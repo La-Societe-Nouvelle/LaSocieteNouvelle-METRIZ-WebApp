@@ -1,0 +1,220 @@
+@import 'base';
+
+/* ----- GENERAL STYLE ----- */
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 2px;
+  border-radius: 3px;
+}
+input {
+  border-radius: 1px;
+  padding: 1px;
+}
+
+/**/
+
+.app-view {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- MENU --- */
+
+.menu {
+  margin: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  .menu-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .menu-indicators {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+  }
+  .menu-button {
+    margin: 2px;
+  }
+
+  button {
+    color: white;
+    background-color: $primary-color;
+    border: 0;
+    height: 25px;
+    width: 200px;
+  }
+}
+
+/* --- SECTION CONTAINER --- */
+
+.section-container {
+  width: 100%;
+}
+
+.section-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: auto;
+
+  .section-view-header {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+.menu-section {
+
+  button {
+    color: white;
+    background-color: $primary-color;
+    border: 0;
+    height: 25px;
+    width: 300px;
+    margin: 2px;
+  }
+}
+
+/* --- TABLE --- */
+
+table {
+  width: 100%;
+
+  input {
+    width: 100%;
+    padding-right: 2px;
+  }
+
+  img {
+    height: 15px;
+  }
+
+  // fixed width
+  .column_delete,.column_resync {
+    width: 15px;
+  }
+
+  thead {
+    background-color: gray;
+    color: white;
+    text-align: center;
+  }
+
+  .with-bottom-line {
+    td {
+      border-bottom: solid grey 2px;
+      padding-bottom: 2px;
+    }
+  }
+
+  tr {
+    .column_corporateId {
+      width: 125px;
+    }
+    .column_corporateName {
+      width: auto;
+    }
+    .column_areaCode {
+      width: 100px;
+    }
+    .column_corporateActivity {
+      width: auto;
+    }
+    .column_amount {
+      width: 150px;
+      input {
+        text-align: right;
+      }
+    }
+    .column_quality {
+      width: 150px;
+      input {
+        text-align: right;
+      }
+    }
+    .column_uncertainty {
+      width: 150px;
+      input {
+        text-align: right;
+      }
+    }
+    .column_libelleFlag {
+      text-align: center;
+    }
+    .column_value {
+      width: 150px;
+      input {
+        text-align: right;
+      }
+    }
+  }
+}
+
+/* --- LEGAL UNIT VIEW --- */
+
+.legal_unit_main_view {
+  .inline-input {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    &.short {
+      input {
+        width: 150px;
+      }
+    }
+    label {
+      min-width: 200px;
+    }
+    input {
+      width: 500px;
+    }
+  }
+}
+
+#import-expenses,
+#import-depreciations,
+#import-session {
+  margin: 0px;
+  padding: 0px;
+  width: 0px;
+  height: 0px;
+}
+
+table 
+{
+  td 
+  {
+    .short-fix-column {
+      width: 125px;
+    }
+    .medium-fix-column {
+      width: 200px;
+    }
+  }
+}

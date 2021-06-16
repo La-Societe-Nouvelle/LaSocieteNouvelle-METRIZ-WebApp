@@ -1,0 +1,115 @@
+
+export class Indicator {
+
+  constructor(indic) 
+  {
+    this.indic = indic;
+    this.value = null;
+    this.flag = null;
+    this.uncertainty = null;
+    // Complements
+    this.libelleFlag = null;
+  }
+
+  updateFromBackUp(backUp) {
+    this.value = backUp.value;
+    this.flag = backUp.flag;
+    this.uncertainty = backUp.uncertainty;
+    this.libelleFlag = backUp.libelleFlag;
+  }
+
+  /* ---------- Printers ---------- */
+
+  printValue() {
+    if (this.getValue()!=null) {
+      return this.getValue();
+    } else {
+      return "";
+    }
+  }
+
+  printUncertainty() {
+    if (this.getUncertainty()!=null) {
+      return this.getUncertainty();
+    } else {
+      return "";
+    }
+  }
+
+  /* ---------- Getters ---------- */
+    
+  getIndic() {return this.indic}
+
+  getValue() {return this.value}
+  
+  getFlag() {return this.flag}
+  
+  getUncertainty() {
+    if (this.getValue()!=null) {return this.uncertainty}
+    else                  {return null}
+  }
+
+  getLibelleFlag() {return this.libelleFlag}
+
+  // Values
+
+  getValueAbsolute(amount) {
+    if (amount!=null & this.getValue()!=null) 
+    { 
+        if      (["ghg","haz","mat","nrg","was","wat"].includes(this.indic))  { return amount*this.getValue()/1000; }
+        else if (["art","eco","knw","soc"].includes(this.indic))              { return amount*this.getValue()/100; }
+        else                                                                  { return null; }
+    }
+    else {return null}
+  }
+  getValueMax() {
+    if (this.value!=null & this.getUncertainty()!=null) {
+        let coef = 1.0 + this.getUncertainty()/100;
+        if (["art","dis","eco","geq","knw","soc"].includes(this.indic)) {
+            return Math.min(this.value*coef,100.0);
+        } else {
+            return this.value*coef;
+        }
+    } else  {return null}
+  }
+  getValueMin() {
+    if (this.value!=null & this.getUncertainty()!=null) {
+        let coef = Math.max(1.0 - this.getUncertainty()/100, 0.0);
+        return this.value*coef;
+    } else  {return null}
+  }
+
+  /* ---------- Update from API & Setters ---------- */
+    
+  update(data) {
+    this.value = data.value;
+    this.flag = data.flag;
+    this.uncertainty = data.uncertainty;
+    // Complements
+    this.libelleFlag = data.libelleFlag;
+  }
+        
+  setValue(value) {
+    this.value = value;
+    if (value!="") {
+        //flag = Flag.INPUT_DATA;
+    } else {
+        //flag = Flag.UNDEFINED;
+        this.uncertainty = "";
+    }
+  }
+
+  setDefaultData() {
+    if (!Indic.isDefautDataSet) {
+        Indic.fetchDefaultData();
+    }
+    quality = indic.getDefaultValue();
+    flag = indic.getDefaultFlag();
+    uncertainty = indic.getDefaultUncertainty();
+  }
+
+  setUncertainty(value) {
+    this.uncertainty = value;
+  }
+
+}
