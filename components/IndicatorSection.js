@@ -320,11 +320,15 @@ class RowTableExpenses extends React.Component {
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
         <td className="column_value"><input value={printValue(amount,0)} disabled={true}/></td>
-        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur}/></td>
-        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur}/></td>
+        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
       </tr>
     )
+  }
+
+  onEnterPress = (event) => {
+    if (event.which==13) {event.target.blur();}
   }
 
   onValueChange = (event) => {
@@ -403,11 +407,15 @@ class RowTableDepreciations extends React.Component {
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
         <td className="column_value"><input value={printValue(amount,0)} disabled={true}/></td>
-        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur}/></td>
-        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur}/></td>
+        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
       </tr>
     )
+  }
+
+  onEnterPress = (event) => {
+    if (event.which==13) {event.target.blur();}
   }
 
   onValueChange = (event) => {
