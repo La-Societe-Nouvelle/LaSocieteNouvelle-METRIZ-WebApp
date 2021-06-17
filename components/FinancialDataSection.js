@@ -163,10 +163,10 @@ class TableMain extends React.Component {
               <td><input type="checkbox" checked={financialData.isAmountExpensesFixed()} onChange={this.setAmountExpensesFixed}/></td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont charges détaillées (cf. Onglet Charges externes)</td>
-              <td className="column_amount"><input value={financialData.printAmountDetailedExpenses()} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getAmountDetailedExpenses(),0)} disabled={true}/></td></tr>
           <tr className="with-bottom-line">
               <td>Valeur ajoutée brute</td>
-              <td className="column_amount"><input value={financialData.printGrossValueAdded()} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getGrossValueAdded(),0)} disabled={true}/></td></tr>
           {/* --- Depreciations & Net Value Added --- */}
           <tr>
               <td>Dotations aux amortissements</td>
@@ -174,10 +174,10 @@ class TableMain extends React.Component {
               <td><input type="checkbox" checked={financialData.isAmountDepreciationsFixed()} onChange={this.setAmountDepreciationsFixed}/></td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont dotations détaillées (cf. Onglet Amortissements sur immobilisations)</td>
-              <td className="column_amount"><input value={financialData.printAmountDetailedDepreciations()} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getAmountDetailedDepreciations(),0)} disabled={true}/></td></tr>
           <tr>
               <td>Valeur ajoutée nette</td>
-              <td className="column_amount"><input value={financialData.printNetValueAdded()} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getNetValueAdded(),0)} disabled={true}/></td></tr>
         </tbody>
       </table>
     )
@@ -318,4 +318,9 @@ class TableMain extends React.Component {
     } else {return null}
   }
 
+}
+
+function printValue(value,precision) {
+  if (value==null) {return ""}
+  else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
 }

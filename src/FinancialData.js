@@ -174,9 +174,13 @@ export class FinancialData {
     }
 
     getAmountDetailedExpenses() {
-        let amount = 0.0;
-        this.expenses.forEach((expense) => {amount+= expense.getAmount()});
-        return amount;
+        if (this.expenses.length > 0) {
+            let amount = 0.0;
+            this.expenses.forEach((expense) => {amount+= expense.getAmount()});
+            return amount;
+        } else {
+            return null;
+        }
     }
 
     isAmountExpensesFixed() {return this.amountExpensesFixed}
@@ -281,9 +285,13 @@ export class FinancialData {
     }
 
     getAmountDetailedDepreciations() {
-        let amount = 0.0;
-        this.depreciations.forEach((depreciation) => {amount+= depreciation.getAmount()});
-        return amount;
+        if (this.depreciations.length > 0) {    
+            let amount = 0.0;
+            this.depreciations.forEach((depreciation) => {amount+= depreciation.getAmount()});
+            return amount;
+        } else {
+            return null;
+        }
     }
 
     isAmountDepreciationsFixed() {return this.amountDepreciationsFixed}
@@ -371,19 +379,11 @@ export class FinancialData {
         }
     }
 
-    printGrossValueAdded() {
+    getGrossValueAdded() {
         if (this.production!=null & this.getAmountExpenses()!=null) {
             return this.production - this.getAmountExpenses();
         } else {
-            return "";
-        }
-    }
-
-    printNetValueAdded() {
-        if (this.getNetValueAdded()!=null) {
-            return this.getNetValueAdded();
-        } else {
-            return "";
+            return null;
         }
     }
 
