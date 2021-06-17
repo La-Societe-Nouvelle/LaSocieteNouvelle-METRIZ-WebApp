@@ -21,7 +21,9 @@ export class AssessmentNRG extends React.Component {
         </thead>
         <tbody>
           <tr className="with-bottom-line">
+
             <td>Consommation totale d'énergie (en MJ)</td>
+
             <td className="column_value"><NumberInput 
               key={versionItems}
               value={indicator.getEnergy()} 
@@ -30,7 +32,9 @@ export class AssessmentNRG extends React.Component {
               key={versionItems}
               value={indicator.getEnergyUncertainty()} 
               onBlur={this.updateUncertainty.bind(this)}/></td>
-          </tr><tr>
+          </tr>
+          
+          <tr>
             <td>Valeur ajoutée nette (en €)</td>
             <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td>
           </tr><tr>
@@ -38,6 +42,7 @@ export class AssessmentNRG extends React.Component {
             <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
             <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
           </tr>
+
         </tbody>
       </table>
     ) 
@@ -45,7 +50,7 @@ export class AssessmentNRG extends React.Component {
 
   updateTotalEnergyConsumption = (event) => {
     let energyConsumption = parseFloat(event.target.value);
-    this.state.indicator.setEnergy(!isNaN(energyConsumption) ? Math.round(energyConsumption) : null);
+    this.state.indicator.setEnergy(!isNaN(energyConsumption) ? energyConsumption : null);
     this.props.onUpdate(this.state.indicator);
     this.setState({versionItems: this.state.versionItems+1});
   }
