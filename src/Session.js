@@ -91,7 +91,7 @@ export class Session {
     
     updateFootprints(indic) {
         this.updateExpensesIndicFootprint(indic);
-        this.updateDepreciationsFootprint(indic);
+        this.updateDepreciationsIndicFootprint(indic);
         this.updateValueAddedFootprint(indic);
     }
     
@@ -230,12 +230,12 @@ export class Session {
     updateDepreciationsFootprint() {
         Indic.values().forEach(
             (indic) => {
-                updateDepreciationsFootprint(indic);
+                updateDepreciationsIndicFootprint(indic);
             }
         )
     }
     
-    async updateDepreciationsFootprint(indic) {
+    async updateDepreciationsIndicFootprint(indic) {
         
         let indicatorDepreciations = this.depreciationsFootprint.getIndicator(indic);
         let defaultData = (await this.getExpenseDefaultFootprint()).getIndicator(indic);

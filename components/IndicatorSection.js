@@ -108,7 +108,11 @@ export class IndicatorSection extends React.Component {
     return (
       <div className="financial_data_expenses_view">
         <h3>Détails des impacts indirects des consommations</h3>
-        <TableExpenses parent={this} financialData={session.getFinancialData()} indic={indic}/>
+        <TableExpenses 
+          indic={indic}
+          parent={this} 
+          financialData={session.getFinancialData()}
+          onUpdate={this.updateFinancialData.bind(this)}/>
       </div>
     )
   }
@@ -119,7 +123,11 @@ export class IndicatorSection extends React.Component {
     return (
       <div className="financial_data_expenses_view">
         <h3>Détails des impacts indirects des immobilisations</h3>
-        <TableDepreciations parent={this} financialData={session.getFinancialData()} indic={indic}/>
+        <TableDepreciations 
+          indic={indic}
+          parent={this} 
+          financialData={session.getFinancialData()} 
+          onUpdate={this.updateFinancialData.bind(this)}/>
       </div>
     )
   }
@@ -129,6 +137,13 @@ export class IndicatorSection extends React.Component {
     this.state.session.setValueAddedIndicator(indicator);
     this.state.session.updateProductionFootprint(this.props.indic);
     this.props.onUpdate(this.state.session);
+  }
+
+  // Save changes
+  updateFinancialData(financialData) {
+    this.state.session.financialData = financialData;
+    this.state.session.updateExpensesIndicFootprint(this.props.indic);
+    this.state.session.updateDepreciationsIndicFootprint(this.props.indic);
   }
 
 }
@@ -269,8 +284,8 @@ class TableExpenses extends React.Component {
               return(<RowTableExpenses 
                 key={"expense_"+expense.getId()} 
                 expense={expense} 
-                onSave={this.updateExpense.bind(this)} 
-                indic={this.state.indic}/>)
+                onUpdate={this.updateExpense.bind(this)} 
+                indic={this.props.indic}/>)
             })
           }
         </tbody>
@@ -278,9 +293,10 @@ class TableExpenses extends React.Component {
     )
   }
 
-  updateExpense({id,value,uncertainty}) {
-    this.state.financialData.getExpense(id).setValue(value);
-    this.state.financialData.getExpense(id).setUncertainty(uncertainty);
+  updateExpense(id,value,uncertainty) {
+    this.state.financialData.getExpense(id).getFootprint().getIndicator(this.props.indic).setValue(value);
+    this.state.financialData.getExpense(id).getFootprint().getIndicator(this.props.indic).setUncertainty(uncertainty);
+    this.props.onUpdate(this.state.financialData);
   }
 
 }
@@ -289,36 +305,39 @@ class RowTableExpenses extends React.Component {
   
   constructor(props) {
     super(props);
-    this.state = {...props.expense, indic: props.indic, save: props.onSave};
+    const indicator = props.expense.getFootprint().getIndicator(props.indic);
+    this.state = {
+      valueInput: indicator.getValue(),
+      uncertaintyInput: indicator.getUncertainty()
+    };
   }
 
   render() {
-    const {corporateId,corporateName,amount,footprint,indic} = this.state;
+    const {corporateId,corporateName,footprint,amount} = this.props.expense;
+    const {valueInput,uncertaintyInput} = this.state;
     return (
       <tr>
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
         <td className="column_value"><input value={printValue(amount,0)} disabled={true}/></td>
-        <td className="column_value"><input value={printValue(footprint.getIndicator(indic).getValue(),1)} onChange={this.onValueChange} onBlur={this.onBlur}/></td>
-        <td className="column_value"><input value={footprint.getIndicator(indic).getUncertainty()} onChange={this.onUncertaintyChange} onBlur={this.onBlur}/></td>
-        <td className="column_libelleFlag">{footprint.getIndicator(indic).getLibelleFlag()}</td>
+        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur}/></td>
+        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur}/></td>
+        <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
       </tr>
     )
   }
 
   onValueChange = (event) => {
-    let footprint = this.state.footprint;
-    footprint.getIndicator(this.state.indic).setValue(event.target.value);
-    this.setState({footprint: footprint})
+    this.setState({valueInput: event.target.value})
   }
   onUncertaintyChange = (event) => {
-    let footprint = this.state.footprint;
-    footprint.getIndicator(this.state.indic).setValue(event.target.value);
-    this.setState({footprint: footprint})
+    this.setState({uncertaintyInput: event.target.value})
   }
 
   onBlur = (event) => {
-    this.state.save(this.state);
+    let value = !isNaN(parseFloat(this.state.valueInput)) ? parseFloat(this.state.valueInput) : null;
+    let uncertainty = !isNaN(parseFloat(this.state.uncertaintyInput)) ? parseFloat(this.state.uncertaintyInput) : null;
+    this.props.onUpdate(this.props.expense.getId(),value,uncertainty);
   }
 }
 
@@ -346,10 +365,10 @@ class TableDepreciations extends React.Component {
           {
             depreciations.map((depreciation) => {
               return(<RowTableDepreciations 
+                indic={this.props.indic}
                 key={"depreciation_"+depreciation.getId()} 
                 depreciation={depreciation} 
-                onSave={this.updateDepreciation.bind(this)} 
-                indic={this.state.indic}/>)
+                onUpdate={this.updateDepreciation.bind(this)}/>)
             })
           }
         </tbody>
@@ -357,9 +376,10 @@ class TableDepreciations extends React.Component {
     )
   }
 
-  updateDepreciation({id,value,uncertainty}) {
-    this.state.financialData.getDepreciation(id).setValue(value);
-    this.state.financialData.getDepreciation(id).setUncertainty(uncertainty);
+  updateDepreciation(id,value,uncertainty) {
+    this.state.financialData.getDepreciation(id).getFootprint().getIndicator(this.props.indic).setValue(value);
+    this.state.financialData.getDepreciation(id).getFootprint().getIndicator(this.props.indic).setUncertainty(uncertainty);
+    this.props.onUpdate(this.state.financialData);
   }
 
 }
@@ -368,36 +388,39 @@ class RowTableDepreciations extends React.Component {
   
   constructor(props) {
     super(props);
-    this.state = {...props.depreciation, indic: props.indic, save: props.onSave};
+    const indicator = props.depreciation.getFootprint().getIndicator(props.indic);
+    this.state = {
+      valueInput: indicator.getValue(),
+      uncertaintyInput: indicator.getUncertainty()
+    };
   }
 
   render() {
-    const {corporateId,corporateName,amount,footprint,indic} = this.state;
+    const {corporateId,corporateName,footprint,amount} = this.props.depreciation;
+    const {valueInput,uncertaintyInput} = this.state;
     return (
       <tr>
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
         <td className="column_value"><input value={printValue(amount,0)} disabled={true}/></td>
-        <td className="column_value"><input value={footprint.getIndicator(indic).getValue()} onChange={this.onValueChange} onBlur={this.onBlur}/></td>
-        <td className="column_value"><input value={footprint.getIndicator(indic).getUncertainty()} onChange={this.onUncertaintyChange} onBlur={this.onBlur}/></td>
-        <td className="column_libelleFlag">{footprint.getIndicator(indic).getLibelleFlag()}</td>
+        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur}/></td>
+        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur}/></td>
+        <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
       </tr>
     )
   }
 
   onValueChange = (event) => {
-    let footprint = this.state.footprint;
-    footprint.getIndicator(this.state.indic).setValue(event.target.value);
-    this.setState({footprint: footprint})
+    this.setState({valueInput: event.target.value})
   }
   onUncertaintyChange = (event) => {
-    let footprint = this.state.footprint;
-    footprint.getIndicator(this.state.indic).setValue(event.target.value);
-    this.setState({footprint: footprint})
+    this.setState({uncertaintyInput: event.target.value})
   }
 
   onBlur = (event) => {
-    this.state.save(this.state);
+    let value = !isNaN(parseFloat(this.state.valueInput)) ? parseFloat(this.state.valueInput) : null;
+    let uncertainty = !isNaN(parseFloat(this.state.uncertaintyInput)) ? parseFloat(this.state.uncertaintyInput) : null;
+    this.props.onUpdate(this.props.depreciation.getId(),value,uncertainty);
   }
 
 }
