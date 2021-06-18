@@ -70,7 +70,7 @@ export class Indicator {
         } else {
             return this.value*coef;
         }
-    } else  {return null}
+    } else {return null}
   }
   getValueMin() {
     if (this.value!=null & this.getUncertainty()!=null) {
@@ -97,15 +97,6 @@ export class Indicator {
         //flag = Flag.UNDEFINED;
         this.uncertainty = "";
     }
-  }
-
-  setDefaultData() {
-    if (!Indic.isDefautDataSet) {
-        Indic.fetchDefaultData();
-    }
-    quality = indic.getDefaultValue();
-    flag = indic.getDefaultFlag();
-    uncertainty = indic.getDefaultUncertainty();
   }
 
   setUncertainty(value) {

@@ -44,12 +44,12 @@ export class SocialFootprint {
   
   // All indicators
   updateAll(data) {
-    indics.map((indic) => {this.update(indic,data[indic.toUpperCase()])})
+    indics.map((indic) => {this.updateIndic(indic,data[indic.toUpperCase()])})
   }
   
   // Specific indicator
-  update(indic,data) {
-      this.indicators[indic].update(data);
+  updateIndic(indic, data) {
+    this.indicators[indic].update(data);
   }
       
 

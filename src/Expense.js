@@ -89,11 +89,11 @@ export class Expense {
     if (!this.dataFetched) {
       let area = this.areaCode !="" ? this.areaCode : "_DV";
       let activity = this.corporateActivity!=null ? this.corporateActivity : "00";
-      let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity;
+      let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity +"flow=PRD";
       let response = await fetch(endpoint, {method:'get'});
       let data = await response.json();
       if (data.header.statut != 200) {
-        endpoint = apiBaseUrl + "default?pays=_DV&activite=00";
+        endpoint = apiBaseUrl + "default?pays=_DV&activite=00&flow=GAP";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
       }
@@ -104,7 +104,7 @@ export class Expense {
 
   // Fetch CSF data for all indicators & complete general data
   fetchCSFdata() {
-      let response = LaSocieteNouvelleAPI.fetchDataSiren(footprintId);
+      let response = fetchFootprintData(footprintId);
       dataFetched = response.isValid();
       if (response.isValid()) {
           if (corporateName.equals("")) { corporateName = response.getDenomination(); }
@@ -118,24 +118,24 @@ export class Expense {
   }
       
   // Fetch only CSF data for a specific indicator
-  fetchCSFdata(indic) {
-      let idCSF = getFootprintId();
-      if (idCSF!=null)
-      {
-          let response = LaSocieteNouvelleAPI.fetchDataSiren(footprintId);
-          if (response.isValid()) {
-              this.footprint.update(indic, response);
-          }
+  async fetchIndicCSFdata(indic) {
+    if (this.footprintId!=null)
+    {
+      let response = await fetchFootprintData(this.footprintId);
+      if (response!=null) {
+        let indicData = response.profil.empreinteSocietale[indic.toUpperCase()];
+        this.footprint.updateIndic(indic, indicData);
       }
-      else
-      {
-          let division = getEconomicDivision();
-          let pays = "FRA";
-          let response = LaSocieteNouvelleAPI.fetchDefaultData(pays,division);
-          if (response.isValid()) {
-              this.footprint.update(indic,response);
-          }
-      }
+    }
+    else
+    {
+        let division = getEconomicDivision();
+        let pays = "FRA";
+        let response = fetchDefaultData(pays,division);
+        if (response.isValid()) {
+            this.footprint.updateIndic(indic,response);
+        }
+    }
   }
 
   /* ---------- Getters ---------- */
@@ -158,4 +158,34 @@ export class Expense {
   getFootprint() {return this.footprint}
   isDataFetched() {return this.dataFetched}
 
+}
+
+async function fetchFootprintData(siren) {
+  try{
+    const endpoint = `${apiBaseUrl}/siren/${siren}`;
+    const response = await fetch(endpoint, {method:'get'});
+    const data = await response.json();
+    if (data.header.statut===200) {
+      return data;
+    } else {
+      return null;
+    }
+  } catch(error){
+    throw error;
+  }
+}
+
+async function fetchDefaultData(pays,activite) {
+  try{
+    const endpoint = `${apiBaseUrl}/default?pays=${pays}&activite=${activite}&flow=PRD`;
+    const response = await fetch(endpoint, {method:'get'});
+    const data = await response.json();
+    if (data.header.statut===200) {
+      return data;
+    } else {
+      return null;
+    }
+  } catch(error){
+    throw error;
+  }
 }

@@ -319,10 +319,15 @@ class RowTableExpenses extends React.Component {
       <tr>
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
-        <td className="column_value"><input value={printValue(amount,0)} disabled={true}/></td>
-        <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+        <td className="column_value">
+          <input value={printValue(amount,0)} disabled={true}/></td>
+        <td className="column_value">
+          <input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+        <td className="column_value">
+          <input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
+        <td className="column_resync">
+          <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncExpense}/></td>
       </tr>
     )
   }
@@ -336,6 +341,17 @@ class RowTableExpenses extends React.Component {
   }
   onUncertaintyChange = (event) => {
     this.setState({uncertaintyInput: event.target.value})
+  }
+
+  onSyncExpense = (event) => {
+    this.fetchData();
+  }
+  async fetchData() {
+    let expense = this.props.expense;
+    await expense.fetchIndicCSFdata(this.props.indic);
+    const {value,uncertainty} = expense.getFootprint().getIndicator(this.props.indic);
+    this.setState({valueInput: value, uncertaintyInput: uncertainty});
+    this.props.onUpdate(this.props.expense.getId(),value,uncertainty);
   }
 
   onBlur = (event) => {

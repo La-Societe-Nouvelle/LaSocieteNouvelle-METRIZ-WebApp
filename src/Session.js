@@ -160,7 +160,7 @@ export class Session {
     async updateExpensesIndicFootprint(indic) {
         
         let indicatorExpenses = this.expensesFootprint.getIndicator(indic);
-        let defaultData = await (await this.getExpenseDefaultFootprint()).getIndicator(indic);
+        let defaultData = (await this.getExpenseDefaultFootprint()).getIndicator(indic);
         
         if (this.financialData.getAmountExpenses()!=null) {
         
@@ -176,8 +176,6 @@ export class Session {
                 if (amountExpense!=null) 
                 {
                     let indicatorExpense = expense.getFootprint().getIndicator(indic);
-                    if (indicatorExpense.getValue()==null) { indicatorExpense.setDefaultData(); }
-
                     totalAmount+= expense.getAmount();
                     absolute+= indicatorExpense.getValue()*amountExpense;
                     absoluteMax+= indicatorExpense.getValueMax()*amountExpense;
