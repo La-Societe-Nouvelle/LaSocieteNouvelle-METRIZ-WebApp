@@ -180,10 +180,12 @@ class RowTableDepreciations extends React.Component {
   }
 
   render() {
+    const {dataFetched} = this.props;
     const {corporateIdInput,corporateNameInput,areaCodeInput,corporateActivityInput,yearInput,amountInput} = this.state;
+    
     return (
       <tr>
-        <td className="column_corporateId">
+        <td className={"column_corporateId"+(dataFetched ? " valid" : "")}>
           <input value={corporateIdInput} onChange={this.onCorporateIdChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_corporateName">
           <input value={corporateNameInput} onChange={this.onCorporateNameChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>

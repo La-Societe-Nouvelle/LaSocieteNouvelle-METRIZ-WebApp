@@ -173,6 +173,11 @@ table {
         text-align: right;
       }
     }
+    .valid {
+      input {
+        background-color: $valid-color;
+      }
+    }
   }
 }
 
