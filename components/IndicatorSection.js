@@ -426,6 +426,8 @@ class RowTableDepreciations extends React.Component {
         <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
+        <td className="column_resync">
+          <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncDepreciation}/></td>
       </tr>
     )
   }
@@ -439,6 +441,17 @@ class RowTableDepreciations extends React.Component {
   }
   onUncertaintyChange = (event) => {
     this.setState({uncertaintyInput: event.target.value})
+  }
+
+  onSyncDepreciation = (event) => {
+    this.fetchData();
+  }
+  async fetchData() {
+    let depreciation = this.props.depreciation;
+    await depreciation.fetchIndicCSFdata(this.props.indic);
+    const {value,uncertainty} = depreciation.getFootprint().getIndicator(this.props.indic);
+    this.setState({valueInput: value, uncertaintyInput: uncertainty});
+    this.props.onUpdate(this.props.depreciation.getId(),value,uncertainty);
   }
 
   onBlur = (event) => {
