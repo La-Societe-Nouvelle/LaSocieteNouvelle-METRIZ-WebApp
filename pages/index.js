@@ -10,7 +10,9 @@ import {IndicatorSection} from '../components/IndicatorSection';
 
 import {Session} from '/src/Session.js';
 
-import {indic} from '../lib/indic';
+import {indic as indicData} from '../lib/indic';
+const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
+
 
 export default function Home() {
   return (
@@ -129,21 +131,20 @@ function Menu({selectedSection, changeSection, downloadSession, importSession}){
     <div className="menu">
       <h2>MENU</h2>
       <div className="menu-items">
-        <button onClick = {() => changeSection("legalData")} className="menu-button">Unité Légale</button>
-        <button onClick = {() => changeSection("financialData")} className="menu-button">Données financières</button>
+        <button className={"menu-button"+("legalData"==selectedSection ? " selected" : "")}
+                onClick = {() => changeSection("legalData")}>Unité Légale</button>
+        <button className={"menu-button"+("financialData"==selectedSection ? " selected" : "")}
+                onClick = {() => changeSection("financialData")} >Données financières</button>
         <div className="menu-indicators">
-          <button onClick = {() => changeSection("art")} className="menu-button">{indic.art.libelleMenu}</button>
-          <button onClick = {() => changeSection("dis")} className="menu-button">{indic.dis.libelleMenu}</button>
-          <button onClick = {() => changeSection("eco")} className="menu-button">{indic.eco.libelleMenu}</button>
-          <button onClick = {() => changeSection("geq")} className="menu-button">{indic.geq.libelleMenu}</button>
-          <button onClick = {() => changeSection("ghg")} className="menu-button">{indic.ghg.libelleMenu}</button>
-          <button onClick = {() => changeSection("haz")} className="menu-button">{indic.haz.libelleMenu}</button>
-          <button onClick = {() => changeSection("knw")} className="menu-button">{indic.knw.libelleMenu}</button>
-          <button onClick = {() => changeSection("mat")} className="menu-button">{indic.mat.libelleMenu}</button>
-          <button onClick = {() => changeSection("nrg")} className="menu-button">{indic.nrg.libelleMenu}</button>
-          <button onClick = {() => changeSection("soc")} className="menu-button">{indic.soc.libelleMenu}</button>
-          <button onClick = {() => changeSection("was")} className="menu-button">{indic.was.libelleMenu}</button>
-          <button onClick = {() => changeSection("wat")} className="menu-button">{indic.wat.libelleMenu}</button>
+          {
+            indics.map((indic) => { return (
+              <button key={"menu-button-"+indic}
+                      className={"menu-button"+(indic==selectedSection ? " selected" : "")}
+                      onClick = {() => changeSection(indic)}>
+                {indicData[indic].libelleMenu}
+              </button>
+            )})
+          }
         </div>
         <button onClick = {() => downloadSession()} className="menu-button">Télécharger la session</button>
         <button onClick={triggerImportFile} className="menu-button">Importer un fichier</button>

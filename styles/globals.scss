@@ -60,6 +60,10 @@ input {
   }
   .menu-button {
     margin: 2px;
+
+    &.selected {
+      background-color: $highlight-color;
+    }
   }
 
   button {
