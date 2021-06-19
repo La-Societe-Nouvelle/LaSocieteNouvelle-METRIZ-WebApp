@@ -91,11 +91,13 @@ export class Indicator {
         
   setValue(value) {
     this.value = value;
-    if (value!="") {
-        //flag = Flag.INPUT_DATA;
+    if (value!=null) {
+        this.flag = "m";
+        this.libelleFlag = "Valeur modifiée";
     } else {
-        //flag = Flag.UNDEFINED;
-        this.uncertainty = "";
+        this.flag = "i";
+        this.libelleFlag = "Valeur invalide";
+        this.uncertainty = null;
     }
   }
 
