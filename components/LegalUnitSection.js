@@ -51,8 +51,14 @@ export class LegalUnitSection extends React.Component {
         <h3>Informations légales</h3>
         <div className="inline-input short">
           <label>Numéro de siren </label>
-          <input id="siren-input" type="text" value={siren} onChange={this.onSirenChange} onBlur={this.updateSession} onKeyPress={this.onEnterPress}/>
-        </div><div className="inline-input">
+          <input id="siren-input" 
+                 type="text" 
+                 value={siren} 
+                 onChange={this.onSirenChange} 
+                 onBlur={this.updateSession} 
+                 onKeyPress={this.onEnterPress}/>
+        </div>
+        <div className="inline-input">
           <label>Dénomination </label>
           <input id="siren-input" type="text" value={corporateName} disabled={true}/>
         </div><div className="inline-input">

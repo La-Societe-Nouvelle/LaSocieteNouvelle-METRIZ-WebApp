@@ -40,7 +40,7 @@ export class Expense {
     // SIRET
     else if (this.corporateId.match("[0-9]{14}")) {return this.corporateId.substring(0,9)}
     // VAT NUMBER
-    else if (this.corporateId.match("FR%")) {return this.corporateId}
+    else if (this.corporateId.match("FR[0-9]{11}")) {return this.corporateId.substring(4,11)}
     // DEFAULT
     else {return null}
   }
@@ -89,7 +89,8 @@ export class Expense {
     if (!this.dataFetched) {
       let area = this.areaCode !="" ? this.areaCode : "_DV";
       let activity = this.corporateActivity!=null ? this.corporateActivity : "00";
-      let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity +"flow=PRD";
+      let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity +"&flow=PRD";
+      console.log(endpoint);
       let response = await fetch(endpoint, {method:'get'});
       let data = await response.json();
       if (data.header.statut != 200) {
