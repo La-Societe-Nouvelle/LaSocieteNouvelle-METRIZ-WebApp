@@ -30,7 +30,7 @@ export class AssessmentWAT extends React.Component {
                                onBlur={this.updateUncertainty.bind(this)}/></td>
           </tr><tr>
                <td>Valeur ajoutée nette (en €)</td>
-               <td className="column_value"><input value={indicator.getNetValueAdded()} disabled={true}/></td>
+               <td className="column_value"><input value={printValue(indicator.getNetValueAdded())} disabled={true}/></td>
           </tr><tr>
                <td>Intensité (en L/€)</td>
                <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
