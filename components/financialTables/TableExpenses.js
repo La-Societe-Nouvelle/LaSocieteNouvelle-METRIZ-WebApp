@@ -1,5 +1,8 @@
 import React from 'react';
 
+import {divisions} from '../../lib/nace'; 
+import {areas} from '../../lib/area'; 
+
 /* ------------------------------------------------------ */
 /* -------------------- EXPENSES TAB -------------------- */
 /* ------------------------------------------------------ */
@@ -21,6 +24,7 @@ export class TableExpenses extends React.Component {
     expenses.sort((a,b) => b.getAmount() - a.getAmount());
     return (
       <div className="expenses-tab">
+
         <table className="table_expenses">
           <thead>
             <tr>
@@ -34,19 +38,21 @@ export class TableExpenses extends React.Component {
             {
               expenses.map((expense) => {
                 return(<RowTableExpenses 
-                  key={"expense_"+expense.getId()} {...expense} 
-                  onSave={this.updateExpense.bind(this)}
-                  onSync={this.syncExpense.bind(this)}
-                  onDelete={this.deleteExpense.bind(this)}/>)
+                          key={"expense_"+expense.getId()} {...expense} 
+                          onSave={this.updateExpense.bind(this)}
+                          onSync={this.syncExpense.bind(this)}
+                          onDelete={this.deleteExpense.bind(this)}/>)
               })
             }
             <NewRowTableExpenses onSave={this.addExpense.bind(this)}/>
           </tbody>
         </table>
+
         <button onClick={this.triggerImportFile}>Importer un fichier</button>
         <input id="import-expenses" type="file" accept=".csv" onChange={this.importFile} visibility="collapse"/>
         <button onClick={this.synchroniseAll}>Re-Synchroniser tout</button>
         <button onClick={this.removeAll}>Supprimer tout</button>
+
       </div>
     )
   }
@@ -183,19 +189,42 @@ class RowTableExpenses extends React.Component {
     return (
       <tr>
         <td className={"column_corporateId"+(dataFetched ? " valid" : "")}>
-          <input value={corporateIdInput} onChange={this.onCorporateIdChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+          <input value={corporateIdInput} 
+                 onChange={this.onCorporateIdChange} 
+                 onBlur={this.onBlur} 
+                 onKeyPress={this.onEnterPress}/></td>
         <td className="column_corporateName">
-          <input value={corporateNameInput} onChange={this.onCorporateNameChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+          <input value={corporateNameInput} 
+                 onChange={this.onCorporateNameChange} 
+                 onBlur={this.onBlur} 
+                 onKeyPress={this.onEnterPress}/></td>
         <td className="column_areaCode">
-          <input value={areaCodeInput} onChange={this.onAreaCodeChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+          <select onChange={this.onAreaCodeChange}>{
+            Object.entries(areas)
+              .sort()
+              .map(([code,libelle]) => { return(
+                <option key={code} value={code} selected={code==areaCodeInput}>{code + " - " +libelle}</option>
+                )})
+          }</select></td>
         <td className="column_corporateActivity">
-          <input value={corporateActivityInput} onChange={this.onCorporateActivityChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+          <select onChange={this.onCorporateActivityChange}>{
+            Object.entries(divisions)
+              .sort((a,b) => parseInt(a)-parseInt(b))
+              .map(([code,libelle]) => { return(
+                <option key={code} value={code} selected={code==corporateActivityInput.substring(0,2)}>{code + " - " +libelle}</option>
+                )})
+          }</select></td>
         <td className="column_amount">
-          <input value={amountInput} onChange={this.onAmountChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+          <input value={amountInput} 
+                 onChange={this.onAmountChange} 
+                 onBlur={this.onBlur} 
+                 onKeyPress={this.onEnterPress}/></td>
         <td className="column_resync">
-          <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncExpense}/></td>
+          <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" 
+               onClick={this.onSyncExpense}/></td>
         <td className="column_delete">
-          <img className="img" src="/resources/icon_delete.png" alt="delete" onClick={this.onDeleteExpense}/></td>
+          <img className="img" src="/resources/icon_delete.png" alt="delete" 
+               onClick={this.onDeleteExpense}/></td>
       </tr>
     )
   }
@@ -206,8 +235,14 @@ class RowTableExpenses extends React.Component {
 
   onCorporateIdChange = (event) => {this.setState({corporateIdInput: event.target.value})}
   onCorporateNameChange = (event) => {this.setState({corporateNameInput: event.target.value})}
-  onAreaCodeChange = (event) => {this.setState({areaCodeInput: event.target.value})}
-  onCorporateActivityChange = (event) => {this.setState({corporateActivityInput: event.target.value})}
+  onAreaCodeChange = (event) => {
+    this.state.areaCodeInput = event.target.value;
+    this.props.onSave(this.state);
+  }
+  onCorporateActivityChange = (event) => {
+    this.state.corporateActivityInput = event.target.value;
+    this.props.onSave(this.state);
+  }
   onAmountChange = (event) => {this.setState({amountInput: event.target.value})}
 
   // Props functions
