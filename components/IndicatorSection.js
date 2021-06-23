@@ -154,16 +154,20 @@ function SectionMenu({selected, parent}){
   return (
     <div className="menu-section">
       <div className="menu-section-items">
-        <button onClick = {() => parent.setState({selectedTab: "main"})}>
+        <button className={"menu-button"+("main"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "main"})}>
           Soldes intermédiaires
         </button>
-        <button onClick = {() => parent.setState({selectedTab: "valueAdded"})}>
+        <button className={"menu-button"+("valueAdded"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "valueAdded"})}>
           Impacts directs - Valeur Ajoutée
         </button>
-        <button onClick = {() => parent.setState({selectedTab: "expenses"})}>
+        <button className={"menu-button"+("expenses"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "expenses"})}>
           Impacts indirects - Consommations
         </button>
-        <button onClick = {() => parent.setState({selectedTab: "depreciations"})}>
+        <button className={"menu-button"+("depreciations"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "depreciations"})}>
           Impacts indirects - Immobilisations
         </button>
       </div>

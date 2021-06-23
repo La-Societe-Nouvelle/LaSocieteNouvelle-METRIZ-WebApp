@@ -86,13 +86,16 @@ function SectionMenu({selected, parent}){
   return (
     <div className="menu-section">
       <div className="menu-section-items">
-        <button onClick = {() => parent.setState({selectedTab: "main"})}>
+        <button className={"menu-button"+("main"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "main"})}>
           Soldes intermédiaires
         </button>
-        <button onClick = {() => parent.setState({selectedTab: "expenses"})}>
+        <button className={"menu-button"+("expenses"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "expenses"})}>
           Charges externes
         </button>
-        <button onClick = {() => parent.setState({selectedTab: "depreciations"})}>
+        <button className={"menu-button"+("depreciations"==selected ? " selected" : "")}
+                onClick = {() => parent.setState({selectedTab: "depreciations"})}>
           Amortissements sur immobilisations
         </button>
       </div>
@@ -159,7 +162,7 @@ class TableMain extends React.Component {
           {/* --- Expenses & Gross Value Added --- */}
           <tr>
               <td>Charges externes</td>
-              <td className="column_amount"><input value={amountExpenses} onChange={this.onAmountExpensesChange} onBlur={this.onAmountExpensesBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValue(amountExpenses,0)} onChange={this.onAmountExpensesChange} onBlur={this.onAmountExpensesBlur} onKeyPress={this.onEnterPress}/></td>
               <td><input type="checkbox" checked={financialData.isAmountExpensesFixed()} onChange={this.setAmountExpensesFixed}/></td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont charges détaillées (cf. Onglet Charges externes)</td>
@@ -170,7 +173,7 @@ class TableMain extends React.Component {
           {/* --- Depreciations & Net Value Added --- */}
           <tr>
               <td>Dotations aux amortissements</td>
-              <td className="column_amount"><input value={amountDepreciations} onChange={this.onAmountDepreciationsChange} onBlur={this.onAmountDepreciationsBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValue(amountDepreciations,0)} onChange={this.onAmountDepreciationsChange} onBlur={this.onAmountDepreciationsBlur} onKeyPress={this.onEnterPress}/></td>
               <td><input type="checkbox" checked={financialData.isAmountDepreciationsFixed()} onChange={this.setAmountDepreciationsFixed}/></td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont dotations détaillées (cf. Onglet Amortissements sur immobilisations)</td>
