@@ -51,7 +51,9 @@ export class FinancialDataSection extends React.Component {
       <div className="financial_data_main_view">
         <div className="coporate-social-footprint">
           <h3>Soldes intermédiaires de gestion</h3>
-          <TableMain onUpdate={this.updateFinancialData.bind(this)} financialData={session.getFinancialData()}/>
+          <TableMain 
+            onUpdate={this.updateFinancialData.bind(this)} 
+            financialData={session.getFinancialData()}/>
         </div>
       </div>
     )
@@ -118,9 +120,9 @@ class TableMain extends React.Component {
       financialData: props.financialData,
       // Input variables
       production: props.financialData.getProduction()!=null ? props.financialData.getProduction() : "",
-        revenue: props.financialData.getRevenue()!=null ? props.financialData.getRevenue() : "",
-        storedProduction: props.financialData.getStoredProduction()!=null ? props.financialData.getStoredProduction() : "",
-        immobilisedProduction: props.financialData.getImmobilisedProduction()!=null ? props.financialData.getImmobilisedProduction() : "",
+      revenue: props.financialData.getRevenue()!=null ? props.financialData.getRevenue() : "",
+      storedProduction: props.financialData.getStoredProduction()!=null ? props.financialData.getStoredProduction() : "",
+      immobilisedProduction: props.financialData.getImmobilisedProduction()!=null ? props.financialData.getImmobilisedProduction() : "",
       unstoredProduction: props.financialData.getUnstoredProduction()!=null ? props.financialData.getUnstoredProduction() : "",
       amountExpenses: props.financialData.getAmountExpenses()!=null ? props.financialData.getAmountExpenses() : "",
       amountDepreciations: props.financialData.getAmountDepreciations()!=null ? props.financialData.getAmountDepreciations() : "",
@@ -204,7 +206,15 @@ class TableMain extends React.Component {
     let revenue = !isNaN(parseFloat(event.target.value)) ? parseFloat(event.target.value) : null;
     this.state.financialData.setRevenue(revenue);
     this.props.onUpdate(this.state.financialData);
-    this.setState({production: this.state.financialData.getProduction()!=null ? this.state.financialData.getProduction() : ""})
+    this.setState({
+      revenue: this.state.financialData.getRevenue()!=null ? this.state.financialData.getRevenue() : "",
+      production: this.state.financialData.getProduction()!=null ? this.state.financialData.getProduction() : "",
+      storedProduction: this.state.financialData.getStoredProduction()!=null ? this.state.financialData.getStoredProduction() : "",
+      immobilisedProduction: this.state.financialData.getImmobilisedProduction()!=null ? this.state.financialData.getImmobilisedProduction() : "",
+      unstoredProduction: this.state.financialData.getUnstoredProduction()!=null ? this.state.financialData.getUnstoredProduction() : "",
+      amountExpenses: this.state.financialData.getAmountExpenses()!=null ? this.state.financialData.getAmountExpenses() : "",
+      amountDepreciations: this.state.financialData.getAmountDepreciations()!=null ? this.state.financialData.getAmountDepreciations() : "",  
+    })
   }
 
   // Production
