@@ -14,19 +14,31 @@ export class AssessmentART extends React.Component {
   render() {
     const indicator = this.state.indicator;
     return (
-      <table>
-        <thead>
-          <tr><td>Libelle</td><td>Valeur</td></tr>
-        </thead>
-        <tbody>
-          <tr className="with-bottom-line"><td>Valeur ajoutée nette artisanale (en €)</td>
-              <td className="column_value"><NumberInput value={indicator.getCraftedProduction()} onBlur={this.updateCraftedProduction.bind(this)}/></td></tr>
-          <tr><td>Valeur ajoutée nette (en €)</td>
-              <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
-          <tr><td>Contribution directe (en %)</td>
-              <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td></tr>
-        </tbody>
-      </table>
+      <div>
+        <table>
+          <thead>
+            <tr><td>Libelle</td><td>Valeur</td></tr>
+          </thead>
+          <tbody>
+            <tr className="with-bottom-line"><td>Valeur ajoutée nette artisanale (en €)</td>
+                <td className="column_value"><NumberInput value={indicator.getCraftedProduction()} onBlur={this.updateCraftedProduction.bind(this)}/></td></tr>
+            <tr><td>Valeur ajoutée nette (en €)</td>
+                <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
+            <tr><td>Contribution directe (en %)</td>
+                <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td></tr>
+          </tbody>
+        </table>
+        <div>
+          <h3>Notes</h3>
+          <p>Grandeur mesurée : Valeur nette créée issue de l’artisanat ou d’un savoir-faire reconnu (en euros)</p>
+          <p>Critères :<br/>
+            - Activité principale répertoriée au registre des métiers / au sein de la Nomenclature d’Activités Française de secteur des métiers de l’Artisanat<br/>
+            - Labellisation Entreprise du Patrimoine Vivant (EPV)</p>
+          <p>
+            <a href="https://www.entreprises.gouv.fr/fr/commerce-et-artisanat/la-nomenclature-d-activites-francaise-de-l-artisanat" target="_blank">La Nomenclature d'Activités Française de l'Artisanat</a><br/>
+            <a href="https://www.entreprises.gouv.fr/fr/commerce-et-artisanat/dispositifs-et-labels/label-entreprise-du-patrimoine-vivant" target="_blank">Le label Entreprise du Patrimoine Vivant</a></p>
+        </div>
+      </div>
     ) 
   }
 
