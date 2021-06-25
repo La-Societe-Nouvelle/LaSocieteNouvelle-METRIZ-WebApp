@@ -26,7 +26,7 @@ export class AssessmentECO extends React.Component {
             <tr><td>Activités localisées en France</td>
                 <td><input type="checkbox"
                               checked={isAllActivitiesInFrance} 
-                              onChange={this.onIsAllActivitiesInFranceBlur}/></td></tr>
+                              onChange={this.onIsAllActivitiesInFranceChange}/></td></tr>
             <tr className="with-bottom-line"><td>Valeur ajoutée nette produite en France (en €)</td>
                 <td className="column_value">
                   <input value={isAllActivitiesInFrance ? printValue(indicator.getNetValueAdded(),0) : domesticProductionInput}
@@ -47,7 +47,7 @@ export class AssessmentECO extends React.Component {
     if (event.which==13) {event.target.blur();}
   }
 
-  onIsAllActivitiesInFranceBlur = (event) => {
+  onIsAllActivitiesInFranceChange = (event) => {
     this.state.indicator.setIsAllActivitiesInFrance(event.target.checked);
     this.state.domesticProductionInput = this.state.indicator.getDomesticProduction();
     this.props.onUpdate(this.state.indicator);
