@@ -8,40 +8,43 @@ export class IndicatorART extends IndicatorNetValueAdded {
     super("art");
     // Specific data for ART
     this.craftedProduction = null;
-    this.hasLabel = false;
+    this.isValueAddedCrafted = false;
   }
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
     this.craftedProduction = backUp.craftedProduction;
-    this.hasLabel = backUp.hasLabel;
+    // 25-06-2021
+    this.isValueAddedCrafted = backUp.isValueAddedCrafted!=undefined ? backUp.isValueAddedCrafted : (backUp.hasLabel!=undefined ? backUp.hasLabel : false);
   }
     
   /* ---------- Setters ---------- */
     
-  setHasLabel(hasLabel) {
-      this.hasLabel = hasLabel;
-      if (hasLabel) {this.value = 100.0}
-  }
-  
   setCraftedProduction(craftedProduction) {
-      this.craftedProduction = craftedProduction;
-      this.uncertainty = 0;
+    this.craftedProduction = craftedProduction;
+    this.uncertainty = 0;
   }    
+  
+  setIsValueAddedCrafted(isValueAddedCrafted) {
+      this.isValueAddedCrafted = isValueAddedCrafted;
+      this.craftedProduction = isValueAddedCrafted ? this.netValueAdded : 0.0;
+  }
   
   /* ---------- Getters ---------- */
   
   getCraftedProduction() {return this.craftedProduction}
-  getHasLabel() {return this.hasLabel}
+  getIsValueAddedCrafted() {return this.isValueAddedCrafted}
   
   /* ---------- Override ---------- */
   
   getValue() {
-    if (this.netValueAdded!=null & this.craftedProduction!=null) {
+    if (this.netValueAdded!=null & this.isValueAddedCrafted) {
+      return 100.0;
+    } else if (this.netValueAdded!=null & this.craftedProduction!=null) {
       if (this.netValueAdded < this.craftedProduction) {
           this.craftedProduction = this.netValueAdded;
       }
-      return ( Math.round(this.craftedProduction/this.netValueAdded*100 *10)/10 ).toFixed(1) ;
+      return this.craftedProduction/this.netValueAdded *100;
       //this.flag = Flag.PUBLICATION;
     } else {
       return null;

@@ -6,13 +6,16 @@ export class AssessmentART extends React.Component {
 
   constructor(props) {
     super(props);
+    let indicator = props.session.getValueAddedFootprint("art");
     this.state = {
-      indicator: props.session.getValueAddedFootprint("art"),
+      indicator: indicator,
+      craftedProductionInput: indicator.getCraftedProduction()!=null ? indicator.getCraftedProduction() : "",
     }
   }
 
   render() {
-    const indicator = this.state.indicator;
+    const {indicator,craftedProductionInput} = this.state;
+    const isValueAddedCrafted = indicator.getIsValueAddedCrafted()!=null ? indicator.getIsValueAddedCrafted() : false;
     return (
       <div>
         <table>
@@ -20,8 +23,16 @@ export class AssessmentART extends React.Component {
             <tr><td>Libelle</td><td>Valeur</td></tr>
           </thead>
           <tbody>
+            <tr><td>Entreprise artisanale ?</td>
+                <td><input type="checkbox"
+                           checked={isValueAddedCrafted} 
+                           onChange={this.onIsValueAddedCraftedChange}/></td></tr>
             <tr className="with-bottom-line"><td>Valeur ajoutée nette artisanale (en €)</td>
-                <td className="column_value"><NumberInput value={indicator.getCraftedProduction()} onBlur={this.updateCraftedProduction.bind(this)}/></td></tr>
+                <td className="column_value">
+                  <input value={isValueAddedCrafted ? printValue(indicator.getNetValueAdded(),0) : craftedProductionInput} 
+                         onChange={this.onCraftedProductionChange}
+                         onBlur={this.onCraftedProductionBlur}
+                         onKeyPress={this.onEnterPress}/></td></tr>
             <tr><td>Valeur ajoutée nette (en €)</td>
                 <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
             <tr><td>Contribution directe (en %)</td>
@@ -42,7 +53,21 @@ export class AssessmentART extends React.Component {
     ) 
   }
 
-  updateCraftedProduction = (event) => {
+  onEnterPress = (event) => {
+    if (event.which==13) {event.target.blur();}
+  }
+
+  onIsValueAddedCraftedChange = (event) => {
+    this.state.indicator.setIsValueAddedCrafted(event.target.checked);
+    this.state.craftedProductionInput = this.state.indicator.getCraftedProduction();
+    this.props.onUpdate(this.state.indicator);
+  }
+
+  onCraftedProductionChange = (event) => {
+    this.state.indicator.setIsValueAddedCrafted(false);
+    this.setState({craftedProductionInput: event.target.value});
+  }
+  onCraftedProductionBlur = (event) => {
     let craftedProduction = parseFloat(event.target.value);
     this.state.indicator.setCraftedProduction(!isNaN(craftedProduction) ? craftedProduction : null);
     this.props.onUpdate(this.state.indicator);
