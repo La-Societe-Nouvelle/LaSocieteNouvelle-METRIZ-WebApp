@@ -15,31 +15,42 @@ export class AssessmentWAS extends React.Component {
   render() {
     const {indicator,versionItems} = this.state;
     return (
-      <table>
-        <thead>
-          <tr><td>Libelle</td><td>Valeur</td><td>Incertitude</td></tr>
-        </thead>
-        <tbody>
-          <tr className="with-bottom-line">
-            <td>Productiont totale de déchets (en kg)</td>
-            <td className="column_value"><NumberInput 
-              key={this.state.versionItems}
-              value={indicator.getTotalWasteProduction()} 
-              onBlur={this.updateTotalWasteProduction.bind(this)}/></td>
-            <td className="column_value"><NumberInput 
-              key={this.state.versionItems}
-              value={indicator.getTotalWasteProductionUncertainty()} 
-              onBlur={this.updateUncertainty.bind(this)}/></td>
-          </tr><tr>
-            <td>Valeur ajoutée nette (en €)</td>
-            <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
-          <tr>
-            <td>Intensité (en g/€)</td>
-            <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
-            <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <table>
+          <thead>
+            <tr><td>Libelle</td><td>Valeur</td><td>Incertitude</td></tr>
+          </thead>
+          <tbody>
+            <tr className="with-bottom-line">
+              <td>Productiont totale de déchets (en kg)</td>
+              <td className="column_value"><NumberInput 
+                key={this.state.versionItems}
+                value={indicator.getTotalWasteProduction()} 
+                onBlur={this.updateTotalWasteProduction.bind(this)}/></td>
+              <td className="column_value"><NumberInput 
+                key={this.state.versionItems}
+                value={indicator.getTotalWasteProductionUncertainty()} 
+                onBlur={this.updateUncertainty.bind(this)}/></td>
+            </tr><tr>
+              <td>Valeur ajoutée nette (en €)</td>
+              <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
+            <tr>
+              <td>Intensité (en g/€)</td>
+              <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
+              <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <h3>Notes</h3>
+          <p>Grandeur mesurée : Quantité produite de déchets (en kg)</p>
+          <p>Catégories de déchets :<br/>
+            - Déchets dangereux<br/>
+            - Déchets non-dangereux valorisés (recyclage, etc.)<br/>
+            - Déchets non-dangereux non-valorisés</p>
+          <p>Les co-produits ne sont pas comptabilisés. Un co-produit correspond à un produit / résidu de production non vendu et transmis à une autre société en vue d’être transformé, sans destruction, en un produit vendu.</p>
+        </div>
+      </div>
     ) 
   }
 
