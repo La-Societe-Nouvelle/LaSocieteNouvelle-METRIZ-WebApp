@@ -23,7 +23,7 @@ export class AssessmentECO extends React.Component {
             <tr><td>Libelle</td><td>Valeur</td></tr>
           </thead>
           <tbody>
-            <tr><td>Activités localisées en France</td>
+            <tr><td>Activités localisées en France (uniquement) ?</td>
                 <td><input type="checkbox"
                               checked={isAllActivitiesInFrance} 
                               onChange={this.onIsAllActivitiesInFranceChange}/></td></tr>
