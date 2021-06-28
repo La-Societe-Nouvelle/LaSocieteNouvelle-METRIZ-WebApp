@@ -24,20 +24,26 @@ export class IndicatorGEQ extends IndicatorNetValueAdded {
   
   setHasEmployees(hasEmployees) {
     this.hasEmployees = hasEmployees
+    this.wageGap = hasEmployees ? null : 0.0;
   }
   
   /* ---------- Getters ---------- */
   
-  getWageGap() {return this.wageGap}
-  getHasEmployees() {return this.hasEmployees}
+  getWageGap() {
+    return this.wageGap
+  }
+
+  getHasEmployees() {
+    return this.hasEmployees
+  }
   
   /* ---------- Override ---------- */
   
   getValue() {
-    if (this.hasEmployees) {
+    if (this.netValueAdded!=null) {
       return this.wageGap;
     } else {
-      return 0.0;
+      return null;
     }
   }
 
