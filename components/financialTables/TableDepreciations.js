@@ -28,7 +28,8 @@ export class TableDepreciations extends React.Component {
               <td className="column_areaCode">Pays</td>
               <td className="column_corporateActivity">Code division</td>
               <td className="column_yearInvestment">Année</td>
-              <td className="column_amount">Montant (en €)</td></tr>
+              <td className="column_amount">Montant (en €)</td>
+              <td colSpan="2"></td></tr>
           </thead>
           <tbody>
             {

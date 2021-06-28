@@ -32,7 +32,8 @@ export class TableExpenses extends React.Component {
               <td className="column_corporateName">Denomination</td>
               <td className="column_areaCode">Pays</td>
               <td className="column_corporateActivity">Code division</td>
-              <td className="column_amount">Montant (en €)</td></tr>
+              <td className="column_amount">Montant (en €)</td>
+              <td colSpan="2"></td></tr>
           </thead>
           <tbody>
             {
@@ -48,7 +49,7 @@ export class TableExpenses extends React.Component {
           </tbody>
         </table>
 
-        <button onClick={this.triggerImportFile}>Importer un fichier</button>
+        <button onClick={this.triggerImportFile}>Importer un fichier csv</button>
         <input id="import-expenses" type="file" accept=".csv" onChange={this.importFile} visibility="collapse"/>
         <button onClick={this.synchroniseAll}>Re-Synchroniser tout</button>
         <button onClick={this.removeAll}>Supprimer tout</button>
@@ -127,6 +128,13 @@ export class TableExpenses extends React.Component {
       importData(reader.result);
      };
     reader.readAsText(file);
+  }
+
+  /* ---------- IMPORT BASIC CSV ---------- */
+
+  importFile = (event) => {
+    let files = event.target.files;
+    this.read(files[0],this.importData.bind(this));
   }
 
   async importData(content) {
