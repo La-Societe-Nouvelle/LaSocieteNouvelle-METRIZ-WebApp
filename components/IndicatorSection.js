@@ -202,61 +202,80 @@ function TableMain({session,indic}) {
   const financialData = session.getFinancialData();
 
   const nbDecimals = indicData[indic].nbDecimals;
+  const unit = indicData[indic].unit;
+  const unitAbsolute = indicData[indic].unitAbsolute;
   const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
   return (
     <table>
       <thead>
         <tr>
-          <td>Agrégat</td>
-          <td>Montant (en €)</td>
-          <td>Valeur (en {indicData[indic].unit})</td>
-          <td>Incertitude (en %)</td>
-        {impactAbsolu ? <td>Impact (en {indicData[indic].unitAbsolute})</td> : null}
+          <td colSpan="3">Agrégat</td>
+          <td className="column_value" colSpan="2">Valeur</td>
+          <td className="column_uncertainty">Incertitude</td>
+          {impactAbsolu ? <td className="column_value" colSpan="2">Impact</td> : null}
         </tr>
       </thead>
       <tbody>
         <tr className="with-bottom-line">
           <td>Chiffre d'affaires</td>
-          <td className="column_value"><input value={printValue(financialData.getRevenue(),0)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)} disabled={true}/></td>
-          {impactAbsolu ? <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getRevenue()),nbDecimals)} disabled={true}/></td> : null}
+          <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_unit">&nbsp;{unit}</td>
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+          {impactAbsolu ? <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getRevenue()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
         <tr>
           <td>Production</td>
-          <td className="column_value"><input value={printValue(financialData.getProduction(),0)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)} disabled={true}/></td>
-          {impactAbsolu ? <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getProduction()),nbDecimals)} disabled={true}/></td> : null}
+          <td className="column_value">{printValue(financialData.getProduction(),0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_unit">&nbsp;{unit}</td>
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+          {impactAbsolu ? <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getProduction()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
         <tr className="with-bottom-line">
           <td>Production déstockée</td>
-          <td className="column_value"><input value={printValue(financialData.getUnstoredProduction(),0)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)} disabled={true}/></td>
-          {impactAbsolu ? <td className="column_value"><input value={printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getUnstoredProduction()),nbDecimals)} disabled={true}/></td> : null}
+          <td className="column_value">{printValue(financialData.getUnstoredProduction(),0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_unit">&nbsp;{unit}</td>
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+          {impactAbsolu ? <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getUnstoredProduction()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
         <tr>
           <td>Charges externes</td>
-          <td className="column_value"><input value={printValue(financialData.getAmountExpenses(),0)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getExpensesFootprint().getIndicator(indic).getValue(),nbDecimals)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getExpensesFootprint().getIndicator(indic).getUncertainty(),0)} disabled={true}/></td>
-          {impactAbsolu ? <td className="column_value"><input value={printValue(session.getExpensesFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountExpenses()),nbDecimals)} disabled={true}/></td> : null}
+          <td className="column_value">{printValue(financialData.getAmountExpenses(),0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+          <td className="column_value">{printValue(session.getExpensesFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_unit">&nbsp;{unit}</td>
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getExpensesFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+          {impactAbsolu ? <td className="column_value">{printValue(session.getExpensesFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountExpenses()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
         <tr className="with-bottom-line">
           <td>Dotations aux amortissements</td>
-          <td className="column_value"><input value={printValue(financialData.getAmountDepreciations(),0)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)} disabled={true}/></td>
-          {impactAbsolu ? <td className="column_value"><input value={printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciations()),nbDecimals)} disabled={true}/></td> : null}
+          <td className="column_value">{printValue(financialData.getAmountDepreciations(),0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+          <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_unit">&nbsp;{unit}</td>
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+          {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciations()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
         <tr>
           <td>Valeur ajoutée nette</td>
-          <td className="column_value"><input value={printValue(financialData.getNetValueAdded(),0)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getValueAddedFootprint(indic).getValue(),nbDecimals)} disabled={true}/></td>
-          <td className="column_value"><input value={printValue(session.getValueAddedFootprint(indic).getUncertainty(),0)} disabled={true}/></td>
-          {impactAbsolu ? <td className="column_value"><input value={printValue(session.getValueAddedFootprint(indic).getValueAbsolute(financialData.getNetValueAdded()),nbDecimals)} disabled={true}/></td> : null}
+          <td className="column_value">{printValue(financialData.getNetValueAdded(),0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+          <td className="column_value">{printValue(session.getValueAddedFootprint(indic).getValue(),nbDecimals)}</td>
+          <td className="column_unit">&nbsp;{unit}</td>
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getValueAddedFootprint(indic).getUncertainty(),0)}&nbsp;%</td>
+          {impactAbsolu ? <td className="column_value">{printValue(session.getValueAddedFootprint(indic).getValueAbsolute(financialData.getNetValueAdded()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
       </tbody>
     </table>
