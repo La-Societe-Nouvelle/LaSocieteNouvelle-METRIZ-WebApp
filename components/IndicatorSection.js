@@ -49,7 +49,7 @@ export class IndicatorSection extends React.Component {
               )})
             }
           </div>
-        <h1>{indicData[indic].libelle}</h1>
+          <h1>{indicData[indic].libelle}</h1>
         </div>
         <SectionMenu selected={selectedTab} parent={this}/>
         {this.buildTabView()}
@@ -304,10 +304,11 @@ class TableExpenses extends React.Component {
           <tr>
             <td>Identifiant</td>
             <td>Denomination</td>
-            <td>Montant (en €)</td>
-            <td>Intensité</td>
-            <td>Incertitude (en %)</td>
+            <td>Montant</td>
+            <td>Valeur</td>
+            <td>Incertitude</td>
             <td>Flag</td>
+            <td></td>
         </tr>
         </thead>
         <tbody>
@@ -351,13 +352,12 @@ class RowTableExpenses extends React.Component {
       <tr>
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
-        <td className="column_value">
-          <input value={printValue(amount,0)} disabled={true}/></td>
+        <td className="column_value">{printValue(amount,0)}&nbsp;</td>
         <td className="column_value">
           <input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_value">
           <input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
+        <td className="column_libelleFlag">&nbsp;{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
         <td className="column_resync">
           <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncExpense}/></td>
       </tr>
@@ -411,7 +411,15 @@ class TableDepreciations extends React.Component {
     return (
       <table>
         <thead>
-          <tr><td>Identifiant</td><td>Denomination</td><td>Montant (en €)</td><td>Intensité</td><td>Incertitude (en %)</td><td>Flag</td></tr>
+          <tr>
+            <td>Identifiant</td>
+            <td>Denomination</td>
+            <td>Montant</td>
+            <td>Valeur</td>
+            <td>Incertitude</td>
+            <td>Flag</td>
+            <td></td>
+          </tr>
         </thead>
         <tbody>
           {
@@ -454,10 +462,10 @@ class RowTableDepreciations extends React.Component {
       <tr>
         <td className="column_corporateId">{corporateId}</td>
         <td className="column_corporateName">{corporateName}</td>
-        <td className="column_value"><input value={printValue(amount,0)} disabled={true}/></td>
+        <td className="column_value">{printValue(amount,0)}&nbsp;</td>
         <td className="column_value"><input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_value"><input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_libelleFlag">{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
+        <td className="column_libelleFlag">&nbsp;{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
         <td className="column_resync">
           <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncDepreciation}/></td>
       </tr>
@@ -495,6 +503,6 @@ class RowTableDepreciations extends React.Component {
 }
 
 function printValue(value,precision) {
-  if (value==null) {return ""}
+  if (value==null) {return "-"}
   else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
 }
