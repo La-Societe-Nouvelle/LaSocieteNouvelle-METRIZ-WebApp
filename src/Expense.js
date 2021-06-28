@@ -90,7 +90,6 @@ export class Expense {
       let area = this.areaCode !="" ? this.areaCode : "_DV";
       let activity = this.corporateActivity!=null ? this.corporateActivity : "00";
       let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity +"&flow=PRD";
-      console.log(endpoint);
       let response = await fetch(endpoint, {method:'get'});
       let data = await response.json();
       if (data.header.statut != 200) {
