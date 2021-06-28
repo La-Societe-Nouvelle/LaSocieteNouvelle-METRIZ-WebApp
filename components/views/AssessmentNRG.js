@@ -15,36 +15,44 @@ export class AssessmentNRG extends React.Component {
   render() {
     const {indicator,versionItems} = this.state;
     return (
-      <table>
-        <thead>
-          <tr><td>Libelle</td><td>Valeur</td><td>Incertitude</td></tr>
-        </thead>
-        <tbody>
-          <tr className="with-bottom-line">
-
-            <td>Consommation totale d'énergie (en MJ)</td>
-
-            <td className="column_value"><NumberInput 
-              key={versionItems}
-              value={indicator.getEnergy()} 
-              onBlur={this.updateTotalEnergyConsumption.bind(this)}/></td>
-            <td className="column_value"><NumberInput
-              key={versionItems}
-              value={indicator.getEnergyUncertainty()} 
-              onBlur={this.updateUncertainty.bind(this)}/></td>
-          </tr>
-          
-          <tr>
-            <td>Valeur ajoutée nette (en €)</td>
-            <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td>
-          </tr><tr>
-            <td>Intensité (en kJ/€)</td>
-            <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
-            <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
-          </tr>
-
-        </tbody>
-      </table>
+      <div>
+        <table>
+          <thead>
+            <tr><td>Libelle</td><td>Valeur</td><td>Incertitude</td></tr>
+          </thead>
+          <tbody>
+            <tr className="with-bottom-line">
+              <td>Consommation totale d'énergie (en MJ)</td>
+              <td className="column_value"><NumberInput 
+                key={versionItems}
+                value={indicator.getEnergy()} 
+                onBlur={this.updateTotalEnergyConsumption.bind(this)}/></td>
+              <td className="column_value"><NumberInput
+                key={versionItems}
+                value={indicator.getEnergyUncertainty()} 
+                onBlur={this.updateUncertainty.bind(this)}/></td>
+            </tr>
+            <tr>
+              <td>Valeur ajoutée nette (en €)</td>
+              <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td>
+            </tr><tr>
+              <td>Intensité (en kJ/€)</td>
+              <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
+              <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <h3>Notes</h3>
+          <p>Grandeur mesurée : Quantité d’énergie consommée (en MJ)</p>
+          <p>Produits énergétiques comptabilisés :<br/>
+            - Electricité<br/>
+            - Energies fossiles (carburant, gaz, etc.)<br/>
+            - Biomasse<br/>
+            - Chaleur<br/>
+            - Energies renouvelables transformées (éolien, photovoltaïque, etc.)</p>
+        </div>
+      </div>
     ) 
   }
 
