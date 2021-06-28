@@ -132,7 +132,10 @@ function buildTableMain(session) {
     <table>
       <thead>
         <tr>
-          <td>Code</td><td>Indicateur</td><td>Valeur</td><td>Incertitude</td>
+          <td>Code</td>
+          <td>Indicateur</td>
+          <td colSpan="2">Valeur</td>
+          <td>Incertitude</td>
         </tr>
       </thead>
       <tbody>
@@ -140,10 +143,11 @@ function buildTableMain(session) {
           indics.map((indic) => {
             return(
               <tr key={indic}>
-                <td className="column_">{indic.toUpperCase()}</td>
-                <td>{indicData[indic].libelle}</td>
-                <td><input value={session.getProductionFootprint().getIndicator(indic).printValue()} disabled={true}/></td>
-                <td><input value={session.getProductionFootprint().getIndicator(indic).printUncertainty()} disabled={true}/></td>
+                <td className="column_code">{indic.toUpperCase()}</td>
+                <td className="column_libelle">{indicData[indic].libelle}</td>
+                <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1)}</td>
+                <td className="column_unit">&nbsp;{indicData[indic].unit}</td>
+                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).printUncertainty(),0)}&nbsp;%</td>
               </tr>
             )
           })
@@ -151,4 +155,9 @@ function buildTableMain(session) {
       </tbody>
     </table>
   )
+}
+
+function printValue(value,precision) {
+  if (value==null) {return "-"}
+  else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
 }
