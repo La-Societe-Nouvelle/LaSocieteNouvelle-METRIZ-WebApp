@@ -41,7 +41,16 @@ export class IndicatorSection extends React.Component {
     const {indic} = this.props;
     return (
       <div className="section-view">
+        <div className="section-view-header">
+          <div className="section-view-header-odds">
+            {
+              indicData[indic].odds.map((odd) => {return (
+                <img id={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
+              )})
+            }
+          </div>
         <h1>{indicData[indic].libelle}</h1>
+        </div>
         <SectionMenu selected={selectedTab} parent={this}/>
         {this.buildTabView()}
       </div>

@@ -88,9 +88,29 @@ input {
   margin: auto;
 
   .section-view-header {
+    display: flex;
+    flex-direction: column;
+    //justify-content: space-between;
+    align-items: flex-start;
     width: 100%;
     text-align: left;
+
+    h1 {
+      margin: 5px;
   }
+
+    .section-view-header-odds {
+      margin-top: 10px;
+    }
+
+    img {
+      height: 40px;
+      width: 40px;
+      margin: 2px;
+    }
+
+  }
+
 }
 
 .menu-section {
