@@ -79,7 +79,9 @@ export class Session {
     getExpensesFootprint( ) {
         this.updateExpensesFootprint();
         return this.expensesFootprint}
-    getDepreciationsFootprint() {return this.depreciationsFootprint}
+    getDepreciationsFootprint() {
+        this.updateDepreciationsFootprint();
+        return this.depreciationsFootprint}
     getImpactsDirects() {return this.impactsDirects}
     getValueAddedFootprint(indic) {return this.impactsDirects[indic]}
 
@@ -226,11 +228,9 @@ export class Session {
     // Depreciation expenses Social Footprint
     
     updateDepreciationsFootprint() {
-        Indic.values().forEach(
-            (indic) => {
-                updateDepreciationsIndicFootprint(indic);
-            }
-        )
+        indics.forEach((indic) => {
+            this.updateDepreciationsIndicFootprint(indic);
+        })
     }
     
     async updateDepreciationsIndicFootprint(indic) {
