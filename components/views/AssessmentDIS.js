@@ -23,10 +23,10 @@ export class AssessmentDIS extends React.Component {
             <tr><td>Libelle</td><td>Valeur</td></tr>
           </thead>
           <tbody>
-          <tr><td>Entreprise employeur</td>
+            <tr><td>Entreprise employeur ?</td>
                 <td><input type="checkbox"
                               checked={hasEmployees} 
-                              onChange={this.onhasEmployeesChange}/></td></tr>
+                              onChange={this.onHasEmployeesChange}/></td></tr>
             <tr className="with-bottom-line"><td>Indice de GINI des taux horaires bruts (/100)</td>
                 <td className="column_value">
                   <input value={hasEmployees ? indexGiniInput : 0}
@@ -35,7 +35,7 @@ export class AssessmentDIS extends React.Component {
                          onKeyPress={this.onEnterPress}/></td></tr>
             <tr><td>Valeur ajoutée nette (en €)</td>
                 <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
-            <tr><td>Contribution directe (en %)</td>
+            <tr><td>Indice relatif à la valeur ajoutée (/100)</td>
                 <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td></tr>
           </tbody>
         </table>
@@ -53,7 +53,7 @@ export class AssessmentDIS extends React.Component {
     if (event.which==13) {event.target.blur();}
   }
 
-  onhasEmployeesChange = (event) => {
+  onHasEmployeesChange = (event) => {
     this.state.indicator.setHasEmployees(event.target.checked);
     this.state.indexGiniInput = event.target.checked ? "" : 0;
     this.props.onUpdate(this.state.indicator);
