@@ -142,47 +142,64 @@ class TableMain extends React.Component {
     return (
       <table>
         <thead>
-          <tr><td>Agrégat</td><td>Montant (en €)</td><td>Fixe</td></tr>
+          <tr><td>Agrégat</td><td colSpan="2">Montant</td><td>Fixe</td></tr>
         </thead>
         <tbody>
           {/* --- Production items --- */}
           <tr className="with-bottom-line">
               <td>Chiffres d'affaires</td>
-              <td className="column_amount"><input value={revenue} onChange={this.onRevenueChange} onBlur={this.onRevenueBlur} onKeyPress={this.onEnterPress}/></td></tr>
+              <td className="column_amount"><input value={revenue} onChange={this.onRevenueChange} onBlur={this.onRevenueBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td>
+              <td></td></tr>
           <tr>
               <td>Production</td>
-              <td className="column_amount"><input value={production} onChange={this.onProductionChange} onBlur={this.onProductionBlur} onKeyPress={this.onEnterPress}/></td></tr>
+              <td className="column_amount"><input value={production} onChange={this.onProductionChange} onBlur={this.onProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td></tr>
           <tr>
               <td>&emsp;dont production stockée</td>
-              <td className="column_amount"><input value={storedProduction} onChange={this.onStoredProductionChange} onBlur={this.onStoredProductionBlur} onKeyPress={this.onEnterPress}/></td></tr>
+              <td className="column_amount"><input value={storedProduction} onChange={this.onStoredProductionChange} onBlur={this.onStoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont production immobilisée</td>
-              <td className="column_amount"><input value={immobilisedProduction} onChange={this.onImmobilisedProductionChange} onBlur={this.onImmobilisedProductionBlur} onKeyPress={this.onEnterPress}/></td></tr>
+              <td className="column_amount"><input value={immobilisedProduction} onChange={this.onImmobilisedProductionChange} onBlur={this.onImmobilisedProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td>
+              <td></td></tr>
           <tr className="with-bottom-line">
               <td>Production déstockée</td>
-              <td className="column_amount"><input value={unstoredProduction} onChange={this.onUnstoredProductionChange} onBlur={this.onUnstoredProductionBlur} onKeyPress={this.onEnterPress}/></td></tr>
+              <td className="column_amount"><input value={unstoredProduction} onChange={this.onUnstoredProductionChange} onBlur={this.onUnstoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td>
+              <td></td></tr>
           {/* --- Expenses & Gross Value Added --- */}
           <tr>
               <td>Charges externes</td>
               <td className="column_amount"><input value={printValue(amountExpenses,0)} onChange={this.onAmountExpensesChange} onBlur={this.onAmountExpensesBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td>
               <td><input type="checkbox" checked={financialData.isAmountExpensesFixed()} onChange={this.setAmountExpensesFixed}/></td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont charges détaillées (cf. Onglet Charges externes)</td>
-              <td className="column_amount"><input value={printValue(financialData.getAmountDetailedExpenses(),0)} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getAmountDetailedExpenses(),0)} disabled={true}/></td>
+              <td className="column_unit">&nbsp;€</td>
+              <td></td></tr>
           <tr className="with-bottom-line">
               <td>Valeur ajoutée brute</td>
-              <td className="column_amount"><input value={printValue(financialData.getGrossValueAdded(),0)} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getGrossValueAdded(),0)} disabled={true}/></td>
+              <td className="column_unit">&nbsp;€</td>
+              <td></td></tr>
           {/* --- Depreciations & Net Value Added --- */}
           <tr>
               <td>Dotations aux amortissements</td>
               <td className="column_amount"><input value={printValue(amountDepreciations,0)} onChange={this.onAmountDepreciationsChange} onBlur={this.onAmountDepreciationsBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_unit">&nbsp;€</td>
               <td><input type="checkbox" checked={financialData.isAmountDepreciationsFixed()} onChange={this.setAmountDepreciationsFixed}/></td></tr>
           <tr className="with-bottom-line">
               <td>&emsp;dont dotations détaillées (cf. Onglet Amortissements sur immobilisations)</td>
-              <td className="column_amount"><input value={printValue(financialData.getAmountDetailedDepreciations(),0)} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getAmountDetailedDepreciations(),0)} disabled={true}/></td>
+              <td className="column_unit">&nbsp;€</td>
+              <td></td></tr>
           <tr>
               <td>Valeur ajoutée nette</td>
-              <td className="column_amount"><input value={printValue(financialData.getNetValueAdded(),0)} disabled={true}/></td></tr>
+              <td className="column_amount"><input value={printValue(financialData.getNetValueAdded(),0)} disabled={true}/></td>
+              <td className="column_unit">&nbsp;€</td></tr>
         </tbody>
       </table>
     )
@@ -301,7 +318,7 @@ class TableMain extends React.Component {
     }
   }
   onAmountDepreciationsBlur = (event) => {
-    let amountDepreciations = !isNaN(event.target.value) ? parseFloat(event.target.value) : null;
+    let amountDepreciations = !isNaN(parseFloat(event.target.value)) ? parseFloat(event.target.value) : null;
     this.state.financialData.setAmountDepreciations(amountDepreciations);
     this.props.onUpdate(this.state.financialData);
     this.setState({amountDepreciations: this.state.financialData.getAmountDepreciations()!=null ? this.state.financialData.getAmountDepreciations() : "" });
@@ -334,6 +351,6 @@ class TableMain extends React.Component {
 }
 
 function printValue(value,precision) {
-  if (value==null) {return ""}
-  else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
+  if (value==null | value==="") {return ""}
+  else                         {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
 }

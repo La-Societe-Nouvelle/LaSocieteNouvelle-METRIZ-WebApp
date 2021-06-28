@@ -26,6 +26,9 @@ button {
 input {
   border-radius: 1px;
   padding: 1px;
+  &:disabled {
+    background-color: #EEEEEE;
+  }
 }
 
 /**/
@@ -97,7 +100,7 @@ input {
 
     h1 {
       margin: 5px;
-  }
+    }
 
     .section-view-header-odds {
       margin-top: 10px;
@@ -115,12 +118,18 @@ input {
 
 .menu-section {
 
+  .menu-section-items {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+  }
+
   .menu-button {
     color: white;
     background-color: $primary-color;
     border: 0;
     height: 25px;
-    width: 300px;
+    width: 100%;
     margin: 2px;
 
     &.selected {
@@ -129,10 +138,11 @@ input {
   }
 }
 
-/* --- TABLE --- */
+/* ---------- TABLE ---------- */
 
 table {
   width: 100%;
+  font-size: 15px;
 
   input {
     width: 100%;
@@ -148,12 +158,6 @@ table {
     width: 15px;
   }
 
-  thead {
-    background-color: gray;
-    color: white;
-    text-align: center;
-  }
-
   .with-bottom-line {
     td {
       border-bottom: solid grey 2px;
@@ -161,10 +165,50 @@ table {
     }
   }
 
-  tr {
+  thead {
+    background-color: gray;
+    color: white;
+    text-align: center;
+
+
+    .column_code {
+      width: 50px;
+      text-align: center;
+    }
+
+    .column_corporateId {
+      width: 125px;
+    }
+    .column_corporateName {
+      width: auto;
+    }
+    .column_areaCode {
+      width: 100px;
+    }
+    .column_corporateActivity {
+      max-width: 200px;
+    }
+    .column_amount {
+      width: 150px;
+    }
+    .column_value {
+      width: 150px;
+      min-width: 150px;
+    }
+    .column_uncertainty {
+      width: 150px;
+    }
+  }
+
+  tbody {
 
     select {
       background-color: white;
+    }
+
+    .column_code {
+      width: 50px;
+      text-align: center;
     }
 
     .column_corporateId {
@@ -189,27 +233,32 @@ table {
         text-align: right;
       }
     }
-    .column_quality {
-      width: 150px;
-      input {
-        text-align: right;
-      }
-    }
+    
     .column_uncertainty {
-      width: 150px;
+      width: 100px;
+      text-align: center;
+      font-size: 12px;
       input {
         text-align: right;
+        font-size: 15px;
       }
     }
     .column_libelleFlag {
-      min-width: 150px;
-      text-align: center;
+      max-width: 50px;
+      text-align: left;
     }
     .column_value {
-      width: 150px;
+      width: 100px;
+      text-align: right;
       input {
         text-align: right;
       }
+    }
+    .column_unit {
+      width: 1%;
+      min-width: 30px;
+      font-size: 12px;
+      white-space: nowrap;
     }
     .valid {
       input {
@@ -242,6 +291,7 @@ table {
 
 #import-expenses,
 #import-depreciations,
+#import-fec,
 #import-session {
   margin: 0px;
   padding: 0px;
