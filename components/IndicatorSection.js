@@ -14,6 +14,8 @@ import { AssessmentSOC } from './views/AssessmentSOC';
 import { AssessmentWAS } from './views/AssessmentWAS';
 import { AssessmentWAT } from './views/AssessmentWAT';
 
+import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../src/Export';
+
 import {indic as indicData} from '../lib/indic';
 
 /* -------------------- INDICATOR VIEW -------------------- */
@@ -76,6 +78,9 @@ export class IndicatorSection extends React.Component {
         <div className="coporate-social-footprint">
           <h3>Tableau récapitulatif</h3>
           <TableMain session={this.props.session} indic={this.props.indic}/>
+          <div>
+            <button onClick={this.exportReporting.bind(this)}>Editer rapport</button>
+          </div>
         </div>
       </div>
     )
@@ -122,6 +127,9 @@ export class IndicatorSection extends React.Component {
           parent={this} 
           financialData={session.getFinancialData()}
           onUpdate={this.updateFinancialData.bind(this)}/>
+        <div>
+          <button onClick={this.exportExpensesData.bind(this)}>Export csv</button>
+        </div>
       </div>
     )
   }
@@ -137,6 +145,9 @@ export class IndicatorSection extends React.Component {
           parent={this} 
           financialData={session.getFinancialData()} 
           onUpdate={this.updateFinancialData.bind(this)}/>
+        <div>
+          <button onClick={this.exportDepreciationsData.bind(this)}>Export csv</button>
+      </div>
       </div>
     )
   }
@@ -152,6 +163,31 @@ export class IndicatorSection extends React.Component {
     this.state.session.updateFinancialData(financialData);
     this.props.onUpdate(this.state.session);
   }
+
+  // Reporting
+  exportReporting() {
+    exportIndicPDF(this.props.indic,this.props.session);
+  }
+
+  // Csv
+  exportExpensesData() {
+    let csvContent = exportIndicDataExpensesCSV(this.props.indic,this.props.session);
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "data_"+(this.props.session.legalUnit.siren!="" ? this.props.session.legalUnit.siren : "xxxxxxxxx")+"-"+this.props.indic.toUpperCase()+"-expenses.csv");
+    document.body.appendChild(link);
+    link.click();
+  }
+
+  exportDepreciationsData() {
+    let csvContent = exportIndicDataExpensesCSV(this.props.indic,this.props.session);
+    let encodedUri = encodeURI(csvContent);
+    let link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "data_"+(this.props.session.legalUnit.siren!="" ? this.props.session.legalUnit.siren : "xxxxxxxxx")+"-"+this.props.indic.toUpperCase()+"-depreciations.csv");
+    document.body.appendChild(link);
+    link.click();
   }
 
 }
@@ -194,7 +230,7 @@ class Tab extends React.Component {
 /* ---------- MAIN TAB ---------- */
 
 function TableMain({session,indic}) {
-  
+    
   const financialData = session.getFinancialData();
 
   const nbDecimals = indicData[indic].nbDecimals;
