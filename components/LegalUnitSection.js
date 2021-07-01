@@ -29,49 +29,40 @@ export class LegalUnitSection extends React.Component {
         year: legalUnit.year!=null ? legalUnit.year : "",
        })
     }
-    /*if (this.state.siren.length===9 & !isNaN(parseFloat(this.state.siren))) {
-      this.getLegalUnitData(this.state.siren);
-    }*/
   }
 
   render() {
+    const {siren,corporateName,corporateHeadquarters,year} = this.state;
+
     return (
       <div className="section-view">
         <h1>Informations générales</h1>
-        {this.buildMain()}
-      </div>
-    )
-  }
-
-  buildMain() {
-
-    const {siren,corporateName,corporateHeadquarters,year} = this.state;
-    return (
-      <div className="legal_unit_main_view">
-        <h3>Informations légales</h3>
-        <div className="inline-input short">
-          <label>Numéro de siren </label>
-          <input id="siren-input" 
-                 type="text" 
-                 value={siren} 
-                 onChange={this.onSirenChange} 
-                 onBlur={this.updateSession} 
-                 onKeyPress={this.onEnterPress}/>
-        </div>
-        <div className="inline-input">
-          <label>Dénomination </label>
-          <input id="siren-input" type="text" value={corporateName} disabled={true}/>
-        </div><div className="inline-input">
-          <label>Domiciliation du siège </label>
-          <input id="siren-input" type="text" value={corporateHeadquarters} disabled={true}/>
-        </div>
-        <h3>Exercice comptable</h3>
-        <div className="inline-input short">
-          <label>Année de fin de l'exercice</label>
-          <input id="year-input" type="text" value={year} onChange={this.onYearChange} onBlur={this.updateSession} onKeyPress={this.onEnterPress}/>
-        </div><div className="coporate-social-footprint">
-          <h3>Empreinte Sociétale de l'Entreprise</h3>
-          {buildTableMain(this.props.session)}
+        <div className="legal_unit_main_view">
+          <h3>Informations légales</h3>
+          <div className="inline-input short">
+            <label>Numéro de siren </label>
+            <input id="siren-input" 
+                  type="text" 
+                  value={siren} 
+                  onChange={this.onSirenChange} 
+                  onBlur={this.updateSession} 
+                  onKeyPress={this.onEnterPress}/>
+          </div>
+          <div className="inline-input">
+            <label>Dénomination </label>
+            <input id="siren-input" type="text" value={corporateName} disabled={true}/>
+          </div><div className="inline-input">
+            <label>Domiciliation du siège </label>
+            <input id="siren-input" type="text" value={corporateHeadquarters} disabled={true}/>
+          </div>
+          <h3>Exercice comptable</h3>
+          <div className="inline-input short">
+            <label>Année de fin de l'exercice</label>
+            <input id="year-input" type="text" value={year} onChange={this.onYearChange} onBlur={this.updateSession} onKeyPress={this.onEnterPress}/>
+          </div><div className="coporate-social-footprint">
+            <h3>Empreinte Sociétale de l'Entreprise</h3>
+            {buildTableMain(this.props.session)}
+          </div>
         </div>
       </div>
     )
