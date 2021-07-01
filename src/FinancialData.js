@@ -63,6 +63,102 @@ export class FinancialData {
         })
     }
 
+    /* --------------------------------------------------------- */
+    /* -------------------- AMOUNTS GETTERS -------------------- */
+    /* --------------------------------------------------------- */
+
+    // REVENUE
+
+    getRevenue() {
+        return this.revenue;
+    }
+
+    // PRODUCTION
+
+    getProduction() {
+        return this.production;
+    }
+
+    getStoredProduction() {
+        return this.storedProduction;
+    }
+
+    getImmobilisedProduction() {
+        return this.immobilisedProduction;
+    }
+
+    getUnstoredProduction() {
+        return this.unstoredProduction;
+    }
+
+    // EXPENSES
+
+    getAmountExpenses() {
+        if (this.amountExpensesFixed) {
+            return this.amountExpenses} 
+        else if (this.expenses.length > 0) {
+            let amount = 0.0;
+            this.expenses.forEach((expense) => {amount+= expense.getAmount()});
+            return amount} 
+        else {return null}
+    }
+
+    getAmountDetailedExpenses() {
+        if (this.expenses.length > 0) {
+            let amount = 0.0;
+            this.expenses.forEach((expense) => {amount+= expense.getAmount()});
+            return amount;
+        } else {
+            return null;
+        }
+    }
+
+    // GROSS VALUE ADDED
+
+    getGrossValueAdded() {
+        if (this.production!=null & this.getAmountExpenses()!=null) {
+            return this.production - this.getAmountExpenses();
+        } else {
+            return null;
+        }
+    }
+
+    // DEPRECIATIONS
+
+    getAmountDepreciations() {
+        if (this.amountDepreciationsFixed) {
+            return this.amountDepreciations} 
+        else if (this.depreciations.length > 0) {
+            let amount = 0.0;
+            this.depreciations.forEach((depreciation) => {amount+= depreciation.getAmount()});
+            return amount}
+        else {return null}
+    }
+
+    getAmountDetailedDepreciations() {
+        if (this.depreciations.length > 0) {    
+            let amount = 0.0;
+            this.depreciations.forEach((depreciation) => {amount+= depreciation.getAmount()});
+            return amount;
+        } else {
+            return null;
+        }
+    }
+
+    // NET VALUE ADDED
+
+    getNetValueAdded() {
+        if (this.production!=null & this.getAmountExpenses()!=null & this.getAmountDepreciations()!=null) {
+            return this.production - this.getAmountExpenses() - this.getAmountDepreciations();
+        } else {
+            return null;
+        }
+    }
+
+    /* ------------------------------------------------------ */
+    /* -------------------- INTERACTIONS -------------------- */
+    /* ------------------------------------------------------ */
+
     /* -------------------------------------- */
     /* ---------- Production items ---------- */
     /* -------------------------------------- */
@@ -81,9 +177,6 @@ export class FinancialData {
             this.unstoredProduction = null;
         }
     }
-
-    // Getter
-    getRevenue() {return this.revenue;}
 
     /* ----- Production ----- */
 
@@ -108,9 +201,6 @@ export class FinancialData {
         this.production = this.revenue+this.storedProduction+this.immobilisedProduction-this.unstoredProduction;
     }
 
-    // Getter
-    getProduction() {return this.production;}
-
     /* ----- Stored Production ----- */
 
     // Setter
@@ -118,9 +208,6 @@ export class FinancialData {
         this.storedProduction = amount;
         this.updateProduction();
     }
-
-    // Getter
-    getStoredProduction() {return this.storedProduction;}
 
     /* ----- Immobilised Production ----- */
     
@@ -130,9 +217,6 @@ export class FinancialData {
         this.updateProduction();
     }
 
-    // Getter
-    getImmobilisedProduction() {return this.immobilisedProduction;}
-
     /* ----- Unstored Production ----- */
 
     // Setter
@@ -140,9 +224,6 @@ export class FinancialData {
         this.unstoredProduction = amount;
         this.updateProduction();
     }
-
-    // Getter
-    getUnstoredProduction() {return this.unstoredProduction;}
 
 
     /* ------------------------------ */
@@ -160,27 +241,6 @@ export class FinancialData {
     setAmountExpensesFixed(fixed) {
         this.amountExpensesFixed = fixed;
         this.amountExpenses = this.getAmountExpenses();
-    }
-
-    // Getter
-    getAmountExpenses() {
-        if (this.amountExpensesFixed) {
-            return this.amountExpenses} 
-        else if (this.expenses.length > 0) {
-            let amount = 0.0;
-            this.expenses.forEach((expense) => {amount+= expense.getAmount()});
-            return amount} 
-        else {return null}
-    }
-
-    getAmountDetailedExpenses() {
-        if (this.expenses.length > 0) {
-            let amount = 0.0;
-            this.expenses.forEach((expense) => {amount+= expense.getAmount()});
-            return amount;
-        } else {
-            return null;
-        }
     }
 
     isAmountExpensesFixed() {return this.amountExpensesFixed}
@@ -274,26 +334,6 @@ export class FinancialData {
     }
 
     //Getter
-    getAmountDepreciations() {
-        if (this.amountDepreciationsFixed) {
-            return this.amountDepreciations} 
-        else if (this.depreciations.length > 0) {
-            let amount = 0.0;
-            this.depreciations.forEach((depreciation) => {amount+= depreciation.getAmount()});
-            return amount}
-        else {return null}
-    }
-
-    getAmountDetailedDepreciations() {
-        if (this.depreciations.length > 0) {    
-            let amount = 0.0;
-            this.depreciations.forEach((depreciation) => {amount+= depreciation.getAmount()});
-            return amount;
-        } else {
-            return null;
-        }
-    }
-
     isAmountDepreciationsFixed() {return this.amountDepreciationsFixed}
 
     // Printer
@@ -366,25 +406,5 @@ export class FinancialData {
     // Get expenses array
     getDepreciations() {return this.depreciations}
 
-
-    /* --------------------------------- */
-    /* ---------- Value Added ---------- */
-    /* --------------------------------- */
-    
-    getNetValueAdded() {
-        if (this.production!=null & this.getAmountExpenses()!=null & this.getAmountDepreciations()!=null) {
-            return this.production - this.getAmountExpenses() - this.getAmountDepreciations();
-        } else {
-            return null;
-        }
-    }
-
-    getGrossValueAdded() {
-        if (this.production!=null & this.getAmountExpenses()!=null) {
-            return this.production - this.getAmountExpenses();
-        } else {
-            return null;
-        }
-    }
 
 }

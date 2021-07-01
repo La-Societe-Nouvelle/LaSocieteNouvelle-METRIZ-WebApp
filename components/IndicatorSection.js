@@ -143,16 +143,15 @@ export class IndicatorSection extends React.Component {
 
   // Update session
   updateIndicator(indicator) {
-    this.state.session.setValueAddedIndicator(indicator);
-    this.state.session.updateProductionFootprint(this.props.indic);
+    this.state.session.updateValueAddedIndicator(indicator);
     this.props.onUpdate(this.state.session);
   }
 
   // Save changes
   updateFinancialData(financialData) {
-    this.state.session.financialData = financialData;
-    this.state.session.updateExpensesIndicFootprint(this.props.indic);
-    this.state.session.updateDepreciationsIndicFootprint(this.props.indic);
+    this.state.session.updateFinancialData(financialData);
+    this.props.onUpdate(this.state.session);
+  }
   }
 
 }
@@ -195,9 +194,6 @@ class Tab extends React.Component {
 /* ---------- MAIN TAB ---------- */
 
 function TableMain({session,indic}) {
-  // Update data
-  session.updateFootprints(indic);
-  session.updateProductionFootprint(indic);
   
   const financialData = session.getFinancialData();
 
@@ -221,7 +217,7 @@ function TableMain({session,indic}) {
           <td>Chiffre d'affaires</td>
           <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
           {impactAbsolu ? <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getRevenue()),nbDecimals)}</td> : null}
@@ -241,7 +237,7 @@ function TableMain({session,indic}) {
           <td>Production déstockée</td>
           <td className="column_value">{printValue(financialData.getUnstoredProduction(),0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
           {impactAbsolu ? <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getUnstoredProduction()),nbDecimals)}</td> : null}

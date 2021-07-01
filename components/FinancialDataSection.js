@@ -41,7 +41,7 @@ export class FinancialDataSection extends React.Component {
 
   // Save changes
   updateFinancialData(financialData) {
-    this.state.session.financialData = financialData;
+    this.state.session.updateFinancialData(financialData);
   }
 
   /* --- MAIN TAB --- */
