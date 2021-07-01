@@ -86,14 +86,14 @@ export class Session {
     // ...from financial section
     updateFinancialData(financialData) {
         this.financialData = financialData;
-        this.updateProductionFootprint();
+        this.updateRevenueFootprint();
     }
 
     // ...from indicator section
     updateValueAddedIndicator(indicator) {
         let indic = indicator.getIndic();
         this.impactsDirects[indic] = indicator;
-        this.updateProductionFootprint(indic);
+        this.updateRevenueFootprint(indic);
     }
 
     /* -------------------- GETTERS -------------------- */
