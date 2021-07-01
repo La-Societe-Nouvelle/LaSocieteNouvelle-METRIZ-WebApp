@@ -45,7 +45,7 @@ export class IndicatorSection extends React.Component {
           <div className="section-view-header-odds">
             {
               indicData[indic].odds.map((odd) => {return (
-                <img id={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
+                <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
               )})
             }
           </div>
