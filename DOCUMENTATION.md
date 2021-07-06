@@ -78,10 +78,12 @@ Actions globales :
 * Synchroniser tout : mettre à jour l'ensemble des données à partir des numéros siren
 * Supprimer tout : supprimer toutes les lignes
 
+&nbsp;
 #### Dotations aux amortissements
 
 Le fonctionnement est similaire à l'onglet *Charges externes*
 
+&nbsp;
 ### INDICATEURS (INFORMATIONS GENERALES)
 
 Pour chaque indicateur, l'interface se compose de 4 onglets :
@@ -90,31 +92,36 @@ Pour chaque indicateur, l'interface se compose de 4 onglets :
 * Onglet *Charges externes* : onglet affichant les valeurs pour chaque entreprise. Il est possible de modifier la valeur proposée et son incertitude.
 * Onglet *Dotations aux Amortissements* : onglet affichant les valeurs pour chaque entreprise. Il est possible de modifier la valeur proposée et son incertitude.
 
+&nbsp;
 ### INDICATEURS (INFORMATIONS SPECIFIQUES)
 
-#### Contribution aux Métiers d'Art et aux Savoir-Faire
+&nbsp;
+#### Soldes intermédiaires
 
-#### Indice de répartition des rémunérations
+L'onglet "Soldes intermédiaires" affiche un tableau récapitulatif des valeurs de l'indicateur pour les différents soldes intermédiaires de gestion.
 
-#### Contribution à l'économie française
+Il est possible d'exporter un rapport (format PDF) relatif à l'indicateur. Le contenu du rapport est en cours d'évolution, n'hésitez pas à transmettre vos remarques et souhaits.
 
-#### Indice d'écart de rémunérations Femmes/Hommes
+&nbsp;
+#### Impacts directs - Valeur Ajoutée
 
-#### Intensité d'émission de Gaz à Effet de Serre
+L'onglet permet la déclaration des "impacts directs". La déclaration est propre à chaque indicateur.
 
-#### Intensité d'Utilisation de Produits dangereux pour la santé et/ou l'environnement
+&nbsp;
+#### Impacts indirects - Consommations
 
-#### Contribution à l'Evolution des Compétences et des Connaissances
+L'onglet affiche le détails des valeurs pour chaque consommation.
 
-#### Intensité d'Extraction de Matières Premières
+Les données utilisées sont obtenues à partir des informations saisies (Section "Données Financières") : numéro de siren OU activités et localisation.
+Il est possible de modifier les données proposées si une valeur plus pertinente est connue.
 
-#### Intensité de Consommation d'Energie
+&nbsp;
+#### Impacts indirects - Immobilisations
 
-#### Contribution aux Acteurs d'Intérêt social
+L'onglet affiche le détails des valeurs pour chaque dotation aux amortissements.
 
-#### Intensité de Production de déchets
-
-#### Intensité de Consomamtion d'Eau
+De même que pour les consommations, les données utilisées sont obtenues à partir des informations saisies (Section "Données Financières") : numéro de siren OU activités et localisation.
+Il est possible de modifier les données proposées si une valeur plus pertinente est connue.
 
 &nbsp;
 ## FICHIERS DE SAUVEGARDE
