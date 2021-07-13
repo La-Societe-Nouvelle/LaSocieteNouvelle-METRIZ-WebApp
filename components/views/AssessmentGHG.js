@@ -20,7 +20,9 @@ export class AssessmentGHG extends React.Component {
       <div>
         <table>
           <thead>
-            <tr><td>Emissions directes de gaz à effet de serre</td><td>Valeur</td><td>Incertitude</td></tr>
+            <tr><td>Emissions directes de gaz à effet de serre</td>
+            <td colSpan="2">Valeur</td>
+            <td colSpan="2">Incertitude</td></tr>
           </thead>
           <tbody>
             <tr>
@@ -28,57 +30,72 @@ export class AssessmentGHG extends React.Component {
               <td className="column_value"><NumberInput value={indicator.getItem(0)}
                                 onBlur={(event) => this.updateItem(0,event.target.value)}
                                 key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;kgCO2e</td>
               <td className="column_value"><NumberInput value={indicator.getItemUncertainty(0)} 
                                 onBlur={(event) => this.updateItemUncertainty(0,event.target.value)}
-                                key={this.state.versionItems}/></td></tr>
+                                key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;%</td></tr>
             <tr>
               <td>Emissions directes des sources mobiles à moteur thermique (en kgCO2e)</td>
               <td className="column_value"><NumberInput value={indicator.getItem(1)}
                                 onBlur={(event) => this.updateItem(1,event.target.value)}
                                 key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;kgCO2e</td>
               <td className="column_value"><NumberInput value={indicator.getItemUncertainty(1)} 
                                 onBlur={(event) => this.updateItemUncertainty(1,event.target.value)}
-                                key={this.state.versionItems}/></td></tr>
+                                key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;%</td></tr>
             <tr>
               <td>Emissions directes des procédés hors énergie (en kgCO2e)</td>
               <td className="column_value"><NumberInput value={indicator.getItem(2)}
                                 onBlur={(event) => this.updateItem(2,event.target.value)}
                                 key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;kgCO2e</td>
               <td className="column_value"><NumberInput value={indicator.getItemUncertainty(2)} 
                                 onBlur={(event) => this.updateItemUncertainty(2,event.target.value)}
-                                key={this.state.versionItems}/></td></tr>
+                                key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;%</td></tr>
             <tr>
               <td>Emissions directes fugitives (en kgCO2e)</td>
               <td className="column_value"><NumberInput value={indicator.getItem(3)}
                                 onBlur={(event) => this.updateItem(3,event.target.value)}
                                 key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;kgCO2e</td>
               <td className="column_value"><NumberInput value={indicator.getItemUncertainty(3)} 
                                 onBlur={(event) => this.updateItemUncertainty(3,event.target.value)}
-                                key={this.state.versionItems}/></td></tr>
+                                key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;%</td></tr>
             <tr>
               <td>Emissions issues de la biomasse - sol et forêt (en kgCO2e)</td>
               <td className="column_value"><NumberInput value={indicator.getItem(4)}
                                 onBlur={(event) => this.updateItem(4,event.target.value)}
                                 key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;kgCO2e</td>
               <td className="column_value"><NumberInput value={indicator.getItemUncertainty(4)} 
                                 onBlur={(event) => this.updateItemUncertainty(4,event.target.value)}
-                                key={this.state.versionItems}/></td></tr>
+                                key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;%</td></tr>
             <tr className="with-bottom-line">
               <td>Total des émissions directes - SCOPE 1 (en kgCO2e)</td>
               <td className="column_value"><NumberInput value={indicator.getTotalEmissions()}
                                 onBlur={this.updateTotalEmissions.bind(this)}
                                 ref={this.refTotal}
                                 key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;kgCO2e</td>
               <td className="column_value"><NumberInput value={printValue(indicator.getTotalEmissionsUncertainty(),0)} 
                                 onBlur={(event) => this.updateUncertainty(event.target.value)}
-                                key={this.state.versionItems}/></td></tr>
+                                key={this.state.versionItems}/></td>
+              <td className="column_unit">&nbsp;%</td></tr>
             <tr>
-              <td>Valeur ajoutée nette (en €)</td>
-              <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
+              <td>Valeur ajoutée nette</td>
+              <td className="column_value">{printValue(indicator.getNetValueAdded(),0)}</td>
+              <td className="column_unit">&nbsp;€</td></tr>
             <tr>
-              <td>Intensité (en gCO2e/€)</td>
-              <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
-              <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td></tr>
+              <td>Intensité d'émissions de gaz à effet de serre</td>
+              <td className="column_value">{printValue(indicator.getValue(),1)}</td>
+              <td className="column_unit">&nbsp;gCO2e/€</td>
+              <td className="column_value">{printValue(indicator.getUncertainty(),0)}</td>
+              <td className="column_unit">&nbsp;%</td></tr>
           </tbody>
         </table>
         <div>

@@ -11,6 +11,7 @@ export class IndicatorMAT extends IndicatorNetValueAdded {
   {
     super("mat")
     this.materials = null;
+    this.isExtractiveActivities = false;
     // Specific data for MAT
     this.items = {};
     this.itemsUncertainty = {};
@@ -21,16 +22,28 @@ export class IndicatorMAT extends IndicatorNetValueAdded {
     this.materials = backUp.materials;
     this.items = backUp.items;
     this.itemsUncertainty = backUp.itemsUncertainty;
+    // 07-07-2021
+    this.isExtractiveActivities = backUp.isExtractiveActivities!=undefined ? backUp.isExtractiveActivities : (this.materials > 0);
   }
     
   /* ---------- Setters ---------- */
   
   setMaterials(materials) {
     this.materials = materials;
+    this.isExtractiveActivities = this.materials > 0;
     if (this.materials == null) {this.uncertainty = null}
     else {this.uncertainty = 50.0}
     this.items = {};
     this.itemsUncertainty = {};
+  }
+
+  setIsExtractiveActivities(isExtractiveActivities) {
+    this.isExtractiveActivities = isExtractiveActivities;
+    if (isExtractiveActivities) {
+      this.materials = null;
+    } else {
+      this.materials = 0.0;
+    }
   }
   
   setMaterialsItem(item,materials) {
@@ -46,7 +59,13 @@ export class IndicatorMAT extends IndicatorNetValueAdded {
   
   /* ---------- Getters ---------- */
   
-  getMaterials() {return this.materials}
+  getMaterials() {
+    return this.materials
+  }
+
+  getIsExtractiveActivities() {
+    return this.isExtractiveActivities;
+  }
 
   getMaterialsUncertainty() {
     if (this.materials!=null) {return this.uncertainty}
@@ -58,7 +77,7 @@ export class IndicatorMAT extends IndicatorNetValueAdded {
   getMateiralsItemUncertainty(item) {return itemsUncertainty[item]}
 
   /* ---------- Update ---------- */
-  
+
   updateTotal() {
       let isTotalSet = false;
       materials = 0.0;

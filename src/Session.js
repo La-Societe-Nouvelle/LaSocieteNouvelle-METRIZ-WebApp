@@ -144,6 +144,10 @@ export class Session {
 
     /* -------------------- FOOTPRINTS PROCESS -------------------- */
 
+    // Footprints are stored in variables to avoid processing mutliple times when render the results
+    // (ex. reprocess depreciations footrpint for gross value added footprint, production footprint & revenue footprint)
+    // & it allows to have all the values directly in the json back up file
+
     /* ---------- REVENUE (AVAILABLE PRODUCTION) ---------- */
 
     updateRevenueFootprint() {
@@ -154,14 +158,14 @@ export class Session {
 
     async updateRevenueIndicFootprint(indic) {
         
+        // update footprints
+        await this.updateProductionIndicFootprint(indic);
+        await this.updateUnstoredProductionIndicFootprint(indic);
+
         // if all aggregates are set..
         if (this.financialData.getProduction()!=null 
-                & this.financialData.getAmountExpenses()!=null
-                & this.financialData.getAmountDepreciations()!=null)
+                & this.financialData.getUnstoredProduction()!=null)
         {
-            // update footprints
-            await this.updateProductionIndicFootprint(indic);
-            await this.updateUnstoredProductionIndicFootprint(indic);
             // ...and check if all the footprints are set (if the amount is not null)
             if ( !(this.financialData.getProduction()>0.0 & this.productionFootprint.getIndicator(indic).getValue()==null) 
                     & !(this.financialData.getUnstoredProduction()>0.0 & this.unstoredProductionFootprint.getIndicator(indic).getValue()==null) ) 
@@ -202,14 +206,15 @@ export class Session {
 
     async updateProductionIndicFootprint(indic) {
         
+        // update footprints
+        await this.updateExpensesIndicFootprint(indic);
+        await this.updateGrossValueAddedIndicFootprint(indic);
+
         // if all aggregates are set..
         if (this.financialData.getProduction()!=null 
                 & this.financialData.getAmountExpenses()!=null
                 & this.financialData.getAmountDepreciations()!=null)
         {
-            // update footprints
-            await this.updateExpensesIndicFootprint(indic);
-            await this.updateGrossValueAddedIndicFootprint(indic);
             // ...and check if all the footprints are set (if the amount is not null)
             if ( !(this.financialData.getAmountExpenses()>0.0 & this.expensesFootprint.getIndicator(indic).getValue()==null) 
                     & !(this.financialData.getGrossValueAdded()>0.0 & this.grossValueAddedFootprint.getIndicator(indic).getValue()==null) ) 
@@ -356,13 +361,14 @@ export class Session {
 
     async updateGrossValueAddedIndicFootprint(indic) {
         
+        // update footprints
+        await this.updateDepreciationsIndicFootprint(indic);
+        await this.updateValueAddedFootprint();
+        
         // if all aggregates are set..
         if (this.financialData.getAmountDepreciations()!=null
                 & this.financialData.getNetValueAdded()!=null)
         {
-            // update footprints
-            await this.updateDepreciationsIndicFootprint(indic);
-            await this.updateValueAddedFootprint();
             // ...and all the footprints are set (if the amount is not null)
             if ( !(this.financialData.getAmountDepreciations()>0.0 & this.depreciationsFootprint.getIndicator(indic).getValue()==null) 
                     & !(this.financialData.getNetValueAdded()>0.0 & this.impactsDirects[indic].getValue()==null) ) 

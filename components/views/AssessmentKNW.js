@@ -17,7 +17,8 @@ export class AssessmentKNW extends React.Component {
       <div>
         <table>
           <thead>
-            <tr><td>Libelle</td><td>Valeur</td></tr>
+            <tr><td>Libelle</td>
+                <td colSpan="2">Valeur</td></tr>
           </thead>
           <tbody>
             <tr className="with-bottom-line">
@@ -25,12 +26,15 @@ export class AssessmentKNW extends React.Component {
               <td className="column_value"><NumberInput 
                 value={indicator.getSpendings()} 
                 onBlur={this.updateTotalContribution.bind(this)}/></td>
+              <td className="column_unit">&nbsp;€</td>
             </tr><tr>
               <td>Valeur ajoutée nette (en €)</td>
-              <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
+              <td className="column_value">{printValue(indicator.getNetValueAdded(),0)}</td>
+              <td className="column_unit">&nbsp;€</td></tr>
             <tr>
               <td>Contribution directe (en %)</td>
-              <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td></tr>
+              <td className="column_value">{printValue(indicator.getValue(),1)}</td>
+              <td className="column_unit">&nbsp;%</td></tr>
           </tbody>
         </table>
         <div>

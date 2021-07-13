@@ -18,7 +18,9 @@ export class AssessmentWAT extends React.Component {
       <div>
         <table>
           <thead>
-            <tr><td>Libelle</td><td>Valeur</td><td>Incertitude</td></tr>
+            <tr><td>Libelle</td>
+                <td colSpan="2">Valeur</td>
+                <td colSpan="2">Incertitude</td></tr>
           </thead>
           <tbody>
             <tr className="with-bottom-line">
@@ -26,16 +28,21 @@ export class AssessmentWAT extends React.Component {
                 <td className="column_value"><NumberInput key={versionItems} 
                                 value={indicator.getTotalWaterConsumption()} 
                                 onBlur={this.updateTotalWaterConsumtpion.bind(this)}/></td>
+                <td className="column_unit">&nbsp;m3</td>
                 <td className="column_value"><NumberInput key={versionItems}
                                 value={indicator.getTotalWaterConsumptionUncertainty()} 
                                 onBlur={this.updateUncertainty.bind(this)}/></td>
+                <td className="column_unit">&nbsp;%</td>
             </tr><tr>
-                <td>Valeur ajoutée nette (en €)</td>
-                <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td>
+                <td>Valeur ajoutée nette</td>
+                <td className="column_value">{printValue(indicator.getNetValueAdded(),0)}</td>
+                <td className="column_unit">&nbsp;€</td>
             </tr><tr>
-                <td>Intensité (en L/€)</td>
-                <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
-                <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
+                <td>Intensité de consommation d'eau</td>
+                <td className="column_value">{printValue(indicator.getValue(),1)}</td>
+                <td className="column_unit">&nbsp;L/€</td>
+                <td className="column_value">{printValue(indicator.getUncertainty(),0)}</td>
+                <td className="column_unit">&nbsp;%</td>
             </tr>
           </tbody>
         </table>

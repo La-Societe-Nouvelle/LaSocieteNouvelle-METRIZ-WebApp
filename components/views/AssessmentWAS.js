@@ -18,7 +18,9 @@ export class AssessmentWAS extends React.Component {
       <div>
         <table>
           <thead>
-            <tr><td>Libelle</td><td>Valeur</td><td>Incertitude</td></tr>
+            <tr><td>Libelle</td>
+                <td colSpan="2">Valeur</td>
+                <td colSpan="2">Incertitude</td></tr>
           </thead>
           <tbody>
             <tr className="with-bottom-line">
@@ -27,17 +29,22 @@ export class AssessmentWAS extends React.Component {
                 key={this.state.versionItems}
                 value={indicator.getTotalWasteProduction()} 
                 onBlur={this.updateTotalWasteProduction.bind(this)}/></td>
+              <td className="column_unit">&nbsp;kg</td>
               <td className="column_value"><NumberInput 
                 key={this.state.versionItems}
                 value={indicator.getTotalWasteProductionUncertainty()} 
                 onBlur={this.updateUncertainty.bind(this)}/></td>
+              <td className="column_unit">&nbsp;%</td>
             </tr><tr>
-              <td>Valeur ajoutée nette (en €)</td>
-              <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
+              <td>Valeur ajoutée nette</td>
+              <td className="column_value">{printValue(indicator.getNetValueAdded(),0)}</td>
+              <td className="column_unit">&nbsp;€</td></tr>
             <tr>
-              <td>Intensité (en g/€)</td>
-              <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td>
-              <td className="column_value"><input value={printValue(indicator.getUncertainty(),0)} disabled={true}/></td>
+              <td>Intensité de production de déchets</td>
+              <td className="column_value">{printValue(indicator.getValue(),1)}</td>
+              <td className="column_unit">&nbsp;g/€</td>
+              <td className="column_value">{printValue(indicator.getUncertainty(),0)}</td>
+              <td className="column_unit">&nbsp;%</td>
             </tr>
           </tbody>
         </table>

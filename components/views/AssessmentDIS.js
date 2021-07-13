@@ -20,23 +20,27 @@ export class AssessmentDIS extends React.Component {
       <div>
         <table>
           <thead>
-            <tr><td>Libelle</td><td>Valeur</td></tr>
+            <tr><td>Libelle</td>
+                <td colSpan="2">Valeur</td></tr>
           </thead>
           <tbody>
             <tr><td>Entreprise employeur ?</td>
                 <td><input type="checkbox"
                               checked={hasEmployees} 
                               onChange={this.onHasEmployeesChange}/></td></tr>
-            <tr className="with-bottom-line"><td>Indice de GINI des taux horaires bruts (/100)</td>
+            <tr className="with-bottom-line"><td>Indice de GINI des taux horaires bruts</td>
                 <td className="column_value">
                   <input value={hasEmployees ? indexGiniInput : 0}
                          onChange={this.onIndexGiniChange}
                          onBlur={this.onIndexGiniBlur}
-                         onKeyPress={this.onEnterPress}/></td></tr>
-            <tr><td>Valeur ajoutée nette (en €)</td>
-                <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
-            <tr><td>Indice relatif à la valeur ajoutée (/100)</td>
-                <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td></tr>
+                         onKeyPress={this.onEnterPress}/></td>
+                  <td className="column_unit">&nbsp;/100</td></tr>
+            <tr><td>Valeur ajoutée nette</td>
+                <td className="column_value">{printValue(indicator.getNetValueAdded(),0)}</td>
+                <td className="column_unit">&nbsp;€</td></tr>
+            <tr><td>Indice relatif à la valeur ajoutée</td>
+                <td className="column_value">{printValue(indicator.getValue(),1)}</td>
+                <td className="column_unit">&nbsp;/100</td></tr>
           </tbody>
         </table>
         <div>

@@ -20,7 +20,8 @@ export class AssessmentGEQ extends React.Component {
       <div>
         <table>
           <thead>
-            <tr><td>Libelle</td><td>Valeur</td></tr>
+            <tr><td>Libelle</td>
+                <td colSpan="2">Valeur</td></tr>
           </thead>
           <tbody>
             <tr><td>Entreprise employeur ?</td>
@@ -32,11 +33,14 @@ export class AssessmentGEQ extends React.Component {
                   <input value={hasEmployees ? wageGapInput : 0}
                          onChange={this.onWageGapChange}
                          onBlur={this.onWageGapBlur}
-                         onKeyPress={this.onEnterPress}/></td></tr>
-            <tr><td>Valeur ajoutée nette (en €)</td>
-                <td className="column_value"><input value={printValue(indicator.getNetValueAdded(),0)} disabled={true}/></td></tr>
-            <tr><td>Indice relatif à la valeur ajoutée (en %)</td>
-                <td className="column_value"><input value={printValue(indicator.getValue(),1)} disabled={true}/></td></tr>
+                         onKeyPress={this.onEnterPress}/></td>
+                  <td className="column_unit">&nbsp;%</td></tr>
+            <tr><td>Valeur ajoutée nette</td>
+                <td className="column_value">{printValue(indicator.getNetValueAdded(),0)}</td>
+                <td className="column_unit">&nbsp;€</td></tr>
+            <tr><td>Indice relatif à la valeur ajoutée</td>
+                <td className="column_value">{printValue(indicator.getValue(),1)}</td>
+                <td className="column_unit">&nbsp;%</td></tr>
           </tbody>
         </table>
         <div>
