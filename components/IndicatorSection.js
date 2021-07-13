@@ -81,6 +81,10 @@ export class IndicatorSection extends React.Component {
           <div>
             <button onClick={this.exportReporting.bind(this)}>Editer rapport</button>
           </div>
+          <div>
+          <h3>A propos</h3>
+          <p><a href={"https://lasocietenouvelle.org/indicateur/"+this.props.indic} target="_blank">Lien vers documentation</a></p>
+          </div>
         </div>
       </div>
     )
