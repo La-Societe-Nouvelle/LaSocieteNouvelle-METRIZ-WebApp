@@ -292,7 +292,9 @@ export class FinancialData {
     }
     
     // Get expense object
-    getExpense(id) {return this.expenses.filter(expense => expense.getId()==id)[0]}
+    getExpense(id) {
+        return this.expenses.filter(expense => expense.getId()==id)[0]
+    }
 
     /* ----- Expenses ----- */
 
