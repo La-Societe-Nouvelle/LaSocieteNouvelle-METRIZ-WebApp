@@ -64,10 +64,16 @@ export class FinancialDataSection extends React.Component {
     const session = this.state.session;
     return (
       <div className="financial_data_expenses_view">
-        <h3>Liste des dépenses par entreprise</h3>
+        <h3>Liste des dépenses par entreprise {this.getNblignesText(session.getFinancialData())}</h3>
         <TableExpenses onUpdate={this.updateFinancialData.bind(this)} financialData={session.getFinancialData()}/>
       </div>
     )
+  }
+
+  getNblignesText(financialData) {
+    if (financialData.expenses.length == 0) { return ""}
+    else if (financialData.expenses.length == 1) { return "(" + financialData.expenses.length+" ligne)"}
+    else {return "(" + financialData.expenses.length + " lignes)"}
   }
 
   /* --- DEPRECIATIONS TAB --- */
