@@ -36,7 +36,9 @@ export class LegalUnitSection extends React.Component {
 
     return (
       <div className="section-view">
-        <h1>Informations générales</h1>
+        <div className="section-view-header">
+          <h1>Informations générales</h1>
+        </div>
         <div className="legal_unit_main_view">
           <h3>Informations légales</h3>
           <div className="inline-input short">
@@ -55,7 +57,7 @@ export class LegalUnitSection extends React.Component {
             <label>Domiciliation du siège </label>
             <input id="siren-input" type="text" value={corporateHeadquarters} disabled={true}/>
           </div>
-          <h3>Exercice comptable</h3>
+          <h3>Informations comptables</h3>
           <div className="inline-input short">
             <label>Année de fin de l'exercice</label>
             <input id="year-input" type="text" value={year} onChange={this.onYearChange} onBlur={this.updateSession} onKeyPress={this.onEnterPress}/>
