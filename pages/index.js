@@ -154,7 +154,7 @@ function Menu({selectedSection, changeSection, downloadSession, importSession}){
           <input id="import-session" type="file" accept=".json" onChange={importFile} visibility="collapse"/>
         </div>
         <div className="menu-items-group">
-          <button onClick={() => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp/blob/main/DOCUMENTATION.md","_blank")} className="menu-button">Documentation (en cours)</button>
+          <button onClick={() => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp/blob/main/DOCUMENTATION.md","_blank")} className="menu-button">Documentation</button>
           <button onClick={() => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp","_blank")} className="menu-button">Code Source</button>
         </div>
       </div>
