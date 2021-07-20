@@ -4,7 +4,7 @@ import React from 'react';
 import { FinancialMainTab } from './financialTables/FinancialMainTab';
 import { FinancialExpensesTab } from './financialTables/FinancialExpensesTab';
 import { FinancialDepreciationsTab } from './financialTables/FinancialDepreciationsTab';
-import { TabCompanies } from './financialTables/CompaniesTab';
+import { CompaniesTab } from './financialTables/CompaniesTab';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */

@@ -436,7 +436,7 @@ class ExpensePopup extends React.Component {
 
   /* ----- PROPS METHODS ----- */
 
-  updateDepreciation() {
+  updateExpense() {
     this.props.onUpdate({id: this.props.id, ...this.state});
     this.props.onClose();
   }
