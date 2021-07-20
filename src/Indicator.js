@@ -46,7 +46,7 @@ export class Indicator {
   
   getUncertainty() {
     if (this.getValue()!=null) {return this.uncertainty}
-    else                  {return null}
+    else                       {return null}
   }
 
   getLibelleFlag() {return this.libelleFlag}

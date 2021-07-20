@@ -20,6 +20,13 @@ export class IndicatorECO extends IndicatorNetValueAdded {
 
   /* ----- SETTERS ----- */
 
+  setDeclaredValue(declaredValue) {
+    this.domesticProduction = this.domesticProduction;
+    if (this.domesticProduction==null) {this.uncertainty = null}
+    else {this.uncertainty = 0}
+    this.isAllActivitiesInFrance = domesticProduction==this.netValueAdded;
+  }
+
   setDomesticProduction(domesticProduction) {
     this.domesticProduction = domesticProduction;
     this.uncertainty = 0;
@@ -46,6 +53,10 @@ export class IndicatorECO extends IndicatorNetValueAdded {
   }
 
   /* ----- VALUE & UNCERTAINTY ----- */
+
+  getDeclaredValue() {
+    return this.domesticProduction;
+  }
 
   getValue() {
     if (this.netValueAdded!=null & this.isAllActivitiesInFrance) {

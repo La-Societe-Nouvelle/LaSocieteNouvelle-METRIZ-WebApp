@@ -1,6 +1,67 @@
 import React from 'react';
-import {NumberInput} from '../NumberInput';
 
+export class AssessmentGHG extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      emissionsInput: props.indicator.getTotalEmissions()!=null ? props.indicator.getTotalEmissions() : "",
+      emissionsUncertaintyInput: props.indicator.getTotalEmissionsUncertainty()!=null ? props.indicator.getTotalEmissionsUncertainty() : "",
+    }
+  }
+
+  render() {
+    const {emissionsInput,emissionsUncertaintyInput} = this.state;
+    return (
+      <div className="assessment">
+        <div className="assessment-item">
+          <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
+          <input className="input-value" 
+                 value={emissionsInput}
+                 onChange={this.onEmissionsChange}
+                 onBlur={this.onEmissionsBlur}
+                 onKeyPress={this.onEnterPress}/>
+          <span>&nbsp;kgCO2e</span>
+        </div>
+        <div className="assessment-item">
+          <label>Incertitude</label>
+          <input className="input-value" 
+                 value={emissionsUncertaintyInput}
+                 onChange={this.onEmissionsUncertaintyChange}
+                 onBlur={this.onEmissionsUncertaintyBlur}
+                 onKeyPress={this.onEnterPress}/>
+          <span>&nbsp;%</span>
+        </div>
+      </div>
+    ) 
+  }
+
+  onEnterPress = (event) => {
+    if (event.which==13) {event.target.blur();}
+  }
+
+  onEmissionsChange = (event) => {
+    this.setState({emissionsInput: event.target.value})
+  }
+  onEmissionsBlur = (event) => {
+    let emissions = parseFloat(event.target.value);
+    this.props.indicator.setTotalEmissions(!isNaN(emissions) ? emissions : null);
+    this.setState({emissionsUncertaintyInput: this.props.indicator.getTotalEmissionsUncertainty()!=null ? this.props.indicator.getTotalEmissionsUncertainty() : ""})
+    this.props.onUpdate(this.props.indicator);
+  }
+
+  onEmissionsUncertaintyChange = (event) => {
+    this.setState({emissionsUncertaintyInput: event.target.value})
+  }
+  onEmissionsUncertaintyBlur = (event) => {
+    let uncertainty = parseFloat(event.target.value);
+    this.props.indicator.setUncertainty(!isNaN(uncertainty) ? uncertainty : null);
+    this.props.onUpdate(this.props.indicator);
+  }
+
+}
+
+/*
 export class AssessmentGHG extends React.Component {
 
   refTotal = React.createRef();
@@ -143,8 +204,4 @@ export class AssessmentGHG extends React.Component {
   }
 
 }
-
-function printValue(value,precision) {
-  if (value==null) {return ""}
-  else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
-}
+*/

@@ -20,12 +20,21 @@ a {
 }
 
 button {
-  margin: 2px;
-  border-radius: 3px;
+  padding: 3px 20px;
+  margin: 0 3px;
+  color: white;
+  background-color: $secondary-color;
+  border: 0;
+
+  &.hidden {
+    visibility: hidden;
+  }
 }
+
 input {
-  border-radius: 1px;
-  padding: 1px;
+  //border-radius: 1px;
+  border: solid 1px $secondary-color;
+  padding: 2px;
   &:disabled {
     background-color: #EEEEEE;
   }
@@ -44,7 +53,7 @@ input {
 /* --- MENU --- */
 
 .menu {
-  margin: 25px;
+  margin: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -62,7 +71,7 @@ input {
     margin: 10px;
   }
   .menu-button {
-    margin: 2px;
+    margin: 2px 0;
 
     &.selected {
       background-color: $highlight-color;
@@ -74,7 +83,7 @@ input {
     background-color: $primary-color;
     border: 0;
     height: 25px;
-    width: 200px;
+    width: 225px;
   }
 }
 
@@ -85,6 +94,7 @@ input {
 }
 
 .section-view {
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -92,11 +102,12 @@ input {
 
   .section-view-header {
     display: flex;
-    flex-direction: column;
-    //justify-content: space-between;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: flex-start;
     width: 100%;
     text-align: left;
+    border-bottom: solid gray 3px;
 
     h1 {
       margin: 10px 5px 5px 5px;
@@ -114,7 +125,23 @@ input {
 
   }
 
+  .view-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 10px 0;
+
+    button {
+      min-width: 100px;
+    }
+  }
+
+  .actions {
+    margin: 0px 0 5px;
+  }
+
 }
+
 
 .menu-section {
 
@@ -138,11 +165,40 @@ input {
   }
 }
 
-/* ---------- TABLE ---------- */
+.financial-section-menu {
+  margin: 20px 0;
+
+  .financial-section-menu-items {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .menu-button {
+    color: $primary-color;
+    background-color: white;
+    height: 25px;
+    width: 100%;
+    margin: 0;
+    border: solid $primary-color 1px;
+    
+    &.selected {
+      color: white;
+      background-color: $primary-color;
+    }
+  }
+}
+
+/* -------------------- TABLE -------------------- */
 
 table {
   width: 100%;
   font-size: 15px;
+  padding: 1px;
+  //border-bottom: solid grey 2px;
+  table-layout: auto;
 
   input {
     width: 100%;
@@ -151,17 +207,46 @@ table {
 
   img {
     height: 15px;
+
+    &.locker {
+      height: 13px;
+    }
   }
 
+  // --- COLUMNS --- //
+
+  .column_short-input {
+    width: 150px;
+
+    input {
+      text-align: right;
+    }
+  }
+
+  .column_unit {
+    width: 1%;
+    min-width: 30px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
   // fixed width
-  .column_delete,.column_resync {
+  .column_delete,
+  .column_resync,
+  .column_icon {
     width: 15px;
+    min-width: 15px;
   }
-
+  
   .with-bottom-line {
     td {
       border-bottom: solid grey 2px;
       padding-bottom: 2px;
+    }
+  }
+  .with-top-line {
+    td {
+      border-top: solid grey 2px;
+      padding-top: 2px;
     }
   }
 
@@ -169,7 +254,6 @@ table {
     background-color: gray;
     color: white;
     text-align: center;
-
 
     .column_code {
       width: 50px;
@@ -179,14 +263,15 @@ table {
     .column_corporateId {
       width: 125px;
     }
-    .column_corporateName {
+    .column_corporateName,
+    .column_auto {
       width: auto;
     }
     .column_areaCode {
       width: 100px;
     }
     .column_corporateActivity {
-      max-width: 200px;
+      width: 200px;
     }
     .column_amount {
       width: 150px;
@@ -204,6 +289,13 @@ table {
 
     select {
       background-color: white;
+      border: solid 1px $secondary-color;
+
+      option {
+        background-color: white;
+        border: solid 1px $secondary-color;
+        border-radius: 0;     
+      }
     }
 
     .column_code {
@@ -214,14 +306,15 @@ table {
     .column_corporateId {
       width: 125px;
     }
-    .column_corporateName {
+    .column_corporateName,
+    .column_auto {
       width: auto;
     }
     .column_areaCode {
       width: 100px;
     }
     .column_corporateActivity {
-      max-width: 200px;
+      width: 200px;
       select {
         width: 100%;
         text-overflow: ellipsis;
@@ -229,6 +322,7 @@ table {
     }
     .column_amount {
       width: 150px;
+      text-align: right;
       input {
         text-align: right;
       }
@@ -244,8 +338,8 @@ table {
       }
     }
     .column_libelleFlag {
-      max-width: 50px;
-      text-align: left;
+      width: 200px;
+      text-align: center;
     }
     .column_value {
       width: 100px;
@@ -254,15 +348,81 @@ table {
         text-align: right;
       }
     }
-    .column_unit {
-      width: 1%;
-      min-width: 30px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
     .valid {
       input {
         background-color: $valid-color;
+      }
+    }
+  }
+}
+
+.table-navigation {
+  margin: 0 2px;
+  padding: 5px 2px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  border-top: solid $primary-color 1px;
+
+  button {
+    min-width: 150px;
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  margin: 30px 0px 30px;
+  //padding-bottom: 10px;
+  border: solid gray 1px;
+
+  h3 {
+    width: max-content;
+    padding: 0px 10px 0px 5px;
+    margin: 0;
+    position: relative;
+    top: -15px;
+    left: 10px;
+    background-color: white;
+  }
+
+  .inline-input {
+    margin-left: 10px;
+  }
+}
+
+.assessment {
+  margin: 2px;
+  padding: 0px 10px 5px;
+  //border: solid gray 1px;
+
+  .assessment-item {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    align-items: baseline;
+
+    label {
+      min-width: 600px;
+    }
+    input {
+      margin: 0;
+    
+      &.input-value {
+        width: 100px;
+        text-align: right;
+      }
+    }
+    span {
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .input-radio {
+      margin-right: 10px;
+
+      label {
+        padding: 0px 5px;
       }
     }
   }
@@ -291,6 +451,7 @@ table {
 
 #import-expenses,
 #import-depreciations,
+#import-companies,
 #import-fec,
 #import-session {
   margin: 0px;
@@ -309,5 +470,71 @@ table
     .medium-fix-column {
       width: 200px;
     }
+  }
+}
+
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color:rgba(255,255,255,0.6);
+}
+
+.popup-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 500px;
+  min-height: 250px;
+  padding: 5px 10px;
+  background-color: white;
+  border: solid $primary-color 1px;
+
+  h3 {
+    margin: 5px 0 10px;
+    text-align: center;
+  }
+
+  .inputs {
+    margin: 10px 5px;
+
+    .inline-input {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 5px;
+      align-items: baseline;
+
+      &.short {
+        input {
+          width: 150px;
+        }
+      }
+      label {
+        min-width: 200px;
+      }
+      input {
+        width: 500px;
+        &.input-number {
+          text-align: right;
+        }
+      }
+      span {
+        font-size: 12px;
+      }
+    }
+  }
+
+
+  .footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
 }

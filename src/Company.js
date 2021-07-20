@@ -1,45 +1,42 @@
-import {SocialFootprint} from "/src/SocialFootprint.js";
+import { SocialFootprint } from "/src/SocialFootprint.js";
 
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
-export class Expense {
+export class Company {
 
-  constructor({id,label,account,companyId,corporateId,corporateName,amount,footprint,dataFetched}) 
-  {
+  constructor({id,corporateId,corporateName,legalUnitName,areaCode,corporateActivity,amount}) 
+  {    
     // Id
     this.id = id;
-    
-    // Information
-    this.label = label!=undefined ? label : ""; // 14-07-2021
-    this.account = account!=undefined ? account : ""; // 14-07-2021
-    this.companyId = companyId!=undefined ? companyId : ""; // 14-07-2021
 
     // Company
-    this.corporateId = corporateId!=undefined ? corporateId : "";
+    this.corporateId = corporateId!=undefined ? corporateId : null;
     this.corporateName = corporateName!=undefined ? corporateName : "";
-    this.areaCode = this.initAreaCode();
-    this.corporateActivity = "00";
+    this.legalUnitName = legalUnitName!=undefined ? legalUnitName : "";
+    this.areaCode = areaCode!=undefined ? areaCode : this.initAreaCode();
+    this.corporateActivity = corporateActivity!=undefined ? corporateActivity : "00";
     
     // Amount
     this.amount = amount!=undefined ? amount : 0.0;
-    
     // Social footprint
     this.footprintId = this.initFootprintId();
-    this.footprint = footprint!=undefined ? footprint : new SocialFootprint(); 
+    this.footprint = new SocialFootprint(); 
     
     // Sync
-    this.dataFetched = dataFetched!=undefined ? dataFetched : false;
+    this.dataFetched = false;
     //this.fetchData(); -- conflict with backup
   }
 
   // init area code
   initAreaCode() {
+    if (this.corporateId==null) {return "WLD"}
     if (this.corporateId.match("[0-9]{9}")) {return "FRA"}
     else {return "WLD"}
   }
 
   // init footrpint id
   initFootprintId() {
+    if (this.corporateId==null) {return null}
     // SIREN
     if (this.corporateId.match("[0-9]{9}")) {return this.corporateId}
     // SIRET
@@ -50,22 +47,26 @@ export class Expense {
     else {return null}
   }
 
-  update(props) {
-    if (props.label!=undefined)           this.label = props.label;
-    if (props.account!=undefined)         this.account = props.account;
-    if (props.companyId!=undefined)       this.companyId = props.companyId;
-    if (props.corporateId!=undefined)     this.corporateId = props.corporateId;
-    if (props.corporateName!=undefined)   this.corporateName = props.corporateName;
-    if (props.amount!=undefined)          this.amount = props.amount;
-    if (props.footprint!=undefined)       this.footprint = props.footprint;
-    if (props.dataFetched!=undefined)     this.dataFetched = props.dataFetched;
+  async update(props) {
+    if (props.corporateId!=undefined & props.corporateId!=this.corporateId) 
+    {
+      this.corporateId = props.corporateId;
+      this.footprintId = this.initFootprintId();
+      await this.fetchData();
+    }
+    else 
+    {
+      if (props.corporateId!=undefined)         this.corporateId = props.corporateId;
+      if (props.corporateName!=undefined)       this.corporateName = props.corporateName;
+      if (props.areaCode!=undefined)            this.areaCode = props.areaCode;
+      if (props.corporateActivity!=undefined)   this.corporateActivity = props.corporateActivity;
+      if (props.amount!=undefined)              this.amount = props.amount;
+    }
   }
 
-  /* ---------- Setters ---------- */
+  /* ---------- Back Up ---------- */
 
   updateFromBackUp(backUp) {
-    this.label = backUp.label!=undefined ? backUp.label : "";
-    this.account = backUp.account!=undefined ? backUp.account : "";
     this.corporateId = backUp.corporateId;
     this.corporateName = backUp.corporateName;
     this.areaCode = backUp.areaCode;
@@ -79,17 +80,17 @@ export class Expense {
 
   /* ---------- Setters ---------- */
 
-  setLabel(label) {this.label = label}
-  setAccount(account) {this.account = account}
-  setCorporateId(identifiant) {this.corporateId = identifiant; this.footprintId = this.initFootprintId()}
+  async setCorporateId(identifiant) {
+      if (identifiant!=this.corporateId) {
+        this.corporateId = identifiant; 
+        this.footprintId = this.initFootprintId();
+        await this.fetchData();
+    }
+  }
   setCorporateName(denominationUniteLegale) {this.corporateName = denominationUniteLegale}
   setCorporateActivity(corporateActivity) {this.corporateActivity = corporateActivity}
   setAreaCode(geo) {this.areaCode = geo}
   setAmount(amount) {this.amount = amount}
-  setFootprint(footprint) {
-    this.footprint = footprint
-    // evolution : update only not modified data
-  }
 
   /* ---------- Fetch Data ---------- */  
 
@@ -97,21 +98,21 @@ export class Expense {
   async fetchData() 
   {
     this.dataFetched = false;
-
+    // Fetch footprint
     if (this.footprintId!=null) 
     {  
       let endpoint = apiBaseUrl + "siren/" + this.footprintId;
       let response = await fetch(endpoint, {method:'get'});
       let data = await response.json();
       if (data.header.statut == 200) {
-        this.corporateName = data.profil.descriptionUniteLegale.denomination;
+        this.legalUnitName = data.profil.descriptionUniteLegale.denomination;
         this.corporateActivity = data.profil.descriptionUniteLegale.activitePrincipale;
         this.areaCode = "FRA";
         this.footprint.updateAll(data.profil.empreinteSocietale);
         this.dataFetched = true;
       }
     }
-    
+    // Fetch default data
     if (!this.dataFetched) {
       let area = this.areaCode !="" ? this.areaCode : "_DV";
       let activity = this.corporateActivity!=null ? this.corporateActivity : "00";
@@ -125,7 +126,6 @@ export class Expense {
       }
       this.footprint.updateAll(data.empreinteSocietale);
     }
-      
   }
 
   // Fetch CSF data for all indicators & complete general data
@@ -167,18 +167,16 @@ export class Expense {
   /* ---------- Getters ---------- */
 
   getId() {return this.id}
-  getLabel() {return this.label}
-  getAccount() {return this.account}
   getCorporateId() {return this.corporateId}
   getCorporateName() {return this.corporateName}
   getCorporateActivity() {return this.corporateActivity}
 
-   getEconomicDivision() {
-      if (this.corporateActivity!=null) {
-          if (this.corporateActivity.length()>=2) {
-              return this.corporateActivity.substring(0, 2);
-          } else {return "00"}
-      } else {return "00"}
+  getEconomicDivision() {
+    if (this.corporateActivity!=null) {
+        if (this.corporateActivity.length()>=2) {
+            return this.corporateActivity.substring(0, 2);
+        } else {return "00"}
+    } else {return "00"}
   }
 
   getAreaCode() {return this.areaCode}

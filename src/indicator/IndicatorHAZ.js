@@ -16,6 +16,12 @@ export class IndicatorHAZ extends IndicatorNetValueAdded {
 
   /* ---------- Setters ---------- */
   
+  setDeclaredValue(declaredValue) {
+    this.hazardsUse = declaredValue;
+    if (this.hazardsUse==null) {this.uncertainty = null}
+    else {this.uncertainty = 50.0}
+  }
+
   setHazard(hazardsUse) {
     this.hazardsUse = hazardsUse;
     if (this.hazardsUse==null) {this.uncertainty = null}
@@ -24,7 +30,9 @@ export class IndicatorHAZ extends IndicatorNetValueAdded {
 
   /* ---------- Getters ---------- */
   
-  getProductsUse() {return this.hazardsUse}
+  getProductsUse() {
+    return this.hazardsUse;
+  }
   
   getProductsUseUncertainty() {
     if (this.hazardsUse!=null) {return this.uncertainty}
@@ -33,6 +41,10 @@ export class IndicatorHAZ extends IndicatorNetValueAdded {
 
   /* ---------- Update ---------- */
   
+  getDeclaredValue() {
+    return this.hazardsUse;
+  }
+
   getValue() {
     if (this.netValueAdded!=null & this.hazardsUse!=null) {
       return this.hazardsUse/this.netValueAdded*1000;

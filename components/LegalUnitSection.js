@@ -40,30 +40,37 @@ export class LegalUnitSection extends React.Component {
           <h1>Informations générales</h1>
         </div>
         <div className="legal_unit_main_view">
-          <h3>Informations légales</h3>
-          <div className="inline-input short">
-            <label>Numéro de siren </label>
-            <input id="siren-input" 
-                  type="text" 
-                  value={siren} 
-                  onChange={this.onSirenChange} 
-                  onBlur={this.updateSession} 
-                  onKeyPress={this.onEnterPress}/>
+          <div className="group">
+            <h3>Informations légales</h3>
+            <div className="inline-input short">
+              <label>Numéro de siren </label>
+              <input id="siren-input" 
+                    type="text" 
+                    value={siren} 
+                    onChange={this.onSirenChange} 
+                    onBlur={this.updateSession} 
+                    onKeyPress={this.onEnterPress}/>
+            </div>
+            <div className="inline-input">
+              <label>Dénomination </label>
+              <input id="siren-input" type="text" value={corporateName} disabled={true}/>
+            </div><div className="inline-input">
+              <label>Domiciliation du siège </label>
+              <input id="siren-input" type="text" value={corporateHeadquarters} disabled={true}/>
+            </div>
           </div>
-          <div className="inline-input">
-            <label>Dénomination </label>
-            <input id="siren-input" type="text" value={corporateName} disabled={true}/>
-          </div><div className="inline-input">
-            <label>Domiciliation du siège </label>
-            <input id="siren-input" type="text" value={corporateHeadquarters} disabled={true}/>
+          <div className="group">
+            <h3>Informations comptables</h3>
+            <div className="inline-input short">
+              <label>Année de fin de l'exercice</label>
+              <input id="year-input" type="text" value={year} onChange={this.onYearChange} onBlur={this.updateSession} onKeyPress={this.onEnterPress}/>
+            </div>
           </div>
-          <h3>Informations comptables</h3>
-          <div className="inline-input short">
-            <label>Année de fin de l'exercice</label>
-            <input id="year-input" type="text" value={year} onChange={this.onYearChange} onBlur={this.updateSession} onKeyPress={this.onEnterPress}/>
-          </div><div className="coporate-social-footprint">
+          <div className="group">
             <h3>Empreinte Sociétale de l'Entreprise</h3>
-            {buildTableMain(this.props.session)}
+            <div className="coporate-social-footprint">
+              {buildTableMain(this.props.session)}
+            </div>
           </div>
         </div>
       </div>
@@ -138,9 +145,9 @@ function buildTableMain(session) {
               <tr key={indic}>
                 <td className="column_code">{indic.toUpperCase()}</td>
                 <td className="column_libelle">{indicData[indic].libelle}</td>
-                <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1)}</td>
+                <td className="column_value">{printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),1)}</td>
                 <td className="column_unit">&nbsp;{indicData[indic].unit}</td>
-                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).printUncertainty(),0)}&nbsp;%</td>
+                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getRevenueFootprint().getIndicator(indic).printUncertainty(),0)}&nbsp;%</td>
               </tr>
             )
           })

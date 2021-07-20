@@ -36,7 +36,7 @@ import { jsPDF } from 'jspdf';
 import {indic as indicData} from '../lib/indic';
 
 function exportIndicPDF(indic,session) {
-
+  
   const doc = new jsPDF();
 
   doc.setFont("Calibri");
@@ -53,7 +53,7 @@ function exportIndicPDF(indic,session) {
 
   x+=10;
   doc.setFontSize(11);
-  doc.text((session.getUniteLegale().corporateName!="" ? session.getUniteLegale().corporateName : " - " ),10,x); 
+  doc.text((session.getUniteLegale().corporateName || " - " ),10,x); 
   x+=10;
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");

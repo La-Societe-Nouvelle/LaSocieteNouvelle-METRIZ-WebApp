@@ -8,7 +8,7 @@ export class IndicatorART extends IndicatorNetValueAdded {
     super("art");
     // Specific data for ART
     this.craftedProduction = null;
-    this.isValueAddedCrafted = false;
+    this.isValueAddedCrafted = undefined;
   }
 
   updateFromBackUp(backUp) {

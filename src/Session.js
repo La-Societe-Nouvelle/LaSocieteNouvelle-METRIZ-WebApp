@@ -17,6 +17,7 @@ import {IndicatorWAS} from '/src/indicator/IndicatorWAS.js';
 import {IndicatorWAT} from '/src/indicator/IndicatorWAT.js';
 
 import {indic as indicData} from '../lib/indic';
+import { Indicator } from './Indicator';
 
 const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
@@ -66,15 +67,14 @@ export class Session {
         await this.legalUnit.updateFromBackUp(backUp.legalUnit);        
         await this.financialData.updateFromBackUp(backUp.financialData);
         await this.updateImpactsDirectsFromBackUp(backUp.impactsDirects);
-        this.updateRevenueFootprint();
-        /*
+        
+        this.revenueFootprint.updateFromBackUp(backUp.revenueFootprint);
         this.productionFootprint.updateFromBackUp(backUp.productionFootprint);
+        this.unstoredProductionFootprint.updateFromBackUp(backUp.unstoredProductionFootprint)
         this.expensesFootprint.updateFromBackUp(backUp.expensesFootprint);
+        this.grossValueAddedFootprint.updateFromBackUp(backUp.grossValueAddedFootprint)
         this.depreciationsFootprint.updateFromBackUp(backUp.depreciationsFootprint);
-        // reprocess instead of import calculated data
-        this.updateGrossValueAddedFootprint();
-        this.updateUnstoredProductionFootprint();
-        */
+        
     }
 
     updateImpactsDirectsFromBackUp(backUp) {
@@ -90,10 +90,11 @@ export class Session {
     }
 
     // ...from indicator section
-    updateValueAddedIndicator(indicator) {
+    async updateValueAddedIndicator(indicator) {
         let indic = indicator.getIndic();
         this.impactsDirects[indic] = indicator;
-        this.updateRevenueFootprint(indic);
+        await this.updateRevenueIndicFootprint(indic);
+        return;
     }
 
     /* -------------------- GETTERS -------------------- */
@@ -150,10 +151,11 @@ export class Session {
 
     /* ---------- REVENUE (AVAILABLE PRODUCTION) ---------- */
 
-    updateRevenueFootprint() {
+    async updateRevenueFootprint() {
         indics.forEach((indic) => {
             this.updateRevenueIndicFootprint(indic);
         })
+        return;
     }
 
     async updateRevenueIndicFootprint(indic) {
@@ -181,19 +183,21 @@ export class Session {
                     absoluteMin+= currentProductionSold*this.productionFootprint.getIndicator(indic).getValueMin();
                 }
                 if (this.financialData.getUnstoredProduction()>0.0) {
-                    let previousProductionSold = this.getUnstoredProduction();
-                    absolute+= previousProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValue();
-                    absoluteMax+= previousProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValueMax();
-                    absoluteMin+= previousProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValueMin();
+                    let unstoredProductionSold = this.financialData.getUnstoredProduction();
+                    absolute+= unstoredProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValue();
+                    absoluteMax+= unstoredProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValueMax();
+                    absoluteMin+= unstoredProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValueMin();
                 }
                 
-                let value = (Math.round(absolute/this.financialData.getProduction() *100)/100).toFixed(indicData[indic].nbDecimals);
+                let value = (Math.round(absolute/this.financialData.getRevenue() *100)/100).toFixed(indicData[indic].nbDecimals);
                 this.revenueFootprint.getIndicator(indic).setValue(value);
-                let uncertainty = Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 );
+                let uncertainty = value > 0 ? Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 ) : 0;
                 this.revenueFootprint.getIndicator(indic).setUncertainty(uncertainty);
             }
             else { this.revenueFootprint.getIndicator(indic).setValue(null); }
         } else { this.revenueFootprint.getIndicator(indic).setValue(null); }
+
+        return;
     }
     
     /* ---------- (CURRENT) PRODUCTION ---------- */
@@ -236,11 +240,13 @@ export class Session {
                 
                 let value = (Math.round(absolute/this.financialData.getProduction() *100)/100).toFixed(indicData[indic].nbDecimals);
                 this.productionFootprint.getIndicator(indic).setValue(value);
-                let uncertainty = Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 );
+                let uncertainty = value > 0 ? Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 ) : 0;
                 this.productionFootprint.getIndicator(indic).setUncertainty(uncertainty);
             }
             else { this.productionFootprint.getIndicator(indic).setValue(null); }
         } else { this.productionFootprint.getIndicator(indic).setValue(null); }
+
+        return;
     }
 
     /* ---------- UNSTORED PRODUCTION ---------- */
@@ -277,6 +283,8 @@ export class Session {
             this.unstoredProductionFootprint.getIndicator(indic).setValue(this.productionFootprint.getIndicator(indic).getValue());
             this.unstoredProductionFootprint.getIndicator(indic).setUncertainty(this.productionFootprint.getIndicator(indic).getUncertainty());
         }
+
+        return;
     }
 
     /* ---------- EXPENSES ---------- */
@@ -323,7 +331,7 @@ export class Session {
 
             if (totalAmount>0.0) { 
                 indicatorExpenses.setValue(absolute/totalAmount);
-                let uncertainty = Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100;
+                let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
                 indicatorExpenses.setUncertainty(uncertainty);
             } else {
                 indicatorExpenses.setValue(null); 
@@ -334,6 +342,8 @@ export class Session {
             indicatorExpenses.setValue(null); 
             indicatorExpenses.setUncertainty(null);
         }
+
+        return;
     }
 
     async getExpenseDefaultFootprint() 
@@ -390,15 +400,15 @@ export class Session {
                     absoluteMax+= this.financialData.getNetValueAdded()*this.impactsDirects[indic].getValueMax();
                     absoluteMin+= this.financialData.getNetValueAdded()*this.impactsDirects[indic].getValueMin();
                 }
-                
                 let value = (Math.round(absolute/totalAmount *100)/100).toFixed(indicData[indic].nbDecimals);
                 this.grossValueAddedFootprint.getIndicator(indic).setValue(value);
-                let uncertainty = Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 );
+                let uncertainty = value > 0 ? Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 ) : 0;
                 this.grossValueAddedFootprint.getIndicator(indic).setUncertainty(uncertainty);
             }
             else { this.grossValueAddedFootprint.getIndicator(indic).setValue(null); }
         } else { this.grossValueAddedFootprint.getIndicator(indic).setValue(null); }
 
+        return;
     }
 
     /* ---------- DEPRECIATIONS ---------- */
@@ -428,9 +438,7 @@ export class Session {
                     let amountDepreciation = depreciation.getAmount();
                     if (amountDepreciation!=null) 
                     {
-                        let indicatorDepreciation = depreciation.getFootprint().getIndicator(indic);
-                        if (indicatorDepreciation.getValue()==null) { indicatorDepreciation.setDefaultData(); }
-    
+                        let indicatorDepreciation = depreciation.getFootprint().getIndicator(indic);    
                         totalAmount+= depreciation.getAmount();
                         absolute+= indicatorDepreciation.getValue()*amountDepreciation;
                         absoluteMax+= indicatorDepreciation.getValueMax()*amountDepreciation;
@@ -449,7 +457,7 @@ export class Session {
             
             if (totalAmount>0.0) { 
                 indicatorDepreciations.setValue(absolute/totalAmount);
-                let uncertainty = Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100;
+                let uncertainty = absolute> 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
                 indicatorDepreciations.setUncertainty(uncertainty);
             } else {
                 indicatorDepreciations.setValue(null);
@@ -459,7 +467,9 @@ export class Session {
         } else { 
             indicatorDepreciations.setValue(null);
             indicatorDepreciations.setUncertainty(null);
-        }        
+        }
+        
+        return;
     }
     
     /* ---------- NET VALUE ADDED ---------- */
@@ -470,6 +480,92 @@ export class Session {
                 this.impactsDirects[indic].setNetValueAdded(this.financialData.getNetValueAdded());
             }
         )
+    }
+
+    /* ---------- ACCOUNTS ---------- */
+
+    getExpensesAccountIndicator(account,indic) {
+        
+        let indicator = new Indicator(indic);
+        
+        if (this.financialData.getAmountExpenses()!=null) 
+        {
+            let totalAmount = 0.0;
+            let absolute = 0.0;
+            let absoluteMax = 0.0;
+            let absoluteMin = 0.0;
+
+            // Process for expenses in account
+            let expenses = this.financialData.getExpenses();
+            expenses.filter(expense => expense.account.substring(0,2)==account).forEach((expense) => {
+                let amountExpense = expense.getAmount();
+                if (amountExpense!=null) 
+                {
+                    let indicatorExpense = expense.getFootprint().getIndicator(indic);
+                    totalAmount+= expense.getAmount();
+                    absolute+= indicatorExpense.getValue()*amountExpense;
+                    absoluteMax+= indicatorExpense.getValueMax()*amountExpense;
+                    absoluteMin+= indicatorExpense.getValueMin()*amountExpense;
+                }
+            })
+
+            if (totalAmount>0.0) { 
+                indicator.setValue(absolute/totalAmount);
+                let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
+                indicator.setUncertainty(uncertainty);
+            } else {
+                indicator.setValue(null); 
+                indicator.setUncertainty(null);
+            }
+        
+        } else { 
+            indicator.setValue(null); 
+            indicator.setUncertainty(null);
+        }
+
+        return indicator;
+    }
+
+    getDepreciationsAccountIndicator(account,indic) {
+        
+        let indicator = new Indicator(indic);
+        
+        if (this.financialData.getAmountDepreciations()!=null) 
+        {
+            let totalAmount = 0.0;
+            let absolute = 0.0;
+            let absoluteMax = 0.0;
+            let absoluteMin = 0.0;
+
+            // Process for depreciations in account
+            let depreciations = this.financialData.getDepreciations();
+            depreciations.filter(depreciation => depreciation.account.substring(0,3)==account).forEach((depreciation) => {
+                let amountDepreciation = depreciation.getAmount();
+                if (amountDepreciation!=null) 
+                {
+                    let indicatorDepreciation = depreciation.getFootprint().getIndicator(indic);
+                    totalAmount+= depreciation.getAmount();
+                    absolute+= indicatorDepreciation.getValue()*amountDepreciation;
+                    absoluteMax+= indicatorDepreciation.getValueMax()*amountDepreciation;
+                    absoluteMin+= indicatorDepreciation.getValueMin()*amountDepreciation;
+                }
+            })
+
+            if (totalAmount>0.0) { 
+                indicator.setValue(absolute/totalAmount);
+                let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
+                indicator.setUncertainty(uncertainty);
+            } else {
+                indicator.setValue(null); 
+                indicator.setUncertainty(null);
+            }
+        
+        } else { 
+            indicator.setValue(null); 
+            indicator.setUncertainty(null);
+        }
+
+        return indicator;
     }
 
 }
