@@ -280,7 +280,7 @@ class TableMain extends React.Component {
     }
   }
   onAmountDepreciationsBlur = (event) => {
-    let amountDepreciations = !isNaN(parseFloat(event.target.value)) ? parseFloat(event.target.value) : null;
+    let amountDepreciations = !isNaN(parseFloat(event.target.value.replaceAll(" ",""))) ? parseFloat(event.target.value.replaceAll(" ","")) : null;
     this.props.financialData.setAmountDepreciations(amountDepreciations);
     this.props.onUpdate(this.props.financialData);
     this.updateInputs();
