@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { printValue } from '../../src/utils/Utils';
+import { printValue, printValueInput } from '../../src/utils/Utils';
 
 // Readers
 import { FECFileReader, processFECData } from '../../src/readers/FECReader';
@@ -84,6 +84,7 @@ class TableMain extends React.Component {
            amountExpensesInput,
            amountDepreciationsInput} = this.state;
     const isAmountExpensesFixed = financialData.isAmountExpensesFixed();
+    const isAMountDepreciationsFixed = financialData.isAmountDepreciationsFixed();
     return (
       <table>
         <thead>
@@ -93,23 +94,23 @@ class TableMain extends React.Component {
           {/* --- Production items --- */}
           <tr className="with-bottom-line">
               <td>Chiffres d'affaires</td>
-              <td className="column_amount"><input value={printValue(revenueInput,0)} onChange={this.onRevenueChange} onBlur={this.onRevenueBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValueInput(revenueInput,0)} onChange={this.onRevenueChange} onBlur={this.onRevenueBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
           <tr>
               <td>Production</td>
-              <td className="column_amount"><input value={printValue(productionInput,0)} onChange={this.onProductionChange} onBlur={this.onProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValueInput(productionInput,0)} onChange={this.onProductionChange} onBlur={this.onProductionBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
           <tr>
               <td>&emsp;dont production stockée</td>
-              <td className="column_amount"><input value={printValue(storedProductionInput,0)} onChange={this.onStoredProductionChange} onBlur={this.onStoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValueInput(storedProductionInput,0)} onChange={this.onStoredProductionChange} onBlur={this.onStoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
           <tr>
               <td>&emsp;dont production immobilisée</td>
-              <td className="column_amount"><input value={printValue(immobilisedProductionInput,0)} onChange={this.onImmobilisedProductionChange} onBlur={this.onImmobilisedProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValueInput(immobilisedProductionInput,0)} onChange={this.onImmobilisedProductionChange} onBlur={this.onImmobilisedProductionBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
           <tr className="with-bottom-line">
               <td>Production déstockée sur l'exercice précédent</td>
-              <td className="column_amount"><input value={printValue(unstoredProductionInput,0)} onChange={this.onUnstoredProductionChange} onBlur={this.onUnstoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
+              <td className="column_amount"><input value={printValueInput(unstoredProductionInput,0)} onChange={this.onUnstoredProductionChange} onBlur={this.onUnstoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
 
           <tr>
@@ -118,7 +119,7 @@ class TableMain extends React.Component {
                   <img className="img locker" src="/resources/icon_locked.jpg" alt="locked" 
                         onClick={this.resyncAmountExpenses}/>}</td>
               <td className="column_amount">
-                <input value={printValue(amountExpensesInput,0)} 
+                <input value={printValueInput(amountExpensesInput,0)} 
                        onChange={this.onAmountExpensesChange} 
                        onBlur={this.onAmountExpensesBlur} 
                        onKeyPress={this.onEnterPress}/></td>
@@ -128,14 +129,14 @@ class TableMain extends React.Component {
               return(
               <tr key={num}>
                 <td>&emsp;{account.label}</td>
-                <td className="column_amount"><input value={printValue(account.amount,0)} disabled={true}/></td>
+                <td className="column_amount"><input value={printValueInput(account.amount,0)} disabled={true}/></td>
                 <td className="column_unit">&nbsp;€</td>
               </tr>
             )})
           }
           <tr className="with-bottom-line with-top-line">
               <td>Valeur ajoutée brute</td>
-              <td className="column_amount"><input value={printValue(financialData.getGrossValueAdded(),0)} disabled={true}/></td>
+              <td className="column_amount"><input value={printValueInput(financialData.getGrossValueAdded(),0)} disabled={true}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
 
           <tr>
@@ -150,14 +151,14 @@ class TableMain extends React.Component {
               return(
               <tr key={num}>
                 <td>&emsp;{account.label}</td>
-                <td className="column_amount"><input value={printValue(account.amount,0)} disabled={true}/></td>
+                <td className="column_amount"><input value={printValueInput(account.amount,0)} disabled={true}/></td>
                 <td className="column_unit">&nbsp;€</td>
               </tr>
             )})
           }
           <tr className="with-top-line with-bottom-line">
               <td>Valeur ajoutée nette</td>
-              <td className="column_amount"><input value={printValue(financialData.getNetValueAdded(),0)} disabled={true}/></td>
+              <td className="column_amount"><input value={printValueInput(financialData.getNetValueAdded(),0)} disabled={true}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
         </tbody>
       </table>
@@ -176,6 +177,8 @@ class TableMain extends React.Component {
   onRevenueChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({revenueInput: parseFloat(event.target.value.replaceAll(" ",""))});
+    } else if (event.target.value=="") {
+      this.setState({revenueInput: null})
     }
   }
   onRevenueBlur = (event) => {
@@ -189,6 +192,8 @@ class TableMain extends React.Component {
   onProductionChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({productionInput: parseFloat(event.target.value.replaceAll(" ",""))});
+    } else if (event.target.value=="") {
+      this.setState({productionInput: null})
     }
   }
   onProductionBlur = (event) => {
@@ -202,6 +207,8 @@ class TableMain extends React.Component {
   onStoredProductionChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({storedProductionInput: parseFloat(event.target.value.replaceAll(" ",""))});
+    } else if (event.target.value=="") {
+      this.setState({storedProductionInput: null})
     }
   }
   onStoredProductionBlur = (event) => {
@@ -215,6 +222,8 @@ class TableMain extends React.Component {
   onImmobilisedProductionChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({immobilisedProductionInput: event.target.value.replaceAll(" ","")});
+    } else if (event.target.value=="") {
+      this.setState({immobilisedProductionInput: null})
     }
   }
   onImmobilisedProductionBlur = (event) => {
@@ -228,6 +237,8 @@ class TableMain extends React.Component {
   onUnstoredProductionChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({unstoredProductionInput: parseFloat(event.target.value.replaceAll(" ",""))});
+    } else if (event.target.value=="") {
+      this.setState({unstoredProductionInput: null})
     }
   }
   onUnstoredProductionBlur = (event) => {
@@ -243,6 +254,8 @@ class TableMain extends React.Component {
   onAmountExpensesChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({amountExpensesInput: parseFloat(event.target.value.replaceAll(" ",""))});
+    }  else if (event.target.value=="") {
+      this.setState({amountExpensesInput: null})
     }
   }
   onAmountExpensesBlur = (event) => {
@@ -262,6 +275,8 @@ class TableMain extends React.Component {
   onAmountDepreciationsChange = (event) => {
     if (!isNaN(parseFloat(event.target.value.replaceAll(" ","")))) {
       this.setState({amountDepreciationsInput: parseFloat(event.target.value.replaceAll(" ",""))});
+    } else if (event.target.value=="") {
+      this.setState({amountDepreciationsInput: null})
     }
   }
   onAmountDepreciationsBlur = (event) => {
