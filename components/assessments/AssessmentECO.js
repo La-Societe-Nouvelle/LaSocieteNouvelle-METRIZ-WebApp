@@ -76,13 +76,13 @@ export class AssessmentECO extends React.Component {
   }
 
   onDomesticProductionChange = (event) => {
-    this.props.indicator.setIsAllActivitiesInFrance(false);
+    this.props.indicator.setIsAllActivitiesInFrance(null);
     this.setState({domesticProductionInput: event.target.value});
   }
   onDomesticProductionBlur = (event) => {
     let domesticProduction = parseFloat(event.target.value);
     this.props.indicator.setDomesticProduction(!isNaN(domesticProduction) ? domesticProduction : null);
-    this.props.onUpdate(this.state.indicator);
+    this.props.onUpdate(this.props.indicator);
   }
   
 }
