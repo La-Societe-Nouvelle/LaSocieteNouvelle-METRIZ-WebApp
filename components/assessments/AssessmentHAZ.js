@@ -46,6 +46,7 @@ export class AssessmentHAZ extends React.Component {
   onAssessmentValueBlur = (event) => {
     let assessmentValue = parseFloat(event.target.value);
     this.props.indicator.setHazard(!isNaN(assessmentValue) ? assessmentValue : null);
+    this.setState({uncertainty: this.props.indicator.getProductsUseUncertainty() || ""})
     this.props.onUpdate(this.props.indicator);
   }
 
