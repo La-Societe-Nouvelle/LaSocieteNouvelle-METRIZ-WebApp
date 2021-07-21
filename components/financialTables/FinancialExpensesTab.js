@@ -34,7 +34,7 @@ export class FinancialExpensesTab extends React.Component {
                 <input id="import-expenses" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
               <button onClick={() => this.triggerChange()}>Ajouter une dépense</button>
               {financialData.expenses.length > 0 && 
-                <button onClick={() =>this.removeAll}>Supprimer tout</button>}
+                <button onClick={() =>this.removeAll()}>Supprimer tout</button>}
             </div>
             
             {financialData.expenses.length > 0 &&

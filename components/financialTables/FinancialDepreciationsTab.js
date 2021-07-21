@@ -34,7 +34,7 @@ export class FinancialDepreciationsTab extends React.Component {
                   <input id="import-depreciations" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
                 <button onClick={() => this.triggerChange()}>Ajouter une immobilisation</button>
                 {financialData.depreciations.length > 0 &&
-                <button onClick={() => this.removeAll}>Supprimer tout</button>}
+                <button onClick={() => this.removeAll()}>Supprimer tout</button>}
               </div>
               
               {financialData.depreciations.length > 0 &&
