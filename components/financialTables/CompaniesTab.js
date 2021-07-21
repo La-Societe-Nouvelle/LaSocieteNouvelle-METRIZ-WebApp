@@ -277,12 +277,16 @@ class RowTableCompanies extends React.Component {
     this.setState({corporateNameInput: event.target.value})
   }
   onAreaCodeChange = (event) => {
-    this.setState({areaCodeInput: event.target.value});
-    this.props.onSave(this.state);
+    let nextProps = this.state;
+    nextProps.areaCodeInput = event.target.value;
+    this.setState(nextProps);
+    this.props.onSave(nextProps);
   }
   onCorporateActivityChange = (event) => {
-    this.setState({corporateActivityInput: event.target.value});
-    this.props.onSave(this.state);
+    let nextProps = this.state;
+    nextProps.corporateActivityInput = event.target.value;
+    this.setState(nextProps)
+    this.props.onSave(nextProps);
   }
 
   // Props functions
