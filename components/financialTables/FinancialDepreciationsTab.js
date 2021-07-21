@@ -304,12 +304,12 @@ class RowTableDepreciations extends React.Component {
             { this.props.companies.map((company) => {return <option key={company.id} value={company.corporateName}/>})}
           </datalist></td>
         <td className="column_short-input">
-          <input value={account} 
+          <input value={account}
                  onChange={this.onAccountChange}
-                 onBlur={this.onBlur} 
+                 onBlur={this.onBlur}
                  onKeyPress={this.onEnterPress}/></td>
         <td className="column_short-input">
-          <input value={year} 
+          <input value={year}
                  onChange={this.onYearChange}
                  onBlur={this.onBlur} 
                  onKeyPress={this.onEnterPress}/></td>
@@ -329,7 +329,7 @@ class RowTableDepreciations extends React.Component {
       </tr>
     )
   }
-  
+
   onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
   onLabelChange = (event) => {
@@ -356,7 +356,7 @@ class RowTableDepreciations extends React.Component {
     let nextProps = {id: this.props.id, ...this.state};
     if (!nextProps.year.match(/[0-9]{4}/)) nextProps.year = undefined;
     nextProps.amount = !isNaN(parseFloat(nextProps.amount)) ? parseFloat(nextProps.amount) : undefined;
-    this.props.onUpdate(props);
+    this.props.onUpdate(nextProps);
   }
 
   /* ----- PROPS METHODS ----- */
