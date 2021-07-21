@@ -139,8 +139,11 @@ class TableMain extends React.Component {
               <td className="column_unit">&nbsp;€</td></tr>
 
           <tr>
-              <td>Dotations aux amortissements</td>
-              <td className="column_amount"><input value={printValue(amountDepreciationsInput,0)} onChange={this.onAmountDepreciationsChange} onBlur={this.onAmountDepreciationsBlur} onKeyPress={this.onEnterPress}/></td>
+              <td>Dotations aux amortissements&nbsp;&nbsp;
+              {isAMountDepreciationsFixed && 
+                  <img className="img locker" src="/resources/icon_locked.jpg" alt="locked" 
+                        onClick={this.resyncAmountDepreciations}/>}</td>
+              <td className="column_amount"><input value={printValueInput(amountDepreciationsInput,0)} onChange={this.onAmountDepreciationsChange} onBlur={this.onAmountDepreciationsBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
           {
             Object.entries(financialData.getDepreciationsAccounts()).map(([num,account]) => {
@@ -266,6 +269,12 @@ class TableMain extends React.Component {
     this.props.financialData.setAmountDepreciations(amountDepreciations);
     this.props.onUpdate(this.props.financialData);
     this.updateInputs();
+  }
+
+  resyncAmountDepreciations = (event) => {
+    this.props.financialData.setAmountDepreciationsFixed(false);
+    this.props.onUpdate(this.props.financialData);
+    this.setState({amountDepreciationsInput: this.props.financialData.getAmountDepreciations()});
   }
 
 }
