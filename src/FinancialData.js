@@ -54,7 +54,7 @@ export class FinancialData {
         
         this.netValueAdded = backUp.netValueAdded;
 
-        // TO DO : add companies data
+        this.updateCompaniesFromBackUp(backUp.companies);
     }
      
     updateExpensesFromBackUp(backUpExpenses) {
@@ -70,6 +70,13 @@ export class FinancialData {
             let depreciation = new Depreciation({id: this.getNewDepreciationId()});
             depreciation.updateFromBackUp(backUpDepreciation);
             this.depreciations.push(depreciation);
+        })
+    }
+
+    updateCompaniesFromBackUp(backUpCompanies) {
+        backUpCompanies.forEach((backUpCompany) => {
+            let company = new Company({id: this.getNewCompanyId(), ...backUpCompany});
+            this.companies.push(company);
         })
     }
 
