@@ -76,7 +76,7 @@ export class AssessmentART extends React.Component {
   }
 
   onCraftedProductionChange = (event) => {
-    this.props.indicator.setIsValueAddedCrafted(false);
+    this.props.indicator.setIsValueAddedCrafted(null);
     this.setState({craftedProductionInput: event.target.value});
   }
   onCraftedProductionBlur = (event) => {

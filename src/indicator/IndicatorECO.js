@@ -30,7 +30,7 @@ export class IndicatorECO extends IndicatorNetValueAdded {
   setDomesticProduction(domesticProduction) {
     this.domesticProduction = domesticProduction;
     this.uncertainty = 0;
-    this.isAllActivitiesInFrance = domesticProduction==this.netValueAdded;
+    //if (domesticProduction === this.netValueAdded) this.isAllActivitiesInFrance = true;
   }
 
   setIsAllActivitiesInFrance(isAllActivitiesInFrance) {
