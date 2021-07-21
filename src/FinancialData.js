@@ -75,7 +75,7 @@ export class FinancialData {
 
     updateCompaniesFromBackUp(backUpCompanies) {
         backUpCompanies.forEach((backUpCompany) => {
-            let company = new Company({id: this.getNewCompanyId(), ...backUpCompany});
+            let company = new Company({ ...backUpCompany});
             this.companies.push(company);
         })
     }

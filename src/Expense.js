@@ -66,6 +66,7 @@ export class Expense {
   updateFromBackUp(backUp) {
     this.label = backUp.label!=undefined ? backUp.label : "";
     this.account = backUp.account!=undefined ? backUp.account : "";
+    this.companyId = backUp.companyId;
     this.corporateId = backUp.corporateId;
     this.corporateName = backUp.corporateName;
     this.areaCode = backUp.areaCode;
