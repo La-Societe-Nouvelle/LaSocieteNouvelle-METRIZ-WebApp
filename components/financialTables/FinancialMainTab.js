@@ -115,7 +115,7 @@ class TableMain extends React.Component {
           <tr>
               <td>Charges externes&nbsp;&nbsp;
               {isAmountExpensesFixed && 
-                  <img className="img locker" src="/resources/icon_refresh.jpg" alt="locked" 
+                  <img className="img locker" src="/resources/icon_locked.jpg" alt="locked" 
                         onClick={this.resyncAmountExpenses}/>}</td>
               <td className="column_amount">
                 <input value={printValue(amountExpensesInput,0)} 
