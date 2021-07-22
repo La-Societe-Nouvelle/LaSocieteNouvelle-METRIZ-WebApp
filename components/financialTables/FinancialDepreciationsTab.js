@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { FECFileReader, processFECData } from '../../src/readers/FECReader';
-import { CSVFileReader, processCSVExpensesData } from '../../src/readers/CSVReader';
+import { CSVFileReader, processCSVDepreciationsData } from '../../src/readers/CSVReader';
 import { InputText } from '../InputText';
 import { InputNumber } from '../InputNumber.js';
 
@@ -74,7 +74,7 @@ export class FinancialDepreciationsTab extends React.Component {
     let reader = new FileReader();
     reader.onload = async () => {
       CSVFileReader(reader.result)
-        .then((CSVData) => processCSVExpensesData(CSVData))
+        .then((CSVData) => processCSVDepreciationsData(CSVData))
         .then(async (nextFinancialData) => {
           this.props.financialData.removeDepreciations();
           await Promise.all(nextFinancialData.depreciations.map(async (depreciation) => {
