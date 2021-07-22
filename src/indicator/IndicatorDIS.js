@@ -8,21 +8,19 @@ export class IndicatorDIS extends IndicatorNetValueAdded {
     super("dis");
     // Specific data for DIS
     this.indexGini = null;
-    this.hasEmployees = true;
+    this.hasEmployees = true; // 25-06-2021
   }
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
     this.indexGini = backUp.indexGini;
-    // 25-06-2021
     this.hasEmployees = backUp.hasEmployees!=undefined ? backUp.hasEmployees : true; 
   }
 
   /* ---------- Setters ---------- */
   
-  setIndexGini(indexGini) {
-    this.indexGini = indexGini;
-    this.uncertainty = 0;
+  setStatement(statement) {
+    this.indexGini = statement;
     this.hasEmployees = true;
   }
 
@@ -33,7 +31,9 @@ export class IndicatorDIS extends IndicatorNetValueAdded {
   
   /* ---------- Getters ---------- */
   
-  getIndexGini() {return this.indexGini}
+  getStatement() {
+    return this.indexGini;
+  }
 
   getHasEmployees() {
     return this.hasEmployees;
@@ -42,11 +42,19 @@ export class IndicatorDIS extends IndicatorNetValueAdded {
   /* ---------- Update ---------- */
   
   getValue() {
-    if (this.netValueAdded!=null) {
-      return this.indexGini
-    } else {
+    if (this.netValueAdded!=null) 
+    {
+      return this.hasEmployees ? this.indexGini : 0.0;
+    } 
+    else 
+    {
       return null;
     }
-  }  
+  }
+  
+  getUncertainty() {
+    return this.getValue()!=null ? 0.0 : null;
+  }
+
 
 }

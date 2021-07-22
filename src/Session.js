@@ -16,6 +16,7 @@ import {IndicatorSOC} from '/src/indicator/IndicatorSOC.js';
 import {IndicatorWAS} from '/src/indicator/IndicatorWAS.js';
 import {IndicatorWAT} from '/src/indicator/IndicatorWAT.js';
 
+import { metaAccounts } from '../lib/accounts';
 import {indic as indicData} from '../lib/indic';
 import { Indicator } from './Indicator';
 
@@ -488,44 +489,23 @@ export class Session {
 
     getExpensesAccountIndicator(account,indic) {
         
-        let indicator = new Indicator(indic);
-        
         if (this.financialData.getAmountExpenses()!=null) 
         {
-            let totalAmount = 0.0;
-            let absolute = 0.0;
-            let absoluteMax = 0.0;
-            let absoluteMin = 0.0;
-
-            // Process for expenses in account
-            let expenses = this.financialData.getExpenses();
-            expenses.filter(expense => expense.account.substring(0,2)==account).forEach((expense) => {
-                let amountExpense = expense.getAmount();
-                if (amountExpense!=null) 
-                {
-                    let indicatorExpense = expense.getFootprint().getIndicator(indic);
-                    totalAmount+= expense.getAmount();
-                    absolute+= indicatorExpense.getValue()*amountExpense;
-                    absoluteMax+= indicatorExpense.getValueMax()*amountExpense;
-                    absoluteMin+= indicatorExpense.getValueMin()*amountExpense;
-                }
-            })
-
-            if (totalAmount>0.0) { 
-                indicator.setValue(absolute/totalAmount);
-                let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
-                indicator.setUncertainty(uncertainty);
-            } else {
-                indicator.setValue(null); 
-                indicator.setUncertainty(null);
+            if (["60","61","62"].includes(account)) { // check if account "set"
+                return buildIndicatorAggregate(indic,
+                    this.financialData.expenses.filter(expense => expense.account.substring(0,2)==account)
+                )
+            } else if (account!="") { // other accounts
+                return buildIndicatorAggregate(indic,
+                    this.financialData.expenses.filter(expense => expense.account == "")
+                )
+            } else { // other expenses
+                let amount = this.financialData.getAmountExpenses() - this.financialData.getAmountDetailedExpenses();
+                // fetch data
             }
-        
-        } else { 
-            indicator.setValue(null); 
-            indicator.setUncertainty(null);
         }
 
-        return indicator;
+        return new Indicator(indic);;
     }
 
     getDepreciationsAccountIndicator(account,indic) {
@@ -570,4 +550,39 @@ export class Session {
         return indicator;
     }
 
+    
+}
+
+
+function buildIndicatorAggregate(indic,elements) 
+{
+    let indicator = new Indicator(indic);
+    
+    let totalAmount = 0.0;
+    let absolute = 0.0;
+    let absoluteMax = 0.0;
+    let absoluteMin = 0.0;
+
+    elements.forEach((element) => {
+        let amount = element.getAmount();
+        if (amount!=null) 
+        {
+            let indicatorElement = element.getFootprint().getIndicator(indic);
+            absolute+= indicatorElement.getValue()*amount;
+            absoluteMax+= indicatorElement.getValueMax()*amount;
+            absoluteMin+= indicatorElement.getValueMin()*amount;
+            totalAmount+= amount;
+        }
+    })
+
+    if (totalAmount>0.0) { 
+        indicator.setValue(absolute/totalAmount);
+        let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
+        indicator.setUncertainty(uncertainty);
+    } else {
+        indicator.setValue(null); 
+        indicator.setUncertainty(null);
+    }
+
+    return indicator;
 }

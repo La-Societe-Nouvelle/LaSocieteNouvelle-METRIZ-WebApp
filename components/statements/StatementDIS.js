@@ -1,20 +1,19 @@
 import React from 'react';
-
-export class AssessmentGEQ extends React.Component {
+export class StatementDIS extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      wageGapInput: props.indicator.getWageGap()!=null ? props.indicator.getWageGap() : "",
+      statement: props.indicator.getStatement() || "",
     }
   }
 
   render() {
-    const hasEmployees = this.props.indicator.getHasEmployees();
-    const {wageGapInput} = this.state;
+    const {hasEmployees} = this.props.indicator;
+    const {statement} = this.state;
     return (
-      <div className="assessment">
-        <div className="assessment-item">
+      <div className="statement">
+        <div className="statement-item">
           <label>L'entreprise est-elle employeur ?</label>
           <div className="input-radio">
             <input type="radio" id="hasEmployees"
@@ -31,15 +30,15 @@ export class AssessmentGEQ extends React.Component {
             <label>Non</label>
           </div>
         </div>
-        <div className="assessment-item">
-          <label>Ecart de rémunarations F/H (en % du taux horaire brut moyen)</label>
+        <div className="statement-item">
+          <label>Indice de GINI des taux horaires bruts</label>
           <input className="input-value"
-                 value={wageGapInput}
-                 onChange={this.onWageGapChange}
-                 onBlur={this.onWageGapBlur}
+                 value={statement}
+                 onChange={this.onStatementChange}
+                 onBlur={this.onStatementBlur}
                  disabled={hasEmployees === false}
                  onKeyPress={this.onEnterPress}/>
-          <span>&nbsp;%</span>
+          <span>&nbsp;/100</span>
         </div>
       </div>
     ) 
@@ -55,17 +54,17 @@ export class AssessmentGEQ extends React.Component {
       case "true": this.props.indicator.setHasEmployees(true); break;
       case "false": this.props.indicator.setHasEmployees(false); break;
     }
+    this.setState({statement: this.props.indicator.getStatement() || ""})
     this.props.onUpdate(this.props.indicator);
-    this.state.wageGapInput = this.props.indicator.getWageGap()!=null ? this.props.indicator.getWageGap() : "";
   }
 
-  onWageGapChange = (event) => {
-    this.setState({wageGapInput: event.target.value});
+  onStatementChange = (event) => {
+    this.setState({statement: event.target.value});
   }
 
-  onWageGapBlur = (event) => {
-    let wageGap = parseFloat(event.target.value);
-    this.props.indicator.setWageGap(!isNaN(wageGap) ? wageGap : null);
+  onStatementBlur = (event) => {
+    let indexGini = parseFloat(event.target.value);
+    this.props.indicator.setStatement(!isNaN(indexGini) ? indexGini : null);
     this.props.onUpdate(this.props.indicator);
   }
 

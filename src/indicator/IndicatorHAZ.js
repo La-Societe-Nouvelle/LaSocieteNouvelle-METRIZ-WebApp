@@ -6,52 +6,46 @@ export class IndicatorHAZ extends IndicatorNetValueAdded {
   {
     super("haz")
     // Specific data for HAZ
-    this.hazardsUse = null;
+    this.hazardousSubstancesConsumtpion = null;
   }
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
-    this.hazardsUse = backUp.hazardsUse;
+    this.hazardousSubstancesConsumtpion = backUp.hazardousSubstancesConsumtpion || backUp.hazardsUse;
   }
 
   /* ---------- Setters ---------- */
-  
-  setDeclaredValue(declaredValue) {
-    this.hazardsUse = declaredValue;
-    if (this.hazardsUse==null) {this.uncertainty = null}
-    else {this.uncertainty = 50.0}
-  }
 
-  setHazard(hazardsUse) {
-    this.hazardsUse = hazardsUse;
-    if (this.hazardsUse==null) {this.uncertainty = null}
-    else {this.uncertainty = 50.0}
+  setStatement(statement) {
+    this.hazardousSubstancesConsumtpion = statement;
+    this.uncertainty = this.hazardousSubstancesConsumtpion > 0 ? 50.0 : 0.0;
   }
-
+k
   /* ---------- Getters ---------- */
   
-  getProductsUse() {
-    return this.hazardsUse;
+  getStatement() {
+    return this.hazardousSubstancesConsumtpion;
   }
   
-  getProductsUseUncertainty() {
-    if (this.hazardsUse!=null) {return this.uncertainty}
-    else {return null}
+  getStatementUncertainty() {
+    return this.getStatement()!=null ? this.uncertainty : null;
   }
 
   /* ---------- Update ---------- */
   
-  getDeclaredValue() {
-    return this.hazardsUse;
-  }
-
   getValue() {
-    if (this.netValueAdded!=null & this.hazardsUse!=null) {
-      return this.hazardsUse/this.netValueAdded*1000;
-    } else {
+    if (this.netValueAdded!=null && this.hazardousSubstancesConsumtpion!=null) 
+    {
+        return this.hazardousSubstancesConsumtpion/this.netValueAdded *1000;
+    } 
+    else 
+    {
       return null;
     }
   }
-  
+
+  getUncertainty() {
+    return this.getValue()!=null ? this.uncertainty : null;
+  }
 
 }

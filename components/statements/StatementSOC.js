@@ -1,29 +1,29 @@
 import React from 'react';
 
-export class AssessmentSOC extends React.Component {
+export class StatementSOC extends React.Component {
 
   constructor(props) {
     super(props);
   }
 
   render() {
-    const hasSocialPurpose = this.props.indicator.getHasSocialPurpose();
+    const statement = this.props.indicator.getStatement();
     return (
-      <div className="assessment">
-        <div className="assessment-item">
+      <div className="statement">
+        <div className="statement-item">
           <label>L'entreprise est-elle d'utilité sociale ou dotée d'une raison d'être ?</label>
           <div className="input-radio">
             <input type="radio" id="hasSocialPurpose"
                    value="true"
-                   checked={hasSocialPurpose === true}
-                   onChange={this.onHasSocialPurposeChange}/>
+                   checked={statement === true}
+                   onChange={this.onStatementChange}/>
             <label>Oui</label>
           </div>
           <div className="input-radio">
             <input type="radio" id="hasSocialPurpose"
                    value="false"
-                   checked={hasSocialPurpose === false}
-                   onChange={this.onHasSocialPurposeChange}/>
+                   checked={statement === false}
+                   onChange={this.onStatementChange}/>
             <label>Non</label>
           </div>
         </div>
@@ -31,11 +31,11 @@ export class AssessmentSOC extends React.Component {
     ) 
   }
 
-  onHasSocialPurposeChange = (event) => {
+  onStatementChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
-      case "true": this.props.indicator.setHasSocialPurpose(true); break;
-      case "false": this.props.indicator.setHasSocialPurpose(false); break;
+      case "true": this.props.indicator.setStatement(true); break;
+      case "false": this.props.indicator.setStatement(false); break;
     }
     this.props.onUpdate(this.props.indicator);
   }

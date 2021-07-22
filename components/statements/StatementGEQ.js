@@ -1,20 +1,19 @@
 import React from 'react';
-
-export class AssessmentDIS extends React.Component {
+export class StatementGEQ extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      indexGiniInput: props.indicator.getIndexGini()!=null ? props.indicator.getIndexGini() : "",
+      statement: props.indicator.getStatement() || "",
     }
   }
 
   render() {
-    const hasEmployees = this.props.indicator.getHasEmployees();
-    const {indexGiniInput} = this.state;
+    const {hasEmployees} = this.props.indicator;
+    const {statement} = this.state;
     return (
-      <div className="assessment">
-        <div className="assessment-item">
+      <div className="statement">
+        <div className="statement-item">
           <label>L'entreprise est-elle employeur ?</label>
           <div className="input-radio">
             <input type="radio" id="hasEmployees"
@@ -31,15 +30,15 @@ export class AssessmentDIS extends React.Component {
             <label>Non</label>
           </div>
         </div>
-        <div className="assessment-item">
-          <label>Indice de GINI des taux horaires bruts</label>
+        <div className="statement-item">
+          <label>Ecart de rémunarations F/H (en % du taux horaire brut moyen)</label>
           <input className="input-value"
-                 value={indexGiniInput}
-                 onChange={this.onIndexGiniChange}
-                 onBlur={this.onIndexGiniBlur}
+                 value={statement}
+                 onChange={this.onStatementChange}
+                 onBlur={this.onStatementBlur}
                  disabled={hasEmployees === false}
                  onKeyPress={this.onEnterPress}/>
-          <span>&nbsp;/100</span>
+          <span>&nbsp;%</span>
         </div>
       </div>
     ) 
@@ -55,17 +54,16 @@ export class AssessmentDIS extends React.Component {
       case "true": this.props.indicator.setHasEmployees(true); break;
       case "false": this.props.indicator.setHasEmployees(false); break;
     }
+    this.setState({statement: this.props.indicator.getStatement() || ""});
     this.props.onUpdate(this.props.indicator);
-    this.state.indexGiniInput = this.props.indicator.getIndexGini()!=null ? this.props.indicator.getIndexGini() : "";
   }
 
-  onIndexGiniChange = (event) => {
-    this.setState({indexGiniInput: event.target.value});
+  onStatementChange = (event) => {
+    this.setState({statement: event.target.value});
   }
-
-  onIndexGiniBlur = (event) => {
-    let indexGini = parseFloat(event.target.value);
-    this.props.indicator.setIndexGini(!isNaN(indexGini) ? indexGini : null);
+  onStatementBlur = (event) => {
+    let wageGap = parseFloat(event.target.value);
+    this.props.indicator.setStatement(!isNaN(wageGap) ? wageGap : null);
     this.props.onUpdate(this.props.indicator);
   }
 

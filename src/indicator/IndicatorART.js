@@ -8,59 +8,66 @@ export class IndicatorART extends IndicatorNetValueAdded {
     super("art");
     // Specific data for ART
     this.craftedProduction = null;
-    this.isValueAddedCrafted = undefined;
+    this.isValueAddedCrafted = null; // 25-06-2021
   }
+
+  /*
+    case craftedProduction != null -> "part"
+    case isValueAddedCrafted -> "true" / "false"
+  */
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
     this.craftedProduction = backUp.craftedProduction;
-    // 25-06-2021
-    this.isValueAddedCrafted = backUp.isValueAddedCrafted!=undefined ? backUp.isValueAddedCrafted : (backUp.hasLabel!=undefined ? backUp.hasLabel : false);
+    this.isValueAddedCrafted = backUp.isValueAddedCrafted!=undefined ? backUp.isValueAddedCrafted : null;
   }
     
   /* ---------- Setters ---------- */
     
-  setCraftedProduction(craftedProduction) {
-    this.craftedProduction = craftedProduction;
+  setStatement(statement) {
+    this.craftedProduction = statement;
     this.uncertainty = 0;
   }    
   
   setIsValueAddedCrafted(isValueAddedCrafted) {
       this.isValueAddedCrafted = isValueAddedCrafted;
-      this.craftedProduction = isValueAddedCrafted ? this.netValueAdded : 0.0;
+      if (this.isValueAddedCrafted == null) {
+        this.craftedProduction = 0.0; // re-init value
+      } else {
+        this.craftedProduction = null;
+      }
   }
   
   /* ---------- Getters ---------- */
   
-  getCraftedProduction() {return this.craftedProduction}
-  getIsValueAddedCrafted() {return this.isValueAddedCrafted}
+  getStatement() {
+    return this.craftedProduction;
+  }
+
+  getIsValueAddedCrafted() {
+    return this.isValueAddedCrafted
+  }
   
   /* ---------- Override ---------- */
   
   getValue() {
-    if (this.netValueAdded!=null & this.isValueAddedCrafted) {
-      return 100.0;
-    } else if (this.netValueAdded!=null & this.craftedProduction!=null) {
-      if (this.netValueAdded < this.craftedProduction) {
-          this.craftedProduction = this.netValueAdded;
-      }
-      return this.craftedProduction/this.netValueAdded *100;
-      //this.flag = Flag.PUBLICATION;
-    } else {
+    if (this.netValueAdded!=null) 
+    {
+      // case : part of the net value added is crafted
+      if (this.craftedProduction!=null) {return this.craftedProduction/this.netValueAdded *100}
+      // case : none/all of the net value added is crafted
+      else if (this.isValueAddedCrafted!=null) {return this.isValueAddedCrafted ? 100 : 0}
+      // case : no statement
+      else {return null}
+    } 
+    else 
+    {
       return null;
-      //this.flag = Flag.UNDEFINED;
     }
   }
     
   getUncertainty() {
-      if (this.getValue()!=null) {return 0.0}
-      else {return null}
-  }
-  
-  getValueAbsolute() {
-  if (this.hasLabel)                        {return this.netValueAdded}
-    else if (this.craftedProduction!=null)  {return this.craftedProduction}
-    else                                    {return null}
+    return this.getValue()!=null ? 0.0 : null;
   }
 
 }

@@ -8,43 +8,38 @@ export class IndicatorECO extends IndicatorNetValueAdded {
     super("eco");
     // Specific data for ECO
     this.domesticProduction = null;
-    this.isAllActivitiesInFrance = null;
+    this.isAllActivitiesInFrance = null; // 24-06-2021
   }
+
+  /*
+    case domesticProduction != null -> "part"
+    case isAllActivitiesInFrance -> "true" / "false"
+  */
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
     this.domesticProduction = backUp.domesticProduction;
-    // 24-06-2021
-    this.isAllActivitiesInFrance = backUp.isAllActivitiesInFrance!=undefined ? backUp.isAllActivitiesInFrance : (this.domesticProduction==this.netValueAdded);
+    this.isAllActivitiesInFrance = backUp.isAllActivitiesInFrance!=undefined ? backUp.isAllActivitiesInFrance : null;
   }
 
   /* ----- SETTERS ----- */
 
-  setDeclaredValue(declaredValue) {
-    this.domesticProduction = this.domesticProduction;
-    if (this.domesticProduction==null) {this.uncertainty = null}
-    else {this.uncertainty = 0}
-    this.isAllActivitiesInFrance = domesticProduction==this.netValueAdded;
-  }
-
-  setDomesticProduction(domesticProduction) {
-    this.domesticProduction = domesticProduction;
-    this.uncertainty = 0;
-    //if (domesticProduction === this.netValueAdded) this.isAllActivitiesInFrance = true;
+  setStatement(statement) {
+    this.domesticProduction = statement;
   }
 
   setIsAllActivitiesInFrance(isAllActivitiesInFrance) {
     this.isAllActivitiesInFrance = isAllActivitiesInFrance;
-    if (isAllActivitiesInFrance) {
-      this.domesticProduction = this.netValueAdded;
+    if (this.isAllActivitiesInFrance == null) {
+      this.domesticProduction = 0.0; // re-init value
     } else {
-      this.domesticProduction = 0.0;
+      this.domesticProduction = null;
     }
   }
 
   /* ----- GETTERS ----- */
 
-  getDomesticProduction() {
+  getStatement() {
     return this.domesticProduction;
   }
 
@@ -54,26 +49,24 @@ export class IndicatorECO extends IndicatorNetValueAdded {
 
   /* ----- VALUE & UNCERTAINTY ----- */
 
-  getDeclaredValue() {
-    return this.domesticProduction;
-  }
-
   getValue() {
-    if (this.netValueAdded!=null & this.isAllActivitiesInFrance) {
-      return 100.0;
-    } else if (this.netValueAdded!=null & this.domesticProduction!=null) {
-      if (this.netValueAdded < this.domesticProduction) {
-          this.domesticProduction = this.netValueAdded;
-      }
-      return this.domesticProduction/this.netValueAdded*100;
-    } else {
+    if (this.netValueAdded!=null) 
+    {
+      // case : part of the net value added is crafted
+      if (this.domesticProduction!=null) {return this.domesticProduction/this.netValueAdded *100}
+      // case : none/all of the net value added is crafted
+      else if (this.isAllActivitiesInFrance!=null) {return this.isAllActivitiesInFrance ? 100 : 0}
+      // case : not defined
+      else {return null}
+    } 
+    else 
+    {
       return null;
     }
   }
 
   getUncertainty() {
-    if (this.getValue()!=null) {return 0.0}
-    else {return null}
+    return this.getValue()!=null ? 0.0 : null;
   }
 
 }

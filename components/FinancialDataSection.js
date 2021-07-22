@@ -1,10 +1,10 @@
 import React from 'react';
 
 // Tabs
-import { FinancialMainTab } from './financialTables/FinancialMainTab';
-import { FinancialExpensesTab } from './financialTables/FinancialExpensesTab';
-import { FinancialDepreciationsTab } from './financialTables/FinancialDepreciationsTab';
-import { CompaniesTab } from './financialTables/CompaniesTab';
+import { FinancialMainTab } from './financialTabs/FinancialMainTab';
+import { FinancialExpensesTab } from './financialTabs/FinancialExpensesTab';
+import { FinancialDepreciationsTab } from './financialTabs/FinancialDepreciationsTab';
+import { CompaniesTab } from './financialTabs/CompaniesTab';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */

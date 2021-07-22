@@ -26,18 +26,29 @@ export function FinancialMainTab(props)
     reader.readAsText(event.target.files[0]);
   }
 
+  const isAmountExpensesFixed = financialData.isAmountExpensesFixed();
+  const isAMountDepreciationsFixed = financialData.isAmountDepreciationsFixed();
+
   return (
     <div className="financial_data_main_view">
       <div className="group">
         <h3>Soldes intermédiaires de gestion</h3>
         <div className="actions">
-          <button onClick={() => {document.getElementById('import-fec').click()}}>Importer un fichier FEC</button>
-          <input id="import-fec" type="file" accept=".csv" onChange={importFECFile} visibility="collapse"/>
+          <button className="highlight" onClick={() => {document.getElementById('import-fec').click()}}>Importer un fichier FEC</button>
+          <input className="hidden" id="import-fec" type="file" accept=".csv" onChange={importFECFile} visibility="collapse"/>
         </div>
         <TableMain
           ref={refTableMain}
           onUpdate={props.onUpdate} 
           financialData={props.financialData}/>
+        <div className="notes">
+          {(isAmountExpensesFixed || isAMountDepreciationsFixed) &&
+            <div>
+              <p>&nbsp;<img className="img locker" src="/resources/icon_locked.jpg" alt="locked"/>
+                 &nbsp;Saisie supérieure à la somme des écritures renseignées. Cliquez sur le cadenas pour recalculer la somme totale.
+              </p>
+            </div>}
+        </div>
       </div>
     </div>
   )
@@ -53,24 +64,24 @@ class TableMain extends React.Component {
     super(props);
     this.state = {
       // Input variables
-      productionInput: props.financialData.getProduction()!=null ? props.financialData.getProduction() : "",
-      revenueInput: props.financialData.getRevenue()!=null ? props.financialData.revenue : "",
-      storedProductionInput: props.financialData.getStoredProduction()!=null ? props.financialData.getStoredProduction() : "",
-      immobilisedProductionInput: props.financialData.getImmobilisedProduction()!=null ? props.financialData.getImmobilisedProduction() : "",
-      unstoredProductionInput: props.financialData.getUnstoredProduction()!=null ? props.financialData.getUnstoredProduction() : "",
-      amountExpensesInput: props.financialData.getAmountExpenses()!=null ? props.financialData.getAmountExpenses() : "",
-      amountDepreciationsInput: props.financialData.getAmountDepreciations()!=null ? props.financialData.getAmountDepreciations() : "",
+      productionInput: props.financialData.getProduction() || "",
+      revenueInput: props.financialData.revenue || "",
+      storedProductionInput: props.financialData.getStoredProduction() || "",
+      immobilisedProductionInput: props.financialData.getImmobilisedProduction() || "",
+      unstoredProductionInput: props.financialData.getUnstoredProduction() || "",
+      amountExpensesInput: props.financialData.getAmountExpenses() || "",
+      amountDepreciationsInput: props.financialData.getAmountDepreciations() || "",
     }
   }
 
   updateInputs() {
-    this.state.productionInput = this.props.financialData.getProduction()!=null ? this.props.financialData.getProduction() : "";
-    this.state.revenueInput = this.props.financialData.getRevenue()!=null ? this.props.financialData.getRevenue() : "";
-    this.state.storedProductionInput = this.props.financialData.getStoredProduction()!=null ? this.props.financialData.getStoredProduction() : "";
-    this.state.immobilisedProductionInput = this.props.financialData.getImmobilisedProduction()!=null ? this.props.financialData.getImmobilisedProduction() : "";
-    this.state.unstoredProductionInput = this.props.financialData.getUnstoredProduction()!=null ? this.props.financialData.getUnstoredProduction() : "";
-    this.state.amountExpensesInput = this.props.financialData.getAmountExpenses()!=null ? this.props.financialData.getAmountExpenses() : "";
-    this.state.amountDepreciationsInput = this.props.financialData.getAmountDepreciations()!=null ? this.props.financialData.getAmountDepreciations() : "";
+    this.state.productionInput = this.props.financialData.getProduction() || "";
+    this.state.revenueInput = this.props.financialData.getRevenue() || "";
+    this.state.storedProductionInput = this.props.financialData.getStoredProduction() || "";
+    this.state.immobilisedProductionInput = this.props.financialData.getImmobilisedProduction() || "";
+    this.state.unstoredProductionInput = this.props.financialData.getUnstoredProduction() || "";
+    this.state.amountExpensesInput = this.props.financialData.getAmountExpenses() || "";
+    this.state.amountDepreciationsInput = this.props.financialData.getAmountDepreciations() || "";
     this.forceUpdate();
   }
 

@@ -2,18 +2,18 @@ import React from 'react';
 
 import { printValue } from '../../src/utils/Utils';
 
-import { AssessmentART } from '../assessments/AssessmentART';
-import { AssessmentDIS } from '../assessments/AssessmentDIS';
-import { AssessmentECO } from '../assessments/AssessmentECO';
-import { AssessmentGEQ } from '../assessments/AssessmentGEQ';
-import { AssessmentGHG } from '../assessments/AssessmentGHG';
-import { AssessmentHAZ } from '../assessments/AssessmentHAZ';
-import { AssessmentKNW } from '../assessments/AssessmentKNW';
-import { AssessmentMAT } from '../assessments/AssessmentMAT';
-import { AssessmentNRG } from '../assessments/AssessmentNRG';
-import { AssessmentSOC } from '../assessments/AssessmentSOC';
-import { AssessmentWAS } from '../assessments/AssessmentWAS';
-import { AssessmentWAT } from '../assessments/AssessmentWAT';
+import { StatementART } from '../statements/StatementART';
+import { StatementDIS } from '../statements/StatementDIS';
+import { StatementECO } from '../statements/StatementECO';
+import { StatementGEQ } from '../statements/StatementGEQ';
+import { StatementGHG } from '../statements/StatementGHG';
+import { StatementHAZ } from '../statements/StatementHAZ';
+import { StatementKNW } from '../statements/StatementKNW';
+import { StatementMAT } from '../statements/StatementMAT';
+import { StatementNRG } from '../statements/StatementNRG';
+import { StatementSOC } from '../statements/StatementSOC';
+import { StatementWAS } from '../statements/StatementWAS';
+import { StatementWAT } from '../statements/StatementWAT';
 
 // Export modules
 import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../../src/Export'
@@ -59,18 +59,18 @@ function Assessment(props) {
     onUpdate: props.onUpdate
   }
   switch(props.indic) {
-    case "art" : return(<AssessmentART {...assessmentProps}/>)
-    case "dis" : return(<AssessmentDIS {...assessmentProps}/>)
-    case "eco" : return(<AssessmentECO {...assessmentProps}/>)
-    case "geq" : return(<AssessmentGEQ {...assessmentProps}/>)
-    case "ghg" : return(<AssessmentGHG {...assessmentProps}/>)
-    case "haz" : return(<AssessmentHAZ {...assessmentProps}/>)
-    case "knw" : return(<AssessmentKNW {...assessmentProps}/>)
-    case "mat" : return(<AssessmentMAT {...assessmentProps}/>)
-    case "nrg" : return(<AssessmentNRG {...assessmentProps}/>)
-    case "soc" : return(<AssessmentSOC {...assessmentProps}/>)
-    case "was" : return(<AssessmentWAS {...assessmentProps}/>)
-    case "wat" : return(<AssessmentWAT {...assessmentProps}/>)
+    case "art" : return(<StatementART {...assessmentProps}/>)
+    case "dis" : return(<StatementDIS {...assessmentProps}/>)
+    case "eco" : return(<StatementECO {...assessmentProps}/>)
+    case "geq" : return(<StatementGEQ {...assessmentProps}/>)
+    case "ghg" : return(<StatementGHG {...assessmentProps}/>)
+    case "haz" : return(<StatementHAZ {...assessmentProps}/>)
+    case "knw" : return(<StatementKNW {...assessmentProps}/>)
+    case "mat" : return(<StatementMAT {...assessmentProps}/>)
+    case "nrg" : return(<StatementNRG {...assessmentProps}/>)
+    case "soc" : return(<StatementSOC {...assessmentProps}/>)
+    case "was" : return(<StatementWAS {...assessmentProps}/>)
+    case "wat" : return(<StatementWAT {...assessmentProps}/>)
   }
 }
 

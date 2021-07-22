@@ -382,11 +382,11 @@ class ExpensePopup extends React.Component {
           <h3>{this.props.id == undefined ? "Ajout d'une dépense" : "Modification"}</h3>
           <div className="inputs">
             <div className="inline-input">
-                <label>Libellé </label>
+                <label>Libellé* </label>
                 <InputText value={label} onUpdate={this.updateLabel.bind(this)}/>
             </div>
             <div className="inline-input short">
-                <label>Montant </label>
+                <label>Montant* </label>
                 <InputNumber className="input-number" value={amount} onUpdate={this.updateAmount.bind(this)}/>
                 <span>&nbsp;€</span>
             </div>
@@ -395,7 +395,7 @@ class ExpensePopup extends React.Component {
                 <InputText value={account} onUpdate={this.updateAccount.bind(this)}/>
             </div>
             <div className="inline-input">
-                <label>Fournisseur </label>
+                <label>Fournisseur* </label>
                 <input value={corporateName} 
                   list="companies"
                   onChange={this.onCorporateNameChange}
@@ -407,7 +407,7 @@ class ExpensePopup extends React.Component {
           </div>
           <div className="footer">
             <button onClick={() => this.props.onClose()}>Fermer</button>
-            <button onClick={() => this.updateExpense()}>Enregistrer</button>
+            <button disabled={label=="" || amount=="" || corporateName==""} onClick={() => this.updateExpense()}>Enregistrer</button>
           </div>
         </div>
       </div>

@@ -1,115 +1,67 @@
 import { IndicatorNetValueAdded } from "./IndicatorNetValueAdded";
-
-const BIOMASSE = 0;
-const METAL = 1;
-const NON_METAL = 2;
-const FOSSILE = 3;
-
 export class IndicatorMAT extends IndicatorNetValueAdded {
 
   constructor() 
   {
     super("mat")
-    this.materials = null;
-    this.isExtractiveActivities = false;
-    // Specific data for MAT
-    this.items = {};
-    this.itemsUncertainty = {};
+    this.materialsExtraction = null;
+    this.isExtractiveActivities = null; // 07-07-2021
   }
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
-    this.materials = backUp.materials;
-    this.items = backUp.items;
-    this.itemsUncertainty = backUp.itemsUncertainty;
-    // 07-07-2021
-    this.isExtractiveActivities = backUp.isExtractiveActivities!=undefined ? backUp.isExtractiveActivities : (this.materials > 0);
+    this.materialsExtraction = backUp.materialsExtraction || backUp.materials;
+    this.isExtractiveActivities = backUp.isExtractiveActivities || null;
   }
     
   /* ---------- Setters ---------- */
   
-  setMaterials(materials) {
-    this.materials = materials;
-    this.isExtractiveActivities = this.materials > 0;
-    if (this.materials == null) {this.uncertainty = null}
-    else {this.uncertainty = 50.0}
-    this.items = {};
-    this.itemsUncertainty = {};
+  setStatement(statement) {
+    this.materialsExtraction = statement;
+    this.uncertainty = this.materialsExtraction > 0 ? 50.0 : 0.0;
+    this.isExtractiveActivities = true;
   }
 
   setIsExtractiveActivities(isExtractiveActivities) {
     this.isExtractiveActivities = isExtractiveActivities;
-    if (isExtractiveActivities) {
-      this.materials = null;
-    } else {
-      this.materials = 0.0;
-    }
-  }
-  
-  setMaterialsItem(item,materials) {
-    this.items[item] = materials;
-    this.itemsUncertainty[item] = 50.0;
-    this.updateTotal();
-  }
-  
-  setMaterialsItemUncertainty(item,uncertainty) {
-      this.itemsUncertainty[item] = uncertainty;
-      this.updateTotal();
+    this.materialsExtraction = this.isExtractiveActivities ? null : 0.0;
+    this.uncertainty = 0.0;
   }
   
   /* ---------- Getters ---------- */
   
-  getMaterials() {
-    return this.materials
+  getStatement() {
+    return this.materialsExtraction;
+  }
+
+  getStatementUncertainty() {
+    return this.getStatement()!=null ? this.uncertainty : null;
   }
 
   getIsExtractiveActivities() {
     return this.isExtractiveActivities;
   }
 
-  getMaterialsUncertainty() {
-    if (this.materials!=null) {return this.uncertainty}
-    else {return null}
-  }
-  
-  getMaterialsItem(item) {return items[item]}
-  
-  getMateiralsItemUncertainty(item) {return itemsUncertainty[item]}
-
-  /* ---------- Update ---------- */
-
-  updateTotal() {
-      let isTotalSet = false;
-      materials = 0.0;
-      let materialsMax = 0.0;
-      let materialsMin = 0.0;
-      for (let item = 0; item < items.length; item++) {
-          let materialsItem = items[item];
-          if (materialsItem!=null) {
-              materialsMax+= materialsItem*(1 + itemsUncertainty[item]/100);
-              materialsMin+= materialsItem*max(1 - itemsUncertainty[item]/100, 0.0);
-              materials+= materialsItem;
-              isTotalSet = true;
-          }
-      }
-      if (isTotalSet) {
-          if (materials > 0.0) { uncertainty = max(materialsMax-materials, materials-materialsMin)/materials *100;} 
-          else                 { uncertainty = 0.0;}
-      } else {
-          materials = null;
-          uncertainty = null;
-          flag = Flag.UNDEFINED;
-      }
-  }
+  /* ---------- Override ---------- */
 
   getValue() {
-    if (this.netValueAdded!=null & this.materials!=null) {
-      return this.materials/this.netValueAdded*1000;
-    } else {
+    if (this.netValueAdded!=null) 
+    {
+      // case : no mining or agricultural activities
+      if (!this.isExtractiveActivities) {return 0.0}
+      // case : mining or agricultural activities
+      else if (this.materialsExtraction!=null) {this.materialsExtraction/this.netValueAdded *1000}
+      // case : no statement
+      else {return null};
+    }
+    else 
+    {
       return null;
     }
   }
   
-  
+  getUncertainty() {
+    return this.getValue()!=null ? this.uncertainty : null;
+  }
 
 }

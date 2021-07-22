@@ -13,38 +13,45 @@ export class IndicatorGEQ extends IndicatorNetValueAdded {
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
     this.wageGap = backUp.wageGap;
-    this.hasEmployees = backUp.hasEmployees;
+    this.hasEmployees = backUp.hasEmployees!=undefined ? backUp.hasEmployees : true;
   }
 
   /* ---------- Setters ---------- */
   
-  setWageGap(wageGap) {
-    this.wageGap = wageGap
+  setStatement(statement) {
+    this.wageGap = statement;
   }
   
   setHasEmployees(hasEmployees) {
     this.hasEmployees = hasEmployees
-    this.wageGap = hasEmployees ? null : 0.0;
+    this.wageGap = this.hasEmployees ? null : 0.0;
   }
   
   /* ---------- Getters ---------- */
   
-  getWageGap() {
-    return this.wageGap
+  getStatement() {
+    return this.wageGap;
   }
 
   getHasEmployees() {
-    return this.hasEmployees
+    return this.hasEmployees;
   }
   
   /* ---------- Override ---------- */
   
   getValue() {
-    if (this.netValueAdded!=null) {
-      return this.wageGap;
-    } else {
+    if (this.netValueAdded!=null) 
+    {
+      return this.hasEmployees ? this.wageGap : 0.0;
+    } 
+    else 
+    {
       return null;
     }
+  }
+
+  getUncertainty() {
+    return this.getValue()!=null ? 0.0 : null;
   }
 
 }

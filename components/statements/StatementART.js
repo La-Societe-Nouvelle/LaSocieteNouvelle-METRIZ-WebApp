@@ -1,28 +1,19 @@
 import React from 'react';
-
-export class AssessmentART extends React.Component {
+export class StatementART extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      craftedProductionInput: props.indicator.getCraftedProduction()!=null ? props.indicator.getCraftedProduction() : "",
-    }
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.indicator.getCraftedProduction()!=prevProps.indicator.getCraftedProduction()) {
-      this.setState({
-        craftedProductionInput: props.indicator.getDeclaredValue()!=null ? indicator.getDeclaredValue() : "",
-      })
+      statement: props.indicator.getStatement() || "",
     }
   }
 
   render() {
-    const isValueAddedCrafted = this.props.indicator.getIsValueAddedCrafted();
-    const {craftedProductionInput} = this.state;
+    const {isValueAddedCrafted,craftedProduction} = this.props.indicator;
+    const {statement} = this.state;
     return (
-      <div className="assessment">
-        <div className="assessment-item">
+      <div className="statement">
+        <div className="statement-item">
           <label>L'entreprise est-elle une entreprise artisanale ?</label>
           <div className="input-radio">
             <input type="radio" id="isValueAddedCrafetd"
@@ -34,7 +25,7 @@ export class AssessmentART extends React.Component {
           <div className="input-radio">
             <input type="radio" id="isValueAddedCrafetd"
                    value="null"
-                   checked={isValueAddedCrafted === null}
+                   checked={craftedProduction != null}
                    onChange={this.onIsValueAddedCraftedChange}/>
             <label>Partiellement</label>
           </div>
@@ -46,12 +37,12 @@ export class AssessmentART extends React.Component {
             <label>Non</label>
           </div>
         </div>
-        <div className="assessment-item">
+        <div className="statement-item">
           <label>Part de la valeur ajoutée artisanale</label>
           <input className="input-value"
-                 value={craftedProductionInput} 
-                 onChange={this.onCraftedProductionChange}
-                 onBlur={this.onCraftedProductionBlur}
+                 value={statement} 
+                 onChange={this.onStatementChange}
+                 onBlur={this.onStatementBlur}
                  disabled={isValueAddedCrafted!=null}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;€</span>
@@ -71,17 +62,16 @@ export class AssessmentART extends React.Component {
       case "null": this.props.indicator.setIsValueAddedCrafted(null); break;
       case "false": this.props.indicator.setIsValueAddedCrafted(false); break;
     }
+    this.setState({statement: this.props.indicator.getStatement() || ""});
     this.props.onUpdate(this.props.indicator);
-    this.state.craftedProductionInput = this.props.indicator.getCraftedProduction()!=null ? this.props.indicator.getCraftedProduction() : "";
   }
 
-  onCraftedProductionChange = (event) => {
-    this.props.indicator.setIsValueAddedCrafted(null);
-    this.setState({craftedProductionInput: event.target.value});
+  onStatementChange = (event) => {
+    this.setState({statement: event.target.value});
   }
-  onCraftedProductionBlur = (event) => {
+  onStatementBlur = (event) => {
     let craftedProduction = parseFloat(event.target.value);
-    this.props.indicator.setCraftedProduction(!isNaN(craftedProduction) ? craftedProduction : null);
+    this.props.indicator.setStatement(!isNaN(craftedProduction) ? craftedProduction : null);
     this.props.onUpdate(this.props.indicator);
   }
 

@@ -1,29 +1,28 @@
 import React from 'react';
-
-export class AssessmentHAZ extends React.Component {
+export class StatementNRG extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      assessmentValue: props.indicator.getProductsUse() || "",
-      uncertainty: props.indicator.getProductsUseUncertainty() || "",
+      statement: props.indicator.getStatement() || "",
+      uncertainty: props.indicator.getStatementUncertainty() || "",
     }
   }
 
   render() {
-    const {assessmentValue,uncertainty} = this.state;
+    const {statement,uncertainty} = this.state;
     return (
-      <div className="assessment">
-        <div className="assessment-item">
-          <label>Utilisation de produits dangereux - santé/environnement</label>
+      <div className="statement">
+        <div className="statement-item">
+          <label>Consommation totale d'énergie</label>
           <input className="input-value" 
-                 value={assessmentValue}
-                 onChange={this.onAssessmentValueChange}
-                 onBlur={this.onAssessmentValueBlur}
+                 value={statement}
+                 onChange={this.onStatementChange}
+                 onBlur={this.onStatementBlur}
                  onKeyPress={this.onEnterPress}/>
-          <span>&nbsp;kg</span>
+          <span>&nbsp;MJ</span>
         </div>
-        <div className="assessment-item">
+        <div className="statement-item">
           <label>Incertitude</label>
           <input className="input-value" 
                  value={uncertainty}
@@ -40,13 +39,13 @@ export class AssessmentHAZ extends React.Component {
     if (event.which==13) {event.target.blur();}
   }
 
-  onAssessmentValueChange = (event) => {
-    this.setState({assessmentValue: event.target.value});
+  onStatementChange = (event) => {
+    this.setState({statement: event.target.value});
   }
-  onAssessmentValueBlur = (event) => {
-    let assessmentValue = parseFloat(event.target.value);
-    this.props.indicator.setHazard(!isNaN(assessmentValue) ? assessmentValue : null);
-    this.setState({uncertainty: this.props.indicator.getProductsUseUncertainty() || ""})
+  onStatementBlur = (event) => {
+    let statement = parseFloat(event.target.value);
+    this.props.indicator.setStatement(!isNaN(statement) ? statement : null);
+    this.setState({uncertainty: this.props.indicator.getStatementUncertainty() || ""})
     this.props.onUpdate(this.props.indicator);
   }
 
@@ -58,5 +57,5 @@ export class AssessmentHAZ extends React.Component {
     this.props.indicator.setUncertainty(!isNaN(uncertainty) ? uncertainty : null);
     this.props.onUpdate(this.props.indicator);
   }
-  
+
 }

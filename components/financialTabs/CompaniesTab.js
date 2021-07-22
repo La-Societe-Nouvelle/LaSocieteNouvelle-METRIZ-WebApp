@@ -129,10 +129,11 @@ class TableCompanies extends React.Component {
             }
           </tbody>
         </table>
-        <div className="table-navigation">
-          <button onClick={this.prevPage}>Page précédente</button>
-          <button onClick={this.nextPage}>Page suivante</button>
-        </div>
+        {companies.length > 20 &&
+          <div className="table-navigation">
+            <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
+            <button className={(page+1)*20 < companies.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+          </div>}
       </div>
     )
   }

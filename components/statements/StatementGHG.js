@@ -1,6 +1,6 @@
 import React from 'react';
 
-export class AssessmentGHG extends React.Component {
+export class StatementGHG extends React.Component {
 
   constructor(props) {
     super(props);
@@ -13,8 +13,8 @@ export class AssessmentGHG extends React.Component {
   render() {
     const {emissionsInput,emissionsUncertaintyInput} = this.state;
     return (
-      <div className="assessment">
-        <div className="assessment-item">
+      <div className="statement">
+        <div className="statement-item">
           <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
           <input className="input-value" 
                  value={emissionsInput}
@@ -23,7 +23,7 @@ export class AssessmentGHG extends React.Component {
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;kgCO2e</span>
         </div>
-        <div className="assessment-item">
+        <div className="statement-item">
           <label>Incertitude</label>
           <input className="input-value" 
                  value={emissionsUncertaintyInput}

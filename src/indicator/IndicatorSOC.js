@@ -16,31 +16,30 @@ export class IndicatorSOC extends IndicatorNetValueAdded {
 
   /* --------- Setters --------- */
   
-  setHasSocialPurpose(hasSocialPurpose) {
-      this.hasSocialPurpose = hasSocialPurpose;
+  setStatement(statement) {
+      this.hasSocialPurpose = statement;
   }
   
   /* --------- Getters --------- */
   
-  getHasSocialPurpose() {return this.hasSocialPurpose}
-  
-  /* --------- Override --------- */
-  
-  getValue() {
-    if (this.netValueAdded!=null & this.hasSocialPurpose!=null) {
-      return this.hasSocialPurpose ? 100.0 : 0.0;
-    } else {
-      return null;
-    }
+  getStatement() {
+    return this.hasSocialPurpose;
   }
   
   /* --------- Override --------- */
   
+  getValue() {
+    if (this.netValueAdded!=null && this.hasSocialPurpose!=null) 
+    {
+      return this.hasSocialPurpose ? 100.0 : 0.0;
+    } 
+    else 
+    {
+      return null;
+    }
+  }
+    
   getUncertainty() {
-      if (this.getValue()!=null) {
-          return 0.0;
-      } else {
-          return null;
-      }
+      return this.getValue()!=null ? 0.0 : null;
   }
 }
