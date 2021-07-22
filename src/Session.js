@@ -84,8 +84,10 @@ export class Session {
     /* -------------------- EXTERNAL UPDATES -------------------- */
 
     // ...from financial section
-    updateFinancialData(financialData) {
+    async updateFinancialData(financialData) {
         this.financialData = financialData;
+        Object.entries(this.impactsDirects).forEach(([indic,indicator]) => {
+            indicator.setNetValueAdded(financialData.getNetValueAdded())})
         this.updateRevenueFootprint();
     }
 
