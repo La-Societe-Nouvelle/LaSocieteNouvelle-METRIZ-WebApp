@@ -75,7 +75,42 @@ async function processCSVExpensesData(CSVExpensesData)
     data.expenses.push(expenseData);
   })
 
-  console.log(data);
+  return data;
+}
+
+/* ---------- DEPRECIATIONS FILE ---------- */ 
+
+/*
+  Header format :
+    -> label : label
+    -> amount : amount
+    -> account : account (id)
+    -> accountLib : account label [not used yet]
+    -> corporateId : id of the company
+    -> corporateName : name of the company
+*/
+
+async function processCSVDepreciationsData(CSVData)
+// ...extract data to use in session
+{
+  let data = {};
+  data.depreciations = [];
+  data.accounts = {};
+  //data.companies = [];
+  
+  await CSVData.forEach((ecriture) => {
+    if (ecriture.account==undefined) { ecriture.account = ""};
+    if (data.accounts[ecriture.account]==undefined) { data.accounts[ecriture.account] = ecriture.accountLib }
+    let depreciationData = {
+      label: ecriture.label,
+      account: ecriture.account,
+      corporateId: ecriture.corporateId,
+      corporateName: ecriture.corporateName,
+      amount: parseFloat(ecriture.amount),
+    }
+    data.depreciations.push(depreciationData);
+  })
+
   return data;
 }
 
