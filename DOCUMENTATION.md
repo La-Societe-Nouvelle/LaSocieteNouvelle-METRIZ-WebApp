@@ -103,7 +103,7 @@ Le fichier d'import .csv doit comporter un en-tête (*header*) avec les libellé
 Exemple :
 
 | 1 |corporateName; corporateId |
-|:-|:-|:-:|:-:|
+|:-|:-|
 | 2 |Fournisseur1; 012785487 |
 | 3 |Fournisseur2; 759647854 |
 
