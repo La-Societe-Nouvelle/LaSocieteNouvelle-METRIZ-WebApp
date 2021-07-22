@@ -45,15 +45,15 @@ La section *Données Financières* correspond à la saisie des données financi�
 * *Soldes intermédiaires* pour la saisie des soldes comptables
 * *Charges externes* pour la saisie ou l'importation des charges externes
 * *Ammortissements sur immobilisations* pour la saisie ou l'importation des dotations aux amortissements
-* *Fournisseurs* pour la saisie de fournisseurs supplémentaires
+* *Fournisseurs* pour l'association des numéros de siren aux fournisseurs
 
 &nbsp;
 #### Soldes intermédiaires
 
-Le tableau des agrégats peut être rempli soit via l'import d'un fichier FEC, soit manuellement. Si un fichier FEC est importé, les données du tableau sont toujours éditables. 
-À noter que le calcul de l'Empreinte Sociétale ne peut se faire que si, à minima, le chiffre d'affaires est renseigné et les montants totaux des charges externes et des dotations aux amortissements sont disponibles (montant total saisi ou calculé à partir des lignes). Le cas échéant, le montant de la valeur ajoutée nette peut être déduit.
+Les soldes comptables peuvent être renseignés manuellement ou via l'import d'un fichier FEC. L'ensemble de ces montants sont disponibles au sein du compte de résultat de l'entreprise.
+À noter que le calcul de l'Empreinte Sociétale ne peut se faire que si le chiffre d'affaires et les montants totaux des charges externes et des dotations aux amortissements sont disponibles (montant total saisi ou calculé à partir des lignes). Le cas échéant, le montant de la valeur ajoutée nette est déduit.
 
-Le chiffre d'affaires (production vendue) est par défaut considéré comme entièrement produit sur l'exercice (ligne production). Le cas non-échéant, il convient de renseigner le volume de production déstockée. Il convient également en cas de production stockée et/ou de production immobilisée de renseigner le volume correspondant.
+Le chiffre d'affaires (production vendue) est par défaut considéré comme entièrement produit sur l'exercice (ligne production). Le cas non-échéant, il convient de renseigner le volume de production déstockée de l'exercice précédent. Il convient également en cas de production stockée et/ou de production immobilisée de renseigner le volume correspondant.
 Pour rappel la production sur un exercice correspond à la somme de la production vendue (chiffre d'affaires), de la production stockée et de la production immobilisée ôtée de la production déstockée.
 
 Le montant total des charges externes (respectivement des dotations aux amortissements) correspond à la somme des montants des charges (respectivement des dotations) saisies ou importées (Cf. onglets *Charges externes* et *Dotations aux amortissements*).
@@ -66,12 +66,10 @@ Le cadenas situé à côté des agrégats permet de *bloquer* le montant i.e. de
 Actions globales :
 * Importer un fichier FEC : importation d'un fichier FEC (les lignes précédemment saisies sont écrasées lors de l'importation)
 * Importer un fichier CSV : importation d'un fichier .csv (les lignes précédemment saisies sont écrasées lors de l'importation)
-* Ajouter une dépense : ouvre un formulaire permettant de renseigner les données nécessaires à l'ajout d'une charge dans le tableau. Cette dépense s'ajoutera aux dépenses existantes.
+* Ajouter une dépense : ajout d'une charge dans le tableau, qui s'ajoutera aux dépenses existantes.
 * Supprimer tout : suppression de toutes les lignes
 
-L'import des charges externes peut se faire manuellement (charge par charge) en saisissant le libellé, le montant, le compte et la fournisseurs associé via le bouton *Ajouter une dépense*. Il est également possible d'importer un fichier .csv ou un fichier FEC. 
-
-Le fichier d'import .csv doit comporter une en-tête (*header*) afin d'identifier les différentes colonnes, et avec les libellés suivants, séparés par des point-virgules :
+Le fichier d'import .csv doit comporter un en-tête (*header*) avec les libellés suivants, les données doivent être séparées par des point-virgules :
 - *corporateId* pour la colonne contenant le numéro siren
 - *corporateName* pour la colonne contenant le libellé de l'entreprise
 - *account* pour la colonne contenant le numéro de compte associé
@@ -80,11 +78,10 @@ Le fichier d'import .csv doit comporter une en-tête (*header*) afin d'identifie
 
 Exemple :
 
-|     | A                                                  | B      | C      |
-|:-|:-|:-:|:-:|
-| 1 |corporateId; corporateName; account; label; amount  |        |        |
-| 2 |012785487; Fournisseur1; 61; achat1; 2000             |        |        |
-| 3 |759647854; Fournisseur2; 61; achat2; 42500             |        |        |
+| 1 | corporateId; corporateName; account; label; amount |
+|:-|:-|
+| 2 | 012785487; Fournisseur1; 61; achat1; 2000 |
+| 3 | 759647854; Fournisseur2; 61; achat2; 42500 |
 
 
 Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
@@ -97,30 +94,31 @@ Le fonctionnement est similaire à l'onglet *Charges externes*
 &nbsp;
 #### Fournisseurs
 
-Cette section se met autmatiquement à jour en fonction des données saisies dans les onglets *Charges externes* et *Amortissements sur immobilisations*. Il est possible d'ajouter des fournisseurs via l'import d'un fichier .csv. L'importation écrasera les données précédemment saisies.
+Cette section se met autmatiquement à jour en fonction des données saisies dans les onglets *Charges externes* et *Amortissements sur immobilisations*. Il est possible de compléter les numéros de siren des fournisseurs via l'import d'un fichier .csv.
 
-Le fichier d'import .csv doit comporter une en-tête (*header*) afin d'identifier les différentes colonnes, et avec les libellés suivants :
+Le fichier d'import .csv doit comporter un en-tête (*header*) avec les libellés suivants, la séparation des données doit se faire avec des points-virgules :
 - *corporateName* pour la colonne contenant le libellé de l'entreprise
 - *corporateId* pour la colonne contenant le numéro siren
 
 Exemple :
 
-|   | A                          | B      | C      |
+| 1 |corporateName; corporateId |
 |:-|:-|:-:|:-:|
-| 1 |corporateName; corporateId; |        |        |
-| 2 |Fournisseur1; 012785487;     |        |        |
-| 3 |Fournisseur2; 759647854;    |        |        |
+| 2 |Fournisseur1; 012785487 |
+| 3 |Fournisseur2; 759647854 |
 
 
-La colonne *siren* est de couleur verte pour les entreprises *reconnues*.
-Si l'entreprise n'est pas reconnue des valeurs génériques par défaut sont utilisées, il est cependant possible de préciser la situation géographique et la division économique à laquelle est rattachée l'entreprise, ou à laquelle elle se rapproche le plus. Cela permet d'affiner les résultats de l'Empreinte Sociétale de l'Entreprise.
+La colonne *siren* est de couleur verte pour les entreprises *reconnues* au sein de la base de données.
+Si l'entreprise n'est pas reconnue, il est cependant possible de préciser la situation géographique et la division économique à laquelle est rattachée l'entreprise, ou à laquelle elle se rapproche le plus.
 
 &nbsp;
 ### INDICATEURS (INFORMATIONS GÉNÉRALES)
 
 Pour chaque indicateur, l'interface se compose de 2 sections :
 * La déclaration des impacts directs : zone de saisie des impacts directs. Il est possible, si besoin, d'accéder à un outil de calcul des données.
-* Le tableau récapitulatif : tableau regroupant les valeurs intermédiaires pour chaque solde intermédiaire et pour la valeur produite. Il est possible de modifier la valeur proposée et son incertitude pour chaque fournisseur. 
+* Le tableau récapitulatif : tableau regroupant les valeurs pour chaque solde intermédiaire. 
+ 
+Dans le cas où des valeurs plus pertinentes sont disponibles pour un fournisseur, il est possible de modifier via les tableaux de détails la valeur utilisée et son incertitude. 
 
 &nbsp;
 ### INDICATEURS (INFORMATIONS SPÉCIFIQUES)
@@ -141,21 +139,20 @@ Il est possible d'exporter un rapport (format PDF) relatif à l'indicateur en cl
 
 Les données utilisées sont obtenues à partir des informations saisies (Section "Données Financières") : numéro de siren OU activités et localisation.
 
-Les boutons *Détail des dépenses* et *Détail des ammortissements* renvoient respectivement à la section *Détails des impacts indirects des consommations* et *Détails des impacts indirects des immobilisations*. Il est possible d'y modifier les données par fournisseur si une valeur plus pertinente est connue, pour affiner le résultat du calcul de l'Empreinte Sociétale de l'Entreprise.
+Les boutons *Détail des dépenses* et *Détail des ammortissements* renvoient respectivement à la section *Détails des impacts indirects des consommations* et *Détails des impacts indirects des immobilisations*. Il est possible d'y modifier les données par fournisseur si une valeur plus pertinente est connue.
 
 &nbsp;
 ## TÉLÉCHARGER LA SESSION / IMPORTER UN FICHIER
 
-Les données saisies n'étant pas sauvegardées, il est possible de les télécharger pour les importer plus tard dans le but de poursuivre ou vérifier la précédente saisie.
-Les fichiers de sauvegarde sont au format JSON.  
+Les données saisies n'étant pas sauvegardées côté serveur, il est possible de télécharger et d'importer un fichier de sauvegarde.
+Les fichiers de sauvegarde sont au format JSON. 
 Les évolutions de l'application pourront entraîner un écart entre l'état sauvegardé au sein d'un fichier de sauvegarde et l'état utilisé au sein de l'application.
 L'importation sera adaptée pour préserver la lisibilité des fichiers. En cas de problème, n'hésitez pas à nous contacter.
 
 &nbsp;
 ## DOCUMENTATION
 
-Renvoie à cette documentation. N'hésitez pas à nous contacter en cas de problème, ne trouvant pas de réponse ici.
-Si vous rencontrez des difficultés à calculer un indicateur, nous proposons un service d'audit. Si vous souhaitez en bénéficier, contactez-nous.
+Renvoie à cette documentation. N'hésitez pas à nous contacter en cas de problème ou pour nous faire part de suggestions.
 
 &nbsp;
 ## CODE SOURCE
