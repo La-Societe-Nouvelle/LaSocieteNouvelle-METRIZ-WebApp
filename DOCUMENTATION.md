@@ -78,6 +78,15 @@ Le fichier d'import .csv doit comporter une en-tête (*header*) afin d'identifie
 - *label* pour la colonne contenant le nom associé à la dépense
 - *amount* pour la colonne contenant le montant de la dépense. 
 
+Exemple :
+
+|     | A                                                  | B      | C      |
+|:-|:-|:-:|:-:|
+| 1 |corporateId; corporateName; account; label; amount  |        |        |
+| 2 |012785487; Fournisseur1; 61; achat1; 2000             |        |        |
+| 3 |759647854; Fournisseur2; 61; achat2; 42500             |        |        |
+
+
 Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
 
 &nbsp;
@@ -93,6 +102,15 @@ Cette section se met autmatiquement à jour en fonction des données saisies dan
 Le fichier d'import .csv doit comporter une en-tête (*header*) afin d'identifier les différentes colonnes, et avec les libellés suivants :
 - *corporateName* pour la colonne contenant le libellé de l'entreprise
 - *corporateId* pour la colonne contenant le numéro siren
+
+Exemple :
+
+|   | A                          | B      | C      |
+|:-|:-|:-:|:-:|
+| 1 |corporateName; corporateId; |        |        |
+| 2 |Fournisseur1; 012785487;     |        |        |
+| 3 |Fournisseur2; 759647854;    |        |        |
+
 
 La colonne *siren* est de couleur verte pour les entreprises *reconnues*.
 Si l'entreprise n'est pas reconnue des valeurs génériques par défaut sont utilisées, il est cependant possible de préciser la situation géographique et la division économique à laquelle est rattachée l'entreprise, ou à laquelle elle se rapproche le plus. Cela permet d'affiner les résultats de l'Empreinte Sociétale de l'Entreprise.
