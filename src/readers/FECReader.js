@@ -88,7 +88,6 @@ async function processFECData(FECData)
   data.accounts = {};
   //data.companies = [];
 
-  console.log(FECData.meta.books);
   await Object.entries(FECData.meta.books).forEach(([bookCode,bookLib]) => 
   {
     // A Nouveaux
