@@ -139,9 +139,19 @@ function exportIndicPDF(indic,session) {
   doc.setFontSize(8);
   doc.text(printValue(session.getExpensesFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
   doc.setFontSize(10);
-  /*doc.line(10,x+2,200,x+2);
+  /*doc.line(10,x+2,200,x+2);*/
 
-  x+=6;
+  Object.entries(session.financialData.getExpensesAccounts()).forEach(([num,account]) => {
+    let indicator = session.getExpensesAccountIndicator(num,indic);
+    x+=6;
+    doc.text("\t"+account.label,10,x);
+    doc.text(printValue(indicator.getValue(),1),yValue+10,x,{align: "right"});
+    doc.setFontSize(8);
+    doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
+    doc.setFontSize(10);
+  })
+
+  /*x+=6;
   doc.text("Valeur ajoutée brute",10,x);
   doc.text(printValue(session.getGrossValueAddedFootprint().getIndicator(indic).getValue(),1),yValue+10,x,{align: "right"});
   doc.setFontSize(8);
@@ -149,12 +159,26 @@ function exportIndicPDF(indic,session) {
   doc.setFontSize(10);
   doc.line(10,x+2,200,x+2);
 */  
+
+  doc.line(10,x+2,200,x+2);
+
   x+=6;
   doc.text("Amortissements",10,x);
   doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),1),yValue+10,x,{align: "right"});
   doc.setFontSize(8);
   doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
   doc.setFontSize(10);
+  
+  Object.entries(session.financialData.getDepreciationsAccounts()).forEach(([num,account]) => {
+    let indicator = session.getDepreciationsAccountIndicator(num,indic);
+    x+=6;
+    doc.text("\t"+account.label,10,x);
+    doc.text(printValue(indicator.getValue(),1),yValue+10,x,{align: "right"});
+    doc.setFontSize(8);
+    doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
+    doc.setFontSize(10);
+  })
+  
   doc.line(10,x+2,200,x+2);
 
   x+=6;
