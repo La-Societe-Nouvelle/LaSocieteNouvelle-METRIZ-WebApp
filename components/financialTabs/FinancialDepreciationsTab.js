@@ -1,9 +1,12 @@
 import React from 'react';
 
-import { FECFileReader, processFECData } from '../../src/readers/FECReader';
-import { CSVFileReader, processCSVDepreciationsData } from '../../src/readers/CSVReader';
 import { InputText } from '../InputText';
 import { InputNumber } from '../InputNumber.js';
+
+import { printValue } from '../../src/utils/Utils';
+
+import { divisions } from '../../lib/nace'; 
+import { areas } from '../../lib/area'; 
 
 /* ----------------------------------------------------------- */
 /* -------------------- DEPRECIATIONS TAB -------------------- */
@@ -13,101 +16,19 @@ export class FinancialDepreciationsTab extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      triggerNewDepreciation: false
-    }
   }
 
   render() {
     const {financialData} = this.props;
-    const {triggerNewDepreciation} = this.state;
     return(
       <div className="financial-tab-view-inner">
         <div className="groups">
-            <div className="group">
-              <h3>Liste des amortissements sur immobilisations</h3>
-
-              <div className="actions">
-                <button onClick={() => {document.getElementById('import-fec').click()}}>Importer un fichier FEC</button>
-                  <input id="import-fec" type="file" accept=".csv" onChange={this.importFECFile} visibility="collapse"/>
-                <button onClick={() => document.getElementById('import-depreciations').click()}>Importer un fichier CSV</button>
-                  <input id="import-depreciations" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
-                <button onClick={() => this.triggerChange()}>Ajouter une immobilisation</button>
-                {financialData.depreciations.length > 0 &&
-                <button onClick={() => this.removeAll()}>Supprimer tout</button>}
-              </div>
-              
-              {financialData.depreciations.length > 0 &&
-                <TableDepreciations financialData={financialData} 
-                                    onUpdate={this.updateFinancialData.bind(this)}/>}
-            </div>
-            
-            {triggerNewDepreciation &&
-            <DepreciationPopup companies={financialData.companies}
-                          onUpdate={this.addDepreciation.bind(this)}
-                          onClose={this.closeChange.bind(this)}/>}
-          </div>
-      </div>
+          <TableDepreciations financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
+          <TableImmobilisations financialData={financialData} onUpdate={this.updateFinancialData.bind(this)} didUpdate={this.props.didUpdate}/>
+          <TableInvestments financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
+        </div>
+    </div>
   )}
-
-  /* ---------- ACTIONS ---------- */
-
-  // Import FEC File
-  importFECFile = (event) => {
-    let reader = new FileReader();
-    reader.onload = async () => {
-      FECFileReader(reader.result)
-        .then((FECData) => processFECData(FECData))
-        .then(async (nextFinancialData) => {
-          this.props.financialData.removeDepreciations();
-          await Promise.all(nextFinancialData.depreciations.map(async (depreciation) => {
-            return this.props.financialData.addDepreciation(depreciation)
-          }))
-        })
-        .then(() => this.forceUpdate())
-      };
-    reader.readAsText(event.target.files[0]);
-  }
-
-  // Import CSV File
-  importCSVFile = (event) => {
-    let reader = new FileReader();
-    reader.onload = async () => {
-      CSVFileReader(reader.result)
-        .then((CSVData) => processCSVDepreciationsData(CSVData))
-        .then(async (nextFinancialData) => {
-          this.props.financialData.removeDepreciations();
-          await Promise.all(nextFinancialData.depreciations.map(async (depreciation) => {
-            return this.props.financialData.addDepreciation(depreciation)
-          }))
-        })
-        .then(() => this.forceUpdate())
-      };
-    reader.readAsText(event.target.files[0]);
-  }
-
-  // Add nex depreciation
-  triggerChange() {
-    this.setState({triggerNewDepreciation: true})
-  }
-
-  closeChange() {
-    this.setState({triggerNewDepreciation: false})
-  }
-  
-  // Remove all depreciations
-  removeAll() {
-    this.props.financialData.removeDepreciations();
-    this.props.onUpdate(this.props.financialData);
-    this.forceUpdate();
-  }
-
-  /* ----- PROPS METHODS ----- */
-
-  async addDepreciation(props) {
-    let depreciation = await this.props.financialData.addDepreciation(props);
-    this.updateFinancialData(this.props.financialData);
-  }
 
   updateFinancialData(financialData) {
     this.props.onUpdate(financialData);
@@ -130,245 +51,129 @@ class TableDepreciations extends React.Component {
       reverseSort: false,
       nbItems: 15,
       page: 0,
-      triggerChange: false,
-      depreciationChange: null,
+      showEditor: false,
+      depreciationToEdit: null,
     }
   }
 
   render() {
-    const {depreciations,companies} = this.props.financialData;
-    const {columnSorted,nbItems,page,triggerChange,depreciationChange} = this.state;
-    this.sortDepreciations(depreciations,columnSorted);
+    const {depreciations,immobilisations} = this.props.financialData;
+    const {columnSorted,nbItems,page,showEditor,depreciationToEdit} = this.state;
+    this.sortItems(depreciations,columnSorted);
     return (
-      <div className="table-container">
-        <table>
-          <thead>
-            <tr>
-              <td className="column_auto"
-                  onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="column_auto"
-                  onClick={() => this.changeColumnSorted("company")}>Fournisseur</td>
-              <td className="column_short-input"
-                  onClick={() => this.changeColumnSorted("account")}>Compte</td>
-              <td className="column_short-input"
-                  onClick={() => this.changeColumnSorted("year")}>Année</td>
-              <td className="column_amount" colSpan="2"
-                  onClick={() => this.changeColumnSorted("amount")}>Montant (en €)</td>
-              <td colSpan="2"></td></tr>
-          </thead>
-          <tbody>
-            {
-              depreciations.slice(page*nbItems,(page+1)*nbItems).map((depreciation) => {
-                return(<RowTableDepreciations
-                  key={"depreciation_"+depreciation.getId()} 
-                  {...depreciation}
-                  companies={companies}
-                  onUpdate={this.updateDepreciation.bind(this)}
-                  onChange={this.changeDepreciation.bind(this)}
-                  onDelete={this.deleteDepreciation.bind(this)}/>)
-              })
-            }
-          </tbody>
-        </table>
-        {depreciations.length > nbItems &&
-          <div className="table-navigation">
-            <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <button className={(page+1)*nbItems < depreciations.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+      <div className="group">
+        <h3>Liste des dotations aux amortissements</h3>
+        <div className="actions">
+          <button onClick={() => this.triggerEditor()}>Ajouter une dotation</button>
+          {depreciations.length > 0 &&
+            <button onClick={() => this.removeAll()}>Supprimer tout</button>}
+        </div>
+
+        {depreciations.length > 0 &&
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+                  <td className="short center" onClick={() => this.changeColumnSorted("accountImmobilisation")}>Immobilisation</td>
+                  <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
+                  <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+                  <td colSpan="2"></td></tr>
+              </thead>
+              <tbody>
+                {depreciations.slice(page*nbItems,(page+1)*nbItems).map((depreciation) => {
+                  return(<RowTableDepreciations key={"depreciation_"+depreciation.getId()} 
+                                                {...depreciation}
+                                                immobilisations={immobilisations}
+                                                onEdit={this.editDepreciation.bind(this)}
+                                                onDelete={this.deleteDepreciation.bind(this)}/>)
+                })}
+              </tbody>
+            </table>
+            {depreciations.length > nbItems &&
+              <div className="table-navigation">
+                <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
+                <button className={(page+1)*nbItems < depreciations.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+              </div>}
           </div>}
-          {triggerChange &&
-          <DepreciationPopup {...depreciationChange}
-                        companies={companies}
-                        onUpdate={this.updateDepreciation.bind(this)}
-                        onClose={this.closeChange.bind(this)}/>}
+        
+        {showEditor &&
+        <DepreciationPopup {...depreciationToEdit}
+                           immobilisations={immobilisations}
+                           onAdd={this.addDepreciation.bind(this)}
+                           onUpdate={this.updateDepreciation.bind(this)}
+                           onClose={this.closeEditor.bind(this)}/>}
       </div>
     )
   }
 
+  /* ---------- ACTIONS ---------- */
+
+  // Manage editor
+  triggerEditor = () => this.setState({showEditor: true, depreciationToEdit: null}) // New Depreciation
+  closeEditor = () => this.setState({showEditor: false})
+  
+  // Remove all depreciations
+  removeAll = () => {this.props.financialData.removeDepreciations();this.forceUpdate()}
+
   /* ----- SORTING ----- */
 
   changeColumnSorted(columnSorted) {
-    if (columnSorted!=this.state.columnSorted) {
-      this.setState({columnSorted: columnSorted, reverseSort: false})
-    } else {
-      this.setState({reverseSort: !this.state.reverseSort})
-    }
+    if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})}
+    else                                        {this.setState({reverseSort: !this.state.reverseSort})}
   }
 
-  sortDepreciations(depreciations,columSorted) {
+  sortItems(items,columSorted) {
     switch(columSorted) {
-      case "label": depreciations.sort((a,b) => a.getLabel().localeCompare(b.getLabel())); break;
-      case "company": depreciations.sort((a,b) => a.getCorporateName().localeCompare(b.getCorporateName())); break;
-      case "account": depreciations.sort((a,b) => a.getAccount().localeCompare(b.getAccount())); break;
-      case "year": depreciations.sort((a,b) => a.getYear().localeCompare(b.getYear())); break;
-      case "amount": depreciations.sort((a,b) => b.getAmount() - a.getAmount()); break;
+      case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
+      case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "accountImmobilisation": items.sort((a,b) => a.accountImmobilisation.localeCompare(b.accountImmobilisation)); break;
+      case "amount": items.sort((a,b) => b.amount - a.amount); break;
     }
-    if (this.state.reverseSort) depreciations.reverse();
+    if (this.state.reverseSort) items.reverse();
   }
 
   /* ----- NAVIGATION ----- */
 
-  prevPage = () => {
-    let currentPage = this.state.page;
-    if (currentPage > 0) this.setState({page: currentPage-1});
-  }
-
-  nextPage = () => {
-    let currentPage = this.state.page;
-    if ((currentPage+1)*this.state.nbItems < this.props.financialData.depreciations.length) {
-      this.setState({page: currentPage+1})
-    }
-  }
+  prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
+  nextPage = () => {if ((this.state.page+1)*this.state.nbItems < this.props.financialData.depreciations.length) this.setState({page: this.state.page+1})}
   
   /* ----- OPERATIONS ON DEPRECIATION ----- */
 
-  async addDepreciation(props) {
-    let depreciation = await this.props.financialData.addDepreciation(props)
-    this.updateFinancialData();
-  }
-
-  updateDepreciation(props) {
-    this.props.financialData.updateDepreciation(props)
-    this.updateFinancialData();
-  }
-
-  deleteDepreciation(depreciationId) {
-    this.props.financialData.removeDepreciation(depreciationId);
-    this.updateFinancialData();
-  }
-
-  changeDepreciation(depreciationId) {
-    this.setState({
-      triggerChange: true,
-      depreciationChange: this.props.financialData.getDepreciation(depreciationId)
-    })
-  }
-
-  closeChange() {
-    this.setState({
-      triggerChange: false
-    })
-  }
+  editDepreciation = (id) => this.setState({showEditor: true, depreciationToEdit: this.props.financialData.getDepreciation(id)})
+  async addDepreciation(props) {await this.props.financialData.addDepreciation(props)}
+  async updateDepreciation(nextProps) {await this.props.financialData.updateDepreciation(nextProps)}
+  deleteDepreciation = (id) => {this.props.financialData.removeDepreciation(id);this.forceUpdate()}
   
   /* ----- OPERATIONS ON DEPRECIATION ----- */
   
   updateFinancialData() {
     this.props.onUpdate(this.props.financialData);
-    this.forceUpdate();
   }
 
 }
 
 /* ---------- ROW DEPRECIATION ---------- */
 
-class RowTableDepreciations extends React.Component {
+function RowTableDepreciations(props) {
   
-  constructor(props) {
-    super(props);
-    this.state = {
-      label : props.label,
-      corporateName: props.corporateName,
-      account: props.account,
-      year: props.year,
-      amount: props.amount};
-  }
+  const {label,amount,account,accountImmobilisation} = props;
 
-  componentDidUpdate(prevProps) {
-    if (this.props !== prevProps) {
-      this.setState({
-        label: this.props.label,
-        corporateName: this.props.corporateName,
-        account: this.props.account,
-        year: this.props.year,
-        amount: this.props.amount
-      })
-    }
-  }
-
-  render() {
-    const {dataFetched} = this.props;
-    const {label,corporateName,account,year,amount} = this.state;
-    return (
-      <tr>
-        <td className="column_auto">
-          <input value={label} 
-                 onChange={this.onLabelChange}
-                 onBlur={this.onBlur} 
-                 onKeyPress={this.onEnterPress}/></td>
-        <td className={"column_auto"+(dataFetched ? " valid" : "")}>
-          <input value={corporateName} 
-                 list="companies"
-                 onChange={this.onCorporateNameChange}
-                 onBlur={this.onBlur} 
-                 onKeyPress={this.onEnterPress}/>
-          <datalist id="companies">
-            { this.props.companies.map((company) => {return <option key={company.id} value={company.corporateName}/>})}
-          </datalist></td>
-        <td className="column_short-input">
-          <input value={account}
-                 onChange={this.onAccountChange}
-                 onBlur={this.onBlur}
-                 onKeyPress={this.onEnterPress}/></td>
-        <td className="column_short-input">
-          <input value={year}
-                 onChange={this.onYearChange}
-                 onBlur={this.onBlur} 
-                 onKeyPress={this.onEnterPress}/></td>
-        <td className="column_short-input">
-          <input value={amount} 
-                 onFocus={this.onAmountFocus}
-                 onChange={this.onAmountChange}
-                 onBlur={this.onBlur} 
-                 onKeyPress={this.onEnterPress}/></td>
-        <td className="column_unit">&nbsp;€</td>
-        <td className="column_icon">
-          <img className="img" src="/resources/icon_change.jpg" alt="change" 
-               onClick={() => this.changeDepreciation()}/></td>
-        <td className="column_icon">
-          <img className="img" src="/resources/icon_delete.jpg" alt="delete" 
-               onClick={() => this.onDeleteDepreciation}/></td>
-      </tr>
-    )
-  }
-
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
-  onLabelChange = (event) => {
-    this.setState({label: event.target.value})
-  }
-  onCorporateNameChange = (event) => {
-    this.setState({corporateName: event.target.value})
-  }
-  onAccountChange = (event) => {
-    this.setState({account: event.target.value})
-  }
-  onYearChange = (event) => {
-    this.setState({year: event.target.value})
-  }
-  onAmountChange = (event) => {
-    this.setState({amount: event.target.value})
-  }
-
-  onAmountFocus = (event) => {
-    this.setState({amount: event.target.value.replace(/^0$/,"")})
-  }
-
-  onBlur = () => {
-    let nextProps = {id: this.props.id, ...this.state};
-    if (!nextProps.year.match(/[0-9]{4}/)) nextProps.year = undefined;
-    nextProps.amount = !isNaN(parseFloat(nextProps.amount)) ? parseFloat(nextProps.amount) : undefined;
-    this.props.onUpdate(nextProps);
-  }
-
-  /* ----- PROPS METHODS ----- */
-
-  changeDepreciation() {
-    this.props.onChange(this.props.id)
-  }
-
-  onDeleteDepreciation() {
-    this.props.onDelete(this.props.id)
-  }
-
+  return (
+    <tr>
+      <td className="column_auto">{label}</td>
+      <td className="short center">{accountImmobilisation}</td>
+      <td className="short center">{account}</td>
+      <td className="short right">{printValue(amount,0)}</td>
+      <td className="column_unit">&nbsp;€</td>
+      <td className="column_icon">
+        <img className="img" src="/resources/icon_change.jpg" alt="change" 
+              onClick={() => props.onEdit(props.id)}/></td>
+      <td className="column_icon">
+        <img className="img" src="/resources/icon_delete.jpg" alt="delete" 
+              onClick={() => props.onDelete(props.id)}/></td>
+    </tr>
+  )
 }
 
 /* ---------- NEW / CHANGE DEPRECIATION POP-UP ---------- */
@@ -382,23 +187,24 @@ class DepreciationPopup extends React.Component {
         amount: props.amount || 0,
         corporateName: props.corporateName || "",
         account: props.account || "",
-        year: props.year || "",
+        accountImmobilisation: props.accountImmobilisation || "",
       }
     }
   
     render() {
-      const {label,corporateName,account,amount,year} = this.state;
+      const {immobilisations} = this.props;
+      const {label,accountImmobilisation,account,amount} = this.state;
       return (
         <div className="popup">
           <div className="popup-inner">
-            <h3>{this.props.id == undefined ? "Ajout d'une immobilisation" : "Modification"}</h3>
+            <h3>{this.props.id == undefined ? "Ajout d'une dotation aux amortissements" : "Modification"}</h3>
             <div className="inputs">
-              <div className="inline-input">
+              <div className="inline-input long">
                   <label>Libellé </label>
                   <InputText value={label} onUpdate={this.updateLabel.bind(this)}/>
               </div>
-              <div className="inline-input short">
-                  <label>Dotation </label>
+              <div className="inline-input short right">
+                  <label>Montant </label>
                   <InputNumber className="input-number" value={amount} onUpdate={this.updateAmount.bind(this)}/>
                   <span>&nbsp;€</span>
               </div>
@@ -406,19 +212,436 @@ class DepreciationPopup extends React.Component {
                   <label>Compte </label>
                   <InputText value={account} onUpdate={this.updateAccount.bind(this)}/>
               </div>
-              <div className="inline-input short">
-                  <label>Année de l'investissement </label>
-                  <InputText value={year} onUpdate={this.updateYear.bind(this)}/>
+              <div className="inline-input long">
+                  <label>Compte d'immobilisation </label>
+                  <select onChange={this.onAccountImmobilisationSelect} value={accountImmobilisation}>{
+                    immobilisations.map(({label,account}) => { return(
+                        <option key={account} value={account}>{account + " - " +label}</option>
+                    )})}
+                    {accountImmobilisation=="" && <option key={"else"} value={""}>{"---"}</option>}
+                  </select>
               </div>
-              <div className="inline-input">
+            </div>
+            <div className="footer">
+              <button onClick={() => this.props.onClose()}>Fermer</button>
+              <button onClick={() => this.updateDepreciation()}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    
+    updateLabel = (nextLabel) => this.setState({label: nextLabel})  
+    updateAccount = (nextAccount) => this.setState({account: nextAccount})  
+    updateAmount = (nextAmount) => {if (nextAmount!=null) this.setState({amount: nextAmount})}
+    onAccountImmobilisationSelect = (event) => this.setState({accountImmobilisation: event.target.value})
+  
+    /* ----- PROPS METHODS ----- */
+  
+    updateDepreciation() {
+      if (this.props.id!=undefined) {this.props.onUpdate({id: this.props.id, ...this.state})}
+      else                          {this.props.onAdd({...this.state})}
+      this.props.onClose();
+    }
+  
+  }
+
+/* -------------------------------------------------------------- */
+/* -------------------- IMMOBILISATION TABLE -------------------- */
+/* -------------------------------------------------------------- */
+
+/* ---------- TABLE IMMOBILISATIONS ---------- */
+
+class TableImmobilisations extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      columnSorted: "amount",
+      reverseSort: false,
+      nbItems: 10,
+      page: 0,
+      showEditor: false,
+      immobilisationToEdit: null,
+    }
+  }
+
+  render() {
+    const {immobilisations} = this.props.financialData;
+    const {columnSorted,nbItems,page,showEditor,immobilisationToEdit} = this.state;
+    this.sortItems(immobilisations,columnSorted);
+    return (
+      <div className="group">
+        <h3>Etat des immobilisations (début d'exercice)</h3>
+        <div className="actions">
+          <button onClick={() => this.triggerEditor()}>Ajouter une immobilisation</button>
+          {immobilisations.length > 0 &&
+            <button onClick={() => this.removeAll()}>Supprimer tout</button>}
+          {immobilisations.length > 0 &&
+            <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>}
+        </div>
+
+        {immobilisations.length > 0 &&
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+                  <td className="medium">Activité associée</td>
+                  <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
+                  <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+                  <td colSpan="2"></td></tr>
+              </thead>
+              <tbody>
+                {immobilisations.slice(page*nbItems,(page+1)*nbItems).map((immobilisation) => {
+                  return(<RowTableImmobilisations key={"immobilisation_"+immobilisation.id} 
+                                                  {...immobilisation}
+                                                  onUpdate={this.updateImmobilisation.bind(this)}
+                                                  onEdit={this.editImmobilisation.bind(this)}
+                                                  onDelete={this.deleteImmobilisation.bind(this)}/>)
+                })}
+              </tbody>
+            </table>
+            {immobilisations.length > nbItems &&
+              <div className="table-navigation">
+                <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
+                <button className={(page+1)*nbItems < immobilisations.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+              </div>}
+          </div>}
+          {showEditor &&
+            <ImmobilisationPopup {...immobilisationToEdit}
+                                 onAdd={this.addImmobilisation.bind(this)}
+                                 onUpdate={this.updateImmobilisation.bind(this)}
+                                 onClose={this.closeEditor.bind(this)}/>}
+      </div>
+    )
+  }
+
+  /* ---------- ACTIONS ---------- */
+
+  // Manage editor
+  triggerEditor = () => this.setState({showEditor: true, immobilisationToEdit: null}) // add new immobilisation
+  closeEditor = () =>this.setState({showEditor: false})
+
+  // Remove all immobilisations
+  removeAll = () => {this.props.financialData.removeImmobilisations();this.forceUpdate()}
+  
+  // Synchronisation
+  async synchroniseAll() {
+    await Promise.all(this.props.financialData.immobilisations.map(async immobilisation => {
+      await this.fetchDataImmobilisation(immobilisation);
+      return;
+    }));
+    this.props.didUpdate();
+    this.forceUpdate();
+  }
+
+  async fetchDataImmobilisation(immobilisation) {
+    await immobilisation.updateFootprintData();
+    //this.props.financialData.updateImmobilisation(immobilisation);
+    //this.forceUpdate();
+  }
+
+  /* ----- SORTING ----- */
+
+  changeColumnSorted(columnSorted) {
+    if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})} 
+    else                                        {this.setState({reverseSort: !this.state.reverseSort})}
+  }
+
+  sortItems(items,columSorted) {
+    switch(columSorted) {
+      case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
+      case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "amount": items.sort((a,b) => b.amount - a.amount); break;
+    }
+    if (this.state.reverseSort) items.reverse();
+  }
+
+  /* ----- NAVIGATION ----- */
+
+  prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
+  nextPage = () => {if ((this.state.page+1)*this.state.nbItems < this.props.financialData.immobilisations.length) this.setState({page: this.state.page+1})}
+  
+  /* ----- OPERATIONS ON IMMOBILISATION ----- */
+
+  editImmobilisation = (id) => this.setState({showEditor: true, immobilisationToEdit: this.props.financialData.getImmobilisation(id)})
+  async addImmobilisation(props) {await this.props.financialData.addImmobilisation(props)}
+  async updateImmobilisation(nextProps) {await this.props.financialData.updateImmobilisation(nextProps)}
+  deleteImmobilisation = (id) => {this.props.financialData.removeImmobilisation(id);this.forceUpdate()} // TO DO : update others tables
+
+}
+
+/* ---------- ROW IMMOBILISATION ---------- */
+
+function RowTableImmobilisations(props) {
+  
+  const {id,label,amount,account,footprint} = props;
+
+  return (
+    <tr>
+      <td className="auto">{label}</td>
+      <td className="long left">{divisions[footprint.activityCode.substring(0,2)]}</td>
+      <td className="short center">{account}</td>
+      <td className="short right">{printValue(amount,0)}</td>
+      <td className="column_unit">&nbsp;€</td>
+      <td className="column_icon">
+        <img className="img" src="/resources/icon_change.jpg" alt="change" 
+              onClick={() => props.onEdit(id)}/></td>
+      <td className="column_icon">
+        <img className="img" src="/resources/icon_delete.jpg" alt="delete" 
+              onClick={() => props.onDelete(id)}/></td>
+    </tr>
+  )
+
+}
+
+/* ---------- NEW / CHANGE IMMOBILISATION POP-UP ---------- */
+
+class ImmobilisationPopup extends React.Component {
+
+    constructor(props) {
+      super(props)
+      this.state = {
+        label: props.label || "",
+        amount: props.amount || "",
+        account: props.account || "",
+        activityCode: props.footprint!=undefined ? props.footprint.activityCode : "00",
+      }
+    }
+  
+    render() {
+      const {label,amount,account,activityCode} = this.state;
+      return (
+        <div className="popup">
+          <div className="popup-inner">
+            <h3>{this.props.id == undefined ? "Ajout d'une immobilisation" : "Modification"}</h3>
+            <div className="inputs">
+              <div className="inline-input long">
+                  <label>Libellé </label>
+                  <InputText value={label} onUpdate={this.updateLabel.bind(this)}/>
+              </div>
+              <div className="inline-input short">
+                  <label>Valeur </label>
+                  <InputNumber className="input-number" value={amount} onUpdate={this.updateAmount.bind(this)}/>
+                  <span>&nbsp;€</span>
+              </div>
+              <div className="inline-input short">
+                  <label>Compte </label>
+                  <InputText value={account} onUpdate={this.updateAccount.bind(this)}/>
+              </div>
+              <div className="inline-input long">
+                <label>Activités associées </label>
+                <select onChange={this.onActivityCodeChange} value={activityCode.substring(0,2)}>
+                  {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b)).map(([code,libelle]) => { return(
+                    <option key={code} value={code}>{code + " - " +libelle}</option>
+                  )})
+                }</select>
+              </div>
+            </div>
+            <div className="footer">
+              <button onClick={() => this.props.onClose()}>Fermer</button>
+              <button onClick={() => this.updateDepreciation()}>Enregistrer</button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+    
+    updateLabel = (nextLabel) => this.setState({label: nextLabel})
+    onActivityCodeChange = (event) => this.setState({activityCode: event.target.value})
+    updateAccount = (nextAccount) => this.setState({account: nextAccount})  
+    updateAmount = (nextAmount) => {if (nextAmount!=null) this.setState({amount: nextAmount})}
+
+    /* ----- PROPS METHODS ----- */
+  
+    updateDepreciation() {
+      if (this.props.id!=undefined) {this.props.onUpdate({id: this.props.id, ...this.state})}
+      else                          {this.props.onAdd({...this.state})}
+      this.props.onClose();
+    }
+  
+  }
+
+/* ----------------------------------------------------------- */
+/* -------------------- INVESTMENTS TABLE -------------------- */
+/* ----------------------------------------------------------- */
+
+/* ---------- TABLE INVESTMENTS ---------- */
+
+class TableInvestments extends React.Component {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      columnSorted: "amount",
+      reverseSort: false,
+      nbItems: 15,
+      page: 0,
+      showEditor: false,
+      investmentToEdit: null,
+    }
+  }
+
+  render() {
+    const {investments,companies,immobilisations} = this.props.financialData;
+    const {columnSorted,nbItems,page,showEditor,investmentToEdit} = this.state;
+    this.sortItems(investments,columnSorted);
+    return (
+      <div className="group">
+        <h3>Liste des dépenses d'investissement</h3>
+
+        <div className="actions">
+          <button onClick={() => this.triggerEditor()}>Ajouter une dépense d'investissement</button>
+          {investments.length > 0 &&
+            <button onClick={() => this.removeAll()}>Supprimer tout</button>}
+        </div>
+        
+        {investments.length > 0 &&
+          <div className="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+                  <td className="auto">Fournisseur</td>
+                  <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
+                  <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+                  <td colSpan="2"></td></tr>
+              </thead>
+              <tbody>
+                {investments.slice(page*nbItems,(page+1)*nbItems).map((investment) => {
+                  return(<RowTableInvestments key={"investment_"+investment.getId()} 
+                                              {...investment}
+                                              onEdit={this.editInvestment.bind(this)}
+                                              onDelete={this.deleteInvestment.bind(this)}/>)
+                })}
+              </tbody>
+            </table>
+            {investments.length > nbItems &&
+              <div className="table-navigation">
+                <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
+                <button className={(page+1)*nbItems < investments.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+              </div>}
+          </div>}
+        
+        {showEditor &&
+          <InvestmentPopup {...investmentToEdit}
+                           companies={companies} immobilisations={immobilisations}
+                           onAdd={this.addInvestment.bind(this)}
+                           onUpdate={this.updateInvestment.bind(this)}
+                           onClose={this.closeEditor.bind(this)}/>}
+      </div>
+    )
+  }
+
+  /* ----- ACTIONS ----- */
+
+  // manage editor
+  triggerEditor = () => this.setState({showEditor: true, investmentToEdit: null}) //...to add investment
+  closeEditor = () => this.setState({showEditor: false})
+
+  // remove all investments
+  removeAll = () => {this.props.financialData.removeInvestments();this.forceUpdate()}
+
+  /* ----- SORTING ----- */
+
+  changeColumnSorted(columnSorted) {
+    if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})}
+    else                                        {this.setState({reverseSort: !this.state.reverseSort})}
+  }
+
+  sortItems(items,columSorted) {
+    switch(columSorted) {
+      case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
+      case "amount": items.sort((a,b) => b.amount - a.amount); break;
+      case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
+    }
+    if (this.state.reverseSort) items.reverse();
+  }
+
+  /* ----- NAVIGATION ----- */
+
+  prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
+  nextPage = () => {if ((this.state.page+1)*this.state.nbItems < this.props.financialData.investments.length) this.setState({page: this.state.page+1})}
+  
+  /* ----- OPERATIONS ON DEPRECIATION ----- */
+
+  editInvestment = (id) => this.setState({showEditor: true, investmentToEdit: this.props.financialData.getInvestment(id)})
+  async addInvestment(props) {await this.props.financialData.addInvestment(props)}
+  async updateInvestment(props) {await this.props.financialData.updateInvestment(props)}
+  deleteInvestment = (id) => {this.props.financialData.removeInvestment(id);this.forceUpdate()}
+
+}
+
+/* ---------- ROW INVESTMENT ---------- */
+
+function RowTableInvestments(props) 
+{
+  const {id,label,companyName,account,amount} = props;
+  return (
+    <tr>
+      <td className="auto">{label}</td>
+      <td className="auto">{companyName}</td>
+      <td className="short center">{account}</td>
+      <td className="short right">{printValue(amount,0)}</td>
+      <td className="column_unit">&nbsp;€</td>
+      <td className="column_icon">
+        <img className="img" src="/resources/icon_change.jpg" alt="change" 
+              onClick={() => props.onEdit(id)}/></td>
+      <td className="column_icon">
+        <img className="img" src="/resources/icon_delete.jpg" alt="delete" 
+              onClick={() => props.onDelete(id)}/></td>
+    </tr>
+  )
+}
+
+/* ---------- NEW / EDIT INVESTMENT POP-UP ---------- */
+
+class InvestmentPopup extends React.Component {
+
+    constructor(props) {
+      super(props)
+      this.state = {
+        label: props.label || "",
+        amount: props.amount || "",
+        companyName: props.companyName || "",
+        account: props.account || "",
+      }
+    }
+  
+    render() {
+      const {companies,immobilisations} = this.props;
+      const {label,companyName,account,amount} = this.state;
+      return (
+        <div className="popup">
+          <div className="popup-inner">
+            <h3>{this.props.id == undefined ? "Ajout d'une dépense d'investissement" : "Modification"}</h3>
+            <div className="inputs">
+              <div className="inline-input long">
+                  <label>Libellé </label>
+                  <InputText value={label} onUpdate={this.updateLabel.bind(this)}/>
+              </div>
+              <div className="inline-input short">
+                  <label>Montant </label>
+                  <InputNumber className="input-number" value={amount} onUpdate={this.updateAmount.bind(this)}/>
+                  <span>&nbsp;€</span>
+              </div>
+              <div className="inline-input long">
                   <label>Fournisseur </label>
-                  <input value={corporateName} 
+                  <input value={companyName} 
                     list="companies"
                     onChange={this.onCorporateNameChange}
                     onKeyPress={this.onEnterPress}/>
                 <datalist id="companies">
-                  { this.props.companies.map((company) => {return <option key={company.id} value={company.corporateName}/>})}
+                  {companies.map((company) => {return <option key={company.id} value={company.corporateName}/>})}
                 </datalist>
+              </div>
+              <div className="inline-input long">
+                  <label>Compte d'immobilisation </label>
+                  <select onChange={this.onAccountImmobilisationSelect} value={account}>
+                    {immobilisations.map(({label,account}) => { return <option key={account} value={account}>{account + " - " +label}</option>})}
+                    {account=="" && <option key={"else"} value={""}>{"---"}</option>}
+                  </select>
               </div>
             </div>
             <div className="footer">
@@ -432,34 +655,14 @@ class DepreciationPopup extends React.Component {
   
     onEnterPress = (event) => {if (event.which==13) event.target.blur()}
   
-    updateLabel(nextLabel) {
-      this.setState({label: nextLabel})
-    }
-  
-    onCorporateNameChange = (event) => {
-      this.setState({corporateName: event.target.value})
-    }
-  
-    updateAccount(nextAccount) {
-      this.setState({account: nextAccount})
-    }
-  
-    updateAmount(nextAmount) {
-      if (nextAmount!=null) {
-        this.setState({amount: nextAmount})  
-      }
-    }
-
-    updateYear(nextYear) {
-      if (nextYear.match(/[0-9]{4}/)) {
-        this.setState({year: nextYear})
-      }
-    }
-  
-    /* ----- PROPS METHODS ----- */
+    updateLabel = (nextLabel) => this.setState({label: nextLabel})
+    onCorporateNameChange = (event) => this.setState({companyName: event.target.value})
+    onAccountImmobilisationSelect = (event) => this.setState({account: event.target.value})
+    updateAmount = (nextAmount) => {if (nextAmount!=null) this.setState({amount: nextAmount})}
   
     updateDepreciation() {
-      this.props.onUpdate({id: this.props.id, ...this.state});
+      if (this.props.id!=undefined) {this.props.onUpdate({id: this.props.id, ...this.state})}
+      else                          {this.props.onAdd({...this.state})}
       this.props.onClose();
     }
   

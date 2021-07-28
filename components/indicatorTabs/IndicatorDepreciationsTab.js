@@ -2,7 +2,7 @@ import React from 'react';
 
 import { printValue } from '../../src/utils/Utils';
 
-import {indic as metaIndic} from '../../lib/indic';
+import { metaIndicators } from '../../lib/indic';
 
 /* ----------------------------------------------------------- */
 /* -------------------- DEPRECIATIONS TAB -------------------- */
@@ -19,9 +19,10 @@ export function DepreciationsTab(props) {
       </div>
       <div className="group">
         <h3>Détails des impacts indirects des immobilisations</h3>
-        <TableDepreciations 
+        <TableDepreciations
+          financialData={props.session.financialData}
           indic={indic}
-          companies={session.financialData.getCompaniesDepreciations()} 
+          immobilisations={session.financialData.immobilisations} 
           onUpdate={props.onUpdate}/>
       </div>
     </div>
@@ -40,9 +41,9 @@ class TableDepreciations extends React.Component {
   }
 
   render() {
-    const {companies} = this.props;
+    const {immobilisations} = this.props;
     const {page} = this.state;
-    companies.sort((a,b) => b.getFootprint().getIndicator(this.props.indic).getValueAbsolute(b.getAmount()) - a.getFootprint().getIndicator(this.props.indic).getValueAbsolute(a.getAmount()));
+    immobilisations.sort((a,b) => b.getFootprint().getIndicator(this.props.indic).getValueAbsolute(b.getAmount()) - a.getFootprint().getIndicator(this.props.indic).getValueAbsolute(a.getAmount()));
     return (
       <div>
         <table>
@@ -58,20 +59,20 @@ class TableDepreciations extends React.Component {
           </thead>
           <tbody>
             {
-              companies.slice(page*20,(page+1)*20).map((company) => {
+              immobilisations.slice(page*20,(page+1)*20).map((immobilisation) => {
                 return(<RowTableDepreciations 
-                  key={"company_"+company.getId()} 
-                  company={company} 
+                  key={"immobilisation_"+immobilisation.getId()} 
+                  immobilisation={immobilisation} 
                   onUpdate={this.updateDepreciation.bind(this)}
                   indic={this.props.indic}/>)
               })
             }
           </tbody>
         </table>
-        {companies.length > 20 &&
+        {immobilisations.length > 20 &&
           <div className="table-navigation">
             <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <button className={(page+1)*20 < companies.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+            <button className={(page+1)*20 < immobilisations.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
           </div>}
       </div>
     )
@@ -95,9 +96,8 @@ class TableDepreciations extends React.Component {
 
   updateDepreciation(id,value,uncertainty) {
     // REWRITE
-    this.state.financialData.getDepreciation(id).getFootprint().getIndicator(this.props.indic).setValue(value);
-    this.state.financialData.getDepreciation(id).getFootprint().getIndicator(this.props.indic).setUncertainty(uncertainty);
-    this.props.onUpdate(this.state.financialData);
+    this.props.financialData.getDepreciation(id).getFootprint().getIndicator(this.props.indic).setValue(value);
+    this.props.financialData.getDepreciation(id).getFootprint().getIndicator(this.props.indic).setUncertainty(uncertainty);
   }
 
 }
@@ -106,7 +106,7 @@ class RowTableDepreciations extends React.Component {
   
   constructor(props) {
     super(props);
-    const indicator = props.company.getFootprint().getIndicator(props.indic);
+    const indicator = props.immobilisation.getFootprint().getIndicator(props.indic);
     this.state = {
       valueInput: indicator.getValue(),
       uncertaintyInput: indicator.getUncertainty()
@@ -114,16 +114,16 @@ class RowTableDepreciations extends React.Component {
   }
 
   render() {
-    const {corporateName,footprint,amount} = this.props.company;
+    const {label,footprint,amount} = this.props.immobilisation;
     const {valueInput,uncertaintyInput} = this.state;
     return (
       <tr>
-        <td className="column_auto">{corporateName}</td>
+        <td className="column_auto">{label}</td>
         <td className="column_value">{printValue(amount,0)}</td>
         <td className="column_unit">&nbsp;€</td>
         <td className="column_value">
           <input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_unit">&nbsp;{metaIndic[this.props.indic].unit}</td>
+        <td className="column_unit">&nbsp;{metaIndicators[this.props.indic].unit}</td>
         <td className="column_value">
           <input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_unit">&nbsp;%</td>
@@ -148,17 +148,17 @@ class RowTableDepreciations extends React.Component {
   }
 
   async fetchData() {
-    let company = this.props.company;
-    await company.fetchIndicCSFdata(this.props.indic);
-    const {value,uncertainty} = company.getFootprint().getIndicator(this.props.indic);
+    let immobilisation = this.props.immobilisation;
+    await immobilisation.updateIndicFootprintData(this.props.indic);
+    const {value,uncertainty} = immobilisation.getFootprint().getIndicator(this.props.indic);
     this.setState({valueInput: value, uncertaintyInput: uncertainty});
-    this.props.onUpdate(this.props.company.getId(),value,uncertainty);
+    this.props.onUpdate(this.props.immobilisation.id,value,uncertainty);
   }
 
   onBlur = (event) => {
     let value = !isNaN(parseFloat(this.state.valueInput)) ? parseFloat(this.state.valueInput) : null;
     let uncertainty = !isNaN(parseFloat(this.state.uncertaintyInput)) ? parseFloat(this.state.uncertaintyInput) : null;
-    this.props.onUpdate(this.props.company.getId(),value,uncertainty);
+    this.props.onUpdate(this.props.immobilisation.id,value,uncertainty);
   }
 
 }

@@ -1,40 +1,34 @@
 import React from 'react';
+import { valueOrDefault } from '../../src/utils/Utils';
 export class StatementHAZ extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      statement: props.indicator.getStatement() || "",
-      uncertainty: props.indicator.getStatementUncertainty() || "",
+      hazardousSubstancesConsumption: valueOrDefault(props.impactsData.hazardousSubstancesConsumption, ""),
+      hazardousSubstancesConsumptionUncertainty: valueOrDefault(props.impactsData.hazardousSubstancesConsumption, ""),
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.indicator !== prevProps.indicator) {
-      this.setState({
-        statement: props.indicator.getStatement() || "",
-        uncertainty: props.indicator.getStatementUncertainty() || "",
-      })
-    }
-  }
+  render() 
+  {
+    const {hazardousSubstancesConsumption,hazardousSubstancesConsumptionUncertainty} = this.state;
 
-  render() {
-    const {statement,uncertainty} = this.state;
     return (
       <div className="statement">
         <div className="statement-item">
           <label>Utilisation de produits dangereux - santé/environnement</label>
           <input className="input-value" 
-                 value={statement}
-                 onChange={this.onStatementChange}
-                 onBlur={this.onStatementBlur}
+                 value={hazardousSubstancesConsumption}
+                 onChange={this.onConsumptionChange}
+                 onBlur={this.onConsumptionBlur}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;kg</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
           <input className="input-value" 
-                 value={uncertainty}
+                 value={hazardousSubstancesConsumptionUncertainty}
                  onChange={this.onUncertaintyChange}
                  onBlur={this.onUncertaintyBlur}
                  onKeyPress={this.onEnterPress}/>
@@ -44,27 +38,25 @@ export class StatementHAZ extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {
-    if (event.which==13) {event.target.blur();}
-  }
+  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
-  onStatementChange = (event) => {
-    this.setState({statement: event.target.value});
+  onConsumptionChange = (event) => {
+    this.setState({hazardousSubstancesConsumption: event.target.value});
   }
-  onStatementBlur = (event) => {
-    let statement = parseFloat(event.target.value);
-    this.props.indicator.setStatement(!isNaN(statement) ? statement : null);
-    this.setState({uncertainty: this.props.indicator.getStatementUncertainty() || ""})
-    this.props.onUpdate(this.props.indicator);
+  onConsumptionBlur = (event) => {
+    let consumption = parseFloat(event.target.value);
+    this.props.impactsData.setHazardousSubstancesConsumption(!isNaN(consumption) ? consumption : null);
+    this.setState({hazardousSubstancesConsumptionUncertainty: valueOrDefault(this.props.impactsData.hazardousSubstancesConsumptionUncertainty, "")});
+    this.props.onUpdate(this.props.impactsData);
   }
 
   onUncertaintyChange = (event) => {
-    this.setState({uncertainty: event.target.value});
+    this.setState({hazardousSubstancesConsumptionUncertainty: event.target.value});
   }
   onUncertaintyBlur = (event) => {
     let uncertainty = parseFloat(event.target.value);
-    this.props.indicator.setUncertainty(!isNaN(uncertainty) ? uncertainty : null);
-    this.props.onUpdate(this.props.indicator);
+    this.props.impactsData.hazardousSubstancesConsumptionUncertainty = !isNaN(uncertainty) ? uncertainty : 25;
+    this.props.onUpdate(this.props.impactsData);
   }
   
 }

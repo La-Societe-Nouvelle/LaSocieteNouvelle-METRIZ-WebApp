@@ -33,7 +33,7 @@ function exportIndicDataDepreciationsCSV(indic,session) {
 
 import { jsPDF } from 'jspdf';
 
-import {indic as indicData} from '../lib/indic';
+import { metaIndicators } from '../lib/indic';
 
 function exportIndicPDF(indic,session) {
   
@@ -67,7 +67,7 @@ function exportIndicPDF(indic,session) {
   x+=20;
   doc.setFontSize(11);
   doc.setFont("Calibri","bold");
-  doc.text(indicData[indic].libelleGrandeur.toUpperCase(),10,x);
+  doc.text(metaIndicators[indic].libelleGrandeur.toUpperCase(),10,x);
   doc.line(10,x+2,200,x+2);
 
   /*
@@ -86,7 +86,7 @@ function exportIndicPDF(indic,session) {
   x+=15;
   doc.setFontSize(8);
   doc.setFont("Calibri","italic");
-  doc.text("(en "+indicData[indic].unit+")",10,x);
+  doc.text("(en "+metaIndicators[indic].unit+")",10,x);
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");
   doc.text("Notes",125,x);
@@ -183,9 +183,9 @@ function exportIndicPDF(indic,session) {
 
   x+=6;
   doc.text("Valeur ajoutée nette",10,x);
-  doc.text(printValue(session.getValueAddedFootprint(indic).getValue(),1),yValue+10,x,{align: "right"});
+  doc.text(printValue(session.getNetValueAddedFootprint().getIndicator(indic).getValue(),1),yValue+10,x,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getValueAddedFootprint(indic).getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
+  doc.text(printValue(session.getNetValueAddedFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
   doc.setFontSize(10);
   doc.line(10,x+2,200,x+2);
 

@@ -44,7 +44,9 @@ export class FinancialDataSection extends React.Component {
     const tabProps = {
       financialData: this.props.session.getFinancialData(), 
       changeTab: this.onChangeTab.bind(this),
-      onUpdate: this.updateFinancialData.bind(this)}
+      onUpdate: this.updateFinancialData.bind(this),
+      didUpdate: () => this.props.session.updateRevenueFootprint(),
+    }
     switch(this.state.selectedTab) 
     {
       case "main" :           return(<FinancialMainTab {...tabProps}/>)
@@ -84,7 +86,7 @@ function SectionMenu({selected, changeTab}){
         </button>
         <button className={"menu-button"+(selected=="depreciations" ? " selected" : "")}
                 onClick = {() => changeTab("depreciations")}>
-          Amortissements sur immobilisations
+          Immobilisations
         </button>
         <button className={"menu-button"+("companies"==selected ? " selected" : "")}
                 onClick = {() => changeTab("companies")}>

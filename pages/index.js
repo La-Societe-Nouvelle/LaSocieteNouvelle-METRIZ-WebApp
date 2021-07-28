@@ -4,13 +4,13 @@ import styles from '../styles/Home.module.css'
 
 import React from 'react';
 
-import {LegalUnitSection} from '/components/LegalUnitSection.js';
+import { LegalDataSection } from '/components/LegalDataSection.js';
 import {FinancialDataSection} from '../components/FinancialDataSection';
 import {IndicatorSection} from '../components/IndicatorSection';
 
 import {Session} from '/src/Session.js';
 
-import {indic as indicData} from '../lib/indic';
+import { metaIndicators } from '../lib/indic';
 const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 
 
@@ -51,7 +51,7 @@ class Metriz extends React.Component {
               downloadSession={this.downloadSession.bind(this)}
               importSession={this.importSession.bind(this)}/>
         <div className="section-container">
-          <Section selectedSection={selectedSection} session={session} onUpdate={this.updateSession.bind(this)}/>
+          {this.buildSectionView()}
         </div>
       </div>
     )
@@ -68,7 +68,7 @@ class Metriz extends React.Component {
   buildSectionView() {
     switch(this.state.selectedSection)
     {
-      case "legalData" : return(<LegalUnitSection session={this.state.session}/>)
+      case "legalData" : return(<LegalDataSection session={this.state.session}/>)
       case "financialData" : return(<FinancialDataSection session={this.state.session}/>)
       case "art" : return(<IndicatorSection session={this.state.session} indic="art"/>)
       case "dis" : return(<IndicatorSection session={this.state.session} indic="dis"/>)
@@ -143,7 +143,7 @@ function Menu({selectedSection, changeSection, downloadSession, importSession}){
               <button key={"menu-button-"+indic}
                       className={"menu-button"+(indic==selectedSection ? " selected" : "")}
                       onClick = {() => changeSection(indic)}>
-                {indicData[indic].libelleMenu}
+                {metaIndicators[indic].libelleMenu}
               </button>
             )})
           }

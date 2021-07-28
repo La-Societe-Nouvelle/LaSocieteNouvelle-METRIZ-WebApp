@@ -1,16 +1,19 @@
 import React from 'react';
+import { valueOrDefault } from '../../src/utils/Utils';
 export class StatementART extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      statement: props.indicator.getStatement() || "",
+      craftedProduction: valueOrDefault(props.impactsData.craftedProduction, ""),
     }
   }
 
-  render() {
-    const {isValueAddedCrafted,craftedProduction} = this.props.indicator;
-    const {statement} = this.state;
+  render() 
+  {
+    const {isValueAddedCrafted} = this.props.impactsData;
+    const {craftedProduction} = this.state;
+
     return (
       <div className="statement">
         <div className="statement-item">
@@ -25,7 +28,7 @@ export class StatementART extends React.Component {
           <div className="input-radio">
             <input type="radio" id="isValueAddedCrafetd"
                    value="null"
-                   checked={craftedProduction != null}
+                   checked={isValueAddedCrafted === null && craftedProduction !== ""}
                    onChange={this.onIsValueAddedCraftedChange}/>
             <label>Partiellement</label>
           </div>
@@ -40,9 +43,9 @@ export class StatementART extends React.Component {
         <div className="statement-item">
           <label>Part de la valeur ajoutée artisanale</label>
           <input className="input-value"
-                 value={statement} 
-                 onChange={this.onStatementChange}
-                 onBlur={this.onStatementBlur}
+                 value={craftedProduction} 
+                 onChange={this.oncraftedProductionChange}
+                 onBlur={this.oncraftedProductionBlur}
                  disabled={isValueAddedCrafted!=null}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;€</span>
@@ -51,28 +54,35 @@ export class StatementART extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {
-    if (event.which==13) {event.target.blur();}
-  }
+  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
   onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
-      case "true": this.props.indicator.setIsValueAddedCrafted(true); break;
-      case "null": this.props.indicator.setIsValueAddedCrafted(null); break;
-      case "false": this.props.indicator.setIsValueAddedCrafted(false); break;
+      case "true": 
+        this.props.impactsData.isValueAddedCrafted = true;
+        this.props.impactsData.craftedProduction = this.props.impactsData.netValueAdded;
+        break;
+      case "null": 
+        this.props.impactsData.isValueAddedCrafted = null;
+        this.props.impactsData.craftedProduction = 0;
+        break;
+      case "false": 
+        this.props.impactsData.isValueAddedCrafted = false;
+        this.props.impactsData.craftedProduction = 0; 
+        break;
     }
-    this.setState({statement: this.props.indicator.getStatement() || ""});
-    this.props.onUpdate(this.props.indicator);
+    this.setState({craftedProduction: valueOrDefault(this.props.impactsData.craftedProduction, "")});
+    this.props.onUpdate(this.props.impactsData);
   }
 
-  onStatementChange = (event) => {
-    this.setState({statement: event.target.value});
+  oncraftedProductionChange = (event) => {
+    this.setState({craftedProduction: event.target.value});
   }
-  onStatementBlur = (event) => {
+  oncraftedProductionBlur = (event) => {
     let craftedProduction = parseFloat(event.target.value);
-    this.props.indicator.setStatement(!isNaN(craftedProduction) ? craftedProduction : null);
-    this.props.onUpdate(this.props.indicator);
+    this.props.impactsData.craftedProduction = !isNaN(craftedProduction) ? craftedProduction : null;
+    this.props.onUpdate(this.props.impactsData);
   }
 
 }

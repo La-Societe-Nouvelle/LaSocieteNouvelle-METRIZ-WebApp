@@ -196,10 +196,10 @@ class TableExpenses extends React.Component {
 
   sortExpenses(expenses,columSorted) {
     switch(columSorted) {
-      case "label": expenses.sort((a,b) => a.getLabel().localeCompare(b.getLabel())); break;
-      case "company": expenses.sort((a,b) => a.getCorporateName().localeCompare(b.getCorporateName())); break;
-      case "account": expenses.sort((a,b) => a.getAccount().localeCompare(b.getAccount())); break;
-      case "amount": expenses.sort((a,b) => b.getAmount() - a.getAmount()); break;
+      case "label": expenses.sort((a,b) => a.label.localeCompare(b.label)); break;
+      case "company": expenses.sort((a,b) => a.companyName.localeCompare(b.companyName)); break;
+      case "account": expenses.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "amount": expenses.sort((a,b) => b.amount - a.amount); break;
     }
     if (this.state.reverseSort) expenses.reverse();
   }
@@ -265,7 +265,7 @@ class RowTableExpenses extends React.Component {
     super(props)
     this.state = {
       label: props.label,
-      corporateName: props.corporateName,
+      corporateName: props.companies.filter(company => company.id==props.companyId)[0].corporateName,
       account: props.account,
       amount: props.amount
     }
@@ -284,7 +284,8 @@ class RowTableExpenses extends React.Component {
 
   render() {
     const {dataFetched} = this.props;
-    const {label,corporateName,account,amount} = this.state;
+    const {label,amount,account} = this.state;
+    const {corporateName} = this.props.companies.filter(company => company.id==this.props.companyId)[0];
     return (
       <tr>
         <td className="column_auto">

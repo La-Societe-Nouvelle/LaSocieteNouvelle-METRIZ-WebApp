@@ -18,24 +18,6 @@ export class Indicator {
     this.libelleFlag = backUp.libelleFlag;
   }
 
-  /* ---------- Printers ---------- */
-
-  printValue() {
-    if (this.getValue()!=null) {
-      return this.getValue();
-    } else {
-      return "";
-    }
-  }
-
-  printUncertainty() {
-    if (this.getUncertainty()!=null) {
-      return this.getUncertainty();
-    } else {
-      return "";
-    }
-  }
-
   /* ---------- Getters ---------- */
     
   getIndic() {return this.indic}
@@ -89,19 +71,24 @@ export class Indicator {
     this.libelleFlag = data.libelleFlag;
   }
         
-  setValue(value) {
+  setValue(value) 
+  {
     this.value = value;
-    if (value!=null) {
+    if (value!=null) 
+    {
         this.flag = "m";
         this.libelleFlag = "Valeur modifiée";
-    } else {
+    } 
+    else 
+    {
         this.flag = "i";
         this.libelleFlag = "Valeur invalide";
         this.uncertainty = null;
     }
   }
 
-  setUncertainty(value) {
+  setUncertainty(value) 
+  {
     this.uncertainty = value;
   }
 

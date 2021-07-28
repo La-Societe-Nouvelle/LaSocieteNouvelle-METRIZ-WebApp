@@ -1,23 +1,24 @@
 import React from 'react';
+import { valueOrDefault } from '../../src/utils/Utils';
 export class StatementKNW extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      statement : props.indicator.getStatement() || "",
+      researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, ""),
     }
   }
 
   render() {
-    const {statement} = this.state;
+    const {researchAndTrainingContribution} = this.state;
     return (
       <div className="statement">
         <div className="statement-item">
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
           <input className="input-value"
-                 value={statement} 
-                 onChange={this.onStatementChange}
-                 onBlur={this.onStatementBlur}
+                 value={researchAndTrainingContribution} 
+                 onChange={this.onContributionChange}
+                 onBlur={this.onContributionBlur}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;€</span>
         </div>
@@ -25,17 +26,15 @@ export class StatementKNW extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {
-    if (event.which==13) {event.target.blur();}
-  }
+  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
-  onStatementChange = (event) => {
-    this.setState({statement: event.target.value});
+  onContributionChange = (event) => {
+    this.setState({researchAndTrainingContribution: event.target.value});
   }
-  onStatementBlur = (event) => {
-    let statement = parseFloat(event.target.value);
-    this.props.indicator.setStatement(!isNaN(statement) ? statement : null);
-    this.props.onUpdate(this.props.indicator);
+  onContributionBlur = (event) => {
+    let contribution = parseFloat(event.target.value);
+    this.props.impactsData.researchAndTrainingContribution = !isNaN(contribution) ? contribution : null;
+    this.props.onUpdate(this.props.impactsData);
   }
 
 }

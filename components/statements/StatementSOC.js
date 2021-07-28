@@ -6,8 +6,10 @@ export class StatementSOC extends React.Component {
     super(props);
   }
 
-  render() {
-    const statement = this.props.indicator.getStatement();
+  render() 
+  {
+    const {hasSocialPurpose} = this.props.impactsData;
+
     return (
       <div className="statement">
         <div className="statement-item">
@@ -15,15 +17,15 @@ export class StatementSOC extends React.Component {
           <div className="input-radio">
             <input type="radio" id="hasSocialPurpose"
                    value="true"
-                   checked={statement === true}
-                   onChange={this.onStatementChange}/>
+                   checked={hasSocialPurpose === true}
+                   onChange={this.onSocialPurposeChange}/>
             <label>Oui</label>
           </div>
           <div className="input-radio">
             <input type="radio" id="hasSocialPurpose"
                    value="false"
-                   checked={statement === false}
-                   onChange={this.onStatementChange}/>
+                   checked={hasSocialPurpose === false}
+                   onChange={this.onSocialPurposeChange}/>
             <label>Non</label>
           </div>
         </div>
@@ -31,13 +33,18 @@ export class StatementSOC extends React.Component {
     ) 
   }
 
-  onStatementChange = (event) => {
+  onSocialPurposeChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
-      case "true": this.props.indicator.setStatement(true); break;
-      case "false": this.props.indicator.setStatement(false); break;
+      case "true": 
+        this.props.impactsData.hasSocialPurpose = true; 
+        break;
+      case "false": 
+        this.props.impactsData.hasSocialPurpose = false; 
+        break;
     }
-    this.props.onUpdate(this.props.indicator);
+    this.props.onUpdate(this.props.impactsData);
+    this.forceUpdate();
   }
 
 }

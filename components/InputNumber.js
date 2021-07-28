@@ -5,13 +5,13 @@ export class InputNumber extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: props.value || "",
+      input: props.value.toString() || "",
     }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.value!=prevProps.value) {
-      this.setState({input: this.props.value || ""})
+      this.setState({input: this.props.value.toString() || ""})
     }
   }
 
@@ -30,7 +30,7 @@ export class InputNumber extends React.Component {
   }
 
   onFocus = () => {
-    if (this.state.input.match(0)) {
+    if (this.state.input.match(/^0$/)) {
       this.setState({input: ""})
     }
   }

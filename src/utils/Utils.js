@@ -16,3 +16,17 @@ export function printValueInput(value,precision) {
                                           .toString()
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
 }
+
+/* ----- ASSIGN ----- */
+
+export function valueOrDefault(value,defaultValue) {
+  if (value!=undefined && value!=null) {
+    return value;
+  } else {
+    return defaultValue;
+  }
+}
+
+/* ----- ID ----- */
+
+export function getNewId(items) {return items.map(item => item.id).reduce((a,b) => {return Math.max(a,b)},0)+1}

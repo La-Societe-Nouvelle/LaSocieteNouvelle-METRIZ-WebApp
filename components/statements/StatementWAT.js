@@ -1,31 +1,34 @@
 import React from 'react';
+import { valueOrDefault } from '../../src/utils/Utils';
 export class StatementWAT extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      statement: props.indicator.getStatement() || "",
-      uncertainty: props.indicator.getStatementUncertainty() || "",
+      waterConsumption: valueOrDefault(props.impactsData.waterConsumption, ""),
+      waterConsumptionUncertainty: valueOrDefault(props.impactsData.waterConsumptionUncertainty, ""),
     }
   }
 
-  render() {
-    const {statement,uncertainty} = this.state;
+  render() 
+  {
+    const {waterConsumption,waterConsumptionUncertainty} = this.state;
+
     return (
       <div className="statement">
         <div className="statement-item">
           <label>Consommation totale d'eau</label>
           <input className="input-value" 
-                 value={statement}
-                 onChange={this.onStatementChange}
-                 onBlur={this.onStatementBlur}
+                 value={waterConsumption}
+                 onChange={this.onConsumptionChange}
+                 onBlur={this.onConsumptionBlur}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;m3</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
           <input className="input-value" 
-                 value={uncertainty}
+                 value={waterConsumptionUncertainty}
                  onChange={this.onUncertaintyChange}
                  onBlur={this.onUncertaintyBlur}
                  onKeyPress={this.onEnterPress}/>
@@ -35,27 +38,25 @@ export class StatementWAT extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {
-    if (event.which==13) {event.target.blur();}
-  }
+  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
-  onStatementChange = (event) => {
-    this.setState({statement: event.target.value});
+  onConsumptionChange = (event) => {
+    this.setState({waterConsumption: event.target.value});
   }
-  onStatementBlur = (event) => {
-    let statement = parseFloat(event.target.value);
-    this.props.indicator.setStatement(!isNaN(statement) ? statement : null);
-    this.setState({uncertainty: this.props.indicator.getStatementUncertainty() || ""})
-    this.props.onUpdate(this.props.indicator);
+  onConsumptionBlur = (event) => {
+    let waterConsumption = parseFloat(event.target.value);
+    this.props.impactsData.setWaterConsumption(!isNaN(waterConsumption) ? waterConsumption : null);
+    this.setState({waterConsumptionUncertainty: valueOrDefault(this.props.impactsData.waterConsumptionUncertainty, "")});
+    this.props.onUpdate(this.props.impactsData);
   }
 
   onUncertaintyChange = (event) => {
-    this.setState({uncertainty: event.target.value});
+    this.setState({waterConsumptionUncertainty: event.target.value});
   }
   onUncertaintyBlur = (event) => {
     let uncertainty = parseFloat(event.target.value);
-    this.props.indicator.setUncertainty(!isNaN(uncertainty) ? uncertainty : null);
-    this.props.onUpdate(this.props.indicator);
+    this.props.impactsData.waterConsumptionUncertainty = !isNaN(uncertainty) ? uncertainty : null;
+    this.props.onUpdate(this.props.impactsData);
   }
 
 }

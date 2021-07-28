@@ -240,13 +240,35 @@ table {
     }
   }
 
+  td {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  td.center {
+    text-align: center;
+  }
+  td.right {
+    text-align: right;
+  }
+
   // --- COLUMNS --- //
+
+  td {
+    &.auto {width: auto}
+    &.long {width: 400px}
+    &.medium {width: 200px}
+    &.short {width: 125px;}
+  }
 
   .column_short-input {
     width: 150px;
 
     input {
       text-align: right;
+    }
+    select {
+      width: 100%;
     }
   }
 
@@ -403,7 +425,7 @@ table {
   //padding-bottom: 10px;
   border: solid gray 1px;
 
-  h3 {
+  > h3 {
     width: max-content;
     padding: 0px 10px 0px 5px;
     margin: 0;
@@ -415,6 +437,10 @@ table {
 
   .inline-input {
     margin-left: 10px;
+
+    .right {
+      text-align: right;
+    }
   }
 
   .notes {
@@ -511,6 +537,7 @@ table
 }
 
 .popup {
+  z-index: 1;
   position: fixed;
   top: 0;
   left: 0;
@@ -526,10 +553,10 @@ table
 .popup-inner {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
   min-width: 500px;
   min-height: 250px;
-  padding: 5px 10px;
+  padding: 5px 25px;
   background-color: white;
   border: solid $primary-color 1px;
 
@@ -544,14 +571,20 @@ table
     .inline-input {
       display: flex;
       flex-direction: row;
-      margin-bottom: 5px;
+      margin: 5px 0;
       align-items: baseline;
 
       &.short {
-        input {
+        input,select {
           width: 150px;
         }
       }
+      &.long {
+        input,select {
+          width: 400px;
+        }
+      }
+
       label {
         min-width: 200px;
       }

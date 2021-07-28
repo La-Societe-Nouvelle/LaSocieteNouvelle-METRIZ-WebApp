@@ -9,7 +9,8 @@ import { DepreciationsTab } from './indicatorTabs/IndicatorDepreciationsTab';
 import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../src/Export';
 
 // Meta data
-import {indic as indicData} from '../lib/indic';
+import { metaIndicators } from '../lib/indic';
+import { ImpactsData } from '../src/ImpactsData';
 
 /* -------------------- INDICATOR SECTION -------------------- */
 export class IndicatorSection extends React.Component {
@@ -19,6 +20,7 @@ export class IndicatorSection extends React.Component {
     this.state = {
       selectedTab: "main"
     }
+    this.refMainTab = React.createRef();
   }
 
   componentDidUpdate(prevProps) {
@@ -30,9 +32,9 @@ export class IndicatorSection extends React.Component {
     return (
       <div className="section-view">
         <div className="section-view-header">
-            <h1>{indicData[indic].libelle}</h1>
+            <h1>{metaIndicators[indic].libelle}</h1>
           <div className="section-view-header-odds">
-            {indicData[indic].odds.map((odd) => {
+            {metaIndicators[indic].odds.map((odd) => {
               return (
                 <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
               )})
@@ -48,7 +50,7 @@ export class IndicatorSection extends React.Component {
   buildTabView()
   {
     switch(this.state.selectedTab) {
-      case "main" :           return(<MainTab {...this.props} onUpdate={this.updateIndicator.bind(this)}
+      case "main" :           return(<MainTab {...this.props} onUpdate={this.updateImpactsData.bind(this)} ref={this.refMainTab}
                                         onPrintDetails={this.onPrintDetails.bind(this)}/>)
       case "expenses" :       return(<ExpensesTab {...this.props} 
                                         onGoBack={this.goBack.bind(this)}/>)
@@ -62,10 +64,14 @@ export class IndicatorSection extends React.Component {
     this.setState({selectedTab: "main"});
   }
 
+  didUpdate = () => this.props.session.updateRevenueFootprint()
+
   // Update session
-  async updateIndicator(indicator) {
-    await this.props.session.updateValueAddedIndicator(indicator);
-    this.props.onUpdate(this.props.session);
+  async updateImpactsData(impactsData) {
+    //await this.props.session.updateImpactsData(impactsData);
+    await this.props.session.updateRevenueFootprint();
+    this.refMainTab.current.updateTable();
+    //this.forceUpdate();
   }
 
   // Save changes

@@ -1,27 +1,40 @@
-import {Expense} from '/src/Expense.js'
+import { EconomicValue } from './EconomicValue';
 
-export class Depreciation extends Expense {
+export class Depreciation extends EconomicValue {
 
-  constructor(props) 
+  constructor({id,label,amount,account,accountImmobilisation,footprint}) 
   {
-    // Expenses props
-    super(props)
+    super({id,label,amount,footprint})
 
-    // Year
-    this.year = props.year!=undefined ? props.year : "";
+    this.account = account;
+    this.accountImmobilisation = accountImmobilisation;
   }
+
+  update(props) {
+    super.update(props);
+    if (props.account!=undefined) this.account = props.account;
+    if (props.accountImmobilisation!=undefined) this.accountImmobilisation = props.accountImmobilisation;
+  }
+
+  /* ---------- Back Up ---------- */
 
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
-    this.year = backUp.year;
+    this.account = backUp.account || "";
+    this.accountImmobilisation = backUp.accountImmobilisation || "";
   }
+  
+  /* ---------- Getters ---------- */
+
+  getAccount() {return this.account}
+  getAccountImmobilisation() {return this.accountImmobilisation}
 
   /* ---------- Setters ---------- */
 
-  setYear(year) {this.year = year}
-
-  /* ---------- Getters ---------- */
-
-  getYear() {return this.year}
+  setAccount(account) {this.account = account}
+  setImmobilisation(immobilisation) {
+    this.accountImmobilisation = immobilisation.account;
+    this.footprint = immobilisation.footprint
+  }
 
 }

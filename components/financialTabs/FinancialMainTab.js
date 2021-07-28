@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { printValue, printValueInput } from '../../src/utils/Utils';
+import { printValue, printValueInput, valueOrDefault } from '../../src/utils/Utils';
 
 // Readers
 import { FECFileReader, processFECData } from '../../src/readers/FECReader';
@@ -26,15 +26,14 @@ export function FinancialMainTab(props)
     reader.readAsText(event.target.files[0]);
   }
 
-  const isAmountExpensesFixed = financialData.isAmountExpensesFixed();
-  const isAMountDepreciationsFixed = financialData.isAmountDepreciationsFixed();
+  const {amountExpensesFixed,amountDepreciationsFixed} = financialData;
 
   return (
     <div className="financial_data_main_view">
       <div className="group">
         <h3>Soldes intermédiaires de gestion</h3>
         <div className="actions">
-          <button className="highlight" onClick={() => {document.getElementById('import-fec').click()}}>Importer un fichier FEC</button>
+          <button onClick={() => {document.getElementById('import-fec').click()}}>Importer un fichier FEC</button>
           <input className="hidden" id="import-fec" type="file" accept=".csv" onChange={importFECFile} visibility="collapse"/>
         </div>
         <TableMain
@@ -42,7 +41,7 @@ export function FinancialMainTab(props)
           onUpdate={props.onUpdate} 
           financialData={props.financialData}/>
         <div className="notes">
-          {(isAmountExpensesFixed || isAMountDepreciationsFixed) &&
+          {(amountExpensesFixed || amountDepreciationsFixed) &&
             <div>
               <p>&nbsp;<img className="img locker" src="/resources/icon_locked.jpg" alt="locked"/>
                  &nbsp;Saisie supérieure à la somme des écritures renseignées. Cliquez sur le cadenas pour recalculer la somme totale.
@@ -64,24 +63,24 @@ class TableMain extends React.Component {
     super(props);
     this.state = {
       // Input variables
-      productionInput: props.financialData.getProduction() || "",
-      revenueInput: props.financialData.revenue || "",
-      storedProductionInput: props.financialData.getStoredProduction() || "",
-      immobilisedProductionInput: props.financialData.getImmobilisedProduction() || "",
-      unstoredProductionInput: props.financialData.getUnstoredProduction() || "",
-      amountExpensesInput: props.financialData.getAmountExpenses() || "",
-      amountDepreciationsInput: props.financialData.getAmountDepreciations() || "",
+      productionInput: valueOrDefault(props.financialData.getProduction(),""),
+      revenueInput: valueOrDefault(props.financialData.revenue,""),
+      storedProductionInput: valueOrDefault(props.financialData.getStoredProduction(),""),
+      immobilisedProductionInput: valueOrDefault(props.financialData.getImmobilisedProduction(),""),
+      unstoredProductionInput: valueOrDefault(props.financialData.getUnstoredProduction(),""),
+      amountExpensesInput: valueOrDefault(props.financialData.getAmountExpenses(),""),
+      amountDepreciationsInput: valueOrDefault(props.financialData.getAmountDepreciations(),""),
     }
   }
 
   updateInputs() {
-    this.state.productionInput = this.props.financialData.getProduction() || "";
-    this.state.revenueInput = this.props.financialData.getRevenue() || "";
-    this.state.storedProductionInput = this.props.financialData.getStoredProduction() || "";
-    this.state.immobilisedProductionInput = this.props.financialData.getImmobilisedProduction() || "";
-    this.state.unstoredProductionInput = this.props.financialData.getUnstoredProduction() || "";
-    this.state.amountExpensesInput = this.props.financialData.getAmountExpenses() || "";
-    this.state.amountDepreciationsInput = this.props.financialData.getAmountDepreciations() || "";
+    this.state.productionInput = valueOrDefault(this.props.financialData.getProduction(),"");
+    this.state.revenueInput = valueOrDefault(this.props.financialData.getRevenue(),"");
+    this.state.storedProductionInput = valueOrDefault(this.props.financialData.getStoredProduction(),"");
+    this.state.immobilisedProductionInput = valueOrDefault(this.props.financialData.getImmobilisedProduction(),"");
+    this.state.unstoredProductionInput = valueOrDefault(this.props.financialData.getUnstoredProduction(),"");
+    this.state.amountExpensesInput = valueOrDefault(this.props.financialData.getAmountExpenses(),"");
+    this.state.amountDepreciationsInput = valueOrDefault(this.props.financialData.getAmountDepreciations(),"");
     this.forceUpdate();
   }
 
@@ -94,8 +93,7 @@ class TableMain extends React.Component {
            unstoredProductionInput,
            amountExpensesInput,
            amountDepreciationsInput} = this.state;
-    const isAmountExpensesFixed = financialData.isAmountExpensesFixed();
-    const isAMountDepreciationsFixed = financialData.isAmountDepreciationsFixed();
+    const {amountExpensesFixed,amountDepreciationsFixed} = financialData;
     return (
       <table>
         <thead>
@@ -125,8 +123,16 @@ class TableMain extends React.Component {
               <td className="column_unit">&nbsp;€</td></tr>
 
           <tr>
+            <td>Stockage achats</td>
+            <td className="column_amount"><input value={(financialData.getStoredProduction() > 0 ? "(" : "")+printValueInput(financialData.getStoredPurchases(),0)+(financialData.getStoredProduction() > 0 ? ")" : "")} disabled={true}/></td>
+            <td className="column_unit">&nbsp;€</td></tr>
+          <tr>
+            <td>Déstockage achats</td>
+            <td className="column_amount"><input value={printValueInput(financialData.getUnstoredPurchases(),0)} disabled={true}/></td>
+            <td className="column_unit">&nbsp;€</td></tr>
+          <tr>
               <td>Charges externes&nbsp;&nbsp;
-              {isAmountExpensesFixed && 
+              {amountExpensesFixed && 
                   <img className="img locker" src="/resources/icon_locked.jpg" alt="locked" 
                         onClick={this.resyncAmountExpenses}/>}</td>
               <td className="column_amount">
@@ -152,7 +158,7 @@ class TableMain extends React.Component {
 
           <tr>
               <td>Dotations aux amortissements&nbsp;&nbsp;
-              {isAMountDepreciationsFixed && 
+              {amountDepreciationsFixed && 
                   <img className="img locker" src="/resources/icon_locked.jpg" alt="locked" 
                         onClick={this.resyncAmountDepreciations}/>}</td>
               <td className="column_amount"><input value={printValueInput(amountDepreciationsInput,0)} onChange={this.onAmountDepreciationsChange} onBlur={this.onAmountDepreciationsBlur} onKeyPress={this.onEnterPress}/></td>

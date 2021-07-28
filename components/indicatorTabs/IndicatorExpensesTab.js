@@ -2,7 +2,7 @@ import React from 'react';
 
 import { printValue } from '../../src/utils/Utils';
 
-import {indic as metaIndic} from '../../lib/indic';
+import { metaIndicators } from '../../lib/indic';
 
 /* ------------------------------------------------------ */
 /* -------------------- EXPENSES TAB -------------------- */
@@ -42,6 +42,7 @@ class TableExpenses extends React.Component {
   render() {
     const {companies} = this.props;
     const {page} = this.state;
+    console.log(companies);
     companies.sort((a,b) => b.getFootprint().getIndicator(this.props.indic).getValueAbsolute(b.getAmount()) - a.getFootprint().getIndicator(this.props.indic).getValueAbsolute(a.getAmount()));
     return (
       <div>
@@ -123,7 +124,7 @@ class RowTableExpenses extends React.Component {
         <td className="column_unit">&nbsp;€</td>
         <td className="column_value">
           <input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_unit">&nbsp;{metaIndic[this.props.indic].unit}</td>
+        <td className="column_unit">&nbsp;{metaIndicators[this.props.indic].unit}</td>
         <td className="column_value">
           <input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
         <td className="column_unit">&nbsp;%</td>

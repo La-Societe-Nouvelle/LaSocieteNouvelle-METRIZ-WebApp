@@ -1,85 +1,56 @@
 
-import {LegalUnit} from '/src/LegalUnit.js';
-import {SocialFootprint} from '/src/SocialFootprint.js';
-import {FinancialData} from '/src/FinancialData.js';
-
-import {IndicatorART} from '/src/indicator/IndicatorART.js';
-import {IndicatorDIS} from '/src/indicator/IndicatorDIS.js';
-import {IndicatorECO} from '/src/indicator/IndicatorECO.js';
-import {IndicatorGEQ} from '/src/indicator/IndicatorGEQ.js';
-import {IndicatorGHG} from '/src/indicator/IndicatorGHG.js';
-import {IndicatorHAZ} from '/src/indicator/IndicatorHAZ.js';
-import {IndicatorKNW} from '/src/indicator/IndicatorKNW.js';
-import {IndicatorMAT} from '/src/indicator/IndicatorMAT.js';
-import {IndicatorNRG} from '/src/indicator/IndicatorNRG.js';
-import {IndicatorSOC} from '/src/indicator/IndicatorSOC.js';
-import {IndicatorWAS} from '/src/indicator/IndicatorWAS.js';
-import {IndicatorWAT} from '/src/indicator/IndicatorWAT.js';
-
-import { metaAccounts } from '../lib/accounts';
-import {indic as indicData} from '../lib/indic';
+// Components
+import { LegalUnit } from '/src/LegalUnit.js';
+import { SocialFootprint } from '/src/SocialFootprint.js';
+import { FinancialData } from '/src/FinancialData.js';
+import { ImpactsData } from './ImpactsData.js';
 import { Indicator } from './Indicator';
 
-const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
+import { metaAccounts } from '../lib/accounts';
+import { metaIndicators } from '../lib/indic';
+
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
+const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 
 export class Session {
-
-    /* -------------------- CONSTRUCTOR -------------------- */
 
     constructor() 
     {
         this.legalUnit = new LegalUnit();
         this.financialData = new FinancialData();
+        this.impactsData = new ImpactsData();
         
         // Footprints
         this.revenueFootprint = new SocialFootprint();
         this.productionFootprint = new SocialFootprint();
         this.unstoredProductionFootprint = new SocialFootprint();
+        this.intermediateConsumptionFootprint = new SocialFootprint();
+        this.unstoredPurchasesFootprint = new SocialFootprint();
         this.expensesFootprint = new SocialFootprint();
         this.grossValueAddedFootprint = new SocialFootprint();
         this.depreciationsFootprint = new SocialFootprint();
+        this.netValueAddedFootprint = new SocialFootprint();
         
-        // Impacts
-        this.impactsDirects = this.buildImpactsDirects();
-    }
-
-    buildImpactsDirects() {
-        let impacts = {};
-        impacts["art"] = new IndicatorART();
-        impacts["dis"] = new IndicatorDIS();
-        impacts["eco"] = new IndicatorECO();
-        impacts["geq"] = new IndicatorGEQ();
-        impacts["ghg"] = new IndicatorGHG();
-        impacts["haz"] = new IndicatorHAZ();
-        impacts["knw"] = new IndicatorKNW();
-        impacts["mat"] = new IndicatorMAT();
-        impacts["nrg"] = new IndicatorNRG();
-        impacts["soc"] = new IndicatorSOC();
-        impacts["was"] = new IndicatorWAS();
-        impacts["wat"] = new IndicatorWAT();
-        return impacts;
     }
 
     /* ---------- BACK UP ---------- */
 
-    async updateFromBackUp(backUp) {
+    async updateFromBackUp(backUp) 
+    {
         await this.legalUnit.updateFromBackUp(backUp.legalUnit);        
         await this.financialData.updateFromBackUp(backUp.financialData);
-        await this.updateImpactsDirectsFromBackUp(backUp.impactsDirects);
+        await this.impactsData.updateFromBackUp(backUp.impactsData);
         
         this.revenueFootprint.updateFromBackUp(backUp.revenueFootprint);
         this.productionFootprint.updateFromBackUp(backUp.productionFootprint);
-        this.unstoredProductionFootprint.updateFromBackUp(backUp.unstoredProductionFootprint)
+        this.unstoredProductionFootprint.updateFromBackUp(backUp.unstoredProductionFootprint);
+        this.intermediateConsumptionFootprint.updateFromBackUp(backUp.intermediateConsumptionFootprint);
         this.expensesFootprint.updateFromBackUp(backUp.expensesFootprint);
-        this.grossValueAddedFootprint.updateFromBackUp(backUp.grossValueAddedFootprint)
+        this.unstoredPurchasesFootprint.updateFromBackUp(backUp.unstoredPurchasesFootprint)
+        this.grossValueAddedFootprint.updateFromBackUp(backUp.grossValueAddedFootprint);
         this.depreciationsFootprint.updateFromBackUp(backUp.depreciationsFootprint);
-        
-    }
-
-    updateImpactsDirectsFromBackUp(backUp) {
-        indics.forEach((indic) => this.impactsDirects[indic].updateFromBackUp(backUp[indic]));
+        this.netValueAddedFootprint.updateFromBackUp(backUp.netValueAddedFootprint);
     }
 
     /* -------------------- EXTERNAL UPDATES -------------------- */
@@ -87,17 +58,13 @@ export class Session {
     // ...from financial section
     async updateFinancialData(financialData) {
         this.financialData = financialData;
-        Object.entries(this.impactsDirects).forEach(([indic,indicator]) => {
-            indicator.setNetValueAdded(financialData.getNetValueAdded())})
-        this.updateRevenueFootprint();
+        this.impactsData.setNetValueAdded(financialData.getNetValueAdded());
+        await this.updateRevenueFootprint();
     }
 
-    // ...from indicator section
-    async updateValueAddedIndicator(indicator) {
-        let indic = indicator.getIndic();
-        this.impactsDirects[indic] = indicator;
-        await this.updateRevenueIndicFootprint(indic);
-        return;
+    async updateImpactsData(impactsData) {
+        this.impactsData = impactsData;
+        await this.updateRevenueFootprint();
     }
 
     /* -------------------- GETTERS -------------------- */
@@ -107,382 +74,343 @@ export class Session {
     getLibelle() {return this.libelle}
     getUniteLegale() {return this.legalUnit}
     getFinancialData() {return this.financialData}
-    getImpactsDirects() {return this.impactsDirects}
+    getImpactsData() {return this.impactsData}
 
     /* ---------- FOOTPRINTS ---------- */
 
     // Revenue
-    getRevenueFootprint() {
-        return this.revenueFootprint;
-    }
+    getRevenueFootprint() {return this.revenueFootprint}
 
     // Production
-    getProductionFootprint() {
-        return this.productionFootprint;
-    }
-
-    // Production
-    getUnstoredProductionFootprint() {
-        return this.unstoredProductionFootprint;
-    }
+    getProductionFootprint() {return this.productionFootprint}
+    getUnstoredProductionFootprint() {return this.unstoredProductionFootprint}
 
     // Expenses
-    getExpensesFootprint( ) {
-        return this.expensesFootprint;
-    }
+    getIntermediateConsumptionFootprint() {return this.intermediateConsumptionFootprint}
+    getExpensesFootprint() {return this.expensesFootprint}
+    getUnstoredPurchasesFootprint() {return this.unstoredPurchasesFootprint}
 
     // Gross Value Added
-    getGrossValueAddedFootprint() {
-        return this.grossValueAddedFootprint;
-    }
-
-    // Depreciations
-    getDepreciationsFootprint() {
-        return this.depreciationsFootprint;
-    }
+    getGrossValueAddedFootprint() {return this.grossValueAddedFootprint}
+    getDepreciationsFootprint() {return this.depreciationsFootprint}
 
     // Net Value Added
-    getValueAddedFootprint(indic) {
-        return this.impactsDirects[indic];
-    }
-
+    getNetValueAddedFootprint() {return this.netValueAddedFootprint}
+    
     /* -------------------- FOOTPRINTS PROCESS -------------------- */
 
     // Footprints are stored in variables to avoid processing mutliple times when render the results
     // (ex. reprocess depreciations footrpint for gross value added footprint, production footprint & revenue footprint)
     // & it allows to have all the values directly in the json back up file
 
-    /* ---------- REVENUE (AVAILABLE PRODUCTION) ---------- */
+    /* ---------- REVENUE (SOLD PRODUCTION) ---------- */
 
     async updateRevenueFootprint() {
-        indics.forEach((indic) => {
-            this.updateRevenueIndicFootprint(indic);
-        })
+        await Promise.all(indics.map(async (indic) => {
+            await this.updateRevenueIndicFootprint(indic);
+            return;
+        }))
         return;
     }
 
-    async updateRevenueIndicFootprint(indic) {
-        
-        // update footprints
+    // aggregated footprint
+    async updateRevenueIndicFootprint(indic) 
+    {
+        // update aggregated footprints
         await this.updateProductionIndicFootprint(indic);
         await this.updateUnstoredProductionIndicFootprint(indic);
 
-        // if all aggregates are set..
-        if (this.financialData.getProduction()!=null 
-                & this.financialData.getUnstoredProduction()!=null)
-        {
-            // ...and check if all the footprints are set (if the amount is not null)
-            if ( !(this.financialData.getProduction()>0.0 & this.productionFootprint.getIndicator(indic).getValue()==null) 
-                    & !(this.financialData.getUnstoredProduction()>0.0 & this.unstoredProductionFootprint.getIndicator(indic).getValue()==null) ) 
-            {
-                let absolute = 0.0;
-                let absoluteMax = 0.0;
-                let absoluteMin = 0.0;
-                
-                if (this.financialData.getProduction()>0.0) {
-                    let currentProductionSold = this.financialData.getProduction()-this.financialData.getStoredProduction()-this.financialData.getImmobilisedProduction();
-                    absolute+= currentProductionSold*this.productionFootprint.getIndicator(indic).getValue();
-                    absoluteMax+= currentProductionSold*this.productionFootprint.getIndicator(indic).getValueMax();
-                    absoluteMin+= currentProductionSold*this.productionFootprint.getIndicator(indic).getValueMin();
-                }
-                if (this.financialData.getUnstoredProduction()>0.0) {
-                    let unstoredProductionSold = this.financialData.getUnstoredProduction();
-                    absolute+= unstoredProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValue();
-                    absoluteMax+= unstoredProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValueMax();
-                    absoluteMin+= unstoredProductionSold*this.unstoredProductionFootprint.getIndicator(indic).getValueMin();
-                }
-                
-                let value = (Math.round(absolute/this.financialData.getRevenue() *100)/100).toFixed(indicData[indic].nbDecimals);
-                this.revenueFootprint.getIndicator(indic).setValue(value);
-                let uncertainty = value > 0 ? Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 ) : 0;
-                this.revenueFootprint.getIndicator(indic).setUncertainty(uncertainty);
-            }
-            else { this.revenueFootprint.getIndicator(indic).setValue(null); }
-        } else { this.revenueFootprint.getIndicator(indic).setValue(null); }
+        // merge footprints
+        let indicator = buildIndicatorMerge(this.productionFootprint.getIndicator(indic), this.financialData.getProduction(),
+                                            this.unstoredProductionFootprint.getIndicator(indic), -this.financialData.getUnstoredProduction())
+        
+        this.revenueFootprint.getIndicator(indic).setValue(indicator.getValue())
+        this.revenueFootprint.getIndicator(indic).setUncertainty(indicator.getUncertainty())
 
         return;
     }
     
     /* ---------- (CURRENT) PRODUCTION ---------- */
 
-    updateProductionFootprint() {
-        indics.forEach((indic) => {
-            this.updateProductionIndicFootprint(indic);
-        })
-    }
-
-    async updateProductionIndicFootprint(indic) {
-        
+    async updateProductionIndicFootprint(indic) 
+    {
         // update footprints
-        await this.updateExpensesIndicFootprint(indic);
+        await this.updateIntermediateConsumptionIndicFootprint(indic);
         await this.updateGrossValueAddedIndicFootprint(indic);
 
         // if all aggregates are set..
-        if (this.financialData.getProduction()!=null 
-                & this.financialData.getAmountExpenses()!=null
-                & this.financialData.getAmountDepreciations()!=null)
-        {
-            // ...and check if all the footprints are set (if the amount is not null)
-            if ( !(this.financialData.getAmountExpenses()>0.0 & this.expensesFootprint.getIndicator(indic).getValue()==null) 
-                    & !(this.financialData.getGrossValueAdded()>0.0 & this.grossValueAddedFootprint.getIndicator(indic).getValue()==null) ) 
-            {
-                let absolute = 0.0;
-                let absoluteMax = 0.0;
-                let absoluteMin = 0.0;
-                
-                if (this.financialData.getAmountExpenses()>0.0) { 
-                    absolute+= this.financialData.getAmountExpenses()*this.expensesFootprint.getIndicator(indic).getValue();
-                    absoluteMax+= this.financialData.getAmountExpenses()*this.expensesFootprint.getIndicator(indic).getValueMax();
-                    absoluteMin+= this.financialData.getAmountExpenses()*this.expensesFootprint.getIndicator(indic).getValueMin();
-                }
-                if (this.financialData.getGrossValueAdded()>0.0) {
-                    absolute+= this.financialData.getGrossValueAdded()*this.grossValueAddedFootprint.getIndicator(indic).getValue();
-                    absoluteMax+= this.financialData.getGrossValueAdded()*this.grossValueAddedFootprint.getIndicator(indic).getValueMax();
-                    absoluteMin+= this.financialData.getGrossValueAdded()*this.grossValueAddedFootprint.getIndicator(indic).getValueMin();
-                }
-                
-                let value = (Math.round(absolute/this.financialData.getProduction() *100)/100).toFixed(indicData[indic].nbDecimals);
-                this.productionFootprint.getIndicator(indic).setValue(value);
-                let uncertainty = value > 0 ? Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 ) : 0;
-                this.productionFootprint.getIndicator(indic).setUncertainty(uncertainty);
-            }
-            else { this.productionFootprint.getIndicator(indic).setValue(null); }
-        } else { this.productionFootprint.getIndicator(indic).setValue(null); }
-
+        let indicator = buildIndicatorMerge(this.grossValueAddedFootprint.getIndicator(indic), this.financialData.getGrossValueAdded(),
+                                            this.intermediateConsumptionFootprint.getIndicator(indic), this.financialData.getAmountIntermediateConsumption())
+            
+        this.productionFootprint.getIndicator(indic).setValue(indicator.getValue())
+        this.productionFootprint.getIndicator(indic).setUncertainty(indicator.getUncertainty())
+        
         return;
     }
 
     /* ---------- UNSTORED PRODUCTION ---------- */
     
-    updateUnstoredProductionFootprint() {
-        indics.forEach((indic) => {
-            this.updateUnstoredProductionIndicFootprint(indic);
-        })
+    async updateUnstoredProductionIndicFootprint(indic) 
+    {
+        // update only if footprint not set
+        if (this.unstoredProductionFootprint.footprintId==null) {
+            this.unstoredProductionFootprint.indicators[indic] = this.productionFootprint.getIndicator(indic);
+        }
+        return;
     }
 
-    async updateUnstoredProductionIndicFootprint(indic) {
-        
-        let isLastYearProductionFootrpintSet = false;
-        
-        if (this.legalUnit.siren.match("[0-9]{9}"))
-        {
-            // Fetch data -> Stored data (only update on action)
-            const endpoint = `${apiBaseUrl}/siren/${this.legalUnit.siren}`; // add year to resquest
-            const response = await fetch(endpoint, {method:'get'});
-            const data = await response.json();
-            if (data.header.statut===200)
-            {
-                let indicator = data.profil.empreinteSocietale[indic.toUpperCase()];
-                if (indicator.valueDeclared & indicator.year<"2021") {
-                    this.unstoredProductionFootprint.getIndicator(indic).setValue(value);
-                    this.unstoredProductionFootprint.getIndicator(indic).setUncertainty(uncertainty);
-                    isLastYearProductionFootrpintSet = true;
-                }
-            }
-        }
+    /* ---------- INTERMEDIATE CONSUMPTION ---------- */
 
-        if (!isLastYearProductionFootrpintSet)
-        {
-            this.unstoredProductionFootprint.getIndicator(indic).setValue(this.productionFootprint.getIndicator(indic).getValue());
-            this.unstoredProductionFootprint.getIndicator(indic).setUncertainty(this.productionFootprint.getIndicator(indic).getUncertainty());
-        }
+    async updateIntermediateConsumptionIndicFootprint(indic)
+    {
+        // Update footprints
+        await this.updateExpensesIndicFootprint(indic);
+        await this.updateUnstoredPurchasesIndicFootprint(indic);
+
+        // merge footprints
+        let indicator = buildIndicatorMerge(this.expensesFootprint.getIndicator(indic), this.financialData.getAmountExpenses(),
+                                            this.unstoredPurchasesFootprint.getIndicator(indic), this.financialData.unstoredPurchases)
+        
+        this.intermediateConsumptionFootprint.getIndicator(indic).setValue(indicator.getValue())
+        this.intermediateConsumptionFootprint.getIndicator(indic).setUncertainty(indicator.getUncertainty())
 
         return;
     }
 
-    /* ---------- EXPENSES ---------- */
-    
-    updateExpensesFootprint() {
-        indics.forEach((indic) => {
-            this.updateExpensesIndicFootprint(indic);
-        })
+    /* ---------- UNSTORED PURCHASES & SUPPLIES ---------- */
+
+    async updateUnstoredPurchasesIndicFootprint(indic)
+    {
+        if (this.financialData.unstoredPurchases > 0) 
+        {
+            // Update only if footprint not set
+            if (this.unstoredPurchasesFootprint.footprintId==null) {
+                this.unstoredPurchasesFootprint.indicators[indic] = this.expensesFootprint.getIndicator(indic); // Improve with 60 only
+            }
+        }
     }
+
+    /* ---------- REVENUE EXPENDITURES ---------- */
     
-    async updateExpensesIndicFootprint(indic) {
-        
-        let indicatorExpenses = this.expensesFootprint.getIndicator(indic);
-        let defaultData = (await this.getExpenseDefaultFootprint()).getIndicator(indic);
-        
+    async updateExpensesIndicFootprint(indic) 
+    {
         if (this.financialData.getAmountExpenses()!=null) 
         {
-            let totalAmount = 0.0;
-            let absolute = 0.0;
-            let absoluteMax = 0.0;
-            let absoluteMin = 0.0;
-
-            // Process for listed expenses
-            let expenses = this.financialData.getExpenses();
-            expenses.forEach((expense) => {
-                let amountExpense = expense.getAmount();
-                if (amountExpense!=null) 
-                {
-                    let indicatorExpense = expense.getFootprint().getIndicator(indic);
-                    totalAmount+= expense.getAmount();
-                    absolute+= indicatorExpense.getValue()*amountExpense;
-                    absoluteMax+= indicatorExpense.getValueMax()*amountExpense;
-                    absoluteMin+= indicatorExpense.getValueMin()*amountExpense;
-                }
-            })
-            // Process for remaining expenses (difference between total declared & total listed expenses)
-            if (totalAmount<this.financialData.getAmountExpenses()) {
-                let amountRemaining = this.financialData.getAmountExpenses()-totalAmount;
-                totalAmount = this.financialData.getAmountExpenses();
-                absolute+= defaultData.getValue()*amountRemaining;
-                absoluteMax+= defaultData.getValueMax()*amountRemaining;
-                absoluteMin+= defaultData.getValueMin()*amountRemaining;
-            }
-
-            if (totalAmount>0.0) { 
-                indicatorExpenses.setValue(absolute/totalAmount);
-                let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
-                indicatorExpenses.setUncertainty(uncertainty);
+            let indicatorDetailedExpenses = buildIndicatorAggregate(indic,this.financialData.expenses);
+            
+            if (this.financialData.amountExpensesFixed) {
+                let gap = this.financialData.getAmountExpenses()-this.financialData.getAmountDetailedExpenses();
+                this.expensesFootprint.indicators[indic] = buildIndicatorMerge(indicatorDetailedExpenses, this.financialData.getAmountDetailedExpenses(),
+                                                                               this.legalUnit.defaultConsumptionFootprint.getIndicator(indic), gap)
             } else {
-                indicatorExpenses.setValue(null); 
-                indicatorExpenses.setUncertainty(null);
+                this.expensesFootprint.indicators[indic] = indicatorDetailedExpenses;
             }
-        
-        } else { 
-            indicatorExpenses.setValue(null); 
-            indicatorExpenses.setUncertainty(null);
         }
-
+        else 
+        { 
+            this.expensesFootprint.indicators[indic].setValue(null);
+            this.expensesFootprint.indicators[indic].setUncertainty(null);
+        }
         return;
-    }
-
-    async getExpenseDefaultFootprint() 
-    {
-        let endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite=00" + "&flow=IC"; // use legal unit data to improve
-        let response = await fetch(endpoint, {method:'get'});
-        let data = await response.json();
-        if (data.header.statut != 200) {
-            endpoint = apiBaseUrl + "defaultpays=FRA&activite=00&flow=IC";
-            response = await fetch(endpoint, {method:'get'});
-            data = await response.json();
-        }
-        let expenseDefaultFootprint = new SocialFootprint();
-        expenseDefaultFootprint.updateAll(data.empreinteSocietale);
-        return expenseDefaultFootprint;
     }
     
     /* ---------- GROSS VALUE ADDED ---------- */
 
-    updateGrossValueAddedFootprint() {
-        indics.forEach((indic) => {
-            this.updateGrossValueAddedIndicFootprint(indic);
-        })
-    }
-
-    async updateGrossValueAddedIndicFootprint(indic) {
-        
+    async updateGrossValueAddedIndicFootprint(indic) 
+    {
         // update footprints
         await this.updateDepreciationsIndicFootprint(indic);
-        await this.updateValueAddedFootprint();
+        await this.updateValueAddedIndicFootprint(indic);
         
-        // if all aggregates are set..
-        if (this.financialData.getAmountDepreciations()!=null
-                & this.financialData.getNetValueAdded()!=null)
-        {
-            // ...and all the footprints are set (if the amount is not null)
-            if ( !(this.financialData.getAmountDepreciations()>0.0 & this.depreciationsFootprint.getIndicator(indic).getValue()==null) 
-                    & !(this.financialData.getNetValueAdded()>0.0 & this.impactsDirects[indic].getValue()==null) ) 
-            {
-                let totalAmount = 0.0;
-                let absolute = 0.0;
-                let absoluteMax = 0.0;
-                let absoluteMin = 0.0;
-                
-                if (this.financialData.getAmountDepreciations()>0.0) {
-                    totalAmount+= this.financialData.getAmountDepreciations();
-                    absolute+= this.financialData.getAmountDepreciations()*this.depreciationsFootprint.getIndicator(indic).getValue();
-                    absoluteMax+= this.financialData.getAmountDepreciations()*this.depreciationsFootprint.getIndicator(indic).getValueMax();
-                    absoluteMin+= this.financialData.getAmountDepreciations()*this.depreciationsFootprint.getIndicator(indic).getValueMin();
-                }
-                if (this.financialData.getNetValueAdded()>0.0) {
-                    totalAmount+= this.financialData.getNetValueAdded();
-                    absolute+= this.financialData.getNetValueAdded()*this.impactsDirects[indic].getValue();
-                    absoluteMax+= this.financialData.getNetValueAdded()*this.impactsDirects[indic].getValueMax();
-                    absoluteMin+= this.financialData.getNetValueAdded()*this.impactsDirects[indic].getValueMin();
-                }
-                let value = (Math.round(absolute/totalAmount *100)/100).toFixed(indicData[indic].nbDecimals);
-                this.grossValueAddedFootprint.getIndicator(indic).setValue(value);
-                let uncertainty = value > 0 ? Math.round( Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 ) : 0;
-                this.grossValueAddedFootprint.getIndicator(indic).setUncertainty(uncertainty);
-            }
-            else { this.grossValueAddedFootprint.getIndicator(indic).setValue(null); }
-        } else { this.grossValueAddedFootprint.getIndicator(indic).setValue(null); }
+        // merge footprints
+        let indicator = buildIndicatorMerge(this.netValueAddedFootprint.getIndicator(indic), this.financialData.getNetValueAdded(),
+                                            this.depreciationsFootprint.getIndicator(indic), this.financialData.getAmountDepreciations())
+        
+        this.grossValueAddedFootprint.getIndicator(indic).setValue(indicator.getValue())
+        this.grossValueAddedFootprint.getIndicator(indic).setUncertainty(indicator.getUncertainty())
 
         return;
     }
 
-    /* ---------- DEPRECIATIONS ---------- */
-    
-    updateDepreciationsFootprint() {
-        indics.forEach((indic) => {
-            this.updateDepreciationsIndicFootprint(indic);
-        })
-    }
-    
-    async updateDepreciationsIndicFootprint(indic) {
-        
-        let indicatorDepreciations = this.depreciationsFootprint.getIndicator(indic);
-        let defaultData = (await this.getExpenseDefaultFootprint()).getIndicator(indic);
-        
-        if (this.financialData.getAmountDepreciations()!=null) {
+    /* ---------- CAPITAL EXPENDITURES ---------- */
 
-            let totalAmount = 0.0;
-            let absolute = 0.0;
-            let absoluteMax = 0.0;
-            let absoluteMin = 0.0;
-            
-            // Process for listed depreciations
-            let depreciations = this.financialData.getDepreciations();
-            depreciations.forEach(
-                (depreciation) => {
-                    let amountDepreciation = depreciation.getAmount();
-                    if (amountDepreciation!=null) 
-                    {
-                        let indicatorDepreciation = depreciation.getFootprint().getIndicator(indic);    
-                        totalAmount+= depreciation.getAmount();
-                        absolute+= indicatorDepreciation.getValue()*amountDepreciation;
-                        absoluteMax+= indicatorDepreciation.getValueMax()*amountDepreciation;
-                        absoluteMin+= indicatorDepreciation.getValueMin()*amountDepreciation;
-                    }
-                }
-            )
-            // Process for remaining amount of depreciations
-            if (totalAmount<this.financialData.getAmountDepreciations()) {
-                let amountRemaining = this.financialData.getAmountDepreciations()-totalAmount;
-                totalAmount = this.financialData.getAmountDepreciations();
-                absolute+= defaultData.getValue()*amountRemaining;
-                absoluteMax+= defaultData.getValueMax()*amountRemaining;
-                absoluteMin+= defaultData.getValueMin()*amountRemaining;
-            }
-            
-            if (totalAmount>0.0) { 
-                indicatorDepreciations.setValue(absolute/totalAmount);
-                let uncertainty = absolute> 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
-                indicatorDepreciations.setUncertainty(uncertainty);
+    // ...update the depreciations footprint
+    async updateDepreciationsIndicFootprint(indic) 
+    {
+        if (this.financialData.getAmountDepreciations()!=null) 
+        {
+            await Promise.all(this.financialData.depreciations.map(async (depreciation) => {
+                await this.updateDepreciationIndicFootprint(indic,depreciation);
+                return;
+            }))
+
+            let indicatorDetailedDepreciations = buildIndicatorAggregate(indic,this.financialData.depreciations)
+
+            if (this.financialData.amountDepreciationsFixed) {
+                let gap = this.financialData.getAmountDepreciations()-this.financialData.getAmountDetailedDepreciations();
+                this.depreciationsFootprint.indicators[indic] = buildIndicatorMerge(indicatorDetailedDepreciations, this.financialData.getAmountDetailedDepreciations(),
+                                                                                    this.legalUnit.defaultConsumptionFootprint.getIndicator(indic), gap)
             } else {
-                indicatorDepreciations.setValue(null);
-                indicatorDepreciations.setUncertainty(null);
+                this.depreciationsFootprint.indicators[indic] = indicatorDetailedDepreciations;
             }
-        
-        } else { 
-            indicatorDepreciations.setValue(null);
-            indicatorDepreciations.setUncertainty(null);
         }
+        else 
+        { 
+            this.depreciationsFootprint.indicators[indic].setValue(null);
+            this.depreciationsFootprint.indicators[indic].setUncertainty(null);
+        }
+        return;
+    }
+
+    // ...update the footprint of each depreciation based on the footprint of the immobilisation account & the investments
+    async updateDepreciationIndicFootprint(indic,depreciation) 
+    {
+        let immobilisation = this.financialData.getImmobilisationByAccount(depreciation.accountImmobilisation);
+        let indicatorImmobilisation = immobilisation.getFootprint().getIndicator(indic);
         
+        let investments = this.financialData.investments.filter(investment => investment.accountImmobilisation==depreciation.accountImmobilisation);
+        if (investments.length > 0) {
+            let amountInvestments = investments.map(investment => investment.amount).reduce((a, b) => a + b, 0);
+            let indicatorInvestments = buildIndicatorAggregate(indic,investments);
+            depreciation.footprint.indicators[indic] = buildIndicatorMerge(indicatorImmobilisation, immobilisation.amount,
+                                                                           indicatorInvestments, amountInvestments)
+        } else {
+            depreciation.footprint.indicators[indic] = indicatorImmobilisation;
+        }
+
         return;
     }
     
     /* ---------- NET VALUE ADDED ---------- */
 
-    updateValueAddedFootprint() {
-        indics.forEach(
-            (indic) => {
-                this.impactsDirects[indic].setNetValueAdded(this.financialData.getNetValueAdded());
+    async updateValueAddedIndicFootprint(indic) 
+    {
+        const netValueAdded = this.financialData.getNetValueAdded();
+        if (netValueAdded!=null)
+        {
+            const impactsData = this.impactsData;
+            switch(indic)
+            {
+                case "art": /* ----- ART ----- */
+
+                    if (impactsData.craftedProduction!=null) {
+                        this.netValueAddedFootprint.getIndicator("art").setValue(impactsData.craftedProduction/netValueAdded *100);
+                        this.netValueAddedFootprint.getIndicator("art").setUncertainty(0);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("art").setValue(null) } 
+                    break;
+            
+                case "dis": /* ----- DIS ----- */
+                    
+                    if (impactsData.indexGini!=null) {
+                        this.netValueAddedFootprint.getIndicator("dis").setValue(impactsData.indexGini);
+                        this.netValueAddedFootprint.getIndicator("dis").setUncertainty(0);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("dis").setValue(null) } 
+                    break;
+                    
+                case "eco": /* ----- ECO ----- */
+                    
+                    if (impactsData.domesticProduction!=null) {
+                        this.netValueAddedFootprint.getIndicator("eco").setValue(impactsData.domesticProduction/netValueAdded *100);
+                        this.netValueAddedFootprint.getIndicator("eco").setUncertainty(0);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("eco").setValue(null) } 
+                    break;
+                    
+                case "geq": /* ----- GEQ ----- */
+                    
+                    if (impactsData.wageGap!=null) {
+                        this.netValueAddedFootprint.getIndicator("geq").setValue(impactsData.wageGap);
+                        this.netValueAddedFootprint.getIndicator("geq").setUncertainty(0);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("geq").setValue(null) } 
+                    break;
+
+
+                case "ghg": /* ----- GHG ----- */
+
+                    if (impactsData.greenhousesGazEmissions!=null) {
+                        this.netValueAddedFootprint.getIndicator("ghg").setValue(impactsData.greenhousesGazEmissions/netValueAdded *1000);
+                        this.netValueAddedFootprint.getIndicator("ghg").setUncertainty(impactsData.greenhousesGazEmissionsUncertainty);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("ghg").setValue(null) } 
+                    break;
+
+
+                case "haz": /* ----- HAZ ----- */
+
+                    if (impactsData.hazardousSubstancesConsumption!=null) {
+                        this.netValueAddedFootprint.getIndicator("haz").setValue(impactsData.hazardousSubstancesConsumption/netValueAdded *1000);
+                        this.netValueAddedFootprint.getIndicator("haz").setUncertainty(impactsData.hazardousSubstancesConsumptionUncertainty);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("haz").setValue(null) } 
+                    break;
+
+
+                case "knw": /* ----- KNW ----- */
+
+                    if (impactsData.researchAndTrainingContribution!=null) {
+                        this.netValueAddedFootprint.getIndicator("knw").setValue(impactsData.researchAndTrainingContribution/netValueAdded *100);
+                        this.netValueAddedFootprint.getIndicator("knw").setUncertainty(0);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("knw").setValue(null) } 
+                    break;
+
+
+                case "mat": /* ----- MAT ----- */
+
+                    if (impactsData.materialsExtraction!=null) {
+                        this.netValueAddedFootprint.getIndicator("mat").setValue(impactsData.materialsExtraction/netValueAdded *1000);
+                        this.netValueAddedFootprint.getIndicator("mat").setUncertainty(impactsData.materialsExtractionUncertainty);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("mat").setValue(null) } 
+                    break;
+
+
+                case "nrg": /* ----- NRG ----- */
+
+                    if (impactsData.energyConsumption!=null) {
+                        this.netValueAddedFootprint.getIndicator("nrg").setValue(impactsData.energyConsumption/netValueAdded *1000);
+                        this.netValueAddedFootprint.getIndicator("nrg").setUncertainty(impactsData.energyConsumptionUncertainty);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("nrg").setValue(null) } 
+                    break;
+
+
+                case "soc": /* ----- SOC ----- */
+
+                    if (impactsData.hasSocialPurpose!=null) {
+                        this.netValueAddedFootprint.getIndicator("soc").setValue(impactsData.hasSocialPurpose ? 100 : 0);
+                        this.netValueAddedFootprint.getIndicator("soc").setUncertainty(0);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("soc").setValue(null) } 
+                    break;
+
+
+                case "was": /* ----- WAS ----- */
+
+                    if (impactsData.wasteProduction!=null) {
+                        this.netValueAddedFootprint.getIndicator("was").setValue(impactsData.wasteProduction/netValueAdded *1000);
+                        this.netValueAddedFootprint.getIndicator("was").setUncertainty(impactsData.wasteProductionUncertainty);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("was").setValue(null) } 
+                    break;
+
+
+                case "wat": /* ----- WAT ----- */
+
+                    if (impactsData.waterConsumption!=null) {
+                        this.netValueAddedFootprint.getIndicator("wat").setValue(impactsData.waterConsumption/netValueAdded *1000);
+                        this.netValueAddedFootprint.getIndicator("wat").setUncertainty(impactsData.waterConsumptionUncertainty);
+                    }
+                    else { this.netValueAddedFootprint.getIndicator("wat").setValue(null) } 
+                    break;
+
             }
-        )
+        }
+
+        else { this.netValueAddedFootprint.getIndicator(indic).setValue(null) } 
     }
 
     /* ---------- ACCOUNTS ---------- */
@@ -497,57 +425,34 @@ export class Session {
                 )
             } else if (account!="") { // other accounts
                 return buildIndicatorAggregate(indic,
-                    this.financialData.expenses.filter(expense => expense.account == "")
+                    this.financialData.expenses.filter(expense => expense.account == "") // change
                 )
             } else { // other expenses
-                let amount = this.financialData.getAmountExpenses() - this.financialData.getAmountDetailedExpenses();
-                // fetch data
+                return this.legalUnit.defaultConsumptionFootprint.getIndicator(indic);
             }
         }
 
-        return new Indicator(indic);;
+        return new Indicator(indic);
     }
 
     getDepreciationsAccountIndicator(account,indic) {
         
-        let indicator = new Indicator(indic);
-        
-        if (this.financialData.getAmountDepreciations()!=null) 
+        if (this.financialData.getAmountDepreciations()!=null)
         {
-            let totalAmount = 0.0;
-            let absolute = 0.0;
-            let absoluteMax = 0.0;
-            let absoluteMin = 0.0;
-
-            // Process for depreciations in account
-            let depreciations = this.financialData.getDepreciations();
-            depreciations.filter(depreciation => depreciation.account.substring(0,3)==account).forEach((depreciation) => {
-                let amountDepreciation = depreciation.getAmount();
-                if (amountDepreciation!=null) 
-                {
-                    let indicatorDepreciation = depreciation.getFootprint().getIndicator(indic);
-                    totalAmount+= depreciation.getAmount();
-                    absolute+= indicatorDepreciation.getValue()*amountDepreciation;
-                    absoluteMax+= indicatorDepreciation.getValueMax()*amountDepreciation;
-                    absoluteMin+= indicatorDepreciation.getValueMin()*amountDepreciation;
-                }
-            })
-
-            if (totalAmount>0.0) { 
-                indicator.setValue(absolute/totalAmount);
-                let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
-                indicator.setUncertainty(uncertainty);
+            if (["280","281","282"].includes(account)) {
+                return buildIndicatorAggregate(indic,
+                    this.financialData.depreciations.filter(depreciation => depreciation.account.substring(0,3)==account)
+                )
+            } else if (account!="") {
+                return buildIndicatorAggregate(indic,
+                    this.financialData.depreciations.filter(depreciation => depreciation.account == "") // change
+                )
             } else {
-                indicator.setValue(null); 
-                indicator.setUncertainty(null);
+                return this.legalUnit.defaultConsumptionFootprint.getIndicator(indic);
             }
-        
-        } else { 
-            indicator.setValue(null); 
-            indicator.setUncertainty(null);
         }
-
-        return indicator;
+        
+        return new Indicator(indic);
     }
 
     
@@ -564,10 +469,10 @@ function buildIndicatorAggregate(indic,elements)
     let absoluteMin = 0.0;
 
     elements.forEach((element) => {
-        let amount = element.getAmount();
-        if (amount!=null) 
+        let amount = element.amount;
+        let indicatorElement = element.getFootprint().getIndicator(indic);
+        if (amount!=null && indicatorElement.getValue()!=null) 
         {
-            let indicatorElement = element.getFootprint().getIndicator(indic);
             absolute+= indicatorElement.getValue()*amount;
             absoluteMax+= indicatorElement.getValueMax()*amount;
             absoluteMin+= indicatorElement.getValueMin()*amount;
@@ -575,7 +480,7 @@ function buildIndicatorAggregate(indic,elements)
         }
     })
 
-    if (totalAmount>0.0) { 
+    if (totalAmount > 0.0) { 
         indicator.setValue(absolute/totalAmount);
         let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
         indicator.setUncertainty(uncertainty);
@@ -584,5 +489,31 @@ function buildIndicatorAggregate(indic,elements)
         indicator.setUncertainty(null);
     }
 
+    return indicator;
+}
+
+function buildIndicatorMerge(indicatorA,amountA,
+                             indicatorB,amountB)
+{
+    let indicator = new Indicator(indicatorA.getIndic());
+
+    if (indicatorA.getValue()!=null && amountA!=null
+     && indicatorB.getValue()!=null && amountB!=null)
+    {
+        let totalAmount = amountA + amountB;
+        let absolute = indicatorA.getValue()*amountA + indicatorB.getValue()*amountB;
+        let absoluteMax = indicatorA.getValueMax()*amountA + indicatorB.getValueMax()*amountB;
+        let absoluteMin = indicatorA.getValueMin()*amountA + indicatorB.getValueMin()*amountB;
+
+        if (totalAmount > 0) {
+            indicator.setValue(absolute/totalAmount);
+            let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
+            indicator.setUncertainty(uncertainty);
+        } else {
+            indicator.setValue(null); 
+            indicator.setUncertainty(null);
+        }
+    }
+     
     return indicator;
 }

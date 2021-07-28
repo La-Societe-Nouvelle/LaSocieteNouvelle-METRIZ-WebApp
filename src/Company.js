@@ -4,27 +4,30 @@ const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
 export class Company {
 
-  constructor({id,corporateId,corporateName,legalUnitName,areaCode,corporateActivity,amount}) 
+  constructor({id,account,corporateId,corporateName,legalUnitName,areaCode,activityCode}) 
   {    
     // Id
     this.id = id;
 
     // Company
-    this.corporateId = corporateId!=undefined ? corporateId : null;
-    this.corporateName = corporateName!=undefined ? corporateName : "";
-    this.legalUnitName = legalUnitName!=undefined ? legalUnitName : "";
-    this.areaCode = areaCode!=undefined ? areaCode : this.initAreaCode();
-    this.corporateActivity = corporateActivity!=undefined ? corporateActivity : "00";
+    this.account = account || null;
+    this.corporateId = corporateId || null;
+    this.corporateName = corporateName || "";
+    this.legalUnitName = legalUnitName || "";
+    this.areaCode = areaCode || this.initAreaCode();
+    this.activityCode = activityCode || "00";
+    this.dataFetched = false;
     
     // Amount
-    this.amount = amount!=undefined ? amount : 0.0;
+    this.amount = null;
+
     // Social footprint
     this.footprintId = this.initFootprintId();
-    this.footprint = new SocialFootprint(); 
-    
-    // Sync
-    this.dataFetched = false;
-    //this.fetchData(); -- conflict with backup
+    this.footprint = new SocialFootprint({
+      footprintId: this.footprintId,
+      areaCode: this.areaCode,
+      activityCode: this.activityCode,
+    });
   }
 
   // init area code
@@ -70,7 +73,7 @@ export class Company {
     this.corporateId = backUp.corporateId;
     this.corporateName = backUp.corporateName;
     this.areaCode = backUp.areaCode;
-    this.corporateActivity = backUp.corporateActivity;
+    this.activityCode = backUp.activityCode;
     this.amount = backUp.amount;
     this.footprintId = backUp.footprintId;
     this.footprint = new SocialFootprint();
@@ -87,9 +90,10 @@ export class Company {
         await this.fetchData();
     }
   }
+  
   setCorporateName(denominationUniteLegale) {this.corporateName = denominationUniteLegale}
-  setCorporateActivity(corporateActivity) {this.corporateActivity = corporateActivity}
-  setAreaCode(geo) {this.areaCode = geo}
+  setActivityCode(activityCode) {this.activityCode = activityCode}
+  setAreaCode(areaCode) {this.areaCode = areaCode}
   setAmount(amount) {this.amount = amount}
 
   /* ---------- Fetch Data ---------- */  
@@ -105,71 +109,61 @@ export class Company {
       let response = await fetch(endpoint, {method:'get'});
       let data = await response.json();
       if (data.header.statut == 200) {
-        this.legalUnitName = data.profil.descriptionUniteLegale.denomination;
-        this.corporateActivity = data.profil.descriptionUniteLegale.activitePrincipale;
-        this.areaCode = "FRA";
-        this.footprint.updateAll(data.profil.empreinteSocietale);
         this.dataFetched = true;
+        this.legalUnitName = data.profil.descriptionUniteLegale.denomination;
+        this.areaCode = "FRA";
+        this.activityCode = data.profil.descriptionUniteLegale.activitePrincipale;
+        this.footprint.dataFetched = true;
+        this.footprint.updateAll(data.profil.empreinteSocietale);
       }
     }
     // Fetch default data
     if (!this.dataFetched) {
-      let area = this.areaCode !="" ? this.areaCode : "_DV";
-      let activity = this.corporateActivity!=null ? this.corporateActivity : "00";
+      let area = this.areaCode || "_DV";
+      let activity = this.activityCode || "00";
       let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity +"&flow=PRD";
       let response = await fetch(endpoint, {method:'get'});
       let data = await response.json();
-      if (data.header.statut != 200) {
+      if (data.header.statut == 200) {
+        this.footprint.areaCode = area;
+        this.footprint.activityCode = activity;
+        this.footprint.updateAll(data.empreinteSocietale);
+      } else {
         endpoint = apiBaseUrl + "default?pays=_DV&activite=00&flow=GAP";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
+        this.footprint.areaCode = "_DV";
+        this.footprint.activityCode = "00";
+        this.footprint.updateAll(data.empreinteSocietale);
       }
-      this.footprint.updateAll(data.empreinteSocietale);
     }
   }
 
-  // Fetch CSF data for all indicators & complete general data
-  fetchCSFdata() {
-      let response = fetchFootprintData(footprintId);
-      dataFetched = response.isValid();
-      if (response.isValid()) {
-          if (corporateName.equals("")) { corporateName = response.getDenomination(); }
-          if (corporateActivity.equals("")) { corporateActivity = response.getEconomicBranch(); }
-          if (areaCode.equals("")) { areaCode = "FRA"; }
-          footprint.updateAll(response);
-          
-      } else {
-          // to be continued
-      }
+  // Fetch footprint data for all indicators & complete general data
+  fetchFootprintdata() {
+      this.footprint.fetchData();
   }
       
   // Fetch only CSF data for a specific indicator
-  async fetchIndicCSFdata(indic) {
-    if (this.footprintId!=null)
-    {
-      let response = await fetchFootprintData(this.footprintId);
-      if (response!=null) {
-        let indicData = response.profil.empreinteSocietale[indic.toUpperCase()];
-        this.footprint.updateIndic(indic, indicData);
-      }
-    }
-    else
-    {
-        let division = getEconomicDivision();
-        let pays = "FRA";
-        let response = fetchDefaultData(pays,division);
-        if (response.isValid()) {
-            this.footprint.updateIndic(indic,response);
-        }
-    }
+  async fetchIndicFootprintData(indic) {
+    this.footprint.fetchIndicFootprintData(indic);
   }
 
   /* ---------- Getters ---------- */
 
   getId() {return this.id}
+  
   getCorporateId() {return this.corporateId}
   getCorporateName() {return this.corporateName}
-  getCorporateActivity() {return this.corporateActivity}
+
+  getAreaCode() {return this.areaCode}
+  getActivityCode() {return this.activityCode}
+  
+  getFootprint() {return this.footprint}
+
+  isDataFetched() {return this.dataFetched}
+
+  getAmount() {return this.amount}
 
   getEconomicDivision() {
     if (this.corporateActivity!=null) {
@@ -178,40 +172,5 @@ export class Company {
         } else {return "00"}
     } else {return "00"}
   }
-
-  getAreaCode() {return this.areaCode}
-  getAmount() {return this.amount}
-  getFootprint() {return this.footprint}
-  isDataFetched() {return this.dataFetched}
-
-}
-
-async function fetchFootprintData(siren) {
-  try{
-    const endpoint = `${apiBaseUrl}/siren/${siren}`;
-    const response = await fetch(endpoint, {method:'get'});
-    const data = await response.json();
-    if (data.header.statut===200) {
-      return data;
-    } else {
-      return null;
-    }
-  } catch(error){
-    throw error;
-  }
-}
-
-async function fetchDefaultData(pays,activite) {
-  try{
-    const endpoint = `${apiBaseUrl}/default?pays=${pays}&activite=${activite}&flow=PRD`;
-    const response = await fetch(endpoint, {method:'get'});
-    const data = await response.json();
-    if (data.header.statut===200) {
-      return data;
-    } else {
-      return null;
-    }
-  } catch(error){
-    throw error;
-  }
+  
 }

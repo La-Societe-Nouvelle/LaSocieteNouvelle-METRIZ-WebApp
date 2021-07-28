@@ -1,17 +1,20 @@
 import React from 'react';
+import { valueOrDefault } from '../../src/utils/Utils';
 
 export class StatementECO extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      statement: props.indicator.getStatement() || "",
+      domesticProduction: valueOrDefault(props.impactsData.domesticProduction, ""),
     }
   }
 
-  render() {
-    const {isAllActivitiesInFrance,domesticProduction} = this.props.indicator;
-    const {statement} = this.state;
+  render() 
+  {
+    const {isAllActivitiesInFrance} = this.props.impactsData;
+    const {domesticProduction} = this.state;
+    
     return (
       <div className="statement">
         <div className="statement-item">
@@ -26,7 +29,7 @@ export class StatementECO extends React.Component {
           <div className="input-radio">
             <input type="radio" id="isAllActivitiesInFrance"
                    value="null"
-                   checked={domesticProduction != null}
+                   checked={isAllActivitiesInFrance === null && domesticProduction !== ""}
                    onChange={this.onIsAllActivitiesInFranceChange}/>
             <label>Partiellement</label>
           </div>
@@ -41,9 +44,9 @@ export class StatementECO extends React.Component {
         <div className="statement-item">
           <label>Valeur ajoutée nette produite en France</label>
           <input className="input-value"
-                 value={statement}
-                 onChange={this.onStatementChange}
-                 onBlur={this.onStatementBlur}
+                 value={domesticProduction}
+                 onChange={this.onDomesticProductionChange}
+                 onBlur={this.onDomesticProductionBlur}
                  disabled={isAllActivitiesInFrance!=null}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;€</span>
@@ -52,28 +55,32 @@ export class StatementECO extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {
-    if (event.which==13) {event.target.blur();}
-  }
+  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
   onIsAllActivitiesInFranceChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
-      case "true": this.props.indicator.setIsAllActivitiesInFrance(true); break;
-      case "null": this.props.indicator.setIsAllActivitiesInFrance(null); break;
-      case "false": this.props.indicator.setIsAllActivitiesInFrance(false); break;
+      case "true": 
+        this.props.impactsData.setIsAllActivitiesInFrance(true);
+        break;
+      case "null": 
+        this.props.impactsData.setIsAllActivitiesInFrance(null); 
+        break;
+      case "false": 
+        this.props.impactsData.setIsAllActivitiesInFrance(false); 
+        break;
     }
-    this.setState({statement: this.props.indicator.getStatement() || ""});
-    this.props.onUpdate(this.props.indicator);
+    this.setState({domesticProduction: valueOrDefault(this.props.impactsData.domesticProduction, "")});
+    this.props.onUpdate(this.props.impactsData);
   }
 
-  onStatementChange = (event) => {
-    this.setState({statement: event.target.value});
+  onDomesticProductionChange = (event) => {
+    this.setState({domesticProduction: event.target.value});
   }
-  onStatementBlur = (event) => {
+  onDomesticProductionBlur = (event) => {
     let domesticProduction = parseFloat(event.target.value);
-    this.props.indicator.setStatement(!isNaN(domesticProduction) ? domesticProduction : null);
-    this.props.onUpdate(this.props.indicator);
+    this.props.impactsData.domesticProduction = !isNaN(domesticProduction) ? domesticProduction : null;
+    this.props.onUpdate(this.props.impactsData);
   }
   
 }

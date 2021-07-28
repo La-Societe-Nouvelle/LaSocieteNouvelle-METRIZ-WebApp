@@ -16,6 +16,7 @@ export class CompaniesTab extends React.Component {
   }
 
   render() {
+    const companies = this.props.financialData.getCompanies();
     return(
       <div className="financial_data_depreciations_view">
         <div className="group">
@@ -23,9 +24,11 @@ export class CompaniesTab extends React.Component {
           <div className="actions">
             <button onClick={() => document.getElementById('import-companies').click()}>Importer un fichier CSV</button>
             <input id="import-companies" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
-            <button onClick={this.synchroniseAll}>Re-Synchroniser tout</button>
+            <button onClick={this.synchroniseAll}>Synchroniser les données</button>
           </div>
-          <TableCompanies {...this.props}/>
+          {companies.length > 0 &&
+            <TableCompanies companies={companies} {...this.props}/>
+          }
         </div>
       </div>
   )}
@@ -66,18 +69,6 @@ export class CompaniesTab extends React.Component {
     this.forceUpdate();
   }
 
-  updateCompany(updatedData) {
-    let financialData = this.props.financialData;
-    financialData.updateCompany({
-      id: updatedData.id,
-      corporateId: updatedData.corporateIdInput,
-      corporateName: updatedData.corporateNameInput,
-      areaCode: updatedData.areaCodeInput,
-      corporateActivity: updatedData.corporateActivityInput
-    })
-    this.props.onUpdate(financialData);
-  }
-
 }
 
 /* --------------------------------------------------------- */
@@ -97,7 +88,7 @@ class TableCompanies extends React.Component {
   }
 
   render() {
-    const companies = this.props.financialData.getCompanies();
+    const companies = this.props.companies;
     const {columnSorted,page} = this.state;
     this.sortCompanies(companies,columnSorted);
     return (
@@ -210,26 +201,26 @@ class RowTableCompanies extends React.Component {
       corporateIdInput: props.corporateId!=null ? props.corporateId : "",
       corporateNameInput: props.corporateName,
       areaCodeInput: props.areaCode,
-      corporateActivityInput: props.corporateActivity};
+      activityCodeInput: props.activityCode};
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.corporateId != prevProps.corporateId
         || this.props.corporateName != prevProps.corporateName
         || this.props.areaCode != prevProps.areaCode
-        || this.props.corporateActivity != prevProps.corporateActivity) {
+        || this.props.activityCode != prevProps.activityCode) {
       this.setState({
         id: this.props.id,
         corporateIdInput: this.props.corporateId,
         corporateNameInput: this.props.corporateName,
         areaCodeInput: this.props.areaCode,
-        corporateActivityInput: this.props.corporateActivity});
+        activityCodeInput: this.props.activityCode});
     }
   }
 
   render() {
     const {dataFetched,amount} = this.props;
-    const {corporateIdInput,corporateNameInput,areaCodeInput,corporateActivityInput} = this.state;
+    const {corporateIdInput,corporateNameInput,areaCodeInput,activityCodeInput} = this.state;
     return (
       <tr>
         <td className={"column_corporateId"+(dataFetched ? " valid" : "")}>
@@ -251,7 +242,7 @@ class RowTableCompanies extends React.Component {
                 )})
           }</select></td>
         <td className="column_corporateActivity">
-          <select onChange={this.onCorporateActivityChange} value={corporateActivityInput.substring(0,2)}>{
+          <select onChange={this.onCorporateActivityChange} value={activityCodeInput.substring(0,2)}>{
             Object.entries(divisions)
               .sort((a,b) => parseInt(a)-parseInt(b))
               .map(([code,libelle]) => { return(
