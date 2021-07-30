@@ -47,7 +47,7 @@ export class CompaniesTab extends React.Component {
                 id: company.id,
                 corporateId})
             };
-          }))
+          return;}))
         })
         .then(() => this.forceUpdate())
       };
@@ -65,7 +65,7 @@ export class CompaniesTab extends React.Component {
   async fetchDataCompany(company) {
     await company.fetchData();
     this.props.financialData.updateCompany(company);
-    this.props.onUpdate(this.props.financialData);
+    //this.props.onUpdate(this.props.financialData);
     this.forceUpdate();
   }
 
