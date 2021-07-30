@@ -141,7 +141,7 @@ class TableCompanies extends React.Component {
 
   sortCompanies(companies,columSorted) {
     switch(columSorted) {
-      case "identifiant": companies.sort((a,b) => a.getCorporateId().localeCompare(b.getCorporateId())); break;
+      case "identifiant": companies.sort((a,b) => a.id.localeCompare(b.id)); break;
       case "denomination": companies.sort((a,b) => a.getCorporateName().localeCompare(b.getCorporateName())); break;
       case "area": companies.sort((a,b) => a.getAreaCode().localeCompare(b.getAreaCode())); break;
       case "activity": companies.sort((a,b) => a.getCorporateActivity().localeCompare(b.getCorporateActivity())); break;
