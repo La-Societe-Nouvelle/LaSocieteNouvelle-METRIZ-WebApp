@@ -86,6 +86,7 @@ async function processFECData(FECData)
   data.stockInitPurchases = 0;
   data.unstoredPurchases = 0;
   data.storedPurchases = 0;
+  data.purchasesDiscounts = [];
   
   data.investments = [];
   data.depreciations = [];
@@ -169,8 +170,10 @@ async function readBookAsJournalVentes(data,book)
   await book.forEach((ecriture) => {
 
     // Revenus
-    if (ecriture.CompteNum.substring(0,2)=="70") {
+    if (ecriture.CompteNum.substring(0,2)=="70" && ecriture.CompteNum.substring(0,3)!="709") {
       data.revenue+= parseFloat(ecriture.Credit);
+    } else if (ecriture.CompteNum.substring(0,3)=="709") {
+      data.revenue-= parseFloat(ecriture.Debit);
     }
   })
 }
@@ -197,6 +200,23 @@ async function readBookAsJournalAchats(data,book)
         amount: parseFloat(ecriture.Debit),
       }
       data.expenses.push(expenseData);
+    }
+
+    // Rabais, remises, ristournes
+    if (ecriture.CompteNum.substring(0,3)=="609") 
+    {
+      if (data.accounts[ecriture.CompteNum]==undefined) data.accounts[ecriture.CompteNum] = ecriture.CompteLib;
+
+      let ecritureAux = book.filter(ecritureAux => ecritureAux.EcritureNum==ecriture.EcritureNum & ecritureAux.CompteNum.substring(0,2)=="40")[0] || "";
+      if (data.accounts[ecritureAux.CompAuxNum]==undefined) data.accounts[ecritureAux.CompAuxNum] = (ecritureAux.CompAuxLib || "").replace(/ *$/,"").replace(/^\"/,"").replace(/\"$/,"");
+
+      let expenseData = {
+        label: ecriture.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
+        account: ecriture.CompteNum,
+        accountProvider: ecritureAux.CompAuxNum,
+        amount: parseFloat(ecriture.Credit),
+      }
+      data.purchasesDiscounts.push(expenseData);
     }
 
     // Investissements

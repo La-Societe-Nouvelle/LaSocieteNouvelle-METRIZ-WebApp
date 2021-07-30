@@ -150,7 +150,7 @@ class TableMain extends React.Component {
             <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountExpenses()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_value">({printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValueAbsolute(financialData.getStoredPurchases()),nbDecimals)})</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           <tr>
@@ -160,9 +160,21 @@ class TableMain extends React.Component {
             <td className="column_value">{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountExpenses()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getValueAbsolute(financialData.getUnstoredPurchases()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
+          {financialData.purchasesDiscounts.length > 0 &&
+            <tr>
+              <td>Rabais, remises, ristournes</td>
+              <td className="column_value">({printValue(financialData.getAmountPurchasesDiscounts(),0)})</td>
+              <td className="column_unit">&nbsp;€</td>
+              <td className="column_value">{printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+              {impactAbsolu ? <td className="column_value">({printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountPurchasesDiscounts()),nbDecimals)})</td> : null}
+              {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>
+          }
           <tr>
             <td>Charges externes</td>
             <td className="column_value">{printValue(financialData.getAmountExpenses(),0)}</td>
@@ -196,7 +208,7 @@ class TableMain extends React.Component {
             <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciations()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(-financialData.getAmountDepreciations()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           {

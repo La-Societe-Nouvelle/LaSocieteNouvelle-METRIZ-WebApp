@@ -93,7 +93,7 @@ class TableMain extends React.Component {
            unstoredProductionInput,
            amountExpensesInput,
            amountDepreciationsInput} = this.state;
-    const {amountExpensesFixed,amountDepreciationsFixed} = financialData;
+    const {amountExpensesFixed,amountDepreciationsFixed,purchasesDiscounts} = financialData;
     return (
       <table>
         <thead>
@@ -130,6 +130,12 @@ class TableMain extends React.Component {
             <td>Déstockage achats</td>
             <td className="column_amount"><input value={printValueInput(financialData.getUnstoredPurchases(),0)} disabled={true}/></td>
             <td className="column_unit">&nbsp;€</td></tr>
+          {purchasesDiscounts.length > 0 &&
+            <tr>
+              <td>Remises, rabais, ristournes</td>
+              <td className="column_amount"><input value={"("+printValueInput(financialData.getAmountPurchasesDiscounts(),0)+")"} disabled={true}/></td>
+              <td className="column_unit">&nbsp;€</td></tr>
+          }
           <tr>
               <td>Charges externes&nbsp;&nbsp;
               {amountExpensesFixed && 

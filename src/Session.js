@@ -27,6 +27,7 @@ export class Session {
         this.unstoredProductionFootprint = new SocialFootprint();
         this.intermediateConsumptionFootprint = new SocialFootprint();
         this.unstoredPurchasesFootprint = new SocialFootprint();
+        this.purchasesDiscountsFootprint = new SocialFootprint();
         this.expensesFootprint = new SocialFootprint();
         this.grossValueAddedFootprint = new SocialFootprint();
         this.depreciationsFootprint = new SocialFootprint();
@@ -46,6 +47,7 @@ export class Session {
         this.productionFootprint.updateFromBackUp(backUp.productionFootprint);
         this.unstoredProductionFootprint.updateFromBackUp(backUp.unstoredProductionFootprint);
         this.intermediateConsumptionFootprint.updateFromBackUp(backUp.intermediateConsumptionFootprint);
+        this.purchasesDiscountsFootprint.updateFromBackUp(backUp.purchasesDiscountsFootprint)
         this.expensesFootprint.updateFromBackUp(backUp.expensesFootprint);
         this.unstoredPurchasesFootprint.updateFromBackUp(backUp.unstoredPurchasesFootprint)
         this.grossValueAddedFootprint.updateFromBackUp(backUp.grossValueAddedFootprint);
@@ -87,6 +89,7 @@ export class Session {
 
     // Expenses
     getIntermediateConsumptionFootprint() {return this.intermediateConsumptionFootprint}
+    getPurchasesDiscountsFootprint() {return this.purchasesDiscountsFootprint}
     getExpensesFootprint() {return this.expensesFootprint}
     getUnstoredPurchasesFootprint() {return this.unstoredPurchasesFootprint}
 
@@ -166,11 +169,17 @@ export class Session {
         // Update footprints
         await this.updateExpensesIndicFootprint(indic);
         await this.updateUnstoredPurchasesIndicFootprint(indic);
+        await this.updatePurchasesDiscountsIndicFootprint(indic);
 
         // merge footprints
         let indicator = buildIndicatorMerge(this.expensesFootprint.getIndicator(indic), this.financialData.getAmountExpenses(),
                                             this.unstoredPurchasesFootprint.getIndicator(indic), this.financialData.unstoredPurchases)
         
+        if (this.financialData.purchasesDiscounts.length > 0) {
+            indicator = buildIndicatorMerge(indicator, this.financialData.getAmountExpenses()+this.financialData.unstoredPurchases,
+                                            this.purchasesDiscountsFootprint.getIndicator(indic), -this.financialData.getAmountPurchasesDiscounts())
+        }
+
         this.intermediateConsumptionFootprint.getIndicator(indic).setValue(indicator.getValue())
         this.intermediateConsumptionFootprint.getIndicator(indic).setUncertainty(indicator.getUncertainty())
 
@@ -188,6 +197,24 @@ export class Session {
                 this.unstoredPurchasesFootprint.indicators[indic] = this.expensesFootprint.getIndicator(indic); // Improve with 60 only
             }
         }
+    }
+
+    /* ---------- REVENUE EXPENDITURES DISCOUNTS ---------- */
+    
+    async updatePurchasesDiscountsIndicFootprint(indic) 
+    {
+        if (this.financialData.purchasesDiscounts.length > 0) 
+        {
+            let indicatorPurchasesDiscounts = buildIndicatorAggregate(indic, this.financialData.purchasesDiscounts);
+            this.purchasesDiscountsFootprint.indicators[indic] = indicatorPurchasesDiscounts;
+            console.log(this.purchasesDiscountsFootprint.indicators[indic].value)
+        }
+        else 
+        { 
+            this.purchasesDiscountsFootprint.indicators[indic].setValue(null);
+            this.purchasesDiscountsFootprint.indicators[indic].setUncertainty(null);
+        }
+        return;
     }
 
     /* ---------- REVENUE EXPENDITURES ---------- */

@@ -27,6 +27,7 @@ export class FinancialData {
         this.expenses = [];
         this.storedPurchases = null;
         this.unstoredPurchases = null;
+        this.purchasesDiscounts = [];
 
         // Immobilisations
         this.amountDepreciations = null;
@@ -60,6 +61,7 @@ export class FinancialData {
         this.updateExpensesFromBackUp(backUp.expenses);
         this.storedPurchases =(backUp.storedPurchases);
         this.unstoredPurchases = backUp.unstoredPurchases;
+        this.updatePurchasesDiscountsFromBackUp(backUp.purchasesDiscounts);
         
         this.amountDepreciations = backUp.amountDepreciations;
         this.amountDepreciationsFixed = backUp.amountDepreciationsFixed;
@@ -79,6 +81,14 @@ export class FinancialData {
             let expense = new Expense({id: backUpExpense.id});
             expense.updateFromBackUp(backUpExpense);
             this.expenses.push(expense);
+        })
+    }
+
+    updatePurchasesDiscountsFromBackUp(backUpPurchasesDiscounts) {
+        backUpPurchasesDiscounts.forEach((backUpDiscount) => {
+            let discount = new Expense({id: bac.id});
+            discount.updateFromBackUp(backUpDiscount);
+            this.expenses.push(discount);
         })
     }
 
@@ -140,6 +150,12 @@ export class FinancialData {
         this.storedPurchases = FECData.storedPurchases;
         this.unstoredPurchases = FECData.stockInitPurchases - FECData.unstoredPurchases + FECData.storedPurchases;
 
+        this.removePurchasesDiscounts();
+        await Promise.all(FECData.purchasesDiscounts.map(async (discount) => {
+            discount.companyName = this.accounts[discount.accountProvider];
+            await this.addDiscount(discount);
+        }));
+
         // Immobilisations
         this.removeImmobilisations();
         await Promise.all(FECData.immobilisations.map(async (immobilisation) => {
@@ -190,11 +206,16 @@ export class FinancialData {
 
     // REVENUE EXPENDITURES
 
-    getAmountIntermediateConsumption() {return this.getAmountExpenses() + this.getVariationStockPurchases()}
+    getAmountIntermediateConsumption() {return this.getAmountExpenses() + this.getVariationStockPurchases() - this.getAmountPurchasesDiscounts()}
     getVariationStockPurchases() {return this.unstoredPurchases - this.storedPurchases}
 
     getStoredPurchases() {return this.storedPurchases}
     getUnstoredPurchases() {return this.unstoredPurchases}
+
+    getAmountPurchasesDiscounts() {
+        if (this.purchasesDiscounts.length > 0) {return this.purchasesDiscounts.map(discount => discount.amount).reduce((a,b) => a + b,0)}
+        else                                    {return null}
+    }
 
     getAmountExpenses() {
         if (this.amountExpensesFixed)       {return this.amountExpenses} 
@@ -345,6 +366,50 @@ export class FinancialData {
     // Remove expenses
     removeExpenses() {this.expenses = []}
 
+    /* ------------------------------- */
+    /* ---------- Discounts ---------- */
+    /* ------------------------------- */
+
+    /* ----- Discount ----- */
+      
+    // Add new discount & return it
+    async addDiscount(props) {
+        let {accountProvider,companyName} = props;
+        // Company
+        let company = this.getCompanyByName(companyName) || this.addCompany({account: accountProvider, corporateName: companyName});
+            props.companyId = company.id;
+            props.footprint = company.footprint;
+        // New expense
+        let discount = new Expense({id: getNewId(this.purchasesDiscounts),...props});
+        this.purchasesDiscounts.push(discount);
+        return discount;
+    }
+
+    // Get discount (by id)
+    getDiscount(id) {return this.purchasesDiscounts.filter(discount => discount.id==id)[0]}
+
+    // Update discount
+    async updateDiscount(nextProps) {
+        let {id,companyName} = nextProps;
+        let discount = this.getDiscount(id);
+        // Company
+        let company = this.getCompanyByName(companyName) || this.addCompany({corporateName: companyName});
+            nextProps.companyId = company.id;
+            nextProps.footprint = company.footprint;
+        // Update
+        discount.update(nextProps);
+    }
+
+    // Remove discount (by id)
+    removeDiscount(id) {this.purchasesDiscounts = this.purchasesDiscounts.filter(discount => discount.getId()!=id)}
+    
+    /* ----- Expenses ----- */
+
+    // Get expenses array
+    getPurchasesDiscounts() {return this.purchasesDiscounts}
+
+    // Remove expenses
+    removePurchasesDiscounts() {this.purchasesDiscounts = []}
 
     /* ------------------------------------- */
     /* ---------- Immobilisations ---------- */
@@ -512,7 +577,7 @@ export class FinancialData {
         let company = this.getCompany(nextProps.id);
         await company.update(nextProps);
         // Updates expenses & investments
-        this.expenses.concat(this.investments).filter(expense => expense.companyId == company.id).forEach((expense) => {
+        this.expenses.concat(this.investments).concat(this.purchasesDiscounts).filter(expense => expense.companyId == company.id).forEach((expense) => {
             expense.companyName = company.corporateName;
             expense.footprint = company.footprint;
         })
