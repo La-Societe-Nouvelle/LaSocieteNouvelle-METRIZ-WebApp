@@ -3,12 +3,12 @@ import { Expense } from './Expense';
 import { Immobilisation } from './Immobilisation';
 import { Depreciation } from './Depreciation'
 import { Company } from './Company';
+import { SocialFootprint } from './SocialFootprint';
 
 import { metaAccounts } from '../lib/accounts.js';
-import { SocialFootprint } from './SocialFootprint';
-import { EconomicValue } from './EconomicValue';
 
-import { getNewId } from './utils/Utils';
+import { getNewId, ifCondition } from './utils/Utils';
+import { Stock } from './Stock';
 
 export class FinancialData {
 
@@ -25,8 +25,8 @@ export class FinancialData {
         this.amountExpenses = null;
         this.amountExpensesFixed = false;
         this.expenses = [];
-        this.storedPurchases = null;
-        this.unstoredPurchases = null;
+        this.initialStocks = [];
+        this.finalStocks = [];
         this.purchasesDiscounts = [];
 
         // Immobilisations
@@ -50,85 +50,39 @@ export class FinancialData {
 
     updateFromBackUp(backUp) 
     {
+        // Amounts
         this.revenue = backUp.revenue;
         this.production = backUp.production;
         this.storedProduction = backUp.storedProduction;
         this.unstoredProduction = backUp.unstoredProduction;
         this.immobilisedProduction = backUp.immobilisedProduction;
-        
         this.amountExpenses = backUp.amountExpenses;
-        this.amountExpensesFixed = backUp.amountExpensesFixed;
-        this.updateExpensesFromBackUp(backUp.expenses);
-        this.storedPurchases =(backUp.storedPurchases);
-        this.unstoredPurchases = backUp.unstoredPurchases;
-        this.updatePurchasesDiscountsFromBackUp(backUp.purchasesDiscounts);
-        
         this.amountDepreciations = backUp.amountDepreciations;
-        this.amountDepreciationsFixed = backUp.amountDepreciationsFixed;
-        this.updateDepreciationsFromBackUp(backUp.depreciations);
-        this.updateImmobilisationsFromBackUp(backUp.immobilisations);
-        this.updateInvestmentsFromBackUp(backUp.investments);
-        
         this.netValueAdded = backUp.netValueAdded;
+        
+        // Booleans
+        this.amountExpensesFixed = backUp.amountExpensesFixed;
+        this.amountDepreciationsFixed = backUp.amountDepreciationsFixed;
 
+        // flows
+        this.expenses = backUp.expenses.map(expense => new Expense(expense))
+        this.initialStocks = backUp.initialStocks.map(initialStock => new Stock(initialStock))
+        this.finalStocks = backUp.finalStocks.map(finalStock => new Stock(finalStock))
+        this.purchasesDiscounts = backUp.purchasesDiscounts.map(purchasesDiscount => new Expense(purchasesDiscount))
+        this.depreciations = backUp.depreciations.map(depreciation => new Depreciation(depreciation))
+        this.immobilisations = backUp.immobilisations.map(immobilisation => new Immobilisation(immobilisation))
+        this.investments = backUp.investments.map(investment => new Expense(investment))
+        
+        // Meta
         this.accounts = backUp.accounts;
-
-        this.updateCompaniesFromBackUp(backUp.companies);
-    }
-     
-    updateExpensesFromBackUp(backUpExpenses) {
-        backUpExpenses.forEach((backUpExpense) => {
-            let expense = new Expense({id: backUpExpense.id});
-            expense.updateFromBackUp(backUpExpense);
-            this.expenses.push(expense);
-        })
-    }
-
-    updatePurchasesDiscountsFromBackUp(backUpPurchasesDiscounts) {
-        backUpPurchasesDiscounts.forEach((backUpDiscount) => {
-            let discount = new Expense({id: bac.id});
-            discount.updateFromBackUp(backUpDiscount);
-            this.expenses.push(discount);
-        })
-    }
-
-    updateDepreciationsFromBackUp(backUpDepreciations) {
-        backUpDepreciations.forEach((backUpDepreciation) => {
-            let depreciation = new Depreciation({id: backUpDepreciation.id});
-            depreciation.updateFromBackUp(backUpDepreciation);
-            this.depreciations.push(depreciation);
-        })
-    }
-
-    updateImmobilisationsFromBackUp(backUpImmobilisations) {
-        backUpImmobilisations.forEach((backUpImmobilisation) => {
-            let immobilisation = new Immobilisation({id: backUpImmobilisation.id});
-            immobilisation.updateFromBackUp(backUpImmobilisation)
-            this.immobilisations.push(immobilisation);
-        })
-    }
-
-    updateInvestmentsFromBackUp(backUpInvestments) {
-        backUpInvestments.forEach((backUpInvestment) => {
-            let investment = new Expense({id: backUpInvestment});
-            investment.updateFromBackUp(backUpInvestment)
-            this.investments.push(investment);
-        })
-    }
-
-    updateCompaniesFromBackUp(backUpCompanies) {
-        backUpCompanies.forEach((backUpCompany) => {
-            let company = new Company({id: backUpCompany.id});
-            company.updateFromBackUp(backUpCompany)
-            this.companies.push(company);
-        })
+        this.companies = backUp.companies.map(company => new Company(company))
     }
 
     /* ---------------------------------------------------- */
-    /* -------------------- FEC SETTER -------------------- */
+    /* -------------------- FEC LOADER -------------------- */
     /* ---------------------------------------------------- */
 
-    async setFECData(FECData) 
+    async loadFECData(FECData) 
     {
         // Accounts
         this.accounts = FECData.accounts;
@@ -139,6 +93,18 @@ export class FinancialData {
         this.setUnstoredProduction(FECData.stockInitProduction);
         this.setImmobilisedProduction(FECData.immobilisedProduction);
 
+        // Stocks
+        this.removeInitialStocks();
+        await Promise.all(FECData.initialStocks.map(async (stock) => {
+            await this.addInitialStock(stock);
+        }));
+        this.removeFinalStocks();
+        await Promise.all(FECData.stocksVariations.map(async (variation) => {
+            let initialStock = this.getInitialStockByAccount(variation.account);
+            let amount = (initialStock!=undefined ? initialStock.amount : 0) + variation.amount;
+            await this.addFinalStock({label: variation.label, account: variation.account, amount: amount});
+        }));
+
         // Expenses
         this.removeExpenses();
         this.amountExpensesFixed = false;
@@ -147,8 +113,6 @@ export class FinancialData {
             await this.addExpense(expense);
         }));
         if (FECData.expenses.length == 0) this.setAmountExpenses(0);
-        this.storedPurchases = FECData.storedPurchases;
-        this.unstoredPurchases = FECData.stockInitPurchases - FECData.unstoredPurchases + FECData.storedPurchases;
 
         this.removePurchasesDiscounts();
         await Promise.all(FECData.purchasesDiscounts.map(async (discount) => {
@@ -196,36 +160,43 @@ export class FinancialData {
     // NET / GROSS VALUE ADDED
     
     getNetValueAdded() {
-        if (this.getGrossValueAdded()!=null & this.getAmountDepreciations()!=null)  {return this.getGrossValueAdded() - this.getAmountDepreciations()}
-        else                                                                        {return null}
+        if (this.getGrossValueAdded()!=null && this.getAmountDepreciations()!=null)  {return this.getGrossValueAdded() - this.getAmountDepreciations()}
+        else                                                                         {return null}
     }
+
     getGrossValueAdded() {
-        if (this.production!=null && this.getAmountExpenses()!=null) {return this.production - this.getAmountExpenses()}
-        else                                                         {return null}
+        if (this.production!=null && this.getAmountIntermediateConsumption()!=null) {return this.production - this.getAmountIntermediateConsumption()}
+        else                                                                        {return null}
     }
 
     // REVENUE EXPENDITURES
 
-    getAmountIntermediateConsumption() {return this.getAmountExpenses() + this.getVariationStockPurchases() - this.getAmountPurchasesDiscounts()}
-    getVariationStockPurchases() {return this.unstoredPurchases - this.storedPurchases}
-
-    getStoredPurchases() {return this.storedPurchases}
-    getUnstoredPurchases() {return this.unstoredPurchases}
-
-    getAmountPurchasesDiscounts() {
-        if (this.purchasesDiscounts.length > 0) {return this.purchasesDiscounts.map(discount => discount.amount).reduce((a,b) => a + b,0)}
-        else                                    {return null}
+    getAmountIntermediateConsumption() {
+        if (this.getAmountExpenses()!=null && this.getVariationStocks()!=null && this.getAmountPurchasesDiscounts()!=null) {
+            return this.getAmountExpenses() + this.getVariationStocks() - this.getAmountPurchasesDiscounts()
+        } else {return null}
     }
+
+    getVariationStocks() 
+    {return this.getAmountInitialStocks() - this.getAmountFinalStocks()}
+
+    getAmountInitialStocks() 
+    {return ifCondition(this.initialStocks.length > 0, this.initialStocks.map(stock => stock.amount).reduce((a,b) => a + b,0))}
+    
+    getAmountFinalStocks() 
+    {return ifCondition(this.finalStocks.length > 0, this.finalStocks.map(stock => stock.amount).reduce((a,b) => a + b,0))}
+
+    getAmountPurchasesDiscounts() 
+    {return ifCondition(this.purchasesDiscounts.length > 0, this.purchasesDiscounts.map(discount => discount.amount).reduce((a,b) => a + b,0))}
 
     getAmountExpenses() {
         if (this.amountExpensesFixed)       {return this.amountExpenses} 
-        else if (this.expenses.length > 0)  {return this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0)} 
-        else                                {return null}
+        else return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0))
     }
-    getAmountDetailedExpenses() {
-        if (this.expenses.length > 0) {return this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0)}
-        else                          {return null}
-    }
+
+    getAmountDetailedExpenses() 
+    {return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0))}
+
     // CAPITAL EXPENDITURES
 
     getAmountDepreciations() {
@@ -233,10 +204,9 @@ export class FinancialData {
         else if (this.depreciations.length > 0) {return this.depreciations.map(depreciation => depreciation.amount).reduce((a,b) => a + b,0)}
         else                                    {return null}
     }
-    getAmountDetailedDepreciations() {
-        if (this.depreciations.length > 0) {return this.depreciations.map(depreciation => depreciation.amount).reduce((a,b) => a + b,0)}
-        else                               {return null}
-    }
+
+    getAmountDetailedDepreciations() 
+    {return ifCondition(this.depreciations.length > 0, this.depreciations.map(depreciation => depreciation.amount).reduce((a,b) => a + b,0))}
 
     /* ------------------------------------------------------ */
     /* -------------------- INTERACTIONS -------------------- */
@@ -307,6 +277,76 @@ export class FinancialData {
     updateProduction() {this.production = this.revenue+this.storedProduction+this.immobilisedProduction-this.unstoredProduction}
     updateUnstoredProduction() {this.unstoredProduction = this.revenue+this.storedProduction+this.immobilisedProduction-this.production}
 
+    /* ---------------------------- */
+    /* ---------- Stocks ---------- */
+    /* ---------------------------- */
+
+    /* ---------- Initial Stocks ---------- */
+
+    /* ----- Stock ----- */
+      
+    // Add new stock & return it
+    // /!\ must have an account number
+    async addInitialStock(props) 
+    {
+        // Init expenditures account & footprint
+        if (props.accountPurchases==undefined) props.accountPurchases = "60"+props.account.slice(1,-1);
+        props.footprint = new SocialFootprint({});
+        // New stock
+        let stock = new Stock({id: getNewId(this.initialStocks),...props});
+        this.initialStocks.push(stock);
+        return stock;
+    }
+    
+    // Update stock
+    async updateInitialStock(nextProps) 
+    {
+        let stock = this.getInitialStock(nextProps.id);
+        stock.update(nextProps);
+    }
+    
+    getInitialStock(id) {return this.initialStocks.filter(stock => stock.id==id)[0]}
+    getInitialStockByAccount(account) {return this.initialStocks.filter(stock => stock.account==account)[0]}
+    removeInitialStock(id) {this.initialStocks = this.initialStocks.filter(stock => stock.id!=id)}
+    
+    /* ----- Stocks ----- */
+
+    getInitialStocks() {return this.initialStocks}
+    removeInitialStocks() {this.initialStocks = []}
+
+    /* ---------- Final Stocks ---------- */
+
+    /* ----- Stock ----- */
+      
+    // Add new stock & return it
+    // /!\ must have an account number
+    async addFinalStock(props) 
+    {
+        // Init expenditures account & footprint
+        if (props.accountPurchases==undefined) props.accountPurchases = "60"+props.account.slice(1,-1);
+        props.footprint = new SocialFootprint({});
+        // New stock
+        let stock = new Stock({id: getNewId(this.finalStocks),...props});
+        this.finalStocks.push(stock);
+        return stock;
+    }
+    
+    // Update stock
+    async updateFinalStock(nextProps) 
+    {
+        let stock = this.getFinalStock(nextProps.id);
+        stock.update(nextProps);
+    }
+    
+    getFinalStock(id) {return this.finalStocks.filter(stock => stock.id==id)[0]}
+    getFinalStockByAccount(account) {return this.finalStocks.filter(stock => stock.account==account)[0]}
+    removeFinalStock(id) {this.finalStocks = this.finalStocks.filter(stock => stock.id!=id)}
+    
+    /* ----- Stocks ----- */
+
+    getFinalStocks() {return this.finalStocks}
+    removeFinalStocks() {this.finalStocks = []}
+
     /* ------------------------------ */
     /* ---------- Expenses ---------- */
     /* ------------------------------ */
@@ -326,44 +366,38 @@ export class FinancialData {
     /* ----- Expense ----- */
       
     // Add new expense & return it
-    async addExpense(props) {
-        let {accountProvider,companyName} = props;
+    async addExpense(props) 
+    {
         // Company
-        let company = this.getCompanyByName(companyName) || this.addCompany({account: accountProvider, corporateName: companyName});
-            props.companyId = company.id;
-            props.footprint = company.footprint;
+        let company = this.getCompanyByName(props.companyName) || await this.addCompany({account: props.accountProvider, corporateName: props.companyName});
+        props.companyId = company.id;
+        props.footprint = company.footprint;
         // New expense
         let expense = new Expense({id: getNewId(this.expenses),...props});
         this.expenses.push(expense);
         return expense;
     }
-
-    // Get expense (by id)
-    getExpense(id) {return this.expenses.filter(expense => expense.id==id)[0]}
-
+    
     // Update expense
-    async updateExpense(nextProps) {
-        let {id,companyName} = nextProps;
-        let expense = this.getExpense(id);
+    async updateExpense(nextProps) 
+    {
+        let expense = this.getExpense(nextProps.id);
         // Company
-        let company = this.getCompanyByName(companyName) || this.addCompany({corporateName: companyName});
-            nextProps.companyId = company.id;
-            nextProps.footprint = company.footprint;
+        let company = this.getCompanyByName(nextProps.companyName) || await this.addCompany({corporateName: nextProps.companyName});
+        nextProps.companyId = company.id;
+        nextProps.footprint = company.footprint;
         // Update
         expense.update(nextProps);
         // Check amount details
         if (this.amountExpensesFixed && this.getAmountDetailedExpenses() > this.amountExpenses) this.setAmountExpensesFixed(false);
     }
-
-    // Remove expense (by id)
+    
+    getExpense(id) {return this.expenses.filter(expense => expense.id==id)[0]}
     removeExpense(id) {this.expenses = this.expenses.filter(expense => expense.getId()!=id)}
     
     /* ----- Expenses ----- */
 
-    // Get expenses array
     getExpenses() {return this.expenses}
-
-    // Remove expenses
     removeExpenses() {this.expenses = []}
 
     /* ------------------------------- */
@@ -373,42 +407,36 @@ export class FinancialData {
     /* ----- Discount ----- */
       
     // Add new discount & return it
-    async addDiscount(props) {
-        let {accountProvider,companyName} = props;
+    async addDiscount(props) 
+    {
         // Company
-        let company = this.getCompanyByName(companyName) || this.addCompany({account: accountProvider, corporateName: companyName});
-            props.companyId = company.id;
-            props.footprint = company.footprint;
-        // New expense
+        let company = this.getCompanyByName(props.companyName) || await this.addCompany({account: props.accountProvider, corporateName: props.companyName});
+        props.companyId = company.id;
+        props.footprint = company.footprint;
+        // New discount
         let discount = new Expense({id: getNewId(this.purchasesDiscounts),...props});
         this.purchasesDiscounts.push(discount);
         return discount;
     }
-
-    // Get discount (by id)
-    getDiscount(id) {return this.purchasesDiscounts.filter(discount => discount.id==id)[0]}
-
+    
     // Update discount
-    async updateDiscount(nextProps) {
-        let {id,companyName} = nextProps;
-        let discount = this.getDiscount(id);
+    async updateDiscount(nextProps) 
+    {
+        let discount = this.getDiscount(nextProps.id);
         // Company
-        let company = this.getCompanyByName(companyName) || this.addCompany({corporateName: companyName});
-            nextProps.companyId = company.id;
-            nextProps.footprint = company.footprint;
-        // Update
+        let company = this.getCompanyByName(nextProps.companyName) || await this.addCompany({corporateName: nextProps.companyName});
+        nextProps.companyId = company.id;
+        nextProps.footprint = company.footprint;
+        // Update discount
         discount.update(nextProps);
-    }
-
-    // Remove discount (by id)
+        }
+        
+    getDiscount(id) {return this.purchasesDiscounts.filter(discount => discount.id==id)[0]}
     removeDiscount(id) {this.purchasesDiscounts = this.purchasesDiscounts.filter(discount => discount.getId()!=id)}
     
-    /* ----- Expenses ----- */
+    /* ----- Discounts ----- */
 
-    // Get expenses array
     getPurchasesDiscounts() {return this.purchasesDiscounts}
-
-    // Remove expenses
     removePurchasesDiscounts() {this.purchasesDiscounts = []}
 
     /* ------------------------------------- */
@@ -418,36 +446,33 @@ export class FinancialData {
     /* ----- Immobilisation ----- */
 
     // Add new immobilisation & return it
-    async addImmobilisation(props) {
-        // Footprint
-        let footprint = new SocialFootprint();
-            props.footprint = footprint;
-            // ...init values
-        // New immobilisation
+    async addImmobilisation(props) 
+    {
         let immobilisation = new Immobilisation({id: getNewId(this.immobilisations),...props});
         this.immobilisations.push(immobilisation);
         return immobilisation;
     }
+    
+    // Update immobilisation
+    async updateImmobilisation(nextProps) 
+    {
+        let immobilisation = this.getImmobilisation(nextProps.id);
+        // if account changed -> update linked depreciations / investments
+        if (nextProps.account!=undefined && nextProps.account!=immobilisation.account) {
+            this.depreciations.filter(depreciation => depreciation.accountImmobilisation==immobilisation.account)
+                              .forEach(depreciation => depreciation.accountImmobilisation = nextProps.account)
+            this.investments.filter(investment => investment.accountImmobilisation==immobilisation.account)
+                            .forEach(investment => investment.accountImmobilisation = nextProps.account)
+        }
+        // Update immobilisation
+        await immobilisation.update(nextProps);
+    }
 
     getImmobilisation(id) {return this.immobilisations.filter(immobilisation => immobilisation.id==id)[0]}
     getImmobilisationByAccount(account) {return this.immobilisations.filter(immobilisation => immobilisation.account==account)[0]}
-
-    async updateImmobilisation(nextProps) {
-        let {id,account} = nextProps;
-        let immobilisation = this.getImmobilisation(id);
-        // Update depreciations
-        this.depreciations.filter(depreciation => depreciation.accountImmobilisation==immobilisation.account)
-                          .forEach(depreciation => depreciation.accountImmobilisation = account)
-        // Update investments
-        this.investments.filter(investment => investment.accountImmobilisation==immobilisation.account)
-                        .forEach(investment => investment.accountImmobilisation = account)
-        // Immobilisation
-        immobilisation.update(nextProps);
-    }
-
     removeImmobilisation(id) {
         let {account} = this.getImmobilisation(id);
-        this.investments = this.investments.filter(investment => investment.accountImmobilisation!=account)
+        this.investments = this.investments.filter(investment => investment.account!=account)
         this.depreciations = this.depreciations.filter(depreciation => depreciation.accountImmobilisation!=account)
         this.immobilisations = this.immobilisations.filter(immobilisation => immobilisation.id!=id)
     }
@@ -455,46 +480,6 @@ export class FinancialData {
     /* ----- Immobilisations ----- */
 
     removeImmobilisations() {this.immobilisations = []}
-
-
-    /* --------------------------------- */
-    /* ---------- Investments ---------- */
-    /* --------------------------------- */
-
-    /* ----- Investments ----- */
-
-    // Add new depreciation & return it
-    async addInvestment(props) {
-        let {label,amount,account,accountProvider,companyName} = props;
-        // Company
-        let company = this.getCompanyByName(companyName) || this.addCompany({account: accountProvider, corporateName: companyName});
-            props.companyId = company.id;
-            props.footprint = company.footprint;
-        // New Investment
-        let investment = new Expense({id: getNewId(this.investments),...props})
-        this.investments.push(investment);
-        return investment;
-    }
-
-    getInvestment(id) {return this.investments.filter(investment => investment.id==id)[0]}
-
-    async updateInvestment(nextProps) {
-        let {id,companyName} = nextProps;
-        let expense = this.getInvestment(id);
-        // Company
-        let company = this.getCompanyByName(companyName) || this.addCompany({corporateName: companyName});
-            nextProps.companyId = company.id;
-            nextProps.footprint = company.footprint;
-        // Update Investment
-        expense.update(nextProps);
-    }
-
-    removeInvestment(id) {this.investments = this.investments.filter(investment => investment.id!=id)}
-
-    /* ----- Investments ----- */
-
-    removeInvestments() {this.investments = []}
-    
 
     /* ----------------------------------- */
     /* ---------- Depreciations ---------- */
@@ -513,197 +498,204 @@ export class FinancialData {
     }
 
     /* ----- Depreciation ----- */
-      
+    
     // Add new depreciation & return it
-    async addDepreciation(props) {
-        let {accountImmobilisation} = props;
-        // Immobilisation
-        let immobilisation = this.getImmobilisationByAccount(accountImmobilisation);
-            props.footprint = immobilisation.footprint;
+    // /!\ must be linked to an immobilisation account
+    async addDepreciation(props) 
+    {
+        // fetch footprint from immobilisation
+        let immobilisation = this.getImmobilisationByAccount(props.accountImmobilisation);
+        props.footprint = immobilisation.footprint;
         // New depreciation
         let depreciation = new Depreciation({id: getNewId(this.depreciations),...props});
         this.depreciations.push(depreciation);
         return depreciation;
     }
     
-    // Get depreciation object
-    getDepreciation(id) {return this.depreciations.filter(depreciation => depreciation.getId()==id)[0]}
-
     // Update depreciation
-    async updateDepreciation(nextProps) {
-        let {id,accountImmobilisation} = nextProps;
-        let depreciation = this.getDepreciation(id);
-        // Immobilisation
-        let immobilisation = this.getImmobilisationByAccount(accountImmobilisation);
-            nextProps.footprint = immobilisation.footprint;
-        // Update
+    async updateDepreciation(nextProps) 
+    {
+        let depreciation = this.getDepreciation(nextProps.id);
+        // fetch footprint from immobilisation
+        let immobilisation = this.getImmobilisationByAccount(nextProps.accountImmobilisation);
+        nextProps.footprint = immobilisation.footprint;
+        // Update depreciation
         depreciation.update(nextProps);
+        // check if amount fixed
         if (this.amountDepreciationsFixed && this.getAmountDetailedDepreciations() > this.amountDepreciations) this.setAmountDepreciationsFixed(false);
     }
-
-    // Remove depreciation (by id)
+    
+    getDepreciation(id) {return this.depreciations.filter(depreciation => depreciation.getId()==id)[0]}
     removeDepreciation(id) {this.depreciations = this.depreciations.filter(depreciation => depreciation.getId()!=id)}
 
     /* ----- Depreciations ----- */
     
-    // Get expenses array
     getDepreciations() {return this.depreciations}
-
-    // Remove expenses
     removeDepreciations() {this.depreciations = []}
 
+    /* --------------------------------- */
+    /* ---------- Investments ---------- */
+    /* --------------------------------- */
+
+    /* ----- Investments ----- */
+
+    // Add new depreciation & return it
+    // /!\ must have the name of the company
+    async addInvestment(props) 
+    {
+        // Company
+        let company = this.getCompanyByName(props.companyName) || await this.addCompany({account: props.accountProvider, corporateName: props.companyName});
+        props.companyId = company.id;
+        props.footprint = company.footprint;
+        // New Investment
+        let investment = new Expense({id: getNewId(this.investments),...props})
+        this.investments.push(investment);
+        return investment;
+    }
+
+    // Update investment
+    async updateInvestment(nextProps) 
+    {
+        let investment = this.getInvestment(nextProps.id);
+        // Company
+        let company = this.getCompanyByName(nextProps.companyName) || await this.addCompany({corporateName: nextProps.companyName});
+        nextProps.companyId = company.id;
+        nextProps.footprint = company.footprint;
+        // Update Investment
+        investment.update(nextProps);
+    }
+    
+    getInvestment(id) {return this.investments.filter(investment => investment.id==id)[0]}
+    removeInvestment(id) {this.investments = this.investments.filter(investment => investment.id!=id)}
+
+    /* ----- Investments ----- */
+
+    removeInvestments() {this.investments = []}
+    
     /* ------------------------------- */
     /* ---------- Companies ---------- */
     /* ------------------------------- */
 
     /* ----- Company ----- */
-      
+
+    getCompany(id) {return this.companies.filter(company => company.getId()==id)[0]}
+
+    getCompanyByAccount(account) {return this.companies.filter(company => company.account==account)[0]}
+    getCompanyByName(name) {return this.companies.filter(company => company.corporateName==name)[0]}
+    
     // Add new company & return it (inside function)
-    // ...if used outside, check if the name available
-    addCompany(props) {
+    // /!\ must check if the name available as it's a key props
+    async addCompany(props) 
+    {
         let company = new Company({id: getNewId(this.companies),...props});
-        //await company.fetchData();
         this.companies.push(company);
         return company;
     }
 
-    // Get expense object
-    getCompany(id) {return this.companies.filter(company => company.getId()==id)[0]}
-    getCompanyByAccount(account) {return this.companies.filter(company => company.account==account)[0]}
-    getCompanyByName(name) {return this.companies.filter(company => company.corporateName==name)[0]}
-
     // Update company
-    async updateCompany(nextProps) {
+    async updateCompany(nextProps) 
+    {
         let company = this.getCompany(nextProps.id);
+        // Update company
         await company.update(nextProps);
-        // Updates expenses & investments
-        this.expenses.concat(this.investments).concat(this.purchasesDiscounts).filter(expense => expense.companyId == company.id).forEach((expense) => {
+        // Updates expenditures linked to the company
+        this.expenses.concat(this.investments).concat(this.purchasesDiscounts)
+                     .filter(expense => expense.companyId == company.id)
+                     .forEach(expense => {
             expense.companyName = company.corporateName;
             expense.footprint = company.footprint;
         })
     }
 
-    // Remove company (by id)
-    removeCompany(id) {this.companies = this.companies.filter(company => company.getId()!=id)}
-
     /* ----- Companies ----- */
 
-    // Update all companies
-    fetchDataCompanies() {
-        this.companies.forEach((company) => {company.fetchData()})
-    }
-
-    // Remove expenses
-    refreshCompanies() {
-        this.companies = [];
-        let names = [];
-        this.expenses.concat(this.depreciations).forEach((expense) => {
-            if (names.includes(expense.corporateName)) {
-                this.companies.filter(company => company.corporateName == expense.corporateName)[0].amount+= expense.amount;
-            } else {
-                let company = new Company({
-                    id: this.getId(this.companies),
-                    corporateId: expense.corporateId,
-                    corporateName: expense.corporateName,
-                    areaCode: expense.areaCode,
-                    corporateActivity: expense.corporateActivity,
-                    amount: expense.amount
-                })
-                this.companies.push(company);
-                names.push(expense.corporateName);
-            }
-        })
-    }
-
-    // Get companies array
-    getCompanies() {
+    // Get requested companies for expenditures
+    //  ...used to set ids
+    getCompanies() 
+    {
         let usedCompanies = [];
+        // scan revenue expenditures & capital expenditures
         this.expenses.concat(this.investments).forEach((expense) => {
-            let company = usedCompanies.filter(company => company.id == expense.companyId)[0];
-            if (company==undefined) {
-                company = this.getCompany(expense.companyId)
+            if (usedCompanies.map(company => company.id).includes(expense.companyId)) {
+                let company = usedCompanies.filter(company => company.id == expense.companyId)[0];
+                company.amount+= expense.amount;
+            } else {
+                let company = this.getCompany(expense.companyId)
                 company.amount = expense.amount;
                 usedCompanies.push(company)
-            } else {
-                company.amount+= expense.amount;
             }
+        })
+        // take discounts into account
+        this.purchasesDiscounts.forEach(discount => {
+            let company = usedCompanies.filter(company => company.id == discount.companyId)[0];
+            if (company!=undefined) company.amount-= discount.amount;
         })
         return usedCompanies;
     }
 
-    getCompaniesExpenses() {
+    // Get requested companies for revenue expenditures
+    //  ...used for adding discount
+    getCompaniesExpenses() 
+    {
         let usedCompanies = [];
-        this.expenses.forEach((expense) => {
-            let company = usedCompanies.filter(company => company.id == expense.companyId)[0];
-            if (company==undefined) {
-                company = this.getCompany(expense.companyId)
+        // scan revenue expenditures
+        this.expenses.forEach(expense => {
+            if (usedCompanies.map(company => company.id).includes(expense.companyId)) {
+                let company = usedCompanies.filter(company => company.id == expense.companyId)[0];
+                company.amount+= expense.amount;
+            } else {
+                let company = this.getCompany(expense.companyId)
                 company.amount = expense.amount;
                 usedCompanies.push(company)
-            } else {
-                company.amount+= expense.amount;
             }
+        })
+        // take discounts into account
+        this.purchasesDiscounts.forEach(discount => {
+            let company = usedCompanies.filter(company => company.id == discount.companyId)[0];
+            if (company!=undefined) company.amount-= discount.amount;
         })
         return usedCompanies;
     }
 
-    getCompaniesDepreciations() {
-        let usedCompanies = [];
-        this.depreciations.forEach((expense) => {
-            let company = usedCompanies.filter(company => company.id == expense.companyId)[0];
-            if (company==undefined) {
-                company = this.getCompany(expense.companyId)
-                company.amount = expense.amount;
-                usedCompanies.push(company)
-            } else {
-                company.amount+= expense.amount;
-            }
-        })
-        return usedCompanies;
-    }
+    /* ------------------------------------------------------------------ */
+    /* ---------- Amounts Expenses / Depreciations by Accounts ---------- */
+    /* ------------------------------------------------------------------ */
 
-    getAllCompanies() {
-        return this.companies;
-    }
-
-    /* ------------------------------ */
-    /* ---------- Accounts ---------- */
-    /* ------------------------------ */
-
-    getExpensesAccounts() {
+    // Expenses
+    getExpensesAccounts() 
+    {
         let accounts = {};
-        accounts[""] = {amount: 0, label: metaAccounts.accountsExpenses[""]};
-        this.expenses.forEach((expense) => {
-            if (expense.account!=undefined & expense.account.length >= 2) {
-                let account = expense.account.substring(0,2);
-                if (accounts[account]==undefined) accounts[account] = {amount: 0, label: metaAccounts.accountsExpenses[account]};
-                accounts[account].amount+= expense.amount;
-            } else {
-                accounts[""].amount+= expense.amount;
-            }
+        // group expenses by account
+        this.expenses.forEach(expense => {
+            let account = (expense.account!=undefined & expense.account.length >= 2) ? expense.account.substring(0,2) : "";
+            if (accounts[account]==undefined) accounts[account] = {amount: 0, label: metaAccounts.accountsExpenses[account]};
+            accounts[account].amount+= expense.amount;
         })
+        // add gap
         if (this.amountExpensesFixed) {
+            if (accounts[""]==undefined) accounts[""] = {amount: 0, label: metaAccounts.accountsExpenses[""]};
             accounts[""].amount+= this.getAmountExpenses()-this.getAmountDetailedExpenses();
         }
-        if (accounts[""].amount == 0) delete accounts[""];
+        // return
         return accounts;
     }
 
-    getDepreciationsAccounts() {
+    // Depreciations
+    getDepreciationsAccounts() 
+    {
         let accounts = {};
-        accounts[""] = {amount: 0, label: metaAccounts.accountsDepreciations[""]};
-        this.depreciations.forEach((depreciation) => {
-            if (depreciation.account!=undefined & depreciation.account.length >= 3) {
-                let account = depreciation.account.substring(0,3);
-                if (accounts[account]==undefined) accounts[account] = {amount: 0, label: metaAccounts.accountsDepreciations[account]};
-                accounts[account].amount+= depreciation.amount;
-            } else {
-                accounts[""].amount+= depreciation.amount;
-            }
+        // group depreciations by account
+        this.depreciations.forEach(depreciation => {
+            let account = (depreciation.account!=undefined && depreciation.account.length >= 3) ? depreciation.account.substring(0,3) : "";
+            if (accounts[account]==undefined) accounts[account] = {amount: 0, label: metaAccounts.accountsDepreciations[account]};
+            accounts[account].amount+= depreciation.amount;
         })
+        // add gap
         if (this.amountDepreciationsFixed) {
+            if (accounts[""]==undefined) accounts[""] = {amount: 0, label: metaAccounts.accountsDepreciations[""]};
             accounts[""].amount+= this.getAmountDepreciations()-this.getAmountDetailedDepreciations();
         }
-        if (accounts[""].amount == 0) delete accounts[""];
+        // return
         return accounts;
     }
 

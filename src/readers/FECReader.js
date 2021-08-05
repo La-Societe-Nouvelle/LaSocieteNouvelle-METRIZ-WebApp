@@ -83,9 +83,8 @@ async function processFECData(FECData)
   data.immobilisedProduction = 0;
 
   data.expenses = [];
-  data.stockInitPurchases = 0;
-  data.unstoredPurchases = 0;
-  data.storedPurchases = 0;
+  data.initialStocks = [];
+  data.stocksVariations = [];
   data.purchasesDiscounts = [];
   
   data.investments = [];
@@ -139,7 +138,12 @@ async function readBookAsJournalANouveaux(data,book)
     if (ecriture.CompteNum.substring(0,2)=="31"
           || ecriture.CompteNum.substring(0,2)=="32"
           || ecriture.CompteNum.substring(0,2)=="37") {
-      data.stockInitPurchases+= parseFloat(ecriture.Debit);
+      let initialStockData = {
+        account: ecriture.CompteNum,
+        label: ecriture.CompteLib,
+        amount: parseFloat(ecriture.Debit)
+      }
+      data.initialStocks.push(initialStockData);
     }
 
     // Immobilisations
@@ -256,9 +260,23 @@ async function readBookAsJournalOperationsDiverses(data,book)
     }
     
     // Stored/Unstored Purchases
-    if (ecriture.CompteNum.substring(0,3)=="603") {
-      data.storedPurchases+= parseFloat(ecriture.Credit);
-      data.unstoredPurchases+= parseFloat(ecriture.Debit);
+    if (ecriture.CompteNum.substring(0,2)=="31"
+        || ecriture.CompteNum.substring(0,2)=="32"
+        || ecriture.CompteNum.substring(0,2)=="37") 
+    {      
+      if (data.accounts[ecriture.CompteNum]==undefined) data.accounts[ecriture.CompteNum] = (ecriture.CompteLib || "").replace(/ *$/,"").replace(/^\"/,"").replace(/\"$/,"");
+
+      let stockAccount = data.stocksVariations.filter(stock => stock.account == ecriture.CompteNum)[0];
+      if (stockAccount!=undefined) {
+        stockAccount.amount+= parseFloat(ecriture.Debit)-parseFloat(ecriture.Credit);
+      } else {
+        let stockAccount = {
+          label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+          account: ecriture.CompteNum,
+          amount: parseFloat(ecriture.Debit)-parseFloat(ecriture.Credit),
+        }
+        data.stocksVariations.push(stockAccount);
+      }
     }
 
     // Dotations amortissements

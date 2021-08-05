@@ -19,16 +19,6 @@ export class Expense extends EconomicValue {
     if (props.companyId!=undefined) this.companyId = props.companyId;
     if (props.companyName!=undefined) this.companyName = props.companyName;
   }
-
-  /* ---------- Back Up ---------- */
-
-  updateFromBackUp(backUp) {
-    super.updateFromBackUp(backUp);
-    this.account = backUp.account || "";
-    this.accountProvider = backUp.accountProvider || "";
-    this.companyId = backUp.companyId || "";
-    this.companyName = backUp.companyName || "";
-  }
   
   /* ---------- Getters ---------- */
 

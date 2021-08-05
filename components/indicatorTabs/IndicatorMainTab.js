@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Chart } from "react-google-charts";
+
 import { printValue } from '../../src/utils/Utils';
 
 import { StatementART } from '../statements/StatementART';
@@ -45,9 +47,13 @@ export class MainTab extends React.Component {
             <div className="actions">
               <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
               <button onClick={() => this.props.onPrintDetails("expenses")}>Détails des dépenses</button>
-              <button onClick={() => this.props.onPrintDetails("depreciations")}>Détails des amortissements</button>
+              <button onClick={() => this.props.onPrintDetails("depreciations")}>Détails des immobilisations</button>
             </div>
             <TableMain {...this.props} ref={this.refTable}/>
+          </div>
+          <div className="group">
+            <h3>Graphiques comparatifs</h3>
+            <ComparisonChart session={this.props.session} indic={this.props.indic}/>
           </div>
         </div>
       </div>
@@ -101,6 +107,11 @@ class TableMain extends React.Component {
     const unit = metaIndicators[indic].unit;
     const unitAbsolute = metaIndicators[indic].unitAbsolute;
     const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
+
+    console.log(session.getNetValueAddedFootprint().getIndicator(indic).indic)
+    console.log(session.getNetValueAddedFootprint().getIndicator(indic).getValueAbsolute(1));
+    console.log(financialData.getNetValueAdded())
+    console.log(session.getNetValueAddedFootprint().getIndicator(indic).getValueAbsolute(financialData.getNetValueAdded()))
   
     return (
       <table>
@@ -124,6 +135,28 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           <tr>
+            <td>Production stockée</td>
+            <td className="column_value">({printValue(financialData.getStoredProduction(),0)})</td>
+            <td className="column_unit">&nbsp;€</td>
+            <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_unit">&nbsp;{unit}</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">({printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getStoredProduction()),nbDecimals)})</td> : null}
+            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>
+          {financialData.getImmobilisedProduction() > 0 &&
+            <tr>
+              <td>Production immobilisée</td>
+              <td className="column_value">({printValue(financialData.getImmobilisedProduction(),0)})</td>
+              <td className="column_unit">&nbsp;€</td>
+              <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+              {impactAbsolu ? <td className="column_value">({printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getImmobilisedProduction()),nbDecimals)})</td> : null}
+              {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+            </tr>
+          }
+          <tr>
             <td>Production</td>
             <td className="column_value">{printValue(financialData.getProduction(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
@@ -144,23 +177,33 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           <tr className="with-bottom-line">
-            <td>Stockage achats</td>
-            <td className="column_value">({printValue(financialData.getStoredPurchases(),0)})</td>
+            <td>Consommations intermédiaires</td>
+            <td className="column_value">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
             <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">({printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValueAbsolute(financialData.getStoredPurchases()),nbDecimals)})</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountIntermediateConsumption()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>
+          <tr>
+            <td>Stockage achats</td>
+            <td className="column_value">({printValue(financialData.getAmountFinalStocks(),0)})</td>
+            <td className="column_unit">&nbsp;€</td>
+            <td className="column_value">{printValue(session.getFinalStocksFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_unit">&nbsp;{unit}</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getFinalStocksFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">({printValue(session.getFinalStocksFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountFinalStocks()),nbDecimals)})</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           <tr>
             <td>Déstockage achats</td>
-            <td className="column_value">{printValue(financialData.getUnstoredPurchases(),0)}</td>
+            <td className="column_value">{printValue(financialData.getAmountInitialStocks(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
-            <td className="column_value">{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_value">{printValue(session.getInitialStocksFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getUnstoredPurchasesFootprint().getIndicator(indic).getValueAbsolute(financialData.getUnstoredPurchases()),nbDecimals)}</td> : null}
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getInitialStocksFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">{printValue(session.getInitialStocksFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountInitialStocks()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           {financialData.purchasesDiscounts.length > 0 &&
@@ -201,6 +244,17 @@ class TableMain extends React.Component {
                 </tr>
               )})
             }
+
+          <tr className="with-top-line">
+            <td>Valeur ajoutée brute</td>
+            <td className="column_value">{printValue(financialData.getGrossValueAdded(),0)}</td>
+            <td className="column_unit">&nbsp;€</td>
+            <td className="column_value">{printValue(session.getGrossValueAddedFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_unit">&nbsp;{unit}</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getGrossValueAddedFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">{printValue(session.getGrossValueAddedFootprint().getIndicator(indic).getValueAbsolute(financialData.getGrossValueAdded()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>  
           <tr className="with-top-line">
             <td>Dotations aux amortissements</td>
             <td className="column_value">{printValue(financialData.getAmountDepreciations(),0)}</td>
@@ -208,7 +262,7 @@ class TableMain extends React.Component {
             <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(-financialData.getAmountDepreciations()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciations()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           {
@@ -242,4 +296,72 @@ class TableMain extends React.Component {
     )
   }
 
+}
+
+const viewsForIndic = {
+    art: {min:0, max:100},
+    dis: {min:0, max:100},
+    eco: {min:0, max:100},
+    geq: {min:0, max:100},
+    ghg: {min:0},
+    haz: {min:0},
+    knw: {min:0, max:100},
+    mat: {min:0},
+    nrg: {min:0},
+    was: {min:0},
+    wat: {min:0},
+    soc: {min:0, max:100},
+}
+
+function ComparisonChart({session,indic}) 
+{
+  const {productionFootprint,netValueAddedFootprint,intermediateConsumptionFootprint} = session;
+  const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = session.legalUnit;
+  
+  const dataProduction = [
+    ["", "title", { role: "style" }],
+    ["Situation", productionFootprint.getIndicator(indic).value || 0.0, "#616161"],
+    ["Branche", productionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
+    ["France", productionAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
+  ]
+
+  const dataValueAdded = [
+    ["", "title", { role: "style" }],
+    ["Situation", netValueAddedFootprint.getIndicator(indic).value || 0.0, "#616161"],
+    ["Branche", valueAddedSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
+    ["France", valueAddedAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
+  ]
+  
+  const dataConsumption = [
+    ["", "title", { role: "style" }],
+    ["Situation", intermediateConsumptionFootprint.getIndicator(indic).value || 0.0, "#616161"],
+    ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
+  ]
+  
+  const viewWindow = viewsForIndic[indic];
+  return (
+    <div className="chart-container" align="center">
+      <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>
+      <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/>
+      <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
+    </div>)
+}
+
+function ColumnChart({title, data, viewWindow}) {
+  return (
+    <div align="center">
+      <Chart
+        height={"200px"}
+        chartType="ColumnChart"
+        loader={<div>Chargement</div>}
+        data={data}
+        options={{
+          title: title,
+          legend: {position: 'none'},
+          vAxis: {viewWindow: viewWindow, viewWindowMode: "explicit"},
+          enableInteractivity: false,
+          animation:{duration:600, easing:"inAndOut"}
+        }}
+      />
+    </div>)
 }

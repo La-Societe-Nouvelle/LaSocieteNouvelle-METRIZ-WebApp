@@ -1,3 +1,4 @@
+import { ifDefined } from "./utils/Utils";
 import {SocialFootprint} from "/src/SocialFootprint.js";
 
 export class EconomicValue {
@@ -6,23 +7,14 @@ export class EconomicValue {
   {
     this.id = id || 0;
     this.label = label || "";
-    this.amount = amount!=undefined ? amount : 0.0;
-    this.footprint = footprint || new SocialFootprint(); 
+    this.amount = ifDefined(amount,0);
+    this.footprint = new SocialFootprint({...footprint}); 
   }
 
   update(props) {
     if (props.label!=undefined) this.label = props.label;
     if (props.amount!=undefined) this.amount = props.amount;
     if (props.footprint!=undefined) this.footprint = props.footprint;
-  }
-
-  /* ---------- Back Up ---------- */
-
-  updateFromBackUp(backUp) {
-    this.label = backUp.label || "";
-    this.amount = backUp.amount;
-    this.footprint = new SocialFootprint();
-    this.footprint.updateFromBackUp(backUp.footprint); 
   }
 
   /* ---------- Getters ---------- */

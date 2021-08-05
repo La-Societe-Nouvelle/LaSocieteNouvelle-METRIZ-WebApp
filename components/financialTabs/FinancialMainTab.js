@@ -20,8 +20,9 @@ export function FinancialMainTab(props)
     reader.onload = async () => {
       FECFileReader(reader.result)
         .then((FECData) => processFECData(FECData))
-        .then((nextFinancialData) => financialData.setFECData(nextFinancialData))
+        .then((nextFinancialData) => financialData.loadFECData(nextFinancialData))
         .then(() => refTableMain.current.updateInputs())
+        .then(() => props.onUpdate())
     };
     reader.readAsText(event.target.files[0]);
   }
@@ -122,13 +123,17 @@ class TableMain extends React.Component {
               <td className="column_amount"><input value={printValueInput(unstoredProductionInput,0)} onChange={this.onUnstoredProductionChange} onBlur={this.onUnstoredProductionBlur} onKeyPress={this.onEnterPress}/></td>
               <td className="column_unit">&nbsp;€</td></tr>
 
+          <tr className="with-bottom-line">
+            <td>Consommations intermédiaires</td>
+            <td className="column_amount"><input value={printValueInput(financialData.getAmountIntermediateConsumption(),0)} disabled={true}/></td>
+            <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>Stockage achats</td>
-            <td className="column_amount"><input value={(financialData.getStoredProduction() > 0 ? "(" : "")+printValueInput(financialData.getStoredPurchases(),0)+(financialData.getStoredProduction() > 0 ? ")" : "")} disabled={true}/></td>
+            <td className="column_amount"><input value={(financialData.getAmountFinalStocks() > 0 ? "(" : "")+printValueInput(financialData.getAmountFinalStocks(),0)+(financialData.getAmountFinalStocks() > 0 ? ")" : "")} disabled={true}/></td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>Déstockage achats</td>
-            <td className="column_amount"><input value={printValueInput(financialData.getUnstoredPurchases(),0)} disabled={true}/></td>
+            <td className="column_amount"><input value={printValueInput(financialData.getAmountInitialStocks(),0)} disabled={true}/></td>
             <td className="column_unit">&nbsp;€</td></tr>
           {purchasesDiscounts.length > 0 &&
             <tr>

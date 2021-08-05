@@ -52,7 +52,7 @@ class TableExpenses extends React.Component {
               <td>Fournisseur</td>
               <td colSpan="2">Montant</td>
               <td colSpan="2">Valeur</td>
-              <td colSpan="2">Incertitude</td>
+              <td colSpan="1">Incertitude</td>
               <td>Flag</td>
               <td></td>
           </tr>
@@ -60,11 +60,10 @@ class TableExpenses extends React.Component {
           <tbody>
             {
               companies.slice(page*20,(page+1)*20).map((company) => {
-                return(<RowTableExpenses 
-                  key={"company_"+company.getId()} 
-                  company={company} 
-                  onUpdate={this.updateCompany.bind(this)} 
-                  indic={this.props.indic}/>)
+                return(<RowTableExpenses key={"company_"+company.getId()} 
+                                         company={company} 
+                                         onUpdate={this.updateCompany.bind(this)} 
+                                         indic={this.props.indic}/>)
               })
             }
           </tbody>
@@ -122,12 +121,9 @@ class RowTableExpenses extends React.Component {
         <td className="column_auto">{corporateName}</td>
         <td className="column_value">{printValue(amount,0)}</td>
         <td className="column_unit">&nbsp;€</td>
-        <td className="column_value">
-          <input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+        <td className="column_value">{printValue(valueInput,1)}</td>
         <td className="column_unit">&nbsp;{metaIndicators[this.props.indic].unit}</td>
-        <td className="column_value">
-          <input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_unit">&nbsp;%</td>
+        <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(uncertaintyInput,0)}&nbsp;%</td>
         <td className="column_libelleFlag">&nbsp;{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
         <td className="column_resync">
           <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncCompany}/></td>

@@ -20,11 +20,24 @@ export function printValueInput(value,precision) {
 /* ----- ASSIGN ----- */
 
 export function valueOrDefault(value,defaultValue) {
-  if (value!=undefined && value!=null) {
+  if (value!==undefined && value!==null) {
     return value;
   } else {
     return defaultValue;
   }
+}
+
+export function ifDefined(value,defaultValue) {
+  if (value!==undefined && value!==null) {
+    return value;
+  } else {
+    return defaultValue;
+  }
+}
+
+export function ifCondition(condition,value) {
+  if (condition) {return value}
+  else           {return null}
 }
 
 /* ----- ID ----- */

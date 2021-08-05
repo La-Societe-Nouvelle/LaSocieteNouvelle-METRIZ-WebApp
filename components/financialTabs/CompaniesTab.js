@@ -1,9 +1,13 @@
 import React from 'react';
 
 import { CSVFileReader, processCSVCompaniesData } from '../../src/readers/CSVReader';
+import { XLSXFileReader } from '../../src/readers/XLSXReader';
 
 import { divisions } from '../../lib/nace'; 
 import { areas } from '../../lib/area'; 
+import { InputText } from '../InputText';
+
+import { printValue } from '../../src/utils/Utils';
 
 /* ------------------------------------------------------- */
 /* -------------------- COMPANIES TAB -------------------- */
@@ -15,20 +19,28 @@ export class CompaniesTab extends React.Component {
     super(props)
   }
 
-  render() {
+  render() 
+  {
     const companies = this.props.financialData.getCompanies();
+
     return(
-      <div className="financial_data_depreciations_view">
+      <div className="financial-tab-view-inner">
         <div className="group">
           <h3>Liste des fournisseurs</h3>
+
           <div className="actions">
             <button onClick={() => document.getElementById('import-companies').click()}>Importer un fichier CSV</button>
             <input id="import-companies" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
+            <button onClick={() => document.getElementById('import-companies-xlsx').click()}>Importer un fichier XLSX</button>
+            <input id="import-companies-xlsx" type="file" accept=".xlsx" onChange={this.importXLSXFile} visibility="collapse"/>
+            <button onClick={() => location.href="/classeurTiers.xlsx"}>Télécharger modèle XLSX</button>
             <button onClick={this.synchroniseAll}>Synchroniser les données</button>
           </div>
+
           {companies.length > 0 &&
             <TableCompanies companies={companies} {...this.props}/>
           }
+
         </div>
       </div>
   )}
@@ -43,29 +55,44 @@ export class CompaniesTab extends React.Component {
           await Promise.all(Object.entries(companiesId).map(async ([corporateName,corporateId]) => {
             let company = this.props.financialData.getCompanyByName(corporateName);
             if (company!=undefined) {
-              this.props.financialData.updateCompany({
+              await this.props.financialData.updateCompany({
                 id: company.id,
                 corporateId})
             };
           return;}))
         })
-        .then(() => this.forceUpdate())
+        .then(() => {this.forceUpdate()})
       };
     reader.readAsText(event.target.files[0]);
   }
 
-  // Synchronisation
-  synchroniseAll = () => {
-    this.props.financialData.getCompanies().forEach((company) => {
-      this.fetchDataCompany(company);
-    })
-    this.props.onUpdate(this.props.financialData);
+  // Import XLSX File
+  importXLSXFile = (event) => {
+    let reader = new FileReader();
+    reader.onload = async () => {
+      XLSXFileReader(reader.result)
+        .then(async data => {
+          await Promise.all(data.map(async ({identifiant,denomination}) => {
+            let company = this.props.financialData.getCompanyByName(denomination);
+            if (company!=undefined) {
+              await this.props.financialData.updateCompany({
+                id: company.id,
+                corporateId: identifiant})
+            };
+          return;}))
+        })
+        .then(() => {this.forceUpdate()})
+      };
+    reader.readAsArrayBuffer(event.target.files[0]);
   }
 
-  async fetchDataCompany(company) {
-    await company.fetchData();
-    this.props.financialData.updateCompany(company);
-    //this.props.onUpdate(this.props.financialData);
+  // Synchronisation
+  synchroniseAll = async () => {
+    await Promise.all(this.props.financialData.companies.map(async (company) => {
+      await company.updateFootprintFromRemote();
+      return;
+    }));
+    this.props.onUpdate();
     this.forceUpdate();
   }
 
@@ -87,24 +114,27 @@ class TableCompanies extends React.Component {
     }
   }
 
-  render() {
-    const companies = this.props.companies;
+  render() 
+  {
+    const {companies} = this.props;
     const {columnSorted,page} = this.state;
+
     this.sortCompanies(companies,columnSorted);
+
     return (
       <div>
         <table className="table_expenses">
           <thead>
             <tr>
-              <td className="column_short-input"
+              <td className="short"
                   onClick={() => this.changeColumnSorted("identifiant")}>Identifiant</td>
-              <td className="column_auto"
+              <td className="auto"
                   onClick={() => this.changeColumnSorted("denomination")}>Denomination</td>
-              <td className="column_areaCode"
-                  onClick={() => this.changeColumnSorted("area")}>Pays</td>
-              <td className="column_corporateActivity"
-                  onClick={() => this.changeColumnSorted("activity")}>Code division</td>
-              <td className="column_amount" colSpan={companies.length > 0 ? "2" : "1"}
+              <td className="medium"
+                  onClick={() => this.changeColumnSorted("area")}>Espace économique</td>
+              <td className="medium"
+                  onClick={() => this.changeColumnSorted("activity")}>Activité asssociée</td>
+              <td className="short" colSpan={companies.length > 0 ? "2" : "1"}
                   onClick={() => this.changeColumnSorted("amount")}>Montant</td>
               <td className="column_icon" colSpan="1"></td></tr>
           </thead>
@@ -114,6 +144,7 @@ class TableCompanies extends React.Component {
                 return(<RowTableCompanies 
                           key={"company_"+company.id} 
                           {...company} 
+                          onUpdate={this.updateCompany.bind(this)}
                           onSave={this.updateCompany.bind(this)}
                           onSync={this.syncCompany.bind(this)}/>)
               })
@@ -173,21 +204,16 @@ class TableCompanies extends React.Component {
     this.forceUpdate();
   }
 
-  updateCompany(updatedData) {
-    let financialData = this.props.financialData;
-    financialData.updateCompany({
-      id: updatedData.id,
-      corporateId: updatedData.corporateIdInput,
-      corporateName: updatedData.corporateNameInput,
-      areaCode: updatedData.areaCodeInput,
-      corporateActivity: updatedData.corporateActivityInput
-    })
-    this.props.onUpdate(financialData);
+  async updateCompany(nextProps) {
+    await this.props.financialData.updateCompany(nextProps)
+    this.props.onUpdate();
+    this.forceUpdate();
   }
 
-  syncCompany(companyId) {
+  async syncCompany(companyId) {
     let company = this.props.financialData.getCompany(companyId);
-    this.fetchDataCompany(company);
+    await company.updateFromRemote();
+    this.forceUpdate();
   }
 
 }
@@ -197,59 +223,55 @@ class RowTableCompanies extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: props.id,
-      corporateIdInput: props.corporateId!=null ? props.corporateId : "",
-      corporateNameInput: props.corporateName,
-      areaCodeInput: props.areaCode,
-      activityCodeInput: props.activityCode};
+      corporateId: props.corporateId!=null ? props.corporateId : "",
+      corporateName: props.corporateName,
+      areaCode: props.footprintAreaCode,
+      activityCode: props.footprintActivityCode,
+    };
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.corporateId != prevProps.corporateId
         || this.props.corporateName != prevProps.corporateName
-        || this.props.areaCode != prevProps.areaCode
-        || this.props.activityCode != prevProps.activityCode) {
+        || this.props.footprintAreaCode != prevProps.footprintAreaCode
+        || this.props.footprintActivityCode != prevProps.footprintActivityCode) {
       this.setState({
-        id: this.props.id,
-        corporateIdInput: this.props.corporateId,
-        corporateNameInput: this.props.corporateName,
-        areaCodeInput: this.props.areaCode,
-        activityCodeInput: this.props.activityCode});
+        corporateId: this.props.corporateId,
+        corporateName: this.props.corporateName,
+        areaCode: this.props.footprintAreaCode,
+        activityCode: this.props.footprintActivityCode,
+      });
     }
   }
 
-  render() {
-    const {dataFetched,amount} = this.props;
-    const {corporateIdInput,corporateNameInput,areaCodeInput,activityCodeInput} = this.state;
+  render() 
+  {
+    const {amount,dataFetched,legalUnitAreaCode,legalUnitActivityCode} = this.props;
+    const {corporateId,corporateName,areaCode,activityCode} = this.state;
+
     return (
       <tr>
-        <td className={"column_corporateId"+(dataFetched ? " valid" : "")}>
-          <input value={corporateIdInput} 
-                 onChange={this.onCorporateIdChange} 
-                 onBlur={this.onBlur} 
-                 onKeyPress={this.onEnterPress}/></td>
-        <td className="column_corporateName">
-          <input value={corporateNameInput} 
-                 onChange={this.onCorporateNameChange} 
-                 onBlur={this.onBlur} 
-                 onKeyPress={this.onEnterPress}/></td>
-        <td className="column_areaCode">
-          <select onChange={this.onAreaCodeChange} value={areaCodeInput}>{
+        <td className={"column_corporateId"+(dataFetched === true ? " valid" : "")}>
+          <InputText value={corporateId} onUpdate={this.updateCorporateId.bind(this)}/></td>
+        <td className="auto">
+          <InputText value={corporateName} onUpdate={this.updateCorporateName.bind(this)}/></td>
+        <td className={"medium"+(dataFetched === false ? " valid" : "")}>
+          <select onChange={this.onAreaCodeChange} value={areaCode}>{
             Object.entries(areas)
               .sort()
               .map(([code,libelle]) => { return(
-                <option key={code} value={code} /*selected={code==areaCodeInput}*/>{code + " - " +libelle}</option>
+                <option className={(legalUnitAreaCode && code==legalUnitAreaCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>
                 )})
           }</select></td>
-        <td className="column_corporateActivity">
-          <select onChange={this.onCorporateActivityChange} value={activityCodeInput.substring(0,2)}>{
+        <td className={"medium"+(dataFetched === false ? " valid" : "")}>
+          <select onChange={this.onActivityCodeChange} value={activityCode.substring(0,2)}>{
             Object.entries(divisions)
               .sort((a,b) => parseInt(a)-parseInt(b))
               .map(([code,libelle]) => { return(
-                <option key={code} value={code} /*selected={code==corporateActivityInput.substring(0,2)}*/>{code + " - " +libelle}</option>
+                <option className={(legalUnitActivityCode && code==legalUnitActivityCode.substring(0,2)) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>
                 )})
           }</select></td>
-        <td className="column_amount">{printValue(amount,0)}</td>
+        <td className="short right">{printValue(amount,0)}</td>
         <td className="column_unit">&nbsp;€</td>
         <td className="column_resync">
           <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" 
@@ -257,41 +279,21 @@ class RowTableCompanies extends React.Component {
       </tr>
     )
   }
-  
-  onEnterPress = (event) => {
-    if (event.which==13) {event.target.blur();}
-  }
 
-  onCorporateIdChange = (event) => {
-    this.setState({corporateIdInput: event.target.value})
-  }
-  onCorporateNameChange = (event) => {
-    this.setState({corporateNameInput: event.target.value})
-  }
+  updateCorporateId = (nextCorporateId) => this.props.onUpdate({id: this.props.id, corporateId: nextCorporateId})
+  updateCorporateName = (nextCorporateName) => this.props.onUpdate({id: this.props.id, corporateName: nextCorporateName})
+
   onAreaCodeChange = (event) => {
-    let nextProps = this.state;
-    nextProps.areaCodeInput = event.target.value;
-    this.setState(nextProps);
-    this.props.onSave(nextProps);
+    this.setState({areaCode: event.target.value})
+    this.props.onUpdate({id: this.props.id, footprintAreaCode: event.target.value});
   }
-  onCorporateActivityChange = (event) => {
-    let nextProps = this.state;
-    nextProps.corporateActivityInput = event.target.value;
-    this.setState(nextProps)
-    this.props.onSave(nextProps);
+  onActivityCodeChange = (event) => {
+    this.setState({activityCode: event.target.value})
+    this.props.onUpdate({id: this.props.id, footprintActivityCode: event.target.value});
   }
 
-  // Props functions
-  onBlur = (event) => {
-    this.props.onSave(this.state);
-  }
   onSyncCompany = (event) => {
     this.props.onSync(this.props.id);
   }
 
-}
-
-function printValue(value,precision) {
-  if (value==null) {return "-"}
-  else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
 }

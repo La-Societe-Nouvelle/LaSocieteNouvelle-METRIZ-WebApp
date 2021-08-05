@@ -114,7 +114,7 @@ class Metriz extends React.Component {
 
   async importData(backUp) {
     const session = new Session();
-    session.updateFromBackUp(backUp);
+    await session.updateFromBackUp(backUp);
     this.setState({
       session: session,
       selectedSection: "legalData"});

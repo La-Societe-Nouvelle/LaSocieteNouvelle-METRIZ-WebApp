@@ -121,12 +121,9 @@ class RowTableDepreciations extends React.Component {
         <td className="column_auto">{label}</td>
         <td className="column_value">{printValue(amount,0)}</td>
         <td className="column_unit">&nbsp;€</td>
-        <td className="column_value">
-          <input value={valueInput} onChange={this.onValueChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
+        <td className="column_value">{printValue(valueInput,1)}</td>
         <td className="column_unit">&nbsp;{metaIndicators[this.props.indic].unit}</td>
-        <td className="column_value">
-          <input value={uncertaintyInput} onChange={this.onUncertaintyChange} onBlur={this.onBlur} onKeyPress={this.onEnterPress}/></td>
-        <td className="column_unit">&nbsp;%</td>
+        <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(uncertaintyInput,0)}&nbsp;%</td>
         <td className="column_libelleFlag">&nbsp;{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
         <td className="column_resync">
           <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncCompany}/></td>
@@ -149,7 +146,7 @@ class RowTableDepreciations extends React.Component {
 
   async fetchData() {
     let immobilisation = this.props.immobilisation;
-    await immobilisation.updateIndicFootprintData(this.props.indic);
+    await immobilisation.updateIndicatorFromRemote(this.props.indic);
     const {value,uncertainty} = immobilisation.getFootprint().getIndicator(this.props.indic);
     this.setState({valueInput: value, uncertaintyInput: uncertainty});
     this.props.onUpdate(this.props.immobilisation.id,value,uncertainty);

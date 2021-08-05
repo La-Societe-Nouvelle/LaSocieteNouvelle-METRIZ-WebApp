@@ -261,6 +261,27 @@ table {
     &.short {width: 125px;}
   }
 
+  td.crop {
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &:hover {
+      //overflow: visible;
+      white-space: normal;
+      
+      span {
+        position: relative;
+        top: 0;
+        left: 0;
+        background-color: white;
+        padding-right: 5px;
+        width: 500px;
+      }
+    }
+  }
+
   .column_short-input {
     width: 150px;
 
@@ -337,6 +358,7 @@ table {
   tbody {
 
     select {
+      width: 100%;
       background-color: white;
       border: solid 1px $secondary-color;
 
@@ -398,9 +420,12 @@ table {
       }
     }
     .valid {
-      input {
+      input,select {
         background-color: $valid-color;
       }
+    }
+    option.default-option {
+      background-color: wheat;
     }
   }
 }
@@ -515,12 +540,15 @@ table {
 #import-expenses,
 #import-depreciations,
 #import-companies,
+#import-companies-xlsx,
 #import-fec,
 #import-session {
   margin: 0px;
   padding: 0px;
   width: 0px;
   height: 0px;
+  visibility: hidden;
+  border: 0px;
 }
 
 table 
@@ -607,4 +635,10 @@ table
     justify-content: center;
     align-items: center;
   }
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }

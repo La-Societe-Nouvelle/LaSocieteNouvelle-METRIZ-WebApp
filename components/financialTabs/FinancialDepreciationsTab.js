@@ -23,15 +23,15 @@ export class FinancialDepreciationsTab extends React.Component {
     return(
       <div className="financial-tab-view-inner">
         <div className="groups">
-          <TableDepreciations financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
           <TableImmobilisations financialData={financialData} onUpdate={this.updateFinancialData.bind(this)} didUpdate={this.props.didUpdate}/>
+          <TableDepreciations financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
           <TableInvestments financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
         </div>
     </div>
   )}
 
-  updateFinancialData(financialData) {
-    this.props.onUpdate(financialData);
+  updateFinancialData() {
+    this.props.onUpdate();
     this.forceUpdate();
   }
 }
@@ -56,10 +56,13 @@ class TableDepreciations extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
     const {depreciations,immobilisations} = this.props.financialData;
     const {columnSorted,nbItems,page,showEditor,depreciationToEdit} = this.state;
+    
     this.sortItems(depreciations,columnSorted);
+    
     return (
       <div className="group">
         <h3>Liste des dotations aux amortissements</h3>
@@ -82,7 +85,7 @@ class TableDepreciations extends React.Component {
               </thead>
               <tbody>
                 {depreciations.slice(page*nbItems,(page+1)*nbItems).map((depreciation) => {
-                  return(<RowTableDepreciations key={"depreciation_"+depreciation.getId()} 
+                  return(<RowTableDepreciations key={"depreciation_"+depreciation.id} 
                                                 {...depreciation}
                                                 immobilisations={immobilisations}
                                                 onEdit={this.editDepreciation.bind(this)}
@@ -145,7 +148,7 @@ class TableDepreciations extends React.Component {
   async updateDepreciation(nextProps) {await this.props.financialData.updateDepreciation(nextProps)}
   deleteDepreciation = (id) => {this.props.financialData.removeDepreciation(id);this.forceUpdate()}
   
-  /* ----- OPERATIONS ON DEPRECIATION ----- */
+  /* ----- PROPS METHOD ----- */
   
   updateFinancialData() {
     this.props.onUpdate(this.props.financialData);
@@ -161,7 +164,7 @@ function RowTableDepreciations(props) {
 
   return (
     <tr>
-      <td className="column_auto">{label}</td>
+      <td className="auto">{label}</td>
       <td className="short center">{accountImmobilisation}</td>
       <td className="short center">{account}</td>
       <td className="short right">{printValue(amount,0)}</td>
@@ -287,7 +290,7 @@ class TableImmobilisations extends React.Component {
               <thead>
                 <tr>
                   <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-                  <td className="medium">Activité associée</td>
+                  <td className="long">Empreinte sociétale</td>
                   <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
                   <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
                   <td colSpan="2"></td></tr>
@@ -337,7 +340,7 @@ class TableImmobilisations extends React.Component {
   }
 
   async fetchDataImmobilisation(immobilisation) {
-    await immobilisation.updateFootprintData();
+    await immobilisation.updateFootprintFromRemote();
     //this.props.financialData.updateImmobilisation(immobilisation);
     //this.forceUpdate();
   }
@@ -367,21 +370,36 @@ class TableImmobilisations extends React.Component {
 
   editImmobilisation = (id) => this.setState({showEditor: true, immobilisationToEdit: this.props.financialData.getImmobilisation(id)})
   async addImmobilisation(props) {await this.props.financialData.addImmobilisation(props)}
-  async updateImmobilisation(nextProps) {await this.props.financialData.updateImmobilisation(nextProps)}
-  deleteImmobilisation = (id) => {this.props.financialData.removeImmobilisation(id);this.forceUpdate()} // TO DO : update others tables
+  async updateImmobilisation(nextProps) {await this.props.financialData.updateImmobilisation(nextProps);this.props.onUpdate();this.forceUpdate()}
+  deleteImmobilisation = (id) => {this.props.financialData.removeImmobilisation(id);this.props.onUpdate();this.forceUpdate()} // TO DO : update others tables
 
 }
 
 /* ---------- ROW IMMOBILISATION ---------- */
 
-function RowTableImmobilisations(props) {
+function RowTableImmobilisations(props) 
+{
+  const {id,label,amount,account,prevFootprintLoaded,footprintActivityCode,dataFetched} = props;
   
-  const {id,label,amount,account,footprint} = props;
+  const activityCode = footprintActivityCode.substring(0,2);
+  const footprintDescription = prevFootprintLoaded ? "Reprise sur exercice précédent" : (activityCode!="00" ? "Empreinte des activités \""+divisions[activityCode]+"\"" : "Empreinte de la production française");
+
+  const onActivityCodeChange = (event) => props.onUpdate({id: id, footprintActivityCode: event.target.value})
 
   return (
     <tr>
       <td className="auto">{label}</td>
-      <td className="long left">{divisions[footprint.activityCode.substring(0,2)]}</td>
+      {prevFootprintLoaded &&
+        <td className="long left crop"><span>{footprintDescription}</span></td>}
+      {!prevFootprintLoaded &&
+        <td className={"medium"+(dataFetched === true ? " valid" : "")}>
+        <select onChange={onActivityCodeChange} value={activityCode}>{
+          Object.entries(divisions)
+            .sort((a,b) => parseInt(a)-parseInt(b))
+            .map(([code,libelle]) => { return(
+              <option className={(activityCode && code==activityCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>
+              )})
+        }</select></td>}
       <td className="short center">{account}</td>
       <td className="short right">{printValue(amount,0)}</td>
       <td className="column_unit">&nbsp;€</td>
@@ -406,12 +424,12 @@ class ImmobilisationPopup extends React.Component {
         label: props.label || "",
         amount: props.amount || "",
         account: props.account || "",
-        activityCode: props.footprint!=undefined ? props.footprint.activityCode : "00",
+        footprintActivityCode: props.footprintActivityCode || "00",
       }
     }
   
     render() {
-      const {label,amount,account,activityCode} = this.state;
+      const {label,amount,account,footprintActivityCode} = this.state;
       return (
         <div className="popup">
           <div className="popup-inner">
@@ -432,7 +450,7 @@ class ImmobilisationPopup extends React.Component {
               </div>
               <div className="inline-input long">
                 <label>Activités associées </label>
-                <select onChange={this.onActivityCodeChange} value={activityCode.substring(0,2)}>
+                <select onChange={this.onActivityCodeChange} value={footprintActivityCode.substring(0,2)}>
                   {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b)).map(([code,libelle]) => { return(
                     <option key={code} value={code}>{code + " - " +libelle}</option>
                   )})
@@ -441,7 +459,7 @@ class ImmobilisationPopup extends React.Component {
             </div>
             <div className="footer">
               <button onClick={() => this.props.onClose()}>Fermer</button>
-              <button onClick={() => this.updateDepreciation()}>Enregistrer</button>
+              <button onClick={() => this.updateImmobilisation()}>Enregistrer</button>
             </div>
           </div>
         </div>
@@ -449,13 +467,13 @@ class ImmobilisationPopup extends React.Component {
     }
     
     updateLabel = (nextLabel) => this.setState({label: nextLabel})
-    onActivityCodeChange = (event) => this.setState({activityCode: event.target.value})
+    onActivityCodeChange = (event) => this.setState({footprintActivityCode: event.target.value})
     updateAccount = (nextAccount) => this.setState({account: nextAccount})  
     updateAmount = (nextAmount) => {if (nextAmount!=null) this.setState({amount: nextAmount})}
 
     /* ----- PROPS METHODS ----- */
   
-    updateDepreciation() {
+    updateImmobilisation() {
       if (this.props.id!=undefined) {this.props.onUpdate({id: this.props.id, ...this.state})}
       else                          {this.props.onAdd({...this.state})}
       this.props.onClose();
@@ -483,10 +501,13 @@ class TableInvestments extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
     const {investments,companies,immobilisations} = this.props.financialData;
     const {columnSorted,nbItems,page,showEditor,investmentToEdit} = this.state;
+
     this.sortItems(investments,columnSorted);
+    
     return (
       <div className="group">
         <h3>Liste des dépenses d'investissement</h3>
@@ -510,7 +531,7 @@ class TableInvestments extends React.Component {
               </thead>
               <tbody>
                 {investments.slice(page*nbItems,(page+1)*nbItems).map((investment) => {
-                  return(<RowTableInvestments key={"investment_"+investment.getId()} 
+                  return(<RowTableInvestments key={"investment_"+investment.id} 
                                               {...investment}
                                               onEdit={this.editInvestment.bind(this)}
                                               onDelete={this.deleteInvestment.bind(this)}/>)
@@ -618,16 +639,16 @@ class InvestmentPopup extends React.Component {
             <h3>{this.props.id == undefined ? "Ajout d'une dépense d'investissement" : "Modification"}</h3>
             <div className="inputs">
               <div className="inline-input long">
-                  <label>Libellé </label>
+                  <label>Libellé* </label>
                   <InputText value={label} onUpdate={this.updateLabel.bind(this)}/>
               </div>
               <div className="inline-input short">
-                  <label>Montant </label>
+                  <label>Montant* </label>
                   <InputNumber className="input-number" value={amount} onUpdate={this.updateAmount.bind(this)}/>
                   <span>&nbsp;€</span>
               </div>
               <div className="inline-input long">
-                  <label>Fournisseur </label>
+                  <label>Fournisseur* </label>
                   <input value={companyName} 
                     list="companies"
                     onChange={this.onCorporateNameChange}
@@ -637,7 +658,7 @@ class InvestmentPopup extends React.Component {
                 </datalist>
               </div>
               <div className="inline-input long">
-                  <label>Compte d'immobilisation </label>
+                  <label>Compte d'immobilisation* </label>
                   <select onChange={this.onAccountImmobilisationSelect} value={account}>
                     {immobilisations.map(({label,account}) => { return <option key={account} value={account}>{account + " - " +label}</option>})}
                     {account=="" && <option key={"else"} value={""}>{"---"}</option>}

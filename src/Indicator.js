@@ -1,14 +1,15 @@
+import { ifDefined } from "./utils/Utils";
 
 export class Indicator {
 
-  constructor(indic) 
+  constructor({indic,value,flag,uncertainty,libelleFlag}) 
   {
     this.indic = indic;
-    this.value = null;
-    this.flag = null;
-    this.uncertainty = null;
+    this.value = ifDefined(value,null);
+    this.flag = flag || null;
+    this.uncertainty = ifDefined(uncertainty,null);
     // Complements
-    this.libelleFlag = null;
+    this.libelleFlag = libelleFlag || null;
   }
 
   updateFromBackUp(backUp) {
@@ -36,7 +37,7 @@ export class Indicator {
   // Values
 
   getValueAbsolute(amount) {
-    if (amount!=null & this.getValue()!=null) 
+    if (amount!=null && this.getValue()!=null) 
     { 
         if      (["ghg","haz","mat","nrg","was","wat"].includes(this.indic))  { return amount*this.getValue()/1000; }
         else if (["art","eco","knw","soc"].includes(this.indic))              { return amount*this.getValue()/100; }

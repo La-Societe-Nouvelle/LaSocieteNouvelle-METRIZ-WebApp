@@ -44,7 +44,7 @@ export class FinancialDataSection extends React.Component {
     const tabProps = {
       financialData: this.props.session.getFinancialData(), 
       changeTab: this.onChangeTab.bind(this),
-      onUpdate: this.updateFinancialData.bind(this),
+      onUpdate: this.updateFootprints.bind(this),
       didUpdate: () => this.props.session.updateRevenueFootprint(),
     }
     switch(this.state.selectedTab) 
@@ -66,6 +66,10 @@ export class FinancialDataSection extends React.Component {
 
   updateFinancialData(financialData) {
     this.props.session.updateFinancialData(financialData);
+  }
+
+  updateFootprints = () => {
+    this.props.session.updateRevenueFootprint();
   }
 
 }
