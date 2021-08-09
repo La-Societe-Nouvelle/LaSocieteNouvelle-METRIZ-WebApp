@@ -43,46 +43,30 @@ L'absence de valeur signifie que des données sont manquantes pour le calcul.
 
 La section *Données Financières* correspond à la saisie des données financières de l'entreprise. Elle regroupe quatre onglets :
 * *Soldes intermédiaires* pour la saisie des soldes comptables
-* *Charges externes* pour la saisie ou l'importation des charges externes
-* *Ammortissements sur immobilisations* pour la saisie ou l'importation des dotations aux amortissements
+* *Charges externes* pour les données relatives aux consommations intermédiaires
+* *Immobilisations* pour les données relatives aux immobilisations
 * *Fournisseurs* pour l'association des numéros de siren aux fournisseurs
 
 &nbsp;
 #### Soldes intermédiaires
 
 Les soldes comptables peuvent être renseignés manuellement ou via l'import d'un fichier FEC. L'ensemble de ces montants sont disponibles au sein du compte de résultat de l'entreprise.
-À noter que le calcul de l'Empreinte Sociétale ne peut se faire que si le chiffre d'affaires et les montants totaux des charges externes et des dotations aux amortissements sont disponibles (montant total saisi ou calculé à partir des lignes). Le cas échéant, le montant de la valeur ajoutée nette est déduit.
+À noter que le calcul de l'Empreinte Sociétale ne peut se faire que si, a minima, le chiffre d'affaires, le montant total des charges externes et le montant total des dotations aux amortissements sont disponibles. Le montant de la valeur ajoutée nette pourras alors être déduit.
 
 Le chiffre d'affaires (production vendue) est par défaut considéré comme entièrement produit sur l'exercice (ligne production). Le cas non-échéant, il convient de renseigner le volume de production déstockée de l'exercice précédent. Il convient également en cas de production stockée et/ou de production immobilisée de renseigner le volume correspondant.
-Pour rappel la production sur un exercice correspond à la somme de la production vendue (chiffre d'affaires), de la production stockée et de la production immobilisée ôtée de la production déstockée.
+Pour rappel la production sur un exercice correspond à la somme de la production vendue (chiffre d'affaires), de la production stockée et de la production immobilisée, à laquelle est ôtée la production déstockée.
 
 Le montant total des charges externes (respectivement des dotations aux amortissements) correspond à la somme des montants des charges (respectivement des dotations) saisies ou importées (Cf. onglets *Charges externes* et *Dotations aux amortissements*).
 
-Le cadenas situé à côté des agrégats permet de *bloquer* le montant i.e. de définir le montant total dans le cas où toutes les charges ou dotations ne sont pas renseignées. L'écart sera considéré comme des charges ou dotations *non classées* et des valeurs par défaut seront utilisées pour la mesure des indicateurs. 
+Le cadenas situé à côté des agrégats permet de *bloquer* le montant i.e. de définir le montant total dans le cas où toutes les charges ou dotations ne sont pas renseignées. L'écart sera considéré comme des charges ou dotations *non classées* et des valeurs par défaut seront utilisées pour la mesure des indicateurs.
 
 &nbsp;
 #### Charges externes
 
 Actions globales :
-* Importer un fichier FEC : importation d'un fichier FEC (les lignes précédemment saisies sont écrasées lors de l'importation)
-* Importer un fichier CSV : importation d'un fichier .csv (les lignes précédemment saisies sont écrasées lors de l'importation)
-* Ajouter une dépense : ajout d'une charge dans le tableau, qui s'ajoutera aux dépenses existantes.
-* Supprimer tout : suppression de toutes les lignes
-
-Le fichier d'import .csv doit comporter un en-tête (*header*) avec les libellés suivants, les données doivent être séparées par des point-virgules :
-- *corporateId* pour la colonne contenant le numéro siren
-- *corporateName* pour la colonne contenant le libellé de l'entreprise
-- *account* pour la colonne contenant le numéro de compte associé
-- *label* pour la colonne contenant le nom associé à la dépense
-- *amount* pour la colonne contenant le montant de la dépense. 
-
-Exemple :
-
-| 1 | corporateId; corporateName; account; label; amount |
-|:-|:-|
-| 2 | 012785487; Fournisseur1; 61; achat1; 2000 |
-| 3 | 759647854; Fournisseur2; 61; achat2; 42500 |
-
+* Ajouter un stock : Ajout d'un stock d'achats, le stock initial correspond au volume en début d'exercice et le stock final en fin d'exercice.
+* Ajout d'une dépense : Ajout d'une charge externes. Les entreprises déjà *sollicitées* apparaissent lors de la saisie du fournisseur; lorsque le fournisseur est nouveau, une nouvelle ligne est créée dans la table des fournisseurs (onglet *Fournisseurs*)
+* Ajout d'une remise : Ajout d'une remise. La remise ne peut être associée qu'à une entreprise à laquelle est associée une dépense.
 
 Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
 
