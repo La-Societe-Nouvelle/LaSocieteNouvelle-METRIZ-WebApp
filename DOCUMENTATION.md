@@ -65,20 +65,25 @@ Le cadenas situé à côté des agrégats permet de *bloquer* le montant i.e. de
 
 Actions globales :
 * Ajouter un stock : Ajout d'un stock d'achats, le stock initial correspond au volume en début d'exercice et le stock final en fin d'exercice.
-* Ajout d'une dépense : Ajout d'une charge externes. Les entreprises déjà *sollicitées* apparaissent lors de la saisie du fournisseur; lorsque le fournisseur est nouveau, une nouvelle ligne est créée dans la table des fournisseurs (onglet *Fournisseurs*)
-* Ajout d'une remise : Ajout d'une remise. La remise ne peut être associée qu'à une entreprise à laquelle est associée une dépense.
+* Ajouter d'une dépense : Ajout d'une charge externes. Les entreprises déjà *sollicitées* apparaissent lors de la saisie du fournisseur; lorsque le fournisseur est nouveau, une nouvelle ligne est créée dans la table des fournisseurs (onglet *Fournisseurs*)
+* Ajouter d'une remise : Ajout d'une remise. La remise ne peut être associée qu'à une entreprise à laquelle est associée une dépense.
 
 Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
 
 &nbsp;
 #### Amortissements sur immobilisations
 
-Le fonctionnement est similaire à l'onglet *Charges externes*
+Actions globales :
+* Ajouter une immobilisation : Ajout d'un compte d'immobilisation, la valeur associée doit correspondre à la valeur actualisée en début d'exercice.
+* Ajouter une dotations aux amortissements : Ajout d'une dotation. La dotation doit être associée à un compte d'immobilisation.
+* Ajouter d'une dépense d'investissement : Ajout d'une dépense en immobilisation. La dépense doit être associée à un compte d'immobilisation.
+
+Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
 
 &nbsp;
 #### Fournisseurs
 
-Cette section se met autmatiquement à jour en fonction des données saisies dans les onglets *Charges externes* et *Amortissements sur immobilisations*. Il est possible de compléter les numéros de siren des fournisseurs via l'import d'un fichier .csv.
+Cette section se met autmatiquement à jour en fonction des données saisies dans les onglets *Charges externes* et *Amortissements sur immobilisations*. Il est possible de compléter les numéros de siren des fournisseurs via l'import d'un fichier .csv ou.xlsx (dont le modèle est téléchargeable).
 
 Le fichier d'import .csv doit comporter un en-tête (*header*) avec les libellés suivants, la séparation des données doit se faire avec des points-virgules :
 - *corporateName* pour la colonne contenant le libellé de l'entreprise
@@ -91,9 +96,21 @@ Exemple :
 | 2 |Fournisseur1; 012785487 |
 | 3 |Fournisseur2; 759647854 |
 
+Le fichier d'import .xlsx doit comporter deux colonnes avec les libellés suivants :
+- *identifiant* pour la colonne contenant le numéro siren
+- *denomination* pour la colonne contenant le libellé de l'entreprise
 
-La colonne *siren* est de couleur verte pour les entreprises *reconnues* au sein de la base de données.
-Si l'entreprise n'est pas reconnue, il est cependant possible de préciser la situation géographique et la division économique à laquelle est rattachée l'entreprise, ou à laquelle elle se rapproche le plus.
+Exemple :
+
+| 1 |identifiant; denomination |
+|:-|:-|
+| 2 |012785487; Fournisseur1 |
+| 3 |759647854; Fournisseur2 |
+
+
+La colonne *siren* est de couleur verte lorsque les données sont synchronisées à partir du numéro de siren. Dès lors qu'elles sont obtenues à partir d'une localisation et d'une division économique, le fond devient vert pour ces deux champs. En l'absence de couleur, aucune donnée n'est associée au fournisseur.
+
+Le bouton *synchroniser les données* permet de mettre à jour les données associées pour l'ensemble des fournisseurs à partir des informations disponibles.
 
 &nbsp;
 ### INDICATEURS (INFORMATIONS GÉNÉRALES)
