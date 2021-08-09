@@ -102,10 +102,10 @@ Le fichier d'import .xlsx doit comporter deux colonnes avec les libellés suivan
 
 Exemple :
 
-| 1 |identifiant; denomination |
-|:-|:-|
-| 2 |012785487; Fournisseur1 |
-| 3 |759647854; Fournisseur2 |
+| 1 |identifiant | denomination |
+|:--|:-----------|:-------------|
+| 2 | 012785487 | Fournisseur1 |
+| 3 | 759647854 | Fournisseur2 |
 
 
 La colonne *siren* est de couleur verte lorsque les données sont synchronisées à partir du numéro de siren. Dès lors qu'elles sont obtenues à partir d'une localisation et d'une division économique, le fond devient vert pour ces deux champs. En l'absence de couleur, aucune donnée n'est associée au fournisseur.
