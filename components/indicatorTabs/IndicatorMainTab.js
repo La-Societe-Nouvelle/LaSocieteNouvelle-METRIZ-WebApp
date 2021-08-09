@@ -32,6 +32,7 @@ export class MainTab extends React.Component {
   constructor(props) {
     super(props);
     this.refTable = React.createRef();  
+    this.refInsights = React.createRef();
   }
 
   render() {
@@ -53,7 +54,7 @@ export class MainTab extends React.Component {
           </div>
           <div className="group">
             <h3>Graphiques comparatifs</h3>
-            <ComparisonChart session={this.props.session} indic={this.props.indic}/>
+            <Insights session={this.props.session} indic={this.props.indic} ref={this.refInsights}/>
           </div>
         </div>
       </div>
@@ -62,6 +63,7 @@ export class MainTab extends React.Component {
 
   updateTable = () => {
     this.refTable.current.forceUpdate();
+    this.refInsights.current.forceUpdate();
   }
 
 }
@@ -313,38 +315,91 @@ const viewsForIndic = {
     soc: {min:0, max:100},
 }
 
-function ComparisonChart({session,indic}) 
-{
-  const {productionFootprint,netValueAddedFootprint,intermediateConsumptionFootprint} = session;
-  const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = session.legalUnit;
+class Insights extends React.Component{
   
-  const dataProduction = [
-    ["", "title", { role: "style" }],
-    ["Situation", productionFootprint.getIndicator(indic).value || 0.0, "#616161"],
-    ["Branche", productionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
-    ["France", productionAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  ]
+  constructor(props) {
+    super(props)
+  }
 
-  const dataValueAdded = [
-    ["", "title", { role: "style" }],
-    ["Situation", netValueAddedFootprint.getIndicator(indic).value || 0.0, "#616161"],
-    ["Branche", valueAddedSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
-    ["France", valueAddedAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  ]
+  render()
+  {
+    const {session,indic} = this.props;
+    const {legalUnit,productionFootprint,netValueAddedFootprint,intermediateConsumptionFootprint} = session;
+    const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = legalUnit;
+    
+    const dataProduction = [
+      ["", "title", { role: "style" }],
+      ["Situation", productionFootprint.getIndicator(indic).value || 0.0, "#616161"],
+      ["Branche", productionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
+      ["France", productionAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
+    ]
   
-  const dataConsumption = [
-    ["", "title", { role: "style" }],
-    ["Situation", intermediateConsumptionFootprint.getIndicator(indic).value || 0.0, "#616161"],
-    ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  ]
+    const dataValueAdded = [
+      ["", "title", { role: "style" }],
+      ["Situation", netValueAddedFootprint.getIndicator(indic).value || 0.0, "#616161"],
+      ["Branche", valueAddedSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
+      ["France", valueAddedAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
+    ]
+    
+    const dataConsumption = [
+      ["", "title", { role: "style" }],
+      ["Situation", intermediateConsumptionFootprint.getIndicator(indic).value || 0.0, "#616161"],
+      ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
+    ]
+    
+    const unit = metaIndicators[indic].unit;
+    const viewWindow = viewsForIndic[indic];
+    return (
+      <div>
+        <div className="chart-container" align="center">
+          <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
+          <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>
+          <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/>
+        </div>
   
-  const viewWindow = viewsForIndic[indic];
-  return (
-    <div className="chart-container" align="center">
-      <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>
-      <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/>
-      <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
-    </div>)
+        <table>
+          <thead>
+            <tr>
+              <td className="auto" colSpan="1">Agrégat</td>
+              {/*<td className="column_value" colSpan="2">Exercice précédent</td>*/}
+              <td className="column_value" colSpan="2">Unité légale</td>
+              <td className="column_value" colSpan="2">Branche</td>
+              <td className="column_value" colSpan="2">France</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Production</td>
+              <td className="short right">{printValue(productionFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="short right">{printValue(productionSectorFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="short right">{printValue(productionAreaFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+            </tr>
+            <tr>
+              <td>Consommations intermédiaires</td>
+              <td className="short right">{printValue(intermediateConsumptionFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="short right">{printValue(consumptionSectorFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="short right">{printValue(null,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+            </tr>
+            <tr>
+              <td>Valeur ajoutée</td>
+              <td className="short right">{printValue(netValueAddedFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="short right">{printValue(valueAddedSectorFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="short right">{printValue(valueAddedAreaFootprint.getIndicator(indic).value,1)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>)
+  }
+  
 }
 
 function ColumnChart({title, data, viewWindow}) {
