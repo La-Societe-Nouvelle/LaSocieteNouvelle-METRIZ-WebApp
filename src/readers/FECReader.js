@@ -5,7 +5,7 @@
 // Labels OR Codes
 // ...to move to a separate file
 const journalANouveauxLabels = ['A NOUVEAUX','A NOUVEAU']; 
-const journalANouveauxCodes = ['AN'];
+const journalANouveauxCodes = ['AN','RAN','AA','AD'];
 
 const journalAchatsLabels = ['ACHATS','BANQUE']; 
 const journalAchatsCodes = ['HA'];
