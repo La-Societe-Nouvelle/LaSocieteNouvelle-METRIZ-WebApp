@@ -136,7 +136,7 @@ async function readBookAsJournalANouveaux(data,book)
     if (ecriture.CompteNum.substring(0,2)=="33"
           || ecriture.CompteNum.substring(0,2)=="34"
           || ecriture.CompteNum.substring(0,2)=="35") {
-      data.stockInitProduction+= parseFloat(ecriture.Debit);
+      data.stockInitProduction+= parseAmount(ecriture.Debit);
     }
 
     // Stock Purchases
@@ -146,7 +146,7 @@ async function readBookAsJournalANouveaux(data,book)
       let initialStockData = {
         account: ecriture.CompteNum,
         label: ecriture.CompteLib,
-        amount: parseFloat(ecriture.Debit)
+        amount: parseAmount(ecriture.Debit)
       }
       data.initialStocks.push(initialStockData);
     }
@@ -157,7 +157,7 @@ async function readBookAsJournalANouveaux(data,book)
       let immobilisationData = {
         account: ecriture.CompteNum,
         label: ecriture.CompteLib,
-        amount: parseFloat(ecriture.Debit)
+        amount: parseAmount(ecriture.Debit)
       }
       data.immobilisations.push(immobilisationData);
     }
@@ -166,7 +166,7 @@ async function readBookAsJournalANouveaux(data,book)
     if (ecriture.CompteNum.substring(0,2)=="28") {
       let depreciationData = {
         account: ecriture.CompteNum,
-        amount: parseFloat(ecriture.Credit)
+        amount: parseAmount(ecriture.Credit)
       }
       data.depreciationsInit.push(depreciationData);
     }
@@ -180,9 +180,9 @@ async function readBookAsJournalVentes(data,book)
 
     // Revenus
     if (ecriture.CompteNum.substring(0,2)=="70" && ecriture.CompteNum.substring(0,3)!="709") {
-      data.revenue+= parseFloat(ecriture.Credit);
+      data.revenue+= parseAmount(ecriture.Credit);
     } else if (ecriture.CompteNum.substring(0,3)=="709") {
-      data.revenue-= parseFloat(ecriture.Debit);
+      data.revenue-= parseAmount(ecriture.Debit);
     }
   })
 }
@@ -201,12 +201,12 @@ async function readBookAsJournalAchats(data,book)
 
       let ecritureAux = book.filter(ecritureAux => ecritureAux.EcritureNum==ecriture.EcritureNum & ecritureAux.CompteNum.substring(0,2)=="40")[0] || "";
       if (data.accounts[ecritureAux.CompAuxNum]==undefined) data.accounts[ecritureAux.CompAuxNum] = (ecritureAux.CompAuxLib || "").replace(/ *$/,"").replace(/^\"/,"").replace(/\"$/,"");
-
+      
       let expenseData = {
         label: ecriture.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         account: ecriture.CompteNum,
         accountProvider: ecritureAux.CompAuxNum,
-        amount: parseFloat(ecriture.Debit),
+        amount: parseAmount(ecriture.Debit),
       }
       data.expenses.push(expenseData);
     }
@@ -223,7 +223,7 @@ async function readBookAsJournalAchats(data,book)
         label: ecriture.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         account: ecriture.CompteNum,
         accountProvider: ecritureAux.CompAuxNum,
-        amount: parseFloat(ecriture.Credit),
+        amount: parseAmount(ecriture.Credit),
       }
       data.purchasesDiscounts.push(expenseData);
     }
@@ -241,7 +241,7 @@ async function readBookAsJournalAchats(data,book)
         label: ecriture.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         account: ecriture.CompteNum,
         accountProvider: ecritureAux.CompAuxNum,
-        amount: parseFloat(ecriture.Debit),
+        amount: parseAmount(ecriture.Debit),
       }
       data.investments.push(investmentData);
     }
@@ -255,13 +255,13 @@ async function readBookAsJournalOperationsDiverses(data,book)
     
     // Stored/Unstored Production
     if (ecriture.CompteNum.substring(0,2)=="71") {
-      data.storedProduction+= parseFloat(ecriture.Credit);
-      data.unstoredProduction+= parseFloat(ecriture.Debit);
+      data.storedProduction+= parseAmount(ecriture.Credit);
+      data.unstoredProduction+= parseAmount(ecriture.Debit);
     }
 
     // Immobilised Production
     if (ecriture.CompteNum.substring(0,2)=="72") {
-      data.immobilisedProduction+= parseFloat(ecriture.Credit);
+      data.immobilisedProduction+= parseAmount(ecriture.Credit);
     }
     
     // Stored/Unstored Purchases
@@ -273,12 +273,12 @@ async function readBookAsJournalOperationsDiverses(data,book)
 
       let stockAccount = data.stocksVariations.filter(stock => stock.account == ecriture.CompteNum)[0];
       if (stockAccount!=undefined) {
-        stockAccount.amount+= parseFloat(ecriture.Debit)-parseFloat(ecriture.Credit);
+        stockAccount.amount+= parseAmount(ecriture.Debit)-parseAmount(ecriture.Credit);
       } else {
         let stockAccount = {
           label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
           account: ecriture.CompteNum,
-          amount: parseFloat(ecriture.Debit)-parseFloat(ecriture.Credit),
+          amount: parseAmount(ecriture.Debit)-parseAmount(ecriture.Credit),
         }
         data.stocksVariations.push(stockAccount);
       }
@@ -289,17 +289,21 @@ async function readBookAsJournalOperationsDiverses(data,book)
     {
       let depreciation = data.depreciations.filter(depreciation => depreciation.account == ecriture.CompteNum)[0];
       if (depreciation != undefined) {
-        depreciation.amount+= parseFloat(ecriture.Credit) - parseFloat(ecriture.Debit);
+        depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
       } else {
         let depreciationData = {
           label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
           account: ecriture.CompteNum,
-          amount: parseFloat(ecriture.Credit)+parseFloat(ecriture.Debit),
+          amount: parseAmount(ecriture.Credit)+parseAmount(ecriture.Debit),
         }
         data.depreciations.push(depreciationData);
       }
     }
   })
+}
+
+function parseAmount(stringAmount) {
+  return parseFloat(stringAmount.replace(',','.'))
 }
 
 export {FECFileReader, processFECData};
