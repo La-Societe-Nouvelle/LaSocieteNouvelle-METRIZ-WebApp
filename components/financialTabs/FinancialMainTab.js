@@ -35,7 +35,7 @@ export function FinancialMainTab(props)
         <h3>Soldes intermédiaires de gestion</h3>
         <div className="actions">
           <button onClick={() => {document.getElementById('import-fec').click()}}>Importer un fichier FEC</button>
-          <input className="hidden" id="import-fec" type="file" accept=".csv" onChange={importFECFile} visibility="collapse"/>
+          <input className="hidden" id="import-fec" type="file" accept=".csv,.txt" onChange={importFECFile} visibility="collapse"/>
         </div>
         <TableMain
           ref={refTableMain}
