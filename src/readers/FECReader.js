@@ -74,6 +74,7 @@ async function readFECFileRow(columns,row) {
 async function processFECData(FECData)
 // ...extract data to use in session
 {
+  //console.log(FECData);
   let data = {};
 
   data.revenue = 0;
@@ -95,26 +96,30 @@ async function processFECData(FECData)
 
   // scan each book
   await Object.entries(FECData.meta.books).forEach(([bookCode,bookLib]) => 
- {
+ {  
     // ~ A Nouveaux
     if (journalANouveauxCodes.includes(bookCode) || journalANouveauxLabels.includes(bookLib.toUpperCase())) { 
       readBookAsJournalANouveaux(data, FECData.books[bookCode])
     }
 
-    // ~ Ventes
-    if (journalVentesCodes.includes(bookCode) || journalVentesLabels.includes(bookLib.toUpperCase())) { 
-      readBookAsJournalVentes(data, FECData.books[bookCode])
+    else 
+    {
+      // ~ Ventes
+      //if (journalVentesCodes.includes(bookCode) || journalVentesLabels.includes(bookLib.toUpperCase())) { 
+        readBookAsJournalVentes(data, FECData.books[bookCode]);
+      //}
+  
+      // ~ Achats
+      //if (journalAchatsCodes.includes(bookCode) || journalAchatsLabels.includes(bookLib.toUpperCase())) { 
+        readBookAsJournalAchats(data, FECData.books[bookCode]);
+      //}
+  
+      // ~ Operations Diverses
+      //if (journalDotationsCodes.includes(bookCode) || journalDotationsLabels.includes(bookLib.toUpperCase())) { 
+        readBookAsJournalOperationsDiverses(data, FECData.books[bookCode]);
+      //}
     }
 
-    // ~ Achats
-    if (journalAchatsCodes.includes(bookCode) || journalAchatsLabels.includes(bookLib.toUpperCase())) { 
-      readBookAsJournalAchats(data, FECData.books[bookCode])
-    }
-
-    // ~ Operations Diverses
-    if (journalDotationsCodes.includes(bookCode) || journalDotationsLabels.includes(bookLib.toUpperCase())) { 
-      readBookAsJournalOperationsDiverses(data, FECData.books[bookCode])
-    }
   })
 
   return data;
