@@ -10,7 +10,7 @@ L'identification des journaux s'effectue via le code et/ou le libellé du journa
 
 | Journal | Code(s) reconnu(s) | Libellé(s) recconu(s) |
 | ------- | ------------------ | --------------------- |
-| A-Nouveaux | AN | "A NOUVEAUX","A NOUVEAU" |
+| A-Nouveaux | AN, RAN, AA, AD | "A NOUVEAUX","A NOUVEAU" |
 | Ventes | VE, VT | "VENTES" |
 | Achats | HA | "ACHATS", "BANQUE" |
 | Opérations diverses | OD, ODA, INV | |
