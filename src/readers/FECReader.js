@@ -63,7 +63,9 @@ async function FECFileReader(content)
 async function readFECFileRow(columns,row) {
   let rowData = {}
   Object.entries(columns).forEach(([column,index]) => {
-    rowData[column] = row[index];
+    rowData[column] = row[index].replace(/^\"/,"")      // remove quote at the beginning
+                                .replace(/\"$/,"")      // remove quote at the end
+                                .replace(/ *$/,"");     // remove spaces at the end
   })
   return rowData;
 }
