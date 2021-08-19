@@ -39,18 +39,20 @@ async function FECFileReader(content)
   await rows.forEach(async (rowString) => {
     if (rowString!="")
     {
-      // read row
+      // split row
       let row = rowString.split("\t");
+      
+      // read row
       let rowData = await readFECFileRow(columns,row);
-      // clean journal code & lib
-      rowData.JournalCode = rowData.JournalCode.replace(/^\"/,"").replace(/\"$/,"").replace(/ *$/,"");
-      rowData.JournalLib = rowData.JournalLib.replace(/^\"/,"").replace(/\"$/,"").replace(/ *$/,"");
+
       // update meta books
-      if (dataFEC.meta.books[rowData.JournalCode]==undefined) {
+      if (dataFEC.meta.books[rowData.JournalCode]==undefined) 
+      {
         dataFEC.meta.books[rowData.JournalCode] = rowData.JournalLib;
         dataFEC.books[rowData.JournalCode] = [];
       }
-      // add row to JSON
+
+      // push
       dataFEC.books[rowData.JournalCode].push(rowData);
     }
   })
