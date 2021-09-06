@@ -1,5 +1,5 @@
 import React from 'react';
-import { valueOrDefault } from '../../src/utils/Utils';
+import { printValue, valueOrDefault } from '../../src/utils/Utils';
 export class StatementART extends React.Component {
 
   constructor(props) {
@@ -43,7 +43,7 @@ export class StatementART extends React.Component {
         <div className="statement-item">
           <label>Part de la valeur ajoutée artisanale</label>
           <input className="input-value"
-                 value={craftedProduction} 
+                 value={printValue(craftedProduction,0)} 
                  onChange={this.oncraftedProductionChange}
                  onBlur={this.oncraftedProductionBlur}
                  disabled={isValueAddedCrafted!=null}

@@ -21,8 +21,11 @@ export class FinancialDataSection extends React.Component {
     }
   }
     
-  render() {
+  render() 
+  {
+    const {session} = this.props;
     const {selectedTab} = this.state;
+
     return (
       <div className="section-view">
         <div className="section-view-header">
@@ -30,53 +33,42 @@ export class FinancialDataSection extends React.Component {
         </div>
         <SectionMenu selected={selectedTab} changeTab={this.onChangeTab.bind(this)}/>
         <div className="tab-view">
-          { this.buildTabView() }
+          <SectionView selectedView={selectedTab}
+                       financialData={session.getFinancialData()}
+                       changeTab={this.onChangeTab.bind(this)}
+                       onUpdate={this.updateFootprints.bind(this)}
+                       didUpdate={() => session.updateRevenueFootprint()}
+                       loadKNWData={this.loadKNWData.bind(this)}/>
         </div>
       </div>
     )
   }
+  
+  /* ----- SELECTED TAB ----- */
+  
+  onChangeTab = (nextTab) => this.setState({selectedTab: nextTab})
+    
+  /* ----- UPDATES ----- */
 
-  /* ---------- TABLE BUILDERS ---------- */
+  updateFootprints = () => this.props.session.updateRevenueFootprint();
 
-  // Build selected tab
-  buildTabView() 
+  /* ----- OTHER METHODS ----- */
+
+  loadKNWData = ({apprenticeshipTax,vocationalTrainingTax}) => 
   {
-    const tabProps = {
-      financialData: this.props.session.getFinancialData(), 
-      changeTab: this.onChangeTab.bind(this),
-      onUpdate: this.updateFootprints.bind(this),
-      didUpdate: () => this.props.session.updateRevenueFootprint(),
-    }
-    switch(this.state.selectedTab) 
-    {
-      case "main" :           return(<FinancialMainTab {...tabProps}/>)
-      case "expenses" :       return(<FinancialExpensesTab {...tabProps}/>)
-      case "depreciations" :  return(<FinancialDepreciationsTab {...tabProps}/>)
-      case "companies" :      return(<CompaniesTab {...tabProps}/>)
-    }
-  }
-
-  /* ----- SAVE CHANGES ----- */
-
-  onChangeTab(nextTab) {
-    this.setState({selectedTab: nextTab})
-  }
-
-  /* ----- SAVE CHANGES ----- */
-
-  updateFinancialData(financialData) {
-    this.props.session.updateFinancialData(financialData);
-  }
-
-  updateFootprints = () => {
-    this.props.session.updateRevenueFootprint();
+    this.props.session.impactsData.knwDetails.apprenticeshipTax = apprenticeshipTax;
+    this.props.session.impactsData.knwDetails.vocationalTrainingTax = vocationalTrainingTax;
+    this.props.session.updateRevenueIndicFootprint("knw");
   }
 
 }
 
-/* ---------- SECTION MENU ---------- */ // Controls the displayed tab
+/* ---------- SECTION MENU ---------- */ 
 
-function SectionMenu({selected, changeTab}){
+// Controls the displayed tab
+
+function SectionMenu({selected, changeTab}) 
+{
   return (
     <div className="financial-section-menu">
       <div className="financial-section-menu-items">
@@ -92,11 +84,21 @@ function SectionMenu({selected, changeTab}){
                 onClick = {() => changeTab("depreciations")}>
           Immobilisations
         </button>
-        <button className={"menu-button"+("companies"==selected ? " selected" : "")}
-                onClick = {() => changeTab("companies")}>
-          Fournisseurs
-        </button>
       </div>
     </div>
   );
+}
+
+/* ---------- SECTION VIEW ---------- */
+
+// Displays the selected tab
+
+function SectionView(viewProps) 
+{
+  switch(viewProps.selectedView) 
+  {
+    case "main" :           return(<FinancialMainTab {...viewProps}/>)
+    case "expenses" :       return(<FinancialExpensesTab {...viewProps}/>)
+    case "depreciations" :  return(<FinancialDepreciationsTab {...viewProps}/>)
+  }
 }

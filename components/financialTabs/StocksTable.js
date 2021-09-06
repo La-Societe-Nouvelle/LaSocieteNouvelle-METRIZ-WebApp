@@ -48,7 +48,6 @@ export class TableStocks extends React.Component {
               <thead>
                 <tr>
                   <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-                  <td className="auto">Empreinte sociétale</td>
                   <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
                   <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
                   <td colSpan="2"></td></tr>
@@ -141,7 +140,6 @@ function StockRow(props)
   return (
     <tr>
       <td className="auto">{label}</td>
-      <td className="long">{prevFootprint ? "Reprise de l'exerice précédent" : "Estimation à partir de l'exercice courant"}</td>
       <td className="short center">{account}</td>
       <td className="short right">{printValue(amount,0)}</td>
       <td className="column_unit">&nbsp;€</td>

@@ -5,10 +5,19 @@ const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
 export class Company {
 
-  constructor({id,account,corporateId,corporateName,
-               legalUnitName,legalUnitAreaCode,legalUnitActivityCode,
-               footprintId,footprintAreaCode,footprintActivityCode,dataFetched,
-               footprint}) 
+  constructor({id,
+               account,
+               corporateId,
+               corporateName,
+               legalUnitName,
+               legalUnitAreaCode,
+               legalUnitActivityCode,
+               footprintId,
+               footprintAreaCode,
+               footprintActivityCode,
+               dataFetched,
+               footprint,
+               lastUpdateFromRemote})
   {    
     // Id
     this.id = id;
@@ -17,10 +26,12 @@ export class Company {
     this.account = account || null;
     this.corporateId = corporateId || null;
     this.corporateName = corporateName || "";
+
     // Legal data
     this.legalUnitName = legalUnitName || null;
     this.legalUnitAreaCode = legalUnitAreaCode || null;
     this.legalUnitActivityCode = legalUnitActivityCode || null;
+
     // Footrpint data
     this.dataFetched = valueOrDefault(dataFetched,null);
     this.footprintId = footprintId || this.getDefaultFootprintId();
@@ -32,10 +43,14 @@ export class Company {
 
     // Social footprint
     this.footprint = new SocialFootprint({...footprint});
+
+    // Updates
+    this.lastUpdateFromRemote = lastUpdateFromRemote || null;
   }
 
   // init area code
-  getDefaultFootprintAreaCode() {
+  getDefaultFootprintAreaCode() 
+  {
     if (this.corporateId==null) {return "WLD"}
     // SIREN
     if (this.corporateId.match(/[0-9]{9}/)) {return "FRA"}
@@ -45,7 +60,8 @@ export class Company {
   }
 
   // init footrpint id
-  getDefaultFootprintId() {
+  getDefaultFootprintId() 
+  {
     if (this.corporateId==null) {return null}
     // SIREN
     if (this.corporateId.match("[0-9]{9}")) {return this.corporateId}
@@ -64,7 +80,8 @@ export class Company {
   async update(props) 
   {
     // Update
-    if (props.corporateName!=undefined)         this.corporateName = props.corporateName;
+    if (props.corporateName!=undefined) this.corporateName = props.corporateName;
+
     // update from remote if id changes
     if (props.corporateId!=undefined && props.corporateId!=this.corporateId) 
     {
@@ -72,6 +89,7 @@ export class Company {
       this.footprintId = this.getDefaultFootprintId();
       await this.updateFromRemote();
     }
+
     // update from remote if footprint data change
     if ( (props.footprintAreaCode!=undefined && props.footprintAreaCode!=this.footprintAreaCode)
       || (props.footprintActivityCode!=undefined && props.footprintActivityCode!=this.footprintActivityCode)) 
@@ -93,7 +111,16 @@ export class Company {
 
   async updateFromRemote() 
   {
+    const today = new Date();
+    const lastUpdateFromRemote = String(today.getDate()).padStart(2, '0') + '-'
+                               + String(today.getMonth()+1).padStart(2, '0') +'-'
+                               + today.getFullYear() + ' '
+                               + today.getHours() + ':'
+                               + today.getMinutes();
+ 
     if (this.footprintId==null) this.footprintId = this.getDefaultFootprintId();
+
+    // Case - Fetch footprint with id
     if (this.footprintId!=null) 
     {
       let data = await this.fetchData();
@@ -114,6 +141,8 @@ export class Company {
         this.footprint.activityCode = data.descriptionUniteLegale.activitePrincipale;
         // update footprint values
         this.footprint.updateAll(data.empreinteSocietale);
+        // date of the update
+        this.lastUpdateFromRemote = lastUpdateFromRemote;
       } 
       else {
         this.dataFetched = false;
@@ -121,6 +150,7 @@ export class Company {
         await this.updateFromRemote();
       }
     }
+    // Case - Fetch default data
     else
     {
       let data = await this.fetchDefaultData();
@@ -142,6 +172,8 @@ export class Company {
         this.footprint.activityCode = data.activityCode;
         // update footprint values
         this.footprint.updateAll(data.empreinteSocietale);
+        // date of the update
+        this.lastUpdateFromRemote = lastUpdateFromRemote;
       } 
       else {
         this.footprintAreaCode = "_DV";
@@ -181,6 +213,7 @@ export class Company {
   async fetchData() 
   {
     let endpoint = apiBaseUrl + "siren/" + this.footprintId;
+    console.log(endpoint);
     let response = await fetch(endpoint, {method:'get'});
     let data = await response.json();
     if (data.header.statut == 200) {return data.profil}
@@ -191,6 +224,7 @@ export class Company {
   async fetchDefaultData() 
   {
     let endpoint = apiBaseUrl + "default?" + "pays="+this.footprintAreaCode + "&activite="+this.footprintActivityCode +"&flow=PRD";
+    console.log(endpoint);
     let response = await fetch(endpoint, {method:'get'});
     let data = await response.json();
     if (data.header.statut == 200) {return {areaCode: this.footprintAreaCode, activityCode: this.footprintActivityCode, ...data}} 

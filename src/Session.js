@@ -164,17 +164,9 @@ export class Session {
         await this.updateExpensesIndicFootprint(indic);
         await this.updateInitialStocksIndicFootprint(indic);
         await this.updateFinalStocksIndicFootprint(indic);
-        await this.updatePurchasesDiscountsIndicFootprint(indic);
 
         let indicator = this.expensesFootprint.indicators[indic];
         let amount = this.financialData.getAmountExpenses();
-        
-        // merge discounts footprint
-        if (this.financialData.purchasesDiscounts.length > 0) {
-            indicator = buildIndicatorMerge(indicator, amount,
-                                            this.purchasesDiscountsFootprint.getIndicator(indic), -this.financialData.getAmountPurchasesDiscounts())
-            amount = amount-this.financialData.getAmountPurchasesDiscounts()
-        }
 
         // merge initial stocks footprint
         if (this.financialData.initialStocks.length > 0) {
@@ -202,7 +194,7 @@ export class Session {
         {
             await this.financialData.initialStocks.forEach(stock => {
                 stock.footprint.indicators[indic] = this.getExpensesAccountIndicator(stock.accountPurchases,indic) 
-                    || this.getExpensesAccountIndicator("60") 
+                    || this.getExpensesAccountIndicator("60",indic) 
                     || this.expensesFootprint.getIndicator(indic);
             })
 
@@ -221,11 +213,18 @@ export class Session {
     {
         if (this.financialData.finalStocks.length > 0) 
         {
-            await this.financialData.finalStocks.forEach(stock => {
-                stock.footprint.indicators[indic] = this.getExpensesAccountIndicator(stock.accountPurchases,indic) 
-                    || this.getExpensesAccountIndicator("60") 
-                    || this.expensesFootprint.getIndicator(indic);
-            })
+            await Promise.all(this.financialData.finalStocks.map(async (stock) => 
+            {
+                // if expenses matching account number -> get footprint of those expenses
+                if (this.financialData.expenses.filter(expense => expense.account.substring(0,stock.accountPurchases.length)==stock.accountPurchases).length > 0) {
+                    stock.footprint.indicators[indic] = this.getExpensesAccountIndicator(stock.accountPurchases,indic);    
+                } 
+                // if not -> get expenses footprint
+                else {
+                    stock.footprint.indicators[indic] = this.expensesFootprint.getIndicator(indic);;
+                }
+                return;
+            }));
 
             let indicator = buildIndicatorAggregate(indic, this.financialData.finalStocks);
             this.finalStocksFootprint.indicators[indic] = indicator;
@@ -235,6 +234,56 @@ export class Session {
             this.finalStocksFootprint.indicators[indic].setValue(null);
             this.finalStocksFootprint.indicators[indic].setUncertainty(null);
         }
+        return;
+    }
+
+    /* ---------- REVENUE EXPENDITURES ---------- */
+    
+    async updateExpensesIndicFootprint(indic) 
+    {        
+        if (this.financialData.getAmountExpenses()!=null) 
+        {
+            // Update footprints
+            await Promise.all(this.financialData.expenses.map(async (expense) => {
+                await this.updateExpenseIndicFootprint(indic,expense);
+                return;
+            }));
+            await this.updatePurchasesDiscountsIndicFootprint(indic);
+            
+            // detailed expenditures footprint
+            let indicator = buildIndicatorAggregate(indic,this.financialData.expenses);
+            let amount = this.financialData.getAmountDetailedExpenses();
+
+            // merge discounts footprint
+            if (this.financialData.purchasesDiscounts.length > 0) {
+                indicator = buildIndicatorMerge(indicator, amount,
+                                                this.purchasesDiscountsFootprint.getIndicator(indic), -this.financialData.getAmountPurchasesDiscounts())
+                amount = amount-this.financialData.getAmountPurchasesDiscounts()
+            }
+            
+            // merge "gap" with total expenditures footprint
+            if (this.financialData.amountExpensesFixed) {
+                let gap = this.financialData.getAmountExpenses()-this.financialData.getAmountDetailedExpenses();
+                indicator = buildIndicatorMerge(indicator, amount,
+                                                                               this.legalUnit.defaultConsumptionFootprint.getIndicator(indic), gap)
+            }
+
+            this.expensesFootprint.indicators[indic] = indicator;
+        }
+        else 
+        { 
+            this.expensesFootprint.indicators[indic].setValue(null);
+            this.expensesFootprint.indicators[indic].setUncertainty(null);
+        }
+        return;
+    }
+
+    // ...update the footprint of each expense based on the footprint of the company
+    async updateExpenseIndicFootprint(indic, expense) 
+    {
+        let company = this.financialData.getCompany(expense.companyId);
+        let indicatorCompany = company.getFootprint().getIndicator(indic);
+        expense.footprint.indicators[indic] = indicatorCompany;
         return;
     }
 
@@ -266,44 +315,6 @@ export class Session {
         let company = this.financialData.getCompany(discount.companyId);
         let indicatorCompany = company.getFootprint().getIndicator(indic);
         discount.footprint.indicators[indic] = indicatorCompany;
-        return;
-    }
-
-    /* ---------- REVENUE EXPENDITURES ---------- */
-    
-    async updateExpensesIndicFootprint(indic) 
-    {
-        if (this.financialData.getAmountExpenses()!=null) 
-        {
-            await Promise.all(this.financialData.expenses.map(async (expense) => {
-                await this.updateExpenseIndicFootprint(indic,expense);
-                return;
-            }));
-            
-            let indicatorDetailedExpenses = buildIndicatorAggregate(indic,this.financialData.expenses);
-            
-            if (this.financialData.amountExpensesFixed) {
-                let gap = this.financialData.getAmountExpenses()-this.financialData.getAmountDetailedExpenses();
-                this.expensesFootprint.indicators[indic] = buildIndicatorMerge(indicatorDetailedExpenses, this.financialData.getAmountDetailedExpenses(),
-                                                                               this.legalUnit.defaultConsumptionFootprint.getIndicator(indic), gap)
-            } else {
-                this.expensesFootprint.indicators[indic] = indicatorDetailedExpenses;
-            }
-        }
-        else 
-        { 
-            this.expensesFootprint.indicators[indic].setValue(null);
-            this.expensesFootprint.indicators[indic].setUncertainty(null);
-        }
-        return;
-    }
-
-    // ...update the footprint of each expense based on the footprint of the company
-    async updateExpenseIndicFootprint(indic, expense) 
-    {
-        let company = this.financialData.getCompany(expense.companyId);
-        let indicatorCompany = company.getFootprint().getIndicator(indic);
-        expense.footprint.indicators[indic] = indicatorCompany;
         return;
     }
     
@@ -358,23 +369,27 @@ export class Session {
     async updateDepreciationIndicFootprint(indic, depreciation) 
     {
         let immobilisation = this.financialData.getImmobilisationByAccount(depreciation.accountImmobilisation);
-        let indicatorImmobilisation = immobilisation.getFootprint().getIndicator(indic);
-        
-        let investments = this.financialData.investments.filter(investment => investment.accountImmobilisation==depreciation.accountImmobilisation);
+
+        let investments = this.financialData.investments.filter(investment => investment.account==immobilisation.account);        
+        // if investments
         if (investments.length > 0) 
         {
-            await Promise.all(investments.map(async (investment) => {
-                await this.updateInvestmentIndicFootprint(indic,investment);
-                return;
-            }));
-
-            let amountInvestments = investments.map(investment => investment.amount).reduce((a, b) => a + b, 0);
+            await Promise.all(investments.map(async (investment) => await this.updateInvestmentIndicFootprint(indic,investment)));
+            let amountInvestments = investments.map(investment => investment.amount)
+            .reduce((a, b) => a + b, 0);
             let indicatorInvestments = buildIndicatorAggregate(indic, investments);
+            
+            let indicatorImmobilisation = immobilisation.initialState=="currentFootprint" ? indicatorInvestments : immobilisation.getFootprint().getIndicator(indic);
+
             depreciation.footprint.indicators[indic] = buildIndicatorMerge(indicatorImmobilisation, immobilisation.amount,
                                                                            indicatorInvestments, amountInvestments)
-        } else {
-            depreciation.footprint.indicators[indic] = indicatorImmobilisation;
         }
+        // else
+        else
+        {
+            depreciation.footprint.indicators[indic] = immobilisation.footprint.indicators[indic];
+        }
+
         return;
     }
 
@@ -513,23 +528,15 @@ export class Session {
 
     /* ---------- ACCOUNTS ---------- */
 
-    getExpensesAccountIndicator(account,indic) {
-        
+    getExpensesAccountIndicator(accountPurchases,indic) 
+    {
         if (this.financialData.getAmountExpenses()!=null) 
         {
-            if (account!="") { // specific account
-                return buildIndicatorAggregate(indic,
-                    this.financialData.expenses.filter(expense => expense.account.substring(0,account.length)==account)
-                )
-            } else if (account=="") { // other accounts
-                return buildIndicatorAggregate(indic,
-                    this.financialData.expenses.filter(expense => expense.account == "") // change
-                )
-            } else { // other expenses
-                return this.legalUnit.defaultConsumptionFootprint.getIndicator(indic);
-            }
+            return buildIndicatorAggregate(indic,
+                this.financialData.expenses.filter(expense => expense.account.substring(0,accountPurchases.length)==accountPurchases)
+            )
         }
-        return new Indicator({indic: indic});
+        return undefined;
     }
 
     getDepreciationsAccountIndicator(account,indic) {

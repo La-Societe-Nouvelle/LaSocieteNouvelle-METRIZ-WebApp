@@ -6,18 +6,28 @@ export class InputText extends React.Component {
     super(props);
     this.state = {
       input: props.value || "",
+      valid: props.valid,
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.value!=prevProps.value) {
-      this.setState({input: this.props.value || ""})
+  componentDidUpdate(prevProps) 
+  {
+    if (this.props.value!=prevProps.value || this.props.valid!=prevProps.valid) 
+    {
+      this.setState({
+        input: this.props.value || "",
+        valid: this.props.valid
+      })
     }
   }
 
-  render() {
+  render() 
+  {
+    const {input,valid} = this.state;
+    
     return (
-      <input  value={this.state.input}
+      <input  className={valid ? " valid" : ""}
+              value={input}
               onChange={this.onChange}
               onBlur={this.onBlur}
               onKeyPress={this.onEnterPress}/>
@@ -29,7 +39,7 @@ export class InputText extends React.Component {
   }
 
   onChange = (event) => {
-    this.setState({input: event.target.value})
+    this.setState({input: event.target.value, valid: false})
   }
   
   onBlur = () => {

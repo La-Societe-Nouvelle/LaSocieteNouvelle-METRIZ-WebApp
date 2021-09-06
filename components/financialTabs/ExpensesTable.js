@@ -114,7 +114,7 @@ export class TableExpenses extends React.Component {
 
   editExpense = (id) => {this.setState({showEditor: true, expenseToEdit: this.props.financialData.getExpense(id)})}
   async addExpense(props) {await this.props.financialData.addExpense(props);this.props.onUpdate();this.forceUpdate()}
-  async updateExpense(nextProps) {await this.props.financialData.updateExpense(nextProps);this.props.onUpdate()}
+  async updateExpense(nextProps) {await this.props.financialData.updateExpense(nextProps);this.props.onUpdate();this.forceUpdate()}
   deleteExpense = (id) => {this.props.financialData.removeExpense(id);this.props.onUpdate();this.forceUpdate()}
 
 }

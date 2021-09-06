@@ -24,6 +24,9 @@ export class StatementNRG extends React.Component {
                  onBlur={this.onConsumptionBlur}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;MJ</span>
+          <div className="assessment-button-container">
+            <button className="assessment-button" onClick={this.props.toAssessment}>Outil de Mesure</button>
+          </div>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>

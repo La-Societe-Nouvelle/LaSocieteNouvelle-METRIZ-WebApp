@@ -7,7 +7,7 @@ import { SocialFootprint } from './SocialFootprint';
 
 import { metaAccounts } from '../lib/accounts.js';
 
-import { getNewId, ifCondition } from './utils/Utils';
+import { getNewId, ifCondition, valueOrDefault } from './utils/Utils';
 import { Stock } from './Stock';
 
 export class FinancialData {
@@ -143,6 +143,14 @@ export class FinancialData {
         }));
         if (FECData.depreciations.length == 0) this.setAmountDepreciations(0);
 
+        // Default initial states
+        this.immobilisations.forEach(immobilisation => {
+            immobilisation.initialState = ((this.investments.filter(investment => investment.account == immobilisation.account)).length > 0) ? "currentFootprint" : "defaultData";
+        })
+        this.initialStocks.forEach(stock => {
+            stock.initialState = ((this.expenses.filter(expense => expense.account == stock.accountPurchases)).length > 0) ? "currentFootprint" : "defaultData";
+        })
+
     }
     
     /* --------------------------------------------------------- */
@@ -172,8 +180,8 @@ export class FinancialData {
     // REVENUE EXPENDITURES
 
     getAmountIntermediateConsumption() {
-        if (this.getAmountExpenses()!=null && this.getVariationStocks()!=null && this.getAmountPurchasesDiscounts()!=null) {
-            return this.getAmountExpenses() + this.getVariationStocks() - this.getAmountPurchasesDiscounts()
+        if (this.getAmountExpenses()!=null && this.getVariationStocks()!=null) {
+            return this.getAmountExpenses() + this.getVariationStocks()
         } else {return null}
     }
 
@@ -186,14 +194,15 @@ export class FinancialData {
     getAmountFinalStocks() 
     {return ifCondition(this.finalStocks.length > 0, this.finalStocks.map(stock => stock.amount).reduce((a,b) => a + b,0))}
 
-    getAmountPurchasesDiscounts() 
-    {return ifCondition(this.purchasesDiscounts.length > 0, this.purchasesDiscounts.map(discount => discount.amount).reduce((a,b) => a + b,0))}
-
+    
     getAmountExpenses() {
         if (this.amountExpensesFixed)       {return this.amountExpenses} 
-        else return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0))
+        else return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0) - valueOrDefault(this.getAmountPurchasesDiscounts(),0))
     }
 
+    getAmountPurchasesDiscounts() 
+    {return ifCondition(this.purchasesDiscounts.length > 0, this.purchasesDiscounts.map(discount => discount.amount).reduce((a,b) => a + b,0))}
+    
     getAmountDetailedExpenses() 
     {return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0))}
 

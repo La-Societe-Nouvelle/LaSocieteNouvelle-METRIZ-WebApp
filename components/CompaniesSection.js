@@ -1,47 +1,64 @@
 import React from 'react';
 
-import { CSVFileReader, processCSVCompaniesData } from '../../src/readers/CSVReader';
-import { XLSXFileReader } from '../../src/readers/XLSXReader';
-
-// Libs
-import { divisions } from '../../lib/nace'; 
-import { areas } from '../../lib/area'; 
-import { InputText } from '../InputText';
+// Readers
+import { CSVFileReader, processCSVCompaniesData } from '../src/readers/CSVReader';
+import { XLSXFileReader } from '../src/readers/XLSXReader';
 
 // Utils
-import { printValue, valueOrDefault } from '../../src/utils/Utils';
+import { printValue, valueOrDefault } from '../src/utils/Utils';
 
-/* ------------------------------------------------------- */
-/* -------------------- COMPANIES TAB -------------------- */
-/* ------------------------------------------------------- */
+// Libs
+import { divisions } from '../lib/nace'; 
+import { areas } from '../lib/area'; 
+import { InputText } from '../components/InputText';
 
-export class CompaniesTab extends React.Component {
+/* ---------------------------------------------------------------- */
+/* -------------------- COMPANIES SECTION -------------------- */
+/* ---------------------------------------------------------------- */
+
+export class CompaniesSection extends React.Component {
 
   constructor(props) {super(props)}
-
-  render() 
+    
+  render()
   {
-    const companies = this.props.financialData.getCompanies();
+    const financialData = this.props.session.financialData;
+    const companies = financialData.getCompanies();
 
-    return(
-      <div className="financial-tab-view-inner">
+    return (
+      <div className="section-view">
+        <div className="section-view-header">
+          <h1>Fournisseurs et Comptes externes</h1>
+        </div>
 
-        <div className="group"><h3>Liste des fournisseurs</h3>
+        <div className="tab-view">
+          <div className="financial-tab-view-inner">
 
-          <div className="actions">
-            <button onClick={() => document.getElementById('import-companies').click()}>Importer un fichier CSV</button>
-              <input id="import-companies" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
-            <button onClick={() => document.getElementById('import-companies-xlsx').click()}>Importer un fichier XLSX</button>
-              <input id="import-companies-xlsx" type="file" accept=".xlsx" onChange={this.importXLSXFile} visibility="collapse"/>
-            <button onClick={() => location.href="/classeurTiers.xlsx"}>Télécharger modèle XLSX</button>
-            <button onClick={this.synchroniseAll}>Synchroniser les données</button>
+            <div className="group"><h3>Liste des fournisseurs</h3>
+
+              <div className="actions">
+                <button onClick={() => document.getElementById('import-companies').click()}>Importer un fichier CSV</button>
+                  <input id="import-companies" type="file" accept=".csv" onChange={this.importCSVFile} visibility="collapse"/>
+                <button onClick={() => document.getElementById('import-companies-xlsx').click()}>Importer un fichier XLSX</button>
+                  <input id="import-companies-xlsx" type="file" accept=".xlsx" onChange={this.importXLSXFile} visibility="collapse"/>
+                <button onClick={() => location.href="/classeurTiers.xlsx"}>Télécharger modèle XLSX</button>
+                <button onClick={this.synchroniseAll}>Synchroniser les données</button>
+              </div>
+
+              {companies.length > 0 && <TableCompanies companies={companies} financialData={financialData}/>}
+
+            </div>
           </div>
-
-          {companies.length > 0 && <TableCompanies companies={companies} {...this.props}/>}
-
         </div>
       </div>
-  )}
+    )
+  }
+      
+  /* ----- UPDATES ----- */
+
+  updateFootprints = () => this.props.session.updateRevenueFootprint();
+
+  /* ----- IMPORTS ----- */
 
   // Import CSV File
   importCSVFile = (event) => 
@@ -212,7 +229,8 @@ class TableCompanies extends React.Component {
     this.forceUpdate();
   }
 
-  async syncCompany(companyId) {
+  async syncCompany(companyId) 
+  {
     let company = this.props.financialData.getCompany(companyId);
     await company.updateFromRemote();
     this.forceUpdate();
@@ -245,7 +263,8 @@ class RowTableCompanies extends React.Component {
     if (this.props.corporateId != prevProps.corporateId
         || this.props.corporateName != prevProps.corporateName
         || this.props.footprintAreaCode != prevProps.footprintAreaCode
-        || this.props.footprintActivityCode != prevProps.footprintActivityCode) 
+        || this.props.footprintActivityCode != prevProps.footprintActivityCode
+        || this.props.dataFetched != prevProps.dataFetched) 
     {
       this.setState({
         corporateId: this.props.corporateId,

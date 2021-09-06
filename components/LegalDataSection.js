@@ -12,7 +12,10 @@ import { metaIndicators } from '../lib/indic'
 /* The base URL of the API */
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 
-// SECTION
+/* ------------------------------------------------------------ */
+/* -------------------- LEGAL DATA SECTION -------------------- */
+/* ------------------------------------------------------------ */
+
 export class LegalDataSection extends React.Component {
 
   constructor(props) {
@@ -28,6 +31,7 @@ export class LegalDataSection extends React.Component {
         <div className="section-view-header">
           <h1>Informations générales</h1>
         </div>
+
         <div className="legal_unit_main_view">
 
           <div className="group"><h3>Informations légales</h3>
@@ -38,7 +42,8 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input">
               <label>Dénomination </label>
               <input type="text" value={corporateName || ""} disabled={true}/>
-            </div><div className="inline-input">
+            </div>
+            <div className="inline-input">
               <label>Domiciliation du siège </label>
               <input type="text" value={corporateHeadquarters || ""} disabled={true}/>
             </div>
@@ -58,12 +63,15 @@ export class LegalDataSection extends React.Component {
           </div>
 
         </div>
+
       </div>
     )
   }
 
   /* --- SIREN --- */
-  async updateSiren(siren) {
+
+  async updateSiren(siren) 
+  {
     await this.props.session.legalUnit.setSiren(siren);
     this.forceUpdate();
   }

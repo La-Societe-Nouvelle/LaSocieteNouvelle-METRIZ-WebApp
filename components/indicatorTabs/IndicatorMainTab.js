@@ -29,13 +29,22 @@ import { metaIndicators } from '../../lib/indic';
 
 export class MainTab extends React.Component {
   
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.refTable = React.createRef();  
     this.refInsights = React.createRef();
   }
 
-  render() {
+  componentDidUpdate(prevProps) 
+  {
+    if (this.props.impactsData!==prevProps.impactsData) {
+      console.log("update");
+    }
+  }
+
+  render() 
+  {
     return (
       <div className="indicator-section-view">
         <div className="groups">
@@ -71,10 +80,12 @@ export class MainTab extends React.Component {
 /* ---------- ASSESSMENT GROUP ---------- */
 
 // Display the correct assessment view according to the indicator
-function Statement(props) {
+function Statement(props) 
+{
   let statementProps = {
     impactsData: props.session.impactsData,
     onUpdate: props.onUpdate,
+    toAssessment: () => props.onPrintDetails("assessment"),
   }
   switch(props.indic) {
     case "art" : return(<StatementART {...statementProps}/>)
@@ -109,11 +120,6 @@ class TableMain extends React.Component {
     const unit = metaIndicators[indic].unit;
     const unitAbsolute = metaIndicators[indic].unitAbsolute;
     const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
-
-    console.log(session.getNetValueAddedFootprint().getIndicator(indic).indic)
-    console.log(session.getNetValueAddedFootprint().getIndicator(indic).getValueAbsolute(1));
-    console.log(financialData.getNetValueAdded())
-    console.log(session.getNetValueAddedFootprint().getIndicator(indic).getValueAbsolute(financialData.getNetValueAdded()))
   
     return (
       <table>
@@ -208,18 +214,6 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_value">{printValue(session.getInitialStocksFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountInitialStocks()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
-          {financialData.purchasesDiscounts.length > 0 &&
-            <tr>
-              <td>Rabais, remises, ristournes</td>
-              <td className="column_value">({printValue(financialData.getAmountPurchasesDiscounts(),0)})</td>
-              <td className="column_unit">&nbsp;€</td>
-              <td className="column_value">{printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
-              <td className="column_unit">&nbsp;{unit}</td>
-              <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-              {impactAbsolu ? <td className="column_value">({printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountPurchasesDiscounts()),nbDecimals)})</td> : null}
-              {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-          </tr>
-          }
           <tr>
             <td>Charges externes</td>
             <td className="column_value">{printValue(financialData.getAmountExpenses(),0)}</td>
@@ -231,21 +225,33 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           {
-              Object.entries(financialData.getExpensesAccounts()).map(([num,account]) => {
-                const indicator = session.getExpensesAccountIndicator(num,indic);
-                return(
-                <tr key={num}>
-                  <td>&emsp;{account.label}</td>
-                  <td className="column_value">{printValue(account.amount,0)}</td>
-                  <td className="column_unit">&nbsp;€</td>
-                  <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
-                  <td className="column_unit">&nbsp;{unit}</td>
-                  <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-                  {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(account.amount),nbDecimals)}</td> : null}
-                  {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-                </tr>
-              )})
-            }
+            Object.entries(financialData.getExpensesAccounts()).map(([num,account]) => {
+              const indicator = session.getExpensesAccountIndicator(num,indic);
+              return(
+              <tr key={num}>
+                <td>&emsp;{account.label}</td>
+                <td className="column_value">{printValue(account.amount,0)}</td>
+                <td className="column_unit">&nbsp;€</td>
+                <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
+                <td className="column_unit">&nbsp;{unit}</td>
+                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
+                {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(account.amount),nbDecimals)}</td> : null}
+                {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+              </tr>
+            )})
+          }
+          {financialData.purchasesDiscounts.length > 0 &&
+            <tr>
+              <td>&emsp;Rabais, remises, ristournes</td>
+              <td className="column_value">({printValue(financialData.getAmountPurchasesDiscounts(),0)})</td>
+              <td className="column_unit">&nbsp;€</td>
+              <td className="column_value">{printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+              <td className="column_unit">&nbsp;{unit}</td>
+              <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+              {impactAbsolu ? <td className="column_value">({printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountPurchasesDiscounts()),nbDecimals)})</td> : null}
+              {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>
+          }
 
           <tr className="with-top-line">
             <td>Valeur ajoutée brute</td>

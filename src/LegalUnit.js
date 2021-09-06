@@ -45,8 +45,10 @@ export class LegalUnit {
 
   /* ----- SETTERS ----- */
 
-  async setSiren(siren) {
+  async setSiren(siren)
+  {
     this.siren = siren;
+    // Fetch data
     await this.fetchLegalUnitData();
     await this.fetchDefaultConsumptionFootprint();
     await this.fetchFootprintsReferences();
@@ -59,34 +61,40 @@ export class LegalUnit {
   /* ----- FETCHING DATA ----- */
 
   // Fetch legal unit data
-  async fetchLegalUnitData() {
+  async fetchLegalUnitData() 
+  {
     if (this.siren.match(/[0-9]{9}/)) 
     {
-      try{
+      try 
+      {
         const endpoint = `${apiBaseUrl}/siren/${this.siren}`;
+        console.log(endpoint);
         const response = await fetch(endpoint, {method:'get'});
         const data = await response.json();
-        if (data.header.statut===200) { // if OK, read data
+
+        if (data.header.statut===200) 
+        {
             this.corporateName = data.profil.descriptionUniteLegale.denomination;
             this.corporateHeadquarters = data.profil.descriptionUniteLegale.communeSiege + " (" + data.profil.descriptionUniteLegale.codePostalSiege + ")" ;
             this.areaCode = "FRA";
             this.activityCode = data.profil.descriptionUniteLegale.activitePrincipale;
-        } else {
+        } 
+        else 
+        {
           this.corporateName = "";
           this.corporateHeadquarters = "";
           this.areaCode = "FRA";
           this.activityCode = "00";
         }
-      } catch(error){
-        throw error;
-      }
+      } 
+      catch(error) {throw error}
     }
     else 
     {
-      this.corporateName = null;
-      this.corporateHeadquarters = null;
-      this.areaCode = null;
-      this.activityCode = null;
+      this.corporateName = "";
+      this.corporateHeadquarters = "";
+      this.areaCode = "";
+      this.activityCode = "";
     }
   }
 
@@ -96,17 +104,31 @@ export class LegalUnit {
       // Fetch default data
       let area = this.areaCode || "FRA";
       let activity = this.activityCode || "00";
-      let endpoint = apiBaseUrl + "default?" + "pays="+area + "&activite="+activity.substring(0,2) +"&flow=IC";
-      let response = await fetch(endpoint, {method:'get'});
-      let data = await response.json();
-      if (data.header.statut == 200) {
-          this.defaultConsumptionFootprint.updateAll(data.empreinteSocietale);
-      } else {
-          endpoint = apiBaseUrl + "default?pays=_DV&activite=00&flow=GAP";
-          response = await fetch(endpoint, {method:'get'});
-          data = await response.json();
-          this.defaultConsumptionFootprint.updateAll(data.empreinteSocietale);
-      }
+
+      try 
+      {
+        const endpoint = apiBaseUrl + "default?" 
+                                    + "pays="+area 
+                                    + "&activite="+activity.substring(0,2) 
+                                    + "&flow="+(activity.substring(0,2)!="00" ? "IC" : "GAP");
+        console.log(endpoint);
+        const response = await fetch(endpoint, {method:'get'});
+        let data = await response.json();
+
+        if (data.header.statut == 200) 
+        {
+            this.defaultConsumptionFootprint.updateAll(data.empreinteSocietale);
+        } 
+        else 
+        {
+            endpoint = apiBaseUrl + "default?pays=_DV&activite=00&flow=GAP";
+            console.log(endpoint);
+            response = await fetch(endpoint, {method:'get'});
+            data = await response.json();
+            this.defaultConsumptionFootprint.updateAll(data.empreinteSocietale);
+        }
+      } 
+      catch(error) {throw error}
   }
 
   // Fetch consumption CSF data
@@ -119,16 +141,19 @@ export class LegalUnit {
       if (this.activityCode!=null)
       {
         let division = this.activityCode.substring(0,2);
+        
         // Production
         endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite="+division +"&flow=PRD";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
         if (data.header.statut == 200) this.productionSectorFootprint.updateAll(data.empreinteSocietale);
+        
         // Value Added
         endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite="+division +"&flow=GDP";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
         if (data.header.statut == 200) this.valueAddedSectorFootprint.updateAll(data.empreinteSocietale);
+        
         // Intermediate Consumption
         endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite="+division +"&flow=IC";
         response = await fetch(endpoint, {method:'get'});

@@ -32,6 +32,9 @@ export class StatementDIS extends React.Component {
                    onChange={this.onHasEmployeesChange}/>
             <label>Non</label>
           </div>
+          {false && <div className="assessment-button-container">
+            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+          </div>}
         </div>
         <div className="statement-item">
           <label>Indice de GINI des taux horaires bruts</label>

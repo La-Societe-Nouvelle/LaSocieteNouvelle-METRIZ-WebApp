@@ -1,3 +1,4 @@
+// La Societe Nouvelle
 
 import React from 'react';
 

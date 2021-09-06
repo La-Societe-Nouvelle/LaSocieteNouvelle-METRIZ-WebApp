@@ -39,11 +39,13 @@ class TableExpenses extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
     const {companies} = this.props;
     const {page} = this.state;
-    console.log(companies);
+
     companies.sort((a,b) => b.getFootprint().getIndicator(this.props.indic).getValueAbsolute(b.getAmount()) - a.getFootprint().getIndicator(this.props.indic).getValueAbsolute(a.getAmount()));
+    
     return (
       <div>
         <table>

@@ -1,0 +1,25 @@
+{
+  "ANOUVEAUX": {
+    "label": "A-Nouveaux",
+    "labels": ["A NOUVEAUX","A NOUVEAU"], 
+    "codes": ["AN","RAN","AA","AD"]
+  },
+
+  "ACHATS": {
+    "label": "Achats",
+    "labels": ["ACHATS","BANQUE"],
+    "codes": ["HA"]
+  },
+
+  "VENTES": {
+    "label": "Ventes",
+    "labels": ["VENTES"],
+    "codes": ["VT","VE"]
+  },
+
+  "OPERATIONS": {
+    "label": "Opérations diverses",
+    "labels": [],
+    "codes": ["OD","ODA","INV"]
+  }
+}

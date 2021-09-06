@@ -22,6 +22,9 @@ export class StatementGHG extends React.Component {
                  onBlur={this.onEmissionsBlur}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;kgCO2e</span>
+          <div className="assessment-button-container">
+            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+          </div>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>

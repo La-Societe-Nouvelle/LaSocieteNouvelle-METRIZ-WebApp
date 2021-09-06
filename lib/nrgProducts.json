@@ -1,0 +1,834 @@
+{
+  "p1": {
+    "label": "Fioul domestique (Europe)",
+    "category": "liquide",
+    "subCategory": "Usage source fixe",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3099},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefNRG": 42.000},
+      "L": {"unit": "kgCO2e/L", "coefGHG": 2.62, "coefNRG": 35.490}
+    }
+  },
+  "p2": {
+    "label": "Fioul domestique (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usage source fixe",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3170},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefNRG": 42.000},
+      "L": {"unit": "kgCO2e/L", "coefGHG": 2.68, "coefNRG": 35.490}
+    }
+  },
+  "p3": {
+    "label": "Fioul lourd - commercial (Europe)",
+    "category": "liquide",
+    "subCategory": "Usage source fixe",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 77.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.28},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3268},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefNRG": 40.000},
+      "L": {"unit": "kgCO2e/L", "coefGHG": 2.8, "coefNRG": 36.000}
+    }
+  },
+  "p4": {
+    "label": "Fioul lourd - commercial (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usage source fixe",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 78.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.283},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3302},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.14, "coefNRG": 40.000},
+      "L": {"unit": "kgCO2e/L", "coefGHG": 2.83, "coefNRG": 36.000}
+    }
+  },
+  "p5": {
+    "label": "Combustible haute viscosité (CHV)",
+    "category": "liquide",
+    "subCategory": "Usage source fixe",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 80.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.29},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3382},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 36.000}
+    }
+  },
+  "p6": {
+    "label": "Essence - Supercarburant sans plomb (95, 95-E10, 98)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 69.2},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.254},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2907},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.2, "coefNRG": 33.220},
+      "t": {"unit": "kgCO2e/t", "coefGHG": 2907, "coefNRG": 44000}
+    }
+  },
+  "p7": {
+    "label": "Gazole routier - B7",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.6},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.254},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2968},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.49, "coefNRG": 35.490},
+      "t": {"unit": "kgCO2e/t", "coefGHG": 3338, "coefNRG": 42000}
+    }
+  },
+  "p8": {
+    "label": "Essence - E10",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 69.3},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.249},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2907},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.19, "coefNRG": 33.220},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.94, "coefNRG": 44}
+    }
+  },
+  "p9": {
+    "label": "Essence - E85",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 16.1},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.058},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 676},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 0.366, "coefNRG": 33.220},
+      "t": {"unit": "kgCO2e/t", "coefGHG": 490, "coefNRG": 44000}
+    }
+  },
+  "p10": {
+    "label": "Gazole - B30",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 54},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.195},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2270},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.88, "coefNRG": 35.490},
+      "t": {"unit": "kgCO2e/t", "coefGHG": 2512, "coefNRG": 42000}
+    }
+  },
+  "p11": {
+    "label": "GPL pour véhicule routier",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2722},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.6, "coefNRG": 24.748},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.487, "coefNRG": 46.000}
+    }
+  },
+  "p12": {
+    "label": "Gazole routier - B10",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 68.2},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.247},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2864},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.41, "coefNRG": 35.490}
+    }
+  },
+  "p13": {
+    "label": "Gazole routier - B100",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 0, "coefNRG": 35.490}
+    }
+  },
+  "p14": {
+    "label": "GNL, Gaz Naturel Liquéfié - (inclus routier, maritime et fluvial)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 52},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.187},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2186},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.69, "coefNRG": 23.064},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.58, "coefNRG": 49.6}
+    }
+  },
+  "p15": {
+    "label": "GNC, Gaz Naturel Comprimé pour véhicule routier",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 52.1},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.187},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2180},
+      "m3" : {"unit": "kgCO2e/m3", "coefGHG": 1.9, "coefNRG": 37824},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.41, "coefNRG": 48.0}
+    }
+  },
+  "p16": {
+    "label": "HFO (Heavy Fuel Oil) - ISO 8217 classes RME à RMK",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 78.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.283},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3302},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 36.000},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.14, "coefNRG": 40.0}
+    }
+  },
+  "p17": {
+    "label": "LFO (Light Fuel Oil) - ISO 8217 classes RMA à RMD (maritime)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3169},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.490},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefNRG": 42.000}
+    }
+  },
+  "p18": {
+    "label": "MDO (Marine Diesel Oil) - ISO 8217 classes DMX à DMC",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3169},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.490},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefNRG": 42.000}
+    }
+  },
+  "p19": {
+    "label": "Carbureacteur - large coupe (jet B) (Europe)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.2},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.253},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2950},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.440},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefNRG": 44.300}
+    }
+  },
+  "p20": {
+    "label": "Carbureacteur - large coupe (jet B) (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.200},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.000}
+    }
+  },
+  "p21": {
+    "label": "Essence aviation (AvGas) (Europe)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.2},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.253},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2950},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.440},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefNRG": 44.300}
+    }
+  },
+  "p22": {
+    "label": "Essence aviation (AvGas) (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.200},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.000}
+    }
+  },
+  "p23": {
+    "label": "Kérosène - jet A1 ou A (Europe)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.7},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.258},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3010},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.53, "coefNRG": 35.280},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.1}
+    }
+  },
+  "p24": {
+    "label": "Kérosène - jet A1 ou A (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.55, "coefNRG": 35.200},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.000}
+    }
+  },
+  "p25": {
+    "label": "Gazole non routier",
+    "category": "liquide",
+    "subCategory": "Usage sources mobiles",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 72.7},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.262},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3055},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.57, "coefNRG": 35.490},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.45, "coefNRG": 42.000}
+    }
+  },
+  "p26": {
+    "label": "Autres produits pétroliers",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3102}
+    }
+  },
+  "p27": {
+    "label": "Bitumes (Europe)",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 81.4},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.293},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3412}
+    }
+  },
+  "p28": {
+    "label": "Bitumes (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 81.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.295},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3432}
+    }
+  },
+  "p29": {
+    "label": "Huiles de schistes (Europe)",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.265},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3090}
+    }
+  },
+  "p30": {
+    "label": "Huiles de schistes (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.2},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.264},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3080}
+    }
+  },
+  "p31": {
+    "label": "Naphta (Europe)",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 72.0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3022}
+    }
+  },
+  "p32": {
+    "label": "Naphta (France continentale)",
+    "category": "liquide",
+    "subCategory": "Usages spéciaux",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3102}
+    }
+  },
+  "p33": {
+    "label": "Pétrole brut",
+    "category": "liquide",
+    "subCategory": "Pétrole brut",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.2},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.07, "coefNRG": 42.000}
+    }
+  },
+  "p34": {
+    "label": "Gaz naturel - 2015 - mix moyen - consommation",
+    "category": "gazeux",
+    "subCategory": "Gaz naturel",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 52.1},
+      "GJ_PCS": {"unit": "kgCO2e/GJ PCS", "coefGHG": 46.9},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.187},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.169},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2180},
+      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 1964},
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 1.82, "coefNRG": 32438}
+    }
+  },
+  "p35": {
+    "label": "Gaz naturel (Europe)",
+    "category": "gazeux",
+    "subCategory": "Gaz naturel",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 56.9},
+      "GJ_PCS": {"unit": "kgCO2e/GJ PCS", "coefGHG": 51.3},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.205},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.185},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2390},
+      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 2153}
+    }
+  },
+  "p36": {
+    "label": "Gaz naturel (France continentale, type H, sauf nord)",
+    "category": "gazeux",
+    "subCategory": "Gaz naturel",
+    "type" : "fossil",
+    "units": {
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 2.12, "coefNRG": 32438}
+    }
+  },
+  "p37": {
+    "label": "Gaz naturel (France continentale, type B, nord)",
+    "category": "gazeux",
+    "subCategory": "Gaz naturel",
+    "type" : "fossil",
+    "units": {
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 1.81, "coefNRG": 32438}
+    }
+  },
+  "p38": {
+    "label": "Gaz d'aciérie",
+    "category": "gazeux",
+    "subCategory": "Gaz industriels",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 183}
+    }
+  },
+  "p39": {
+    "label": "Gaz de cokerie",
+    "category": "gazeux",
+    "subCategory": "Gaz industriels",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 47.5}
+    }
+  },
+  "p40": {
+    "label": "Gaz de haut fourneau",
+    "category": "gazeux",
+    "subCategory": "Gaz industriels",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 268}
+    }
+  },
+  "p41": {
+    "label": "Butane - inclus maritime (Europe)",
+    "category": "gazeux",
+    "subCategory": "Propane et butane",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 63.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.23},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2682},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.76, "coefNRG": 27.671},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.02, "coefNRG": 47.300}
+    }
+  },
+  "p42": {
+    "label": "Butane - inclus maritime (France continentale)",
+    "category": "gazeux",
+    "subCategory": "Propane et butane",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2722},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.73, "coefNRG": 26.676},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.95, "coefNRG": 45.600}
+    }
+  },
+  "p43": {
+    "label": "Propane - inclus maritime (Europe)",
+    "category": "gazeux",
+    "subCategory": "Propane et butane",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 63.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.23},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2682},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.55, "coefNRG": 24.360},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.02, "coefNRG": 47.300}
+    }
+  },
+  "p44": {
+    "label": "Propane - inclus maritime (France continentale)",
+    "category": "gazeux",
+    "subCategory": "Propane et butane",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2722},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.53, "coefNRG": 23.690},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.98, "coefNRG": 46.000}
+    }
+  },
+  "p45": {
+    "label": "Agglomérés de houille",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4025},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.07, "coefNRG": 32.000}
+    }
+  },
+  "p46": {
+    "label": "Anthracite",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 98.7},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.356},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4147},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.63, "coefNRG": 26.700}
+    }
+  },
+  "p47": {
+    "label": "Briquette de lignite",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 99.2},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.357},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4172},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.69, "coefNRG": 17.000}
+    }
+  },
+  "p48": {
+    "label": "Charbon à coke - PCS supérieur à 23865 kJ/kg",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4023},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.49, "coefNRG": 26.000}
+    }
+  },
+  "p49": {
+    "label": "Charbon à vapeur - PCS supérieur à 23865 kJ/kg",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4025},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.49, "coefNRG": 26.000}
+    }
+  },
+  "p50": {
+    "label": "Charbon sous-bitumineux - PCS entre 17 435 et 23 865 kJ/kg",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 96.8},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.349},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4065},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.94, "coefNRG": 20.000}
+    }
+  },
+  "p51": {
+    "label": "Houille - PCS supérieur à 23865 kJ/kg",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 96.1},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.346},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4036},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.08, "coefNRG": 32.000}
+    }
+  },
+  "p52": {
+    "label": "Lignite - PCS inférieur à 17435 kJ/kg",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 101.0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.364},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4251},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.72, "coefNRG": 17.000}
+    }
+  },
+  "p53": {
+    "label": "Tourbe",
+    "category": "solide",
+    "subCategory": "Charbon",
+    "type" : "fossil",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 110.0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.398},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4637},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.28, "coefNRG": 11.600}
+    }
+  },
+  "p54": {
+    "label": "Bois bûche - 20% d'humidité",
+    "category": "solide",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3988}, 
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.5426, "coefNRG": 13.900}
+    }
+  },
+  "p55": {
+    "label": "Granulés bois - 8% d'humidité",
+    "category": "solide",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.476},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.7411, "coefNRG": 17.600}
+    }
+  },
+  "p56": {
+    "label": "Plaquettes forestières - 25% d'humidité",
+    "category": "solide",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3902},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.4282, "coefNRG": 13.100}
+    }
+  },
+  "p57": {
+    "label": "Sciures et chutes de scieries - 50% d'humidité",
+    "category": "solide",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.4172},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.9175, "coefNRG": 7.900}
+    }
+  },
+  "p58": {
+    "label": "Broyats de cagettes et de pallettes - 20% d'humidité",
+    "category": "solide",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3763},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.4712, "coefNRG": 14.000}
+    }
+  },
+  "p59": {
+    "label": "Paille - 10% d'humidité",
+    "category": "solide",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.33},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.39, "coefNRG": 14.000}
+    }
+  },
+  "p60": {
+    "label": "BioGNC -Biométhane comprimé - Pour véhicule routier - Mix Moyen",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 0.433},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0020},
+      "tep": {"unit":"kgCO2e/tep PCI", "coefGHG": 18.1},
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 0.016},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.02}
+    }
+  },
+  "p61": {
+    "label": "Biométhane - Injecté dans les réseau - Issu de la filière STEU",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0029},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.0026}
+    }
+  },
+  "p62": {
+    "label": "Biométhane - Injecté dans les réseaux - Mix moyen",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0.405},
+      "GJ_PCS": {"unit":"kgCO2e/GJ PCs", "coefGHG": 0.377},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0016},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.0011},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 17.5},
+      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 15.6},
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 0.0162}
+    }
+  },
+  "p63": {
+    "label": "Biopropane - à base d'huile de colza",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  },
+  "p64": {
+    "label": "Biopropane - à base d'huile de palme",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  },
+  "p65": {
+    "label": "Biopropane - à base d'huile de tournesol",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  },
+  "p67": {
+    "label": "Biopropane - à base d'huiles de cuisson",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  },
+  "p68": {
+    "label": "Biopropane - à base de distillat d'acides gras d'huile de palme comme résidu",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  },
+  "p69": {
+    "label": "Biopropane - à base de graisses animales",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  },
+  "p70": {
+    "label": "Biopropane - mix annuel 2020",
+    "category": "gaz",
+    "subCategory": "",
+    "type" : "biomass",
+    "units": {
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+    }
+  }
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { valueOrDefault } from '../../src/utils/Utils';
+import { printValueInput, valueOrDefault } from '../../src/utils/Utils';
 export class StatementKNW extends React.Component {
 
   constructor(props) {
@@ -9,18 +9,23 @@ export class StatementKNW extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
     const {researchAndTrainingContribution} = this.state;
+
     return (
       <div className="statement">
         <div className="statement-item">
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
           <input className="input-value"
-                 value={researchAndTrainingContribution} 
+                 value={printValueInput(researchAndTrainingContribution,0)} 
                  onChange={this.onContributionChange}
                  onBlur={this.onContributionBlur}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;€</span>
+          <div className="assessment-button-container">
+            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+          </div>
         </div>
       </div>
     ) 

@@ -18,15 +18,19 @@ export class ImpactsData  {
     /* --- Social Data --- */
 
     this.hasEmployees = null;
+    this.employees = [];
 
     this.indexGini = null;
     this.wageGap = null;
     this.researchAndTrainingContribution = null;
 
+    this.knwDetails = {};
+
     /* --- Environnemental Data */
 
     this.greenhousesGazEmissions = null;
     this.greenhousesGazEmissionsUncertainty = null;
+    this.ghgDetails = {};
 
     this.hazardousSubstancesConsumption = null;
     this.hazardousSubstancesConsumptionUncertainty = null;
@@ -37,6 +41,7 @@ export class ImpactsData  {
 
     this.energyConsumption = null;
     this.energyConsumptionUncertainty = null;
+    this.nrgDetails = {};
 
     this.wasteProduction = null;
     this.wasteProductionUncertainty = null;
@@ -51,24 +56,34 @@ export class ImpactsData  {
   updateFromBackUp(backUp) 
   {
     this.netValueAdded = backUp.netValueAdded;
+
     this.isAllActivitiesInFrance = backUp.isAllActivitiesInFrance;
     this.domesticProduction = backUp.domesticProduction;
     this.isValueAddedCrafted = backUp.isValueAddedCrafted;
     this.craftedProduction = backUp.craftedProduction;
     this.hasSocialPurpose = backUp.hasSocialPurpose;
     this.hasEmployees = backUp.hasEmployees;
+    this.employees = backUp.employees || [];
     this.indexGini = backUp.indexGini;
     this.wageGap = backUp.wageGap;
+
     this.researchAndTrainingContribution = backUp.researchAndTrainingContribution;
+    this.knwDetails = backUp.knwDetails || {};
+    
     this.greenhousesGazEmissions = backUp.greenhousesGazEmissions;
     this.greenhousesGazEmissionsUncertainty = backUp.greenhousesGazEmissionsUncertainty;
+    this.ghgDetails = backUp.ghgDetails || {};
+
     this.hazardousSubstancesConsumption = backUp.hazardousSubstancesConsumption;
     this.hazardousSubstancesConsumptionUncertainty = backUp.hazardousSubstancesConsumptionUncertainty;
     this.isExtractiveActivities = backUp.isExtractiveActivities;
     this.materialsExtraction = backUp.materialsExtraction;
     this.materialsExtractionUncertainty = backUp.materialsExtractionUncertainty;
+
     this.energyConsumption = backUp.energyConsumption;
     this.energyConsumptionUncertainty = backUp.energyConsumptionUncertainty;
+    this.nrgDetails = backUp.nrgDetails || {};
+
     this.wasteProduction = backUp.wasteProduction;
     this.wasteProductionUncertainty = backUp.wasteProductionUncertainty;
     this.waterConsumption = backUp.waterConsumption;

@@ -4,17 +4,24 @@ import styles from '../styles/Home.module.css'
 
 import React from 'react';
 
+// Sections
 import { LegalDataSection } from '/components/LegalDataSection.js';
-import {FinancialDataSection} from '../components/FinancialDataSection';
-import {IndicatorSection} from '../components/IndicatorSection';
+import { FinancialDataSection } from '../components/FinancialDataSection';
+import { CompaniesSection } from '../components/CompaniesSection';
+import { InitialStatesSection } from '../components/InitialStatesSection';
+import { IndicatorSection } from '../components/IndicatorSection';
 
 import {Session} from '/src/Session.js';
 
 import { metaIndicators } from '../lib/indic';
 const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 
+/* ---------------------------------------------- */
+/* -------------------- HOME -------------------- */
+/* ---------------------------------------------- */
 
-export default function Home() {
+export default function Home() 
+{
   return (
     <div className={styles.container}>
       <Head>
@@ -29,6 +36,10 @@ export default function Home() {
   )
 }
 
+/* --------------------------------------------- */
+/* -------------------- APP -------------------- */
+/* --------------------------------------------- */
+
 class Metriz extends React.Component {
 
   constructor(props) {
@@ -39,10 +50,9 @@ class Metriz extends React.Component {
     }
   }
 
-  render() {
-
-    const session = this.state.session;
-    const selectedSection = this.state.selectedSection;
+  render() 
+  {
+    const {session,selectedSection} = this.state;
 
     return (
       <div className="app-view">
@@ -65,11 +75,14 @@ class Metriz extends React.Component {
     this.setState({selectedSection: section});
   }
 
-  buildSectionView() {
+  buildSectionView() 
+  {
     switch(this.state.selectedSection)
     {
       case "legalData" : return(<LegalDataSection session={this.state.session}/>)
       case "financialData" : return(<FinancialDataSection session={this.state.session}/>)
+      case "companies" : return(<CompaniesSection session={this.state.session}/>)
+      case "initialStates" : return(<InitialStatesSection session={this.state.session}/>)
       case "art" : return(<IndicatorSection session={this.state.session} indic="art"/>)
       case "dis" : return(<IndicatorSection session={this.state.session} indic="dis"/>)
       case "eco" : return(<IndicatorSection session={this.state.session} indic="eco"/>)
@@ -122,7 +135,8 @@ class Metriz extends React.Component {
 
 }
 
-function Menu({selectedSection, changeSection, downloadSession, importSession}){
+function Menu({selectedSection, changeSection, downloadSession, importSession}) 
+{
 
   const triggerImportFile = () => {document.getElementById('import-session').click()};
   const importFile = (event) => {importSession((event.target.files)[0])}
@@ -132,11 +146,20 @@ function Menu({selectedSection, changeSection, downloadSession, importSession}){
       <h2>MENU</h2>
       <div className="menu-items">
         <div className="menu-items-group">
+
           <button className={"menu-button"+("legalData"==selectedSection ? " selected" : "")}
                   onClick = {() => changeSection("legalData")}>Unité Légale</button>
+          
           <button className={"menu-button"+("financialData"==selectedSection ? " selected" : "")}
                   onClick = {() => changeSection("financialData")} >Données financières</button>
+          
+          <button className={"menu-button"+("companies"==selectedSection ? " selected" : "")}
+                  onClick = {() => changeSection("companies")} >Fournisseurs</button>
+          
+          <button className={"menu-button"+("initialStates"==selectedSection ? " selected" : "")}
+                  onClick = {() => changeSection("initialStates")} >Etats initiaux</button>
         </div>
+
         <div className="menu-items-group">
           {
             indics.map((indic) => { return (
@@ -160,24 +183,4 @@ function Menu({selectedSection, changeSection, downloadSession, importSession}){
       </div>
     </div>
   );
-}
-
-function Section({selectedSection,session,onUpdate}) {
-  switch(selectedSection)
-  {
-    case "legalData" :      return(<LegalUnitSection      session={session}               onUpdate={onUpdate}/>)
-    case "financialData" :  return(<FinancialDataSection  session={session}               onUpdate={onUpdate}/>)
-    case "art" :            return(<IndicatorSection      session={session} indic="art"   onUpdate={onUpdate}/>)
-    case "dis" :            return(<IndicatorSection      session={session} indic="dis"   onUpdate={onUpdate}/>)
-    case "eco" :            return(<IndicatorSection      session={session} indic="eco"   onUpdate={onUpdate}/>)
-    case "geq" :            return(<IndicatorSection      session={session} indic="geq"   onUpdate={onUpdate}/>)
-    case "ghg" :            return(<IndicatorSection      session={session} indic="ghg"   onUpdate={onUpdate}/>)
-    case "haz" :            return(<IndicatorSection      session={session} indic="haz"   onUpdate={onUpdate}/>)
-    case "knw" :            return(<IndicatorSection      session={session} indic="knw"   onUpdate={onUpdate}/>)
-    case "mat" :            return(<IndicatorSection      session={session} indic="mat"   onUpdate={onUpdate}/>)
-    case "nrg" :            return(<IndicatorSection      session={session} indic="nrg"   onUpdate={onUpdate}/>)
-    case "soc" :            return(<IndicatorSection      session={session} indic="soc"   onUpdate={onUpdate}/>)
-    case "was" :            return(<IndicatorSection      session={session} indic="was"   onUpdate={onUpdate}/>)
-    case "wat" :            return(<IndicatorSection      session={session} indic="wat"   onUpdate={onUpdate}/>)
-  }
 }

@@ -5,23 +5,25 @@ export class InputNumber extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: props.value.toString() || "",
+      input: props.value!=undefined ? props.value.toString() || "" : "",
     }
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.value!=prevProps.value) {
+    if (this.props.value!==prevProps.value) {
       this.setState({input: this.props.value.toString() || ""})
     }
   }
 
-  render() {
+  render() 
+  {
     return (
       <input  value={this.state.input}
               onFocus={this.onFocus}
               onChange={this.onChange}
               onBlur={this.onBlur}
-              onKeyPress={this.onEnterPress}/>
+              onKeyPress={this.onEnterPress}
+              disabled={this.props.disabled}/>
     )
   }
 

@@ -27,7 +27,7 @@ export class FinancialDepreciationsTab extends React.Component {
           <TableDepreciations financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
           <TableInvestments financialData={financialData} onUpdate={this.updateFinancialData.bind(this)}/>
         </div>
-    </div>
+      </div>
   )}
 
   updateFinancialData() {
@@ -257,7 +257,8 @@ class DepreciationPopup extends React.Component {
 
 class TableImmobilisations extends React.Component {
   
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       columnSorted: "amount",
@@ -269,10 +270,13 @@ class TableImmobilisations extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
     const {immobilisations} = this.props.financialData;
     const {columnSorted,nbItems,page,showEditor,immobilisationToEdit} = this.state;
+    
     this.sortItems(immobilisations,columnSorted);
+
     return (
       <div className="group">
         <h3>Etat des immobilisations (début d'exercice)</h3>
@@ -280,8 +284,6 @@ class TableImmobilisations extends React.Component {
           <button onClick={() => this.triggerEditor()}>Ajouter une immobilisation</button>
           {immobilisations.length > 0 &&
             <button onClick={() => this.removeAll()}>Supprimer tout</button>}
-          {immobilisations.length > 0 &&
-            <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>}
         </div>
 
         {immobilisations.length > 0 &&
@@ -290,7 +292,6 @@ class TableImmobilisations extends React.Component {
               <thead>
                 <tr>
                   <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-                  <td className="long">Empreinte sociétale</td>
                   <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
                   <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
                   <td colSpan="2"></td></tr>
@@ -328,22 +329,6 @@ class TableImmobilisations extends React.Component {
 
   // Remove all immobilisations
   removeAll = () => {this.props.financialData.removeImmobilisations();this.forceUpdate()}
-  
-  // Synchronisation
-  async synchroniseAll() {
-    await Promise.all(this.props.financialData.immobilisations.map(async immobilisation => {
-      await this.fetchDataImmobilisation(immobilisation);
-      return;
-    }));
-    this.props.didUpdate();
-    this.forceUpdate();
-  }
-
-  async fetchDataImmobilisation(immobilisation) {
-    await immobilisation.updateFootprintFromRemote();
-    //this.props.financialData.updateImmobilisation(immobilisation);
-    //this.forceUpdate();
-  }
 
   /* ----- SORTING ----- */
 
@@ -379,27 +364,10 @@ class TableImmobilisations extends React.Component {
 
 function RowTableImmobilisations(props) 
 {
-  const {id,label,amount,account,prevFootprintLoaded,footprintActivityCode,dataFetched} = props;
-  
-  const activityCode = footprintActivityCode.substring(0,2);
-  const footprintDescription = prevFootprintLoaded ? "Reprise sur exercice précédent" : (activityCode!="00" ? "Empreinte des activités \""+divisions[activityCode]+"\"" : "Empreinte de la production française");
-
-  const onActivityCodeChange = (event) => props.onUpdate({id: id, footprintActivityCode: event.target.value})
-
+  const {id,label,amount,account} = props;
   return (
     <tr>
       <td className="auto">{label}</td>
-      {prevFootprintLoaded &&
-        <td className="long left crop"><span>{footprintDescription}</span></td>}
-      {!prevFootprintLoaded &&
-        <td className={"medium"+(dataFetched === true ? " valid" : "")}>
-        <select onChange={onActivityCodeChange} value={activityCode}>{
-          Object.entries(divisions)
-            .sort((a,b) => parseInt(a)-parseInt(b))
-            .map(([code,libelle]) => { return(
-              <option className={(activityCode && code==activityCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>
-              )})
-        }</select></td>}
       <td className="short center">{account}</td>
       <td className="short right">{printValue(amount,0)}</td>
       <td className="column_unit">&nbsp;€</td>
@@ -424,12 +392,11 @@ class ImmobilisationPopup extends React.Component {
         label: props.label || "",
         amount: props.amount || "",
         account: props.account || "",
-        footprintActivityCode: props.footprintActivityCode || "00",
       }
     }
   
     render() {
-      const {label,amount,account,footprintActivityCode} = this.state;
+      const {label,amount,account} = this.state;
       return (
         <div className="popup">
           <div className="popup-inner">
@@ -448,14 +415,6 @@ class ImmobilisationPopup extends React.Component {
                   <label>Compte </label>
                   <InputText value={account} onUpdate={this.updateAccount.bind(this)}/>
               </div>
-              <div className="inline-input long">
-                <label>Activités associées </label>
-                <select onChange={this.onActivityCodeChange} value={footprintActivityCode.substring(0,2)}>
-                  {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b)).map(([code,libelle]) => { return(
-                    <option key={code} value={code}>{code + " - " +libelle}</option>
-                  )})
-                }</select>
-              </div>
             </div>
             <div className="footer">
               <button onClick={() => this.props.onClose()}>Fermer</button>
@@ -467,7 +426,6 @@ class ImmobilisationPopup extends React.Component {
     }
     
     updateLabel = (nextLabel) => this.setState({label: nextLabel})
-    onActivityCodeChange = (event) => this.setState({footprintActivityCode: event.target.value})
     updateAccount = (nextAccount) => this.setState({account: nextAccount})  
     updateAmount = (nextAmount) => {if (nextAmount!=null) this.setState({amount: nextAmount})}
 

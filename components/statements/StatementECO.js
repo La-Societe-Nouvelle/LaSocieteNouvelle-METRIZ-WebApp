@@ -1,5 +1,5 @@
 import React from 'react';
-import { valueOrDefault } from '../../src/utils/Utils';
+import { printValue, valueOrDefault } from '../../src/utils/Utils';
 
 export class StatementECO extends React.Component {
 
@@ -44,7 +44,7 @@ export class StatementECO extends React.Component {
         <div className="statement-item">
           <label>Valeur ajoutée nette produite en France</label>
           <input className="input-value"
-                 value={domesticProduction}
+                 value={printValue(domesticProduction,0)}
                  onChange={this.onDomesticProductionChange}
                  onBlur={this.onDomesticProductionBlur}
                  disabled={isAllActivitiesInFrance!=null}

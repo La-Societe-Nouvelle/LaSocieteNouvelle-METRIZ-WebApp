@@ -5,43 +5,45 @@ import { MainTab } from './indicatorTabs/IndicatorMainTab';
 import { ExpensesTab } from './indicatorTabs/IndicatorExpensesTab';
 import { DepreciationsTab } from './indicatorTabs/IndicatorDepreciationsTab';
 
+// Assessments components
+import { AssessmentGHG } from './assessments/AssessmentGHG';
+import { AssessmentKNW } from './assessments/AssessmentKNW';
+import { AssessmentNRG } from './assessments/AssessmentNRG';
+
 // Export modules
 import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../src/Export';
 
 // Meta data
 import { metaIndicators } from '../lib/indic';
-import { ImpactsData } from '../src/ImpactsData';
+import { AssessmentDIS } from './assessments/AssessmentDIS';
 
 /* -------------------- INDICATOR SECTION -------------------- */
 export class IndicatorSection extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
-    this.state = {
-      selectedTab: "main"
-    }
+    this.state = {selectedTab: "main"}
     this.refMainTab = React.createRef();
   }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.indic!=prevProps.indic) this.setState({selectedTab: "main"})
-  }
-
-  render() {
+  
+  render() 
+  {
     const {indic} = this.props;
+
     return (
       <div className="section-view">
-        <div className="section-view-header">
-            <h1>{metaIndicators[indic].libelle}</h1>
+
+        <div className="section-view-header"><h1>{metaIndicators[indic].libelle}</h1>
           <div className="section-view-header-odds">
-            {metaIndicators[indic].odds.map((odd) => {
-              return (
-                <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
-              )})
-            }
+            {metaIndicators[indic].odds.map((odd) => 
+              <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
+            )}
           </div>
         </div>
+
         {this.buildTabView()}
+
       </div>
     )
   }
@@ -49,40 +51,26 @@ export class IndicatorSection extends React.Component {
   // Switch tab according to the selected tab
   buildTabView()
   {
-    switch(this.state.selectedTab) {
-      case "main" :           return(<MainTab {...this.props} onUpdate={this.updateImpactsData.bind(this)} ref={this.refMainTab}
-                                        onPrintDetails={this.onPrintDetails.bind(this)}/>)
-      case "expenses" :       return(<ExpensesTab {...this.props} 
-                                        onGoBack={this.goBack.bind(this)}/>)
-      case "depreciations" :  return(<DepreciationsTab {...this.props} 
-                                        onGoBack={this.goBack.bind(this)}/>)
+    const goBackToMain = () => this.setState({selectedTab: "main"})
+    const refreshDisplay = async () => {
+      await this.props.session.updateRevenueFootprint();
+      this.refMainTab.current.updateTable();
     }
-  }
+    const changeSelectedTab = (nextSelectedTab) => this.setState({selectedTab: nextSelectedTab})
 
-  // Go Back
-  goBack() {
-    this.setState({selectedTab: "main"});
-  }
-
-  didUpdate = () => this.props.session.updateRevenueFootprint()
-
-  // Update session
-  async updateImpactsData(impactsData) {
-    //await this.props.session.updateImpactsData(impactsData);
-    await this.props.session.updateRevenueFootprint();
-    this.refMainTab.current.updateTable();
-    //this.forceUpdate();
-  }
-
-  // Save changes
-  updateFinancialData(financialData) {
-    this.state.session.updateFinancialData(financialData);
-    this.props.onUpdate(this.state.session);
-  }
-
-  //
-  onPrintDetails(details) {
-    this.setState({selectedTab: details});
+    switch(this.state.selectedTab) 
+    {
+      case "main" :           return(<MainTab {...this.props} 
+                                              onUpdate={refreshDisplay.bind(this)} ref={this.refMainTab}
+                                              onPrintDetails={changeSelectedTab.bind(this)}/>)
+      case "assessment" :     return(<Assessment {...this.props}
+                                                 onUpdate={refreshDisplay.bind(this)}
+                                                 onGoBack={goBackToMain.bind(this)}/>)
+      case "expenses" :       return(<ExpensesTab {...this.props} 
+                                                  onGoBack={goBackToMain.bind(this)}/>)
+      case "depreciations" :  return(<DepreciationsTab {...this.props} 
+                                                       onGoBack={goBackToMain.bind(this)}/>)
+    }
   }
 
   // Reporting
@@ -111,4 +99,16 @@ export class IndicatorSection extends React.Component {
     link.click();
   }
 
+}
+
+function Assessment(props) 
+{
+  switch(props.indic) 
+  {
+    case "dis": return(<AssessmentDIS {...props}/>)
+    case "ghg": return(<AssessmentGHG {...props}/>)
+    case "knw": return(<AssessmentKNW {...props}/>)
+    case "nrg": return(<AssessmentNRG {...props}/>)
+    default: return(<div></div>)
+  }
 }

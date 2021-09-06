@@ -1,0 +1,122 @@
+{
+  "fos1": {
+    "type": "fossil",
+    "label": "Butane (inclus maritime)",
+    "units": {
+      "t": {"unit": "t", "coef": 47300},
+      "kg": {"unit": "kg", "coef": 47.3},
+      "m3" : {"unit": "m3", "coef": 27670.5},
+      "L" : {"unit": "L", "coef": 27.670}
+    }
+  },
+  "fos2": {
+    "type": "fossil",
+    "label": "Essence - SP95/SP98",
+    "units": {
+      "t": {"unit": "t", "coef": 43000},
+      "kg": {"unit": "kg", "coef": 43},
+      "m3" : {"unit": "m3", "coef": 32465},
+      "L" : {"unit": "L", "coef": 32.465}
+    }
+  },
+  "fos3": {
+    "type": "fossil",
+    "label": "Fioul domestique",
+    "units": {
+      "t": {"unit": "t", "coef": 42000},
+      "kg": {"unit": "kg", "coef": 42},
+      "m3" : {"unit": "m3", "coef": 35490},
+      "L" : {"unit": "L", "coef": 35.490}
+    }
+  },
+  "fos4": {
+    "type": "fossil",
+    "label": "Fioul lourd",
+    "units": {
+      "t": {"unit": "t", "coef": 40000},
+      "kg": {"unit": "kg", "coef": 40},
+      "m3" : {"unit": "m3", "coef": 36000},
+      "L" : {"unit": "L", "coef": 36.0}
+    }
+  },
+  "fos5": {
+    "type": "fossil",
+    "label": "Gaz Naturel",
+    "units": {
+      "t": {"unit": "t", "coef": 48000},
+      "kg": {"unit": "kg", "coef": 48},
+      "m3" : {"unit": "m3", "coef": 31392},
+      "L" : {"unit": "L", "coef": 31.392}
+    }
+  },
+  "fos6": {
+    "type": "fossil",
+    "label": "Gazole",
+    "units": {
+      "t": {"unit": "t", "coef": 43000},
+      "kg": {"unit": "kg", "coef": 43},
+      "m3" : {"unit": "m3", "coef": 36335},
+      "L" : {"unit": "L", "coef": 36.335}
+    }
+  },
+  "fos7": {
+    "type": "fossil",
+    "label": "GNL, Gaz Naturel Liquéfié (inclus routier, maritime et fluvial)",
+    "units": {
+      "t": {"unit": "t", "coef": 49600},
+      "kg": {"unit": "kg", "coef": 49.6}
+    }
+  },
+  "fos8": {
+    "type": "fossil",
+    "label": "GPL pour véhicule routier",
+    "units": {
+      "t": {"unit": "t", "coef": 46000},
+      "kg": {"unit": "kg", "coef": 46},
+      "m3" : {"unit": "m3", "coef": 24748},
+      "L" : {"unit": "L", "coef": 24.748}
+    }
+  },
+  "fos9": {
+    "type": "fossil",
+    "label": "Propane (inclus maritime)",
+    "units": {
+      "t": {"unit": "t", "coef": 47300},
+      "kg": {"unit": "kg", "coef": 47.3},
+      "m3" : {"unit": "m3", "coef": 24359.5},
+      "L" : {"unit": "L", "coef": 24.359}
+    }
+  },
+  "bio1": {
+    "type": "biomass",
+    "label": "Bois bûche - 20% d'humidité",
+    "units": {
+      "t": {"unit": "t", "coef": 13900},
+      "kg": {"unit": "kg", "coef": 13.9}
+    }
+  },
+  "bio2": {
+    "type": "biomass",
+    "label": "Granulés bois - 8% d'humidité",
+    "units": {
+      "t": {"unit": "t", "coef": 17600},
+      "kg": {"unit": "kg", "coef": 17.6}
+    }
+  },
+  "bio3": {
+    "type": "biomass",
+    "label": "Plaquettes forestières - 25% d'humidité",
+    "units": {
+      "t": {"unit": "t", "coef": 13100},
+      "kg": {"unit": "kg", "coef": 13.1}
+    }
+  },
+  "bio4": {
+    "type": "biomass",
+    "label": "Sciures et chutes de scieries - 50% d'humidité",
+    "units": {
+      "t": {"unit": "t", "coef": 7920},
+      "kg": {"unit": "kg", "coef": 7.92}
+    }
+  }
+}

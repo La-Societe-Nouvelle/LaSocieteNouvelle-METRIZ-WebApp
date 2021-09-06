@@ -238,6 +238,12 @@ table {
     &.locker {
       height: 13px;
     }
+
+    &.active {
+      transform: rotate(360deg);
+      transition: transform 1000ms;
+    }
+    
   }
 
   td {
@@ -245,11 +251,15 @@ table {
     padding-right: 4px;
   }
 
-  td.center {
-    text-align: center;
+  td {
+    &.center {text-align: center}
+    &.right {text-align: right}
+
+    &.right input {text-align: right}
   }
-  td.right {
-    text-align: right;
+
+  td.sub {
+    padding-left: 25px;
   }
 
   // --- COLUMNS --- //
@@ -419,11 +429,19 @@ table {
         text-align: right;
       }
     }
+
     .valid {
       input,select {
         background-color: $valid-color;
       }
     }
+
+    input,select {
+      &.valid {
+        background-color: $valid-color; 
+      }
+    }
+
     option.default-option {
       background-color: wheat;
     }
@@ -508,12 +526,21 @@ table {
       }
     }
 
+    .assessment-button-container {
+      margin-left: auto;
+
+      .assessment-button {
+        width: 150px;
+      }
+    }
+
   }
 
   .notes {
     font-size: 12px;
     font-style: italic;
   }
+
 }
 
 /* --- LEGAL UNIT VIEW --- */
