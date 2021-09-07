@@ -10,7 +10,7 @@ import React from 'react';
 import {Session} from '/src/Session.js';
 
 // Sections
-import { LegalDataSection } from '/components/LegalDataSection.js';
+import { LegalDataSection } from '/components/sections/LegalDataSection.js';
 import { FinancialDataSection } from '../components/FinancialDataSection';
 import { CompaniesSection } from '../components/CompaniesSection';
 import { InitialStatesSection } from '../components/InitialStatesSection';
