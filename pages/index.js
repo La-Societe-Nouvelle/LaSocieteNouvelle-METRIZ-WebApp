@@ -1,10 +1,11 @@
 // La Société Nouvelle
 
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+// Style
+import styles from '../styles/Home.module.css';
 
+// React / Next
 import React from 'react';
+import Head from 'next/head';
 
 // Objects
 import {Session} from '/src/Session.js';
@@ -109,7 +110,6 @@ class Metriz extends React.Component {
       // JSON -> session
       const session = new Session();
       await session.updateFromBackUp(backUp);
-      
       this.setState({
         session: session,
         selectedSection: "legalData"
