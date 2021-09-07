@@ -77,70 +77,73 @@ class Metriz extends React.Component {
     )
   }
 
-  updateSession(session) {
-    this.setState({session: session});
-  }
+  // change selected session
+  changeSection = (nextSelectedSection) => this.setState({selectedSection: nextSelectedSection})
 
-  changeSection(section) {
-    this.setState({selectedSection: section});
-  }
-
-  buildSectionView() 
+  // download session (session -> JSON data)
+  downloadSession = async () => 
   {
-    switch(this.state.selectedSection)
-    {
-      case "legalData" : return(<LegalDataSection session={this.state.session}/>)
-      case "financialData" : return(<FinancialDataSection session={this.state.session}/>)
-      case "companies" : return(<CompaniesSection session={this.state.session}/>)
-      case "initialStates" : return(<InitialStatesSection session={this.state.session}/>)
-      case "art" : return(<IndicatorSection session={this.state.session} indic="art"/>)
-      case "dis" : return(<IndicatorSection session={this.state.session} indic="dis"/>)
-      case "eco" : return(<IndicatorSection session={this.state.session} indic="eco"/>)
-      case "geq" : return(<IndicatorSection session={this.state.session} indic="geq"/>)
-      case "ghg" : return(<IndicatorSection session={this.state.session} indic="ghg"/>)
-      case "haz" : return(<IndicatorSection session={this.state.session} indic="haz"/>)
-      case "knw" : return(<IndicatorSection session={this.state.session} indic="knw"/>)
-      case "mat" : return(<IndicatorSection session={this.state.session} indic="mat"/>)
-      case "nrg" : return(<IndicatorSection session={this.state.session} indic="nrg"/>)
-      case "soc" : return(<IndicatorSection session={this.state.session} indic="soc"/>)
-      case "was" : return(<IndicatorSection session={this.state.session} indic="was"/>)
-      case "wat" : return(<IndicatorSection session={this.state.session} indic="wat"/>)
-    }
-  }
-
-  async downloadSession() {
+    // build JSON
     const session = this.state.session;
     const fileName = "svg_ese_"+session.getUniteLegale().siren; // To update
     const json = JSON.stringify(session);
+
+    // build download link & activate
     const blob = new Blob([json],{type:'application/json'});
     const href = await URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = href;
-    link.download = fileName + ".json";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+          link.href = href;
+          link.download = fileName + ".json";    
+          link.click();
   }
 
-  importSession(file) {
-    this.read(file,this.importData.bind(this));
-  }
-
-  read(file,importData) {
+  // import session (JSON data -> session)
+  importSession = (file) =>
+  {
     const reader = new FileReader();
-    reader.onload = function fileReadCompleted() {
+    reader.onload = async () => 
+    {
+      // text -> JSON
       const backUp = JSON.parse(reader.result);
-      importData(backUp);
-     };
+
+      // JSON -> session
+      const session = new Session();
+      await session.updateFromBackUp(backUp);
+      
+      this.setState({
+        session: session,
+        selectedSection: "legalData"
+      })
+    }
     reader.readAsText(file);
   }
 
-  async importData(backUp) {
-    const session = new Session();
-    await session.updateFromBackUp(backUp);
-    this.setState({
-      session: session,
-      selectedSection: "legalData"});
+  /* ----- SECTION ----- */
+
+  // ...redirect to the selected section
+  buildSectionView()
+  {
+    const {selectedSection,session} = this.state;
+
+    switch(selectedSection)
+    {
+      case "legalData" : return(<LegalDataSection session={session}/>)
+      case "financialData" : return(<FinancialDataSection session={session}/>)
+      case "companies" : return(<CompaniesSection session={session}/>)
+      case "initialStates" : return(<InitialStatesSection session={session}/>)
+      case "art" : return(<IndicatorSection session={session} indic="art"/>)
+      case "dis" : return(<IndicatorSection session={session} indic="dis"/>)
+      case "eco" : return(<IndicatorSection session={session} indic="eco"/>)
+      case "geq" : return(<IndicatorSection session={session} indic="geq"/>)
+      case "ghg" : return(<IndicatorSection session={session} indic="ghg"/>)
+      case "haz" : return(<IndicatorSection session={session} indic="haz"/>)
+      case "knw" : return(<IndicatorSection session={session} indic="knw"/>)
+      case "mat" : return(<IndicatorSection session={session} indic="mat"/>)
+      case "nrg" : return(<IndicatorSection session={session} indic="nrg"/>)
+      case "soc" : return(<IndicatorSection session={session} indic="soc"/>)
+      case "was" : return(<IndicatorSection session={session} indic="was"/>)
+      case "wat" : return(<IndicatorSection session={session} indic="wat"/>)
+    }
   }
 
 }
