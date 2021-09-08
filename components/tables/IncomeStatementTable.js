@@ -1,12 +1,14 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
 
+// Utils
 import { printValueInput, valueOrDefault } from '../../src/utils/Utils';
 
-/* -------------------------------------------------------------- */
-/* -------------------- FINANCIAL DATA TABLE -------------------- */
-/* -------------------------------------------------------------- */
+/* ---------- INCOME STATEMENT TABLE ---------- */
 
-export class FinancialDataTable extends React.Component {
+export class IncomeStatementTable extends React.Component {
 
   constructor(props) {
     super(props);
@@ -19,6 +21,22 @@ export class FinancialDataTable extends React.Component {
       unstoredProductionInput: valueOrDefault(props.financialData.getUnstoredProduction(),""),
       amountExpensesInput: valueOrDefault(props.financialData.getAmountExpenses(),""),
       amountDepreciationsInput: valueOrDefault(props.financialData.getAmountDepreciations(),""),
+    }
+  }
+
+  componentDidUpdate(prevProps) 
+  {
+    if (this.props!==prevProps)
+    {
+      this.setState({
+        productionInput: valueOrDefault(this.props.financialData.getProduction(),""),
+        revenueInput: valueOrDefault(this.props.financialData.revenue,""),
+        storedProductionInput: valueOrDefault(this.props.financialData.getStoredProduction(),""),
+        immobilisedProductionInput: valueOrDefault(this.props.financialData.getImmobilisedProduction(),""),
+        unstoredProductionInput: valueOrDefault(this.props.financialData.getUnstoredProduction(),""),
+        amountExpensesInput: valueOrDefault(this.props.financialData.getAmountExpenses(),""),
+        amountDepreciationsInput: valueOrDefault(this.props.financialData.getAmountDepreciations(),"")
+      })
     }
   }
 
