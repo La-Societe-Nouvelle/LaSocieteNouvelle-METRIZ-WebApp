@@ -86,7 +86,7 @@ class Metriz extends React.Component {
               downloadSession={this.downloadSession.bind(this)}
               importSession={this.importSession.bind(this)}/>
         <div className="section-container">
-          {this.buildSectionView()}
+          {this.buildSectionView(selectedSection)}
         </div>
       </div>
     )
@@ -135,9 +135,9 @@ class Metriz extends React.Component {
   /* ----- SECTION ----- */
 
   // ...redirect to the selected section
-  buildSectionView()
+  buildSectionView = (selectedSection) =>
   {
-    const {selectedSection,session} = this.state;
+    const {session} = this.state;
 
     switch(selectedSection)
     {
