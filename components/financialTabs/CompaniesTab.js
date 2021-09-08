@@ -288,7 +288,7 @@ class RowTableCompanies extends React.Component {
           </select></td>
         <td className="short right">{printValue(amount,0)}</td>
         <td className="column_unit">&nbsp;€</td>
-        <td className="column_resync">
+        <td className="column_icon">
           <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="refresh" 
                onClick={this.syncCompany}/></td>
       </tr>
