@@ -252,20 +252,13 @@ export class Session {
             
             // detailed expenditures footprint
             let indicator = buildIndicatorAggregate(indic,this.financialData.expenses);
-            let amount = this.financialData.getAmountDetailedExpenses();
+            let amount = this.financialData.getAmountExpenses();
 
             // merge discounts footprint
             if (this.financialData.purchasesDiscounts.length > 0) {
                 indicator = buildIndicatorMerge(indicator, amount,
                                                 this.purchasesDiscountsFootprint.getIndicator(indic), -this.financialData.getAmountPurchasesDiscounts())
                 amount = amount-this.financialData.getAmountPurchasesDiscounts()
-            }
-            
-            // merge "gap" with total expenditures footprint
-            if (this.financialData.amountExpensesFixed) {
-                let gap = this.financialData.getAmountExpenses()-this.financialData.getAmountDetailedExpenses();
-                indicator = buildIndicatorMerge(indicator, amount,
-                                                                               this.legalUnit.defaultConsumptionFootprint.getIndicator(indic), gap)
             }
 
             this.expensesFootprint.indicators[indic] = indicator;
@@ -347,15 +340,7 @@ export class Session {
                 return;
             }));
             
-            let indicatorDetailedDepreciations = buildIndicatorAggregate(indic, this.financialData.depreciations)
-            
-            if (this.financialData.amountDepreciationsFixed) {
-                let gap = this.financialData.getAmountDepreciations()-this.financialData.getAmountDetailedDepreciations();
-                this.depreciationsFootprint.indicators[indic] = buildIndicatorMerge(indicatorDetailedDepreciations, this.financialData.getAmountDetailedDepreciations(),
-                                                                                    this.legalUnit.defaultConsumptionFootprint.getIndicator(indic), gap)
-            } else {
-                this.depreciationsFootprint.indicators[indic] = indicatorDetailedDepreciations;
-            }
+            this.depreciationsFootprint.indicators[indic] = buildIndicatorAggregate(indic, this.financialData.depreciations)
         }
         else 
         { 

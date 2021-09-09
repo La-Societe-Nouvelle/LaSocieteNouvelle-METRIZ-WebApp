@@ -127,7 +127,7 @@ class RowTableExpenses extends React.Component {
         <td className="column_unit">&nbsp;{metaIndicators[this.props.indic].unit}</td>
         <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(uncertaintyInput,0)}&nbsp;%</td>
         <td className="column_libelleFlag">&nbsp;{footprint.getIndicator(this.props.indic).getLibelleFlag()}</td>
-        <td className="column_resync">
+        <td className="column_icon">
           <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={this.onSyncCompany}/></td>
       </tr>
     )

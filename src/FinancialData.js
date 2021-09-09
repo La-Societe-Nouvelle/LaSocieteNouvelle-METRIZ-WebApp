@@ -14,6 +14,8 @@ export class FinancialData {
 
     constructor() 
     {
+        this.isFinancialDataLoaded = false;
+        
         // Production
         this.revenue = null;
         this.production = null;
@@ -23,7 +25,6 @@ export class FinancialData {
 
         // Expenses
         this.amountExpenses = null;
-        this.amountExpensesFixed = false;
         this.expenses = [];
         this.initialStocks = [];
         this.finalStocks = [];
@@ -31,7 +32,6 @@ export class FinancialData {
 
         // Immobilisations
         this.amountDepreciations = null;
-        this.amountDepreciationsFixed = false;
         this.depreciations = [];
         this.immobilisations = [];
         this.investments = [];
@@ -40,7 +40,7 @@ export class FinancialData {
         this.netValueAdded = null;
 
         // Accounts
-        this.accounts = {};
+        this.labelsAccounts = {};
 
         // Companies
         this.companies = [];
@@ -60,10 +60,6 @@ export class FinancialData {
         this.amountDepreciations = backUp.amountDepreciations;
         this.netValueAdded = backUp.netValueAdded;
         
-        // Booleans
-        this.amountExpensesFixed = backUp.amountExpensesFixed;
-        this.amountDepreciationsFixed = backUp.amountDepreciationsFixed;
-
         // flows
         this.expenses = backUp.expenses.map(expense => new Expense(expense))
         this.initialStocks = backUp.initialStocks.map(initialStock => new Stock(initialStock))
@@ -74,7 +70,7 @@ export class FinancialData {
         this.investments = backUp.investments.map(investment => new Expense(investment))
         
         // Meta
-        this.accounts = backUp.accounts;
+        this.labelsAccounts = backUp.labelsAccounts;
         this.companies = backUp.companies.map(company => new Company(company))
     }
 
@@ -85,7 +81,7 @@ export class FinancialData {
     async loadFECData(FECData) 
     {
         // Accounts
-        this.accounts = FECData.accounts;
+        this.labelsAccounts = FECData.accounts;
 
         // Production
         this.setRevenue(FECData.revenue);
@@ -107,16 +103,14 @@ export class FinancialData {
 
         // Expenses
         this.removeExpenses();
-        this.amountExpensesFixed = false;
         await Promise.all(FECData.expenses.map(async (expense) => {
-            expense.companyName = this.accounts[expense.accountProvider];
+            expense.companyName = this.labelsAccounts[expense.accountProvider];
             await this.addExpense(expense);
         }));
-        if (FECData.expenses.length == 0) this.setAmountExpenses(0);
 
         this.removePurchasesDiscounts();
         await Promise.all(FECData.purchasesDiscounts.map(async (discount) => {
-            discount.companyName = this.accounts[discount.accountProvider];
+            discount.companyName = this.labelsAccounts[discount.accountProvider];
             await this.addDiscount(discount);
         }));
 
@@ -131,12 +125,11 @@ export class FinancialData {
         
         this.removeInvestments();
         await Promise.all(FECData.investments.map(async (investment) => {
-            investment.companyName = this.accounts[investment.accountProvider];
+            investment.companyName = this.labelsAccounts[investment.accountProvider];
             await this.addInvestment(investment);
         }));
         
-        this.removeDepreciations();
-        this.amountDepreciationsFixed = false;
+        this.removeDepreciations();//
         await Promise.all(FECData.depreciations.map(async (depreciation) => {
             depreciation.accountImmobilisation = "2"+depreciation.account.substring(2)+"0";
             await this.addDepreciation(depreciation);
@@ -196,26 +189,19 @@ export class FinancialData {
 
     
     getAmountExpenses() {
-        if (this.amountExpensesFixed)       {return this.amountExpenses} 
-        else return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0) - valueOrDefault(this.getAmountPurchasesDiscounts(),0))
+        return this.expenses.map(expense => expense.amount)
+                            .reduce((a,b) => a + b,0)
     }
 
     getAmountPurchasesDiscounts() 
     {return ifCondition(this.purchasesDiscounts.length > 0, this.purchasesDiscounts.map(discount => discount.amount).reduce((a,b) => a + b,0))}
     
-    getAmountDetailedExpenses() 
-    {return ifCondition(this.expenses.length > 0, this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0))}
-
     // CAPITAL EXPENDITURES
 
     getAmountDepreciations() {
-        if (this.amountDepreciationsFixed)      {return this.amountDepreciations} 
-        else if (this.depreciations.length > 0) {return this.depreciations.map(depreciation => depreciation.amount).reduce((a,b) => a + b,0)}
-        else                                    {return null}
+        return this.depreciations.map(depreciation => depreciation.amount)
+                                 .reduce((a,b) => a + b,0)
     }
-
-    getAmountDetailedDepreciations() 
-    {return ifCondition(this.depreciations.length > 0, this.depreciations.map(depreciation => depreciation.amount).reduce((a,b) => a + b,0))}
 
     /* ------------------------------------------------------ */
     /* -------------------- INTERACTIONS -------------------- */
@@ -360,18 +346,6 @@ export class FinancialData {
     /* ---------- Expenses ---------- */
     /* ------------------------------ */
 
-    /* ----- Amount ----- */
-
-    setAmountExpenses(amount) {
-        this.amountExpenses = amount >= this.getAmountDetailedExpenses() ? amount : this.getAmountDetailedExpenses();
-        this.amountExpensesFixed = this.amountExpenses!=null;
-    }
-    
-    setAmountExpensesFixed(fixed) {
-        this.amountExpensesFixed = fixed;
-        this.amountExpenses = this.getAmountExpenses();
-    }
-
     /* ----- Expense ----- */
       
     // Add new expense & return it
@@ -397,8 +371,6 @@ export class FinancialData {
         nextProps.footprint = company.footprint;
         // Update
         expense.update(nextProps);
-        // Check amount details
-        if (this.amountExpensesFixed && this.getAmountDetailedExpenses() > this.amountExpenses) this.setAmountExpensesFixed(false);
     }
     
     getExpense(id) {return this.expenses.filter(expense => expense.id==id)[0]}
@@ -498,12 +470,6 @@ export class FinancialData {
 
     setAmountDepreciations(amount) {
         this.amountDepreciations = amount >= this.getAmountDetailedDepreciations() ? amount : this.getAmountDetailedDepreciations();
-        this.amountDepreciationsFixed = this.amountDepreciations!=null;    
-    }
-
-    setAmountDepreciationsFixed(fixed) {
-        this.amountDepreciationsFixed = fixed;
-        this.amountDepreciations = this.getAmountDepreciations();
     }
 
     /* ----- Depreciation ----- */
@@ -530,8 +496,6 @@ export class FinancialData {
         nextProps.footprint = immobilisation.footprint;
         // Update depreciation
         depreciation.update(nextProps);
-        // check if amount fixed
-        if (this.amountDepreciationsFixed && this.getAmountDetailedDepreciations() > this.amountDepreciations) this.setAmountDepreciationsFixed(false);
     }
     
     getDepreciation(id) {return this.depreciations.filter(depreciation => depreciation.getId()==id)[0]}
@@ -680,11 +644,6 @@ export class FinancialData {
             if (accounts[account]==undefined) accounts[account] = {amount: 0, label: metaAccounts.accountsExpenses[account]};
             accounts[account].amount+= expense.amount;
         })
-        // add gap
-        if (this.amountExpensesFixed) {
-            if (accounts[""]==undefined) accounts[""] = {amount: 0, label: metaAccounts.accountsExpenses[""]};
-            accounts[""].amount+= this.getAmountExpenses()-this.getAmountDetailedExpenses();
-        }
         // return
         return accounts;
     }
@@ -699,11 +658,6 @@ export class FinancialData {
             if (accounts[account]==undefined) accounts[account] = {amount: 0, label: metaAccounts.accountsDepreciations[account]};
             accounts[account].amount+= depreciation.amount;
         })
-        // add gap
-        if (this.amountDepreciationsFixed) {
-            if (accounts[""]==undefined) accounts[""] = {amount: 0, label: metaAccounts.accountsDepreciations[""]};
-            accounts[""].amount+= this.getAmountDepreciations()-this.getAmountDetailedDepreciations();
-        }
         // return
         return accounts;
     }

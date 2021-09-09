@@ -31,8 +31,6 @@ export class FinancialMainTab extends React.Component {
   {
     const {financialData} = this.props;
     const {importedData} = this.state;
-
-    const {amountExpensesFixed,amountDepreciationsFixed} = financialData;
   
     return (
       <div className="tab-view">
@@ -53,12 +51,6 @@ export class FinancialMainTab extends React.Component {
                                 onUpdate={this.onUpdate}/>
 
           <div className="notes">
-            {(amountExpensesFixed || amountDepreciationsFixed) &&
-              <div className="note">
-                <p>&nbsp;<img className="img locker" src="/resources/icon_locked.jpg" alt="locked"/>
-                   &nbsp;Saisie supérieure à la somme des écritures renseignées. Cliquez sur le cadenas pour recalculer la somme totale.
-                </p>
-              </div>}
           </div>
           
         </div>
@@ -83,7 +75,7 @@ export class FinancialMainTab extends React.Component {
 
     let reader = new FileReader();
     reader.onload = async () => FECFileReader(reader.result)
-                                  .then((FECData) => this.setState({importedData: FECData}))
+                                  .then((FECData) => this.setState({importedData: FECData}));
     reader.readAsText(file);
   }
 
