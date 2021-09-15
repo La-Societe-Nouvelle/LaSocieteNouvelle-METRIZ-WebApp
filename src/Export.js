@@ -101,9 +101,9 @@ function exportIndicPDF(indic,session)
   doc.setFont("Calibri","bold");
   doc.text("Chiffre d'affaires",10,y);
   doc.setFont("Calibri","normal");
-  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(session.getAvailableProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
   doc.line(10,y+2,200,y+2);
 
@@ -146,21 +146,21 @@ function exportIndicPDF(indic,session)
   doc.setFontSize(10);
   doc.line(10,y+2,200,y+2);
 
-  if (financialData.getAmountFinalStocks() > 0) {
+  if (financialData.getAmountStocks() > 0) {
     y+=6;
     doc.text("Stockage achats",10,y);
-    doc.text(printValue(session.getFinalStocksFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+    doc.text(printValue(session.getStocksFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(session.getFinalStocksFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(session.getStocksFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   }
 
-  if (financialData.getAmountInitialStocks() > 0) {
+  if (financialData.getPrevAmountStocks() > 0) {
     y+=6;
     doc.text("Déstockage achats",10,y);
-    doc.text(printValue(session.getInitialStocksFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+    doc.text(printValue(session.getStocksPrevFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(session.getInitialStocksFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(session.getStocksPrevFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   }
 
@@ -180,7 +180,7 @@ function exportIndicPDF(indic,session)
   doc.text(printValue(session.getExpensesFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
-  Object.entries(session.financialData.getExpensesAccounts()).forEach(([num,account]) => {
+  Object.entries(session.financialData.getExpensesByAccounts()).forEach(([num,account]) => {
     let indicator = session.getExpensesAccountIndicator(num,indic);
     y+=6;
     doc.text("\t"+account.label,10,y);

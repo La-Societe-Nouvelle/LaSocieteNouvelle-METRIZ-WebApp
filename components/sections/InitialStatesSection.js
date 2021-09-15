@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Components
-import { InitialStatesTable } from './tables/InitialStatesTable'
+import { InitialStatesTable } from '/components/tables/InitialStatesTable'
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -17,7 +17,7 @@ export class InitialStatesSection extends React.Component {
     super(props);
     this.state =
     {
-      financialData: this.props.session.financialData
+      financialData: props.session.financialData
     }
   }
     
@@ -34,7 +34,7 @@ export class InitialStatesSection extends React.Component {
         <div className="section-view-main">
           <div className="groups">
 
-            <div className="group"><h3>Comptes</h3>
+            <div className="group"><h3>Comptes de Stocks et d'Immobilisations</h3>
 
               <div className="actions">
                 {financialData.immobilisations.length > 0 && <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>}
@@ -56,13 +56,20 @@ export class InitialStatesSection extends React.Component {
   // Synchronisation
   async synchroniseAll() 
   {
-    await Promise.all(this.props.financialData.immobilisations.filter(immobilisation => immobilisation.initialState == "defaultData")
-                                                              .map(async immobilisation => await this.fetchDefaultData(immobilisation)));
+    await Promise.all(this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks)
+                                                                      .filter(immobilisation => immobilisation.initialState == "defaultData")
+                                                                      .map(async immobilisation => await this.fetchDefaultData(immobilisation)));
     this.setState({financialData: this.props.session.financialData});
   }
-      
+
+  fetchDefaultData = async (stockOrImmobilisation) => 
+  {
+    await stockOrImmobilisation.updatePrevFootprintFromRemote();
+    this.setState({financialData: this.props.session.financialData});
+  }
+
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => this.props.session.updateRevenueFootprint();
+  updateFootprints = () => this.props.session.updateAvailableProductionFootprint();
 
 }

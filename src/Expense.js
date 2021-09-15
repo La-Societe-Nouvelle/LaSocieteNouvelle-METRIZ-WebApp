@@ -2,38 +2,32 @@ import { EconomicValue } from "./EconomicValue";
 
 export class Expense extends EconomicValue {
 
-  constructor({id,label,amount,account,accountProvider,companyId,companyName,footprint}) 
+  constructor({id,label,amount,footprint,
+               account,accountLib,
+               accountAux,accountAuxLib}) 
   {
     super({id,label,amount,footprint})
     
     this.account = account || "";
-    this.accountProvider = accountProvider || "";
-    this.companyId = companyId || "";
-    this.companyName = companyName || "";
+    this.accountLib = accountLib || "";
+
+    this.accountAux = accountAux || "";
+    this.accountAuxLib = accountAuxLib || "";
   }
 
-  update(props) {
-    super.update(props);
-    if (props.account!=undefined) this.account = props.account;
-    if (props.accountProvider!=undefined) this.accountProvider = props.accountProvider;
-    if (props.companyId!=undefined) this.companyId = props.companyId;
-    if (props.companyName!=undefined) this.companyName = props.companyName;
-  }
+  update = (props) => super.update(props)
   
   /* ---------- Getters ---------- */
 
-  getAccount() {return this.account}
-  getAccountProvider() {return this.accountProvider}
-  getCompanyId() {return this.companyId}
-  getCompanyId() {return this.companyName}
+  getAccount = () => this.account
+  getAccountAux = () => this.accountAux
 
   /* ---------- Setters ---------- */
 
   setAccount(account) {this.account = account}
-  setCompany(company) {
-    this.accountProvider = company.accountAux;
-    this.companyId = company.id;
-    this.companyName = company.corporateName;
+  setCompany(company) 
+  {
+    this.accountAux = company.accountAux;
     this.footprint = company.footprint
   }
 

@@ -19,9 +19,9 @@ export function ExpensesTab(props) {
       </div>
       <div className="group">
         <h3>Détails des impacts indirects des consommations</h3>
-        <TableExpenses 
+        <ExpensesTable 
           indic={indic}
-          companies={session.financialData.getCompaniesExpenses()}
+          companies={session.financialData.companies}
           onUpdate={props.onUpdate}/>
       </div>
     </div>
@@ -30,7 +30,7 @@ export function ExpensesTab(props) {
 
 /* ---------- EXPENSES TAB ---------- */
 
-class TableExpenses extends React.Component {
+class ExpensesTable extends React.Component {
   
   constructor(props) {
     super(props);

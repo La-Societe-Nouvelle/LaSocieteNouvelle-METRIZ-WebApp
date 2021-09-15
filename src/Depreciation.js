@@ -2,18 +2,23 @@ import { EconomicValue } from './EconomicValue';
 
 export class Depreciation extends EconomicValue {
 
-  constructor({id,label,amount,account,accountImmobilisation,footprint}) 
+  constructor({id,label,amount,footprint,
+               account,accountLib,
+               accountAux,accountAuxlib}) 
   {
     super({id,label,amount,footprint})
 
     this.account = account;
-    this.accountImmobilisation = accountImmobilisation;
+    this.accountLib = accountLib;
+
+    this.accountAux = accountAux;
+    this.accountAuxLib = accountAuxlib;
   }
 
   update(props) {
     super.update(props);
     if (props.account!=undefined) this.account = props.account;
-    if (props.accountImmobilisation!=undefined) this.accountImmobilisation = props.accountImmobilisation;
+    if (props.accountAux!=undefined) this.accountAux = props.accountAux;
   }
 
   /* ---------- Back Up ---------- */
@@ -21,19 +26,19 @@ export class Depreciation extends EconomicValue {
   updateFromBackUp(backUp) {
     super.updateFromBackUp(backUp);
     this.account = backUp.account || "";
-    this.accountImmobilisation = backUp.accountImmobilisation || "";
+    this.accountAux = backUp.accountImmobilisation || "";
   }
   
   /* ---------- Getters ---------- */
 
   getAccount() {return this.account}
-  getAccountImmobilisation() {return this.accountImmobilisation}
+  getAccountAuxn() {return this.accountAux}
 
   /* ---------- Setters ---------- */
 
   setAccount(account) {this.account = account}
   setImmobilisation(immobilisation) {
-    this.accountImmobilisation = immobilisation.account;
+    this.accountAux = immobilisation.account;
     this.footprint = immobilisation.footprint
   }
 

@@ -20,39 +20,43 @@ export class CompaniesTable extends React.Component {
     super(props);
     this.state = 
     {
+      companies: props.companies,
       columnSorted: "amount",
       reverseSort: false,
       page: 0
     }
   }
 
+  componentDidUpdate(prevProps) 
+  {
+    if (this.props != prevProps) this.setState({companies: this.props.companies})
+  }
+
   render() 
   {
-    const {companies} = this.props;
-    const {columnSorted,page} = this.state;
+    const {amounts} = this.props;
+    const {companies,columnSorted,page} = this.state;
 
+    companies.forEach(company => company.amount = amounts[company.account] || 0);
     this.sortCompanies(companies,columnSorted);
 
     return (
       <div className="table-container">
-
         <table className="table">
-
           <thead>
             <tr>
-              <td className="short"
+              <td className="short" 
                   onClick={() => this.changeColumnSorted("identifiant")}>Identifiant</td>
-              <td className="auto"
+              <td className="auto" 
                   onClick={() => this.changeColumnSorted("denomination")}>Denomination</td>
-              <td className="medium"
+              <td className="medium" 
                   onClick={() => this.changeColumnSorted("area")}>Espace économique</td>
-              <td className="medium"
+              <td className="medium" 
                   onClick={() => this.changeColumnSorted("activity")}>Activité asssociée</td>
               <td className="short" colSpan={companies.length > 0 ? "2" : "1"}
                   onClick={() => this.changeColumnSorted("amount")}>Montant</td>
               <td className="column_icon" colSpan="1"></td></tr>
           </thead>
-
           <tbody>
             {companies.slice(page*20,(page+1)*20)
                       .map((company) => 
@@ -75,7 +79,8 @@ export class CompaniesTable extends React.Component {
 
   /* ---------- SORTING ---------- */
 
-  changeColumnSorted(columnSorted) {
+  changeColumnSorted(columnSorted) 
+  {
     if (columnSorted!=this.state.columnSorted) {
       this.setState({columnSorted: columnSorted, reverseSort: false})
     } else {
@@ -83,8 +88,10 @@ export class CompaniesTable extends React.Component {
     }
   }
 
-  sortCompanies(companies,columSorted) {
-    switch(columSorted) {
+  sortCompanies(companies,columSorted) 
+  {
+    switch(columSorted) 
+    {
       case "identifiant": companies.sort((a,b) => valueOrDefault(a.corporateId,"").localeCompare(valueOrDefault(b.corporateId,""))); break;
       case "denomination": companies.sort((a,b) => a.getCorporateName().localeCompare(b.getCorporateName())); break;
       case "area": companies.sort((a,b) => a.getAreaCode().localeCompare(b.getAreaCode())); break;
@@ -103,7 +110,7 @@ export class CompaniesTable extends React.Component {
 
   nextPage = () => {
     let currentPage = this.state.page;
-    if ((currentPage+1)*20 < this.props.financialData.getCompanies().length) {
+    if ((currentPage+1)*20 < this.props.financialData.companies.length) {
       this.setState({page: currentPage+1})
     }
   }
@@ -113,21 +120,20 @@ export class CompaniesTable extends React.Component {
   async fetchDataCompany(company) {
     await company.fetchData();
     this.props.financialData.updateCompany(company);
-    this.props.onUpdate(this.props.financialData);
     this.forceUpdate();
   }
 
-  updateCompany = async (nextProps) => {
+  updateCompany = async (nextProps) => 
+  {
     await this.props.financialData.updateCompany(nextProps);
-    this.props.onUpdate();
-    this.forceUpdate();
+    this.setState({companies: this.props.financialData.companies});
   }
 
   async syncCompany(companyId) 
   {
     let company = this.props.financialData.getCompany(companyId);
     await company.updateFromRemote();
-    this.forceUpdate();
+    this.setState({companies: this.props.financialData.companies});
   }
 
 }
@@ -143,8 +149,8 @@ class RowTableCompanies extends React.Component {
     {
       corporateId: props.corporateId || "",
       corporateName: props.corporateName,
-      areaCode: props.footprintAreaCode,
-      activityCode: props.footprintActivityCode,
+      footprintAreaCode: props.footprintAreaCode,
+      footprintActivityCode: props.footprintActivityCode,
       dataFetched: props.dataFetched,
 
       toggleIcon: false
@@ -153,51 +159,56 @@ class RowTableCompanies extends React.Component {
 
   componentDidUpdate(prevProps)
   {
-    if (this.props.corporateId != prevProps.corporateId
-        || this.props.corporateName != prevProps.corporateName
-        || this.props.footprintAreaCode != prevProps.footprintAreaCode
-        || this.props.footprintActivityCode != prevProps.footprintActivityCode
-        || this.props.dataFetched != prevProps.dataFetched) 
-    {
+    if (this.props!=prevProps) {
       this.setState({
-        corporateId: this.props.corporateId,
+        corporateId: this.props.corporateId || "",
         corporateName: this.props.corporateName,
-        areaCode: this.props.footprintAreaCode,
-        activityCode: this.props.footprintActivityCode,
-        dataFetched: this.props.dataFetched,
+        footprintAreaCode: this.props.footprintAreaCode,
+        footprintActivityCode: this.props.footprintActivityCode,
+        dataFetched: this.props.dataFetched
       })
     }
   }
 
   render() 
   {
-    const {amount,legalUnitAreaCode,legalUnitActivityCode} = this.props;
-    const {corporateId,corporateName,areaCode,activityCode,dataFetched} = this.state;
+    const {amount,legalUnitAreaCode,legalUnitActivityCode,dataFetched} = this.props;
+    const {corporateId,corporateName,footprintAreaCode,footprintActivityCode} = this.state;
     const {toggleIcon} = this.state;
 
     return (
       <tr>
         <td className="short">
-          <InputText value={corporateId} 
+          <InputText value={corporateId}
                      valid={dataFetched === true}
                      onUpdate={this.updateCorporateId.bind(this)}/></td>
+
         <td className="auto">
           <InputText value={corporateName} 
                      onUpdate={this.updateCorporateName.bind(this)}/></td>
+
         <td className="medium">
           <select className={dataFetched === false ? " valid" : ""}
-                  value={areaCode}
+                  value={footprintAreaCode}
                   onChange={this.onAreaCodeChange}>
-            {Object.entries(areas).sort()
-                                  .map(([code,libelle]) => <option className={(legalUnitAreaCode && code==legalUnitAreaCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
+          {Object.entries(areas).sort()
+                                .map(([code,libelle]) => 
+            <option className={(legalUnitAreaCode && code==legalUnitAreaCode) ? "default-option" : ""} 
+                    key={code} 
+                    value={code}>
+              {code + " - " +libelle}
+            </option>)}
           </select></td>
+
         <td className="medium">
           <select className={dataFetched === false ? " valid" : ""}
-                  value={activityCode.substring(0,2)}
+                  value={footprintActivityCode.substring(0,2)}
                   onChange={this.onActivityCodeChange}>
             {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b))
-                                      .map(([code,libelle]) => <option className={(legalUnitActivityCode && code==legalUnitActivityCode.substring(0,2)) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
+                                      .map(([code,libelle]) => 
+              <option className={(legalUnitActivityCode && code==legalUnitActivityCode.substring(0,2)) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
           </select></td>
+
         <td className="short right">{printValue(amount,0)}</td>
         <td className="column_unit">&nbsp;€</td>
         <td className="column_icon">
@@ -212,19 +223,20 @@ class RowTableCompanies extends React.Component {
     this.props.updateCompany({id: this.props.id, corporateId: nextCorporateId})
   }
   
-  updateCorporateName = (nextCorporateName) => this.props.updateCompany({id: this.props.id, corporateName: nextCorporateName})
+  updateCorporateName = (nextCorporateName) => {
+    this.props.updateCompany({id: this.props.id, corporateName: nextCorporateName})
+  }
 
   onAreaCodeChange = (event) => {
-    this.setState({areaCode: event.target.value, dataFetched: null})
-    this.props.updateCompany({id: this.props.id, footprintAreaCode: event.target.value});
+    this.setState({footprintAreaCode: event.target.value, dataFetched: null})
+    this.props.updateCompany({id: this.props.id, footprintAreaCode: event.target.value})
   }
   onActivityCodeChange = (event) => {
-    this.setState({activityCode: event.target.value, dataFetched: null})
-    this.props.updateCompany({id: this.props.id, footprintActivityCode: event.target.value});
+    this.setState({footprintActivityCode: event.target.value, dataFetched: null})
+    this.props.updateCompany({id: this.props.id, footprintActivityCode: event.target.value})
   }
 
-  syncCompany = async (event) => 
-  {
+  syncCompany = async () => {
     this.setState({toggleIcon: true})
     await this.props.syncCompany(this.props.id)
     this.setState({toggleIcon: false})

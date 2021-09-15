@@ -23,7 +23,7 @@ export class Company {
     this.id = id;
 
     // Company
-    this.account = account || null;
+    this.account = account || "";
     this.corporateId = corporateId || null;
     this.corporateName = corporateName || "";
 
@@ -77,28 +77,27 @@ export class Company {
 
   /* ---------- Update ---------- */
 
-  async update(props) 
+  async update(nextProps) 
   {
     // Update
-    if (props.corporateName!=undefined) this.corporateName = props.corporateName;
+    if (nextProps.corporateName!=undefined) this.corporateName = nextProps.corporateName;
 
     // update from remote if id changes
-    if (props.corporateId!=undefined && props.corporateId!=this.corporateId) 
+    if (nextProps.corporateId!=undefined && nextProps.corporateId!="" && nextProps.corporateId!=this.corporateId) 
     {
-      this.corporateId = props.corporateId;
+      this.corporateId = nextProps.corporateId;
       this.footprintId = this.getDefaultFootprintId();
       await this.updateFromRemote();
     }
 
     // update from remote if footprint data change
-    if ( (props.footprintAreaCode!=undefined && props.footprintAreaCode!=this.footprintAreaCode)
-      || (props.footprintActivityCode!=undefined && props.footprintActivityCode!=this.footprintActivityCode)) 
+    if ( (nextProps.footprintAreaCode!=undefined && nextProps.footprintAreaCode!=this.footprintAreaCode)
+      || (nextProps.footprintActivityCode!=undefined && nextProps.footprintActivityCode!=this.footprintActivityCode)) 
     {
       this.footprintId = null;
-      if (props.footprintAreaCode!=undefined)     this.footprintAreaCode = props.footprintAreaCode;
-      if (props.footprintActivityCode!=undefined) this.footprintActivityCode = props.footprintActivityCode;
-      await this.updateFootprintFromRemote();
-      this.dataFetched = false;
+      if (nextProps.footprintAreaCode!=undefined)     this.footprintAreaCode = nextProps.footprintAreaCode;
+      if (nextProps.footprintActivityCode!=undefined) this.footprintActivityCode = nextProps.footprintActivityCode;
+      if (this.dataFetched != null) await this.updateFootprintFromRemote();
     }
   }
 

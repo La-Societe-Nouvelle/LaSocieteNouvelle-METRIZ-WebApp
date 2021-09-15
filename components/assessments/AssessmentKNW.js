@@ -101,7 +101,7 @@ export class AssessmentKNW extends React.Component {
     impactsData.knwDetails = {...impactsData.knwDetails,...nextProps};
     // update result
     impactsData.researchAndTrainingContribution = this.getSumCosts();
-    await this.props.session.updateRevenueIndicFootprint("knw");
+    await this.props.session.updateAvailableProductionIndicFootprint("knw");
     this.forceUpdate();
   }
 
@@ -113,7 +113,7 @@ export class AssessmentKNW extends React.Component {
     impactsData.knwDetails = this.state.knwDetails;
     impactsData.researchAndTrainingContribution = this.getSumCosts();
     
-    await this.props.session.updateRevenueIndicFootprint("knw");
+    await this.props.session.updateAvailableProductionIndicFootprint("knw");
   }
 
   getSumCosts() 

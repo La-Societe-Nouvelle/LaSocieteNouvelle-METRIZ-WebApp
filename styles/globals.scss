@@ -218,18 +218,40 @@ sup {
   }
 }
 
+.group {
+  .actions {
+    select {
+      width: 400px;
+      background-color: $secondary-color;
+      color: white;
+      border: solid 1px $secondary-color;
+      border-radius: 0;
+
+      option 
+      {
+        background-color: white;
+        color: $primary-color;
+        border: solid 1px $primary-color;
+        border-radius: 0;     
+      }
+    }
+  }
+}
+
 /* -------------------- TABLE -------------------- */
 
 table {
   width: 100%;
   font-size: 15px;
   padding: 1px;
-  //border-bottom: solid grey 2px;
   table-layout: auto;
 
+  // specific tags
   input {
     width: 100%;
     padding-right: 2px;
+
+    &.right {text-align: right}
   }
 
   img {
@@ -240,36 +262,82 @@ table {
     }
 
     &.active {
-      transform: rotate(360deg);
+      transform: rotate(-360deg);
       transition: transform 1000ms;
     }
     
   }
 
+  // --- Row --- //
+
+  tr {
+
+    // Borders
+    &.with-bottom-line td {
+      border-bottom: solid grey 2px;
+      padding-bottom: 2px;
+    }
+    &.with-top-line td {
+      border-top: solid grey 2px;
+      padding-top: 2px;
+    }
+
+  }
+
+  // --- Cell --- //
+
   td {
     padding-left: 4px;
     padding-right: 4px;
-  }
 
-  td {
-    &.center {text-align: center}
-    &.right {text-align: right}
-
-    &.right input {text-align: right}
-  }
-
-  td.sub {
-    padding-left: 25px;
-  }
-
-  // --- COLUMNS --- //
-
-  td {
+    // width
     &.auto {width: auto}
     &.long {width: 400px}
     &.medium {width: 200px}
     &.short {width: 125px;}
+
+    // text align
+    &.center {text-align: center}
+    &.right {text-align: right}
+
+    // index
+    &.sub {
+      padding-left: 25px;
+    }
+
+    // font
+    &.detail {
+      font-style: italic;
+      font-size: 15px;
+    }
+    &.important {
+      font-weight: bold;
+    }
+
+    // borders
+    &.with-bottom-line {
+      border-bottom: solid grey 2px;
+      padding-bottom: 2px;
+    }
+    &.with-top-line {
+      border-top: solid grey 2px;
+      padding-top: 2px;
+    }
+
+    // specific style
+    &.column_unit {
+      width: 1%;
+      min-width: 30px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    &.column_icon {
+      width: 15px;
+      min-width: 15px;
+    }
   }
+
+  // --- COLUMNS --- //
 
   td.crop {
     max-width: 400px;
@@ -292,44 +360,6 @@ table {
     }
   }
 
-  .column_short-input {
-    width: 150px;
-
-    input {
-      text-align: right;
-    }
-    select {
-      width: 100%;
-    }
-  }
-
-  .column_unit {
-    width: 1%;
-    min-width: 30px;
-    font-size: 12px;
-    white-space: nowrap;
-  }
-  // fixed width
-  .column_delete,
-  .column_resync,
-  .column_icon {
-    width: 15px;
-    min-width: 15px;
-  }
-  
-  .with-bottom-line {
-    td {
-      border-bottom: solid grey 2px;
-      padding-bottom: 2px;
-    }
-  }
-  .with-top-line {
-    td {
-      border-top: solid grey 2px;
-      padding-top: 2px;
-    }
-  }
-
   thead {
     background-color: gray;
     color: white;
@@ -340,20 +370,10 @@ table {
       text-align: center;
     }
 
-    .column_corporateId {
-      width: 125px;
-    }
-    .column_corporateName,
     .column_auto {
       width: auto;
     }
-    .column_areaCode {
-      width: 100px;
-    }
-    .column_corporateActivity {
-      width: 200px;
-    }
-    .column_amount {
+    .column_amount { // income statement table
       width: 150px;
     }
     .column_value {
@@ -379,29 +399,15 @@ table {
       }
     }
 
-    .column_code {
+    .column_code { // legal data section
       width: 50px;
       text-align: center;
     }
 
-    .column_corporateId {
-      width: 125px;
-    }
-    .column_corporateName,
-    .column_auto {
+    .column_auto { // depreciations tabs, expenses tab
       width: auto;
     }
-    .column_areaCode {
-      width: 100px;
-    }
-    .column_corporateActivity {
-      width: 200px;
-      select {
-        width: 100%;
-        text-overflow: ellipsis;
-      }
-    }
-    .column_amount {
+    .column_amount { // income statement table
       width: 150px;
       text-align: right;
       input {
@@ -409,7 +415,7 @@ table {
       }
     }
     
-    .column_uncertainty {
+    .column_uncertainty { // depreciation tab, expenses tab, indicator main tab, legal data section
       width: 100px;
       text-align: center;
       font-size: 12px;
@@ -418,7 +424,7 @@ table {
         font-size: 15px;
       }
     }
-    .column_libelleFlag {
+    .column_libelleFlag { // depreciation tab, expenses tab
       width: 200px;
       text-align: center;
     }
@@ -545,28 +551,26 @@ table {
 
 /* --- LEGAL UNIT VIEW --- */
 
-.legal_unit_main_view {
-  .inline-input {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 5px;
-    &.short {
-      input {
-        width: 150px;
-      }
-    }
-    label {
-      min-width: 200px;
-    }
+.inline-input {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 5px;
+  &.short {
     input {
-      width: 500px;
+      width: 150px;
     }
+  }
+  label {
+    min-width: 200px;
+  }
+  input {
+    width: 500px;
   }
 }
 
 #import-expenses,
 #import-depreciations,
-#import-companies,
+#import-companies-csv,
 #import-companies-xlsx,
 #import-fec,
 #import-session {

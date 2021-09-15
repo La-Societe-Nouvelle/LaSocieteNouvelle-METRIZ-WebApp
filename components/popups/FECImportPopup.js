@@ -31,7 +31,8 @@ export class FECImportPopup extends React.Component {
                 <td className="short center">Début</td>
                 <td className="short center">Fin</td>
                 <td className="short center">Lignes</td>
-                <td className="medium center">Type</td>
+                {/*<td className="medium center">Type</td>*/}
+                <td className="medium center">A-Nouveaux</td>
               </tr>
             </thead>
             <tbody>
@@ -47,11 +48,14 @@ export class FECImportPopup extends React.Component {
                     <td className="short center">{dateStart.substring(6,8)+"/"+dateStart.substring(4,6)+"/"+dateStart.substring(0,4)}</td>
                     <td className="short center">{dateEnd.substring(6,8)+"/"+dateEnd.substring(4,6)+"/"+dateEnd.substring(0,4)}</td>
                     <td className="short center">{nLines}</td>
-                    <td className="medium center">
+                    {/*<td className="medium center">
                       <select onChange={(event) => this.onBookTypeChange(code,event)} value={type}>
                         {Object.entries(booksProps).map(([type,{label}]) => <option key={type} value={type}>{label}</option>)}
                         <option key={"AUTRE"} value={"AUTRE"}>{"---"}</option>
-                  </select></td>
+                      </select></td>*/}
+                  <td>
+                    <input type="radio" name="ANOUVEAUX" value={code} checked={type=="ANOUVEAUX"} onChange={this.changeJournalANouveaux}/>
+                  </td>
                   </tr>
                 )}
               )}
@@ -66,6 +70,15 @@ export class FECImportPopup extends React.Component {
   }
 
   /* ----- EDIT ----- */
+
+  changeJournalANouveaux = (event) => 
+  {
+    let selectedCode = event.target.value;
+    let meta = this.state.meta;
+    Object.entries(meta.books).forEach(([code,_]) => meta.books[code].type = (code == selectedCode ? "ANOUVEAUX" : ""));
+    console.log(meta);
+    this.setState({meta: meta});
+  }
 
   onBookTypeChange = (code,event) => 
   {

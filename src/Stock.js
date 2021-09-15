@@ -1,25 +1,40 @@
+// La Société Nouvelle
+
+
+// Imports
 import { EconomicValue } from './EconomicValue';
+import { SocialFootprint } from './SocialFootprint';
+
+// API url
+const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
 export class Stock extends EconomicValue {
 
   constructor({id,label,amount,footprint,
                account,
-               accountPurchases,
+               accountLib,
+               accountAux,
+               prevAmount,
                initialState,
-               prevFootprintLoaded,
-               footprintAreaCode,
-               footprintActivityCode,
-               dataFetched})
+               prevFootprint,
+               prevFootprintAreaCode,
+               prevFootprintActivityCode,
+               dataFetched,
+               isProductionStock})
   {
     super({id,label,amount,footprint})
 
     this.account = account || "";
-    this.accountPurchases = accountPurchases;
-    this.initialState = initialState || "none";
-    this.prevFootprintLoaded = prevFootprintLoaded || false;
+    this.accountLib = accountLib || "";
+    this.isProductionStock = isProductionStock;
+    this.accountAux = accountAux;
 
-    this.footprintAreaCode = footprintAreaCode || "FRA";
-    this.footprintActivityCode = footprintActivityCode || "00";
+    this.prevAmount = prevAmount || 0;
+    this.initialState = initialState || "none";
+    this.prevFootprint = new SocialFootprint({...prevFootprint});
+
+    this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
+    this.prevFootprintActivityCode = prevFootprintActivityCode || "00";
     this.dataFetched = dataFetched || false;
   }
 
@@ -29,30 +44,29 @@ export class Stock extends EconomicValue {
 
     // update accounts numbers
     if (nextProps.account!=undefined) this.account = nextProps.account;
-    if (nextProps.accountPurchases!=undefined) this.accountPurchases = nextProps.accountPurchases;
+    if (nextProps.accountAux!=undefined) this.accountAux = nextProps.accountAux;
 
     // if initial state changed
     if (nextProps.initialState!=undefined && nextProps.initialState!=this.initialState) 
     {
       this.initialState = nextProps.initialState;
-      this.prevFootprintLoaded = false;
       this.dataFetched = false;
     }
 
     // update from remote if changes (and initial state came from default data)
     if (this.initialState=="defaultData" 
-      && (nextProps.footprintAreaCode!=this.footprintAreaCode || nextProps.footprintActivityCode!=this.footprintActivityCode))
+      && (nextProps.prevFootprintAreaCode!=this.prevFootprintAreaCode || nextProps.prevFootprintActivityCode!=this.prevFootprintActivityCode))
     {
-      if (nextProps.footprintAreaCode!=undefined) this.footprintAreaCode = nextProps.footprintAreaCode;
-      if (nextProps.footprintActivityCode!=undefined) this.footprintActivityCode = nextProps.footprintActivityCode;
-      await this.updateFootprintFromRemote();
+      if (nextProps.prevFootprintAreaCode!=undefined) this.prevFootprintAreaCode = nextProps.prevFootprintAreaCode;
+      if (nextProps.prevFootprintActivityCode!=undefined) this.prevFootprintActivityCode = nextProps.prevFootprintActivityCode;
+      await this.updatePrevFootprintFromRemote();
     }
   }
 
   /* ---------- Getters ---------- */
 
   getAccount() {return this.account}
-  getAccountPurchases() {return this.accountPurchases}
+  getAccountAux() {return this.accountPurchases}
   getInitialAmount() {return this.amount}
 
   /* ---------- Setters ---------- */
@@ -65,18 +79,17 @@ export class Stock extends EconomicValue {
 
   async loadPreviousFootprint(data)
   {
+    this.prevFootprint.updateAll(data.empreinteSocietale);
     this.initialState = "prevFootprint";
-    this.footprint.updateAll(data.empreinteSocietale);
-    this.prevFootprintLoaded = true;
     this.dataFetched = false;
   }
 
   /* ---------- Fetch Data ---------- */ 
 
-  async updateFootprintFromRemote() 
+  async updatePrevFootprintFromRemote() 
   {
     let data = await this.fetchDefaultData();
-    if (data!=null) {this.footprint.updateAll(data.empreinteSocietale);this.dataFetched = true}
+    if (data!=null) {this.prevFootprint.updateAll(data.empreinteSocietale);this.dataFetched = true}
   }
 
   /* ---------- Fetching data ---------- */
@@ -84,10 +97,10 @@ export class Stock extends EconomicValue {
   // Fetch default data
   async fetchDefaultData() 
   {
-    let endpoint = apiBaseUrl + "default?" + "pays="+this.footprintAreaCode + "&activite="+this.footprintActivityCode +"&flow=PRD";
+    let endpoint = apiBaseUrl + "default?" + "pays="+this.prevFootprintAreaCode + "&activite="+this.prevFootprintActivityCode +"&flow=PRD";
     let response = await fetch(endpoint, {method:'get'});
     let data = await response.json();
-    if (data.header.statut == 200) {return {areaCode: this.footprintAreaCode, activityCode: this.footprintActivityCode, ...data}} 
+    if (data.header.statut == 200) {return {areaCode: this.prevFootprintAreaCode, activityCode: this.prevFootprintActivityCode, ...data}} 
     else                           {return null}
   }
 

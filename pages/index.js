@@ -13,9 +13,9 @@ import {Session} from '/src/Session.js';
 // Sections
 import { LegalDataSection } from '/components/sections/LegalDataSection.js';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
-import { CompaniesSection } from '../components/sections/CompaniesSection';
-import { InitialStatesSection } from '../components/InitialStatesSection';
-import { IndicatorSection } from '../components/IndicatorSection';
+import { CompaniesSection } from '/components/sections/CompaniesSection';
+import { InitialStatesSection } from '/components/sections/InitialStatesSection';
+import { IndicatorSection } from '/components/sections/IndicatorSection';
 
 // Others components
 import { Menu } from '../components/Menu';

@@ -1,12 +1,24 @@
 
 /* ----- PRINT VALUE ----- */
 
-export function printValue(value,precision) {
-  if (value==null | value==="") {return " - "}
-  else                          {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision))
-                                          .toFixed(precision)
-                                          .toString()
-                                          .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
+export function printValue(value,precision) 
+{
+  if (value==null || value==undefined || value=="") {return " - "}
+  else 
+  {
+    let roundedValue = Math.round(value*Math.pow(10,precision))/Math.pow(10,precision).toFixed(precision);
+    if (roundedValue < 0) {
+      return "("+(-roundedValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")+")";
+    } else {
+      return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+  }
+}
+
+export function printValueIf(value,precision,condition)
+{
+  if (condition) return printValue(value,precision);
+  else return " - ";
 }
 
 export function printValueInput(value,precision) {

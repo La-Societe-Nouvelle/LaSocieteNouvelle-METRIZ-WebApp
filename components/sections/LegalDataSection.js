@@ -38,7 +38,7 @@ export class LegalDataSection extends React.Component {
           <h1>Informations générales</h1>
         </div>
 
-        <div className="legal_unit_main_view">
+        <div className="section-view-main">
 
           <div className="group"><h3>Informations légales</h3>
             <div className="inline-input short">
@@ -64,11 +64,11 @@ export class LegalDataSection extends React.Component {
             </div>
           </div>
 
-          <div className="group"><h3>Empreinte Sociétale de l'Entreprise</h3>
+          {/*<div className="group"><h3>Empreinte Sociétale de l'Entreprise</h3>
             <div className="coporate-social-footprint">
               <FootprintTable session={session}/>
             </div>
-          </div>
+          </div>*/}
 
         </div>
       </div>
@@ -97,7 +97,7 @@ export class LegalDataSection extends React.Component {
 
 function FootprintTable({session}) 
 {
-  const revenueFootprint = session.getRevenueFootprint();
+  const availableProductionFootprint = session.getAvailableProductionFootprint();
   
   return (
     <table>
@@ -109,9 +109,9 @@ function FootprintTable({session})
           <tr key={indic}>
             <td className="column_code">{indic.toUpperCase()}</td>
             <td className="auto">{indicData.libelle}</td>
-            <td className="column_value">{printValue(revenueFootprint.getIndicator(indic).getValue(),1)}</td>
+            <td className="column_value">{printValue(availableProductionFootprint.getIndicator(indic).getValue(),1)}</td>
             <td className="column_unit">&nbsp;{indicData.unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(availableProductionFootprint.getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
           </tr>
         )}
       </tbody>

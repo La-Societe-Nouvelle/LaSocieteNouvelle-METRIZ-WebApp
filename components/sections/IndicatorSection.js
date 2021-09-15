@@ -1,21 +1,21 @@
 import React from 'react';
 
 // Tab Components
-import { MainTab } from './indicatorTabs/IndicatorMainTab';
-import { ExpensesTab } from './indicatorTabs/IndicatorExpensesTab';
-import { DepreciationsTab } from './indicatorTabs/IndicatorDepreciationsTab';
+import { MainTab } from '/components/indicatorTabs/IndicatorMainTab';
+import { ExpensesTab } from '/components/indicatorTabs/IndicatorExpensesTab';
+import { DepreciationsTab } from '/components/indicatorTabs/IndicatorDepreciationsTab';
 
 // Assessments components
-import { AssessmentGHG } from './assessments/AssessmentGHG';
-import { AssessmentKNW } from './assessments/AssessmentKNW';
-import { AssessmentNRG } from './assessments/AssessmentNRG';
+import { AssessmentGHG } from '/components/assessments/AssessmentGHG';
+import { AssessmentKNW } from '/components/assessments/AssessmentKNW';
+import { AssessmentNRG } from '/components/assessments/AssessmentNRG';
+import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
-import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../src/Export';
+import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '/src/Export';
 
 // Meta data
-import { metaIndicators } from '../lib/indic';
-import { AssessmentDIS } from './assessments/AssessmentDIS';
+import { metaIndicators } from '/lib/indic';
 
 /* -------------------- INDICATOR SECTION -------------------- */
 export class IndicatorSection extends React.Component {
@@ -53,7 +53,7 @@ export class IndicatorSection extends React.Component {
   {
     const goBackToMain = () => this.setState({selectedTab: "main"})
     const refreshDisplay = async () => {
-      await this.props.session.updateRevenueFootprint();
+      await this.props.session.updateAvailableProductionFootprint();
       this.refMainTab.current.updateTable();
     }
     const changeSelectedTab = (nextSelectedTab) => this.setState({selectedTab: nextSelectedTab})

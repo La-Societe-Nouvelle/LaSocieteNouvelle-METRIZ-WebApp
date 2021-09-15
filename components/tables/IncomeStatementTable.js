@@ -1,155 +1,130 @@
 // La Société Nouvelle
 
-// React
-import React from 'react';
+// Libraries
+import { metaAccounts } from '../../lib/accounts';
 
 // Utils
-import { printValueInput, valueOrDefault } from '../../src/utils/Utils';
+import { printValue } from '../../src/utils/Utils';
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 
-export class IncomeStatementTable extends React.Component {
+export const IncomeStatementTable = ({financialData}) =>
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      // Input variables
-      productionInput: valueOrDefault(props.financialData.getProduction(),""),
-      revenueInput: valueOrDefault(props.financialData.revenue,""),
-      storedProductionInput: valueOrDefault(props.financialData.getStoredProduction(),""),
-      immobilisedProductionInput: valueOrDefault(props.financialData.getImmobilisedProduction(),""),
-      unstoredProductionInput: valueOrDefault(props.financialData.getUnstoredProduction(),""),
-      amountExpensesInput: valueOrDefault(props.financialData.getAmountExpenses(),""),
-      amountDepreciationsInput: valueOrDefault(props.financialData.getAmountDepreciations(),""),
-    }
-  }
+  <div className="table-container">
 
-  componentDidUpdate(prevProps) 
+  {financialData.isFinancialDataLoaded &&  
+    <table>
+      <thead>
+        <tr><td>Agrégat</td><td colSpan="2">Montant</td></tr>
+      </thead>
+      <tbody>
+
+        <tr className="with-bottom-line">
+          <td>Produits d'exploitation</td>
+          <td className="column_amount">{printValue(financialData.getProduction() + financialData.getAmountOtherOperatingIncomes(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        
+        <tr>
+          <td>Production sur l'exercice courant</td>
+          <td className="column_amount important">{printValue(financialData.getProduction(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;Chiffre d'Affaires</td>
+          <td className="column_amount">{printValue(financialData.getRevenue(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;Production stockée</td>
+          <td className="column_amount">{printValue(financialData.getStoredProduction(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;Production déstockée sur l'exercice précédent</td>
+          <td className="column_amount">{"("+printValue(financialData.getUnstoredProduction(),0)+")"}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;Production immobilisée</td>
+          <td className="column_amount">{printValue(financialData.getImmobilisedProduction(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>Autres produits d'exploitation</td>
+          <td className="column_amount">{printValue(financialData.getAmountOtherOperatingIncomes(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        
+        
+        <tr className="with-top-line">
+          <td>Consommations intermédiaires</td>
+          <td className="column_amount important">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;Variation de stocks</td>
+          <td className="column_amount">{financialData.getVariationPurchasesStocks() > 0 ? ("("+printValue(financialData.getVariationPurchasesStocks(),0)+")") : printValue(financialData.getVariationPurchasesStocks(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+      {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => 
+        <tr key={account}>
+          <td>&emsp;{accountLib}</td>
+          <td className="column_amount">{printValue(amount,0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+        </tr>)}
+
+        <tr className="with-top-line">
+          <td>Dotations aux amortissements</td>
+          <td className="column_amount important">{printValue(financialData.getAmountDepreciations(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+      {Object.entries(groupDepreciationsByAccounts(financialData.depreciations)).map(([_,{account,accountLib,amount}]) => 
+        <tr key={account}>
+          <td>&emsp;{accountLib}</td>
+          <td className="column_amount">{printValue(amount,0)}</td>
+          <td className="column_unit">&nbsp;€</td>
+        </tr>)}
+
+        <tr className="with-top-line">
+          <td>Valeur ajoutée nette</td>
+          <td className="column_amount important">{printValue(financialData.getNetValueAdded(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;dont charges de personnel</td>
+          <td className="column_amount detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr>
+          <td>&emsp;dont impôts, taxe et versements assimilés</td>
+          <td className="column_amount detail">{printValue(financialData.getAmountTaxes(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        <tr className="with-bottom-line">
+          <td>&emsp;dont résultat d'exploitation</td>
+          <td className="column_amount detail">{printValue(financialData.getOperatingResult(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>
+        {/*<tr>
+          <td>&emsp;dont autres charges d'exploitation</td>
+          <td className="column_amount">{printValue(financialData.getAmountOtherExpenses(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>*/}
+        {/*<tr>
+          <td>&emsp;dont dépréciations et provisions</td>
+          <td className="column_amount">{printValue(financialData.getAmountProvisions(),0)}</td>
+          <td className="column_unit">&nbsp;€</td></tr>*/}
+
+      </tbody>
+    </table>}
+  </div>
+
+const groupExpensesByAccounts = (expenses) =>
+{
+  let expensesByAccounts = {};
+  expenses.forEach((expense) => 
   {
-    if (this.props!==prevProps)
-    {
-      this.setState({
-        productionInput: valueOrDefault(this.props.financialData.getProduction(),""),
-        revenueInput: valueOrDefault(this.props.financialData.revenue,""),
-        storedProductionInput: valueOrDefault(this.props.financialData.getStoredProduction(),""),
-        immobilisedProductionInput: valueOrDefault(this.props.financialData.getImmobilisedProduction(),""),
-        unstoredProductionInput: valueOrDefault(this.props.financialData.getUnstoredProduction(),""),
-        amountExpensesInput: valueOrDefault(this.props.financialData.getAmountExpenses(),""),
-        amountDepreciationsInput: valueOrDefault(this.props.financialData.getAmountDepreciations(),"")
-      })
-    }
-  }
+    let account = expense.account.substring(0,2);
+    if (expensesByAccounts[account]==undefined) expensesByAccounts[account] = {...expense, accountLib: metaAccounts.accountsExpenses[account]};
+    else expensesByAccounts[account].amount+= expense.amount;
+  })
+  return expensesByAccounts;
+}
 
-  updateInputs() 
+const groupDepreciationsByAccounts = (depreciations) =>
+{
+  let depreciationsByAccounts = {};
+  depreciations.forEach((depreciation) => 
   {
-    this.state.productionInput = valueOrDefault(this.props.financialData.getProduction(),"");
-    this.state.revenueInput = valueOrDefault(this.props.financialData.getRevenue(),"");
-    this.state.storedProductionInput = valueOrDefault(this.props.financialData.getStoredProduction(),"");
-    this.state.immobilisedProductionInput = valueOrDefault(this.props.financialData.getImmobilisedProduction(),"");
-    this.state.unstoredProductionInput = valueOrDefault(this.props.financialData.getUnstoredProduction(),"");
-    this.state.amountExpensesInput = valueOrDefault(this.props.financialData.getAmountExpenses(),"");
-    this.state.amountDepreciationsInput = valueOrDefault(this.props.financialData.getAmountDepreciations(),"");
-    this.forceUpdate();
-  }
-
-  render() 
-  {
-    const financialData = this.props.financialData;
-    const {revenueInput,
-           productionInput,
-           storedProductionInput,
-           immobilisedProductionInput,
-           unstoredProductionInput,
-           amountExpensesInput,
-           amountDepreciationsInput} = this.state;
-    const {purchasesDiscounts} = financialData;
-
-    return (
-      <table>
-        <thead>
-          <tr><td>Agrégat</td><td colSpan="2">Montant</td></tr>
-        </thead>
-        <tbody>
-          {/* --- Production items --- */}
-          <tr className="with-bottom-line">
-              <td>Chiffres d'affaires</td>
-              <td className="column_amount">{printValueInput(revenueInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-              <td>Production</td>
-              <td className="column_amount">{printValueInput(productionInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-              <td>&emsp;dont production stockée</td>
-              <td className="column_amount">{printValueInput(storedProductionInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-              <td>&emsp;dont production immobilisée</td>
-              <td className="column_amount">{printValueInput(immobilisedProductionInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line">
-              <td>Production déstockée sur l'exercice précédent</td>
-              <td className="column_amount">{printValueInput(unstoredProductionInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-
-          <tr className="with-bottom-line">
-            <td>Consommations intermédiaires</td>
-            <td className="column_amount">{printValueInput(financialData.getAmountIntermediateConsumption(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td>Stockage achats</td>
-            <td className="column_amount">{(financialData.getAmountFinalStocks() > 0 ? "(" : "")+printValueInput(financialData.getAmountFinalStocks(),0)+(financialData.getAmountFinalStocks() > 0 ? ")" : "")}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td>Déstockage achats</td>
-            <td className="column_amount">{printValueInput(financialData.getAmountInitialStocks(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-              <td>Charges externes</td>
-              <td className="column_amount">{printValueInput(amountExpensesInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          {
-            Object.entries(financialData.getExpensesAccounts()).map(([num,account]) => {
-              return(
-                <tr key={num}>
-                <td>&emsp;{account.label}</td>
-                <td className="column_amount">{printValueInput(account.amount,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-              </tr>
-            )})
-          }
-          {purchasesDiscounts.length > 0 &&
-            <tr>
-              <td>&emsp;Remises, rabais, ristournes</td>
-              <td className="column_amount">{"("+printValueInput(financialData.getAmountPurchasesDiscounts(),0)+")"}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          }
-          <tr className="with-bottom-line with-top-line">
-              <td>Valeur ajoutée brute</td>
-              <td className="column_amount">{printValueInput(financialData.getGrossValueAdded(),0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-
-          <tr>
-              <td>Dotations aux amortissements</td>
-              <td className="column_amount">{printValueInput(amountDepreciationsInput,0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-          {
-            Object.entries(financialData.getDepreciationsAccounts()).map(([num,account]) => {
-              return(
-              <tr key={num}>
-                <td>&emsp;{account.label}</td>
-                <td className="column_amount">{printValueInput(account.amount,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-              </tr>
-            )})
-          }
-          <tr className="with-top-line with-bottom-line">
-              <td>Valeur ajoutée nette</td>
-              <td className="column_amount">{printValueInput(financialData.getNetValueAdded(),0)}</td>
-              <td className="column_unit">&nbsp;€</td></tr>
-        </tbody>
-      </table>
-    )
-  }
-
+    let account = depreciation.account.substring(0,3);
+    if (depreciationsByAccounts[account]==undefined) depreciationsByAccounts[account] = {...depreciation, accountLib: metaAccounts.accountsDepreciations[account]};
+    else depreciationsByAccounts[account].amount+= depreciation.amount;
+  })
+  return depreciationsByAccounts;
 }
