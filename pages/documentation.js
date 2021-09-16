@@ -1,4 +1,4 @@
-import Head from 'next/head'
+/*import Head from 'next/head'
 //import Header from '../src/components/header'
 //import Footer from '../src/components/footer'
 
@@ -27,7 +27,7 @@ export default async function Home()
         <link rel="icon" href="/resources/logo_miniature.jpg" />
       </Head>
       
-      {/*<Header/>*/}
+      {/*<Header/>}
       <main className="main">
 
         <div className="content-md" dangerouslySetInnerHTML={{__html: content}}/>
@@ -37,7 +37,7 @@ export default async function Home()
         </div>
 
       </main>
-      {/*<Footer/>*/}
+      {/*<Footer/>}
     </div>
   )
-}
+}*/
