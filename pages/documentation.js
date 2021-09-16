@@ -4,10 +4,10 @@ import Head from 'next/head'
 
 import fs from 'fs'
 
-const unified = import('unified');
-const remarkParse = import('remark-parse');
-const remarkGfm = import('remark-gfm');
-const html = import('remark-html');
+import unified from 'unified';
+import remarkParse from 'remark-parse';
+import remarkGfm from 'remark-gfm';
+import html from 'remark-html';
 
 import React from 'react'
 
