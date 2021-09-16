@@ -3,7 +3,8 @@ import Head from 'next/head'
 //import Footer from '../src/components/footer'
 
 import fs from 'fs'
-var unified = require('unified');
+
+const unified = import('unified');
 const remarkParse = import('remark-parse');
 const remarkGfm = import('remark-gfm');
 const html = import('remark-html');

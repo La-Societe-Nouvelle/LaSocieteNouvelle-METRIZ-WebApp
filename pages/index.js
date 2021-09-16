@@ -8,10 +8,10 @@ import React from 'react';
 import Head from 'next/head';
 
 // Objects
-import {Session} from '/src/Session.js';
+import { Session } from '/src/Session';
 
 // Sections
-import { LegalDataSection } from '/components/sections/LegalDataSection.js';
+import { LegalDataSection } from '/components/sections/LegalDataSection';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
 import { CompaniesSection } from '/components/sections/CompaniesSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
