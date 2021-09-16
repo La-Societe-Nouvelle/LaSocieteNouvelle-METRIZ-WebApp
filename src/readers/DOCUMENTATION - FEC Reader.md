@@ -111,7 +111,7 @@ Pour chaque écriture relative aux comptes 60x, 61x et 62x (hors 603x), sont enr
 - Libellé du compte fournisseur auxiliaire associé
 - Montant (Pour les comptes 609x, le montant est inversé: Crédit - Débit, pour être traité comme une dépense *négative*)
 
-* Le numéro du compte auxiliaire est obtenu à partir de la ligne de l'écriture comptable relative à un compte fournisseur 40x. Lorsqu'aucun compte auxiliaire n'est utilisé, le compte fournisseur 40x est repris; et lorsqu'aucune ligne fournisseur n'est trouvable, un compte fournisseur par défaut est créé à partir du numéro du compte de charges et avec le libellé "DEPENESE - X" où *X* est le libellé du compte de charges.
+\* *Le numéro du compte auxiliaire est obtenu à partir de la ligne de l'écriture comptable relative à un compte fournisseur 40x. Lorsqu'aucun compte auxiliaire n'est utilisé, le compte fournisseur 40x est repris; et lorsqu'aucune ligne fournisseur n'est trouvable, un compte fournisseur par défaut est créé à partir du numéro du compte de charges et avec le libellé "DEPENESE - X" où X est le libellé du compte de charges.*
 
 Pour chaque écriture relative aux comptes 603x, sont enregistrées les informations suivantes:
 - Numéro du compte
@@ -128,8 +128,9 @@ Pour chaque écriture relative aux comptes 6811x, sont enregistrées les informa
 - Numéro du compte d'immobilisation associé*
 - Montant**
 
-* Le numéro du compte d'immobilisation est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement 28x. Si plusieurs comptes d'amortissements, chaque compte fait l'objet d'un enregistrement
-** Le montant enregistré est celui de la ligne relative au compte d'amortissement 28x, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.
+\* *Le numéro du compte d'immobilisation est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement 28x. Si plusieurs comptes d'amortissements, chaque compte fait l'objet d'un enregistrement*
+
+\** *Le montant enregistré est celui de la ligne relative au compte d'amortissement 28x, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.*
 
 Pour les autres écritures relatives à un compte de charges (63x, 64x, 65x, 66x, 67x, 68x hors 6811x, 69x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
 
