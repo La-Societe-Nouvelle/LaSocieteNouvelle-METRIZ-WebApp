@@ -1,158 +1,137 @@
-# DOCUMENTATION - FEC READER
+# DESCRIPTION - LECTURE FEC
 
-Le script de lecture s'effectue sur l'ensemble des écritures présents au sein du fichier. Seule le journal des A-Nouveaux fait l'objet d'une lecture différente.
+Le présent document décrit le fonctionnement du script de lecture du fichier FEC.
 
-La description des informations extraites est décrite ci-dessous.
+## INFORMATIONS EXTRAITES
 
-*Note : la terminologie : "écriture relative au comptes x" signifie que le numéro de compte de la ligne d'écriture commence par le numéro x.*
+La lecture du FEC a pour objectif de récupérer les éléments suivants :
+- Montant du chiffre d'affaires
+- Montant de la production immobilisée
+- Liste des charges externes (avec comptes auxiliaires associés)
+- Montants des comptes de stocks en début et fin d'exercice
+- Flux de variations de stocks (avec comptes de stocks associés)
+- Montants (comptables) des comptes d'immobilisations en début et fin d'exercice
+- Liste des acquisitions (avec comptes d'immobilisations et auxiliaires associés)
+- Liste des amortissements (avec comptes d'immobilisations associés)
+
+Ainsi que d'autres données complémentaires, utilisées à des fins de contrôle :
+- Montant des autres produits d'exploitation
+- Montant des taxes
+- Montant des charges personnels
+- Montant des autres charges d'exploitation
+- Montant des charges financières
+- Montant des charges exceptionnelles
+- Montant des provisions
+- Montant des impôts sur les sociétés
 
 
-## OBJETS
+## EXECUTION
 
-Les données comptables permettent de construire les objets suivantes :
-- Immobilisation
-- Stock
-- Dépenses
-- Dotations aux amortissements sur immobilisations
-- Variations de stocks
+Le script de lecture s'effectue sur l'ensemble des écritures présentes au sein du fichier. Seul le journal des A-Nouveaux fait l'objet d'une lecture différente.
 
-### Immobilisation
-
-Attributs:
-- Numéro du compte
-- Libellé du compte
-- Montant (valeur comptable) en début d'exercice
-- Montant (valeur comptable) en fin d'exercice
-- Caractère amortissable
 
 ## LECTURE DU JOURNAL A-NOUVEAUX
 
-La lecture du journal des A-Nouveaux permet de connaître les montants en début d'exercice des comptes de stocks et d'immobilisations.
-
+Les informations extraites du journal sont les suivantes:
+- Montants des comptes de stocks en début d'exercice
+- Montants (comptables) des comptes d'immobilisations en début d'exercice
 
 ### Ecritures relatives aux comptes d'Immobilisations
 
-Pour chaque écriture relative à un compte d'immobilisation (hors comptes d'amortissements et de dépréciations), sont enregistrées les informations suivantes :
-- numéro du compte
-- libellé du compte
-- caractère amortissable (comptes 20 et 21)
-- montant (valeur comptable)*
+Pour chaque écriture relative à un compte d'immobilisation (hors comptes d'amortissements et de dépréciations) i.e. comptes 20x, 21x, 22x, 23x, 25x, 26x et 27x, sont enregistrées les informations suivantes :
+- Numéro du compte
+- Libellé du compte
+- Caractère amortissable (comptes 20x ou 21x)
+- Montant (Pour les comptes 20 et 21, un compte d'amortissement 28x est recherché au sein du journal. Si existant, le montant enregistré pour l'immobilisation est réduit du montant de l'amortissement)
 
-* Pour les comptes 20 et 21, un compte d'amortissement est recherché au sein du journal. Si existant, le montant enregistré pour l'immobilisation est réduit du montant de l'amortissement.
+Les comtpes 28x sont traités indirectement lors de la lecture des comptes 20x et 21x.
+
+Les comptes 29x ne sont pas pris en comptes, n'ayant pas d'incidence sur les comptes d'exploitation de l'entreprise.
 
 ### Ecritures relatives aux comptes de Stocks
 
-Seuls les comptes 31, 32, 33, 34, 35 et 37 font l'objet d'un traitement.
+Pour chaque écriture relative à un compte de stocks (hors dépréciations, stocks provenant d'immobilisation et stocks en voie d'acheminement) i.e. comptes 31x, 32x, 33x, 34x, 35x et 37x, sont enregistrées les informations suivantes:
+- Numéro du compte
+- Libellé du compte
+- Montant
+- Type de stock (achats et marchandises / produits)  
 
-Pour chaque écriture relative à l'un de ces comptes, sont enregistrées les informations suivantes :
-- numéro du compte
-- libellé du compte
-- Montant initial
-- type de stock (achats et marchandises/produits)
-- correspondance avec les comptes de charges (pour les comptes 31, 32 et 37)
+Et pour les comptes d'achats et de marchandises :
+- Préfixe des comptes de charges associés au stock (ex. 311x <-> 6011)
+
+Les comptes 36x et 38x ne sont pas pris en comptes.
+
+Les comptes 39x ne sont pas pris en comptes, n'ayant pas d'incidence sur les comptes d'exploitation de l'entreprise.
 
 
 ## AUTRES JOURNAUX
+
+Les informations extraites des journaux sont les suivantes:
+- Montant du chiffre d'affaires
+- Montant de la production immobilisée
+- Liste des charges externes (avec comptes auxiliaires associés)
+- Montants des comptes de stocks en fin d'exercice
+- Flux de variations de stocks (avec comptes de stocks associés)
+- Montants (comptables) des comptes d'immobilisations en fin d'exercice
+- Liste des acquisitions (avec comptes d'immobilisations et auxiliaires associés)
+- Liste des amortissements (avec comptes d'immobilisations associés)
+
+Les lignes d'écritures *lues* sont celles relatives aux comptes d'immobilisations 2x, aux comptes de stocks 3x, aux comptes de charges 6x et aux comptes de produits 7x.
+
+*Note : la lecture de certaines lignes peut entraîner une recherche sur d'autres comptes (40x par exemple dans le cas des dépenses) qui ne font cependant pas l'objet d'une lecture spontanée*
+
 
 ### Ecritures relatives aux comptes d'Immobilisation
 
-Pour les écritures relatives aux comptes 20 à 27, la variation (débit - crédit) est enregistrée au niveau du compte d'immobilisation
+Pour chaque écriture relative à un compte d'immobilisations i.e. comptes 20x, 21x, 22x, 23x, 25x, 26x, 27x, la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
-________________________________________________________________
+Pour chaque écriture relative à un compte d'amortissements i.e. comptes 28x, la variation (Débit - Crédit) est incrémentée au volume courant du compte d'immobilisation associé (i.e. comptes 20x ou 21x); afin d'obtenir la valeur comptable en fin d'exercice.
 
-Les informations reprises sont les montants nets comptables des comptes d'immobilisations.
+Les comptes 29x ne sont pas pris en compte, n'ayant pas d'incidence sur les comptes d'exploitation de l'entreprise.
 
-Les comptes 20 à 27 font l'objet d'un enregistrement
-
-| Ecriture | Traitement |
-| Les écritures relatives à un compte d'immobilisations (2) (hors comptes 28 et 29), le montant au débit est enregistré.
-
-Pour les comptes 20 et 21, un compte d'amortissement 28 est associé. Si le compte est présent dans le journal, le montant au crédit vient réduire le montant de l'immobilisation.
-
-Les comptes 29 ne sont pas pris en comptes. Ils n'ont pas d'incidence sur le résultat d'exploitation de l'entreprise.
-
-Les comptes enregistrées sont les comptes 20 à 27.
+*Note : lorsque le compte d'immobilisations n'est pas encore répertorié (absent du journal des A-Nouveaux), son montant en début d'exercice est considérée comme nul (égal à 0)*
 
 
-La lecture du journal permet la récupération des données suivantes :
-- Stock initial d'achats;
-- Stock initial de produits;
-- Valeur des immobilisations. 
+### Ecritures relatives aux comptes de Stocks
 
-Le stock initial d'achats correspond à la somme des débits des comptes 33, 34 et 35.
-Le montant apparaît au sein du tableau des soldes intermédiaires sour la dénomination "Achats déstockés".
+Pour chaque écriture relative à un compte de stocks (comptes 31x, 32x, 33x, 34x, 35x et 37x), la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
-Le stock initial de produits correspond quant à lui à la somme des débits des comptes 31, 32 et 37.  
-Le montant apparaît au sein du tableau des soldes intermédiaires sous la dénomination "Production déstockée sur l'exercice précédent".
+Les comptes 36x, 38x et 39x ne sont pas pris en compte.
 
-La valeur des immobilisations est obtenue pour chaque compte 20 et 21 à partir des débits des comptes 20 et 21 et des crédits des comptes d'amortissements correspondants. La correspondance se fait suivant le modèle 2xxxx0 <-> 28xxxx.
-Les valeurs sont accessibles au sein du tableau "Etat des immobilisations" (Données financières - Onglet Immobilisations).
-
-### Comptes de Stocks
-
-Pour chaque écriture relative à un compte de stock (hors comptes 36, 38 et 39), le montant au débit est enregistré.
-
-Les comptes 31, 32 et 37 sont considérés comme des comptes d'achats i.e. leurs indicateurs sont obtenues à partir des comptes de charges.
-
-Les comptes 33, 34 et 35 sont considérés comme des comptes de produits i.e. leurs indicateurs sont obtenus à partir de l'empreinte de la production de l'entreprise.
+*Note : de même que pour les comptes d'immobilisations, lorsque le compte de stocks n'est pas encore répertorié (absent du journal des A-Nouveaux), son montant en début d'exercice est considérée comme nul (égal à 0)*
 
 
-## AUTRES JOURNAUX
+### Ecritures relatives aux comptes de Charges
 
-### ECRITURE - COMPTE D'IMMOBILISATIONS
+Pour chaque écriture relative aux comptes 60x, 61x et 62x (hors 603x), sont enregistrées les informations suivantes:
+- Libellé de l'écriture
+- Numéro du compte de charges
+- Libellé du compte de charges
+- Numéro du compte fournisseur auxiliaire associé*
+- Libellé du compte fournisseur auxiliaire associé
+- Montant (Pour les comptes 609x, le montant est inversé: Crédit - Débit, pour être traité comme une dépense *négative*)
 
-La lecture des écritures relatives aux immobilisations permet d'obtenir la valeur finale du compte concerné.
+* Le numéro du compte auxiliaire est obtenu à partir de la ligne de l'écriture comptable relative à un compte fournisseur 40x. Lorsqu'aucun compte auxiliaire n'est utilisé, le compte fournisseur 40x est repris; et lorsqu'aucune ligne fournisseur n'est trouvable, un compte fournisseur par défaut est créé à partir du numéro du compte de charges et avec le libellé "DEPENESE - X" où *X* est le libellé du compte de charges.
 
-La valeur finale permet de produire l'état final des comptes, qui pourra alors être importé lors du prochain exercice.
+Pour chaque écriture relative aux comptes 603x, sont enregistrées les informations suivantes:
+- Numéro du compte
+- Libellé du compte
+- Numéro du compte de stock associé
+- Montant
 
-### ECRITURE - COMPTE DE STOCKS
+Lorsque le compte 603x est d'ores-et-déjà présent au sein de la liste des variations de stocks, la variation (Débit - Crédit) est incrémentée au montant courant de la variation de stocks.
 
-La lecture des écritures relatives aux stocks permet, à l'image des comtpes d'immobilisations, d'obtenir le montant des stocks en fin d'exercice.
+Pour chaque écriture relative aux comptes 6811x, sont enregistrées les informations suivantes:
+- Numéro du compte
+- Libellé du compte
+- Numéro du compte d'immobilisation associé*
+- Montant**
 
-### ECRITURE - COMPTE DE CHARGES
+* Le numéro du compte d'immobilisation est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement 28x. Si plusieurs comptes d'amortissements, chaque compte fait l'objet d'un enregistrement
+** Le montant enregistré est celui de la ligne relative au compte d'amortissement 28x, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.
 
-La lecture des écritures relatives aux charges comprend trois cas.
+Pour les autres écritures relatives à un compte de charges (63x, 64x, 65x, 66x, 67x, 68x hors 6811x, 69x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
 
-Pour les comptes 60, 61 et 62 hors 603 : enregistrement de la dépense.
-Un compte auxiliaire est recherché : compte 40 ayant le même numéro de ligne d'écriture et le même libellé d'écriture.
-Si le compte auxiliaire n'est pas disponible, le compte de fournisseur est utilisé, et si celui n'est pas disponible un compte par défaut "DEPENSES - {Compte de charge}" est utilisé.
-
-Les rabais, remises, ristournes sont enregistrés en tant que dépenses négatives pour plus de simplicité.
-Elle sont associés aux comptes correspondant 609 => 60_
-
-Pour les comptes 603,
-une variattion de stock est enregistrée.
-
-Est-ce que pour un 603 plusieurs 3__
-
-## JOURNAL - VENTES
-
-La lecture du journal des ventes permet l'obtention du chiffre d'affaires. Il est obtenu en faisant la somme des crédits executés sur le compte 70.
-
-## JOURNAL - ACHATS
-
-La lecture du journal des achats permet l'obtention des dépenses d'exploitation et des dépenses en immobilisations.
-
-Pour les dépenses d'exploitation, les comptes considérés sont les comptes 60 (hors 603), 61 et 62. Les dépenses sont associées au fournisseur via les comptes auxiliaires (à partir de ligne relative au compte fournisseur).
-La liste des dépenses est ensuite accessible via l'onglet "Charges externes".
-
-Pour les dépenses en immobilisations, les comptes considérés sont les comptes 20 et 21. Les dépenses sont directement associées au compte d'immbolisation concerné.
-La liste des dépenses est accessible via l'onglet "Immobilisations" (3ème tableau).
+### Ecritures relatives aux comptes de Produits
 
 
-## JOURNAL - AUTRES OPERATIONS
-
-La lecture des journaux correspondants aux autres opérations permet l'acquisition des données suivantes :
-- Volume de la production immobilisée
-- Stock final de produits
-- Stock final d'achats
-- Dotations aux amortissements
-
-Le volume de la production immobilisée correspond à la somme des crédits sur le compte 72.
-
-Le stock final de produits est obtenu à partir des débits/crédits sur le compte 71.
-
-Le stock final d'achats est quand à lui obtenur à partir des débits/crédits sur le compte 603.
-
-Les dotations aux amortissements sont obtenus à partir des écritures sur les comptes 28.
-La liste des dotations est accessible via l'onglet "Immobilisations" (1er tableau).
