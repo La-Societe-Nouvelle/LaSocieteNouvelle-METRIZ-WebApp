@@ -116,7 +116,8 @@ Pour chaque écriture relative aux comptes 60x, 61x et 62x (hors 603x), sont enr
 Pour chaque écriture relative aux comptes 603x, sont enregistrées les informations suivantes:
 - Numéro du compte
 - Libellé du compte
-- Numéro du compte de stock associé
+- Numéro du compte de stocks associé
+- Type de compte de stocks concerné (achats et marchandises)
 - Montant
 
 Lorsque le compte 603x est d'ores-et-déjà présent au sein de la liste des variations de stocks, la variation (Débit - Crédit) est incrémentée au montant courant de la variation de stocks.
@@ -133,5 +134,25 @@ Pour chaque écriture relative aux comptes 6811x, sont enregistrées les informa
 Pour les autres écritures relatives à un compte de charges (63x, 64x, 65x, 66x, 67x, 68x hors 6811x, 69x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
 
 ### Ecritures relatives aux comptes de Produits
+
+Pour chaque écriture relative à un compte de vente de produits 70x, la variation (Débit - Crédit) est incrémentée au volume courant du chiffre d'affaires.
+
+Pour chaque écriture relative à un compte de stocks de produits 71x, sont enregistrées les informations suivantes:
+- Numéro du compte
+- Libellé du compte
+- Numéro du compte de stocks associé
+- Type de compte de stocks concerné (produits)
+- Montant
+
+Lorsque le compte 71x est d'ores-et-déjà présent au sein de la liste des variations de stocks, la variation (Débit - Crédit) est incrémentée au montant courant de la variation de stocks.
+
+Pour chaque écriture relative à un compte de production immobilisée 72x, la variation (Débit - Crédit) est incrémentée au volume courant de la production immobilisée.
+
+Pour les autres écritures relatives à un compte de produits d'exploitation (74x, 75x, 781x, 791x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat "autres produits d'exploitations".
+
+
+## AUTRES INFORMATIONS EXTRAITES
+
+La lecture du FEC permet également d'extraire les montants des taxes d'apprentissage et des contributions des employeurs à la formation professionnelle, utilisés pour l'indicateur relatif à l'évolution des compétences et des connaissances.
 
 
