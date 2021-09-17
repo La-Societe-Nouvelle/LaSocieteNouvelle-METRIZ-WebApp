@@ -132,7 +132,7 @@ Pour chaque écriture relative aux comptes 6811x, sont enregistrées les informa
 
 \** *Le montant enregistré est celui de la ligne relative au compte d'amortissement 28x, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.*
 
-Pour les autres écritures relatives à un compte de charges (63x, 64x, 65x, 66x, 67x, 68x hors 6811x, 69x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
+Pour les autres écritures relatives à un compte de charges (63x, 64x, 65x, 66x et 686x, 67x et 687x, 681x hors 6811x, 69x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
 
 ### Ecritures relatives aux comptes de Produits
 
