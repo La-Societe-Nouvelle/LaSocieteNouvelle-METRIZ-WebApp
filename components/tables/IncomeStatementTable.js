@@ -66,7 +66,7 @@ export const IncomeStatementTable = ({financialData}) =>
         </tr>)}
 
         <tr className="with-top-line">
-          <td>Dotations aux amortissements</td>
+          <td>Dotations aux amortissements sur immobilisations</td>
           <td className="column_amount important">{printValue(financialData.getAmountDepreciations(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
       {Object.entries(groupDepreciationsByAccounts(financialData.depreciations)).map(([_,{account,accountLib,amount}]) => 
