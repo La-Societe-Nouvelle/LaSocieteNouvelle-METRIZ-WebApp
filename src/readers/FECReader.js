@@ -517,9 +517,9 @@ const readExpenseEntry = async (data,book,ecriture) =>
   if (ecriture.CompteNum.substring(0,2)=="63") data.taxes+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,2)=="64") data.personnelExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,2)=="65") data.otherExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="66") data.financialExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="67") data.exceptionalExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="68" & ecriture.CompteNum.substring(0,4)!="6811") data.provisions+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (ecriture.CompteNum.substring(0,2)=="66" || ecriture.CompteNum.substring(0,3)=="686") data.financialExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (ecriture.CompteNum.substring(0,2)=="67" || ecriture.CompteNum.substring(0,3)=="687") data.exceptionalExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (ecriture.CompteNum.substring(0,3)=="681" && ecriture.CompteNum.substring(0,4)!="6811") data.provisions+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,2)=="69") data.taxOnProfits+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
 
 }
