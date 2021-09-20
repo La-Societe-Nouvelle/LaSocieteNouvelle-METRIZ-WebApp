@@ -12,45 +12,44 @@ import { Flow } from './Flow';
 
 export class FinancialData {
 
-    constructor() 
+    constructor(props) 
     {
-        this.isFinancialDataLoaded = false;
+    // ---------------------------------------------------------------------------------------------------- //
+        
+        // data loaded state
+        this.isFinancialDataLoaded = false;                 // i.e. FEC loaded
         
         // Production
-        this.revenue = null;
-        this.production = null;
-        this.immobilisedProduction = null;
+        this.revenue = null;                                // revenue (#70)
+        this.immobilisedProduction = null;                  // immobilised production (#72)
 
         // Expenses
-        this.expenses = [];
+        this.expenses = [];                                 // external expenses (#60, #61, #62)
+        this.depreciationExpenses = [];                     // depreciation expenses (#6811, #6871)
 
         // Stocks
-        this.stocks = [];
-        this.stocksVariations = [];
+        this.stocks = [];                                   // stocks (#31 to #35, #37)
+        this.stockVariations = [];                          // stock variation (#71, #603)
         
         // Immobilisations
-        this.immobilisations = [];
-        this.depreciations = [];
-        this.investments = [];
-
-        // Net Value Added
-        this.netValueAdded = null;
+        this.immobilisations = [];                          // immobilisations (#20 to #27)
+        this.depreciations = [];                            // depreciations (#28 & #29)
+        this.investments = [];                              // investments (flows #2 <- #404)
 
         // Other figures
-        this.otherOperatingIncomes = 0;
-        this.taxes = 0;               // 63_
-        this.personnelExpenses = 0;   // 64_
-        this.otherExpenses = 0;       // 65_
-        this.financialExpenses = 0;   // 66_
-        this.exceptionalExpenses = 0; // 67_
-        this.provisions = 0;          // 68_ (hors amortissements)
-        this.taxOnProfits = 0;        // 69_
-
-        // Accounts
-        this.labelsAccounts = {};
+        this.otherOperatingIncomes = 0;                     //
+        this.taxes = 0;                                     // #63
+        this.personnelExpenses = 0;                         // #64
+        this.otherExpenses = 0;                             // #65
+        this.financialExpenses = 0;                         // #66
+        this.exceptionalExpenses = 0;                       // #67 hors #6871
+        this.provisions = 0;                                // #68 hors #6811
+        this.taxOnProfits = 0;                              // #69
 
         // Companies
-        this.companies = [];
+        this.companies = [];                                // Companies
+
+    // ---------------------------------------------------------------------------------------------------- //
     }
 
     /* ----- Back Up ----- */
@@ -80,67 +79,45 @@ export class FinancialData {
     /* -------------------- FEC LOADER -------------------- */
     /* ---------------------------------------------------- */
 
-    async loadFECData(FECData) 
+    async loadData(data) 
     {
-        console.log(FECData);
+    // ---------------------------------------------------------------------------------------------------- //    
         
-        /* --- Comptes d'Immobilisations (2) --- */
+        // Print
+        console.log(data);
         
+        // Production
+        this.revenue = data.revenue || 0;
+        this.immobilisedProduction = data.immobilisedProduction || 0;
+
+        // Expenses
+        this.expenses = data.expenses.map((props,id) => new Expense({id: id, ...props}));
+        this.depreciationExpenses = data.depreciationExpenses.map((props,id) => new Expense({id: id, ...props}));
+
+        // Stocks
+        this.stocks = data.stocks.map((props,id) => new Stock({id: id, ...props}));
+        this.stockVariations = data.stockVariations.map((props,id) => new Flow({id: id, ...props}));
+
         // Immobilisations
-        this.immobilisations = [];
-        await Promise.all(FECData.immobilisations.map((immobilisation) => this.addImmobilisation(immobilisation)));
-        
-        this.investments = [];
-        await Promise.all(FECData.investments.map((investment) => this.addInvestment(investment)));
-        
-        this.depreciations = [];
-        await Promise.all(FECData.depreciations.map((depreciation) => this.addDepreciation(depreciation)));
-
-        /* --- Comptes de Stocks (3) --- */
-        
-        this.stocks =[];
-        await Promise.all(FECData.stocks.map((stock) => this.addStock(stock)));
-        
-        /* --- Comptes de Charges (7) --- */
-        
-        // 60, 61, 62
-        this.expenses = [];
-        await Promise.all(FECData.expenses.map((expense) => this.addExpense(expense)));
-        
-        // 603 & 71
-        this.stocksVariations =[];
-        await Promise.all(FECData.stocksVariations.map((stockVariation) => this.addStockVariation(stockVariation)));
-
-        // Other expenses
-        this.taxes = FECData.taxes;
-        this.personnelExpenses = FECData.personnelExpenses;
-        this.otherExpenses = FECData.otherExpenses;
-        this.financialExpenses = FECData.financialExpenses;
-        this.exceptionalExpenses = FECData.exceptionalExpenses;
-        this.provisions = FECData.provisions;
-
-        /* --- Comptes de Produits (7) --- */
-
-        // 70
-        this.revenue = FECData.revenue;
-
-        // 71
-        // ...Cf. stocksVariations
-
-        // 72
-        this.immobilisedProduction = FECData.immobilisedProduction;
+        this.immobilisations = data.immobilisations.map((props,id) => new Immobilisation({id: id, ...props}));
+        this.depreciations = data.depreciations.map((props,id) => new Depreciation({id: id, ...props}));
+        this.investments = data.investments.map((props,id) => new Expense({id: id, ...props}));
 
         // Other figures
-        this.otherOperatingIncomes = FECData.otherOperatingIncomes;
-        this.taxOnProfits = FECData.taxOnProfits;
+        this.otherOperatingIncomes = data.otherOperatingIncomes || 0;
+        this.taxes = data.taxes || 0;
+        this.personnelExpenses = data.personnelExpenses || 0;
+        this.otherExpenses = data.otherExpenses || 0;
+        this.financialExpenses = data.financialExpenses || 0;
+        this.exceptionalExpenses = data.exceptionalExpenses || 0;
+        this.provisions = data.provisions || 0;
+        this.taxOnProfits = data.taxOnProfits || 0;
 
-        /* --- Companies --- */
-
-        this.companies = [];
-        await Promise.all(this.expenses.concat(this.investments)
-                                       .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib})})
-                                       .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                                       .map(({account,accountLib}) => this.addCompany({account, corporateName: accountLib})));
+        // Companies
+        this.companies = this.expenses.concat(this.investments)
+                                      .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib})})
+                                      .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
+                                      .map(({account,accountLib},id) => new Company({id, account, corporateName: accountLib}));
         
         /* --- INITIAL STATES --- */
 
@@ -151,7 +128,9 @@ export class FinancialData {
         this.stocks.filter(stock => stock.isProductionStock)
                    .forEach(stock => stock.initialState = "currentFootprint")
 
+        // data loaded
         this.isFinancialDataLoaded = true;
+    // ---------------------------------------------------------------------------------------------------- //
     }
     
     /* -------------------- AMOUNTS GETTERS -------------------- */

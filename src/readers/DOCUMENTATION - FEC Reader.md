@@ -7,12 +7,13 @@ Le présent document décrit le fonctionnement du script de lecture du fichier F
 La lecture du FEC a pour objectif de récupérer les éléments suivants :
 - Montant du chiffre d'affaires
 - Montant de la production immobilisée
-- Liste des charges externes (avec comptes auxiliaires associés)
+- Liste des charges externes (avec comptes fournisseurs auxiliaires associés)
 - Montants des comptes de stocks en début et fin d'exercice
 - Flux de variations de stocks (avec comptes de stocks associés)
-- Montants (comptables) des comptes d'immobilisations en début et fin d'exercice
-- Liste des acquisitions (avec comptes d'immobilisations et auxiliaires associés)
+- Montants des comptes d'immobilisations en début et fin d'exercice
+- Liste des acquisitions (avec comptes d'immobilisations et comptes fournisseurs auxiliaires associés)
 - Liste des amortissements (avec comptes d'immobilisations associés)
+- Liste des dotations aux amortissements sur immobilisations (avec comptes d'amortissements associés)
 
 Ainsi que d'autres données complémentaires, utilisées à des fins de contrôle :
 - Montant des autres produits d'exploitation
@@ -23,6 +24,7 @@ Ainsi que d'autres données complémentaires, utilisées à des fins de contrôl
 - Montant des charges exceptionnelles
 - Montant des provisions
 - Montant des impôts sur les sociétés
+- Montants des comptes de dépréciations en début et fin d'exercice(avec comptes d'immobilisations associés)
 
 
 ## EXECUTION
@@ -34,7 +36,8 @@ Le script de lecture s'effectue sur l'ensemble des écritures présentes au sein
 
 Les informations extraites du journal sont les suivantes:
 - Montants des comptes de stocks en début d'exercice
-- Montants (comptables) des comptes d'immobilisations en début d'exercice
+- Montants des comptes d'immobilisations en début d'exercice
+- Montants des comptes d'amortissements et de dépréciations en début d'exercice
 
 ### Ecritures relatives aux comptes d'Immobilisations
 
@@ -42,11 +45,14 @@ Pour chaque écriture relative à un compte d'immobilisation (hors comptes d'amo
 - Numéro du compte
 - Libellé du compte
 - Caractère amortissable (comptes 20x ou 21x)
-- Montant (Pour les comptes 20 et 21, un compte d'amortissement 28x est recherché au sein du journal. Si existant, le montant enregistré pour l'immobilisation est réduit du montant de l'amortissement)
+- Montant
 
-Les comtpes 28x sont traités indirectement lors de la lecture des comptes 20x et 21x.
+Pour chaque écriture relative à un compte d'amortissement ou de dépréciation i.e. #28 et #29, sont enregistrées les informations suivantes :
+- Numéro du compte
+- Libellé du compte
+- Numéro du compte d'immobilisation associé
+- Montant
 
-Les comptes 29x ne sont pas pris en comptes, n'ayant pas d'incidence sur les comptes d'exploitation de l'entreprise.
 
 ### Ecritures relatives aux comptes de Stocks
 
@@ -61,8 +67,7 @@ Et pour les comptes d'achats et de marchandises :
 
 Les comptes 36x et 38x ne sont pas pris en comptes.
 
-Les comptes 39x ne sont pas pris en comptes, n'ayant pas d'incidence sur les comptes d'exploitation de l'entreprise.
-
+Les comptes 39x ne sont pas pris en comptes, n'ayant pas d'incidence sur le volume de la valeur ajoutée nette de l'entreprise.
 
 ## AUTRES JOURNAUX
 
@@ -72,9 +77,10 @@ Les informations extraites des journaux sont les suivantes:
 - Liste des charges externes (avec comptes auxiliaires associés)
 - Montants des comptes de stocks en fin d'exercice
 - Flux de variations de stocks (avec comptes de stocks associés)
-- Montants (comptables) des comptes d'immobilisations en fin d'exercice
+- Montants des comptes d'immobilisations en fin d'exercice
+- Montants des comptes d'amortissements et de dépréciations des immboilisations en fin d'exercice
 - Liste des acquisitions (avec comptes d'immobilisations et auxiliaires associés)
-- Liste des amortissements (avec comptes d'immobilisations associés)
+- Liste des dotations aux amortissements sur immobilisations (avec comptes d'immobilisations associés)
 
 Les lignes d'écritures *lues* sont celles relatives aux comptes d'immobilisations 2x, aux comptes de stocks 3x, aux comptes de charges 6x et aux comptes de produits 7x.
 
@@ -85,9 +91,7 @@ Les lignes d'écritures *lues* sont celles relatives aux comptes d'immobilisatio
 
 Pour chaque écriture relative à un compte d'immobilisations i.e. comptes 20x, 21x, 22x, 23x, 25x, 26x, 27x, la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
-Pour chaque écriture relative à un compte d'amortissements i.e. comptes 28x, la variation (Débit - Crédit) est incrémentée au volume courant du compte d'immobilisation associé (i.e. comptes 20x ou 21x); afin d'obtenir la valeur comptable en fin d'exercice.
-
-Les comptes 29x ne sont pas pris en compte, n'ayant pas d'incidence sur les comptes d'exploitation de l'entreprise.
+Pour chaque écriture relative à un compte d'amortissements ou de dépréciations i.e. comptes #28 ou #29, la variation (Débit - Crédit) est incrémentée au volume courant du compte associé (i.e. comptes #28 ou #29); afin d'obtenir la valeur comptable en fin d'exercice.
 
 *Note : lorsque le compte d'immobilisations n'est pas encore répertorié (absent du journal des A-Nouveaux), son montant en début d'exercice est considérée comme nul (égal à 0)*
 
@@ -103,7 +107,7 @@ Les comptes 36x, 38x et 39x ne sont pas pris en compte.
 
 ### Ecritures relatives aux comptes de Charges
 
-Pour chaque écriture relative aux comptes 60x, 61x et 62x (hors 603x), sont enregistrées les informations suivantes:
+Pour chaque écriture relative aux comptes #60, #61 et #62 (hors #603), sont enregistrées les informations suivantes:
 - Libellé de l'écriture
 - Numéro du compte de charges
 - Libellé du compte de charges
@@ -113,26 +117,26 @@ Pour chaque écriture relative aux comptes 60x, 61x et 62x (hors 603x), sont enr
 
 \* *Le numéro du compte auxiliaire est obtenu à partir de la ligne de l'écriture comptable relative à un compte fournisseur 40x. Lorsqu'aucun compte auxiliaire n'est utilisé, le compte fournisseur 40x est repris; et lorsqu'aucune ligne fournisseur n'est trouvable, un compte fournisseur par défaut est créé à partir du numéro du compte de charges et avec le libellé "DEPENESE - X" où X est le libellé du compte de charges.*
 
-Pour chaque écriture relative aux comptes 603x, sont enregistrées les informations suivantes:
+Pour chaque écriture relative aux comptes #603, sont enregistrées les informations suivantes:
 - Numéro du compte
 - Libellé du compte
 - Numéro du compte de stocks associé
 - Type de compte de stocks concerné (achats et marchandises)
 - Montant
 
-Lorsque le compte 603x est d'ores-et-déjà présent au sein de la liste des variations de stocks, la variation (Débit - Crédit) est incrémentée au montant courant de la variation de stocks.
+Lorsque le compte #603 est d'ores-et-déjà présent au sein de la liste des variations de stocks, la variation (Débit - Crédit) est incrémentée au montant courant de la variation de stocks.
 
-Pour chaque écriture relative aux comptes 6811x, sont enregistrées les informations suivantes:
+Pour chaque écriture relative aux comptes #6811 et #6871 (dotations aux amortissements sur immobilisations), sont enregistrées les informations suivantes:
 - Numéro du compte
 - Libellé du compte
 - Numéro du compte d'immobilisation associé*
 - Montant**
 
-\* *Le numéro du compte d'immobilisation est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement 28x. Si plusieurs comptes d'amortissements, chaque compte fait l'objet d'un enregistrement*
+\* *Le numéro du compte d'amortissement est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement #28. Si plusieurs comptes d'amortissements, chaque compte fait l'objet d'un enregistrement*
 
-\** *Le montant enregistré est celui de la ligne relative au compte d'amortissement 28x, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.*
+\** *Le montant enregistré est celui de la ligne relative au compte d'amortissement #28, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.*
 
-Pour les autres écritures relatives à un compte de charges (63x, 64x, 65x, 66x et 686x, 67x et 687x, 681x hors 6811x, 69x), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
+Pour les autres écritures relatives à un compte de charges (#63, #64, #65, #66 et #686, #67 et #687 hors #6871, #681 hors 6811x, #69), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
 
 ### Ecritures relatives aux comptes de Produits
 

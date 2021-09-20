@@ -31,22 +31,22 @@ const parseAmount = (stringAmount) => parseFloat(stringAmount.replace(',','.'))
 async function FECFileReader(content) 
 // ...build JSON from FEC File (FEC -> JSON)
 {
-  /* --- OUTPUT --- */
-  
+  // Output data ---------------------------------------------------------------------------------------- //
+
   let dataFEC = {meta: {books: {},accounts: {}, accountsAux: {}}, books: []};
 
-  /* --- SEPARATOR --- */
+  // Separator ------------------------------------------------------------------------------------------ //
 
   let separator = content.slice(0,content.indexOf('\n')).split('\t').length == 18 ? '\t' : '|';
 
-  /* --- HEADER --- */
+  // Header --------------------------------------------------------------------------------------------- //
   
   // read header & build columns index
   let indexColumns = {};
   const header = content.slice(0,content.indexOf('\n')).split(separator);
         header.forEach(column => indexColumns[column] = header.indexOf(column));
 
-  /* --- ROWS --- */
+  // Rows ----------------------------------------------------------------------------------------------- //
   
   // array of rows
   const rows = content.slice(content.indexOf('\n')+1).split('\n');
@@ -81,8 +81,7 @@ async function FECFileReader(content)
     }
   })
 
-  /* --- RETURN --- */
-
+  // Return --------------------------------------------------------------------------------------------- //
   return dataFEC;
 }
 
@@ -124,7 +123,7 @@ function getDefaultBookType(bookCode,bookLib)
 async function FECDataReader(FECData)
 // ...extract data to use in session (JSON -> Session)
 { 
-  /* --- OUTPUT --- */
+  // Output data ---------------------------------------------------------------------------------------- //
   
   let data = {};
 
@@ -134,22 +133,23 @@ async function FECDataReader(FECData)
 
   // Production / Incomes ------------------------------------------------------------------------------- //
   data.revenue = 0;                 // 70
-  data.storedProduction = 0;        // 71 + prevAmount 33, 34 & 35
+  //data.storedProduction = 0;      // 71 + prevAmount 33, 34 & 35
+  //data.unstoredProduction = 0;    // prevAmount 33, 34 & 35
   data.immobilisedProduction = 0;   // 72
-  data.unstoredProduction = 0;      // prevAmount 33, 34 & 35
   data.otherOperatingIncomes = 0;   // 74, 75, 781, 791
 
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = [];                 // stock 31, 32, 33, 34, 35, 37
-  data.stocksVariations = [];       // stock flow 603, 71 <-> 31, 32, 33, 34, 35, 37
+  data.stockVariations = [];       // stock flow 603, 71 <-> 31, 32, 33, 34, 35, 37
 
   // Expenses ------------------------------------------------------------------------------------------- //
   data.expenses = [];               // 60, 61, 62 (hors 603) (609 read as negative expenses)
+  data.depreciationExpenses = [];   // 6811 and 6871
   
   // Immobilisations ------------------------------------------------------------------------------------ //
-  data.immobilisations = [];        // stock 20, 21
+  data.immobilisations = [];        // stock 20 to 27
   data.investments = [];            // flow 404 -> 20, 21
-  data.depreciations = [];          // flow 6811 -> 28 (i.e 20, 21)
+  data.depreciations = [];          // stock 28 and 29
 
   // others key figures --------------------------------------------------------------------------------- //
   data.taxes = 0;                   // flow <- 63_
@@ -174,6 +174,7 @@ async function FECDataReader(FECData)
 
   /* --- OTHER BOOKS --- */
 
+  // Read books (except "A Nouveaux")
   await Object.entries(FECData.meta.books)
               .filter(([_,{type}]) => type != "ANOUVEAUX")
               .forEach(async ([bookCode,_]) => 
@@ -228,32 +229,38 @@ async function readBookAsJournalANouveaux(data,book)
      */
 
     // Comptes d'immobilisations (hors amortissements et dépréciations) --------------------------------- //
-    if (ecriture.CompteNum.charAt(0)=="2" && !["28","29"].includes(ecriture.CompteNum))
+    if (ecriture.CompteNum.charAt(0)=="2" && !["28","29"].includes(ecriture.CompteNum.substring(0,2)))
     {
-      // amortissement pour les immobilisations amortissables
-      let valueLoss = 0;
-      let isDepreciableImmobilisation = ["20","21"].includes(ecriture.CompteNum.substring(0,2));
-      if (isDepreciableImmobilisation)
-      {
-        let accountAmortisation = "28"+ecriture.CompteNum.slice(1,-1);
-        let ecritureAmortisation = book.filter(ecritureAmortisation => ecritureAmortisation.CompteNum == accountAmortisation)[0];
-        valueLoss = ecritureAmortisation ? parseAmount(ecritureAmortisation.Credit) : 0;
-      }
-
       // immobilisation data
       let immobilisationData = 
       {
         account: ecriture.CompteNum,
         accountLib: ecriture.CompteLib,
-        isDepreciableImmobilisation: true,
-        prevAmount: parseAmount(ecriture.Debit) - valueLoss,
-        amount: parseAmount(ecriture.Debit) - valueLoss
+        isDepreciableImmobilisation: ["20","21"].includes(ecriture.CompteNum.substring(0,2)),
+        prevAmount: parseAmount(ecriture.Debit),
+        amount: parseAmount(ecriture.Debit)
       }
 
       // push data
       data.immobilisations.push(immobilisationData);
     }
 
+    // Comptes d'amortissements et de dépréciations ----------------------------------------------------- //
+    if (ecriture.CompteNum.charAt(0)=="2" && ["28","29"].includes(ecriture.CompteNum.substring(0,2)))
+    {
+      // depreciation data
+      let depreciationData = 
+      {
+        account: ecriture.CompteNum,
+        accountLib: ecriture.CompteLib,
+        accountAux: "2"+ecriture.CompteNum.substring(2)+"0",
+        prevAmount: parseAmount(ecriture.Credit),
+        amount: parseAmount(ecriture.Credit)
+      }
+
+      // push data
+      data.depreciations.push(depreciationData);
+    }
 
     /* --- STOCKS --- */
 
@@ -275,15 +282,14 @@ async function readBookAsJournalANouveaux(data,book)
     if (ecriture.CompteNum.charAt(0)=="3" && !["36","38","39"].includes(ecriture.CompteNum.substring(0,2)))
     {
       let isProductionStock = ["33","34","35"].includes(ecriture.CompteNum.substring(0,2));
-      // Unstored production aggregate
-      data.unstoredProduction+= isProductionStock ? parseAmount(ecriture.Debit) : 0;
+
       // stock data
       let stockData = 
       {
         account: ecriture.CompteNum,
-        isProductionStock: isProductionStock,
-        accountAux: isProductionStock ? undefined : "60"+ecriture.CompteNum.slice(1,-1).replaceAll("0$",""),
         accountLib: ecriture.CompteLib,
+        accountAux: isProductionStock ? undefined : "60"+ecriture.CompteNum.slice(1,-1).replaceAll("0$",""),
+        isProductionStock: isProductionStock,
         amount: parseAmount(ecriture.Debit),
         prevAmount: parseAmount(ecriture.Debit)
       }
@@ -342,16 +348,16 @@ const readImmobilisationEntry = async (data,book,ecriture) =>
       // push data
       data.investments.push(investmentData);
     }
-    
   }
 
-  // Amortissement ------------------------------------------------------------------------------------ //
-  if (ecriture.CompteNum.substring(0,2)=="28")
+  // Amortissement & Dépréciation --------------------------------------------------------------------- //
+  if (["28","29"].includes(ecriture.CompteNum.substring(0,2)))
   {
+    // Retrieve depreciation item
+    let depreciation = data.depreciations.filter(depreciation => depreciation.account == ecriture.CompteNum)[0];
+    
     // variation de la valeur de l'immobilisation
-    let accountImmobilisation = "2"+ecriture.CompteNum.substring(2)+"0";
-    let immobilisation = data.immobilisations.filter(immobilisation => immobilisation.account == accountImmobilisation)[0];
-    immobilisation.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+    depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
   }
 
 }
@@ -394,8 +400,8 @@ const readStockEntry = async (data,book,ecriture) =>
       {
         account: ecriture.CompteNum,
         accountLib: ecriture.CompteLib,
-        isProductionStock: isProductionStock,
         accountAux: isProductionStock ? undefined : "60"+ecriture.CompteNum.slice(1,-1).replaceAll("0$",""),
+        isProductionStock: isProductionStock,
         amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
         prevAmount: 0
       }
@@ -460,8 +466,8 @@ const readExpenseEntry = async (data,book,ecriture) =>
     if (data.accounts[ecritureStock.CompteNum]==undefined) data.accounts[ecritureStock.CompteNum] = (ecritureStock.CompteLib || "").replace(/ *$/,"").replace(/^\"/,"").replace(/\"$/,"");
       
     // retrieve stock variation item
-    let stockVariation = data.stocksVariations.filter(stockVariation => stockVariation.account == ecriture.CompteNum
-                                                                     && stockVariation.accountAux == ecritureStock.CompteNum)[0];
+    let stockVariation = data.stockVariations.filter(stockVariation => stockVariation.account == ecriture.CompteNum
+                                                                    && stockVariation.accountAux == ecritureStock.CompteNum)[0];
 
     // if stock variation already defined
     if (stockVariation!=undefined) stockVariation.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
@@ -479,36 +485,38 @@ const readExpenseEntry = async (data,book,ecriture) =>
         label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
         amount: prevAmount + parseAmount(ecriture.Debit) - parseAmount(ecritureStock.Credit),
       }
-      data.stocksVariations.push(stockVariationData);
+      data.stockVariations.push(stockVariationData);
     }
   }
 
-  // Dotations aux amortissements sur immobilisations (6811) ------------------------------------------ //
-  if (ecriture.CompteNum.substring(0,4)=="6811")
+  // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
+  if (ecriture.CompteNum.substring(0,4)=="6811" || ecriture.CompteNum.substring(0,4)=="6871")
   {
-    // retrieve amortisation accounts
+    // retrieve depreciation accounts
     book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum 
              && ecritureDepreciation.EcritureLib == ecriture.EcritureLib
              && ecritureDepreciation.CompteNum.substring(0,2)=="28")
         .forEach((ecritureDepreciation) => 
     {
-      let depreciation = data.depreciations.filter(depreciation => depreciation.account == ecritureDepreciation.CompteNum)[0];
+      // retrieve depreciation expense item
+      let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ecriture.CompteNum
+                                                                         && expense.accountAux == ecritureDepreciation.CompteNum)[0];
       
-      // if depreciation already defined
-      if (depreciation!=undefined) depreciation.amount+= parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit);
+      // if depreciation expense already defined
+      if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit);
       
-      // if depreciation undefined
+      // if depreciation expense undefined
       else if (ecritureDepreciation!=undefined)
       {
-        let depreciationData = 
+        let depreciationExpenseData = 
         {
-          account: ecritureDepreciation.CompteNum,
-          accountLib: ecritureDepreciation.CompteLib,
-          accountAux: "2"+ecritureDepreciation.CompteNum.substring(2)+"0",
-          label: ecritureDepreciation.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+          label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+          account: ecriture.CompteNum,
+          accountLib: ecriture.CompteLib,
+          accountAux: ecritureDepreciation.CompteNum,
           amount: parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit),
         }
-        data.depreciations.push(depreciationData);
+        data.depreciationExpenses.push(depreciationExpenseData);
       }
     })
   }
@@ -518,7 +526,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
   if (ecriture.CompteNum.substring(0,2)=="64") data.personnelExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,2)=="65") data.otherExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,2)=="66" || ecriture.CompteNum.substring(0,3)=="686") data.financialExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="67" || ecriture.CompteNum.substring(0,3)=="687") data.exceptionalExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (ecriture.CompteNum.substring(0,2)=="67" || ecriture.CompteNum.substring(0,3)=="687" && ecriture.CompteNum.substring(0,4)!="6871") data.exceptionalExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,3)=="681" && ecriture.CompteNum.substring(0,4)!="6811") data.provisions+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
   if (ecriture.CompteNum.substring(0,2)=="69") data.taxOnProfits+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
 
@@ -554,8 +562,8 @@ const readProductionEntry = async (data,book,ecriture) =>
                                                   && ecritureStock.CompteNum.charAt(0)=="3")[0] || {};
 
     // retrieve stock variation item
-    let stockVariation = data.stocksVariations.filter(stockVariation => stockVariation.account == ecritureStock.CompteNum
-                                                                     && stockVariation.accountAux == ecriture.CompteNum)[0];
+    let stockVariation = data.stockVariations.filter(stockVariation => stockVariation.account == ecritureStock.CompteNum
+                                                                    && stockVariation.accountAux == ecriture.CompteNum)[0];
     
     // if stock variation already defined
     if (stockVariation!=undefined) stockVariation.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
@@ -572,7 +580,7 @@ const readProductionEntry = async (data,book,ecriture) =>
         label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
         amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
       }
-      data.stocksVariations.push(stockVariationData);
+      data.stockVariations.push(stockVariationData);
     }
   }
   
