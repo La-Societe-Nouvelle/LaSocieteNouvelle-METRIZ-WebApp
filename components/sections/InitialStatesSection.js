@@ -70,6 +70,6 @@ export class InitialStatesSection extends React.Component {
 
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => this.props.session.updateAvailableProductionFootprint();
+  updateFootprints = () => this.props.session.updateFootprints();
 
 }

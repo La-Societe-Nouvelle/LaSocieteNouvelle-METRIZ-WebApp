@@ -16,10 +16,7 @@ export class IncomeStatementTree extends React.Component {
       // Input variables
       productionInput: valueOrDefault(props.financialData.getProduction(),""),
       revenueInput: valueOrDefault(props.financialData.revenue,""),
-      storedProductionInput: valueOrDefault(props.financialData.getStoredProduction(),""),
       immobilisedProductionInput: valueOrDefault(props.financialData.getImmobilisedProduction(),""),
-      unstoredProductionInput: valueOrDefault(props.financialData.getUnstoredProduction(),""),
-      amountExpensesInput: valueOrDefault(props.financialData.getAmountExpenses(),""),
       amountDepreciationsInput: valueOrDefault(props.financialData.getAmountDepreciations(),""),
     }
   }
@@ -31,10 +28,7 @@ export class IncomeStatementTree extends React.Component {
       this.setState({
         productionInput: valueOrDefault(this.props.financialData.getProduction(),""),
         revenueInput: valueOrDefault(this.props.financialData.revenue,""),
-        storedProductionInput: valueOrDefault(this.props.financialData.getStoredProduction(),""),
         immobilisedProductionInput: valueOrDefault(this.props.financialData.getImmobilisedProduction(),""),
-        unstoredProductionInput: valueOrDefault(this.props.financialData.getUnstoredProduction(),""),
-        amountExpensesInput: valueOrDefault(this.props.financialData.getAmountExpenses(),""),
         amountDepreciationsInput: valueOrDefault(this.props.financialData.getAmountDepreciations(),"")
       })
     }
@@ -45,9 +39,7 @@ export class IncomeStatementTree extends React.Component {
     const financialData = this.props.financialData;
     const {revenueInput,
            productionInput,
-           storedProductionInput,
            immobilisedProductionInput,
-           unstoredProductionInput,
            amountDepreciationsInput} = this.state;
     const {purchasesDiscounts} = financialData;
 
@@ -116,10 +108,6 @@ export class IncomeStatementTree extends React.Component {
           <tr>
             <td>&emsp;|&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;|--- dont résultat d'exploitation</td>
             <td className="column_amount">{printValueInput(financialData.getOperatingResult(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td>&emsp;|--- Production déstockée sur l'exercice précédent</td>
-            <td className="column_amount">{printValueInput(unstoredProductionInput,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr className="with-bottom-line">
             <td>&emsp;|--- Autres produits d'exploitation</td>

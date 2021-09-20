@@ -53,7 +53,7 @@ export class IndicatorSection extends React.Component {
   {
     const goBackToMain = () => this.setState({selectedTab: "main"})
     const refreshDisplay = async () => {
-      await this.props.session.updateAvailableProductionFootprint();
+      await this.props.session.updateFootprints();
       this.refMainTab.current.updateTable();
     }
     const changeSelectedTab = (nextSelectedTab) => this.setState({selectedTab: nextSelectedTab})

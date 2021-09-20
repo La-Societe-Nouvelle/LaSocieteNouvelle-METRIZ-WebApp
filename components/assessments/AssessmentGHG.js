@@ -266,7 +266,7 @@ export class AssessmentGHG extends React.Component {
     impactsData.greenhousesGazEmissions = this.state.greenhousesGazEmissions;
     impactsData.greenhousesGazEmissionsUncertainty = this.state.greenhousesGazEmissionsUncertainty;
     
-    await this.props.session.updateAvailableProductionIndicFootprint("ghg");
+    await this.props.session.updateIndicator("ghg");
 
     // update nrg data
     // ...details
@@ -300,7 +300,7 @@ export class AssessmentGHG extends React.Component {
                                           .map(([key,data]) => data.nrgConsumption)
                                           .reduce((a,b) => a + b,0);
     
-    await this.props.session.updateAvailableProductionIndicFootprint("nrg");
+    await this.props.session.updateIndicator("nrg");
   }
 
   getTotalGhgEmissions()

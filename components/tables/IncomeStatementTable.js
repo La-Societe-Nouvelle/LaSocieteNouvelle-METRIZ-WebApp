@@ -65,7 +65,7 @@ export const IncomeStatementTable = ({financialData}) =>
           <td>Dotations aux amortissements sur immobilisations</td>
           <td className="column_amount important">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
-      {Object.entries(groupDepreciationsByAccounts(financialData.depreciations)).map(([_,{account,accountLib,amount}]) => 
+      {Object.entries(groupDepreciationExpensesByAccounts(financialData.depreciationExpenses)).map(([_,{account,accountLib,amount}]) => 
         <tr key={account}>
           <td>&emsp;{accountLib}</td>
           <td className="column_amount">{printValue(amount,0)}</td>
@@ -113,14 +113,14 @@ const groupExpensesByAccounts = (expenses) =>
   return expensesByAccounts;
 }
 
-const groupDepreciationsByAccounts = (depreciations) =>
+const groupDepreciationExpensesByAccounts = (expenses) =>
 {
-  let depreciationsByAccounts = {};
-  depreciations.forEach((depreciation) => 
+  let expensesByAccounts = {};
+  expenses.forEach((expense) => 
   {
-    let account = depreciation.account.substring(0,3);
-    if (depreciationsByAccounts[account]==undefined) depreciationsByAccounts[account] = {...depreciation, accountLib: metaAccounts.accountsDepreciations[account]};
-    else depreciationsByAccounts[account].amount+= depreciation.amount;
+    let account = expense.account.substring(0,5);
+    if (expensesByAccounts[account]==undefined) expensesByAccounts[account] = {...expense, accountLib: metaAccounts.accountsDepreciationExpenses[account]};
+    else expensesByAccounts[account].amount+= expense.amount;
   })
-  return depreciationsByAccounts;
+  return expensesByAccounts;
 }

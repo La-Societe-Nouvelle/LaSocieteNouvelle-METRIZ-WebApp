@@ -101,9 +101,9 @@ function exportIndicPDF(indic,session)
   doc.setFont("Calibri","bold");
   doc.text("Chiffre d'affaires",10,y);
   doc.setFont("Calibri","normal");
-  doc.text(printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getAvailableProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
   doc.line(10,y+2,200,y+2);
 
@@ -131,7 +131,7 @@ function exportIndicPDF(indic,session)
   doc.setFontSize(10);*/
 
   y+=6;
-  doc.text("Production déstockée sur l'exercice précédent",10,y);
+  doc.text("Production stockée",10,y);
   doc.text(session.financialData.unstoredProduction!=null ? printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getValue(),1) : " - ",yValue+10,y,{align: "right"});
   doc.setFontSize(8);
   doc.text(session.financialData.unstoredProduction!=null ? printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %" : "- %",yUncertainty+13,y,{align: "right"});

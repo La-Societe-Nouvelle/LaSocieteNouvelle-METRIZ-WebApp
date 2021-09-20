@@ -97,7 +97,7 @@ export class LegalDataSection extends React.Component {
 
 function FootprintTable({session}) 
 {
-  const availableProductionFootprint = session.getAvailableProductionFootprint();
+  const availableProductionFootprint = session.getProductionFootprint();
   
   return (
     <table>

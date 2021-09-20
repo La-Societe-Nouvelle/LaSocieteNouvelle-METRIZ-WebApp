@@ -94,7 +94,7 @@ export class FinancialDataSection extends React.Component {
     
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => this.props.session.updateAvailableProductionFootprint()
+  updateFootprints = () => this.props.session.updateFootprints()
 
   /* ----- FEC IMPORT ----- */
 
@@ -113,7 +113,7 @@ export class FinancialDataSection extends React.Component {
     FECDataReader(FECData)
       .then(async (nextFinancialData) => 
       {
-        await this.props.session.financialData.loadFECData(nextFinancialData);
+        await this.props.session.financialData.loadData(nextFinancialData);
         this.loadKNWData(nextFinancialData.KNWData);
       })
       .then(() => 
@@ -127,7 +127,7 @@ export class FinancialDataSection extends React.Component {
   {
     this.props.session.impactsData.knwDetails.apprenticeshipTax = apprenticeshipTax;
     this.props.session.impactsData.knwDetails.vocationalTrainingTax = vocationalTrainingTax;
-    this.props.session.updateAvailableProductionIndicFootprint("knw");
+    this.props.session.updateIndicator("knw");
   }
 
 }

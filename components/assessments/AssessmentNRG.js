@@ -309,7 +309,7 @@ export class AssessmentNRG extends React.Component {
     impactsData.energyConsumption = this.state.energyConsumption;
     impactsData.energyConsumptionUncertainty = this.state.energyConsumptionUncertainty;
 
-    await this.props.session.updateAvailableProductionIndicFootprint("nrg");
+    await this.props.session.updateIndicator("nrg");
 
     // update ghg data
     // ...details
@@ -343,7 +343,7 @@ export class AssessmentNRG extends React.Component {
                                                 .map(([key,data]) => data.ghgEmissions)
                                                 .reduce((a,b) => a + b,0);
 
-    await this.props.session.updateAvailableProductionIndicFootprint("ghg");
+    await this.props.session.updateIndicator("ghg");
   }
 
   getTotalNrgConsumption() 

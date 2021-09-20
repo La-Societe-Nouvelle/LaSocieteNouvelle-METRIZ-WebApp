@@ -93,7 +93,7 @@ export class CompaniesSection extends React.Component {
 
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => this.props.session.updateAvailableProductionFootprint()
+  updateFootprints = () => this.props.session.updateFootprints()
 
   changeView = (event) => this.setState({view : event.target.value})
 

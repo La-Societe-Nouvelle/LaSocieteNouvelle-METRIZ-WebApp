@@ -26,6 +26,7 @@ import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciation
 // Libraries
 import { metaIndicators } from '/lib/indic';
 import { metaAccounts } from '/lib/accounts';
+import { Indicator } from '../../src/Indicator';
 
 /* -------------------------------------------------- */
 /* -------------------- MAIN TAB -------------------- */
@@ -201,7 +202,7 @@ class TableMain extends React.Component {
           </tr>
         {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => {
           const indicator = session.getExpensesAccountIndicator(account,indic);
-          return(
+          return (
           <tr key={account}>
             <td>&emsp;{accountLib}</td>
             <td className="column_value">{printValue(amount,0)}</td>
@@ -223,19 +224,19 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciationExpenses()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
-        {Object.entries(groupDepreciationsByAccounts(financialData.depreciations)).map(([_,{account,accountLib,amount}]) => {
-           const indicator = session.getDepreciationsAccountIndicator(account,indic);
-           return (
-            <tr key={account}>
-              <td>&emsp;{accountLib}</td>
-              <td className="column_value">{printValue(amount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
-              <td className="column_unit">&nbsp;{unit}</td>
-              <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-              {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
-              {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-            </tr>)})}
+        {Object.entries(groupDepreciationsByAccounts(financialData.depreciationExpenses)).map(([_,{account,accountLib,amount}]) => {
+          const indicator = session.getDepreciationsAccountIndicator(account,indic);
+          return (
+          <tr key={account}>
+            <td>&emsp;{accountLib}</td>
+            <td className="column_value">{printValue(amount,0)}</td>
+            <td className="column_unit">&nbsp;€</td>
+            <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
+            <td className="column_unit">&nbsp;{unit}</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>)})}
           
           <tr className="with-top-line">
             <td>Valeur ajoutée nette</td>
@@ -387,14 +388,14 @@ const groupExpensesByAccounts = (expenses) =>
   return expensesByAccounts;
 }
 
-const groupDepreciationsByAccounts = (depreciations) =>
+const groupDepreciationsByAccounts = (depreciationExpenses) =>
 {
-  let depreciationsByAccounts = {};
-  depreciations.forEach((depreciation) => 
+  let depreciationExpensesByAccounts = {};
+  depreciationExpenses.forEach((expense) => 
   {
-    let account = depreciation.account.substring(0,3);
-    if (depreciationsByAccounts[account]==undefined) depreciationsByAccounts[account] = {...depreciation, account, accountLib: metaAccounts.accountsDepreciations[account]};
-    else depreciationsByAccounts[account].amount+= depreciation.amount;
+    let account = expense.account.substring(0,5);
+    if (depreciationExpensesByAccounts[account]==undefined) depreciationExpensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsDepreciationExpenses[account]};
+    else depreciationExpensesByAccounts[account].amount+= expense.amount;
   })
-  return depreciationsByAccounts;
+  return depreciationExpensesByAccounts;
 }
