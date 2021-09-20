@@ -130,19 +130,24 @@ L'outil de calcul correspond à une simple décomposition de la contribution dir
 * Rémunérations dans le cadre d'activités de recherche ou de formation
 
 &nbsp;
-## TÉLÉCHARGER LA SESSION / IMPORTER UN FICHIER
+## TÉLÉCHARGEMENT DE LA SESSION / IMPORTATION D'UNE SAUVEGARDE
 
 Les données saisies n'étant pas sauvegardées côté serveur, il est possible de télécharger et d'importer un fichier de sauvegarde.
 Les fichiers de sauvegarde sont au format JSON. 
 Les évolutions de l'application pourront entraîner un écart entre l'état sauvegardé au sein d'un fichier de sauvegarde et l'état utilisé au sein de l'application.
 L'importation sera adaptée pour préserver la lisibilité des fichiers. En cas de problème, n'hésitez pas à nous contacter.
 
-&nbsp;
-## DOCUMENTATION
-
-Renvoie à cette documentation. N'hésitez pas à nous contacter en cas de problème ou pour nous faire part de suggestions.
 
 &nbsp;
-## CODE SOURCE
+## FORMULES DE CALCULS
 
-Cet outil est open source, ce lien renvoie au code source sur Github. Vous pouvez participer au développement du projet en proposant des améliorations.
+### Empreinte de la valeur ajoutée nette
+
+### Empreinte d'une immobilisation
+
+### Empreinte d'une dotation aux amortissements sur immobilisations
+
+### Empreinte d'une charge externe
+
+
+
