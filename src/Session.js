@@ -220,9 +220,9 @@ export class Session {
                     
                     if (immobilisation.initialState=="currentFootprint") immobilisation.prevFootprint.indicators[indic] = indicatorInvestments;
                     
-                    immobilisation.footprint.indicators[indic] == await buildIndicatorMerge(
+                    immobilisation.footprint.indicators[indic] = await buildIndicatorMerge(
                         immobilisation.prevFootprint.indicators[indic], immobilisation.prevAmount,
-                        indicatorInvestments, amountInvestments)
+                        indicatorInvestments, amountInvestments);
                 } else {
                     immobilisation.footprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
                 }
