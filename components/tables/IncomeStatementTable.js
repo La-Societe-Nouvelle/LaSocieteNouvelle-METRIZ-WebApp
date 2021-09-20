@@ -34,11 +34,7 @@ export const IncomeStatementTable = ({financialData}) =>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;Production stockée</td>
-          <td className="column_amount">{printValue(financialData.getStoredProduction(),0)}</td>
-          <td className="column_unit">&nbsp;€</td></tr>
-        <tr>
-          <td>&emsp;Production déstockée sur l'exercice précédent</td>
-          <td className="column_amount">{"("+printValue(financialData.getUnstoredProduction(),0)+")"}</td>
+          <td className="column_amount">{printValue(financialData.getAmountProductionStockVariations(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;Production immobilisée</td>
@@ -67,7 +63,7 @@ export const IncomeStatementTable = ({financialData}) =>
 
         <tr className="with-top-line">
           <td>Dotations aux amortissements sur immobilisations</td>
-          <td className="column_amount important">{printValue(financialData.getAmountDepreciations(),0)}</td>
+          <td className="column_amount important">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
       {Object.entries(groupDepreciationsByAccounts(financialData.depreciations)).map(([_,{account,accountLib,amount}]) => 
         <tr key={account}>

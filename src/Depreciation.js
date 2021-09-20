@@ -1,45 +1,34 @@
-import { EconomicValue } from './EconomicValue';
+// La Société Nouvelle
 
-export class Depreciation extends EconomicValue {
+// 
+import { SocialFootprint } from "/src/SocialFootprint.js";
 
-  constructor({id,label,amount,footprint,
-               account,accountLib,
-               accountAux,accountAuxlib}) 
+export class Depreciation {
+
+  constructor({id,
+               account,
+               accountLib,
+               accountAux,
+               amount,
+               footprint,
+               prevAmount,
+               prevFootprint,
+               initialState}) 
   {
-    super({id,label,amount,footprint})
+  // ---------------------------------------------------------------------------------------------------- //
+    this.id = id;                                                   // id
 
-    this.account = account;
-    this.accountLib = accountLib;
+    this.account = account;                                         // #28 or #29
+    this.accountLib = accountLib;                                   // label of the account
+    this.accountAux = accountAux;                                   // Immobilisation account (#2)
 
-    this.accountAux = accountAux;
-    this.accountAuxLib = accountAuxlib;
-  }
+    this.amount = amount || 0;                                      // amount at the end
+    this.footprint = new SocialFootprint({...footprint});           //
 
-  update(props) {
-    super.update(props);
-    if (props.account!=undefined) this.account = props.account;
-    if (props.accountAux!=undefined) this.accountAux = props.accountAux;
-  }
-
-  /* ---------- Back Up ---------- */
-
-  updateFromBackUp(backUp) {
-    super.updateFromBackUp(backUp);
-    this.account = backUp.account || "";
-    this.accountAux = backUp.accountImmobilisation || "";
-  }
-  
-  /* ---------- Getters ---------- */
-
-  getAccount() {return this.account}
-  getAccountAuxn() {return this.accountAux}
-
-  /* ---------- Setters ---------- */
-
-  setAccount(account) {this.account = account}
-  setImmobilisation(immobilisation) {
-    this.accountAux = immobilisation.account;
-    this.footprint = immobilisation.footprint
+    this.prevAmount = prevAmount || 0;                              // amount at the beginning
+    this.prevFootprint = new SocialFootprint({...prevFootprint});   //
+    this.initialState = initialState || "currentFootprint";         //
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
 }

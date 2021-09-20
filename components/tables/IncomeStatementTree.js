@@ -80,7 +80,7 @@ export class IncomeStatementTree extends React.Component {
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;|&emsp;&emsp;|&emsp;&emsp;|--- Charges externes</td>
-            <td className="column_amount">{printValueInput(financialData.getAmountExpenses(),0)}</td>
+            <td className="column_amount">{printValueInput(financialData.getAmountExternalExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
         {Object.entries(financialData.getExpensesByAccounts()).map(([num,account]) => 
           <tr key={num}>

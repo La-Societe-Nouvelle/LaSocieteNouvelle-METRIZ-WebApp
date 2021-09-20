@@ -26,7 +26,7 @@ export class InitialStatesTable extends React.Component {
 
   render()
   {
-    const {immobilisations,depreciations,stocks,expenses,investments,stocksVariations} = this.props.financialData;
+    const {immobilisations,depreciations,stocks,expenses,investments,stockVariations} = this.props.financialData;
     const {columnSorted,nbItems,page} = this.state;
 
     const immobilisationsShowed = immobilisations.filter(immobilisation => ["20","21","22","23","25"].includes(immobilisation.account.substring(0,2)));
@@ -57,7 +57,7 @@ export class InitialStatesTable extends React.Component {
               <RowTableStocks key={"stock_"+stock.id} 
                               {...stock}
                               expenses={expenses}
-                              stocksVariations={stocksVariations}
+                              stockVariations={stockVariations}
                               onInitialStateUpdate={this.updateStock.bind(this)}
                               syncData={this.synchroniseStock.bind(this)}/>)}
           </tbody>
@@ -215,11 +215,11 @@ function RowTableImmobilisations(props)
 
 function RowTableStocks(props)
 {
-  const {id,prevAmount,account,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,expenses,stocksVariations} = props;
+  const {id,prevAmount,account,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,expenses,stockVariations} = props;
   const activityCode = prevFootprintActivityCode.substring(0,2);
 
   const entries = expenses.filter(expense => expense.account == accountAux);
-  const stockUsed = stocksVariations.filter(stockVariation => stockVariation.accountAux == account).length > 0;
+  const stockUsed = stockVariations.filter(stockVariation => stockVariation.accountAux == account).length > 0;
 
   const [toggleIcon,setToggleIcon] = useState(false);
 

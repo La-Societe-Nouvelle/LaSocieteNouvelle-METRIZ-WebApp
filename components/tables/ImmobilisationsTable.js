@@ -23,7 +23,7 @@ export class ImmobilisationsTable extends React.Component {
 
   render() 
   {
-    const immobilisations = this.props.financialData.immobilisations.filter(immobilisation => ["0","1","2","3","5","6","7"].includes(immobilisation.account.charAt(1)));
+    const {immobilisations,depreciations} = this.props.financialData;
     const {columnSorted,nbItems,page} = this.state;
     
     this.sortItems(immobilisations,columnSorted);
@@ -42,27 +42,34 @@ export class ImmobilisationsTable extends React.Component {
           </thead>
           <tbody>
             {immobilisations.slice(page*nbItems,(page+1)*nbItems)
-                            .map(({account,accountLib,amount,prevAmount}) => 
-              <tr key={account}>
-                <td className="short center">{account}</td>
-                <td className="auto">{accountLib}</td>
-                <td className="short right">{printValue(amount,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(prevAmount,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(amount-prevAmount,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-              </tr>)}
+                            .map(({account,accountLib,amount,prevAmount}) => {
+              let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
+                                           .map(depreciation => depreciation.amount)
+                                           .reduce((a,b) => a + b,0);
+              let prevValueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
+                                           .map(depreciation => depreciation.prevAmount)
+                                           .reduce((a,b) => a + b,0);
+              return(
+                <tr key={account}>
+                  <td className="short center">{account}</td>
+                  <td className="auto">{accountLib}</td>
+                  <td className="short right">{printValue(amount-valueLoss,0)}</td>
+                  <td className="column_unit">&nbsp;€</td>
+                  <td className="short right">{printValue(prevAmount-prevValueLoss,0)}</td>
+                  <td className="column_unit">&nbsp;€</td>
+                  <td className="short right">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}</td>
+                  <td className="column_unit">&nbsp;€</td>
+                </tr>)})}
             
             {immobilisations.length > 0 &&
               <tr className="with-top-line">
                 <td className="short center"> - </td>
                 <td className="auto">TOTAL</td>
-                <td className="short right">{printValue(this.props.financialData.getAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(this.props.financialData.getNetAmountImmobilisations(),0)}</td>
                 <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(this.props.financialData.getPrevAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(this.props.financialData.getPrevNetAmountImmobilisations(),0)}</td>
                 <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(this.props.financialData.getAmountImmobilisations()-this.props.financialData.getPrevAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(this.props.financialData.getNetAmountImmobilisations()-this.props.financialData.getPrevNetAmountImmobilisations(),0)}</td>
                 <td className="column_unit">&nbsp;€</td>
               </tr>}
           </tbody>

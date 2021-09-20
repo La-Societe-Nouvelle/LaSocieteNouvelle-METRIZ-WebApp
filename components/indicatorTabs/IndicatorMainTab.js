@@ -137,50 +137,7 @@ class TableMain extends React.Component {
         </thead>
         <tbody>
           <tr>
-            <td>Production disponible</td>
-            <td className="column_value">{printValue(financialData.getAvailableProduction(),0)}</td>
-            <td className="column_unit">&nbsp;€</td>
-            <td className="column_value">{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
-            <td className="column_unit">&nbsp;{unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getAvailableProduction()),nbDecimals)}</td> : null}
-            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-          </tr>
-          <tr>
-            <td>&emsp;Production vendue</td>
-            <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
-            <td className="column_unit">&nbsp;€</td>
-            <td className="column_value">{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
-            <td className="column_unit">&nbsp;{unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getRevenue()),nbDecimals)}</td> : null}
-            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-          </tr>
-        {financialData.getStoredProduction() > 0 &&
-          <tr>
-            <td>&emsp;Production stockée</td>
-            <td className="column_value">{printValue(financialData.getStoredProduction(),0)}</td>
-            <td className="column_unit">&nbsp;€</td>
-            <td className="column_value">{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
-            <td className="column_unit">&nbsp;{unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">({printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getStoredProduction()),nbDecimals)})</td> : null}
-            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-          </tr>}
-        {financialData.getImmobilisedProduction() > 0 &&
-          <tr>
-            <td>&emsp;Production immobilisée</td>
-            <td className="column_value">({printValue(financialData.getImmobilisedProduction(),0)})</td>
-            <td className="column_unit">&nbsp;€</td>
-            <td className="column_value">{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
-            <td className="column_unit">&nbsp;{unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getAvailableProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">({printValue(session.getAvailableProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getImmobilisedProduction()),nbDecimals)})</td> : null}
-            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-          </tr>
-          }
-          <tr className="with-top-line">
-            <td>Production sur l'exercice courant</td>
+            <td>Production</td>
             <td className="column_value">{printValue(financialData.getProduction(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
             <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
@@ -190,15 +147,38 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
           <tr>
-            <td>Production déstockée sur l'exercice précédent</td>
-            <td className="column_value">{printValue(financialData.getUnstoredProduction(),0)}</td>
+            <td>&emsp;Production vendue</td>
+            <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
-            <td className="column_value">{printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_value">{printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getUnstoredProduction()),nbDecimals)}</td> : null}
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">{printValue(session.getRevenueFootprint().getIndicator(indic).getValueAbsolute(financialData.getRevenue()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
+        {financialData.stockVariations.filter(variation => variation.account.charAt(0)=="7").length > 0 &&
+          <tr>
+            <td>&emsp;Production stockée</td>
+            <td className="column_value">{printValue(financialData.getAmountProductionStockVariations(),0)}</td>
+            <td className="column_unit">&nbsp;€</td>
+            <td className="column_value">{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_unit">&nbsp;{unit}</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">({printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountProductionStockVariations()),nbDecimals)})</td> : null}
+            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>}
+        {financialData.getImmobilisedProduction() > 0 &&
+          <tr>
+            <td>&emsp;Production immobilisée</td>
+            <td className="column_value">({printValue(financialData.getImmobilisedProduction(),0)})</td>
+            <td className="column_unit">&nbsp;€</td>
+            <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+            <td className="column_unit">&nbsp;{unit}</td>
+            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
+            {impactAbsolu ? <td className="column_value">({printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getImmobilisedProduction()),nbDecimals)})</td> : null}
+            {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          </tr>
+          }
           <tr className="with-top-line">
             <td>Consommations intermédiaires</td>
             <td className="column_value">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
@@ -235,12 +215,12 @@ class TableMain extends React.Component {
 
           <tr className="with-top-line">
             <td>Dotations aux amortissements</td>
-            <td className="column_value">{printValue(financialData.getAmountDepreciations(),0)}</td>
+            <td className="column_value">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
             <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciations()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciationExpenses()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
         {Object.entries(groupDepreciationsByAccounts(financialData.depreciations)).map(([_,{account,accountLib,amount}]) => {
