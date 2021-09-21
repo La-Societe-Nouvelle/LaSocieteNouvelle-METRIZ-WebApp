@@ -129,7 +129,9 @@ export class CompaniesSection extends React.Component {
   updateCorporateId = async (corporateName,corporateId) => 
   {
     let company = this.props.session.financialData.getCompanyByName(corporateName);
-    if (company!=undefined) await this.props.session.financialData.updateCompany({id: company.id,corporateId});
+    if (company!=undefined) {
+      company.update({id: company.id,corporateId});
+    }
   }
 
   // Export CSV File
@@ -153,7 +155,14 @@ export class CompaniesSection extends React.Component {
   // Synchronisation
   synchroniseAll = async () => 
   {
-    await Promise.all(this.props.session.financialData.companies.map(async (company) => await company.updateFootprintFromRemote()));
+    console.log("updates");
+    for (let company of this.props.session.financialData.companies) 
+    {
+      console.log(company.corporateName);
+      await company.updateFromRemote();
+      await new Promise(r => setTimeout(r, 10));
+    }
+    //await Promise.all(this.props.session.financialData.companies.map(async (company) => await company.updateFromRemote()));
     this.setState({companies: this.props.session.financialData.companies});
   }
 

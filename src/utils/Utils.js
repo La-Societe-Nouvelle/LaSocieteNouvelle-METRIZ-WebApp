@@ -55,3 +55,16 @@ export function ifCondition(condition,value) {
 /* ----- ID ----- */
 
 export function getNewId(items) {return items.map(item => item.id).reduce((a,b) => {return Math.max(a,b)},0)+1}
+
+/* ----- ID ----- */
+
+export const getCurrentDateString = () => // dd-MM-yyyy hh:mm
+{
+  const today = new Date();
+  const dateString = String(today.getDate()).padStart(2, '0') + '-'
+                   + String(today.getMonth()+1).padStart(2, '0') +'-'
+                   + today.getFullYear() + ' '
+                   + today.getHours() + ':'
+                   + today.getMinutes();
+  return dateString
+}

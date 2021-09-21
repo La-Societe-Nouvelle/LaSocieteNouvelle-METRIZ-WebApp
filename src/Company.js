@@ -1,4 +1,4 @@
-import { valueOrDefault } from "./utils/Utils";
+import { getCurrentDateString, valueOrDefault } from "./utils/Utils";
 import { SocialFootprint } from "/src/SocialFootprint.js";
 
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
@@ -15,48 +15,37 @@ export class Company {
                footprintId,
                footprintAreaCode,
                footprintActivityCode,
+               status,
                dataFetched,
                footprint,
                lastUpdateFromRemote})
-  {    
+  {   
+  // ---------------------------------------------------------------------------------------------------- //
     // Id
     this.id = id;
 
     // Company
-    this.account = account || "";
-    this.corporateId = corporateId || null;
-    this.corporateName = corporateName || "";
+    this.account = account || "";                                       // numéro compte auxiliaire
+    this.corporateId = corporateId || null;                             // siren
+    this.corporateName = corporateName || "";                           // libellé du compte auxiliaire
 
     // Legal data
-    this.legalUnitName = legalUnitName || null;
-    this.legalUnitAreaCode = legalUnitAreaCode || null;
-    this.legalUnitActivityCode = legalUnitActivityCode || null;
+    this.legalUnitName = legalUnitName || null;                         // denomination legale
+    this.legalUnitAreaCode = legalUnitAreaCode || null;                 // code géographique (unité légale)
+    this.legalUnitActivityCode = legalUnitActivityCode || null;         // code d'activité (unité légale)
 
-    // Footrpint data
-    this.dataFetched = valueOrDefault(dataFetched,null);
-    this.footprintId = footprintId || this.getDefaultFootprintId();
-    this.footprintAreaCode = footprintAreaCode || this.getDefaultFootprintAreaCode();
-    this.footprintActivityCode = footprintActivityCode || "00";
-    
-    // Amount
-    this.amount = null;
-
-    // Social footprint
+    // Footprint
+    this.state = "default";                                             // "" | "siren" | "default"
     this.footprint = new SocialFootprint({...footprint});
-
+    this.footprintId = footprintId || this.getDefaultFootprintId();
+    this.footprintAreaCode = footprintAreaCode || "WLD";                // code géographique (valeurs par défaut)
+    this.footprintActivityCode = footprintActivityCode || "00";         // code d'activité (valeurs par défaut)
+    
     // Updates
-    this.lastUpdateFromRemote = lastUpdateFromRemote || null;
-  }
-
-  // init area code
-  getDefaultFootprintAreaCode() 
-  {
-    if (this.corporateId==null) {return "WLD"}
-    // SIREN
-    if (this.corporateId.match(/[0-9]{9}/)) {return "FRA"}
-    // VAT NUMBER
-    // ...
-    else {return "WLD"}
+    this.status = status || null;                                       // 200 (ok), 404 (not found), 500 (server error)
+    this.dataFetched = dataFetched || false;                            // response received
+    this.lastUpdateFromRemote = lastUpdateFromRemote || null;           // date of last update
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
   // init footrpint id
@@ -79,154 +68,112 @@ export class Company {
 
   async update(nextProps) 
   {
-    // Update
-    if (nextProps.corporateName!=undefined) this.corporateName = nextProps.corporateName;
-
-    // update from remote if id changes
-    if (nextProps.corporateId!=undefined && nextProps.corporateId!="" && nextProps.corporateId!=this.corporateId) 
+    // update corporate id ------------------------------ //
+    if (nextProps.corporateId!=undefined && nextProps.corporateId!=this.corporateId) 
     {
       this.corporateId = nextProps.corporateId;
       this.footprintId = this.getDefaultFootprintId();
-      await this.updateFromRemote();
+      // legal data
+      this.legalUnitName = "";
+      this.legalUnitAreaCode = "";
+      this.legalUnitActivityCode = "";
+      // status
+      this.state = this.footprintId ? "siren" : "";
+      this.dataFetched = false;
+      this.status = null;
     }
 
-    // update from remote if footprint data change
-    if ( (nextProps.footprintAreaCode!=undefined && nextProps.footprintAreaCode!=this.footprintAreaCode)
-      || (nextProps.footprintActivityCode!=undefined && nextProps.footprintActivityCode!=this.footprintActivityCode)) 
+    // update default footprint ------------------------- //
+    else if (nextProps.footprintAreaCode!=undefined || nextProps.footprintActivityCode!=undefined) 
     {
-      this.footprintId = null;
       if (nextProps.footprintAreaCode!=undefined)     this.footprintAreaCode = nextProps.footprintAreaCode;
       if (nextProps.footprintActivityCode!=undefined) this.footprintActivityCode = nextProps.footprintActivityCode;
-      if (this.dataFetched != null) await this.updateFootprintFromRemote();
+      // status
+      this.state = "default";
+      this.dataFetched = false;
+      this.status = null;
     }
   }
-
-  /* ---------- Setters ---------- */
-
-  // used for list
-  setAmount(amount) {this.amount = amount}
 
   /* ---------- Remote ---------- */
 
   async updateFromRemote() 
-  {
-    const today = new Date();
-    const lastUpdateFromRemote = String(today.getDate()).padStart(2, '0') + '-'
-                               + String(today.getMonth()+1).padStart(2, '0') +'-'
-                               + today.getFullYear() + ' '
-                               + today.getHours() + ':'
-                               + today.getMinutes();
- 
-    if (this.footprintId==null) this.footprintId = this.getDefaultFootprintId();
-
-    // Case - Fetch footprint with id
-    if (this.footprintId!=null) 
+  { 
+    // Case - Fetch footprint with id --------------------------------------------------------------------- //
+    if (this.state=="siren" && this.footprintId.match(/[0-9]{9}/)) 
     {
-      let data = await this.fetchData();
+      // request
+      let endpoint = apiBaseUrl + "siren/" + this.footprintId;
+      let response = await this.fetchData(endpoint);
 
-      if (data!=null) 
+      if (response!=null) // code == 200 ------------------------------ //
       {
-        this.dataFetched = true;
-        // update legal data
+        let data = response.profil;
+        // legal data --------------------------------------- //
         this.legalUnitName = data.descriptionUniteLegale.denomination;
         this.legalUnitAreaCode = "FRA";
         this.legalUnitActivityCode = data.descriptionUniteLegale.activitePrincipale;
-        // update footprint data
-        this.footprintAreaCode = "FRA";
-        this.footprintActivityCode = data.descriptionUniteLegale.activitePrincipale;
-        // update footprint parameters
-        this.footprint.footprintId = this.footprintId;
-        this.footprint.areaCode = "FRA";
-        this.footprint.activityCode = data.descriptionUniteLegale.activitePrincipale;
-        // update footprint values
+        // footprint ---------------------------------------- //
         this.footprint.updateAll(data.empreinteSocietale);
-        // date of the update
-        this.lastUpdateFromRemote = lastUpdateFromRemote;
+        // state -------------------------------------------- //
+        this.lastUpdateFromRemote = getCurrentDateString();
+        this.dataFetched = true;
+        this.status = 200;
       } 
-      else {
-        this.dataFetched = false;
-        this.footprintId = null;
-        await this.updateFromRemote();
-      }
-    }
-    // Case - Fetch default data
-    else
-    {
-      let data = await this.fetchDefaultData();
-      
-      if (data!=null)
+      else // code == 404 --------------------------------------------- //
       {
+        // legal data --------------------------------------- //
+        this.legalUnitName = "";
+        this.legalUnitAreaCode = "";
+        this.legalUnitActivityCode = "";
+        // footprint ---------------------------------------- //
+        this.footprint = new SocialFootprint({});
+        // state -------------------------------------------- //
+        this.lastUpdateFromRemote = "";
         this.dataFetched = false;
-        // update legal data
-        this.legalUnitName = null;
-        this.legalUnitAreaCode = null;
-        this.legalUnitActivityCode = null;
-        // update footprint data
-        this.footprintId = null;
-        this.footprintAreaCode = data.areaCode;
-        this.footprintActivityCode = data.activityCode;
-        // update footprint parameters
-        this.footprint.footprintId = null;
-        this.footprint.areaCode = data.areaCode;
-        this.footprint.activityCode = data.activityCode;
-        // update footprint values
-        this.footprint.updateAll(data.empreinteSocietale);
-        // date of the update
-        this.lastUpdateFromRemote = lastUpdateFromRemote;
-      } 
-      else {
-        this.footprintAreaCode = "_DV";
-        this.footprintActivityCode = "00";
-        await this.updateFromRemote();
+        this.status = 404;
       }
     }
-  }
-
-  async updateFootprintFromRemote() 
-  {
-    if (this.footprintId!=null) {
-      let data = await this.fetchData();
-      if (data!=null) {this.footprint.updateAll(data.empreinteSocietale);this.dataFetched = true}
-      else {this.dataFetched = null}
-    } else {
-      let data = await this.fetchDefaultData();
-      if (data!=null) {this.footprint.updateAll(data.empreinteSocietale);this.dataFetched = false}
-      else {this.dataFetched = null}
+    // Case - Fetch default data -------------------------------------------------------------------------- //
+    else if (this.state=="default")
+    {
+      // request
+      let endpoint = apiBaseUrl + "default?" + "pays="+this.footprintAreaCode + "&activite="+this.footprintActivityCode +"&flow=PRD";
+      let response = await this.fetchData(endpoint);
+      
+      if (response!=null) // code == 200 ------------------------------ //
+      {
+        let data = response;
+        // footprint ---------------------------------------- //
+        this.footprint.updateAll(data.empreinteSocietale);
+        // state -------------------------------------------- //
+        this.lastUpdateFromRemote = getCurrentDateString();
+        this.dataFetched = true;
+        this.status = 200;
+      } 
+      else // code == 404 --------------------------------------------- //
+      {
+        // footprint ---------------------------------------- //
+        this.footprint = new SocialFootprint({});
+        // state -------------------------------------------- //
+        this.lastUpdateFromRemote = "";
+        this.dataFetched = false;
+        this.status = 404;
+      }
     }
-  }
-
-  async updateIndicatorFromRemote() 
-  {
-    if (this.footprintId!=null) {
-      let data = await this.fetchData();
-      if (data!=null) this.footprint.updateIndic(indic, data.empreinteSocietale[indic.toUpperCase()]);
-    } else {
-      let data = await this.fetchDefaultData();
-      if (data!=null) this.footprint.updateIndic(indic, data.empreinteSocietale[indic.toUpperCase()]);
-    }
+    // ---------------------------------------------------------------------------------------------------- //
+    return;
   }
 
   /* ---------- Fetch Data ---------- */  
 
   // Fetch data (by id)
-  async fetchData() 
+  async fetchData(endpoint) 
   {
-    let endpoint = apiBaseUrl + "siren/" + this.footprintId;
-    console.log(endpoint);
     let response = await fetch(endpoint, {method:'get'});
     let data = await response.json();
-    if (data.header.statut == 200) {return data.profil}
-    else                           {return null}
-  }
-
-  // Fetch default data
-  async fetchDefaultData() 
-  {
-    let endpoint = apiBaseUrl + "default?" + "pays="+this.footprintAreaCode + "&activite="+this.footprintActivityCode +"&flow=PRD";
-    console.log(endpoint);
-    let response = await fetch(endpoint, {method:'get'});
-    let data = await response.json();
-    if (data.header.statut == 200) {return {areaCode: this.footprintAreaCode, activityCode: this.footprintActivityCode, ...data}} 
+    console.log(endpoint+' status:'+data.header.statut);
+    if (data.header.statut == 200) {return data}
     else                           {return null}
   }
 
@@ -242,14 +189,4 @@ export class Company {
   
   getFootprint() {return this.footprint}
 
-  getAmount() {return this.amount}
-
-  getEconomicDivision() {
-    if (this.corporateActivity!=null) {
-        if (this.corporateActivity.length()>=2) {
-            return this.corporateActivity.substring(0, 2);
-        } else {return "00"}
-    } else {return "00"}
-  }
-  
 }
