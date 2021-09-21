@@ -31,59 +31,29 @@ La Notice d'utilisation est organisée selon le menu de navigation (à gauche).
 ### UNITÉ LÉGALE
 
 Le **numéro de siren** (numéro à 9 chiffres fournit par l'INSEE) est indispensable pour la publication des résultats au sein de la base de données puisqu'il correspond actuellement au numéro d'identification de l'Empreinte Sociétale d'une Entreprise.
-Il permet également de récupérer la branche d'activité de l'entreprise et d'affecter pour les dépenses non renseignées (Cf. partie *Données financières*) des valeurs par défaut plus appropriées.
+Il permet également de récupérer des valeurs comparatives liées à la branche d'activités pour une meilleure appréciation des résultats obtenus.
 
 L'**année de fin de l'exercice** permettra d'assurer un suivi annuel de la performance de l'entreprise et l'utilisation de la bonne valeur pour estimer les impacts de dépenses passées.
-
-Le tableau présent au sein de la vue correspond à un récapitulatif de l'Empreinte Sociétale de l'Entreprise (valeurs des indicateurs relatives au chiffre d'affaires de l'entreprise).
-L'absence de valeur signifie que des données sont manquantes pour le calcul.
 
 &nbsp;
 ### DONNÉES FINANCIÈRES
 
-La section *Données Financières* correspond à la saisie des données financières de l'entreprise. Elle regroupe quatre onglets :
-* *Soldes intermédiaires* pour la saisie des soldes comptables
-* *Charges externes* pour les données relatives aux consommations intermédiaires
-* *Immobilisations* pour les données relatives aux immobilisations
-* *Fournisseurs* pour l'association des numéros de siren aux fournisseurs
+La section *Données Financières* correspond à l'importation et à la vérification des données comptables. L'importation s'effectue au format FEC (Fichier d'Ecritures Comptables) 
+
+Les vues disponibles pour le contrôle des données sont :
+* *Compte de résultat* avec les soldes intermédiaires de gestion
+* *Immobilisations* - Tableau de variations des valeurs nettes comptables des immobilisations
+* *Charges externes* - Liste des montants des charges externes par compte de charges
+* *Stocks* - Tableau des variations des stocks
+
+Attention: Les charges des comptes #609 sont enregistrées comme des dépenses *négatives* et sont associées au compte de charge lié (ex. #601 pour #6091)
 
 &nbsp;
-#### Soldes intermédiaires
+### FOURNISSEURS
 
-Les soldes comptables peuvent être renseignés manuellement ou via l'import d'un fichier FEC. L'ensemble de ces montants sont disponibles au sein du compte de résultat de l'entreprise.
-À noter que le calcul de l'Empreinte Sociétale ne peut se faire que si, a minima, le chiffre d'affaires, le montant total des charges externes et le montant total des dotations aux amortissements sont disponibles. Le montant de la valeur ajoutée nette pourras alors être déduit.
+Cette section se met automatiquement à jour à partir des données comptables, et a pour objectif de faire le lien entre les comptes fournisseurs et le numéro de siren de l'entreprise. Il est possible de compléter les numéros de siren l'import d'un fichier .csv ou.xlsx (dont le modèle, pré-rempli, est téléchargeable).
 
-Le chiffre d'affaires (production vendue) est par défaut considéré comme entièrement produit sur l'exercice (ligne production). Le cas non-échéant, il convient de renseigner le volume de production déstockée de l'exercice précédent. Il convient également en cas de production stockée et/ou de production immobilisée de renseigner le volume correspondant.
-Pour rappel la production sur un exercice correspond à la somme de la production vendue (chiffre d'affaires), de la production stockée et de la production immobilisée, à laquelle est ôtée la production déstockée.
-
-Le montant total des charges externes (respectivement des dotations aux amortissements) correspond à la somme des montants des charges (respectivement des dotations) saisies ou importées (Cf. onglets *Charges externes* et *Dotations aux amortissements*).
-
-Le cadenas situé à côté des agrégats permet de *bloquer* le montant i.e. de définir le montant total dans le cas où toutes les charges ou dotations ne sont pas renseignées. L'écart sera considéré comme des charges ou dotations *non classées* et des valeurs par défaut seront utilisées pour la mesure des indicateurs.
-
-&nbsp;
-#### Charges externes
-
-Actions globales :
-* Ajouter un stock : Ajout d'un stock d'achats, le stock initial correspond au volume en début d'exercice et le stock final en fin d'exercice.
-* Ajouter d'une dépense : Ajout d'une charge externes. Les entreprises déjà *sollicitées* apparaissent lors de la saisie du fournisseur; lorsque le fournisseur est nouveau, une nouvelle ligne est créée dans la table des fournisseurs (onglet *Fournisseurs*)
-* Ajouter d'une remise : Ajout d'une remise. La remise ne peut être associée qu'à une entreprise à laquelle est associée une dépense.
-
-Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
-
-&nbsp;
-#### Amortissements sur immobilisations
-
-Actions globales :
-* Ajouter une immobilisation : Ajout d'un compte d'immobilisation, la valeur associée doit correspondre à la valeur actualisée en début d'exercice.
-* Ajouter une dotations aux amortissements : Ajout d'une dotation. La dotation doit être associée à un compte d'immobilisation.
-* Ajouter d'une dépense d'investissement : Ajout d'une dépense en immobilisation. La dépense doit être associée à un compte d'immobilisation.
-
-Les données sont modifiables au niveau de chaque ligne, en cliquant sur l'icône *crayon*. Il est également possible de supprimer la ligne en cliquant sur l'icône *poubelle* ou de supprimer toutes les lignes en cliquant sur le bouton *Supprimer tout*.
-
-&nbsp;
-#### Fournisseurs
-
-Cette section se met autmatiquement à jour en fonction des données saisies dans les onglets *Charges externes* et *Amortissements sur immobilisations*. Il est possible de compléter les numéros de siren des fournisseurs via l'import d'un fichier .csv ou.xlsx (dont le modèle est téléchargeable).
+Lorsque les charges ne sont pas rattachées à un compte fournisseur auxiliaire, un compte "DEPENSES - " est créé.
 
 Le fichier d'import .csv doit comporter un en-tête (*header*) avec les libellés suivants, la séparation des données doit se faire avec des points-virgules :
 - *corporateName* pour la colonne contenant le libellé de l'entreprise
@@ -102,15 +72,22 @@ Le fichier d'import .xlsx doit comporter deux colonnes avec les libellés suivan
 
 Exemple :
 
-| 1 |identifiant | denomination |
+| 1 | denomination | siren |
 |:--|:-----------|:-------------|
-| 2 | 012785487 | Fournisseur1 |
-| 3 | 759647854 | Fournisseur2 |
+| 2 | Fournisseur1 | 012785487 |
+| 3 | Fournisseur2 | 759647854 |
 
 
 La colonne *siren* est de couleur verte lorsque les données sont synchronisées à partir du numéro de siren. Dès lors qu'elles sont obtenues à partir d'une localisation et d'une division économique, le fond devient vert pour ces deux champs. En l'absence de couleur, aucune donnée n'est associée au fournisseur.
 
 Le bouton *synchroniser les données* permet de mettre à jour les données associées pour l'ensemble des fournisseurs à partir des informations disponibles.
+
+&nbsp;
+### ETATS INITIAUX
+
+Cette section a pour objectif de charger les empreintes des comptes de stocks et d'immobilisations en fin d'exercice précédent. En l'absence d'analyse réalisée sur l'exercice précédent, les données peuvent être estimées à partir de l'exercice courant ou à partir de valeurs par défaut.
+
+Dès que des données le permettent, les valeurs sont issues de l'exercice courant.
 
 &nbsp;
 ### INDICATEURS (INFORMATIONS GÉNÉRALES)
@@ -153,19 +130,24 @@ L'outil de calcul correspond à une simple décomposition de la contribution dir
 * Rémunérations dans le cadre d'activités de recherche ou de formation
 
 &nbsp;
-## TÉLÉCHARGER LA SESSION / IMPORTER UN FICHIER
+## TÉLÉCHARGEMENT DE LA SESSION / IMPORTATION D'UNE SAUVEGARDE
 
 Les données saisies n'étant pas sauvegardées côté serveur, il est possible de télécharger et d'importer un fichier de sauvegarde.
 Les fichiers de sauvegarde sont au format JSON. 
 Les évolutions de l'application pourront entraîner un écart entre l'état sauvegardé au sein d'un fichier de sauvegarde et l'état utilisé au sein de l'application.
 L'importation sera adaptée pour préserver la lisibilité des fichiers. En cas de problème, n'hésitez pas à nous contacter.
 
-&nbsp;
-## DOCUMENTATION
-
-Renvoie à cette documentation. N'hésitez pas à nous contacter en cas de problème ou pour nous faire part de suggestions.
 
 &nbsp;
-## CODE SOURCE
+## FORMULES DE CALCULS
 
-Cet outil est open source, ce lien renvoie au code source sur Github. Vous pouvez participer au développement du projet en proposant des améliorations.
+### Empreinte de la valeur ajoutée nette
+
+### Empreinte d'une immobilisation
+
+### Empreinte d'une dotation aux amortissements sur immobilisations
+
+### Empreinte d'une charge externe
+
+
+
