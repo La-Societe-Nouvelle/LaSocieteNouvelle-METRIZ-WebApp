@@ -27,7 +27,7 @@ export class StocksTable extends React.Component {
 
   render() 
   {
-    const {stocks} = this.props.financialData;
+    const {stocks,depreciations} = this.props.financialData;
     const {columnSorted,nbItems,page,showEditor,stockToEdit} = this.state;
 
     this.sortItems(stocks,columnSorted);
@@ -46,17 +46,24 @@ export class StocksTable extends React.Component {
           </thead>
           <tbody>
           {stocks.slice(page*nbItems,(page+1)*nbItems)
-                  .map(({account,accountLib,amount,prevAmount}) => 
-            <tr key={account}>
-              <td className="short center">{account}</td>
-              <td className="auto">{accountLib}</td>
-              <td className="short right">{printValue(amount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(amount-prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-            </tr>)}
+                  .map(({account,accountLib,amount,prevAmount}) => {
+            let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
+                                         .map(depreciation => depreciation.amount)
+                                         .reduce((a,b) => a + b,0);
+            let prevValueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
+                                             .map(depreciation => depreciation.prevAmount)
+                                             .reduce((a,b) => a + b,0);
+            return(
+              <tr key={account}>
+                <td className="short center">{account}</td>
+                <td className="auto">{accountLib}</td>
+                <td className="short right">{printValue(amount-valueLoss,0)}</td>
+                <td className="column_unit">&nbsp;€</td>
+                <td className="short right">{printValue(prevAmount-prevValueLoss,0)}</td>
+                <td className="column_unit">&nbsp;€</td>
+                <td className="short right">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}</td>
+                <td className="column_unit">&nbsp;€</td>
+              </tr>)})}
           {stocks.length > 0 &&
             <tr className="with-top-line">
               <td className="short center"> - </td>
