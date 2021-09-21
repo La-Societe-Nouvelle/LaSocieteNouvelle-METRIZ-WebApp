@@ -441,10 +441,18 @@ table {
         background-color: $valid-color;
       }
     }
+    .unvalid {
+      input,select {
+        background-color: $unvalid-color;
+      }
+    }
 
     input,select {
       &.valid {
         background-color: $valid-color; 
+      }
+      &.unvalid {
+        background-color: $unvalid-color; 
       }
     }
 

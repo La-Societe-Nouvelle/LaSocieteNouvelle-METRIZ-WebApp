@@ -264,7 +264,7 @@ export class FinancialData {
 
     /* ----- Company ----- */
 
-    getCompany = (id) => this.companies.filter(company => company.getId()==id)[0]
+    getCompany = (id) => this.companies.filter(company => company.id==id)[0]
     getCompanyByAccount = (account) => this.companies.filter(company => company.account==account)[0]
     getCompanyByName = (name) => this.companies.filter(company => company.corporateName==name)[0]
     getCompanies = () => this.companies 
