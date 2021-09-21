@@ -5,8 +5,6 @@ import React from 'react';
 
 // Utils
 import { printValue } from "../../src/utils/Utils";
-import { InputNumber } from '../InputNumber';
-import { InputText } from '../InputText';
 
 /* ---------- TABLE STOCKS ---------- */
 
@@ -20,15 +18,13 @@ export class StocksTable extends React.Component {
       reverseSort: false,
       nbItems: 15,
       page: 0,
-      showEditor: false,
-      stockToEdit: null,
     }
   }
 
   render() 
   {
     const {stocks,depreciations} = this.props.financialData;
-    const {columnSorted,nbItems,page,showEditor,stockToEdit} = this.state;
+    const {columnSorted,nbItems,page} = this.state;
 
     this.sortItems(stocks,columnSorted);
 
@@ -88,9 +84,6 @@ export class StocksTable extends React.Component {
 
   /* ----- ACTIONS ----- */
 
-  // Manage editor
-  closeEditor = () => this.setState({showEditor: false})
-  
   // Import CSV File
   importPrevStateFile = (event) => {
     const reader = new FileReader();
@@ -107,12 +100,14 @@ export class StocksTable extends React.Component {
 
   /* ----- SORTING ----- */
 
-  changeColumnSorted(columnSorted) {
+  changeColumnSorted(columnSorted) 
+  {
     if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})}
     else                                        {this.setState({reverseSort: !this.state.reverseSort})}
   }
 
-  sortItems(items,columSorted) {
+  sortItems(items,columSorted) 
+  {
     switch(columSorted) {
       case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
       case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
@@ -128,31 +123,4 @@ export class StocksTable extends React.Component {
   prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
   nextPage = () => {if ((this.state.page+1)*this.state.nbItems < this.props.financialData.stocks.length) this.setState({page: this.state.page+1})}
 
-  /* ----- OPERATIONS ON EXPENSE ----- */
-
-  editStock = (id) => {this.setState({showEditor: true, stockToEdit: this.props.financialData.getInitialStock(id)})}
-  deleteStock = (id) => {this.props.financialData.removeInitialStock(id);this.props.onUpdate();this.forceUpdate()}
-
-}
-
-/* ---------- ROW STOCK ---------- */
-
-/* ---------- ROW TOTAL ---------- */
-
-function RowTotal(props) 
-{
-  const {financialData} = props
-  
-  return (
-    <tr className="with-top-line">
-      <td className="short center"> - </td>
-      <td className="auto">TOTAL</td>
-      <td className="short right">{printValue(financialData.getPrevAmountStocks(),0)}</td>
-      <td className="column_unit">&nbsp;€</td>
-      <td className="short right">{printValue(financialData.getVariationStocks(),0)}</td>
-      <td className="column_unit">&nbsp;€</td>
-      <td className="short right">{printValue(financialData.getAmountStocks(),0)}</td>
-      <td className="column_unit">&nbsp;€</td>
-    </tr>
-  )
 }
