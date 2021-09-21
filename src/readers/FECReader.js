@@ -140,25 +140,27 @@ async function FECDataReader(FECData)
 
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = [];                 // stock 31, 32, 33, 34, 35, 37
-  data.stockVariations = [];       // stock flow 603, 71 <-> 31, 32, 33, 34, 35, 37
+  data.stockVariations = [];        // stock flow 603, 71 <-> 31, 32, 33, 34, 35, 37
 
   // Expenses ------------------------------------------------------------------------------------------- //
   data.expenses = [];               // 60, 61, 62 (hors 603) (609 read as negative expenses)
   data.depreciationExpenses = [];   // 6811 and 6871
   
   // Immobilisations ------------------------------------------------------------------------------------ //
-  data.immobilisations = [];        // stock 20 to 27
-  data.investments = [];            // flow 404 -> 20, 21
-  data.depreciations = [];          // stock 28 and 29
+  data.immobilisations = [];        // #20 to #27
+  data.investments = [];            // flow #2 <- #404
+
+  // Amortissements et Dépréciations -------------------------------------------------------------------- //
+  data.depreciations = [];          // #28, #29 and #39
 
   // others key figures --------------------------------------------------------------------------------- //
-  data.taxes = 0;                   // flow <- 63_
-  data.personnelExpenses = 0;       // flow <- 64_
-  data.otherExpenses = 0;           // flow <- 65_
-  data.financialExpenses = 0;       // flow <- 66_
-  data.exceptionalExpenses = 0;     // flow <- 67_
-  data.provisions = 0;              // flow <- 68_ (hors 6811)
-  data.taxOnProfits = 0;            // flow <- 69_
+  data.taxes = 0;                   // #63
+  data.personnelExpenses = 0;       // #64
+  data.otherExpenses = 0;           // #65
+  data.financialExpenses = 0;       // #66 & #686
+  data.exceptionalExpenses = 0;     // #67 & #687 (hors #6871)
+  data.provisions = 0;              // #68 (hors #6811)
+  data.taxOnProfits = 0;            // #69
 
   // Other used data ------------------------------------------------------------------------------------//
   data.KNWData = {apprenticeshipTax: 0, vocationalTrainingTax: 0}
@@ -297,6 +299,23 @@ async function readBookAsJournalANouveaux(data,book)
       data.stocks.push(stockData);
     }
 
+    // Comptes de dépréciations ------------------------------------------------------------------------- //
+    if (ecriture.CompteNum.charAt(0)=="3" && ["39"].includes(ecriture.CompteNum.substring(0,2)))
+    {
+      // depreciation data
+      let depreciationData = 
+      {
+        account: ecriture.CompteNum,
+        accountLib: ecriture.CompteLib,
+        accountAux: "3"+ecriture.CompteNum.substring(2)+"0",
+        prevAmount: parseAmount(ecriture.Credit),
+        amount: parseAmount(ecriture.Credit)
+      }
+
+      // push data
+      data.depreciations.push(depreciationData);
+    }
+
   })
 }
 
@@ -410,6 +429,17 @@ const readStockEntry = async (data,book,ecriture) =>
       data.stocks.push(stockData);
     }
   }
+
+  // Dépréciation ------------------------------------------------------------------------------------- //
+  if (["39"].includes(ecriture.CompteNum.substring(0,2)))
+  {
+    // Retrieve depreciation item
+    let depreciation = data.depreciations.filter(depreciation => depreciation.account == ecriture.CompteNum)[0];
+    
+    // variation de la valeur de l'immobilisation
+    depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+  }
+
 }
 
 /* ---------- COMPTES DE CHARGES ---------- */
