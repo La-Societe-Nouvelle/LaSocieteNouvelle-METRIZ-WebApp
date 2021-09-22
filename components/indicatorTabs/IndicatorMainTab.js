@@ -165,7 +165,7 @@ class TableMain extends React.Component {
             <td className="column_value">{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">({printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountProductionStockVariations()),nbDecimals)})</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountProductionStockVariations()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>}
         {financialData.getImmobilisedProduction() > 0 &&
@@ -197,7 +197,7 @@ class TableMain extends React.Component {
             <td className="column_value">{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">({printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)})</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
         {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => {
