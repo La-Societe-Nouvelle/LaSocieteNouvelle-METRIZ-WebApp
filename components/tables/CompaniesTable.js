@@ -29,7 +29,7 @@ export class CompaniesTable extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (this.props != prevProps) this.setState({companies: this.props.companies})
+    if (this.props != prevProps) this.setState({companies: this.filterCompanies(this.props.companies,this.props.view), view: this.props.view})
   }
 
   render() 
@@ -59,9 +59,10 @@ export class CompaniesTable extends React.Component {
           </thead>
           <tbody>
             {companies.slice(page*20,(page+1)*20)
-                      .map((company) => 
+                            .map((company) => 
               <RowTableCompanies key={"company_"+company.id} 
                                  {...company}
+
                                  updateCompany={this.updateCompany.bind(this)}
                                  syncCompany={this.updateCompanyFromRemote.bind(this)}/>)}
           </tbody>
@@ -78,6 +79,18 @@ export class CompaniesTable extends React.Component {
   }
 
   /* ---------- SORTING ---------- */
+
+  filterCompanies(companies,view)
+  {
+    switch(view)
+    {
+      case "aux": return companies.filter(company => company.account.charAt(0) != "_");
+      case "expenses": return companies.filter(company => company.account.charAt(0) == "_");
+      case "undefined": return companies.filter(company => company.state != "siren");
+      case "unsync": return companies.filter(company => company.status != 200);
+      default: return companies;
+    }
+  }
 
   changeColumnSorted(columnSorted) 
   {
@@ -115,14 +128,16 @@ export class CompaniesTable extends React.Component {
   {
     let company = this.props.financialData.getCompany(nextProps.id);
     company.update(nextProps);
-    this.setState({companies: this.props.financialData.companies});
+    this.props.onUpdate();
+    this.setState({companies: this.filterCompanies(this.props.companies,this.props.view)});
   }
 
   updateCompanyFromRemote = async (companyId) =>
   {
     let company = this.props.financialData.getCompany(companyId);
     await company.updateFromRemote();
-    this.setState({companies: this.props.financialData.companies});
+    this.props.onUpdate();
+    this.setState({companies: this.filterCompanies(this.props.companies,this.props.view)});
   }
 
 }
@@ -211,25 +226,30 @@ class RowTableCompanies extends React.Component {
     )
   }
 
-  updateCorporateId = (nextCorporateId) => {
+  updateCorporateId = (nextCorporateId) => 
+  {
     this.setState({dataUpdated: true})
     this.props.updateCompany({id: this.props.id, corporateId: nextCorporateId})
   }
   
-  updateCorporateName = (nextCorporateName) => {
+  updateCorporateName = (nextCorporateName) => 
+  {
     this.props.updateCompany({id: this.props.id, corporateName: nextCorporateName})
   }
 
-  onAreaCodeChange = (event) => {
+  onAreaCodeChange = (event) => 
+  {
     this.setState({areaCode: event.target.value, dataUpdated: true})
     this.props.updateCompany({id: this.props.id, footprintAreaCode: event.target.value})
   }
-  onActivityCodeChange = (event) => {
+  onActivityCodeChange = (event) => 
+  {
     this.setState({activityCode: event.target.value, dataUpdated: true})
     this.props.updateCompany({id: this.props.id, footprintActivityCode: event.target.value})
   }
 
-  syncCompany = async () => {
+  syncCompany = async () => 
+  {
     this.setState({toggleIcon: true})
     await this.props.syncCompany(this.props.id)
     this.setState({toggleIcon: false})

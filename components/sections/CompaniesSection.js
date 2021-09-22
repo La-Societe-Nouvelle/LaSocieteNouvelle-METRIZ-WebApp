@@ -32,11 +32,6 @@ export class CompaniesSection extends React.Component {
     const financialData = this.props.session.financialData;
 
     const expensesByCompanies = getExpensesByCompanies(financialData.expenses.concat(financialData.investments));
-    
-    let companiesShowed = companies;
-    if (view=="aux") companiesShowed = companies.filter(company => company.account.charAt(0) != "_");
-    if (view=="expenses") companiesShowed = companies.filter(company => company.account.charAt(0) == "_");
-    if (view=="undefined") companiesShowed = companies.filter(company => company.state != "siren");
 
     return (
       <div className="section-view">
@@ -67,22 +62,23 @@ export class CompaniesSection extends React.Component {
               <button onClick={this.exportXLSXFile}>
                 Télécharger modèle XLSX
               </button>
-              {companiesShowed.length > 0 &&
+              {companies.length > 0 &&
                 <select value={view}
                         onChange={this.changeView}>
                   <option key="1" value="all">Affichage de tous les comptes externes</option>
                   <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
-                  <option key="3" value="undefined">Affichage des comptes non rattachés</option>
-                  <option key="4" value="expenses">Affichage des dépenses non rattachées</option>
+                  <option key="3" value="expenses">Affichage des autres comptes tiers</option>
+                  <option key="4" value="unsync">Affichage des comptes non synchronisés</option>
                 </select>}
               <button onClick={this.synchroniseAll}>
                 Synchroniser les données
               </button>
             </div>
 
-            {companiesShowed.length > 0 && 
+            {companies.length > 0 && 
               <CompaniesTable view={view}
-                              companies={companiesShowed} 
+                              onUpdate={this.updateFootprints.bind(this)}
+                              companies={companies}
                               financialData={financialData}
                               amounts={expensesByCompanies}/>}
 
