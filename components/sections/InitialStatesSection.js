@@ -59,6 +59,7 @@ export class InitialStatesSection extends React.Component {
     await Promise.all(this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks)
                                                                       .filter(immobilisation => immobilisation.initialState == "defaultData")
                                                                       .map(async immobilisation => await this.fetchDefaultData(immobilisation)));
+    this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData});
   }
 
