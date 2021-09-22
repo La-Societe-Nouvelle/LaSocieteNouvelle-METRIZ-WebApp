@@ -51,15 +51,15 @@ export class Company {
   // init footrpint id
   getDefaultFootprintId() 
   {
-    if (this.corporateId==null) {return null}
+    if (!this.corporateId) {return null}
     // SIREN
-    if (this.corporateId.match("[0-9]{9}")) {return this.corporateId}
+    if (this.corporateId.match(/[0-9]{9}/)) {return this.corporateId}
     // SIRET
-    else if (this.corporateId.match("[0-9]{14}")) {return this.corporateId.substring(0,9)}
+    else if (this.corporateId.match(/[0-9]{14}/)) {return this.corporateId.substring(0,9)}
     // VAT NUMBER
-    else if (this.corporateId.match("FR[0-9]{11}")) {return this.corporateId.substring(4,11)}
+    else if (this.corporateId.match(/FR[0-9]{11}/)) {return this.corporateId.substring(4,11)}
     // DEFAULT
-    else {return null}
+    else {return this.corporateId}
   }
 
   /* -------------------- OPERATIONS -------------------- */
@@ -78,7 +78,7 @@ export class Company {
       this.legalUnitAreaCode = "";
       this.legalUnitActivityCode = "";
       // status
-      this.state = this.footprintId ? "siren" : "";
+      this.state = this.footprintId ? "siren" : "default";
       this.dataFetched = false;
       this.status = null;
     }
@@ -133,6 +133,20 @@ export class Company {
         this.dataFetched = false;
         this.status = 404;
       }
+    }
+    // Case - Fetch id not ok ----------------------------------------------------------------------------- //
+    else if (this.state=="siren") 
+    {
+      // legal data --------------------------------------- //
+      this.legalUnitName = "";
+      this.legalUnitAreaCode = "";
+      this.legalUnitActivityCode = "";
+      // footprint ---------------------------------------- //
+      this.footprint = new SocialFootprint({});
+      // state -------------------------------------------- //
+      this.lastUpdateFromRemote = "";
+      this.dataFetched = false;
+      this.status = 404;
     }
     // Case - Fetch default data -------------------------------------------------------------------------- //
     else if (this.state=="default")
