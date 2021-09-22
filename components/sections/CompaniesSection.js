@@ -36,6 +36,7 @@ export class CompaniesSection extends React.Component {
     let companiesShowed = companies;
     if (view=="aux") companiesShowed = companies.filter(company => company.account.charAt(0) != "_");
     if (view=="expenses") companiesShowed = companies.filter(company => company.account.charAt(0) == "_");
+    if (view=="undefined") companiesShowed = companies.filter(company => company.state != "siren");
 
     return (
       <div className="section-view">
@@ -71,7 +72,8 @@ export class CompaniesSection extends React.Component {
                         onChange={this.changeView}>
                   <option key="1" value="all">Affichage de tous les comptes externes</option>
                   <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
-                  <option key="3" value="expenses">Affichage des dépenses non rattachées</option>
+                  <option key="3" value="undefined">Affichage des comptes non rattachés</option>
+                  <option key="4" value="expenses">Affichage des dépenses non rattachées</option>
                 </select>}
               <button onClick={this.synchroniseAll}>
                 Synchroniser les données
