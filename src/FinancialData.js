@@ -33,8 +33,10 @@ export class FinancialData {
         
         // Immobilisations
         this.immobilisations = [];                          // immobilisations (#20 to #27)
-        this.depreciations = [];                            // depreciations (#28 & #29)
         this.investments = [];                              // investments (flows #2 <- #404)
+
+        // Depreciations
+        this.depreciations = [];                            // depreciations (#28, #29 & #39)
 
         // Other figures
         this.otherOperatingIncomes = 0;                     //
@@ -81,8 +83,10 @@ export class FinancialData {
 
         // Immobilisations
         this.immobilisations = data.immobilisations.map((props,id) => new Immobilisation({id: id, ...props}));
-        this.depreciations = data.depreciations.map((props,id) => new Depreciation({id: id, ...props}));
         this.investments = data.investments.map((props,id) => new Expense({id: id, ...props}));
+
+        // Depreciations
+        this.depreciations = data.depreciations.map((props,id) => new Depreciation({id: id, ...props}));
 
         // Other figures
         this.otherOperatingIncomes = data.otherOperatingIncomes || 0;
