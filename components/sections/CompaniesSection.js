@@ -164,8 +164,8 @@ export class CompaniesSection extends React.Component {
       await company.updateFromRemote();
       await new Promise(r => setTimeout(r, 10));
     }
-    //await Promise.all(this.props.session.financialData.companies.map(async (company) => await company.updateFromRemote()));
     this.setState({companies: this.props.session.financialData.companies});
+    this.props.session.updateFootprints();
   }
 
 }
