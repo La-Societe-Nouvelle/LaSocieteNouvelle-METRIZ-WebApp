@@ -120,7 +120,7 @@ export class Session {
         })
 
         // Production stock variations (items)
-        let productionStockVariations = this.financialData.stockVariations.filter(stockVariation => stockVariation.account.charAt() == "6");
+        let productionStockVariations = this.financialData.stockVariations.filter(stockVariation => stockVariation.account.charAt(0) == "7");
         await Promise.all(productionStockVariations.map(async (stockVariation) => {
             let stock = this.financialData.getStockByAccount(stockVariation.accountAux);
             stockVariation.footprint.indicators[indic] = await buildIndicatorMerge(
@@ -423,7 +423,7 @@ function buildIndicatorAggregate(indic,elements,usePrev)
 
     if (!missingData && totalAmount != 0) { 
         indicator.setValue(absolute/totalAmount);
-        let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
+        let uncertainty = Math.abs(absolute) > 0 ? Math.max( Math.abs(absoluteMax-absolute) , Math.abs(absolute-absoluteMin) )/Math.abs(absolute) *100 : 0;
         indicator.setUncertainty(uncertainty);
     } else {
         indicator.setValue(null); 

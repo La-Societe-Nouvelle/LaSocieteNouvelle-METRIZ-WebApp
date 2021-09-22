@@ -603,9 +603,9 @@ const readProductionEntry = async (data,book,ecriture) =>
     {
       let stockVariationData = 
       {
-        account: ecritureStock.CompteNum,
+        account: ecriture.CompteNum,
         accountLib: ecritureStock.CompteLib,
-        accountAux: ecriture.CompteNum,
+        accountAux: ecritureStock.CompteNum,
         isProductionStock: true,
         label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
         amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
