@@ -2,7 +2,7 @@ import React from 'react';
 
 import { InputNumber } from '../InputNumber';
 import { getNewId, printValue } from '../../src/utils/Utils';
-import { TableSocialData } from '../indicatorTabs/SocialDataTable';
+import { SocialDataTable } from '../tables/SocialDataTable';
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT DIS -------------------- */
@@ -31,8 +31,19 @@ export class AssessmentDIS extends React.Component {
     const {employees} = this.state;
     
     return(
-      <TableSocialData employees={employees}/>
+      <div className="indicator-section-view">
+        <div className="view-header">
+          <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
+        </div>
+
+        <div className="group assessment"><h3>Outil de mesure</h3>
+          <SocialDataTable employees={employees}/>
+        </div>
+      </div>
     )
   }
+
+  onSubmit = async () => {}
 
 }

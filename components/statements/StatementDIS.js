@@ -45,6 +45,9 @@ export class StatementDIS extends React.Component {
                  disabled={hasEmployees === false}
                  onKeyPress={this.onEnterPress}/>
           <span>&nbsp;/100</span>
+          <div className="assessment-button-container">
+            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+          </div>
         </div>
       </div>
     ) 
