@@ -1,5 +1,5 @@
-import { ifDefined } from "./utils/Utils";
-import {SocialFootprint} from "/src/SocialFootprint.js";
+import { ifDefined } from "/src/utils/Utils";
+import {SocialFootprint} from "/src/footprintObjects/SocialFootprint.js";
 
 export class EconomicValue {
 

@@ -1,14 +1,12 @@
 
-import { Expense } from './Expense';
-import { Immobilisation } from './Immobilisation';
-import { Depreciation } from './Depreciation'
-import { Company } from './Company';
-import { Stock } from './Stock';
+import { Expense } from '/src/accountingObjects/Expense';
+import { Immobilisation } from '/src/accountingObjects/Immobilisation';
+import { Depreciation } from '/src/accountingObjects/Depreciation'
+import { Stock } from '/src/accountingObjects/Stock';
 
-import { metaAccounts } from '../lib/accounts.js';
+import { Company } from '/src/Company';
 
 import { getNewId } from './utils/Utils';
-import { Flow } from './Flow';
 
 export class FinancialData {
 
@@ -79,7 +77,7 @@ export class FinancialData {
 
         // Stocks
         this.stocks = data.stocks.map((props,id) => new Stock({id: id, ...props}));
-        this.stockVariations = data.stockVariations.map((props,id) => new Flow({id: id, ...props}));
+        this.stockVariations = data.stockVariations.map((props,id) => new Expense({id: id, ...props}));
 
         // Immobilisations
         this.immobilisations = data.immobilisations.map((props,id) => new Immobilisation({id: id, ...props}));
@@ -193,9 +191,6 @@ export class FinancialData {
     getStockByAccount = (account) => this.stocks.filter(stock => stock.account==account)[0]
     getStocks = () => this.stocks
       
-    // Add new stock
-    addStock = (props) => this.stocks.push(new Stock({id: getNewId(this.stocks),...props}))
-    
     // Update stock
     updateStock = (nextProps) => this.getStock(nextProps.id).update(nextProps)    
 
@@ -203,8 +198,6 @@ export class FinancialData {
       
     getStockVariation = (id) => this.stockVariations.filter(expense => expense.id==id)[0]
     getStocksVariations = () => this.stockVariations
-
-    addStockVariation = (props) => this.stockVariations.push(new Flow({id: getNewId(this.stockVariations),...props}))
     
     updateStockVariation = (nextProps) => this.getStockVariation(nextProps.id).update(nextProps)    
 
@@ -212,9 +205,7 @@ export class FinancialData {
 
     getExpense = (id) => this.expenses.filter(expense => expense.id==id)[0]
     getExpenses = () => this.expenses
-      
-    addExpense = (props) => this.expenses.push(new Expense({id: getNewId(this.expenses),...props}))
-    
+          
     updateExpense = (nextProps) => this.getExpense(nextProps.id).update(nextProps)
 
     /* ---------- Depreciations ---------- */
@@ -222,8 +213,6 @@ export class FinancialData {
     getDepreciationExpense = (id) => this.depreciationExpenses.filter(expense => expense.getId()==id)[0]
     getDepreciationExpenses = () => this.depreciationExpenses
     getDepreciationExpensesByAccountAux = (account) => this.depreciationExpenses.filter(expense => expense.accountAux==account)
-
-    addDepreciationExpense = (props) => this.depreciationExpenses.push(new Expense({id: getNewId(this.depreciationExpenses),...props}))
     
     updateDepreciationExpense = (nextProps) => this.getAmountDepreciationExpense(nextProps.id).update(nextProps)
 
@@ -232,8 +221,6 @@ export class FinancialData {
     getImmobilisation = (id) => this.immobilisations.filter(immobilisation => immobilisation.id==id)[0]
     getImmobilisationByAccount = (account) => this.immobilisations.filter(immobilisation => immobilisation.account==account)[0]
     getImmobilisations = () => this.immobilisations
-
-    addImmobilisation = (props) =>  this.immobilisations.push(new Immobilisation({id: getNewId(this.immobilisations),...props}))
    
     updateImmobilisation = (nextProps) => this.getImmobilisation(nextProps.id).update(nextProps)
 
@@ -248,8 +235,6 @@ export class FinancialData {
 
     getAmortisations = () => this.depreciations.filter(depreciation => depreciation.account.charAt(1)=="8")
     getDepreciations = () => this.depreciations.filter(depreciation => depreciation.account.charAt(1)=="9")
-
-    addDepreciation = (props) => this.depreciations.push(new Depreciation({id: getNewId(this.depreciations),...props}))
     
     updateDepreciation = (nextProps) => this.getDepreciation(nextProps.id).update(nextProps)
 
@@ -258,8 +243,6 @@ export class FinancialData {
     getInvestment = (id) => this.investments.filter(investment => investment.id==id)[0]
     getInvestments = () => this.investments
     
-    addInvestment = (props) => this.investments.push(new Expense({id: getNewId(this.investments),...props}))
-
     updateInvestment = (nextProps) => this.getInvestment(nextProps.id).update(nextProps)    
     
     /* ------------------------------- */

@@ -1,10 +1,11 @@
 
 // Components
 import { LegalUnit } from '/src/LegalUnit.js';
-import { SocialFootprint } from '/src/SocialFootprint.js';
 import { FinancialData } from '/src/FinancialData.js';
-import { ImpactsData } from './ImpactsData.js';
-import { Indicator } from './Indicator';
+import { ImpactsData } from '/src/ImpactsData.js';
+
+import { SocialFootprint } from '/src/footprintObjects/SocialFootprint.js';
+import { Indicator } from '/src/footprintObjects/Indicator';
 
 // Libraries
 import indics from '../lib/indics.json';

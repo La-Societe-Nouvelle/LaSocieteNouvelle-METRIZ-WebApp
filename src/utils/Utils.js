@@ -3,7 +3,7 @@
 
 export function printValue(value,precision) 
 {
-  if (value==null || value==undefined || value=="") {return " - "}
+  if (value===null || value===undefined || value==="") {return " - "}
   else 
   {
     let roundedValue = Math.round(value*Math.pow(10,precision))/Math.pow(10,precision).toFixed(precision);

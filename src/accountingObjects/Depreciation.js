@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // 
-import { SocialFootprint } from "/src/SocialFootprint.js";
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 
 export class Depreciation {
 

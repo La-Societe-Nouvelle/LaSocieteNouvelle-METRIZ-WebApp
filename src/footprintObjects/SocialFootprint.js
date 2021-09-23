@@ -1,4 +1,4 @@
-import {Indicator} from '/src/Indicator.js';
+import {Indicator} from './Indicator';
 
 const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 
@@ -24,12 +24,14 @@ export class SocialFootprint {
   /* ---------- Updaters ---------- */
   
   // All indicators
-  updateAll(data) {
+  updateAll(data) 
+  {
     indics.map((indic) => {this.updateIndic(indic,data[indic.toUpperCase()])})
   }
   
   // Specific indicator
-  updateIndic(indic, data) {
+  updateIndic(indic, data) 
+  {
     this.indicators[indic].update(data);
   }
 

@@ -26,7 +26,6 @@ import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciation
 // Libraries
 import { metaIndicators } from '/lib/indic';
 import { metaAccounts } from '/lib/accounts';
-import { Indicator } from '../../src/Indicator';
 
 /* -------------------------------------------------- */
 /* -------------------- MAIN TAB -------------------- */

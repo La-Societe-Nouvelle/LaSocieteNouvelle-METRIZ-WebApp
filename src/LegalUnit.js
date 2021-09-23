@@ -1,4 +1,4 @@
-import { SocialFootprint } from "./SocialFootprint";
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 export class LegalUnit {

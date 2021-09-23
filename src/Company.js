@@ -1,5 +1,5 @@
 import { getCurrentDateString, valueOrDefault } from "./utils/Utils";
-import { SocialFootprint } from "/src/SocialFootprint.js";
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
