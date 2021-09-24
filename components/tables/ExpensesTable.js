@@ -24,15 +24,13 @@ export class ExpensesTable extends React.Component {
     {
       columnSorted: "amount",
       reverseSort: false,
-      nbItems: 15,
-      page: 0,
     }
   }
 
   render() 
   {
     const {expenses} = this.props.financialData;
-    const {columnSorted,nbItems,page} = this.state;
+    const {columnSorted} = this.state;
 
     const expensesByAccount = getExpensesGroupByAccount(expenses);
     this.sortExpenses(expensesByAccount,columnSorted);
@@ -48,8 +46,7 @@ export class ExpensesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {expensesByAccount.slice(page*nbItems,(page+1)*nbItems)
-                              .map(({account,amount,accountLib}) => 
+            {expensesByAccount.map(({account,amount,accountLib}) => 
               <tr key={account}>
                 <td className="short center">{account}</td>
                 <td className="auto">{accountLib}</td>
@@ -58,11 +55,6 @@ export class ExpensesTable extends React.Component {
               </tr>)}
           </tbody>
         </table>
-        {expenses.length > nbItems &&
-          <div className="table-navigation">
-            <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <button className={(page+1)*nbItems < expenses.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
-          </div>}
       </div>
     )
   }
@@ -84,11 +76,6 @@ export class ExpensesTable extends React.Component {
     }
     if (this.state.reverseSort) expenses.reverse();
   }
-
-  /* ----- NAVIGATION ----- */
-
-  prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
-  nextPage = () => {if ((this.state.page+1)*this.state.nbItems < this.props.financialData.expenses.length) this.setState({page: this.state.page+1})}
 
 }
 

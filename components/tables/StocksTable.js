@@ -15,16 +15,14 @@ export class StocksTable extends React.Component {
     this.state = 
     {
       columnSorted: "account",
-      reverseSort: false,
-      nbItems: 15,
-      page: 0,
+      reverseSort: false
     }
   }
 
   render() 
   {
     const {stocks,depreciations} = this.props.financialData;
-    const {columnSorted,nbItems,page} = this.state;
+    const {columnSorted} = this.state;
 
     this.sortItems(stocks,columnSorted);
 
@@ -41,8 +39,7 @@ export class StocksTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-          {stocks.slice(page*nbItems,(page+1)*nbItems)
-                  .map(({account,accountLib,amount,prevAmount}) => {
+          {stocks.map(({account,accountLib,amount,prevAmount}) => {
             let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
                                          .map(depreciation => depreciation.amount)
                                          .reduce((a,b) => a + b,0);
@@ -73,11 +70,6 @@ export class StocksTable extends React.Component {
           </tr>}
           </tbody>
         </table>
-        {stocks.length > nbItems &&
-          <div className="table-navigation">
-            <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <button className={(page+1)*nbItems < stocks.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
-          </div>}
       </div>
     )
   }
@@ -117,10 +109,5 @@ export class StocksTable extends React.Component {
     }
     if (this.state.reverseSort) items.reverse();
   }
-
-  /* ----- NAVIGATION ----- */
-
-  prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
-  nextPage = () => {if ((this.state.page+1)*this.state.nbItems < this.props.financialData.stocks.length) this.setState({page: this.state.page+1})}
 
 }
