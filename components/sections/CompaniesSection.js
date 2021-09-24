@@ -36,7 +36,7 @@ export class CompaniesSection extends React.Component {
     return (
       <div className="section-view">
         <div className="section-view-header">
-          <h1>Fournisseurs et Comptes externes</h1>
+          <h1>Fournisseurs</h1>
         </div>
 
         <div className="section-view-main">
