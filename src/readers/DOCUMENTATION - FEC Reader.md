@@ -121,7 +121,7 @@ Pour chaque écriture relative aux comptes #60, #61 et #62 (hors #603), sont enr
 - Libellé du compte de charges
 - Numéro du compte fournisseur auxiliaire associé*
 - Libellé du compte fournisseur auxiliaire associé
-- Montant (Pour les comptes #609, le montant est inversé: Crédit - Débit, pour être traité comme une dépense *négative*)
+- Montant
 
 \* *Le numéro du compte auxiliaire est obtenu à partir de la ligne de l'écriture comptable relative à un compte fournisseur #40. Lorsqu'aucun compte auxiliaire n'est utilisé, le compte fournisseur #40 est repris; et lorsqu'aucune ligne fournisseur n'est trouvable, un compte fournisseur par défaut est créé à partir du numéro du compte de charges et avec le libellé "DEPENESE - X" où X est le libellé du compte de charges.*
 

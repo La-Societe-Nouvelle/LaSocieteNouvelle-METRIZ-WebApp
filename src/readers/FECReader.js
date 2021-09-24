@@ -464,9 +464,6 @@ const readExpenseEntry = async (data,book,ecriture) =>
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
   if (["60","61","62"].includes(ecriture.CompteNum.substring(0,2)) && ecriture.CompteNum.substring(0,3)!="603")
   { 
-    // check if 609
-    let isRefund = (ecriture.CompteNum.substring(0,3)=="609");
-
     // lecture du compte auxiliaire
     let ecritureAux = book.filter(ecritureAux => ecritureAux.EcritureNum == ecriture.EcritureNum 
                                               && ecritureAux.CompteNum.substring(0,2)=="40")[0] || {};
@@ -475,11 +472,11 @@ const readExpenseEntry = async (data,book,ecriture) =>
     let expenseData = 
     {
       label: ecriture.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
-      account: isRefund ? "60"+ecriture.CompteNum.substring(3)+"0" :  ecriture.CompteNum,
+      account: ecriture.CompteNum,
       accountLib: ecriture.CompteLib,
       accountAux: ecritureAux.CompAuxNum || ecritureAux.CompteNum || "_"+ecriture.CompteNum,
       accountAuxLib: ecritureAux.CompAuxLib || ecritureAux.CompAuxLib || "DEPENSES "+ecriture.CompteLib,
-      amount: (isRefund ? -1 : 1) * (parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)),
+      amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
     }
 
     // push data
