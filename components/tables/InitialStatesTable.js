@@ -31,7 +31,7 @@ export class InitialStatesTable extends React.Component {
 
     const immobilisationsShowed = immobilisations.filter(immobilisation => ["20","21","22","23","25"].includes(immobilisation.account.substring(0,2)));
     this.sortItems(immobilisationsShowed,columnSorted);
-
+    
     return (
       <div className="table-container">
         <table>
@@ -81,7 +81,7 @@ export class InitialStatesTable extends React.Component {
     this.forceUpdate();
   }
 
-  async synchroniseImmobilisation(id) {
+  synchroniseImmobilisation = async (id) => {
     let immobilisation = this.props.financialData.getImmobilisation(id);
     await this.fetchDefaultData(immobilisation);
   }
@@ -91,8 +91,9 @@ export class InitialStatesTable extends React.Component {
     await this.fetchDefaultData(stock);
   }
 
-  async fetchDefaultData(stockOrImmobilisation) {
-    await stockOrImmobilisation.updateFootprintFromRemote();
+  async fetchDefaultData(stockOrImmobilisation) 
+  {
+    await stockOrImmobilisation.updatePrevFootprintFromRemote();
     this.forceUpdate();
   }
 

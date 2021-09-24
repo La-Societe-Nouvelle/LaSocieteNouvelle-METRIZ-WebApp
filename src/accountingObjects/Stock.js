@@ -89,10 +89,10 @@ export class Stock {
   async updatePrevFootprintFromRemote() 
   {
     // Case - Fetch default data -------------------------------------------------------------------------- //
-    if (this.state=="defaultData") 
+    if (this.initialState=="defaultData") 
     {
       // request
-      let endpoint = apiBaseUrl + "default?" + "pays="+this.footprintAreaCode + "&activite="+this.footprintActivityCode +"&flow=PRD";
+      let endpoint = apiBaseUrl + "default?" + "pays="+this.prevFootprintAreaCode + "&activite="+this.prevFootprintActivityCode +"&flow=PRD";
       let response = await this.fetchData(endpoint);
       
       if (response!=null) // code == 200 ------------------------------ //
