@@ -17,7 +17,7 @@ export class SocialFootprint {
 
     // indicators
     this.indicators = {};
-    indics.forEach(indic => this.indicators[indic] = new Indicator(props.indicators[indic]) )
+    indics.forEach(indic => this.indicators[indic] = new Indicator({indic,...props.indicators[indic]}) )
   // ---------------------------------------------------------------------------------------------------- //
   }
 
