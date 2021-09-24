@@ -37,7 +37,7 @@ export class FinancialDataSection extends React.Component {
     return (
       <div className="section-view">
         <div className="section-view-header">
-          <h1>Données financières</h1>
+          <h1>Ecritures comptables</h1>
         </div>
         <div className="section-view-main">
 
