@@ -2,10 +2,12 @@
 
 // React
 import React from 'react';
-import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 
 // Components
 import { CompaniesTable } from '../tables/CompaniesTable';
+
+// Writers
+import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 
 // Readers
 import { CSVFileReader, processCSVCompaniesData } from '/src/readers/CSVReader';
