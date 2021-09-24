@@ -12,7 +12,7 @@ import { AssessmentNRG } from '/components/assessments/AssessmentNRG';
 import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
-import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '/src/Export';
+import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '/src/writers/Export';
 
 // Meta data
 import { metaIndicators } from '/lib/indic';

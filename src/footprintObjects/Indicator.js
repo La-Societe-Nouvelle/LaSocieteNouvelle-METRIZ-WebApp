@@ -2,17 +2,22 @@ import { ifDefined } from "/src/utils/Utils";
 
 export class Indicator {
 
-  constructor({indic,value,flag,uncertainty,libelleFlag}) 
+  constructor(props) 
   {
-    this.indic = indic;
-    this.value = ifDefined(value,null);
-    this.flag = flag || null;
-    this.uncertainty = ifDefined(uncertainty,null);
+    if (props==undefined) props = {};
+  // ---------------------------------------------------------------------------------------------------- //
+    this.indic = props.indic;
+    this.value = props.value || null;
+    this.flag = props.flag || null;
+    this.uncertainty = props.uncertainty || null;
+    
     // Complements
-    this.libelleFlag = libelleFlag || null;
+    this.libelleFlag = props.libelleFlag || null;
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
-  updateFromBackUp(backUp) {
+  updateFromBackUp(backUp) 
+  {
     this.value = backUp.value;
     this.flag = backUp.flag;
     this.uncertainty = backUp.uncertainty;
@@ -21,11 +26,9 @@ export class Indicator {
 
   /* ---------- Getters ---------- */
     
-  getIndic() {return this.indic}
-
-  getValue() {return this.value}
-  
-  getFlag() {return this.flag}
+  getIndic = () => this.indic
+  getValue = () => this.value  
+  getFlag = () => this.flag
   
   getUncertainty() {
     if (this.getValue()!=null) {return this.uncertainty}

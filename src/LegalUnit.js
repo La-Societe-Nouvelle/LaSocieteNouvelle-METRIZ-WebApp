@@ -3,25 +3,33 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 export class LegalUnit {
 
-  constructor() 
+  constructor(props) 
   {
-      this.siren = "";
-      this.corporateName = null;
-      this.corporateHeadquarters = null;
-      this.areaCode = null;
-      this.activityCode = null;
+    if (props==undefined) props = {};
+  // ---------------------------------------------------------------------------------------------------- //
 
-      this.year = "";
+    this.siren = props.siren || "";
 
-      this.defaultConsumptionFootprint = new SocialFootprint({});
-      this.fetchDefaultConsumptionFootprint();
+    this.corporateName = props.corporateName || null;
+    this.corporateHeadquarters = props.corporateHeadquarters || null;
+    this.areaCode = props.areaCode || null;
+    this.activityCode = props.activityCode || null;
 
-      this.productionSectorFootprint = new SocialFootprint({});
-      this.valueAddedSectorFootprint = new SocialFootprint({});
-      this.consumptionSectorFootprint = new SocialFootprint({});
-      this.productionAreaFootprint = new SocialFootprint({});
-      this.valueAddedAreaFootprint = new SocialFootprint({});
-      this.fetchFootprintsReferences();
+    // Accounting period
+    this.year = props.year || "";
+
+    // Default data
+    this.defaultConsumptionFootprint = new SocialFootprint(props.defaultConsumptionFootprint);
+
+    // Sector footprints
+    this.productionSectorFootprint = new SocialFootprint(props.productionSectorFootprint);
+    this.valueAddedSectorFootprint = new SocialFootprint(props.valueAddedSectorFootprint);
+    this.consumptionSectorFootprint = new SocialFootprint(props.consumptionSectorFootprint);
+    // Economic area footprints
+    this.productionAreaFootprint = new SocialFootprint(props.productionAreaFootprint);
+    this.valueAddedAreaFootprint = new SocialFootprint(props.valueAddedAreaFootprint);
+
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
   /* ----- BACK UP ----- */

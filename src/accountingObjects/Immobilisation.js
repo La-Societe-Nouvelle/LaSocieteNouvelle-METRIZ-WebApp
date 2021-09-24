@@ -1,12 +1,14 @@
 // La Société Nouvelle
 
-import { getCurrentDateString } from '../utils/Utils';
-import { EconomicValue } from '/src/EconomicValue';
+// Imports
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
+
+// Utils
+import { getCurrentDateString } from '../utils/Utils';
 
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
 
-export class Immobilisation extends EconomicValue {
+export class Immobilisation {
 
   constructor({id,
                account,
@@ -33,12 +35,12 @@ export class Immobilisation extends EconomicValue {
     
     // Footprint
     this.amount = amount || 0;
-    this.footprint = new SocialFootprint({...footprint})
+    this.footprint = new SocialFootprint(footprint)
 
     // Previous footprint
     this.prevAmount = prevAmount || 0;
     this.initialState = initialState || "none";
-    this.prevFootprint = new SocialFootprint({...prevFootprint})
+    this.prevFootprint = new SocialFootprint(prevFootprint)
     this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
     this.prevFootprintActivityCode = prevFootprintActivityCode || "00";
 
@@ -106,7 +108,7 @@ export class Immobilisation extends EconomicValue {
       else // code == 404 --------------------------------------------- //
       {
         // footprint ---------------------------------------- //
-        this.prevFootprint = new SocialFootprint({});
+        this.prevFootprint = new SocialFootprint();
         // state -------------------------------------------- //
         this.lastUpdateFromRemote = "";
         this.dataFetched = false;

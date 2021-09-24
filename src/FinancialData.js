@@ -12,42 +12,43 @@ export class FinancialData {
 
     constructor(props) 
     {
+        if (props==undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
         
         // data loaded state
-        this.isFinancialDataLoaded = false;                 // i.e. FEC loaded
+        this.isFinancialDataLoaded = props.isFinancialDataLoaded || false;                                                                                      // i.e. FEC loaded
         
         // Production
-        this.revenue = null;                                // revenue (#70)
-        this.immobilisedProduction = null;                  // immobilised production (#72)
+        this.revenue = props.revenue || 0;                                                                                                                      // revenue (#70)
+        this.immobilisedProduction = props.immobilisedProduction || 0;                                                                                          // immobilised production (#72)
 
         // Expenses
-        this.expenses = [];                                 // external expenses (#60, #61, #62)
-        this.depreciationExpenses = [];                     // depreciation expenses (#6811, #6871)
+        this.expenses = props.expenses ? props.expenses.map((props,id) => new Expense({id: id, ...props})) : [];                                                // external expenses (#60, #61, #62)
+        this.depreciationExpenses = props.depreciationExpenses ? props.depreciationExpenses.map((props,id) => new Expense({id: id, ...props})) : [];            // depreciation expenses (#6811, #6871)
 
         // Stocks
-        this.stocks = [];                                   // stocks (#31 to #35, #37)
-        this.stockVariations = [];                          // stock variation (#71, #603)
+        this.stocks = props.stocks ? props.stocks.map((props,id) => new Stock({id: id, ...props})) : [];                                                        // stocks (#31 to #35, #37)
+        this.stockVariations = props.stockVariations ? props.stockVariations.map((props,id) => new Expense({id: id, ...props})) : [];                           // stock variation (#71, #603)
         
         // Immobilisations
-        this.immobilisations = [];                          // immobilisations (#20 to #27)
-        this.investments = [];                              // investments (flows #2 <- #404)
+        this.immobilisations = props.immobilisations ? props.immobilisations.map((props,id) => new Immobilisation({id: id, ...props})) : [];                    // immobilisations (#20 to #27)
+        this.investments = props.investments ? props.investments.map((props,id) => new Expense({id: id, ...props})) : [];                                       // investments (flows #2 <- #404)
 
         // Depreciations
-        this.depreciations = [];                            // depreciations (#28, #29 & #39)
+        this.depreciations = props.depreciations ? props.depreciations.map((props,id) => new Depreciation({id: id, ...props})) : [];                            // depreciations (#28, #29 & #39)
 
         // Other figures
-        this.otherOperatingIncomes = 0;                     //
-        this.taxes = 0;                                     // #63
-        this.personnelExpenses = 0;                         // #64
-        this.otherExpenses = 0;                             // #65
-        this.financialExpenses = 0;                         // #66
-        this.exceptionalExpenses = 0;                       // #67 hors #6871
-        this.provisions = 0;                                // #68 hors #6811
-        this.taxOnProfits = 0;                              // #69
+        this.otherOperatingIncomes = props.otherOperatingIncomes || 0;                                                                                          //
+        this.taxes = props.taxes || 0;                                                                                                                          // #63
+        this.personnelExpenses = props.personnelExpenses || 0;                                                                                                  // #64
+        this.otherExpenses = props.otherExpenses || 0;                                                                                                          // #65
+        this.financialExpenses = props.financialExpenses || 0;                                                                                                  // #66
+        this.exceptionalExpenses = props.exceptionalExpenses || 0;                                                                                              // #67 hors #6871
+        this.provisions = props.provisions || 0;                                                                                                                // #68 hors #6811
+        this.taxOnProfits = props.taxOnProfits || 0;                                                                                                            // #69
 
         // Companies
-        this.companies = [];                                // Companies
+        this.companies = props.companies ? props.companies.map((props,id) => new Company({id: id, ...props})) : [];                                             // Companies
 
     // ---------------------------------------------------------------------------------------------------- //
     }

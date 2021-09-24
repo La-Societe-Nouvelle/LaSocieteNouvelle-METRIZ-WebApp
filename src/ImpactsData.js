@@ -1,54 +1,58 @@
 
 export class ImpactsData  {
 
-  constructor(props) {
+  constructor(props) 
+  {
+    if (props==undefined) props = {};
+  // ---------------------------------------------------------------------------------------------------- //
 
-    this.netValueAdded = null;
+    this.netValueAdded = props.netValueAdded || null;
 
     /* --- Value Creation --- */
 
-    this.isAllActivitiesInFrance = null;
-    this.domesticProduction = null;
+    this.isAllActivitiesInFrance = props.isAllActivitiesInFrance || null;
+    this.domesticProduction = props.domesticProduction || null;
 
-    this.isValueAddedCrafted = null;
-    this.craftedProduction = null;
+    this.isValueAddedCrafted = props.isValueAddedCrafted || null;
+    this.craftedProduction = props.craftedProduction || null;
 
-    this.hasSocialPurpose = null;
+    this.hasSocialPurpose = props.hasSocialPurpose || null;
 
     /* --- Social Data --- */
 
-    this.hasEmployees = null;
-    this.employees = [];
+    this.hasEmployees = props.hasEmployees || null;
+    this.employees = props.employees || [];
 
-    this.indexGini = null;
-    this.wageGap = null;
-    this.researchAndTrainingContribution = null;
+    this.indexGini = props.indexGini || null;
+    this.wageGap = props.wageGap || null;
+    this.researchAndTrainingContribution = props.researchAndTrainingContribution || null;
 
-    this.knwDetails = {};
+    this.knwDetails = props.knwDetails || {};
 
     /* --- Environnemental Data */
 
-    this.greenhousesGazEmissions = null;
-    this.greenhousesGazEmissionsUncertainty = null;
-    this.ghgDetails = {};
+    this.greenhousesGazEmissions = props.greenhousesGazEmissions || null;
+    this.greenhousesGazEmissionsUncertainty = props.greenhousesGazEmissionsUncertainty || null;
+    this.ghgDetails = props.ghgDetails || {};
 
-    this.hazardousSubstancesConsumption = null;
-    this.hazardousSubstancesConsumptionUncertainty = null;
+    this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption || null;
+    this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty || null;
 
-    this.isExtractiveActivities = null;
-    this.materialsExtraction = null;
-    this.materialsExtractionUncertainty = null;
+    this.isExtractiveActivities = props.isExtractiveActivities || null;
+    this.materialsExtraction = props.materialsExtraction || null;
+    this.materialsExtractionUncertainty = props.materialsExtractionUncertainty || null;
 
-    this.energyConsumption = null;
-    this.energyConsumptionUncertainty = null;
-    this.nrgDetails = {};
+    this.energyConsumption = props.energyConsumption || null;
+    this.energyConsumptionUncertainty = props.energyConsumptionUncertainty || null;
+    this.nrgDetails = props.nrgDetails || {};
 
-    this.wasteProduction = null;
-    this.wasteProductionUncertainty = null;
+    this.wasteProduction = props.wasteProduction || null;
+    this.wasteProductionUncertainty = props.wasteProductionUncertainty || null;
 
-    this.waterConsumption = null;
-    this.waterConsumptionUncertainty = null;
-
+    this.waterConsumption = props.waterConsumption || null;
+    this.waterConsumptionUncertainty = props.waterConsumptionUncertainty || null;
+    
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
   /* ----- BACK UP ----- */

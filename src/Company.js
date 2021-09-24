@@ -36,7 +36,7 @@ export class Company {
 
     // Footprint
     this.state = "default";                                             // "" | "siren" | "default"
-    this.footprint = new SocialFootprint({...footprint});
+    this.footprint = new SocialFootprint(footprint);
     this.footprintId = footprintId || this.getDefaultFootprintId();
     this.footprintAreaCode = footprintAreaCode || "WLD";                // code géographique (valeurs par défaut)
     this.footprintActivityCode = footprintActivityCode || "00";         // code d'activité (valeurs par défaut)
@@ -127,7 +127,7 @@ export class Company {
         this.legalUnitAreaCode = "";
         this.legalUnitActivityCode = "";
         // footprint ---------------------------------------- //
-        this.footprint = new SocialFootprint({});
+        this.footprint = new SocialFootprint();
         // state -------------------------------------------- //
         this.lastUpdateFromRemote = "";
         this.dataFetched = false;
@@ -142,7 +142,7 @@ export class Company {
       this.legalUnitAreaCode = "";
       this.legalUnitActivityCode = "";
       // footprint ---------------------------------------- //
-      this.footprint = new SocialFootprint({});
+      this.footprint = new SocialFootprint();
       // state -------------------------------------------- //
       this.lastUpdateFromRemote = "";
       this.dataFetched = false;
@@ -168,7 +168,7 @@ export class Company {
       else // code == 404 --------------------------------------------- //
       {
         // footprint ---------------------------------------- //
-        this.footprint = new SocialFootprint({});
+        this.footprint = new SocialFootprint();
         // state -------------------------------------------- //
         this.lastUpdateFromRemote = "";
         this.dataFetched = false;

@@ -4,17 +4,21 @@ const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat
 
 export class SocialFootprint {
 
-  constructor({footprintId,areaCode,activityCode,flowCode,indicators}) 
+  constructor(props) 
   {
+    if (props==undefined) props = {indicators: {}};
+  // ---------------------------------------------------------------------------------------------------- //
+
     // parameters
-    this.footprintId = footprintId || null;
-    this.areaCode = areaCode || null;
-    this.activityCode = activityCode || null;
-    this.flowCode = flowCode || null;
+    this.footprintId = props.footprintId || null;
+    this.areaCode = props.areaCode || null;
+    this.activityCode = props.activityCode || null;
+    this.flowCode = props.flowCode || null;
+
     // indicators
     this.indicators = {};
-    if (indicators!=undefined) {indics.forEach(indic => {this.indicators[indic] = new Indicator(indicators[indic])})}
-    else {indics.forEach(indic => {this.indicators[indic] = new Indicator({indic: indic})})}
+    indics.forEach(indic => this.indicators[indic] = new Indicator(props.indicators[indic]) )
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
   /* --------- Getters ---------- */

@@ -33,7 +33,7 @@ function exportIndicDataDepreciationsCSV(indic,session) {
 
 import { jsPDF } from 'jspdf';
 
-import { metaIndicators } from '../lib/indic';
+import { metaIndicators } from '../../lib/indic';
 
 function exportIndicPDF(indic,session) 
 {

@@ -14,27 +14,28 @@ import indics from '../lib/indics.json';
 
 export class Session {
 
-    constructor() 
+    constructor(props) 
     {
+        if (props==undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
         // Data
-        this.legalUnit = new LegalUnit();
-        this.financialData = new FinancialData();
-        this.impactsData = new ImpactsData();
+        this.legalUnit = new LegalUnit(props.legalUnit);
+        this.financialData = new FinancialData(props.financialData);
+        this.impactsData = new ImpactsData(props.impactsData);
         
         // Footprints
-        this.revenueFootprint = new SocialFootprint({});
-        this.productionFootprint = new SocialFootprint({});
-        this.productionStocksVariationsFootprint = new SocialFootprint({});
+        this.revenueFootprint = new SocialFootprint(props.revenueFootprint);
+        this.productionFootprint = new SocialFootprint(props.productionFootprint);
+        this.productionStocksVariationsFootprint = new SocialFootprint(props.productionStocksVariationsFootprint);
                 
-        this.intermediateConsumptionFootprint = new SocialFootprint({});
-        this.purchasesStocksVariationsFootprint = new SocialFootprint({});
-        this.expensesFootprint = new SocialFootprint({});
+        this.intermediateConsumptionFootprint = new SocialFootprint(props.intermediateConsumptionFootprint);
+        this.purchasesStocksVariationsFootprint = new SocialFootprint(props.purchasesStocksVariationsFootprint);
+        this.expensesFootprint = new SocialFootprint(props.expensesFootprint);
 
-        this.grossValueAddedFootprint = new SocialFootprint({});
-        this.depreciationExpensesFootprint = new SocialFootprint({});
+        this.grossValueAddedFootprint = new SocialFootprint(props.grossValueAddedFootprint);
+        this.depreciationExpensesFootprint = new SocialFootprint(props.depreciationExpensesFootprint);
 
-        this.netValueAddedFootprint = new SocialFootprint({});
+        this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
     // ---------------------------------------------------------------------------------------------------- //
     }
 

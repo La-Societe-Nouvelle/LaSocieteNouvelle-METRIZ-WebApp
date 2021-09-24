@@ -22,7 +22,7 @@ export class Expense {
     this.accountAuxLib = accountAuxLib;
 
     this.amount = amount || 0;
-    this.footprint = new SocialFootprint({...footprint});
+    this.footprint = new SocialFootprint(footprint);
   // ---------------------------------------------------------------------------------------------------- //
   }
 

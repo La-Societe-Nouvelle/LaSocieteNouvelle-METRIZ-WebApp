@@ -21,7 +21,7 @@ import { StatementWAS } from '/components/statements/StatementWAS';
 import { StatementWAT } from '/components/statements/StatementWAT';
 
 // Export modules
-import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../../src/Export'
+import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '../../src/writers/Export'
 
 // Libraries
 import { metaIndicators } from '/lib/indic';

@@ -119,11 +119,11 @@ class Metriz extends React.Component {
     reader.onload = async () => 
     {
       // text -> JSON
-      const backUp = JSON.parse(reader.result);
+      const prevProps = JSON.parse(reader.result);
 
       // JSON -> session
-      const session = new Session();
-      await session.updateFromBackUp(backUp);
+      const session = new Session(prevProps);
+      //await session.updateFromBackUp(backUp);
       this.setState({
         session: session,
         selectedSection: "legalData"

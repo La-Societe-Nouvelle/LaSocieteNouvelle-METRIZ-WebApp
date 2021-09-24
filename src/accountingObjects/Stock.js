@@ -35,12 +35,12 @@ export class Stock {
 
     // Footprint
     this.amount = amount || 0;
-    this.footprint = new SocialFootprint({...footprint})
+    this.footprint = new SocialFootprint(footprint)
 
     // Previous footprint
     this.prevAmount = prevAmount || 0;
     this.initialState = initialState || "none";
-    this.prevFootprint = new SocialFootprint({...prevFootprint});
+    this.prevFootprint = new SocialFootprint(prevFootprint);
     this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
     this.prevFootprintActivityCode = prevFootprintActivityCode || "00";
 
@@ -108,7 +108,7 @@ export class Stock {
       else // code == 404 --------------------------------------------- //
       {
         // footprint ---------------------------------------- //
-        this.prevFootprint = new SocialFootprint({});
+        this.prevFootprint = new SocialFootprint();
         // state -------------------------------------------- //
         this.lastUpdateFromRemote = "";
         this.dataFetched = false;
