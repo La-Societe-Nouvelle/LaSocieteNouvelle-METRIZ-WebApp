@@ -6,7 +6,7 @@ import React from 'react';
 // Components
 import { CompaniesTable } from '../tables/CompaniesTable';
 
-// Other sources
+// Writers
 import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 
 // Readers
