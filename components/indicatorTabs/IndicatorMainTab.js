@@ -59,9 +59,9 @@ export class MainTab extends React.Component {
           <div className="group">
             <h3>Tableau récapitulatif</h3>
             <div className="actions">
-              <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
-              <button onClick={() => this.props.onPrintDetails("expenses")}>Détails des dépenses</button>
-              <button onClick={() => this.props.onPrintDetails("depreciations")}>Détails des immobilisations</button>
+              {/*<button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>*/}
+              {/*<button onClick={() => this.props.onPrintDetails("expenses")}>Détails des dépenses</button>*/}
+              {/*<button onClick={() => this.props.onPrintDetails("depreciations")}>Détails des immobilisations</button>*/}
             </div>
             <TableMain {...this.props} ref={this.refTable}/>
           </div>
@@ -191,12 +191,12 @@ class TableMain extends React.Component {
           </tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td className="column_value">({printValue(financialData.getVariationPurchasesStocks(),0)})</td>
+            <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
             <td className="column_unit">&nbsp;€</td>
             <td className="column_value">{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-            {impactAbsolu ? <td className="column_value">{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)}</td> : null}
+            {impactAbsolu ? <td className="column_value">{printValue(-session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
         {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => {
