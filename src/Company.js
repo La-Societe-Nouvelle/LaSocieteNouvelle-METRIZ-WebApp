@@ -13,12 +13,13 @@ export class Company {
                legalUnitName,
                legalUnitAreaCode,
                legalUnitActivityCode,
+               state,
+               footprint,
                footprintId,
                footprintAreaCode,
                footprintActivityCode,
                status,
                dataFetched,
-               footprint,
                lastUpdateFromRemote})
   {   
   // ---------------------------------------------------------------------------------------------------- //
@@ -33,12 +34,12 @@ export class Company {
     this.corporateName = corporateName || "";                           // libellé du compte auxiliaire
 
     // Legal data
-    this.legalUnitName = legalUnitName || null;                         // denomination legale
-    this.legalUnitAreaCode = legalUnitAreaCode || null;                 // code géographique (unité légale)
-    this.legalUnitActivityCode = legalUnitActivityCode || null;         // code d'activité (unité légale)
+    this.legalUnitName = legalUnitName || "";                           // denomination legale
+    this.legalUnitAreaCode = legalUnitAreaCode || "";                   // code géographique (unité légale)
+    this.legalUnitActivityCode = legalUnitActivityCode || "";           // code d'activité (unité légale)
 
     // Footprint
-    this.state = "default";                                             // "" | "siren" | "default"
+    this.state = state || "default";                                    // "" | "siren" | "default"
     this.footprint = new SocialFootprint(footprint);
     this.footprintId = footprintId || this.getDefaultFootprintId();
     this.footprintAreaCode = footprintAreaCode || "WLD";                // code géographique (valeurs par défaut)
@@ -46,7 +47,7 @@ export class Company {
     
     // Updates
     this.status = status || null;                                       // 200 (ok), 404 (not found), 500 (server error)
-    this.dataFetched = dataFetched || false;                            // response received
+    this.dataFetched = dataFetched;                                     // response received
     this.lastUpdateFromRemote = lastUpdateFromRemote || null;           // date of last update
   // ---------------------------------------------------------------------------------------------------- //
   }

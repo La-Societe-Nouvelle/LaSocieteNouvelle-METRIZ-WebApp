@@ -22,16 +22,25 @@ export class LegalDataSection extends React.Component {
     const legalUnit = props.session.legalUnit;
     this.state =
     {
-      corporateName: legalUnit.corporateName,
-      corporateHeadquarters: legalUnit.corporateHeadquarters,
+      siren: legalUnit.siren || "",
+      year: legalUnit.year || "",
+    }
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.session.legalUnit!=this.props.session.legalUnit) {
+      this.setState({
+        siren: this.props.session.legalUnit.siren || "",
+        year: this.props.session.legalUnit.year || "",
+      })
     }
   }
 
   render() 
   {
-    const session = this.props.session;
-    const {siren,corporateName,corporateHeadquarters,year} = session.legalUnit;
-
+    const {corporateName,corporateHeadquarters} = this.props.session.legalUnit;
+    const {siren,year} = this.state;
+    
     return (
       <div className="section-view">
         <div className="section-view-header">
@@ -40,7 +49,7 @@ export class LegalDataSection extends React.Component {
 
         <div className="section-view-main">
 
-          <div className="group"><h3>Informations légales</h3>
+          <div className="group"><h3>Informations relatives à l'entreprise</h3>
             <div className="inline-input short">
               <label>Numéro de siren </label>
               <InputText value={siren} 
@@ -57,7 +66,7 @@ export class LegalDataSection extends React.Component {
             </div>
           </div>
 
-          <div className="group"><h3>Informations comptables</h3>
+          <div className="group"><h3>Informations relatives à l'analyse</h3>
             <div className="inline-input short">
               <label>Année de fin de l'exercice</label>
               <InputText value={year} 
@@ -65,12 +74,6 @@ export class LegalDataSection extends React.Component {
                          onUpdate={this.updateYear.bind(this)}/>
             </div>
           </div>
-
-          {/*<div className="group"><h3>Empreinte Sociétale de l'Entreprise</h3>
-            <div className="coporate-social-footprint">
-              <FootprintTable session={session}/>
-            </div>
-          </div>*/}
 
         </div>
       </div>
@@ -83,15 +86,16 @@ export class LegalDataSection extends React.Component {
   {
     let legalUnit = this.props.session.legalUnit;
     await legalUnit.setSiren(siren);
-    this.setState({
-      corporateName: legalUnit.corporateName,
-      corporateHeadquarters: legalUnit.corporateHeadquarters
-    })
+    this.setState({siren: siren})
   }
 
   /* --- EXERCICE --- */
 
-  updateYear = (year) => this.props.session.legalUnit.setYear(year)
+  updateYear = (year) => 
+  {
+    this.props.session.legalUnit.setYear(year);
+    this.setState({year: year})
+  }
 
 }
 
