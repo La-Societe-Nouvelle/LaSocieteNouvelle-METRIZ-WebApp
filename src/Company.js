@@ -7,6 +7,7 @@ export class Company {
 
   constructor({id,
                account,
+               isDefaultAccount,
                corporateId,
                corporateName,
                legalUnitName,
@@ -26,6 +27,8 @@ export class Company {
 
     // Company
     this.account = account || "";                                       // numéro compte auxiliaire
+    this.isDefaultAccount = isDefaultAccount;                           // account aux defined in FEC
+    
     this.corporateId = corporateId || null;                             // siren
     this.corporateName = corporateName || "";                           // libellé du compte auxiliaire
 

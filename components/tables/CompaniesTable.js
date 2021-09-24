@@ -20,7 +20,7 @@ export class CompaniesTable extends React.Component {
     super(props);
     this.state = 
     {
-      companies: props.companies,
+      companies: this.filterCompanies(props.companies,props.view),
       columnSorted: "amount",
       reverseSort: false,
       page: 0
@@ -84,8 +84,8 @@ export class CompaniesTable extends React.Component {
   {
     switch(view)
     {
-      case "aux": return companies.filter(company => company.account.charAt(0) != "_");
-      case "expenses": return companies.filter(company => company.account.charAt(0) == "_");
+      case "aux": return companies.filter(company => !company.isDefaultAccount);
+      case "expenses": return companies.filter(company => company.isDefaultAccount);
       case "undefined": return companies.filter(company => company.state != "siren");
       case "unsync": return companies.filter(company => company.status != 200);
       default: return companies;

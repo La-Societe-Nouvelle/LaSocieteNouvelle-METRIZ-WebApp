@@ -361,6 +361,7 @@ const readImmobilisationEntry = async (data,book,ecriture) =>
         accountLib: ecriture.CompteLib,
         accountAux: ecritureAux.CompAuxNum || ecritureAux.CompteNum,
         accountAuxLib : ecritureAux.CompAuxLib,
+        isDefaultAccountAux: ecritureAux.CompAuxNum ? false : true,
         amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
       }
 
@@ -467,7 +468,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
     // lecture du compte auxiliaire
     let ecritureAux = book.filter(ecritureAux => ecritureAux.EcritureNum == ecriture.EcritureNum 
                                               && ecritureAux.CompteNum.substring(0,2)=="40")[0] || {};
-    
+
     // expense data
     let expenseData = 
     {
@@ -476,6 +477,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
       accountLib: ecriture.CompteLib,
       accountAux: ecritureAux.CompAuxNum || ecritureAux.CompteNum || "_"+ecriture.CompteNum,
       accountAuxLib: ecritureAux.CompAuxLib || ecritureAux.CompAuxLib || "DEPENSES "+ecriture.CompteLib,
+      isDefaultAccountAux: ecritureAux.CompAuxNum ? false : true,
       amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
     }
 

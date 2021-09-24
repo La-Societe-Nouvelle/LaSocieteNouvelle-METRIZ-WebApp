@@ -10,6 +10,7 @@ export class Expense {
                accountLib,
                accountAux,
                accountAuxLib,
+               isDefaultAccountAux,
                amount,
                footprint}) 
   {
@@ -20,6 +21,7 @@ export class Expense {
     this.accountLib = accountLib;
     this.accountAux = accountAux;
     this.accountAuxLib = accountAuxLib;
+    this.isDefaultAccountAux = isDefaultAccountAux;
 
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint);

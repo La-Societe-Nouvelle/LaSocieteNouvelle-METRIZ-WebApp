@@ -99,9 +99,9 @@ export class FinancialData {
 
         // Companies
         this.companies = this.expenses.concat(this.investments)
-                                      .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib})})
+                                      .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib, isDefaultAccount: expense.isDefaultAccountAux})})
                                       .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                                      .map(({account,accountLib},id) => new Company({id, account, corporateName: accountLib}));
+                                      .map(({account,accountLib,isDefaultAccount},id) => new Company({id, account, isDefaultAccount, corporateName: accountLib}));
         
         /* --- INITIAL STATES --- */
 
