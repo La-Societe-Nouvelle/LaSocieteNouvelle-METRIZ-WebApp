@@ -44,6 +44,7 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input short">
               <label>Numéro de siren </label>
               <InputText value={siren} 
+                         valid={/[0-9]{9}/.test(siren)}
                          onUpdate={this.updateSiren.bind(this)}/>
             </div>
             <div className="inline-input">
@@ -60,6 +61,7 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input short">
               <label>Année de fin de l'exercice</label>
               <InputText value={year} 
+                         valid={/[0-9]{4}/.test(year)}
                          onUpdate={this.updateYear.bind(this)}/>
             </div>
           </div>

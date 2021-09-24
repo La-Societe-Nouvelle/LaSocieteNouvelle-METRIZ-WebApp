@@ -32,7 +32,7 @@ export class InputNumber extends React.Component {
   }
 
   onFocus = () => {
-    if (this.state.input.match(/^0$/)) {
+    if (/^0$/.test(this.state.input)) {
       this.setState({input: ""})
     }
   }

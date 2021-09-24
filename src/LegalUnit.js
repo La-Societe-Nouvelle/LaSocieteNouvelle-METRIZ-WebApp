@@ -71,7 +71,7 @@ export class LegalUnit {
   // Fetch legal unit data
   async fetchLegalUnitData() 
   {
-    if (this.siren.match(/[0-9]{9}/)) 
+    if (/[0-9]{9}/.test(this.siren)) 
     {
       try 
       {

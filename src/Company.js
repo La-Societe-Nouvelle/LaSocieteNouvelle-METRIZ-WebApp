@@ -56,11 +56,11 @@ export class Company {
   {
     if (!this.corporateId) {return null}
     // SIREN
-    if (this.corporateId.match(/[0-9]{9}/)) {return this.corporateId}
+    if (/[0-9]{9}/.test(this.corporateId)) {return this.corporateId}
     // SIRET
-    else if (this.corporateId.match(/[0-9]{14}/)) {return this.corporateId.substring(0,9)}
+    else if (/[0-9]{14}/.test(this.corporateId)) {return this.corporateId.substring(0,9)}
     // VAT NUMBER
-    else if (this.corporateId.match(/FR[0-9]{11}/)) {return this.corporateId.substring(4,11)}
+    else if (/FR[0-9]{11}/.test(this.corporateId)) {return this.corporateId.substring(4,11)}
     // DEFAULT
     else {return this.corporateId}
   }
@@ -103,7 +103,7 @@ export class Company {
   async updateFromRemote() 
   { 
     // Case - Fetch footprint with id --------------------------------------------------------------------- //
-    if (this.state=="siren" && this.footprintId.match(/[0-9]{9}/)) 
+    if (this.state=="siren" && /[0-9]{9}/.test(this.footprintId)) 
     {
       // request
       let endpoint = apiBaseUrl + "siren/" + this.footprintId;

@@ -49,7 +49,7 @@ export class Session {
         
         // rebuild footprints
         Object.entries(backUp)
-              .filter(([label,_]) => label.match(/Footprint/))
+              .filter(([label,_]) => /Footprint/.test(label))
               .forEach(([label,footprint]) => this[label] = new SocialFootprint(footprint));
     }
 
