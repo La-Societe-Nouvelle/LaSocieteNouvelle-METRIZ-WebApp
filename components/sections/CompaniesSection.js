@@ -26,6 +26,13 @@ export class CompaniesSection extends React.Component {
     }
   }
 
+  componentDidUpdate()
+  {
+    if (this.state.view=="unsync" && this.state.companies.filter(company => company.status != 200).length==0) {
+      this.setState({view: "all"});
+    }
+  }
+
   render()
   {
     const {companies,view} = this.state;
@@ -68,7 +75,7 @@ export class CompaniesSection extends React.Component {
                   <option key="1" value="all">Affichage de tous les comptes externes</option>
                   <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
                   <option key="3" value="expenses">Affichage des autres comptes tiers</option>
-                  <option key="4" value="unsync">Affichage des comptes non synchronisés</option>
+                  {companies.filter(company => company.status != 200).length > 0 && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
                 </select>}
               <button onClick={this.synchroniseAll}>
                 Synchroniser les données
@@ -91,7 +98,11 @@ export class CompaniesSection extends React.Component {
 
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => this.props.session.updateFootprints()
+  updateFootprints = () => 
+  {
+    this.props.session.updateFootprints();
+    this.setState({companies: this.props.session.financialData.companies});
+  }
 
   changeView = (event) => this.setState({view : event.target.value})
 
@@ -153,13 +164,13 @@ export class CompaniesSection extends React.Component {
   // Synchronisation
   synchroniseAll = async () => 
   {
-    console.log("updates");
     for (let company of this.props.session.financialData.companies) 
     {
       console.log(company.corporateName);
       await company.updateFromRemote();
       await new Promise(r => setTimeout(r, 10));
     }
+    if (this.props.session.financialData.companies.filter(company => company.status != 200).length > 0) this.state.view = "unsync";
     this.setState({companies: this.props.session.financialData.companies});
     this.props.session.updateFootprints();
   }

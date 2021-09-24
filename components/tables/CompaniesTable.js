@@ -29,7 +29,7 @@ export class CompaniesTable extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (this.props != prevProps) this.setState({companies: this.filterCompanies(this.props.companies,this.props.view), view: this.props.view})
+    if (this.props !== prevProps) this.setState({companies: this.filterCompanies(this.props.companies,this.props.view), view: this.props.view})
   }
 
   render() 
@@ -62,7 +62,6 @@ export class CompaniesTable extends React.Component {
                             .map((company) => 
               <RowTableCompanies key={"company_"+company.id} 
                                  {...company}
-
                                  updateCompany={this.updateCompany.bind(this)}
                                  syncCompany={this.updateCompanyFromRemote.bind(this)}/>)}
           </tbody>
@@ -116,9 +115,10 @@ export class CompaniesTable extends React.Component {
   prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
   nextPage = () => {if ((this.state.page+1)*20 < this.props.financialData.companies.length) this.setState({page: this.state.page+1})}
 
-  /* ---------- OPERATIONS ON EXPENSE ---------- */
+  /* ---------- OPERATIONS ON COMPANY ---------- */
   
-  async fetchDataCompany(company) {
+  async fetchDataCompany(company) 
+  {
     await company.fetchData();
     this.props.financialData.updateCompany(company);
     this.forceUpdate();
