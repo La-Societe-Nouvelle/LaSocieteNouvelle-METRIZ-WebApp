@@ -475,8 +475,8 @@ const readExpenseEntry = async (data,book,ecriture) =>
       label: ecriture.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
       account: ecriture.CompteNum,
       accountLib: ecriture.CompteLib,
-      accountAux: ecritureAux.CompAuxNum || ecritureAux.CompteNum || "_"+ecriture.CompteNum,
-      accountAuxLib: ecritureAux.CompAuxLib || ecritureAux.CompAuxLib || "DEPENSES "+ecriture.CompteLib,
+      accountAux: ecritureAux.CompAuxNum || "_"+ecriture.CompteNum,
+      accountAuxLib: ecritureAux.CompAuxLib || "DEPENSES "+ecriture.CompteLib,
       isDefaultAccountAux: ecritureAux.CompAuxNum ? false : true,
       amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
     }
