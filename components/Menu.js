@@ -21,7 +21,7 @@ export function Menu({selectedSection, changeSection, downloadSession, importSes
                   onClick = {() => changeSection("legalData")}>Unité Légale</button>
           
           <button className={"menu-button"+("financialData"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("financialData")} >Données financières</button>
+                  onClick = {() => changeSection("financialData")} >Ecritures comptables</button>
           
           <button className={"menu-button"+("companies"==selectedSection ? " selected" : "")}
                   onClick = {() => changeSection("companies")} >Fournisseurs</button>
