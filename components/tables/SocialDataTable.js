@@ -7,6 +7,7 @@ import React from 'react';
 import { InputText } from '/components/InputText';
 import { InputNumber } from '/components/InputNumber';
 import { valueOrDefault } from '/src/utils/Utils';
+import { getNewId } from '../../src/utils/Utils';
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -63,6 +64,8 @@ export class SocialDataTable extends React.Component {
               <Row key={"company_"+employee.id} 
                    {...employee}
                    updateSocialData={this.updateSocialData.bind(this)}/>)}
+              <Row key="new_employee"
+                   updateSocialData={this.updateSocialData.bind(this)}/>
           </tbody>
         </table>
 
@@ -102,8 +105,23 @@ export class SocialDataTable extends React.Component {
 
   updateSocialData = (nextProps) => 
   {
-    let employee = this.props.employees.filter(employee => employee.id == nextProps.id);
-    employee = {...employee,...nextProps};
+    let employee = this.props.employees.filter(employee => employee.id == nextProps.id)[0];
+    if (employee==undefined) {
+      employee = {
+        id: getNewId(this.props.employees),
+        name: nextProps.name || "",
+        sex: "",
+        wage: null,
+        workingHours: null,
+        hourlyRate: null,
+        trainingHours: null,
+        trainingContract: false
+      }
+      this.props.employees.push(employee)
+    } else {
+      Object.entries(nextProps).forEach(([propName,propValue]) => employee[propName] = propValue);
+    }
+    this.setState({employees: this.props.employees});
   }
 
 }
@@ -127,6 +145,21 @@ class Row extends React.Component {
     };
   }
 
+  componentDidUpdate(prevProps)
+  {
+    if (prevProps!==this.props) {
+      this.setState({
+        name: this.props.name || "",
+        sex: this.props.sex || "",
+        wage: this.props.wage || null,
+        workingHours: this.props.workingHours || null,
+        hourlyRate: this.props.hourlyRate || null,
+        trainingHours: this.props.trainingHours || 0,
+        trainingContract: this.props.trainingContract || false
+      })
+    }
+  }
+
   render() 
   {
     const {id} = this.props;
@@ -138,20 +171,21 @@ class Row extends React.Component {
           <InputText value={name}
                      onUpdate={this.updateName.bind(this)}/></td>
 
-        <td className="short">
+        <td className="short center">
           <select value={sex}
                   onChange={this.updateSex}>
+            <option key="" value=""> - </option>
             <option key="F" value="F">F</option>
             <option key="H" value="H">H</option>
             {sex==null && <option key="" value="">-</option>}
           </select></td>
 
-        <td className="short">
+        <td className="short right">
           <InputNumber value={wage}
                        onUpdate={this.updateWage.bind(this)}/>
         </td>
 
-        <td className="short">
+        <td className="short right">
           <InputNumber value={workingHours}
                        onUpdate={this.updateWorkingHours.bind(this)}/>
         </td>
@@ -180,13 +214,11 @@ class Row extends React.Component {
   updateName = (input) => 
   {
     this.props.updateSocialData({id: this.props.id, name: input})
-    this.setState({name: input})
   }
 
   updateSex = (input) => 
   {
-    this.props.updateSocialData({id: this.props.id, sex: input})
-    this.setState({sex: input})
+    this.props.updateSocialData({id: this.props.id, sex: input.target.value})
   }
 
   updateWage = (input) =>
@@ -212,13 +244,11 @@ class Row extends React.Component {
   updateTrainingContract = (event) =>
   {
     this.props.updateSocialData({id: this.props.id, trainingContract: event.target.checked})
-    this.setState({trainingContract: event.target.checked})
   }
 
   updateTrainingHours = (input) =>
   {
     this.props.updateSocialData({id: this.props.id, trainingHours: input})
-    this.setState({trainingHours: input})
   }
 
 }
