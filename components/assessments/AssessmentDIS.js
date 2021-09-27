@@ -2,8 +2,13 @@ import React from 'react';
 
 import { InputNumber } from '../InputNumber';
 import { getNewId, printValue } from '../../src/utils/Utils';
+
+// Components
 import { SocialDataTable } from '../tables/SocialDataTable';
+
+// Other sources
 import { SocialDataContentReader } from '../../src/readers/SocialDataContentReader';
+import { XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT DIS -------------------- */
@@ -53,7 +58,7 @@ export class AssessmentDIS extends React.Component {
               <input id="import-companies-xlsx" visibility="collapse"
                       type="file" accept=".xlsx" 
                       onChange={this.importXLSXFile}/>
-            <button onClick={() => location.href="/classeurTiers.xlsx"}>
+            <button onClick={exportXLSXFile}>
               Télécharger modèle XLSX
             </button>
           </div>
@@ -97,4 +102,19 @@ export class AssessmentDIS extends React.Component {
     reader.readAsArrayBuffer(file);
   }
 
+}
+
+// Export XLSX File
+const exportXLSXFile = async () =>
+{
+  let arrayHeader = [["Nom - Prénom","Sexe (F/H)","Heures travaillées","Rémunérations brutes","Taux horaire","Contrat de formation (O/N)","Heures de formation"]];
+  let fileProps = {wsclos: [{wch:40},{wch:15},{wch:25},{wch:25},{wch:25},{wch:25},{wch:25}]};
+  // write file (Array -> ArrayBuffer)
+  let file = await XLSXHeaderFileWriter(fileProps,"Collaborateurs",arrayHeader);
+  // trig download
+  let blob = new Blob([file],{type:"application/octet-stream"});
+  let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "Collaborateurs.xlsx";
+      link.click();
 }
