@@ -4,7 +4,11 @@ import * as XLSX from 'xlsx';
 /* -------------------- XSLX WRITER -------------------- */
 /* ----------------------------------------------------- */
 
+<<<<<<< HEAD
 export { XLSXFileWriterFromJSON, XLSXHeaderFileWriter };
+=======
+export { XLSXFileWriterFromJSON,XLSXHeaderFileWriter };
+>>>>>>> b21e646b0a6fa73f40a27f5dcdff4c4855699b8a
 
 /* ---------- CONTENT WRITER ---------- */ 
 
@@ -33,7 +37,11 @@ async function XLSXFileWriterFromJSON(fileProps,sheetName,jsonContent)
 /* ---------- HEADER WRITER ---------- */ 
 
 async function XLSXHeaderFileWriter(fileProps,sheetName,arrayHeader)
+<<<<<<< HEAD
 // ...build XLSX File (empty file with header) from array
+=======
+// ...build XLSX File from array (header)
+>>>>>>> b21e646b0a6fa73f40a27f5dcdff4c4855699b8a
 {
   const worksheet = XLSX.utils.aoa_to_sheet(arrayHeader);
   
@@ -44,8 +52,11 @@ async function XLSXHeaderFileWriter(fileProps,sheetName,arrayHeader)
         workbook.SheetNames.push(sheetName);
         workbook.Sheets[sheetName] = worksheet;
 
+<<<<<<< HEAD
   workbook.Sheets[sheetName] = worksheet;
 
+=======
+>>>>>>> b21e646b0a6fa73f40a27f5dcdff4c4855699b8a
   var XLSXData = XLSX.write(workbook, {bookType:'xlsx',  type: 'binary'});
 
   // convert to ArrayBuffer
