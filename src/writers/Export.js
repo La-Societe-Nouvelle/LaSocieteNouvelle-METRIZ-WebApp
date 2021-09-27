@@ -1,3 +1,8 @@
+// La Société Nouvelle
+
+// Libraries
+import { metaAccounts } from '/lib/accounts';
+
 
 function exportIndicDataExpensesCSV(indic,session) {
 
@@ -95,134 +100,101 @@ function exportIndicPDF(indic,session)
   doc.text("Valeur",150,y);
   doc.text("Incertitude",175,y);
   
-  // Revenue
   doc.line(10,y+2,200,y+2);
+
+  // Production
   y+=6;
   doc.setFont("Calibri","bold");
-  doc.text("Chiffre d'affaires",10,y);
+  doc.text("Production",10,y);
   doc.setFont("Calibri","normal");
-  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.setFontSize(8);
+  doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.setFontSize(10);
+  doc.line(10,y+2,200,y+2);
+
+  // Revenue
+  y+=6;
+  doc.text("\tdont Chiffre d'affaires",10,y);  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
   doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
   doc.line(10,y+2,200,y+2);
 
-  // Production
+  // Stock production
   y+=6;
-  doc.text("Production",10,y);
-  doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text("\tdont Production stockée",10,y);
+  doc.text(printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
-  /*  StoredProduction & Immobilised production
-  x+=6;
-  doc.text("dont production stockée",15,x);
-  doc.text(session.financialData.storedProduction!=null ? printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1) : " - ",yValue+10,x,{align: "right"});
-  doc.setFontSize(8);
-  doc.text(session.financialData.storedProduction!=null ? printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %" : "- %",yUncertainty+13,x,{align: "right"});
-  doc.setFontSize(10);
-
-  x+=6;
-  doc.text("dont production immobilisée",15,x);
-  doc.text(session.financialData.immobilisedProduction!=null ? printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1) : " - ",yValue+10,x,{align: "right"});
-  doc.setFontSize(8);
-  doc.text(session.financialData.immobilisedProduction!=null ? printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %" : "- %",yUncertainty+13,x,{align: "right"});
-  doc.setFontSize(10);*/
-
-  y+=6;
-  doc.text("Production stockée",10,y);
-  doc.text(session.financialData.unstoredProduction!=null ? printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getValue(),1) : " - ",yValue+10,y,{align: "right"});
-  doc.setFontSize(8);
-  doc.text(session.financialData.unstoredProduction!=null ? printValue(session.getUnstoredProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %" : "- %",yUncertainty+13,y,{align: "right"});
-  doc.setFontSize(10);
+  // Immobilised production
+  if (financialData.getImmobilisedProduction() > 0) {
+    x+=6;
+    doc.text("\tdont production immobilisée",10,x);
+    doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,x,{align: "right"});
+    doc.setFontSize(8);
+    doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
+    doc.setFontSize(10);
+  }
   
   doc.line(10,y+2,200,y+2);
+
   y+=6;
   doc.text("Consommations intermédiaires",10,y);
   doc.text(printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
   doc.text(printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
-  doc.line(10,y+2,200,y+2);
 
-  if (financialData.getAmountStocks() > 0) {
+  if (financialData.getVariationPurchasesStocks() > 0) {
     y+=6;
-    doc.text("Stockage achats",10,y);
-    doc.text(printValue(session.getStocksFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+    doc.text("Variation de stocks",10,y);
+    doc.text(printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(session.getStocksFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   }
 
-  if (financialData.getPrevAmountStocks() > 0) {
+  Object.entries(groupExpensesByAccounts(financialData.expenses)).forEach(([_,{account,accountLib}]) => {
+    const indicator = session.getExpensesAccountIndicator(account,indic);
     y+=6;
-    doc.text("Déstockage achats",10,y);
-    doc.text(printValue(session.getStocksPrevFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
-    doc.setFontSize(8);
-    doc.text(printValue(session.getStocksPrevFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
-    doc.setFontSize(10);
-  }
-
-  if (financialData.getAmountPurchasesDiscounts() > 0) {
-    y+=6;
-    doc.text("Rabais, remises, ristournes",10,y);
-    doc.text(printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
-    doc.setFontSize(8);
-    doc.text(printValue(session.getPurchasesDiscountsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
-    doc.setFontSize(10);
-  }
-
-  y+=6;
-  doc.text("Charges externes",10,y);
-  doc.text(printValue(session.getExpensesFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
-  doc.setFontSize(8);
-  doc.text(printValue(session.getExpensesFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
-  doc.setFontSize(10);
-
-  Object.entries(session.financialData.getExpensesByAccounts()).forEach(([num,account]) => {
-    let indicator = session.getExpensesAccountIndicator(num,indic);
-    y+=6;
-    doc.text("\t"+account.label,10,y);
+    doc.text("\t"+accountLib,10,y);
     doc.text(printValue(indicator.getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
     doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   })
 
-  doc.line(10,y+2,200,y+2);
-  y+=6;
-  doc.text("Valeur ajoutée brute",10,y);
-  doc.text(printValue(session.getGrossValueAddedFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
-  doc.setFontSize(8);
-  doc.text(printValue(session.getGrossValueAddedFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
-  doc.setFontSize(10);
-  doc.line(10,y+2,200,y+2); 
+  doc.line(10,y+2,200,y+2); // Depreciations
 
   y+=6;
-  doc.text("Amortissements sur immobilisations",10,y);
+  doc.text("Dotations aux Amortissements sur immobilisations",10,y);
   doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
   doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
-  
-  Object.entries(session.financialData.getDepreciationsAccounts()).forEach(([num,account]) => {
-    let indicator = session.getDepreciationsAccountIndicator(num,indic);
+
+  Object.entries(groupDepreciationsByAccounts(financialData.depreciationExpenses)).map(([_,{account,accountLib}]) => {
+    const indicator = session.getDepreciationsAccountIndicator(account,indic);
     y+=6;
-    doc.text("\t"+account.label,10,y);
+    doc.text("\t"+accountLib,10,y);
     doc.text(printValue(indicator.getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
     doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   })
   
-  doc.line(10,y+2,200,y+2);
+  doc.line(10,y+2,200,y+2); // Net Value Added
+
   y+=6;
   doc.text("Valeur ajoutée nette",10,y);
   doc.text(printValue(session.getNetValueAddedFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
   doc.text(printValue(session.getNetValueAddedFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
+
   doc.line(10,y+2,200,y+2);
 
   // Export
@@ -235,4 +207,28 @@ export {exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndic
 function printValue(value,precision) {
   if (value==null) {return "-"}
   else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
+}
+
+const groupExpensesByAccounts = (expenses) =>
+{
+  let expensesByAccounts = {};
+  expenses.forEach((expense) => 
+  {
+    let account = expense.account.substring(0,2);
+    if (expensesByAccounts[account]==undefined) expensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsExpenses[account]};
+    else expensesByAccounts[account].amount+= expense.amount;
+  })
+  return expensesByAccounts;
+}
+
+const groupDepreciationsByAccounts = (depreciationExpenses) =>
+{
+  let depreciationExpensesByAccounts = {};
+  depreciationExpenses.forEach((expense) => 
+  {
+    let account = expense.account.substring(0,5);
+    if (depreciationExpensesByAccounts[account]==undefined) depreciationExpensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsDepreciationExpenses[account]};
+    else depreciationExpensesByAccounts[account].amount+= expense.amount;
+  })
+  return depreciationExpensesByAccounts;
 }

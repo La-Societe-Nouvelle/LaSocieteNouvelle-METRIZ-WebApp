@@ -59,7 +59,7 @@ export class MainTab extends React.Component {
           <div className="group">
             <h3>Tableau récapitulatif</h3>
             <div className="actions">
-              {/*<button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>*/}
+              <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
               {/*<button onClick={() => this.props.onPrintDetails("expenses")}>Détails des dépenses</button>*/}
               {/*<button onClick={() => this.props.onPrintDetails("depreciations")}>Détails des immobilisations</button>*/}
             </div>
