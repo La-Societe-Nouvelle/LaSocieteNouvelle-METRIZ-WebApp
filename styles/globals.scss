@@ -67,6 +67,15 @@ sup {
   font-size: 9px;
 }
 
+input,select {
+  &.valid {
+    background-color: $valid-color; 
+  }
+  &.unvalid {
+    background-color: $unvalid-color; 
+  }
+}
+
 /**/
 
 .app-view {
@@ -444,15 +453,6 @@ table {
     .unvalid {
       input,select {
         background-color: $unvalid-color;
-      }
-    }
-
-    input,select {
-      &.valid {
-        background-color: $valid-color; 
-      }
-      &.unvalid {
-        background-color: $unvalid-color; 
       }
     }
 
