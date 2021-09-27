@@ -6,6 +6,13 @@ import { getNewId, printValue } from '../../src/utils/Utils';
 // Components
 import { SocialDataTable } from '../tables/SocialDataTable';
 
+// Components
+import { SocialDataTable } from '../tables/SocialDataTable';
+
+// Other sources
+import { SocialDataContentReader } from '../../src/readers/SocialDataContentReader';
+import { XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
+
 // Other sources
 import { SocialDataContentReader } from '../../src/readers/SocialDataContentReader';
 import { XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
@@ -44,7 +51,6 @@ export class AssessmentDIS extends React.Component {
         </div>
 
         <div className="group assessment"><h3>Outil de mesure</h3>
-
           <div className="actions">
             <button onClick={() => document.getElementById('import-companies-csv').click()}>
               Importer un fichier CSV
@@ -64,7 +70,6 @@ export class AssessmentDIS extends React.Component {
           </div>
 
           <SocialDataTable employees={employees}/>
-
         </div>
       </div>
     )
