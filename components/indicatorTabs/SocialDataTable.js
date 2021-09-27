@@ -1,13 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+// Components
+import { InputNumber } from '../InputNumber';
+import { InputText } from '../InputText';
+
+// Other sources
+import { XLSXFileWriterFromJSON, XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
 
 /* ----------------------------------------------------------- */
 /* -------------------- SOCIAL DATA TABLE -------------------- */
 /* ----------------------------------------------------------- */
-
-import { printValue } from "../../src/utils/Utils";
-import { InputNumber } from '../InputNumber';
-import { InputText } from '../InputText';
-
 /* ---------- TABLE ---------- */
 
 export class TableSocialData extends React.Component {
@@ -35,6 +40,9 @@ export class TableSocialData extends React.Component {
       <div className="group"><h3>Liste des collaborateurs</h3>
 
         <div className="actions">
+          <button onClick={exportXLSXFile}>
+            Télécharger modèle XLSX
+          </button>
           <button onClick={() => this.triggerEditor()}>Ajouter un collaborateur</button>
           {employees.length > 0 &&
             <button onClick={() => this.removeAll()}>Supprimer tout</button>}
@@ -234,4 +242,19 @@ class EmployeePopup extends React.Component {
     this.props.onClose();
   }
 
+}
+
+// Export CSV File
+const exportXLSXFile = async () =>
+{
+  let arrayHeader = [["Nom - Prénom","Sexe"]];
+  let fileProps = {wsclos: [{wch:50},{wch:20}]};
+  // write file (Array -> ArrayBuffer)
+  let file = await XLSXHeaderFileWriter(fileProps,"Données sociales",arrayHeader);
+  // trig download
+  let blob = new Blob([file],{type:"application/octet-stream"});
+  let link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "employees.xlsx";
+      link.click();
 }
