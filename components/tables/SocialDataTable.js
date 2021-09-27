@@ -27,7 +27,7 @@ export class SocialDataTable extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (this.props != prevProps) this.setState({employees: employees})
+    if (this.props != prevProps) this.setState({employees: this.props.employees})
   }
 
   render() 

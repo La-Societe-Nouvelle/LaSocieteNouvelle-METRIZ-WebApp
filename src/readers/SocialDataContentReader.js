@@ -14,13 +14,13 @@ const SocialDataContentReader = async (content) =>
     let employeeData = 
     {
       id: index,
-      name: contentItem.nom || "",
-      sex: contentItem.sexe || "",
-      wage: contentItem.remuneration || null,
-      workingHours: contentItem.heuresTravail || null,
-      hourlyRate: contentItem.tauxHoraire || null,
-      trainingContract: contentItem.contratFormation || false,
-      trainingHours: contentItem.heuresFormation || 0
+      name: contentItem['Nom - Prénom'] || contentItem.nom || "",
+      sex: contentItem['Sexe (F/H)'] || contentItem.sexe || "",
+      wage: contentItem['Rémunérations brutes'] || contentItem.remuneration || null,
+      workingHours: contentItem['Heures travaillées'] || contentItem.heuresTravail || null,
+      hourlyRate: contentItem['Taux horaire'] || contentItem.tauxHoraire || null,
+      trainingContract: contentItem['Contrat de formation (O/N)'] || contentItem.contratFormation || false,
+      trainingHours: contentItem['Heures de formation'] || contentItem.heuresFormation || 0
     }
     employees.push(employeeData);
   })

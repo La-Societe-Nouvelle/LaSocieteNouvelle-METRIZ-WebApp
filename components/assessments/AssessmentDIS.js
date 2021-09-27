@@ -1,19 +1,13 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
 
-import { InputNumber } from '../InputNumber';
-import { getNewId, printValue } from '../../src/utils/Utils';
-
-// Components
-import { SocialDataTable } from '../tables/SocialDataTable';
-
 // Components
 import { SocialDataTable } from '../tables/SocialDataTable';
 
 // Other sources
-import { SocialDataContentReader } from '../../src/readers/SocialDataContentReader';
-import { XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
-
-// Other sources
+import { XLSXFileReader } from '../../src/readers/XLSXReader'
 import { SocialDataContentReader } from '../../src/readers/SocialDataContentReader';
 import { XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
 
