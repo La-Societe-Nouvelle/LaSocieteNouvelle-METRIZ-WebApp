@@ -2,10 +2,12 @@
 
 // React
 import React from 'react';
-import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 
 // Components
 import { CompaniesTable } from '../tables/CompaniesTable';
+
+// Other sources
+import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 
 // Readers
 import { CSVFileReader, processCSVCompaniesData } from '/src/readers/CSVReader';
@@ -63,9 +65,6 @@ export class CompaniesSection extends React.Component {
                 <input id="import-companies-xlsx" visibility="collapse"
                        type="file" accept=".xlsx" 
                        onChange={this.importXLSXFile}/>
-              {/*<button onClick={() => location.href="/classeurTiers.xlsx"}>
-                Télécharger modèle XLSX
-              </button>*/}
               <button onClick={this.exportXLSXFile}>
                 Télécharger modèle XLSX
               </button>
@@ -149,6 +148,7 @@ export class CompaniesSection extends React.Component {
     let jsonContent = await this.props.session.financialData.companies.filter(company => company.account.charAt(0) != "_")
                                                                       .map(company => {return({denomination: company.corporateName, siren: company.corporateId})});
     let fileProps = {wsclos: [{wch:50},{wch:20}]};
+    console.log(jsonContent);
     // write file (JSON -> ArrayBuffer)
     let file = await XLSXFileWriterFromJSON(fileProps,"fournisseurs",jsonContent);
     // trig download
