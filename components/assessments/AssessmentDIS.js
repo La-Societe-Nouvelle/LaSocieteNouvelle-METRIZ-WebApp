@@ -469,14 +469,14 @@ const getGenderWageGap = (employees) =>
 const getApprenticesRemunerations = (employees) => 
 {
   let apprenticesRemunerations = employees.filter(employee => employee.trainingContract)
-                                          .map(employee => employee.wage)
+                                          .map(employee => employee.wage || 0)
                                           .reduce((a,b) => a + b,0);
   return roundValue(apprenticesRemunerations,0);
 }
 
 const getEmployeesTrainingCompensations = (employees) => 
 {
-  let employeesTrainingsCompensations = employees.map(employee => employee.hourlyRate*employee.trainingHours)
-                                          .reduce((a,b) => a + b,0);
+  let employeesTrainingsCompensations = employees.map(employee => (employee.hourlyRate || 0)*(employee.trainingHours || 0))
+                                                 .reduce((a,b) => a + b,0);
   return roundValue(employeesTrainingsCompensations,0);
 }
