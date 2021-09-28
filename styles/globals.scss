@@ -306,8 +306,14 @@ table {
     &.short {width: 125px;}
 
     // text align
-    &.center {text-align: center}
-    &.right {text-align: right}
+    &.center {
+      text-align: center;
+      input,select {text-align: center;}
+    }
+    &.right {
+      text-align: right;
+      input {text-align: right;}
+    }
 
     // index
     &.sub {

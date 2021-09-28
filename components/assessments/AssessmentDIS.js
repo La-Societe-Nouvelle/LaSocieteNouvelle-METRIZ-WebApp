@@ -36,12 +36,17 @@ export class AssessmentDIS extends React.Component {
   render() 
   {
     const {employees} = this.state;
-    
+
+    const isAllValid = employees.map(employee => employee.hourlyRate!=null && employee.workingHours!=null).reduce((a,b) => a && b,true);
+
     return(
       <div className="indicator-section-view">
         <div className="view-header">
-          <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
+          <button className="retour" 
+                  onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className="retour" 
+                  disabled={!isAllValid}
+                  onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 
         <div className="group assessment"><h3>Outil de mesure</h3>
@@ -61,6 +66,9 @@ export class AssessmentDIS extends React.Component {
             <button onClick={exportXLSXFile}>
               Télécharger modèle XLSX
             </button>
+            <button onClick={this.deleteAll}>
+                Supprimer tout
+              </button>
           </div>
 
           <SocialDataTable employees={employees}/>
@@ -82,6 +90,12 @@ export class AssessmentDIS extends React.Component {
     
     await this.props.session.updateIndicator("dis");
     await this.props.session.updateIndicator("geq");    
+  }
+  
+  deleteAll = () =>
+  {
+    this.props.session.impactsData.employees = [];
+    this.setState({employees: []});
   }
 
   /* ----- IMPORTS ----- */
@@ -140,7 +154,6 @@ const getIndexGini = (employees) =>
 
   // Nombre total d'heures travaillées
   let n = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
-  console.log(n)
   
   let s1 = 0;
   let s2 = 0;
@@ -155,8 +168,6 @@ const getIndexGini = (employees) =>
     i+= parseInt(employee.workingHours);
     // S2
     s2+= n*parseInt(employee.workingHours)*employee.hourlyRate;
-    console.log(s1);
-    console.log(s2);
   })
 
   let indexGini = ((s1/s2) - (n+1)/n)*100;

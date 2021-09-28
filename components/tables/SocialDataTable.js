@@ -7,7 +7,7 @@ import React from 'react';
 import { InputText } from '/components/InputText';
 import { InputNumber } from '/components/InputNumber';
 import { valueOrDefault } from '/src/utils/Utils';
-import { getNewId } from '../../src/utils/Utils';
+import { getNewId, roundValue } from '../../src/utils/Utils';
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -37,8 +37,6 @@ export class SocialDataTable extends React.Component {
 
     this.sortCompanies(employees,columnSorted);
 
-    console.log(employees);
-
     const newEmployee = {
       id: getNewId(this.props.employees),
       name: "",
@@ -60,9 +58,9 @@ export class SocialDataTable extends React.Component {
               <td className="short" 
                   onClick={() => this.changeColumnSorted("sex")}>Sexe</td>
               <td className="short" 
-                  onClick={() => this.changeColumnSorted("workingHours")}>Heures travaillées</td>
+                  onClick={() => this.changeColumnSorted("workingHours")}>Heures travaillées (annuelles)</td>
               <td className="short" 
-                  onClick={() => this.changeColumnSorted("wage")}>Rémunérations brutes</td>
+                  onClick={() => this.changeColumnSorted("wage")}>Rémunération annuelle brute</td>
               <td className="short" 
                   onClick={() => this.changeColumnSorted("hourlyRate")}>Taux horaire</td>
               <td className="short" 
@@ -157,7 +155,7 @@ class Row extends React.Component {
       wage: props.wage || null,
       workingHours: props.workingHours || null,
       hourlyRate: props.hourlyRate || null,
-      trainingHours: props.trainingHours || 0,
+      trainingHours: props.trainingHours || null,
       trainingContract: props.trainingContract || false
     };
   }
@@ -171,7 +169,7 @@ class Row extends React.Component {
         wage: this.props.wage || null,
         workingHours: this.props.workingHours || null,
         hourlyRate: this.props.hourlyRate || null,
-        trainingHours: this.props.trainingHours || 0,
+        trainingHours: this.props.trainingHours || null,
         trainingContract: this.props.trainingContract || false
       })
     }
@@ -182,9 +180,11 @@ class Row extends React.Component {
     const {id} = this.props;
     const {name,sex,wage,workingHours,hourlyRate,trainingHours,trainingContract} = this.state;
 
+    const isValid = (hourlyRate!=null && workingHours!=null);
+
     return (
       <tr>
-        <td className="long">
+        <td className={"long"+(!this.props.isNewEmployeeRow ?  (isValid ? " valid" : " unvalid") : "")}>
           <InputText value={name}
                      onUpdate={this.updateName.bind(this)}/></td>
 
@@ -207,7 +207,7 @@ class Row extends React.Component {
                        onUpdate={this.updateWage.bind(this)}/>
         </td>
 
-        <td className="short">
+        <td className="short right">
           <InputNumber value={hourlyRate}
                        onUpdate={this.updateHourlyRate.bind(this)}/>
         </td>
@@ -219,7 +219,7 @@ class Row extends React.Component {
                  onChange={this.updateTrainingContract.bind(this)}/>
         </td>
 
-        <td className="short">
+        <td className="short right">
           <InputNumber value={trainingHours}
                        onUpdate={this.updateTrainingHours.bind(this)}/>
         </td>
@@ -241,15 +241,16 @@ class Row extends React.Component {
 
   updateWage = (input) =>
   {
-    this.state.wage = input;
-    if (this.state.workingHours > 0) this.updateHourlyRate(input/this.state.workingHours)
+    this.state.wage = roundValue(input,0);
+    if (input==null) this.updateHourlyRate(null)
+    else if (this.state.workingHours > 0) this.updateHourlyRate(input/this.state.workingHours)
     else if (this.state.workingHours==null && this.state.hourlyRate > 0) this.updateWorkingHours(input/this.state.hourlyRate)
     this.props.updateSocialData({id: this.props.id, ...this.state})
   }
 
   updateWorkingHours = (input) => 
   {
-    this.state.workingHours = input;
+    this.state.workingHours = parseInt(input);
     if (input==null || input==0) this.updateHourlyRate(null)
     else if (this.state.wage!=null) this.updateHourlyRate(this.state.wage/input)
     else if (this.state.hourlyRate!=null) this.updateWage(this.state.hourlyRate*input)
@@ -258,8 +259,8 @@ class Row extends React.Component {
 
   updateHourlyRate = (input) =>
   {
-    this.state.hourlyRate = input;
-    if (input==null) this.updateWage(null)
+    this.state.hourlyRate = roundValue(input,1);
+    if (input==null && this.state.wage!=null) this.updateWage(null)
     else if (this.state.workingHours!=null) this.state.wage = input*this.state.workingHours
     else if (this.state.wage!=null && input > 0) this.state.workingHours = this.state.wage/input
     this.props.updateSocialData({id: this.props.id, ...this.state})
