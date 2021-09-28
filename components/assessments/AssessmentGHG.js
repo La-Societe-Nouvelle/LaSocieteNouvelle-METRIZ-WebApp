@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { InputNumber } from '../InputNumber';
+import { InputText } from '../InputText';
 import { getNewId, printValue } from '../../src/utils/Utils';
 
 import nrgProducts from '../../lib/nrgProducts.json';
@@ -17,7 +18,8 @@ import nrgProducts from '../../lib/nrgProducts.json';
     - emissions de la biomasse (sols et forêts) [5]
 
    Each item in ghgDetails has the following properties :
-    id: id of the item
+    id: id of the source,
+    label: name of the source
     idNRG: if of the matching item in nrg details
     fuelCode: code of the energetic product (cf. base nrgProducts)
     type: fossil/biomass (used for distinction between fossil and biomass products)
@@ -42,8 +44,7 @@ export class AssessmentGHG extends React.Component {
       // details (by products)
       ghgDetails: props.session.impactsData.ghgDetails,
       // adding new product
-      newItem1: false,
-      newItem2: false
+      itemNewProduct: ""
     }
   }
 
@@ -51,7 +52,7 @@ export class AssessmentGHG extends React.Component {
   {
     const {netValueAdded} = this.props.session.impactsData;
     const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,ghgDetails} = this.state;
-    const {newItem1, newItem2} = this.state;
+    const {itemNewProduct} = this.state;
 
     return (
       <div className="indicator-section-view">
@@ -77,14 +78,14 @@ export class AssessmentGHG extends React.Component {
               </tr>
 
               {Object.entries(ghgDetails)
-                     .filter(([itemId,itemData]) => itemData.assessmentItem=="1")
+                     .filter(([_,itemData]) => itemData.assessmentItem=="1")
                      .map(([itemId,itemData]) => 
                 <tr key={itemId}>
                   <td className="sub">
                     <select value={itemData.fuelCode}
                             onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
                       {Object.entries(nrgProducts)
-                              .filter(([key,data]) => data.subCategory=="Usage source fixe")
+                              //.filter(([key,data]) => data.subCategory=="Usage source fixe")
                               .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                     </select></td>
                   <td className="short right">
@@ -102,14 +103,14 @@ export class AssessmentGHG extends React.Component {
                 </tr>
               )}
 
-              {newItem1 &&
+              {itemNewProduct=="1" &&
                 <tr>
                   <td className="sub">
                     <select value="0"
                             onChange={(event) => this.addProduct("1",event.target.value)}>
                       <option key="none" value="none">---</option>
                       {Object.entries(nrgProducts)
-                             .filter(([key,data]) => data.subCategory=="Usage source fixe")
+                             //.filter(([_,data]) => data.subCategory=="Usage source fixe")
                              .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                     </select></td>
                 </tr>
@@ -123,14 +124,14 @@ export class AssessmentGHG extends React.Component {
               </tr>
 
               {Object.entries(ghgDetails)
-                     .filter(([itemId,itemData]) => itemData.assessmentItem=="2")
+                     .filter(([_,itemData]) => itemData.assessmentItem=="2")
                      .map(([itemId,itemData]) => 
                 <tr key={itemId}>
                   <td className="sub">
                     <select value={itemData.fuelCode}
                             onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
                       {Object.entries(nrgProducts)
-                             .filter(([key,data]) => data.subCategory=="Usage sources mobiles")
+                             //.filter(([key,data]) => data.subCategory=="Usage sources mobiles")
                              .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                     </select></td>
                   <td className="short right">
@@ -148,36 +149,107 @@ export class AssessmentGHG extends React.Component {
                 </tr>
               )}
 
-              {newItem2 &&
-                <tr>
-                  <td className="sub">
-                    <select value="0"
-                            onChange={(event) => this.addProduct("2",event.target.value)}>
-                      <option key="none" value="none">---</option>
-                      {Object.entries(nrgProducts)
-                             .filter(([key,data]) => data.subCategory=="Usage sources mobiles")
-                             .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
-                    </select></td>
-                </tr>
-              }
+            {itemNewProduct=="2" &&
+              <tr>
+                <td className="sub">
+                  <select value="0"
+                          onChange={(event) => this.addProduct("2",event.target.value)}>
+                    <option key="none" value="none">---</option>
+                    {Object.entries(nrgProducts)
+                            //.filter(([key,data]) => data.subCategory=="Usage sources mobiles")
+                            .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                  </select></td>
+              </tr>}
 
               <tr>
                 <td colSpan="3">Emissions directes des procédés (hors énergie)</td>
                 <td className="short right">{printValue(this.getTotalByAssessmentItem("3"),0)}</td>
                 <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
+                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" 
+                  onClick={() => this.addNewLine("3")}/></td>
               </tr>
+
+            {Object.entries(ghgDetails)
+                    .filter(([_,itemData]) => itemData.assessmentItem=="3")
+                    .map(([itemId,itemData]) => 
+              <tr key={itemId}>
+                <td className="sub">
+                  <InputText value={itemData.label}/></td>
+                <td className="short right">
+                  <InputNumber value={itemData.consumption} 
+                                onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                <td>kgCO2e</td>
+                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
+                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
+                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+              </tr>)}
+
+            {itemNewProduct=="3" &&
+            <tr>
+              <td className="sub">
+                <InputText value=""
+                           onUpdate={(nextValue) => this.addProduct.bind(this)("3",nextValue)}/></td>
+            </tr>}
               
               <tr>
                 <td colSpan="3">Emissions directes fugitives</td>
                 <td className="short right">{printValue(this.getTotalByAssessmentItem("4"),0)}</td>
                 <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
+                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" 
+                  onClick={() => this.addNewLine("4")}/></td>
               </tr>
+
+            {Object.entries(ghgDetails)
+                    .filter(([_,itemData]) => itemData.assessmentItem=="4")
+                    .map(([itemId,itemData]) => 
+              <tr key={itemId}>
+                <td className="sub">
+                  <InputText value={itemData.label}/></td>
+                <td className="short right">
+                  <InputNumber value={itemData.consumption} 
+                                onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                <td>kgCO2e</td>
+                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
+                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
+                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+              </tr>)}
+
+            {itemNewProduct=="4" &&
+              <tr>
+                <td className="sub">
+                  <InputText value=""
+                            onUpdate={(nextValue) => this.addProduct.bind(this)("4",nextValue)}/></td>
+              </tr>}
               
               <tr>
                 <td colSpan="3">Emissions issues de la biomasse (sols et forêts)</td>
                 <td className="short right">{printValue(this.getTotalByAssessmentItem("5"),0)}</td>
                 <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
+                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" 
+                  onClick={() => this.addNewLine("5")}/></td>
               </tr>
+
+            {Object.entries(ghgDetails)
+                    .filter(([_,itemData]) => itemData.assessmentItem=="5")
+                    .map(([itemId,itemData]) => 
+              <tr key={itemId}>
+                <td className="sub">
+                  <InputText value={itemData.label}/></td>
+                <td className="short right">
+                  <InputNumber value={itemData.consumption} 
+                                onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                <td>kgCO2e</td>
+                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
+                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
+                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+              </tr>)}
+
+            {itemNewProduct=="5" &&
+              <tr>
+                <td className="sub">
+                  <InputText value=""
+                              onUpdate={(nextValue) => this.addProduct.bind(this)("5",nextValue)}/></td>
+              </tr>}
 
               <tr className="with-top-line">
                 <td colSpan="3">Total</td>
@@ -199,7 +271,7 @@ export class AssessmentGHG extends React.Component {
     ) 
   }
 
-  addNewLine = (type) => this.setState({newItem1: (type=="1"), newItem2: (type=="2")})
+  addNewLine = (type) => this.setState({itemNewProduct: type})
 
   updateFuelConsumption = (itemId,nextValue) => 
   {
@@ -209,33 +281,46 @@ export class AssessmentGHG extends React.Component {
     this.updateGhgEmissions();
   }
 
-  addProduct = (assessmentItem,fuelCode) => 
+  updateLabel = (itemId,nextValue) => 
+  {
+    let item = this.props.session.impactsData.ghgDetails[itemId];
+    item.label = nextValue;
+  }
+
+  addProduct = (assessmentItem,source) => 
   {
     let ghgDetails = this.props.session.impactsData.ghgDetails;
-    const id = getNewId(Object.entries(ghgDetails)
-                              .map(([id,item]) => item));
+    const id = getNewId(Object.entries(ghgDetails).map(([id,item]) => item));
     ghgDetails[id] = {
       id: id,
-      fuelCode: fuelCode, 
+      label: source,
+      fuelCode: source, 
       consumption: 0.0, 
-      consumptionUnit: "GJ", 
+      consumptionUnit: ["1","2"].includes(assessmentItem) ? "GJ" : "kgCO2e", 
       uncertainty: 25.0, 
       ghgEmissions: 0.0,
       assessmentItem: assessmentItem
     }
-    this.setState({ghgDetails: ghgDetails, newItem1: false, newItem2: false});
+    this.setState({ghgDetails: ghgDetails, itemNewProduct: ""});
   }
 
   changeNrgProduct = (itemId,nextFuelCode) =>
   {
     let itemData = this.props.session.impactsData.ghgDetails[itemId];
-    itemData.fuelCode = nextFuelCode;
-    // check if the unit used is also available for the new product
-    if (Object.keys(nrgProducts[nextFuelCode].units)
-              .includes(itemData.consumptionUnit)) {
-      itemData.ghgEmissions = this.getGhgEmissions(itemData);
-    } else {
-      itemData = {...itemData, consumption: 0.0, ghgEmissions: 0.0, consumptionUnit: "GJ", uncertainty: 25.0}
+    if (["1","2"].includes(itemData.assessmentItem))
+    {
+      itemData.fuelCode = nextFuelCode;
+      // check if the unit used is also available for the new product
+      if (Object.keys(nrgProducts[nextFuelCode].units)
+                .includes(itemData.consumptionUnit)) {
+        itemData.ghgEmissions = this.getGhgEmissions(itemData);
+      } else {
+        itemData = {...itemData, consumption: 0.0, ghgEmissions: 0.0, consumptionUnit: "GJ", uncertainty: 25.0}
+      }
+    }
+    else
+    {
+      itemData.ghgEmissions = itemData.consumption;
     }
     // update total
     this.updateGhgEmissions();
@@ -272,6 +357,7 @@ export class AssessmentGHG extends React.Component {
     // ...details
     Object.entries(impactsData.ghgDetails)
           .filter(([id,data]) => data.fuelCode!=undefined)
+          .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
           .forEach(([itemId,itemData]) => 
           {
             if (itemData.idNRG==undefined) {
@@ -312,11 +398,11 @@ export class AssessmentGHG extends React.Component {
     return sum;
   }
 
-  getTotalByAssessmentItem(type) 
+  getTotalByAssessmentItem(assessmentItem) 
   {
     const ghgDetails = this.props.session.impactsData.ghgDetails;
-    //const sum = Object.entries(ghgDetails).filter(([key,data]) => key.charAt(0)==type).map(([key,data]) => data.consumption).reduce((a,b) => a + b,0);
-    return 0;
+    const sum = Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem==assessmentItem).map(([_,itemData]) => itemData.ghgEmissions).reduce((a,b) => a + b,0);
+    return sum;
   }
 
   getGhgEmissions({consumption,consumptionUnit,fuelCode}) 

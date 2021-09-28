@@ -1,7 +1,7 @@
 {
   "p1": {
     "label": "Fioul domestique (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage source fixe",
     "type" : "fossil",
     "units": {
@@ -14,7 +14,7 @@
   },
   "p2": {
     "label": "Fioul domestique (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage source fixe",
     "type" : "fossil",
     "units": {
@@ -27,7 +27,7 @@
   },
   "p3": {
     "label": "Fioul lourd - commercial (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage source fixe",
     "type" : "fossil",
     "units": {
@@ -40,7 +40,7 @@
   },
   "p4": {
     "label": "Fioul lourd - commercial (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage source fixe",
     "type" : "fossil",
     "units": {
@@ -53,7 +53,7 @@
   },
   "p5": {
     "label": "Combustible haute viscosité (CHV)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage source fixe",
     "type" : "fossil",
     "units": {
@@ -65,7 +65,7 @@
   },
   "p6": {
     "label": "Essence - Supercarburant sans plomb (95, 95-E10, 98)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -78,7 +78,7 @@
   },
   "p7": {
     "label": "Gazole routier - B7",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -91,7 +91,7 @@
   },
   "p8": {
     "label": "Essence - E10",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -104,7 +104,7 @@
   },
   "p9": {
     "label": "Essence - E85",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -117,7 +117,7 @@
   },
   "p10": {
     "label": "Gazole - B30",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -130,7 +130,7 @@
   },
   "p11": {
     "label": "GPL pour véhicule routier",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -143,7 +143,7 @@
   },
   "p12": {
     "label": "Gazole routier - B10",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -155,7 +155,7 @@
   },
   "p13": {
     "label": "Gazole routier - B100",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -167,7 +167,7 @@
   },
   "p14": {
     "label": "GNL, Gaz Naturel Liquéfié - (inclus routier, maritime et fluvial)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -180,7 +180,7 @@
   },
   "p15": {
     "label": "GNC, Gaz Naturel Comprimé pour véhicule routier",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -193,7 +193,7 @@
   },
   "p16": {
     "label": "HFO (Heavy Fuel Oil) - ISO 8217 classes RME à RMK",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -206,7 +206,7 @@
   },
   "p17": {
     "label": "LFO (Light Fuel Oil) - ISO 8217 classes RMA à RMD (maritime)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -219,7 +219,7 @@
   },
   "p18": {
     "label": "MDO (Marine Diesel Oil) - ISO 8217 classes DMX à DMC",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -232,7 +232,7 @@
   },
   "p19": {
     "label": "Carbureacteur - large coupe (jet B) (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -245,7 +245,7 @@
   },
   "p20": {
     "label": "Carbureacteur - large coupe (jet B) (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -258,7 +258,7 @@
   },
   "p21": {
     "label": "Essence aviation (AvGas) (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -271,7 +271,7 @@
   },
   "p22": {
     "label": "Essence aviation (AvGas) (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -284,7 +284,7 @@
   },
   "p23": {
     "label": "Kérosène - jet A1 ou A (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -297,7 +297,7 @@
   },
   "p24": {
     "label": "Kérosène - jet A1 ou A (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -310,7 +310,7 @@
   },
   "p25": {
     "label": "Gazole non routier",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
@@ -323,7 +323,7 @@
   },
   "p26": {
     "label": "Autres produits pétroliers",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -334,7 +334,7 @@
   },
   "p27": {
     "label": "Bitumes (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -345,7 +345,7 @@
   },
   "p28": {
     "label": "Bitumes (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -356,7 +356,7 @@
   },
   "p29": {
     "label": "Huiles de schistes (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -367,7 +367,7 @@
   },
   "p30": {
     "label": "Huiles de schistes (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -378,7 +378,7 @@
   },
   "p31": {
     "label": "Naphta (Europe)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -389,7 +389,7 @@
   },
   "p32": {
     "label": "Naphta (France continentale)",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
@@ -400,7 +400,7 @@
   },
   "p33": {
     "label": "Pétrole brut",
-    "category": "liquide",
+    "category": "liquides",
     "subCategory": "Pétrole brut",
     "type" : "fossil",
     "units": {
@@ -536,7 +536,7 @@
   },
   "p45": {
     "label": "Agglomérés de houille",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -548,7 +548,7 @@
   },
   "p46": {
     "label": "Anthracite",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -560,7 +560,7 @@
   },
   "p47": {
     "label": "Briquette de lignite",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -572,7 +572,7 @@
   },
   "p48": {
     "label": "Charbon à coke - PCS supérieur à 23865 kJ/kg",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -584,7 +584,7 @@
   },
   "p49": {
     "label": "Charbon à vapeur - PCS supérieur à 23865 kJ/kg",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -596,7 +596,7 @@
   },
   "p50": {
     "label": "Charbon sous-bitumineux - PCS entre 17 435 et 23 865 kJ/kg",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -608,7 +608,7 @@
   },
   "p51": {
     "label": "Houille - PCS supérieur à 23865 kJ/kg",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -620,7 +620,7 @@
   },
   "p52": {
     "label": "Lignite - PCS inférieur à 17435 kJ/kg",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -632,7 +632,7 @@
   },
   "p53": {
     "label": "Tourbe",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
@@ -644,7 +644,7 @@
   },
   "p54": {
     "label": "Bois bûche - 20% d'humidité",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -654,7 +654,7 @@
   },
   "p55": {
     "label": "Granulés bois - 8% d'humidité",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -664,7 +664,7 @@
   },
   "p56": {
     "label": "Plaquettes forestières - 25% d'humidité",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -674,7 +674,7 @@
   },
   "p57": {
     "label": "Sciures et chutes de scieries - 50% d'humidité",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -684,7 +684,7 @@
   },
   "p58": {
     "label": "Broyats de cagettes et de pallettes - 20% d'humidité",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -694,7 +694,7 @@
   },
   "p59": {
     "label": "Paille - 10% d'humidité",
-    "category": "solide",
+    "category": "solides",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -704,7 +704,7 @@
   },
   "p60": {
     "label": "BioGNC -Biométhane comprimé - Pour véhicule routier - Mix Moyen",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -717,7 +717,7 @@
   },
   "p61": {
     "label": "Biométhane - Injecté dans les réseau - Issu de la filière STEU",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -727,7 +727,7 @@
   },
   "p62": {
     "label": "Biométhane - Injecté dans les réseaux - Mix moyen",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -742,7 +742,7 @@
   },
   "p63": {
     "label": "Biopropane - à base d'huile de colza",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -755,7 +755,7 @@
   },
   "p64": {
     "label": "Biopropane - à base d'huile de palme",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -768,7 +768,7 @@
   },
   "p65": {
     "label": "Biopropane - à base d'huile de tournesol",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -781,7 +781,7 @@
   },
   "p67": {
     "label": "Biopropane - à base d'huiles de cuisson",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -794,7 +794,7 @@
   },
   "p68": {
     "label": "Biopropane - à base de distillat d'acides gras d'huile de palme comme résidu",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -807,7 +807,7 @@
   },
   "p69": {
     "label": "Biopropane - à base de graisses animales",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
@@ -820,7 +820,7 @@
   },
   "p70": {
     "label": "Biopropane - mix annuel 2020",
-    "category": "gaz",
+    "category": "gazeux",
     "subCategory": "",
     "type" : "biomass",
     "units": {
