@@ -19,7 +19,7 @@ export class SocialDataTable extends React.Component {
     this.state = 
     {
       employees: props.employees,
-      columnSorted: "name",
+      columnSorted: "id",
       reverseSort: false,
       page: 0
     }
@@ -36,6 +36,19 @@ export class SocialDataTable extends React.Component {
     const {columnSorted,page} = this.state;
 
     this.sortCompanies(employees,columnSorted);
+
+    console.log(employees);
+
+    const newEmployee = {
+      id: getNewId(this.props.employees),
+      name: "",
+      sex: "",
+      wage: null,
+      workingHours: null,
+      hourlyRate: null,
+      trainingHours: null,
+      trainingContract: false
+    }
 
     return (
       <div className="table-container">
@@ -63,8 +76,11 @@ export class SocialDataTable extends React.Component {
                       .map((employee) => 
               <Row key={"company_"+employee.id} 
                    {...employee}
+                   isNewEmployeeRow={false}
                    updateSocialData={this.updateSocialData.bind(this)}/>)}
               <Row key="new_employee"
+                   {...newEmployee}
+                   isNewEmployeeRow={true}
                    updateSocialData={this.updateSocialData.bind(this)}/>
           </tbody>
         </table>
@@ -87,13 +103,14 @@ export class SocialDataTable extends React.Component {
     else                                        {this.setState({reverseSort: !this.state.reverseSort})}
   }
 
-  sortCompanies(companies,columSorted) 
+  sortCompanies(items,columSorted) 
   {
     switch(columSorted) 
     {
-      case "name": companies.sort((a,b) => valueOrDefault(a.name,"").localeCompare(valueOrDefault(b.name,""))); break;
+      case "id": items.sort((a,b) => a.id - b.id); break;
+      case "name": items.sort((a,b) => valueOrDefault(a.name,"").localeCompare(valueOrDefault(b.name,""))); break;
     }
-    if (this.state.reverseSort) companies.reverse();
+    if (this.state.reverseSort) items.reverse();
   }
 
   /* ---------- NAVIGATION ---------- */
@@ -149,7 +166,7 @@ class Row extends React.Component {
   {
     if (prevProps!==this.props) {
       this.setState({
-        name: this.props.name || "",
+        name: this.props.isNewEmployeeRow ? "" : this.props.name || "",
         sex: this.props.sex || "",
         wage: this.props.wage || null,
         workingHours: this.props.workingHours || null,
@@ -181,13 +198,13 @@ class Row extends React.Component {
           </select></td>
 
         <td className="short right">
-          <InputNumber value={wage}
-                       onUpdate={this.updateWage.bind(this)}/>
+          <InputNumber value={workingHours}
+                       onUpdate={this.updateWorkingHours.bind(this)}/>
         </td>
 
         <td className="short right">
-          <InputNumber value={workingHours}
-                       onUpdate={this.updateWorkingHours.bind(this)}/>
+          <InputNumber value={wage}
+                       onUpdate={this.updateWage.bind(this)}/>
         </td>
 
         <td className="short">
@@ -213,7 +230,8 @@ class Row extends React.Component {
 
   updateName = (input) => 
   {
-    this.props.updateSocialData({id: this.props.id, name: input})
+    this.props.updateSocialData({id: this.props.id, name: input});
+    this.setState({name: input});
   }
 
   updateSex = (input) => 
@@ -223,22 +241,28 @@ class Row extends React.Component {
 
   updateWage = (input) =>
   {
-    let hourlyRate = input!=null && this.state.workingHours > 0 ? input/this.state.workingHours : this.state.hourlyRate;
-    this.props.updateSocialData({id: this.props.id, wage: input, hourlyRate: hourlyRate})
-    this.setState({wage: input})
+    this.state.wage = input;
+    if (this.state.workingHours > 0) this.updateHourlyRate(input/this.state.workingHours)
+    else if (this.state.workingHours==null && this.state.hourlyRate > 0) this.updateWorkingHours(input/this.state.hourlyRate)
+    this.props.updateSocialData({id: this.props.id, wage: input})
   }
 
   updateWorkingHours = (input) => 
   {
-    let hourlyRate = this.state.wage!=undefined && input > 0 ? this.state.wage/input : this.state.hourlyRate ;
-    this.props.updateSocialData({id: this.props.id, workingHours: input, hourlyRate: hourlyRate})
-    this.setState({workingHours: input})
+    this.state.workingHours = input;
+    if (input==null || input==0) this.updateHourlyRate(null)
+    else if (this.state.wage!=null) this.updateHourlyRate(this.state.wage/input)
+    else if (this.state.hourlyRate!=null) this.updateWage(this.state.hourlyRate*input)
+    this.props.updateSocialData({id: this.props.id, workingHours: input})
   }
 
   updateHourlyRate = (input) =>
   {
-    this.props.updateSocialData({id: this.props.id, hourlyRate: input})
-    this.setState({hourlyRate: input})
+    this.state.hourlyRate = input;
+    if (input==null) this.updateWage(null)
+    else if (this.state.workingHours!=null) this.state.wage = input*this.state.workingHours
+    else if (this.state.wage!=null && input > 0) this.state.workingHours = this.state.wage/input
+    this.props.updateSocialData({id: this.props.id, ...this.state})
   }
   
   updateTrainingContract = (event) =>

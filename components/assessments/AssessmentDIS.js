@@ -64,6 +64,7 @@ export class AssessmentDIS extends React.Component {
           </div>
 
           <SocialDataTable employees={employees}/>
+          
         </div>
       </div>
     )
