@@ -70,7 +70,19 @@ export class AssessmentDIS extends React.Component {
     )
   }
 
-  onSubmit = async () => {}
+  onSubmit = async () => 
+  {
+    let impactsData = this.props.session.impactsData;
+
+    // update dis data
+    impactsData.indexGini = getIndexGini(impactsData.employees);
+
+    // update geq data
+    impactsData.wageGap = getGenderGap(impactsData.employees);
+    
+    await this.props.session.updateIndicator("dis");
+    await this.props.session.updateIndicator("geq");    
+  }
 
   /* ----- IMPORTS ----- */
 
@@ -117,4 +129,74 @@ const exportXLSXFile = async () =>
       link.href = URL.createObjectURL(blob);
       link.download = "Collaborateurs.xlsx";
       link.click();
+}
+
+/* ----- Formulas ----- */
+
+const getIndexGini = (employees) => 
+{
+  // order acoording to the hourly rate
+  employees.sort((a,b) => a.hourlyRate - b.hourlyRate);
+
+  // Nombre total d'heures travaillées
+  let n = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+  console.log(n)
+  
+  let s1 = 0;
+  let s2 = 0;
+  let i = 0;
+
+  employees.forEach(employee =>
+  {
+    // S1
+    for (let j = 1; j <= parseInt(employee.workingHours); j++) {
+      s1+= 2*(i+j)*employee.hourlyRate;
+    }
+    i+= parseInt(employee.workingHours);
+    // S2
+    s2+= n*parseInt(employee.workingHours)*employee.hourlyRate;
+    console.log(s1);
+    console.log(s2);
+  })
+
+  let indexGini = ((s1/s2) - (n+1)/n)*100;
+  
+  /*
+  // order acoording to the hourly rate
+  employees.sort((a,b) => a.hourlyRate - b.hourlyRate);
+
+  // Nombre total d'heures travaillées
+  let total_workingHours = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+  let total_wage = employees.map(employee => employee.wage).reduce((a,b) => a + b,0);
+  
+  let s = 0;
+  //let n_hours = 0;
+  let cumul_wage = 0;
+
+  employees.forEach(employee =>
+  {
+    s+= (parseInt(employee.workingHours)/total_workingHours)*((cumul_wage+employee.wage)/total_wage);
+    cumul_wage+=employee.wage;
+  })
+
+  let indexGini = 1-s;
+  console.log(indexGini*100);
+  */
+
+  return indexGini;
+}
+
+const getGenderGap = (employees) => 
+{
+  const women = employees.filter(employee => employee.sex == "F");
+  const men = employees.filter(employee => employee.sex == "M");
+
+  let hourlyRateWomen = women.map(employee => employee.wage).reduce((a,b) => a + b,0) / women.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+  let hourlyRateMen = men.map(employee => employee.wage).reduce((a,b) => a + b,0) / men.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+
+  let hourlyRateEmployees = employees.map(employee => employee.wage).reduce((a,b) => a + b,0) / employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+
+  let wageGap = Math.abs(hourlyRateMen-hourlyRateWomen)/hourlyRateEmployees *100;
+
+  return wageGap;
 }

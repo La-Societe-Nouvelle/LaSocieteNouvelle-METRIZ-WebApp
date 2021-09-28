@@ -244,7 +244,7 @@ class Row extends React.Component {
     this.state.wage = input;
     if (this.state.workingHours > 0) this.updateHourlyRate(input/this.state.workingHours)
     else if (this.state.workingHours==null && this.state.hourlyRate > 0) this.updateWorkingHours(input/this.state.hourlyRate)
-    this.props.updateSocialData({id: this.props.id, wage: input})
+    this.props.updateSocialData({id: this.props.id, ...this.state})
   }
 
   updateWorkingHours = (input) => 
@@ -253,7 +253,7 @@ class Row extends React.Component {
     if (input==null || input==0) this.updateHourlyRate(null)
     else if (this.state.wage!=null) this.updateHourlyRate(this.state.wage/input)
     else if (this.state.hourlyRate!=null) this.updateWage(this.state.hourlyRate*input)
-    this.props.updateSocialData({id: this.props.id, workingHours: input})
+    this.props.updateSocialData({id: this.props.id, ...this.state})
   }
 
   updateHourlyRate = (input) =>
