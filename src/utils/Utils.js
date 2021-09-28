@@ -35,7 +35,7 @@ export function roundValue(value,precision)
 {
   if (value==undefined || value==null || value==="") {return value}
   else {
-    return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)
+    return Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)
   }
 }
 
