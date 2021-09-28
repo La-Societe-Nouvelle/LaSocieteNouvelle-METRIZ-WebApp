@@ -146,13 +146,17 @@ export class AssessmentDIS extends React.Component {
     let impactsData = this.props.session.impactsData;
 
     // update dis data
-    impactsData.indexGini = roundValue(getIndexGini(impactsData.employees),1);
+    impactsData.indexGini = getIndexGini(impactsData.employees),1;
+    await this.props.session.updateIndicator("dis");
 
     // update geq data
-    impactsData.wageGap = roundValue(getGenderGap(impactsData.employees),1);
-    
-    await this.props.session.updateIndicator("dis");
+    impactsData.wageGap = getGenderWageGap(impactsData.employees);
     await this.props.session.updateIndicator("geq");
+
+    // update knw data
+    impactsData.knwDetails.apprenticesRemunerations = getApprenticesRemunerations(impactsData.employees);
+    impactsData.knwDetails.employeesTrainingsCompensations = getEmployeesTrainingCompensations(impactsData.employees);
+    await this.props.session.updateIndicator("knw");
     
     this.props.onGoBack();
   }
@@ -442,20 +446,37 @@ const getIndexGini = (employees) =>
   console.log(indexGini*100);
   */
 
-  return indexGini;
+  return roundValue(indexGini,1);
 }
 
-const getGenderGap = (employees) => 
+const getGenderWageGap = (employees) => 
 {
   const women = employees.filter(employee => employee.sex == "F");
-  const men = employees.filter(employee => employee.sex == "M");
+  const men = employees.filter(employee => employee.sex == "H");
 
-  let hourlyRateWomen = women.map(employee => employee.wage).reduce((a,b) => a + b,0) / women.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
-  let hourlyRateMen = men.map(employee => employee.wage).reduce((a,b) => a + b,0) / men.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+  if (men.length > 0 && women.length > 0)
+  {
+    let hourlyRateWomen = women.map(employee => employee.wage).reduce((a,b) => a + b,0) / women.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+    let hourlyRateMen = men.map(employee => employee.wage).reduce((a,b) => a + b,0) / men.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+    let hourlyRateEmployees = employees.map(employee => employee.wage).reduce((a,b) => a + b,0) / employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+    
+    let wageGap = Math.abs(hourlyRateMen-hourlyRateWomen)/hourlyRateEmployees *100;
+    return roundValue(wageGap,1);
+  }
+  else {return 0}
+}
 
-  let hourlyRateEmployees = employees.map(employee => employee.wage).reduce((a,b) => a + b,0) / employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+const getApprenticesRemunerations = (employees) => 
+{
+  let apprenticesRemunerations = employees.filter(employee => employee.trainingContract)
+                                          .map(employee => employee.wage)
+                                          .reduce((a,b) => a + b,0);
+  return roundValue(apprenticesRemunerations,0);
+}
 
-  let wageGap = Math.abs(hourlyRateMen-hourlyRateWomen)/hourlyRateEmployees *100;
-
-  return wageGap;
+const getEmployeesTrainingCompensations = (employees) => 
+{
+  let employeesTrainingsCompensations = employees.map(employee => employee.hourlyRate*employee.trainingHours)
+                                          .reduce((a,b) => a + b,0);
+  return roundValue(employeesTrainingsCompensations,0);
 }
