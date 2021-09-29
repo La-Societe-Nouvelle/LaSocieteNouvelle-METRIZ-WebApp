@@ -86,7 +86,28 @@ export class LegalDataSection extends React.Component {
   {
     let legalUnit = this.props.session.legalUnit;
     await legalUnit.setSiren(siren);
+    this.initImpactsData();
     this.setState({siren: siren})
+  }
+
+  initImpactsData = () =>
+  {
+    let {legalUnit,impactsData} = this.props.session;
+
+    // ART
+    // ... check registreMetiers pour les établissements actifs (API response to upgrade)
+
+    // DIS-GEQ
+    if (this.props.session.legalUnit.isEmployeur!=null) impactsData.hasEmployees = legalUnit.isEmployeur;
+
+    // MAT
+    if (this.props.session.legalUnit.activityCode!=null) impactsData.isExtractiveActivities = ["01","02","03","05","06","07","08"].includes(legalUnit.activityCode.substring(0,2));
+
+    // ECO
+    // ... init activités en France selon l'adresse des établissements (API response to upgrade)
+
+    // SOC
+    if (this.props.session.legalUnit.isEconomieSocialeSolidaire!=null) impactsData.hasSocialPurpose = legalUnit.isEconomieSocialeSolidaire;
   }
 
   /* --- EXERCICE --- */

@@ -15,6 +15,11 @@ export class LegalUnit {
     this.areaCode = props.areaCode || null;
     this.activityCode = props.activityCode || null;
 
+    //
+    this.isEmployeur = props.isEmployeur || null;
+    this.trancheEffectifs = props.trancheEffectifs || "";
+    this.isEconomieSocialeSolidaire = props.isEconomieSocialeSolidaire || null;
+
     // Accounting period
     this.year = props.year || "";
 
@@ -86,6 +91,10 @@ export class LegalUnit {
             this.corporateHeadquarters = data.profil.descriptionUniteLegale.communeSiege + " (" + data.profil.descriptionUniteLegale.codePostalSiege + ")" ;
             this.areaCode = "FRA";
             this.activityCode = data.profil.descriptionUniteLegale.activitePrincipale;
+
+            this.isEmployeur = data.profil.descriptionUniteLegale.employeur;
+            this.trancheEffectifs = data.profil.descriptionUniteLegale.trancheEffectifs;
+            this.isEconomieSocialeSolidaire = data.profil.descriptionUniteLegale.isEconomieSocialeSolidaire;
         } 
         else 
         {
