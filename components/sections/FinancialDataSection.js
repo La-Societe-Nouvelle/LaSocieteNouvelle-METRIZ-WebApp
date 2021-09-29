@@ -104,8 +104,12 @@ export class FinancialDataSection extends React.Component {
 
     let reader = new FileReader();
     reader.onload = async () => FECFileReader(reader.result)
-                                  .then((FECData) => this.setState({importedData: FECData}));
-    reader.readAsText(file, "iso-8859-1");
+      .then((FECData) => this.setState({importedData: FECData}));
+    try {
+      reader.readAsText(file, "iso-8859-1");
+    } catch(error) {
+      console.error(error);
+    }
   }
 
   loadFECData = (FECData) => 

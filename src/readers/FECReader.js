@@ -3,6 +3,26 @@
 // Libraries
 import booksProps from '../../lib/books.json'
 
+// FEC colums
+const columnsFEC = ["JournalCode",
+                    "JournalLib",
+                    "EcritureNum",
+                    "EcritureDate",
+                    "CompteNum",
+                    "CompteLib",
+                    "CompAuxNum",
+                    "CompAuxLib",
+                    "PieceRef",
+                    "PieceDate",
+                    "EcritureLib",
+                    "Debit",
+                    "Credit",
+                    "EcritureLet",
+                    "DateLet",
+                    "ValidDate",
+                    "Montantdevise",
+                    "Idevise"]
+
 /* ---------------------------------------------------- */
 /* -------------------- FEC READER -------------------- */
 /* ---------------------------------------------------- */
@@ -38,13 +58,15 @@ async function FECFileReader(content)
   // Separator ------------------------------------------------------------------------------------------ //
 
   let separator = content.slice(0,content.indexOf('\n')).split('\t').length == 18 ? '\t' : '|';
+  if (!['\t','|'].includes(separator)) throw 'Erreur - Fichier erroné';
 
   // Header --------------------------------------------------------------------------------------------- //
   
   // read header & build columns index
   let indexColumns = {};
-  const header = content.slice(0,content.indexOf('\n')).split(separator);
+  const header = content.slice(0,content.indexOf('\n')).replace('\r','').split(separator);
         header.forEach(column => indexColumns[column] = header.indexOf(column));
+  header.forEach(column => {if (!columnsFEC.includes(column)) throw 'Erreur - Fichier erroné'});
 
   // Rows ----------------------------------------------------------------------------------------------- //
   
@@ -52,10 +74,10 @@ async function FECFileReader(content)
   const rows = content.slice(content.indexOf('\n')+1).split('\n');
 
   // read rows
-  await rows.forEach(async (rowString) => 
+  await rows.forEach(async (rowString,index) => 
   {
     // split & read row (String -> JSON)
-    let rowArray = rowString.split(separator);
+    let rowArray = rowString.replace('\r','').split(separator);
 
     if (rowArray.length == 18)
     {
@@ -79,6 +101,7 @@ async function FECFileReader(content)
       // push data
       dataFEC.books[rowData.JournalCode].push(rowData);
     }
+    else if (rowString!="") throw 'Erreur - Ligne incomplète ('+(index+2)+')'
   })
 
   // Return --------------------------------------------------------------------------------------------- //
