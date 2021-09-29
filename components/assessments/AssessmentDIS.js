@@ -3,26 +3,21 @@
 // React
 import React from 'react';
 
-// Components
-import { SocialDataTable } from '../tables/SocialDataTable';
-
-// Other sources
-import { XLSXFileReader } from '../../src/readers/XLSXReader'
-import { SocialDataContentReader } from '../../src/readers/SocialDataContentReader';
-import { XLSXHeaderFileWriter } from '../../src/writers/XLSXWriter';
+// Readers / Writers
+import { XLSXFileReader } from '/src/readers/XLSXReader'
+import { SocialDataContentReader } from '/src/readers/SocialDataContentReader';
+import { XLSXHeaderFileWriter } from '/src/writers/XLSXWriter';
 
 // Utils
 import { InputText } from '/components/InputText';
 import { InputNumber } from '/components/InputNumber';
 import { valueOrDefault } from '/src/utils/Utils';
-import { getNewId,roundValue } from '../../src/utils/Utils';
+import { getNewId,roundValue } from '/src/utils/Utils';
 
-/* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT DIS -------------------- */
-/* -------------------------------------------------------- */
 
-/* The table is the same than the one for GEQ / DIS
-
+/* The assessment tool is the same for DIS & GEQ
+   it's also used for KNW with the training hourse and the training contracts 
 */
 
 export class AssessmentDIS extends React.Component {
@@ -36,21 +31,19 @@ export class AssessmentDIS extends React.Component {
       // details
       hasEmployees: props.session.impactsData.hasEmployees,
       employees: props.session.impactsData.employees,
-      //
+      // display
       columnSorted: "id",
       reverseSort: false,
-      page: 0
     }
   }
 
   render() 
   {
-    const {employees,columnSorted,page} = this.state;
+    const {employees,columnSorted} = this.state;
 
     const isAllValid = employees.map(employee => employee.hourlyRate!=null && employee.workingHours!=null).reduce((a,b) => a && b,true);
 
     this.sortCompanies(employees,columnSorted);
-
     const newEmployee = {
       id: getNewId(employees),
       name: "",
@@ -64,6 +57,7 @@ export class AssessmentDIS extends React.Component {
 
     return(
       <div className="indicator-section-view">
+
         <div className="view-header">
           <button className="retour" 
                   onClick = {() => this.props.onGoBack()}>Retour</button>
@@ -72,7 +66,7 @@ export class AssessmentDIS extends React.Component {
                   onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 
-        <div className="group assessment"><h3>Outil de mesure</h3>
+        <div className="group assessment"><h3>Données sociales</h3>
           <div className="actions">
             <button onClick={() => document.getElementById('import-companies-csv').click()}>
               Importer un fichier CSV
@@ -86,7 +80,7 @@ export class AssessmentDIS extends React.Component {
               <input id="import-companies-xlsx" visibility="collapse"
                       type="file" accept=".xlsx" 
                       onChange={this.importXLSXFile}/>
-            <button onClick={exportXLSXFile}>
+            <button onClick={this.exportXLSXFile}>
               Télécharger modèle XLSX
             </button>
             <button onClick={this.deleteAll}>
@@ -115,8 +109,7 @@ export class AssessmentDIS extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                {employees.slice(page*20,(page+1)*20)
-                          .map((employee) => 
+                {employees.map((employee) => 
                   <Row key={"company_"+employee.id} 
                       {...employee}
                       isNewEmployeeRow={false}
@@ -128,12 +121,6 @@ export class AssessmentDIS extends React.Component {
               </tbody>
             </table>
 
-            {employees.length > 20 &&
-              <div className="table-navigation">
-                <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-                <button className={(page+1)*20 < employees.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
-              </div>}
-            
           </div>
           
         </div>
@@ -141,6 +128,9 @@ export class AssessmentDIS extends React.Component {
     )
   }
 
+  /* ---------- HEADER ACTIONS ---------- */
+
+  // Submit
   onSubmit = async () => 
   {
     let impactsData = this.props.session.impactsData;
@@ -160,60 +150,8 @@ export class AssessmentDIS extends React.Component {
     
     this.props.onGoBack();
   }
-  
-  deleteAll = () =>
-  {
-    this.props.session.impactsData.employees = [];
-    this.setState({employees: []});
-  }
 
-  /* ---------- SORTING ---------- */
-
-  changeColumnSorted(columnSorted) 
-  {
-    if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})} 
-    else                                        {this.setState({reverseSort: !this.state.reverseSort})}
-  }
-
-  sortCompanies(items,columSorted) 
-  {
-    switch(columSorted) 
-    {
-      case "id": items.sort((a,b) => a.id - b.id); break;
-      case "name": items.sort((a,b) => valueOrDefault(a.name,"").localeCompare(valueOrDefault(b.name,""))); break;
-    }
-    if (this.state.reverseSort) items.reverse();
-  }
-
-  /* ---------- NAVIGATION ---------- */
-
-  prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
-  nextPage = () => {if ((this.state.page+1)*20 < this.props.employees.length) this.setState({page: this.state.page+1})}
-
-  /* ---------- OPERATIONS ON EXPENSE ---------- */
-
-  updateSocialData = (nextProps) => 
-  {
-    let employee = this.props.session.impactsData.employees.filter(employee => employee.id == nextProps.id)[0];
-    if (employee==undefined) {
-      employee = {
-        id: getNewId(this.props.session.impactsData.employees),
-        name: nextProps.name || "",
-        sex: "",
-        wage: null,
-        workingHours: null,
-        hourlyRate: null,
-        trainingHours: null,
-        trainingContract: false
-      }
-      this.state.employees.push(employee)
-    } else {
-      Object.entries(nextProps).forEach(([propName,propValue]) => employee[propName] = propValue);
-    }
-    this.setState({employees: this.props.session.impactsData.employees});
-  }
-
-  /* ----- IMPORTS ----- */
+  /* ---------- TABLE ACTIONS ---------- */
 
   // Import CSV File
   importCSVFile = (event) => 
@@ -243,21 +181,72 @@ export class AssessmentDIS extends React.Component {
     reader.readAsArrayBuffer(file);
   }
 
-}
+  // Export XLSX File
+  exportXLSXFile = async () =>
+  {
+    let arrayHeader = [["Nom - Prénom","Sexe (F/H)","Heures travaillées","Rémunérations brutes","Taux horaire","Contrat de formation (O/N)","Heures de formation"]];
+    let fileProps = {wsclos: [{wch:40},{wch:15},{wch:25},{wch:25},{wch:25},{wch:25},{wch:25}]};
+    // write file (Array -> ArrayBuffer)
+    let file = await XLSXHeaderFileWriter(fileProps,"Collaborateurs",arrayHeader);
+    // trig download
+    let blob = new Blob([file],{type:"application/octet-stream"});
+    let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "Collaborateurs.xlsx";
+        link.click();
+  }
+  
+  // Delete all
+  deleteAll = () =>
+  {
+    this.props.session.impactsData.employees = [];
+    this.setState({employees: []});
+  }
 
-// Export XLSX File
-const exportXLSXFile = async () =>
-{
-  let arrayHeader = [["Nom - Prénom","Sexe (F/H)","Heures travaillées","Rémunérations brutes","Taux horaire","Contrat de formation (O/N)","Heures de formation"]];
-  let fileProps = {wsclos: [{wch:40},{wch:15},{wch:25},{wch:25},{wch:25},{wch:25},{wch:25}]};
-  // write file (Array -> ArrayBuffer)
-  let file = await XLSXHeaderFileWriter(fileProps,"Collaborateurs",arrayHeader);
-  // trig download
-  let blob = new Blob([file],{type:"application/octet-stream"});
-  let link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = "Collaborateurs.xlsx";
-      link.click();
+  /* ---------- TABLE DISPLAY ---------- */
+
+  // Column for sorting
+  changeColumnSorted(columnSorted) 
+  {
+    if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})} 
+    else                                        {this.setState({reverseSort: !this.state.reverseSort})}
+  }
+
+  // Sorting
+  sortCompanies(items,columSorted) 
+  {
+    switch(columSorted) 
+    {
+      case "id": items.sort((a,b) => a.id - b.id); break;
+      case "name": items.sort((a,b) => valueOrDefault(a.name,"").localeCompare(valueOrDefault(b.name,""))); break;
+    }
+    if (this.state.reverseSort) items.reverse();
+  }
+
+  /* ---------- ROW ACTIONS ---------- */
+
+  // Update
+  updateSocialData = (nextProps) => 
+  {
+    let employee = this.props.session.impactsData.employees.filter(employee => employee.id == nextProps.id)[0];
+    if (employee==undefined) {
+      employee = {
+        id: getNewId(this.props.session.impactsData.employees),
+        name: nextProps.name || "",
+        sex: "",
+        wage: null,
+        workingHours: null,
+        hourlyRate: null,
+        trainingHours: null,
+        trainingContract: false
+      }
+      this.state.employees.push(employee)
+    } else {
+      Object.entries(nextProps).forEach(([propName,propValue]) => employee[propName] = propValue);
+    }
+    this.setState({employees: this.props.session.impactsData.employees});
+  }
+
 }
 
 /* -------------------- EMPLOYEE ROW -------------------- */
@@ -340,6 +329,7 @@ class Row extends React.Component {
 
         <td className="short right">
           <InputNumber value={trainingHours}
+                       disabled={trainingContract}
                        onUpdate={this.updateTrainingHours.bind(this)}/>
         </td>
 
@@ -347,16 +337,14 @@ class Row extends React.Component {
     )
   }
 
-  updateName = (input) => 
-  {
+  /* --- UPDATES --- */
+
+  updateName = (input) => {
     this.props.updateSocialData({id: this.props.id, name: input});
     this.setState({name: input});
   }
 
-  updateSex = (input) => 
-  {
-    this.props.updateSocialData({id: this.props.id, sex: input.target.value})
-  }
+  updateSex = (input) => this.props.updateSocialData({id: this.props.id, sex: input.target.value})
 
   updateWage = (input) =>
   {
@@ -388,17 +376,16 @@ class Row extends React.Component {
   updateTrainingContract = (event) =>
   {
     this.props.updateSocialData({id: this.props.id, trainingContract: event.target.checked})
+    if (event.target.checked) this.updateTrainingHours(null)
   }
 
-  updateTrainingHours = (input) =>
-  {
-    this.props.updateSocialData({id: this.props.id, trainingHours: input})
-  }
+  updateTrainingHours = (input) => this.props.updateSocialData({id: this.props.id, trainingHours: input})
 
 }
 
-/* ----- Formulas ----- */
+/* -------------------- FORMULAS -------------------- */
 
+// Coefficient de GINI
 const getIndexGini = (employees) => 
 {
   // order acoording to the hourly rate
@@ -424,16 +411,13 @@ const getIndexGini = (employees) =>
 
   let indexGini = ((s1/s2) - (n+1)/n)*100;
   
-  /*
-  // order acoording to the hourly rate
-  employees.sort((a,b) => a.hourlyRate - b.hourlyRate);
+  /* -- Other formula
 
   // Nombre total d'heures travaillées
   let total_workingHours = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
   let total_wage = employees.map(employee => employee.wage).reduce((a,b) => a + b,0);
   
   let s = 0;
-  //let n_hours = 0;
   let cumul_wage = 0;
 
   employees.forEach(employee =>
@@ -443,12 +427,12 @@ const getIndexGini = (employees) =>
   })
 
   let indexGini = 1-s;
-  console.log(indexGini*100);
   */
 
   return roundValue(indexGini,1);
 }
 
+// Ecart de rémunération F/H
 const getGenderWageGap = (employees) => 
 {
   const women = employees.filter(employee => employee.sex == "F");
@@ -466,6 +450,7 @@ const getGenderWageGap = (employees) =>
   else {return 0}
 }
 
+// Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
 const getApprenticesRemunerations = (employees) => 
 {
   let apprenticesRemunerations = employees.filter(employee => employee.trainingContract)
@@ -474,9 +459,11 @@ const getApprenticesRemunerations = (employees) =>
   return roundValue(apprenticesRemunerations,0);
 }
 
+// Rémunérations liées à des heures de formation
 const getEmployeesTrainingCompensations = (employees) => 
 {
-  let employeesTrainingsCompensations = employees.map(employee => (employee.hourlyRate || 0)*(employee.trainingHours || 0))
+  let employeesTrainingsCompensations = employees.filter(employee => !employee.trainingContract)
+                                                 .map(employee => (employee.hourlyRate || 0)*(employee.trainingHours || 0))
                                                  .reduce((a,b) => a + b,0);
   return roundValue(employeesTrainingsCompensations,0);
 }
