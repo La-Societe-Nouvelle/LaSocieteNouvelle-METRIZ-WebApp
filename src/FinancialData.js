@@ -106,7 +106,9 @@ export class FinancialData {
         /* --- INITIAL STATES --- */
 
         // Default initial states
-        this.immobilisations.forEach(immobilisation => {immobilisation.initialState = (this.investments.filter(investment => investment.account == immobilisation.account).length > 0) ? "currentFootprint" : "defaultData";})
+        this.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+                            .filter(immobilisation => (this.depreciations.filter(depreciation => depreciation.accountAux==immobilisation.account).length > 0))
+                            .forEach(immobilisation => {immobilisation.initialState = (this.investments.filter(investment => investment.account == immobilisation.account).length > 0) ? "currentFootprint" : "defaultData";})
         this.stocks.filter(stock => !stock.isProductionStock)
                    .forEach(stock => {stock.initialState = (this.expenses.filter(expense => expense.account == stock.accountAux).length > 0) ? "currentFootprint" : "defaultData";})
         this.stocks.filter(stock => stock.isProductionStock)

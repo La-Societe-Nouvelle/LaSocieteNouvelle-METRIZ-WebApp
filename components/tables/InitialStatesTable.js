@@ -84,6 +84,7 @@ export class InitialStatesTable extends React.Component {
   synchroniseImmobilisation = async (id) => {
     let immobilisation = this.props.financialData.getImmobilisation(id);
     await this.fetchDefaultData(immobilisation);
+    this.props.onUpdate();
   }
 
   async synchroniseStock(id) {
@@ -95,6 +96,7 @@ export class InitialStatesTable extends React.Component {
   {
     await stockOrImmobilisation.updatePrevFootprintFromRemote();
     this.forceUpdate();
+    this.props.onUpdate();
   }
 
   /* ----- SORTING ----- */

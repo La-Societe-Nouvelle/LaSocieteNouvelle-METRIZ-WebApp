@@ -25,10 +25,20 @@ export class InitialStatesSection extends React.Component {
   {
     const {financialData} = this.state;
 
+    const isAllValid = !(financialData.immobilisations.concat(financialData.stocks)
+                                                      .filter(account => account.initialState=="defaultData" && !account.dataFetched)
+                                                      .length > 0);
+    console.log(financialData.immobilisations.concat(financialData.stocks)
+    .filter(account => account.initialState=="defaultData" && !account.dataFetched))
+
     return (
       <div className="section-view">
         <div className="section-view-header">
           <h1>Etats initiaux</h1>
+        </div>
+
+        <div>
+          <p>Informations : {isAllValid ? "OK" : "Données manquantes"}</p>
         </div>
 
         <div className="section-view-main">
@@ -37,10 +47,10 @@ export class InitialStatesSection extends React.Component {
             <div className="group"><h3>Comptes de Stocks et d'Immobilisations</h3>
 
               <div className="actions">
-                {financialData.immobilisations.length > 0 && <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>}
+                {financialData.immobilisations.concat(financialData.stocks).length > 0 && <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>}
               </div>
 
-              {financialData.immobilisations.length > 0 &&
+              {financialData.immobilisations.concat(financialData.stocks).length > 0 &&
                 <InitialStatesTable financialData={financialData} 
                                     onUpdate={this.updateFootprints.bind(this)}/>}
             </div>
@@ -71,6 +81,9 @@ export class InitialStatesSection extends React.Component {
 
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => this.props.session.updateFootprints();
+  updateFootprints = () => {
+    this.props.session.updateFootprints();
+    this.setState({financialData: this.props.session.financialData})
+  }
 
 }
