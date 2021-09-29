@@ -1,6 +1,6 @@
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
+const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 export class LegalUnit {
 
   constructor(props) 
@@ -132,7 +132,7 @@ export class LegalUnit {
 
       try 
       {
-        const endpoint = apiBaseUrl + "default?" 
+        const endpoint = apiBaseUrl + "/default?" 
                                     + "pays="+area 
                                     + "&activite="+activity.substring(0,2) 
                                     + "&flow="+(activity.substring(0,2)!="00" ? "IC" : "GAP");
@@ -146,7 +146,7 @@ export class LegalUnit {
         } 
         else 
         {
-            endpoint = apiBaseUrl + "default?pays=_DV&activite=00&flow=GAP";
+            endpoint = apiBaseUrl + "/default?pays=_DV&activite=00&flow=GAP";
             console.log(endpoint);
             response = await fetch(endpoint, {method:'get'});
             data = await response.json();
@@ -168,19 +168,19 @@ export class LegalUnit {
         let division = this.activityCode.substring(0,2);
         
         // Production
-        endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite="+division +"&flow=PRD";
+        endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=PRD";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
         if (data.header.statut == 200) this.productionSectorFootprint.updateAll(data.empreinteSocietale);
         
         // Value Added
-        endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite="+division +"&flow=GDP";
+        endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=GDP";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
         if (data.header.statut == 200) this.valueAddedSectorFootprint.updateAll(data.empreinteSocietale);
         
         // Intermediate Consumption
-        endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite="+division +"&flow=IC";
+        endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=IC";
         response = await fetch(endpoint, {method:'get'});
         data = await response.json();
         if (data.header.statut == 200) this.consumptionSectorFootprint.updateAll(data.empreinteSocietale);
@@ -189,12 +189,12 @@ export class LegalUnit {
       // Fetch area footprints
       
       // Production
-      endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite=00" +"&flow=GAP";
+      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GAP";
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
       if (data.header.statut == 200) this.productionAreaFootprint.updateAll(data.empreinteSocietale);
       // Value Added
-      endpoint = apiBaseUrl + "default?" + "pays=FRA" + "&activite=00" +"&flow=GDP";
+      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GDP";
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
       if (data.header.statut == 200) this.valueAddedAreaFootprint.updateAll(data.empreinteSocietale);
