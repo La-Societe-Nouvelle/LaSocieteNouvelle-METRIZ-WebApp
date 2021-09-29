@@ -34,6 +34,9 @@ export class LegalUnit {
     this.productionAreaFootprint = new SocialFootprint(props.productionAreaFootprint);
     this.valueAddedAreaFootprint = new SocialFootprint(props.valueAddedAreaFootprint);
 
+    //
+    this.dataFetched = props.dataFetched || false;
+
   // ---------------------------------------------------------------------------------------------------- //
   }
 
@@ -61,6 +64,7 @@ export class LegalUnit {
   async setSiren(siren)
   {
     this.siren = siren;
+    this.dataFetched = false;
     // Fetch data
     await this.fetchLegalUnitData();
     await this.fetchDefaultConsumptionFootprint();
@@ -95,6 +99,8 @@ export class LegalUnit {
             this.isEmployeur = data.profil.descriptionUniteLegale.employeur;
             this.trancheEffectifs = data.profil.descriptionUniteLegale.trancheEffectifs;
             this.isEconomieSocialeSolidaire = data.profil.descriptionUniteLegale.isEconomieSocialeSolidaire;
+
+            this.dataFetched = true;
         } 
         else 
         {
@@ -102,6 +108,7 @@ export class LegalUnit {
           this.corporateHeadquarters = "";
           this.areaCode = "FRA";
           this.activityCode = "00";
+          this.dataFetched = false;
         }
       } 
       catch(error) {throw error}
@@ -112,6 +119,7 @@ export class LegalUnit {
       this.corporateHeadquarters = "";
       this.areaCode = "";
       this.activityCode = "";
+      this.dataFetched = false;
     }
   }
 

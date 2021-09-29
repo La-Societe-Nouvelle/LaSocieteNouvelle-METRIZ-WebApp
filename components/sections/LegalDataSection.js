@@ -5,10 +5,10 @@ import React from 'react';
 
 // Utils
 import { InputText } from '../InputText';
-import { printValue } from '../../src/utils/Utils';
+import { printValue } from '/src/utils/Utils';
 
 // Libraries
-import indics from '../../lib/indics.json'
+import indics from '/lib/indics.json'
 
 /* ------------------------------------------------------------ */
 /* -------------------- LEGAL DATA SECTION -------------------- */
@@ -38,7 +38,7 @@ export class LegalDataSection extends React.Component {
 
   render() 
   {
-    const {corporateName,corporateHeadquarters} = this.props.session.legalUnit;
+    const {corporateName,corporateHeadquarters,dataFetched} = this.props.session.legalUnit;
     const {siren,year} = this.state;
     
     return (
@@ -53,8 +53,9 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input short">
               <label>Numéro de siren </label>
               <InputText value={siren} 
-                         valid={/[0-9]{9}/.test(siren)}
+                         //valid={/[0-9]{9}/.test(siren)}
                          onUpdate={this.updateSiren.bind(this)}/>
+              {dataFetched && <img className="icon" src="/resources/icon_good.png" alt="refresh"/>}
             </div>
             <div className="inline-input">
               <label>Dénomination </label>
@@ -70,8 +71,9 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input short">
               <label>Année de fin de l'exercice</label>
               <InputText value={year} 
-                         valid={/[0-9]{4}/.test(year)}
+                         //valid={/[0-9]{4}/.test(year)}
                          onUpdate={this.updateYear.bind(this)}/>
+              {/[0-9]{4}/.test(year) && <img className="icon" src="/resources/icon_good.png" alt="refresh"/>}
             </div>
           </div>
 
