@@ -106,6 +106,7 @@ function Assessment(props)
   switch(props.indic) 
   {
     case "dis": return(<AssessmentDIS {...props}/>)
+    case "geq": return(<AssessmentDIS {...props}/>)
     case "ghg": return(<AssessmentGHG {...props}/>)
     case "knw": return(<AssessmentKNW {...props}/>)
     case "nrg": return(<AssessmentNRG {...props}/>)

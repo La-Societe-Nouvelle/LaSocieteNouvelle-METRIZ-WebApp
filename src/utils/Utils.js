@@ -29,6 +29,16 @@ export function printValueInput(value,precision) {
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
 }
 
+/* ----- ROUND ----- */
+
+export function roundValue(value,precision) 
+{
+  if (value==undefined || value==null || value==="") {return value}
+  else {
+    return Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)
+  }
+}
+
 /* ----- ASSIGN ----- */
 
 export function valueOrDefault(value,defaultValue) {
