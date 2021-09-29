@@ -42,10 +42,16 @@ export class CompaniesSection extends React.Component {
 
     const expensesByCompanies = getExpensesByCompanies(financialData.expenses.concat(financialData.investments));
 
+    const isAllValid = !(companies.filter(company => company.status != 200).length > 0);
+
     return (
       <div className="section-view">
         <div className="section-view-header">
           <h1>Fournisseurs</h1>
+        </div>
+
+        <div>
+          <p>Informations : {isAllValid ? "Données synchronisées" : "Données manquantes (cf. Affichage des comptes non synchronisés)"}</p>
         </div>
 
         <div className="section-view-main">
@@ -74,7 +80,7 @@ export class CompaniesSection extends React.Component {
                   <option key="1" value="all">Affichage de tous les comptes externes</option>
                   <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
                   <option key="3" value="expenses">Affichage des autres comptes tiers</option>
-                  {companies.filter(company => company.status != 200).length > 0 && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
+                  {!isAllValid && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
                 </select>}
               <button onClick={this.synchroniseAll}>
                 Synchroniser les données
