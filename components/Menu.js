@@ -5,7 +5,7 @@ import React from 'react';
 // Libraries
 import indics from '../lib/indics.json';
 
-export function Menu({selectedSection, changeSection, downloadSession, importSession}) 
+export function Menu({selectedSection, changeSection, downloadSession, importSession, progression}) 
 {
 
   const triggerImportFile = () => {document.getElementById('import-session').click()};
@@ -18,16 +18,16 @@ export function Menu({selectedSection, changeSection, downloadSession, importSes
         <div className="menu-items-group">
 
           <button className={"menu-button"+("legalData"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("legalData")}>Unité Légale</button>
+                  onClick = {() => changeSection("legalData")}>Unité Légale {progression.legalUnitOK && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
           
           <button className={"menu-button"+("financialData"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("financialData")} >Ecritures comptables</button>
+                  onClick = {() => changeSection("financialData")} >Ecritures comptables {progression.financialDataOK && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
           
           <button className={"menu-button"+("companies"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("companies")} >Fournisseurs</button>
+                  onClick = {() => changeSection("companies")} >Fournisseurs {(progression.financialDataOK && progression.companiesOK) && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
           
           <button className={"menu-button"+("initialStates"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("initialStates")} >Etats initiaux</button>
+                  onClick = {() => changeSection("initialStates")} >Etats initiaux {(progression.financialDataOK && progression.initialStatesOK) && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
         </div>
 
         <div className="menu-items-group">
