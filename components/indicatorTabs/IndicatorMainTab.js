@@ -189,6 +189,7 @@ class TableMain extends React.Component {
             {impactAbsolu ? <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountIntermediateConsumption()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
           </tr>
+        {financialData.stocks.filter(stock => !stock.isProductionStock).length > 0 &&
           <tr>
             <td>&emsp;Variation de stocks</td>
             <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
@@ -198,7 +199,7 @@ class TableMain extends React.Component {
             <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
             {impactAbsolu ? <td className="column_value">{printValue(-session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)}</td> : null}
             {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-          </tr>
+          </tr>}
         {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => {
           const indicator = session.getExpensesAccountIndicator(account,indic);
           return (
