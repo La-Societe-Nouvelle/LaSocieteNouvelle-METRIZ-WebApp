@@ -1,5 +1,6 @@
 // La Societe Nouvelle
 
+// React
 import React from 'react';
 
 // Libraries
@@ -7,10 +8,11 @@ import indics from '../lib/indics.json';
 
 export function Menu({selectedSection, changeSection, downloadSession, importSession, progression}) 
 {
-
+  // import file
   const triggerImportFile = () => {document.getElementById('import-session').click()};
   const importFile = (event) => {importSession((event.target.files)[0])}
   
+  // render
   return (
     <div className="menu">
       <h2>MENU</h2>

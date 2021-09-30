@@ -28,9 +28,7 @@ export class InitialStatesSection extends React.Component {
     const isAllValid = !(financialData.immobilisations.concat(financialData.stocks)
                                                       .filter(account => account.initialState=="defaultData" && !account.dataFetched)
                                                       .length > 0);
-    console.log(financialData.immobilisations.concat(financialData.stocks)
-    .filter(account => account.initialState=="defaultData" && !account.dataFetched))
-
+    
     return (
       <div className="section-view">
         <div className="section-view-header">
@@ -71,6 +69,7 @@ export class InitialStatesSection extends React.Component {
                                                                       .map(async immobilisation => await this.fetchDefaultData(immobilisation)));
     this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData});
+    this.props.updateMenu();
   }
 
   fetchDefaultData = async (stockOrImmobilisation) => 
@@ -84,6 +83,7 @@ export class InitialStatesSection extends React.Component {
   updateFootprints = () => {
     this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData})
+    this.props.updateMenu();
   }
 
 }

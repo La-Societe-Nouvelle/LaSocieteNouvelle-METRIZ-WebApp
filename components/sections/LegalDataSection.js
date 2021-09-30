@@ -90,6 +90,7 @@ export class LegalDataSection extends React.Component {
     await legalUnit.setSiren(siren);
     this.initImpactsData();
     this.setState({siren: siren})
+    this.props.updateMenu();
   }
 
   initImpactsData = () =>
@@ -118,6 +119,7 @@ export class LegalDataSection extends React.Component {
   {
     this.props.session.legalUnit.setYear(year);
     this.setState({year: year})
+    this.props.updateMenu();
   }
 
 }

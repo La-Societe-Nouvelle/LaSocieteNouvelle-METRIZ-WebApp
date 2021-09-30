@@ -123,6 +123,7 @@ export class FinancialDataSection extends React.Component {
       .then(() => 
       {
         this.setState({importedData: null});
+        this.props.updateMenu();
       })
   }
 

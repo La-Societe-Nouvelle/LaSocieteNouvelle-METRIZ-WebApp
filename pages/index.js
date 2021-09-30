@@ -147,25 +147,43 @@ class Metriz extends React.Component {
   {
     const {session} = this.state;
 
+    const sectionProps = {
+      session: session,
+      updateMenu: () => this.changeSection.bind(this)(selectedSection)
+    }
+
     switch(selectedSection)
     {
-      case "legalData" : return(<LegalDataSection session={session}/>)
-      case "financialData" : return(<FinancialDataSection session={session}/>)
-      case "companies" : return(<CompaniesSection session={session}/>)
-      case "initialStates" : return(<InitialStatesSection session={session}/>)
-      case "art" : return(<IndicatorSection session={session} indic="art"/>)
-      case "dis" : return(<IndicatorSection session={session} indic="dis"/>)
-      case "eco" : return(<IndicatorSection session={session} indic="eco"/>)
-      case "geq" : return(<IndicatorSection session={session} indic="geq"/>)
-      case "ghg" : return(<IndicatorSection session={session} indic="ghg"/>)
-      case "haz" : return(<IndicatorSection session={session} indic="haz"/>)
-      case "knw" : return(<IndicatorSection session={session} indic="knw"/>)
-      case "mat" : return(<IndicatorSection session={session} indic="mat"/>)
-      case "nrg" : return(<IndicatorSection session={session} indic="nrg"/>)
-      case "soc" : return(<IndicatorSection session={session} indic="soc"/>)
-      case "was" : return(<IndicatorSection session={session} indic="was"/>)
-      case "wat" : return(<IndicatorSection session={session} indic="wat"/>)
+      case "legalData" : return(<LegalDataSection {...sectionProps}/>)
+      case "financialData" : return(<FinancialDataSection {...sectionProps}/>)
+      case "companies" : return(<CompaniesSection {...sectionProps}/>)
+      case "initialStates" : return(<InitialStatesSection {...sectionProps}/>)
+      case "art" : return(<IndicatorSection {...sectionProps} indic="art"/>)
+      case "dis" : return(<IndicatorSection {...sectionProps} indic="dis"/>)
+      case "eco" : return(<IndicatorSection {...sectionProps} indic="eco"/>)
+      case "geq" : return(<IndicatorSection {...sectionProps} indic="geq"/>)
+      case "ghg" : return(<IndicatorSection {...sectionProps} indic="ghg"/>)
+      case "haz" : return(<IndicatorSection {...sectionProps} indic="haz"/>)
+      case "knw" : return(<IndicatorSection {...sectionProps} indic="knw"/>)
+      case "mat" : return(<IndicatorSection {...sectionProps} indic="mat"/>)
+      case "nrg" : return(<IndicatorSection {...sectionProps} indic="nrg"/>)
+      case "soc" : return(<IndicatorSection {...sectionProps} indic="soc"/>)
+      case "was" : return(<IndicatorSection {...sectionProps} indic="was"/>)
+      case "wat" : return(<IndicatorSection {...sectionProps} indic="wat"/>)
     }
+  }
+
+  /* ----- PROGESSION ---- */
+
+  getProgression = (session) =>
+  {
+    const progression = {
+      legalUnitOK: session.legalUnit.dataFetched && /[0-9]{4}/.test(session.legalUnit.year),
+      financialDataOK: session.financialData.isFinancialDataLoaded,
+      companiesOK: !(session.financialData.companies.filter(company => company.status != 200).length > 0),
+      initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0)
+    }
+    return progression;
   }
 
 }

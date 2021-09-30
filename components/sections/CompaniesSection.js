@@ -107,6 +107,7 @@ export class CompaniesSection extends React.Component {
   {
     this.props.session.updateFootprints();
     this.setState({companies: this.props.session.financialData.companies});
+    this.props.updateMenu();
   }
 
   changeView = (event) => this.setState({view : event.target.value})
@@ -154,7 +155,6 @@ export class CompaniesSection extends React.Component {
     let jsonContent = await this.props.session.financialData.companies.filter(company => company.account.charAt(0) != "_")
                                                                       .map(company => {return({denomination: company.corporateName, siren: company.corporateId})});
     let fileProps = {wsclos: [{wch:50},{wch:20}]};
-    console.log(jsonContent);
     // write file (JSON -> ArrayBuffer)
     let file = await XLSXFileWriterFromJSON(fileProps,"fournisseurs",jsonContent);
     // trig download
@@ -179,6 +179,7 @@ export class CompaniesSection extends React.Component {
     if (this.props.session.financialData.companies.filter(company => company.status != 200).length > 0) this.state.view = "unsync";
     this.setState({companies: this.props.session.financialData.companies});
     this.props.session.updateFootprints();
+    this.props.updateMenu();
   }
 
 }
