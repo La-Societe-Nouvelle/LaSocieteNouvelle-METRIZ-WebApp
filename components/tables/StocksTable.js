@@ -33,9 +33,9 @@ export class StocksTable extends React.Component {
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant (N)</td>
-              <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("prevAmount")}>Montant (N-1)</td>
-              <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("variation")}>Variation</td>
+              <td className="short center" colSpan="2" >Montant (N)</td>
+              <td className="short center" colSpan="2" >Montant (N-1)</td>
+              <td className="short center" colSpan="2" >Variation</td>
             </tr>
           </thead>
           <tbody>
@@ -100,12 +100,14 @@ export class StocksTable extends React.Component {
 
   sortItems(items,columSorted) 
   {
-    switch(columSorted) {
-      case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
+    switch(columSorted) 
+    {
+      case "label": items.sort((a,b) => a.accountLib.localeCompare(b.accountLib)); break;
       case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
-      case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
-      case "amount": items.sort((a,b) => b.amount - a.amount); break;
-      case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;
+      //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
+      //case "amount": items.sort((a,b) => b.amount - a.amount); break;
+      //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;
+      // ...les valeurs affichées sont les valeurs nettes comptables (différentes des valeurs "amount")
     }
     if (this.state.reverseSort) items.reverse();
   }

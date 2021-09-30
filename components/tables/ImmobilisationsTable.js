@@ -33,9 +33,9 @@ export class ImmobilisationsTable extends React.Component {
             <tr>
               <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td className="auto" onClick={() => this.changeColumnSorted("accountLib")}>Libellé</td>
-              <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant (N)</td>
-              <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("prevAmount")}>Montant (N-1)</td>
-              <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("variation")}>Variation</td>
+              <td className="short" colSpan="2" >Montant (N)</td>
+              <td className="short" colSpan="2" >Montant (N-1)</td>
+              <td className="short" colSpan="2" >Variation</td>
             </tr>
           </thead>
           <tbody>
@@ -85,13 +85,16 @@ export class ImmobilisationsTable extends React.Component {
 
   sortItems(items,columSorted) 
   {
+    console.log(columSorted);
+    console.log(items.sort((a,b) => b.amount - a.amount));
     switch(columSorted) 
     {
       case "accountLib": items.sort((a,b) => a.accountLib.localeCompare(b.accountLib)); break;
       case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
-      case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
-      case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;
-      case "amount": items.sort((a,b) => b.amount - a.amount); break;
+      //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
+      //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;
+      //case "amount": items.sort((a,b) => b.amount - a.amount); break;
+      // ...les valeurs affichées sont les valeurs nettes comptables (différentes des valeurs "amount")
     }
     if (this.state.reverseSort) items.reverse();
   }
