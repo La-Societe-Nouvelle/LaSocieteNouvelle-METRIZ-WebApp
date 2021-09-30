@@ -59,18 +59,12 @@ export class CompaniesSection extends React.Component {
           <div className="group"><h3>Liste des fournisseurs</h3>
 
             <div className="actions">
-              <button onClick={() => document.getElementById('import-companies-csv').click()}>
-                Importer un fichier CSV
+              <button onClick={() => document.getElementById('import-companies').click()}>
+                Importer un fichier (.csv, .xlsx)
               </button>
-              <input id="import-companies-csv" visibility="collapse"
-                     type="file" accept=".csv" 
-                     onChange={this.importCSVFile}/>
-              <button onClick={() => document.getElementById('import-companies-xlsx').click()}>
-                Importer un fichier XLSX
-              </button>
-                <input id="import-companies-xlsx" visibility="collapse"
-                       type="file" accept=".xlsx" 
-                       onChange={this.importXLSXFile}/>
+              <input id="import-companies" visibility="collapse"
+                     type="file" accept=".csv,.xlsx" 
+                     onChange={this.importFile}/>
               <button onClick={this.exportXLSXFile}>
                 Télécharger modèle XLSX
               </button>
@@ -114,11 +108,20 @@ export class CompaniesSection extends React.Component {
 
   /* ----- IMPORTS ----- */
 
-  // Import CSV File
-  importCSVFile = (event) => 
+  importFile = (event) =>
   {
     let file = event.target.files[0];
-    
+    let extension = file.name.split('.').pop();
+    switch (extension)
+    {
+      case "csv": this.importCSVFile(file); break;
+      case "xlsx": this.importXLSXFile(file); break;
+    }
+  }
+
+  // Import CSV File
+  importCSVFile = (file) => 
+  {    
     let reader = new FileReader();
     reader.onload = async () => 
       CSVFileReader(reader.result)
@@ -129,10 +132,8 @@ export class CompaniesSection extends React.Component {
   }
 
   // Import XLSX File
-  importXLSXFile = (event) => 
-  {
-    let file = event.target.files[0];
-    
+  importXLSXFile = (file) => 
+  {    
     let reader = new FileReader();
     reader.onload = async () => 
       XLSXFileReader(reader.result)
