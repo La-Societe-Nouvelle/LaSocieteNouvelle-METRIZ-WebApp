@@ -64,9 +64,13 @@ export class InitialStatesSection extends React.Component {
   // Synchronisation
   async synchroniseAll() 
   {
-    await Promise.all(this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks)
-                                                                      .filter(immobilisation => immobilisation.initialState == "defaultData")
-                                                                      .map(async immobilisation => await this.fetchDefaultData(immobilisation)));
+    for (let stockAccount of this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks).filter(immobilisation => immobilisation.initialState == "defaultData")) 
+    {
+      console.log(stockAccount.accountLib);
+      await stockAccount.updatePrevFootprintFromRemote();
+      this.setState({financialData: this.props.session.financialData});
+      await new Promise(r => setTimeout(r, 10));
+    }
     this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData});
     this.props.updateMenu();
