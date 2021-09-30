@@ -49,7 +49,7 @@ export class ExpensesTable extends React.Component {
             {expensesByAccount.map(({account,amount,accountLib}) => 
               <tr key={account}>
                 <td className="short center">{account}</td>
-                <td className="auto">{accountLib}</td>
+                <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
                 <td className="short right">{printValue(amount,0)}</td>
                 <td className="column_unit">&nbsp;€</td>
               </tr>)}
