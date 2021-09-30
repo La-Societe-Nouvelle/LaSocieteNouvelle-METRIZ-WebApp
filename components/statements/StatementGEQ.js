@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementGEQ extends React.Component {
 
   constructor(props) {
@@ -33,12 +34,9 @@ export class StatementGEQ extends React.Component {
         </div>
         <div className="statement-item">
           <label>Ecart de rémunarations F/H (en % du taux horaire brut moyen)</label>
-          <input className="input-value"
-                 value={wageGap}
-                 onChange={this.onWageGapChange}
-                 onBlur={this.onWageGapBlur}
-                 disabled={hasEmployees === false}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={wageGap}
+                       disabled={hasEmployees === false}
+                       onUpdate={this.updateWageGap}/>
           <span>&nbsp;%</span>
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
@@ -48,28 +46,25 @@ export class StatementGEQ extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
   onHasEmployeesChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
-        this.props.impactsData.setHasEmployees(true); 
+        this.props.impactsData.setHasEmployees(true);
+        this.props.impactsData.wageGap = null;
         break;
       case "false": 
         this.props.impactsData.setHasEmployees(false); 
+        this.props.impactsData.wageGap = 0;
         break;
     }
     this.setState({wageGap: valueOrDefault(this.props.impactsData.wageGap, "")});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onWageGapChange = (event) => {
-    this.setState({wageGap: event.target.value});
-  }
-  onWageGapBlur = (event) => {
-    let wageGap = parseFloat(event.target.value);
-    this.props.impactsData.wageGap =!isNaN(wageGap) ? wageGap : null;
+  updateWageGap = (input) => {
+    this.props.impactsData.wageGap = input;
+    this.setState({wageGap: this.props.impactsData.wageGap});
     this.props.onUpdate(this.props.impactsData);
   }
 

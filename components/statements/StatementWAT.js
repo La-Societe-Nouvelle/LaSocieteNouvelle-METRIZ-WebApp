@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementWAT extends React.Component {
 
   constructor(props) {
@@ -18,44 +19,28 @@ export class StatementWAT extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Consommation totale d'eau</label>
-          <input className="input-value" 
-                 value={waterConsumption}
-                 onChange={this.onConsumptionChange}
-                 onBlur={this.onConsumptionBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={waterConsumption}
+                       onUpdate={this.updateWaterConsumption}/>
           <span>&nbsp;m3</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <input className="input-value" 
-                 value={waterConsumptionUncertainty}
-                 onChange={this.onUncertaintyChange}
-                 onBlur={this.onUncertaintyBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={waterConsumptionUncertainty}
+                       onUpdate={this.updateWaterConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
       </div>
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
-  onConsumptionChange = (event) => {
-    this.setState({waterConsumption: event.target.value});
-  }
-  onConsumptionBlur = (event) => {
-    let waterConsumption = parseFloat(event.target.value);
-    this.props.impactsData.setWaterConsumption(!isNaN(waterConsumption) ? waterConsumption : null);
-    this.setState({waterConsumptionUncertainty: valueOrDefault(this.props.impactsData.waterConsumptionUncertainty, "")});
+  updateWaterConsumption = (input) => {
+    this.props.impactsData.setWaterConsumption(input);
+    this.setState({waterConsumptionUncertainty: this.props.impactsData.waterConsumptionUncertainty});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onUncertaintyChange = (event) => {
-    this.setState({waterConsumptionUncertainty: event.target.value});
-  }
-  onUncertaintyBlur = (event) => {
-    let uncertainty = parseFloat(event.target.value);
-    this.props.impactsData.waterConsumptionUncertainty = !isNaN(uncertainty) ? uncertainty : null;
+  updateWaterConsumptionUncertainty = (input) => {
+    this.props.impactsData.waterConsumptionUncertainty = input;
     this.props.onUpdate(this.props.impactsData);
   }
 

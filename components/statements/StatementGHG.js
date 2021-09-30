@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementGHG extends React.Component {
 
   constructor(props) {
@@ -16,11 +17,8 @@ export class StatementGHG extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
-          <input className="input-value" 
-                 value={greenhousesGazEmissions}
-                 onChange={this.onEmissionsChange}
-                 onBlur={this.onEmissionsBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={greenhousesGazEmissions}
+                       onUpdate={this.updateGreenhousesGazEmissions}/>
           <span>&nbsp;kgCO2e</span>
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
@@ -28,35 +26,22 @@ export class StatementGHG extends React.Component {
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <input className="input-value" 
-                 value={greenhousesGazEmissionsUncertainty}
-                 onChange={this.onEmissionsUncertaintyChange}
-                 onBlur={this.onEmissionsUncertaintyBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={greenhousesGazEmissionsUncertainty}
+                       onUpdate={this.updateGreenhousesGazEmissionsUncertainty}/>
           <span>&nbsp;%</span>
         </div>
       </div>
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
-  onEmissionsChange = (event) => {
-    this.setState({greenhousesGazEmissions: event.target.value})
-  }
-  onEmissionsBlur = (event) => {
-    let emissions = parseFloat(event.target.value);
-    this.props.impactsData.setGreenhousesGazEmissions(!isNaN(emissions) ? emissions : null);
-    this.setState({greenhousesGazEmissionsUncertainty: valueOrDefault(this.props.impactsData.greenhousesGazEmissionsUncertainty, "")});
+  updateGreenhousesGazEmissions = (input) => {
+    this.props.impactsData.setGreenhousesGazEmissions(input);
+    this.setState({greenhousesGazEmissionsUncertainty: this.props.impactsData.greenhousesGazEmissionsUncertainty});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onEmissionsUncertaintyChange = (event) => {
-    this.setState({greenhousesGazEmissionsUncertainty: event.target.value})
-  }
-  onEmissionsUncertaintyBlur = (event) => {
-    let uncertainty = parseFloat(event.target.value);
-    this.props.impactsData.greenhousesGazEmissionsUncertainty = !isNaN(uncertainty) ? uncertainty : 25;
+  updateGreenhousesGazEmissionsUncertainty = (input) => {
+    this.props.impactsData.greenhousesGazEmissionsUncertainty = input;
     this.props.onUpdate(this.props.impactsData);
   }
 

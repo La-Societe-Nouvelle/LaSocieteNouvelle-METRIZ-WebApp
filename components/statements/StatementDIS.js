@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementDIS extends React.Component {
 
   constructor(props) {
@@ -38,12 +39,9 @@ export class StatementDIS extends React.Component {
         </div>
         <div className="statement-item">
           <label>Indice de GINI des taux horaires bruts</label>
-          <input className="input-value"
-                 value={indexGini}
-                 onChange={this.onIndexGiniChange}
-                 onBlur={this.onIndexGiniBlur}
-                 disabled={hasEmployees === false}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={indexGini}
+                       disabled={hasEmployees === false}
+                       onUpdate={this.updateIndexGini}/>
           <span>&nbsp;/100</span>
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
@@ -53,29 +51,25 @@ export class StatementDIS extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
   onHasEmployeesChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
-        this.props.impactsData.setHasEmployees(true); 
+        this.props.impactsData.setHasEmployees(true);
+        this.props.impactsData.wageGap = null; 
         break;
       case "false": 
         this.props.impactsData.setHasEmployees(false);
+        this.props.impactsData.wageGap = 0;
         break;
     }
     this.setState({indexGini: valueOrDefault(this.props.impactsData.indexGini, "")});
     this.props.onUpdate(this.props.impactsData);
   }
-
-  onIndexGiniChange = (event) => {
-    this.setState({indexGini: event.target.value});
-  }
-
-  onIndexGiniBlur = (event) => {
-    let indexGini = parseFloat(event.target.value);
-    this.props.impactsData.indexGini = !isNaN(indexGini) ? indexGini : null;
+  
+  updateIndexGini = (input) => {
+    this.props.impactsData.indexGini = input;
+    this.setState({indexGini: this.props.impactsData.indexGini});
     this.props.onUpdate(this.props.impactsData);
   }
 

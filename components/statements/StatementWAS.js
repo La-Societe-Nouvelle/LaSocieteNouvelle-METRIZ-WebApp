@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementWAS extends React.Component {
 
   constructor(props) {
@@ -18,20 +19,14 @@ export class StatementWAS extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Productiont totale de déchets (y compris DAOM<sup>1</sup>)</label>
-          <input className="input-value" 
-                 value={wasteProduction} 
-                 onChange={this.onWasteProductionChange}
-                 onBlur={this.onWasteProductionBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={wasteProduction} 
+                       onUpdate={this.updateWasteProduction}/>
           <span>&nbsp;kg</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <input className="input-value" 
-                 value={wasteProductionUncertainty} 
-                 onChange={this.onUncertaintyChange}
-                 onBlur={this.onUncertaintyBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={wasteProductionUncertainty} 
+                       onUpdate={this.updateWasteProductionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
         <div className="notes">
@@ -41,24 +36,14 @@ export class StatementWAS extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
-  onWasteProductionChange = (event) => {
-    this.setState({wasteProduction: event.target.value});
-  }
-  onWasteProductionBlur = (event) => {
-    let wasteProduction = parseFloat(event.target.value);
-    this.props.impactsData.setWasteProduction(!isNaN(wasteProduction) ? wasteProduction : null);
-    this.setState({wasteProductionUncertainty: valueOrDefault(this.props.impactsData.wasteProductionUncertainty, "")});
+  updateWasteProduction = (input) => {
+    this.props.impactsData.setWasteProduction(input);
+    this.setState({wasteProductionUncertainty: this.props.impactsData.wasteProductionUncertainty});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onUncertaintyChange = (event) => {
-    this.setState({wasteProductionUncertainty: event.target.value});
-  }
-  onUncertaintyBlur = (event) => {
-    let uncertainty = parseFloat(event.target.value);
-    this.props.impactsData.wasteProductionUncertainty = !isNaN(uncertainty) ? uncertainty : null;
+  updateWasteProductionUncertainty = (input) => {
+    this.props.impactsData.wasteProductionUncertainty = input;
     this.props.onUpdate(this.props.impactsData);
   }
 

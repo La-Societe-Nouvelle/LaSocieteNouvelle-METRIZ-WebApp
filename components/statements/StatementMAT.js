@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementMAT extends React.Component {
 
   constructor(props) {
@@ -36,22 +37,16 @@ export class StatementMAT extends React.Component {
         </div>
         <div className="statement-item">
           <label>Quantité extraite de matières premières</label>
-          <input className="input-value"
-                 value={materialsExtraction}
-                 disabled={isExtractiveActivities === false}
-                 onChange={this.onExtractionChange}
-                 onBlur={this.onExtractionBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={materialsExtraction}
+                       disabled={isExtractiveActivities === false}
+                       onUpdate={this.updateMaterialsExtraction}/>
           <span>&nbsp;kg</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <input className="input-value" 
-                 value={materialsExtractionUncertainty}
-                 disabled={isExtractiveActivities === false}
-                 onChange={this.onUncertaintyChange}
-                 onBlur={this.onUncertaintyBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={materialsExtractionUncertainty}
+                       disabled={isExtractiveActivities === false}
+                       onUpdate={this.updateMaterialsExtractionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
       </div>
@@ -76,22 +71,15 @@ export class StatementMAT extends React.Component {
     })
   }
 
-  onExtractionChange = (event) => {
-    this.setState({materialsExtraction: event.target.value});
-  }
-  onExtractionBlur = (event) => {
-    let materialsExtraction = parseFloat(event.target.value);
-    this.props.impactsData.setMaterialsExtraction(!isNaN(materialsExtraction) ? materialsExtraction : null);
-    this.setState({materialsExtractionUncertainty: valueOrDefault(this.props.impactsData.materialsExtractionUncertainty, "")});
+  updateMaterialsExtraction = (input) => {
+    this.props.impactsData.setMaterialsExtraction(input);
+    this.setState({materialsExtractionUncertainty: this.props.impactsData.materialsExtractionUncertainty});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onUncertaintyChange = (event) => {
-    this.setState({materialsExtractionUncertainty: event.target.value})
-  }
-  onUncertaintyBlur = (event) => {
-    let uncertainty = parseFloat(event.target.value);
-    this.props.impactsData.materialsExtractionUncertainty = !isNaN(uncertainty) ? uncertainty : 25;
+  updateMaterialsExtractionUncertainty = (input) => {
+    this.props.impactsData.materialsExtractionUncertainty = input;
+    this.setState({materialsExtraction: this.props.impactsData.materialsExtraction});
     this.props.onUpdate(this.props.impactsData);
   }
 

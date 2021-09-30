@@ -1,5 +1,6 @@
 import React from 'react';
 import { printValueInput, valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementKNW extends React.Component {
 
   constructor(props) {
@@ -17,11 +18,8 @@ export class StatementKNW extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
-          <input className="input-value"
-                 value={printValueInput(researchAndTrainingContribution,0)} 
-                 onChange={this.onContributionChange}
-                 onBlur={this.onContributionBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={researchAndTrainingContribution} 
+                       onUpdate={this.updateResearchAndTrainingContribution}/>
           <span>&nbsp;€</span>
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
@@ -31,14 +29,8 @@ export class StatementKNW extends React.Component {
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
-  onContributionChange = (event) => {
-    this.setState({researchAndTrainingContribution: event.target.value});
-  }
-  onContributionBlur = (event) => {
-    let contribution = parseFloat(event.target.value);
-    this.props.impactsData.researchAndTrainingContribution = !isNaN(contribution) ? contribution : null;
+  updateResearchAndTrainingContribution = (input) => {
+    this.props.impactsData.researchAndTrainingContribution = input;
     this.props.onUpdate(this.props.impactsData);
   }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { printValue, valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 
 export class StatementECO extends React.Component {
 
@@ -43,43 +44,38 @@ export class StatementECO extends React.Component {
         </div>
         <div className="statement-item">
           <label>Valeur ajoutée nette produite en France</label>
-          <input className="input-value"
-                 value={printValue(domesticProduction,0)}
-                 onChange={this.onDomesticProductionChange}
-                 onBlur={this.onDomesticProductionBlur}
-                 disabled={isAllActivitiesInFrance!=null}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={domesticProduction}
+                       disabled={isAllActivitiesInFrance!=null}
+                       onUpdate={this.updateDomesticProduction}/>
           <span>&nbsp;€</span>
         </div>
       </div>
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
   onIsAllActivitiesInFranceChange = (event) => {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
         this.props.impactsData.setIsAllActivitiesInFrance(true);
+        this.props.impactsData.domesticProduction = this.props.impactsData.netValueAdded;
         break;
       case "null": 
-        this.props.impactsData.setIsAllActivitiesInFrance(null); 
+        this.props.impactsData.setIsAllActivitiesInFrance(null);
+        this.props.impactsData.domesticProduction = 0;
         break;
       case "false": 
-        this.props.impactsData.setIsAllActivitiesInFrance(false); 
+        this.props.impactsData.setIsAllActivitiesInFrance(false);
+        this.props.impactsData.domesticProduction = 0;
         break;
     }
     this.setState({domesticProduction: valueOrDefault(this.props.impactsData.domesticProduction, "")});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onDomesticProductionChange = (event) => {
-    this.setState({domesticProduction: event.target.value});
-  }
-  onDomesticProductionBlur = (event) => {
-    let domesticProduction = parseFloat(event.target.value);
-    this.props.impactsData.domesticProduction = !isNaN(domesticProduction) ? domesticProduction : null;
+  updateDomesticProduction = (input) => {
+    this.props.impactsData.domesticProduction = input;
+    this.setState({domesticProduction: this.props.impactsData.domesticProduction});
     this.props.onUpdate(this.props.impactsData);
   }
   

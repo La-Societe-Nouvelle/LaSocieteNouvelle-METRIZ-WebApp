@@ -1,5 +1,6 @@
 import React from 'react';
-import { printValue, valueOrDefault } from '../../src/utils/Utils';
+import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementART extends React.Component {
 
   constructor(props) {
@@ -13,6 +14,8 @@ export class StatementART extends React.Component {
   {
     const {isValueAddedCrafted} = this.props.impactsData;
     const {craftedProduction} = this.state;
+
+    console.log(craftedProduction);
 
     return (
       <div className="statement">
@@ -42,19 +45,14 @@ export class StatementART extends React.Component {
         </div>
         <div className="statement-item">
           <label>Part de la valeur ajoutée artisanale</label>
-          <input className="input-value"
-                 value={printValue(craftedProduction,0)} 
-                 onChange={this.oncraftedProductionChange}
-                 onBlur={this.oncraftedProductionBlur}
-                 disabled={isValueAddedCrafted!=null}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={roundValue(craftedProduction,0)}
+                       onUpdate={this.updateCraftedProduction.bind(this)}
+                       disabled={isValueAddedCrafted!=null}/>
           <span>&nbsp;€</span>
         </div>
       </div>
     ) 
   }
-
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
 
   onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
@@ -72,16 +70,13 @@ export class StatementART extends React.Component {
         this.props.impactsData.craftedProduction = 0; 
         break;
     }
-    this.setState({craftedProduction: valueOrDefault(this.props.impactsData.craftedProduction, "")});
+    this.setState({craftedProduction: this.props.impactsData.craftedProduction});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  oncraftedProductionChange = (event) => {
-    this.setState({craftedProduction: event.target.value});
-  }
-  oncraftedProductionBlur = (event) => {
-    let craftedProduction = parseFloat(event.target.value);
-    this.props.impactsData.craftedProduction = !isNaN(craftedProduction) ? craftedProduction : null;
+  updateCraftedProduction = (input) => {
+    this.props.impactsData.craftedProduction = input;
+    this.setState({craftedProduction: this.props.impactsData.craftedProduction});
     this.props.onUpdate(this.props.impactsData);
   }
 

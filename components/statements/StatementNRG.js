@@ -1,5 +1,6 @@
 import React from 'react';
 import { valueOrDefault } from '../../src/utils/Utils';
+import { InputNumber } from '../InputNumber';
 export class StatementNRG extends React.Component {
 
   constructor(props) {
@@ -18,11 +19,8 @@ export class StatementNRG extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Consommation totale d'énergie</label>
-          <input className="input-value" 
-                 value={energyConsumption}
-                 onChange={this.onConsumptionChange}
-                 onBlur={this.onConsumptionBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={energyConsumption}
+                       onUpdate={this.updateEnergyConsumption}/>
           <span>&nbsp;MJ</span>
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Outil de Mesure</button>
@@ -30,35 +28,22 @@ export class StatementNRG extends React.Component {
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <input className="input-value" 
-                 value={energyConsumptionUncertainty}
-                 onChange={this.onUncertaintyChange}
-                 onBlur={this.onUncertaintyBlur}
-                 onKeyPress={this.onEnterPress}/>
+          <InputNumber value={energyConsumptionUncertainty}
+                       onUpdate={this.updateEnergyConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
       </div>
     ) 
   }
 
-  onEnterPress = (event) => {if (event.which==13) event.target.blur()}
-
-  onConsumptionChange = (event) => {
-    this.setState({energyConsumption: event.target.value});
-  }
-  onConsumptionBlur = (event) => {
-    let energyConsumption = parseFloat(event.target.value);
-    this.props.impactsData.setEnergyConsumption(!isNaN(energyConsumption) ? energyConsumption : null);
-    this.setState({energyConsumptionUncertainty: valueOrDefault(this.props.impactsData.energyConsumptionUncertainty, "")});
+  updateEnergyConsumption = (input) => {
+    this.props.impactsData.setEnergyConsumption(input);
+    this.setState({energyConsumptionUncertainty: this.props.impactsData.energyConsumptionUncertainty});
     this.props.onUpdate(this.props.impactsData);
   }
 
-  onUncertaintyChange = (event) => {
-    this.setState({energyConsumptionUncertainty: event.target.value});
-  }
-  onUncertaintyBlur = (event) => {
-    let uncertainty = parseFloat(event.target.value);
-    this.props.impactsData.energyConsumptionUncertainty = !isNaN(uncertainty) ? uncertainty : 25;
+  updateEnergyConsumptionUncertainty = (input) => {
+    this.props.impactsData.energyConsumptionUncertainty = input;
     this.props.onUpdate(this.props.impactsData);
   }
 
