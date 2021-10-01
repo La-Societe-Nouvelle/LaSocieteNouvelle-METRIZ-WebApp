@@ -622,6 +622,26 @@ table
   }
 }
 
+.popup-container {
+  margin-left: 10%;
+  margin-right: 10%;
+
+  .progressbar {
+    height: 25px;
+    width: 500px;
+
+    .progressbar_shape {
+      height: 100%;
+      width: 100%;
+
+      rect {
+        height: 100%;
+        fill: $primary-color;
+      }
+    }
+  }
+}
+
 .popup {
   z-index: 1;
   position: fixed;
@@ -640,8 +660,9 @@ table
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  min-width: 500px;
-  min-height: 250px;
+  align-items: center;
+  min-width: 550px;
+  min-height: 100px;
   padding: 5px 25px;
   background-color: white;
   border: solid $primary-color 1px;

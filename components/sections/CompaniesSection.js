@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import Popup from 'reactjs-popup';
 
 // Components
 import { CompaniesTable } from '../tables/CompaniesTable';
@@ -12,6 +13,7 @@ import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 // Readers
 import { CSVFileReader, processCSVCompaniesData } from '/src/readers/CSVReader';
 import { XLSXFileReader } from '/src/readers/XLSXReader';
+import { ProgressBar } from '../popups/ProgressBar';
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -25,6 +27,8 @@ export class CompaniesSection extends React.Component {
     this.state = {
       companies: props.session.financialData.companies,
       view: "all",
+      fetching: false,
+      progression: 0,
     }
   }
 
@@ -37,7 +41,7 @@ export class CompaniesSection extends React.Component {
 
   render()
   {
-    const {companies,view} = this.state;
+    const {companies,view,fetching,progression} = this.state;
     const financialData = this.props.session.financialData;
 
     const expensesByCompanies = getExpensesByCompanies(financialData.expenses.concat(financialData.investments));
@@ -91,6 +95,12 @@ export class CompaniesSection extends React.Component {
           </div>
             
         </div>
+
+        <Popup open={fetching}>
+          <ProgressBar message="Récupération des données fournisseurs..."
+                        progression={progression}/>
+        </Popup>
+
       </div>
     )
   }
@@ -171,14 +181,16 @@ export class CompaniesSection extends React.Component {
   // Synchronisation
   synchroniseAll = async () => 
   {
+    this.setState({fetching: true, progression: 0})
+    let i = 0; let n = this.props.session.financialData.companies.length;
     for (let company of this.props.session.financialData.companies) 
     {
-      console.log(company.corporateName);
       await company.updateFromRemote();
-      await new Promise(r => setTimeout(r, 10));
+      i++;
+      this.setState({progression: Math.round((i/n)*100)})
     }
     if (this.props.session.financialData.companies.filter(company => company.status != 200).length > 0) this.state.view = "unsync";
-    this.setState({companies: this.props.session.financialData.companies});
+    this.setState({fetching: false, progression:0, companies: this.props.session.financialData.companies});
     this.props.session.updateFootprints();
     this.props.updateMenu();
   }

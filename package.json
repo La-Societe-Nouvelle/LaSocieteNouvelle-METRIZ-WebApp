@@ -24,6 +24,7 @@
     "react-google-charts": "^3.0.15",
     "react-markdown": "^6.0.3",
     "react-router-dom": "^5.2.0",
+    "reactjs-popup": "^2.0.5",
     "remark-gfm": "^1.0.0",
     "remark-html": "^14.0.0",
     "remark-parse": "^10.0.0",
