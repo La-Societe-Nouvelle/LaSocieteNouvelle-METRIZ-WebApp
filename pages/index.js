@@ -131,7 +131,7 @@ class Metriz extends React.Component {
 
       // JSON -> session
       const session = new Session(prevProps);
-      //await session.updateFromBackUp(backUp);
+      
       this.setState({
         session: session,
         selectedSection: "legalData"

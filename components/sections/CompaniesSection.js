@@ -66,7 +66,7 @@ export class CompaniesSection extends React.Component {
                      type="file" accept=".csv,.xlsx" 
                      onChange={this.importFile}/>
               <button onClick={this.exportXLSXFile}>
-                Télécharger modèle XLSX
+                Exporter (.xlsx)
               </button>
               {companies.length > 0 &&
                 <select value={view}

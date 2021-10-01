@@ -85,8 +85,6 @@ export class ImmobilisationsTable extends React.Component {
 
   sortItems(items,columSorted) 
   {
-    console.log(columSorted);
-    console.log(items.sort((a,b) => b.amount - a.amount));
     switch(columSorted) 
     {
       case "accountLib": items.sort((a,b) => a.accountLib.localeCompare(b.accountLib)); break;
