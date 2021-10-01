@@ -135,7 +135,7 @@ export class LegalUnit {
       else this.productionSectorFootprint = new SocialFootprint();
       
       // Value Added
-      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=NVA";
+      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=GVA";
       console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();

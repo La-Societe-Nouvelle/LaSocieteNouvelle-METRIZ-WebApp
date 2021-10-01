@@ -93,19 +93,24 @@ export class LegalDataSection extends React.Component {
     let {legalUnit,impactsData} = this.props.session;
 
     // ART
-    // ... check registreMetiers pour les établissements actifs (API response to upgrade)
+    if (this.props.session.legalUnit.isActivitesArtisanales!=null
+      && impactsData.isValueAddedCrafted==null) impactsData.isValueAddedCrafted = legalUnit.isActivitesArtisanales;
 
     // DIS-GEQ
-    if (this.props.session.legalUnit.isEmployeur!=null) impactsData.hasEmployees = legalUnit.isEmployeur;
+    if (this.props.session.legalUnit.isEmployeur!=null
+      && impactsData.hasEmployees==null) impactsData.hasEmployees = legalUnit.isEmployeur;
 
     // MAT
-    if (this.props.session.legalUnit.activityCode!=null) impactsData.isExtractiveActivities = ["01","02","03","05","06","07","08"].includes(legalUnit.activityCode.substring(0,2));
+    if (this.props.session.legalUnit.activityCode!=null
+      && impactsData.isExtractiveActivities==null) impactsData.isExtractiveActivities = ["01","02","03","05","06","07","08"].includes(legalUnit.activityCode.substring(0,2));
 
     // ECO
-    // ... init activités en France selon l'adresse des établissements (API response to upgrade)
+    if (this.props.session.legalUnit.isLocalisationEtranger!=null
+      && impactsData.isAllActivitiesInFrance==null) impactsData.isAllActivitiesInFrance = !legalUnit.isLocalisationEtranger;
 
     // SOC
-    if (this.props.session.legalUnit.isEconomieSocialeSolidaire!=null) impactsData.hasSocialPurpose = legalUnit.isEconomieSocialeSolidaire;
+    if (this.props.session.legalUnit.isEconomieSocialeSolidaire!=null
+      && impactsData.hasSocialPurpose==null) impactsData.hasSocialPurpose = legalUnit.isEconomieSocialeSolidaire;
   }
 
   /* --- EXERCICE --- */
