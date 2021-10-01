@@ -38,21 +38,7 @@ export class Session {
         this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
     // ---------------------------------------------------------------------------------------------------- //
     }
-
-    /* ---------- BACK UP ---------- */
-
-    async updateFromBackUp(backUp) 
-    {
-        await this.legalUnit.updateFromBackUp(backUp.legalUnit);        
-        await this.financialData.updateFromBackUp(backUp.financialData);
-        await this.impactsData.updateFromBackUp(backUp.impactsData);
-        
-        // rebuild footprints
-        Object.entries(backUp)
-              .filter(([label,_]) => /Footprint/.test(label))
-              .forEach(([label,footprint]) => this[label] = new SocialFootprint(footprint));
-    }
-
+    
     /* -------------------- GETTERS -------------------- */
 
     /* ---------- GENERAL ---------- */

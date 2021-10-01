@@ -17,7 +17,10 @@ import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciation
 // Meta data
 import { metaIndicators } from '/lib/indic';
 
+/* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
+/* ----------------------------------------------------------- */
+
 export class IndicatorSection extends React.Component {
 
   constructor(props) 

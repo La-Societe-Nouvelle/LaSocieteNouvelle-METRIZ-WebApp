@@ -5,10 +5,6 @@ import React from 'react';
 
 // Utils
 import { InputText } from '../InputText';
-import { printValue } from '/src/utils/Utils';
-
-// Libraries
-import indics from '/lib/indics.json'
 
 /* ------------------------------------------------------------ */
 /* -------------------- LEGAL DATA SECTION -------------------- */
@@ -27,8 +23,10 @@ export class LegalDataSection extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.session.legalUnit!=this.props.session.legalUnit) {
+  componentDidUpdate(prevProps) 
+  // ...update state when importing session
+  {
+    if (prevProps.session.legalUnit!==this.props.session.legalUnit) {
       this.setState({
         siren: this.props.session.legalUnit.siren || "",
         year: this.props.session.legalUnit.year || "",
@@ -53,7 +51,6 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input short">
               <label>Numéro de siren </label>
               <InputText value={siren} 
-                         //valid={/[0-9]{9}/.test(siren)}
                          onUpdate={this.updateSiren.bind(this)}/>
               {dataFetched && <img className="icon" src="/resources/icon_good.png" alt="refresh"/>}
             </div>
@@ -71,7 +68,6 @@ export class LegalDataSection extends React.Component {
             <div className="inline-input short">
               <label>Année de fin de l'exercice</label>
               <InputText value={year} 
-                         //valid={/[0-9]{4}/.test(year)}
                          onUpdate={this.updateYear.bind(this)}/>
               {/[0-9]{4}/.test(year) && <img className="icon" src="/resources/icon_good.png" alt="refresh"/>}
             </div>
@@ -86,10 +82,9 @@ export class LegalDataSection extends React.Component {
 
   updateSiren = async (siren) => 
   {
-    let legalUnit = this.props.session.legalUnit;
-    await legalUnit.setSiren(siren);
-    this.initImpactsData();
+    await this.props.session.legalUnit.setSiren(siren);
     this.setState({siren: siren})
+    this.initImpactsData();
     this.props.updateMenu();
   }
 
@@ -122,30 +117,4 @@ export class LegalDataSection extends React.Component {
     this.props.updateMenu();
   }
 
-}
-
-/* ---------- FOOTPRINT TABLE ---------- */
-
-function FootprintTable({session}) 
-{
-  const availableProductionFootprint = session.getProductionFootprint();
-  
-  return (
-    <table>
-      <thead>
-        <tr><td>Code</td><td>Indicateur</td><td colSpan="2">Valeur</td><td>Incertitude</td></tr>
-      </thead>
-      <tbody>
-        {Object.entries(indics).map(([indic,indicData]) => 
-          <tr key={indic}>
-            <td className="column_code">{indic.toUpperCase()}</td>
-            <td className="auto">{indicData.libelle}</td>
-            <td className="column_value">{printValue(availableProductionFootprint.getIndicator(indic).getValue(),1)}</td>
-            <td className="column_unit">&nbsp;{indicData.unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(availableProductionFootprint.getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          </tr>
-        )}
-      </tbody>
-    </table>
-  )
 }
