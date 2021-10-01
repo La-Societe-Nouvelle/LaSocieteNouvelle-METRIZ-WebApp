@@ -23,6 +23,8 @@ export class LegalUnit {
     this.isEmployeur = props.isEmployeur || null;
     this.trancheEffectifs = props.trancheEffectifs || "";
     this.isEconomieSocialeSolidaire = props.isEconomieSocialeSolidaire || null;
+    this.isActivitesArtisanales = props.isActivitesArtisanales || null;
+    this.isLocalisationEtranger = props.isLocalisationEtranger || null;
 
     // Accounting period
     this.year = props.year || "";
@@ -75,9 +77,11 @@ export class LegalUnit {
           this.areaCode = "FRA";
           this.activityCode = data.profil.descriptionUniteLegale.activitePrincipale;
 
-          this.isEmployeur = data.profil.descriptionUniteLegale.employeur;
+          this.isEmployeur = data.profil.descriptionUniteLegale.isEmployeur;
           this.trancheEffectifs = data.profil.descriptionUniteLegale.trancheEffectifs;
           this.isEconomieSocialeSolidaire = data.profil.descriptionUniteLegale.isEconomieSocialeSolidaire;
+          this.isActivitesArtisanales = data.profil.descriptionUniteLegale.isActivitesArtisanales;
+          this.isLocalisationEtranger = data.profil.descriptionUniteLegale.isLocalisationEtranger;
 
           this.dataFetched = true;
         } 
@@ -87,6 +91,11 @@ export class LegalUnit {
           this.corporateHeadquarters = "";
           this.areaCode = "FRA";
           this.activityCode = "00";
+          this.isEmployeur = null;
+          this.trancheEffectifs = null;
+          this.isEconomieSocialeSolidaire = null;
+          this.isActivitesArtisanales = null;
+          this.isLocalisationEtranger = null;
           this.dataFetched = false;
         }
       } 
@@ -98,6 +107,11 @@ export class LegalUnit {
       this.corporateHeadquarters = "";
       this.areaCode = "";
       this.activityCode = "";
+      this.isEmployeur = null;
+      this.trancheEffectifs = null;
+      this.isEconomieSocialeSolidaire = null;
+      this.isActivitesArtisanales = null;
+      this.isLocalisationEtranger = null;
       this.dataFetched = false;
     }
   }
