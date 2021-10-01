@@ -89,6 +89,7 @@ function Statement(props)
   let statementProps = {
     impactsData: props.session.impactsData,
     onUpdate: props.onUpdate,
+    onValidate: props.onValidate,
     toAssessment: () => props.onPrintDetails("assessment"),
   }
   switch(props.indic) {

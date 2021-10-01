@@ -55,16 +55,20 @@ export class IndicatorSection extends React.Component {
   buildTabView()
   {
     const goBackToMain = () => this.setState({selectedTab: "main"})
+    const changeSelectedTab = (nextSelectedTab) => this.setState({selectedTab: nextSelectedTab})
+
     const refreshDisplay = async () => {
       await this.props.session.updateFootprints();
       this.refMainTab.current.updateTable();
     }
-    const changeSelectedTab = (nextSelectedTab) => this.setState({selectedTab: nextSelectedTab})
+
+    const validateStatement = (indic) => this.props.session.validations[indic] = true
 
     switch(this.state.selectedTab) 
     {
       case "main" :           return(<MainTab {...this.props} 
                                               onUpdate={refreshDisplay.bind(this)} ref={this.refMainTab}
+                                              onValidate={validateStatement.bind(this)}
                                               onPrintDetails={changeSelectedTab.bind(this)}/>)
       case "assessment" :     return(<Assessment {...this.props}
                                                  onUpdate={refreshDisplay.bind(this)}

@@ -568,6 +568,13 @@ table {
 
   }
 
+  .statement-validation {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 5px;
+    justify-content: right;
+  }
+
   .notes {
     font-size: 12px;
     font-style: italic;

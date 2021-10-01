@@ -12,10 +12,10 @@ export class StatementART extends React.Component {
 
   render() 
   {
-    const {isValueAddedCrafted} = this.props.impactsData;
+    const {isValueAddedCrafted,netValueAdded} = this.props.impactsData;
     const {craftedProduction} = this.state;
 
-    console.log(craftedProduction);
+    let isValid = craftedProduction!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -50,6 +50,10 @@ export class StatementART extends React.Component {
                        disabled={isValueAddedCrafted!=null}/>
           <span>&nbsp;€</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
@@ -63,7 +67,7 @@ export class StatementART extends React.Component {
         break;
       case "null": 
         this.props.impactsData.isValueAddedCrafted = null;
-        this.props.impactsData.craftedProduction = 0;
+        this.props.impactsData.craftedProduction = null;
         break;
       case "false": 
         this.props.impactsData.isValueAddedCrafted = false;
@@ -79,5 +83,7 @@ export class StatementART extends React.Component {
     this.setState({craftedProduction: this.props.impactsData.craftedProduction});
     this.props.onUpdate(this.props.impactsData);
   }
+
+  onValidate = () => this.props.onValidate()
 
 }

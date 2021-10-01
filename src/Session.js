@@ -36,9 +36,12 @@ export class Session {
         this.depreciationExpensesFootprint = new SocialFootprint(props.depreciationExpensesFootprint);
 
         this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
+
+        // Validations
+        this.validations = props.validations || Object.keys(indics).map((indic) => {return({[indic]: false})});
     // ---------------------------------------------------------------------------------------------------- //
     }
-    
+
     /* -------------------- GETTERS -------------------- */
 
     /* ---------- GENERAL ---------- */
