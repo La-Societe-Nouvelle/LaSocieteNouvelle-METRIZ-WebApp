@@ -19,6 +19,13 @@ export class StatementGEQ extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.wageGap!=this.props.impactsData.wageGap) {
+      this.setState({wageGap: this.props.impactsData.wageGap});
+    }
+  }
+
   render() 
   {
     const {hasEmployees,netValueAdded} = this.props.impactsData;

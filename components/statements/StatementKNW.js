@@ -19,6 +19,13 @@ export class StatementKNW extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.researchAndTrainingContribution!=this.props.impactsData.researchAndTrainingContribution) {
+      this.setState({researchAndTrainingContribution: this.props.impactsData.researchAndTrainingContribution});
+    }
+  }
+
   render() 
   {
     const {netValueAdded} = this.props.impactsData;

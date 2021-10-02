@@ -18,6 +18,13 @@ export class StatementDIS extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.indexGini!=this.props.impactsData.indexGini) {
+      this.setState({indexGini: this.props.impactsData.indexGini});
+    }
+  }
+
   render() 
   {
     const {hasEmployees,netValueAdded} = this.props.impactsData;

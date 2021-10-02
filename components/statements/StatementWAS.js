@@ -20,6 +20,16 @@ export class StatementWAS extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.wasteProduction!=this.props.impactsData.wasteProduction) {
+      this.setState({wasteProduction: this.props.impactsData.wasteProduction});
+    }
+    if (this.state.wasteProductionUncertainty!=this.props.impactsData.wasteProductionUncertainty) {
+      this.setState({wasteProductionUncertainty: this.props.impactsData.wasteProductionUncertainty});
+    }
+  }
+
   render() 
   {
     const {netValueAdded} = this.props.impactsData;

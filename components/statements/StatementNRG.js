@@ -20,6 +20,16 @@ export class StatementNRG extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.energyConsumption!=this.props.impactsData.energyConsumption) {
+      this.setState({energyConsumption: this.props.impactsData.energyConsumption});
+    }
+    if (this.state.energyConsumptionUncertainty!=this.props.impactsData.energyConsumptionUncertainty) {
+      this.setState({energyConsumptionUncertainty: this.props.impactsData.energyConsumptionUncertainty});
+    }
+  }
+
   render() 
   {
     const {netValueAdded} = this.props.impactsData;

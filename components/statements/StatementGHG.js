@@ -20,6 +20,16 @@ export class StatementGHG extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.greenhousesGazEmissions!=this.props.impactsData.greenhousesGazEmissions) {
+      this.setState({greenhousesGazEmissions: this.props.impactsData.greenhousesGazEmissions});
+    }
+    if (this.state.greenhousesGazEmissionsUncertainty!=this.props.impactsData.greenhousesGazEmissionsUncertainty) {
+      this.setState({greenhousesGazEmissionsUncertainty: this.props.impactsData.greenhousesGazEmissionsUncertainty});
+    }
+  }
+
   render() 
   {
     const {netValueAdded} = this.props.impactsData;

@@ -32,6 +32,13 @@ export class StatementART extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.craftedProduction!=this.props.impactsData.craftedProduction) {
+      this.setState({craftedProduction: this.props.impactsData.craftedProduction});
+    }
+  }
+
   render() 
   {
     const {isValueAddedCrafted,netValueAdded} = this.props.impactsData;

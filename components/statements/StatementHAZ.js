@@ -20,6 +20,16 @@ export class StatementHAZ extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.hazardousSubstancesConsumption!=this.props.impactsData.hazardousSubstancesConsumption) {
+      this.setState({hazardousSubstancesConsumption: this.props.impactsData.hazardousSubstancesConsumption});
+    }
+    if (this.state.hazardousSubstancesConsumptionUncertainty!=this.props.impactsData.hazardousSubstancesConsumptionUncertainty) {
+      this.setState({hazardousSubstancesConsumptionUncertainty: this.props.impactsData.hazardousSubstancesConsumptionUncertainty});
+    }
+  }
+
   render() 
   {
     const {netValueAdded} = this.props.impactsData;

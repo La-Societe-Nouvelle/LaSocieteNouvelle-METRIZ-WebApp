@@ -20,6 +20,16 @@ export class StatementMAT extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.materialsExtraction!=this.props.impactsData.materialsExtraction) {
+      this.setState({materialsExtraction: this.props.impactsData.materialsExtraction});
+    }
+    if (this.state.materialsExtractionUncertainty!=this.props.impactsData.materialsExtractionUncertainty) {
+      this.setState({materialsExtractionUncertainty: this.props.impactsData.materialsExtractionUncertainty});
+    }
+  }
+
   render() 
   {
     const {isExtractiveActivities,netValueAdded} = this.props.impactsData;

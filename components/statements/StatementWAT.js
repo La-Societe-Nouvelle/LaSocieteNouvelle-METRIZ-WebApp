@@ -20,6 +20,16 @@ export class StatementWAT extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.waterConsumption!=this.props.impactsData.waterConsumption) {
+      this.setState({waterConsumption: this.props.impactsData.waterConsumption});
+    }
+    if (this.state.waterConsumptionUncertainty!=this.props.impactsData.waterConsumptionUncertainty) {
+      this.setState({waterConsumptionUncertainty: this.props.impactsData.waterConsumptionUncertainty});
+    }
+  }
+
   render() 
   {
     const {netValueAdded} = this.props.impactsData;

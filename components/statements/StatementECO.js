@@ -19,6 +19,13 @@ export class StatementECO extends React.Component {
     }
   }
 
+  componentDidUpdate() 
+  {
+    if (this.state.domesticProduction!=this.props.impactsData.domesticProduction) {
+      this.setState({domesticProduction: this.props.impactsData.domesticProduction});
+    }
+  }
+
   render() 
   {
     const {isAllActivitiesInFrance,netValueAdded} = this.props.impactsData;
