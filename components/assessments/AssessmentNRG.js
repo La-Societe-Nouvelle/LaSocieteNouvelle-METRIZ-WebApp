@@ -37,10 +37,10 @@ export class AssessmentNRG extends React.Component {
     this.state = 
     {
       // total consumption & uncertainty
-      energyConsumption: props.session.impactsData.energyConsumption,
-      energyConsumptionUncertainty: props.session.impactsData.energyConsumptionUncertainty,
+      energyConsumption: props.impactsData.energyConsumption,
+      energyConsumptionUncertainty: props.impactsData.energyConsumptionUncertainty,
       // details (by products)
-      nrgDetails: props.session.impactsData.nrgDetails,
+      nrgDetails: props.impactsData.nrgDetails,
       // adding new product
       newFossilProduct: false,
       newBiomassProduct: false
@@ -59,19 +59,19 @@ export class AssessmentNRG extends React.Component {
 
   render() 
   {
-    const {netValueAdded} = this.props.session.impactsData;
+    const {netValueAdded} = this.props.impactsData;
     const {energyConsumption,energyConsumptionUncertainty,nrgDetails} = this.state;
     const {newFossilProduct,newBiomassProduct} = this.state;
 
     return (
-      <div className="indicator-section-view">
+      <div className="assessment">
 
         <div className="view-header">
           <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
           <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 
-        <div className="group assessment"><h3>Outil de mesure</h3>
+        <div className="group"><h3>Outil de mesure</h3>
 
           <table>
             <thead>
@@ -302,14 +302,14 @@ export class AssessmentNRG extends React.Component {
 
   onSubmit = async () =>
   {
-    let {impactsData} = this.props.session;
+    let {impactsData} = this.props;
 
     // update ng data
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = this.state.energyConsumption;
     impactsData.energyConsumptionUncertainty = this.state.energyConsumptionUncertainty;
 
-    await this.props.session.updateIndicator("nrg");
+    await this.props.onUpdate("nrg");
 
     // update ghg data
     // ...details
@@ -343,7 +343,7 @@ export class AssessmentNRG extends React.Component {
                                                 .map(([key,data]) => data.ghgEmissions)
                                                 .reduce((a,b) => a + b,0);
 
-    await this.props.session.updateIndicator("ghg");
+    await this.props.onUpdate("ghg");
   }
 
   getTotalNrgConsumption() 

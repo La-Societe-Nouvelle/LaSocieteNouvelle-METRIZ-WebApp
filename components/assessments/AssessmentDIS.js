@@ -20,6 +20,18 @@ import { getNewId,roundValue } from '/src/utils/Utils';
    it's also used for KNW with the training hourse and the training contracts 
 */
 
+/** Component in IndicatorSection
+ *  Props : 
+ *    - impactsData
+ *    - onGoBack -> close popup
+ *  Behaviour :
+ *    Edit directly impactsData (session) on inputs blur
+ *    Redirect to assessment tool (if defined)
+ *    Update footprints on validation
+ *  State :
+ *    inputs
+ */
+
 export class AssessmentDIS extends React.Component {
 
   constructor(props) {
@@ -27,10 +39,10 @@ export class AssessmentDIS extends React.Component {
     this.state = 
     {
       // gini index
-      indexGini: props.session.impactsData.indexGini,
+      indexGini: props.impactsData.indexGini,
       // details
-      hasEmployees: props.session.impactsData.hasEmployees,
-      employees: props.session.impactsData.employees,
+      hasEmployees: props.impactsData.hasEmployees,
+      employees: props.impactsData.employees,
       // display
       columnSorted: "id",
       reverseSort: false,
@@ -56,17 +68,9 @@ export class AssessmentDIS extends React.Component {
     }
 
     return(
-      <div className="indicator-section-view">
+      <div className="assessment">
 
-        <div className="view-header">
-          <button className="retour" 
-                  onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className="retour" 
-                  disabled={!isAllValid}
-                  onClick = {() => this.onSubmit()}>Valider</button>
-        </div>
-
-        <div className="group assessment"><h3>Données sociales</h3>
+        <div className="group"><h3>Données sociales</h3>
           <div className="actions">
             <button onClick={() => document.getElementById('import-companies-csv').click()}>
               Importer un fichier CSV
@@ -124,6 +128,15 @@ export class AssessmentDIS extends React.Component {
           </div>
           
         </div>
+
+        <div className="view-footer">
+        <button className="retour" 
+                  onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className="retour" 
+                  disabled={!isAllValid}
+                  onClick = {() => this.onSubmit()}>Valider</button>
+        </div>
+
       </div>
     )
   }
@@ -137,16 +150,16 @@ export class AssessmentDIS extends React.Component {
 
     // update dis data
     impactsData.indexGini = getIndexGini(impactsData.employees),1;
-    await this.props.session.updateIndicator("dis");
+    await this.props.onUpdate("dis");
 
     // update geq data
     impactsData.wageGap = getGenderWageGap(impactsData.employees);
-    await this.props.session.updateIndicator("geq");
+    await this.props.onUpdate("geq");
 
     // update knw data
     impactsData.knwDetails.apprenticesRemunerations = getApprenticesRemunerations(impactsData.employees);
     impactsData.knwDetails.employeesTrainingsCompensations = getEmployeesTrainingCompensations(impactsData.employees);
-    await this.props.session.updateIndicator("knw");
+    await this.props.onUpdate("knw");
     
     this.props.onGoBack();
   }
@@ -162,8 +175,8 @@ export class AssessmentDIS extends React.Component {
     reader.onload = async () => 
       CSVFileReader(reader.result)
         .then((content) => SocialDataContentReader(content))
-        .then((data) => this.props.session.impactsData.employees = data.employees)
-        .then(() => this.setState({employees: this.props.session.impactsData.employees}));
+        .then((data) => this.props.impactsData.employees = data.employees)
+        .then(() => this.setState({employees: this.props.impactsData.employees}));
     reader.readAsText(file);
   }
 
@@ -176,8 +189,8 @@ export class AssessmentDIS extends React.Component {
     reader.onload = async () => 
       XLSXFileReader(reader.result)
         .then((XLSXData) => SocialDataContentReader(XLSXData))
-        .then((data) => this.props.session.impactsData.employees = data.employees)
-        .then(() => this.setState({employees: this.props.session.impactsData.employees}));
+        .then((data) => this.props.impactsData.employees = data.employees)
+        .then(() => this.setState({employees: this.props.impactsData.employees}));
     reader.readAsArrayBuffer(file);
   }
 
@@ -199,7 +212,7 @@ export class AssessmentDIS extends React.Component {
   // Delete all
   deleteAll = () =>
   {
-    this.props.session.impactsData.employees = [];
+    this.props.impactsData.employees = [];
     this.setState({employees: []});
   }
 
@@ -228,10 +241,10 @@ export class AssessmentDIS extends React.Component {
   // Update
   updateSocialData = (nextProps) => 
   {
-    let employee = this.props.session.impactsData.employees.filter(employee => employee.id == nextProps.id)[0];
+    let employee = this.props.impactsData.employees.filter(employee => employee.id == nextProps.id)[0];
     if (employee==undefined) {
       employee = {
-        id: getNewId(this.props.session.impactsData.employees),
+        id: getNewId(this.props.impactsData.employees),
         name: nextProps.name || "",
         sex: "",
         wage: null,
@@ -244,7 +257,7 @@ export class AssessmentDIS extends React.Component {
     } else {
       Object.entries(nextProps).forEach(([propName,propValue]) => employee[propName] = propValue);
     }
-    this.setState({employees: this.props.session.impactsData.employees});
+    this.setState({employees: this.props.impactsData.employees});
   }
 
 }

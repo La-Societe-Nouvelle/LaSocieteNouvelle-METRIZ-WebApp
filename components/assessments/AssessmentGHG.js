@@ -39,10 +39,10 @@ export class AssessmentGHG extends React.Component {
     this.state = 
     {
       // total ghg emissions & uncertainty
-      greenhousesGazEmissions: props.session.impactsData.greenhousesGazEmissions,
-      greenhousesGazEmissionsUncertainty: props.session.impactsData.greenhousesGazEmissionsUncertainty,
+      greenhousesGazEmissions: props.impactsData.greenhousesGazEmissions,
+      greenhousesGazEmissionsUncertainty: props.impactsData.greenhousesGazEmissionsUncertainty,
       // details (by products)
-      ghgDetails: props.session.impactsData.ghgDetails,
+      ghgDetails: props.impactsData.ghgDetails,
       // adding new product
       itemNewProduct: ""
     }
@@ -50,18 +50,18 @@ export class AssessmentGHG extends React.Component {
 
   render() 
   {
-    const {netValueAdded} = this.props.session.impactsData;
+    const {netValueAdded} = this.props.impactsData;
     const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,ghgDetails} = this.state;
     const {itemNewProduct} = this.state;
 
     return (
-      <div className="indicator-section-view">
+      <div className="assessment">
         <div className="view-header">
           <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
           <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 
-        <div className="group assessment"><h3>Outil de mesure</h3>
+        <div className="group"><h3>Outil de mesure</h3>
 
           <table>
             <thead>
@@ -275,7 +275,7 @@ export class AssessmentGHG extends React.Component {
 
   updateFuelConsumption = (itemId,nextValue) => 
   {
-    let item = this.props.session.impactsData.ghgDetails[itemId];
+    let item = this.props.impactsData.ghgDetails[itemId];
     item.consumption = nextValue;
     item.ghgEmissions = this.getGhgEmissions(item);
     this.updateGhgEmissions();
@@ -283,13 +283,13 @@ export class AssessmentGHG extends React.Component {
 
   updateLabel = (itemId,nextValue) => 
   {
-    let item = this.props.session.impactsData.ghgDetails[itemId];
+    let item = this.props.impactsData.ghgDetails[itemId];
     item.label = nextValue;
   }
 
   addProduct = (assessmentItem,source) => 
   {
-    let ghgDetails = this.props.session.impactsData.ghgDetails;
+    let ghgDetails = this.props.impactsData.ghgDetails;
     const id = getNewId(Object.entries(ghgDetails).map(([id,item]) => item));
     ghgDetails[id] = {
       id: id,
@@ -306,7 +306,7 @@ export class AssessmentGHG extends React.Component {
 
   changeNrgProduct = (itemId,nextFuelCode) =>
   {
-    let itemData = this.props.session.impactsData.ghgDetails[itemId];
+    let itemData = this.props.impactsData.ghgDetails[itemId];
     if (["1","2"].includes(itemData.assessmentItem))
     {
       itemData.fuelCode = nextFuelCode;
@@ -328,7 +328,7 @@ export class AssessmentGHG extends React.Component {
 
   changeIntensityUnit = (itemId,nextConsumptionUnit) => 
   {
-    let itemData = this.props.session.impactsData.ghgDetails[itemId];
+    let itemData = this.props.impactsData.ghgDetails[itemId];
     itemData.consumptionUnit = nextConsumptionUnit;
     itemData.ghgEmissions = this.getGhgEmissions(itemData);
     this.updateGhgEmissions();
@@ -336,7 +336,7 @@ export class AssessmentGHG extends React.Component {
 
   deleteItem = (itemId) =>
   {
-    delete this.props.session.impactsData.ghgDetails[itemId];
+    delete this.props.impactsData.ghgDetails[itemId];
     this.updateGhgEmissions();
   }
 
@@ -344,14 +344,14 @@ export class AssessmentGHG extends React.Component {
 
   onSubmit = async () =>
   {
-    let impactsData = this.props.session.impactsData;
+    let impactsData = this.props.impactsData;
 
     // update ghg data
     impactsData.ghgDetails = this.state.ghgDetails;
     impactsData.greenhousesGazEmissions = this.state.greenhousesGazEmissions;
     impactsData.greenhousesGazEmissionsUncertainty = this.state.greenhousesGazEmissionsUncertainty;
     
-    await this.props.session.updateIndicator("ghg");
+    await this.props.onUpdate("ghg");
 
     // update nrg data
     // ...details
@@ -386,7 +386,7 @@ export class AssessmentGHG extends React.Component {
                                           .map(([key,data]) => data.nrgConsumption)
                                           .reduce((a,b) => a + b,0);
     
-    await this.props.session.updateIndicator("nrg");
+    await this.props.onUpdate("nrg");
   }
 
   getTotalGhgEmissions()
@@ -400,7 +400,7 @@ export class AssessmentGHG extends React.Component {
 
   getTotalByAssessmentItem(assessmentItem) 
   {
-    const ghgDetails = this.props.session.impactsData.ghgDetails;
+    const ghgDetails = this.props.impactsData.ghgDetails;
     const sum = Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem==assessmentItem).map(([_,itemData]) => itemData.ghgEmissions).reduce((a,b) => a + b,0);
     return sum;
   }

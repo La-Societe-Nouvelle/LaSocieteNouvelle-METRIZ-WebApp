@@ -22,24 +22,24 @@ export class AssessmentKNW extends React.Component {
     this.state =
     {
       // details
-      knwDetails: props.session.impactsData.knwDetails
+      knwDetails: props.impactsData.knwDetails
     }
   }
 
   render() 
   {
-    const {netValueAdded} = this.props.session.impactsData;
+    const {netValueAdded} = this.props.impactsData;
     const {knwDetails} = this.state;
     const researchAndTrainingContribution = this.getSumCosts();
 
     return (
-      <div className="indicator-section-view">
+      <div className="assessment">
         <div className="view-header">
           <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
           <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 
-        <div className="group assessment"><h3>Outil de mesure</h3>
+        <div className="group"><h3>Outil de mesure</h3>
 
           <table>
             <thead>
@@ -96,24 +96,24 @@ export class AssessmentKNW extends React.Component {
 
   updateResearchAndTrainingContribution = async (nextProps) => 
   {
-    let impactsData = this.props.session.impactsData;
+    let impactsData = this.props.impactsData;
     // update knw details
     impactsData.knwDetails = {...impactsData.knwDetails,...nextProps};
     // update result
     impactsData.researchAndTrainingContribution = this.getSumCosts();
-    await this.props.session.updateIndicator("knw");
+    await this.props.onUpdate("knw");
     this.forceUpdate();
   }
 
   onSubmit = async () =>
   {
-    let impactsData = this.props.session.impactsData;
+    let impactsData = this.props.impactsData;
 
     // update knw data
     impactsData.knwDetails = this.state.knwDetails;
     impactsData.researchAndTrainingContribution = this.getSumCosts();
     
-    await this.props.session.updateIndicator("knw");
+    await this.props.onUpdate("knw");
   }
 
   getSumCosts() 
