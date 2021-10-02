@@ -182,6 +182,17 @@ img.icon-menu {
     }
   }
 
+  .view-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 10px 0;
+
+    button {
+      min-width: 100px;
+    }
+  }
+
   .actions {
     margin: 0px 0 5px;
   }
@@ -582,6 +593,11 @@ table {
 
 }
 
+.assessment {
+  width: 100%;
+  height: 100%;
+}
+
 /* --- LEGAL UNIT VIEW --- */
 
 .inline-input {
@@ -673,6 +689,11 @@ table
   padding: 5px 25px;
   background-color: white;
   border: solid $primary-color 1px;
+
+  &.full-size {
+    width: 90%;
+    height: 90%;
+  }
 
   h3 {
     margin: 5px 0 10px;
