@@ -146,7 +146,7 @@ export class AssessmentDIS extends React.Component {
   // Submit
   onSubmit = async () => 
   {
-    let impactsData = this.props.session.impactsData;
+    let impactsData = this.props.impactsData;
 
     // update dis data
     impactsData.indexGini = getIndexGini(impactsData.employees),1;
