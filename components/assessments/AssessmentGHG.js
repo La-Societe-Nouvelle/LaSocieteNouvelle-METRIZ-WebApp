@@ -339,6 +339,14 @@ export class AssessmentGHG extends React.Component {
     this.updateGhgEmissions();
   }
 
+  updateFuelConsumptionUncertainty = (itemId,nextValue) =>
+  {
+    let item = this.props.session.impactsData.ghgDetails[itemId];
+    item.consumptionUncertainty = nextValue;
+    item.ghgEmissionsUncertainty = this.getGhgEmissionsUncertainty(item);
+    this.updateGhgEmissions();
+  }
+
   updateLabel = (itemId,nextValue) => 
   {
     let item = this.props.impactsData.ghgDetails[itemId];
@@ -458,6 +466,24 @@ export class AssessmentGHG extends React.Component {
   }
 
   getTotalGhgEmissionsUncertainty()
+  {
+    const ghgDetails = this.props.session.impactsData.ghgDetails;
+    const items = Object.entries(ghgDetails).map(([_,itemData]) => itemData);
+    if (items.length > 0)
+    {
+      const value = items.map((item) => item.ghgEmissions).reduce((a,b) => a + b,0);
+      if (value > 0) {
+        const valueMax = items.map((item) => item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
+        const valueMin = items.map((item) => item.ghgEmissions*Math.max(1-item.ghgEmissionsUncertainty/100,0)).reduce((a,b) => a + b,0);
+        return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+      } else {
+        return 0;
+      }
+    }
+    else return  null;
+  }
+
+  getTotalByAssessmentItem(assessmentItem) 
   {
     const ghgDetails = this.props.session.impactsData.ghgDetails;
     const items = Object.entries(ghgDetails).map(([_,itemData]) => itemData);
