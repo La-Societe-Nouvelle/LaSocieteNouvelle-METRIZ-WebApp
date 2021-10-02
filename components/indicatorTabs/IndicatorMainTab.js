@@ -26,6 +26,7 @@ import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciation
 // Libraries
 import { metaIndicators } from '/lib/indic';
 import { metaAccounts } from '/lib/accounts';
+import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
 
 /* -------------------------------------------------- */
 /* -------------------- MAIN TAB -------------------- */
@@ -36,15 +37,8 @@ export class MainTab extends React.Component {
   constructor(props) 
   {
     super(props);
-    this.refTable = React.createRef();  
+    //this.refTable = React.createRef();  
     this.refInsights = React.createRef();
-  }
-
-  componentDidUpdate(prevProps) 
-  {
-    if (this.props.impactsData!==prevProps.impactsData) {
-      console.log("update");
-    }
   }
 
   render() 
@@ -52,10 +46,12 @@ export class MainTab extends React.Component {
     return (
       <div className="indicator-section-view">
         <div className="groups">
+
           <div className="group">
             <h3>Déclaration des impacts directs</h3>
             <Statement {...this.props}/>
           </div>
+
           <div className="group">
             <h3>Tableau récapitulatif</h3>
             <div className="actions">
@@ -63,19 +59,21 @@ export class MainTab extends React.Component {
               {/*<button onClick={() => this.props.onPrintDetails("expenses")}>Détails des dépenses</button>*/}
               {/*<button onClick={() => this.props.onPrintDetails("depreciations")}>Détails des immobilisations</button>*/}
             </div>
-            <TableMain {...this.props} ref={this.refTable}/>
+            <IndicatorStatementTable session={this.props.session} indic={this.props.indic}/>
           </div>
+
           <div className="group">
             <h3>Graphiques comparatifs</h3>
             <Insights session={this.props.session} indic={this.props.indic} ref={this.refInsights}/>
           </div>
+
         </div>
       </div>
     )
   }
 
   updateTable = () => {
-    this.refTable.current.forceUpdate();
+    //this.refTable.current.forceUpdate();
     this.refInsights.current.forceUpdate();
   }
 
@@ -305,6 +303,7 @@ class Insights extends React.Component{
     
     const unit = metaIndicators[indic].unit;
     const viewWindow = viewsForIndic[indic];
+    
     return (
       <div>
         <div className="chart-container" align="center">

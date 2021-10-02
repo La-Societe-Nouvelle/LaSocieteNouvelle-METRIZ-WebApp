@@ -1,9 +1,28 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
 
+// Modules
+import Popup from 'reactjs-popup';
+
 // Tab Components
-import { MainTab } from '/components/indicatorTabs/IndicatorMainTab';
-import { ExpensesTab } from '/components/indicatorTabs/IndicatorExpensesTab';
-import { DepreciationsTab } from '/components/indicatorTabs/IndicatorDepreciationsTab';
+import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
+import { IndicatorGraphs } from '../graphs/IndicatorGraphs';
+
+// Components
+import { StatementART } from '/components/statements/StatementART';
+import { StatementDIS } from '/components/statements/StatementDIS';
+import { StatementECO } from '/components/statements/StatementECO';
+import { StatementGEQ } from '/components/statements/StatementGEQ';
+import { StatementGHG } from '/components/statements/StatementGHG';
+import { StatementHAZ } from '/components/statements/StatementHAZ';
+import { StatementKNW } from '/components/statements/StatementKNW';
+import { StatementMAT } from '/components/statements/StatementMAT';
+import { StatementNRG } from '/components/statements/StatementNRG';
+import { StatementSOC } from '/components/statements/StatementSOC';
+import { StatementWAS } from '/components/statements/StatementWAS';
+import { StatementWAT } from '/components/statements/StatementWAT';
 
 // Assessments components
 import { AssessmentGHG } from '/components/assessments/AssessmentGHG';
@@ -12,27 +31,51 @@ import { AssessmentNRG } from '/components/assessments/AssessmentNRG';
 import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
-import { exportIndicPDF, exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV } from '/src/writers/Export';
+import { exportIndicPDF, exportIndicDataExpensesCSV } from '/src/writers/Export';
 
-// Meta data
+// Libraries
 import { metaIndicators } from '/lib/indic';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
+/** Informations
+ *  Props : session / indic / updateMenu
+ *  Components :
+ *    - Statement area
+ *    - Indicator statement table
+ *    - Graphs
+ *  Popups :
+ *    - assessment tool (if defined)
+ *    - published data of providers (not available yet)
+ *    - details for each accounts (not available yet)
+ *  Actions :
+ *    - export reporting (.pdf)
+ *  State :
+ *    - triggerPopup
+ */
+
 export class IndicatorSection extends React.Component {
 
   constructor(props) 
   {
     super(props);
-    this.state = {selectedTab: "main"}
-    this.refMainTab = React.createRef();
+    this.state = {
+      triggerPopup: ""
+    }
+  }
+
+  componentDidUpdate(prevProps)
+  {
+    if (prevProps.indic!=this.props.indic) this.setState({triggerPopup: ""})
   }
   
   render() 
   {
+    console.log("render");
     const {indic} = this.props;
+    const {triggerPopup} = this.state;
 
     return (
       <div className="section-view">
@@ -40,72 +83,97 @@ export class IndicatorSection extends React.Component {
         <div className="section-view-header"><h1>{metaIndicators[indic].libelle}</h1>
           <div className="section-view-header-odds">
             {metaIndicators[indic].odds.map((odd) => 
-              <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>
-            )}
+              <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}
           </div>
         </div>
 
-        {this.buildTabView()}
+        <div className="indicator-section-view">
+          <div className="groups">
+
+            <div className="group">
+              <h3>Déclaration des impacts directs</h3>
+              <Statement indic={indic}
+                         impactsData={this.props.session.impactsData}
+                         onUpdate={ this.checkNetValueAddedIndicator.bind(this)}
+                         onValidate={this.validateIndicator.bind(this)}
+                         toAssessment={() => this.triggerPopup("assessment")}/>
+            </div>
+
+            <div className="group">
+              <h3>Tableau récapitulatif</h3>
+                <div className="actions">
+                  <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
+                </div>
+              <IndicatorStatementTable session={this.props.session} indic={this.props.indic}/>
+            </div>
+
+            <div className="group">
+              <h3>Graphiques comparatifs</h3>
+              <IndicatorGraphs session={this.props.session} indic={this.props.indic}/>
+            </div>
+
+          </div>
+        </div>
+
+        {triggerPopup=="assessment" &&
+          <div className="popup">
+            <div className="popup-inner full-size">
+              <Assessment indic={indic}
+                          impactsData={this.props.session.impactsData}
+                          onUpdate={this.checkNetValueAddedIndicator.bind(this)}
+                          onValidate={this.validateIndicator.bind(this)}
+                          onGoBack={() => this.triggerPopup("")}/>
+            </div>
+          </div>}
 
       </div>
     )
   }
 
-  // Switch tab according to the selected tab
-  buildTabView()
+  checkNetValueAddedIndicator = async (indic) =>
   {
-    const goBackToMain = () => this.setState({selectedTab: "main"})
-    const changeSelectedTab = (nextSelectedTab) => this.setState({selectedTab: nextSelectedTab})
-
-    const refreshDisplay = async () => {
-      await this.props.session.updateFootprints();
-      this.refMainTab.current.updateTable();
-    }
-
-    const validateStatement = (indic) => this.props.session.validations[indic] = true
-
-    switch(this.state.selectedTab) 
-    {
-      case "main" :           return(<MainTab {...this.props} 
-                                              onUpdate={refreshDisplay.bind(this)} ref={this.refMainTab}
-                                              onValidate={validateStatement.bind(this)}
-                                              onPrintDetails={changeSelectedTab.bind(this)}/>)
-      case "assessment" :     return(<Assessment {...this.props}
-                                                 onUpdate={refreshDisplay.bind(this)}
-                                                 onGoBack={goBackToMain.bind(this)}/>)
-      case "expenses" :       return(<ExpensesTab {...this.props} 
-                                                  onGoBack={goBackToMain.bind(this)}/>)
-      case "depreciations" :  return(<DepreciationsTab {...this.props} 
-                                                       onGoBack={goBackToMain.bind(this)}/>)
+    let nextIndicator = this.props.session.getValueAddedIndicator(indic);
+    if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) {
+      this.props.session.validations[indic] = false;
+      await this.props.session.updateIndicator(indic);
+      if (indic==this.props.indic) this.forceUpdate();
     }
   }
+
+  validateIndicator = async () =>
+  {
+    this.props.session.validations[this.props.indic] = true;
+    await this.props.session.updateIndicator(this.props.indic);
+    this.forceUpdate();
+  }
+
+  triggerPopup = (popupLabel) => this.setState({triggerPopup: popupLabel})
 
   // Reporting
-  exportReporting() {
-    exportIndicPDF(this.props.indic,this.props.session);
-  }
+  exportReporting = () => exportIndicPDF(this.props.indic,this.props.session)
 
-  // Csv
-  exportExpensesData() {
-    let csvContent = exportIndicDataExpensesCSV(this.props.indic,this.props.session);
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "data_"+(this.props.session.legalUnit.siren!="" ? this.props.session.legalUnit.siren : "xxxxxxxxx")+"-"+this.props.indic.toUpperCase()+"-expenses.csv");
-    document.body.appendChild(link);
-    link.click();
-  }
+}
 
-  exportDepreciationsData() {
-    let csvContent = exportIndicDataExpensesCSV(this.props.indic,this.props.session);
-    let encodedUri = encodeURI(csvContent);
-    let link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "data_"+(this.props.session.legalUnit.siren!="" ? this.props.session.legalUnit.siren : "xxxxxxxxx")+"-"+this.props.indic.toUpperCase()+"-depreciations.csv");
-    document.body.appendChild(link);
-    link.click();
-  }
+/* ----- STATEMENTS ----- */
 
+// Display the correct assessment view according to the indicator
+function Statement(props) 
+{
+  switch(props.indic) 
+  {
+    case "art" : return(<StatementART {...props}/>)
+    case "dis" : return(<StatementDIS {...props}/>)
+    case "eco" : return(<StatementECO {...props}/>)
+    case "geq" : return(<StatementGEQ {...props}/>)
+    case "ghg" : return(<StatementGHG {...props}/>)
+    case "haz" : return(<StatementHAZ {...props}/>)
+    case "knw" : return(<StatementKNW {...props}/>)
+    case "mat" : return(<StatementMAT {...props}/>)
+    case "nrg" : return(<StatementNRG {...props}/>)
+    case "soc" : return(<StatementSOC {...props}/>)
+    case "was" : return(<StatementWAS {...props}/>)
+    case "wat" : return(<StatementWAT {...props}/>)
+  }
 }
 
 function Assessment(props) 

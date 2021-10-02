@@ -244,126 +244,36 @@ export class Session {
 
     /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
-    updateValueAddedFootprint = async (indic) =>
+    updateValueAddedFootprint = (indic) => this.netValueAddedFootprint.indicators[indic] = this.validations[indic] ? this.getValueAddedIndicator(indic) : new Indicator({indic})
+
+    getValueAddedIndicator = (indic) =>
     {
+        let indicator = new Indicator({indic: indic});
+        
         const netValueAdded = this.financialData.getNetValueAdded();
         if (netValueAdded!=null)
         {
             const impactsData = this.impactsData;
             impactsData.setNetValueAdded(netValueAdded);
+
             switch(indic)
             {
-                case "art": /* ----- ART ----- */
-
-                    if (impactsData.craftedProduction!=null) {
-                        this.netValueAddedFootprint.getIndicator("art").setValue(impactsData.craftedProduction/netValueAdded *100);
-                        this.netValueAddedFootprint.getIndicator("art").setUncertainty(0);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("art").setValue(null) } 
-                    break;
-            
-                case "dis": /* ----- DIS ----- */
-                    
-                    if (impactsData.indexGini!=null) {
-                        this.netValueAddedFootprint.getIndicator("dis").setValue(impactsData.indexGini);
-                        this.netValueAddedFootprint.getIndicator("dis").setUncertainty(0);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("dis").setValue(null) } 
-                    break;
-                    
-                case "eco": /* ----- ECO ----- */
-                    
-                    if (impactsData.domesticProduction!=null) {
-                        this.netValueAddedFootprint.getIndicator("eco").setValue(impactsData.domesticProduction/netValueAdded *100);
-                        this.netValueAddedFootprint.getIndicator("eco").setUncertainty(0);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("eco").setValue(null) } 
-                    break;
-                    
-                case "geq": /* ----- GEQ ----- */
-                    
-                    if (impactsData.wageGap!=null) {
-                        this.netValueAddedFootprint.getIndicator("geq").setValue(impactsData.wageGap);
-                        this.netValueAddedFootprint.getIndicator("geq").setUncertainty(0);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("geq").setValue(null) } 
-                    break;
-
-                case "ghg": /* ----- GHG ----- */
-
-                    if (impactsData.greenhousesGazEmissions!=null) {
-                        this.netValueAddedFootprint.getIndicator("ghg").setValue(impactsData.greenhousesGazEmissions/netValueAdded *1000);
-                        this.netValueAddedFootprint.getIndicator("ghg").setUncertainty(impactsData.greenhousesGazEmissionsUncertainty);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("ghg").setValue(null) } 
-                    break;
-
-                case "haz": /* ----- HAZ ----- */
-
-                    if (impactsData.hazardousSubstancesConsumption!=null) {
-                        this.netValueAddedFootprint.getIndicator("haz").setValue(impactsData.hazardousSubstancesConsumption/netValueAdded *1000);
-                        this.netValueAddedFootprint.getIndicator("haz").setUncertainty(impactsData.hazardousSubstancesConsumptionUncertainty);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("haz").setValue(null) } 
-                    break;
-
-                case "knw": /* ----- KNW ----- */
-
-                    if (impactsData.researchAndTrainingContribution!=null) {
-                        this.netValueAddedFootprint.getIndicator("knw").setValue(impactsData.researchAndTrainingContribution/netValueAdded *100);
-                        this.netValueAddedFootprint.getIndicator("knw").setUncertainty(0);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("knw").setValue(null) } 
-                    break;
-
-                case "mat": /* ----- MAT ----- */
-
-                    if (impactsData.materialsExtraction!=null) {
-                        this.netValueAddedFootprint.getIndicator("mat").setValue(impactsData.materialsExtraction/netValueAdded *1000);
-                        this.netValueAddedFootprint.getIndicator("mat").setUncertainty(impactsData.materialsExtractionUncertainty);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("mat").setValue(null) } 
-                    break;
-
-                case "nrg": /* ----- NRG ----- */
-
-                    if (impactsData.energyConsumption!=null) {
-                        this.netValueAddedFootprint.getIndicator("nrg").setValue(impactsData.energyConsumption/netValueAdded *1000);
-                        this.netValueAddedFootprint.getIndicator("nrg").setUncertainty(impactsData.energyConsumptionUncertainty);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("nrg").setValue(null) } 
-                    break;
-
-                case "soc": /* ----- SOC ----- */
-
-                    if (impactsData.hasSocialPurpose!=null) {
-                        this.netValueAddedFootprint.getIndicator("soc").setValue(impactsData.hasSocialPurpose ? 100 : 0);
-                        this.netValueAddedFootprint.getIndicator("soc").setUncertainty(0);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("soc").setValue(null) } 
-                    break;
-
-                case "was": /* ----- WAS ----- */
-
-                    if (impactsData.wasteProduction!=null) {
-                        this.netValueAddedFootprint.getIndicator("was").setValue(impactsData.wasteProduction/netValueAdded *1000);
-                        this.netValueAddedFootprint.getIndicator("was").setUncertainty(impactsData.wasteProductionUncertainty);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("was").setValue(null) } 
-                    break;
-
-                case "wat": /* ----- WAT ----- */
-
-                    if (impactsData.waterConsumption!=null) {
-                        this.netValueAddedFootprint.getIndicator("wat").setValue(impactsData.waterConsumption/netValueAdded *1000);
-                        this.netValueAddedFootprint.getIndicator("wat").setUncertainty(impactsData.waterConsumptionUncertainty);
-                    }
-                    else { this.netValueAddedFootprint.getIndicator("wat").setValue(null) } 
-                    break;
+                case "art": setValueART(indicator,impactsData); break;
+                case "dis": setValueDIS(indicator,impactsData); break;
+                case "eco": setValueECO(indicator,impactsData); break;
+                case "geq": setValueGEQ(indicator,impactsData); break;
+                case "ghg": setValueGHG(indicator,impactsData); break;
+                case "haz": setValueHAZ(indicator,impactsData); break;
+                case "knw": setValueKNW(indicator,impactsData); break;
+                case "mat": setValueMAT(indicator,impactsData); break;
+                case "nrg": setValueNRG(indicator,impactsData); break;
+                case "soc": setValueSOC(indicator,impactsData); break;
+                case "was": setValueWAS(indicator,impactsData); break;
+                case "wat": setValueWAT(indicator,impactsData); break;
             }
         }
 
-        else { this.netValueAddedFootprint.getIndicator(indic).setValue(null) } 
+       return indicator; 
     }
 
     /* ---------- ACCOUNTS ---------- */
@@ -378,7 +288,106 @@ export class Session {
         return buildIndicatorAggregate(indic, this.financialData.depreciationExpenses.filter(expense => expense.account.substring(0,account.length) == account))
     }
 
-    
+}
+
+/* ---------------------------------------------------------------------------- */
+/* -------------------- NET VALUE ADDED INDICATORS SETTERS -------------------- */
+/* ---------------------------------------------------------------------------- */
+
+const setValueART = (indicator,impactsData) => 
+{
+    if (impactsData.craftedProduction!=null) {
+        indicator.setValue(impactsData.craftedProduction/impactsData.netValueAdded *100);
+        indicator.setUncertainty(0);
+    }
+}
+
+const setValueDIS = (indicator,impactsData) => 
+{
+    if (impactsData.indexGini!=null) {
+        indicator.setValue(impactsData.indexGini);
+        indicator.setUncertainty(0);
+    }
+}
+
+const setValueECO = (indicator,impactsData) => 
+{
+    if (impactsData.domesticProduction!=null) {
+        indicator.setValue(impactsData.domesticProduction/impactsData.netValueAdded *100);
+        indicator.setUncertainty(0);
+    }
+}
+
+const setValueGEQ = (indicator,impactsData) => 
+{
+    if (impactsData.wageGap!=null) {
+        indicator.setValue(impactsData.wageGap);
+        indicator.setUncertainty(0);
+    }
+}
+
+const setValueGHG = (indicator,impactsData) => 
+{
+    if (impactsData.greenhousesGazEmissions!=null) {
+        indicator.setValue(impactsData.greenhousesGazEmissions/impactsData.netValueAdded *1000);
+        indicator.setUncertainty(impactsData.greenhousesGazEmissionsUncertainty);
+    }
+}
+
+const setValueHAZ = (indicator,impactsData) => 
+{
+    if (impactsData.hazardousSubstancesConsumption!=null) {
+        indicator.setValue(impactsData.hazardousSubstancesConsumption/impactsData.netValueAdded *1000);
+        indicator.setUncertainty(impactsData.hazardousSubstancesConsumptionUncertainty);
+    }
+}
+
+const setValueKNW = (indicator,impactsData) => 
+{
+    if (impactsData.researchAndTrainingContribution!=null) {
+        indicator.setValue(impactsData.researchAndTrainingContribution/impactsData.netValueAdded *100);
+        indicator.setUncertainty(0);
+    }
+}
+
+const setValueMAT = (indicator,impactsData) => 
+{
+    if (impactsData.materialsExtraction!=null) {
+        indicator.setValue(impactsData.materialsExtraction/impactsData.netValueAdded *1000);
+        indicator.setUncertainty(impactsData.materialsExtractionUncertainty);
+    }
+}
+
+const setValueNRG = (indicator,impactsData) => 
+{
+    if (impactsData.energyConsumption!=null) {
+        indicator.setValue(impactsData.energyConsumption/impactsData.netValueAdded *1000);
+        indicator.setUncertainty(impactsData.energyConsumptionUncertainty);
+    }
+}
+
+const setValueSOC = (indicator,impactsData) => 
+{
+    if (impactsData.hasSocialPurpose!=null) {
+        indicator.setValue(impactsData.hasSocialPurpose ? 100 : 0);
+        indicator.setUncertainty(0);
+    }
+}
+
+const setValueWAS = (indicator,impactsData) => 
+{
+    if (impactsData.wasteProduction!=null) {
+        indicator.setValue(impactsData.wasteProduction/impactsData.netValueAdded *1000);
+        indicator.setUncertainty(impactsData.wasteProductionUncertainty);
+    }
+}
+
+const setValueWAT = (indicator,impactsData) => 
+{
+    if (impactsData.waterConsumption!=null) {
+        indicator.setValue(impactsData.waterConsumption/impactsData.netValueAdded *1000);
+        indicator.setUncertainty(impactsData.waterConsumptionUncertainty);
+    }
 }
 
 /* ------------------------------------------------------------- */
