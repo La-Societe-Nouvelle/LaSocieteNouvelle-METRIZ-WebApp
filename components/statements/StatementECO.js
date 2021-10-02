@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #ECO ---------- */
@@ -61,7 +61,7 @@ export class StatementECO extends React.Component {
         </div>
         <div className="statement-item">
           <label>Valeur ajoutée nette produite en France</label>
-          <InputNumber value={domesticProduction}
+          <InputNumber value={roundValue(domesticProduction,0)}
                        disabled={isAllActivitiesInFrance!=null}
                        onUpdate={this.updateDomesticProduction}/>
           <span>&nbsp;€</span>
