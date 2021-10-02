@@ -21,80 +21,80 @@ export const IncomeStatementTable = ({financialData}) =>
 
         <tr className="with-bottom-line">
           <td>Produits d'exploitation</td>
-          <td className="column_amount">{printValue(financialData.getProduction() + financialData.getAmountOtherOperatingIncomes(),0)}</td>
+          <td className="column_value">{printValue(financialData.getProduction() + financialData.getAmountOtherOperatingIncomes(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         
         <tr>
           <td>Production sur l'exercice courant</td>
-          <td className="column_amount important">{printValue(financialData.getProduction(),0)}</td>
+          <td className="column_value important">{printValue(financialData.getProduction(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;Chiffre d'Affaires</td>
-          <td className="column_amount">{printValue(financialData.getRevenue(),0)}</td>
+          <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;Production stockée</td>
-          <td className="column_amount">{printValue(financialData.getAmountProductionStockVariations(),0)}</td>
+          <td className="column_value">{printValue(financialData.getAmountProductionStockVariations(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;Production immobilisée</td>
-          <td className="column_amount">{printValue(financialData.getImmobilisedProduction(),0)}</td>
+          <td className="column_value">{printValue(financialData.getImmobilisedProduction(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>Autres produits d'exploitation</td>
-          <td className="column_amount">{printValue(financialData.getAmountOtherOperatingIncomes(),0)}</td>
+          <td className="column_value">{printValue(financialData.getAmountOtherOperatingIncomes(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         
         
         <tr className="with-top-line">
           <td>Consommations intermédiaires</td>
-          <td className="column_amount important">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
+          <td className="column_value important">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;Variation de stocks</td>
-          <td className="column_amount">{financialData.getVariationPurchasesStocks() > 0 ? ("("+printValue(financialData.getVariationPurchasesStocks(),0)+")") : printValue(financialData.getVariationPurchasesStocks(),0)}</td>
+          <td className="column_value">{financialData.getVariationPurchasesStocks() > 0 ? ("("+printValue(financialData.getVariationPurchasesStocks(),0)+")") : printValue(financialData.getVariationPurchasesStocks(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
       {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => 
         <tr key={account}>
           <td>&emsp;{accountLib}</td>
-          <td className="column_amount">{printValue(amount,0)}</td>
+          <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
         </tr>)}
 
         <tr className="with-top-line">
           <td>Dotations aux amortissements sur immobilisations</td>
-          <td className="column_amount important">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
+          <td className="column_value important">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
       {Object.entries(groupDepreciationExpensesByAccounts(financialData.depreciationExpenses)).map(([_,{account,accountLib,amount}]) => 
         <tr key={account}>
           <td>&emsp;{accountLib}</td>
-          <td className="column_amount">{printValue(amount,0)}</td>
+          <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
         </tr>)}
 
         <tr className="with-top-line">
           <td>Valeur ajoutée nette</td>
-          <td className="column_amount important">{printValue(financialData.getNetValueAdded(),0)}</td>
+          <td className="column_value important">{printValue(financialData.getNetValueAdded(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;dont charges de personnel</td>
-          <td className="column_amount detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
+          <td className="column_value detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td>&emsp;dont impôts, taxe et versements assimilés</td>
-          <td className="column_amount detail">{printValue(financialData.getAmountTaxes(),0)}</td>
+          <td className="column_value detail">{printValue(financialData.getAmountTaxes(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr className="with-bottom-line">
           <td>&emsp;dont résultat d'exploitation</td>
-          <td className="column_amount detail">{printValue(financialData.getOperatingResult(),0)}</td>
+          <td className="column_value detail">{printValue(financialData.getOperatingResult(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>
         {/*<tr>
           <td>&emsp;dont autres charges d'exploitation</td>
-          <td className="column_amount">{printValue(financialData.getAmountOtherExpenses(),0)}</td>
+          <td className="column_value">{printValue(financialData.getAmountOtherExpenses(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>*/}
         {/*<tr>
           <td>&emsp;dont dépréciations et provisions</td>
-          <td className="column_amount">{printValue(financialData.getAmountProvisions(),0)}</td>
+          <td className="column_value">{printValue(financialData.getAmountProvisions(),0)}</td>
           <td className="column_unit">&nbsp;€</td></tr>*/}
 
       </tbody>

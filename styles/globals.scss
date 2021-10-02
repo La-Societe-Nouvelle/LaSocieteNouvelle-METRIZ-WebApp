@@ -1,6 +1,6 @@
 @import 'base';
 
-/* ----- GENERAL STYLE ----- */
+/* ---------- GENERAL STYLE ---------- */
 
 html,
 body {
@@ -10,12 +10,23 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-p {
+// Image
 
-  img {
-    height: 12px;
+img {
+  height: 12px;
+
+  &.icon {  // icon
+    height: 20px;
+    margin: 0 5px;
+  }
+  
+  &.icon-menu { // icon in menu button (tick)
+    height: 14px;
+    margin: 0 0 0 5px;
   }
 }
+
+// link
 
 a {
   color: inherit;
@@ -25,6 +36,8 @@ a {
 * {
   box-sizing: border-box;
 }
+
+// button
 
 button {
   padding: 3px 20px;
@@ -49,8 +62,9 @@ button {
   }
 }
 
+// Input
+
 input {
-  //border-radius: 1px;
   border: solid 1px $primary-color;
   padding: 2px;
 
@@ -63,11 +77,16 @@ input {
   }
 }
 
+// Exposant
+
 sup {
   font-size: 9px;
 }
 
-input,select {
+/* ----- SHARED STYLE ----- */
+
+input,
+select {
   &.valid {
     background-color: $valid-color; 
   }
@@ -76,17 +95,7 @@ input,select {
   }
 }
 
-img.icon {
-  height: 20px;
-  margin: 0 5px;
-}
-
-img.icon-menu {
-  height: 14px;
-  margin: 0 0 0 5px;
-}
-
-/**/
+/* ---------- APP VIEW ---------- */
 
 .app-view {
   display: flex;
@@ -96,7 +105,7 @@ img.icon-menu {
   height: 100%;
 }
 
-/* --- MENU --- */
+/* ---------- MENU ---------- */
 
 .menu {
   margin: 10px;
@@ -116,105 +125,14 @@ img.icon-menu {
     align-items: center;
     margin: 10px;
   }
+
   .menu-button {
-    margin: 2px 0;
-
-    &.selected {
-      background-color: $highlight-color;
-    }
-  }
-
-  button {
-    color: white;
-    background-color: $primary-color;
-    border: 0;
     height: 25px;
     width: 225px;
-  }
-}
-
-/* --- SECTION CONTAINER --- */
-
-.section-container {
-  width: 100%;
-}
-
-.section-view {
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  margin: auto;
-
-  .section-view-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-    width: 100%;
-    text-align: left;
-    border-bottom: solid gray 3px;
-
-    h1 {
-      margin: 10px 5px 5px 5px;
-    }
-
-    .section-view-header-odds {
-      margin-top: 10px;
-    }
-
-    img {
-      height: 40px;
-      width: 40px;
-      margin: 2px;
-    }
-
-  }
-
-  .view-header {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    margin: 10px 0;
-
-    button {
-      min-width: 100px;
-    }
-  }
-
-  .view-footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    margin: 10px 0;
-
-    button {
-      min-width: 100px;
-    }
-  }
-
-  .actions {
-    margin: 0px 0 5px;
-  }
-
-}
-
-
-.menu-section {
-
-  .menu-section-items {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-  }
-
-  .menu-button {
-    color: white;
-    background-color: $primary-color;
+    margin: 2px 0;
     border: 0;
-    height: 25px;
-    width: 100%;
-    margin: 2px;
+    background-color: $primary-color;
+    color: white;
 
     &.selected {
       background-color: $highlight-color;
@@ -222,34 +140,65 @@ img.icon-menu {
   }
 }
 
-.financial-section-menu {
-  margin: 20px 0;
+/* ----- SECTION CONTAINER ----- */
 
-  .financial-section-menu-items {
-    width: 100%;
+.section-container { // index.js
+  width: 100%;
+
+  .section-view { // section view
+    padding: 20px;
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
+    flex-direction: column;
+    justify-content: flex-start;
+    margin: auto;
 
-  .menu-button {
-    color: $primary-color;
-    background-color: white;
-    height: 25px;
-    width: 100%;
-    margin: 0;
-    border: solid $primary-color 1px;
-    
-    &.selected {
-      color: white;
-      background-color: $primary-color;
+    .section-view-header { // header of section view
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+      text-align: left;
+      border-bottom: solid gray 3px;
+
+      h1 {  // title of section
+        margin: 10px 5px 5px 5px;
+      }
+
+      .section-view-header-odds { // group of sdg icons
+        margin-top: 10px;
+        
+        img { // sdg icon
+          height: 40px;
+          width: 40px;
+          margin: 2px;
+        }
+      }
     }
   }
 }
 
+/* ---------- GROUP ---------- */
+
 .group {
+  display: flex;
+  flex-direction: column;
+  margin: 30px 0px 30px;
+  border: solid $primary-color 1px;
+
+  > h3 {
+    width: max-content;
+    padding: 0px 10px 0px 5px;
+    margin: 0;
+    position: relative;
+    top: -15px;
+    left: 10px;
+    background-color: white;
+  }
+
   .actions {
+    margin: 5px;
+
     select {
       width: 400px;
       background-color: $primary-color;
@@ -266,9 +215,13 @@ img.icon-menu {
       }
     }
   }
+
+  .notes {
+    font-size: 13px;
+  }
 }
 
-/* -------------------- TABLE -------------------- */
+/* ---------- TABLE ---------- */
 
 table {
   width: 100%;
@@ -287,22 +240,18 @@ table {
   img {
     height: 15px;
 
-    &.locker {
-      height: 13px;
-    }
-
     &.active {
       transform: rotate(-360deg);
       transition: transform 1000ms;
     }
-    
+
   }
 
   // --- Row --- //
 
   tr {
 
-    // Borders
+    // Borders (top & bottom)
     &.with-bottom-line td {
       border-bottom: solid $primary-color 2px;
       padding-bottom: 2px;
@@ -326,7 +275,10 @@ table {
     &.auto {width: auto}
     &.long {width: 400px}
     &.medium {width: 200px}
-    &.short {width: 125px;}
+    &.short {width: 125px}
+
+    &.column_value {width: 150px}
+    &.column_uncertainty {width: 100px}
 
     // text align
     &.center {
@@ -335,7 +287,7 @@ table {
     }
     &.right {
       text-align: right;
-      input {text-align: right;}
+      input,select {text-align: right;}
     }
 
     // index
@@ -352,16 +304,6 @@ table {
       font-weight: bold;
     }
 
-    // borders
-    &.with-bottom-line {
-      border-bottom: solid $primary-color 2px;
-      padding-bottom: 2px;
-    }
-    &.with-top-line {
-      border-top: solid $primary-color 2px;
-      padding-top: 2px;
-    }
-
     // specific style
     &.column_unit {
       width: 1%;
@@ -375,56 +317,19 @@ table {
     }
   }
 
-  // --- COLUMNS --- //
-
-  td.crop {
-    max-width: 400px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-
-    &:hover {
-      //overflow: visible;
-      white-space: normal;
-      
-      span {
-        position: relative;
-        top: 0;
-        left: 0;
-        background-color: white;
-        padding-right: 5px;
-        width: 500px;
-      }
-    }
-  }
+  // --- Head --- //
 
   thead {
     background-color: $primary-color;
     color: white;
     text-align: center;
-
-    .column_code {
-      width: 50px;
-      text-align: center;
-    }
-
-    .column_auto {
-      width: auto;
-    }
-    .column_amount { // income statement table
-      width: 150px;
-    }
-    .column_value {
-      width: 150px;
-      min-width: 150px;
-    }
-    .column_uncertainty {
-      width: 150px;
-    }
   }
+
+  // --- Body --- //
 
   tbody {
 
+    // select
     select {
       width: 100%;
       background-color: white;
@@ -437,24 +342,16 @@ table {
       }
     }
 
-    .column_code { // legal data section
-      width: 50px;
-      text-align: center;
-    }
-
-    .column_auto { // depreciations tabs, expenses tab
-      width: auto;
-    }
-    .column_amount { // income statement table
-      width: 150px;
+    // value
+    .column_value {
       text-align: right;
       input {
         text-align: right;
       }
     }
     
-    .column_uncertainty { // depreciation tab, expenses tab, indicator main tab, legal data section
-      width: 100px;
+    // uncertainty
+    .column_uncertainty {
       text-align: center;
       font-size: 12px;
       input {
@@ -462,27 +359,11 @@ table {
         font-size: 15px;
       }
     }
-    .column_libelleFlag { // depreciation tab, expenses tab
-      width: 200px;
-      text-align: center;
-    }
-    .column_value {
-      width: 100px;
-      text-align: right;
-      input {
-        text-align: right;
-      }
-    }
 
-    .valid {
-      input,select {
-        background-color: $valid-color;
-      }
-    }
-    .unvalid {
-      input,select {
-        background-color: $unvalid-color;
-      }
+    // background valid/unvalid/default
+    input,select {
+      &.valid {background-color: $valid-color}
+      &.unvalid {background-color: $unvalid-color}
     }
 
     option.default-option {
@@ -504,41 +385,13 @@ table {
   }
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  margin: 30px 0px 30px;
-  //padding-bottom: 10px;
-  border: solid $primary-color 1px;
-
-  > h3 {
-    width: max-content;
-    padding: 0px 10px 0px 5px;
-    margin: 0;
-    position: relative;
-    top: -15px;
-    left: 10px;
-    background-color: white;
-  }
-
-  .inline-input {
-    margin-left: 10px;
-
-    .right {
-      text-align: right;
-    }
-  }
-
-  .notes {
-    font-size: 13px;
-  } 
-}
+/* ---------- STATEMENT ---------- */
 
 .statement {
   margin: 2px;
   padding: 0px 10px 5px;
-  //border: solid gray 1px;
 
+  // statement item
   .statement-item {
     display: flex;
     flex-direction: row;
@@ -548,6 +401,7 @@ table {
     label {
       min-width: 600px;
     }
+
     input {
       margin: 0;
     
@@ -556,11 +410,13 @@ table {
         text-align: right;
       }
     }
+
     span {
       font-size: 13px;
       white-space: nowrap;
     }
 
+    // specific case - input radio
     .input-radio {
       margin-right: 10px;
 
@@ -569,6 +425,7 @@ table {
       }
     }
 
+    // assessment button
     .assessment-button-container {
       margin-left: auto;
 
@@ -579,6 +436,7 @@ table {
 
   }
 
+  // validation button
   .statement-validation {
     display: flex;
     flex-direction: row;
@@ -586,6 +444,7 @@ table {
     justify-content: right;
   }
 
+  // notes
   .notes {
     font-size: 12px;
     font-style: italic;
@@ -593,12 +452,37 @@ table {
 
 }
 
+/* ---------- ASSESSMENT ---------- */
+
 .assessment {
   width: 100%;
   height: 100%;
+
+  .view-header {  // header in assessment
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 10px 0;
+
+    button {
+      min-width: 100px;
+    }
+  }
+  
+  .view-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin: 10px 0;
+
+    button {
+      min-width: 100px;
+    }
+  }
+
 }
 
-/* --- LEGAL UNIT VIEW --- */
+/* --- x --- */
 
 .inline-input {
   display: flex;
@@ -632,18 +516,7 @@ table {
   border: 0px;
 }
 
-table 
-{
-  td 
-  {
-    .short-fix-column {
-      width: 125px;
-    }
-    .medium-fix-column {
-      width: 200px;
-    }
-  }
-}
+/* ---------- POPUP ---------- */
 
 .popup-container {
   margin-left: 10%;
@@ -743,6 +616,8 @@ table
     align-items: center;
   }
 }
+
+/* ----- x ----- */
 
 .chart-container {
   display: flex;
