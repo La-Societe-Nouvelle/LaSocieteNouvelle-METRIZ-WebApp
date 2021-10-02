@@ -11,8 +11,8 @@ export class InputNumber extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (this.props.value!==prevProps.value) {
-      this.setState({input: this.props.value ? this.props.value.toString() || "" : ""})
+    if (this.props.value!=prevProps.value) {
+      this.setState({input: this.props.value ? (this.props.value.toString() || "") : ""})
     }
   }
 

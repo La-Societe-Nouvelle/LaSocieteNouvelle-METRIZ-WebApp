@@ -73,7 +73,6 @@ export class IndicatorSection extends React.Component {
   
   render() 
   {
-    console.log("render");
     const {indic} = this.props;
     const {triggerPopup} = this.state;
 

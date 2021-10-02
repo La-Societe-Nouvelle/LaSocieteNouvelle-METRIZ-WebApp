@@ -313,8 +313,8 @@ export class AssessmentGHG extends React.Component {
   // set nrg product
   addProduct = (assessmentItem,source) => 
   {
-    let ghgDetails = this.props.impactsData.ghgDetails;
-    const id = getNewId(Object.entries(ghgDetails).map(([id,item]) => item));
+    let {ghgDetails} = this.state;
+    const id = getNewId(Object.entries(ghgDetails).map(([_,item]) => item));
     ghgDetails[id] = {
       id: id,
       label: source,
@@ -344,8 +344,10 @@ export class AssessmentGHG extends React.Component {
     } 
     // else re-init values
     else {
-      itemData = {...itemData, consumption: 0.0, ghgEmissions: 0.0, consumptionUnit: "GJ", uncertainty: 25.0}
+      itemData = {...itemData, consumption: 0.0, consumptionUnit: "GJ", consumptionUncertainty: 0.0, ghgEmissions: 0.0, ghgEmissionsUncertainty: 0.0}
     }
+
+    // update total
     this.updateGhgEmissions();
   }
 
@@ -361,14 +363,14 @@ export class AssessmentGHG extends React.Component {
   // update label source (items 3, 4 and 5)
   updateLabel = (itemId,nextValue) => 
   {
-    let item = this.props.impactsData.ghgDetails[itemId];
+    let item = this.state.ghgDetails[itemId];
     item.label = nextValue;
   }
 
   // update fuel consumption or ghg emissions
   updateFuelConsumption = (itemId,nextValue) => 
   {
-    let item = this.props.impactsData.ghgDetails[itemId];
+    let item = this.state.ghgDetails[itemId];
     item.consumption = nextValue;
     if (!item.consumption) item.consumptionUncertainty = 0
     else if (!item.consumptionUncertainty) item.consumptionUncertainty = 25.0;
@@ -380,7 +382,7 @@ export class AssessmentGHG extends React.Component {
   // update uncertainty
   updateFuelConsumptionUncertainty = (itemId,nextValue) =>
   {
-    let item = this.props.impactsData.ghgDetails[itemId];
+    let item = this.state.ghgDetails[itemId];
     item.consumptionUncertainty = nextValue;
     item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
     this.updateGhgEmissions();
@@ -390,7 +392,9 @@ export class AssessmentGHG extends React.Component {
 
   deleteItem = (itemId) =>
   {
-    delete this.props.impactsData.ghgDetails[itemId];
+    let idNRG = this.state.ghgDetails[itemId].idNRG;
+    if (idNRG!=undefined) delete this.state.nrgDetails[idNRG];
+    delete this.state.ghgDetails[itemId];
     this.updateGhgEmissions();
   }
 
@@ -420,34 +424,30 @@ export class AssessmentGHG extends React.Component {
     // update nrg data
     // ...details
     Object.entries(impactsData.ghgDetails)
-          .filter(([id,data]) => data.fuelCode!=undefined)
+          .filter(([_,itemData]) => itemData.fuelCode!=undefined)
           .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
           .forEach(([itemId,itemData]) => 
           {
-            if (itemData.idNRG==undefined) {
+            let nrgItem = Object.entries(impactsData.nrgDetails).map(([_,nrgItemData]) => nrgItemData).filter(nrgItem => nrgItem.idGHG==itemId)[0];
+            // init if undefined
+            if (nrgItem==undefined) {
               const id = getNewId(Object.entries(impactsData.nrgDetails)
-                                        .map(([id,data]) => data));
-              impactsData.nrgDetails[id] = {
-                id: id,
-                idGHG: itemId,
-                fuelCode: itemData.fuelCode,
-                consumption: itemData.consumption, 
-                consumptionUnit: itemData.consumptionUnit,
-                uncertainty: itemData.uncertainty, 
-                nrgConsumption: getNrgConsumption(itemData),
-                type: nrgProducts[itemData.fuelCode].type
-              }
-            } else {
-              impactsData.nrgDetails[itemData.idNRG].fuelCode = itemData.fuelCode;
-              impactsData.nrgDetails[itemData.idNRG].consumption = itemData.consumption;
-              impactsData.nrgDetails[itemData.idNRG].consumptionUnit = itemData.consumptionUnit;
-              impactsData.nrgDetails[itemData.idNRG].uncertainty = itemData.uncertainty;
-              impactsData.nrgDetails[itemData.idNRG].nrgConsumption = getNrgConsumption(itemData);
+                                        .map(([_,data]) => data));
+              impactsData.nrgDetails[id] = {id: id,idGHG: itemId}
+              nrgItem = impactsData.nrgDetails[id];
             }
+            // update values
+            nrgItem.fuelCode = itemData.fuelCode;
+            nrgItem.consumption = itemData.consumption;
+            nrgItem.consumptionUnit = itemData.consumptionUnit;
+            nrgItem.consumptionUncertainty = itemData.consumptionUncertainty;
+            nrgItem.nrgConsumption = getNrgConsumption(itemData);
+            nrgItem.nrgConsumptionUncertainty = itemData.consumptionUncertainty;
+            nrgItem.type = nrgProducts[itemData.fuelCode].type;
           })
     // ...total & uncertainty
     impactsData.energyConsumption = Object.entries(impactsData.nrgDetails)
-                                          .map(([key,data]) => data.nrgConsumption)
+                                          .map(([_,data]) => data.nrgConsumption)
                                           .reduce((a,b) => a + b,0);
     
     await this.props.onUpdate("nrg");
@@ -525,13 +525,11 @@ const getUncertaintyByAssessmentItem = (ghgDetails,assessmentItem) =>
 
 const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) =>
 {
-  switch(consumptionUnit) 
-  {
-    case "MJ": return consumption;
-    case "kWh": return consumption*3.6;
-    default: {
-      const coef = nrgProducts[fuelCode].units[consumptionUnit].coefNRG;
-      return consumption * coef;
-    }
+  switch(consumptionUnit) {
+    case "MJ":  return consumption;
+    case "GJ":  return consumption * 1000;
+    case "tep": return consumption * 41868;
+    case "kWh": return consumption * 3.6;
+    default:    return consumption * nrgProducts[fuelCode].units[consumptionUnit].coefNRG;
   }
 }
