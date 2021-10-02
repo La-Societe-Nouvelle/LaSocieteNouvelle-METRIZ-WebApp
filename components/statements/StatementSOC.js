@@ -1,14 +1,22 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+/* ---------- DECLARATION - INDIC #SOC ---------- */
 
 export class StatementSOC extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
   }
 
   render() 
   {
-    const {hasSocialPurpose} = this.props.impactsData;
+    const {hasSocialPurpose,netValueAdded} = this.props.impactsData;
+
+    let isValid = hasSocialPurpose!==null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -29,11 +37,16 @@ export class StatementSOC extends React.Component {
             <label>Non</label>
           </div>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  onSocialPurposeChange = (event) => {
+  onSocialPurposeChange = (event) => 
+  {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
@@ -43,8 +56,9 @@ export class StatementSOC extends React.Component {
         this.props.impactsData.hasSocialPurpose = false; 
         break;
     }
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("soc");
     this.forceUpdate();
   }
 
+  onValidate = () => this.props.onValidate()
 }

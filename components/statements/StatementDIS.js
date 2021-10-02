@@ -1,9 +1,17 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+// Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #DIS ---------- */
 export class StatementDIS extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       indexGini: valueOrDefault(props.impactsData.indexGini, ""),
@@ -12,8 +20,10 @@ export class StatementDIS extends React.Component {
 
   render() 
   {
-    const {hasEmployees} = this.props.impactsData;
+    const {hasEmployees,netValueAdded} = this.props.impactsData;
     const {indexGini} = this.state;
+
+    let isValid = indexGini!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -47,11 +57,16 @@ export class StatementDIS extends React.Component {
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
           </div>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  onHasEmployeesChange = (event) => {
+  onHasEmployeesChange = (event) => 
+  {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
@@ -64,13 +79,16 @@ export class StatementDIS extends React.Component {
         break;
     }
     this.setState({indexGini: valueOrDefault(this.props.impactsData.indexGini, "")});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("dis");
+    this.props.onUpdate("geq");
   }
   
-  updateIndexGini = (input) => {
+  updateIndexGini = (input) => 
+  {
     this.props.impactsData.indexGini = input;
     this.setState({indexGini: this.props.impactsData.indexGini});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("dis");
   }
 
+  onValidate = () => this.props.onValidate()
 }

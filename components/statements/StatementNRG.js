@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+// Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #NRG ---------- */
+
 export class StatementNRG extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       energyConsumption: valueOrDefault(props.impactsData.energyConsumption, ""),
@@ -13,7 +22,10 @@ export class StatementNRG extends React.Component {
 
   render() 
   {
+    const {netValueAdded} = this.props.impactsData;
     const {energyConsumption,energyConsumptionUncertainty} = this.state;
+
+    let isValid = energyConsumption!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -32,19 +44,26 @@ export class StatementNRG extends React.Component {
                        onUpdate={this.updateEnergyConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  updateEnergyConsumption = (input) => {
+  updateEnergyConsumption = (input) => 
+  {
     this.props.impactsData.setEnergyConsumption(input);
     this.setState({energyConsumptionUncertainty: this.props.impactsData.energyConsumptionUncertainty});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("nrg");
   }
 
-  updateEnergyConsumptionUncertainty = (input) => {
+  updateEnergyConsumptionUncertainty = (input) => 
+  {
     this.props.impactsData.energyConsumptionUncertainty = input;
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("nrg");
   }
 
+  onValidate = () => this.props.onValidate()
 }

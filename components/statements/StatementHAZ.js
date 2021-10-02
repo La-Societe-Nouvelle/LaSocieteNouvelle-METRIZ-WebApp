@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+// Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #HAZ ---------- */
+
 export class StatementHAZ extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       hazardousSubstancesConsumption: valueOrDefault(props.impactsData.hazardousSubstancesConsumption, ""),
@@ -13,7 +22,10 @@ export class StatementHAZ extends React.Component {
 
   render() 
   {
+    const {netValueAdded} = this.props.impactsData;
     const {hazardousSubstancesConsumption,hazardousSubstancesConsumptionUncertainty} = this.state;
+
+    let isValid = hazardousSubstancesConsumption!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -29,19 +41,26 @@ export class StatementHAZ extends React.Component {
                        onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  updateHazardousSubstancesConsumption = (input) => {
+  updateHazardousSubstancesConsumption = (input) => 
+  {
     this.props.impactsData.setHazardousSubstancesConsumption(input);
     this.setState({hazardousSubstancesConsumptionUncertainty: this.props.impactsData.hazardousSubstancesConsumptionUncertainty});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("haz");
   }
 
-  updateHazardousSubstancesConsumptionUncertainty = (input) => {
+  updateHazardousSubstancesConsumptionUncertainty = (input) => 
+  {
     this.props.impactsData.hazardousSubstancesConsumptionUncertainty = input;
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("haz");
   }
   
+  onValidate = () => this.props.onValidate()
 }

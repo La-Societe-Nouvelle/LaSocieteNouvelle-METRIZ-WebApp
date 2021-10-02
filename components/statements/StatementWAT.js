@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+//Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #WAT ---------- */
+
 export class StatementWAT extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       waterConsumption: valueOrDefault(props.impactsData.waterConsumption, ""),
@@ -13,7 +22,10 @@ export class StatementWAT extends React.Component {
 
   render() 
   {
+    const {netValueAdded} = this.props.impactsData;
     const {waterConsumption,waterConsumptionUncertainty} = this.state;
+
+    let isValid = waterConsumption!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -29,19 +41,26 @@ export class StatementWAT extends React.Component {
                        onUpdate={this.updateWaterConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  updateWaterConsumption = (input) => {
+  updateWaterConsumption = (input) => 
+  {
     this.props.impactsData.setWaterConsumption(input);
     this.setState({waterConsumptionUncertainty: this.props.impactsData.waterConsumptionUncertainty});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("wat");
   }
 
-  updateWaterConsumptionUncertainty = (input) => {
+  updateWaterConsumptionUncertainty = (input) => 
+  {
     this.props.impactsData.waterConsumptionUncertainty = input;
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("wat");
   }
 
+  onValidate = () => this.props.onValidate()
 }

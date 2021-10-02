@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
-import { printValueInput, valueOrDefault } from '../../src/utils/Utils';
+
+// Utils
+import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #KNW ---------- */
+
 export class StatementKNW extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, ""),
@@ -12,7 +21,10 @@ export class StatementKNW extends React.Component {
 
   render() 
   {
+    const {netValueAdded} = this.props.impactsData;
     const {researchAndTrainingContribution} = this.state;
+
+    let isValid = researchAndTrainingContribution!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -25,13 +37,19 @@ export class StatementKNW extends React.Component {
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
           </div>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  updateResearchAndTrainingContribution = (input) => {
+  updateResearchAndTrainingContribution = (input) => 
+  {
     this.props.impactsData.researchAndTrainingContribution = input;
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("knw");
   }
 
+  onValidate = () => this.props.onValidate()
 }

@@ -1,6 +1,28 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
-import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
+
+// Utils
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #ART ---------- */
+
+/** Component in IndicatorMainTab
+ *  Props : 
+ *    - impactsData
+ *    - onUpdate -> update footprints, update table
+ *    - onValidate -> update validations
+ *    - toAssessment -> open assessment view (if defined)
+ *  Behaviour :
+ *    Edit directly impactsData (session) on inputs blur
+ *    Redirect to assessment tool (if defined)
+ *    Update footprints on validation
+ *  State :
+ *    inputs
+ */
+
 export class StatementART extends React.Component {
 
   constructor(props) {
@@ -58,7 +80,8 @@ export class StatementART extends React.Component {
     ) 
   }
 
-  onIsValueAddedCraftedChange = (event) => {
+  onIsValueAddedCraftedChange = (event) => 
+  {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
@@ -75,13 +98,14 @@ export class StatementART extends React.Component {
         break;
     }
     this.setState({craftedProduction: this.props.impactsData.craftedProduction});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("art");
   }
 
-  updateCraftedProduction = (input) => {
+  updateCraftedProduction = (input) => 
+  {
     this.props.impactsData.craftedProduction = input;
     this.setState({craftedProduction: this.props.impactsData.craftedProduction});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("art");
   }
 
   onValidate = () => this.props.onValidate()

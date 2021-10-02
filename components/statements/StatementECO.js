@@ -1,10 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
-import { printValue, valueOrDefault } from '../../src/utils/Utils';
+
+// Utils
+import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #ECO ---------- */
 
 export class StatementECO extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       domesticProduction: valueOrDefault(props.impactsData.domesticProduction, ""),
@@ -13,9 +21,11 @@ export class StatementECO extends React.Component {
 
   render() 
   {
-    const {isAllActivitiesInFrance} = this.props.impactsData;
+    const {isAllActivitiesInFrance,netValueAdded} = this.props.impactsData;
     const {domesticProduction} = this.state;
     
+    let isValid = domesticProduction!=null && netValueAdded!=null;
+
     return (
       <div className="statement">
         <div className="statement-item">
@@ -49,11 +59,16 @@ export class StatementECO extends React.Component {
                        onUpdate={this.updateDomesticProduction}/>
           <span>&nbsp;€</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  onIsAllActivitiesInFranceChange = (event) => {
+  onIsAllActivitiesInFranceChange = (event) => 
+  {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
@@ -70,13 +85,15 @@ export class StatementECO extends React.Component {
         break;
     }
     this.setState({domesticProduction: valueOrDefault(this.props.impactsData.domesticProduction, "")});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("eco");
   }
 
-  updateDomesticProduction = (input) => {
+  updateDomesticProduction = (input) => 
+  {
     this.props.impactsData.domesticProduction = input;
     this.setState({domesticProduction: this.props.impactsData.domesticProduction});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("eco");
   }
   
+  onValidate = () => this.props.onValidate()
 }

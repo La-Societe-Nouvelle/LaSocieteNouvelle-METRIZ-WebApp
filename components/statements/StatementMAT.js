@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+//Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #MAT ---------- */
+
 export class StatementMAT extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       materialsExtraction: valueOrDefault(props.impactsData.materialsExtraction, ""),
@@ -13,8 +22,10 @@ export class StatementMAT extends React.Component {
 
   render() 
   {
-    const {isExtractiveActivities} = this.props.impactsData;
+    const {isExtractiveActivities,netValueAdded} = this.props.impactsData;
     const {materialsExtraction,materialsExtractionUncertainty} = this.state;
+
+    let isValid = materialsExtraction!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -49,6 +60,10 @@ export class StatementMAT extends React.Component {
                        onUpdate={this.updateMaterialsExtractionUncertainty}/>
           <span>&nbsp;%</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
@@ -71,16 +86,19 @@ export class StatementMAT extends React.Component {
     })
   }
 
-  updateMaterialsExtraction = (input) => {
+  updateMaterialsExtraction = (input) => 
+  {
     this.props.impactsData.setMaterialsExtraction(input);
     this.setState({materialsExtractionUncertainty: this.props.impactsData.materialsExtractionUncertainty});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("mat");
   }
 
-  updateMaterialsExtractionUncertainty = (input) => {
+  updateMaterialsExtractionUncertainty = (input) => 
+  {
     this.props.impactsData.materialsExtractionUncertainty = input;
     this.setState({materialsExtraction: this.props.impactsData.materialsExtraction});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("mat");
   }
 
+  onValidate = () => this.props.onValidate()
 }

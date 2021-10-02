@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+//Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #WAS ---------- */
+
 export class StatementWAS extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       wasteProduction: valueOrDefault(props.impactsData.wasteProduction, ""),
@@ -13,7 +22,10 @@ export class StatementWAS extends React.Component {
 
   render() 
   {
+    const {netValueAdded} = this.props.impactsData;
     const {wasteProduction,wasteProductionUncertainty} = this.state;
+
+    let isValid = wasteProduction!=null && netValueAdded!=null;
 
     return (
       <div className="statement">
@@ -32,19 +44,26 @@ export class StatementWAS extends React.Component {
         <div className="notes">
           <p><sup>1</sup> Déchets assimilés aux ordures ménagères</p>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  updateWasteProduction = (input) => {
+  updateWasteProduction = (input) => 
+  {
     this.props.impactsData.setWasteProduction(input);
     this.setState({wasteProductionUncertainty: this.props.impactsData.wasteProductionUncertainty});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("was");
   }
 
-  updateWasteProductionUncertainty = (input) => {
+  updateWasteProductionUncertainty = (input) => 
+  {
     this.props.impactsData.wasteProductionUncertainty = input;
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("was");
   }
 
+  onValidate = () => this.props.onValidate()
 }

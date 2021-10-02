@@ -1,18 +1,31 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+// Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #GEQ ---------- */
+
 export class StatementGEQ extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       wageGap: valueOrDefault(props.impactsData.wageGap, ""),
     }
   }
 
-  render() {
-    const {hasEmployees} = this.props.impactsData;
+  render() 
+  {
+    const {hasEmployees,netValueAdded} = this.props.impactsData;
     const {wageGap} = this.state;
+
+    let isValid = wageGap!=null && netValueAdded!=null;
+
     return (
       <div className="statement">
         <div className="statement-item">
@@ -42,11 +55,16 @@ export class StatementGEQ extends React.Component {
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
           </div>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  onHasEmployeesChange = (event) => {
+  onHasEmployeesChange = (event) => 
+  {
     let radioValue = event.target.value;
     switch(radioValue) {
       case "true": 
@@ -59,13 +77,16 @@ export class StatementGEQ extends React.Component {
         break;
     }
     this.setState({wageGap: valueOrDefault(this.props.impactsData.wageGap, "")});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("geq");
+    this.props.onUpdate("dis");
   }
 
-  updateWageGap = (input) => {
+  updateWageGap = (input) => 
+  {
     this.props.impactsData.wageGap = input;
     this.setState({wageGap: this.props.impactsData.wageGap});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("geq");
   }
 
+  onValidate = () => this.props.onValidate()
 }

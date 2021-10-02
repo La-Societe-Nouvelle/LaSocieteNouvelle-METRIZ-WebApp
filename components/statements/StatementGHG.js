@@ -1,9 +1,18 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
+
+// Utils
 import { valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
+
+/* ---------- DECLARATION - INDIC #GHG ---------- */
+
 export class StatementGHG extends React.Component {
 
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       greenhousesGazEmissions: valueOrDefault(props.impactsData.greenhousesGazEmissions, ""),
@@ -11,8 +20,13 @@ export class StatementGHG extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
+    const {netValueAdded} = this.props.impactsData;
     const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty} = this.state;
+
+    let isValid = greenhousesGazEmissions!=null && netValueAdded!=null;
+
     return (
       <div className="statement">
         <div className="statement-item">
@@ -30,19 +44,26 @@ export class StatementGHG extends React.Component {
                        onUpdate={this.updateGreenhousesGazEmissionsUncertainty}/>
           <span>&nbsp;%</span>
         </div>
+        <div className="statement-validation">
+          <button disabled={!isValid}
+                  onClick={this.onValidate}>Valider</button>
+        </div>
       </div>
     ) 
   }
 
-  updateGreenhousesGazEmissions = (input) => {
+  updateGreenhousesGazEmissions = (input) => 
+  {
     this.props.impactsData.setGreenhousesGazEmissions(input);
     this.setState({greenhousesGazEmissionsUncertainty: this.props.impactsData.greenhousesGazEmissionsUncertainty});
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("ghg");
   }
 
-  updateGreenhousesGazEmissionsUncertainty = (input) => {
+  updateGreenhousesGazEmissionsUncertainty = (input) => 
+  {
     this.props.impactsData.greenhousesGazEmissionsUncertainty = input;
-    this.props.onUpdate(this.props.impactsData);
+    this.props.onUpdate("ghg");
   }
 
+  onValidate = () => this.props.onValidate()
 }
