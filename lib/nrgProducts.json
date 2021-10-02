@@ -197,11 +197,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 78.5},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.283},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3302},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 36.000},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.14, "coefNRG": 40.0}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 78.5, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.283, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3302, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 36.000},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.14, "coefGHGUncertainty": 5, "coefNRG": 40.0}
     }
   },
   "p17": {
@@ -210,11 +210,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3169},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.490},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefNRG": 42.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3169, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 35.490},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefGHGUncertainty": 5, "coefNRG": 42.000}
     }
   },
   "p18": {
@@ -223,11 +223,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3169},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.490},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefNRG": 42.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 75.5, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.272, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3169, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 35.490},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.17, "coefGHGUncertainty": 5, "coefNRG": 42.000}
     }
   },
   "p19": {
@@ -236,11 +236,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.2},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.253},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2950},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.440},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefNRG": 44.300}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.2, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.253, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2950, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 35.440},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefGHGUncertainty": 5, "coefNRG": 44.300}
     }
   },
   "p20": {
@@ -249,11 +249,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.200},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 35.200},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefGHGUncertainty": 5, "coefNRG": 44.000}
     }
   },
   "p21": {
@@ -262,11 +262,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.2},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.253},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2950},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.440},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefNRG": 44.300}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 70.2, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.253, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2950, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 35.440},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.11, "coefGHGUncertainty": 5, "coefNRG": 44.300}
     }
   },
   "p22": {
@@ -275,11 +275,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefNRG": 35.200},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.48, "coefGHGUncertainty": 5, "coefNRG": 35.200},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefGHGUncertainty": 5, "coefNRG": 44.000}
     }
   },
   "p23": {
@@ -288,11 +288,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.7},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.258},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3010},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.53, "coefNRG": 35.280},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.1}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.7, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.258, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3010, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.53, "coefGHGUncertainty": 5, "coefNRG": 35.280},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefGHGUncertainty": 5, "coefNRG": 44.1}
     }
   },
   "p24": {
@@ -301,11 +301,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.55, "coefNRG": 35.200},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefNRG": 44.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 71.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3020, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.55, "coefGHGUncertainty": 5, "coefNRG": 35.200},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.16, "coefGHGUncertainty": 5, "coefNRG": 44.000}
     }
   },
   "p25": {
@@ -314,11 +314,11 @@
     "subCategory": "Usage sources mobiles",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 72.7},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.262},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3055},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.57, "coefNRG": 35.490},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.45, "coefNRG": 42.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 72.7, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.262, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3055, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.57, "coefGHGUncertainty": 10, "coefNRG": 35.490},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.45, "coefGHGUncertainty": 10, "coefNRG": 42.000}
     }
   },
   "p26": {
@@ -327,9 +327,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3102}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3102, "coefGHGUncertainty": 20}
     }
   },
   "p27": {
@@ -338,9 +338,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 81.4},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.293},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3412}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 81.4, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.293, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3412, "coefGHGUncertainty": 5}
     }
   },
   "p28": {
@@ -349,9 +349,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 81.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.295},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3432}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 81.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.295, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3432, "coefGHGUncertainty": 5}
     }
   },
   "p29": {
@@ -360,9 +360,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.5},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.265},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3090}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.5, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.265, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3090, "coefGHGUncertainty": 5}
     }
   },
   "p30": {
@@ -371,9 +371,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.2},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.264},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3080}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.2, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.264, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3080, "coefGHGUncertainty": 5}
     }
   },
   "p31": {
@@ -382,9 +382,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 72.0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3022}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 72.0, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.259, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3022, "coefGHGUncertainty": 5}
     }
   },
   "p32": {
@@ -393,9 +393,9 @@
     "subCategory": "Usages spéciaux",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3102}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.266, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 3102, "coefGHGUncertainty": 5}
     }
   },
   "p33": {
@@ -404,8 +404,8 @@
     "subCategory": "Pétrole brut",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.2},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.07, "coefNRG": 42.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 73.2, "coefGHGUncertainty": 5},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.07, "coefGHGUncertainty": 5, "coefNRG": 42.000}
     }
   },
   "p34": {
@@ -414,13 +414,13 @@
     "subCategory": "Gaz naturel",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 52.1},
-      "GJ_PCS": {"unit": "kgCO2e/GJ PCS", "coefGHG": 46.9},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.187},
-      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.169},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2180},
-      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 1964},
-      "m3": {"unit": "kgCO2e/m3", "coefGHG": 1.82, "coefNRG": 32438}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 52.1, "coefGHGUncertainty": 5},
+      "GJ_PCS": {"unit": "kgCO2e/GJ PCS", "coefGHG": 46.9, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.187, "coefGHGUncertainty": 5},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.169, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2180, "coefGHGUncertainty": 5},
+      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 1964, "coefGHGUncertainty": 5},
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 1.82, "coefGHGUncertainty": 5, "coefNRG": 32438}
     }
   },
   "p35": {
@@ -429,12 +429,12 @@
     "subCategory": "Gaz naturel",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 56.9},
-      "GJ_PCS": {"unit": "kgCO2e/GJ PCS", "coefGHG": 51.3},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.205},
-      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.185},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2390},
-      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 2153}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 56.9, "coefGHGUncertainty": 5},
+      "GJ_PCS": {"unit": "kgCO2e/GJ PCS", "coefGHG": 51.3, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.205, "coefGHGUncertainty": 5},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.185, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2390, "coefGHGUncertainty": 5},
+      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 2153, "coefGHGUncertainty": 5}
     }
   },
   "p36": {
@@ -443,7 +443,7 @@
     "subCategory": "Gaz naturel",
     "type" : "fossil",
     "units": {
-      "m3": {"unit": "kgCO2e/m3", "coefGHG": 2.12, "coefNRG": 32438}
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 2.12, "coefGHGUncertainty": 5, "coefNRG": 32438}
     }
   },
   "p37": {
@@ -452,7 +452,7 @@
     "subCategory": "Gaz naturel",
     "type" : "fossil",
     "units": {
-      "m3": {"unit": "kgCO2e/m3", "coefGHG": 1.81, "coefNRG": 32438}
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 1.81, "coefGHGUncertainty": 5, "coefNRG": 32438}
     }
   },
   "p38": {
@@ -461,7 +461,7 @@
     "subCategory": "Gaz industriels",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 183}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 183, "coefGHGUncertainty": 5}
     }
   },
   "p39": {
@@ -470,7 +470,7 @@
     "subCategory": "Gaz industriels",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 47.5}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 47.5, "coefGHGUncertainty": 5}
     }
   },
   "p40": {
@@ -479,7 +479,7 @@
     "subCategory": "Gaz industriels",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 268}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 268, "coefGHGUncertainty": 5}
     }
   },
   "p41": {
@@ -488,11 +488,11 @@
     "subCategory": "Propane et butane",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 63.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.23},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2682},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.76, "coefNRG": 27.671},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.02, "coefNRG": 47.300}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 63.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.23, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2682, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.76, "coefGHGUncertainty": 5, "coefNRG": 27.671},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.02, "coefGHGUncertainty": 5, "coefNRG": 47.300}
     }
   },
   "p42": {
@@ -501,11 +501,11 @@
     "subCategory": "Propane et butane",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2722},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.73, "coefNRG": 26.676},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.95, "coefNRG": 45.600}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2722, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.73, "coefGHGUncertainty": 5, "coefNRG": 26.676},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.95, "coefGHGUncertainty": 5, "coefNRG": 45.600}
     }
   },
   "p43": {
@@ -514,11 +514,11 @@
     "subCategory": "Propane et butane",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 63.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.23},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2682},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.55, "coefNRG": 24.360},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.02, "coefNRG": 47.300}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 63.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.23, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2682, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.55, "coefGHGUncertainty": 5, "coefNRG": 24.360},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.02, "coefGHGUncertainty": 5, "coefNRG": 47.300}
     }
   },
   "p44": {
@@ -527,11 +527,11 @@
     "subCategory": "Propane et butane",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2722},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.53, "coefNRG": 23.690},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.98, "coefNRG": 46.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 64.8, "coefGHGUncertainty": 5},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.233, "coefGHGUncertainty": 5},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 2722, "coefGHGUncertainty": 5},
+      "L" : {"unit": "kgCO2e/L", "coefGHG": 1.53, "coefGHGUncertainty": 5, "coefNRG": 23.690},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.98, "coefGHGUncertainty": 5, "coefNRG": 46.000}
     }
   },
   "p45": {
@@ -540,10 +540,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4025},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.07, "coefNRG": 32.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4025, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.07, "coefGHGUncertainty": 20, "coefNRG": 32.000}
     }
   },
   "p46": {
@@ -552,10 +552,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 98.7},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.356},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4147},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.63, "coefNRG": 26.700}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 98.7, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.356, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4147, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.63, "coefGHGUncertainty": 20, "coefNRG": 26.700}
     }
   },
   "p47": {
@@ -564,10 +564,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 99.2},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.357},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4172},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.69, "coefNRG": 17.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 99.2, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.357, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4172, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.69, "coefGHGUncertainty": 20, "coefNRG": 17.000}
     }
   },
   "p48": {
@@ -576,10 +576,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4023},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.49, "coefNRG": 26.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4023, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.49, "coefGHGUncertainty": 20, "coefNRG": 26.000}
     }
   },
   "p49": {
@@ -588,10 +588,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4025},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.49, "coefNRG": 26.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 95.8, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.345, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4025, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.49, "coefGHGUncertainty": 20, "coefNRG": 26.000}
     }
   },
   "p50": {
@@ -600,10 +600,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 96.8},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.349},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4065},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.94, "coefNRG": 20.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 96.8, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.349, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4065, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.94, "coefGHGUncertainty": 20, "coefNRG": 20.000}
     }
   },
   "p51": {
@@ -612,10 +612,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 96.1},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.346},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4036},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.08, "coefNRG": 32.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 96.1, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.346, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4036, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 3.08, "coefGHGUncertainty": 20, "coefNRG": 32.000}
     }
   },
   "p52": {
@@ -624,10 +624,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 101.0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.364},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4251},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.72, "coefNRG": 17.000}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 101.0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.364, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4251, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.72, "coefGHGUncertainty": 20, "coefNRG": 17.000}
     }
   },
   "p53": {
@@ -636,10 +636,10 @@
     "subCategory": "Charbon",
     "type" : "fossil",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 110.0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.398},
-      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4637},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.28, "coefNRG": 11.600}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 110.0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.398, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep", "coefGHG": 4637, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.28, "coefGHGUncertainty": 20, "coefNRG": 11.600}
     }
   },
   "p54": {
@@ -648,8 +648,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3988}, 
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.5426, "coefNRG": 13.900}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3988, "coefGHGUncertainty": 50}, 
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.5426, "coefGHGUncertainty": 50, "coefNRG": 13.900}
     }
   },
   "p55": {
@@ -658,8 +658,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.476},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.7411, "coefNRG": 17.600}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.476, "coefGHGUncertainty": 50},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.7411, "coefGHGUncertainty": 50, "coefNRG": 17.600}
     }
   },
   "p56": {
@@ -668,8 +668,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3902},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.4282, "coefNRG": 13.100}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3902, "coefGHGUncertainty": 50},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.4282, "coefGHGUncertainty": 50, "coefNRG": 13.100}
     }
   },
   "p57": {
@@ -678,8 +678,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.4172},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.9175, "coefNRG": 7.900}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.4172, "coefGHGUncertainty": 50},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.9175, "coefGHGUncertainty": 50, "coefNRG": 7.900}
     }
   },
   "p58": {
@@ -688,8 +688,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3763},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.4712, "coefNRG": 14.000}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.3763, "coefGHGUncertainty": 50},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.4712, "coefGHGUncertainty": 50, "coefNRG": 14.000}
     }
   },
   "p59": {
@@ -698,8 +698,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.33},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.39, "coefNRG": 14.000}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.33, "coefGHGUncertainty": 50},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 1.39, "coefGHGUncertainty": 50, "coefNRG": 14.000}
     }
   },
   "p60": {
@@ -708,11 +708,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 0.433},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0020},
-      "tep": {"unit":"kgCO2e/tep PCI", "coefGHG": 18.1},
-      "m3": {"unit": "kgCO2e/m3", "coefGHG": 0.016},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.02}
+      "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 0.433, "coefGHGUncertainty": 70},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0020, "coefGHGUncertainty": 70},
+      "tep": {"unit":"kgCO2e/tep PCI", "coefGHG": 18.1, "coefGHGUncertainty": 70},
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 0.016, "coefGHGUncertainty": 70},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0.02, "coefGHGUncertainty": 70}
     }
   },
   "p61": {
@@ -721,8 +721,8 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0029},
-      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.0026}
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0029, "coefGHGUncertainty": 70},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.0026, "coefGHGUncertainty": 70}
     }
   },
   "p62": {
@@ -731,13 +731,13 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0.405},
-      "GJ_PCS": {"unit":"kgCO2e/GJ PCs", "coefGHG": 0.377},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0016},
-      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.0011},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 17.5},
-      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 15.6},
-      "m3": {"unit": "kgCO2e/m3", "coefGHG": 0.0162}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0.405, "coefGHGUncertainty": 20},
+      "GJ_PCS": {"unit":"kgCO2e/GJ PCs", "coefGHG": 0.377, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.0016, "coefGHGUncertainty": 20},
+      "kWh_PCS": {"unit": "kgCO2e/kWh PCS", "coefGHG": 0.0011, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 17.5, "coefGHGUncertainty": 20},
+      "tep_PCS": {"unit": "kgCO2e/tep PCS", "coefGHG": 15.6, "coefGHGUncertainty": 20},
+      "m3": {"unit": "kgCO2e/m3", "coefGHG": 0.0162, "coefGHGUncertainty": 20}
     }
   },
   "p63": {
@@ -746,11 +746,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   },
   "p64": {
@@ -759,11 +759,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   },
   "p65": {
@@ -772,11 +772,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   },
   "p67": {
@@ -785,11 +785,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   },
   "p68": {
@@ -798,11 +798,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   },
   "p69": {
@@ -811,11 +811,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   },
   "p70": {
@@ -824,11 +824,11 @@
     "subCategory": "",
     "type" : "biomass",
     "units": {
-      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0},
-      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0},
-      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0},
-      "L": {"unit": "kgCO2e/m3", "coefGHG": 0},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0}
+      "GJ": {"unit":"kgCO2e/GJ PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "L": {"unit": "kgCO2e/m3", "coefGHG": 0, "coefGHGUncertainty": 20},
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 0, "coefGHGUncertainty": 20}
     }
   }
 }
