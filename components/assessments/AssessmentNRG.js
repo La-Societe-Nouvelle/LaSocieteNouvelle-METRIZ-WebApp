@@ -47,7 +47,7 @@ export class AssessmentNRG extends React.Component {
     }
   }
 
-  componentDidMount()
+  componentDidMount() // Create basic nrg product (electricity/heat/renewable)
   {
     let {nrgDetails} = this.state;
     const productsToInit = {"electricity": 0,"heat": 1,"renewableTransformedEnergy": 2};
@@ -73,12 +73,14 @@ export class AssessmentNRG extends React.Component {
 
           <table>
             <thead>
-              <tr><td colSpan="5">Libellé</td><td colSpan="2">Valeur</td><td colSpan="2">Incertitude</td><td></td></tr>
+              <tr><td colSpan="6">Libellé</td><td colSpan="2">Valeur</td><td colSpan="2">Incertitude</td></tr>
             </thead>
             <tbody>
 
               {nrgDetails["electricity"] &&
-              <tr><td>Electricité</td>
+              <tr>
+                <td/>
+                <td>Electricité</td>
                 <td className="short right">
                   <InputNumber value={nrgDetails["electricity"].consumption} 
                                onUpdate={(nextValue) => this.updateConsumption.bind(this)("electricity", nextValue)}/></td>
@@ -98,18 +100,20 @@ export class AssessmentNRG extends React.Component {
                 <td className="column_unit"><span>&nbsp;%</span></td>
               </tr>}
               
-              <tr><td colSpan="5">Produits énergétiques fossiles</td>
+              <tr>
+                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("fossil")} alt="add"/></td>
+                <td colSpan="5">Produits énergétiques fossiles</td>
                 <td className="short right">{printValue(getTotalByType(nrgDetails,"fossil"),0)}</td>
                 <td className="column_unit"><span>&nbsp;MJ</span></td>
                 <td className="short right">{printValue(getUncertaintyByType(nrgDetails,"fossil"),0)}</td>
                 <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("fossil")} alt="add"/></td>
               </tr>
 
               {Object.entries(nrgDetails)
                      .filter(([_,data]) => data.type=="fossil")
                      .map(([itemId,itemData]) => 
                 <tr key={itemId}>
+                  <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
                     <select value={itemData.fuelCode}
                             onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
@@ -136,12 +140,12 @@ export class AssessmentNRG extends React.Component {
                   <td className="column_unit"><span>&nbsp;MJ</span></td>
                   <td className="short right">{printValue(itemData.nrgConsumptionUncertainty,0)}</td>
                   <td className="column_unit"><span>&nbsp;%</span></td>
-                  <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                 </tr>
               )}
 
               {typeNewProduct=="fossil" &&
                 <tr>
+                  <td/>
                   <td className="sub">
                     <select value="none"
                             onChange={(event) => this.addProduct(event.target.value)}>
@@ -154,18 +158,19 @@ export class AssessmentNRG extends React.Component {
               }
 
               <tr>
+                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("biomass")} alt="add" /></td>
                 <td colSpan="5">Biomasse</td>
                 <td className="short right">{printValue(getTotalByType(nrgDetails,"biomass"),0)}</td>
                 <td className="column_unit"><span>&nbsp;MJ</span></td>
                 <td className="short right">{printValue(getUncertaintyByType(nrgDetails,"biomass"),0)}</td>
                 <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("biomass")} alt="add" /></td>
               </tr>
 
               {Object.entries(nrgDetails)
                      .filter(([_,itemData]) => itemData.type=="biomass")
                      .map(([itemId,itemData]) => 
                 <tr key={itemId}>
+                  <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
                     <select value={itemData.fuelCode}
                             onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
@@ -192,12 +197,12 @@ export class AssessmentNRG extends React.Component {
                   <td className="column_unit"><span>&nbsp;MJ</span></td>
                   <td className="short right">{printValue(itemData.nrgConsumptionUncertainty,0)}</td>
                   <td className="column_unit"><span>&nbsp;%</span></td>
-                  <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                 </tr>
               )}
 
               {typeNewProduct=="biomass" &&
                 <tr>
+                  <td/>
                   <td className="sub">
                     <select value="none"
                             onChange={(event) => this.addProduct(event.target.value)}>
@@ -211,6 +216,7 @@ export class AssessmentNRG extends React.Component {
 
               {nrgDetails["heat"] &&
               <tr>
+                <td/>
                 <td>Chaleur</td>
                 <td className="short right">
                   <InputNumber value={nrgDetails["heat"].consumption} 
@@ -233,6 +239,7 @@ export class AssessmentNRG extends React.Component {
 
               {nrgDetails["renewableTransformedEnergy"] &&
               <tr>
+                <td/>
                 <td>Energie renouvelable transformée</td>
                 <td className="short right">
                   <InputNumber value={nrgDetails["renewableTransformedEnergy"].consumption} 
@@ -254,6 +261,7 @@ export class AssessmentNRG extends React.Component {
               </tr>}
 
               <tr className="with-top-line">
+                <td/>
                 <td colSpan="5">Total</td>
                 <td className="column_value">{printValue(energyConsumption,0)}</td>
                 <td className="column_unit">&nbsp;MJ</td>
@@ -303,8 +311,13 @@ export class AssessmentNRG extends React.Component {
     if (Object.keys(nrgProducts[nextFuelCode].units)
               .includes(itemData.consumptionUnit)) {
       itemData.nrgConsumption = getNrgConsumption(itemData);
+      itemData.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
     } else {
-      itemData = {...itemData, consumption: 0.0, consumptionUnit: "GJ", consumptionUncertainty: 0.0, nrgConsumption: 0.0, nrgConsumptionUncertainty: 0.0}
+      itemData.consumption = 0.0;
+      itemData.consumptionUnit = "GJ";
+      itemData.consumptionUncertainty = 0.0;
+      itemData.nrgConsumption = 0.0;
+      itemData.nrgConsumptionUncertainty = 0.0;
     }
 
     // update total
@@ -316,6 +329,7 @@ export class AssessmentNRG extends React.Component {
     let itemData = this.state.nrgDetails[itemId];
     itemData.consumptionUnit = nextConsumptionUnit;
     itemData.nrgConsumption = getNrgConsumption(itemData);
+    itemData.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
     this.updateEnergyConsumption();
   }
 
@@ -332,7 +346,7 @@ export class AssessmentNRG extends React.Component {
   // update uncertainty
   updateConsumptionUncertainty = (itemId,nextValue) =>
   {
-    let item = this.props.impactsData.nrgDetails[itemId];
+    let item = this.satte.nrgDetails[itemId];
     item.consumptionUncertainty = nextValue;
     item.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(item);
     this.updateEnergyConsumption();
@@ -342,9 +356,9 @@ export class AssessmentNRG extends React.Component {
 
   deleteItem = (item) =>
   {
-    let idGHG = this.state.impactsData.ghgDetails[itemId].idGHG;
-    if (idGHG!=undefined) delete this.state.impactsData.ghgDetails[idGHG];
-    delete this.state.impactsData.nrgDetails[itemId];
+    let idGHG = this.state.ghgDetails[itemId].idGHG;
+    if (idGHG!=undefined) delete this.state.ghgDetails[idGHG];
+    delete this.state.nrgDetails[itemId];
     this.updateEnergyConsumption();
   }
 
