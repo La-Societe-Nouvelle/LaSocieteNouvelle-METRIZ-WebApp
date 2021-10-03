@@ -326,7 +326,7 @@ export class AssessmentGHG extends React.Component {
     const id = getNewId(Object.entries(ghgDetails).map(([_,item]) => item));
     ghgDetails[id] = {
       id: id,
-      label: ["1","2"].includes(assessmentItem) ? nrgProducts[nextFuelCode].label : source,
+      label: ["1","2"].includes(assessmentItem) ? nrgProducts[source].label : source,
       fuelCode: source, 
       consumption: 0.0, 
       consumptionUnit: ["1","2"].includes(assessmentItem) ? "GJ" : "kgCO2e", 
