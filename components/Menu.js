@@ -25,11 +25,14 @@ export function Menu({selectedSection, changeSection, downloadSession, importSes
           <button className={"menu-button"+("financialData"==selectedSection ? " selected" : "")}
                   onClick = {() => changeSection("financialData")} >Ecritures comptables {progression.financialDataOK && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
           
+          <button className={"menu-button"+("initialStates"==selectedSection ? " selected" : "")}
+                  disabled={!progression.financialDataOK}
+                  onClick = {() => changeSection("initialStates")} >Etats initiaux {(progression.financialDataOK && progression.initialStatesOK) && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
+          
           <button className={"menu-button"+("companies"==selectedSection ? " selected" : "")}
+                  disabled={!progression.financialDataOK}
                   onClick = {() => changeSection("companies")} >Fournisseurs {(progression.financialDataOK && progression.companiesOK) && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
           
-          <button className={"menu-button"+("initialStates"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("initialStates")} >Etats initiaux {(progression.financialDataOK && progression.initialStatesOK) && <img className="icon-menu" src="/resources/icon_good-white.png" alt="refresh"/>}</button>
         </div>
 
         <div className="menu-items-group">

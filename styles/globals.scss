@@ -137,6 +137,11 @@ select {
     &.selected {
       background-color: $highlight-color;
     }
+    &:disabled {
+      background-color: white;
+      color: $primary-color;
+      border: solid $primary-color 1px;
+    }
   }
 }
 
