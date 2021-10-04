@@ -380,9 +380,8 @@ export class AssessmentNRG extends React.Component {
 
     // update ng data
     impactsData.nrgDetails = this.state.nrgDetails;
-    impactsData.energyConsumption = this.state.energyConsumption;
-    impactsData.energyConsumptionUncertainty = this.state.energyConsumptionUncertainty;
-
+    impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails);
+    impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
     await this.props.onUpdate("nrg");
 
     // update ghg data
@@ -409,10 +408,8 @@ export class AssessmentNRG extends React.Component {
             ghgItem.assessmentItem = "1";
           })
     // ...total & uncertainty
-    impactsData.greenhousesGazEmissions = Object.entries(impactsData.ghgDetails)
-                                                .map(([_,data]) => data.ghgEmissions)
-                                                .reduce((a,b) => a + b,0);
-
+    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
+    impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
     await this.props.onUpdate("ghg");
   }
 }
@@ -430,11 +427,33 @@ const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) =>
   }
 }
 
+const getNrgConsumptionMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  switch(consumptionUnit) {
+    case "MJ":  return consumption*(1+consumptionUncertainty/100);
+    case "GJ":  return consumption*(1+consumptionUncertainty/100) * 1000;
+    case "tep": return consumption*(1+consumptionUncertainty/100) * 41868;
+    case "kWh": return consumption*(1+consumptionUncertainty/100) * 3.6;
+    default:    return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+  }
+}
+
+const getNrgConsumptionMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  switch(consumptionUnit) {
+    case "MJ":  return consumption*(1-consumptionUncertainty/100);
+    case "GJ":  return consumption*(1-consumptionUncertainty/100) * 1000;
+    case "tep": return consumption*(1-consumptionUncertainty/100) * 41868;
+    case "kWh": return consumption*(1-consumptionUncertainty/100) * 3.6;
+    default:    return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+  }
+}
+
 const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
 {
   const value = getNrgConsumption({consumption,consumptionUnit,fuelCode});
-  const valueMax = getNrgConsumption({consumption: consumption*(1+consumptionUncertainty/100),consumptionUnit,fuelCode});
-  const valueMin = getNrgConsumption({consumption: consumption*Math.max(1-consumptionUncertainty/100,0),consumptionUnit,fuelCode})
+  const valueMax = getNrgConsumptionMax({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
+  const valueMin = getNrgConsumptionMin({consumption,consumptionUnit,consumptionUncertainty,fuelCode})
   return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
 }
 
@@ -493,7 +512,6 @@ const getUncertaintyByType = (nrgDetails,type) =>
 
 const getGhgEmissions = ({consumption,consumptionUnit,fuelCode}) =>
 {
-  console.log(fuelCode);
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption;
     case "tCO2e":   return consumption * 1000;
@@ -501,10 +519,53 @@ const getGhgEmissions = ({consumption,consumptionUnit,fuelCode}) =>
   }
 }
 
+const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  switch(consumptionUnit) {
+    case "kgCO2e":  return consumption*(1+consumptionUncertainty/100);
+    case "tCO2e":   return consumption*(1+consumptionUncertainty/100) * 1000;
+    default:        return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
+  }
+}
+
+const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  switch(consumptionUnit) {
+    case "kgCO2e":  return consumption*(1-consumptionUncertainty/100);
+    case "tCO2e":   return consumption*(1-consumptionUncertainty/100) * 1000;
+    default:        return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
+  }
+}
+
 const getGhgEmissionsUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
 {
   const value = getGhgEmissions({consumption,consumptionUnit,fuelCode});
-  const valueMax = getGhgEmissions({consumption: consumption*(1+consumptionUncertainty/100),consumptionUnit,fuelCode});
-  const valueMin = getGhgEmissions({consumption: consumption*Math.max(1-consumptionUncertainty/100,0),consumptionUnit,fuelCode})
+  const valueMax = getGhgEmissionsMax({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
+  const valueMin = getGhgEmissionsMin({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
   return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+}
+
+const getTotalGhgEmissions = (ghgDetails) =>
+{
+  const sum = Object.entries(ghgDetails)
+                    .map(([_,data]) => data.ghgEmissions)
+                    .reduce((a,b) => a + b,0);
+  return sum;
+}
+
+const getTotalGhgEmissionsUncertainty = (ghgDetails) =>
+{
+  const items = Object.entries(ghgDetails).map(([_,itemData]) => itemData);
+  if (items.length > 0)
+  {
+    const value = items.map((item) => item.ghgEmissions).reduce((a,b) => a + b,0);
+    if (value > 0) {
+      const valueMax = items.map((item) => item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
+      const valueMin = items.map((item) => item.ghgEmissions*Math.max(1-item.ghgEmissionsUncertainty/100,0)).reduce((a,b) => a + b,0);
+      return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+    } else {
+      return 0;
+    }
+  }
+  else return  null;
 }

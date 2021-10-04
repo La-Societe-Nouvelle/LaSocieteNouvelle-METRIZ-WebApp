@@ -432,9 +432,8 @@ export class AssessmentGHG extends React.Component {
 
     // update ghg data
     impactsData.ghgDetails = this.state.ghgDetails;
-    impactsData.greenhousesGazEmissions = this.state.greenhousesGazEmissions;
-    impactsData.greenhousesGazEmissionsUncertainty = this.state.greenhousesGazEmissionsUncertainty;
-    
+    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
+    impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
     await this.props.onUpdate("ghg");
 
     // update nrg data
@@ -458,14 +457,12 @@ export class AssessmentGHG extends React.Component {
             nrgItem.consumptionUnit = itemData.consumptionUnit;
             nrgItem.consumptionUncertainty = itemData.consumptionUncertainty;
             nrgItem.nrgConsumption = getNrgConsumption(itemData);
-            nrgItem.nrgConsumptionUncertainty = itemData.consumptionUncertainty;
+            nrgItem.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
             nrgItem.type = nrgProducts[itemData.fuelCode].type;
           })
     // ...total & uncertainty
-    impactsData.energyConsumption = Object.entries(impactsData.nrgDetails)
-                                          .map(([_,data]) => data.nrgConsumption)
-                                          .reduce((a,b) => a + b,0);
-    
+    impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails)
+    impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails)
     await this.props.onUpdate("nrg");
   }
 }
@@ -484,8 +481,8 @@ const getGhgEmissions = ({consumption,consumptionUnit,fuelCode}) =>
 const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
 {
   switch(consumptionUnit) {
-    case "kgCO2e":  return consumption;
-    case "tCO2e":   return consumption * 1000;
+    case "kgCO2e":  return consumption*(1+consumptionUncertainty/100);
+    case "tCO2e":   return consumption*(1+consumptionUncertainty/100) * 1000;
     default:        return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
   }
 }
@@ -493,9 +490,9 @@ const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,
 const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
 {
   switch(consumptionUnit) {
-    case "kgCO2e":  return consumption;
-    case "tCO2e":   return consumption * 1000;
-    default:        return consumption*Math.max(1-consumptionUncertainty/100,0) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
+    case "kgCO2e":  return consumption*(1-consumptionUncertainty/100);
+    case "tCO2e":   return consumption*(1-consumptionUncertainty/100) * 1000;
+    default:        return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
   }
 }
 
@@ -566,4 +563,59 @@ const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) =>
     case "kWh": return consumption * 3.6;
     default:    return consumption * nrgProducts[fuelCode].units[consumptionUnit].coefNRG;
   }
+}
+
+const getNrgConsumptionMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  switch(consumptionUnit) {
+    case "MJ":  return consumption*(1+consumptionUncertainty/100);
+    case "GJ":  return consumption*(1+consumptionUncertainty/100) * 1000;
+    case "tep": return consumption*(1+consumptionUncertainty/100) * 41868;
+    case "kWh": return consumption*(1+consumptionUncertainty/100) * 3.6;
+    default:    return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+  }
+}
+
+const getNrgConsumptionMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  switch(consumptionUnit) {
+    case "MJ":  return consumption*(1-consumptionUncertainty/100);
+    case "GJ":  return consumption*(1-consumptionUncertainty/100) * 1000;
+    case "tep": return consumption*(1-consumptionUncertainty/100) * 41868;
+    case "kWh": return consumption*(1-consumptionUncertainty/100) * 3.6;
+    default:    return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+  }
+}
+
+const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+{
+  const value = getNrgConsumption({consumption,consumptionUnit,fuelCode});
+  const valueMax = getNrgConsumptionMax({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
+  const valueMin = getNrgConsumptionMin({consumption,consumptionUnit,consumptionUncertainty,fuelCode})
+  return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+}
+
+const getTotalNrgConsumption = (nrgDetails) =>
+{
+  const sum = Object.entries(nrgDetails)
+                    .map(([_,data]) => data.nrgConsumption)
+                    .reduce((a,b) => a + b,0);
+  return sum;
+}
+
+const getTotalNrgConsumptionUncertainty = (nrgDetails) =>
+{
+  const items = Object.entries(nrgDetails).map(([_,itemData]) => itemData);
+  if (items.length > 0)
+  {
+    const value = items.map((item) => item.nrgConsumption).reduce((a,b) => a + b,0);
+    if (value > 0) {
+      const valueMax = items.map((item) => item.nrgConsumption*(1+item.nrgConsumptionUncertainty/100)).reduce((a,b) => a + b,0);
+      const valueMin = items.map((item) => item.nrgConsumption*Math.max(1-item.nrgConsumptionUncertainty/100,0)).reduce((a,b) => a + b,0);
+      return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+    } else {
+      return 0;
+    }
+  }
+  else return  null;
 }
