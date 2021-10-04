@@ -50,16 +50,28 @@ export class AssessmentNRG extends React.Component {
   componentDidMount() // Create basic nrg product (electricity/heat/renewable)
   {
     let {nrgDetails} = this.state;
-    const productsToInit = {"electricity": 0,"heat": 1,"renewableTransformedEnergy": 2};
-    Object.entries(productsToInit)
-          .filter(([_,id]) => nrgDetails[id]==undefined)
-          .forEach(([product,id]) => nrgDetails[product] = {id: id, fuelCode: product, type: product, consumption: 0.0, consumptionUnit: "kWh", consumptionUncertainty: 0.0, nrgConsumption: 0.0, nrgConsumptionUncertainty: 0.0})
+    const productsToInit = ["electricity","heat","renewableTransformedEnergy"];
+    productsToInit.filter((product) => nrgDetails[product]==undefined)
+                  .forEach((product) => 
+    {
+      nrgDetails[product] = {
+        id: product,
+        fuelCode: product, 
+        type: product,
+        consumption: 0.0, 
+        consumptionUnit: "kWh",
+        consumptionUncertainty: 0.0, 
+        nrgConsumption: 0.0,
+        nrgConsumptionUncertainty: 0.0,
+      }
+    })
     this.setState({nrgDetails: nrgDetails});
   }
 
   render() 
   {
     const {energyConsumption,energyConsumptionUncertainty,nrgDetails,typeNewProduct} = this.state;
+    console.log(nrgDetails);
 
     return (
       <div className="assessment">
@@ -346,7 +358,7 @@ export class AssessmentNRG extends React.Component {
   // update uncertainty
   updateConsumptionUncertainty = (itemId,nextValue) =>
   {
-    let item = this.satte.nrgDetails[itemId];
+    let item = this.state.nrgDetails[itemId];
     item.consumptionUncertainty = nextValue;
     item.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(item);
     this.updateEnergyConsumption();
@@ -411,6 +423,9 @@ export class AssessmentNRG extends React.Component {
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
     impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
     await this.props.onUpdate("ghg");
+
+    // go bakc
+    this.props.onGoBack();
   }
 }
 
