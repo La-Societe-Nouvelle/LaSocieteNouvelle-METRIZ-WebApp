@@ -297,7 +297,7 @@ export class AssessmentNRG extends React.Component {
   addProduct = (fuelCode) => 
   {
     let {nrgDetails} = this.state;
-    const id = getNewId(Object.entries(this.props.impactsData.nrgDetails).map(([_,item]) => item).filter(item => !isNaN(item.id)));
+    const id = getNewId(Object.entries(nrgDetails).map(([_,item]) => item).filter(item => !isNaN(item.id)));
     nrgDetails[id] = {
       id: id,
       fuelCode: fuelCode, 
@@ -395,6 +395,15 @@ export class AssessmentNRG extends React.Component {
     await this.props.onUpdate("nrg");
 
     // update ghg data
+    // ...delete
+    Object.entries(impactsData.ghgDetails)
+          .filter(([_,itemData]) => itemData.fuelCode!=undefined)
+          .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
+          .forEach(([itemId,_]) => 
+          {
+            let nrgItem = Object.entries(impactsData.nrgDetails).map(([_,nrgItemData]) => nrgItemData).filter(nrgItem => nrgItem.idGHG==itemId)[0];
+            if (nrgItem==undefined) delete impactsData.ghgDetails[itemId];
+          })
     // ...add & update
     Object.entries(impactsData.nrgDetails)
           .filter(([_,data]) => data.type=="fossil" || data.type=="biomass")
@@ -403,8 +412,7 @@ export class AssessmentNRG extends React.Component {
             let ghgItem = Object.entries(impactsData.ghgDetails).map(([_,ghgItemData]) => ghgItemData).filter(ghgItem => ghgItem.idNRG==itemId)[0];
             // init if undefined
             if (ghgItem==undefined) {
-              const id = getNewId(Object.entries(impactsData.ghgDetails)
-                                        .map(([_,data]) => data));
+              const id = getNewId(Object.entries(impactsData.ghgDetails).map(([_,data]) => data));
               impactsData.ghgDetails[id] = {id: id,idNRG: itemId}
               ghgItem = impactsData.ghgDetails[id];
               itemData.idGHG = id;
@@ -417,15 +425,6 @@ export class AssessmentNRG extends React.Component {
             ghgItem.ghgEmissions = getGhgEmissions(itemData);
             ghgItem.getGhgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
             ghgItem.assessmentItem = "1";
-          })
-    // ...delete
-    Object.entries(impactsData.ghgDetails)
-          .filter(([_,itemData]) => itemData.fuelCode!=undefined)
-          .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
-          .forEach(([itemId,_]) => 
-          {
-            let nrgItem = Object.entries(impactsData.nrgDetails).map(([_,nrgItemData]) => nrgItemData).filter(nrgItem => nrgItem.idGHG = itemId)[0];
-            if (nrgItem==undefined) delete impactsData.ghgDetails[itemId];
           })
     // ...total & uncertainty
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
