@@ -464,6 +464,9 @@ export class AssessmentGHG extends React.Component {
     impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails)
     impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails)
     await this.props.onUpdate("nrg");
+
+    // back to statement
+    this.props.onGoBack();
   }
 }
 
