@@ -297,7 +297,7 @@ export class AssessmentNRG extends React.Component {
   addProduct = (fuelCode) => 
   {
     let {nrgDetails} = this.state;
-    const id = getNewId(Object.entries(nrgDetails).map(([_,item]) => item));
+    const id = getNewId(Object.entries(this.props.impactsData.nrgDetails).map(([_,item]) => item));
     nrgDetails[id] = {
       id: id,
       fuelCode: fuelCode, 
@@ -366,10 +366,8 @@ export class AssessmentNRG extends React.Component {
 
   /* ----- DELETE ----- */
 
-  deleteItem = (item) =>
+  deleteItem = (itemId) =>
   {
-    let idGHG = this.state.ghgDetails[itemId].idGHG;
-    if (idGHG!=undefined) delete this.state.ghgDetails[idGHG];
     delete this.state.nrgDetails[itemId];
     this.updateEnergyConsumption();
   }
@@ -397,7 +395,7 @@ export class AssessmentNRG extends React.Component {
     await this.props.onUpdate("nrg");
 
     // update ghg data
-    // ...details
+    // ...add & update
     Object.entries(impactsData.nrgDetails)
           .filter(([_,data]) => data.type=="fossil" || data.type=="biomass")
           .forEach(([itemId,itemData]) => 
@@ -409,6 +407,7 @@ export class AssessmentNRG extends React.Component {
                                         .map(([_,data]) => data));
               impactsData.ghgDetails[id] = {id: id,idNRG: itemId}
               ghgItem = impactsData.ghgDetails[id];
+              itemData.idGHG = id;
             }
             // update values
             ghgItem.fuelCode = itemData.fuelCode;
@@ -418,6 +417,15 @@ export class AssessmentNRG extends React.Component {
             ghgItem.ghgEmissions = getGhgEmissions(itemData);
             ghgItem.getGhgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
             ghgItem.assessmentItem = "1";
+          })
+    // ...delete
+    Object.entries(impactsData.ghgDetails)
+          .filter(([_,itemData]) => itemData.fuelCode!=undefined)
+          .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
+          .forEach(([itemId,_]) => 
+          {
+            let nrgItem = Object.entries(impactsData.nrgDetails).map(([_,nrgItemData]) => nrgItemData).filter(nrgItem => nrgItem.idGHG = itemId)[0];
+            if (nrgItem==undefined) delete impactsData.ghgDetails[itemId];
           })
     // ...total & uncertainty
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);

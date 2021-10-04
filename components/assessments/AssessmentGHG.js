@@ -323,7 +323,7 @@ export class AssessmentGHG extends React.Component {
   addProduct = (assessmentItem,source) => 
   {
     let {ghgDetails} = this.state;
-    const id = getNewId(Object.entries(ghgDetails).map(([_,item]) => item));
+    const id = getNewId(Object.entries(this.props.impactsData.ghgDetails).map(([_,item]) => item));
     ghgDetails[id] = {
       id: id,
       label: ["1","2"].includes(assessmentItem) ? nrgProducts[source].label : source,
@@ -408,8 +408,6 @@ export class AssessmentGHG extends React.Component {
 
   deleteItem = (itemId) =>
   {
-    let idNRG = this.state.ghgDetails[itemId].idNRG;
-    if (idNRG!=undefined) delete this.state.nrgDetails[idNRG];
     delete this.state.ghgDetails[itemId];
     this.updateGhgEmissions();
   }
@@ -437,7 +435,7 @@ export class AssessmentGHG extends React.Component {
     await this.props.onUpdate("ghg");
 
     // update nrg data
-    // ...details
+    // ...add & update
     Object.entries(impactsData.ghgDetails)
           .filter(([_,itemData]) => itemData.fuelCode!=undefined)
           .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
@@ -447,9 +445,11 @@ export class AssessmentGHG extends React.Component {
             // init if undefined
             if (nrgItem==undefined) {
               const id = getNewId(Object.entries(impactsData.nrgDetails)
-                                        .map(([_,data]) => data));
+                                        .map(([_,data]) => data)
+                                        .filter(item => !isNaN(item.id)));
               impactsData.nrgDetails[id] = {id: id,idGHG: itemId}
               nrgItem = impactsData.nrgDetails[id];
+              itemData.idNRG = id;
             }
             // update values
             nrgItem.fuelCode = itemData.fuelCode;
@@ -459,6 +459,14 @@ export class AssessmentGHG extends React.Component {
             nrgItem.nrgConsumption = getNrgConsumption(itemData);
             nrgItem.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
             nrgItem.type = nrgProducts[itemData.fuelCode].type;
+          })
+    // ...delete
+    Object.entries(impactsData.nrgDetails)
+          .filter(([_,itemData]) => itemData.type=="fossil" || itemData.type=="biomass")
+          .forEach(([itemId,_]) => 
+          {
+            let ghgItem = Object.entries(impactsData.ghgDetails).map(([_,ghgItemData]) => ghgItemData).filter(ghgItem => ghgItem.idNRG = itemId)[0];
+            if (ghgItem==undefined) delete impactsData.nrgDetails[itemId];
           })
     // ...total & uncertainty
     impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails)
