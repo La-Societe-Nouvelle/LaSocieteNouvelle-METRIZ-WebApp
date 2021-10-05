@@ -163,7 +163,7 @@ function RowTableImmobilisations(props)
               <td className="short center">{account}</td>
               <td className="auto">{accountLib}</td>
               <td colSpan={initialState=="defaultData" ? 1 : 2}>
-                <select className={(initialState=="prevFootprint" || dataFetched) ? "valid" : ""}
+                <select className={(initialState=="prevFootprint" || initialState=="currentFootprint" || dataFetched) ? "valid" : ""}
                         value={initialState}
                         onChange={onOriginStateChange}>
                   {initialState=="none" &&          <option key="none" value="none">---</option>}
@@ -174,7 +174,9 @@ function RowTableImmobilisations(props)
               </td>
             {initialState=="defaultData" &&
               <td className={"medium"+(dataFetched === true ? " valid" : "")}>
-                <select onChange={onActivityCodeChange} value={activityCode}>
+                <select className={dataFetched ? " valid" : ""}
+                        value={activityCode}
+                        onChange={onActivityCodeChange}>
                   {Object.entries(divisions)
                          .sort((a,b) => parseInt(a)-parseInt(b))
                          .map(([code,libelle]) => 
@@ -191,7 +193,7 @@ function RowTableImmobilisations(props)
     return (<tr>
               <td className="short center">{account}</td>
               <td className="auto">{accountLib}</td>
-              <td colSpan="2">Immobilisation non amortie sur l'exercice</td>
+              <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
               <td className="short right">{printValue(prevAmount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
               {initialState=="defaultData" &&
@@ -240,7 +242,7 @@ function RowTableStocks(props)
       <td className="auto">{accountLib}</td>
       {!isProductionStock &&
         <td colSpan={initialState=="defaultData" ? 1 : 2}>
-          <select className={initialState=="prevFootprint" || dataFetched ? "valid" : ""}
+          <select className={initialState=="prevFootprint" || initialState=="currentFootprint" || dataFetched ? "valid" : ""}
                   value={initialState}
                   onChange={onOriginStateChange}>
             {initialState=="none" && <option key="none" value="none">---</option>}
@@ -250,7 +252,8 @@ function RowTableStocks(props)
           </select></td>}
       {isProductionStock &&
         <td colSpan="2">
-          <select value="currentFootprint"
+          <select className={initialState=="currentFootprint" ? "valid" : ""}
+                  value="currentFootprint"
                   onChange={onOriginStateChange}>
             <option key="currentFootprint" value="none">Estimée sur exercice courant</option>
           </select></td>}

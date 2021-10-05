@@ -251,7 +251,7 @@ export class Session {
         let indicator = new Indicator({indic: indic});
         
         const netValueAdded = this.financialData.getNetValueAdded();
-        if (netValueAdded!=null)
+        if (this.financialData.isFinancialDataLoaded && netValueAdded > 0)
         {
             const impactsData = this.impactsData;
             impactsData.setNetValueAdded(netValueAdded);

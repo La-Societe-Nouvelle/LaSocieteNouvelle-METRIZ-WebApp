@@ -40,7 +40,7 @@ export class InitialStatesSection extends React.Component {
         </div>
 
         <div>
-          <p>Informations : {isAllValid ? "OK" : "Données manquantes"}</p>
+          <p>Informations : {isAllValid ? "Données complètes" : "Données non-synchronisées (Cf. menu(s) déroulant(s))"}</p>
         </div>
 
         <div className="section-view-main">
@@ -60,10 +60,11 @@ export class InitialStatesSection extends React.Component {
           </div>
         </div>
 
-        <Popup open={fetching}>
+      {fetching &&
+        <div className="popup">
           <ProgressBar message="Récupération des données par défaut..."
                         progression={progression}/>
-        </Popup>
+        </div>}
 
       </div>
     )

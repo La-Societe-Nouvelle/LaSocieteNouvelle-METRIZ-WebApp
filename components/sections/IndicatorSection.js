@@ -76,6 +76,10 @@ export class IndicatorSection extends React.Component {
     const {indic} = this.props;
     const {triggerPopup} = this.state;
 
+    const isAllValid = this.props.session.financialData.isFinancialDataLoaded
+                    && !(this.props.session.financialData.companies.filter(company => company.status != 200).length > 0)
+                    && !(this.props.session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0);
+
     return (
       <div className="section-view">
 
@@ -85,6 +89,11 @@ export class IndicatorSection extends React.Component {
               <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}
           </div>
         </div>
+
+      {!isAllValid &&
+        <div>
+          <p>Informations : {!this.props.session.financialData.isFinancialDataLoaded ? "Absences d'écritures comptables" : "Données non-synchronisées (Etats initiaux ou Fournisseurs)"}</p>
+        </div>}
 
         <div className="indicator-section-view">
           <div className="groups">

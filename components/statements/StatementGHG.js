@@ -45,7 +45,7 @@ export class StatementGHG extends React.Component {
                        onUpdate={this.updateGreenhousesGazEmissions}/>
           <span>&nbsp;kgCO2e</span>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
         </div>
         <div className="statement-item">

@@ -77,6 +77,13 @@ input {
   }
 }
 
+// Select
+
+select {
+  padding: 3px 20px;
+  margin: 0 3px;
+}
+
 // Exposant
 
 sup {
@@ -188,6 +195,7 @@ select {
 .group {
   display: flex;
   flex-direction: column;
+  padding: 5px;
   margin: 30px 0px 30px;
   border: solid $primary-color 1px;
 
@@ -196,19 +204,19 @@ select {
     padding: 0px 10px 0px 5px;
     margin: 0;
     position: relative;
-    top: -15px;
+    top: -20px;
     left: 10px;
     background-color: white;
   }
 
   .actions {
-    margin: 5px;
+    margin: 5px 0;
 
     select {
       width: 400px;
       background-color: $primary-color;
       color: white;
-      border: solid 1px $primary-color;
+      border: solid 0px $primary-color;
       border-radius: 0;
 
       option 
@@ -339,6 +347,7 @@ table {
       width: 100%;
       background-color: white;
       border: solid 1px $primary-color;
+      padding: 2px;
 
       option {
         background-color: white;
@@ -492,7 +501,8 @@ table {
 .inline-input {
   display: flex;
   flex-direction: row;
-  margin-bottom: 5px;
+  margin: 2px 5px;
+
   &.short {
     input {
       width: 150px;
@@ -584,7 +594,7 @@ table {
     .inline-input {
       display: flex;
       flex-direction: row;
-      margin: 5px 0;
+      margin: 5px;
       align-items: baseline;
 
       &.short {
@@ -619,6 +629,7 @@ table {
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    margin-top: 5px;
   }
 }
 

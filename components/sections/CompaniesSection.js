@@ -55,7 +55,7 @@ export class CompaniesSection extends React.Component {
         </div>
 
         <div>
-          <p>Informations : {isAllValid ? "Données synchronisées" : "Données manquantes (cf. Affichage des comptes non synchronisés)"}</p>
+          <p>Informations : {isAllValid ? "Données complètes" : "Données non-synchronisées (cf. Affichage des comptes non synchronisés)"}</p>
         </div>
 
         <div className="section-view-main">
@@ -96,10 +96,11 @@ export class CompaniesSection extends React.Component {
             
         </div>
 
-        <Popup open={fetching}>
+      {fetching &&
+        <div className="popup">
           <ProgressBar message="Récupération des données fournisseurs..."
                         progression={progression}/>
-        </Popup>
+        </div>}
 
       </div>
     )

@@ -59,7 +59,7 @@ export class StatementGEQ extends React.Component {
                        onUpdate={this.updateWageGap}/>
           <span>&nbsp;%</span>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
         </div>
         <div className="statement-validation">

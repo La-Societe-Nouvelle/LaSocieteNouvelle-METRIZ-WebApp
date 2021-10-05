@@ -45,7 +45,7 @@ export class StatementNRG extends React.Component {
                        onUpdate={this.updateEnergyConsumption}/>
           <span>&nbsp;MJ</span>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Outil de Mesure</button>
+            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
         </div>
         <div className="statement-item">

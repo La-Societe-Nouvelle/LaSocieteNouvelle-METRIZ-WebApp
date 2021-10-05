@@ -41,7 +41,7 @@ export class StatementKNW extends React.Component {
                        onUpdate={this.updateResearchAndTrainingContribution}/>
           <span>&nbsp;€</span>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
         </div>
         <div className="statement-validation">

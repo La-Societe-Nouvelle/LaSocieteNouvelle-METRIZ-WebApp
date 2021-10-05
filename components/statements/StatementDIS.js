@@ -61,7 +61,7 @@ export class StatementDIS extends React.Component {
                        onUpdate={this.updateIndexGini}/>
           <span>&nbsp;/100</span>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
+            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
         </div>
         <div className="statement-validation">

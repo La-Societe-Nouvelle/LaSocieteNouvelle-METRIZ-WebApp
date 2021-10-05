@@ -39,7 +39,7 @@ export class StatementART extends React.Component {
     }
   }
 
-  render() 
+  render()
   {
     const {isValueAddedCrafted,netValueAdded} = this.props.impactsData;
     const {craftedProduction} = this.state;
