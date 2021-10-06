@@ -95,20 +95,16 @@ Les lignes d'écritures *lues* sont celles relatives aux comptes d'immobilisatio
 
 ### Ecritures relatives aux comptes d'Immobilisation
 
-Pour chaque écriture relative à un compte d'immobilisations i.e. comptes #20, #21, #22, #23, #25, #26, #27, la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
-
-Pour chaque écriture relative à un compte d'amortissements ou de dépréciations i.e. comptes #28 ou #29, la variation (Débit - Crédit) est incrémentée au volume courant du compte associé (i.e. comptes #28 ou #29); afin d'obtenir la valeur en fin d'exercice.
+Pour chaque écriture relative à un compte d'immobilisations i.e. comptes #20, #21, #22, #23, #25, #26, #27, #28 et #29, la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
 *Note : lorsque le compte d'immobilisations n'est pas encore répertorié (absent du journal des A-Nouveaux), son montant en début d'exercice est considérée comme nul (égal à 0)*
 
 
 ### Ecritures relatives aux comptes de Stocks
 
-Pour chaque écriture relative à un compte de stocks (comptes #31, #32, #33, #34, #35 et #37), la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
+Pour chaque écriture relative à un compte de stocks (comptes #31, #32, #33, #34, #35, #37 et #39), la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
-Pour chaque écriture relative à un compte de dépréciations i.e. comptes #39, la variation (Débit - Crédit) est incrémentée au volume courant du compte associé afin d'obtenir la valeur en fin d'exercice.
-
-Les comptes #36 et #38 ne sont pas pris en compte.
+Les comptes #36 et #38 ne sont actuellement pas pris en compte.
 
 *Note : de même que pour les comptes d'immobilisations, lorsque le compte de stocks n'est pas encore répertorié (absent du journal des A-Nouveaux), son montant en début d'exercice est considérée comme nul (égal à 0)*
 
