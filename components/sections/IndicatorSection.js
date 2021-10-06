@@ -78,7 +78,7 @@ export class IndicatorSection extends React.Component {
 
     const isAllValid = this.props.session.financialData.isFinancialDataLoaded
                     && !(this.props.session.financialData.companies.filter(company => company.status != 200).length > 0)
-                    && !(this.props.session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0);
+                    && !(this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0);
 
     return (
       <div className="section-view">
