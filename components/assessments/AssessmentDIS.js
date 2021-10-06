@@ -396,6 +396,32 @@ class Row extends React.Component {
 
 }
 
+/* -------------------- LOADER -------------------- */
+
+const SocialDataContentReader_ = async (content) =>
+// ...build data from JSON content
+{
+  let employees = [];
+  
+  Object.entries(content).forEach(([index,contentItem]) => 
+  {
+    let employeeData = 
+    {
+      id: index,
+      name: contentItem['Nom - Prénom'] || contentItem.nom || "",
+      sex: contentItem['Sexe (F/H)'] || contentItem.sexe || "",
+      workingHours: contentItem['Heures travaillées'] || contentItem.heuresTravail || null,
+      wage: contentItem['Rémunérations brutes'] || contentItem.remuneration || null,
+      hourlyRate: contentItem['Taux horaire'] || contentItem.tauxHoraire || null,
+      trainingContract: contentItem['Contrat de formation (O/N)'] || contentItem.contratFormation || false,
+      trainingHours: contentItem['Heures de formation'] || contentItem.heuresFormation || 0
+    }
+    employees.push(employeeData);
+  })
+
+  return {employees};
+}
+
 /* -------------------- FORMULAS -------------------- */
 
 // Coefficient de GINI
@@ -405,7 +431,7 @@ const getIndexGini = (employees) =>
   employees.sort((a,b) => a.hourlyRate - b.hourlyRate);
 
   // Nombre total d'heures travaillées
-  let n = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+  let n = parseInt(employees.map(employee => parseInt(employee.workingHours)).reduce((a,b) => a + b,0));
   
   let s1 = 0;
   let s2 = 0;
@@ -415,16 +441,16 @@ const getIndexGini = (employees) =>
   {
     // S1
     for (let j = 1; j <= parseInt(employee.workingHours); j++) {
-      s1+= 2*(i+j)*employee.hourlyRate;
+      s1+= (i+j)*employee.hourlyRate;
     }
     i+= parseInt(employee.workingHours);
     // S2
-    s2+= n*parseInt(employee.workingHours)*employee.hourlyRate;
+    s2+= parseInt(employee.workingHours)*employee.hourlyRate;
   })
-
-  let indexGini = ((s1/s2) - (n+1)/n)*100;
   
-  /* -- Other formula
+  let indexGini = Math.abs( ( (2*s1)/(n*s2) ) - (n+1)/n ) *100;
+  
+  /*-- Other formula
 
   // Nombre total d'heures travaillées
   let total_workingHours = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
@@ -435,13 +461,13 @@ const getIndexGini = (employees) =>
 
   employees.forEach(employee =>
   {
-    s+= (parseInt(employee.workingHours)/total_workingHours)*((cumul_wage+employee.wage)/total_wage);
+    s+= (parseInt(employee.workingHours)/total_workingHours) * ((employee.wage)/total_wage);
+    console.log(s);
     cumul_wage+=employee.wage;
   })
 
-  let indexGini = 1-s;
-  */
-
+  let indexGini = Math.abs(s-1)*100; */
+  
   return roundValue(indexGini,1);
 }
 
@@ -453,9 +479,9 @@ const getGenderWageGap = (employees) =>
 
   if (men.length > 0 && women.length > 0)
   {
-    let hourlyRateWomen = women.map(employee => employee.wage).reduce((a,b) => a + b,0) / women.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
-    let hourlyRateMen = men.map(employee => employee.wage).reduce((a,b) => a + b,0) / men.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
-    let hourlyRateEmployees = employees.map(employee => employee.wage).reduce((a,b) => a + b,0) / employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
+    let hourlyRateWomen = women.map(employee => parseFloat(employee.wage)).reduce((a,b) => a + b,0) / women.map(employee => parseInt(employee.workingHours)).reduce((a,b) => a + b,0);
+    let hourlyRateMen = men.map(employee => parseFloat(employee.wage)).reduce((a,b) => a + b,0) / men.map(employee => parseInt(employee.workingHours)).reduce((a,b) => a + b,0);
+    let hourlyRateEmployees = employees.map(employee => parseFloat(employee.wage)).reduce((a,b) => a + b,0) / employees.map(employee => parseInt(employee.workingHours)).reduce((a,b) => a + b,0);
     
     let wageGap = Math.abs(hourlyRateMen-hourlyRateWomen)/hourlyRateEmployees *100;
     return roundValue(wageGap,1);
