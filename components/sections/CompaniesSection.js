@@ -148,7 +148,7 @@ export class CompaniesSection extends React.Component {
     let reader = new FileReader();
     reader.onload = async () => 
       XLSXFileReader(reader.result)
-        .then(async (XLSXData) => await Promise.all(XLSXData.map(async ({identifiant,denomination}) => this.updateCorporateId(denomination,identifiant))))
+        .then(async (XLSXData) => await Promise.all(XLSXData.map(async ({denomination,siren}) => this.updateCorporateId(denomination,siren))))
         .then(() => this.setState({companies: this.props.session.financialData.companies}));
     reader.readAsArrayBuffer(file);
   }
