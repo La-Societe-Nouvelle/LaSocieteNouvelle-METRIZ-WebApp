@@ -38,7 +38,7 @@ L'**année de fin de l'exercice** permettra d'assurer un suivi annuel de la perf
 &nbsp;
 ### DONNÉES FINANCIÈRES
 
-La section *Données Financières* correspond à l'importation et à la vérification des données comptables. L'importation s'effectue au format FEC (Fichier d'Ecritures Comptables) 
+La section *Données Financières* permet l'importation et la vérification des données comptables. L'importation s'effectue au format FEC (Fichier d'Ecritures Comptables).
 
 Les vues disponibles pour le contrôle des données sont :
 * *Compte de résultat* avec les soldes intermédiaires de gestion
@@ -46,7 +46,14 @@ Les vues disponibles pour le contrôle des données sont :
 * *Charges externes* - Liste des montants des charges externes par compte de charges
 * *Stocks* - Tableau des variations des stocks
 
-Attention: Les charges des comptes #609 sont enregistrées comme des dépenses *négatives* et sont associées au compte de charge lié (ex. #601 pour #6091)
+
+&nbsp;
+### ETATS INITIAUX
+
+Cette section a pour objectif de charger les empreintes des comptes de stocks et d'immobilisations en fin d'exercice précédent. En l'absence d'analyse réalisée sur l'exercice précédent, les données peuvent être estimées à partir de l'exercice courant ou de valeurs à l'échelle macro.
+
+Dès que des données le permettent, les valeurs sont issues de l'exercice courant.
+
 
 &nbsp;
 ### FOURNISSEURS
@@ -67,7 +74,7 @@ Exemple :
 | 3 |Fournisseur2; 759647854 |
 
 Le fichier d'import .xlsx doit comporter deux colonnes avec les libellés suivants :
-- *identifiant* pour la colonne contenant le numéro siren
+- *siren* pour la colonne contenant le numéro siren
 - *denomination* pour la colonne contenant le libellé de l'entreprise
 
 Exemple :
@@ -82,19 +89,15 @@ La colonne *siren* est de couleur verte lorsque les données sont synchronisées
 
 Le bouton *synchroniser les données* permet de mettre à jour les données associées pour l'ensemble des fournisseurs à partir des informations disponibles.
 
-&nbsp;
-### ETATS INITIAUX
-
-Cette section a pour objectif de charger les empreintes des comptes de stocks et d'immobilisations en fin d'exercice précédent. En l'absence d'analyse réalisée sur l'exercice précédent, les données peuvent être estimées à partir de l'exercice courant ou à partir de valeurs par défaut.
-
-Dès que des données le permettent, les valeurs sont issues de l'exercice courant.
 
 &nbsp;
 ### INDICATEURS (INFORMATIONS GÉNÉRALES)
 
 Pour chaque indicateur, l'interface se compose de 2 sections :
-* La déclaration des impacts directs : zone de saisie des impacts directs. Il est possible, si besoin, d'accéder à un outil de calcul des données.
+* La déclaration des impacts directs : zone de saisie des impacts directs. Il est possible, si besoin, d'accéder à un outil d'évaluation.
 * Le tableau récapitulatif : tableau regroupant les valeurs pour chaque solde intermédiaire. 
+
+Dès modification des valeurs déclarées, une validation est nécessaire pour mettre à jour le tableau de résultat.
  
 Dans le cas où des valeurs plus pertinentes sont disponibles pour un fournisseur, il est possible de modifier via les tableaux de détails la valeur utilisée et son incertitude. 
 
@@ -106,7 +109,9 @@ Dans le cas où des valeurs plus pertinentes sont disponibles pour un fournisseu
 
 Cette section permet la déclaration des "impacts directs". La déclaration est propre à chaque indicateur.
 
-Si nécessaire, un outil de calcul de l'impact est mis à disposition via le bouton *Outil de calcul*.
+Certaines informations peuvent être pré-complétées à partir de données connues de l'entreprise (activité principale, tranche d'effectifs, etc.)
+
+Si nécessaire, un outil de calcul de l'impact est mis à disposition via le bouton *Outil d'évaluation*.
 
 &nbsp;
 #### Le tableau récapitulatif
@@ -117,9 +122,34 @@ Il est possible d'exporter un rapport (format PDF) relatif à l'indicateur en cl
 
 Les données utilisées sont obtenues à partir des informations saisies (Section "Données Financières") : numéro de siren OU activités et localisation.
 
-Les boutons *Détail des dépenses* et *Détail des ammortissements* renvoient respectivement à la section *Détails des impacts indirects des consommations* et *Détails des impacts indirects des immobilisations*. Il est possible d'y modifier les données par fournisseur si une valeur plus pertinente est connue.
+A venir : Les boutons *Détail des dépenses* et *Détail des ammortissements* renvoient respectivement à la section *Détails des impacts indirects des consommations* et *Détails des impacts indirects des immobilisations*. Il est possible d'y modifier les données par fournisseur si une valeur plus pertinente est connue.
+  
+&nbsp;
+## OUTILS D'EVALUATION
 
-## OUTILS DE MESURE
+### INDICES SOCIAUX
+
+L'outil d'évaluation correspond à un tableau contenant, pour chaque collaborateur, les données sociales suivantes :
+ * Nom (option)
+ * Sexe
+ * Nombre d'heures travaillées (année)
+ * Rémunérations annuelles brutes
+ * Taux horaire brut
+ * Contrat de formation (stage, alternance, etc.)
+ * Nombre d'heures de formation
+
+Les données permettent de produire l'indice de répartitiond des rémunérations, l'écart de rémunérations femmes/hommes, et les rémunérations liées à la formation pour l'indicateur liée à la recherche et à la formation (cf. ci-dessous).
+
+
+### EMISSIONS DIRECTES DE GAZ A EFFET DE SERRE
+
+Outil d'évaluation des émissions de gaz à effet de serre.
+
+
+### CONSOMMATION D'ENERGIE
+
+Outil d'évaluation de la consommation d'énergie.
+
 
 ### CONTRIBUTION A L'EVOLUTION DES COMPETENCES ET DES CONNAISSANCES
 
@@ -136,18 +166,4 @@ Les données saisies n'étant pas sauvegardées côté serveur, il est possible 
 Les fichiers de sauvegarde sont au format JSON. 
 Les évolutions de l'application pourront entraîner un écart entre l'état sauvegardé au sein d'un fichier de sauvegarde et l'état utilisé au sein de l'application.
 L'importation sera adaptée pour préserver la lisibilité des fichiers. En cas de problème, n'hésitez pas à nous contacter.
-
-
-&nbsp;
-## FORMULES DE CALCULS
-
-### Empreinte de la valeur ajoutée nette
-
-### Empreinte d'une immobilisation
-
-### Empreinte d'une dotation aux amortissements sur immobilisations
-
-### Empreinte d'une charge externe
-
-
 
