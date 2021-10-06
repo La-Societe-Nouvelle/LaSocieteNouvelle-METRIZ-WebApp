@@ -546,7 +546,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
   {
     // retrieve depreciation accounts
     book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum 
-             && ecritureDepreciation.EcritureLib == ecriture.EcritureLib
+             //&& ecritureDepreciation.EcritureLib == ecriture.EcritureLib
              && ecritureDepreciation.CompteNum.substring(0,2)=="28")
         .forEach((ecritureDepreciation) => 
     {
