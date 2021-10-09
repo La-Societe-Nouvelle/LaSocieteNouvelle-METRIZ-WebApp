@@ -544,33 +544,73 @@ const readExpenseEntry = async (data,book,ecriture) =>
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
   if (ecriture.CompteNum.substring(0,4)=="6811" || ecriture.CompteNum.substring(0,4)=="6871")
   {
-    // retrieve depreciation accounts
-    book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum 
-             //&& ecritureDepreciation.EcritureLib == ecriture.EcritureLib
-             && ecritureDepreciation.CompteNum.substring(0,2)=="28")
-        .forEach((ecritureDepreciation) => 
+    let prefixAccountAux = /6811[1-2]/.test(ecriture.CompteNum.substring(0,5)) ? "28"+(parseInt(ecriture.CompteNum.charAt(4))-1) : "28";
+    let ecrituresDepreciations = book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum
+                                          && ecritureDepreciation.CompteNum.substring(0,prefixAccountAux.length)==prefixAccountAux);
+    let isTraceable = (ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit))
+                                             .reduce((a,b) => a+b,0) == (parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)));
+    
+    // case : use of 68111 or 68112 for 280 & 281
+    if (!isTraceable && /6811[1-2]/.test(ecriture.CompteNum.substring(0,5)))
+    {
+      let ecrituresDepreciations = book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum
+                                            && ecritureDepreciation.CompteNum.substring(0,2)=="28");
+      let isTraceable = (ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit))
+                                               .reduce((a,b) => a+b,0) == (parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)));
+      if (isTraceable) prefixAccountAux = "28";
+    }
+
+    // depreciation is linked to immobilisation accounts
+    if (isTraceable) 
+    {
+      ecrituresDepreciations.forEach((ecritureDepreciation) => 
+      {
+        // retrieve depreciation expense item
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ecriture.CompteNum
+                                                                           && expense.accountAux == ecritureDepreciation.CompteNum)[0];
+        
+        // if depreciation expense already defined
+        if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit);
+        
+        // if depreciation expense undefined
+        else if (ecritureDepreciation!=undefined)
+        {
+          let depreciationExpenseData = 
+          {
+            label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+            account: ecriture.CompteNum,
+            accountLib: ecriture.CompteLib,
+            accountAux: ecritureDepreciation.CompteNum,
+            amount: parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit),
+          }
+          data.depreciationExpenses.push(depreciationExpenseData);
+        }
+      })
+    }
+    // depreciation is not linked to immobilisation account (use prefix)
+    else
     {
       // retrieve depreciation expense item
       let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ecriture.CompteNum
-                                                                         && expense.accountAux == ecritureDepreciation.CompteNum)[0];
+                                                                         && expense.accountAux == prefixAccountAux)[0];
       
       // if depreciation expense already defined
-      if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit);
+      if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
       
       // if depreciation expense undefined
-      else if (ecritureDepreciation!=undefined)
+      else
       {
         let depreciationExpenseData = 
         {
           label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
           account: ecriture.CompteNum,
           accountLib: ecriture.CompteLib,
-          accountAux: ecritureDepreciation.CompteNum,
-          amount: parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit),
+          accountAux: prefixAccountAux,
+          amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
         }
         data.depreciationExpenses.push(depreciationExpenseData);
       }
-    })
+    }    
   }
 
   // Other expenses ----------------------------------------------------------------------------------- //

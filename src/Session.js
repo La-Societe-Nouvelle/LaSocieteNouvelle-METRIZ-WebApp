@@ -220,22 +220,35 @@ export class Session {
                 return;
             }));
 
-        // Depreciations & Depreciation expenses
+        // Depreciations
+        await Promise.all(this.financialData.depreciations.map(async (depreciation) =>
+        {
+            if (depreciation.initialState=="currentFootprint") {
+                let immobilisation = this.financialData.getImmobilisationByAccount(depreciation.accountAux);
+                depreciation.prevFootprint.indicators[indic] = immobilisation.footprint.indicators[indic];
+            }
+        }));
+
+        // Depreciation expenses
         await Promise.all(this.financialData.depreciationExpenses.map(async (expense) => 
         {
-            let depreciation = this.financialData.getDepreciationByAccount(expense.accountAux);
-            let immobilisation = this.financialData.getImmobilisationByAccount(depreciation.accountAux);
+            // retrieve depreciations & immobilisations concerned by the depreciation expense
+            let depreciations = this.financialData.depreciations.filter(depreciation => depreciation.account.startsWith(expense.accountAux));
+            let immobilisations = depreciations.map(depreciation => this.financialData.getImmobilisationByAccount(depreciation.accountAux));
+            
+            // build indicator for immobilisations
+            let indicatorImmobilisations = await buildIndicatorAggregate(indic,immobilisations);
+            let amountImmobilisations = immobilisations.map(immobilisation => immobilisation.amount).reduce((a,b) => a+b,0);
+            
+            // build indicator for depreciations (before current period)
+            let usePrev = true;
+            let indicatorDepreciations = await buildIndicatorAggregate(indic,depreciations,usePrev);
+            let prevAmountDepreciations = depreciations.map(depreciation => depreciation.prevAmount).reduce((a,b) => a+b,0);
 
-            if (depreciation.initialState=="currentFootprint") depreciation.prevFootprint.indicators[indic] = immobilisation.footprint.indicators[indic];
-            
             expense.footprint.indicators[indic] = await buildIndicatorMerge(
-                immobilisation.footprint.indicators[indic], immobilisation.amount,
-                depreciation.prevFootprint.indicators[indic], -depreciation.prevAmount)
+                indicatorImmobilisations, amountImmobilisations,
+                indicatorDepreciations, -prevAmountDepreciations);
             
-            let amountDepreciationExpenses = this.financialData.getAmountDepreciationExpensesByAccountAux(depreciation.account);
-            depreciation.footprint.indicators[indic] = await buildIndicatorMerge(
-                depreciation.prevFootprint.indicators[indic], depreciation.prevAmount,
-                expense.footprint.indicators[indic], amountDepreciationExpenses);
             return;
         }));
 
@@ -425,6 +438,9 @@ function buildIndicatorAggregate(indic,elements,usePrev)
         indicator.setValue(absolute/totalAmount);
         let uncertainty = Math.abs(absolute) > 0 ? Math.max( Math.abs(absoluteMax-absolute) , Math.abs(absolute-absoluteMin) )/Math.abs(absolute) *100 : 0;
         indicator.setUncertainty(uncertainty);
+    } else if (elements.length == 0) {
+        indicator.setValue(0); 
+        indicator.setUncertainty(0);
     } else {
         indicator.setValue(null); 
         indicator.setUncertainty(null);
