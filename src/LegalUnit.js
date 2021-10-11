@@ -40,6 +40,9 @@ export class LegalUnit {
     // status
     this.dataFetched = props.dataFetched || false;
 
+    // fetch default references
+    if (props.productionAreaFootprint==undefined) this.initFootprintsReferences();
+
   // ---------------------------------------------------------------------------------------------------- //
   }
 
@@ -156,6 +159,29 @@ export class LegalUnit {
       this.valueAddedAreaFootprint = new SocialFootprint();
       this.consumptionSectorFootprint = new SocialFootprint();
     }
+
+    // Fetch area footprints
+    
+    // PIB+IMP FRA (Available production in FRA)
+    endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GAP";
+    console.log(endpoint);
+    response = await fetch(endpoint, {method:'get'});
+    data = await response.json();
+    if (data.header.statut == 200) this.productionAreaFootprint.updateAll(data.empreinteSocietale);
+    else this.productionAreaFootprint = new SocialFootprint();
+
+    // PIB FRA (Value Added in France)
+    endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GDP";
+    console.log(endpoint);
+    response = await fetch(endpoint, {method:'get'});
+    data = await response.json();
+    if (data.header.statut == 200) this.valueAddedAreaFootprint.updateAll(data.empreinteSocietale);
+    else this.valueAddedAreaFootprint = new SocialFootprint();
+  }
+
+  initFootprintsReferences = async () =>
+  {
+    let endpoint; let response; let data;
 
     // Fetch area footprints
     
