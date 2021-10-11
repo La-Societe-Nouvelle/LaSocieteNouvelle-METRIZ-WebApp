@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #GHG ---------- */
@@ -41,7 +41,7 @@ export class StatementGHG extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
-          <InputNumber value={greenhousesGazEmissions}
+          <InputNumber value={roundValue(greenhousesGazEmissions,0)}
                        onUpdate={this.updateGreenhousesGazEmissions}/>
           <span>&nbsp;kgCO2e</span>
           <div className="assessment-button-container">
@@ -50,7 +50,7 @@ export class StatementGHG extends React.Component {
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <InputNumber value={greenhousesGazEmissionsUncertainty}
+          <InputNumber value={roundValue(greenhousesGazEmissionsUncertainty,0)}
                        onUpdate={this.updateGreenhousesGazEmissionsUncertainty}/>
           <span>&nbsp;%</span>
         </div>

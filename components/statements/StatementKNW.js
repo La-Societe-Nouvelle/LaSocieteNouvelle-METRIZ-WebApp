@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #KNW ---------- */
@@ -37,7 +37,7 @@ export class StatementKNW extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
-          <InputNumber value={researchAndTrainingContribution} 
+          <InputNumber value={roundValue(researchAndTrainingContribution,1)} 
                        onUpdate={this.updateResearchAndTrainingContribution}/>
           <span>&nbsp;€</span>
           <div className="assessment-button-container">

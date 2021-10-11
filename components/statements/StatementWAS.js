@@ -4,7 +4,7 @@
 import React from 'react';
 
 //Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
@@ -41,13 +41,13 @@ export class StatementWAS extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Productiont totale de déchets (y compris DAOM<sup>1</sup>)</label>
-          <InputNumber value={wasteProduction} 
+          <InputNumber value={roundValue(wasteProduction,0)} 
                        onUpdate={this.updateWasteProduction}/>
           <span>&nbsp;kg</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <InputNumber value={wasteProductionUncertainty} 
+          <InputNumber value={roundValue(wasteProductionUncertainty,0)} 
                        onUpdate={this.updateWasteProductionUncertainty}/>
           <span>&nbsp;%</span>
         </div>

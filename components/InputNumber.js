@@ -19,7 +19,8 @@ export class InputNumber extends React.Component {
   render() 
   {
     return (
-      <input  value={this.state.input}
+      <input  className="input-number"
+              value={this.state.input}
               onFocus={this.onFocus}
               onChange={this.onChange}
               onBlur={this.onBlur}

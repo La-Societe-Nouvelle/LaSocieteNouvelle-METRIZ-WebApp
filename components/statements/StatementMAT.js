@@ -4,7 +4,7 @@
 import React from 'react';
 
 //Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #MAT ---------- */
@@ -58,14 +58,14 @@ export class StatementMAT extends React.Component {
         </div>
         <div className="statement-item">
           <label>Quantité extraite de matières premières</label>
-          <InputNumber value={materialsExtraction}
+          <InputNumber value={roundValue(materialsExtraction,0)}
                        disabled={isExtractiveActivities === false}
                        onUpdate={this.updateMaterialsExtraction}/>
           <span>&nbsp;kg</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <InputNumber value={materialsExtractionUncertainty}
+          <InputNumber value={roundValue(materialsExtractionUncertainty,0)}
                        disabled={isExtractiveActivities === false}
                        onUpdate={this.updateMaterialsExtractionUncertainty}/>
           <span>&nbsp;%</span>

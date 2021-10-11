@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #HAZ ---------- */
@@ -41,13 +41,13 @@ export class StatementHAZ extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Utilisation de produits dangereux - santé/environnement</label>
-          <InputNumber value={hazardousSubstancesConsumption}
+          <InputNumber value={roundValue(hazardousSubstancesConsumption,0)}
                        onUpdate={this.updateHazardousSubstancesConsumption}/>
           <span>&nbsp;kg</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <InputNumber value={hazardousSubstancesConsumptionUncertainty}
+          <InputNumber value={roundValue(hazardousSubstancesConsumptionUncertainty,0)}
                        onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>

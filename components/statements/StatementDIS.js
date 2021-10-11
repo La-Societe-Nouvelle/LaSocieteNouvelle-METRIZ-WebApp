@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #DIS ---------- */
@@ -56,7 +56,7 @@ export class StatementDIS extends React.Component {
         </div>
         <div className="statement-item">
           <label>Indice de GINI des taux horaires bruts</label>
-          <InputNumber value={indexGini}
+          <InputNumber value={roundValue(indexGini,1)}
                        disabled={hasEmployees === false}
                        onUpdate={this.updateIndexGini}/>
           <span>&nbsp;/100</span>

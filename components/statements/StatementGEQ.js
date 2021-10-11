@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #GEQ ---------- */
@@ -54,7 +54,7 @@ export class StatementGEQ extends React.Component {
         </div>
         <div className="statement-item">
           <label>Ecart de rémunarations F/H (en % du taux horaire brut moyen)</label>
-          <InputNumber value={wageGap}
+          <InputNumber value={roundValue(wageGap,1)}
                        disabled={hasEmployees === false}
                        onUpdate={this.updateWageGap}/>
           <span>&nbsp;%</span>

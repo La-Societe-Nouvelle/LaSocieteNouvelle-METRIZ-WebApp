@@ -4,7 +4,7 @@
 import React from 'react';
 
 //Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #WAT ---------- */
@@ -41,13 +41,13 @@ export class StatementWAT extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Consommation totale d'eau</label>
-          <InputNumber value={waterConsumption}
+          <InputNumber value={roundValue(waterConsumption,0)}
                        onUpdate={this.updateWaterConsumption}/>
           <span>&nbsp;m3</span>
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <InputNumber value={waterConsumptionUncertainty}
+          <InputNumber value={roundValue(waterConsumptionUncertainty,0)}
                        onUpdate={this.updateWaterConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>

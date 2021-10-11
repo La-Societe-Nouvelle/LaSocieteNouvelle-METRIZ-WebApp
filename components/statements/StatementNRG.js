@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { valueOrDefault } from '../../src/utils/Utils';
+import { roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
@@ -41,7 +41,7 @@ export class StatementNRG extends React.Component {
       <div className="statement">
         <div className="statement-item">
           <label>Consommation totale d'énergie</label>
-          <InputNumber value={energyConsumption}
+          <InputNumber value={roundValue(energyConsumption,0)}
                        onUpdate={this.updateEnergyConsumption}/>
           <span>&nbsp;MJ</span>
           <div className="assessment-button-container">
@@ -50,7 +50,7 @@ export class StatementNRG extends React.Component {
         </div>
         <div className="statement-item">
           <label>Incertitude</label>
-          <InputNumber value={energyConsumptionUncertainty}
+          <InputNumber value={roundValue(energyConsumptionUncertainty,0)}
                        onUpdate={this.updateEnergyConsumptionUncertainty}/>
           <span>&nbsp;%</span>
         </div>

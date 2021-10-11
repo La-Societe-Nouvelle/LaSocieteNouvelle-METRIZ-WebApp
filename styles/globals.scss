@@ -68,6 +68,9 @@ input {
   border: solid 1px $primary-color;
   padding: 2px;
 
+  &.input-number {text-align: right;}
+  &.input-text {text-align: left;}
+
   &:disabled {
     background-color: #EEEEEE;
   }
