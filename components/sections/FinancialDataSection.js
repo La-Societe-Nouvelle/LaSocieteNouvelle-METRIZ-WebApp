@@ -13,6 +13,9 @@ import { FECImportPopup } from '../popups/FECImportPopup';
 // Readers
 import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
 
+// Libraries
+import indics from '/lib/indics.json';
+
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
 /* ----------------------------------------------------------- */
@@ -118,7 +121,9 @@ export class FinancialDataSection extends React.Component {
       .then(async (nextFinancialData) => 
       {
         await this.props.session.financialData.loadData(nextFinancialData);
+        this.props.session.impactsData.netValueAdded = this.props.session.financialData.getNetValueAdded();
         this.loadKNWData(nextFinancialData.KNWData);
+        this.checkNetValueAddedIndicator();
       })
       .then(() => 
       {
@@ -133,6 +138,17 @@ export class FinancialDataSection extends React.Component {
     this.props.session.impactsData.knwDetails.apprenticeshipTax = apprenticeshipTax;
     this.props.session.impactsData.knwDetails.vocationalTrainingTax = vocationalTrainingTax;
     this.props.session.updateIndicator("knw");
+  }
+
+  checkNetValueAddedIndicator = async () =>
+  {
+    Object.keys(indics).forEach((indic) => 
+    {
+      let nextIndicator = this.props.session.getValueAddedIndicator(indic);
+      if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) {
+        this.props.session.validations[indic] = false;
+      }
+    })
   }
 
 }
