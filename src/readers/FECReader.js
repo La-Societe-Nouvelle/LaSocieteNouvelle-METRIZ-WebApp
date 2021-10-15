@@ -546,7 +546,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
   {
     let prefixAccountAux = /6811[1-2]/.test(ecriture.CompteNum.substring(0,5)) ? "28"+(parseInt(ecriture.CompteNum.charAt(4))-1) : "28";
     let ecrituresDepreciations = book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum
-                                          && ecritureDepreciation.CompteNum.substring(0,prefixAccountAux.length)==prefixAccountAux);
+                                          && ecritureDepreciation.CompteNum.startsWith(prefixAccountAux));
     let isTraceable = (ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit))
                                              .reduce((a,b) => a+b,0) == (parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)));
     

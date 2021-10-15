@@ -137,11 +137,11 @@ Lorsque que le *flux* n'est pas encore défini, sont enregistrées les informati
 - Numéro du compte d'immobilisation associé*
 - Montant**
 
-Lorsque que le lien entre compte de dotations et compte d'amortissements n'est pas possible (ex. plusieurs dotations au sein de la même écriture comptable) la dotation est associé à tout ou une partie des comptes d'amortissements selon le compte utilisé (ex. compte d'amortissements aux immobilisations corporelles si compte #68112).
+Lorsque que le lien entre compte de dotations et compte(s) d'amortissements n'est pas possible (ex. plusieurs dotations au sein de la même écriture comptable) la dotation est *associée* à tout ou une partie des comptes d'amortissements selon le compte utilisé (ex. compte d'amortissements aux immobilisations corporelles si compte #68112).
 
 \* *Le numéro du compte d'amortissement est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement #28. Si plusieurs comptes d'amortissements, chaque compte fait l'objet d'un enregistrement*
 
-\** *Le montant enregistré est celui de la ligne relative au compte d'amortissements #28, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.*
+\*\* *Le montant enregistré est celui de la ligne relative au compte d'amortissements #28, afin de prendre en compte le cas de figure où plusieurs comptes d'amortissements sont concernés par la dotation.*
 
 Pour les autres écritures relatives à un compte de charges (#63, #64, #65, #66 et #686, #67 et #687 hors #6871, #681 hors 6811x, #69), la variation (Débit - Crédit) est incrémentée au montant courant de l'agrégat correspondant (taxes, charges de personnel, etc.).
 
