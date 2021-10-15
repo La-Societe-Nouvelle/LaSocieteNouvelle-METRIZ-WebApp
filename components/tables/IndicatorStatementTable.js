@@ -6,6 +6,7 @@ import { printValue } from '/src/utils/Utils';
 // Libraries
 import { metaIndicators } from '/lib/indic';
 import { metaAccounts } from '/lib/accounts';
+import { buildIndicatorAggregate } from '../../src/footprintFormulas';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -17,6 +18,9 @@ export const IndicatorStatementTable = ({indic,session}) =>
   const unit = metaIndicators[indic].unit;
   const unitAbsolute = metaIndicators[indic].unitAbsolute;
   const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
+
+  const expensesGroups = getBasicExpensesGroups(indic,financialData);
+  const depreciationExpensesGroups = getBasicDepreciationExpensesGroups(indic,financialData);
 
   return (
     <table>
@@ -93,11 +97,11 @@ export const IndicatorStatementTable = ({indic,session}) =>
           {impactAbsolu ? <td className="column_value">{printValue(-session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)}</td> : null}
           {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>}
-      {Object.entries(groupExpensesByAccounts(financialData.expenses)).map(([_,{account,accountLib,amount}]) => {
-        const indicator = session.getExpensesAccountIndicator(account,indic);
-        return (
-        <tr key={account}>
-          <td>&emsp;{accountLib}</td>
+
+      {expensesGroups.filter(group => group.expenses.length > 0)
+                     .map(({label,amount,indicator}) => 
+        <tr key={label}>
+          <td>&emsp;{label}</td>
           <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
           <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
@@ -105,7 +109,7 @@ export const IndicatorStatementTable = ({indic,session}) =>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
           {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
           {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-        </tr>)})}
+        </tr>)}
 
         <tr className="with-top-line">
           <td>Dotations aux amortissements</td>
@@ -117,11 +121,10 @@ export const IndicatorStatementTable = ({indic,session}) =>
           {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciationExpenses()),nbDecimals)}</td> : null}
           {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
-      {Object.entries(groupDepreciationsByAccounts(financialData.depreciationExpenses)).map(([_,{account,accountLib,amount}]) => {
-        const indicator = session.getDepreciationsAccountIndicator(account,indic);
-        return (
-        <tr key={account}>
-          <td>&emsp;{accountLib}</td>
+      {depreciationExpensesGroups.filter(group => group.expenses.length > 0)
+                                 .map(({label,amount,indicator}) => 
+        <tr key={label}>
+          <td>&emsp;{label}</td>
           <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
           <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
@@ -129,7 +132,7 @@ export const IndicatorStatementTable = ({indic,session}) =>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
           {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
           {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
-        </tr>)})}
+        </tr>)}
         
         <tr className="with-top-line">
           <td>Valeur ajoutée nette</td>
@@ -148,26 +151,28 @@ export const IndicatorStatementTable = ({indic,session}) =>
 
 /* ----- GROUP FUNCTIONS ----- */
 
-const groupExpensesByAccounts = (expenses) =>
+const getBasicExpensesGroups = (indic,financialData) =>
 {
-  let expensesByAccounts = {};
-  expenses.forEach((expense) => 
+  let expensesGroups = financialData.getBasicExpensesGroups();
+
+  expensesGroups.forEach(group => 
   {
-    let account = expense.account.substring(0,2);
-    if (expensesByAccounts[account]==undefined) expensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsExpenses[account]};
-    else expensesByAccounts[account].amount+= expense.amount;
+    group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
+    group.indicator = buildIndicatorAggregate(indic,group.expenses);
   })
-  return expensesByAccounts;
+
+  return expensesGroups;
 }
 
-const groupDepreciationsByAccounts = (depreciationExpenses) =>
+const getBasicDepreciationExpensesGroups = (indic,financialData) =>
 {
-  let depreciationExpensesByAccounts = {};
-  depreciationExpenses.forEach((expense) => 
+  let expensesGroups = financialData.getBasicDepreciationExpensesGroups();
+
+  expensesGroups.forEach(group => 
   {
-    let account = expense.account.substring(0,5);
-    if (depreciationExpensesByAccounts[account]==undefined) depreciationExpensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsDepreciationExpenses[account]};
-    else depreciationExpensesByAccounts[account].amount+= expense.amount;
+    group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
+    group.indicator = buildIndicatorAggregate(indic,group.expenses);
   })
-  return depreciationExpensesByAccounts;
+
+  return expensesGroups;
 }

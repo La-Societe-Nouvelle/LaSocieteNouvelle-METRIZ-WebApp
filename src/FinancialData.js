@@ -274,4 +274,49 @@ export class FinancialData {
         await company.update(nextProps);
     }
 
+    /* ----------------------------- */
+    /* ---------- Details ---------- */
+    /* ----------------------------- */
+
+    getBasicExpensesGroups = () =>
+    {
+        // Achats
+        let purchases = this.expenses.filter(expense => expense.account.substring(0,2)=="60" 
+                                                     && expense.account.substring(0,3)!="604" && expense.account.substring(0,4)!="6094"
+                                                     && expense.account.substring(0,4)!="6061" && expense.account.substring(0,5)!="60961");
+        // Achats non stockables
+        let nonStorablePurchases = this.expenses.filter(expense => expense.account.substring(0,4)=="6061" || expense.account.substring(0,5)=="60961");
+        // Services extérieurs
+        let externalServices = this.expenses.filter(expense => expense.account.substring(0,2)=="61" 
+                                                            || expense.account.substring(0,3)=="604" || expense.account.substring(0,4)=="6094");
+        // Autres services extérieurs
+        let otherExternalServices = this.expenses.filter(expense => expense.account.substring(0,2)=="62");
+
+        return ([{label: "Achats (hors achats d'études, prestations de services et fournitures non-stockables)",
+                expenses: purchases},
+                {label: "Fournitures non-stockables",
+                expenses: nonStorablePurchases},
+                {label: "Services extérieurs",
+                expenses: externalServices},
+                {label: "Autres services extérieurs",
+                expenses: otherExternalServices}]);
+    }
+
+    getBasicDepreciationExpensesGroups = () =>
+    {
+        // Dotations sur immobilisations incorporelles
+        let intangibleAssetsDepreciationsExpenses = this.depreciationExpenses.filter(expense => expense.account.substring(0,5)=="68111");
+        // Dotations sur immoblisations corporelles
+        let tangibleAssetsDepreciationsExpenses = this.depreciationExpenses.filter(expense => expense.account.substring(0,5)=="68112");
+        // Dotations exceptionnelles
+        let exceptionalDepreciationsExpenses = this.depreciationExpenses.filter(expense => expense.account.substring(0,4)=="6871");
+
+        return ([{label: "Dotations aux amortissements sur immobilisations incorporelles",
+                expenses: intangibleAssetsDepreciationsExpenses},
+                {label: "Dotations aux amortissements sur immobilisations incorporelles",
+                expenses: tangibleAssetsDepreciationsExpenses},
+                {label: "Dotations aux amortissements exceptionnels sur immobilisations",
+                expenses: exceptionalDepreciationsExpenses}]);
+    }
+
 }
