@@ -582,7 +582,7 @@ table {
   align-items: center;
   min-width: 550px;
   min-height: 100px;
-  padding: 5px 25px;
+  padding: 25px;
   background-color: white;
   border: solid $primary-color 1px;
 
@@ -594,6 +594,15 @@ table {
   h3 {
     margin: 5px 0 10px;
     text-align: center;
+  }
+
+  .group {
+    max-height: 100%;
+    width: 100%;
+  }
+
+  .table-container {
+    overflow: auto;
   }
 
   .inputs {

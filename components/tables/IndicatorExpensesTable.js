@@ -1,0 +1,107 @@
+// La Société Nouvelle
+
+// React
+import React from 'react';
+
+// Libraries
+import { metaIndicators } from '/lib/indic';
+
+// Utils
+import { printValue } from "../../src/utils/Utils";
+
+/* -------------------- EXPENSES TABLE -------------------- */
+
+/*  Notes :
+ *  The table shows the footprint (indicator) for each expenditures accounts (subaccounts of 60, 61 & 62)
+ */
+
+export class IndicatorExpensesTable extends React.Component {
+  
+  constructor(props) 
+  {
+    super(props)
+    this.state = 
+    {
+      columnSorted: "amount",
+      reverseSort: false,
+    }
+  }
+
+  render() 
+  {
+    const {session,indic} = this.props;
+    const {columnSorted} = this.state;
+
+    const expensesByAccount = getExpensesGroupByAccount(session.financialData.expenses);
+    this.sortExpenses(expensesByAccount,columnSorted);
+
+    const nbDecimals = metaIndicators[indic].nbDecimals;
+    const unit = metaIndicators[indic].unit;
+    const unitAbsolute = metaIndicators[indic].unitAbsolute;
+    const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
+
+    return (
+      <div className="table-container">
+        <table>
+          <thead>
+            <tr>
+              <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
+              <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+              <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td className="column_value" colSpan="2">Valeur</td>
+              <td className="column_uncertainty">Incertitude</td>
+              {impactAbsolu ? <td className="column_value" colSpan="2">Impact</td> : null}
+            </tr>
+          </thead>
+          <tbody>
+            {expensesByAccount.map(({account,amount,accountLib}) => 
+            {
+              const indicator = session.getExpensesAccountIndicator(account,indic);
+              return(
+                <tr key={account}>
+                  <td className="short center">{account}</td>
+                  <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
+                  <td className="short right">{printValue(amount,0)}</td>
+                  <td className="column_unit">&nbsp;€</td>
+                  <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
+                  <td className="column_unit">&nbsp;{unit}</td>
+                  <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
+                  {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
+                  {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+                </tr>)})}
+          </tbody>
+        </table>
+      </div>
+    )
+  }
+
+  /* ----- SORTING ----- */
+
+  changeColumnSorted(columnSorted) 
+  {
+    if (columnSorted!=this.state.columnSorted)  {this.setState({columnSorted: columnSorted, reverseSort: false})}
+    else                                        {this.setState({reverseSort: !this.state.reverseSort})}
+  }
+
+  sortExpenses(expenses,columSorted) 
+  {
+    switch(columSorted) 
+    {
+      case "account": expenses.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "amount": expenses.sort((a,b) => b.amount - a.amount); break;
+    }
+    if (this.state.reverseSort) expenses.reverse();
+  }
+
+}
+
+const getExpensesGroupByAccount = (expenses) =>  
+{
+    let expensesByAccount = {};
+    expenses.forEach(({account,accountLib,amount}) => 
+    {
+        if (expensesByAccount[account] == undefined) expensesByAccount[account] = {account, amount, accountLib};
+        else expensesByAccount[account].amount+= amount;
+    })
+    return Object.entries(expensesByAccount).map(([account,{amount,accountLib}]) => ({account, amount, accountLib}));
+}

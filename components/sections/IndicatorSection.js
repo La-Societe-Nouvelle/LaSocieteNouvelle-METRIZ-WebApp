@@ -8,6 +8,8 @@ import Popup from 'reactjs-popup';
 
 // Tab Components
 import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
+import { IndicatorExpensesTable } from '../tables/IndicatorExpensesTable';
+import { IndicatorCompaniesTable } from '../tables/IndicatorCompaniesTable';
 import { IndicatorGraphs } from '../graphs/IndicatorGraphs';
 
 // Components
@@ -62,7 +64,8 @@ export class IndicatorSection extends React.Component {
   {
     super(props);
     this.state = {
-      triggerPopup: ""
+      triggerPopup: "",
+      selectedTable: "incomeStatement"
     }
   }
 
@@ -74,7 +77,7 @@ export class IndicatorSection extends React.Component {
   render() 
   {
     const {indic} = this.props;
-    const {triggerPopup} = this.state;
+    const {triggerPopup,selectedTable} = this.state;
 
     const isAllValid = this.props.session.financialData.isFinancialDataLoaded
                     && !(this.props.session.financialData.companies.filter(company => company.status != 200).length > 0)
@@ -107,12 +110,19 @@ export class IndicatorSection extends React.Component {
                          toAssessment={() => this.triggerPopup("assessment")}/>
             </div>
 
-            <div className="group">
-              <h3>Tableau récapitulatif</h3>
-                <div className="actions">
-                  <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
-                </div>
-              <IndicatorStatementTable session={this.props.session} indic={this.props.indic}/>
+            <div className="group"><h3>Tableau récapitulatif</h3>
+              <div className="actions">
+                <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
+                <select value={selectedTable}
+                      onChange={this.changeShowedTable}>
+                <option key="1" value="incomeStatement">Compte de résultat</option>
+                <option key="2" value="expensesAccounts">Détails - Comptes de charges</option>
+                <option key="3" value="companies">Valeurs publiées - Fournisseurs</option>
+              </select>
+              </div>
+              
+              {this.buildtable(selectedTable)}
+
             </div>
 
             <div className="group">
@@ -137,6 +147,22 @@ export class IndicatorSection extends React.Component {
       </div>
     )
   }
+
+  buildtable = (selectedTable) => 
+  {
+    switch(selectedTable) 
+    {
+      case "incomeStatement" :  return(<IndicatorStatementTable session={this.props.session} indic={this.props.indic}/>)
+      case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.props.indic}/>)
+      case "companies" : return(<IndicatorCompaniesTable session={this.props.session} indic={this.props.indic}/>)
+    }
+  }
+
+  /* ----- SELECTED TAB ----- */
+  
+  changeShowedTable = (event) => this.setState({selectedTable: event.target.value})
+
+  /* ----- - ----- */
 
   checkNetValueAddedIndicator = async (indic) =>
   {
