@@ -39,4 +39,6 @@ export class SocialFootprint {
     this.indicators[indic].update(data);
   }
 
+  isComplete = () => Object.entries(this.indicators).filter(([_,indicator]) => !indicator.value).length == 0;
+
 }

@@ -92,7 +92,8 @@ class Metriz extends React.Component {
               progression={progression}
               changeSection={this.changeSection.bind(this)}
               downloadSession={this.downloadSession.bind(this)}
-              importSession={this.importSession.bind(this)}/>
+              importSession={this.importSession.bind(this)}
+              downloadFinalStates={this.downloadFinalStates.bind(this)}/>
         <div className="section-container">
           {this.buildSectionView(selectedSection)}
         </div>
@@ -138,6 +139,23 @@ class Metriz extends React.Component {
       })
     }
     reader.readAsText(file);
+  }
+
+  // download final states
+  downloadFinalStates = async () =>
+  {
+    // build JSON
+    const finalStates = this.state.session.getFinalStatesFootprints();
+    const fileName = "svg_fs_"+this.state.session.legalUnit.siren;
+    const json = JSON.stringify(finalStates);
+
+    // build download link & activate
+    const blob = new Blob([json],{type:'application/json'});
+    const href = await URL.createObjectURL(blob);
+    const link = document.createElement('a');
+          link.href = href;
+          link.download = fileName + ".json";    
+          link.click();
   }
 
   /* ----- SECTION ----- */

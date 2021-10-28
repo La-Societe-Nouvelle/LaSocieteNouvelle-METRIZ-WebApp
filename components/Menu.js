@@ -6,7 +6,7 @@ import React from 'react';
 // Libraries
 import indics from '../lib/indics.json';
 
-export function Menu({selectedSection, changeSection, downloadSession, importSession, progression}) 
+export function Menu({selectedSection, changeSection, downloadSession, importSession, downloadFinalStates, progression}) 
 {
   // import file
   const triggerImportFile = () => {document.getElementById('import-session').click()};
@@ -49,6 +49,7 @@ export function Menu({selectedSection, changeSection, downloadSession, importSes
           <button onClick = {() => downloadSession()} className="menu-button">Télécharger la session</button>
           <button onClick={triggerImportFile} className="menu-button">Importer un fichier</button>
           <input id="import-session" type="file" accept=".json" onChange={importFile} visibility="collapse"/>
+          <button onClick = {() => downloadFinalStates()} className="menu-button">Télécharger les états finaux</button>
         </div>
         <div className="menu-items-group">
           <button onClick={() => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp/blob/main/DOCUMENTATION.md","_blank")} className="menu-button">Documentation</button>

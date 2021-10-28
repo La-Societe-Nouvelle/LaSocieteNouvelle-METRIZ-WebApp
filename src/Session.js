@@ -73,6 +73,16 @@ export class Session {
 
     // Net Value Added
     getNetValueAddedFootprint = () => this.netValueAddedFootprint;
+
+    // Final States
+    getFinalStatesFootprints = () => 
+    {
+        let finalStates = {};
+        this.financialData.stocks.concat(this.financialData.immobilisations)
+                                 .concat(this.financialData.depreciations)
+                                 .forEach(({account,footprint}) => finalStates[account] = footprint);
+        return finalStates;
+    }
     
     /* ---------------------------------------- FOOTPRINTS PROCESS ---------------------------------------- */
 
@@ -207,22 +217,22 @@ export class Session {
         // Immobilisations
         await Promise.all(this.financialData.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
                                                             .map(async (immobilisation) => 
-            {
-                let investments = this.financialData.investments.filter(investment => investment.account == immobilisation.account); 
-                if (investments.length > 0) {
-                    let indicatorInvestments = await buildIndicatorAggregate(indic, investments);
-                    let amountInvestments = investments.map(investment => investment.amount).reduce((a, b) => a + b, 0);
-                    
-                    if (immobilisation.initialState=="currentFootprint") immobilisation.prevFootprint.indicators[indic] = indicatorInvestments;
-                    
-                    immobilisation.footprint.indicators[indic] = await buildIndicatorMerge(
-                        immobilisation.prevFootprint.indicators[indic], immobilisation.prevAmount,
-                        indicatorInvestments, amountInvestments);
-                } else {
-                    immobilisation.footprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
-                }
-                return;
-            }));
+        {
+            let investments = this.financialData.investments.filter(investment => investment.account == immobilisation.account); 
+            if (investments.length > 0) {
+                let indicatorInvestments = await buildIndicatorAggregate(indic, investments);
+                let amountInvestments = investments.map(investment => investment.amount).reduce((a, b) => a + b, 0);
+                
+                if (immobilisation.initialState=="currentFootprint") immobilisation.prevFootprint.indicators[indic] = indicatorInvestments;
+                
+                immobilisation.footprint.indicators[indic] = await buildIndicatorMerge(
+                    immobilisation.prevFootprint.indicators[indic], immobilisation.prevAmount,
+                    indicatorInvestments, amountInvestments);
+            } else {
+                immobilisation.footprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
+            }
+            return;
+        }));
 
         // Depreciations
         await Promise.all(this.financialData.depreciations.map(async (depreciation) =>
