@@ -48,9 +48,16 @@ export class InitialStatesSection extends React.Component {
 
             <div className="group"><h3>Comptes de Stocks et d'Immobilisations</h3>
 
+            {financialData.immobilisations.concat(financialData.stocks).length > 0 && 
               <div className="actions">
-                {financialData.immobilisations.concat(financialData.stocks).length > 0 && <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>}
-              </div>
+                <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>
+                <button onClick={() => document.getElementById('import-states').click()}>
+                Importer un fichier (.json)
+              </button>
+              <input id="import-states" visibility="collapse"
+                     type="file" accept=".json" 
+                     onChange={this.importFile}/>
+              </div>}
 
               {financialData.immobilisations.concat(financialData.stocks).length > 0 &&
                 <InitialStatesTable financialData={financialData} 
@@ -103,6 +110,29 @@ export class InitialStatesSection extends React.Component {
     this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData})
     this.props.updateMenu();
+  }
+
+  importFile = (event) =>
+  {
+    let file = event.target.files[0];
+    this.importStates(file);
+  }
+
+  // import session (JSON data -> session)
+  importStates = (file) =>
+  {
+    const reader = new FileReader();
+    reader.onload = async () => 
+    {
+      // text -> JSON
+      const prevStates = JSON.parse(reader.result);
+
+      // JSON -> session
+      this.props.session.financialData.loadInitialStates(prevStates);
+      this.setState({financialData: this.props.session.financialData});
+      this.props.updateMenu();
+    }
+    reader.readAsText(file);
   }
 
 }

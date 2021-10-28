@@ -1,8 +1,12 @@
+// La Société Nouvelle
+
 
 import { Expense } from '/src/accountingObjects/Expense';
 import { Immobilisation } from '/src/accountingObjects/Immobilisation';
 import { Depreciation } from '/src/accountingObjects/Depreciation'
 import { Stock } from '/src/accountingObjects/Stock';
+
+import { SocialFootprint } from '/src/footprintObjects/SocialFootprint'
 
 import { Company } from '/src/Company';
 
@@ -116,6 +120,40 @@ export class FinancialData {
 
         // data loaded
         this.isFinancialDataLoaded = true;
+    // ---------------------------------------------------------------------------------------------------- //
+    }
+
+    /* --------------------------------------------------------------- */
+    /* -------------------- INITIAL STATES LOADER -------------------- */
+    /* --------------------------------------------------------------- */
+
+    async loadInitialStates(data) 
+    {
+    // ---------------------------------------------------------------------------------------------------- //    
+        
+        // Print
+        console.log(data);
+
+        // Available accounts
+        let availableAccounts = Object.keys(data);
+
+        this.stocks.concat(this.immobilisations).forEach((stock) => 
+        {
+            if (availableAccounts.includes(stock.account)) 
+            {
+                let footprint = new SocialFootprint(data[stock.account]);
+                if (footprint.isComplete()) 
+                {
+                    stock.prevFootprint = footprint;
+                    stock.initialState = "prevFootprint";
+                }
+                else
+                {
+                    stock.prevFootprint = new SocialFootprint();
+                    stock.initialState = stock.isProductionStock ? "currentFootprint" : "defaultData";
+                }
+            }
+        })
     // ---------------------------------------------------------------------------------------------------- //
     }
     
