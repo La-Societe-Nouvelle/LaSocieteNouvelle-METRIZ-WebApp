@@ -99,3 +99,16 @@ export class StatementDIS extends React.Component {
 
   onValidate = () => this.props.onValidate()
 }
+
+export const writeStatementDIS = (doc,x,y,impactsData) =>
+{
+  doc.text("Indice de GINI interne : "+printValue(impactsData.indexGini,0)+" /100"+(!impactsData.hasEmployees ? "*" : ""),x,y);
+  if (!impactsData.hasEmployees)
+  {
+    y+=6;
+    doc.setFont("Calibri","italic");
+    doc.text("*L'entreprise est déclarée non-employeur",x,y);
+    doc.setFont("Calibri","normal");
+  }
+  return y;
+}

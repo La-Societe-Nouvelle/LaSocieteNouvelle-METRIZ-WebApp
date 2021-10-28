@@ -77,3 +77,10 @@ export class StatementGHG extends React.Component {
 
   onValidate = () => this.props.onValidate()
 }
+
+export const writeStatementGHG = (doc,x,y,impactsData) =>
+{
+  doc.text("Emissions directes de gaz à effet de serre : "+printValue(impactsData.greenhousesGazEmissions,0)+" kgCO2e +/- "+greenhousesGazEmissionsUncertainty+ " %",x,y);
+  // détail si existant
+  return y;
+}

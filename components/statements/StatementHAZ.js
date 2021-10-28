@@ -74,3 +74,9 @@ export class StatementHAZ extends React.Component {
   
   onValidate = () => this.props.onValidate()
 }
+
+export const writeStatementHAZ = (doc,x,y,impactsData) =>
+{
+  doc.text("Quantité utilisée de produits dangereux : "+printValue(impactsData.hazardousSubstancesConsumption,0)+" kg +/- "+hazardousSubstancesConsumptionUncertainty+ " %",x,y);
+  return y;
+}

@@ -77,3 +77,10 @@ export class StatementNRG extends React.Component {
 
   onValidate = () => this.props.onValidate()
 }
+
+export const writeStatementNRG = (doc,x,y,impactsData) =>
+{
+  doc.text("Consommation d'eau déclarée : "+printValue(impactsData.energyConsumption,0)+" MJ +/- "+printValue(impactsData.energyConsumptionUncertainty,0)+ " %",x,y);
+
+  return y;
+}

@@ -39,6 +39,19 @@ function exportIndicDataDepreciationsCSV(indic,session) {
 import { jsPDF } from 'jspdf';
 
 import { metaIndicators } from '../../lib/indic';
+import { buildIndicatorAggregate } from '../footprintFormulas';
+import { writeStatementART } from '../../components/statements/StatementART';
+import { writeStatementDIS } from '../../components/statements/StatementDIS';
+import { writeStatementECO } from '../../components/statements/StatementECO';
+import { writeStatementGEQ } from '../../components/statements/StatementGEQ';
+import { writeStatementGHG } from '../../components/statements/StatementGHG';
+import { writeStatementHAZ } from '../../components/statements/StatementHAZ';
+import { writeStatementKNW } from '../../components/statements/StatementKNW';
+import { writeStatementMAT } from '../../components/statements/StatementMAT';
+import { writeStatementNRG } from '../../components/statements/StatementNRG';
+import { writeStatementSOC } from '../../components/statements/StatementSOC';
+import { writeStatementWAS } from '../../components/statements/StatementWAS';
+import { writeStatementWAT } from '../../components/statements/StatementWAT';
 
 function exportIndicPDF(indic,session) 
 {
@@ -111,7 +124,6 @@ function exportIndicPDF(indic,session)
   doc.setFontSize(8);
   doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
-  doc.line(10,y+2,200,y+2);
 
   // Revenue
   y+=6;
@@ -119,7 +131,6 @@ function exportIndicPDF(indic,session)
   doc.setFontSize(8);
   doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
-  doc.line(10,y+2,200,y+2);
 
   // Stock production
   y+=6;
@@ -157,10 +168,11 @@ function exportIndicPDF(indic,session)
     doc.setFontSize(10);
   }
 
-  Object.entries(groupExpensesByAccounts(financialData.expenses)).forEach(([_,{account,accountLib}]) => {
-    const indicator = session.getExpensesAccountIndicator(account,indic);
+  financialData.getBasicExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => { 
+    const amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
+    const indicator = buildIndicatorAggregate(indic,group.expenses);
     y+=6;
-    doc.text("\t"+accountLib,10,y);
+    doc.text("\t"+group.label,10,y);
     doc.text(printValue(indicator.getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
     doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
@@ -176,10 +188,11 @@ function exportIndicPDF(indic,session)
   doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
-  Object.entries(groupDepreciationsByAccounts(financialData.depreciationExpenses)).map(([_,{account,accountLib}]) => {
-    const indicator = session.getDepreciationsAccountIndicator(account,indic);
+  financialData.getBasicDepreciationExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => {
+    const amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
+    const indicator = buildIndicatorAggregate(indic,group.expenses);
     y+=6;
-    doc.text("\t"+accountLib,10,y);
+    doc.text("\t"+group.label,10,y);
     doc.text(printValue(indicator.getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
     doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
@@ -197,9 +210,37 @@ function exportIndicPDF(indic,session)
 
   doc.line(10,y+2,200,y+2);
 
+  y+=20;
+  doc.setFontSize(11);
+  doc.setFont("Calibri","bold");
+  doc.text("DECLARATION",10,y);
+  doc.line(10,y+2,200,y+2);
+
+  y+=10;
+  y+= getStatementNote(doc,10,y,session.impactsData,indic);
+
   // Export
   doc.save("rapport_"+(session.legalUnit.siren!="" ? session.legalUnit.siren : "xxxxxxxxx")+"-"+indic.toUpperCase()+".pdf");
 
+}
+
+const getStatementNote = (doc,x,y,impactsData,indic) =>
+{
+  switch(indic)
+  {
+    case "art": return writeStatementART(doc,x,y,impactsData);
+    case "dis": return writeStatementDIS(doc,x,y,impactsData);
+    case "eco": return writeStatementECO(doc,x,y,impactsData);
+    case "geq": return writeStatementGEQ(doc,x,y,impactsData);
+    case "ghg": return writeStatementGHG(doc,x,y,impactsData);
+    case "haz": return writeStatementHAZ(doc,x,y,impactsData);
+    case "knw": return writeStatementKNW(doc,x,y,impactsData);
+    case "mat": return writeStatementMAT(doc,x,y,impactsData);
+    case "nrg": return writeStatementNRG(doc,x,y,impactsData);
+    case "soc": return writeStatementSOC(doc,x,y,impactsData);
+    case "was": return writeStatementWAS(doc,x,y,impactsData);
+    case "wat": return writeStatementWAT(doc,x,y,impactsData);
+  }
 }
 
 export {exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF};
@@ -207,28 +248,4 @@ export {exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndic
 function printValue(value,precision) {
   if (value==null) {return "-"}
   else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
-}
-
-const groupExpensesByAccounts = (expenses) =>
-{
-  let expensesByAccounts = {};
-  expenses.forEach((expense) => 
-  {
-    let account = expense.account.substring(0,2);
-    if (expensesByAccounts[account]==undefined) expensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsExpenses[account]};
-    else expensesByAccounts[account].amount+= expense.amount;
-  })
-  return expensesByAccounts;
-}
-
-const groupDepreciationsByAccounts = (depreciationExpenses) =>
-{
-  let depreciationExpensesByAccounts = {};
-  depreciationExpenses.forEach((expense) => 
-  {
-    let account = expense.account.substring(0,5);
-    if (depreciationExpensesByAccounts[account]==undefined) depreciationExpensesByAccounts[account] = {...expense, account, accountLib: metaAccounts.accountsDepreciationExpenses[account]};
-    else depreciationExpensesByAccounts[account].amount+= expense.amount;
-  })
-  return depreciationExpensesByAccounts;
 }

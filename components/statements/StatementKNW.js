@@ -60,3 +60,16 @@ export class StatementKNW extends React.Component {
 
   onValidate = () => this.props.onValidate()
 }
+
+export const writeStatementKNW = (doc,x,y,impactsData) =>
+{
+  doc.text("Valeur ajoutée artisanale : "+printValue(impactsData.craftedProduction,0)+" €"+(impactsData.isValueAddedCrafted ? "*" : ""),x,y);
+  if (impactsData.isValueAddedCrafted)
+  {
+    y+=6;
+    doc.setFont("Calibri","italic");
+    doc.text("*Les activités de l'entreprise sont déclarées artisanales / faisant appel à un savoir-faire reconnu",x,y);
+    doc.setFont("Calibri","normal");
+  }
+  return y;
+}
