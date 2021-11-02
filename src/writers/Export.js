@@ -161,7 +161,7 @@ function exportIndicPDF(indic,session)
 
   if (financialData.getVariationPurchasesStocks() > 0) {
     y+=6;
-    doc.text("Variation de stocks",10,y);
+    doc.text("\tVariation de stocks",10,y);
     doc.text(printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
     doc.text(printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
@@ -248,4 +248,8 @@ export {exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndic
 function printValue(value,precision) {
   if (value==null) {return "-"}
   else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
+}
+
+function superscript(doc,x,y,text) {
+  
 }
