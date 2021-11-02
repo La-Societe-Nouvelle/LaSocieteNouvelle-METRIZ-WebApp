@@ -77,6 +77,6 @@ export class StatementHAZ extends React.Component {
 
 export const writeStatementHAZ = (doc,x,y,impactsData) =>
 {
-  doc.text("Quantité utilisée de produits dangereux : "+printValue(impactsData.hazardousSubstancesConsumption,0)+" kg +/- "+hazardousSubstancesConsumptionUncertainty+ " %",x,y);
+  doc.text("Quantité utilisée de produits dangereux : "+printValue(impactsData.hazardousSubstancesConsumption,0)+" kg +/- "+printValue(impactsData.hazardousSubstancesConsumptionUncertainty,0)+ " %",x,y);
   return y;
 }
