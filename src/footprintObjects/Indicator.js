@@ -10,6 +10,8 @@ export class Indicator {
     this.value = props.value || null;
     this.flag = props.flag || null;
     this.uncertainty = props.uncertainty || null;
+    this.source = props.source || "";
+    this.info = props.info || "";
     
     // Complements
     this.libelleFlag = props.libelleFlag || null;
@@ -22,6 +24,7 @@ export class Indicator {
     this.flag = backUp.flag;
     this.uncertainty = backUp.uncertainty;
     this.libelleFlag = backUp.libelleFlag;
+    this.info = backUp.info;
   }
 
   /* ---------- Getters ---------- */
@@ -29,6 +32,8 @@ export class Indicator {
   getIndic = () => this.indic
   getValue = () => this.value  
   getFlag = () => this.flag
+  getInfo = () => this.info
+  getSource = () => this.source
   
   getUncertainty() {
     if (this.getValue()!=null) {return this.uncertainty}
@@ -71,6 +76,8 @@ export class Indicator {
     this.value = data.value;
     this.flag = data.flag;
     this.uncertainty = data.uncertainty;
+    this.info = data.info;
+    this.source = data.source;
     // Complements
     this.libelleFlag = data.libelleFlag;
   }
