@@ -2,6 +2,7 @@
 
 // Modules
 import { jsPDF } from 'jspdf';
+import { printValue } from '../utils/Utils';
 
 // Libraries
 import metaData from '/lib/indics.json';
@@ -73,10 +74,10 @@ const writeStatementPDF = (data) =>
     doc.setFont("Calibri","bold");
     doc.text(metaData[indic].libelle,10,y);
     doc.setFont("Calibri","normal");
-    doc.text(indicator.value+" ",xValue+7,y,{align: "right"});
+    doc.text(printValue(indicator.value,0)+" ",xValue+7,y,{align: "right"});
     doc.text(metaData[indic].unit,xValue+7,y,{align: "left"});
     doc.setFontSize(8);
-    doc.text(indicator.uncertainty+" %",xUncertainty+12,y,{align: "right"});
+    doc.text(printValue(indicator.uncertainty,0)+" %",xUncertainty+12,y,{align: "right"});
     doc.setFontSize(10);
     if (indicator.info.length > 0) {
       y+=6;
