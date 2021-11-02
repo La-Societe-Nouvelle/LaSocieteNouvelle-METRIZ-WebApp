@@ -16,6 +16,7 @@ import { FinancialDataSection } from '/components/sections/FinancialDataSection'
 import { CompaniesSection } from '/components/sections/CompaniesSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
+import { StatementSection } from '../components/sections/StatementSection';
 
 // Others components
 import { Menu } from '../components/Menu';
@@ -188,6 +189,7 @@ class Metriz extends React.Component {
       case "soc" : return(<IndicatorSection {...sectionProps} indic="soc"/>)
       case "was" : return(<IndicatorSection {...sectionProps} indic="was"/>)
       case "wat" : return(<IndicatorSection {...sectionProps} indic="wat"/>)
+      case "publication" : return(<StatementSection {...sectionProps}/>)
     }
   }
 
