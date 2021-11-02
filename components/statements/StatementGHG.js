@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { roundValue, valueOrDefault } from '../../src/utils/Utils';
+import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
 import { InputNumber } from '../InputNumber';
 
 /* ---------- DECLARATION - INDIC #GHG ---------- */
