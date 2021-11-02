@@ -330,7 +330,7 @@ export class FinancialData {
         // Autres services extérieurs
         let otherExternalServices = this.expenses.filter(expense => expense.account.substring(0,2)=="62");
 
-        return ([{label: "Achats (hors achats d'études, prestations de services et fournitures non-stockables)",
+        return ([{label: "Achats",
                 expenses: purchases},
                 {label: "Fournitures non-stockables",
                 expenses: nonStorablePurchases},
