@@ -54,7 +54,6 @@ export class StatementSection extends React.Component {
   render() 
   {
     const {step} = this.state;    
-    console.log(this.state);
 
     return (
       <div className="section-view">
