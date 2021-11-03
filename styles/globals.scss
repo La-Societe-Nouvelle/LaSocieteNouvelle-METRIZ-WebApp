@@ -213,7 +213,13 @@ select {
   }
 
   .actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
     margin: 5px 0;
+
+    &.left {justify-content: flex-end;}
 
     select {
       width: 400px;

@@ -43,6 +43,12 @@ export class Session {
 
         // Validations
         this.validations = props.validations || Object.keys(indics).map((indic) => {return({[indic]: false})});
+
+        // Publication
+        this.publications = props.publications || Object.keys(indics).map((indic) => {return({[indic]: false})});
+        // this.declarantName = "";
+        // this.declarantEmail = "";
+        // this.price = "";
     // ---------------------------------------------------------------------------------------------------- //
     }
 

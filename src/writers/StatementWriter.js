@@ -44,7 +44,7 @@ const writeStatementPDF = (data) =>
   y+=10;
   doc.text("Unité légale : "+data.siren,10,y); 
   y+=6;
-  doc.text("Dénomination : "+(data.corporateName || "").toUpperCase(),10,y); 
+  doc.text("Dénomination : "+(data.denomination || "").toUpperCase(),10,y); 
   y+=6;
   doc.text("Année : "+data.year,10,y); 
 
@@ -67,8 +67,8 @@ const writeStatementPDF = (data) =>
   doc.text("Incertitude",180,y);
   
   doc.line(10,y+2,200,y+2);
-  Object.entries(data.socialfootprint.indicators).filter(([_,indicator]) => indicator.value != null)
-                                                 .forEach(([indic,indicator]) => 
+  Object.entries(data.socialFootprint).filter(([_,indicator]) => indicator.value != null)
+                                      .forEach(([indic,indicator]) => 
   {
     y+=6;
     doc.setFont("Calibri","bold");
@@ -88,7 +88,7 @@ const writeStatementPDF = (data) =>
       y+=(infos.length-1)*4;
     }
   })
-  if (Object.entries(data.socialfootprint.indicators).filter(([_,indicator]) => indicator.value != null).length == 0) {
+  if (Object.entries(data.socialFootprint).filter(([_,indicator]) => indicator.value != null).length == 0) {
     y+=6;
     doc.setFont("Calibri","italic");
     doc.text("Aucune donnée déclarée",105,y,{align: "center"});
