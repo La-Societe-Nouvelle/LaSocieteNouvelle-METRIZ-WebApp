@@ -26,7 +26,6 @@ export const sendContactMail = async (objet,message,coordonnees) =>
 
 export const sendStatementToAdmin = async (message,statementFile) => 
 {
-  console.log("here");
   const recipientMail= "admin@lasocietenouvelle.org";
   const objetMail= "Demande de publication (via formulaire)";
   const messageMail = message;
@@ -48,7 +47,6 @@ export const sendStatementToAdmin = async (message,statementFile) =>
   try 
   {
       const res = await fetch('/api/mail-sender', request);
-      console.log(res);
       return res;
   } 
   catch (error) {

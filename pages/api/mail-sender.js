@@ -31,7 +31,6 @@ const mailer = ({objetMail,messageMail,recipientMail,attachments}) =>
         text: messageMail,
         attachments: attachments || []
     }
-    console.log(mail);
 
     return new Promise((resolve,reject) => {transporter.sendMail(mail, (error,info) => error ? reject(error) : resolve(info))})
 }
