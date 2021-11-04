@@ -22,6 +22,7 @@ export class Session {
     {
         if (props==undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
+        
         // Data
         this.legalUnit = new LegalUnit(props.legalUnit);
         this.financialData = new FinancialData(props.financialData);
@@ -41,8 +42,9 @@ export class Session {
 
         this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
 
-        // Validations
+        // Statements
         this.validations = props.validations || [];
+        this.year = props.year || "";
 
     // ---------------------------------------------------------------------------------------------------- //
     }

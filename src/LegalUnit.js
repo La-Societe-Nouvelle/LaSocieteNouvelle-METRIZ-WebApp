@@ -38,6 +38,7 @@ export class LegalUnit {
     this.valueAddedAreaFootprint = new SocialFootprint(props.valueAddedAreaFootprint);
 
     // status
+    this.status = props.status || "";                                                             // OK:200 NOT FOUND: 404 ERROR: 500
     this.dataFetched = props.dataFetched || false;
 
     // fetch default references
@@ -51,7 +52,7 @@ export class LegalUnit {
   setSiren = async (siren) =>
   {
     this.siren = siren;
-    this.dataFetched = false;
+    this.dataFetched = null;
     // Fetch data
     await this.fetchLegalUnitData();
     await this.fetchFootprintsReferences();
@@ -86,6 +87,7 @@ export class LegalUnit {
           this.isActivitesArtisanales = data.profil.descriptionUniteLegale.isActivitesArtisanales;
           this.isLocalisationEtranger = data.profil.descriptionUniteLegale.isLocalisationEtranger;
 
+          this.status = 200;
           this.dataFetched = true;
         } 
         else 
@@ -99,10 +101,11 @@ export class LegalUnit {
           this.isEconomieSocialeSolidaire = null;
           this.isActivitesArtisanales = null;
           this.isLocalisationEtranger = null;
+          this.status = 404;
           this.dataFetched = false;
         }
       } 
-      catch(error) {throw error}
+      catch(error) {throw error} // this.status = 500;
     }
     else 
     {
@@ -115,6 +118,7 @@ export class LegalUnit {
       this.isEconomieSocialeSolidaire = null;
       this.isActivitesArtisanales = null;
       this.isLocalisationEtranger = null;
+      this.status = null;
       this.dataFetched = false;
     }
   }
