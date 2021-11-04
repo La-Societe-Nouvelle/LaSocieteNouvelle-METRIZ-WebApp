@@ -70,6 +70,7 @@ export class CompaniesTable extends React.Component {
         {companies.length > 20 &&
           <div className="table-navigation">
             <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
+            <div><p>{page+1}/{parseInt(companies.length/20+1)}</p></div>
             <button className={(page+1)*20 < companies.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
           </div>}
         
