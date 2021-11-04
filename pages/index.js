@@ -84,7 +84,7 @@ class Metriz extends React.Component {
       financialDataOK: session.financialData.isFinancialDataLoaded,
       companiesOK: !(session.financialData.companies.filter(company => company.status != 200).length > 0),
       initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0),
-      publicationOK: /[0-9]{9}/.test(session.legalUnit.siren) && session.validations.length > 0
+      publicationOK: /[0-9]{9}/.test(session.legalUnit.siren) && Object.entries(session.revenueFootprint.indicators).filter(([_,indicator]) => indicator.value!=null).length > 0
     }
 
     return (

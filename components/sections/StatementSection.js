@@ -119,11 +119,14 @@ class IndicatorSelection extends React.Component
   {
     super(props);
     const socialFootprint = {};
-    props.validations.forEach(indic => socialFootprint[indic] = props.revenueFootprint.indicators[indic]);
+    Object.entries(props.revenueFootprint.indicators).filter(([_,indicator]) => indicator.value!=null)
+                                                     .forEach(([indic,indicator]) => socialFootprint[indic] = indicator);
     this.state = {
       socialFootprint: socialFootprint
     } 
   }
+
+  //didUpdate... when indicator not valid anymore
 
   render()
   {
