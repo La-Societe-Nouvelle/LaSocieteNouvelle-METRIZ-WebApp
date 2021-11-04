@@ -71,7 +71,7 @@ export class StatementSection extends React.Component {
     {
       case 0: return <ErrorMessage />
       case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
-      case 2: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} onGoBack={this.goBack}/>
+      case 2: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
       case 3: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
       case 4: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
       case 5: return <StatementSendingMessage />
@@ -118,10 +118,11 @@ class IndicatorSelection extends React.Component
   constructor(props)
   {
     super(props);
+    const socialFootprint = {};
+    props.validations.forEach(indic => socialFootprint[indic] = props.revenueFootprint.indicators[indic]);
     this.state = {
-      socialFootprint: {}
-      //socialFootprint = {}; //Object.keys(metaIndicators).filter(indic => validations[indic]).map(indic => revenueFootprint.indicators[indic])
-    }
+      socialFootprint: socialFootprint
+    } 
   }
 
   render()
@@ -143,7 +144,7 @@ class IndicatorSelection extends React.Component
             </thead>
             <tbody>
               {Object.keys(metaIndicators).map(indic =>  
-                <tr>
+                <tr key={indic}>
                   <td className="auto">{metaIndicators[indic].libelle}</td>
                   <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndicators[indic].nbDecimals)}</td>
                   <td className="column_unit">&nbsp;{metaIndicators[indic].unit}</td>
@@ -151,13 +152,13 @@ class IndicatorSelection extends React.Component
                   <td><input type="checkbox" 
                              value={indic}
                              checked={socialFootprint[indic]!=undefined}
-                             disabled={!validations[indic]}
+                             disabled={validations.indexOf(indic) < 0}
                              onChange={this.onCheckIndicator}/></td>
                 </tr>)}
             </tbody>
           </table>
           <div className="actions left">
-            <button onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
+            <button disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
           </div>
         </div>
       </div>)

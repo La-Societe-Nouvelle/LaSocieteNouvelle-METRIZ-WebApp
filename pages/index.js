@@ -79,12 +79,12 @@ class Metriz extends React.Component {
   render() 
   {
     const {selectedSection,session} = this.state;
-
     const progression = {
       legalUnitOK: session.legalUnit.dataFetched && /[0-9]{4}/.test(session.legalUnit.year),
       financialDataOK: session.financialData.isFinancialDataLoaded,
       companiesOK: !(session.financialData.companies.filter(company => company.status != 200).length > 0),
-      initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0)
+      initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0),
+      publicationOK: /[0-9]{9}/.test(session.legalUnit.siren) && session.validations.length > 0
     }
 
     return (
@@ -201,7 +201,8 @@ class Metriz extends React.Component {
       legalUnitOK: session.legalUnit.dataFetched && /[0-9]{4}/.test(session.legalUnit.year),
       financialDataOK: session.financialData.isFinancialDataLoaded,
       companiesOK: !(session.financialData.companies.filter(company => company.status != 200).length > 0),
-      initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0)
+      initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0),
+      publicationOK: /[0-9]{9}/.test(session.legalUnit.siren) && Object.entries(session.validations).filter(([_,validation]) => validation).length > 0
     }
     return progression;
   }

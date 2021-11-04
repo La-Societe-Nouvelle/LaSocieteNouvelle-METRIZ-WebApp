@@ -114,7 +114,7 @@ export class IndicatorSection extends React.Component {
               <div className="actions">
                 <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
                 <select value={selectedTable}
-                      onChange={this.changeShowedTable}>
+                        onChange={this.changeShowedTable}>
                 <option key="1" value="incomeStatement">Compte de résultat</option>
                 <option key="2" value="expensesAccounts">Détails - Comptes de charges</option>
                 <option key="3" value="companies">Valeurs publiées - Fournisseurs</option>
@@ -154,7 +154,7 @@ export class IndicatorSection extends React.Component {
     {
       case "incomeStatement" :  return(<IndicatorStatementTable session={this.props.session} indic={this.props.indic}/>)
       case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.props.indic}/>)
-      case "companies" : return(<IndicatorCompaniesTable session={this.props.session} indic={this.props.indic}/>)
+      case "companies" :        return(<IndicatorCompaniesTable session={this.props.session} indic={this.props.indic}/>)
     }
   }
 
@@ -168,7 +168,7 @@ export class IndicatorSection extends React.Component {
   {
     let nextIndicator = this.props.session.getValueAddedIndicator(indic);
     if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) {
-      this.props.session.validations[indic] = false;
+      this.props.session.validations = this.props.session.validations.filter(item => item != indic);
       await this.props.session.updateIndicator(indic);
       if (indic==this.props.indic) this.forceUpdate();
     }
@@ -176,7 +176,7 @@ export class IndicatorSection extends React.Component {
 
   validateIndicator = async () =>
   {
-    this.props.session.validations[this.props.indic] = true;
+    if (this.props.session.validations.indexOf(this.props.indic) < 0) this.props.session.validations.push(this.props.indic);
     await this.props.session.updateIndicator(this.props.indic);
     this.forceUpdate();
   }

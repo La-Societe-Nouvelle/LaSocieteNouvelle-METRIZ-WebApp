@@ -146,7 +146,7 @@ export class FinancialDataSection extends React.Component {
     {
       let nextIndicator = this.props.session.getValueAddedIndicator(indic);
       if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) {
-        this.props.session.validations[indic] = false;
+        this.props.session.validations = this.props.session.validations.filter(item => item != indic);
       }
     })
   }

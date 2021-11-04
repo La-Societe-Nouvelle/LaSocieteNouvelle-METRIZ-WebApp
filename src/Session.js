@@ -42,13 +42,8 @@ export class Session {
         this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
 
         // Validations
-        this.validations = props.validations || Object.keys(indics).map((indic) => {return({[indic]: false})});
+        this.validations = props.validations || [];
 
-        // Publication
-        this.publications = props.publications || Object.keys(indics).map((indic) => {return({[indic]: false})});
-        // this.declarantName = "";
-        // this.declarantEmail = "";
-        // this.price = "";
     // ---------------------------------------------------------------------------------------------------- //
     }
 
@@ -108,6 +103,7 @@ export class Session {
 
     async updateIndicator(indic) 
     {
+        console.log("update indicator : "+indic);
         await this.updateFinancialItemsFootprints(indic);
         await this.updateAggregatesFootprints(indic);
         await this.updateProductionFootprints(indic);
@@ -277,10 +273,11 @@ export class Session {
 
     /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
-    updateValueAddedFootprint = (indic) => this.netValueAddedFootprint.indicators[indic] = this.validations[indic] ? this.getValueAddedIndicator(indic) : new Indicator({indic})
+    updateValueAddedFootprint = (indic) => this.netValueAddedFootprint.indicators[indic] = this.validations.indexOf(indic) >= 0 ? this.getValueAddedIndicator(indic) : new Indicator({indic})
 
     getValueAddedIndicator = (indic) =>
     {
+        console.log("check");
         let indicator = new Indicator({indic: indic});
         
         const netValueAdded = this.financialData.getNetValueAdded();

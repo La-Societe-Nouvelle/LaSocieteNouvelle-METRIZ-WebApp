@@ -47,7 +47,8 @@ export function Menu({selectedSection, changeSection, downloadSession, importSes
         
         <div className="menu-items-group">
         <button className={"menu-button"+("publication"==selectedSection ? " selected" : "")}
-                  onClick = {() => changeSection("publication")}>Publication</button>
+                disabled={!progression.publicationOK}
+                onClick = {() => changeSection("publication")}>Publication</button>
           <button onClick = {() => downloadSession()} className="menu-button">Télécharger la session</button>
           <button onClick={triggerImportFile} className="menu-button">Importer un fichier</button>
           <input id="import-session" type="file" accept=".json" onChange={importFile} visibility="collapse"/>
