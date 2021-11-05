@@ -3,9 +3,6 @@
 // React
 import React from 'react';
 
-// Libraries
-import { metaAccounts } from '../../lib/accounts';
-
 // Utils
 import { printValue } from "../../src/utils/Utils";
 

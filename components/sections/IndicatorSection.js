@@ -36,7 +36,7 @@ import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 import { exportIndicPDF, exportIndicDataExpensesCSV } from '/src/writers/Export';
 
 // Libraries
-import { metaIndicators } from '/lib/indic';
+import metaIndics from '/lib/indics';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -86,9 +86,9 @@ export class IndicatorSection extends React.Component {
     return (
       <div className="section-view">
 
-        <div className="section-view-header"><h1>{metaIndicators[indic].libelle}</h1>
+        <div className="section-view-header"><h1>{metaIndics[indic].libelle}</h1>
           <div className="section-view-header-odds">
-            {metaIndicators[indic].odds.map((odd) => 
+            {metaIndics[indic].odds.map((odd) => 
               <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}
           </div>
         </div>

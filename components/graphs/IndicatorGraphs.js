@@ -7,7 +7,7 @@ import { Chart } from "react-google-charts";
 import { printValue } from '/src/utils/Utils';
 
 // Libraries
-import { metaIndicators } from '/lib/indic';
+import metaIndics from '/lib/indics';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -51,7 +51,7 @@ export const IndicatorGraphs = ({session,indic}) =>
     ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
   ]
   
-  const unit = metaIndicators[indic].unit;
+  const unit = metaIndics[indic].unit;
   const viewWindow = viewsForIndic[indic];
 
   return (

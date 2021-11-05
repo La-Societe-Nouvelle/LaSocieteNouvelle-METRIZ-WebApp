@@ -4,8 +4,7 @@
 import { printValue } from '/src/utils/Utils';
 
 // Libraries
-import { metaIndicators } from '/lib/indic';
-import { metaAccounts } from '/lib/accounts';
+import metaIndics from '/lib/indics';
 import { buildIndicatorAggregate } from '../../src/footprintFormulas';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
@@ -14,9 +13,9 @@ export const IndicatorStatementTable = ({indic,session}) =>
 {
   const financialData = session.financialData;
 
-  const nbDecimals = metaIndicators[indic].nbDecimals;
-  const unit = metaIndicators[indic].unit;
-  const unitAbsolute = metaIndicators[indic].unitAbsolute;
+  const nbDecimals = metaIndics[indic].nbDecimals;
+  const unit = metaIndics[indic].unit;
+  const unitAbsolute = metaIndics[indic].unitAbsolute;
   const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
   const expensesGroups = getBasicExpensesGroups(indic,financialData);

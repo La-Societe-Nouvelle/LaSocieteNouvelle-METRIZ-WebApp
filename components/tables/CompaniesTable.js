@@ -8,8 +8,8 @@ import { InputText } from '/components/InputText';
 import { printValue, valueOrDefault } from '/src/utils/Utils';
 
 // Libs
-import { divisions } from '/lib/nace'; 
-import { areas } from '/lib/area'; 
+import divisions from '/lib/divisions'; 
+import areas from '/lib/areas'; 
 
 /* ---------- COMPANIES TABLE ---------- */
 

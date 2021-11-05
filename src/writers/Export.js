@@ -1,8 +1,27 @@
 // La Société Nouvelle
 
-// Libraries
-import { metaAccounts } from '/lib/accounts';
+// Modules
+import { jsPDF } from 'jspdf';
 
+// Libs
+import metaIndics from '../../lib/indics';
+
+// Sources
+import { buildIndicatorAggregate } from '../footprintFormulas';
+
+// Statement writers
+import { writeStatementART } from '../../components/statements/StatementART';
+import { writeStatementDIS } from '../../components/statements/StatementDIS';
+import { writeStatementECO } from '../../components/statements/StatementECO';
+import { writeStatementGEQ } from '../../components/statements/StatementGEQ';
+import { writeStatementGHG } from '../../components/statements/StatementGHG';
+import { writeStatementHAZ } from '../../components/statements/StatementHAZ';
+import { writeStatementKNW } from '../../components/statements/StatementKNW';
+import { writeStatementMAT } from '../../components/statements/StatementMAT';
+import { writeStatementNRG } from '../../components/statements/StatementNRG';
+import { writeStatementSOC } from '../../components/statements/StatementSOC';
+import { writeStatementWAS } from '../../components/statements/StatementWAS';
+import { writeStatementWAT } from '../../components/statements/StatementWAT';
 
 function exportIndicDataExpensesCSV(indic,session) {
 
@@ -35,23 +54,6 @@ function exportIndicDataDepreciationsCSV(indic,session) {
 
   return csvContent;
 }
-
-import { jsPDF } from 'jspdf';
-
-import { metaIndicators } from '../../lib/indic';
-import { buildIndicatorAggregate } from '../footprintFormulas';
-import { writeStatementART } from '../../components/statements/StatementART';
-import { writeStatementDIS } from '../../components/statements/StatementDIS';
-import { writeStatementECO } from '../../components/statements/StatementECO';
-import { writeStatementGEQ } from '../../components/statements/StatementGEQ';
-import { writeStatementGHG } from '../../components/statements/StatementGHG';
-import { writeStatementHAZ } from '../../components/statements/StatementHAZ';
-import { writeStatementKNW } from '../../components/statements/StatementKNW';
-import { writeStatementMAT } from '../../components/statements/StatementMAT';
-import { writeStatementNRG } from '../../components/statements/StatementNRG';
-import { writeStatementSOC } from '../../components/statements/StatementSOC';
-import { writeStatementWAS } from '../../components/statements/StatementWAS';
-import { writeStatementWAT } from '../../components/statements/StatementWAT';
 
 function exportIndicPDF(indic,session) 
 {
@@ -87,7 +89,7 @@ function exportIndicPDF(indic,session)
   y+=20;
   doc.setFontSize(11);
   doc.setFont("Calibri","bold");
-  doc.text(metaIndicators[indic].libelleGrandeur.toUpperCase(),10,y);
+  doc.text(metaIndics[indic].libelleGrandeur.toUpperCase(),10,y);
   doc.line(10,y+2,200,y+2);
 
   /*
@@ -106,7 +108,7 @@ function exportIndicPDF(indic,session)
   y+=15;
   doc.setFontSize(8);
   doc.setFont("Calibri","italic");
-  doc.text("(en "+metaIndicators[indic].unit+")",10,y);
+  doc.text("(en "+metaIndics[indic].unit+")",10,y);
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");
   doc.text("Notes",125,y);

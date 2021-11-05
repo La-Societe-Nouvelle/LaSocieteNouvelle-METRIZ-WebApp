@@ -14,7 +14,7 @@ import { printValue } from '../../src/utils/Utils';
 import { InputText } from '../InputText';
 
 // Libraries
-import { metaIndicators } from '/lib/indic';
+import metaIndics from '/lib/indics';
 
 /* ----------------------------------------------------------- */
 /* -------------------- STATEMENT SECTION -------------------- */
@@ -146,11 +146,11 @@ class IndicatorSelection extends React.Component
               </tr>
             </thead>
             <tbody>
-              {Object.keys(metaIndicators).map(indic =>  
+              {Object.keys(metaIndics).map(indic =>  
                 <tr key={indic}>
-                  <td className="auto">{metaIndicators[indic].libelle}</td>
-                  <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndicators[indic].nbDecimals)}</td>
-                  <td className="column_unit">&nbsp;{metaIndicators[indic].unit}</td>
+                  <td className="auto">{metaIndics[indic].libelle}</td>
+                  <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndics[indic].nbDecimals)}</td>
+                  <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
                   <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty,0)}&nbsp;%</td>
                   <td><input type="checkbox" 
                              value={indic}
@@ -291,7 +291,7 @@ const Summary = (props) =>
           <p><b>Dénomination : </b>{denomination}</p>
           <p><b>Année : </b>{year}</p>
           <p><b>Indicateurs : </b></p>
-          {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).map(([indic,_]) => <p key={indic}>&emsp;{metaIndicators[indic].libelle}</p>)}
+          {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).map(([indic,_]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
           {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).length == 0 &&
             <p>&emsp; - </p>}
           <p><b>Fait le : </b>{todayString}</p>

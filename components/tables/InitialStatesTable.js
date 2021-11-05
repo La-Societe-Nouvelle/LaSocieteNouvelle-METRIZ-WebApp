@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { printValue } from '/src/utils/Utils';
 
 // Libraries
-import { divisions } from '/lib/nace'; 
+import divisions from '/lib/divisions'; 
 
 /* ---------- INITIAL STATES TABLE ---------- */
 

@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Libraries
-import { metaIndicators } from '/lib/indic';
+import metaIndics from '/lib/indics';
 
 // Utils
 import { printValue } from "../../src/utils/Utils";
@@ -38,9 +38,9 @@ export class IndicatorCompaniesTable extends React.Component {
 
     this.sortCompanies(companies,columnSorted);
 
-    const nbDecimals = metaIndicators[indic].nbDecimals;
-    const unit = metaIndicators[indic].unit;
-    const unitAbsolute = metaIndicators[indic].unitAbsolute;
+    const nbDecimals = metaIndics[indic].nbDecimals;
+    const unit = metaIndics[indic].unit;
+    const unitAbsolute = metaIndics[indic].unitAbsolute;
     const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
     return (

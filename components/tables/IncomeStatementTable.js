@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // Libraries
-import { metaAccounts } from '../../lib/accounts';
+import metaAccounts from '../../lib/accounts';
 
 // Utils
 import { printValue } from '../../src/utils/Utils';
