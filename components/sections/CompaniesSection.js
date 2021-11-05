@@ -55,7 +55,9 @@ export class CompaniesSection extends React.Component {
         </div>
 
         <div>
-          <p>Informations : {isAllValid ? "Données complètes" : "Données non-synchronisées (cf. Affichage des comptes non synchronisés)"}</p>
+          <p>Synchronisation des données relatives aux fournisseurs (charges et immobilisations).</p>
+          {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
+          {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
         </div>
 
         <div className="section-view-main">

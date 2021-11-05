@@ -40,7 +40,9 @@ export class InitialStatesSection extends React.Component {
         </div>
 
         <div>
-          <p>Informations : {isAllValid ? "Données complètes" : "Données non-synchronisées (Cf. menu(s) déroulant(s))"}</p>
+          <p>Empreintes des comptes de stocks et des comptes d'immobilisations en début d'exercice.</p>
+          {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
+          {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
         </div>
 
         <div className="section-view-main">
@@ -50,13 +52,11 @@ export class InitialStatesSection extends React.Component {
 
             {financialData.immobilisations.concat(financialData.stocks).length > 0 && 
               <div className="actions">
+                <button onClick={() => document.getElementById('import-states').click()}>Importer un fichier (.json)</button>
+                <input id="import-states" visibility="collapse"
+                        type="file" accept=".json" 
+                        onChange={this.importFile}/>
                 <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>
-                <button onClick={() => document.getElementById('import-states').click()}>
-                Importer un fichier (.json)
-              </button>
-              <input id="import-states" visibility="collapse"
-                     type="file" accept=".json" 
-                     onChange={this.importFile}/>
               </div>}
 
               {financialData.immobilisations.concat(financialData.stocks).length > 0 &&
