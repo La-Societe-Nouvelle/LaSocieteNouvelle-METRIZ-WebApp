@@ -161,7 +161,7 @@ function RowTableImmobilisations(props)
   if (isDepreciableImmobilisation && immobilisationUsed) {
     return (<tr>
               <td className="short center">{account}</td>
-              <td className="auto">{accountLib}</td>
+              <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan={initialState=="defaultData" ? 1 : 2}>
                 <select className={(initialState=="prevFootprint" || initialState=="currentFootprint" || dataFetched) ? "valid" : ""}
                         value={initialState}
@@ -192,7 +192,7 @@ function RowTableImmobilisations(props)
   } else if (isDepreciableImmobilisation) {
     return (<tr>
               <td className="short center">{account}</td>
-              <td className="auto">{accountLib}</td>
+              <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
               <td className="short right">{printValue(prevAmount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
@@ -204,7 +204,7 @@ function RowTableImmobilisations(props)
   } else {
     return (<tr>
               <td className="short center">{account}</td>
-              <td className="auto">{accountLib}</td>
+              <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">Immobilisation non prise en compte (non amortissable)</td>
               <td className="short right">{printValue(prevAmount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
@@ -239,7 +239,7 @@ function RowTableStocks(props)
   return (
     <tr>
       <td className="short center">{account}</td>
-      <td className="auto">{accountLib}</td>
+      <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
       {!isProductionStock &&
         <td colSpan={initialState=="defaultData" ? 1 : 2}>
           <select className={initialState=="prevFootprint" || initialState=="currentFootprint" || dataFetched ? "valid" : ""}

@@ -49,7 +49,7 @@ export class ImmobilisationsTable extends React.Component {
               return(
                 <tr key={account}>
                   <td className="short center">{account}</td>
-                  <td className="auto">{accountLib}</td>
+                  <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
                   <td className="short right">{printValue(amount-valueLoss,0)}</td>
                   <td className="column_unit">&nbsp;€</td>
                   <td className="short right">{printValue(prevAmount-prevValueLoss,0)}</td>
