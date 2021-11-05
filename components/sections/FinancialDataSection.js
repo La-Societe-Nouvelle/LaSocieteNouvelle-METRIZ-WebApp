@@ -15,6 +15,7 @@ import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
 
 // Libraries
 import indics from '/lib/indics.json';
+import { MessagePopup } from '../popups/MessagePopup';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -27,21 +28,24 @@ export class FinancialDataSection extends React.Component {
     super(props);
     this.state = 
     {
+      selectedTable: "incomeStatement",
       importedData: null,
-      selectedTable: "incomeStatement"
+      errorFile: false
     }
   }
     
   render() 
   {
-    const {importedData,selectedTable} = this.state;
+    const {selectedTable,importedData,errorFile} = this.state;
     const isDataLoaded = this.props.session.financialData.isFinancialDataLoaded;
     
     return (
       <div className="section-view">
+
         <div className="section-view-header">
           <h1>Ecritures comptables</h1>
         </div>
+
         <div className="section-view-main">
 
           <div className="group"><h3>Données comptables</h3>
@@ -74,6 +78,8 @@ export class FinancialDataSection extends React.Component {
           {importedData!=null &&
             <FECImportPopup FECData={importedData}
                             onValidate={this.loadFECData.bind(this)}/>}
+          {errorFile &&
+            <MessagePopup title="Erreur - Fichier" message="Le fichier n'est pas lisible." closePopup={() => this.setState({errorFile: false})}/>}
 
         </div>
       </div>
@@ -106,12 +112,20 @@ export class FinancialDataSection extends React.Component {
     let file = event.target.files[0];
 
     let reader = new FileReader();
-    reader.onload = async () => FECFileReader(reader.result)
-      .then((FECData) => this.setState({importedData: FECData}));
+    reader.onload = async () => 
+    {
+      try {
+        let FECData = await FECFileReader(reader.result)
+        this.setState({importedData: FECData});
+      } catch(error) {
+        this.setState({errorFile: true});
+      }
+    }
+    
     try {
       reader.readAsText(file, "iso-8859-1");
     } catch(error) {
-      console.error(error);
+      this.setState({errorFile: true});
     }
   }
 
