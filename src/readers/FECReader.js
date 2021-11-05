@@ -23,14 +23,14 @@ const columnsFEC = ["JournalCode",
                     "Montantdevise",
                     "Idevise"]
 
-/* ---------------------------------------------------- */
-/* -------------------- FEC READER -------------------- */
-/* ---------------------------------------------------- */
+/* -------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- FEC READER ---------------------------------------- */
+/* -------------------------------------------------------------------------------------------- */
 
 /*  This reader is divided into 2 methods:
  *    - FECFileReader to read the file and parse it to JSON
- *        Encoding has to be ISO-8859-1 [as normally required]
- *        Separator must be '\t' (tabulation) or '|' (pipe) [as normally required]
+ *        Encoding has to be ISO-8859-1 [as required]
+ *        Separator must be '\t' (tabulation) or '|' (pipe) [as required]
  *        Structure of the JSON :
  *          .books (Array) -> books with the entries ({bookCode : [...entries]})
  *          .meta -> books labels, accounts labels, accountsAux labels ({code: label})
@@ -39,16 +39,15 @@ const columnsFEC = ["JournalCode",
  *  A documentation of the reading is available at https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp/blob/main/src/readers/DOCUMENTATION%20-%20FEC%20Reader.md
  */
 
-// EXPORT
-export { FECFileReader, FECDataReader };
-
 /* -------------------- PARSER -------------------- */
 
 const parseAmount = (stringAmount) => parseFloat(stringAmount.replace(',','.'))
 
+/* ----------------------------------------------------- */
 /* -------------------- FILE READER -------------------- */ 
+/* ----------------------------------------------------- */
 
-async function FECFileReader(content) 
+export async function FECFileReader(content) 
 // ...build JSON from FEC File (FEC -> JSON)
 {
   // Output data ---------------------------------------------------------------------------------------- //
@@ -57,8 +56,7 @@ async function FECFileReader(content)
 
   // Separator ------------------------------------------------------------------------------------------ //
 
-  let separator = content.slice(0,content.indexOf('\n')).split('\t').length == 18 ? '\t' : '|';
-  if (!['\t','|'].includes(separator)) throw 'Erreur - Fichier erroné';
+  let separator = getSeparator(content.slice(0,content.indexOf('\n')));
 
   // Header --------------------------------------------------------------------------------------------- //
   
@@ -66,6 +64,7 @@ async function FECFileReader(content)
   let indexColumns = {};
   const header = content.slice(0,content.indexOf('\n')).replace('\r','').split(separator);
         header.forEach(column => indexColumns[column] = header.indexOf(column));
+  // check if all columns are in the header
   header.forEach(column => {if (!columnsFEC.includes(column)) throw 'Erreur - Fichier erroné'});
 
   // Rows ----------------------------------------------------------------------------------------------- //
@@ -90,13 +89,10 @@ async function FECFileReader(content)
         dataFEC.meta.books[rowData.JournalCode] = {label: rowData.JournalLib, type: getDefaultBookType(rowData.JournalCode,rowData.JournalLib)}
       }
       // update meta accounts
-      if (dataFEC.meta.accounts[rowData.CompteNum] == undefined) {
-        dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
-      }
+      if (dataFEC.meta.accounts[rowData.CompteNum] == undefined) dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
+      
       // update meta subsidiaries accounts
-      if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) {
-        dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
-      }
+      if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
 
       // push data
       dataFEC.books[rowData.JournalCode].push(rowData);
@@ -106,6 +102,14 @@ async function FECFileReader(content)
 
   // Return --------------------------------------------------------------------------------------------- //
   return dataFEC;
+}
+
+// Get separator
+function getSeparator(line)
+{
+  if      (line.split('\t').length == 18) return '\t';
+  else if (line.split('|').length == 18)  return '|';
+  else throw 'Erreur - Fichier erroné';
 }
 
 // Read line (Array -> JSON)
@@ -140,10 +144,11 @@ function getDefaultBookType(bookCode,bookLib)
   else return "AUTRE";
 }
 
+/* ----------------------------------------------------- */
+/* -------------------- DATA READER -------------------- */
+/* ----------------------------------------------------- */ 
 
-/* -------------------- DATA READER -------------------- */ 
-
-async function FECDataReader(FECData)
+export async function FECDataReader(FECData)
 // ...extract data to use in session (JSON -> Session)
 { 
   // Output data ---------------------------------------------------------------------------------------- //
@@ -163,7 +168,7 @@ async function FECDataReader(FECData)
 
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = [];                 // stock 31, 32, 33, 34, 35, 37
-  data.stockVariations = [];        // stock flow 603, 71 <-> 31, 32, 33, 34, 35, 37
+  data.stockVariations = [];        // stock flows 603, 71 <-> 31, 32, 33, 34, 35, 37
 
   // Expenses ------------------------------------------------------------------------------------------- //
   data.expenses = [];               // 60, 61, 62 (hors 603) (609 read as negative expenses)
@@ -188,6 +193,8 @@ async function FECDataReader(FECData)
   // Other used data ------------------------------------------------------------------------------------//
   data.KNWData = {apprenticeshipTax: 0, vocationalTrainingTax: 0}
 
+  // ----------------------------------------------------------------------------------------------------//
+
   /* --- A NOUVEAUX --- */
 
   // Get book code for "A Nouveaux"
@@ -200,9 +207,9 @@ async function FECDataReader(FECData)
   /* --- OTHER BOOKS --- */
 
   // Read books (except "A Nouveaux")
-  await Object.entries(FECData.meta.books)
-              .filter(([_,{type}]) => type != "ANOUVEAUX")
-              .forEach(async ([bookCode,_]) => 
+  Object.entries(FECData.meta.books)
+        .filter(([_,{type}]) => type != "ANOUVEAUX")
+        .forEach(async ([bookCode,_]) => 
  {  
     // Get book
     let book = FECData.books[bookCode];
@@ -219,7 +226,6 @@ async function FECDataReader(FECData)
       // Read entry for additional data
       if (ecriture.CompteNum.substring(0,2) == "63") readAddtionalDataEntry(data,book,ecriture);
     })
-
   })
 
   /* --- RETURN --- */
@@ -254,24 +260,23 @@ async function readBookAsJournalANouveaux(data,book)
      */
 
     // Comptes d'immobilisations (hors amortissements et dépréciations) --------------------------------- //
-    if (ecriture.CompteNum.charAt(0)=="2" && !["28","29"].includes(ecriture.CompteNum.substring(0,2)))
+    if (/^2[0-7]/.test(ecriture.CompteNum))
     {
       // immobilisation data
       let immobilisationData = 
       {
         account: ecriture.CompteNum,
         accountLib: ecriture.CompteLib,
-        isDepreciableImmobilisation: ["20","21"].includes(ecriture.CompteNum.substring(0,2)),
+        isDepreciableImmobilisation: /^2[0-1]/.test(ecriture.CompteNum),
         prevAmount: parseAmount(ecriture.Debit),
         amount: parseAmount(ecriture.Debit)
       }
-
       // push data
       data.immobilisations.push(immobilisationData);
     }
 
     // Comptes d'amortissements et de dépréciations ----------------------------------------------------- //
-    if (ecriture.CompteNum.charAt(0)=="2" && ["28","29"].includes(ecriture.CompteNum.substring(0,2)))
+    if (/^2[8-9]/.test(ecriture.CompteNum))
     {
       // depreciation data
       let depreciationData = 
@@ -282,7 +287,6 @@ async function readBookAsJournalANouveaux(data,book)
         prevAmount: parseAmount(ecriture.Credit),
         amount: parseAmount(ecriture.Credit)
       }
-
       // push data
       data.depreciations.push(depreciationData);
     }
@@ -299,15 +303,15 @@ async function readBookAsJournalANouveaux(data,book)
       Comptes 36 - Stocks provenant d'immobilisation (non traités)
       Comptes 37 - Stocks de marchandises
       Comptes 38 - Stocks en voie d'acheminement (non traités)
-      Comptes 39 - Dépréciations des stocks et en-cours (non traités)
+      Comptes 39 - Dépréciations des stocks et en-cours
     ----------------------------------------------------------------------------------------------------
      */
     
     // Comptes de stocks (hors dépréciations et comptes 36 & 38) ---------------------------------------- //
-    if (ecriture.CompteNum.charAt(0)=="3" && !["36","38","39"].includes(ecriture.CompteNum.substring(0,2)))
+    if (/^3([1-5]|7)/.test(ecriture.CompteNum))
     {
-      let isProductionStock = ["33","34","35"].includes(ecriture.CompteNum.substring(0,2));
-
+      // stock type
+      let isProductionStock = /^3[3-5]/.test(ecriture.CompteNum);
       // stock data
       let stockData = 
       {
@@ -323,7 +327,7 @@ async function readBookAsJournalANouveaux(data,book)
     }
 
     // Comptes de dépréciations ------------------------------------------------------------------------- //
-    if (ecriture.CompteNum.charAt(0)=="3" && ["39"].includes(ecriture.CompteNum.substring(0,2)))
+    if (/^39/.test(ecriture.CompteNum))
     {
       // depreciation data
       let depreciationData = 
@@ -334,7 +338,6 @@ async function readBookAsJournalANouveaux(data,book)
         prevAmount: parseAmount(ecriture.Credit),
         amount: parseAmount(ecriture.Credit)
       }
-
       // push data
       data.depreciations.push(depreciationData);
     }
@@ -363,17 +366,37 @@ const readImmobilisationEntry = async (data,book,ecriture) =>
   */
 
   // Immobilisation ----------------------------------------------------------------------------------- //
-  if (["20","21","23","25","26","27"].includes(ecriture.CompteNum.substring(0,2)))
+  if (/^2[0-7]/.test(ecriture.CompteNum))
   {
+    // Immobilisation --------------------------------------------------- //
+    
     // Retrieve immobilisation item
     let immobilisation = data.immobilisations.filter(immobilisation => immobilisation.account == ecriture.CompteNum)[0];
-    
-    // variation de la valeur de l'immobilisation
-    immobilisation.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
 
+    // si compte existant -> variation de la valeur de l'immobilisation
+    if (immobilisation!=undefined) immobilisation.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+    
+    // si compte inexistant -> ajout compte
+    else 
+    {
+      // immobilisation data
+      let immobilisationData = 
+      {
+        account: ecriture.CompteNum,
+        accountLib: ecriture.CompteLib,
+        isDepreciableImmobilisation: /^2[0-1]/.test(ecriture.CompteNum),
+        prevAmount: 0.0,
+        amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)
+      }
+      // push data
+      data.immobilisations.push(immobilisationData);
+    }
+
+    // Acquisition ------------------------------------------------------ //
+    
     // lecture du compte auxiliaire (cas acquisition)
     let ecritureAux = book.filter(ecritureAux => ecritureAux.EcritureNum == ecriture.EcritureNum 
-                                              && ecritureAux.CompteNum.substring(0,2) == "40")[0];
+                                              && /^40/.test(ecritureAux.CompteNum))[0];
     if (ecritureAux != undefined)
     {      
       // investment data
@@ -383,24 +406,39 @@ const readImmobilisationEntry = async (data,book,ecriture) =>
         account: ecriture.CompteNum,
         accountLib: ecriture.CompteLib,
         accountAux: ecritureAux.CompAuxNum || ecritureAux.CompteNum,
-        accountAuxLib : ecritureAux.CompAuxLib,
+        accountAuxLib : ecritureAux.CompAuxLib || ecritureAux.CompteLib,
         isDefaultAccountAux: ecritureAux.CompAuxNum ? false : true,
         amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
       }
-
       // push data
       data.investments.push(investmentData);
     }
   }
 
   // Amortissement & Dépréciation --------------------------------------------------------------------- //
-  if (["28","29"].includes(ecriture.CompteNum.substring(0,2)))
+  if (/^2[8-9]/.test(ecriture.CompteNum))
   {
     // Retrieve depreciation item
     let depreciation = data.depreciations.filter(depreciation => depreciation.account == ecriture.CompteNum)[0];
     
-    // variation de la valeur de l'immobilisation
-    depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+    // si compte existant -> variation de la valeur de l'immobilisation
+    if (depreciation!=undefined) depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+
+    // si compte inexistant -> ajout compte
+    else
+    {
+      // depreciation data
+      let depreciationData = 
+      {
+        account: ecriture.CompteNum,
+        accountLib: ecriture.CompteLib,
+        accountAux: "2"+ecriture.CompteNum.substring(2)+"0",
+        prevAmount: 0.0,
+        amount: parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit)
+      }
+      // push data
+      data.depreciations.push(depreciationData);
+    }
   }
 
 }
@@ -424,20 +462,19 @@ const readStockEntry = async (data,book,ecriture) =>
   */
   
   // Stock -------------------------------------------------------------------------------------------- //
-  if (["31","32","33","34","35","37"].includes(ecriture.CompteNum.substring(0,2)))
+  if (/^3([1-5]|7)/.test(ecriture.CompteNum))
   {    
     // Retrieve stock item
     let stock = data.stocks.filter(stock => stock.account == ecriture.CompteNum)[0];
     
     // if stock already define
-    if (stock != undefined) stock.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+    if (stock!=undefined) stock.amount+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
 
     // if stock not defined
     else
     {
-      // Type of stock
-      let isProductionStock = ["33","34","35"].includes(ecriture.CompteNum.substring(0,2));
-            
+      // stock type
+      let isProductionStock = /^3[3-5]/.test(ecriture.CompteNum);
       // stock data
       let stockData = 
       {
@@ -448,20 +485,35 @@ const readStockEntry = async (data,book,ecriture) =>
         amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
         prevAmount: 0
       }
-
       // push data
       data.stocks.push(stockData);
     }
   }
 
   // Dépréciation ------------------------------------------------------------------------------------- //
-  if (["39"].includes(ecriture.CompteNum.substring(0,2)))
+  if (/^39/.test(ecriture.CompteNum))
   {
     // Retrieve depreciation item
     let depreciation = data.depreciations.filter(depreciation => depreciation.account == ecriture.CompteNum)[0];
     
-    // variation de la valeur de l'immobilisation
-    depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+    // si compte existant -> variation de la valeur de l'immobilisation
+    if (depreciation!=undefined) depreciation.amount+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+
+    // si compte inexistant -> ajout compte
+    else
+    {
+      // depreciation data
+      let depreciationData = 
+      {
+        account: ecriture.CompteNum,
+        accountLib: ecriture.CompteLib,
+        accountAux: "3"+ecriture.CompteNum.substring(2)+"0",
+        prevAmount: 0.0,
+        amount: parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit)
+      }
+      // push data
+      data.depreciations.push(depreciationData);
+    }
   }
 
 }
@@ -486,12 +538,11 @@ const readExpenseEntry = async (data,book,ecriture) =>
   */
 
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
-  if (["60","61","62"].includes(ecriture.CompteNum.substring(0,2)) && ecriture.CompteNum.substring(0,3)!="603")
+  if (/^6(0[^3]|[1-2])/.test(ecriture.CompteNum))
   { 
     // lecture du compte auxiliaire
     let ecritureAux = book.filter(ecritureAux => ecritureAux.EcritureNum == ecriture.EcritureNum 
-                                              && ecritureAux.CompteNum.substring(0,2)=="40")[0] || {};
-
+                                              && /^40/.test(ecritureAux.CompteNum))[0] || {};
     // expense data
     let expenseData = 
     {
@@ -503,13 +554,12 @@ const readExpenseEntry = async (data,book,ecriture) =>
       isDefaultAccountAux: ecritureAux.CompAuxNum ? false : true,
       amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
     }
-
     // push data
     data.expenses.push(expenseData);
   }
 
   // Stocks variation (603) --------------------------------------------------------------------------- //
-  if (ecriture.CompteNum.substring(0,3)=="603")
+  if (/^603/.test(ecriture.CompteNum))
   {    
     // retrieve stock entry
     let ecritureStock = book.filter(ecritureStock => ecritureStock.EcritureNum == ecriture.EcritureNum 
@@ -528,6 +578,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
     else
     {
       let prevAmount = data.stocks.filter(stock => stock.account == ecritureStock.CompteNum).map(stock => stock.prevAmount)[0] || 0;
+      // stock variation data
       let stockVariationData = 
       {
         account: ecriture.CompteNum,
@@ -537,30 +588,34 @@ const readExpenseEntry = async (data,book,ecriture) =>
         label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
         amount: prevAmount + parseAmount(ecriture.Debit) - parseAmount(ecritureStock.Credit),
       }
+      // push data
       data.stockVariations.push(stockVariationData);
     }
   }
 
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
-  if (ecriture.CompteNum.substring(0,4)=="6811" || ecriture.CompteNum.substring(0,4)=="6871")
+  if (/^68(11[1-2]|71)/.test(ecriture.CompteNum))
   {
-    let prefixAccountAux = /6811[1-2]/.test(ecriture.CompteNum.substring(0,5)) ? "28"+(parseInt(ecriture.CompteNum.charAt(4))-1) : "28";
+    // init default prefix account aux & retrieve depreciations entries (#280 & #281)
+    let prefixAccountAux = /^6811[1-2]/.test(ecriture.CompteNum) ? "28"+(parseInt(ecriture.CompteNum.charAt(4))-1) : "28";
+    let amountDepreciationExpense = parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+    
+        // check if depreciation expenses are trackables
     let ecrituresDepreciations = book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum
                                           && ecritureDepreciation.CompteNum.startsWith(prefixAccountAux));
-    let isTraceable = (ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit))
-                                             .reduce((a,b) => a+b,0) == (parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)));
+    let amountEcrituresDepreciations = ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit)).reduce((a,b) => a+b,0);
+    let isTraceable = (amountEcrituresDepreciations == amountDepreciationExpense);
     
-    // case : use of 68111 or 68112 for 280 & 281
-    if (!isTraceable && /6811[1-2]/.test(ecriture.CompteNum.substring(0,5)))
+    // case : use of 6811[1-2] for both 280 and 281
+    if (!isTraceable && /^6811[1-2]/.test(ecriture.CompteNum))
     {
-      let ecrituresDepreciations = book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum
-                                            && ecritureDepreciation.CompteNum.substring(0,2)=="28");
-      let isTraceable = (ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit))
-                                               .reduce((a,b) => a+b,0) == (parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit)));
-      if (isTraceable) prefixAccountAux = "28";
+      ecrituresDepreciations = book.filter(ecritureDepreciation => ecritureDepreciation.EcritureNum == ecriture.EcritureNum
+                                        && ecritureDepreciation.CompteNum.startsWith("28"));
+      amountEcrituresDepreciations = ecrituresDepreciations.map(ecritureDepreciation => parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit)).reduce((a,b) => a+b,0);
+      isTraceable = (amountEcrituresDepreciations == amountDepreciationExpense);
     }
 
-    // depreciation is linked to immobilisation accounts
+    // depreciation expense is linked to depreciations accounts (#28)
     if (isTraceable) 
     {
       ecrituresDepreciations.forEach((ecritureDepreciation) => 
@@ -568,13 +623,13 @@ const readExpenseEntry = async (data,book,ecriture) =>
         // retrieve depreciation expense item
         let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ecriture.CompteNum
                                                                            && expense.accountAux == ecritureDepreciation.CompteNum)[0];
-        
         // if depreciation expense already defined
         if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit);
         
         // if depreciation expense undefined
-        else if (ecritureDepreciation!=undefined)
+        else
         {
+          // depreciation expense data
           let depreciationExpenseData = 
           {
             label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
@@ -583,6 +638,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
             accountAux: ecritureDepreciation.CompteNum,
             amount: parseAmount(ecritureDepreciation.Credit) - parseAmount(ecritureDepreciation.Debit),
           }
+          // push data
           data.depreciationExpenses.push(depreciationExpenseData);
         }
       })
@@ -600,6 +656,7 @@ const readExpenseEntry = async (data,book,ecriture) =>
       // if depreciation expense undefined
       else
       {
+        // depreciation expense data
         let depreciationExpenseData = 
         {
           label: ecriture.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
@@ -608,19 +665,20 @@ const readExpenseEntry = async (data,book,ecriture) =>
           accountAux: prefixAccountAux,
           amount: parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit),
         }
+        // push data
         data.depreciationExpenses.push(depreciationExpenseData);
       }
     }    
   }
 
   // Other expenses ----------------------------------------------------------------------------------- //
-  if (ecriture.CompteNum.substring(0,2)=="63") data.taxes+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="64") data.personnelExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="65") data.otherExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="66" || ecriture.CompteNum.substring(0,3)=="686") data.financialExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="67" || ecriture.CompteNum.substring(0,3)=="687" && ecriture.CompteNum.substring(0,4)!="6871") data.exceptionalExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,3)=="681" && ecriture.CompteNum.substring(0,4)!="6811") data.provisions+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
-  if (ecriture.CompteNum.substring(0,2)=="69") data.taxOnProfits+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^63/.test(ecriture.CompteNum)) data.taxes+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^64/.test(ecriture.CompteNum)) data.personnelExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^65/.test(ecriture.CompteNum)) data.otherExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^6(6|86)/.test(ecriture.CompteNum)) data.financialExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^6(7|87[^1])/.test(ecriture.CompteNum)) data.exceptionalExpenses+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^681[^1]/.test(ecriture.CompteNum)) data.provisions+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
+  if (/^69/.test(ecriture.CompteNum)) data.taxOnProfits+= parseAmount(ecriture.Debit) - parseAmount(ecriture.Credit);
 
 }
 
@@ -643,10 +701,10 @@ const readProductionEntry = async (data,book,ecriture) =>
   */
 
   // Revenue ------------------------------------------------------------------------------------------ //
-  if (ecriture.CompteNum.substring(0,2)=="70") data.revenue+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+  if (/^70/.test(ecriture.CompteNum)) data.revenue+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
   
   // Stored/Unstored Production ----------------------------------------------------------------------- //
-  if (ecriture.CompteNum.substring(0,2)=="71")
+  if (/^71/.test(ecriture.CompteNum))
   {
     // retrieve stock entry
     let ecritureStock = book.filter(ecritureStock => ecritureStock.EcritureNum == ecriture.EcritureNum 
@@ -677,7 +735,7 @@ const readProductionEntry = async (data,book,ecriture) =>
   }
   
   // Immobilised Production --------------------------------------------------------------------------- //
-  if (ecriture.CompteNum.substring(0,2)=="72") data.immobilisedProduction+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
+  if (/^72/.test(ecriture.CompteNum)) data.immobilisedProduction+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
   
   // Other operating incomes -------------------------------------------------------------------------- //
   if (ecriture.CompteNum.substring(0,2)=="74") data.otherOperatingIncomes+= parseAmount(ecriture.Credit) - parseAmount(ecriture.Debit);
