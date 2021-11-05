@@ -4,7 +4,9 @@
 import React from 'react';
 
 // Libraries
-import indics from '../lib/indics.json';
+import metaIndics from '../lib/indics';
+
+const indics = ["eco","soc","art","dis","knw","geq","ghg","nrg","mat","wat","was","haz"];
 
 export function Menu({selectedSection, changeSection, downloadSession, importSession, downloadFinalStates, progression}) 
 {
@@ -36,11 +38,11 @@ export function Menu({selectedSection, changeSection, downloadSession, importSes
         </div>
 
         <div className="menu-items-group">
-          {Object.entries(indics).map(([codeIndic,dataIndic]) => 
-            <button key={"menu-button-"+codeIndic}
-                    className={"menu-button"+(codeIndic==selectedSection ? " selected" : "")}
-                    onClick = {() => changeSection(codeIndic)}>
-              {dataIndic.libelleMenu}
+          {indics.map(indic => 
+            <button key={"menu-button-"+indic}
+                    className={"menu-button"+(indic==selectedSection ? " selected" : "")}
+                    onClick = {() => changeSection(indic)}>
+              {metaIndics[indic].libelleMenu}
             </button>
           )}
         </div>
