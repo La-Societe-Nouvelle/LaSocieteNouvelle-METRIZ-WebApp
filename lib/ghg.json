@@ -1,0 +1,157 @@
+{
+  "co2": {
+    "label": "",
+    "prg": 1,
+    "uncertainty": 0
+  },
+  "co2f": {
+    "label": "",
+    "prg": 1,
+    "uncertainty": 30
+  },
+  "ch4b": {
+    "label": "",
+    "prg": 28,
+    "uncertainty": 30
+  },
+  "ch4f": {
+    "label": "",
+    "prg": 30,
+    "uncertainty": 30
+  },
+  "n2o": {
+    "label": "",
+    "prg": 265,
+    "uncertainty": 30
+  },
+  "SF6": {
+    "label": "SF6",
+    "prg": 23500,
+    "uncertainty": 30
+  },
+  "NF3": {
+    "label": "NF3",
+    "prg": 16100,
+    "uncertainty": 30
+  },
+  "R14": {
+    "label": "R14",
+    "prg": 6630,
+    "uncertainty": 30
+  },
+  "R23": {
+    "label": "R23",
+    "prg": 12400,
+    "uncertainty": 30
+  },
+  "R32": {
+    "label": "R32",
+    "prg": 677,
+    "uncertainty": 30
+  },
+  "R116": {
+    "label": "R116",
+    "prg": 11100,
+    "uncertainty": 30
+  },
+  "R125": {
+    "label": "R125",
+    "prg": 3170,
+    "uncertainty": 30
+  },
+  "R134a": {
+    "label": "R134a",
+    "prg": 1300,
+    "uncertainty": 30
+  },
+  "R143a": {
+    "label": "R143a",
+    "prg": 4800,
+    "uncertainty": 30
+  },
+  "R152a": {
+    "label": "R152a",
+    "prg": 138,
+    "uncertainty": 30
+  },
+  "R218": {
+    "label": "R218",
+    "prg": 8900,
+    "uncertainty": 30
+  },
+  "R227ea": {
+    "label": "R227ea",
+    "prg": 2640,
+    "uncertainty": 30
+  },
+  "R318": {
+    "label": "R318",
+    "prg": 9540,
+    "uncertainty": 30
+  },
+  "R404a": {
+    "label": "R404a",
+    "prg": 3943,
+    "uncertainty": 30
+  },
+  "R407a": {
+    "label": "R407a",
+    "prg": 1923,
+    "uncertainty": 30
+  },
+  "R407c": {
+    "label": "R407c",
+    "prg": 1624,
+    "uncertainty": 30
+  },
+  "R407f": {
+    "label": "R407f",
+    "prg": 1674,
+    "uncertainty": 30
+  },
+  "R410a": {
+    "label": "R410a",
+    "prg": 1924,
+    "uncertainty": 30
+  },
+  "R417a": {
+    "label": "R417a",
+    "prg": 2127,
+    "uncertainty": 30
+  },
+  "R422a": {
+    "label": "R422a",
+    "prg": 2844,
+    "uncertainty": 30
+  },
+  "R422d": {
+    "label": "R422d",
+    "prg": 2473,
+    "uncertainty": 30
+  },
+  "R427a": {
+    "label": "R427a",
+    "prg": 2024,
+    "uncertainty": 30
+  },
+  "R4310mee": {
+    "label": "R4310mee",
+    "prg": 1650,
+    "uncertainty": 30
+  },
+  "R507": {
+    "label": "R507",
+    "prg": 3985,
+    "uncertainty": 30
+  },
+  "R507a": {
+    "label": "R507a",
+    "prg": 2235,
+    "uncertainty": 30
+  },
+  "R5114": {
+    "label": "R5114",
+    "prg": 7910,
+    "uncertainty": 30
+  }
+}
