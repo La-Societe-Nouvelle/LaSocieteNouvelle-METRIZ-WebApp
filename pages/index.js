@@ -18,9 +18,9 @@ import { IndicatorSection } from '/components/sections/IndicatorSection';
 import { StatementSection } from '../components/sections/StatementSection';
 
 // Others components
-import { Header } from '../components/Header';
-import { StartSection } from '../components/sections/startSection';
-import { SirenSection } from '../components/sections/SirenSection';
+import { Header } from '/components/Header';
+import { StartSection } from '/components/sections/startSection';
+import { SirenSection } from '/components/sections/SirenSection';
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
