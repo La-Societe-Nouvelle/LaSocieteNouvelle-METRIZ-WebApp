@@ -11,16 +11,16 @@ import Head from 'next/head';
 import { Session } from '/src/Session';
 
 // Sections
+import { StartSection } from '/components/sections/StartSection';
+import { SirenSection } from '/components/sections/SirenSection';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
-import { CompaniesSection } from '/components/sections/CompaniesSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
+import { CompaniesSection } from '/components/sections/CompaniesSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
 import { StatementSection } from '../components/sections/StatementSection';
 
 // Others components
 import { Header } from '/components/Header';
-import { StartSection } from '/components/sections/startSection';
-import { SirenSection } from '/components/sections/SirenSection';
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
