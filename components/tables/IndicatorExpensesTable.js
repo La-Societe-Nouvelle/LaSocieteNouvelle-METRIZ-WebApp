@@ -41,7 +41,7 @@ export class IndicatorExpensesTable extends React.Component {
     const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table>
           <thead>
             <tr>

@@ -9,12 +9,16 @@ export class FECImportPopup extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = props.FECData;
+    this.state = {
+      ...props.FECData,
+      noBook: false
+    }
   }
 
   render() 
   {
-    const {meta,books} = this.state;
+    const {meta,books,noBook} = this.state;
+    const disabledValidation = !(noBook || Object.entries(meta.books).map(([_,{type}]) => type).includes("ANOUVEAUX"));
     
     return (
       <div className="popup">
@@ -53,9 +57,19 @@ export class FECImportPopup extends React.Component {
               )}
             </tbody>
           </table>
+          <div>
+
+          </div>
+          <div className="input">
+            <input type="checkbox" 
+                   checked={noBook}
+                   onChange={this.onCheckboxChange}/>
+              <label htmlFor="certification">&nbsp;Pas de journal A-Nouveaux</label>
+          </div>
           <div className="footer">
+            <div></div>
             <button onClick={() => this.validate()}
-                    disabled={!(Object.entries(meta.books).filter(([_,{type}]) => type=="ANOUVEAUX").length > 0)}>Valider</button>
+                    disabled={disabledValidation}>Valider</button>
           </div>
         </div>
       </div>
@@ -69,15 +83,14 @@ export class FECImportPopup extends React.Component {
     let selectedCode = event.target.value;
     let meta = this.state.meta;
     Object.entries(meta.books).forEach(([code,_]) => meta.books[code].type = (code == selectedCode ? "ANOUVEAUX" : ""));
-    console.log(meta);
-    this.setState({meta: meta});
+    this.setState({meta: meta, noBook: false});
   }
 
-  onBookTypeChange = (code,event) => 
+  onCheckboxChange = (event) =>
   {
     let meta = this.state.meta;
-    meta.books[code].type = event.target.value;
-    this.setState({meta: meta});
+    if (event.target.checked) Object.entries(meta.books).forEach(([code,_]) => meta.books[code].type = "");
+    this.setState({meta: meta, noBook: event.target.checked});
   }
 
   /* ----- PROPS METHODS ----- */

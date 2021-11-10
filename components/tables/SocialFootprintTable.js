@@ -7,7 +7,7 @@ import React from 'react';
 import { printValue } from '/src/utils/Utils';
 
 // Libraries
-import metaIndicators from '/lib/indics';
+import metaIndics from '/lib/indics';
 
 /* ---------- SOCIAL FOOTPRINT TABLE ---------- */
 
@@ -37,11 +37,11 @@ export class SocialFootprintTable extends React.Component {
           </tr>
         </thead>
         <tbody>
-          {Object.keys(metaIndicators).map(indic =>
+          {Object.keys(metaIndics).map(indic =>
             <tr>
-              <td className="auto">{metaIndicators[indic].libelle}</td>
-              <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndicators[indic].nbDecimals)}</td>
-              <td className="column_unit">&nbsp;{metaIndicators[indic].unit}</td>
+              <td className="auto">{metaIndics[indic].libelle}</td>
+              <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndics[indic].nbDecimals)}</td>
+              <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
               <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty,0)}&nbsp;%</td>
               <td><input type="checkbox" 
                          value={indic}

@@ -1,10 +1,10 @@
 // La Société Nouvelle
 
+// Libraries
+import metaIndics from '/lib/indics';
+
 // React
 import React from 'react';
-
-// Modules
-import Popup from 'reactjs-popup';
 
 // Tab Components
 import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
@@ -33,10 +33,7 @@ import { AssessmentNRG } from '/components/assessments/AssessmentNRG';
 import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
-import { exportIndicPDF, exportIndicDataExpensesCSV } from '/src/writers/Export';
-
-// Libraries
-import metaIndics from '/lib/indics';
+import { exportIndicPDF } from '/src/writers/Export';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -64,85 +61,100 @@ export class IndicatorSection extends React.Component {
   {
     super(props);
     this.state = {
+      indic: "eco",
       triggerPopup: "",
       selectedTable: "incomeStatement"
     }
   }
-
-  componentDidUpdate(prevProps)
-  {
-    if (prevProps.indic!=this.props.indic) this.setState({triggerPopup: ""})
-  }
   
   render() 
   {
-    const {indic} = this.props;
+    const {indic} = this.state;
     const {triggerPopup,selectedTable} = this.state;
 
-    const isAllValid = this.props.session.financialData.isFinancialDataLoaded
-                    && !(this.props.session.financialData.companies.filter(company => company.status != 200).length > 0)
-                    && !(this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0);
+    const isPublicationAvailable = Object.entries(this.props.session.revenueFootprint.indicators).filter(([_,indicator]) => indicator.value!=null).length > 0;
 
     return (
       <div className="section-view">
 
-        <div className="section-view-header"><h1>{metaIndics[indic].libelle}</h1>
-          <div className="section-view-header-odds">
-            {metaIndics[indic].odds.map((odd) => 
-              <img key={"logo-odd-"+odd} src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}
+        <div className="section-view-actions">
+          <div className="sections-actions">
+            <select id="selection-indicator"
+                    value={indic}
+                    onChange={this.changeSelectedIndicator}>
+              <option disabled>Création de la valeur</option>
+              <option key="eco" value="eco">&emsp;&emsp;{metaIndics["eco"].libelle}</option>
+              <option key="art" value="art">&emsp;&emsp;{metaIndics["art"].libelle}</option>
+              <option key="soc" value="soc">&emsp;&emsp;{metaIndics["soc"].libelle}</option>
+              <option disabled>Empreinte sociale</option>
+              <option key="dis" value="dis">&emsp;&emsp;{metaIndics["dis"].libelle}</option>
+              <option key="geq" value="geq">&emsp;&emsp;{metaIndics["geq"].libelle}</option>
+              <option key="knw" value="knw">&emsp;&emsp;{metaIndics["knw"].libelle}</option>
+              <option disabled>Empreinte environnementale</option>
+              <option key="ghg" value="ghg">&emsp;&emsp;{metaIndics["ghg"].libelle}</option>
+              <option key="nrg" value="nrg">&emsp;&emsp;{metaIndics["nrg"].libelle}</option>
+              <option key="wat" value="wat">&emsp;&emsp;{metaIndics["wat"].libelle}</option>
+              <option key="mat" value="mat">&emsp;&emsp;{metaIndics["mat"].libelle}</option>
+              <option key="was" value="was">&emsp;&emsp;{metaIndics["was"].libelle}</option>
+              <option key="haz" value="haz">&emsp;&emsp;{metaIndics["haz"].libelle}</option>
+            </select>
+          </div>
+          <div>
+            <button id="validation-button" disabled={!isPublicationAvailable} onClick={this.props.publish}>Publication</button>
           </div>
         </div>
 
-      {!isAllValid &&
-        <div>
-          <p>Informations : {!this.props.session.financialData.isFinancialDataLoaded ? "Absences d'écritures comptables" : "Données non-synchronisées (Etats initiaux ou Fournisseurs)"}</p>
-        </div>}
+        <div className="section-view-header-odds">
+          {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-"+odd} 
+                                                    src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}
+        </div>
+
+        <div className="section-view-header">
+          <h1>{metaIndics[indic].libelle}</h1>
+        </div>
 
         <div className="indicator-section-view">
-          <div className="groups">
 
-            <div className="group">
-              <h3>Déclaration des impacts directs</h3>
-              <Statement indic={indic}
-                         impactsData={this.props.session.impactsData}
-                         onUpdate={ this.checkNetValueAddedIndicator.bind(this)}
-                         onValidate={this.validateIndicator.bind(this)}
-                         toAssessment={() => this.triggerPopup("assessment")}/>
-            </div>
+          <div className="group">
+            <h3>Déclaration des impacts directs</h3>
+            <Statement indic={indic}
+                       impactsData={this.props.session.impactsData}
+                       onUpdate={ this.willNetValueAddedIndicator.bind(this)}
+                       onValidate={this.validateIndicator.bind(this)}
+                       toAssessment={() => this.triggerPopup("assessment")}/>
+          </div>
 
-            <div className="group"><h3>Tableau récapitulatif</h3>
-              <div className="actions">
-                <button onClick={() => exportIndicPDF(this.props.indic,this.props.session)}>Editer rapport</button>
-                <select value={selectedTable}
-                        onChange={this.changeShowedTable}>
+          <div className="group">
+            <h3>Tableau récapitulatif</h3>
+            <div className="actions">
+              <button onClick={() => exportIndicPDF(this.state.indic,this.props.session)}>Editer rapport</button>
+              <select value={selectedTable}
+                      onChange={this.changeShowedTable}>
                 <option key="1" value="incomeStatement">Compte de résultat</option>
                 <option key="2" value="expensesAccounts">Détails - Comptes de charges</option>
                 <option key="3" value="companies">Valeurs publiées - Fournisseurs</option>
               </select>
-              </div>
-              
-              {this.buildtable(selectedTable)}
-
             </div>
-
-            <div className="group">
-              <h3>Graphiques comparatifs</h3>
-              <IndicatorGraphs session={this.props.session} indic={this.props.indic}/>
-            </div>
-
+            {this.buildtable(selectedTable)}
           </div>
+
+          <div className="group">
+            <h3>Graphiques comparatifs</h3>
+            <IndicatorGraphs session={this.props.session} indic={indic}/>
+          </div>
+
         </div>
 
-        {triggerPopup=="assessment" &&
-          <div className="popup">
-            <div className="popup-inner full-size">
-              <Assessment indic={indic}
-                          impactsData={this.props.session.impactsData}
-                          onUpdate={this.checkNetValueAddedIndicator.bind(this)}
-                          onValidate={this.validateIndicator.bind(this)}
-                          onGoBack={() => this.triggerPopup("")}/>
-            </div>
-          </div>}
+      {triggerPopup=="assessment" &&
+        <div className="popup">
+          <div className="popup-inner full-size">
+            <Assessment indic={indic}
+                        impactsData={this.props.session.impactsData}
+                        onUpdate={this.willNetValueAddedIndicator.bind(this)}
+                        onValidate={this.validateIndicator.bind(this)}
+                        onGoBack={() => this.triggerPopup("")}/>
+          </div>
+        </div>}
 
       </div>
     )
@@ -152,45 +164,55 @@ export class IndicatorSection extends React.Component {
   {
     switch(selectedTable) 
     {
-      case "incomeStatement" :  return(<IndicatorStatementTable session={this.props.session} indic={this.props.indic}/>)
-      case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.props.indic}/>)
-      case "companies" :        return(<IndicatorCompaniesTable session={this.props.session} indic={this.props.indic}/>)
+      case "incomeStatement" :  return(<IndicatorStatementTable session={this.props.session} indic={this.state.indic}/>)
+      case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.state.indic}/>)
+      case "companies" :        return(<IndicatorCompaniesTable session={this.props.session} indic={this.state.indic}/>)
     }
   }
 
-  /* ----- SELECTED TAB ----- */
+  /* ----- SELECTED INDICATOR / TABLE ----- */
   
+  changeSelectedIndicator = (event) => this.setState({indic: event.target.value})
   changeShowedTable = (event) => this.setState({selectedTable: event.target.value})
 
-  /* ----- - ----- */
+  /* ----- CHANGE/VALIDATION HANDLER ----- */
 
-  checkNetValueAddedIndicator = async (indic) =>
+  // check if net value indicator will change with new value & cancel value if necessary
+  willNetValueAddedIndicator = async (indic) =>
   {
-    let nextIndicator = this.props.session.getValueAddedIndicator(indic);
-    if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) {
+    // get new value
+    let nextIndicator = this.props.session.getNetValueAddedIndicator(indic);
+
+    if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) 
+    {
+      // remove validation
       this.props.session.validations = this.props.session.validations.filter(item => item != indic);
+      // update footprint
       await this.props.session.updateIndicator(indic);
-      if (indic==this.props.indic) this.forceUpdate();
+      // update state
+      if (indic==this.state.indic) this.forceUpdate();
     }
   }
 
   validateIndicator = async () =>
   {
-    if (this.props.session.validations.indexOf(this.props.indic) < 0) this.props.session.validations.push(this.props.indic);
-    await this.props.session.updateIndicator(this.props.indic);
+    // add validation
+    if (!this.props.session.validations.includes(this.state.indic)) this.props.session.validations.push(this.state.indic);
+    // update footprint
+    await this.props.session.updateIndicator(this.state.indic);
+    // update state
     this.forceUpdate();
   }
 
-  triggerPopup = (popupLabel) => this.setState({triggerPopup: popupLabel})
+  /* ----- POP-UP ----- */
 
-  // Reporting
-  exportReporting = () => exportIndicPDF(this.props.indic,this.props.session)
+  triggerPopup = (popupLabel) => this.setState({triggerPopup: popupLabel})
 
 }
 
-/* ----- STATEMENTS ----- */
+/* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
 
-// Display the correct assessment view according to the indicator
+// Display the correct statement view according to the indicator
 function Statement(props) 
 {
   switch(props.indic) 
@@ -210,6 +232,7 @@ function Statement(props)
   }
 }
 
+// Display the correct assessment view according to the indicator
 function Assessment(props) 
 {
   switch(props.indic) 

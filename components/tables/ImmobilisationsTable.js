@@ -27,7 +27,7 @@ export class ImmobilisationsTable extends React.Component {
     this.sortItems(immobilisations,columnSorted);
 
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table>
           <thead>
             <tr>
@@ -62,11 +62,11 @@ export class ImmobilisationsTable extends React.Component {
               <tr className="with-top-line">
                 <td className="short center"> - </td>
                 <td className="auto">TOTAL</td>
-                <td className="short right">{printValue(this.props.financialData.getNetAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(this.props.financialData.getFinalNetAmountImmobilisations(),0)}</td>
                 <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(this.props.financialData.getPrevNetAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(this.props.financialData.getInitialNetAmountImmobilisations(),0)}</td>
                 <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(this.props.financialData.getNetAmountImmobilisations()-this.props.financialData.getPrevNetAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(this.props.financialData.getFinalNetAmountImmobilisations()-this.props.financialData.getInitialNetAmountImmobilisations(),0)}</td>
                 <td className="column_unit">&nbsp;€</td>
               </tr>}
           </tbody>

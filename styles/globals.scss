@@ -88,7 +88,7 @@ input {
 // Select
 
 select {
-  padding: 3px 20px;
+  padding: 3px 5px;
   margin: 0 3px;
 }
 
@@ -114,10 +114,76 @@ select {
 
 .app-view {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-between;
   width: 100%;
   height: 100%;
+}
+
+/* ---------- HEADER ---------- */
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-content: center;
+  border-bottom: solid 3px $primary-color;
+
+  #global-actions {
+    position: absolute;
+    top: 15px;
+    left: 10px;
+
+    img {
+      height: 30px;
+      margin-right: 10px;
+    }
+  }
+
+  #progression {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 15px;
+    margin-bottom: 10px;
+
+    button {
+      width: 30px;
+      height: 30px;
+      padding: 0;
+    }
+
+    p {
+      margin: 5px 0;
+      position: relative;
+      width: 200px;
+      text-align: center;
+    }
+
+    svg {
+      height: 30px;
+      line {
+        stroke: $primary-color;
+      }
+    }
+
+    .progression-item {
+      width: 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      &.current {
+        button {
+          background-color: $highlight-color;
+          color: white;
+          border: solid 1px $highlight-color;
+        }
+      }
+    }
+  }
+
 }
 
 /* ---------- MENU ---------- */
@@ -164,34 +230,124 @@ select {
 
 .section-container { // index.js
   width: 100%;
+  height: 100%;
 
   .section-view { // section view
-    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     margin: auto;
+    align-items: center;
+    min-height: 100%;
+
+    .section-view-actions {
+      width: 100%;
+      height: 30px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: solid 2px $primary-color;
+
+      select {
+        width: 400px;
+        background-color: $primary-color;
+        color: white;
+        border: solid 0px $primary-color;
+        border-radius: 0;
+  
+        option 
+        {
+          background-color: white;
+          color: $primary-color;
+          border: solid 1px $primary-color;
+          border-radius: 0;     
+        }
+      }
+
+      #validation-button {
+        width: 150px;
+      }
+      
+      #selection-indicator {
+        width: 750px;
+      }
+    }
 
     .section-view-header { // header of section view
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
+      justify-content: center;
+      align-items: center;
       width: 100%;
-      text-align: left;
-      border-bottom: solid gray 3px;
+      text-align: center;
+      //border-bottom: solid gray 3px;
 
       h1 {  // title of section
-        margin: 10px 5px 5px 5px;
+        margin: 15px 5px 20px 5px;
       }
 
-      .section-view-header-odds { // group of sdg icons
-        margin-top: 10px;
+    }
+
+    .section-view-header-odds { // group of sdg icons
+      position: absolute;
+      top: 125px;
+      right: 25px;
+      margin-top: 10px;
+      
+      img { // sdg icon
+        height: 40px;
+        width: 40px;
+        margin: 2px;
+      }
+    }
+
+    .section-view-main {
+      padding: 0 25px 25px;
+      width: 100%;
+      overflow: auto;
+
+      .table-container {
         
-        img { // sdg icon
-          height: 40px;
-          width: 40px;
-          margin: 2px;
+        .table-header {
+
+          select {
+            width: 400px;
+            background-color: $primary-color;
+            color: white;
+            border: solid 0px $primary-color;
+            border-radius: 0;
+      
+            option 
+            {
+              background-color: white;
+              color: $primary-color;
+              border: solid 1px $primary-color;
+              border-radius: 0;     
+            }
+          }
+        }
+      }
+    }
+
+    .statement-section-view {
+      margin: auto;
+      width: 80%;
+
+      .inline-input,
+      .input {
+        margin: 10px 0 15px;
+      }
+
+      .actions {
+        width: 100%;
+        margin-top: 100px;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        button {
+          width: 200px;
         }
       }
     }
@@ -242,19 +398,39 @@ select {
       }
     }
   }
+}
 
-  .notes {
-    font-size: 13px;
+/* ---------- GROUP ---------- */
+
+.notes {
+  width: 100%;
+  padding: 0 5px 20px;
+
+  p {
+    margin: 5px 0;
   }
 }
 
 /* ---------- TABLE ---------- */
 
+.table-container {
+
+  .table-header {
+    width: 100%;
+    padding: 5px 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+
 table {
   width: 100%;
   font-size: 15px;
-  padding: 1px;
+  padding: 1px 1px 5px;
   table-layout: auto;
+  border: solid 1px $secondary-color;
 
   // specific tags
   input {
@@ -361,7 +537,7 @@ table {
       width: 100%;
       background-color: white;
       border: solid 1px $primary-color;
-      padding: 2px;
+      //padding: 2px;
 
       option {
         background-color: white;
@@ -406,7 +582,6 @@ table {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  border-top: solid $primary-color 1px;
 
   button {
     min-width: 150px;
@@ -420,8 +595,14 @@ table {
 /* ---------- STATEMENT ---------- */
 
 .statement {
-  margin: 2px;
-  padding: 0px 10px 5px;
+  margin: 2px 0;
+  padding: 0px 20px 5px;
+
+  .statement-area {
+    margin-bottom: 15px;
+    padding: 10px;
+    //border: solid 1px $secondary-color;
+  }
 
   // statement item
   .statement-item {
@@ -472,6 +653,7 @@ table {
   .statement-validation {
     display: flex;
     flex-direction: row;
+    margin-top: 5px;
     margin-bottom: 5px;
     justify-content: right;
 
@@ -513,6 +695,56 @@ table {
 
     button {
       min-width: 100px;
+    }
+  }
+
+}
+
+/* ---------- SPECIFIC ITEMS ---------- */
+
+#start-choices-container,
+#siren-form-container,
+#import-fec-container {
+  width: 100%;
+  padding-bottom: 10%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: auto;
+
+  #start-choices {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 125px;
+    width: 300px;
+
+  }
+
+  button.big {
+    width: 300px;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .siren-input {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 60px;
+
+    button {
+      padding-top: 2px;
+      padding-bottom: 2px;
+      width: 100px;
+      border: solid 1px $primary-color;
+    }
+
+    input {
+      text-align: center;
     }
   }
 
@@ -617,7 +849,7 @@ table {
     width: 100%;
   }
 
-  .table-container {
+  .table-main {
     overflow: auto;
   }
 
@@ -656,11 +888,16 @@ table {
     }
   }
 
+  .input {
+    width: 100%;
+    margin: 5px;
+  }
 
   .footer {
+    width: 100%;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     margin-top: 5px;
   }

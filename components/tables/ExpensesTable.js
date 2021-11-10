@@ -33,7 +33,7 @@ export class ExpensesTable extends React.Component {
     this.sortExpenses(expensesByAccount,columnSorted);
 
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table>
           <thead>
             <tr>

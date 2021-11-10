@@ -27,7 +27,7 @@ export class StocksTable extends React.Component {
     this.sortItems(stocks,columnSorted);
 
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table>
           <thead>
             <tr>
@@ -61,9 +61,9 @@ export class StocksTable extends React.Component {
             <tr className="with-top-line">
               <td className="short center"> - </td>
               <td className="auto">TOTAL</td>
-              <td className="short right">{printValue(this.props.financialData.getAmountStocks(),0)}</td>
+              <td className="short right">{printValue(this.props.financialData.getFinalAmountStocks(),0)}</td>
               <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(this.props.financialData.getPrevAmountStocks(),0)}</td>
+              <td className="short right">{printValue(this.props.financialData.getInitialAmountStocks(),0)}</td>
               <td className="column_unit">&nbsp;€</td>
               <td className="short right">{printValue(this.props.financialData.getVariationStocks(),0)}</td>
               <td className="column_unit">&nbsp;€</td>

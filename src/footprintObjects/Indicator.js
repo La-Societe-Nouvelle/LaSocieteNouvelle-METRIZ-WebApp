@@ -44,6 +44,17 @@ export class Indicator {
 
   // Values
 
+  getGrossImpact = (amount) =>
+  {
+    if (amount!=null && this.value!=null) 
+    { 
+        if      (["ghg","haz","mat","nrg","was","wat"].includes(this.indic))  { return amount*this.value/1000; }
+        else if (["art","eco","knw","soc"].includes(this.indic))              { return amount*this.value/100; }
+        else                                                                  { return null; }
+    }
+    else {return null}
+  }
+
   getValueAbsolute(amount) {
     if (amount!=null && this.getValue()!=null) 
     { 

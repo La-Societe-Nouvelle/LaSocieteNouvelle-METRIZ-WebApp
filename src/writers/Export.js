@@ -7,7 +7,7 @@ import { jsPDF } from 'jspdf';
 import metaIndics from '../../lib/indics';
 
 // Sources
-import { buildIndicatorAggregate } from '../footprintFormulas';
+import { buildIndicatorAggregate } from '../formulas/footprintFormulas';
 
 // Statement writers
 import { writeStatementART } from '../../components/statements/StatementART';
@@ -28,7 +28,7 @@ function exportIndicDataExpensesCSV(indic,session) {
   let csvContent = "data:text/csv;charset=utf-8,";
   csvContent += "corporated_id;corporate_name;amount;value;uncertainty"
   
-  let expenses = session.financialData.getExpenses();
+  let expenses = session.financialData.expenses;
   expenses.forEach((expense) => {
     csvContent += "\r\n";
     let indicator = expense.getFootprint().getIndicator(indic);
@@ -75,13 +75,13 @@ function exportIndicPDF(indic,session)
 
   y+=10;
   doc.setFontSize(11);
-  doc.text((session.getUniteLegale().corporateName || " - " ),10,y); 
+  doc.text((session.legalUnit.corporateName || " - " ),10,y); 
   y+=10;
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");
   doc.text("Numéro de siren : "+(session.legalUnit.siren!="" ? session.legalUnit.siren : " - " ),10,y); 
   y+=10;
-  doc.text("Année de fin d'exercice : "+(session.getUniteLegale().year!=null ? session.getUniteLegale().year : " - " ),10,y); 
+  doc.text("Année de fin d'exercice : "+(session.year!=null ? session.year : " - " ),10,y); 
   y+=6;
   let today = new Date();
   doc.text("Edition du : "+String(today.getDate()).padStart(2,'0')+"/"+String(today.getMonth()+1).padStart(2,'0')+"/"+today.getFullYear(),10,y); 

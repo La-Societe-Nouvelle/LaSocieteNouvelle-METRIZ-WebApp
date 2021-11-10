@@ -2,7 +2,6 @@
 
 // React
 import React from 'react';
-import Popup from 'reactjs-popup';
 
 // Components
 import { CompaniesTable } from '../tables/CompaniesTable';
@@ -14,6 +13,7 @@ import { XLSXFileWriterFromJSON } from '../../src/writers/XLSXWriter';
 import { CSVFileReader, processCSVCompaniesData } from '/src/readers/CSVReader';
 import { XLSXFileReader } from '/src/readers/XLSXReader';
 import { ProgressBar } from '../popups/ProgressBar';
+import { getSignificativeCompanies } from '../../src/formulas/significativeLimitFormulas';
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -27,6 +27,7 @@ export class CompaniesSection extends React.Component {
     this.state = {
       companies: props.session.financialData.companies,
       view: "all",
+      nbItems: 20,
       fetching: false,
       progression: 0,
     }
@@ -41,60 +42,77 @@ export class CompaniesSection extends React.Component {
 
   render()
   {
-    const {companies,view,fetching,progression} = this.state;
+    const {companies,view,nbItems,fetching,progression} = this.state;
     const financialData = this.props.session.financialData;
 
+    // get amounts
     const expensesByCompanies = getExpensesByCompanies(financialData.expenses.concat(financialData.investments));
-
+    
+    // check synchro
     const isAllValid = !(companies.filter(company => company.status != 200).length > 0);
+
+    //
+    const significativeAccounts = isAllValid ? getSignificativeCompanies(financialData) : [];
+    const companiesShowed = filterCompanies(companies,view,significativeAccounts);
 
     return (
       <div className="section-view">
-        <div className="section-view-header">
-          <h1>Fournisseurs</h1>
+
+        <div className="section-view-actions">
+          <div className="sections-actions">
+            <button onClick={() => document.getElementById('import-companies').click()}>
+              Importer un fichier (.csv, .xlsx)
+            </button>
+            <input id="import-companies" visibility="collapse"
+                    type="file" accept=".csv,.xlsx" 
+                    onChange={this.importFile}/>
+            <button onClick={this.exportXLSXFile}>
+              Exporter (.xlsx)
+            </button>
+            {companies.length > 0 &&
+              <select value={view}
+                      onChange={this.changeView}>
+                <option key="1" value="all">Affichage de tous les comptes externes</option>
+                <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
+                <option key="3" value="expenses">Affichage des autres comptes tiers</option>
+                {!isAllValid && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
+                {significativeAccounts.length > 0 && <option key="5" value="significative">Affichage des comptes significatifs</option>}
+              </select>}
+          </div>
+          <div>
+            <button id="validation-button" disabled={!isAllValid} onClick={this.props.submit}>Valider</button>
+          </div>
         </div>
 
-        <div>
-          <p>Synchronisation des données relatives aux fournisseurs (charges et immobilisations).</p>
-          {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
-          {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
+        <div className="section-view-header">
+          <h1>Fournisseurs &amp; Comptes tiers</h1>
         </div>
 
         <div className="section-view-main">
 
-          <div className="group"><h3>Liste des fournisseurs</h3>
-
-            <div className="actions">
-              <button onClick={() => document.getElementById('import-companies').click()}>
-                Importer un fichier (.csv, .xlsx)
-              </button>
-              <input id="import-companies" visibility="collapse"
-                     type="file" accept=".csv,.xlsx" 
-                     onChange={this.importFile}/>
-              <button onClick={this.exportXLSXFile}>
-                Exporter (.xlsx)
-              </button>
-              {companies.length > 0 &&
-                <select value={view}
-                        onChange={this.changeView}>
-                  <option key="1" value="all">Affichage de tous les comptes externes</option>
-                  <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
-                  <option key="3" value="expenses">Affichage des autres comptes tiers</option>
-                  {!isAllValid && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
-                </select>}
-              <button onClick={this.synchroniseAll}>
-                Synchroniser les données
-              </button>
-            </div>
-
-            {companies.length > 0 && 
-              <CompaniesTable view={view}
-                              onUpdate={this.updateFootprints.bind(this)}
-                              companies={companies}
-                              financialData={financialData}
-                              amounts={expensesByCompanies}/>}
-
+          <div className="notes">
+            <p>Synchronisation des données relatives aux fournisseurs (charges et investissements).</p>
+            {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
+            {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
           </div>
+
+        {companies.length > 0 && 
+          <div className="table-container">
+            <div className="table-header">
+              <select value={nbItems}
+                      onChange={this.changeNbItems}>
+                <option key="1" value="20">20 éléments</option>
+                <option key="2" value="50">50 éléments</option>
+                <option key="3" value="all">Tous les éléments</option>
+              </select>
+              <button onClick={this.synchroniseShowed}>Synchroniser les données</button>
+            </div>
+            <CompaniesTable nbItems={nbItems=="all" ? companiesShowed.length : parseInt(nbItems)}
+                            onUpdate={this.updateFootprints.bind(this)}
+                            companies={companiesShowed}
+                            financialData={financialData}
+                            amounts={expensesByCompanies}/>
+          </div>}
             
         </div>
 
@@ -118,6 +136,8 @@ export class CompaniesSection extends React.Component {
   }
 
   changeView = (event) => this.setState({view : event.target.value})
+
+  changeNbItems = (event) => this.setState({nbItems : event.target.value})
 
   /* ----- IMPORTS ----- */
 
@@ -181,19 +201,31 @@ export class CompaniesSection extends React.Component {
 
   /* ----- SYNCHRONISATION ----- */
 
-  // Synchronisation
+  // Synchronisation all
   synchroniseAll = async () => 
   {
+    await this.synchroniseCompanies(this.state.companies);
+  }
+
+  // Synchronisation showed
+  synchroniseShowed = async () => 
+  {
+    let {companies,view} = this.state;
+    await this.synchroniseCompanies(filterCompanies(companies,view));
+  }
+
+  synchroniseCompanies = async (companiesToSynchronise) =>
+  {
     this.setState({fetching: true, progression: 0})
-    let i = 0; let n = this.props.session.financialData.companies.length;
-    for (let company of this.props.session.financialData.companies) 
+    let i = 0; let n = companiesToSynchronise.length;
+    for (let company of companiesToSynchronise)
     {
       await company.updateFromRemote();
       i++;
       this.setState({progression: Math.round((i/n)*100)})
     }
-    if (this.props.session.financialData.companies.filter(company => company.status != 200).length > 0) this.state.view = "unsync";
-    this.setState({fetching: false, progression:0, companies: this.props.session.financialData.companies});
+    if (this.state.view=="all" && this.state.companies.filter(company => company.status != 200).length > 0) this.state.view = "unsync";
+    this.setState({fetching: false, progression:0});
     this.props.session.updateFootprints();
     this.props.updateMenu();
   }
@@ -209,4 +241,19 @@ const getExpensesByCompanies = (expenses) =>
         else expensesByCompanies[expense.accountAux]+= expense.amount;
     })
     return expensesByCompanies;
+}
+
+/* ---------- DISPLAY ---------- */
+
+const filterCompanies = (companies,view,significativeCompanies) =>
+{
+  switch(view)
+  {
+    case "aux":           return companies.filter(company => !company.isDefaultAccount);
+    case "expenses":      return companies.filter(company => company.isDefaultAccount);
+    case "undefined":     return companies.filter(company => company.state != "siren");
+    case "unsync":        return companies.filter(company => company.status != 200);
+    case "significative": return significativeCompanies;
+    default: return companies;
+  }
 }

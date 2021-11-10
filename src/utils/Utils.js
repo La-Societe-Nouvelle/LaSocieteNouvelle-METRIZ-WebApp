@@ -29,6 +29,18 @@ export function printValueInput(value,precision) {
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
 }
 
+/* ----- AMOUNT ----- */
+
+export function getSumItems(items)
+{
+  return items.reduce((a,b) => a+b,0)
+}
+
+export function getAmountItems(items)
+{
+  return getSumItems(items.map(item => item.amount))
+}
+
 /* ----- ROUND ----- */
 
 export function roundValue(value,precision) 

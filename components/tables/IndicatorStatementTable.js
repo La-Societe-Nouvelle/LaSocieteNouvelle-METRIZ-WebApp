@@ -5,7 +5,7 @@ import { printValue } from '/src/utils/Utils';
 
 // Libraries
 import metaIndics from '/lib/indics';
-import { buildIndicatorAggregate } from '../../src/footprintFormulas';
+import { buildIndicatorAggregate } from '../../src/formulas/footprintFormulas';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -98,8 +98,8 @@ export const IndicatorStatementTable = ({indic,session}) =>
         </tr>}
 
       {expensesGroups.filter(group => group.expenses.length > 0)
-                     .map(({label,amount,indicator}) => 
-        <tr key={label}>
+                     .map(({label,amount,indicator},index) => 
+        <tr key={index}>
           <td>&emsp;{label}</td>
           <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
@@ -121,8 +121,8 @@ export const IndicatorStatementTable = ({indic,session}) =>
           {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
         </tr>
       {depreciationExpensesGroups.filter(group => group.expenses.length > 0)
-                                 .map(({label,amount,indicator}) => 
-        <tr key={label}>
+                                 .map(({label,amount,indicator},index) => 
+        <tr key={index}>
           <td>&emsp;{label}</td>
           <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
@@ -158,7 +158,7 @@ const getBasicExpensesGroups = (indic,financialData) =>
   {
     group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
     group.indicator = buildIndicatorAggregate(indic,group.expenses);
-  })
+  });
 
   return expensesGroups;
 }
@@ -171,7 +171,8 @@ const getBasicDepreciationExpensesGroups = (indic,financialData) =>
   {
     group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
     group.indicator = buildIndicatorAggregate(indic,group.expenses);
-  })
+  });
+  console.log(expensesGroups);
 
   return expensesGroups;
 }

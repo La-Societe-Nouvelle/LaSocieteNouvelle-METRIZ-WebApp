@@ -92,7 +92,7 @@ export class AssessmentDIS extends React.Component {
               </button>
           </div>
 
-          <div className="table-container">
+          <div className="table-main">
             <table className="table">
               <thead>
                 <tr>

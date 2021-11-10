@@ -52,31 +52,31 @@ export class StatementART extends React.Component {
           <label>L'entreprise est-elle une entreprise artisanale ?</label>
           <div className="input-radio">
             <input type="radio" id="isValueAddedCrafetd"
-                   value="true"
-                   checked={isValueAddedCrafted === true}
-                   onChange={this.onIsValueAddedCraftedChange}/>
+                  value="true"
+                  checked={isValueAddedCrafted === true}
+                  onChange={this.onIsValueAddedCraftedChange}/>
             <label>Oui</label>
           </div>
           <div className="input-radio">
             <input type="radio" id="isValueAddedCrafetd"
-                   value="null"
-                   checked={isValueAddedCrafted === null && craftedProduction !== ""}
-                   onChange={this.onIsValueAddedCraftedChange}/>
+                  value="null"
+                  checked={isValueAddedCrafted === null && craftedProduction !== ""}
+                  onChange={this.onIsValueAddedCraftedChange}/>
             <label>Partiellement</label>
           </div>
           <div className="input-radio">
             <input type="radio" id="isValueAddedCrafetd"
-                   value="false"
-                   checked={isValueAddedCrafted === false}
-                   onChange={this.onIsValueAddedCraftedChange}/>
+                  value="false"
+                  checked={isValueAddedCrafted === false}
+                  onChange={this.onIsValueAddedCraftedChange}/>
             <label>Non</label>
           </div>
         </div>
         <div className="statement-item">
           <label>Part de la valeur ajoutée artisanale</label>
           <InputNumber value={roundValue(craftedProduction,0)}
-                       onUpdate={this.updateCraftedProduction.bind(this)}
-                       disabled={isValueAddedCrafted!=null}/>
+                      onUpdate={this.updateCraftedProduction.bind(this)}
+                      disabled={isValueAddedCrafted!=null}/>
           <span>&nbsp;€</span>
         </div>
         <div className="statement-validation">

@@ -20,7 +20,7 @@ export class CompaniesTable extends React.Component {
     super(props);
     this.state = 
     {
-      companies: this.filterCompanies(props.companies,props.view),
+      companies: props.companies,
       columnSorted: "amount",
       reverseSort: false,
       page: 0
@@ -29,24 +29,24 @@ export class CompaniesTable extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (this.props !== prevProps) this.setState({companies: this.filterCompanies(this.props.companies,this.props.view), view: this.props.view})
+    if (this.props !== prevProps) this.setState({companies: this.props.companies})
   }
 
   render() 
   {
-    const {amounts} = this.props;
+    const {amounts,nbItems} = this.props;
     const {companies,columnSorted,page} = this.state;
 
     companies.forEach(company => company.amount = amounts[company.account] || 0);
     this.sortCompanies(companies,columnSorted);
 
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table className="table">
           <thead>
             <tr>
               <td className="short" 
-                  onClick={() => this.changeColumnSorted("identifiant")}>Identifiant</td>
+                  onClick={() => this.changeColumnSorted("identifiant")}>Siren</td>
               <td className="auto" 
                   onClick={() => this.changeColumnSorted("denomination")}>Denomination</td>
               <td className="medium" 
@@ -58,7 +58,7 @@ export class CompaniesTable extends React.Component {
               <td className="column_icon" colSpan="1"></td></tr>
           </thead>
           <tbody>
-            {companies.slice(page*20,(page+1)*20)
+            {companies.slice(page*nbItems,(page+1)*nbItems)
                             .map((company) => 
               <RowTableCompanies key={"company_"+company.id} 
                                  {...company}
@@ -67,11 +67,11 @@ export class CompaniesTable extends React.Component {
           </tbody>
         </table>
 
-        {companies.length > 20 &&
+        {companies.length > nbItems &&
           <div className="table-navigation">
             <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <div><p>{page+1}/{parseInt(companies.length/20+1)}</p></div>
-            <button className={(page+1)*20 < companies.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+            <div><p>{page+1}/{parseInt(companies.length/nbItems+1)}</p></div>
+            <button className={(page+1)*nbItems < companies.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
           </div>}
         
       </div>
@@ -79,18 +79,6 @@ export class CompaniesTable extends React.Component {
   }
 
   /* ---------- SORTING ---------- */
-
-  filterCompanies(companies,view)
-  {
-    switch(view)
-    {
-      case "aux": return companies.filter(company => !company.isDefaultAccount);
-      case "expenses": return companies.filter(company => company.isDefaultAccount);
-      case "undefined": return companies.filter(company => company.state != "siren");
-      case "unsync": return companies.filter(company => company.status != 200);
-      default: return companies;
-    }
-  }
 
   changeColumnSorted(columnSorted) 
   {
@@ -114,7 +102,7 @@ export class CompaniesTable extends React.Component {
   /* ---------- NAVIGATION ---------- */
 
   prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
-  nextPage = () => {if ((this.state.page+1)*20 < this.props.financialData.companies.length) this.setState({page: this.state.page+1})}
+  nextPage = () => {if ((this.state.page+1)*nbItems < this.props.financialData.companies.length) this.setState({page: this.state.page+1})}
 
   /* ---------- OPERATIONS ON COMPANY ---------- */
   
@@ -130,7 +118,7 @@ export class CompaniesTable extends React.Component {
     let company = this.props.financialData.getCompany(nextProps.id);
     company.update(nextProps);
     this.props.onUpdate();
-    this.setState({companies: this.filterCompanies(this.props.companies,this.props.view)});
+    this.setState({companies: this.props.companies});
   }
 
   updateCompanyFromRemote = async (companyId) =>
@@ -138,7 +126,7 @@ export class CompaniesTable extends React.Component {
     let company = this.props.financialData.getCompany(companyId);
     await company.updateFromRemote();
     this.props.onUpdate();
-    this.setState({companies: this.filterCompanies(this.props.companies,this.props.view)});
+    this.setState({companies: this.props.companies});
   }
 
 }

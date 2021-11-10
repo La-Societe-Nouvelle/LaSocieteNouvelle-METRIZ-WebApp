@@ -57,10 +57,9 @@ export class StatementSection extends React.Component {
 
     return (
       <div className="section-view">
-        <div className="section-view-header">
-          <h1>Publication des données</h1>
+        <div className="statement-section-view">
+          {this.buildView(step)}
         </div>
-        {this.buildView(step)}
       </div>
     )
   }
@@ -135,34 +134,34 @@ class IndicatorSelection extends React.Component
 
     return(
       <div className="section-view-main">
-        <div className="group"><h3>Sélection des indicateurs</h3>
-          <table>
-            <thead>
-              <tr>
-                <td >Indicateur</td>
-                <td className="column_value" colSpan="2">Valeur</td>
-                <td className="column_uncertainty">Incertitude</td>
-                <td>Publication</td>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.keys(metaIndics).map(indic =>  
-                <tr key={indic}>
-                  <td className="auto">{metaIndics[indic].libelle}</td>
-                  <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndics[indic].nbDecimals)}</td>
-                  <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
-                  <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty,0)}&nbsp;%</td>
-                  <td><input type="checkbox" 
-                             value={indic}
-                             checked={socialFootprint[indic]!=undefined}
-                             disabled={validations.indexOf(indic) < 0}
-                             onChange={this.onCheckIndicator}/></td>
-                </tr>)}
-            </tbody>
-          </table>
-          <div className="actions left">
-            <button disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
-          </div>
+        <h3>Sélection des indicateurs</h3>
+        <table>
+          <thead>
+            <tr>
+              <td >Indicateur</td>
+              <td className="column_value" colSpan="2">Valeur</td>
+              <td className="column_uncertainty">Incertitude</td>
+              <td>Publication</td>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(metaIndics).map(indic =>  
+              <tr key={indic}>
+                <td className="auto">{metaIndics[indic].libelle}</td>
+                <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndics[indic].nbDecimals)}</td>
+                <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
+                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty,0)}&nbsp;%</td>
+                <td><input type="checkbox" 
+                            value={indic}
+                            checked={socialFootprint[indic]!=undefined}
+                            disabled={validations.indexOf(indic) < 0}
+                            onChange={this.onCheckIndicator}/></td>
+              </tr>)}
+          </tbody>
+        </table>
+        <div className="actions">
+          <div></div>
+          <button disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
         </div>
       </div>)
   }
@@ -197,28 +196,32 @@ class DeclarantForm extends React.Component {
   render()
   {
     const {declarant,email,autorisation} = this.state;
-    const isAllValid = declarant.length > 0 && email.length > 0 && autorisation;
+    const isAllValid = declarant.length > 0 
+                    && /^(.*)@(.*)\.(.*)$/.test(email) 
+                    && autorisation;
     
     return(
       <div className="section-view-main">
-        <div className="group"><h3>Déclarant</h3>
-          <div className="inline-input short">
-            <label>Nom - Prénom </label>
-            <InputText value={declarant} 
-                        onUpdate={this.onDeclarantChange.bind(this)}/>
-          </div>
-          <div className="inline-input">
-            <label>Adresse e-mail </label>
-            <InputText value={email} 
-                       onUpdate={this.onEmailChange.bind(this)}/>
-          </div>
-          <div className="input" id="certification">
-            <input type="checkbox" onChange={this.onCheckboxChange}/><label htmlFor="certification">Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
-          </div>
-          <div className="actions">
-            <button onClick={this.onGoBack}>Retour</button>
-            <button disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
-          </div>
+        <h3>Déclarant</h3>
+        <div className="inline-input">
+          <label>Nom - Prénom </label>
+          <InputText value={declarant} 
+                      onUpdate={this.onDeclarantChange.bind(this)}/>
+        </div>
+        <div className="inline-input">
+          <label>Adresse e-mail </label>
+          <InputText value={email} 
+                     unvalid={email!="" && !/^(.*)@(.*)\.(.*)$/.test(email)}
+                     onUpdate={this.onEmailChange.bind(this)}/>
+        </div>
+        <div className="input" id="certification">
+          <input type="checkbox" 
+                 onChange={this.onCheckboxChange}/>
+            <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
+        </div>
+        <div className="actions">
+          <button onClick={this.onGoBack}>Retour</button>
+          <button disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
         </div>
       </div>
     )
@@ -242,32 +245,31 @@ const PriceInput = ({price,commitPrice,goBack}) =>
 
   return(
     <div className="section-view-main">
-      <div className="group"><h3>Coût de la formalité</h3>
-        <div className="radio-button-input">
-          <div className="input">
-            <input id="price" type="radio" value="0" checked={priceInput=="0"} onChange={changePrice}/>
-            <label>Première déclaration : publication offerte</label>
-          </div>
-          <div className="input">
-            <input id="price" type="radio" value="25" checked={priceInput=="25"} onChange={changePrice}/>
-            <label>Société unipersonnelle : 25 €</label>
-          </div>
-          <div className="input">
-            <input id="price" type="radio" value="50" checked={priceInput=="50"} onChange={changePrice}/>
-            <label>Société : 50 €</label>
-          </div>
-          <div className="input">
-            <input id="price" type="radio" value="10" checked={priceInput=="10"} onChange={changePrice}/>
-            <label>Organise à but non lucratif : 10 €</label>
-          </div>
+      <h3>Coût de la formalité</h3>
+      <div className="radio-button-input">
+        <div className="input">
+          <input id="price" type="radio" value="0" checked={priceInput=="0"} onChange={changePrice}/>
+          <label>Première déclaration : publication offerte</label>
         </div>
-        <div>
-          <p>Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
+        <div className="input">
+          <input id="price" type="radio" value="25" checked={priceInput=="25"} onChange={changePrice}/>
+          <label>Société unipersonnelle : 25 €</label>
         </div>
-        <div className="actions">
-          <button onClick={goBack}>Retour</button>
-          <button disabled={priceInput==""} onClick={onCommit}>Valider</button>
+        <div className="input">
+          <input id="price" type="radio" value="50" checked={priceInput=="50"} onChange={changePrice}/>
+          <label>Société : 50 €</label>
         </div>
+        <div className="input">
+          <input id="price" type="radio" value="10" checked={priceInput=="10"} onChange={changePrice}/>
+          <label>Organise à but non lucratif : 10 €</label>
+        </div>
+      </div>
+      <div>
+        <p>Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
+      </div>
+      <div className="actions">
+        <button onClick={goBack}>Retour</button>
+        <button disabled={priceInput==""} onClick={onCommit}>Valider</button>
       </div>
     </div>)
 }
@@ -285,25 +287,24 @@ const Summary = (props) =>
 
   return(
     <div className="section-view-main">
-      <div className="group"><h3>Récapitulatif</h3>
-        <div className="summary">
-          <p><b>Siren : </b>{siren}</p>
-          <p><b>Dénomination : </b>{denomination}</p>
-          <p><b>Année : </b>{year}</p>
-          <p><b>Indicateurs : </b></p>
-          {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).map(([indic,_]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
-          {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).length == 0 &&
-            <p>&emsp; - </p>}
-          <p><b>Fait le : </b>{todayString}</p>
-          <p><b>Déclarant : </b>{declarant}</p>
-          <p><b>Coût de la formalité : </b>{price} €</p>
-        </div> 
-        <div className="actions">
-          <button onClick={props.goBack}>Retour</button>
-          <button onClick={props.exportStatement}>Télécharger</button>
-          <button onClick={props.submitStatement}>Envoyer</button>
-        </div> 
-      </div>
+      <h3>Récapitulatif</h3>
+      <div className="summary">
+        <p><b>Siren : </b>{siren}</p>
+        <p><b>Dénomination : </b>{denomination}</p>
+        <p><b>Année : </b>{year}</p>
+        <p><b>Indicateurs : </b></p>
+        {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).map(([indic,_]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
+        {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).length == 0 &&
+          <p>&emsp; - </p>}
+        <p><b>Fait le : </b>{todayString}</p>
+        <p><b>Déclarant : </b>{declarant}</p>
+        <p><b>Coût de la formalité : </b>{price} €</p>
+      </div> 
+      <div className="actions">
+        <button onClick={props.goBack}>Retour</button>
+        <button onClick={props.exportStatement}>Télécharger</button>
+        <button onClick={props.submitStatement}>Envoyer</button>
+      </div> 
     </div>)
 }
 

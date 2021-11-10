@@ -44,7 +44,7 @@ export class IndicatorCompaniesTable extends React.Component {
     const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
     return (
-      <div className="table-container">
+      <div className="table-main">
 
       {companies.length == 0 &&
         <p>Aucun fournisseur n'a publié ses données</p>}

@@ -29,11 +29,11 @@ export class InitialStatesTable extends React.Component {
     const {immobilisations,depreciations,stocks,expenses,investments,stockVariations} = this.props.financialData;
     const {columnSorted,nbItems,page} = this.state;
 
-    const immobilisationsShowed = immobilisations.filter(immobilisation => ["20","21","22","23","25"].includes(immobilisation.account.substring(0,2)));
-    this.sortItems(immobilisationsShowed,columnSorted);
+    this.sortItems(immobilisations,columnSorted);
+    const nbAccounts = immobilisations.length + stocks.length;
     
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table>
           <thead>
             <tr>
@@ -44,8 +44,8 @@ export class InitialStatesTable extends React.Component {
               <td colSpan="2"></td></tr>
           </thead>
           <tbody>
-            {immobilisationsShowed.slice(page*nbItems,(page+1)*nbItems)
-                                  .map((immobilisation) => 
+            {immobilisations.slice(page*nbItems,(page+1)*nbItems)
+                            .map((immobilisation) => 
               <RowTableImmobilisations key={"immobilisation_"+immobilisation.id} 
                                         {...immobilisation}
                                         depreciations={depreciations}
@@ -62,26 +62,19 @@ export class InitialStatesTable extends React.Component {
                               syncData={this.synchroniseStock.bind(this)}/>)}
           </tbody>
         </table>
-        {immobilisationsShowed.length > nbItems &&
+        {nbAccounts.length > nbItems &&
           <div className="table-navigation">
             <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <button className={(page+1)*nbItems < immobilisationsShowed.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+            <button className={(page+1)*nbItems < nbAccounts.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
           </div>}
       </div>
     )
   }
 
   /* ---------- ACTIONS ---------- */
-  
-  // Synchronisation
-  async synchroniseAll() 
-  {
-    await Promise.all(this.props.financialData.immobilisations.filter(immobilisation => immobilisation.initialState == "defaultData")
-                                                              .map(async immobilisation => await this.fetchDefaultData(immobilisation)));
-    this.forceUpdate();
-  }
 
-  synchroniseImmobilisation = async (id) => {
+  synchroniseImmobilisation = async (id) => 
+  {
     let immobilisation = this.props.financialData.getImmobilisation(id);
     await this.fetchDefaultData(immobilisation);
     this.props.onUpdate();
@@ -205,7 +198,7 @@ function RowTableImmobilisations(props)
     return (<tr>
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-              <td colSpan="2">Immobilisation non prise en compte (non amortissable)</td>
+              <td colSpan="2">&nbsp;&nbsp;Immobilisation non prise en compte (non amortissable)</td>
               <td className="short right">{printValue(prevAmount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
               {initialState=="defaultData" &&

@@ -49,7 +49,7 @@ export class SocialDataTable extends React.Component {
     }
 
     return (
-      <div className="table-container">
+      <div className="table-main">
         <table className="table">
           <thead>
             <tr>
