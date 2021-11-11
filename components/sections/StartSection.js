@@ -22,7 +22,7 @@ export class StartSection extends React.Component {
 
         <div className="section-top-notes">
           <p><b>Notes : </b>
-             L'ensemble des données saisies au cours de l'analyse sont traités au sein de la page web. 
+             Les données saisies au cours de l'analyse sont traitées au sein de la page web. 
              Vos données restent ainsi en local pour garantir leur sécurité.</p>
         </div>
 
