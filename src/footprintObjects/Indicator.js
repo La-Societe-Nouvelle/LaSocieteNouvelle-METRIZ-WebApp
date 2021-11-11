@@ -5,16 +5,18 @@ export class Indicator {
   constructor(props) 
   {
     if (props==undefined) props = {};
-  // ---------------------------------------------------------------------------------------------------- //
+
+    // ---------------------------------------------------------------------------------------------------- //
+    
     this.indic = props.indic;
-    this.value = props.value || null;
-    this.flag = props.flag || null;
-    this.uncertainty = props.uncertainty || null;
-    this.source = props.source || "";
-    this.info = props.info || "";
+    this.value = props.value!=undefined ? props.value : null;
+    this.flag = props.flag!=undefined ? props.flag : null;
+    this.uncertainty = props.uncertainty!=undefined ? props.uncertainty : null;
+    this.source = props.source!=undefined ? props.source : "";
+    this.info = props.info!=undefined ? props.info : "";
     
     // Complements
-    this.libelleFlag = props.libelleFlag || null;
+    this.libelleFlag = props.libelleFlag!=undefined ? props.libelleFlag : null;
   // ---------------------------------------------------------------------------------------------------- //
   }
 

@@ -10,7 +10,7 @@ import { Indicator } from '/src/footprintObjects/Indicator';
 
 export function buildIndicatorAggregate(indic,elements,usePrev) 
 {
-    let indicator = new Indicator({indic: indic});
+    let indicator = new Indicator({indic});
     
     let totalAmount = 0.0;
     let absolute = 0.0;
@@ -266,7 +266,7 @@ export const updateDepreciationsIndicator = async (indic,financialData) =>
 
 export function buildNetValueAddedIndicator(indic,impactsData)
 {
-    let indicator = new Indicator({indic: indic});
+    let indicator = new Indicator({indic});
     switch(indic)
     {
         case "art": buildValueART(indicator,impactsData); break;
