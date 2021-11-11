@@ -211,7 +211,9 @@ export class CompaniesSection extends React.Component {
   synchroniseShowed = async () => 
   {
     let {companies,view} = this.state;
-    await this.synchroniseCompanies(filterCompanies(companies,view));
+    let significativeAccounts = view=="significative" ? getSignificativeCompanies(financialData) : [];
+    let companiesShowed = filterCompanies(companies,view,significativeAccounts);
+    await this.synchroniseCompanies(companiesShowed);
   }
 
   synchroniseCompanies = async (companiesToSynchronise) =>
