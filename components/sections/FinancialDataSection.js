@@ -53,6 +53,14 @@ export class FinancialDataSection extends React.Component {
             </div>
           </div>
 
+          <div className="section-top-notes">
+            <p><b>Notes : </b>
+              Le fichier FEC doit couvrir l'ensemble de l'exercice. 
+              Il est conseillé de vérifier la validité de la structure du fichier avant l'import.
+              La lecture du fichier peut entraîner des exceptions (écritures complexes, problème de correspondances, etc.). En cas d'erreur(s), n'hésitez pas à nous contacter.
+            </p>
+          </div>
+
           <div id="import-fec-container">
             <button className="big" onClick={() => {document.getElementById('import-fec').click()}}>
               Importer un fichier FEC
@@ -96,6 +104,13 @@ export class FinancialDataSection extends React.Component {
           <div>
             <button id="validation-button" onClick={this.props.submit}>Valider</button>
           </div>
+        </div>
+
+        <div className="section-top-notes">
+          <p><b>Notes : </b>
+            Merci de vérifier la lecture des écritures comptables et l'exactitude des principaux agrégats financiers.
+            Plusieurs vues sont disponibles via le menu déroulant ci-dessus.
+          </p>
         </div>
 
         <div className="section-view-header">

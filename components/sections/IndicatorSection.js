@@ -104,6 +104,12 @@ export class IndicatorSection extends React.Component {
           </div>
         </div>
 
+        <div className="section-top-notes">
+          <p><b>Notes : </b>
+            Une description de l'indicateur est disponible <a href={"https://lasocietenouvelle.org/indicateur/"+indic} target="_blank">ici</a>
+          </p>
+        </div>
+
         <div className="section-view-header-odds">
           {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-"+odd} 
                                                     src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}

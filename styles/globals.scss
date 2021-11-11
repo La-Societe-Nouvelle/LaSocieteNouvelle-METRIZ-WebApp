@@ -237,7 +237,7 @@ select {
   }
 }
 
-/* ----- SECTION CONTAINER ----- */
+/* ----- SECTION ----- */
 
 .section-container { // index.js
   width: 100%;
@@ -286,6 +286,18 @@ select {
       }
     }
 
+    .section-top-notes {
+      width: 100%;
+      margin: 5px 5px;
+      padding: 10px;
+      border: solid 1px $secondary-color;
+
+      p {
+        margin: 0;
+        font-size: 14px;
+      }
+    }
+
     .section-view-header { // header of section view
       display: flex;
       flex-direction: row;
@@ -303,7 +315,7 @@ select {
 
     .section-view-header-odds { // group of sdg icons
       position: absolute;
-      top: 125px;
+      top: 160px;
       right: 25px;
       margin-top: 10px;
       
@@ -337,6 +349,10 @@ select {
               border: solid 1px $primary-color;
               border-radius: 0;     
             }
+          }
+
+          p {
+            margin: 0;
           }
         }
       }

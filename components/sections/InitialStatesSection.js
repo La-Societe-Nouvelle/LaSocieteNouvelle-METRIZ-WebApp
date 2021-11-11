@@ -49,22 +49,27 @@ export class InitialStatesSection extends React.Component {
           </div>
         </div>
 
+        <div className="section-top-notes">
+          <p><b>Notes : </b>
+            Les états initiaux correspondent aux empreintes des comptes de stocks et d'immobilisations en début d'exercice. 
+            Les empreintes peuvent être reprises de l'exercice précédent à partir d'une sauvegarde (Cf. Importer un fichier). 
+            En l'absence de données historisées, elles sont estimées sur l'exercice courant ou initialisées à partir de valeurs par défaut.
+          </p>
+        </div>
+
         <div className="section-view-header">
           <h1>Etats initiaux</h1>
         </div>
 
         <div className="section-view-main">
 
-          <div className="notes">
-            <p>Empreintes des comptes de stocks et des comptes d'immobilisations en début d'exercice.</p>
-            {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
-            {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
-          </div>
-
         {financialData.immobilisations.concat(financialData.stocks).length > 0 &&
           <div className="table-container">
             <div className="table-header">
-              <div></div>
+              <div>
+                {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
+                {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
+              </div>
               <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>
             </div>
             <InitialStatesTable financialData={financialData} 

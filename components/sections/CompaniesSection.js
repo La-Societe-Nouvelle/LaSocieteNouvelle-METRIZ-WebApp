@@ -88,6 +88,14 @@ export class CompaniesSection extends React.Component {
           </div>
         </div>
 
+        <div className="section-top-notes">
+          <p><b>Notes : </b>
+            Les comptes fournisseurs et autres comptes tiers correspondent aux entités exterieures vers lesquelles sont dirigés les charges externes et les investissements.
+            Les "autres comptes tiers" font référence aux comptes par défaut résultants de l'impossibilité d'associer certains flux sortants à un compte fournisseur auxiliaire.<br/>
+            L'obtention des empreintes des comptes fournisseurs s'effectuent via leur numéro de siren.
+          </p>
+        </div>
+
         <div className="section-view-header">
           <h1>Fournisseurs &amp; Comptes tiers</h1>
         </div>
@@ -95,7 +103,6 @@ export class CompaniesSection extends React.Component {
         <div className="section-view-main">
 
           <div className="notes">
-            <p>Synchronisation des données relatives aux fournisseurs (charges et investissements).</p>
             {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
             {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
           </div>
@@ -103,12 +110,14 @@ export class CompaniesSection extends React.Component {
         {companies.length > 0 && 
           <div className="table-container">
             <div className="table-header">
-              <select value={nbItems}
-                      onChange={this.changeNbItems}>
-                <option key="1" value="20">20 éléments</option>
-                <option key="2" value="50">50 éléments</option>
-                <option key="3" value="all">Tous les éléments</option>
-              </select>
+              <div>
+                <select value={nbItems}
+                        onChange={this.changeNbItems}>
+                  <option key="1" value="20">20 éléments</option>
+                  <option key="2" value="50">50 éléments</option>
+                  <option key="3" value="all">Tous les éléments</option>
+                </select>
+              </div>
               <button onClick={this.synchroniseShowed}>Synchroniser les données</button>
             </div>
             <CompaniesTable nbItems={nbItems=="all" ? companiesShowed.length : parseInt(nbItems)}
