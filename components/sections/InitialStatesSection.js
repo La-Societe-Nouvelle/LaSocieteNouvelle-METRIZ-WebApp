@@ -102,7 +102,6 @@ export class InitialStatesSection extends React.Component {
     }
     this.props.session.updateFootprints();
     this.setState({fetching: false, progression:0, financialData: this.props.session.financialData});
-    this.props.updateMenu();
   }
 
   fetchDefaultData = async (stockOrImmobilisation) => 
@@ -116,7 +115,6 @@ export class InitialStatesSection extends React.Component {
   updateFootprints = () => {
     this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData})
-    this.props.updateMenu();
   }
 
   importFile = (event) =>
@@ -137,7 +135,6 @@ export class InitialStatesSection extends React.Component {
       // JSON -> session
       this.props.session.financialData.loadInitialStates(prevSession);
       this.setState({financialData: this.props.session.financialData});
-      this.props.updateMenu();
     }
     reader.readAsText(file);
   }

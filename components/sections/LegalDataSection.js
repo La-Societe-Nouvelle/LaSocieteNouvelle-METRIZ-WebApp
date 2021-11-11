@@ -99,7 +99,6 @@ export class LegalDataSection extends React.Component {
     this.setState({siren: siren});
     await this.props.session.legalUnit.setSiren(siren);
     this.initImpactsData();
-    this.props.updateMenu();
   }
 
   /* --- update financial year --- */
@@ -108,7 +107,6 @@ export class LegalDataSection extends React.Component {
   {
     this.setState({year: year})
     if (/^20([0-1][0-9]|2[0-1])$/.test(year)) this.props.session.legalUnit.setYear(year);
-    this.props.updateMenu();
   }
 
   /* --- init impacts data from legal unit data --- */

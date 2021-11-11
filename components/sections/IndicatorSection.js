@@ -40,7 +40,7 @@ import { exportIndicPDF } from '/src/writers/Export';
 /* ----------------------------------------------------------- */
 
 /** Informations
- *  Props : session / indic / updateMenu
+ *  Props : session / indic
  *  Components :
  *    - Statement area
  *    - Indicator statement table

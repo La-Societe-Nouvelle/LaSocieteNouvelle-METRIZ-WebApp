@@ -70,8 +70,7 @@ class Metriz extends React.Component {
     this.state = 
     {
       session: new Session(),
-      step: 0,
-      selectedSection: "legalData",
+      step: 0
     }
   }
 
@@ -146,7 +145,6 @@ class Metriz extends React.Component {
 
     const sectionProps = {
       session: session,
-      updateMenu: () => this.changeSection.bind(this)(step),
       submit: () => this.validStep(this.state.step)
     }
 

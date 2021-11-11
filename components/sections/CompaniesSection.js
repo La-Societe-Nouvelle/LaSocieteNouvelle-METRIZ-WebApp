@@ -136,7 +136,6 @@ export class CompaniesSection extends React.Component {
   {
     this.props.session.updateFootprints();
     this.setState({companies: this.props.session.financialData.companies});
-    this.props.updateMenu();
   }
 
   changeView = (event) => this.setState({view : event.target.value})
@@ -243,7 +242,6 @@ export class CompaniesSection extends React.Component {
     
     // update session
     this.props.session.updateFootprints();
-    this.props.updateMenu();
   }
 
 }

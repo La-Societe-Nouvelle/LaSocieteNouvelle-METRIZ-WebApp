@@ -188,7 +188,6 @@ export class FinancialDataSection extends React.Component {
       this.props.session.progression = 2;
       // update state
       this.setState({importedData: null});
-      this.props.updateMenu();
     }
   }
 
