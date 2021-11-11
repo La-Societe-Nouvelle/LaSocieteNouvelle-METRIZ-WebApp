@@ -1,4 +1,24 @@
 
+/* Media query mixins */
+@mixin xs {
+  @media (max-width: 599px) { @content; }
+}
+@mixin sm {
+  @media (min-width: 600px) { @content; }
+}
+@mixin md {
+  @media (min-width: 900px) { @content; }
+}
+@mixin lg {
+  @media (min-width: 1200px) { @content; }
+}
+@mixin xl {
+  @media (min-width: 1800px) { @content; }
+}
+@mixin screen-min($width) {
+  @media (min-width:$width) { @content }
+}
+
 /* Theming */
 
 $primary-color: #616161;    /* Dark-grey */
