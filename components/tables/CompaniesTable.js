@@ -102,7 +102,7 @@ export class CompaniesTable extends React.Component {
   /* ---------- NAVIGATION ---------- */
 
   prevPage = () => {if (this.state.page > 0) this.setState({page: this.state.page-1})}
-  nextPage = () => {if ((this.state.page+1)*nbItems < this.props.financialData.companies.length) this.setState({page: this.state.page+1})}
+  nextPage = () => {if ((this.state.page+1)*this.props.nbItems < this.props.financialData.companies.length) this.setState({page: this.state.page+1})}
 
   /* ---------- OPERATIONS ON COMPANY ---------- */
   
