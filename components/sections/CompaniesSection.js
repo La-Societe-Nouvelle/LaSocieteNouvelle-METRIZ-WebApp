@@ -26,6 +26,7 @@ export class CompaniesSection extends React.Component {
     super(props)
     this.state = {
       companies: props.session.financialData.companies,
+      significativeCompanies: [],
       view: "all",
       nbItems: 20,
       fetching: false,
@@ -35,14 +36,19 @@ export class CompaniesSection extends React.Component {
 
   componentDidUpdate()
   {
+    // change view to main if unsync empty
     if (this.state.view=="unsync" && this.state.companies.filter(company => company.status != 200).length==0) {
       this.setState({view: "all"});
+    }
+    if(this.state.significativeCompanies.length == 0 && this.state.companies.filter(company => company.status != 200).length == 0) {
+      let significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
+      this.setState({significativeCompanies});
     }
   }
 
   render()
   {
-    const {companies,view,nbItems,fetching,progression} = this.state;
+    const {companies,significativeCompanies,view,nbItems,fetching,progression} = this.state;
     const financialData = this.props.session.financialData;
 
     // get amounts
@@ -51,9 +57,7 @@ export class CompaniesSection extends React.Component {
     // check synchro
     const isAllValid = !(companies.filter(company => company.status != 200).length > 0);
 
-    //
-    const significativeAccounts = isAllValid ? getSignificativeCompanies(financialData) : [];
-    const companiesShowed = filterCompanies(companies,view,significativeAccounts);
+    const companiesShowed = filterCompanies(companies,view,significativeCompanies);
 
     return (
       <div className="section-view">
@@ -76,7 +80,7 @@ export class CompaniesSection extends React.Component {
                 <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
                 <option key="3" value="expenses">Affichage des autres comptes tiers</option>
                 {!isAllValid && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
-                {significativeAccounts.length > 0 && <option key="5" value="significative">Affichage des comptes significatifs</option>}
+                {significativeCompanies.length > 0 && <option key="5" value="significative">Affichage des comptes significatifs</option>}
               </select>}
           </div>
           <div>
@@ -218,6 +222,7 @@ export class CompaniesSection extends React.Component {
 
   synchroniseCompanies = async (companiesToSynchronise) =>
   {
+    // synchronise data
     this.setState({fetching: true, progression: 0})
     let i = 0; let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise)
@@ -226,8 +231,17 @@ export class CompaniesSection extends React.Component {
       i++;
       this.setState({progression: Math.round((i/n)*100)})
     }
+
+    // update view
     if (this.state.view=="all" && this.state.companies.filter(company => company.status != 200).length > 0) this.state.view = "unsync";
+    
+    // update signficative companies
+    if(this.state.companies.filter(company => company.status != 200).length == 0) this.state.significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
+    
+    // update state
     this.setState({fetching: false, progression:0});
+    
+    // update session
     this.props.session.updateFootprints();
     this.props.updateMenu();
   }
