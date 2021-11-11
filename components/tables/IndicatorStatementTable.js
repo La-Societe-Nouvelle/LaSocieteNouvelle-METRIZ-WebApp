@@ -172,7 +172,6 @@ const getBasicDepreciationExpensesGroups = (indic,financialData) =>
     group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
     group.indicator = buildIndicatorAggregate(indic,group.expenses);
   });
-  console.log(expensesGroups);
 
   return expensesGroups;
 }

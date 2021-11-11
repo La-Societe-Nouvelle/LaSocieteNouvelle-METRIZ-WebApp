@@ -178,20 +178,20 @@ export const updateDepreciationExpensesIndicator = async (indic,financialData) =
     let depreciation = financialData.getDepreciationByAccount(expense.accountAux);
     let immobilisation = financialData.getImmobilisationByAccount(depreciation.accountAux);
 
-    // Operations during financial year
+    // Indicator of immobilisation before immobilised production
     let investments = financialData.investments.filter(investment => investment.account == immobilisation.account);
+    let investmentsIndicator = await buildIndicatorAggregate(indic,investments);
+
     let amountInvestments = investments.map(investment => investment.amount)
                                        .reduce((a,b) => a+b,0);
     let amountImmobilisedProduction = financialData.immobilisationProductions.filter(immobilisationProduction => immobilisationProduction.account == immobilisation.account)
                                                                              .map(immobilisationProduction => immobilisationProduction.amount)
                                                                              .reduce((a,b) => a+b,0);
     
-    // Indicator of immobilisation before immobilised production
-    let investmentsIndicator = await buildIndicatorAggregate(indic,investments);
     let immobilisationIndicator = investments.length > 0 ? await buildIndicatorMerge(immobilisation.prevFootprint.indicators[indic], immobilisation.amount-amountInvestments-amountImmobilisedProduction,
                                                                                      investmentsIndicator, amountInvestments) 
                                                          : immobilisation.prevFootprint.indicators[indic];
-
+    // Footprint (reste à amortir)
     expense.footprint.indicators[indic] = await buildIndicatorMerge(immobilisationIndicator, immobilisation.amount-amountImmobilisedProduction,
                                                                     depreciation.prevFootprint.indicators[indic], -(depreciation.amount-expense.amount));
     return;
