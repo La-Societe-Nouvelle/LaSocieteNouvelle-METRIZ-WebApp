@@ -13,9 +13,9 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
     let indicator = new Indicator({indic});
     
     let totalAmount = 0.0;
-    let absolute = 0.0;
-    let absoluteMax = 0.0;
-    let absoluteMin = 0.0;
+    let grossImpact = 0.0;
+    let grossImpactMax = 0.0;
+    let grossImpactMin = 0.0;
 
     let missingData = false;
     
@@ -26,17 +26,17 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
 
         if (amount!=null && indicatorElement.getValue()!=null) 
         {
-            absolute+= indicatorElement.getValue()*amount;
-            absoluteMax+= indicatorElement.getValueMax()*amount;
-            absoluteMin+= indicatorElement.getValueMin()*amount;
+            grossImpact+= indicatorElement.getValue()*amount;
+            grossImpactMax+= Math.max(indicatorElement.getValueMax()*amount,indicatorElement.getValueMin()*amount);
+            grossImpactMin+= Math.min(indicatorElement.getValueMax()*amount,indicatorElement.getValueMin()*amount);
             totalAmount+= amount;
         } 
         else {missingData = true}
     })
 
     if (!missingData && totalAmount != 0) { 
-        indicator.setValue(absolute/totalAmount);
-        let uncertainty = Math.abs(absolute) > 0 ? Math.max( Math.abs(absoluteMax-absolute) , Math.abs(absolute-absoluteMin) )/Math.abs(absolute) *100 : 0;
+        indicator.setValue(grossImpact/totalAmount);
+        let uncertainty = Math.abs(grossImpact) > 0 ? Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100 : 0;
         indicator.setUncertainty(uncertainty);
     } else if (elements.length == 0) {
         indicator.setValue(0); 
@@ -58,13 +58,15 @@ export function buildIndicatorMerge(indicatorA,amountA,
      && indicatorB.getValue()!=null && amountB!=null)
     {
         let totalAmount = amountA + amountB;
-        let absolute = indicatorA.getValue()*amountA + indicatorB.getValue()*amountB;
-        let absoluteMax = indicatorA.getValueMax()*amountA + indicatorB.getValueMax()*amountB;
-        let absoluteMin = indicatorA.getValueMin()*amountA + indicatorB.getValueMin()*amountB;
+        let grossImpact = indicatorA.getValue()*amountA + indicatorB.getValue()*amountB;
+        let grossImpactMax = Math.max(indicatorA.getValueMax()*amountA, indicatorA.getValueMin()*amountA) 
+                           + Math.max(indicatorB.getValueMax()*amountB, indicatorB.getValueMin()*amountB);
+        let grossImpactMin = Math.min(indicatorA.getValueMax()*amountA, indicatorA.getValueMin()*amountA)
+                           + Math.min(indicatorB.getValueMax()*amountB, indicatorB.getValueMin()*amountB);
 
         if (totalAmount != 0) {
-            indicator.setValue(absolute/totalAmount);
-            let uncertainty = absolute > 0 ? Math.max(absoluteMax-absolute,absolute-absoluteMin)/absolute *100 : 0;
+            indicator.setValue(grossImpact/totalAmount);
+            let uncertainty = Math.abs(grossImpact) > 0 ? Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100 : 0;
             indicator.setUncertainty(uncertainty);
         } else {
             indicator.setValue(null); 
