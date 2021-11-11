@@ -129,6 +129,11 @@ select {
   align-content: center;
   border-bottom: solid 3px $primary-color;
 
+  h1 {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   #global-actions {
     position: absolute;
     top: 15px;
