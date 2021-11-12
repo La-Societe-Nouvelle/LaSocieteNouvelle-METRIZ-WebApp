@@ -33,7 +33,7 @@ export class StatementSection extends React.Component {
       // Legal entity data (steps 1 to 3)
       siren: props.session.legalUnit.siren || "",
       denomination: props.session.legalUnit.corporateName || "",
-      year: props.session.legalUnit.year || "",
+      year: props.session.year || "",
 
       // Statements (step 4)
       revenueFootprint: props.session.revenueFootprint,

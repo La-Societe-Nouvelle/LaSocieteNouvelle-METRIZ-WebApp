@@ -68,7 +68,7 @@ export async function FECFileReader(content)
 
   let dataFEC = {
     books: [],
-    meta: {books: {},accounts: {}, accountsAux: {}}
+    meta: {books: {},accounts: {}, accountsAux: {}, firstDate: null, lastDate: null}
   };
 
   // Separator ------------------------------------------------------------------------------------------ //
@@ -116,6 +116,10 @@ export async function FECFileReader(content)
       // Mise à jour des métadonnées relatives aux libellés de comptes
       if (dataFEC.meta.accounts[rowData.CompteNum] == undefined) dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
       if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
+
+      // Date
+      if (dataFEC.meta.firstDate==null || parseInt(rowData.EcritureDate) < parseInt(dataFEC.meta.firstDate)) dataFEC.meta.firstDate = rowData.EcritureDate;
+      if (dataFEC.meta.lastDate==null || parseInt(rowData.EcritureDate) > parseInt(dataFEC.meta.lastDate)) dataFEC.meta.lastDate = rowData.EcritureDate;
 
       // Ajout des données
       dataFEC.books[rowData.JournalCode].push(rowData);

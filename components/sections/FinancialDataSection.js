@@ -190,6 +190,8 @@ export class FinancialDataSection extends React.Component {
       this.setState({errorFile: true, errorMessage: nextFinancialData.errors[0], importedData: null});
     }
     else {
+      // year
+      this.props.session.year = /^[0-9]{8}/.test(FECData.meta.lastDate) ? FECData.meta.lastDate.substring(0,4) : "";
       // load financial data
       this.props.session.financialData = new FinancialData(nextFinancialData);
       this.props.session.financialData.companiesInitializer();
