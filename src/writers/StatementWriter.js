@@ -30,6 +30,8 @@ const writeStatementPDF = (data) =>
   const doc = new jsPDF();
   let today = new Date();
 
+  let notes = [];
+
   // 
   doc.setFont("Calibri");
   let y = 10;
@@ -56,6 +58,7 @@ const writeStatementPDF = (data) =>
 
   /* ----- TABLE ----- */
 
+  let xNote = 140;
   let xValue = 160;
   let xUncertainty = 180;
 
@@ -63,6 +66,7 @@ const writeStatementPDF = (data) =>
   y+=15;
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");
+  doc.text("Notes",140,y);
   doc.text("Valeur",160,y);
   doc.text("Incertitude",180,y);
   
@@ -73,7 +77,12 @@ const writeStatementPDF = (data) =>
     y+=6;
     doc.setFont("Calibri","bold");
     doc.text(metaIndics[indic].libelle,10,y);
+
     doc.setFont("Calibri","normal");
+    if (data.comments[indic]) {
+      notes.push(data.comments[indic]);
+      doc.text(""+notes.length,xNote,y,{align: "center"});
+    }
     doc.text(printValue(indicator.value,0)+" ",xValue+7,y,{align: "right"});
     doc.text(metaIndics[indic].unit,xValue+7,y,{align: "left"});
     doc.setFontSize(8);
@@ -110,6 +119,29 @@ const writeStatementPDF = (data) =>
 
   // Base de page
   doc.text("La Société Nouvelle - Société immatriculée au RCS de Lille Métropole - 889 182 770",105,280,{align: "center"})
+
+  // Page with notes
+  if (notes.length > 0) 
+  {
+    doc.addPage();
+    y = 10;
+
+    // Titre
+    doc.setFontSize(14);
+    doc.setFont("Calibri","bold");
+    doc.text("NOTES",10,y);
+    y+=10;
+
+    doc.setFontSize(10);
+    doc.setFont("Calibri","normal");
+    for (let i = 0; i < notes.length; i++)
+    {
+      doc.text(""+(i+1),10,y);
+      let lignesNote = doc.splitTextToSize(notes[i],100);
+      doc.text(lignesNote,20,y);
+      y+=lignesNote*6;
+    }
+  }
 
   // ----- RETURN ----- //
   return doc;
