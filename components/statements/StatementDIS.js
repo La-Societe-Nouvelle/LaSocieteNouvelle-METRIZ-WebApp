@@ -15,6 +15,7 @@ export class StatementDIS extends React.Component {
     super(props);
     this.state = {
       indexGini: valueOrDefault(props.impactsData.indexGini, ""),
+      info : props.impactsData.comments.dis || ""
     }
   }
 
@@ -96,6 +97,9 @@ export class StatementDIS extends React.Component {
     this.setState({indexGini: this.props.impactsData.indexGini});
     this.props.onUpdate("dis");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.dis = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

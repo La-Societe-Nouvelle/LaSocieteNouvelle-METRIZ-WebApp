@@ -17,6 +17,7 @@ export class StatementMAT extends React.Component {
     this.state = {
       materialsExtraction: valueOrDefault(props.impactsData.materialsExtraction, ""),
       materialsExtractionUncertainty: valueOrDefault(props.impactsData.materialsExtractionUncertainty, ""),
+      info : props.impactsData.comments.mat || ""
     }
   }
 
@@ -109,6 +110,9 @@ export class StatementMAT extends React.Component {
     this.setState({materialsExtraction: this.props.impactsData.materialsExtraction});
     this.props.onUpdate("mat");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.mat = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

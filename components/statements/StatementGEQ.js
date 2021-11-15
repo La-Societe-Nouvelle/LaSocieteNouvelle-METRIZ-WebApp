@@ -16,6 +16,7 @@ export class StatementGEQ extends React.Component {
     super(props);
     this.state = {
       wageGap: valueOrDefault(props.impactsData.wageGap, ""),
+      info : props.impactsData.comments.geq || ""
     }
   }
 
@@ -94,6 +95,9 @@ export class StatementGEQ extends React.Component {
     this.setState({wageGap: this.props.impactsData.wageGap});
     this.props.onUpdate("geq");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.geq = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

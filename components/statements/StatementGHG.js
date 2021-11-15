@@ -17,6 +17,7 @@ export class StatementGHG extends React.Component {
     this.state = {
       greenhousesGazEmissions: valueOrDefault(props.impactsData.greenhousesGazEmissions, ""),
       greenhousesGazEmissionsUncertainty: valueOrDefault(props.impactsData.greenhousesGazEmissionsUncertainty, ""),
+      info : props.impactsData.comments.ghg || ""
     }
   }
 
@@ -74,6 +75,9 @@ export class StatementGHG extends React.Component {
     this.props.impactsData.greenhousesGazEmissionsUncertainty = input;
     this.props.onUpdate("ghg");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.ghg = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

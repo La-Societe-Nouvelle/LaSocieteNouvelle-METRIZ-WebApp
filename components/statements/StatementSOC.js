@@ -11,6 +11,9 @@ export class StatementSOC extends React.Component {
   constructor(props) 
   {
     super(props);
+    this.state = {
+      info : props.impactsData.comments.soc || ""
+    }
   }
 
   render() 
@@ -60,6 +63,9 @@ export class StatementSOC extends React.Component {
     this.props.onUpdate("soc");
     this.forceUpdate();
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.soc = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

@@ -17,6 +17,7 @@ export class StatementNRG extends React.Component {
     this.state = {
       energyConsumption: valueOrDefault(props.impactsData.energyConsumption, ""),
       energyConsumptionUncertainty: valueOrDefault(props.impactsData.energyConsumptionUncertainty, ""),
+      info : props.impactsData.comments.nrg || ""
     }
   }
 
@@ -74,6 +75,9 @@ export class StatementNRG extends React.Component {
     this.props.impactsData.energyConsumptionUncertainty = input;
     this.props.onUpdate("nrg");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.nrg = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

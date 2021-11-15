@@ -17,6 +17,7 @@ export class StatementWAS extends React.Component {
     this.state = {
       wasteProduction: valueOrDefault(props.impactsData.wasteProduction, ""),
       wasteProductionUncertainty: valueOrDefault(props.impactsData.wasteProductionUncertainty, ""),
+      info : props.impactsData.comments.was || ""
     }
   }
 
@@ -74,6 +75,9 @@ export class StatementWAS extends React.Component {
     this.props.impactsData.wasteProductionUncertainty = input;
     this.props.onUpdate("was");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.was = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

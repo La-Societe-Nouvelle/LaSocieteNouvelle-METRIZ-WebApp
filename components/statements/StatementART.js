@@ -29,6 +29,7 @@ export class StatementART extends React.Component {
     super(props);
     this.state = {
       craftedProduction: valueOrDefault(props.impactsData.craftedProduction, ""),
+      info : props.impactsData.comments.art || ""
     }
   }
 
@@ -114,6 +115,9 @@ export class StatementART extends React.Component {
     this.setState({craftedProduction: this.props.impactsData.craftedProduction});
     this.props.onUpdate("art");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.art = this.state.info;
 
   onValidate = () => this.props.onValidate()
 

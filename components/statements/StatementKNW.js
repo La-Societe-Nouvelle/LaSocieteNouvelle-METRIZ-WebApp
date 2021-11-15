@@ -16,6 +16,7 @@ export class StatementKNW extends React.Component {
     super(props);
     this.state = {
       researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, ""),
+      info : props.impactsData.comments.knw || ""
     }
   }
 
@@ -57,6 +58,9 @@ export class StatementKNW extends React.Component {
     this.props.impactsData.researchAndTrainingContribution = input;
     this.props.onUpdate("knw");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.knw = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }
