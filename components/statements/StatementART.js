@@ -43,7 +43,7 @@ export class StatementART extends React.Component {
   render()
   {
     const {isValueAddedCrafted,netValueAdded} = this.props.impactsData;
-    const {craftedProduction} = this.state;
+    const {craftedProduction,info} = this.state;
 
     let isValid = craftedProduction!=null && netValueAdded!=null;
 
@@ -79,6 +79,13 @@ export class StatementART extends React.Component {
                       onUpdate={this.updateCraftedProduction.bind(this)}
                       disabled={isValueAddedCrafted!=null}/>
           <span>&nbsp;€</span>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

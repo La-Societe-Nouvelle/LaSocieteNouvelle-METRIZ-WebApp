@@ -34,7 +34,7 @@ export class StatementNRG extends React.Component {
   render() 
   {
     const {netValueAdded} = this.props.impactsData;
-    const {energyConsumption,energyConsumptionUncertainty} = this.state;
+    const {energyConsumption,energyConsumptionUncertainty,info} = this.state;
 
     let isValid = energyConsumption!=null && netValueAdded!=null;
 
@@ -54,6 +54,13 @@ export class StatementNRG extends React.Component {
           <InputNumber value={roundValue(energyConsumptionUncertainty,0)}
                        onUpdate={this.updateEnergyConsumptionUncertainty}/>
           <span>&nbsp;%</span>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

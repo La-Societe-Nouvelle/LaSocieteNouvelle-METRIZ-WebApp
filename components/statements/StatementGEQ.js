@@ -30,7 +30,7 @@ export class StatementGEQ extends React.Component {
   render() 
   {
     const {hasEmployees,netValueAdded} = this.props.impactsData;
-    const {wageGap} = this.state;
+    const {wageGap,info} = this.state;
 
     let isValid = wageGap!=null && netValueAdded!=null;
 
@@ -62,6 +62,13 @@ export class StatementGEQ extends React.Component {
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

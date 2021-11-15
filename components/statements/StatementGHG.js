@@ -34,7 +34,7 @@ export class StatementGHG extends React.Component {
   render() 
   {
     const {netValueAdded} = this.props.impactsData;
-    const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty} = this.state;
+    const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,info} = this.state;
 
     let isValid = greenhousesGazEmissions!=null && netValueAdded!=null;
 
@@ -54,6 +54,13 @@ export class StatementGHG extends React.Component {
           <InputNumber value={roundValue(greenhousesGazEmissionsUncertainty,0)}
                        onUpdate={this.updateGreenhousesGazEmissionsUncertainty}/>
           <span>&nbsp;%</span>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

@@ -34,7 +34,7 @@ export class StatementWAS extends React.Component {
   render() 
   {
     const {netValueAdded} = this.props.impactsData;
-    const {wasteProduction,wasteProductionUncertainty} = this.state;
+    const {wasteProduction,wasteProductionUncertainty,info} = this.state;
 
     let isValid = wasteProduction!=null && netValueAdded!=null;
 
@@ -54,6 +54,13 @@ export class StatementWAS extends React.Component {
         </div>
         <div className="notes">
           <p><sup>1</sup> Déchets assimilés aux ordures ménagères</p>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}
