@@ -17,6 +17,7 @@ export class StatementHAZ extends React.Component {
     this.state = {
       hazardousSubstancesConsumption: valueOrDefault(props.impactsData.hazardousSubstancesConsumption, ""),
       hazardousSubstancesConsumptionUncertainty: valueOrDefault(props.impactsData.hazardousSubstancesConsumption, ""),
+      info : props.impactsData.comments.haz || ""
     }
   }
 
@@ -71,6 +72,9 @@ export class StatementHAZ extends React.Component {
     this.props.impactsData.hazardousSubstancesConsumptionUncertainty = input;
     this.props.onUpdate("haz");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.haz = this.state.info;
   
   onValidate = () => this.props.onValidate()
 }

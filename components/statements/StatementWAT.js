@@ -17,6 +17,7 @@ export class StatementWAT extends React.Component {
     this.state = {
       waterConsumption: valueOrDefault(props.impactsData.waterConsumption, ""),
       waterConsumptionUncertainty: valueOrDefault(props.impactsData.waterConsumptionUncertainty, ""),
+      info : props.impactsData.comments.wat || ""
     }
   }
 
@@ -71,6 +72,9 @@ export class StatementWAT extends React.Component {
     this.props.impactsData.waterConsumptionUncertainty = input;
     this.props.onUpdate("wat");
   }
+  
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.wat = this.state.info;
 
   onValidate = () => this.props.onValidate()
 }

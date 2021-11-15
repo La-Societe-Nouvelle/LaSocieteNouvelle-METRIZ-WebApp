@@ -701,6 +701,21 @@ table {
 
   }
 
+  .statement-comments {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 5px;
+
+    textarea {
+      margin-top: 5px;
+      width: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+      font-size: 14px;
+    }
+  }
+
   // validation button
   .statement-validation {
     display: flex;

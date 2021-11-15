@@ -16,6 +16,7 @@ export class StatementECO extends React.Component {
     super(props);
     this.state = {
       domesticProduction: valueOrDefault(props.impactsData.domesticProduction, ""),
+      info : props.impactsData.comments.eco || ""
     }
   }
 
@@ -29,7 +30,7 @@ export class StatementECO extends React.Component {
   render() 
   {
     const {isAllActivitiesInFrance,netValueAdded} = this.props.impactsData;
-    const {domesticProduction} = this.state;
+    const {domesticProduction,info} = this.state;
     
     let isValid = domesticProduction!=null && netValueAdded!=null;
 
@@ -66,6 +67,13 @@ export class StatementECO extends React.Component {
                        onUpdate={this.updateDomesticProduction}/>
           <span>&nbsp;€</span>
         </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
+        </div>
         <div className="statement-validation">
           <button disabled={!isValid}
                   onClick={this.onValidate}>Valider</button>
@@ -101,6 +109,9 @@ export class StatementECO extends React.Component {
     this.setState({domesticProduction: this.props.impactsData.domesticProduction});
     this.props.onUpdate("eco");
   }
+
+  updateInfo = (event) => this.setState({info: event.target.value});
+  saveInfo = () => this.props.impactsData.comments.eco = this.state.info;
   
   onValidate = () => this.props.onValidate()
 }

@@ -51,6 +51,10 @@ export class ImpactsData  {
 
     this.waterConsumption = props.waterConsumption || null;
     this.waterConsumptionUncertainty = props.waterConsumptionUncertainty || null;
+
+    /* --- Commentaires --- */
+
+    this.comments = props.comments || {};
     
   // ---------------------------------------------------------------------------------------------------- //
   }
