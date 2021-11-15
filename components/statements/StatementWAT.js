@@ -34,7 +34,7 @@ export class StatementWAT extends React.Component {
   render() 
   {
     const {netValueAdded} = this.props.impactsData;
-    const {waterConsumption,waterConsumptionUncertainty} = this.state;
+    const {waterConsumption,waterConsumptionUncertainty,info} = this.state;
 
     let isValid = waterConsumption!=null && netValueAdded!=null;
 
@@ -51,6 +51,13 @@ export class StatementWAT extends React.Component {
           <InputNumber value={roundValue(waterConsumptionUncertainty,0)}
                        onUpdate={this.updateWaterConsumptionUncertainty}/>
           <span>&nbsp;%</span>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

@@ -34,7 +34,7 @@ export class StatementMAT extends React.Component {
   render() 
   {
     const {isExtractiveActivities,netValueAdded} = this.props.impactsData;
-    const {materialsExtraction,materialsExtractionUncertainty} = this.state;
+    const {materialsExtraction,materialsExtractionUncertainty,info} = this.state;
 
     let isValid = materialsExtraction!=null && netValueAdded!=null;
 
@@ -70,6 +70,13 @@ export class StatementMAT extends React.Component {
                        disabled={isExtractiveActivities === false}
                        onUpdate={this.updateMaterialsExtractionUncertainty}/>
           <span>&nbsp;%</span>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

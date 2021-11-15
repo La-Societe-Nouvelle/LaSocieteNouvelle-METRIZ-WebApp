@@ -30,7 +30,7 @@ export class StatementKNW extends React.Component {
   render() 
   {
     const {netValueAdded} = this.props.impactsData;
-    const {researchAndTrainingContribution} = this.state;
+    const {researchAndTrainingContribution,info} = this.state;
 
     let isValid = researchAndTrainingContribution!=null && netValueAdded!=null;
 
@@ -44,6 +44,13 @@ export class StatementKNW extends React.Component {
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

@@ -34,7 +34,7 @@ export class StatementHAZ extends React.Component {
   render() 
   {
     const {netValueAdded} = this.props.impactsData;
-    const {hazardousSubstancesConsumption,hazardousSubstancesConsumptionUncertainty} = this.state;
+    const {hazardousSubstancesConsumption,hazardousSubstancesConsumptionUncertainty,info} = this.state;
 
     let isValid = hazardousSubstancesConsumption!=null && netValueAdded!=null;
 
@@ -51,6 +51,13 @@ export class StatementHAZ extends React.Component {
           <InputNumber value={roundValue(hazardousSubstancesConsumptionUncertainty,0)}
                        onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}/>
           <span>&nbsp;%</span>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

@@ -19,6 +19,7 @@ export class StatementSOC extends React.Component {
   render() 
   {
     const {hasSocialPurpose,netValueAdded} = this.props.impactsData;
+    const {info} = this.state;
 
     let isValid = hasSocialPurpose!==null && netValueAdded!=null;
 
@@ -40,6 +41,13 @@ export class StatementSOC extends React.Component {
                    onChange={this.onSocialPurposeChange}/>
             <label>Non</label>
           </div>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}

@@ -29,7 +29,7 @@ export class StatementDIS extends React.Component {
   render() 
   {
     const {hasEmployees,netValueAdded} = this.props.impactsData;
-    const {indexGini} = this.state;
+    const {indexGini,info} = this.state;
 
     let isValid = indexGini!=null && netValueAdded!=null;
 
@@ -64,6 +64,13 @@ export class StatementDIS extends React.Component {
           <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
+        </div>
+        <div className="statement-comments">
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false"
+                    value={info} 
+                    onChange={this.updateInfo}
+                    onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
           <button disabled={!isValid}
