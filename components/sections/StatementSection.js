@@ -38,6 +38,7 @@ export class StatementSection extends React.Component {
       // Statements (step 4)
       revenueFootprint: props.session.revenueFootprint,
       validations: props.session.validations,
+      comments: props.session.impactsData.comments || {},
       socialFootprint: {},
 
       // declarant data (step 5)
