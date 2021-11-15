@@ -9,7 +9,7 @@ export function Header({step,stepMax,downloadSession,setStep})
 {  
   const refresh = () => location.reload(true);
   const openRepository = () => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp","_blank");
-  const openDocumentation = () => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp/blob/main/DOCUMENTATION.md","_blank");
+  const openDocumentation = () => window.open("https://lasocietenouvelle.org/METRIZ_documentation_v1.pdf","_blank");
   const saveSession = () => downloadSession();
   const goBack = () => setStep(5);
 
