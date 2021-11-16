@@ -22,11 +22,6 @@ export const MainAggregatesTable = ({financialData}) =>
           <tr><td>Agrégat</td><td colSpan="2">Montant</td></tr>
         </thead>
         <tbody>
-
-          <tr className="with-bottom-line">
-            <td>Produits d'exploitation</td>
-            <td className="column_value">{printValue(financialData.getProduction() + financialData.getAmountOtherOperatingIncomes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
           
           <tr>
             <td>Production sur l'exercice courant</td>
@@ -43,12 +38,7 @@ export const MainAggregatesTable = ({financialData}) =>
           <tr>
             <td>&emsp;Production immobilisée</td>
             <td className="column_value">{printValue(financialData.getImmobilisedProduction(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td>Autres produits d'exploitation</td>
-            <td className="column_value">{printValue(financialData.getAmountOtherOperatingIncomes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          
+            <td className="column_unit">&nbsp;€</td></tr>          
           
           <tr className="with-top-line">
             <td>Consommations intermédiaires</td>
@@ -56,7 +46,7 @@ export const MainAggregatesTable = ({financialData}) =>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td className="column_value">{financialData.getVariationPurchasesStocks() > 0 ? ("("+printValue(financialData.getVariationPurchasesStocks(),0)+")") : printValue(financialData.getVariationPurchasesStocks(),0)}</td>
+            <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
         {expensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
@@ -83,14 +73,6 @@ export const MainAggregatesTable = ({financialData}) =>
           <tr>
             <td>&emsp;dont charges de personnel</td>
             <td className="column_value detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td>&emsp;dont impôts, taxe et versements assimilés</td>
-            <td className="column_value detail">{printValue(financialData.getAmountTaxes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line">
-            <td>&emsp;dont résultat d'exploitation</td>
-            <td className="column_value detail">{printValue(financialData.getOperatingResult(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
 
         </tbody>
