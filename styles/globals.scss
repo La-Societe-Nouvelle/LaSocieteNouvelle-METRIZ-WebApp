@@ -498,6 +498,14 @@ table {
       padding-top: 2px;
     }
 
+    // margins (top & bottom)
+    &.with-bottom-margin td {
+      padding-bottom: 10px;
+    }
+    &.with-top-margin td {
+      padding-top: 10px;
+    }
+
     // cursor
     cursor: default;
   }
@@ -516,6 +524,16 @@ table {
 
     &.column_value {width: 150px}
     &.column_uncertainty {width: 100px}
+
+    // border
+    &.with-bottom-line {
+      border-bottom: solid $primary-color 1px;
+      padding-bottom: 2px;
+    }
+    &.with-top-line {
+      border-top: solid $primary-color 1px;
+      padding-top: 2px;
+    }
 
     // text align
     &.center {

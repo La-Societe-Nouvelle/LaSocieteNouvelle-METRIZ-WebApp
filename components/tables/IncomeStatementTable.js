@@ -26,7 +26,7 @@ export const IncomeStatementTable = ({financialData}) =>
         </thead>
         <tbody>
 
-          <tr>
+          <tr className="with-top-margin">
             <td>Chiffre d'affaires</td>
             <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
@@ -39,20 +39,20 @@ export const IncomeStatementTable = ({financialData}) =>
             <td>Production immobilisée</td>
             <td className="column_value">{printValue(financialData.getImmobilisedProduction(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
+          <tr className="with-top-margin">
             <td>Autres produits d'exploitation</td>
             <td className="column_value">{printValue(financialData.getAmountOtherOperatingIncomes(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line">
+          <tr className="with-bottom-line with-top-margin">
             <td><b>TOTAL DES PRODUITS D'EXPLOITATION</b></td>
             <td className="column_value important">{printValue(financialData.getAmountOperatingIncomes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className="column_unit important">&nbsp;€</td></tr>
           
-          <tr>
+          <tr className="with-top-margin">
             <td>CHARGES EXTERNES</td></tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td className="column_value">{financialData.getVariationPurchasesStocks() > 0 ? ("("+printValue(financialData.getVariationPurchasesStocks(),0)+")") : printValue(financialData.getVariationPurchasesStocks(),0)}</td>
+            <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
         {expensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
@@ -60,46 +60,51 @@ export const IncomeStatementTable = ({financialData}) =>
             <td className="column_value">{printValue(amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>)}
           <tr>
-            <td><b>Total des charges externes</b></td>
-            <td className="column_value important">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td></td>
+            <td className="column_value important with-top-line">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
+            <td className="column_unit important">&nbsp;€</td></tr>
 
-          <tr>
+          <tr className="with-top-margin">
             <td>IMPOTS, TAXES ET VERSEMENTS ASSIMILES</td>
-            <td className="column_value">{financialData.getAmountTaxes() < 0 ? ("("+printValue(financialData.getAmountTaxes(),0)+")") : printValue(financialData.getAmountTaxes(),0)}</td>
+            <td className="column_value">{printValue(financialData.getAmountTaxes(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           
-          <tr>
+          <tr className="with-top-margin">
             <td>CHARGES DE PERSONNEL</td>
-            <td className="column_value">{financialData.getAmountPersonnelExpenses() < 0 ? ("("+printValue(financialData.getAmountPersonnelExpenses(),0)+")") : printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
+            <td className="column_value">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
 
-          <tr>
+          <tr className="with-top-margin">
             <td>DOTATIONS D'EXPLOITATION</td></tr>
           <tr>
-            <td>Dotations aux amortissements sur immobilisations</td>
+            <td>&emsp;Dotations aux amortissements sur immobilisations</td>
             <td className="column_value">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
-            <td>Autres dotations aux amortissements, aux dépréciations et aux provisions</td>
+            <td>&emsp;Autres dotations aux amortissements, aux dépréciations et aux provisions</td>
             <td className="column_value">{printValue(financialData.getAmountProvisions(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
-            <td><b>Total des dotations d'exploitation</b></td>
-            <td className="column_value important">{printValue(financialData.getAmountDepreciationExpenses()+financialData.getAmountProvisions(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td></td>
+            <td className="column_value important with-top-line">{printValue(financialData.getAmountDepreciationExpenses()+financialData.getAmountProvisions(),0)}</td>
+            <td className="column_unit important">&nbsp;€</td></tr>
 
-          <tr>
+          <tr className="with-top-margin">
             <td>AUTRES CHARGES D'EXPLOITATION</td>
-            <td className="column_value">{financialData.getAmountOtherExpenses() < 0 ? ("("+printValue(financialData.getAmountOtherExpenses(),0)+")") : printValue(financialData.getAmountOtherExpenses(),0)}</td>
+            <td className="column_value">{printValue(financialData.getAmountOtherExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
 
-          <tr className="with-bottom-line">
+          <tr className="with-bottom-line with-top-margin">
             <td><b>TOTAL DES CHARGES D'EXPLOITATION</b></td>
             <td className="column_value important">{printValue(financialData.getAmountOperatingExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className="column_unit important">&nbsp;€</td></tr>
 
-          <tr>
+          <tr className="with-bottom-line with-top-margin">
+            <td><b>RESULTAT D'EXPLOITATION</b></td>
+            <td className="column_value important">{printValue(financialData.getOperatingResult(),0)}</td>
+            <td className="column_unit important">&nbsp;€</td></tr>
+
+          <tr className="with-top-margin">
             <td>PRODUITS FINANCIERS</td>
             <td className="column_value">{printValue(financialData.getAmountFinancialIncomes(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
@@ -107,12 +112,12 @@ export const IncomeStatementTable = ({financialData}) =>
             <td>CHARGES FINANCIERES</td>
             <td className="column_value">{printValue(financialData.getAmountFinancialExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line">
+          <tr className="with-bottom-line with-top-margin">
             <td><b>RESULTAT FINANCIER</b></td>
             <td className="column_value important">{printValue(financialData.getFinancialResult(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className="column_unit important">&nbsp;€</td></tr>
 
-          <tr>
+          <tr className="with-top-margin">
             <td>PRODUITS EXCEPTIONNELS</td>
             <td className="column_value">{printValue(financialData.getAmountExceptionalIncomes(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
@@ -120,12 +125,12 @@ export const IncomeStatementTable = ({financialData}) =>
             <td>CHARGES EXCEPTIONNELLES</td>
             <td className="column_value">{printValue(financialData.getAmountExceptionalExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line">
+          <tr className="with-bottom-line with-top-margin">
             <td><b>RESULTAT EXCEPTIONNEL</b></td>
             <td className="column_value important">{printValue(financialData.getExceptionalResult(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className="column_unit important">&nbsp;€</td></tr>
 
-          <tr>
+          <tr className="with-top-margin with-bottom-margin">
             <td>PARTICIPATION DES SALARIES, IMPOTS SUR LES BENEFICES ET ASSIMILES</td>
             <td className="column_value">{printValue(financialData.getAmountTaxOnProfits(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
@@ -133,7 +138,7 @@ export const IncomeStatementTable = ({financialData}) =>
           <tr className="with-bottom-line with-top-line">
             <td><b>BENEFICE OU PERTE</b></td>
             <td className="column_value important">{printValue(financialData.getProfit(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className="column_unit important">&nbsp;€</td></tr>
 
         </tbody>
       </table>}
