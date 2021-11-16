@@ -4,6 +4,7 @@
 import React from 'react';
 
 // Components
+import { MainAggregatesTable } from '../tables/MainAggregatesTable';
 import { ImmobilisationsTable } from '../tables/ImmobilisationsTable';
 import { IncomeStatementTable } from '../tables/IncomeStatementTable';
 import { ExpensesTable } from '../tables/ExpensesTable';
@@ -95,10 +96,11 @@ export class FinancialDataSection extends React.Component {
                   onChange={this.importFECFile}/>
             <select value={selectedTable}
                           onChange={this.changeFinancialTable}>
-              <option key="1" value="incomeStatement">Compte de résultat</option>
-              <option key="2" value="immobilisations">Immobilisations</option>
-              <option key="3" value="expenses">Charges externes</option>
-              <option key="4" value="stocks">Stocks</option>
+              <option key="1" value="mainAggregates">Soldes intermédiaires de gestion</option>
+              <option key="2" value="incomeStatement">Compte de résultat</option>
+              <option key="3" value="immobilisations">Immobilisations</option>
+              <option key="4" value="expenses">Charges externes</option>
+              <option key="5" value="stocks">Stocks</option>
             </select>
           </div>
           <div>
@@ -138,6 +140,7 @@ export class FinancialDataSection extends React.Component {
   {
     switch(selectedTable) 
     {
+      case "mainAggregates" :   return(<MainAggregatesTable financialData={this.props.session.financialData}/>)
       case "incomeStatement" :  return(<IncomeStatementTable financialData={this.props.session.financialData}/>)
       case "immobilisations" :  return(<ImmobilisationsTable financialData={this.props.session.financialData}/>)
       case "expenses" :         return(<ExpensesTable financialData={this.props.session.financialData}/>)
@@ -232,6 +235,7 @@ const getTitle = (selectedTable) =>
 {
   switch(selectedTable)
   {
+    case "mainAggregates" :  return("Soldes intermédiaires de gestion")
     case "incomeStatement" :  return("Compte de résultat")
     case "immobilisations" :  return("Immobilisations")
     case "expenses" :         return("Comptes de charges externes")
