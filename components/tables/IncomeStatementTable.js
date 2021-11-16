@@ -45,7 +45,7 @@ export const IncomeStatementTable = ({financialData}) =>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr className="with-bottom-line">
             <td><b>TOTAL DES PRODUITS D'EXPLOITATION</b></td>
-            <td className="column_value important">{printValue(financialData.getProduction() + financialData.getAmountOtherOperatingIncomes(),0)}</td>
+            <td className="column_value important">{printValue(financialData.getAmountOperatingIncomes(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           
           <tr>
@@ -81,7 +81,7 @@ export const IncomeStatementTable = ({financialData}) =>
             <td className="column_value">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
-            <td>Dotations aux provisions</td>
+            <td>Autres dotations aux amortissements, aux dépréciations et aux provisions</td>
             <td className="column_value">{printValue(financialData.getAmountProvisions(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
@@ -96,7 +96,7 @@ export const IncomeStatementTable = ({financialData}) =>
 
           <tr className="with-bottom-line">
             <td><b>TOTAL DES CHARGES D'EXPLOITATION</b></td>
-            <td className="column_value important">{printValue(financialData.getAmountIntermediateConsumption()+financialData.getAmountTaxes()+financialData.getAmountPersonnelExpenses()+financialData.getAmountDepreciationExpenses()+financialData.getAmountProvisions()+financialData.getAmountOtherExpenses(),0)}</td>
+            <td className="column_value important">{printValue(financialData.getAmountOperatingExpenses(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
 
           <tr>
@@ -126,17 +126,13 @@ export const IncomeStatementTable = ({financialData}) =>
             <td className="column_unit">&nbsp;€</td></tr>
 
           <tr>
-            <td>Participation des salariés aux résultats de l'entreprise</td>
-            <td className="column_value">{printValue(financialData.getAmountTaxOnProfits()+financialData.getAmountProvisions(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td>Impôts sur les bénéfices</td>
-            <td className="column_value">{printValue(financialData.getAmountTaxOnProfits()+financialData.getAmountProvisions(),0)}</td>
+            <td>PARTICIPATION DES SALARIES, IMPOTS SUR LES BENEFICES ET ASSIMILES</td>
+            <td className="column_value">{printValue(financialData.getAmountTaxOnProfits(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           
           <tr className="with-bottom-line with-top-line">
             <td><b>BENEFICE OU PERTE</b></td>
-            <td className="column_value important">{printValue(financialData.getAmountTaxOnProfits(),0)}</td>
+            <td className="column_value important">{printValue(financialData.getProfit(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
 
         </tbody>

@@ -185,11 +185,14 @@ export class FinancialData {
     // OTHER KEY FIGURES --------------------------------------- //
 
     // Incomes
+    getAmountOperatingIncomes = () => this.getProduction()+this.getAmountOtherOperatingIncomes();
     getAmountOtherOperatingIncomes = () => this.otherOperatingIncomes;
     getAmountFinancialIncomes = () => this.financialIncomes;
     getAmountExceptionalIncomes = () => this.exceptionalIncomes;
 
     // Expenses
+    getAmountOperatingExpenses = () => this.getAmountIntermediateConsumption()+this.getAmountTaxes()+this.getAmountPersonnelExpenses()+this.getAmountDepreciationExpenses()+this.getAmountProvisions()+this.getAmountOtherExpenses()
+
     getAmountTaxes = () => this.taxes;
     getAmountPersonnelExpenses = () => this.personnelExpenses;
     getAmountOtherExpenses = () => this.otherExpenses;
@@ -199,9 +202,12 @@ export class FinancialData {
     getAmountTaxOnProfits = () => this.taxOnProfits;
 
     // Results
-    getOperatingResult = () => this.getNetValueAdded() - this.getAmountTaxes() - this.getAmountPersonnelExpenses() - this.getAmountOtherExpenses() - this.getAmountProvisions() + this.getAmountOtherOperatingIncomes();
+    getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountDepreciationExpenses();
     getFinancialResult = () => this.getAmountFinancialIncomes() - this.getAmountFinancialExpenses();
     getExceptionalResult = () => this.getAmountExceptionalIncomes() - this.getAmountExceptionalExpenses();
+
+    // Profit
+    getProfit = () => this.getOperatingResult()+this.getFinancialResult()+this.getExceptionalResult()-this.getAmountTaxOnProfits();
 
     /* ---------------------------------------- INTERACTIONS ---------------------------------------- */
 
