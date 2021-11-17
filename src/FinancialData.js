@@ -202,7 +202,7 @@ export class FinancialData {
     getAmountTaxOnProfits = () => this.taxOnProfits;
 
     // Results
-    getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountDepreciationExpenses();
+    getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountOperatingExpenses();
     getFinancialResult = () => this.getAmountFinancialIncomes() - this.getAmountFinancialExpenses();
     getExceptionalResult = () => this.getAmountExceptionalIncomes() - this.getAmountExceptionalExpenses();
 
