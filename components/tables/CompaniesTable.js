@@ -29,7 +29,7 @@ export class CompaniesTable extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (this.props !== prevProps) this.setState({companies: this.props.companies})
+    if (this.props !== prevProps) this.setState({companies: this.props.companies, page: 0})
   }
 
   render() 
