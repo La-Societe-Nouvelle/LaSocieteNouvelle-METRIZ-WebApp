@@ -1,10 +1,16 @@
 // La Société Nouvelle
 
+const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
+
 // Libraries
 import metaIndics from '/lib/indics';
+import divisions from '/lib/divisions'; 
 
 // React
 import React from 'react';
+
+// Objects
+import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
 // Tab Components
 import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
@@ -63,14 +69,27 @@ export class IndicatorSection extends React.Component {
     this.state = {
       indic: "eco",
       triggerPopup: "",
-      selectedTable: "incomeStatement"
+      selectedTable: "incomeStatement",
+      comparativeDivision: "00",
+      productionSectorFootprint: new SocialFootprint(),
+      valueAddedSectorFootprint: new SocialFootprint(),
+      consumptionSectorFootprint: new SocialFootprint(),
+      productionAreaFootprint: new SocialFootprint(),
+      valueAddedAreaFootprint: new SocialFootprint(),
+      economicAreaData: null
     }
+  }
+
+  componentDidMount()
+  {
+    fetchEconomicAreaData("FRA","GDP").then(footprint => this.setState({valueAddedAreaFootprint: footprint}));
+    fetchEconomicAreaData("FRA","GAP").then(footprint => this.setState({productionAreaFootprint: footprint}));
   }
   
   render() 
   {
     const {indic} = this.state;
-    const {triggerPopup,selectedTable} = this.state;
+    const {triggerPopup,selectedTable,comparativeDivision} = this.state;
 
     const isPublicationAvailable = Object.entries(this.props.session.revenueFootprint.indicators).filter(([_,indicator]) => indicator.value!=null).length > 0;
 
@@ -146,7 +165,21 @@ export class IndicatorSection extends React.Component {
 
           <div className="group">
             <h3>Graphiques comparatifs</h3>
-            <IndicatorGraphs session={this.props.session} indic={indic}/>
+            <div className="actions">
+              <div>Division économique comparative : </div>
+              <select value={comparativeDivision}
+                      onChange={this.changeComparativeDivision}>
+                {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b))
+                                          .map(([code,libelle]) => 
+                <option key={code} 
+                        value={code}>
+                  {code + " - " +libelle}
+                </option>)}
+              </select>
+            </div>
+            <IndicatorGraphs session={this.props.session} 
+                             indic={indic}
+                             comparativeFootprints={this.state}/>
           </div>
 
         </div>
@@ -180,6 +213,16 @@ export class IndicatorSection extends React.Component {
   
   changeSelectedIndicator = (event) => this.setState({indic: event.target.value})
   changeShowedTable = (event) => this.setState({selectedTable: event.target.value})
+
+  changeComparativeDivision = async (event) => 
+  {
+    let division = event.target.value;
+    this.setState({comparativeDivision: division});
+    let productionSectorFootprint = await fetchDivisionData(division,"PRD");
+    let valueAddedSectorFootprint = await fetchDivisionData(division,"GVA");
+    let consumptionSectorFootprint = await fetchDivisionData(division,"IC");
+    this.setState({productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint});
+  }
 
   /* ----- CHANGE/VALIDATION HANDLER ----- */
 
@@ -250,4 +293,39 @@ function Assessment(props)
     case "nrg": return(<AssessmentNRG {...props}/>)
     default: return(<div></div>)
   }
+}
+
+// Fetch comparative data
+
+const fetchDivisionData = async (division,flow) =>
+{
+  let endpoint; let response; let data;
+
+  // comparative data
+  let footprint = new SocialFootprint();
+
+  endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow="+flow;
+  console.log(endpoint);
+  response = await fetch(endpoint, {method:'get'});
+  data = await response.json();
+  if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
+  
+  return footprint;
+}
+
+const fetchEconomicAreaData = async (area,flow) =>
+{
+  let endpoint; let response; let data;
+
+  // comparative data
+  let footprint = new SocialFootprint();
+  
+  // Available production
+  endpoint = apiBaseUrl + "/default?" + "pays="+area + "&activite=00" +"&flow="+flow;
+  console.log(endpoint);
+  response = await fetch(endpoint, {method:'get'});
+  data = await response.json();
+  if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
+
+  return footprint;
 }

@@ -26,10 +26,10 @@ const viewsForIndic = {
   soc: {min:0, max:100},
 }
 
-export const IndicatorGraphs = ({session,indic}) =>
+export const IndicatorGraphs = ({session,indic,comparativeFootprints}) =>
 {
   const {legalUnit,productionFootprint,netValueAddedFootprint,intermediateConsumptionFootprint} = session;
-  const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = legalUnit;
+  const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = comparativeFootprints;
   
   const dataProduction = [
     ["", "title", { role: "style" }],
