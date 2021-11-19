@@ -70,12 +70,13 @@ export class StatementSection extends React.Component {
     switch(step)
     {
       case 0: return <ErrorMessage />
-      case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
-      case 2: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
-      case 3: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
-      case 4: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
-      case 5: return <StatementSendingMessage />
-      case 6: return <StatementSendMessage />
+      case 1: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren}/>
+      case 2: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
+      case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
+      case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
+      case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
+      case 6: return <StatementSendingMessage />
+      case 7: return <StatementSendMessage />
     }
   }
 
@@ -84,18 +85,20 @@ export class StatementSection extends React.Component {
 
   // Commits
 
-  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: 2})
+  commitSiren = (siren) => this.setState({siren: siren, step: 2})
 
-  commitDeclarant = (declarant,email,autorisation) => this.setState({declarant: declarant, email: email, autorisation: autorisation, step: 3})
+  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: 3})
 
-  commitPrice = (price) => this.setState({price: price, step: 4})
+  commitDeclarant = (declarant,email,autorisation) => this.setState({declarant: declarant, email: email, autorisation: autorisation, step: 4})
+
+  commitPrice = (price) => this.setState({price: price, step: 5})
 
   exportStatement = () => exportStatementPDF(this.state);
 
   submitStatement = async (event) => 
   {
     event.preventDefault();
-    this.setState({step: 5})
+    this.setState({step: 6})
     
     const statementFile = getBinaryPDF(this.state);
 
@@ -105,10 +108,37 @@ export class StatementSection extends React.Component {
     const messageToDeclarant = mailToDeclarantWriter(this.state);
     const resDeclarant = await sendStatementToDeclarant(this.state.email,messageToDeclarant,statementFile);
 
-    if (resAdmin.status<300) this.setState({step: 6})
+    if (resAdmin.status<300) this.setState({step: 7})
     else this.setState({step: 0})
   }
 
+}
+
+/* ----- Siren Form ---- */
+
+const SirenInput = ({siren,commitSiren}) => 
+{
+  const [sirenInput, setSiren] = useState(siren);
+  const onSirenChange = (event) => setSiren(event.target.value);
+  const onCommit = () => commitSiren(sirenInput)
+
+  const isAllValid = /^[0-9]{9}$/.test(sirenInput);
+
+  return(
+    <div className="section-view-main">
+      <h3>Numéro de siren</h3>
+      <div className="inline-input">
+        <label>Numéro de siren (9 chiffres) : </label>
+        <InputText value={sirenInput} 
+                   unvalid={sirenInput!="" && !/^[0-9]{9}$/.test(sirenInput)}
+                   onUpdate={onSirenChange}/>
+      </div>
+      <div className="actions">
+        <div></div>
+        <button disabled={!isAllValid} onClick={onCommit}>Valider</button>
+      </div>
+    </div> 
+  )
 }
 
 /* ----- Indicator selection ----- */
@@ -161,7 +191,7 @@ class IndicatorSelection extends React.Component
           </tbody>
         </table>
         <div className="actions">
-          <div></div>
+        <button onClick={this.props.goBack}>Retour</button>
           <button disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
         </div>
       </div>)
