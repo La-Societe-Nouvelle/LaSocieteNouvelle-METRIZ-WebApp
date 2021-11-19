@@ -26,7 +26,7 @@ const viewsForIndic = {
   soc: {min:0, max:100},
 }
 
-export const IndicatorGraphs = ({session,indic}) =>
+export const IndicatorGraphs = ({session,indic,comparativeFootprints}) =>
 {
   const {legalUnit,financialData} = session;
   const {production,netValueAdded,intermediateConsumption} = financialData.aggregates;
