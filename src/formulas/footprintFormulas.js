@@ -196,6 +196,9 @@ export const updateDepreciationExpensesIndicator = async (indic,financialData) =
     // Footprint (reste à amortir)
     expense.footprint.indicators[indic] = await buildIndicatorMerge(immobilisationIndicator, immobilisation.amount-amountImmobilisedProduction,
                                                                     depreciation.prevFootprint.indicators[indic], -(depreciation.amount-expense.amount));
+    // Le calcul de l'incertitude peut entraîner des résultats erronés, les valeurs étant supposées décorrélées et l'impact brut restant à amortir pouvant être faible
+    // L'incertitude associée est donc celle de la valeur associée à l'immobilisation
+    expense.footprint.indicators[indic].setUncertainty(immobilisationIndicator.getUncertainty());
     return;
   }));
   return;
