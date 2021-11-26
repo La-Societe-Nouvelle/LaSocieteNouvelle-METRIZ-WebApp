@@ -46,6 +46,8 @@ export class StatementSection extends React.Component {
       email: "",
       phone: "",
       autorisation: false,
+      forThirdParty: false,
+      declarantOrganisation: "",
 
       // tarif (step 6)
       price: "0"
@@ -71,11 +73,12 @@ export class StatementSection extends React.Component {
     {
       case 0: return <ErrorMessage />
       case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
-      case 2: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
-      case 3: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
-      case 4: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
-      case 5: return <StatementSendingMessage />
-      case 6: return <StatementSendMessage />
+      case 2: return <SirenForm siren={this.state.siren} onCommit={this.commitSiren} goBack={this.goBack}/>
+      case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
+      case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
+      case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
+      case 6: return <StatementSendingMessage />
+      case 7: return <StatementSendMessage />
     }
   }
 
@@ -84,18 +87,20 @@ export class StatementSection extends React.Component {
 
   // Commits
 
-  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: 2})
+  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: /^[0-9]{9}/.test(this.state.siren) ? 3 : 2})
 
-  commitDeclarant = (declarant,email,autorisation) => this.setState({declarant: declarant, email: email, autorisation: autorisation, step: 3})
+  commitSiren = (siren) => this.setState({siren: siren, step: 3})
 
-  commitPrice = (price) => this.setState({price: price, step: 4})
+  commitDeclarant = (declarant,email,autorisation) => this.setState({declarant: declarant, email: email, autorisation: autorisation, step: 4})
+
+  commitPrice = (price) => this.setState({price: price, step: 5})
 
   exportStatement = () => exportStatementPDF(this.state);
 
   submitStatement = async (event) => 
   {
     event.preventDefault();
-    this.setState({step: 5})
+    this.setState({step: 6})
     
     const statementFile = getBinaryPDF(this.state);
 
@@ -105,7 +110,7 @@ export class StatementSection extends React.Component {
     const messageToDeclarant = mailToDeclarantWriter(this.state);
     const resDeclarant = await sendStatementToDeclarant(this.state.email,messageToDeclarant,statementFile);
 
-    if (resAdmin.status<300) this.setState({step: 6})
+    if (resAdmin.status<300) this.setState({step: 7})
     else this.setState({step: 0})
   }
 
@@ -178,6 +183,48 @@ class IndicatorSelection extends React.Component
   
 }
 
+/* ----- Siren form ----- */
+
+class SirenForm extends React.Component {
+
+  // form for siren number
+
+  constructor(props)
+  {
+    super(props);
+    this.state = {
+      siren: props.siren
+    }
+  }
+
+  render()
+  {
+    const {siren} = this.state;
+    const isAllValid = /^[0-9]{9}/.test(siren);
+    
+    return(
+      <div className="section-view-main">
+        <h3>Unité légale</h3>
+        <div className="inline-input">
+          <label>Numéro de siren </label>
+          <InputText value={siren} 
+                      onUpdate={this.onSirenChange}/>
+        </div>
+        <div className="actions">
+          <button onClick={this.onGoBack}>Retour</button>
+          <button disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
+        </div>
+      </div>
+    )
+  }
+
+  onSirenChange = (input) => { this.setState({siren: input})}
+  onCommit = () => this.props.onCommit(this.state.siren);
+  onGoBack = () => this.props.goBack();
+
+}
+
+
 /* ----- Declarant form ----- */
 
 class DeclarantForm extends React.Component {
@@ -196,10 +243,11 @@ class DeclarantForm extends React.Component {
 
   render()
   {
-    const {declarant,email,autorisation} = this.state;
+    const {declarant,email,autorisation,forThirdParty,declarantOrganisation} = this.state;
     const isAllValid = declarant.length > 0 
                     && /^(.*)@(.*)\.(.*)$/.test(email) 
-                    && autorisation;
+                    && autorisation
+                    && (forThirdParty || declarantOrganisation.length > 0);
     
     return(
       <div className="section-view-main">
@@ -215,9 +263,19 @@ class DeclarantForm extends React.Component {
                      unvalid={email!="" && !/^(.*)@(.*)\.(.*)$/.test(email)}
                      onUpdate={this.onEmailChange.bind(this)}/>
         </div>
+        <div className="input" id="thirdParty">
+          <input type="checkbox" 
+                 onChange={this.onThirdPartyChange}/>
+          <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
+        </div>
+      {forThirdParty &&
+        <div className="inline-input">
+          <label>Structure déclarante</label>
+          <InputText value={declarantOrganisation}/>
+        </div>}
         <div className="input" id="certification">
           <input type="checkbox" 
-                 onChange={this.onCheckboxChange}/>
+                 onChange={this.onAutorisationChange}/>
             <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
         </div>
         <div className="actions">
@@ -230,8 +288,9 @@ class DeclarantForm extends React.Component {
 
   onDeclarantChange = (input) => { this.setState({declarant: input})}
   onEmailChange = (input) => { this.setState({email: input}) }
-  onCheckboxChange = () => { this.setState({autorisation: !this.state.autorisation})}
-  onCommit = () => this.props.onCommit(this.state.declarant,this.state.email,this.state.autorisation);
+  onAutorisationChange = () => { this.setState({autorisation: !this.state.autorisation})}
+  onThirdPartyChange = () => { this.setState({forThirdParty: !this.state.forThirdParty})}
+  onCommit = () => this.props.onCommit(this.state.declarant,this.state.email,this.state.autorisation,this.state.forThirdParty,this.state.declarantOrganisation);
   onGoBack = () => this.props.goBack();
 
 }
