@@ -1,15 +1,27 @@
 // La Société Nouvelle
 
-// Objects
+// Accounting Objects
 import { Expense } from '/src/accountingObjects/Expense';
 import { Immobilisation } from '/src/accountingObjects/Immobilisation';
 import { Depreciation } from '/src/accountingObjects/Depreciation'
 import { Stock } from '/src/accountingObjects/Stock';
+import { Account } from './accountingObjects/Account';
+
+// Other objects
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint'
 import { Company } from '/src/Company';
+import { getSumItems } from './utils/Utils';
 
-// Utils
-import { getNewId } from './utils/Utils';
+// list aggregates
+const metaAggregates = ["revenue",
+                        "production",
+                        "storedProduction",
+                        "intermediateConsumption",
+                        "purchasesStocksVariations",
+                        "externalExpenses",
+                        "grossValueAdded",
+                        "depreciationExpenses",
+                        "netValueAdded"];
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */
 
@@ -27,28 +39,34 @@ export class FinancialData {
         // data loaded state
         this.isFinancialDataLoaded = data.isFinancialDataLoaded || false;   
         
-        // Production
+        // Production ------------------------------ //
+
         this.revenue = data.revenue || 0;                                                                                                                               // revenue (#71)
-        this.storedProduction = data.storedProduction || 0;                                                                                                             // stored production (#71) -> variation
+        this.storedProduction = data.storedProduction || 0;                                                                                                             // stored production (#71)
         this.immobilisedProduction = data.immobilisedProduction || 0;                                                                                                   // immobilised production (#72)
 
-        // Expenses
-        this.expenses = data.expenses ? data.expenses.map((props,index) => new Expense({id: index, ...props})) : [];                                                    // external expenses (#60, #61, #62)
-        this.depreciationExpenses = data.depreciationExpenses ? data.depreciationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                // depreciation expenses (#6811, #6871)
+        // Expenses -------------------------------- //
 
-        // Stocks
-        this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                            // stocks (#31 to #35, #37)
+        this.expenses = data.expenses ? data.expenses.map((props,index) => new Expense({id: index, ...props})) : [];                                                    // external expenses (#60[^3], #61, #62)
         this.stockVariations = data.stockVariations ? data.stockVariations.map((props,index) => new Expense({id: index, ...props})) : [];                               // stock variation (#603, #71)
+        this.depreciationExpenses = data.depreciationExpenses ? data.depreciationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                // depreciation expenses (#6811, #6871)
         
-        // Immobilisations
-        this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                        // immobilisations (#20 to #27)
+        this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({id: props.id, ...props})) : [];
+        
+        // Stocks ---------------------------------- //
+        
+        this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                            // stocks (#31 to #35, #37)
+        
+        // Immobilisations ------------------------- //
+
         this.investments = data.investments ? data.investments.map((props,index) => new Expense({id: index, ...props})) : [];                                           // investments (flows #2 <- #404)
         this.immobilisationProductions = data.immobilisationProductions ? data.immobilisationProductions.map((props,index) => new Expense({id: index, ...props})) : []; // productions of immobilisations (flows #2 <- #72)
-
-        // Depreciations
+        
+        this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                        // immobilisations (#20 to #27)
         this.depreciations = data.depreciations ? data.depreciations.map((props,index) => new Depreciation({id: index, ...props})) : [];                                // depreciations (#28, #29 & #39)
 
-        // Other figures
+        // Other figures --------------------------- //
+
         this.financialIncomes = data.financialIncomes || 0;
         this.exceptionalIncomes = data.exceptionalIncomes || 0;
         this.otherOperatingIncomes = data.otherOperatingIncomes || 0;                                                                                                   //
@@ -63,9 +81,6 @@ export class FinancialData {
         // Companies
         this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
         
-        // Accounts (not use yet)
-        //this.accounts = data.accounts ? data.accounts.map((props) => new Account({id: props.accountNum, ...props})) : [];
-
     // ---------------------------------------------------------------------------------------------------- //
     }
 
@@ -123,6 +138,17 @@ export class FinancialData {
                 account.initialState = account.isProductionStock ? "currentFootprint" : "defaultData";
             }
         })
+
+        // Expense accounts
+        this.expenseAccounts.forEach(account =>
+        {
+            let prevProps = data.expenseAccounts.filter(prevAccount => prevAccount.accountNum = account.accountNum)[0];
+            if (prevProps!=undefined)
+            {
+                account.prevFootprint = new SocialFootprint(prevProps.footprint);
+                account.initialState = "prevFootprint";
+            }
+        })
     }
     
     /* ---------------------------------------- AMOUNTS GETTERS ---------------------------------------- */
@@ -145,14 +171,14 @@ export class FinancialData {
     // EXPENSES ------------------------------------------------ //
 
     // External penses
-    getAmountExternalExpenses = () => this.expenses.map(expense => expense.amount).reduce((a,b) => a + b,0)
-    getAmountExpensesByAccountAux = (accountNum) => this.expenses.filter(expense => expense.accountAux.startsWith(accountNum)).map(expense => expense.amount).reduce((a,b) => a + b,0)
+    getAmountExternalExpenses = () => getSumItems(this.expenses.map(expense => expense.amount))
+    getAmountExpensesByAccountAux = (accountNum) => getSumItems(this.expenses.filter(expense => expense.accountAux.startsWith(accountNum)).map(expense => expense.amount))
     
     // Depreciation expenses
-    getAmountDepreciationExpenses = () => this.depreciationExpenses.map(expense => expense.amount).reduce((a,b) => a + b,0)
-    getAmountOperatingDepreciationExpenses = () => this.depreciationExpenses.filter(expense => /^6811/.test(expense.account)).map(expense => expense.amount).reduce((a,b) => a + b,0)
-    getAmountExceptionalDepreciationExpenses = () => this.depreciationExpenses.filter(expense => /^6871/.test(expense.account)).map(expense => expense.amount).reduce((a,b) => a + b,0)
-    getAmountDepreciationExpensesByAccountAux = (accountNum) => this.depreciationExpenses.filter(expense => expense.accountAux.startsWith(accountNum)).map(expense => expense.amount).reduce((a,b) => a + b,0)
+    getAmountDepreciationExpenses = () => getSumItems(this.depreciationExpenses.map(expense => expense.amount))
+    getAmountOperatingDepreciationExpenses = () => getSumItems(this.depreciationExpenses.filter(expense => /^6811/.test(expense.account)).map(expense => expense.amount))
+    getAmountExceptionalDepreciationExpenses = () => getSumItems(this.depreciationExpenses.filter(expense => /^6871/.test(expense.account)).map(expense => expense.amount))
+    getAmountDepreciationExpensesByAccountAux = (accountNum) => getSumItems(this.depreciationExpenses.filter(expense => expense.accountAux.startsWith(accountNum)).map(expense => expense.amount))
 
     // STOCKS -------------------------------------------------- //
     

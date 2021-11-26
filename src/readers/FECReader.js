@@ -68,7 +68,7 @@ export async function FECFileReader(content)
 
   let dataFEC = {
     books: [],
-    meta: {books: {},accounts: {}, accountsAux: {}, firstDate: null, lastDate: null}
+    meta: {books: {},accounts: [], accountsAux: {}, firstDate: null, lastDate: null}
   };
 
   // Separator ------------------------------------------------------------------------------------------ //
@@ -114,7 +114,7 @@ export async function FECFileReader(content)
       }
 
       // Mise à jour des métadonnées relatives aux libellés de comptes
-      if (dataFEC.meta.accounts[rowData.CompteNum] == undefined) dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
+      if (dataFEC.meta.accounts.map(account => account.accountNum).includes(rowData.CompteNum)) dataFEC.meta.accounts.push({accountNum:rowData.CompteNum, accountLib:rowData.CompteLib});
       if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
 
       // Date
@@ -183,6 +183,7 @@ export async function FECDataReader(FECData)
   // Meta ----------------------------------------------------------------------------------------------- //
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
+  data.expenseAccounts = [];
   data.errors =[];
 
   // Production / Incomes ------------------------------------------------------------------------------- //
@@ -630,6 +631,9 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
     Comptes 69 - Participation des salariés, impôts sur les bénéfices et assimilés
   ----------------------------------------------------------------------------------------------------
   */
+
+  // Expense accounts
+  if (dataFEC.meta.expenseAccounts.map(account => account.accountNum).includes(rowData.CompteNum)) dataFEC.meta.expenseAccounts.push({accountNum:rowData.CompteNum,accountLib:rowData.CompteLib});
 
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
 

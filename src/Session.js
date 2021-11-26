@@ -19,6 +19,7 @@ import { buildIndicatorAggregate,
          updateDepreciationExpensesIndicator, 
          updateDepreciationsIndicator, 
          updateExternalExpensesIndicator, 
+         updateExternalExpensesAccountsIndicator,
          updateImmobilisationsIndicator, 
          updateInvestmentsIndicator, 
          updatePurchasesStocksIndicator, 
@@ -69,16 +70,6 @@ export class Session {
         this.validations = props.validations || [];
 
     // ---------------------------------------------------------------------------------------------------- //
-    }
-    
-    /* ---------------------------------------- ACCOUNTS FOOTPRINTS INITIALIZER ---------------------------------------- */
-
-    accountsFootprintsInitializer = () =>
-    {
-        let accounts = this.financialData.expenses.map(expense => expense.account)
-                                                  .filter((value, index, self) => index === self.findIndex(item => item.account === value.account));
-        this.accountsFootprints = {};
-        accounts.forEach(accountNum => this.accountsFootprints[accountNum] = new SocialFootprint({id: accountNum}));
     }
 
     /* -------------------- PROGRESSION -------------------- */    
@@ -165,7 +156,7 @@ export class Session {
         // External expenses
         await updateExternalExpensesIndicator(indic,this.financialData);
 
-        // Test (accounts)
+        // External expenses accounts
         await updateExternalExpensesAccountsIndicator(indic,this.financialData);
 
         // Purchasing stocks

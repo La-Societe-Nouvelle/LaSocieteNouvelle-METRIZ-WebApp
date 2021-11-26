@@ -81,9 +81,9 @@ export function buildIndicatorMerge(indicatorA,amountA,
 /* -------------------- FINANCIAL ITEMS INDICATORS FORMULAS -------------------- */
 /* ----------------------------------------------------------------------------- */
 
-/* ----- External expenses footprints ----- */
+/* ----- Empreintes des charges externes ----- */
 
-// company footprint is assign to the expense
+// Affectation de l'empreinte du fournisseur (compte auxiliaire)
 
 export const updateExternalExpensesIndicator = async (indic,financialData) =>
 {
@@ -98,13 +98,14 @@ export const updateExternalExpensesIndicator = async (indic,financialData) =>
   return;
 }
 
-/* ----- External expenses accounts footprints ----- */
+/* ----- Empreintes des comptes de charges externes ----- */
 
-// aggregate footprints by accounts
+// Agrégation des dépenses rattachées au compte
 
 export const updateExternalExpensesAccountsIndicator = async (indic,financialData) =>
 {
-    await Promise.all(Object.entries(financialData.accountsFootprints).map(async ([accountNum,footprint]) => 
+    await Promise.all(financialData.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum))
+                                                   .map(async ({accountNum,footprint}) => 
     {
         // filter expenses
         let expenses = financialData.expenses.filter(expense => expense.account == accountNum);
@@ -119,16 +120,16 @@ export const updateExternalExpensesAccountsIndicator = async (indic,financialDat
     return;
 }
 
-/* ----- Purchases stocks footprints ----- */
+/* ----- Empreinte des stocks d'achats ----- */
 
-// stock footprint is based on expenses related to the stock account
+// Agrégation des comptes de charges rattachés au compte de stock
 
 export const updatePurchasesStocksIndicator = async (indic,financialData) =>
 {
   let stocks = financialData.stocks.filter(stock => !stock.isProductionStock);
   await Promise.all(stocks.map(async (stock) =>
   {
-    let expensesRelatedToStock = getExpensesRelatedToStock(stock,financialData.expenses);
+    let expensesRelatedToStock = getAccountsRelatedToStock(stock,financialData.expenseAccounts);
     if (expensesRelatedToStock.length > 0) stock.footprint.indicators[indic] = await buildIndicatorAggregate(indic, expensesRelatedToStock);
     else                                   stock.footprint.indicators[indic] = stock.prevFootprint.indicators[indic];
     return;
@@ -136,17 +137,15 @@ export const updatePurchasesStocksIndicator = async (indic,financialData) =>
   return;
 }
 
-const getExpensesRelatedToStock = (stock,expenses) =>
+const getAccountsRelatedToStock = (stock,accounts) =>
 {
-  let expensesRelatedToStock = expenses.filter(expense => expense.account.startsWith(stock.accountAux));
+  let accountsRelatedToStock = accounts.filter(account => account.accountNum.startsWith(stock.accountAux));
   // case - no expenses related to stock
-  if (expensesRelatedToStock.length == 0) {
-    expensesRelatedToStock = expenses.filter(expense => expense.account.startsWith("60"+stock.account.charAt(1)));
-  }
-  return expensesRelatedToStock;
+  if (accountsRelatedToStock.length == 0) accountsRelatedToStock = expenses.filter(expense => expense.account.startsWith("60"+stock.account.charAt(1)));
+  return accountsRelatedToStock;
 }
 
-/* ----- Stocks (purchases) variations footprints ----- */
+/* ----- Empreinte des variations de stocks d'achats ----- */
 
 // stock variation footprint is based on initial & final footprint of the stock account
 // VS = SI - SF
@@ -163,6 +162,24 @@ export const updatePurchasesStocksVariationsIndicator = async (indic,financialDa
     return;
   }));
   return;
+}
+
+/* ----- Empreinte des comptes de variations de stocks d'achats ----- */
+
+// stock variation footprint is based on initial & final footprint of the stock account
+
+export const updatePurchasesStocksVariationsAccountsIndicator = async (indic,financialData) =>
+{
+    await Promise.all(financialData.expenseAccounts.filter(account => /^603/.test(account.accountNum))
+                                                   .map(async ({accountNum,footprint}) => 
+    {
+        // filter expenses
+        let stockVariations = financialData.stockVariations.filter(variation => variation.account == accountNum);
+        // build indicator
+        footprint.indicators[indic] = await buildIndicatorAggregate(indic,stockVariations);
+        return;
+    }));
+    return;
 }
 
 /* ----- Investments footprints ----- */
