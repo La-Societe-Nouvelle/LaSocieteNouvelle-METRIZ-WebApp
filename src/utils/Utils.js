@@ -1,6 +1,12 @@
 
 /* ----- PRINT VALUE ----- */
 
+/** Print value :
+ *    " - " if value null or undefined
+ *    value in parenthesis if negative
+ *    put spaces between numbers (x3)
+ */
+
 export function printValue(value,precision) 
 {
   if (value===null || value===undefined || value==="") {return " - "}
@@ -13,12 +19,6 @@ export function printValue(value,precision)
       return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
   }
-}
-
-export function printValueIf(value,precision,condition)
-{
-  if (condition) return printValue(value,precision);
-  else return " - ";
 }
 
 export function printValueInput(value,precision) {
