@@ -136,7 +136,7 @@ export class IndicatorSection extends React.Component {
               <button onClick={() => exportIndicPDF(this.state.indic,this.props.session)}>Editer rapport</button>
               <select value={selectedTable}
                       onChange={this.changeShowedTable}>
-                <option key="1" value="incomeStatement">Compte de résultat</option>
+                <option key="1" value="mainAggregates">Soldes intermédiaires de gestion</option>
                 <option key="2" value="expensesAccounts">Détails - Comptes de charges</option>
                 <option key="3" value="companies">Valeurs publiées - Fournisseurs</option>
               </select>
@@ -170,7 +170,7 @@ export class IndicatorSection extends React.Component {
   {
     switch(selectedTable) 
     {
-      case "incomeStatement" :  return(<IndicatorStatementTable session={this.props.session} indic={this.state.indic}/>)
+      case "mainAggregates" :  return(<IndicatorStatementTable session={this.props.session} indic={this.state.indic}/>)
       case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.state.indic}/>)
       case "companies" :        return(<IndicatorCompaniesTable session={this.props.session} indic={this.state.indic}/>)
     }
