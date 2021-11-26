@@ -350,32 +350,33 @@ const ErrorMessage = () =>
 
 const mailToAdminWriter = (statementData) => 
 (
-    "Unité légale : "+statementData.siren + "\r"
-  + "Dénomination : "+statementData.denomination + "\r"
-  + "Année : "+statementData.year + "\r"
-  + "\r"
-  + "Valeurs à publier :" + "\r"
-  + "\r"
-  + Object.entries(statementData.socialFootprint).map(([_,indicator]) => (indicator.indic+" : "+indicator.value+" +/- "+indicator.uncertainty+" % "+"\r"))
-  + "\r"
-  + "Déclarant :" + "\r"
-  + "Nom : "+" - " + "\r"
-  + "Mail : "+" - " + "\r"
-  + "\r"
-  + "Tarif :" +" - " +" €" + "\r"
+    "Unité légale : "+statementData.siren + "\n"
+  + "Dénomination : "+statementData.denomination + "\n"
+  + "Année : "+statementData.year + "\n"
+  + "\n"
+  + "Valeurs à publier :" + "\n"
+  + "\n"
+  + Object.entries(statementData.socialFootprint).map(([_,indicator]) => (indicator.indic+" : "+indicator.value+" +/- "+indicator.uncertainty+" % "))
+                                                 .reduce((a,b) => a+"\r\n"+b,"")
+  + "\n"
+  + "Déclarant :" + "\n"
+  + "Nom : "+" - " + "\n"
+  + "Mail : "+" - " + "\n"
+  + "\n"
+  + "Tarif :" +" - " +" €" + "\n"
 )
 
 const mailToDeclarantWriter = (statementData) => 
 (
     ""
-  + statementData.declarant+"," + "\r"
-  + "\r"
-  + "Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration." + "\r"
-  + "Le délai de traitement est de 7 jours." + "\r"
-  + "\r"
-  + "Pour modifier ou supprimer les données publiées, contactez-nous directement via l'adresse mail admin@lasocietenouvelle.org" + "\r"
-  + "\r"
-  + "Bien à vous," + "\r"
-  + "\r"
-  + "La Société Nouvelle." + "\r"
+  + statementData.declarant+"," + "\n"
+  + "\n"
+  + "Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration." + "\n"
+  + "Le délai de traitement est de 7 jours." + "\n"
+  + "\n"
+  + "Pour modifier ou supprimer les données publiées, contactez-nous directement via l'adresse mail admin@lasocietenouvelle.org" + "\n"
+  + "\n"
+  + "Bien à vous," + "\n"
+  + "\n"
+  + "La Société Nouvelle."
 )
