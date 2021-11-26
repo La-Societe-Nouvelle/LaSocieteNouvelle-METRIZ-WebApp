@@ -9,7 +9,7 @@ import { buildIndicatorAggregate } from '../../src/formulas/footprintFormulas';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
-export const IndicatorStatementTable = ({indic,session}) =>
+export const IndicatorMainAggregatesTable = ({indic,session}) =>
 {
   const financialData = session.financialData;
 
