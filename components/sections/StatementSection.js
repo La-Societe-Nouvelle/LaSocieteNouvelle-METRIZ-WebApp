@@ -48,7 +48,7 @@ export class StatementSection extends React.Component {
       autorisation: false,
 
       // tarif (step 6)
-      price: ""
+      price: "0"
     }
   }
 
