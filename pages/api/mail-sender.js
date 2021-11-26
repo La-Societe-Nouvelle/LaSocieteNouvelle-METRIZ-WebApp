@@ -25,7 +25,7 @@ export default async (req,res) =>
 const mailer = ({objetMail,messageMail,recipientMail,attachments}) => 
 {
     const mail = {
-        from: "La Société Nouvelle <sender@lasocietenouvelle.org>",
+        from: "La Société Nouvelle <no-reply@lasocietenouvelle.org>",
         to: recipientMail,
         subject: objetMail,
         text: messageMail,
