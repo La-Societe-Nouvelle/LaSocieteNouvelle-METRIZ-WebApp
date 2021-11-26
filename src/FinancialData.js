@@ -61,7 +61,10 @@ export class FinancialData {
         this.taxOnProfits = data.taxOnProfits || 0;                                                                                                                     // #69
 
         // Companies
-        this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];                                                       // Companies
+        this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
+        
+        // Accounts (not use yet)
+        //this.accounts = data.accounts ? data.accounts.map((props) => new Account({id: props.accountNum, ...props})) : [];
 
     // ---------------------------------------------------------------------------------------------------- //
     }

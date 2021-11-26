@@ -98,6 +98,27 @@ export const updateExternalExpensesIndicator = async (indic,financialData) =>
   return;
 }
 
+/* ----- External expenses accounts footprints ----- */
+
+// aggregate footprints by accounts
+
+export const updateExternalExpensesAccountsIndicator = async (indic,financialData) =>
+{
+    await Promise.all(Object.entries(financialData.accountsFootprints).map(async ([accountNum,footprint]) => 
+    {
+        // filter expenses
+        let expenses = financialData.expenses.filter(expense => expense.account == accountNum);
+        // control uncertainty
+        expenses.filter(expense => expense.amount < 0)
+                .filter(expense => expenses.filter(item => item.amount > 0 && item.company == expense.company).length > 0)
+                .forEach(expense => expense.footprint.indicators[indic].uncertainty = 0);
+        // build indicator
+        footprint.indicators[indic] = await buildIndicatorAggregate(indic,expenses);
+        return;
+    }));
+    return;
+}
+
 /* ----- Purchases stocks footprints ----- */
 
 // stock footprint is based on expenses related to the stock account

@@ -199,6 +199,7 @@ export class FinancialDataSection extends React.Component {
       this.props.session.financialData = new FinancialData(nextFinancialData);
       this.props.session.financialData.companiesInitializer();
       this.props.session.financialData.initialStatesInitializer();
+      this.props.session.accountsFootprintsInitializer();
       // load impacts data
       this.props.session.impactsData.netValueAdded = this.props.session.financialData.getNetValueAdded();
       this.loadKNWData(nextFinancialData.KNWData);

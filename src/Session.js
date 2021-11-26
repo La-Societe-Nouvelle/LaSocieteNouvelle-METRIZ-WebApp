@@ -60,10 +60,25 @@ export class Session {
 
         this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
 
+        // Footprints (Comptes)
+
+        this.accountsFootprints = {};
+        Object.entries(props.accountsFootprints || {}).forEach(([accountNum,footprint]) => this.accountsFootprints[accountNum] = new SocialFootprint(footprint));
+
         // Validations 
         this.validations = props.validations || [];
 
     // ---------------------------------------------------------------------------------------------------- //
+    }
+    
+    /* ---------------------------------------- ACCOUNTS FOOTPRINTS INITIALIZER ---------------------------------------- */
+
+    accountsFootprintsInitializer = () =>
+    {
+        let accounts = this.financialData.expenses.map(expense => expense.account)
+                                                  .filter((value, index, self) => index === self.findIndex(item => item.account === value.account));
+        this.accountsFootprints = {};
+        accounts.forEach(accountNum => this.accountsFootprints[accountNum] = new SocialFootprint({id: accountNum}));
     }
 
     /* -------------------- PROGRESSION -------------------- */    
@@ -149,6 +164,9 @@ export class Session {
         
         // External expenses
         await updateExternalExpensesIndicator(indic,this.financialData);
+
+        // Test (accounts)
+        await updateExternalExpensesAccountsIndicator(indic,this.financialData);
 
         // Purchasing stocks
         await updatePurchasesStocksIndicator(indic,this.financialData);
