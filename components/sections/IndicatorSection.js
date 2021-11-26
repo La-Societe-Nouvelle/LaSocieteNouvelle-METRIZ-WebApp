@@ -7,7 +7,7 @@ import metaIndics from '/lib/indics';
 import React from 'react';
 
 // Tab Components
-import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
+import { IndicatorMainAggregatesTable, IndicatorStatementTable } from '../tables/IndicatorMainAggregatesTable';
 import { IndicatorExpensesTable } from '../tables/IndicatorExpensesTable';
 import { IndicatorCompaniesTable } from '../tables/IndicatorCompaniesTable';
 import { IndicatorGraphs } from '../graphs/IndicatorGraphs';
@@ -34,6 +34,7 @@ import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
 import { exportIndicPDF } from '/src/writers/Export';
+import { IndicatorIncomeStatementTable } from '../tables/IndicatorIncomeStatementTable';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
