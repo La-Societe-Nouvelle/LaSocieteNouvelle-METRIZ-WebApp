@@ -1,7 +1,13 @@
 // La Société Nouvelle
 
 // Components
+import { roundValue } from '../utils/Utils';
+
+// Utils
 import { Indicator } from '/src/footprintObjects/Indicator';
+
+// Librairies
+import metaIndics from '/lib/indics';
 
 /* ------------------------------------------------------------ */
 /* -------------------- FOOTPRINT FORMULAS -------------------- */
@@ -35,8 +41,8 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
     })
 
     if (!missingData && totalAmount != 0) { 
-        indicator.setValue(grossImpact/totalAmount);
-        let uncertainty = Math.abs(grossImpact) > 0 ? Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100 : 0;
+        indicator.setValue(roundValue(grossImpact/totalAmount,metaIndics[indic].nbDecimals));
+        let uncertainty = Math.abs(grossImpact) > 0 ? roundValue(Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100 ,0) : 0;
         indicator.setUncertainty(uncertainty);
     } else if (elements.length == 0) {
         indicator.setValue(0); 
@@ -65,8 +71,8 @@ export function buildIndicatorMerge(indicatorA,amountA,
                            + Math.min(indicatorB.getValueMax()*amountB, indicatorB.getValueMin()*amountB);
 
         if (totalAmount != 0) {
-            indicator.setValue(grossImpact/totalAmount);
-            let uncertainty = Math.abs(grossImpact) > 0 ? Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100 : 0;
+            indicator.setValue(roundValue(grossImpact/totalAmount,metaIndics[indicator.indic].nbDecimals));
+            let uncertainty = Math.abs(grossImpact) > 0 ? roundValue(Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100,0) : 0;
             indicator.setUncertainty(uncertainty);
         } else {
             indicator.setValue(null); 
