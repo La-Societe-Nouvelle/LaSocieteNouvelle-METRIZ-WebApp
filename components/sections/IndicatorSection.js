@@ -7,7 +7,7 @@ import metaIndics from '/lib/indics';
 import React from 'react';
 
 // Tab Components
-import { IndicatorStatementTable } from '../tables/IndicatorStatementTable';
+import { IndicatorMainAggregatesTable, IndicatorStatementTable } from '../tables/IndicatorMainAggregatesTable';
 import { IndicatorExpensesTable } from '../tables/IndicatorExpensesTable';
 import { IndicatorCompaniesTable } from '../tables/IndicatorCompaniesTable';
 import { IndicatorGraphs } from '../graphs/IndicatorGraphs';
@@ -34,6 +34,7 @@ import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
 import { exportIndicPDF } from '/src/writers/Export';
+import { IndicatorIncomeStatementTable } from '../tables/IndicatorIncomeStatementTable';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -136,9 +137,10 @@ export class IndicatorSection extends React.Component {
               <button onClick={() => exportIndicPDF(this.state.indic,this.props.session)}>Editer rapport</button>
               <select value={selectedTable}
                       onChange={this.changeShowedTable}>
-                <option key="1" value="incomeStatement">Compte de résultat</option>
-                <option key="2" value="expensesAccounts">Détails - Comptes de charges</option>
-                <option key="3" value="companies">Valeurs publiées - Fournisseurs</option>
+                <option key="1" value="mainAggregates">Soldes intermédiaires de gestion</option>
+                <option key="2" value="incomeStatement">Compte de résultat</option>
+                <option key="3" value="expensesAccounts">Détails - Comptes de charges</option>
+                <option key="4" value="companies">Valeurs publiées - Fournisseurs</option>
               </select>
             </div>
             {this.buildtable(selectedTable)}
@@ -170,7 +172,8 @@ export class IndicatorSection extends React.Component {
   {
     switch(selectedTable) 
     {
-      case "incomeStatement" :  return(<IndicatorStatementTable session={this.props.session} indic={this.state.indic}/>)
+      case "mainAggregates" :   return(<IndicatorMainAggregatesTable session={this.props.session} indic={this.state.indic}/>)
+      case "incomeStatement" :  return(<IndicatorIncomeStatementTable session={this.props.session} indic={this.state.indic}/>)
       case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.state.indic}/>)
       case "companies" :        return(<IndicatorCompaniesTable session={this.props.session} indic={this.state.indic}/>)
     }
