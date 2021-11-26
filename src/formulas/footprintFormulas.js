@@ -141,7 +141,7 @@ const getAccountsRelatedToStock = (stock,accounts) =>
 {
   let accountsRelatedToStock = accounts.filter(account => account.accountNum.startsWith(stock.accountAux));
   // case - no expenses related to stock
-  if (accountsRelatedToStock.length == 0) accountsRelatedToStock = expenses.filter(expense => expense.account.startsWith("60"+stock.account.charAt(1)));
+  if (accountsRelatedToStock.length == 0) accountsRelatedToStock = accounts.filter(account => account.accountNum.startsWith("60"+stock.account.charAt(1)));
   return accountsRelatedToStock;
 }
 
