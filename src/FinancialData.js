@@ -10,7 +10,8 @@ import { Account } from './accountingObjects/Account';
 // Other objects
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint'
 import { Company } from '/src/Company';
-import { getSumItems } from './utils/Utils';
+import { getAmountItems, getPrevAmountItems, getSumItems } from './utils/Utils';
+import { Aggregate } from './accountingObjects/Aggregate';
 
 // list aggregates
 const metaAggregates = ["revenue",
@@ -80,6 +81,9 @@ export class FinancialData {
 
         // Companies
         this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
+
+        // Aggregates
+        data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : this.aggregatesBuilder();
         
     // ---------------------------------------------------------------------------------------------------- //
     }
@@ -88,7 +92,106 @@ export class FinancialData {
 
     aggregatesBuilder = () =>
     {
-        // to write
+        this.aggregates = {}
+
+        // MAIN AGGREGATES ----------------------------------------- //
+
+        this.aggregates.production = new Aggregate({
+            label: "Production",
+            amount: this.getRevenue() + this.getStoredProduction() + this.getImmobilisedProduction()
+        });
+
+        this.aggregates.intermediateConsumption = new Aggregate({
+            label: "Consommations intermédiaires",
+            amount: this.getAmountExternalExpenses() - this.getVariationPurchasesStocks()
+        })
+
+        this.aggregates.grossValueAdded = new Aggregate({
+            label: "Valeur ajoutée brute",
+            amount: this.getProduction() - this.getAmountIntermediateConsumption()
+        })
+
+        this.aggregates.capitalConsumption = new Aggregate({
+            label: "Consommations de capital fixe",
+            amount: this.getAmountDepreciationExpenses()
+        })
+
+        this.aggregates.netValueAdded = new Aggregate({
+            label: "Valeur ajoutée nette",
+            amount: this.getGrossValueAdded() - this.getAmountDepreciationExpenses()
+        })
+
+        // PRODUCTION ---------------------------------------------- //
+
+        this.aggregates.revenue = new Aggregate({
+            label: "Chiffre d'affaires",
+            amount: this.revenue
+        });
+        this.aggregates.storedProduction = new Aggregate({
+            label: "Production stockée",
+            amount: getSumItems(this.stocks.filter(stock => stock.isProductionStock).map(stock => stock.amount - stock.prevAmount))
+        });
+        this.aggregates.immobilisedProduction = new Aggregate({
+            label: "Production immobilisée",
+            amount: this.immobilisedProduction
+        });
+
+        // EXPENSES ------------------------------------------------ //
+
+        this.aggregates.externalExpenses = new Aggregate({
+            label: "Charges externes",
+            amount: getAmountItems(this.expenses)
+        });
+        this.aggregates.depreciationExpenses = new Aggregate({
+            label: "Dotations aux amortissements sur immobilisations",
+            amount: getAmountItems(this.depreciationExpenses)
+        });
+        this.aggregates.storedPurchases = new Aggregate({
+            label: "Variation de stock d'achats et de marchandises",
+            amount: getSumItems(this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.amount - stock.prevAmount))
+        });
+
+        // STOCKS -------------------------------------------------- //
+
+        // Purchases
+        this.aggregates.purchaseStocks = new Aggregate({
+            label: "Stocks d'achats et de marchandises",
+            amount: getAmountItems(this.stocks.filter(stock => !stock.isProductionStock)),
+            prevAmount: getPrevAmountItems(this.stocks.filter(stock => !stock.isProductionStock))
+        });
+
+        // Production
+        this.aggregates.productionStocks = new Aggregate({
+            label: "Stocks de production",
+            amount: getAmountItems(this.stocks.filter(stock => stock.isProductionStock)),
+            prevAmount: getPrevAmountItems(this.stocks.filter(stock => stock.isProductionStock))
+        });
+
+        // Stocks
+        this.aggregates.stocksVariation = new Aggregate({
+            label: "Variation des stocks",
+            amount: getSumItems(this.stocks.map(stock => stock.amount - stock.prevAmount))
+        });
+        this.aggregates.stocks = new Aggregate({
+            label: "Stocks",
+            amount: getAmountItems(this.stocks),
+            prevAmount: getPrevAmountItems(this.stocks)
+        });
+
+        // IMMOBILISATIONS ----------------------------------------- //
+
+        // Immobilisation
+        this.aggregates.grossAmountImmobilisation = new Aggregate({
+            label: "Immobilisations",
+            amount: getAmountItems(this.immobilisations),
+            prevAmount: getPrevAmountItems(this.immobilisations)
+        });
+        this.aggregates.netAmountImmobilisation = new Aggregate({
+            label: "Immobilisations",
+            amount: getSumItems(this.immobilisations.map(immobilisation => immobilisation.amount - this.getFinalValueLossImmobilisation(immobilisation.account))),
+            prevAmount: getSumItems(this.immobilisations.map(immobilisation => immobilisation.prevAmount - this.getInitialValueLossImmobilisation(immobilisation.account)))
+        });
+
     }
 
     /* ---------------------------------------- COMPANIES INITIALIZER ---------------------------------------- */
@@ -211,38 +314,40 @@ export class FinancialData {
     getFinalNetAmountImmobilisations = () => this.immobilisations.map(immobilisation => immobilisation.amount - this.getFinalValueLossImmobilisation(immobilisation.account)).reduce((a,b) => a + b,0)
     
     // Value loss
-    getInitialValueLossImmobilisation = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount).reduce((a,b) => a+b,0)
-    getFinalValueLossImmobilisation = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux==accountNum).map(depreciation => depreciation.amount).reduce((a,b) => a+b,0)
-
-    // Amounts
-    getInitialAmountImmobilisations = () => this.immobilisations.map(immobilisation => immobilisation.prevAmount).reduce((a,b) => a + b,0)
-    getFinalAmountImmobilisations = () => this.immobilisations.map(immobilisation => immobilisation.amount).reduce((a,b) => a + b,0)
+    getInitialValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount))
+    getFinalValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux==accountNum).map(depreciation => depreciation.amount))
 
     // OTHER KEY FIGURES --------------------------------------- //
 
-    // Incomes
+    // Operating section
+
     getAmountOperatingIncomes = () => this.getProduction()+this.getAmountOtherOperatingIncomes();
     getAmountOtherOperatingIncomes = () => this.otherOperatingIncomes;
-    getAmountFinancialIncomes = () => this.financialIncomes;
-    getAmountExceptionalIncomes = () => this.exceptionalIncomes;
-
-    // Expenses
-    getAmountOperatingExpenses = () => this.getAmountIntermediateConsumption()+this.getAmountTaxes()+this.getAmountPersonnelExpenses()+this.getAmountDepreciationExpenses()+this.getAmountProvisions()+this.getAmountOtherExpenses()
 
     getAmountTaxes = () => this.taxes;
     getAmountPersonnelExpenses = () => this.personnelExpenses;
     getAmountOtherExpenses = () => this.otherExpenses;
+    getAmountOperatingExpenses = () => this.getAmountIntermediateConsumption()+this.getAmountTaxes()+this.getAmountPersonnelExpenses()+this.getAmountDepreciationExpenses()+this.getAmountProvisions()+this.getAmountOtherExpenses()
+
+    getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountOperatingExpenses();
+
+    
+    // Financial section
+    
+    getAmountFinancialIncomes = () => this.financialIncomes;
     getAmountFinancialExpenses = () => this.financialExpenses;
+    getFinancialResult = () => this.getAmountFinancialIncomes() - this.getAmountFinancialExpenses();
+    
+    // Exceptionnal section
+    
+    getAmountExceptionalIncomes = () => this.exceptionalIncomes;
     getAmountExceptionalExpenses = () => this.exceptionalExpenses;
+    getExceptionalResult = () => this.getAmountExceptionalIncomes() - this.getAmountExceptionalExpenses();
+    
+    // Profit
+
     getAmountProvisions = () => this.provisions;
     getAmountTaxOnProfits = () => this.taxOnProfits;
-
-    // Results
-    getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountOperatingExpenses();
-    getFinancialResult = () => this.getAmountFinancialIncomes() - this.getAmountFinancialExpenses();
-    getExceptionalResult = () => this.getAmountExceptionalIncomes() - this.getAmountExceptionalExpenses();
-
-    // Profit
     getProfit = () => this.getOperatingResult()+this.getFinancialResult()+this.getExceptionalResult()-this.getAmountTaxOnProfits();
 
     /* ---------------------------------------- INTERACTIONS ---------------------------------------- */
