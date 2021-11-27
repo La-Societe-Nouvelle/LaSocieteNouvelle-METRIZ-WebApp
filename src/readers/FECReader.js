@@ -2,6 +2,7 @@
 
 // Libraries
 import booksProps from '../../lib/books'
+import { roundValue } from '../utils/Utils';
 
 // FEC colums
 const columnsFEC = ["JournalCode",
@@ -46,7 +47,7 @@ const columnsFEC = ["JournalCode",
 
 /* -------------------- PARSER -------------------- */
 
-const parseAmount = (stringAmount) => parseFloat(stringAmount.replace(',','.'))
+const parseAmount = (stringAmount) => roundValue(parseFloat(stringAmount.replace(',','.')),2)
 
 /* -------------------- BALANCE CHECKER -------------------- */
 
@@ -183,7 +184,7 @@ export async function FECDataReader(FECData)
   // Meta ----------------------------------------------------------------------------------------------- //
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
-  data.expenseAccounts = [];
+  //data.expenseAccounts = [];
   data.errors =[];
 
   // Production / Incomes ------------------------------------------------------------------------------- //
@@ -633,7 +634,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
   */
 
   // Expense accounts
-  if (!data.expenseAccounts.map(account => account.accountNum).includes(ligneCourante.CompteNum)) data.expenseAccounts.push({accountNum:ligneCourante.CompteNum,accountLib:ligneCourante.CompteLib});
+  //if (!data.expenseAccounts.map(account => account.accountNum).includes(ligneCourante.CompteNum)) data.expenseAccounts.push({accountNum:ligneCourante.CompteNum,accountLib:ligneCourante.CompteLib});
 
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
 
