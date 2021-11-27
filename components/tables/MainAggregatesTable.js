@@ -12,6 +12,15 @@ export const MainAggregatesTable = ({financialData}) =>
 
   const depreciationExpensesGroups = financialData.getBasicDepreciationExpensesGroups();
         depreciationExpensesGroups.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+
+  const {production,
+         revenue,
+         storedProduction,
+         immobilisedProduction,
+         intermediateConsumption,
+         storedPurchases,
+         depreciationExpenses,
+         netValueAdded} = financialData.aggregates;
   
   return(
     <div className="table-main">
@@ -25,28 +34,28 @@ export const MainAggregatesTable = ({financialData}) =>
           
           <tr>
             <td>Production sur l'exercice courant</td>
-            <td className="column_value important">{printValue(financialData.getProduction(),0)}</td>
+            <td className="column_value important">{printValue(production.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;Chiffre d'Affaires</td>
-            <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
+            <td className="column_value">{printValue(revenue.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;Production stockée</td>
-            <td className="column_value">{printValue(financialData.getStoredProduction(),0)}</td>
+            <td className="column_value">{printValue(storedProduction.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;Production immobilisée</td>
-            <td className="column_value">{printValue(financialData.getImmobilisedProduction(),0)}</td>
+            <td className="column_value">{printValue(immobilisedProduction.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>          
           
           <tr className="with-top-line">
             <td>Consommations intermédiaires</td>
-            <td className="column_value important">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
+            <td className="column_value important">{printValue(intermediateConsumption.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
+            <td className="column_value">{printValue(-storedPurchases.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
         {expensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
@@ -56,8 +65,8 @@ export const MainAggregatesTable = ({financialData}) =>
           </tr>)}
 
           <tr className="with-top-line">
-            <td>Dotations aux amortissements sur immobilisations</td>
-            <td className="column_value important">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
+            <td>Consommations de capital fixe</td>
+            <td className="column_value important">{printValue(depreciationExpenses.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
         {depreciationExpensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
@@ -68,7 +77,7 @@ export const MainAggregatesTable = ({financialData}) =>
 
           <tr className="with-top-line">
             <td>Valeur ajoutée nette</td>
-            <td className="column_value important">{printValue(financialData.getNetValueAdded(),0)}</td>
+            <td className="column_value important">{printValue(netValueAdded.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
           <tr>
             <td>&emsp;dont charges de personnel</td>

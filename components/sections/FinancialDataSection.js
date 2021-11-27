@@ -3,21 +3,25 @@
 // React
 import React from 'react';
 
-// Components
+// Objects
+import { FinancialData } from '../../src/FinancialData';
+
+// Tables
 import { MainAggregatesTable } from '../tables/MainAggregatesTable';
 import { ImmobilisationsTable } from '../tables/ImmobilisationsTable';
 import { IncomeStatementTable } from '../tables/IncomeStatementTable';
 import { ExpensesTable } from '../tables/ExpensesTable';
 import { StocksTable } from '../tables/StocksTable';
+
+// Components
 import { FECImportPopup } from '../popups/FECImportPopup';
+import { MessagePopup } from '../popups/MessagePopup';
 
 // Readers
 import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
 
 // Libraries
 import indics from '/lib/indics.json';
-import { MessagePopup } from '../popups/MessagePopup';
-import { FinancialData } from '../../src/FinancialData';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */

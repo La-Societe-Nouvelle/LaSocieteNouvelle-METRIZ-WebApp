@@ -83,9 +83,9 @@ export function buildIndicatorMerge(indicatorA,amountA,
     return indicator;
 }
 
-/* ----------------------------------------------------------------------------- */
-/* -------------------- FINANCIAL ITEMS INDICATORS FORMULAS -------------------- */
-/* ----------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------- */
+/* -------------------- ASSIGN COMPANIES FOOTPRINTS -------------------- */
+/* --------------------------------------------------------------------- */
 
 /* ----- Empreintes des charges externes ----- */
 
@@ -104,7 +104,28 @@ export const updateExternalExpensesIndicator = async (indic,financialData) =>
   return;
 }
 
-/* ----- Empreintes des comptes de charges externes ----- */
+/* ----- Investments footprints ----- */
+
+// company footprint is assign to the investment
+
+export const updateInvestmentsIndicator = async (indic,financialData) =>
+{
+  await Promise.all(financialData.investments.map(async (investment) => 
+  {
+    // fetch company
+    let company = financialData.getCompanyByAccount(investment.accountAux);
+    // assign indicator
+    investment.footprint.indicators[indic] = company.footprint.indicators[indic];
+    return;
+  }));
+  return;
+}
+
+/* -------------------------------------------------------------------------------- */
+/* -------------------- FINANCIAL ACCOUNTS INDICATORS FORMULAS -------------------- */
+/* -------------------------------------------------------------------------------- */
+
+/* ---------- Empreintes des comptes de charges externes ---------- */
 
 // Agrégation des dépenses rattachées au compte
 
@@ -126,7 +147,7 @@ export const updateExternalExpensesAccountsIndicator = async (indic,financialDat
     return;
 }
 
-/* ----- Empreinte des stocks d'achats ----- */
+/* ---------- Empreinte des stocks d'achats ---------- */
 
 // Agrégation des comptes de charges rattachés au compte de stock
 
@@ -135,8 +156,8 @@ export const updatePurchasesStocksIndicator = async (indic,financialData) =>
   let stocks = financialData.stocks.filter(stock => !stock.isProductionStock);
   await Promise.all(stocks.map(async (stock) =>
   {
-    let expensesRelatedToStock = getAccountsRelatedToStock(stock,financialData.expenseAccounts);
-    if (expensesRelatedToStock.length > 0) stock.footprint.indicators[indic] = await buildIndicatorAggregate(indic, expensesRelatedToStock);
+    let accountsRelatedToStock = getAccountsRelatedToStock(stock,financialData.expenseAccounts);
+    if (accountsRelatedToStock.length > 0) stock.footprint.indicators[indic] = await buildIndicatorAggregate(indic, accountsRelatedToStock);
     else                                   stock.footprint.indicators[indic] = stock.prevFootprint.indicators[indic];
     return;
   }));
@@ -151,7 +172,7 @@ const getAccountsRelatedToStock = (stock,accounts) =>
   return accountsRelatedToStock;
 }
 
-/* ----- Empreinte des variations de stocks d'achats ----- */
+/* ---------- Empreinte des variations de stocks d'achats ---------- */
 
 // stock variation footprint is based on initial & final footprint of the stock account
 // VS = SI - SF
@@ -160,11 +181,11 @@ const getAccountsRelatedToStock = (stock,accounts) =>
 export const updatePurchasesStocksVariationsIndicator = async (indic,financialData) =>
 {
   let stocksVariations = financialData.stockVariations.filter(stockVariation => /^6/.test(stockVariation.account));
-  await Promise.all(stocksVariations.map(async (stockVariation) =>
+  await Promise.all(stocksVariations.map(async (variation) =>
   {
-    let stock = financialData.getStockByAccount(stockVariation.accountAux);
-    stockVariation.footprint.indicators[indic] = await buildIndicatorMerge(stock.prevFootprint.indicators[indic], stock.prevAmount,
-                                                                           stock.footprint.indicators[indic], -stock.amount);
+    let stock = financialData.getStockByAccount(variation.accountAux);
+    variation.footprint.indicators[indic] = await buildIndicatorMerge(stock.prevFootprint.indicators[indic], stock.prevAmount,
+                                                                      stock.footprint.indicators[indic], -stock.amount);
     return;
   }));
   return;
@@ -186,23 +207,6 @@ export const updatePurchasesStocksVariationsAccountsIndicator = async (indic,fin
         return;
     }));
     return;
-}
-
-/* ----- Investments footprints ----- */
-
-// company footprint is assign to the investment
-
-export const updateInvestmentsIndicator = async (indic,financialData) =>
-{
-  await Promise.all(financialData.investments.map(async (investment) => 
-  {
-    // fetch company
-    let company = financialData.getCompanyByAccount(investment.accountAux);
-    // assign indicator
-    investment.footprint.indicators[indic] = company.footprint.indicators[indic];
-    return;
-  }));
-  return;
 }
 
 /* ----- Depreciation expenses footprints ----- */
@@ -246,6 +250,24 @@ export const updateDepreciationExpensesIndicator = async (indic,financialData) =
     return;
   }));
   return;
+}
+
+/* ---------- Empreintes des comptes de charges externes ---------- */
+
+// Agrégation des dotations rattachées au compte
+
+export const updateDepreciationExpensesAccountsIndicator = async (indic,financialData) =>
+{
+    await Promise.all(financialData.expenseAccounts.filter(account => /^68/.test(account.accountNum))
+                                                   .map(async ({accountNum,footprint}) => 
+    {
+        // filter expenses
+        let expenses = financialData.depreciationExpenses.filter(expense => expense.account == accountNum);
+        // build indicator
+        footprint.indicators[indic] = await buildIndicatorAggregate(indic,expenses);
+        return;
+    }));
+    return;
 }
 
 /* ----- Immoblisations footprints ----- */
@@ -307,6 +329,70 @@ export const updateDepreciationsIndicator = async (indic,financialData) =>
   return;
 }
 
+/* ---------------------------------------------------------------------------------- */
+/* -------------------- FINANCIAL AGGREGATES INDICATORS FORMULAS -------------------- */
+/* ---------------------------------------------------------------------------------- */
+
+export const updateAggregatesFootprints = async (indic,financialData) =>
+{
+    const {netValueAdded,
+           externalExpenses,
+           storedPurchases,
+           intermediateConsumption,
+           capitalConsumption,
+           grossValueAdded,
+           production} = financialData.aggregates;
+
+    // External expenses
+    let externalExpensesAccounts = financialData.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum));
+    externalExpenses.footprint.indicators[indic] = await buildIndicatorAggregate(indic,externalExpensesAccounts);
+    
+    // Purchasing stock Variations
+    let purchaseStocksVariationsAccounts = financialData.expenseAccounts.filter(account => /^603/.test(account.accountNum));
+    storedPurchases.footprint.indicators[indic] = await buildIndicatorAggregate(indic,purchaseStocksVariationsAccounts);
+    
+    // Intermediate consumption
+    let expensesAccounts = financialData.expenseAccounts.filter(account => /^6(0|1|2)/.test(account.accountNum));
+    intermediateConsumption.footprint.indicators[indic] = await buildIndicatorAggregate(indic,expensesAccounts);;
+    
+    // Dépreciation expenses
+    let depreciationExpensesAccounts = financialData.expenseAccounts.filter(account => /^68/.test(account.accountNum));
+    capitalConsumption.footprint.indicators[indic] = await buildIndicatorAggregate(indic,depreciationExpensesAccounts);
+    
+    // Gross value added
+    grossValueAdded.footprint.indicators[indic] = await buildIndicatorMerge(netValueAdded.footprint.indicators[indic], netValueAdded.amount,
+                                                                            capitalConsumption.footprint.indicators[indic], capitalConsumption.amount)
+    // Current production
+
+    production.footprint.indicators[indic] = await buildIndicatorMerge(intermediateConsumption.footprint.indicators[indic], intermediateConsumption.amount,
+                                                                       grossValueAdded.footprint.indicators[indic], grossValueAdded.amount);
+    
+    return;
+}
+
+export const updateProductionItemsFootprints = async (indic,financialData) =>
+{
+    const {production,
+           productionStocks,
+           storedProduction,
+           immobilisedProduction,
+           revenue} = financialData.aggregates;
+
+    // Stored production
+    productionStocks.prevFootprint.indicators[indic] = await buildIndicatorAggregate(indic,financialData.stocks.filter(stock => stock.isProductionStock),{usePrev: true});
+    productionStocks.footprint.indicators[indic] = await buildIndicatorAggregate(indic,financialData.stocks.filter(stock => stock.isProductionStock));
+    storedProduction.footprint.indicators[indic] = await buildIndicatorMerge(productionStocks.footprint.indicators[indic], productionStocks.amount,
+                                                                             productionStocks.prevFootprint.indicators[indic], productionStocks.prevAmount);
+
+    // Immobilised production
+    immobilisedProduction.footprint.indicators[indic] = production.footprint.indicators[indic];
+
+    // Revenue footprint
+    revenue.footprint.indicators[indic] = await buildIndicatorMerge(production.footprint.indicators[indic], production.amount-productionStocks.prevAmount,
+                                                                    productionStocks.prevFootprint.indicators[indic], productionStocks.prevAmount);
+    
+    return;
+}
 
 /* ----------------------------------------------------------------------------- */
 /* -------------------- NET VALUE ADDED INDICATORS FORMULAS -------------------- */

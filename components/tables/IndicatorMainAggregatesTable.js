@@ -15,11 +15,20 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
 
   const nbDecimals = metaIndics[indic].nbDecimals;
   const unit = metaIndics[indic].unit;
-  const unitAbsolute = metaIndics[indic].unitAbsolute;
-  const impactAbsolu = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
+  const unitGrossImpact = metaIndics[indic].unitAbsolute;
+  const printGrossImpact = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
-  const expensesGroups = getBasicExpensesGroups(indic,financialData);
+  const expensesGroups = getBasicExternalExpensesGroups(indic,financialData);
   const depreciationExpensesGroups = getBasicDepreciationExpensesGroups(indic,financialData);
+
+  const {production,
+         revenue,
+         storedProduction,
+         immobilisedProduction,
+         intermediateConsumption,
+         storedPurchases,
+         capitalConsumption,
+         netValueAdded} = financialData.aggregates;
 
   return (
     <table>
@@ -28,73 +37,73 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
           <td colSpan="3">Agrégat</td>
           <td className="column_value" colSpan="2">Valeur</td>
           <td className="column_uncertainty">Incertitude</td>
-          {impactAbsolu ? <td className="column_value" colSpan="2">Impact</td> : null}
+          {printGrossImpact ? <td className="column_value" colSpan="2">Impact</td> : null}
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>Production</td>
-          <td className="column_value">{printValue(financialData.getProduction(),0)}</td>
+          <td className="column_value">{printValue(production.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(production.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getProduction()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(production.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(production.footprint.indicators[indic].getGrossImpact(production.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
         <tr>
           <td>&emsp;Production vendue</td>
-          <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
+          <td className="column_value">{printValue(revenue.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(revenue.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getRevenueFootprint().getIndicator(indic).getValueAbsolute(financialData.getRevenue()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenue.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(revenue.footprint.indicators[indic].getGrossImpact(revenue.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
-      {financialData.stockVariations.filter(variation => variation.account.charAt(0)=="7").length > 0 &&
+      {storedProduction != 0 &&
         <tr>
           <td>&emsp;Production stockée</td>
-          <td className="column_value">{printValue(financialData.getAmountProductionStockVariations(),0)}</td>
+          <td className="column_value">{printValue(storedProduction.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(storedProduction.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountProductionStockVariations()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(storedProduction.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(storedProduction.footprint.indicators[indic].getGrossImpact(storedProduction.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>}
-      {financialData.getImmobilisedProduction() > 0 &&
+      {immobilisedProduction.amount > 0 &&
         <tr>
           <td>&emsp;Production immobilisée</td>
-          <td className="column_value">({printValue(financialData.getImmobilisedProduction(),0)})</td>
+          <td className="column_value">({printValue(immobilisedProduction.amount,0)})</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getProductionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(immobilisedProduction.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">({printValue(session.getProductionFootprint().getIndicator(indic).getValueAbsolute(financialData.getImmobilisedProduction()),nbDecimals)})</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">({printValue(immobilisedProduction.footprint.indicators[indic].getGrossImpact(immobilisedProduction.amount),nbDecimals)})</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
         }
         <tr className="with-top-line">
           <td>Consommations intermédiaires</td>
-          <td className="column_value">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
+          <td className="column_value">{printValue(intermediateConsumption.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(intermediateConsumption.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountIntermediateConsumption()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(intermediateConsumption.footprint.indicators[indic].getGrossImpact(intermediateConsumption.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
-      {financialData.stocks.filter(stock => !stock.isProductionStock).length > 0 &&
+      {storedPurchases != 0 &&
         <tr>
           <td>&emsp;Variation de stocks</td>
-          <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
+          <td className="column_value">{printValue(-storedPurchases.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(storedPurchases.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(-session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getVariationPurchasesStocks()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(storedPurchases.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(storedPurchases.footprint.indicators[indic].getGrossImpact(-storedPurchases.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>}
 
       {expensesGroups.filter(group => group.expenses.length > 0)
@@ -106,19 +115,19 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
           <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          {printGrossImpact ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>)}
 
         <tr className="with-top-line">
-          <td>Dotations aux amortissements</td>
-          <td className="column_value">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
+          <td>Consommations de capital fixe</td>
+          <td className="column_value">{printValue(capitalConsumption.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(capitalConsumption.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciationExpenses()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(capitalConsumption.footprint.indicators[indic].getGrossImpact(capitalConsumption.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
       {depreciationExpensesGroups.filter(group => group.expenses.length > 0)
                                  .map(({label,amount,indicator},index) => 
@@ -129,19 +138,19 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
           <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          {printGrossImpact ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>)}
         
         <tr className="with-top-line">
           <td>Valeur ajoutée nette</td>
-          <td className="column_value">{printValue(financialData.getNetValueAdded(),0)}</td>
+          <td className="column_value">{printValue(netValueAdded.amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(session.getNetValueAddedFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(netValueAdded.footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getNetValueAddedFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getNetValueAddedFootprint().getIndicator(indic).getValueAbsolute(financialData.getNetValueAdded()),nbDecimals)}</td> : null}
-          {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(netValueAdded.footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(netValueAdded.footprint.indicators[indic].getGrossImpact(netValueAdded.amount),nbDecimals)}</td> : null}
+          {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
       </tbody>
     </table>
@@ -150,7 +159,8 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
 
 /* ----- GROUP FUNCTIONS ----- */
 
-const getBasicExpensesGroups = (indic,financialData) =>
+// External expenses
+const getBasicExternalExpensesGroups = (indic,financialData) =>
 {
   let expensesGroups = financialData.getBasicExpensesGroups();
 
@@ -163,6 +173,7 @@ const getBasicExpensesGroups = (indic,financialData) =>
   return expensesGroups;
 }
 
+// Depreciation expenses
 const getBasicDepreciationExpensesGroups = (indic,financialData) =>
 {
   let expensesGroups = financialData.getBasicDepreciationExpensesGroups();
