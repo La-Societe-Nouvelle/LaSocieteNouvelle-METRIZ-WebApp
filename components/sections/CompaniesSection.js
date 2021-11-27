@@ -226,6 +226,7 @@ export class CompaniesSection extends React.Component {
     let significativeAccounts = view=="significative" ? getSignificativeCompanies(financialData) : [];
     let companiesShowed = filterCompanies(companies,view,significativeAccounts);
     await this.synchroniseCompanies(companiesShowed);
+    this.updateFootprints();
   }
 
   synchroniseCompanies = async (companiesToSynchronise) =>
