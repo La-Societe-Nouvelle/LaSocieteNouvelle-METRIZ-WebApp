@@ -633,7 +633,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
   */
 
   // Expense accounts
-  if (data.expenseAccounts.map(account => account.accountNum).includes(ligneCourante.CompteNum)) data.expenseAccounts.push({accountNum:ligneCourante.CompteNum,accountLib:ligneCourante.CompteLib});
+  if (!data.expenseAccounts.map(account => account.accountNum).includes(ligneCourante.CompteNum)) data.expenseAccounts.push({accountNum:ligneCourante.CompteNum,accountLib:ligneCourante.CompteLib});
 
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
 
