@@ -33,7 +33,7 @@ export function printValueInput(value,precision) {
 
 export function getSumItems(items)
 {
-  return items.reduce((a,b) => a+b,0)
+  return roundValue(items.reduce((a,b) => a+b,0),2)
 }
 
 export function getAmountItems(items)
