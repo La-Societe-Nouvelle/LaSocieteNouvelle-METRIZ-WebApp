@@ -14,20 +14,12 @@ import { Indicator } from '/src/footprintObjects/Indicator';
 
 // Formulas
 import { buildIndicatorAggregate, 
-         buildIndicatorMerge, 
-         buildNetValueAddedIndicator,
-         updateDepreciationExpensesIndicator, 
-         updateDepreciationsIndicator, 
-         updateExternalExpensesIndicator, 
-         updateExternalExpensesAccountsIndicator,
-         updateImmobilisationsIndicator, 
-         updateInvestmentsIndicator, 
-         updatePurchasesStocksIndicator, 
-         updatePurchasesStocksVariationsIndicator, 
          updateAggregatesFootprints,
-         updatePurchasesStocksVariationsAccountsIndicator,
-         updateDepreciationExpensesAccountsIndicator,
-         updateProductionItemsFootprints} from './formulas/footprintFormulas';
+         updateProductionItemsFootprints,
+         updateOutputFlowsFootprints,
+         updateAccountsFootprints,
+         updateFinalStatesFootprints} from './formulas/aggregatesFootprintFormulas';
+import { buildNetValueAddedIndicator } from './formulas/netValueAddedFootprintFormulas';
 
 /* ---------- OBJECT SESSION ---------- */
 
@@ -136,121 +128,21 @@ export class Session {
         // Net Value Added
         this.updateNetValueAddedFootprint(indic);
 
-        // Financial items : expenses / investments
-        await this.updateOutputFlowsFootprints(indic);
+        // Output flows : expenses / investments
+        await updateOutputFlowsFootprints(indic,this.financialData);
 
-        // Accounts footprints
-        await this.updateAccountsFootprints(indic);
+        // Accounts
+        await updateAccountsFootprints(indic,this.financialData);
 
-        // Aggregates Footprints
+        // Aggregates
         await updateAggregatesFootprints(indic,this.financialData);
 
-        // Revenue Footprint
-        await this.updateProductionItemsFootprints(indic);
+        // Production items
+        await updateProductionItemsFootprints(indic,this.financialData);
 
-        // Final States Footprints
-        await this.updateFinalStatesFootprints(indic);
+        // Immobilisations & Stocks
+        await updateFinalStatesFootprints(indic,this.financialData);
 
-        return;
-    }
-
-    /* -------------------- OUTPUT FLOWS FOOTPRINTS -------------------- */
-
-    updateOutputFlowsFootprints = async (indic) =>
-    {
-        // External expenses
-        await updateExternalExpensesIndicator(indic,this.financialData);
-
-        // Investments
-        await updateInvestmentsIndicator(indic,this.financialData);
-    }
-
-    updateAccountsFootprints = async (indic) =>
-    {
-        // External expenses --------------------------------------------------------- //
-
-        // External expenses accounts
-        await updateExternalExpensesAccountsIndicator(indic,this.financialData);
-
-        // Purchase stocks ----------------------------------------------------------- //
-        
-        // Purchase stocks
-        await updatePurchasesStocksIndicator(indic,this.financialData);
-
-        // ...previous footprints based on current financial year
-        this.financialData.stocks.filter(stock => !stock.isProductionStock)
-                                 .filter(stock => stock.initialState == "currentFootprint")
-                                 .map(async (stock) => stock.prevFootprint.indicators[indic] = stock.footprint.indicators[indic]);      
-
-        // Purchase stocks variations ------------------------------------------------ //
-
-        // Stocks variations footprints
-        await updatePurchasesStocksVariationsIndicator(indic,this.financialData);
-
-        // Stocks variations accounts footprints
-        await updatePurchasesStocksVariationsAccountsIndicator(indic,this.financialData);
-
-        // Immobilisation ------------------------------------------------------------ //
-
-        // ...previous immobilisation footprints based on current financial year
-        this.financialData.immobilisations.filter(immobilisation => immobilisation.initialState == "currentFootprint")
-                                          .map(async (immobilisation) => 
-            {
-                let investmentsRelatedToImmobilisation = this.financialData.investments.filter(investment => investment.account == immobilisation.account);
-                immobilisation.prevFootprint.indicators[indic] = await buildIndicatorAggregate(indic,investmentsRelatedToImmobilisation);
-            });
-
-        // ...previous depreciation footprints based on current financial year
-        this.financialData.depreciations.filter(depreciation => depreciation.initialState == "currentFootprint")
-                                        .map(async (depreciation) => 
-            {
-                let immobilisation = this.financialData.getImmobilisationByAccount(depreciation.accountAux);
-                depreciation.prevFootprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
-            });
-
-        // Depreciation expenses ----------------------------------------------------- //
-        
-        // Depreciation expenses
-        await updateDepreciationExpensesIndicator(indic,this.financialData);
-
-        // Depreciation expenses accounts
-        await updateDepreciationExpensesAccountsIndicator(indic,this.financialData);
-
-        return;
-    }
-
-    /* -------------------- REVENUE FOOTPRINT -------------------- */
-
-    updateProductionItemsFootprints = async (indic) =>
-    {      
-        // Production stocks ----------------------------------------------------------- //
-
-        // Set production footprint to final production stocks footprint
-        this.financialData.stocks.filter(stock => stock.isProductionStock)
-                                 .forEach(stock => stock.footprint.indicators[indic] = this.financialData.aggregates.production.footprint.indicators[indic]);
-        
-        // ...initial production stock footprint based on current production footprint
-        this.financialData.stocks.filter(stock => stock.isProductionStock)
-                                 .filter(stock => stock.initialState == "currentFootprint")
-                                 .forEach(stock => stock.prevFootprint.indicators[indic] = this.financialData.aggregates.production.footprint.indicators[indic]);
-
-        // Production items ------------------------------------------------------------ //
-        
-        await updateProductionItemsFootprints(indic,this.financialData)
-        
-        return;
-    }
-    
-    /* -------------------- FINAL STATES FOOTPRINTS -------------------- */
-
-    updateFinalStatesFootprints = async (indic) =>
-    {
-        // Immobilisations
-        await updateImmobilisationsIndicator(indic,this.financialData);
-        
-        // Depreciations
-        await updateDepreciationsIndicator(indic,this.financialData);
-        
         return;
     }
 
