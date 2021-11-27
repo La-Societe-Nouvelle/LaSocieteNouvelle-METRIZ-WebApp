@@ -41,6 +41,11 @@ export function getAmountItems(items)
   return getSumItems(items.map(item => item.amount))
 }
 
+export function getPrevAmountItems(items)
+{
+  return getSumItems(items.map(item => item.prevAmount))
+}
+
 /* ----- ROUND ----- */
 
 export function roundValue(value,precision) 
