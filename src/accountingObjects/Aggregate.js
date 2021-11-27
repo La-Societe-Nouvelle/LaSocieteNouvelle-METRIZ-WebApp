@@ -5,8 +5,7 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 export class Aggregate {
 
-  constructor({id,
-               label,
+  constructor({label,
                amount,
                footprint,
                prevAmount,
@@ -14,7 +13,6 @@ export class Aggregate {
                initialState}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
-    this.id = id;
     this.label = label;
 
     this.amount = amount || 0;

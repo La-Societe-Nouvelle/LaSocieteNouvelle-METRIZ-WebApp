@@ -28,26 +28,27 @@ const viewsForIndic = {
 
 export const IndicatorGraphs = ({session,indic}) =>
 {
-  const {legalUnit,productionFootprint,netValueAddedFootprint,intermediateConsumptionFootprint} = session;
+  const {legalUnit,financialData} = session;
+  const {production,netValueAdded,intermediateConsumption} = financialData.aggregates;
   const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = legalUnit;
   
   const dataProduction = [
     ["", "title", { role: "style" }],
-    ["Situation", productionFootprint.getIndicator(indic).value || 0.0, "#616161"],
+    ["Situation", production.footprint.getIndicator(indic).value || 0.0, "#616161"],
     ["Branche", productionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
     ["France", productionAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
   ]
 
   const dataValueAdded = [
     ["", "title", { role: "style" }],
-    ["Situation", netValueAddedFootprint.getIndicator(indic).value || 0.0, "#616161"],
+    ["Situation", netValueAdded.footprint.getIndicator(indic).value || 0.0, "#616161"],
     ["Branche", valueAddedSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
     ["France", valueAddedAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
   ]
   
   const dataConsumption = [
     ["", "title", { role: "style" }],
-    ["Situation", intermediateConsumptionFootprint.getIndicator(indic).value || 0.0, "#616161"],
+    ["Situation", intermediateConsumption.footprint.getIndicator(indic).value || 0.0, "#616161"],
     ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
   ]
   
@@ -74,7 +75,7 @@ export const IndicatorGraphs = ({session,indic}) =>
         <tbody>
           <tr>
             <td>Production</td>
-            <td className="short right">{printValue(productionFootprint.getIndicator(indic).value,1)}</td>
+            <td className="short right">{printValue(production.footprint.getIndicator(indic).value,1)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="short right">{printValue(productionSectorFootprint.getIndicator(indic).value,1)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
@@ -83,7 +84,7 @@ export const IndicatorGraphs = ({session,indic}) =>
           </tr>
           <tr>
             <td>Consommations intermédiaires</td>
-            <td className="short right">{printValue(intermediateConsumptionFootprint.getIndicator(indic).value,1)}</td>
+            <td className="short right">{printValue(intermediateConsumption.footprint.getIndicator(indic).value,1)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="short right">{printValue(consumptionSectorFootprint.getIndicator(indic).value,1)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
@@ -92,7 +93,7 @@ export const IndicatorGraphs = ({session,indic}) =>
           </tr>
           <tr>
             <td>Valeur ajoutée</td>
-            <td className="short right">{printValue(netValueAddedFootprint.getIndicator(indic).value,1)}</td>
+            <td className="short right">{printValue(netValueAdded.footprint.getIndicator(indic).value,1)}</td>
             <td className="column_unit">&nbsp;{unit}</td>
             <td className="short right">{printValue(valueAddedSectorFootprint.getIndicator(indic).value,1)}</td>
             <td className="column_unit">&nbsp;{unit}</td>

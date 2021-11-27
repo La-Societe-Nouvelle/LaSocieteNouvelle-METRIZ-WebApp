@@ -7,7 +7,7 @@ import metaIndics from '/lib/indics';
 import React from 'react';
 
 // Tab Components
-import { IndicatorMainAggregatesTable, IndicatorStatementTable } from '../tables/IndicatorMainAggregatesTable';
+import { IndicatorMainAggregatesTable } from '../tables/IndicatorMainAggregatesTable';
 import { IndicatorExpensesTable } from '../tables/IndicatorExpensesTable';
 import { IndicatorCompaniesTable } from '../tables/IndicatorCompaniesTable';
 import { IndicatorGraphs } from '../graphs/IndicatorGraphs';
@@ -73,7 +73,7 @@ export class IndicatorSection extends React.Component {
     const {indic} = this.state;
     const {triggerPopup,selectedTable} = this.state;
 
-    const isPublicationAvailable = Object.entries(this.props.session.revenueFootprint.indicators).filter(([_,indicator]) => indicator.value!=null).length > 0;
+    const isPublicationAvailable = Object.entries(this.props.session.financialData.aggregates.revenue.footprint.indicators).filter(([_,indicator]) => indicator.value!=null).length > 0;
 
     return (
       <div className="section-view">
@@ -171,7 +171,7 @@ export class IndicatorSection extends React.Component {
   {
     switch(selectedTable) 
     {
-      case "mainAggregates" :  return(<IndicatorStatementTable session={this.props.session} indic={this.state.indic}/>)
+      case "mainAggregates" :   return(<IndicatorMainAggregatesTable session={this.props.session} indic={this.state.indic}/>)
       case "expensesAccounts" : return(<IndicatorExpensesTable session={this.props.session} indic={this.state.indic}/>)
       case "companies" :        return(<IndicatorCompaniesTable session={this.props.session} indic={this.state.indic}/>)
     }

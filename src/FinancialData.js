@@ -52,7 +52,7 @@ export class FinancialData {
         this.stockVariations = data.stockVariations ? data.stockVariations.map((props,index) => new Expense({id: index, ...props})) : [];                               // stock variation (#603, #71)
         this.depreciationExpenses = data.depreciationExpenses ? data.depreciationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                // depreciation expenses (#6811, #6871)
         
-        this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({id: props.id, ...props})) : [];
+        this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({...props})) : this.expensesAccountsBuilder();
         
         // Stocks ---------------------------------- //
         
@@ -83,10 +83,25 @@ export class FinancialData {
         this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
 
         // Aggregates
+        this.aggregates = {};
         data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : this.aggregatesBuilder();
         
     // ---------------------------------------------------------------------------------------------------- //
     }
+
+    /* ---------------------------------------- AGGREGATES BUILDER ---------------------------------------- */
+
+    expensesAccountsBuilder = () =>
+    {
+        return this.expenses.concat(this.depreciationExpenses)
+                            .concat(this.stockVariations.filter(variation => /^6/.test(variation.account)))
+                            .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
+                            .map(expense => new Account({accountNum: expense.account, accountLib: expense.accountLib, amount: this.getAmountExpenseByAccount(expense.account)}));
+    }
+
+    getAmountExpenseByAccount = (accountNum) => getAmountItems(this.expenses.concat(this.depreciationExpenses)
+                                                                            .concat(this.stockVariations)
+                                                                            .filter(expense => expense.account == accountNum))
 
     /* ---------------------------------------- AGGREGATES BUILDER ---------------------------------------- */
 
