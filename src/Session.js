@@ -41,27 +41,6 @@ export class Session {
         this.financialData = new FinancialData(props.financialData);
         this.impactsData = new ImpactsData(props.impactsData);
         
-        // Footprints (Soldes Intermédiaires de Gestion)
-
-        this.revenueFootprint = new SocialFootprint(props.revenueFootprint);
-
-        this.productionFootprint = new SocialFootprint(props.productionFootprint);
-        this.storedProductionFootprint = new SocialFootprint(props.storedProductionFootprint);
-                
-        this.intermediateConsumptionFootprint = new SocialFootprint(props.intermediateConsumptionFootprint);
-        this.purchasesStocksVariationsFootprint = new SocialFootprint(props.purchasesStocksVariationsFootprint);
-        this.expensesFootprint = new SocialFootprint(props.expensesFootprint);
-
-        this.grossValueAddedFootprint = new SocialFootprint(props.grossValueAddedFootprint);
-        this.depreciationExpensesFootprint = new SocialFootprint(props.depreciationExpensesFootprint);
-
-        this.netValueAddedFootprint = new SocialFootprint(props.netValueAddedFootprint);
-
-        // Footprints (Comptes)
-
-        this.accountsFootprints = {};
-        Object.entries(props.accountsFootprints || {}).forEach(([accountNum,footprint]) => this.accountsFootprints[accountNum] = new SocialFootprint(footprint));
-
         // Validations 
         this.validations = props.validations || [];
 

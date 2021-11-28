@@ -190,7 +190,7 @@ export class IndicatorSection extends React.Component {
     // get new value
     let nextIndicator = this.props.session.getNetValueAddedIndicator(indic);
 
-    if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) 
+    if (nextIndicator!==this.props.session.financialData.aggregates.netValueAdded.footprint.indicators[indic]) 
     {
       // remove validation
       this.props.session.validations = this.props.session.validations.filter(item => item != indic);
