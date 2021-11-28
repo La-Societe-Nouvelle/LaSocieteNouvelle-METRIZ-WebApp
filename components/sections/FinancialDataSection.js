@@ -228,7 +228,7 @@ export class FinancialDataSection extends React.Component {
     Object.keys(indics).forEach((indic) => 
     {
       let nextIndicator = this.props.session.getNetValueAddedIndicator(indic);
-      if (nextIndicator!==this.props.session.netValueAddedFootprint.indicators[indic]) {
+      if (nextIndicator!==this.props.session.financialData.aggregates.netValueAdded.footprint.indicators[indic]) {
         this.props.session.validations = this.props.session.validations.filter(item => item != indic);
       }
     })

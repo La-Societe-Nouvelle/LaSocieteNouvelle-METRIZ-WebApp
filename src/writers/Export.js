@@ -75,11 +75,11 @@ function exportIndicPDF(indic,session)
 
   y+=10;
   doc.setFontSize(11);
-  doc.text((session.legalUnit.corporateName || " - " ),10,y); 
+  doc.text((legalUnit.corporateName || " - " ),10,y); 
   y+=10;
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");
-  doc.text("Numéro de siren : "+(session.legalUnit.siren!="" ? session.legalUnit.siren : " - " ),10,y); 
+  doc.text("Numéro de siren : "+(legalUnit.siren!="" ? legalUnit.siren : " - " ),10,y); 
   y+=10;
   doc.text("Année de fin d'exercice : "+(session.year!=null ? session.year : " - " ),10,y); 
   y+=6;
@@ -99,6 +99,15 @@ function exportIndicPDF(indic,session)
   */
 
   /* ----- TABLE ----- */
+
+  const {production,
+         revenue,
+         storedProduction,
+         immobilisedProduction,
+         intermediateConsumption,
+         storedPurchases,
+         capitalConsumption,
+         netValueAdded} = financialData.aggregates;
 
   let yNotes = 125;
   let yValue = 150;
@@ -122,33 +131,34 @@ function exportIndicPDF(indic,session)
   doc.setFont("Calibri","bold");
   doc.text("Production",10,y);
   doc.setFont("Calibri","normal");
-  doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(production.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(production.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   // Revenue
   y+=6;
-  doc.text("\tdont Chiffre d'affaires",10,y);  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text("\tdont Chiffre d'affaires",10,y);  
+  doc.text(printValue(revenue.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getRevenueFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(revenue.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   // Stock production
   y+=6;
   doc.text("\tdont Production stockée",10,y);
-  doc.text(printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(storedProduction.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getProductionStockVariationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(storedProduction.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   // Immobilised production
   if (financialData.getImmobilisedProduction() > 0) {
     x+=6;
     doc.text("\tdont production immobilisée",10,x);
-    doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getValue(),1),yValue+10,x,{align: "right"});
+    doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getValue(),1),yValue+10,x,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(session.getProductionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
+    doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
     doc.setFontSize(10);
   }
   
@@ -156,21 +166,23 @@ function exportIndicPDF(indic,session)
 
   y+=6;
   doc.text("Consommations intermédiaires",10,y);
-  doc.text(printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getIntermediateConsumptionFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
-  if (financialData.getVariationPurchasesStocks() > 0) {
+  if (storedPurchases.amount != 0) 
+  {
     y+=6;
     doc.text("\tVariation de stocks",10,y);
-    doc.text(printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+    doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   }
 
-  financialData.getBasicExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => { 
+  financialData.getBasicExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => 
+  { 
     const amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
     const indicator = buildIndicatorAggregate(indic,group.expenses);
     y+=6;
@@ -185,12 +197,13 @@ function exportIndicPDF(indic,session)
 
   y+=6;
   doc.text("Dotations aux Amortissements sur immobilisations",10,y);
-  doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(capitalConsumption.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
-  financialData.getBasicDepreciationExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => {
+  financialData.getBasicDepreciationExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => 
+  {
     const amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
     const indicator = buildIndicatorAggregate(indic,group.expenses);
     y+=6;
@@ -205,9 +218,9 @@ function exportIndicPDF(indic,session)
 
   y+=6;
   doc.text("Valeur ajoutée nette",10,y);
-  doc.text(printValue(session.getNetValueAddedFootprint().getIndicator(indic).getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(netValueAdded.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(session.getNetValueAddedFootprint().getIndicator(indic).getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(netValueAdded.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   doc.line(10,y+2,200,y+2);
@@ -222,7 +235,7 @@ function exportIndicPDF(indic,session)
   y+= getStatementNote(doc,10,y,session.impactsData,indic);
 
   // Export
-  doc.save("rapport_"+(session.legalUnit.siren!="" ? session.legalUnit.siren : "xxxxxxxxx")+"-"+indic.toUpperCase()+".pdf");
+  doc.save("rapport_"+(legalUnit.siren!="" ? legalUnit.siren : "xxxxxxxxx")+"-"+indic.toUpperCase()+".pdf");
 
 }
 

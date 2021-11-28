@@ -93,7 +93,7 @@ export const updateAccountsFootprints = async (indic,financialData) =>
     financialData.depreciations.filter(depreciation => depreciation.initialState == "currentFootprint")
                                .map(async (depreciation) => 
     {
-        let immobilisation = this.financialData.getImmobilisationByAccount(depreciation.accountAux);
+        let immobilisation = financialData.getImmobilisationByAccount(depreciation.accountAux);
         depreciation.prevFootprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
     });
 
