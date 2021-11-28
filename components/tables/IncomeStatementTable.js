@@ -10,16 +10,15 @@ import { printValue } from '../../src/utils/Utils';
 
 export const IncomeStatementTable = ({financialData}) =>
 {
-  const expensesGroups = financialData.getBasicExpensesGroups();
-        expensesGroups.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+  const externalExpensesMainAccounts = financialData.getBasicExpensesGroups();
+        externalExpensesMainAccounts.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
 
-  const depreciationExpensesGroups = financialData.getBasicDepreciationExpensesGroups();
-        depreciationExpensesGroups.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+  const depreciationExpensesMainAccounts = financialData.getBasicDepreciationExpensesGroups();
+        depreciationExpensesMainAccounts.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
   
   return(
     <div className="table-main">
 
-    {financialData.isFinancialDataLoaded &&  
       <table>
         <thead>
           <tr><td>Agrégat</td><td colSpan="2">Montant</td></tr>
@@ -54,7 +53,7 @@ export const IncomeStatementTable = ({financialData}) =>
             <td>&emsp;Variation de stocks</td>
             <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-        {expensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
+        {externalExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
             <td>&emsp;{label}</td>
             <td className="column_value">{printValue(amount,0)}</td>
@@ -141,6 +140,6 @@ export const IncomeStatementTable = ({financialData}) =>
             <td className="column_unit important">&nbsp;€</td></tr>
 
         </tbody>
-      </table>}
+      </table>
     </div>)
 }

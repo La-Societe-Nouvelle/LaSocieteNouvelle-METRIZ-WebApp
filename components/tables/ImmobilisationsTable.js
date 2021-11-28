@@ -21,7 +21,7 @@ export class ImmobilisationsTable extends React.Component {
 
   render() 
   {
-    const {immobilisations,depreciations} = this.props.financialData;
+    const {immobilisations,depreciations,aggregates} = this.props.financialData;
     const {columnSorted} = this.state;
     
     this.sortItems(immobilisations,columnSorted);
@@ -62,11 +62,11 @@ export class ImmobilisationsTable extends React.Component {
               <tr className="with-top-line">
                 <td className="short center"> - </td>
                 <td className="auto">TOTAL</td>
-                <td className="short right">{printValue(this.props.financialData.getFinalNetAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(aggregates.netAmountImmobilisation.amount,0)}</td>
                 <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(this.props.financialData.getInitialNetAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(aggregates.netAmountImmobilisation.prevAmount,0)}</td>
                 <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(this.props.financialData.getFinalNetAmountImmobilisations()-this.props.financialData.getInitialNetAmountImmobilisations(),0)}</td>
+                <td className="short right">{printValue(aggregates.netAmountImmobilisation.amount-aggregates.netAmountImmobilisation.prevAmount,0)}</td>
                 <td className="column_unit">&nbsp;€</td>
               </tr>}
           </tbody>

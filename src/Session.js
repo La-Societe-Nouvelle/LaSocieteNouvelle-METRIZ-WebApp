@@ -63,6 +63,20 @@ export class Session {
         else return 5;
     }
 
+    /* -------------------- VALIDATIONS -------------------- */ 
+
+    checkValidations = async () =>
+    {
+        Object.keys(metaIndics).forEach((indic) => 
+        {
+            let nextIndicator = this.getNetValueAddedIndicator(indic);
+            if (nextIndicator !== this.financialData.aggregates.netValueAdded.footprint.indicators[indic]) 
+            {
+                this.validations = this.validations.filter(item => item != indic);
+            }
+        })
+    }
+
     /* ---------------------------------------- FOOTPRINTS PROCESS ---------------------------------------- */
 
     // Main footprints are stored in variables to avoid processing multiple times when render the results

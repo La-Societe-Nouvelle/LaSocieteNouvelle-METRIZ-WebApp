@@ -20,7 +20,8 @@ export class Company {
                footprintActivityCode,
                status,
                dataFetched,
-               lastUpdateFromRemote})
+               lastUpdateFromRemote,
+               amount})
   {   
   // ---------------------------------------------------------------------------------------------------- //
     // Id
@@ -49,6 +50,9 @@ export class Company {
     this.status = status || null;                                       // 200 (ok), 404 (not found), 500 (server error)
     this.dataFetched = dataFetched;                                     // response received
     this.lastUpdateFromRemote = lastUpdateFromRemote || null;           // date of last update
+
+    // Amount (expenses & investments)
+    this.amount = amount || 0;
   // ---------------------------------------------------------------------------------------------------- //
   }
 

@@ -21,7 +21,7 @@ export class StocksTable extends React.Component {
 
   render() 
   {
-    const {stocks,depreciations} = this.props.financialData;
+    const {stocks,depreciations,aggregates} = this.props.financialData;
     const {columnSorted} = this.state;
 
     this.sortItems(stocks,columnSorted);
@@ -61,33 +61,17 @@ export class StocksTable extends React.Component {
             <tr className="with-top-line">
               <td className="short center"> - </td>
               <td className="auto">TOTAL</td>
-              <td className="short right">{printValue(this.props.financialData.getFinalAmountStocks(),0)}</td>
+              <td className="short right">{printValue(aggregates.netAmountStocks.amount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(this.props.financialData.getInitialAmountStocks(),0)}</td>
+              <td className="short right">{printValue(aggregates.netAmountStocks.prevAmount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(this.props.financialData.getVariationStocks(),0)}</td>
+              <td className="short right">{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}</td>
               <td className="column_unit">&nbsp;€</td>
           </tr>}
           </tbody>
         </table>
       </div>
     )
-  }
-
-  /* ----- ACTIONS ----- */
-
-  // Import CSV File
-  importPrevStateFile = (event) => {
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const previousPeriodFootprints = JSON.parse(reader.result);
-      Object.entries(previousPeriodFootprints).forEach(([accountStock,footprint]) => {
-        let stock = this.props.financialData.getInitialStockByAccount(accountStock);
-        stock.footprint = footprint;
-        stock.prevFootprint = true;
-      }).then(this.forceUpdate());
-    };
-    reader.readAsText(event.target.files[0]);
   }
 
   /* ----- SORTING ----- */

@@ -24,7 +24,8 @@ export class CompaniesSection extends React.Component {
   constructor(props) 
   {
     super(props)
-    this.state = {
+    this.state = 
+    {
       companies: props.session.financialData.companies,
       significativeCompanies: [],
       view: "all",
@@ -36,11 +37,12 @@ export class CompaniesSection extends React.Component {
 
   componentDidUpdate()
   {
-    // change view to main if unsync empty
-    if (this.state.view=="unsync" && this.state.companies.filter(company => company.status != 200).length==0) {
-      this.setState({view: "all"});
-    }
-    if(this.state.significativeCompanies.length == 0 && this.state.companies.filter(company => company.status != 200).length == 0) {
+    // change view to main if array of companies with data unfetched empty
+    if (this.state.view=="unsync" && this.state.companies.filter(company => company.status != 200).length==0) this.setState({view: "all"});
+    
+    // update significative companies array
+    if(this.state.significativeCompanies.length == 0 && this.state.companies.filter(company => company.status != 200).length == 0) 
+    {
       let significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
       this.setState({significativeCompanies});
     }
@@ -51,13 +53,11 @@ export class CompaniesSection extends React.Component {
     const {companies,significativeCompanies,view,nbItems,fetching,progression} = this.state;
     const financialData = this.props.session.financialData;
 
-    // get amounts
-    const expensesByCompanies = getExpensesByCompanies(financialData.expenses.concat(financialData.investments));
-    
-    // check synchro
-    const isAllValid = !(companies.filter(company => company.status != 200).length > 0);
-
+    // Filter commpanies showed
     const companiesShowed = filterCompanies(companies,view,significativeCompanies);
+
+    // check synchro
+    const isNextStepAvailable = nextStepAvailable(this.state);
 
     return (
       <div className="section-view">
@@ -79,12 +79,12 @@ export class CompaniesSection extends React.Component {
                 <option key="1" value="all">Affichage de tous les comptes externes</option>
                 <option key="2" value="aux">Affichage des comptes fournisseurs uniquement</option>
                 <option key="3" value="expenses">Affichage des autres comptes tiers</option>
-                {!isAllValid && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
+                {!isNextStepAvailable && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
                 {significativeCompanies.length > 0 && <option key="5" value="significative">Affichage des comptes significatifs</option>}
               </select>}
           </div>
           <div>
-            <button id="validation-button" disabled={!isAllValid} onClick={this.props.submit}>Valider</button>
+            <button id="validation-button" disabled={!isNextStepAvailable} onClick={this.props.submit}>Valider</button>
           </div>
         </div>
 
@@ -103,8 +103,8 @@ export class CompaniesSection extends React.Component {
         <div className="section-view-main">
 
           <div className="notes">
-            {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
-            {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
+            {isNextStepAvailable && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
+            {!isNextStepAvailable && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
           </div>
 
         {companies.length > 0 && 
@@ -123,8 +123,7 @@ export class CompaniesSection extends React.Component {
             <CompaniesTable nbItems={nbItems=="all" ? companiesShowed.length : parseInt(nbItems)}
                             onUpdate={this.updateFootprints.bind(this)}
                             companies={companiesShowed}
-                            financialData={financialData}
-                            amounts={expensesByCompanies}/>
+                            financialData={financialData}/>
           </div>}
             
         </div>
@@ -139,7 +138,12 @@ export class CompaniesSection extends React.Component {
     )
   }
 
-  /* ----- UPDATES ----- */
+  /* ---------- VIEW ---------- */
+  
+  changeView = (event) => this.setState({view : event.target.value})
+  changeNbItems = (event) => this.setState({nbItems : event.target.value})
+
+  /* ---------- UPDATES ---------- */
 
   updateFootprints = () => 
   {
@@ -147,15 +151,12 @@ export class CompaniesSection extends React.Component {
     this.setState({companies: this.props.session.financialData.companies});
   }
 
-  changeView = (event) => this.setState({view : event.target.value})
-
-  changeNbItems = (event) => this.setState({nbItems : event.target.value})
-
-  /* ----- IMPORTS ----- */
+  /* ---------- FILE IMPORT ---------- */
 
   importFile = (event) =>
   {
     let file = event.target.files[0];
+
     let extension = file.name.split('.').pop();
     switch (extension)
     {
@@ -169,10 +170,13 @@ export class CompaniesSection extends React.Component {
   {    
     let reader = new FileReader();
     reader.onload = async () => 
-      CSVFileReader(reader.result)
-        .then((CSVData) => processCSVCompaniesData(CSVData))
-        .then(async (companiesIds) => await Promise.all(Object.entries(companiesIds).map(async ([corporateName,corporateId]) => this.updateCorporateId(corporateName,corporateId))))
-        .then(() => this.setState({companies: this.props.session.financialData.companies}));
+    {
+      let CSVData = await CSVFileReader(reader.result);
+      let companiesIds = await processCSVCompaniesData(CSVData);
+      await Promise.all(Object.entries(companiesIds).map(async ([corporateName,corporateId]) => this.props.session.financialData.updateCorporateId(corporateName,corporateId)));
+      this.setState({companies: this.props.session.financialData.companies});
+    }
+
     reader.readAsText(file);
   }
 
@@ -181,19 +185,16 @@ export class CompaniesSection extends React.Component {
   {    
     let reader = new FileReader();
     reader.onload = async () => 
-      XLSXFileReader(reader.result)
-        .then(async (XLSXData) => await Promise.all(XLSXData.map(async ({denomination,siren}) => this.updateCorporateId(denomination,siren))))
-        .then(() => this.setState({companies: this.props.session.financialData.companies}));
+    {
+      let XLSXData = XLSXFileReader(reader.result);
+      await Promise.all(XLSXData.map(async ({denomination,siren}) => this.props.session.financialData.updateCorporateId(denomination,siren)));
+      this.setState({companies: this.props.session.financialData.companies})
+    }
+    
     reader.readAsArrayBuffer(file);
   }
 
-  updateCorporateId = async (corporateName,corporateId) => 
-  {
-    let company = this.props.session.financialData.getCompanyByName(corporateName);
-    if (company!=undefined) {
-      company.update({id: company.id,corporateId});
-    }
-  }
+  /* ---------- FILE EXPORT ---------- */
 
   // Export CSV File
   exportXLSXFile = async () =>
@@ -201,8 +202,10 @@ export class CompaniesSection extends React.Component {
     let jsonContent = await this.props.session.financialData.companies.filter(company => company.account.charAt(0) != "_")
                                                                       .map(company => {return({denomination: company.corporateName, siren: company.corporateId})});
     let fileProps = {wsclos: [{wch:50},{wch:20}]};
+    
     // write file (JSON -> ArrayBuffer)
     let file = await XLSXFileWriterFromJSON(fileProps,"fournisseurs",jsonContent);
+    
     // trig download
     let blob = new Blob([file],{type:"application/octet-stream"});
     let link = document.createElement("a");
@@ -211,7 +214,7 @@ export class CompaniesSection extends React.Component {
         link.click();
   }
 
-  /* ----- SYNCHRONISATION ----- */
+  /* ---------- FETCHING DATA ---------- */
 
   // Synchronisation all
   synchroniseAll = async () => 
@@ -226,14 +229,15 @@ export class CompaniesSection extends React.Component {
     let significativeAccounts = view=="significative" ? getSignificativeCompanies(financialData) : [];
     let companiesShowed = filterCompanies(companies,view,significativeAccounts);
     await this.synchroniseCompanies(companiesShowed);
-    this.updateFootprints();
   }
 
   synchroniseCompanies = async (companiesToSynchronise) =>
   {
     // synchronise data
     this.setState({fetching: true, progression: 0})
-    let i = 0; let n = companiesToSynchronise.length;
+
+    let i = 0; 
+    let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise)
     {
       await company.updateFromRemote();
@@ -256,15 +260,12 @@ export class CompaniesSection extends React.Component {
 
 }
 
-const getExpensesByCompanies = (expenses) => 
+/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
+
+const nextStepAvailable = ({companies}) =>
+// condition : data fetched for all companies (or no company with data unfetched)
 {
-    let expensesByCompanies = {};
-    expenses.forEach((expense) => 
-    {
-        if (expensesByCompanies[expense.accountAux] == undefined) expensesByCompanies[expense.accountAux] = expense.amount;
-        else expensesByCompanies[expense.accountAux]+= expense.amount;
-    })
-    return expensesByCompanies;
+  return(!(companies.filter(company => company.status != 200).length > 0));
 }
 
 /* ---------- DISPLAY ---------- */
