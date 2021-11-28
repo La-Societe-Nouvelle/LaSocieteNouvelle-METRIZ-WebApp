@@ -26,11 +26,11 @@ export class ExpensesTable extends React.Component {
 
   render() 
   {
-    const {expenses} = this.props.financialData;
-    const {columnSorted} = this.state;
+    const {expenseAccounts} = this.props.financialData;
+    const {columnSorted,reverseSort} = this.state;
 
-    const expensesByAccount = getExpensesGroupByAccount(expenses);
-    this.sortExpenses(expensesByAccount,columnSorted);
+    const externalExpensesAccounts = expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum));
+    sortExpenses(externalExpensesAccounts,columnSorted,reverseSort);
 
     return (
       <div className="table-main">
@@ -43,9 +43,9 @@ export class ExpensesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {expensesByAccount.map(({account,amount,accountLib}) => 
-              <tr key={account}>
-                <td className="short center">{account}</td>
+            {externalExpensesAccounts.map(({accountNum,amount,accountLib}) => 
+              <tr key={accountNum}>
+                <td className="short center">{accountNum}</td>
                 <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
                 <td className="short right">{printValue(amount,0)}</td>
                 <td className="column_unit">&nbsp;€</td>
@@ -64,25 +64,14 @@ export class ExpensesTable extends React.Component {
     else                                        {this.setState({reverseSort: !this.state.reverseSort})}
   }
 
-  sortExpenses(expenses,columSorted) 
-  {
-    switch(columSorted) 
-    {
-      case "account": expenses.sort((a,b) => a.account.localeCompare(b.account)); break;
-      case "amount": expenses.sort((a,b) => b.amount - a.amount); break;
-    }
-    if (this.state.reverseSort) expenses.reverse();
-  }
-
 }
 
-const getExpensesGroupByAccount = (expenses) =>  
+const sortExpenses = (accounts,columSorted,reverseSort) =>
 {
-    let expensesByAccount = {};
-    expenses.forEach(({account,accountLib,amount}) => 
-    {
-        if (expensesByAccount[account] == undefined) expensesByAccount[account] = {account, amount, accountLib};
-        else expensesByAccount[account].amount+= amount;
-    })
-    return Object.entries(expensesByAccount).map(([account,{amount,accountLib}]) => ({account, amount, accountLib}));
+  switch(columSorted) 
+  {
+    case "account": accounts.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
+    case "amount": accounts.sort((a,b) => b.amount - a.amount); break;
+  }
+  if (reverseSort) accounts.reverse();
 }

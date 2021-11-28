@@ -29,11 +29,15 @@ export class InitialStatesTable extends React.Component {
     const {immobilisations,depreciations,stocks,expenses,investments,stockVariations} = this.props.financialData;
     const {columnSorted,nbItems,page} = this.state;
 
+    const accounts = immobilisations.concat(stocks);  // merge array
     this.sortItems(immobilisations,columnSorted);
+    this.sortItems(stocks,columnSorted);
+
     const nbAccounts = immobilisations.length + stocks.length;
     
     return (
       <div className="table-main">
+
         <table>
           <thead>
             <tr>
@@ -62,11 +66,13 @@ export class InitialStatesTable extends React.Component {
                               syncData={this.synchroniseStock.bind(this)}/>)}
           </tbody>
         </table>
-        {nbAccounts.length > nbItems &&
-          <div className="table-navigation">
-            <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
-            <button className={(page+1)*nbItems < nbAccounts.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
-          </div>}
+
+      {nbAccounts.length > nbItems &&
+        <div className="table-navigation">
+          <button className={page==0 ? "hidden" : ""} onClick={this.prevPage}>Page précédente</button>
+          <button className={(page+1)*nbItems < nbAccounts.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
+        </div>}
+
       </div>
     )
   }
@@ -77,11 +83,11 @@ export class InitialStatesTable extends React.Component {
   {
     let immobilisation = this.props.financialData.getImmobilisation(id);
     await this.fetchDefaultData(immobilisation);
-    this.props.onUpdate();
   }
 
-  async synchroniseStock(id) {
-    let stock = this.props.financialData.getInitialStock(id);
+  synchroniseStock = async (id) =>
+  {
+    let stock = this.props.financialData.getStock(id);
     await this.fetchDefaultData(stock);
   }
 
@@ -99,8 +105,10 @@ export class InitialStatesTable extends React.Component {
     else                                        {this.setState({reverseSort: !this.state.reverseSort})}
   }
 
-  sortItems(items,columSorted) {
-    switch(columSorted) {
+  sortItems(items,columSorted) 
+  {
+    switch(columSorted) 
+    {
       case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
       case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
       case "amount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
@@ -135,7 +143,7 @@ export class InitialStatesTable extends React.Component {
 
 function RowTableImmobilisations(props) 
 {
-  const {id,prevAmount,account,accountLib,initialState,prevFootprintActivityCode,dataFetched,depreciations,investments,isDepreciableImmobilisation} = props;
+  const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,depreciations,investments,isDepreciableImmobilisation} = props;
   const activityCode = prevFootprintActivityCode.substring(0,2);
 
   const entries = investments.filter(investment => investment.account == account);
@@ -182,7 +190,8 @@ function RowTableImmobilisations(props)
                   <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
                       onClick={() => syncData(id)}/></td>}
             </tr>)
-  } else if (isDepreciableImmobilisation) {
+  } 
+  else if (isDepreciableImmobilisation) {
     return (<tr>
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>

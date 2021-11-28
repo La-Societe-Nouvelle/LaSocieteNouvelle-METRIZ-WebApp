@@ -20,19 +20,16 @@ export class InitialStatesSection extends React.Component {
     {
       financialData: props.session.financialData,
       fetching: false,
-      progressionSynchro: 0
+      syncProgression: 0
     }
   }
     
   render()
   {
-    const {financialData,fetching,progressionSynchro} = this.state;
-
-    const isAllValid = !(financialData.immobilisations.concat(financialData.stocks)
-                                                      .filter(account => account.initialState=="defaultData" && !account.dataFetched)
-                                                      .length > 0);
-    //
+    const {financialData,fetching,syncProgression} = this.state;
     const accountsShowed = financialData.immobilisations.concat(financialData.stocks);
+
+    const isNextStepAvailable = nextStepAvailable(this.state);
     
     return (
       <div className="section-view">
@@ -45,7 +42,7 @@ export class InitialStatesSection extends React.Component {
                    onChange={this.importFile}/>
           </div>
           <div>
-            <button id="validation-button" disabled={!isAllValid} onClick={this.props.submit}>Valider</button>
+            <button id="validation-button" disabled={!isNextStepAvailable} onClick={this.props.submit}>Valider</button>
           </div>
         </div>
 
@@ -67,8 +64,8 @@ export class InitialStatesSection extends React.Component {
           <div className="table-container">
             <div className="table-header">
               <div>
-                {isAllValid && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
-                {!isAllValid && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
+                {isNextStepAvailable && <p><img className="img" src="/resources/icon_good.png" alt="warning"/> Données complètes.</p>}
+                {!isNextStepAvailable && <p><img className="img" src="/resources/icon_warning.png" alt="warning"/> L'empreinte de certains comptes ne sont pas initialisés.</p>}
               </div>
               <button onClick={() => this.synchroniseAll()}>Synchroniser les données</button>
             </div>
@@ -82,7 +79,7 @@ export class InitialStatesSection extends React.Component {
       {fetching &&
         <div className="popup">
           <ProgressBar message="Récupération des données par défaut..."
-                        progression={progressionSynchro}/>
+                       progression={syncProgression}/>
         </div>}
 
       </div>
@@ -94,44 +91,41 @@ export class InitialStatesSection extends React.Component {
   // Synchronisation
   async synchroniseAll() 
   {
-    this.setState({fetching: true, progression: 0})
-    const stockAccountsToSync = this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks).filter(immobilisation => immobilisation.initialState == "defaultData");
-    
-    let i=0; let n=stockAccountsToSync.length;
-    for (let stockAccount of stockAccountsToSync) 
-    {
-      await stockAccount.updatePrevFootprintFromRemote();
-      i++;
-      this.setState({progression: Math.round((i/n)*100),financialData: this.props.session.financialData});
-      await new Promise(r => setTimeout(r, 10));
-    }
-    this.props.session.updateFootprints();
-    this.setState({fetching: false, progression:0, financialData: this.props.session.financialData});
-  }
+    // init progression
+    this.setState({fetching: true, syncProgression: 0})
 
-  fetchDefaultData = async (stockOrImmobilisation) => 
-  {
-    await stockOrImmobilisation.updatePrevFootprintFromRemote();
-    this.setState({financialData: this.props.session.financialData});
+    // accounts
+    const accountsToSync = this.props.session.financialData.immobilisations.concat(this.props.session.financialData.stocks)
+                                                                           .filter(account => account.initialState == "defaultData");
+    
+    let i=0; 
+    let n=accountsToSync.length;
+    for (let account of accountsToSync) 
+    {
+      await account.updatePrevFootprintFromRemote();
+      i++;
+      this.setState({syncProgression: Math.round((i/n)*100), financialData: this.props.session.financialData});
+    }
+
+    await this.props.session.updateFootprints();
+    this.setState({fetching: false, syncProgression:0, financialData: this.props.session.financialData});
   }
 
   /* ----- UPDATES ----- */
 
-  updateFootprints = () => {
+  updateFootprints = () => 
+  {
     this.props.session.updateFootprints();
     this.setState({financialData: this.props.session.financialData})
   }
 
+  /* ---------- BACK-UP IMPORT ---------- */
+
   importFile = (event) =>
   {
     let file = event.target.files[0];
-    this.importStates(file);
-  }
 
-  // import session (JSON data -> session)
-  importStates = (file) =>
-  {
-    const reader = new FileReader();
+    let reader = new FileReader();
     reader.onload = async () => 
     {
       // text -> JSON
@@ -139,9 +133,25 @@ export class InitialStatesSection extends React.Component {
 
       // JSON -> session
       this.props.session.financialData.loadInitialStates(prevSession);
+      
+      // Update component
       this.setState({financialData: this.props.session.financialData});
     }
-    reader.readAsText(file);
-  }
 
+    try 
+    {
+      reader.readAsText(file);
+    }
+    catch(error) {this.setState({errorFile: true});}
+  }
+}
+
+/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
+
+const nextStepAvailable = ({financialData}) =>
+// condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
+{
+  let accounts = financialData.immobilisations.concat(financialData.stocks);
+  return(!(accounts.filter(account => account.initialState=="defaultData" && !account.dataFetched)
+                   .length > 0));
 }

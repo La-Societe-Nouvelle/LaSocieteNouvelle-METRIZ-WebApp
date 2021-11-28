@@ -34,10 +34,9 @@ export class CompaniesTable extends React.Component {
 
   render() 
   {
-    const {amounts,nbItems} = this.props;
+    const {nbItems} = this.props;
     const {companies,columnSorted,page} = this.state;
 
-    companies.forEach(company => company.amount = amounts[company.account] || 0);
     this.sortCompanies(companies,columnSorted);
 
     return (

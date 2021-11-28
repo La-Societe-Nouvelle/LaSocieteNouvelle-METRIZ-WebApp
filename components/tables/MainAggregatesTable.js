@@ -1,17 +1,17 @@
 // La Société Nouvelle
 
 // Utils
-import { printValue } from '../../src/utils/Utils';
+import { getAmountItems, printValue } from '../../src/utils/Utils';
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 
 export const MainAggregatesTable = ({financialData}) =>
 {
-  const expensesGroups = financialData.getBasicExpensesGroups();
-        expensesGroups.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+  const externalExpensesMainAccounts = financialData.getBasicExpensesGroups();
+        externalExpensesMainAccounts.forEach(group => group.amount = getAmountItems(group.expenses));
 
-  const depreciationExpensesGroups = financialData.getBasicDepreciationExpensesGroups();
-        depreciationExpensesGroups.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+  const depreciationExpensesMainAccounts = financialData.getBasicDepreciationExpensesGroups();
+        depreciationExpensesMainAccounts.forEach(group => group.amount = getAmountItems(group.expenses));
 
   const {production,
          revenue,
@@ -57,7 +57,7 @@ export const MainAggregatesTable = ({financialData}) =>
             <td>&emsp;Variation de stocks</td>
             <td className="column_value">{printValue(-storedPurchases.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-        {expensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
+        {externalExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
             <td>&emsp;{label}</td>
             <td className="column_value">{printValue(amount,0)}</td>
@@ -68,7 +68,7 @@ export const MainAggregatesTable = ({financialData}) =>
             <td>Consommations de capital fixe</td>
             <td className="column_value important">{printValue(depreciationExpenses.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-        {depreciationExpensesGroups.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
+        {depreciationExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
             <td>&emsp;{label}</td>
             <td className="column_value">{printValue(amount,0)}</td>

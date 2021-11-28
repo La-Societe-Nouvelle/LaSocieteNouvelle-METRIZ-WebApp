@@ -192,6 +192,16 @@ export class FinancialData {
             amount: getAmountItems(this.stocks),
             prevAmount: getPrevAmountItems(this.stocks)
         });
+        this.aggregates.grossAmountStocks = new Aggregate({
+            label: "Stocks",
+            amount: getAmountItems(this.stocks),
+            prevAmount: getPrevAmountItems(this.stocks)
+        });
+        this.aggregates.netAmountStocks = new Aggregate({
+            label: "Stocks",
+            amount: this.getFinalNetAmountStocks(),
+            prevAmount: this.getInitialNetAmountStocks()
+        });
 
         // IMMOBILISATIONS ----------------------------------------- //
 
@@ -216,8 +226,12 @@ export class FinancialData {
         this.companies = this.expenses.concat(this.investments)
                                       .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib, isDefaultAccount: expense.isDefaultAccountAux})})
                                       .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                                      .map(({account,accountLib,isDefaultAccount},id) => new Company({id, account, isDefaultAccount, corporateName: accountLib}));
+                                      .map(({account,accountLib,isDefaultAccount},id) => new Company({id, account, isDefaultAccount, corporateName: accountLib, amount: this.getAmountExpenseByAccountAux(account)}));
+        console.log(this.companies);
     }
+
+    getAmountExpenseByAccountAux = (accountNum) => getAmountItems(this.expenses.concat(this.investments)
+                                                                               .filter(expense => expense.accountAux == accountNum))
 
     /* ---------------------------------------- INITIAL STATES INITIALIZER ---------------------------------------- */
 
@@ -309,8 +323,8 @@ export class FinancialData {
     
     // All stocks
     getVariationStocks = () => this.getFinalAmountStocks() - this.getInitialAmountStocks()
-    getInitialAmountStocks = () => this.stocks.map(stock => stock.prevAmount).reduce((a,b) => a + b,0)
-    getFinalAmountStocks = () => this.stocks.map(stock => stock.amount).reduce((a,b) => a + b,0)
+    getInitialAmountStocks = () => getPrevAmountItems(this.stocks)
+    getFinalAmountStocks = () => getAmountItems(this.stocks)
 
     // Purchases stocks
     getVariationPurchasesStocks = () => this.getFinalAmountPurchasesStocks() - this.getInitialAmountPurchasesStocks()
@@ -322,6 +336,15 @@ export class FinancialData {
     getInitialAmountProductionStocks = () => this.stocks.filter(stock => stock.isProductionStock).map(stock => stock.prevAmount).reduce((a,b) => a + b,0)
     getFinalAmountProductionStocks = () => this.stocks.filter(stock => stock.isProductionStock).map(stock => stock.amount).reduce((a,b) => a + b,0)
     
+    // Net amount
+    getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.account)))
+    getFinalNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.amount - this.getFinalValueLossStock(stock.account)))
+
+    // Value loss
+    getInitialValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount)[0] || 0;
+    getFinalValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.amount)[0] || 0;
+
+
     // IMMOBILISATIONS ----------------------------------------- //
     
     // Net amount
@@ -419,6 +442,12 @@ export class FinancialData {
         let company = this.getCompany(nextProps.id);
         // Update company
         await company.update(nextProps);
+    }
+
+    updateCorporateId = (corporateName,corporateId) => 
+    {
+        let company = this.getCompanyByName(corporateName);
+        if (company!=undefined) company.update({id: company.id,corporateId});
     }
 
     /* ---------------------------------------- Details ---------------------------------------- */
