@@ -237,7 +237,9 @@ class DeclarantForm extends React.Component {
     this.state = {
       declarant: props.declarant,
       email: props.declarant,
-      autorisation: props.autorisation
+      autorisation: props.autorisation,
+      forThirdParty: props.forThirdParty,
+      declarantOrganisation: props.declarantOrganisation
     }
   }
 
@@ -271,7 +273,8 @@ class DeclarantForm extends React.Component {
       {forThirdParty &&
         <div className="inline-input">
           <label>Structure déclarante</label>
-          <InputText value={declarantOrganisation}/>
+          <InputText value={declarantOrganisation}
+                     onUpdate={this.onDeclarantOrganisationChange.bind(this)}/>
         </div>}
         <div className="input" id="certification">
           <input type="checkbox" 
@@ -286,10 +289,11 @@ class DeclarantForm extends React.Component {
     )
   }
 
-  onDeclarantChange = (input) => { this.setState({declarant: input})}
-  onEmailChange = (input) => { this.setState({email: input}) }
-  onAutorisationChange = () => { this.setState({autorisation: !this.state.autorisation})}
-  onThirdPartyChange = () => { this.setState({forThirdParty: !this.state.forThirdParty})}
+  onDeclarantChange = (input) => this.setState({declarant: input})
+  onEmailChange = (input) => this.setState({email: input})
+  onAutorisationChange = () => this.setState({autorisation: !this.state.autorisation})
+  onThirdPartyChange = () => this.setState({forThirdParty: !this.state.forThirdParty})
+  onDeclarantOrganisationChange = (input) => this.setState({declarantOrganisation: input})
   onCommit = () => this.props.onCommit(this.state.declarant,this.state.email,this.state.autorisation,this.state.forThirdParty,this.state.declarantOrganisation);
   onGoBack = () => this.props.goBack();
 
