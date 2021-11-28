@@ -63,27 +63,6 @@ export class Session {
         else return 5;
     }
 
-
-    /* -------------------- GETTERS -------------------- */    
-
-    // Production
-    getRevenueFootprint = () => this.revenueFootprint;
-    getProductionStockVariationsFootprint = () => this.storedProductionFootprint;
-    getProductionFootprint = () => this.productionFootprint;
-
-    // Expenses
-    getIntermediateConsumptionFootprint = () => this.intermediateConsumptionFootprint;
-    getPurchasesStocksVariationsFootprint = () => this.purchasesStocksVariationsFootprint;
-    getExpensesFootprint = () => this.expensesFootprint;
-
-    // Gross Value Added
-    getGrossValueAddedFootprint = () => this.grossValueAddedFootprint;
-    getDepreciationsFootprint = () => this.depreciationExpensesFootprint;
-
-    // Net Value Added
-    getNetValueAddedFootprint = () => this.netValueAddedFootprint;
-    
-
     /* ---------------------------------------- FOOTPRINTS PROCESS ---------------------------------------- */
 
     // Main footprints are stored in variables to avoid processing multiple times when render the results
