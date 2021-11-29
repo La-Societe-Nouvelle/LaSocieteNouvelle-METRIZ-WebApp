@@ -1,5 +1,7 @@
 // La Société Nouvelle
 
+const currentVersion = "1.0.0";
+
 // Libraries
 import metaIndics from '../lib/indics.json';
 
@@ -9,7 +11,6 @@ import { FinancialData } from '/src/FinancialData.js';
 import { ImpactsData } from '/src/ImpactsData.js';
 
 // General objects
-import { SocialFootprint } from '/src/footprintObjects/SocialFootprint.js';
 import { Indicator } from '/src/footprintObjects/Indicator';
 
 // Formulas
@@ -30,6 +31,9 @@ export class Session {
         if (props==undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
         
+        // Version
+        this.version = currentVersion;
+
         // Session
         this.progression = props.progression || 0;
         

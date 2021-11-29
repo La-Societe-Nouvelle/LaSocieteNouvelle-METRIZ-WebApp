@@ -139,6 +139,9 @@ export class InitialStatesSection extends React.Component {
         // text -> JSON
         const prevSession = JSON.parse(reader.result);
 
+        // update to current version
+        updateVersion(prevProps);
+
         if (prevSession.legalUnit.siren == this.props.session.legalUnit.siren
           && parseInt(prevSession.year) == parseInt(this.props.session.year)-1)
         {

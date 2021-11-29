@@ -22,6 +22,7 @@ import { StatementSection } from '../components/sections/StatementSection';
 // Others components
 import { Header } from '/components/Header';
 import { getPrevAmountItems } from '../src/utils/Utils';
+import { updateVersion } from '../src/version/updateVersion';
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -125,6 +126,9 @@ class Metriz extends React.Component {
       // text -> JSON
       const prevProps = JSON.parse(reader.result);
 
+      // update to current version
+      updateVersion(prevProps);
+
       // JSON -> session
       const session = new Session(prevProps);
       
@@ -134,6 +138,7 @@ class Metriz extends React.Component {
         selectedSection: "legalData"
       })
     }
+
     reader.readAsText(file);
   }
 
