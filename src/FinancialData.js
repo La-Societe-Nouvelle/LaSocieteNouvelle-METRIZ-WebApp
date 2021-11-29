@@ -13,6 +13,9 @@ import { Company } from '/src/Company';
 import { getAmountItems, getPrevAmountItems, getSumItems } from './utils/Utils';
 import { Aggregate } from './accountingObjects/Aggregate';
 
+// Scripts
+import { aggregatesBuilder } from './formulas/aggregatesBuilder';
+
 // list aggregates
 const metaAggregates = ["revenue",
                         "production",
@@ -84,12 +87,12 @@ export class FinancialData {
 
         // Aggregates
         this.aggregates = {};
-        data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : this.aggregatesBuilder();
+        data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : aggregatesBuilder(this);
         
     // ---------------------------------------------------------------------------------------------------- //
     }
 
-    /* ---------------------------------------- AGGREGATES BUILDER ---------------------------------------- */
+    /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
 
     expensesAccountsBuilder = () =>
     {
@@ -102,122 +105,6 @@ export class FinancialData {
     getAmountExpenseByAccount = (accountNum) => getAmountItems(this.expenses.concat(this.depreciationExpenses)
                                                                             .concat(this.stockVariations)
                                                                             .filter(expense => expense.account == accountNum))
-
-    /* ---------------------------------------- AGGREGATES BUILDER ---------------------------------------- */
-
-    aggregatesBuilder = () =>
-    {
-        this.aggregates = {}
-
-        // MAIN AGGREGATES ----------------------------------------- //
-
-        this.aggregates.production = new Aggregate({
-            label: "Production",
-            amount: this.getRevenue() + this.getStoredProduction() + this.getImmobilisedProduction()
-        });
-
-        this.aggregates.intermediateConsumption = new Aggregate({
-            label: "Consommations intermédiaires",
-            amount: this.getAmountExternalExpenses() - this.getVariationPurchasesStocks()
-        })
-
-        this.aggregates.grossValueAdded = new Aggregate({
-            label: "Valeur ajoutée brute",
-            amount: this.getProduction() - this.getAmountIntermediateConsumption()
-        })
-
-        this.aggregates.capitalConsumption = new Aggregate({
-            label: "Consommations de capital fixe",
-            amount: this.getAmountDepreciationExpenses()
-        })
-
-        this.aggregates.netValueAdded = new Aggregate({
-            label: "Valeur ajoutée nette",
-            amount: this.getGrossValueAdded() - this.getAmountDepreciationExpenses()
-        })
-
-        // PRODUCTION ---------------------------------------------- //
-
-        this.aggregates.revenue = new Aggregate({
-            label: "Chiffre d'affaires",
-            amount: this.revenue
-        });
-        this.aggregates.storedProduction = new Aggregate({
-            label: "Production stockée",
-            amount: getSumItems(this.stocks.filter(stock => stock.isProductionStock).map(stock => stock.amount - stock.prevAmount))
-        });
-        this.aggregates.immobilisedProduction = new Aggregate({
-            label: "Production immobilisée",
-            amount: this.immobilisedProduction
-        });
-
-        // EXPENSES ------------------------------------------------ //
-
-        this.aggregates.externalExpenses = new Aggregate({
-            label: "Charges externes",
-            amount: getAmountItems(this.expenses)
-        });
-        this.aggregates.depreciationExpenses = new Aggregate({
-            label: "Dotations aux amortissements sur immobilisations",
-            amount: getAmountItems(this.depreciationExpenses)
-        });
-        this.aggregates.storedPurchases = new Aggregate({
-            label: "Variation de stock d'achats et de marchandises",
-            amount: getSumItems(this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.amount - stock.prevAmount))
-        });
-
-        // STOCKS -------------------------------------------------- //
-
-        // Purchases
-        this.aggregates.purchaseStocks = new Aggregate({
-            label: "Stocks d'achats et de marchandises",
-            amount: getAmountItems(this.stocks.filter(stock => !stock.isProductionStock)),
-            prevAmount: getPrevAmountItems(this.stocks.filter(stock => !stock.isProductionStock))
-        });
-
-        // Production
-        this.aggregates.productionStocks = new Aggregate({
-            label: "Stocks de production",
-            amount: getAmountItems(this.stocks.filter(stock => stock.isProductionStock)),
-            prevAmount: getPrevAmountItems(this.stocks.filter(stock => stock.isProductionStock))
-        });
-
-        // Stocks
-        this.aggregates.stocksVariation = new Aggregate({
-            label: "Variation des stocks",
-            amount: getSumItems(this.stocks.map(stock => stock.amount - stock.prevAmount))
-        });
-        this.aggregates.stocks = new Aggregate({
-            label: "Stocks",
-            amount: getAmountItems(this.stocks),
-            prevAmount: getPrevAmountItems(this.stocks)
-        });
-        this.aggregates.grossAmountStocks = new Aggregate({
-            label: "Stocks",
-            amount: getAmountItems(this.stocks),
-            prevAmount: getPrevAmountItems(this.stocks)
-        });
-        this.aggregates.netAmountStocks = new Aggregate({
-            label: "Stocks",
-            amount: this.getFinalNetAmountStocks(),
-            prevAmount: this.getInitialNetAmountStocks()
-        });
-
-        // IMMOBILISATIONS ----------------------------------------- //
-
-        // Immobilisation
-        this.aggregates.grossAmountImmobilisation = new Aggregate({
-            label: "Immobilisations",
-            amount: getAmountItems(this.immobilisations),
-            prevAmount: getPrevAmountItems(this.immobilisations)
-        });
-        this.aggregates.netAmountImmobilisation = new Aggregate({
-            label: "Immobilisations",
-            amount: getSumItems(this.immobilisations.map(immobilisation => immobilisation.amount - this.getFinalValueLossImmobilisation(immobilisation.account))),
-            prevAmount: getSumItems(this.immobilisations.map(immobilisation => immobilisation.prevAmount - this.getInitialValueLossImmobilisation(immobilisation.account)))
-        });
-
-    }
 
     /* ---------------------------------------- COMPANIES INITIALIZER ---------------------------------------- */
 
