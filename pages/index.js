@@ -21,6 +21,7 @@ import { StatementSection } from '../components/sections/StatementSection';
 
 // Others components
 import { Header } from '/components/Header';
+import { getPrevAmountItems } from '../src/utils/Utils';
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -167,6 +168,9 @@ class Metriz extends React.Component {
   {
     // Increase progression
     this.state.session.progression = Math.max(step+1,this.state.session.progression);
+    // skip initial states if first year
+    if (this.state.session.progression == 3 && 
+      getPrevAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks)) == 0) this.state.session.progression++;
     // update current step
     this.setState({step: this.state.session.progression});
   }
