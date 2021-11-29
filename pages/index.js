@@ -17,12 +17,12 @@ import { FinancialDataSection } from '/components/sections/FinancialDataSection'
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { CompaniesSection } from '/components/sections/CompaniesSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
-import { StatementSection } from '../components/sections/StatementSection';
+import { StatementSection } from '/components/sections/StatementSection';
 
 // Others components
 import { Header } from '/components/Header';
-import { getPrevAmountItems } from '../src/utils/Utils';
-import { updateVersion } from '../src/version/updateVersion';
+import { getPrevAmountItems } from '/src/utils/Utils';
+import { updateVersion } from '/src/version/updateVersion';
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -38,9 +38,9 @@ import { updateVersion } from '../src/version/updateVersion';
  */
 
 
-/* ---------------------------------------------- */
-/* -------------------- HOME -------------------- */
-/* ---------------------------------------------- */
+/* -------------------------------------------------------------------------------------- */
+/* ---------------------------------------- HOME ---------------------------------------- */
+/* -------------------------------------------------------------------------------------- */
 
 export default function Home() 
 {
@@ -56,12 +56,14 @@ export default function Home()
   )
 }
 
-/* --------------------------------------------- */
-/* -------------------- APP -------------------- */
-/* --------------------------------------------- */
+/* ------------------------------------------------------------------------------------- */
+/* ---------------------------------------- APP ---------------------------------------- */
+/* ------------------------------------------------------------------------------------- */
 
 /** Notes :
- * 
+ *    2 variables :
+ *        - Session (données saisies) -> LegalUnit (données relatives à l'unité légale) / FinancialData (données comptables) / ImpactsData (données d'impacts)
+ *        - step -> étape courante
  */
 
 class Metriz extends React.Component {
@@ -90,15 +92,8 @@ class Metriz extends React.Component {
     )
   }
 
-  // change selected session
-  changeSection = (nextSelectedSection) => this.setState({selectedSection: nextSelectedSection})
+  // change session
   setStep = (nextStep) => this.setState({step: nextStep});
-
-  // start new session
-  startNewSession = () => 
-  {
-    this.setState({step: 1});
-  }
 
   // download session (session -> JSON data)
   downloadSession = async () => 
@@ -156,13 +151,13 @@ class Metriz extends React.Component {
 
     switch(step)
     {
-      case 0 : return(<StartSection startNewSession={this.startNewSession} 
+      case 0 : return(<StartSection startNewSession={() => this.setStep(1)} 
                                     loadPrevSession={this.loadPrevSession}/>)
       case 1 : return(<SirenSection {...sectionProps}/>)
       case 2 : return(<FinancialDataSection {...sectionProps}/>)
       case 3 : return(<InitialStatesSection {...sectionProps}/>)
       case 4 : return(<CompaniesSection {...sectionProps}/>)
-      case 5 : return(<IndicatorSection {...sectionProps} publish={this.publish}/>)
+      case 5 : return(<IndicatorSection {...sectionProps} publish={() => this.setStep(6)}/>)
       case 6 : return(<StatementSection {...sectionProps}/>)
     }
   }
@@ -173,28 +168,13 @@ class Metriz extends React.Component {
   {
     // Increase progression
     this.state.session.progression = Math.max(step+1,this.state.session.progression);
+
     // skip initial states if first year
     if (this.state.session.progression == 3 && 
       getPrevAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks)) == 0) this.state.session.progression++;
-    // update current step
-    this.setState({step: this.state.session.progression});
-  }
-
-  publish = () =>
-  {
-    this.setState({step: 6});
-  }
-
-  getProgression = (session) =>
-  {
-    const progression = {
-      legalUnitOK: session.legalUnit.dataFetched && /[0-9]{4}/.test(session.legalUnit.year),
-      financialDataOK: session.financialData.isFinancialDataLoaded,
-      companiesOK: !(session.financialData.companies.filter(company => company.status != 200).length > 0),
-      initialStatesOK: !(session.financialData.immobilisations.concat(session.financialData.stocks).filter(account => account.initialState=="defaultData" && !account.dataFetched).length > 0),
-      publicationOK: /[0-9]{9}/.test(session.legalUnit.siren) && Object.entries(session.validations).filter(([_,validation]) => validation).length > 0
-    }
-    return progression;
+    
+      // update current step
+    this.setStep(this.state.session.progression);
   }
 
 }
