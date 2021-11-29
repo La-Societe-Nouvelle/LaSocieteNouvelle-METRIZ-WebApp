@@ -15,7 +15,7 @@ import { StocksTable } from '../tables/StocksTable';
 
 // Components
 import { FECImportPopup } from '../popups/FECImportPopup';
-import { MessagePopup } from '../popups/MessagePopup';
+import { MessagePopup, MessagePopupErrors } from '../popups/MessagePopup';
 
 // Readers
 import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
@@ -35,12 +35,13 @@ export class FinancialDataSection extends React.Component {
       importedData: null,
       errorFile: false,
       errorMessage: "",
+      errors: [],
     }
   }
     
   render() 
   {
-    const {selectedTable,importedData,errorFile,errorMessage} = this.state;
+    const {selectedTable,importedData,errorFile,errorMessage,errors} = this.state;
     
     if (!this.props.session.financialData.isFinancialDataLoaded) 
     {
@@ -77,7 +78,7 @@ export class FinancialDataSection extends React.Component {
           <FECImportPopup FECData={importedData}
                           onValidate={this.loadFECData.bind(this)}/>}
         {errorFile &&
-          <MessagePopup title="Erreur - Fichier" message={errorMessage} closePopup={() => this.setState({errorFile: false})}/>}
+          <MessagePopupErrors title="Erreur - Fichier" message={errorMessage} errors={errors} closePopup={() => this.setState({errorFile: false})}/>}
         </div>)          
     } 
     else 
@@ -128,7 +129,7 @@ export class FinancialDataSection extends React.Component {
               <FECImportPopup FECData={importedData}
                               onValidate={this.loadFECData.bind(this)}/>}
             {errorFile &&
-              <MessagePopup title="Erreur - Fichier" message={errorMessage} closePopup={() => this.setState({errorFile: false})}/>}
+              <MessagePopupErrors title="Erreur - Fichier" message={errorMessage} errors={errors} closePopup={() => this.setState({errorFile: false})}/>}
 
           </div>
         </div>
@@ -169,14 +170,14 @@ export class FinancialDataSection extends React.Component {
         let FECData = await FECFileReader(reader.result)                                  // read file (file -> JSON)
         this.setState({importedData: FECData});                                           // update state with imported data
       } 
-      catch(error) {this.setState({errorFile: true, errorMessage: error});}               // show error(s) (file structure)
+      catch(error) {this.setState({errorFile: true, errorMessage: error, errors: []});}   // show error(s) (file structure)
     }
     
     try 
     {
       reader.readAsText(file, "iso-8859-1");                                              // Read file
     }
-    catch(error) {this.setState({errorFile: true});}                                      // show error (file)
+    catch(error) {this.setState({errorFile: true, errorMessage: error, errors: []});}     // show error (file)
   }
 
   // Load imported data into financial data
@@ -187,7 +188,7 @@ export class FinancialDataSection extends React.Component {
     if (nextFinancialData.errors.length > 0)                                                                              // show error(s) (content)
     {
       nextFinancialData.errors.forEach(error => console.log(error));
-      this.setState({errorFile: true, errorMessage: nextFinancialData.errors[0], importedData: null});
+      this.setState({errorFile: true, errorMessage: "Erreur(s) relvée(s) : ", errors: nextFinancialData.errors, importedData: null});
     }
     else 
     {
