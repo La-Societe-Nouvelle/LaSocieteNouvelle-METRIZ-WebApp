@@ -19,21 +19,24 @@ export class InitialStatesTable extends React.Component {
     {
       columnSorted: "account",
       reverseSort: false,
-      nbItems: 10,
+      nbItems: 20,
       page: 0,
     }
   }
 
   render()
   {
-    const {immobilisations,depreciations,stocks,expenses,investments,stockVariations} = this.props.financialData;
+    const {immobilisations,stocks} = this.props.financialData;
     const {columnSorted,nbItems,page} = this.state;
 
     const accounts = immobilisations.concat(stocks);  // merge array
+    accounts.forEach(account => buildHasInputs(account,this.props.financialData));
+    this.sortItems(accounts,columnSorted);
+
     this.sortItems(immobilisations,columnSorted);
     this.sortItems(stocks,columnSorted);
 
-    const nbAccounts = immobilisations.length + stocks.length;
+    const nbAccounts = accounts.length;
     
     return (
       <div className="table-main">
@@ -48,22 +51,12 @@ export class InitialStatesTable extends React.Component {
               <td colSpan="2"></td></tr>
           </thead>
           <tbody>
-            {immobilisations.slice(page*nbItems,(page+1)*nbItems)
-                            .map((immobilisation) => 
-              <RowTableImmobilisations key={"immobilisation_"+immobilisation.id} 
-                                        {...immobilisation}
-                                        depreciations={depreciations}
-                                        investments={investments}
-                                        onInitialStateUpdate={this.updateImmobilisation.bind(this)}
-                                        syncData={this.synchroniseImmobilisation.bind(this)}/>)}
-            {stocks.slice(page*nbItems,(page+1)*nbItems)
-                   .map(stock => 
-              <RowTableStocks key={"stock_"+stock.id} 
-                              {...stock}
-                              expenses={expenses}
-                              stockVariations={stockVariations}
-                              onInitialStateUpdate={this.updateStock.bind(this)}
-                              syncData={this.synchroniseStock.bind(this)}/>)}
+            {accounts.slice(page*nbItems,(page+1)*nbItems)
+                     .map((account) => 
+              <Row key={account.account} 
+                   {...account}
+                   onInitialStateUpdate={this.updateAccount.bind(this)}
+                   syncData={this.synchroniseAccount.bind(this)}/>)}
           </tbody>
         </table>
 
@@ -79,16 +72,20 @@ export class InitialStatesTable extends React.Component {
 
   /* ---------- ACTIONS ---------- */
 
-  synchroniseImmobilisation = async (id) => 
+  synchroniseAccount = async (accountNum) =>
   {
-    let immobilisation = this.props.financialData.getImmobilisation(id);
-    await this.fetchDefaultData(immobilisation);
-  }
-
-  synchroniseStock = async (id) =>
-  {
-    let stock = this.props.financialData.getStock(id);
-    await this.fetchDefaultData(stock);
+    // Immobilisation
+    if (/^2/.test(accountNum)) 
+    {
+      let immobilisation = this.props.financialData.getImmobilisationByAccount(accountNum);
+      this.fetchDefaultData(immobilisation);
+    } 
+    // Stock
+    else if (/^3/.test(accountNum)) 
+    {
+      let stock = this.props.financialData.getStockByAccount(accountNum);
+      this.fetchDefaultData(stock);
+    }
   }
 
   async fetchDefaultData(stockOrImmobilisation) 
@@ -123,43 +120,60 @@ export class InitialStatesTable extends React.Component {
   
   /* ----- OPERATIONS ON IMMOBILISATION ----- */
 
-  updateImmobilisation(nextProps) 
+  updateAccount = (nextProps) =>
   {
-    this.props.financialData.updateImmobilisation(nextProps)
-      .then(() => this.forceUpdate());
+    // Immobilisation
+    if (/^2/.test(nextProps.account)) this.props.financialData.updateImmobilisation(nextProps);
+    // Stock
+    else if (/^3/.test(nextProps.account)) this.props.financialData.updateStock(nextProps);
+    
     this.props.onUpdate();
   }
 
-  updateStock(nextProps) 
-  {
-    this.props.financialData.updateStock(nextProps)
-      .then(() => this.forceUpdate());
-    this.props.onUpdate();
-  }
+}
 
+/* ---------- INPUTS/OUTPUTS AVAILABLE ---------- */
+
+const buildHasInputs = (account,financialData) =>
+{
+  if (/^3/.test(account.account)) {
+    account.hasInputs = financialData.expenses.filter(expense => expense.account == account.accountAux).length > 0;
+    account.hasOutputs = financialData.stockVariations.filter(stockVariation => stockVariation.accountAux == account.account).length > 0;
+  } else if (/^2/.test(account.account)) {
+    account.hasInputs = financialData.investments.filter(investment => investment.account == account.account).length > 0;
+    account.hasOutputs = financialData.depreciations.filter(depreciation => depreciation.accountAux == account.account).length > 0;
+  }
+}
+
+/* ---------- ROWS ---------- */
+
+const Row = (props) => 
+{
+  switch(props.account.charAt(0))
+  {
+    case "2": return <RowTableImmobilisations {...props}/>
+    case "3": return <RowTableStocks {...props}/>
+  }
 }
 
 /* ---------- ROW IMMOBILISATION ---------- */
 
 function RowTableImmobilisations(props) 
 {
-  const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,depreciations,investments,isDepreciableImmobilisation} = props;
+  const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
   const activityCode = prevFootprintActivityCode.substring(0,2);
-
-  const entries = investments.filter(investment => investment.account == account);
-  const immobilisationUsed = depreciations.filter(depreciation => depreciation.accountAux == account).length > 0;
 
   const [toggleIcon,setToggleIcon] = useState(false);
 
-  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, prevFootprintActivityCode: event.target.value})
-  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, initialState: event.target.value})
-  const syncData = async (event) => {
+  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, account: account, prevFootprintActivityCode: event.target.value})
+  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, account: account, initialState: event.target.value})
+  const syncData = async () => {
     setToggleIcon(true);
-    await props.syncData(id);
+    await props.syncData(account);
     setToggleIcon(false);
   }
 
-  if (isDepreciableImmobilisation && immobilisationUsed) {
+  if (isDepreciableImmobilisation && hasOutputs) {
     return (<tr>
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
@@ -169,7 +183,7 @@ function RowTableImmobilisations(props)
                         onChange={onOriginStateChange}>
                   {initialState=="none" &&          <option key="none" value="none">---</option>}
                   {initialState=="prevFootprint" && <option key="prevFootprint" value="prevFootprint">Reprise sur exerice précédent</option>}
-                  {entries.length > 0 &&            <option key="currentFootprint" value="currentFootprint">Estimée sur exerice courant</option>}
+                  {hasInputs &&            <option key="currentFootprint" value="currentFootprint">Estimée sur exerice courant</option>}
                   <option key="defaultData" value="defaultData">Valeurs par défaut</option>
                 </select>
               </td>
@@ -188,7 +202,7 @@ function RowTableImmobilisations(props)
               {initialState=="defaultData" &&
                 <td className="column_icon">
                   <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-                      onClick={() => syncData(id)}/></td>}
+                      onClick={() => syncData()}/></td>}
             </tr>)
   } 
   else if (isDepreciableImmobilisation) {
@@ -201,7 +215,7 @@ function RowTableImmobilisations(props)
               {initialState=="defaultData" &&
                 <td className="column_icon">
                   <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-                        onClick={() => syncData(id)}/></td>}
+                        onClick={() => syncData()}/></td>}
             </tr>)
   } else {
     return (<tr>
@@ -213,7 +227,7 @@ function RowTableImmobilisations(props)
               {initialState=="defaultData" &&
                 <td className="column_icon">
                   <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-                        onClick={() => syncData(id)}/></td>}
+                        onClick={() => syncData()}/></td>}
             </tr>)
   }
 }
@@ -222,19 +236,16 @@ function RowTableImmobilisations(props)
 
 function RowTableStocks(props)
 {
-  const {id,prevAmount,account,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,expenses,stockVariations} = props;
+  const {id,prevAmount,account,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs} = props;
   const activityCode = prevFootprintActivityCode.substring(0,2);
-
-  const entries = expenses.filter(expense => expense.account == accountAux);
-  const stockUsed = stockVariations.filter(stockVariation => stockVariation.accountAux == account).length > 0;
 
   const [toggleIcon,setToggleIcon] = useState(false);
 
-  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, prevFootprintActivityCode: event.target.value})
-  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, initialState: event.target.value})
-  const syncData = async (event) => {
+  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, account: account, prevFootprintActivityCode: event.target.value})
+  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, account: account, initialState: event.target.value})
+  const syncData = async () => {
     setToggleIcon(true);
-    await props.syncData(id);
+    await props.syncData(account);
     setToggleIcon(false);
   }
 
@@ -249,7 +260,7 @@ function RowTableStocks(props)
                   onChange={onOriginStateChange}>
             {initialState=="none" && <option key="none" value="none">---</option>}
             {initialState=="prevFootprint" && <option key="prevFootprint" value="prevFootprint">Reprise sur exerice précédent</option>}
-            {entries.length > 0 && <option key="currentFootprint" value="currentFootprint">Estimée sur exercice courant</option>}
+            {hasInputs > 0 && <option key="currentFootprint" value="currentFootprint">Estimée sur exercice courant</option>}
             <option key="defaultData" value="defaultData">Valeurs par défaut</option>
           </select></td>}
       {isProductionStock &&
@@ -270,7 +281,7 @@ function RowTableStocks(props)
       {initialState=="defaultData" &&
         <td className="column_icon">
           <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-               onClick={() => syncData(id)}/></td>}
+               onClick={() => syncData()}/></td>}
     </tr>
   )
 }
