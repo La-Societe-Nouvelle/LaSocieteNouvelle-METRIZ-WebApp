@@ -2,10 +2,10 @@
 
 // React
 import React from 'react';
-import { ProgressBar } from '../popups/ProgressBar';
 
 // Components
 import { InitialStatesTable } from '/components/tables/InitialStatesTable'
+import { ProgressBar } from '../popups/ProgressBar';
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -131,11 +131,14 @@ export class InitialStatesSection extends React.Component {
       // text -> JSON
       const prevSession = JSON.parse(reader.result);
 
-      // JSON -> session
-      this.props.session.financialData.loadInitialStates(prevSession);
-      
-      // Update component
-      this.setState({financialData: this.props.session.financialData});
+      if (parseInt(prevSession.year) == parseInt(this.props.session.year)-1)
+      {
+        // JSON -> session
+        this.props.session.financialData.loadInitialStates(prevSession);
+  
+        // Update component
+        this.setState({financialData: this.props.session.financialData});
+      }
     }
 
     try 
@@ -146,7 +149,7 @@ export class InitialStatesSection extends React.Component {
   }
 }
 
-/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
+/* -------------------------------------------------- NEXT SECTION -------------------------------------------------- */
 
 const nextStepAvailable = ({financialData}) =>
 // condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
