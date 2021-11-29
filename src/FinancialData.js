@@ -273,8 +273,8 @@ export class FinancialData {
             }
             else
             {
-                account.prevFootprint = new SocialFootprint();
-                account.initialState = account.isProductionStock ? "currentFootprint" : "defaultData";
+                stock.prevFootprint = new SocialFootprint();
+                stock.initialState = account.isProductionStock ? "currentFootprint" : "defaultData";
             }
         })
 
