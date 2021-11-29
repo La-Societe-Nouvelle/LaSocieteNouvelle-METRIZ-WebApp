@@ -6,6 +6,7 @@ import React from 'react';
 // Components
 import { InitialStatesTable } from '/components/tables/InitialStatesTable'
 import { ProgressBar } from '../popups/ProgressBar';
+import { MessagePopup } from '../popups/MessagePopup';
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -20,13 +21,16 @@ export class InitialStatesSection extends React.Component {
     {
       financialData: props.session.financialData,
       fetching: false,
-      syncProgression: 0
+      syncProgression: 0,
+      showMessage: false,
+      titlePopup: "",
+      message: ""
     }
   }
     
   render()
   {
-    const {financialData,fetching,syncProgression} = this.state;
+    const {financialData,fetching,syncProgression,showMessage,titlePopup,message} = this.state;
     const accountsShowed = financialData.immobilisations.concat(financialData.stocks);
 
     const isNextStepAvailable = nextStepAvailable(this.state);
@@ -81,6 +85,8 @@ export class InitialStatesSection extends React.Component {
           <ProgressBar message="Récupération des données par défaut..."
                        progression={syncProgression}/>
         </div>}
+      {showMessage &&
+        <MessagePopup title={titlePopup} message={message} closePopup={() => this.setState({showMessage: false})}/>}
 
       </div>
     )
@@ -128,24 +134,31 @@ export class InitialStatesSection extends React.Component {
     let reader = new FileReader();
     reader.onload = async () => 
     {
-      // text -> JSON
-      const prevSession = JSON.parse(reader.result);
-
-      if (parseInt(prevSession.year) == parseInt(this.props.session.year)-1)
+      try
       {
-        // JSON -> session
-        this.props.session.financialData.loadInitialStates(prevSession);
-  
-        // Update component
-        this.setState({financialData: this.props.session.financialData});
+        // text -> JSON
+        const prevSession = JSON.parse(reader.result);
+
+        if (prevSession.legalUnit.siren == this.props.session.legalUnit.siren
+          && parseInt(prevSession.year) == parseInt(this.props.session.year)-1)
+        {
+          // JSON -> session
+          this.props.session.financialData.loadInitialStates(prevSession);
+    
+          // Update component
+          this.setState({financialData: this.props.session.financialData});
+        }
+        else if (prevSession.legalUnit.siren!=this.props.session.legalUnit.siren) {this.setState({titlePopup: "Erreur - Fichier", message: "Les numéros de siren ne correspondent pas.", showMessage: true})}
+        else {this.setState({titlePopup: "Erreur - Fichier", message: "La sauvegarde ne correspond pas à l'année précédente.", showMessage: true})}
       }
+      catch(error) {this.setState({titlePopup: "Erreur - Fichier", message: "Fihcier non lisible.", showMessage: true});}
     }
 
     try 
     {
       reader.readAsText(file);
     }
-    catch(error) {this.setState({errorFile: true});}
+    catch(error) {this.setState({titlePopup: "Erreur - Fichier", message: "Fihcier non lisible.", showMessage: true});}
   }
 }
 
