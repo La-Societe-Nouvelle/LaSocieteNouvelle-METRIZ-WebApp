@@ -175,7 +175,7 @@ export class LegalUnit {
     else this.productionAreaFootprint = new SocialFootprint();
 
     // PIB FRA (Value Added in France)
-    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GDP";
+    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GVA";
     console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
@@ -198,7 +198,7 @@ export class LegalUnit {
     else this.productionAreaFootprint = new SocialFootprint();
 
     // PIB FRA (Value Added in France)
-    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GDP";
+    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GVA";
     console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
