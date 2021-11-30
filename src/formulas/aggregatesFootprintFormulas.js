@@ -82,19 +82,21 @@ export const updateAccountsFootprints = async (indic,financialData) =>
     // Immobilisation ------------------------------------------------------------ //
 
     // ...previous immobilisation footprints based on current financial year
-    financialData.immobilisations.filter(immobilisation => immobilisation.initialState == "currentFootprint")
-                                 .map(async (immobilisation) => 
+    await financialData.immobilisations.filter(immobilisation => immobilisation.initialState == "currentFootprint")
+                                       .map(async (immobilisation) => 
     {
         let investmentsRelatedToImmobilisation = financialData.investments.filter(investment => investment.account == immobilisation.account);
         immobilisation.prevFootprint.indicators[indic] = await buildIndicatorAggregate(indic,investmentsRelatedToImmobilisation);
+        return;
     });
 
     // ...previous depreciation footprints based on current financial year
-    financialData.depreciations.filter(depreciation => depreciation.initialState == "currentFootprint")
-                               .map(async (depreciation) => 
+    await financialData.depreciations.filter(depreciation => depreciation.initialState == "currentFootprint")
+                                     .map(async (depreciation) => 
     {
         let immobilisation = financialData.getImmobilisationByAccount(depreciation.accountAux);
         depreciation.prevFootprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
+        return;
     });
 
     // Depreciation expenses ----------------------------------------------------- //

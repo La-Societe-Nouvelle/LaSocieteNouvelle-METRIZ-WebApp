@@ -19,7 +19,7 @@ export const MainAggregatesTable = ({financialData}) =>
          immobilisedProduction,
          intermediateConsumption,
          storedPurchases,
-         depreciationExpenses,
+         capitalConsumption,
          netValueAdded} = financialData.aggregates;
   
   return(
@@ -66,7 +66,7 @@ export const MainAggregatesTable = ({financialData}) =>
 
           <tr className="with-top-line">
             <td>Consommations de capital fixe</td>
-            <td className="column_value important">{printValue(depreciationExpenses.amount,0)}</td>
+            <td className="column_value important">{printValue(capitalConsumption.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
         {depreciationExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
           <tr key={index}>
