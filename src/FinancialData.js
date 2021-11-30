@@ -16,6 +16,9 @@ import { Aggregate } from './accountingObjects/Aggregate';
 // Scripts
 import { aggregatesBuilder } from './formulas/aggregatesBuilder';
 
+// Libraries
+import accountsMatching from '/lib/accountsMatching'
+
 // list aggregates
 const metaAggregates = ["revenue",
                         "production",
@@ -114,7 +117,6 @@ export class FinancialData {
                                       .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib, isDefaultAccount: expense.isDefaultAccountAux})})
                                       .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
                                       .map(({account,accountLib,isDefaultAccount},id) => new Company({id, account, isDefaultAccount, corporateName: accountLib, amount: this.getAmountExpenseByAccountAux(account)}));
-        console.log(this.companies);
     }
 
     getAmountExpenseByAccountAux = (accountNum) => getAmountItems(this.expenses.concat(this.investments)
@@ -136,6 +138,20 @@ export class FinancialData {
         // Stocks (production)
         this.stocks.filter(stock => stock.isProductionStock)
                    .forEach(stock => stock.initialState = "currentFootprint");
+
+        // match accounts
+        this.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+                            .filter(immobilisation => immobilisation.initialState == "defaultData")
+                            .forEach(immobilisation => 
+        {
+            accountsMatching.branche.forEach(matching => 
+            {
+                let regex = new RegExp(matching.accountRegex);
+                if (regex.test(immobilisation.account)) {
+                    //immobilisation.prevFootprintActivityCode = matching.branche;
+                }
+            })
+        });
     }
 
     /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
