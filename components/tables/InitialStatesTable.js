@@ -8,6 +8,7 @@ import { printValue } from '/src/utils/Utils';
 
 // Libraries
 import divisions from '/lib/divisions'; 
+import branches from '/lib/branches'; 
 
 /* ---------- INITIAL STATES TABLE ---------- */
 
@@ -162,6 +163,7 @@ function RowTableImmobilisations(props)
 {
   const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
   const activityCode = prevFootprintActivityCode.substring(0,2);
+  console.log(activityCode);
 
   const [toggleIcon,setToggleIcon] = useState(false);
 
@@ -183,7 +185,7 @@ function RowTableImmobilisations(props)
                         onChange={onOriginStateChange}>
                   {initialState=="none" &&          <option key="none" value="none">---</option>}
                   {initialState=="prevFootprint" && <option key="prevFootprint" value="prevFootprint">Reprise sur exerice précédent</option>}
-                  {hasInputs &&            <option key="currentFootprint" value="currentFootprint">Estimée sur exerice courant</option>}
+                  {hasInputs &&                     <option key="currentFootprint" value="currentFootprint">Estimée sur exerice courant</option>}
                   <option key="defaultData" value="defaultData">Valeurs par défaut</option>
                 </select>
               </td>
@@ -192,8 +194,8 @@ function RowTableImmobilisations(props)
                 <select className={dataFetched ? " valid" : ""}
                         value={activityCode}
                         onChange={onActivityCodeChange}>
-                  {Object.entries(divisions)
-                         .sort((a,b) => parseInt(a)-parseInt(b))
+                  {Object.entries(branches)
+                         .sort((a,b) => a[0].localeCompare(b[0]))
                          .map(([code,libelle]) => 
                     <option className={(activityCode && code==activityCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
                 </select></td>}

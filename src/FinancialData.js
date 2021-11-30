@@ -148,7 +148,7 @@ export class FinancialData {
             {
                 let regex = new RegExp(matching.accountRegex);
                 if (regex.test(immobilisation.account)) {
-                    //immobilisation.prevFootprintActivityCode = matching.branche;
+                    immobilisation.prevFootprintActivityCode = matching.branche;
                 }
             })
         });
