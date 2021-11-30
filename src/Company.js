@@ -160,7 +160,7 @@ export class Company {
     else if (this.state=="default")
     {
       // request
-      let endpoint = apiBaseUrl + "default?" + "pays="+this.footprintAreaCode + "&activite="+this.footprintActivityCode +"&flow=PRD";
+      let endpoint = apiBaseUrl + "default?" + "area="+this.footprintAreaCode + "&activity="+this.footprintActivityCode +"&flow=PRD";
       let response = await this.fetchData(endpoint);
       
       if (response!=null) // code == 200 ------------------------------ //

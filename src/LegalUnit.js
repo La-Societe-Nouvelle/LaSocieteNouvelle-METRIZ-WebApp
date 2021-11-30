@@ -134,7 +134,7 @@ export class LegalUnit {
       let division = this.activityCode.substring(0,2);
       
       // Production
-      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=PRD";
+      endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=PRD";
       console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
@@ -142,7 +142,7 @@ export class LegalUnit {
       else this.productionSectorFootprint = new SocialFootprint();
       
       // Value Added
-      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=GVA";
+      endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=GVA";
       console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
@@ -150,7 +150,7 @@ export class LegalUnit {
       else this.valueAddedSectorFootprint = new SocialFootprint();
       
       // Intermediate Consumption
-      endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow=IC";
+      endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=IC";
       console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
@@ -167,7 +167,7 @@ export class LegalUnit {
     // Fetch area footprints
     
     // PIB+IMP FRA (Available production in FRA)
-    endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GAP";
+    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GAP";
     console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
@@ -175,7 +175,7 @@ export class LegalUnit {
     else this.productionAreaFootprint = new SocialFootprint();
 
     // PIB FRA (Value Added in France)
-    endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GDP";
+    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GDP";
     console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
@@ -190,7 +190,7 @@ export class LegalUnit {
     // Fetch area footprints
     
     // PIB+IMP FRA (Available production in FRA)
-    endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GAP";
+    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GAP";
     console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
@@ -198,7 +198,7 @@ export class LegalUnit {
     else this.productionAreaFootprint = new SocialFootprint();
 
     // PIB FRA (Value Added in France)
-    endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite=00" +"&flow=GDP";
+    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GDP";
     console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();

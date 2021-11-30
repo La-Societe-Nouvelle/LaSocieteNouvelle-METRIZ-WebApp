@@ -92,7 +92,7 @@ export class Immobilisation {
     if (this.initialState=="defaultData") 
     {
       // request
-      let endpoint = apiBaseUrl + "default?" + "pays="+this.prevFootprintAreaCode + "&activite="+this.prevFootprintActivityCode +"&flow=PRD";
+      let endpoint = apiBaseUrl + "default?" + "area="+this.prevFootprintAreaCode + "&activity="+this.prevFootprintActivityCode +"&flow=PRD";
       let response = await this.fetchData(endpoint);
       
       if (response!=null) // code == 200 ------------------------------ //
