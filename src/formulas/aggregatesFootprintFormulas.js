@@ -91,7 +91,8 @@ export const updateAccountsFootprints = async (indic,financialData) =>
     });
 
     // ...previous depreciation footprints based on current financial year
-    await financialData.depreciations.filter(depreciation => depreciation.initialState == "currentFootprint")
+    await financialData.depreciations.filter(depreciation => /^28/.test(depreciation.account))
+                                     .filter(depreciation => depreciation.initialState == "currentFootprint")
                                      .map(async (depreciation) => 
     {
         let immobilisation = financialData.getImmobilisationByAccount(depreciation.accountAux);
