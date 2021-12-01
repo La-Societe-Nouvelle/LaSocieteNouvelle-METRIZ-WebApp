@@ -10,7 +10,7 @@
               {"accountRegex": "^212", "branche": "FZ"},
               {"accountRegex": "^213", "branche": "FZ"},
               {"accountRegex": "^214", "branche": "FZ"},
-              {"accountRegex": "^215(1|3|4|5)", "branche": "CK"},
+              {"accountRegex": "^215[^7]", "branche": "CK"},
               {"accountRegex": "^2157", "branche": "FZ"},
               {"accountRegex": "^2182", "branche": "CL"},
               {"accountRegex": "^2183", "branche": "CI"},
