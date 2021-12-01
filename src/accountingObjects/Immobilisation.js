@@ -42,7 +42,7 @@ export class Immobilisation {
     this.initialState = initialState || "none";
     this.prevFootprint = new SocialFootprint(prevFootprint)
     this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
-    this.prevFootprintActivityCode = prevFootprintActivityCode || "00";
+    this.prevFootprintActivityCode = prevFootprintActivityCode || "TOTAL";
 
     // Updates
     this.status = status || null;                                           // 200 (ok), 404 (not found), 500 (server error)
