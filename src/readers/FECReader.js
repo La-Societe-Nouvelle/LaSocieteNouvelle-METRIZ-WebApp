@@ -184,7 +184,7 @@ export async function FECDataReader(FECData)
   // Meta ----------------------------------------------------------------------------------------------- //
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
-  //data.expenseAccounts = [];
+  data.ignoreDepreciationEntries = [];
   data.errors =[];
 
   // Production / Incomes ------------------------------------------------------------------------------- //
@@ -708,9 +708,12 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
   if (/^68(1|7)1/.test(ligneCourante.CompteNum))
   {
     // lignes des comptes d'amortissements
-    let otherDepreciationExpensesOnEntry = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                                && ligne.EcritureLib == ligneCourante.EcritureLib
-                                                                && /^68(1|7)1/.test(ligne.CompteNum)).length > 1;
+    let otherDepreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
+                                                         && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                         && /^68(1|7)1/.test(ligne.CompteNum))
+    let otherDepreciationExpensesOnEntry = otherDepreciationExpenses.length > 1;
+    let sameAccountUsed = otherDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length > 1;
+
     let regexPrefixeCompteAmortissements = otherDepreciationExpensesOnEntry ? ( /^68(1|7)11/.test(ligneCourante.CompteNum) ? /^280/
                                                                               : /^68(1|7)12/.test(ligneCourante.CompteNum) ? /^28(1|2)/
                                                                                                                            : /^28/)
@@ -719,6 +722,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
                                                     && ligne.EcritureLib == ligneCourante.EcritureLib
                                                     && regexPrefixeCompteAmortissements.test(ligne.CompteNum));
     
+    // cas basique
     let equilibre = checkBalance([ligneCourante],lignesDepreciations);
     if (equilibre) 
     {
@@ -746,6 +750,35 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
           data.depreciationExpenses.push(depreciationExpenseData);
         }
       })
+    }
+    // case - lignes multiples (un seul numéro de compte utilisé)
+    else if (sameAccountUsed && checkBalance(otherDepreciationExpenses,lignesDepreciations) && !data.ignoreDepreciationEntries(ligneCourante.EcritureNum))
+    {
+      lignesDepreciations.forEach((ligneDepreciation) =>
+      {
+        // retrieve depreciation expense item
+        let accountDepreciationExpense = ligneCourante.CompteNum.substring(0,4)+(/^280/.test(ligneDepreciation.CompteNum) ? "1" : "2");
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == accountDepreciationExpense
+                                                                           && expense.accountAux == ligneDepreciation.CompteNum)[0];
+
+        if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
+
+        else
+        {
+          // depreciation expense data
+          let depreciationExpenseData = 
+          {
+            label: ligneCourante.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+            account: accountDepreciationExpense,
+            accountLib: ligneCourante.CompteLib,
+            accountAux: ligneDepreciation.CompteNum,
+            amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
+          }
+          // push data
+          data.depreciationExpenses.push(depreciationExpenseData);
+        }
+      })
+      data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
     }
     else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements)."
   }
