@@ -162,8 +162,7 @@ const Row = (props) =>
 function RowTableImmobilisations(props) 
 {
   const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
-  const activityCode = prevFootprintActivityCode.substring(0,2);
-  console.log(activityCode);
+  const activityCode = /^[0-9]{2}/.test(prevFootprintActivityCode) ? prevFootprintActivityCode.substring(0,2) : prevFootprintActivityCode;
 
   const [toggleIcon,setToggleIcon] = useState(false);
 
