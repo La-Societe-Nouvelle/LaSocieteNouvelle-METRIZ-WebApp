@@ -30,14 +30,14 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
         let amount = usePrev ? element.prevAmount : element.amount;
         let indicatorElement = usePrev ? element.prevFootprint.indicators[indic] : element.footprint.indicators[indic];
 
-        if (amount!=null && indicatorElement.getValue()!=null) 
+        if (amount!=null && amount!=0 && indicatorElement.getValue()!=null) 
         {
             grossImpact+= indicatorElement.getValue()*amount;
             grossImpactMax+= Math.max(indicatorElement.getValueMax()*amount,indicatorElement.getValueMin()*amount);
             grossImpactMin+= Math.min(indicatorElement.getValueMax()*amount,indicatorElement.getValueMin()*amount);
             totalAmount+= amount;
         } 
-        else {missingData = true}
+        else if (amount==null || (amount!=0 && indicatorElement.getValue()==null)) {missingData = true}
     })
 
     if (!missingData && totalAmount != 0) { 
@@ -60,8 +60,8 @@ export function buildIndicatorMerge(indicatorA,amountA,
 {
     let indicator = new Indicator({indic: indicatorA.getIndic()});
 
-    if (indicatorA.getValue()!=null && amountA!=null
-     && indicatorB.getValue()!=null && amountB!=null)
+    if (indicatorA.getValue()!=null && amountA!=null && amountA!=0
+     && indicatorB.getValue()!=null && amountB!=null && amountB!=0)
     {
         let totalAmount = amountA + amountB;
         let grossImpact = indicatorA.getValue()*amountA + indicatorB.getValue()*amountB;
@@ -78,6 +78,16 @@ export function buildIndicatorMerge(indicatorA,amountA,
             indicator.setValue(null); 
             indicator.setUncertainty(null);
         }
+    }
+    else if (indicatorA.getValue()!=null && amountA!=null && amountA!=0 && amountB!=null && amountB==0)
+    {
+        indicator.setValue(indicatorA.getValue());
+        indicator.setUncertainty(indicatorA.getValue());
+    }
+    else if (indicatorB.getValue()!=null && amountB!=null && amountB!=0 && amountA!=null && amountA==0)
+    {
+        indicator.setValue(indicatorB.getValue());
+        indicator.setUncertainty(indicatorB.getValue());
     }
      
     return indicator;
