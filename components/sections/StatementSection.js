@@ -153,7 +153,7 @@ class IndicatorSelection extends React.Component
           <tbody>
             {Object.keys(metaIndics).map(indic =>  
               <tr key={indic}>
-                <td className="auto">{metaIndics[indic].libelle}</td>
+                <td className="auto">{metaIndics[indic].libelle+(metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
                 <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndics[indic].nbDecimals)}</td>
                 <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
                 <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty,0)}&nbsp;%</td>

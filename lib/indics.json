@@ -1,5 +1,6 @@
 {
   "art": {
+    "isBeta": true,
     "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Contribution aux Métiers d'Art et aux Savoir-Faire",
@@ -11,6 +12,7 @@
     "unitAbsolute": "€"
   },
   "dis": {
+    "isBeta": true,
     "libelle": "Indice de répartition des rémunérations",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Répartition des rémunérations",
@@ -22,6 +24,7 @@
     "unitAbsolute": "/100"
   },
   "eco": {
+    "isBeta": false,
     "libelle": "Contribution à l'économie nationale",
     "libelleDeclaredValue": "Valeur ajoutée nette produite en France",
     "libelleGrandeur": "Contribution à l'économie nationale",
@@ -33,6 +36,7 @@
     "unitAbsolute": "€"
   },
   "geq": {
+    "isBeta": false,
     "libelle": "Indice d'écart de rémunérations F/H",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Ecart de rémunérations F/H",
@@ -44,6 +48,7 @@
     "unitAbsolute": "%"
   },
   "ghg": {
+    "isBeta": false,
     "libelle": "Intensité d'Emissions de Gaz à effet de serre",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Emissions de Gaz à effet de serre",
@@ -55,6 +60,7 @@
     "unitAbsolute": "kgCO2e"
   },
   "haz": {
+    "isBeta": true,
     "libelle": "Intensité d'Utilisation de produits dangereux",
     "libelleDeclaredValue": "Quantité utilisée de produits dangereux pour la santé et/ou l'environnement",
     "libelleGrandeur": "Utilisation de produits dangereux - santé/environnement",
@@ -66,6 +72,7 @@
     "unitAbsolute": "kg"
   },
   "knw": {
+    "isBeta": false,
     "libelle": "Contribution à l'Evolution des compétences et des connaissances",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Contribution à l'Evolution des compétences et des connaissances",
@@ -77,6 +84,7 @@
     "unitAbsolute": "€"
   },
   "mat": {
+    "isBeta": true,
     "libelle": "Intensité d'Extraction de Matières premières",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Extraction de matières premières",
@@ -88,6 +96,7 @@
     "unitAbsolute": "kg"
   },
   "nrg": {
+    "isBeta": false,
     "libelle": "Intensité de Consommation d'Energie",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Consommation d'énergie",
@@ -99,6 +108,7 @@
     "unitAbsolute": "MJ"
   },
   "soc": {
+    "isBeta": false,
     "libelle": "Contribution aux Acteurs d'Intérêt social",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Contribution aux Acteurs d'Intérêt social",
@@ -110,6 +120,7 @@
     "unitAbsolute": "€"
   },
   "was": {
+    "isBeta": false,
     "libelle": "Intensité de Production de Déchets",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Production de déchets",
@@ -121,6 +132,7 @@
     "unitAbsolute": "kg"
   },
   "wat": {
+    "isBeta": false,
     "libelle": "Intensité de Consommation d'Eau",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Consommation d'eau",
