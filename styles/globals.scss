@@ -192,6 +192,12 @@ select {
           //border: solid 1px $highlight-color;
         }
       }
+
+      p {
+        @include xs {
+          display: none;
+        }
+      }
     }
   }
 
