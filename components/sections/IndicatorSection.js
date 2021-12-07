@@ -140,7 +140,7 @@ export class IndicatorSection extends React.Component {
                       onChange={this.changeShowedTable}>
                 <option key="1" value="mainAggregates">Soldes intermédiaires de gestion</option>
                 <option key="2" value="expensesAccounts">Détails - Comptes de charges</option>
-                <option key="3" value="companies">Valeurs publiées - Fournisseurs</option>
+                {/*<option key="3" value="companies">Valeurs publiées - Fournisseurs</option>*/}
               </select>
             </div>
             {this.buildtable(selectedTable)}
