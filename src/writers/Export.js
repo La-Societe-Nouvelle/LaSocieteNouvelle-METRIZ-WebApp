@@ -9,6 +9,9 @@ import metaIndics from '../../lib/indics';
 // Sources
 import { buildIndicatorAggregate } from '../formulas/footprintFormulas';
 
+// Utils
+import { printValue } from '/src/utils/Utils';
+
 // Statement writers
 import { writeStatementART } from '../../components/statements/StatementART';
 import { writeStatementDIS } from '../../components/statements/StatementDIS';
@@ -109,9 +112,10 @@ function exportIndicPDF(indic,session)
          capitalConsumption,
          netValueAdded} = financialData.aggregates;
 
-  let yNotes = 125;
-  let yValue = 150;
-  let yUncertainty = 175;
+  let xNotes = 115;
+  let xAmount= 150;
+  let xValue = 170;
+  let xUncertainty = 180;
 
   // first line table
   y+=15;
@@ -120,9 +124,10 @@ function exportIndicPDF(indic,session)
   doc.text("(en "+metaIndics[indic].unit+")",10,y);
   doc.setFontSize(10);
   doc.setFont("Calibri","normal");
-  doc.text("Notes",125,y);
-  doc.text("Valeur",150,y);
-  doc.text("Incertitude",175,y);
+  doc.text("Notes",xNotes,y);
+  doc.text("Montant",xAmount-13,y);
+  doc.text("Valeur",xValue-8,y);
+  doc.text("Incertitude",xUncertainty,y);
   
   doc.line(10,y+2,200,y+2);
 
@@ -131,34 +136,38 @@ function exportIndicPDF(indic,session)
   doc.setFont("Calibri","bold");
   doc.text("Production",10,y);
   doc.setFont("Calibri","normal");
-  doc.text(printValue(production.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(production.amount,0)+" €",xAmount,y,{align: "right"});
+  doc.text(printValue(production.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(production.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(production.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   // Revenue
   y+=6;
   doc.text("\tdont Chiffre d'affaires",10,y);  
-  doc.text(printValue(revenue.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(revenue.amount,0)+" €",xAmount,y,{align: "right"});
+  doc.text(printValue(revenue.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(revenue.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(revenue.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   // Stock production
   y+=6;
   doc.text("\tdont Production stockée",10,y);
-  doc.text(printValue(storedProduction.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(storedProduction.amount,0)+" €",xAmount,y,{align: "right"});
+  doc.text(printValue(storedProduction.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(storedProduction.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(storedProduction.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   // Immobilised production
   if (financialData.getImmobilisedProduction() > 0) {
     x+=6;
     doc.text("\tdont production immobilisée",10,x);
-    doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getValue(),1),yValue+10,x,{align: "right"});
+    doc.text(printValue(immobilisedProduction.amount,0)+" €",xAmount,y,{align: "right"});
+    doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getValue(),1),xValue,x,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,x,{align: "right"});
+    doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,x,{align: "right"});
     doc.setFontSize(10);
   }
   
@@ -166,30 +175,32 @@ function exportIndicPDF(indic,session)
 
   y+=6;
   doc.text("Consommations intermédiaires",10,y);
-  doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(intermediateConsumption.amount,0)+" €",xAmount,y,{align: "right"});
+  doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   if (storedPurchases.amount != 0) 
   {
     y+=6;
     doc.text("\tVariation de stocks",10,y);
-    doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+    doc.text(printValue(storedPurchases.amount,0)+" €",xAmount,y,{align: "right"});
+    doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   }
 
-  financialData.getBasicExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => 
+  financialData.getExternalExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => 
   { 
-    const amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
-    const indicator = buildIndicatorAggregate(indic,group.expenses);
+    const indicator = aggregate.footprint.indicators[indic];
     y+=6;
-    doc.text("\t"+group.label,10,y);
-    doc.text(printValue(indicator.getValue(),1),yValue+10,y,{align: "right"});
+    doc.text("\t"+aggregate.accountLib,10,y);
+    doc.text(printValue(aggregate.amount,0)+" €",xAmount,y,{align: "right"});
+    doc.text(printValue(indicator.getValue(),1),xValue,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(indicator.getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   })
 
@@ -197,20 +208,21 @@ function exportIndicPDF(indic,session)
 
   y+=6;
   doc.text("Dotations aux Amortissements sur immobilisations",10,y);
-  doc.text(printValue(capitalConsumption.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(capitalConsumption.amount,0)+" €",xAmount,y,{align: "right"});
+  doc.text(printValue(capitalConsumption.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
-  financialData.getBasicDepreciationExpensesGroups().filter(group => group.expenses.length > 0).forEach(group => 
+  financialData.getBasicDepreciationExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => 
   {
-    const amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
-    const indicator = buildIndicatorAggregate(indic,group.expenses);
+    const indicator = aggregate.footprint.indicators[indic];
     y+=6;
-    doc.text("\t"+group.label,10,y);
-    doc.text(printValue(indicator.getValue(),1),yValue+10,y,{align: "right"});
+    doc.text("\t"+aggregate.accountLib,10,y);
+    doc.text(printValue(aggregate.amount,0)+" €",xAmount,y,{align: "right"});
+    doc.text(printValue(indicator.getValue(),1),xValue,y,{align: "right"});
     doc.setFontSize(8);
-    doc.text(printValue(indicator.getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+    doc.text(printValue(indicator.getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
     doc.setFontSize(10);
   })
   
@@ -218,9 +230,10 @@ function exportIndicPDF(indic,session)
 
   y+=6;
   doc.text("Valeur ajoutée nette",10,y);
-  doc.text(printValue(netValueAdded.footprint.indicators[indic].getValue(),1),yValue+10,y,{align: "right"});
+  doc.text(printValue(netValueAdded.amount,0)+" €",xAmount,y,{align: "right"});
+  doc.text(printValue(netValueAdded.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
-  doc.text(printValue(netValueAdded.footprint.indicators[indic].getUncertainty(),0)+" %",yUncertainty+13,y,{align: "right"});
+  doc.text(printValue(netValueAdded.footprint.indicators[indic].getUncertainty(),0)+" %",xUncertainty+13,y,{align: "right"});
   doc.setFontSize(10);
 
   doc.line(10,y+2,200,y+2);
@@ -260,10 +273,10 @@ const getStatementNote = (doc,x,y,impactsData,indic) =>
 
 export {exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF};
 
-function printValue(value,precision) {
+/*function printValue(value,precision) {
   if (value==null) {return "-"}
   else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
-}
+}*/
 
 function superscript(doc,x,y,text) {
   

@@ -5,7 +5,7 @@ import { Expense } from '/src/accountingObjects/Expense';
 import { Immobilisation } from '/src/accountingObjects/Immobilisation';
 import { Depreciation } from '/src/accountingObjects/Depreciation'
 import { Stock } from '/src/accountingObjects/Stock';
-import { Account } from './accountingObjects/Account';
+import { Account, buildAggregateFromArray } from './accountingObjects/Account';
 
 // Other objects
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint'
@@ -355,45 +355,47 @@ export class FinancialData {
 
     /* ---------------------------------------- Details ---------------------------------------- */
 
-    getBasicExpensesGroups = () =>
+    getExternalExpensesAggregates = () =>
     {
         // Achats
-        let purchases = this.expenses.filter(expense => expense.account.substring(0,2)=="60" 
-                                                     && expense.account.substring(0,3)!="604" && expense.account.substring(0,4)!="6094"
-                                                     && expense.account.substring(0,4)!="6061" && expense.account.substring(0,5)!="60961");
-        // Achats non stockables
-        let nonStorablePurchases = this.expenses.filter(expense => expense.account.substring(0,4)=="6061" || expense.account.substring(0,5)=="60961");
-        // Services extérieurs
-        let externalServices = this.expenses.filter(expense => expense.account.substring(0,2)=="61" 
-                                                            || expense.account.substring(0,3)=="604" || expense.account.substring(0,4)=="6094");
-        // Autres services extérieurs
-        let otherExternalServices = this.expenses.filter(expense => expense.account.substring(0,2)=="62");
+        let purchases = this.expenseAccounts.filter(account => /^60(?!4|94|61|961)/.test(account.accountNum));
+        let purchasesAggregate = buildAggregateFromArray({accountLib: "Achats",items: purchases});
 
-        return ([{label: "Achats",
-                expenses: purchases},
-                {label: "Fournitures non-stockables",
-                expenses: nonStorablePurchases},
-                {label: "Services extérieurs",
-                expenses: externalServices},
-                {label: "Autres services extérieurs",
-                expenses: otherExternalServices}]);
+        // Achats non stockables
+        let nonStorablePurchases = this.expenseAccounts.filter(account => /^60(61|961)/.test(account.accountNum));
+        let nonStorablePurchasesAggregate = buildAggregateFromArray({accountLib: "Fournitures non-stockables",items: nonStorablePurchases});
+        
+        // Services extérieurs
+        let externalServices = this.expenseAccounts.filter(account => /^6(1|04|94)/.test(account.accountNum));
+        let externalServicesAggregate = buildAggregateFromArray({accountLib: "Services extérieurs",items: externalServices});
+        
+        // Autres services extérieurs
+        let otherExternalServices = this.expenseAccounts.filter(account => /^62/.test(account.accountNum));
+        let otherExternalServicesAggregate = buildAggregateFromArray({accountLib: "Autres services extérieurs",items: otherExternalServices});        
+
+        return ([purchasesAggregate,
+                 nonStorablePurchasesAggregate,
+                 externalServicesAggregate,
+                 otherExternalServicesAggregate]);
     }
 
-    getBasicDepreciationExpensesGroups = () =>
+    getBasicDepreciationExpensesAggregates = () =>
     {
         // Dotations sur immobilisations incorporelles
-        let intangibleAssetsDepreciationsExpenses = this.depreciationExpenses.filter(expense => /^68111/.test(expense.account));
-        // Dotations sur immoblisations corporelles
-        let tangibleAssetsDepreciationsExpenses = this.depreciationExpenses.filter(expense => /^68112/.test(expense.account));
-        // Dotations exceptionnelles
-        let exceptionalDepreciationsExpenses = this.depreciationExpenses.filter(expense => /^6871/.test(expense.account));
+        let intangibleAssetsDepreciationsExpenses = this.expenseAccounts.filter(account => /^68111/.test(account.accountNum));
+        let intangibleAssetsDepreciationsExpensesAggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations incorporelles",items: intangibleAssetsDepreciationsExpenses});
 
-        return ([{label: "Dotations aux amortissements sur immobilisations incorporelles",
-                expenses: intangibleAssetsDepreciationsExpenses},
-                {label: "Dotations aux amortissements sur immobilisations corporelles",
-                expenses: tangibleAssetsDepreciationsExpenses},
-                {label: "Dotations aux amortissements exceptionnels sur immobilisations",
-                expenses: exceptionalDepreciationsExpenses}]);
+        // Dotations sur immoblisations corporelles
+        let tangibleAssetsDepreciationsExpenses = this.expenseAccounts.filter(account => /^68112/.test(account.accountNum));
+        let tangibleAssetsDepreciationsExpensesAggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations corporelles",items: tangibleAssetsDepreciationsExpenses});
+        
+        // Dotations exceptionnelles
+        let exceptionalDepreciationsExpenses = this.expenseAccounts.filter(account => /^6871/.test(account.accountNum));
+        let exceptionalDepreciationsExpensesAggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements exceptionnels sur immobilisations",items: exceptionalDepreciationsExpenses});
+
+        return ([intangibleAssetsDepreciationsExpensesAggregate,
+                 tangibleAssetsDepreciationsExpensesAggregate,
+                 exceptionalDepreciationsExpensesAggregate]);
     }
 
 }

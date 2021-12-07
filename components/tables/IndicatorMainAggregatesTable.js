@@ -18,8 +18,8 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
   const printGrossImpact = ["ghg","haz","mat","nrg","was","wat"].includes(indic);
 
-  const expensesGroups = getBasicExternalExpensesGroups(indic,financialData);
-  const depreciationExpensesGroups = getBasicDepreciationExpensesGroups(indic,financialData);
+  const expensesAggregates = getBasicExternalExpensesGroups(indic,financialData);
+  const depreciationExpensesAggregates = getBasicDepreciationExpensesGroups(indic,financialData);
 
   const {production,
          revenue,
@@ -106,16 +106,16 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
           {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>}
 
-      {expensesGroups.filter(group => group.expenses.length > 0)
-                     .map(({label,amount,indicator},index) => 
+      {expensesAggregates.filter(aggregate => aggregate.amount != 0)
+                         .map(({accountLib,amount,footprint},index) => 
         <tr key={index}>
-          <td>&emsp;{label}</td>
+          <td>&emsp;{accountLib}</td>
           <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-          {printGrossImpact ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(footprint.indicators[indic].getGrossImpact(amount),nbDecimals)}</td> : null}
           {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>)}
 
@@ -129,16 +129,16 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
           {printGrossImpact ? <td className="column_value">{printValue(capitalConsumption.footprint.indicators[indic].getGrossImpact(capitalConsumption.amount),nbDecimals)}</td> : null}
           {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
-      {depreciationExpensesGroups.filter(group => group.expenses.length > 0)
-                                 .map(({label,amount,indicator},index) => 
+      {depreciationExpensesAggregates.filter(aggregate => aggregate.amount != 0)
+                                     .map(({accountLib,amount,footprint},index) => 
         <tr key={index}>
-          <td>&emsp;{label}</td>
+          <td>&emsp;{accountLib}</td>
           <td className="column_value">{printValue(amount,0)}</td>
           <td className="column_unit">&nbsp;€</td>
-          <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
+          <td className="column_value">{printValue(footprint.indicators[indic].getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
-          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-          {printGrossImpact ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
+          <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(footprint.indicators[indic].getUncertainty(),0)}&nbsp;%</td>
+          {printGrossImpact ? <td className="column_value">{printValue(footprint.indicators[indic].getGrossImpact(amount),nbDecimals)}</td> : null}
           {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>)}
         
@@ -162,27 +162,13 @@ export const IndicatorMainAggregatesTable = ({indic,session}) =>
 // External expenses
 const getBasicExternalExpensesGroups = (indic,financialData) =>
 {
-  let expensesGroups = financialData.getBasicExpensesGroups();
-
-  expensesGroups.forEach(group => 
-  {
-    group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
-    group.indicator = buildIndicatorAggregate(indic,group.expenses);
-  });
-
+  let expensesGroups = financialData.getExternalExpensesAggregates();
   return expensesGroups;
 }
 
 // Depreciation expenses
 const getBasicDepreciationExpensesGroups = (indic,financialData) =>
 {
-  let expensesGroups = financialData.getBasicDepreciationExpensesGroups();
-
-  expensesGroups.forEach(group => 
-  {
-    group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0);
-    group.indicator = buildIndicatorAggregate(indic,group.expenses);
-  });
-
+  let expensesGroups = financialData.getBasicDepreciationExpensesAggregates();
   return expensesGroups;
 }

@@ -7,11 +7,9 @@ import { getAmountItems, printValue } from '../../src/utils/Utils';
 
 export const MainAggregatesTable = ({financialData}) =>
 {
-  const externalExpensesMainAccounts = financialData.getBasicExpensesGroups();
-        externalExpensesMainAccounts.forEach(group => group.amount = getAmountItems(group.expenses));
+  const externalExpensesAggregates = financialData.getExternalExpensesAggregates();
 
-  const depreciationExpensesMainAccounts = financialData.getBasicDepreciationExpensesGroups();
-        depreciationExpensesMainAccounts.forEach(group => group.amount = getAmountItems(group.expenses));
+  const depreciationExpensesAggregates = financialData.getBasicDepreciationExpensesAggregates();
 
   const {production,
          revenue,
@@ -57,9 +55,9 @@ export const MainAggregatesTable = ({financialData}) =>
             <td>&emsp;Variation de stocks</td>
             <td className="column_value">{printValue(-storedPurchases.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-        {externalExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
+        {externalExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
           <tr key={index}>
-            <td>&emsp;{label}</td>
+            <td>&emsp;{accountLib}</td>
             <td className="column_value">{printValue(amount,0)}</td>
             <td className="column_unit">&nbsp;€</td>
           </tr>)}
@@ -68,9 +66,9 @@ export const MainAggregatesTable = ({financialData}) =>
             <td>Consommations de capital fixe</td>
             <td className="column_value important">{printValue(capitalConsumption.amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-        {depreciationExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
+        {depreciationExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
           <tr key={index}>
-            <td>&emsp;{label}</td>
+            <td>&emsp;{accountLib}</td>
             <td className="column_value">{printValue(amount,0)}</td>
             <td className="column_unit">&nbsp;€</td>
           </tr>)}

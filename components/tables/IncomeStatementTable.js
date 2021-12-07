@@ -10,11 +10,9 @@ import { printValue } from '../../src/utils/Utils';
 
 export const IncomeStatementTable = ({financialData}) =>
 {
-  const externalExpensesMainAccounts = financialData.getBasicExpensesGroups();
-        externalExpensesMainAccounts.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+  const externalExpensesAggregates = financialData.getExternalExpensesAggregates();
 
-  const depreciationExpensesMainAccounts = financialData.getBasicDepreciationExpensesGroups();
-        depreciationExpensesMainAccounts.forEach(group => group.amount = group.expenses.map(expense => expense.amount).reduce((a,b) => a+b,0));
+  const depreciationExpensesAggregates = financialData.getBasicDepreciationExpensesAggregates();
   
   return(
     <div className="table-main">
@@ -53,9 +51,9 @@ export const IncomeStatementTable = ({financialData}) =>
             <td>&emsp;Variation de stocks</td>
             <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>
-        {externalExpensesMainAccounts.filter(group => group.expenses.length > 0).map(({label,amount},index) => 
+        {externalExpensesAggregates.map(({accountLib,amount},index) => 
           <tr key={index}>
-            <td>&emsp;{label}</td>
+            <td>&emsp;{accountLib}</td>
             <td className="column_value">{printValue(amount,0)}</td>
             <td className="column_unit">&nbsp;€</td></tr>)}
           <tr>
