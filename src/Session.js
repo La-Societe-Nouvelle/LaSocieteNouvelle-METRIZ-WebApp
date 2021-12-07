@@ -14,8 +14,8 @@ import { ImpactsData } from '/src/ImpactsData.js';
 import { Indicator } from '/src/footprintObjects/Indicator';
 
 // Formulas
-import { buildIndicatorAggregate, 
-         updateAggregatesFootprints,
+import { buildIndicatorAggregate } from './formulas/footprintFormulas';
+import { updateAggregatesFootprints,
          updateProductionItemsFootprints,
          updateOutputFlowsFootprints,
          updateAccountsFootprints,
