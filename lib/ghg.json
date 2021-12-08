@@ -1,4 +1,9 @@
 {
+  "co2e": {
+    "label": "",
+    "prg": 1,
+    "uncertainty": 0
+  },
   "co2": {
     "label": "",
     "prg": 1,
