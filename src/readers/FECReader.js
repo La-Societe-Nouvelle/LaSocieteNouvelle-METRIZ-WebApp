@@ -446,7 +446,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        isDepreciableImmobilisation: /^2[0-1]/.test(ligneCourante.CompteNum),
+        isDepreciableImmobilisation: /^2[0-2]/.test(ligneCourante.CompteNum),
         prevAmount: 0.0,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit)
       }
@@ -789,17 +789,20 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
   if (/^64/.test(ligneCourante.CompteNum))      data.personnelExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   if (/^65/.test(ligneCourante.CompteNum))      data.otherExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   if (/^681[^1]/.test(ligneCourante.CompteNum)) data.provisions+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-  if (/^69/.test(ligneCourante.CompteNum))      data.taxOnProfits+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-
+  
   // Financial expenses ------------------------------------------------------------------------------- //
 
   if (/^66/.test(ligneCourante.CompteNum))      data.financialExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   if (/^686/.test(ligneCourante.CompteNum))     data.financialExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
   // Exceptional expenses ----------------------------------------------------------------------------- //
-
+  
   if (/^67/.test(ligneCourante.CompteNum))      data.exceptionalExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   if (/^687[^1]/.test(ligneCourante.CompteNum)) data.exceptionalExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  
+  // Tax on profits ----------------------------------------------------------------------------------- //
+
+  if (/^69/.test(ligneCourante.CompteNum))      data.taxOnProfits+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
 }
 
