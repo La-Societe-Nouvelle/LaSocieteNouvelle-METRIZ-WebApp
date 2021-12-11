@@ -712,7 +712,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
                                                          && ligne.EcritureLib == ligneCourante.EcritureLib
                                                          && /^68(1|7)1/.test(ligne.CompteNum))
     let otherDepreciationExpensesOnEntry = otherDepreciationExpenses.length > 1;
-    let sameAccountUsed = otherDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length > 1;
+    let sameAccountUsed = otherDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
 
     let regexPrefixeCompteAmortissements = otherDepreciationExpensesOnEntry ? ( /^68(1|7)11/.test(ligneCourante.CompteNum) ? /^280/
                                                                               : /^68(1|7)12/.test(ligneCourante.CompteNum) ? /^28(1|2)/
@@ -752,7 +752,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       })
     }
     // case - lignes multiples (un seul numéro de compte utilisé)
-    else if (sameAccountUsed && checkBalance(otherDepreciationExpenses,lignesDepreciations) && !data.ignoreDepreciationEntries(ligneCourante.EcritureNum))
+    else if (sameAccountUsed && checkBalance(otherDepreciationExpenses,lignesDepreciations) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
     {
       lignesDepreciations.forEach((ligneDepreciation) =>
       {
@@ -780,6 +780,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       })
       data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
     }
+    else if (data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum)) {}
     else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements)."
   }
 
