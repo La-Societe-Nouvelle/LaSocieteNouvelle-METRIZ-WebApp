@@ -315,7 +315,7 @@ async function readBookAsJournalANouveaux(data,book)
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        isDepreciableImmobilisation: /^2[0-2]/.test(ligneCourante.CompteNum),
+        isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
         prevAmount: parseAmount(ligneCourante.Debit),
         amount: parseAmount(ligneCourante.Debit)
       }
@@ -446,7 +446,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        isDepreciableImmobilisation: /^2[0-2]/.test(ligneCourante.CompteNum),
+        isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
         prevAmount: 0.0,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit)
       }

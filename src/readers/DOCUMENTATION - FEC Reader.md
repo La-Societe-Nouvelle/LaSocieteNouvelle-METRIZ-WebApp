@@ -47,7 +47,7 @@ Les informations extraites du journal sont les suivantes:
 Pour chaque écriture relative à un compte d'immobilisation (hors comptes d'amortissements et de dépréciations) i.e. comptes #20, #21, #22, #23, #25, #26 et #27, sont enregistrées les informations suivantes :
 - Numéro du compte
 - Libellé du compte
-- Caractère amortissable (comptes #20, #21 ou #22)
+- Caractère amortissable (comptes #20, #21)
 - Montant
 
 Pour chaque écriture relative à un compte d'amortissements ou de dépréciations i.e. #28 et #29, sont enregistrées les informations suivantes :
