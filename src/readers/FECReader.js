@@ -708,19 +708,19 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
   if (/^68(1|7)1/.test(ligneCourante.CompteNum))
   {
     // lignes des comptes d'amortissements
-    let otherDepreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                         && ligne.EcritureLib == ligneCourante.EcritureLib
-                                                         && /^68(1|7)1/.test(ligne.CompteNum))
-    let otherDepreciationExpensesOnEntry = otherDepreciationExpenses.length > 1;
-    let sameAccountUsed = otherDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+    let depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
+                                                    && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                    && /^68(1|7)1/.test(ligne.CompteNum))
+    let otherDepreciationExpensesOnEntry = depreciationExpenses.length > 1;
+    let sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
 
     let regexPrefixeCompteAmortissements = otherDepreciationExpensesOnEntry ? ( /^68(1|7)11/.test(ligneCourante.CompteNum) ? /^280/
-                                                                              : /^68(1|7)12/.test(ligneCourante.CompteNum) ? /^28(1|2)/
+                                                                              : /^68(1|7)12/.test(ligneCourante.CompteNum) ? /^281/
                                                                                                                            : /^28/)
                                                                             : /^28/;
     let lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                    && ligne.EcritureLib == ligneCourante.EcritureLib
-                                                    && regexPrefixeCompteAmortissements.test(ligne.CompteNum));
+                                                   && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                   && regexPrefixeCompteAmortissements.test(ligne.CompteNum));
     
     // cas basique
     let equilibre = checkBalance([ligneCourante],lignesDepreciations);
@@ -729,8 +729,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       lignesDepreciations.forEach((ligneDepreciation) =>
       {
         // retrieve depreciation expense item
-        let accountDepreciationExpense = ligneCourante.CompteNum.substring(0,4)+(/^280/.test(ligneDepreciation.CompteNum) ? "1" : "2");
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == accountDepreciationExpense
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneCourante.CompteNum
                                                                            && expense.accountAux == ligneDepreciation.CompteNum)[0];
 
         if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
@@ -741,7 +740,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
           let depreciationExpenseData = 
           {
             label: ligneCourante.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-            account: accountDepreciationExpense,
+            account: ligneCourante.CompteNum,
             accountLib: ligneCourante.CompteLib,
             accountAux: ligneDepreciation.CompteNum,
             amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
@@ -752,13 +751,12 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       })
     }
     // case - lignes multiples (un seul numéro de compte utilisé)
-    else if (sameAccountUsed && checkBalance(otherDepreciationExpenses,lignesDepreciations) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
+    else if (sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
     {
       lignesDepreciations.forEach((ligneDepreciation) =>
       {
         // retrieve depreciation expense item
-        let accountDepreciationExpense = ligneCourante.CompteNum.substring(0,4)+(/^280/.test(ligneDepreciation.CompteNum) ? "1" : "2");
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == accountDepreciationExpense
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneCourante.CompteNum
                                                                            && expense.accountAux == ligneDepreciation.CompteNum)[0];
 
         if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
@@ -769,7 +767,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
           let depreciationExpenseData = 
           {
             label: ligneCourante.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-            account: accountDepreciationExpense,
+            account: ligneCourante.CompteNum,
             accountLib: ligneCourante.CompteLib,
             accountAux: ligneDepreciation.CompteNum,
             amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),

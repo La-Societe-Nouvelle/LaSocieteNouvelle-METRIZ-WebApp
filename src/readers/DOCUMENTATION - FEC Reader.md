@@ -174,7 +174,7 @@ Lorsque une dotation concernant les deux comptes (compte de dotation #68 et comp
 Dans le cas où la dotation concernent plusieurs comptes d'amortissements :
 - Si la lecture des lignes permet d'obtenir un équilibre, la dotation est ventilée pour chaque compte d'amortissement
 - Si la lecture des lignes ne permet pas d'obtenir un équilibre, une erreur est levée
-Dans le cas où que plusieurs dotations avec le même numéro de compte #68 sont présentes dans la même écriture comptable, et que lecture permet d'obtenir un équilibre, les dotations sont fusionnées (même compte de dotation) et ventilées par compte d'amortissement et les autres dotations de l'écriture comptable sont ignorées pour éviter un double comptage. Si plusieurs comptes de dotations interviennent, une erreur est levée.
+Dans le cas où que plusieurs dotations avec le même numéro de compte #68 sont présentes dans la même écriture comptable, et que lecture permet d'obtenir un équilibre, les dotations sont fusionnées (même compte de dotation) et ventilées par compte d'amortissement. Les autres dotations de l'écriture comptable sont ignorées pour éviter un double comptage. Si plusieurs comptes de dotations interviennent, une erreur est levée.
 
 \* *Le numéro du compte d'amortissement est obtenu à partir de la ligne de l'écriture comptable relative au compte d'amortissement #28.*
 
