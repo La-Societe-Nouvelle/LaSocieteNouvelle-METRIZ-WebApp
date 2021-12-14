@@ -85,19 +85,19 @@ export class IndicatorSection extends React.Component {
                     onChange={this.changeSelectedIndicator}>
               <option disabled>Création de la valeur</option>
               <option key="eco" value="eco">&emsp;&emsp;{metaIndics["eco"].libelle}</option>
-              <option key="art" value="art">&emsp;&emsp;{metaIndics["art"].libelle} [BETA]</option>
+              <option key="art" value="art">&emsp;&emsp;{metaIndics["art"].libelle}</option>
               <option key="soc" value="soc">&emsp;&emsp;{metaIndics["soc"].libelle}</option>
               <option disabled>Empreinte sociale</option>
-              <option key="dis" value="dis">&emsp;&emsp;{metaIndics["dis"].libelle} [BETA]</option>
+              <option key="dis" value="dis">&emsp;&emsp;{metaIndics["dis"].libelle}</option>
               <option key="geq" value="geq">&emsp;&emsp;{metaIndics["geq"].libelle}</option>
               <option key="knw" value="knw">&emsp;&emsp;{metaIndics["knw"].libelle}</option>
               <option disabled>Empreinte environnementale</option>
               <option key="ghg" value="ghg">&emsp;&emsp;{metaIndics["ghg"].libelle}</option>
               <option key="nrg" value="nrg">&emsp;&emsp;{metaIndics["nrg"].libelle}</option>
               <option key="wat" value="wat">&emsp;&emsp;{metaIndics["wat"].libelle}</option>
-              <option key="mat" value="mat">&emsp;&emsp;{metaIndics["mat"].libelle} [BETA]</option>
+              <option key="mat" value="mat">&emsp;&emsp;{metaIndics["mat"].libelle}</option>
               <option key="was" value="was">&emsp;&emsp;{metaIndics["was"].libelle}</option>
-              <option key="haz" value="haz">&emsp;&emsp;{metaIndics["haz"].libelle} [BETA]</option>
+              <option key="haz" value="haz">&emsp;&emsp;{metaIndics["haz"].libelle}</option>
             </select>
           </div>
           <div>
@@ -118,7 +118,7 @@ export class IndicatorSection extends React.Component {
         </div>
 
         <div className="section-view-header">
-          <h1>{metaIndics[indic].libelle+(metaIndics[indic].isBeta ? " [BETA]" : "")}</h1>
+          <h1>{metaIndics[indic].libelle}</h1>{metaIndics[indic].isBeta && <p className="beta">&nbsp;BETA&nbsp;</p>}
         </div>
 
         <div className="indicator-section-view">
