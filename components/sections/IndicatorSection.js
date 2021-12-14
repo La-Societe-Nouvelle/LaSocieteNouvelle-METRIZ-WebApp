@@ -169,7 +169,7 @@ export class IndicatorSection extends React.Component {
           <div className="group">
             <h3>Graphiques comparatifs</h3>
             <div className="actions">
-              <div>Division économique comparative : </div>
+              <div>Activités économiques comparatives : </div>
               <select value={comparativeDivision}
                       onChange={this.changeComparativeDivision}>
                 {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b))
@@ -226,11 +226,21 @@ export class IndicatorSection extends React.Component {
   changeComparativeDivision = async (event) => 
   {
     let division = event.target.value;
-    this.setState({comparativeDivision: division});
-    let productionSectorFootprint = await fetchDivisionData(division,"PRD");
-    let valueAddedSectorFootprint = await fetchDivisionData(division,"GVA");
-    let consumptionSectorFootprint = await fetchDivisionData(division,"IC");
-    this.setState({productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint});
+    if (division!="00")
+    {
+      this.setState({comparativeDivision: division});
+      let productionSectorFootprint = await fetchDivisionData(division,"PRD");
+      let valueAddedSectorFootprint = await fetchDivisionData(division,"GVA");
+      let consumptionSectorFootprint = await fetchDivisionData(division,"IC");
+      this.setState({productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint});
+    }
+    else
+    {
+      this.setState({comparativeDivision: division,
+                     productionSectorFootprint: new SocialFootprint(),
+                     valueAddedSectorFootprint: new SocialFootprint(),
+                     consumptionSectorFootprint: new SocialFootprint()});
+    }
   }
 
   /* ----- CHANGE/VALIDATION HANDLER ----- */

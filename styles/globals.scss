@@ -815,22 +815,24 @@ table {
     padding: 0;
     margin: 0;
   }
+
+  button.xl {
+    width: 500px;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+  }
   
   .siren-input {
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: space-between;
     height: 60px;
 
-    button {
-      padding-top: 2px;
-      padding-bottom: 2px;
-      width: 100px;
-      border: solid 1px $primary-color;
-    }
-
     input {
       text-align: center;
+      width: 500px;
     }
   }
 
