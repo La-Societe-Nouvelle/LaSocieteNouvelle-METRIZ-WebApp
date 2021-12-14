@@ -35,6 +35,7 @@ import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 // Export modules
 import { exportIndicPDF } from '/src/writers/Export';
 import { IndicatorIncomeStatementTable } from '../tables/IndicatorIncomeStatementTable';
+import { analysisTextWriterECO } from '../../src/writers/analysis/analysisTextWriterECO';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -151,6 +152,12 @@ export class IndicatorSection extends React.Component {
             <IndicatorGraphs session={this.props.session} indic={indic}/>
           </div>
 
+        {this.props.session.validations.includes(this.state.indic) &&
+          <div className="group">
+            <h3>Analyse</h3>
+            <Analyse indic={this.state.indic} session={this.props.session}/>
+          </div>}
+
         </div>
 
       {triggerPopup=="assessment" &&
@@ -251,5 +258,38 @@ function Assessment(props)
     case "knw": return(<AssessmentKNW {...props}/>)
     case "nrg": return(<AssessmentNRG {...props}/>)
     default: return(<div></div>)
+  }
+}
+
+/* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
+
+const Analyse = (indic,session) =>
+{
+  let analyse = getAnalyse(indic,session);
+  return <div>{analyse.map(paragraph => <p>{paragraph.reduce((a,b) => a+" "+b,"")}</p>)}</div>
+}
+
+const Paragraph = (text) =>
+{
+  return <p>{text.reduce((a,b) => a+" "+b),""}</p>
+}
+
+// Display the correct statement view according to the indicator
+function getAnalyse(props) 
+{
+  switch(props.indic) 
+  {
+    case "art" : return(analysisTextWriterECO(props.session))
+    case "dis" : return(analysisTextWriterECO(props.session))
+    case "eco" : return(analysisTextWriterECO(props.session))
+    case "geq" : return(analysisTextWriterECO(props.session))
+    case "ghg" : return(analysisTextWriterECO(props.session))
+    case "haz" : return(analysisTextWriterECO(props.session))
+    case "knw" : return(analysisTextWriterECO(props.session))
+    case "mat" : return(analysisTextWriterECO(props.session))
+    case "nrg" : return(analysisTextWriterECO(props.session))
+    case "soc" : return(analysisTextWriterECO(props.session))
+    case "was" : return(analysisTextWriterECO(props.session))
+    case "wat" : return(analysisTextWriterECO(props.session))
   }
 }
