@@ -28,6 +28,7 @@ const metaAggregates = ["revenue",
                         "externalExpenses",
                         "grossValueAdded",
                         "depreciationExpenses",
+                        "capitalConsumption",
                         "netValueAdded"];
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */

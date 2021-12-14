@@ -266,7 +266,7 @@ function Assessment(props)
 const Analyse = (indic,session) =>
 {
   let analyse = getAnalyse(indic,session);
-  return <div>{analyse.map(paragraph => <p>{paragraph.reduce((a,b) => a+" "+b,"")}</p>)}</div>
+  return <div className="analysis">{analyse.map(paragraph => <p>{paragraph.reduce((a,b) => a+" "+b,"")}</p>)}</div>
 }
 
 const Paragraph = (text) =>
