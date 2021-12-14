@@ -172,6 +172,9 @@ export const updatePurchasesStocksVariationsIndicator = async (indic,financialDa
     let stock = financialData.getStockByAccount(variation.accountAux);
     variation.footprint.indicators[indic] = await buildIndicatorMerge(stock.prevFootprint.indicators[indic], stock.prevAmount,
                                                                       stock.footprint.indicators[indic], -stock.amount);
+    // Le calcul de l'incertitude peut entraîner des résultats erronés, les valeurs étant traitées comme décorrélées
+    // L'incertitude associée est donc celle de la valeur courante
+    variation.footprint.indicators[indic].setUncertainty(stock.footprint.indicators[indic].getUncertainty());
     return;
   }));
   return;
@@ -325,6 +328,9 @@ export const updateProductionItemsFootprints = async (indic,financialData) =>
   productionStocks.footprint.indicators[indic] = await buildIndicatorAggregate(indic,financialData.stocks.filter(stock => stock.isProductionStock));
   storedProduction.footprint.indicators[indic] = await buildIndicatorMerge(productionStocks.footprint.indicators[indic], productionStocks.amount,
                                                                            productionStocks.prevFootprint.indicators[indic], productionStocks.prevAmount);
+  // Le calcul de l'incertitude peut entraîner des résultats erronés, les valeurs étant supposées décorrélées et l'impact brut restant à amortir pouvant être faible
+  // L'incertitude associée est donc celle de la production courante
+  storedProduction.footprint.indicators[indic].setUncertainty(productionStocks.prevFootprint.indicators[indic].getUncertainty());
 
   // Immobilised production
   immobilisedProduction.footprint.indicators[indic] = production.footprint.indicators[indic];
