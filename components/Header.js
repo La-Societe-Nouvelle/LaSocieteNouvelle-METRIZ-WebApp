@@ -38,7 +38,7 @@ export function Header({step,stepMax,downloadSession,setStep})
       <div id="progression">
         <div className={"progression-item"+(step==1 ? " current" : "")}>
           <button disabled={stepMax < 1} onClick={() => setStep(1)}>1</button>
-          <p>Siren</p>
+          <p>Dénomination</p>
         </div>
         <Line/>
         <div className={"progression-item"+(step==2 ? " current" : "")}>

@@ -13,6 +13,7 @@ import { Session } from '/src/Session';
 // Sections
 import { StartSection } from '/components/sections/StartSection';
 import { SirenSection } from '/components/sections/SirenSection';
+import { CorporateNameSection } from '../components/sections/CorporateNameSection';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { CompaniesSection } from '/components/sections/CompaniesSection';
@@ -153,7 +154,7 @@ class Metriz extends React.Component {
     {
       case 0 : return(<StartSection startNewSession={() => this.setStep(1)} 
                                     loadPrevSession={this.loadPrevSession}/>)
-      case 1 : return(<SirenSection {...sectionProps}/>)
+      case 1 : return(<CorporateNameSection {...sectionProps}/>)
       case 2 : return(<FinancialDataSection {...sectionProps}/>)
       case 3 : return(<InitialStatesSection {...sectionProps}/>)
       case 4 : return(<CompaniesSection {...sectionProps}/>)
