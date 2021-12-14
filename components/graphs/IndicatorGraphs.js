@@ -28,9 +28,8 @@ const viewsForIndic = {
 
 export const IndicatorGraphs = ({session,indic,comparativeFootprints}) =>
 {
-  const {legalUnit,financialData} = session;
-  const {production,netValueAdded,intermediateConsumption} = financialData.aggregates;
-  const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = legalUnit;
+  const {legalUnit,productionFootprint,netValueAddedFootprint,intermediateConsumptionFootprint} = session;
+  const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = comparativeFootprints;
   
   const dataProduction = [
     ["", "title", { role: "style" }],
