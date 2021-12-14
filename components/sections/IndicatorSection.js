@@ -71,7 +71,7 @@ export class IndicatorSection extends React.Component {
     this.state = {
       indic: "eco",
       triggerPopup: "",
-      selectedTable: "incomeStatement",
+      selectedTable: "mainAggregates",
       comparativeDivision: "00",
       productionSectorFootprint: new SocialFootprint(),
       valueAddedSectorFootprint: new SocialFootprint(),
