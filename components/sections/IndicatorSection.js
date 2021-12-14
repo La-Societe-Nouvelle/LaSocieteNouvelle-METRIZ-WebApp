@@ -84,7 +84,7 @@ export class IndicatorSection extends React.Component {
 
   componentDidMount()
   {
-    fetchEconomicAreaData("FRA","GDP").then(footprint => this.setState({valueAddedAreaFootprint: footprint}));
+    fetchEconomicAreaData("FRA","GVA").then(footprint => this.setState({valueAddedAreaFootprint: footprint}));
     fetchEconomicAreaData("FRA","GAP").then(footprint => this.setState({productionAreaFootprint: footprint}));
   }
   
@@ -346,7 +346,7 @@ const fetchDivisionData = async (division,flow) =>
   // comparative data
   let footprint = new SocialFootprint();
 
-  endpoint = apiBaseUrl + "/default?" + "pays=FRA" + "&activite="+division +"&flow="+flow;
+  endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow="+flow;
   console.log(endpoint);
   response = await fetch(endpoint, {method:'get'});
   data = await response.json();
@@ -363,7 +363,7 @@ const fetchEconomicAreaData = async (area,flow) =>
   let footprint = new SocialFootprint();
   
   // Available production
-  endpoint = apiBaseUrl + "/default?" + "pays="+area + "&activite=00" +"&flow="+flow;
+  endpoint = apiBaseUrl + "/default?" + "area="+area + "&activity=00" +"&flow="+flow;
   console.log(endpoint);
   response = await fetch(endpoint, {method:'get'});
   data = await response.json();
