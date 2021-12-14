@@ -97,7 +97,7 @@ export class AssessmentGHG extends React.Component {
                     <select value={itemData.fuelCode}
                             onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
                       {Object.entries(nrgProducts)
-                              //.filter(([key,data]) => data.subCategory=="Usage source fixe")
+                              .filter(([key,data]) => data.usageSourcesFixes)
                               .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                     </select></td>
                   <td className="short right">
@@ -128,7 +128,7 @@ export class AssessmentGHG extends React.Component {
                             onChange={(event) => this.addProduct("1",event.target.value)}>
                       <option key="none" value="none">---</option>
                       {Object.entries(nrgProducts)
-                             //.filter(([_,data]) => data.subCategory=="Usage source fixe")
+                             .filter(([key,data]) => data.usageSourcesFixes)
                              .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                     </select></td>
                 </tr>
@@ -152,7 +152,7 @@ export class AssessmentGHG extends React.Component {
                     <select value={itemData.fuelCode}
                             onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
                       {Object.entries(nrgProducts)
-                             //.filter(([key,data]) => data.subCategory=="Usage sources mobiles")
+                             .filter(([key,data]) => data.usageSourcesMobiles)
                              .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                     </select></td>
                   <td className="short right">
@@ -183,8 +183,8 @@ export class AssessmentGHG extends React.Component {
                           onChange={(event) => this.addProduct("2",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(nrgProducts)
-                            //.filter(([key,data]) => data.subCategory=="Usage sources mobiles")
-                            .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                           .filter(([key,data]) => data.usageSourcesMobiles)
+                           .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                   </select></td>
               </tr>}
 
