@@ -66,7 +66,7 @@ export class FinancialDataSection extends React.Component {
 
           <div id="import-fec-container">
             <button className="big" onClick={() => {document.getElementById('import-fec').click()}}>
-              Importer un fichier FEC
+              Importer un Fichier d'Ecritures Comptables
             </button>
             <input className="hidden" id="import-fec" visibility="collapse"
                     type="file" 

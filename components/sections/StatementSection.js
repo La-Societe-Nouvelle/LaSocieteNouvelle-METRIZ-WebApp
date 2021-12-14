@@ -121,7 +121,7 @@ export class StatementSection extends React.Component {
 const SirenInput = ({siren,commitSiren}) => 
 {
   const [sirenInput, setSiren] = useState(siren);
-  const onSirenChange = (event) => setSiren(event.target.value);
+  const onSirenChange = (input) => setSiren(input);
   const onCommit = () => commitSiren(sirenInput)
 
   const isAllValid = /^[0-9]{9}$/.test(sirenInput);
@@ -129,7 +129,7 @@ const SirenInput = ({siren,commitSiren}) =>
   return(
     <div className="section-view-main">
       <h3>Numéro de siren</h3>
-      <div className="inline-input">
+      <div className="inline-input short">
         <label>Numéro de siren (9 chiffres) : </label>
         <InputText value={sirenInput} 
                    unvalid={sirenInput!="" && !/^[0-9]{9}$/.test(sirenInput)}
