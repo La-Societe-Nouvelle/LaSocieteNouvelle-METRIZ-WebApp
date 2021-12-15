@@ -72,8 +72,8 @@ export class StatementSection extends React.Component {
     switch(step)
     {
       case 0: return <ErrorMessage />
-      case 1: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren}/>
-      case 2: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
+      case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
+      case 2: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren}/>
       case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
       case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
       case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
@@ -87,9 +87,9 @@ export class StatementSection extends React.Component {
 
   // Commits
 
-  commitSiren = (siren) => this.setState({siren: siren, step: 2})
+  commitSiren = (siren) => this.setState({siren: siren, step: 3})
 
-  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: 3})
+  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: 2})
 
   commitDeclarant = (declarant,email,autorisation) => this.setState({declarant: declarant, email: email, autorisation: autorisation, step: 4})
 

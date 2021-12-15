@@ -28,9 +28,18 @@ export class StartSection extends React.Component {
 
         <div id="start-choices-container">
           <div id="start-choices">
-            <button className="big" onClick={this.props.startNewSession}>Nouvelle évaluation</button>
+            <button className="big" onClick={this.props.startNewSession}>Démarrer une annalyse</button>
             <button className="big" onClick={this.triggerImportFile}>Importer une sauvegarde</button>
           </div>
+        </div>
+
+        <div id="logos">
+          <div className="logos_container">
+            <div>
+              <img className="img" src="/LaSocieteNouvelle_logo.jpg" alt="logo"/>
+            </div>
+          </div>
+          <p>METRIZ &copy;La Société Nouvelle</p>
         </div>
         
         <input id="import-session" type="file" accept=".json" onChange={this.importFile} visibility="collapse"/>

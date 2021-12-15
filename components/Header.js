@@ -8,7 +8,7 @@ import React from 'react';
 export function Header({step,stepMax,downloadSession,setStep}) 
 {  
   const refresh = () => location.reload(true);
-  const openRepository = () => window.open("https://github.com/SylvainH-LSN/LaSocieteNouvelle-METRIZ-WebApp","_blank");
+  const openRepository = () => window.open("https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp","_blank");
   const openDocumentation = () => window.open("https://lasocietenouvelle.notion.site/METRIZ-GUIDE-D-UTILISATION-ce7af947e69e47b1a3f90697374ad80b","_blank");
   const redirectToContactForm = () => window.open("https://lasocietenouvelle.org/contact","_blank");
   const saveSession = () => downloadSession();
