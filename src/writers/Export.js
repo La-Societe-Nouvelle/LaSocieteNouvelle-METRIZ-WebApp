@@ -65,13 +65,13 @@ function exportIndicPDF(indic,session)
   const {financialData,legalUnit} = session;
 
   // 
-  doc.setFont("Calibri");
+  doc.setFont("Helvetica");
   let y = 10;
 
   // HEADER
   doc.setFontSize(16);
-  doc.setFont("Calibri","bold");
-  doc.text("COMPTE DE RESULTAT",10,y);
+  doc.setFont("Helvetica","bold");
+  doc.text("RAPPORT - ANALYSE EXTRA-FINANCIERE",10,y);
   //let imgData = 'data:image/jpeg;base64,'+ Base64.encode('../public/resources/Logo_N&B.jpg');
   //let imgData = canvas.toDataURL('../public/resources/Logo_N&B.jpg');
   //doc.addImage(imgData, "JPEG", 100, 100, 50, 50);
@@ -81,9 +81,9 @@ function exportIndicPDF(indic,session)
   doc.text((legalUnit.corporateName || " - " ),10,y); 
   y+=10;
   doc.setFontSize(10);
-  doc.setFont("Calibri","normal");
-  doc.text("Numéro de siren : "+(legalUnit.siren!="" ? legalUnit.siren : " - " ),10,y); 
-  y+=10;
+  doc.setFont("Helvetica","normal");
+  //doc.text("Numéro de siren : "+(legalUnit.siren!="" ? legalUnit.siren : " - " ),10,y); 
+  //y+=10;
   doc.text("Année de fin d'exercice : "+(session.year!=null ? session.year : " - " ),10,y); 
   y+=6;
   let today = new Date();
@@ -91,7 +91,7 @@ function exportIndicPDF(indic,session)
 
   y+=20;
   doc.setFontSize(11);
-  doc.setFont("Calibri","bold");
+  doc.setFont("Helvetica","bold");
   doc.text(metaIndics[indic].libelleGrandeur.toUpperCase(),10,y);
   doc.line(10,y+2,200,y+2);
 
@@ -120,10 +120,10 @@ function exportIndicPDF(indic,session)
   // first line table
   y+=15;
   doc.setFontSize(8);
-  doc.setFont("Calibri","italic");
+  doc.setFont("Helvetica","italic");
   doc.text("(en "+metaIndics[indic].unit+")",10,y);
   doc.setFontSize(10);
-  doc.setFont("Calibri","normal");
+  doc.setFont("Helvetica","normal");
   doc.text("Notes",xNotes,y);
   doc.text("Montant",xAmount-13,y);
   doc.text("Valeur",xValue-8,y);
@@ -133,9 +133,9 @@ function exportIndicPDF(indic,session)
 
   // Production
   y+=6;
-  doc.setFont("Calibri","bold");
+  doc.setFont("Helvetica","bold");
   doc.text("Production",10,y);
-  doc.setFont("Calibri","normal");
+  doc.setFont("Helvetica","normal");
   doc.text(printValue(production.amount,0)+" €",xAmount,y,{align: "right"});
   doc.text(printValue(production.footprint.indicators[indic].getValue(),1),xValue,y,{align: "right"});
   doc.setFontSize(8);
@@ -240,7 +240,7 @@ function exportIndicPDF(indic,session)
 
   y+=20;
   doc.setFontSize(11);
-  doc.setFont("Calibri","bold");
+  doc.setFont("Helvetica","bold");
   doc.text("DECLARATION",10,y);
   doc.line(10,y+2,200,y+2);
 
@@ -248,7 +248,7 @@ function exportIndicPDF(indic,session)
   y+= getStatementNote(doc,10,y,session.impactsData,indic);
 
   // Export
-  doc.save("rapport_"+(legalUnit.siren!="" ? legalUnit.siren : "xxxxxxxxx")+"-"+indic.toUpperCase()+".pdf");
+  doc.save("rapport_"+legalUnit.corporateName.replaceAll(" ","")+"-"+indic.toUpperCase()+".pdf");
 
 }
 
