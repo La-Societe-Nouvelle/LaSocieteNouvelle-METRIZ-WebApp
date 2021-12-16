@@ -28,7 +28,7 @@ export class StartSection extends React.Component {
 
         <div id="start-choices-container">
           <div id="start-choices">
-            <button className="big" onClick={this.props.startNewSession}>Démarrer une annalyse</button>
+            <button className="big" onClick={this.props.startNewSession}>Démarrer une analyse</button>
             <button className="big" onClick={this.triggerImportFile}>Importer une sauvegarde</button>
           </div>
         </div>
