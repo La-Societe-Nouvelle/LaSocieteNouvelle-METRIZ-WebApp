@@ -81,6 +81,7 @@ export class CompaniesSection extends React.Component {
                 <option key="3" value="expenses">Affichage des autres comptes tiers</option>
                 {!isNextStepAvailable && <option key="4" value="unsync">Affichage des comptes non synchronisés</option>}
                 {significativeCompanies.length > 0 && <option key="5" value="significative">Affichage des comptes significatifs</option>}
+                <option key="6" value="defaultActivity">Affichage des comptes tiers non rattachés à un secteur d'activités</option>
               </select>}
           </div>
           <div>
@@ -274,11 +275,12 @@ const filterCompanies = (companies,view,significativeCompanies) =>
 {
   switch(view)
   {
-    case "aux":           return companies.filter(company => !company.isDefaultAccount);
-    case "expenses":      return companies.filter(company => company.isDefaultAccount);
-    case "undefined":     return companies.filter(company => company.state != "siren");
-    case "unsync":        return companies.filter(company => company.status != 200);
-    case "significative": return significativeCompanies;
-    default: return companies;
+    case "aux":             return companies.filter(company => !company.isDefaultAccount);
+    case "expenses":        return companies.filter(company => company.isDefaultAccount);
+    case "undefined":       return companies.filter(company => company.state != "siren");
+    case "unsync":          return companies.filter(company => company.status != 200);
+    case "defaultActivity": return companies.filter(company => company.state=="default" && (company.footprintActivityCode=="00" || company.footprintActivityCode=="TOTAL"));
+    case "significative":   return significativeCompanies;
+    default:                return companies;
   }
 }
