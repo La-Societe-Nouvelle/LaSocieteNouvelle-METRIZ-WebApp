@@ -1,0 +1,98 @@
+{
+  "utcf4": {
+    "label": "Prairie vers Culture",
+    "from": "Prairie",
+    "to": "Culture",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 3480, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf3": {
+    "label": "Prairie vers Forêt",
+    "from": "Prairie",
+    "to": "Forêt",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": -370, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf2": {
+    "label": "Prairie vers Sols imperméabilisés",
+    "from": "Prairie",
+    "to": "Sols imperméabilisés",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 290000, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf1": {
+    "label": "Prairie vers Sols non imperméabilisés",
+    "from": "Prairie",
+    "to": "Sols non imperméabilisés",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 0, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf8": {
+    "label": "Forêt vers Culture",
+    "from": "Forêt",
+    "to": "Culture",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 2750, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf6": {
+    "label": "Forêt vers Prairie",
+    "from": "Forêt",
+    "to": "Prairie",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 370, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf7": {
+    "label": "Forêt vers Sols imperméabilisés",
+    "from": "Forêt",
+    "to": "Sols imperméabilisés",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 290000, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf5": {
+    "label": "Forêt vers Sols non imperméabilisés",
+    "from": "Forêt",
+    "to": "Sols non imperméabilisés",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 0, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf12": {
+    "label": "Culture vers Forêt",
+    "from": "Culture",
+    "to": "Forêt",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": -1610, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf10": {
+    "label": "Culture vers Prairie",
+    "from": "Culture",
+    "to": "Prairie",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": -1800, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf11": {
+    "label": "Culture vers Sols imperméabilisés",
+    "from": "Culture",
+    "to": "Sols imperméabilisés",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 190000, "coefGHGUncertainty": 70}
+    }
+  },
+  "utcf9": {
+    "label": "Culture vers Sols non imperméabilisés",
+    "from": "Culture",
+    "to": "Sols non imperméabilisés",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 0, "coefGHGUncertainty": 70}
+    }
+  }
+}
