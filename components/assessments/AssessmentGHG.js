@@ -5,16 +5,19 @@ import React from 'react';
 
 // Utils
 import { InputNumber } from '../InputNumber';
-import { InputText } from '../InputText';
 import { getNewId, printValue } from '../../src/utils/Utils';
 
 // Libraries
-import nrgProducts from '../../lib/nrgProducts.json';
-import ghgFactors from '../../lib/ghgFactors.json';
-import coolingSystems from '../../lib/coolingSystems.json';
-import ghg from '../../lib/ghg.json';
+import fuels from '/lib/fuels.json';
+import industrialProcesses from '/lib/industrialProcesses.json';
+import coolingSystems from '/lib/coolingSystems.json';
+import ghg from '/lib/ghg.json';
+import landChanges from '/lib/landChanges.json';
 
-const allGhgFactors = {...nrgProducts,...ghgFactors.industrialProcesses,...coolingSystems};
+const allSources = {...fuels,
+                    ...industrialProcesses,
+                    ...coolingSystems,
+                    ...landChanges};
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT GHG -------------------- */
@@ -28,17 +31,18 @@ const allGhgFactors = {...nrgProducts,...ghgFactors.industrialProcesses,...cooli
     - emissions de la biomasse (sols et forêts) [5]
 
    Each item in ghgDetails has the following properties :
-    id: id of the source,
-    idNRG: if of the matching item in nrg details
-    label: name of the source
-    fuelCode: code of the energetic product (cf. base nrgProducts)
-    type: fossil/biomass (used for distinction between fossil and biomass products)
+    id: id of the item,
     assessmentItem : id of the assessment item (1 -> 5)
+    label: name of the source
+    code: code to fetch data (fuelCode, coolingSystemsCode, etc.)
+    gaz: code of gaz (co2e by default)
     consumption: consumption
     consumptionUnit: unit for the consumption value
     consumptionUncertainty: uncertainty for the consumption value
     ghgEmissions: greenhouse gas emissions (in kgCO2e)
     ghgEmissionsUncertainty: uncertainty for the emissions
+   for fuels :
+    idNRG : id of the item in nrgDetails
 
    Modifications are saved only when validation button is pressed, otherwise it stay in the state
 */
@@ -94,24 +98,31 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.fuelCode}
-                            onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
-                      {Object.entries(nrgProducts)
-                              .filter(([key,data]) => data.usageSourcesFixes)
-                              .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
+                    <select value={itemData.source} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                      {Object.entries(fuels)
+                             .filter(([_,data]) => data.usageSourcesFixes)
+                             .map(([_,data]) => data.group)
+                             .filter((value, index, self) => index === self.findIndex(item => item === value))
+                             .sort((a,b) => a!="Autres" && b!="Autres" ? a.localeCompare(b) : (a=="Autres" ? 1 : -1))
+                             .map((groupName) => 
+                        <optgroup label={groupName}>
+                          {Object.entries(fuels)
+                                 .filter(([_,data]) => data.usageSourcesFixes && data.group==groupName)
+                                 .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
+                        </optgroup>)}
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumption} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                   <td>
-                    <select onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)} 
+                    <select onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)} 
                             value={itemData.consumptionUnit}>
-                      {Object.entries(nrgProducts[itemData.fuelCode].units)
+                      {Object.entries(fuels[itemData.source].units)
                              .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumptionUncertainty} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
                   <td className="column_unit"><span>&nbsp;%</span></td>
                   <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
                   <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
@@ -125,11 +136,20 @@ export class AssessmentGHG extends React.Component {
                   <td/>
                   <td className="sub">
                     <select value="0"
-                            onChange={(event) => this.addProduct("1",event.target.value)}>
+                            onChange={(event) => this.addItem("1",event.target.value)}>
                       <option key="none" value="none">---</option>
-                      {Object.entries(nrgProducts)
-                             .filter(([key,data]) => data.usageSourcesFixes)
-                             .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                      {Object.entries(fuels)
+                             .filter(([_,data]) => data.usageSourcesFixes)
+                             .map(([_,data]) => data.group)
+                             .filter((value, index, self) => index === self.findIndex(item => item === value))
+                             .sort((a,b) => a!="Autres" && b!="Autres" ? a.localeCompare(b) : (a=="Autres" ? 1 : -1))
+                             .map((groupName) => 
+                        <optgroup label={groupName}>
+                          {Object.entries(fuels)
+                                 .filter(([_,data]) => data.usageSourcesFixes && data.group==groupName)
+                                 .sort()
+                                 .map(([key,data]) => <option key={"new_"+key} value={key}>{data.label}</option>)}
+                        </optgroup>)}
                     </select></td>
                 </tr>
               }
@@ -149,24 +169,31 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.fuelCode}
-                            onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
-                      {Object.entries(nrgProducts)
-                             .filter(([key,data]) => data.usageSourcesMobiles)
-                             .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
+                    <select value={itemData.source} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                      {Object.entries(fuels)
+                             .filter(([_,data]) => data.usageSourcesMobiles)
+                             .map(([_,data]) => data.group)
+                             .filter((value, index, self) => index === self.findIndex(item => item === value))
+                             .sort((a,b) => a!="Autres" && b!="Autres" ? a.localeCompare(b) : (a=="Autres" ? 1 : -1))
+                             .map((groupName) => 
+                        <optgroup label={groupName}>
+                          {Object.entries(fuels)
+                                 .filter(([_,data]) => data.usageSourcesMobiles && data.group==groupName)
+                                 .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
+                        </optgroup>)}
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumption} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                   <td>
                     <select value={itemData.consumptionUnit}
-                            onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
-                      {Object.entries(nrgProducts[itemData.fuelCode].units)
+                            onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
+                      {Object.entries(fuels[itemData.source].units)
                              .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumptionUncertainty} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
                   <td className="column_unit"><span>&nbsp;%</span></td>
                   <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
                   <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
@@ -180,11 +207,19 @@ export class AssessmentGHG extends React.Component {
                 <td/>
                 <td className="sub">
                   <select value="0"
-                          onChange={(event) => this.addProduct("2",event.target.value)}>
+                          onChange={(event) => this.addItem("2",event.target.value)}>
                     <option key="none" value="none">---</option>
-                    {Object.entries(nrgProducts)
-                           .filter(([key,data]) => data.usageSourcesMobiles)
-                           .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                    {Object.entries(fuels)
+                           .filter(([_,data]) => data.usageSourcesMobiles)
+                           .map(([_,data]) => data.group)
+                           .filter((value, index, self) => index === self.findIndex(item => item === value))
+                           .sort((a,b) => a!="Autres" && b!="Autres" ? a.localeCompare(b) : (a=="Autres" ? 1 : -1))
+                           .map((groupName) => 
+                      <optgroup label={groupName}>
+                        {Object.entries(fuels)
+                               .filter(([_,data]) => data.usageSourcesMobiles && data.group==groupName)
+                               .map(([key,data]) => <option key={"new_"+key} value={key}>{data.label}</option>)}
+                      </optgroup>)}
                   </select></td>
               </tr>}
 
@@ -204,25 +239,25 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.fuelCode}
-                            onChange={(event) => this.changeGhgFactor(itemId,event.target.value)}>
-                      {Object.entries(ghgFactors.industrialProcesses)
+                    <select value={itemData.source}
+                            onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                      {Object.entries(industrialProcesses.industrialProcesses)
                              .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumption} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                   <td>
                     <select value={itemData.consumptionUnit}
-                            onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
-                      {Object.entries(ghgFactors.industrialProcesses[itemData.fuelCode].units)
+                            onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
+                      {Object.entries(industrialProcesses.industrialProcesses[itemData.source].units)
                              .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                       <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                       <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumptionUncertainty} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
                   <td className="column_unit"><span>&nbsp;%</span></td>
                   <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
                   <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
@@ -236,9 +271,9 @@ export class AssessmentGHG extends React.Component {
               <td/>
               <td className="sub">
                 <select value="0"
-                        onChange={(event) => this.addProduct("3",event.target.value)}>
+                        onChange={(event) => this.addItem("3",event.target.value)}>
                   <option key="none" value="none">---</option>
-                  {Object.entries(ghgFactors.industrialProcesses)
+                  {Object.entries(industrialProcesses.industrialProcesses)
                          .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                 </select></td>
             </tr>}
@@ -259,30 +294,38 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.fuelCode}
-                            onChange={(event) => this.changeCoolingSystem(itemId,event.target.value)}>
+                    <select value={itemData.source} onChange={(event) => this.changeSource(itemId,event.target.value)}>
                       {Object.entries(coolingSystems)
-                             .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                             .map(([_,data]) => data.group)
+                             .filter((value, index, self) => index === self.findIndex(item => item === value))
+                             .sort()
+                             .map((groupName) => 
+                        <optgroup label={groupName}>
+                          {Object.entries(coolingSystems)
+                                 .filter(([_,data]) => data.group==groupName)
+                                 .sort()
+                                 .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                        </optgroup>)}
                     </select></td>
                   <td className="short right">
                     <InputNumber value={itemData.consumption} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                   <td>
                     <select value={itemData.consumptionUnit}
-                            onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
-                      <option key={coolingSystems[itemData.fuelCode].unit} value={coolingSystems[itemData.fuelCode].unit}>{coolingSystems[itemData.fuelCode].unit}</option>
+                            onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
+                      <option key={coolingSystems[itemData.source].unit} value={coolingSystems[itemData.source].unit}>{coolingSystems[itemData.source].unit}</option>
                       <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                       <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                     </select></td>
                   {(itemData.consumptionUnit=="kgCO2e" || itemData.consumptionUnit=="tCO2e") &&
                     <td className="short right">
                       <InputNumber value={itemData.consumptionUncertainty} 
-                                  onUpdate={(nextValue) => this.updateFuelConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>}
+                                  onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>}
                   {(itemData.consumptionUnit=="kgCO2e" || itemData.consumptionUnit=="tCO2e") && <td className="column_unit"><span>&nbsp;%</span></td>}
                   {(itemData.consumptionUnit!="kgCO2e" && itemData.consumptionUnit!="tCO2e") &&
                     <td colSpan="2">
                       <select value={itemData.gaz}
-                              onChange={(event) => this.changeCoolingGaz(itemId,event.target.value)}>
+                              onChange={(event) => this.changeGaz(itemId,event.target.value)}>
                         {Object.entries(ghg)
                                .filter(([_,data]) => data.label!="")
                                .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
@@ -298,10 +341,19 @@ export class AssessmentGHG extends React.Component {
                 <td/>
                 <td className="sub">
                   <select value="0"
-                          onChange={(event) => this.addLeak("4",event.target.value)}>
+                          onChange={(event) => this.addItem("4",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(coolingSystems)
-                            .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                           .map(([_,data]) => data.group)
+                           .filter((value, index, self) => index === self.findIndex(item => item === value))
+                           .sort()
+                           .map((groupName) => 
+                      <optgroup label={groupName}>
+                        {Object.entries(coolingSystems)
+                               .filter(([_,data]) => data.group==groupName)
+                               .sort()
+                               .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                      </optgroup>)}
                   </select></td>
               </tr>}
               
@@ -321,14 +373,31 @@ export class AssessmentGHG extends React.Component {
               <tr key={itemId}>
                 <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                 <td className="sub">
-                  <InputText value={itemData.label}/></td>
+                    <select value={itemData.sour} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                    {Object.entries(landChanges)
+                           .map(([_,data]) => data.from)
+                           .filter((value, index, self) => index === self.findIndex(item => item === value))
+                           .sort()
+                           .map((from) => 
+                      <optgroup label={from}>
+                        {Object.entries(landChanges)
+                               .filter(([_,data]) => data.from==from)
+                               .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                      </optgroup>)}
+                    </select></td>
                 <td className="short right">
-                  <InputNumber value={itemData.consumption} 
-                                onUpdate={(nextValue) => this.updateFuelConsumption.bind(this)(itemId,nextValue)}/></td>
-                <td>kgCO2e</td>
+                  <InputNumber value={itemData.consumption}
+                                onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
+                <td>
+                    <select value={itemData.consumptionUnit}
+                            onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
+                      <option key={"ha"} value={"ha"}>{"ha"}</option>
+                      <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
+                      <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
+                    </select></td>
                 <td className="short right">
                     <InputNumber value={itemData.consumptionUncertainty} 
-                                 onUpdate={(nextValue) => this.updateFuelConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
+                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
                 <td className="column_unit"><span>&nbsp;%</span></td>
                 <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
                 <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
@@ -340,8 +409,19 @@ export class AssessmentGHG extends React.Component {
               <tr>
                 <td/>
                 <td className="sub">
-                  <InputText value=""
-                              onUpdate={(nextValue) => this.addProduct.bind(this)("5",nextValue)}/></td>
+                  <select value="0" onChange={(event) => this.addItem("5",event.target.value)}>
+                    <option key="none" value="none">---</option>
+                    {Object.entries(landChanges)
+                           .map(([_,data]) => data.from)
+                           .filter((value, index, self) => index === self.findIndex(item => item === value))
+                           .sort()
+                           .map((from) => 
+                      <optgroup label={from}>
+                        {Object.entries(landChanges)
+                               .filter(([_,data]) => data.from==from)
+                               .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
+                      </optgroup>)}
+                  </select></td>
               </tr>}
 
               <tr className="with-top-line">
@@ -358,80 +438,78 @@ export class AssessmentGHG extends React.Component {
     ) 
   }
 
-  /* ----- NEW ITEM ----- */
+  /* ---------- NEW ITEM ---------- */
 
   // New line
   addNewLine = (type) => this.setState({itemNewProduct: type})
 
-  // set nrg product
-  addProduct = (assessmentItem,source) => 
+  // add new ghg emissions item
+  addItem = (assessmentItem,source) =>
   {
     let {ghgDetails} = this.state;
     const id = getNewId(Object.entries(ghgDetails).map(([_,item]) => item));
     ghgDetails[id] = {
       id: id,
-      label: ["1","2"].includes(assessmentItem) ? nrgProducts[source].label : source,
-      fuelCode: source, 
-      gaz: "co2e",
+      assessmentItem: assessmentItem,
+      label: allSources[source].label,
+      source: source,
+      gaz: assessmentItem=="4" ? "R14" : "co2e",
       consumption: 0.0, 
-      consumptionUnit: ["1","2"].includes(assessmentItem) ? "GJ" : "kgCO2e", 
+      consumptionUnit: Object.keys(allSources[source].units)[0], 
       consumptionUncertainty: 0.0,
       ghgEmissions: 0.0,
       ghgEmissionsUncertainty: 0.0, 
-      assessmentItem: assessmentItem
     }
     this.setState({ghgDetails: ghgDetails, itemNewProduct: ""});
   }
 
-  addLeak = (assessmentItem,coolingSystemId) =>
-  {
-    let {ghgDetails} = this.state;
-    const id = getNewId(Object.entries(ghgDetails).map(([_,item]) => item));
-    ghgDetails[id] = {
-      id: id,
-      label: coolingSystems[coolingSystemId].label,
-      fuelCode: coolingSystemId, 
-      gaz: "R14",
-      consumption: 0.0, 
-      consumptionUnit: "kgCO2e", 
-      consumptionUncertainty: 0.0,
-      ghgEmissions: 0.0,
-      ghgEmissionsUncertainty: 0.0, 
-      assessmentItem: assessmentItem
-    }
-    this.setState({ghgDetails: ghgDetails, itemNewProduct: ""});
-  }
+  /* ---------- UPDATES ---------- */
 
-  /* ----- UPDATES ----- */
-
-  // update nrg product (items 1 and 2)
-  changeNrgProduct = (itemId,nextFuelCode) =>
+  // Source
+  changeSource = (itemId,nextSourceId) =>
   {
     let itemData = this.state.ghgDetails[itemId];
-    itemData.fuelCode = nextFuelCode;
-    itemData.label = nrgProducts[nextFuelCode].label;
+    itemData.source = nextSourceId;
+    itemData.label = allSources[nextSourceId].label;
 
-    // check if the unit used is also available for the new product
-    if (Object.keys(nrgProducts[nextFuelCode].units)
-              .includes(itemData.consumptionUnit)) {
-      itemData.ghgEmissions = getGhgEmissions(itemData);
-      itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    } 
-    // else re-init values
-    else {
+    // re-init if unit unvailable for new source
+    if (!["kgCO2e","tCO2e"].includes(itemData.consumptionUnit) && 
+        !Object.keys(allSources[nextSourceId].units).includes(itemData.consumptionUnit))
+    {
       itemData.consumption = 0.0;
-      itemData.consumptionUnit = "GJ";
+      itemData.consumptionUnit = Object.keys(allSources[source].units)[0];
       itemData.consumptionUncertainty = 0.0;
       itemData.ghgEmissions = 0.0;
       itemData.ghgEmissionsUncertainty = 0.0;
+    }
+    else
+    {
+      itemData.ghgEmissions = getGhgEmissions(itemData);
+      itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
     }
 
     // update total
     this.updateGhgEmissions();
   }
 
-  // update nrg product unit (items 1 and 2)
-  changeNrgProductUnit = (itemId,nextConsumptionUnit) => 
+  // Consumption
+  updateConsumption = (itemId,nextConsumption) => 
+  {
+    let item = this.state.ghgDetails[itemId];
+    item.consumption = nextConsumption;
+
+    // uncertainty to zero if consumption null
+    if (!item.consumption) item.consumptionUncertainty = 0.0;
+    // and default uncertainty to 25 % if uncertainty null
+    else if (!item.consumptionUncertainty) item.consumptionUncertainty = 25.0;
+
+    item.ghgEmissions = getGhgEmissions(item);
+    item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
+    this.updateGhgEmissions();
+  }
+
+  // Consumption unit
+  changeConsumptionUnit = (itemId,nextConsumptionUnit) => 
   {
     let itemData = this.state.ghgDetails[itemId];
     itemData.consumptionUnit = nextConsumptionUnit;
@@ -440,87 +518,34 @@ export class AssessmentGHG extends React.Component {
     this.updateGhgEmissions();
   }
 
-  // update ghg emissions factor
-  changeGhgFactor = (itemId,nextFactorId) =>
+  // Consumption uncertainty
+  updateConsumptionUncertainty = (itemId,nextConsumptionUncertainty) =>
   {
-    let itemData = this.state.ghgDetails[itemId];
-    itemData.fuelCode = nextFactorId;
-    itemData.label = ghgFactors[nextFactorId].label;
-
-    itemData.ghgEmissions = getGhgEmissions(itemData);
-    itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-
-    // update total
+    let item = this.state.ghgDetails[itemId];
+    item.consumptionUncertainty = nextConsumptionUncertainty;
+    item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
     this.updateGhgEmissions();
   }
 
-  changeCoolingSystem = (itemId,nextCoolingSystemId) =>
+  // Gaz (only used for cooling systems)
+  changeGaz = (itemId,nextGaz) =>
   {
     let itemData = this.state.ghgDetails[itemId];
-    itemData.fuelCode = nextCoolingSystemId;
-    itemData.label = coolingSystems[nextCoolingSystemId].label;
-    
-    // check if the unit used is also available for the new product
-    if (Object.keys(coolingSystems[nextCoolingSystemId].units)
-              .concat(["kgCO2e","tCO2e"])
-              .includes(itemData.consumptionUnit)) {
-      itemData.ghgEmissions = getGhgEmissions(itemData);
-      itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    } 
-    // else re-init values
-    else {
-      itemData.consumption = 0.0;
-      itemData.consumptionUnit = Object.keys(coolingSystems[nextCoolingSystemId].units)[0];
-      itemData.consumptionUncertainty = 0.0;
-      itemData.ghgEmissions = 0.0;
-      itemData.ghgEmissionsUncertainty = 0.0;
-    }
-
-    // update total
-    this.updateGhgEmissions();
-  }
-
-  changeCoolingGaz = (itemId,nextCoolingGazId) =>
-  {
-    let itemData = this.state.ghgDetails[itemId];
-    itemData.gaz = nextCoolingGazId;
+    itemData.gaz = nextGaz;
 
     itemData.ghgEmissions = getGhgEmissions(itemData);
     itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-
-    // update total
     this.updateGhgEmissions();
   }
   
-  // update label source (items 3, 4 and 5)
-  updateLabel = (itemId,nextValue) => 
+  // Label
+  changeLabel = (itemId,nextLabel) => 
   {
     let item = this.state.ghgDetails[itemId];
-    item.label = nextValue;
+    item.label = nextLabel;
   }
 
-  // update fuel consumption or ghg emissions
-  updateFuelConsumption = (itemId,nextValue) => 
-  {
-    let item = this.state.ghgDetails[itemId];
-    item.consumption = nextValue;
-    if (!item.consumption) item.consumptionUncertainty = 0
-    else if (!item.consumptionUncertainty) item.consumptionUncertainty = 25.0;
-    item.ghgEmissions = getGhgEmissions(item);
-    item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
-    this.updateGhgEmissions();
-  }
-
-  // update uncertainty
-  updateFuelConsumptionUncertainty = (itemId,nextValue) =>
-  {
-    let item = this.state.ghgDetails[itemId];
-    item.consumptionUncertainty = nextValue;
-    item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
-    this.updateGhgEmissions();
-  }
-
-  /* ----- DELETE ----- */
+  /* ---------- DELETE ---------- */
 
   deleteItem = (itemId) =>
   {
@@ -561,7 +586,6 @@ export class AssessmentGHG extends React.Component {
           })
     // ...add & update
     Object.entries(impactsData.ghgDetails)
-          .filter(([_,itemData]) => itemData.fuelCode!=undefined)
           .filter(([_,itemData]) => ["1","2"].includes(itemData.assessmentItem))
           .forEach(([itemId,itemData]) => 
           {
@@ -573,13 +597,13 @@ export class AssessmentGHG extends React.Component {
               itemData.idNRG = id;
             }
             // update values
-            nrgItem.fuelCode = itemData.fuelCode;
+            nrgItem.fuelCode = itemData.source;
             nrgItem.consumption = itemData.consumption;
             nrgItem.consumptionUnit = itemData.consumptionUnit;
             nrgItem.consumptionUncertainty = itemData.consumptionUncertainty;
             nrgItem.nrgConsumption = getNrgConsumption(itemData);
             nrgItem.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
-            nrgItem.type = nrgProducts[itemData.fuelCode].type;
+            nrgItem.type = fuels[itemData.source].type;
           })
     // ...total & uncertainty
     impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails)
@@ -591,32 +615,32 @@ export class AssessmentGHG extends React.Component {
   }
 }
 
-/* ---------- GHG FORMULAS ---------- */
+/* -------------------- GHG FORMULAS -------------------- */
 
-const getGhgEmissions = ({consumption,consumptionUnit,fuelCode,gaz}) =>
+const getGhgEmissions = ({consumption,consumptionUnit,source,gaz}) =>
 {
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption;
     case "tCO2e":   return consumption * 1000;
-    default:        return consumption * allGhgFactors[fuelCode].units[consumptionUnit].coefGHG * ghg[gaz].prg;
+    default:        return consumption * allSources[source].units[consumptionUnit].coefGHG * ghg[gaz].prg;
   }
 }
 
-const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode,gaz}) =>
+const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,source,gaz}) =>
 {
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption*(1+consumptionUncertainty/100);
     case "tCO2e":   return consumption*(1+consumptionUncertainty/100) * 1000;
-    default:        return consumption*(1+consumptionUncertainty/100) * allGhgFactors[fuelCode].units[consumptionUnit].coefGHG*(1+allGhgFactors[fuelCode].units[consumptionUnit].coefGHGUncertainty/100) * ghg[gaz].prg;
+    default:        return consumption*(1+consumptionUncertainty/100) * allSources[source].units[consumptionUnit].coefGHG*(1+allSources[source].units[consumptionUnit].coefGHGUncertainty/100) * ghg[gaz].prg;
   }
 }
 
-const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode,gaz}) =>
+const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,source,gaz}) =>
 {
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption*(1-consumptionUncertainty/100);
     case "tCO2e":   return consumption*(1-consumptionUncertainty/100) * 1000;
-    default:        return consumption*(1-consumptionUncertainty/100) * allGhgFactors[fuelCode].units[consumptionUnit].coefGHG*(1-allGhgFactors[fuelCode].units[consumptionUnit].coefGHGUncertainty/100) * ghg[gaz].prg;
+    default:        return consumption*(1-consumptionUncertainty/100) * allSources[source].units[consumptionUnit].coefGHG*(1-allSources[source].units[consumptionUnit].coefGHGUncertainty/100) * ghg[gaz].prg;
   }
 }
 
@@ -625,7 +649,7 @@ const getGhgEmissionsUncertainty = (item) =>
   const value = getGhgEmissions(item);
   const valueMax = getGhgEmissionsMax(item);
   const valueMin = getGhgEmissionsMin(item);
-  return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+  return value != 0 ? Math.round(Math.max(valueMax-value,value-valueMin)/value *100) : 0;
 }
 
 const getTotalGhgEmissions = (ghgDetails) =>
@@ -642,7 +666,7 @@ const getTotalGhgEmissionsUncertainty = (ghgDetails) =>
   if (items.length > 0)
   {
     const value = items.map((item) => item.ghgEmissions).reduce((a,b) => a + b,0);
-    if (value > 0) {
+    if (value != 0) {
       const valueMax = items.map((item) => item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
       const valueMin = items.map((item) => item.ghgEmissions*Math.max(1-item.ghgEmissionsUncertainty/100,0)).reduce((a,b) => a + b,0);
       return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
@@ -676,54 +700,46 @@ const getUncertaintyByAssessmentItem = (ghgDetails,assessmentItem) =>
   else return  null;
 }
 
-const getGhgEmissionsLeak = ({consumption,fuelCode,gaz}) =>
-{
-  let fluidQty = coolingSystems[fuelCode].unit == "kg" ? coolingSystems[fuelCode].fluidQty : consumption*coolingSystems[fuelCode].fluidQty;
-  let leakQty = fluidQty*(coolingSystems[fuelCode].annualLeak/100);
-  let ghgFactor = ghg[gaz].prg;
-  return leakQty*ghgFactor;
-}
-
 /* ---------- NRG FORMULAS ---------- */
 
-const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) =>
+const getNrgConsumption = ({consumption,consumptionUnit,source}) =>
 {
   switch(consumptionUnit) {
     case "MJ":  return consumption;
     case "GJ":  return consumption * 1000;
     case "tep": return consumption * 41868;
     case "kWh": return consumption * 3.6;
-    default:    return consumption * nrgProducts[fuelCode].units[consumptionUnit].coefNRG;
+    default:    return consumption * fuels[source].units[consumptionUnit].coefNRG;
   }
 }
 
-const getNrgConsumptionMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+const getNrgConsumptionMax = ({consumption,consumptionUnit,consumptionUncertainty,source}) =>
 {
   switch(consumptionUnit) {
     case "MJ":  return consumption*(1+consumptionUncertainty/100);
     case "GJ":  return consumption*(1+consumptionUncertainty/100) * 1000;
     case "tep": return consumption*(1+consumptionUncertainty/100) * 41868;
     case "kWh": return consumption*(1+consumptionUncertainty/100) * 3.6;
-    default:    return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+    default:    return consumption*(1+consumptionUncertainty/100) * fuels[source].units[consumptionUnit].coefNRG*(1+fuels[source].units[consumptionUnit].coefNRGUncertainty/100);
   }
 }
 
-const getNrgConsumptionMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+const getNrgConsumptionMin = ({consumption,consumptionUnit,consumptionUncertainty,source}) =>
 {
   switch(consumptionUnit) {
     case "MJ":  return consumption*(1-consumptionUncertainty/100);
     case "GJ":  return consumption*(1-consumptionUncertainty/100) * 1000;
     case "tep": return consumption*(1-consumptionUncertainty/100) * 41868;
     case "kWh": return consumption*(1-consumptionUncertainty/100) * 3.6;
-    default:    return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+    default:    return consumption*(1-consumptionUncertainty/100) * fuels[source].units[consumptionUnit].coefNRG*(1-fuels[source].units[consumptionUnit].coefNRGUncertainty/100);
   }
 }
 
-const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,source}) =>
 {
-  const value = getNrgConsumption({consumption,consumptionUnit,fuelCode});
-  const valueMax = getNrgConsumptionMax({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
-  const valueMin = getNrgConsumptionMin({consumption,consumptionUnit,consumptionUncertainty,fuelCode})
+  const value = getNrgConsumption({consumption,consumptionUnit,source});
+  const valueMax = getNrgConsumptionMax({consumption,consumptionUnit,consumptionUncertainty,source});
+  const valueMin = getNrgConsumptionMin({consumption,consumptionUnit,consumptionUncertainty,source})
   return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
 }
 

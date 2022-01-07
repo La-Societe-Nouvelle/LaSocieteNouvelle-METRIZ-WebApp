@@ -382,7 +382,7 @@
   },
   "p25": {
     "label": "Gazole non routier",
-    "group": "Carburant",
+    "group": "Autres",
     "usageSourcesFixes": false,
     "usageSourcesMobiles": true,
     "category": "liquides",
