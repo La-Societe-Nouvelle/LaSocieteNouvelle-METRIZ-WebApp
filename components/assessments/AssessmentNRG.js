@@ -8,7 +8,7 @@ import { InputNumber } from '../InputNumber';
 import { getNewId, printValue } from '../../src/utils/Utils';
 
 // Libs
-import nrgProducts from '../../lib/nrgProducts.json';
+import nrgProducts from '../../lib/fuels.json';
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT NRG -------------------- */

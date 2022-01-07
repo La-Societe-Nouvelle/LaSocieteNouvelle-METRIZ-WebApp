@@ -1,6 +1,7 @@
 {
   "s1": {
     "label": "Réfrigération commerciale - meuble autonome - charge moyenne",
+    "group": "Réfrigération commerciale",
     "fluidQty": 0.3,
     "units": {
       "U": {"unit": "U", "coefGHG": 0.15, "coefGHGUncertainty": 50}
@@ -11,6 +12,7 @@
   },
   "s2": {
     "label": "Réfrigération commerciale - surface de vente (120 à 400 m²), alimentation générale, système direct - charge moyenne",
+    "group": "Réfrigération commerciale",
     "fluidQty": 5,
     "units": {
       "U": {"unit": "U", "coefGHG": 50, "coefGHGUncertainty": 50}
@@ -21,6 +23,7 @@
   },
   "s3": {
     "label": "Réfrigération commerciale - surface de vente (120 à 400 m²), supérette, système direct - charge moyenne",
+    "group": "Réfrigération commerciale",
     "fluidQty": 132,
     "units": {
       "U": {"unit": "U", "coefGHG": 1848, "coefGHGUncertainty": 50}
@@ -31,6 +34,7 @@
   },
   "s4": {
     "label": "Réfrigération commerciale - surface de vente (400 à 2500 m²), système direct - ratio de charge",
+    "group": "Réfrigération commerciale",
     "fluidQty": 0.21,
     "units": {
       "m2": {"unit": "m2", "coefGHG": 4.2, "coefGHGUncertainty": 50}
@@ -41,6 +45,7 @@
   },
   "s5": {
     "label": "Réfrigération commerciale - surface de vente (2500 à 15000 m²), système direct - ratio de charge",
+    "group": "Réfrigération commerciale",
     "fluidQty": 0.19,
     "units": {
       "m2": {"unit": "m2", "coefGHG": 5.13, "coefGHGUncertainty": 50}
@@ -51,6 +56,7 @@
   },
   "s6": {
     "label": "Réfrigération commerciale - toute surface de vente, système indirect - ratio de charge",
+    "group": "Réfrigération commerciale",
     "fluidQty": 0.12,
     "units": {
       "m2": {"unit": "m2", "coefGHG": 1.2, "coefGHGUncertainty": 50}
@@ -61,6 +67,7 @@
   },
   "s7": {
     "label": "Réfrigération industrielle - bière - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
@@ -71,6 +78,7 @@
   },
   "s8": {
     "label": "Réfrigération industrielle - boissons gazeuses - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
@@ -81,6 +89,7 @@
   },
   "s9": {
     "label": "Réfrigération industrielle - chocolaterie industrielle - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
@@ -91,6 +100,7 @@
   },
   "s10": {
     "label": "Réfrigération industrielle - entrepôts frigorifiques - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 6,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 84, "coefGHGUncertainty": 50}
@@ -101,6 +111,7 @@
   },
   "s11": {
     "label": "Réfrigération industrielle - glace hydrique poissons - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 4,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 56, "coefGHGUncertainty": 50}
@@ -111,6 +122,7 @@
   },
   "s12": {
     "label": "Réfrigération industrielle - Industrie viande (abattoirs) - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 5.5,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 77, "coefGHGUncertainty": 50}
@@ -121,6 +133,7 @@
   },
   "s13": {
     "label": "Réfrigération industrielle - produits laitiers - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 1,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 12, "coefGHGUncertainty": 50}
@@ -131,6 +144,7 @@
   },
   "s14": {
     "label": "Réfrigération industrielle - surgelés - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 8.8,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 123.2, "coefGHGUncertainty": 50}
@@ -141,6 +155,7 @@
   },
   "s15": {
     "label": "Réfrigération industrielle - vin - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
@@ -151,6 +166,7 @@
   },
   "s16": {
     "label": "Réfrigération industrielle - caoutchouc - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 5.5,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 82.5, "coefGHGUncertainty": 50}
@@ -161,6 +177,7 @@
   },
   "s17": {
     "label": "Réfrigération industrielle - chimique - ratio de charge",
+    "group": "Réfrigération industrielle",
     "fluidQty": 6,
     "units": {
       "kW": {"unit": "kW", "coefGHG": 84, "coefGHGUncertainty": 50}
@@ -171,6 +188,7 @@
   },
   "s18": {
     "label": "Réfrigération industrielle - patinoire fixe - charge moyenne",
+    "group": "Réfrigération industrielle",
     "fluidQty": 1000,
     "units": {
       "U": {"unit": "U", "coefGHG": 15000, "coefGHGUncertainty": 50}
@@ -181,6 +199,7 @@
   },
   "s19": {
     "label": "Réfrigération industrielle - tank à lait - charge moyenne",
+    "group": "Réfrigération industrielle",
     "fluidQty": 2.1,
     "units": {
       "U": {"unit": "U", "coefGHG": 25.2, "coefGHGUncertainty": 50}
@@ -191,6 +210,7 @@
   },
   "s20": {
     "label": "Réfrigération fret maritime - conteneur frigorifique 1 evp - charge moyenne",
+    "group": "Réfrigération fret",
     "fluidQty": 1000,
     "units": {
       "U": {"unit": "U", "coefGHG": 15000, "coefGHGUncertainty": 50}
@@ -201,6 +221,7 @@
   },
   "s21": {
     "label": "Réfrigération fret routier - camion, système poulie-courroie - charge moyenne",
+    "group": "Réfrigération fret",
     "fluidQty": 2.2,
     "units": {
       "U": {"unit": "U", "coefGHG": 48.4, "coefGHGUncertainty": 50}
@@ -211,6 +232,7 @@
   },
   "s22": {
     "label": "Réfrigération fret routier - conteneur autonomes - charge moyenne",
+    "group": "Réfrigération fret",
     "fluidQty": 4.6,
     "units": {
       "U": {"unit": "U", "coefGHG": 92, "coefGHGUncertainty": 50}
@@ -221,6 +243,7 @@
   },
   "s23": {
     "label": "Réfrigération fret routier - semi-remorque, système 'moteur thermique' - charge moyenne",
+    "group": "Réfrigération fret",
     "fluidQty": 6.5,
     "units": {
       "U": {"unit": "U", "coefGHG": 84.5, "coefGHGUncertainty": 50}
