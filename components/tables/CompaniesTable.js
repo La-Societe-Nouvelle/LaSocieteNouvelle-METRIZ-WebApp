@@ -91,8 +91,8 @@ export class CompaniesTable extends React.Component {
     {
       case "identifiant": companies.sort((a,b) => valueOrDefault(a.corporateId,"").localeCompare(valueOrDefault(b.corporateId,""))); break;
       case "denomination": companies.sort((a,b) => a.getCorporateName().localeCompare(b.getCorporateName())); break;
-      case "area": companies.sort((a,b) => a.getAreaCode().localeCompare(b.getAreaCode())); break;
-      case "activity": companies.sort((a,b) => a.getCorporateActivity().localeCompare(b.getCorporateActivity())); break;
+      //case "area": companies.sort((a,b) => a.footprintAreaCode.localeCompare(b.footprintAreaCode)); break;
+      //case "activity": companies.sort((a,b) => a.footprintActivityCode.localeCompare(b.footprintActivityCode)); break;
       case "amount": companies.sort((a,b) => b.amount - a.amount); break;
     }
     if (this.state.reverseSort) companies.reverse();
