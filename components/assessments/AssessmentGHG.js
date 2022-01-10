@@ -5,16 +5,16 @@ import React from 'react';
 
 // Utils
 import { InputNumber } from '../InputNumber';
-import { getNewId, printValue } from '../../src/utils/Utils';
+import { getNewId, getSumItems, printValue } from '../../src/utils/Utils';
 
 // Libraries
 import fuels from '/lib/fuels.json';
 import industrialProcesses from '/lib/industrialProcesses.json';
 import coolingSystems from '/lib/coolingSystems.json';
-import ghg from '/lib/ghg.json';
+import greenhouseGases from '/lib/ghg.json';
 import landChanges from '/lib/landChanges.json';
 
-const allSources = {...fuels,
+const emissionFactors = {...fuels,
                     ...industrialProcesses,
                     ...coolingSystems,
                     ...landChanges};
@@ -34,7 +34,7 @@ const allSources = {...fuels,
     id: id of the item,
     assessmentItem : id of the assessment item (1 -> 5)
     label: name of the source
-    code: code to fetch data (fuelCode, coolingSystemsCode, etc.)
+    factorId: code to the emission factor used (fuel, coolingSystems, etc.)
     gaz: code of gaz (co2e by default)
     consumption: consumption
     consumptionUnit: unit for the consumption value
@@ -56,16 +56,16 @@ export class AssessmentGHG extends React.Component {
       // total ghg emissions & uncertainty
       greenhousesGazEmissions: props.impactsData.greenhousesGazEmissions,
       greenhousesGazEmissionsUncertainty: props.impactsData.greenhousesGazEmissionsUncertainty,
-      // details (by products)
+      // details
       ghgDetails: props.impactsData.ghgDetails,
-      // adding new product
-      itemNewProduct: ""
+      // adding new factor
+      newFactorAssessmentItem: ""
     }
   }
 
   render() 
   {
-    const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,ghgDetails,itemNewProduct} = this.state;
+    const {greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,ghgDetails,newFactorAssessmentItem} = this.state;
 
     return (
       <div className="assessment">
@@ -98,7 +98,7 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.source} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                    <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                       {Object.entries(fuels)
                              .filter(([_,data]) => data.usageSourcesFixes)
                              .map(([_,data]) => data.group)
@@ -117,7 +117,7 @@ export class AssessmentGHG extends React.Component {
                   <td>
                     <select onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)} 
                             value={itemData.consumptionUnit}>
-                      {Object.entries(fuels[itemData.source].units)
+                      {Object.entries(fuels[itemData.factorId].units)
                              .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     </select></td>
                   <td className="short right">
@@ -131,7 +131,7 @@ export class AssessmentGHG extends React.Component {
                 </tr>
               )}
 
-              {itemNewProduct=="1" &&
+              {newFactorAssessmentItem=="1" &&
                 <tr>
                   <td/>
                   <td className="sub">
@@ -169,7 +169,7 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.source} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                    <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                       {Object.entries(fuels)
                              .filter(([_,data]) => data.usageSourcesMobiles)
                              .map(([_,data]) => data.group)
@@ -188,7 +188,7 @@ export class AssessmentGHG extends React.Component {
                   <td>
                     <select value={itemData.consumptionUnit}
                             onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
-                      {Object.entries(fuels[itemData.source].units)
+                      {Object.entries(fuels[itemData.factorId].units)
                              .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     </select></td>
                   <td className="short right">
@@ -202,7 +202,7 @@ export class AssessmentGHG extends React.Component {
                 </tr>
               )}
 
-            {itemNewProduct=="2" &&
+            {newFactorAssessmentItem=="2" &&
               <tr>
                 <td/>
                 <td className="sub">
@@ -239,8 +239,8 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.source}
-                            onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                    <select value={itemData.factorId}
+                            onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                       {Object.entries(industrialProcesses.industrialProcesses)
                              .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                     </select></td>
@@ -250,7 +250,7 @@ export class AssessmentGHG extends React.Component {
                   <td>
                     <select value={itemData.consumptionUnit}
                             onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
-                      {Object.entries(industrialProcesses.industrialProcesses[itemData.source].units)
+                      {Object.entries(industrialProcesses.industrialProcesses[itemData.factorId].units)
                              .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                       <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                       <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
@@ -266,7 +266,7 @@ export class AssessmentGHG extends React.Component {
                 </tr>
               )}
 
-            {itemNewProduct=="3" &&
+            {newFactorAssessmentItem=="3" &&
             <tr>
               <td/>
               <td className="sub">
@@ -294,7 +294,7 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                   <td className="sub">
-                    <select value={itemData.source} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                    <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                       {Object.entries(coolingSystems)
                              .map(([_,data]) => data.group)
                              .filter((value, index, self) => index === self.findIndex(item => item === value))
@@ -313,7 +313,7 @@ export class AssessmentGHG extends React.Component {
                   <td>
                     <select value={itemData.consumptionUnit}
                             onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
-                      <option key={coolingSystems[itemData.source].unit} value={coolingSystems[itemData.source].unit}>{coolingSystems[itemData.source].unit}</option>
+                      <option key={coolingSystems[itemData.factorId].unit} value={coolingSystems[itemData.factorId].unit}>{coolingSystems[itemData.factorId].unit}</option>
                       <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                       <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                     </select></td>
@@ -325,8 +325,8 @@ export class AssessmentGHG extends React.Component {
                   {(itemData.consumptionUnit!="kgCO2e" && itemData.consumptionUnit!="tCO2e") &&
                     <td colSpan="2">
                       <select value={itemData.gaz}
-                              onChange={(event) => this.changeGaz(itemId,event.target.value)}>
-                        {Object.entries(ghg)
+                              onChange={(event) => this.updateGaz(itemId,event.target.value)}>
+                        {Object.entries(greenhouseGases)
                                .filter(([_,data]) => data.label!="")
                                .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                       </select></td>}
@@ -336,7 +336,7 @@ export class AssessmentGHG extends React.Component {
                   <td className="column_unit"><span>&nbsp;%</span></td>
                 </tr>)}
 
-            {itemNewProduct=="4" &&
+            {newFactorAssessmentItem=="4" &&
               <tr>
                 <td/>
                 <td className="sub">
@@ -373,7 +373,7 @@ export class AssessmentGHG extends React.Component {
               <tr key={itemId}>
                 <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
                 <td className="sub">
-                    <select value={itemData.sour} onChange={(event) => this.changeSource(itemId,event.target.value)}>
+                    <select value={itemData.sour} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(landChanges)
                            .map(([_,data]) => data.from)
                            .filter((value, index, self) => index === self.findIndex(item => item === value))
@@ -405,7 +405,7 @@ export class AssessmentGHG extends React.Component {
                 <td className="column_unit"><span>&nbsp;%</span></td>
               </tr>)}
 
-            {itemNewProduct=="5" &&
+            {newFactorAssessmentItem=="5" &&
               <tr>
                 <td/>
                 <td className="sub">
@@ -441,47 +441,51 @@ export class AssessmentGHG extends React.Component {
   /* ---------- NEW ITEM ---------- */
 
   // New line
-  addNewLine = (type) => this.setState({itemNewProduct: type})
+  addNewLine = (assessmentItem) => this.setState({newFactorAssessmentItem: assessmentItem})
 
   // add new ghg emissions item
-  addItem = (assessmentItem,source) =>
+  addItem = (assessmentItem,factorId) =>
   {
     let {ghgDetails} = this.state;
+
     const id = getNewId(Object.entries(ghgDetails).map(([_,item]) => item));
     ghgDetails[id] = {
       id: id,
       assessmentItem: assessmentItem,
-      label: allSources[source].label,
-      source: source,
+      label: emissionFactors[factorId].label,
+      factorId: factorId,
       gaz: assessmentItem=="4" ? "R14" : "co2e",
       consumption: 0.0, 
-      consumptionUnit: Object.keys(allSources[source].units)[0], 
+      consumptionUnit: Object.keys(emissionFactors[factorId].units)[0], 
       consumptionUncertainty: 0.0,
       ghgEmissions: 0.0,
       ghgEmissionsUncertainty: 0.0, 
     }
-    this.setState({ghgDetails: ghgDetails, itemNewProduct: ""});
+
+    this.setState({ghgDetails: ghgDetails, newFactorAssessmentItem: ""});
   }
 
   /* ---------- UPDATES ---------- */
 
   // Source
-  changeSource = (itemId,nextSourceId) =>
+  changeFactor = (itemId,nextFactorId) =>
   {
     let itemData = this.state.ghgDetails[itemId];
-    itemData.source = nextSourceId;
-    itemData.label = allSources[nextSourceId].label;
+
+    itemData.factorId = nextFactorId;
+    itemData.label = emissionFactors[nextFactorId].label;
 
     // re-init if unit unvailable for new source
     if (!["kgCO2e","tCO2e"].includes(itemData.consumptionUnit) && 
-        !Object.keys(allSources[nextSourceId].units).includes(itemData.consumptionUnit))
+        !Object.keys(emissionFactors[nextFactorId].units).includes(itemData.consumptionUnit))
     {
       itemData.consumption = 0.0;
-      itemData.consumptionUnit = Object.keys(allSources[source].units)[0];
+      itemData.consumptionUnit = Object.keys(emissionFactors[nextFactorId].units)[0];
       itemData.consumptionUncertainty = 0.0;
       itemData.ghgEmissions = 0.0;
       itemData.ghgEmissionsUncertainty = 0.0;
     }
+    // ...or update amount of emission with new unit
     else
     {
       itemData.ghgEmissions = getGhgEmissions(itemData);
@@ -496,6 +500,7 @@ export class AssessmentGHG extends React.Component {
   updateConsumption = (itemId,nextConsumption) => 
   {
     let item = this.state.ghgDetails[itemId];
+
     item.consumption = nextConsumption;
 
     // uncertainty to zero if consumption null
@@ -505,6 +510,8 @@ export class AssessmentGHG extends React.Component {
 
     item.ghgEmissions = getGhgEmissions(item);
     item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
+
+    // update total
     this.updateGhgEmissions();
   }
 
@@ -512,9 +519,12 @@ export class AssessmentGHG extends React.Component {
   changeConsumptionUnit = (itemId,nextConsumptionUnit) => 
   {
     let itemData = this.state.ghgDetails[itemId];
+
     itemData.consumptionUnit = nextConsumptionUnit;
     itemData.ghgEmissions = getGhgEmissions(itemData);
     itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
+
+    // update total
     this.updateGhgEmissions();
   }
 
@@ -522,24 +532,29 @@ export class AssessmentGHG extends React.Component {
   updateConsumptionUncertainty = (itemId,nextConsumptionUncertainty) =>
   {
     let item = this.state.ghgDetails[itemId];
+
     item.consumptionUncertainty = nextConsumptionUncertainty;
     item.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(item);
+
+    // update total
     this.updateGhgEmissions();
   }
 
   // Gaz (only used for cooling systems)
-  changeGaz = (itemId,nextGaz) =>
+  updateGaz = (itemId,nextGaz) =>
   {
     let itemData = this.state.ghgDetails[itemId];
-    itemData.gaz = nextGaz;
 
+    itemData.gaz = nextGaz;
     itemData.ghgEmissions = getGhgEmissions(itemData);
     itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
+
+    // update total
     this.updateGhgEmissions();
   }
   
   // Label
-  changeLabel = (itemId,nextLabel) => 
+  updateLabel = (itemId,nextLabel) => 
   {
     let item = this.state.ghgDetails[itemId];
     item.label = nextLabel;
@@ -550,6 +565,8 @@ export class AssessmentGHG extends React.Component {
   deleteItem = (itemId) =>
   {
     delete this.state.ghgDetails[itemId];
+
+    // update total
     this.updateGhgEmissions();
   }
 
@@ -573,6 +590,7 @@ export class AssessmentGHG extends React.Component {
     impactsData.ghgDetails = this.state.ghgDetails;
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
     impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
+
     await this.props.onUpdate("ghg");
 
     // update nrg data
@@ -615,32 +633,32 @@ export class AssessmentGHG extends React.Component {
   }
 }
 
-/* -------------------- GHG FORMULAS -------------------- */
+/* -------------------- GHG FORMULAS | ITEM -------------------- */
 
-const getGhgEmissions = ({consumption,consumptionUnit,source,gaz}) =>
+const getGhgEmissions = ({consumption,consumptionUnit,factorId,gaz}) =>
 {
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption;
     case "tCO2e":   return consumption * 1000;
-    default:        return consumption * allSources[source].units[consumptionUnit].coefGHG * ghg[gaz].prg;
+    default:        return consumption * emissionFactors[factorId].units[consumptionUnit].coefGHG * greenhouseGases[gaz].prg;
   }
 }
 
-const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,source,gaz}) =>
+const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,factorId,gaz}) =>
 {
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption*(1+consumptionUncertainty/100);
     case "tCO2e":   return consumption*(1+consumptionUncertainty/100) * 1000;
-    default:        return consumption*(1+consumptionUncertainty/100) * allSources[source].units[consumptionUnit].coefGHG*(1+allSources[source].units[consumptionUnit].coefGHGUncertainty/100) * ghg[gaz].prg;
+    default:        return consumption*(1+consumptionUncertainty/100) * emissionFactors[factorId].units[consumptionUnit].coefGHG*(1+emissionFactors[factorId].units[consumptionUnit].coefGHGUncertainty/100) * greenhouseGases[gaz].prg;
   }
 }
 
-const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,source,gaz}) =>
+const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,factorId,gaz}) =>
 {
   switch(consumptionUnit) {
     case "kgCO2e":  return consumption*(1-consumptionUncertainty/100);
     case "tCO2e":   return consumption*(1-consumptionUncertainty/100) * 1000;
-    default:        return consumption*(1-consumptionUncertainty/100) * allSources[source].units[consumptionUnit].coefGHG*(1-allSources[source].units[consumptionUnit].coefGHGUncertainty/100) * ghg[gaz].prg;
+    default:        return consumption*(1-consumptionUncertainty/100) * emissionFactors[factorId].units[consumptionUnit].coefGHG*(1-emissionFactors[factorId].units[consumptionUnit].coefGHGUncertainty/100) * greenhouseGases[gaz].prg;
   }
 }
 
@@ -649,50 +667,54 @@ const getGhgEmissionsUncertainty = (item) =>
   const value = getGhgEmissions(item);
   const valueMax = getGhgEmissionsMax(item);
   const valueMin = getGhgEmissionsMin(item);
-  return value != 0 ? Math.round(Math.max(valueMax-value,value-valueMin)/value *100) : 0;
+  return value != 0 ? Math.round(Math.max(Math.abs(valueMax-value),Math.abs(value-valueMin))/value *100) : 0;
 }
+
+/* -------------------- GHG FORMULAS | ITEMS -------------------- */
 
 const getTotalGhgEmissions = (ghgDetails) =>
 {
-  const sum = Object.entries(ghgDetails)
-                    .map(([_,data]) => data.ghgEmissions)
-                    .reduce((a,b) => a + b,0);
-  return sum;
+  const items = Object.entries(ghgDetails).map(([_,itemData]) => itemData);
+  const emissions = getGhgEmissionsUncertaintyItems(items);
+  return emissions
 }
 
 const getTotalGhgEmissionsUncertainty = (ghgDetails) =>
 {
   const items = Object.entries(ghgDetails).map(([_,itemData]) => itemData);
-  if (items.length > 0)
-  {
-    const value = items.map((item) => item.ghgEmissions).reduce((a,b) => a + b,0);
-    if (value != 0) {
-      const valueMax = items.map((item) => item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
-      const valueMin = items.map((item) => item.ghgEmissions*Math.max(1-item.ghgEmissionsUncertainty/100,0)).reduce((a,b) => a + b,0);
-      return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
-    } else {
-      return 0;
-    }
-  }
-  else return  null;
+  const uncertainty = getGhgEmissionsUncertaintyItems(items);
+  return uncertainty
 }
 
 const getTotalByAssessmentItem = (ghgDetails,assessmentItem) =>
-  {
-    const sum = Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem==assessmentItem).map(([_,itemData]) => itemData.ghgEmissions).reduce((a,b) => a + b,0);
-    return sum;
-  }
+{
+  const items = Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem==assessmentItem).map(([_,itemData]) => itemData);
+  const emissions = getGhgEmissionsItems(items);
+  return emissions;
+}
 
 const getUncertaintyByAssessmentItem = (ghgDetails,assessmentItem) =>
 {
   const items = Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem==assessmentItem).map(([_,itemData]) => itemData);
+  const uncertainty = getGhgEmissionsUncertaintyItems(items);
+  return uncertainty
+}
+
+const getGhgEmissionsItems = (items) =>
+{
+  const sum = getSumItems(items.map((item) => item.ghgEmissions));
+  return sum;
+}
+
+const getGhgEmissionsUncertaintyItems = (items) =>
+{
   if (items.length > 0)
   {
-    const value = items.map((item) => item.ghgEmissions).reduce((a,b) => a + b,0);
-    if (value > 0) {
-      const valueMax = items.map((item) => item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
-      const valueMin = items.map((item) => item.ghgEmissions*Math.max(1-item.ghgEmissionsUncertainty/100,0)).reduce((a,b) => a + b,0);
-      return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
+    const value = getSumItems(items.map((item) => item.ghgEmissions));
+    if (value != 0) {
+      const valueMax = getSumItems(items.map((item) => Math.max(item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100),item.ghgEmissions*(1-item.ghgEmissionsUncertainty/100)) ) );
+      const valueMin = getSumItems(items.map((item) => Math.min(item.ghgEmissions*Math.max(1+item.ghgEmissionsUncertainty/100,0),item.ghgEmissions*Math.max(1-item.ghgEmissionsUncertainty/100,0)) ));
+      return Math.round(Math.max(Math.abs(valueMax-value),Math.abs(value-valueMin))/value *100);
     } else {
       return 0;
     }
