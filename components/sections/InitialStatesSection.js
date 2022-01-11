@@ -154,7 +154,7 @@ export class InitialStatesSection extends React.Component {
         else if (prevSession.legalUnit.siren!=this.props.session.legalUnit.siren) {this.setState({titlePopup: "Erreur - Fichier", message: "Les numéros de siren ne correspondent pas.", showMessage: true})}
         else {this.setState({titlePopup: "Erreur - Fichier", message: "La sauvegarde ne correspond pas à l'année précédente.", showMessage: true})}
       }
-      catch(error) {this.setState({titlePopup: "Erreur - Fichier", message: "Fihcier non lisible.", showMessage: true});}
+      catch(error) {this.setState({titlePopup: "Erreur - Fichier", message: "Fichier non lisible.", showMessage: true});}
     }
 
     try 
