@@ -276,7 +276,7 @@ class DeclarantForm extends React.Component {
     const isAllValid = declarant.length > 0 
                     && /^(.*)@(.*)\.(.*)$/.test(email) 
                     && autorisation
-                    && (forThirdParty || declarantOrganisation.length > 0);
+                    && (!forThirdParty || declarantOrganisation.length > 0);
     
     return(
       <div className="section-view-main">
