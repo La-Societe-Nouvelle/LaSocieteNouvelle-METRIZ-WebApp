@@ -8,7 +8,8 @@ import { InputNumber } from '../InputNumber';
 import { getNewId, printValue } from '../../src/utils/Utils';
 
 // Libs
-import nrgProducts from '../../lib/fuels.json';
+import fuels from '/lib/emissionFactors/fuels.json';
+import { getGhgEmissions, getGhgEmissionsUncertainty, getTotalGhgEmissions, getTotalGhgEmissionsUncertainty } from './AssessmentGHG';
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT NRG -------------------- */
@@ -20,7 +21,7 @@ import nrgProducts from '../../lib/fuels.json';
     - biomass products
     - heat (id: "heat")
     - renewableTranformedEnergy (id: "renewableTranformedEnergy")
-  /!\ Must filter to use getNewId function  
+  /!\ Must filter to use getNewId function
 
    Each item in nrgDetails has the following properties :
     id: id of the item
@@ -134,7 +135,7 @@ export class AssessmentNRG extends React.Component {
                 <td className="sub">
                   <select value={itemData.fuelCode}
                           onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
-                    {Object.entries(nrgProducts)
+                    {Object.entries(fuels)
                             .filter(([_,data]) => data.type=="fossil")
                             .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                   </select></td>
@@ -146,7 +147,7 @@ export class AssessmentNRG extends React.Component {
                           onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
                       <option key="MJ" value="MJ">&nbsp;MJ</option>
                       <option key="kWh" value="kWh">&nbsp;kWh</option>
-                      {Object.entries(nrgProducts[itemData.fuelCode].units)
+                      {Object.entries(fuels[itemData.fuelCode].units)
                               .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     </select></td>
                 <td className="short right">
@@ -166,7 +167,7 @@ export class AssessmentNRG extends React.Component {
                   <select value="none"
                           onChange={(event) => this.addProduct(event.target.value)}>
                     <option key="none" value="none">---</option>
-                    {Object.entries(nrgProducts)
+                    {Object.entries(fuels)
                             .filter(([_,data]) => data.type=="fossil")
                             .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                   </select></td>
@@ -189,7 +190,7 @@ export class AssessmentNRG extends React.Component {
                 <td className="sub">
                   <select value={itemData.fuelCode}
                           onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
-                    {Object.entries(nrgProducts)
+                    {Object.entries(fuels)
                             .filter(([_,data]) => data.type=="biomass")
                             .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                   </select></td>
@@ -201,7 +202,7 @@ export class AssessmentNRG extends React.Component {
                           onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
                     <option key="MJ" value="MJ">&nbsp;MJ</option>
                     <option key="kWh" value="kWh">&nbsp;kWh</option>
-                    {Object.entries(nrgProducts[itemData.fuelCode].units)
+                    {Object.entries(fuels[itemData.fuelCode].units)
                             .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                   </select></td>
                 <td className="short right">
@@ -221,7 +222,7 @@ export class AssessmentNRG extends React.Component {
                   <select value="none"
                           onChange={(event) => this.addProduct(event.target.value)}>
                     <option key="none" value="none">---</option>
-                    {Object.entries(nrgProducts)
+                    {Object.entries(fuels)
                             .filter(([_,data]) => data.type=="biomass")
                             .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                   </select></td>
@@ -301,7 +302,7 @@ export class AssessmentNRG extends React.Component {
     nrgDetails[id] = {
       id: id,
       fuelCode: fuelCode, 
-      type: nrgProducts[fuelCode].type,
+      type: fuels[fuelCode].type,
       consumption: 0.0, 
       consumptionUnit: "GJ",
       consumptionUncertainty: 25.0, 
@@ -320,7 +321,7 @@ export class AssessmentNRG extends React.Component {
     itemData.fuelCode = nextFuelCode;
 
     // check if the unit used is also available for the new product
-    if (Object.keys(nrgProducts[nextFuelCode].units)
+    if (Object.keys(fuels[nextFuelCode].units)
               .includes(itemData.consumptionUnit)) {
       itemData.nrgConsumption = getNrgConsumption(itemData);
       itemData.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
@@ -418,13 +419,15 @@ export class AssessmentNRG extends React.Component {
               itemData.idGHG = id;
             }
             // update values
-            ghgItem.fuelCode = itemData.fuelCode;
+            ghgItem.assessmentItem = fuels[ghgItem.factorId].usageSourcesFixes ? "1" : "2";
+            ghgItem.label = itemData.label,
+            ghgItem.factorId = itemData.fuelCode;
+            ghgItem.gaz = "co2e",
             ghgItem.consumption = itemData.consumption;
             ghgItem.consumptionUnit = itemData.consumptionUnit;
             ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
-            ghgItem.ghgEmissions = getGhgEmissions(itemData);
-            ghgItem.getGhgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-            ghgItem.assessmentItem = "1";
+            ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
+            ghgItem.getGhgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
           })
     // ...total & uncertainty
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
@@ -438,14 +441,14 @@ export class AssessmentNRG extends React.Component {
 
 /* ---------- NRG FORMULAS ---------- */
 
-const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) =>
+export const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) =>
 {
   switch(consumptionUnit) {
     case "MJ":  return consumption;
     case "GJ":  return consumption * 1000;
     case "tep": return consumption * 41868;
     case "kWh": return consumption * 3.6;
-    default:    return consumption * nrgProducts[fuelCode].units[consumptionUnit].coefNRG;
+    default:    return consumption * fuels[fuelCode].units[consumptionUnit].coefNRG;
   }
 }
 
@@ -456,7 +459,7 @@ const getNrgConsumptionMax = ({consumption,consumptionUnit,consumptionUncertaint
     case "GJ":  return consumption*(1+consumptionUncertainty/100) * 1000;
     case "tep": return consumption*(1+consumptionUncertainty/100) * 41868;
     case "kWh": return consumption*(1+consumptionUncertainty/100) * 3.6;
-    default:    return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+    default:    return consumption*(1+consumptionUncertainty/100) * fuels[fuelCode].units[consumptionUnit].coefNRG*(1+fuels[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
   }
 }
 
@@ -467,11 +470,11 @@ const getNrgConsumptionMin = ({consumption,consumptionUnit,consumptionUncertaint
     case "GJ":  return consumption*(1-consumptionUncertainty/100) * 1000;
     case "tep": return consumption*(1-consumptionUncertainty/100) * 41868;
     case "kWh": return consumption*(1-consumptionUncertainty/100) * 3.6;
-    default:    return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefNRG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
+    default:    return consumption*(1-consumptionUncertainty/100) * fuels[fuelCode].units[consumptionUnit].coefNRG*(1-fuels[fuelCode].units[consumptionUnit].coefNRGUncertainty/100);
   }
 }
 
-const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
+export const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
 {
   const value = getNrgConsumption({consumption,consumptionUnit,fuelCode});
   const valueMax = getNrgConsumptionMax({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
@@ -479,7 +482,7 @@ const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUn
   return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
 }
 
-const getTotalNrgConsumption = (nrgDetails) =>
+export const getTotalNrgConsumption = (nrgDetails) =>
 {
   const sum = Object.entries(nrgDetails)
                     .map(([_,data]) => data.nrgConsumption)
@@ -487,7 +490,7 @@ const getTotalNrgConsumption = (nrgDetails) =>
   return sum;
 }
 
-const getTotalNrgConsumptionUncertainty = (nrgDetails) =>
+export const getTotalNrgConsumptionUncertainty = (nrgDetails) =>
 {
   const items = Object.entries(nrgDetails).map(([_,itemData]) => itemData);
   if (items.length > 0)
@@ -522,68 +525,6 @@ const getNrgConsumptionUncertaintyByType = (nrgDetails,type) =>
     if (value > 0) {
       const valueMax = items.map((item) => item.nrgConsumption*(1+item.nrgConsumptionUncertainty/100)).reduce((a,b) => a + b,0);
       const valueMin = items.map((item) => item.nrgConsumption*(1-item.nrgConsumptionUncertainty/100)).reduce((a,b) => a + b,0);
-      return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
-    } else {
-      return 0;
-    }
-  }
-  else return  null;
-}
-
-/* ---------- GHG FORMULAS ---------- */
-
-const getGhgEmissions = ({consumption,consumptionUnit,fuelCode}) =>
-{
-  switch(consumptionUnit) {
-    case "kgCO2e":  return consumption;
-    case "tCO2e":   return consumption * 1000;
-    default:        return consumption * nrgProducts[fuelCode].units[consumptionUnit].coefGHG;
-  }
-}
-
-const getGhgEmissionsMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
-{
-  switch(consumptionUnit) {
-    case "kgCO2e":  return consumption*(1+consumptionUncertainty/100);
-    case "tCO2e":   return consumption*(1+consumptionUncertainty/100) * 1000;
-    default:        return consumption*(1+consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1+nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
-  }
-}
-
-const getGhgEmissionsMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
-{
-  switch(consumptionUnit) {
-    case "kgCO2e":  return consumption*(1-consumptionUncertainty/100);
-    case "tCO2e":   return consumption*(1-consumptionUncertainty/100) * 1000;
-    default:        return consumption*(1-consumptionUncertainty/100) * nrgProducts[fuelCode].units[consumptionUnit].coefGHG*(1-nrgProducts[fuelCode].units[consumptionUnit].coefGHGUncertainty/100);
-  }
-}
-
-const getGhgEmissionsUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) =>
-{
-  const value = getGhgEmissions({consumption,consumptionUnit,fuelCode});
-  const valueMax = getGhgEmissionsMax({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
-  const valueMin = getGhgEmissionsMin({consumption,consumptionUnit,consumptionUncertainty,fuelCode});
-  return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
-}
-
-const getTotalGhgEmissions = (ghgDetails) =>
-{
-  const sum = Object.entries(ghgDetails)
-                    .map(([_,data]) => data.ghgEmissions)
-                    .reduce((a,b) => a + b,0);
-  return sum;
-}
-
-const getTotalGhgEmissionsUncertainty = (ghgDetails) =>
-{
-  const items = Object.entries(ghgDetails).map(([_,itemData]) => itemData);
-  if (items.length > 0)
-  {
-    const value = items.map((item) => item.ghgEmissions).reduce((a,b) => a + b,0);
-    if (value > 0) {
-      const valueMax = items.map((item) => item.ghgEmissions*(1+item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
-      const valueMin = items.map((item) => item.ghgEmissions*(1-item.ghgEmissionsUncertainty/100)).reduce((a,b) => a + b,0);
       return Math.round(Math.max(valueMax-value,value-valueMin)/value *100);
     } else {
       return 0;
