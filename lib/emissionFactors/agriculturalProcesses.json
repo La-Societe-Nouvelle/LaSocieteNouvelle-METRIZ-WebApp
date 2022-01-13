@@ -1,0 +1,100 @@
+{
+  "agri1": {
+    "label": "Vache laitière",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 5008, "coefGHGUncertainty": 164}
+    }
+  },
+  "agri2": {
+    "label": "Autres bovins",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 2051, "coefGHGUncertainty": 199}
+    }
+  },
+  "agri3": {
+    "label": "Ovins",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 405, "coefGHGUncertainty": 296}
+    }
+  },
+  "agri4": {
+    "label": "Caprins",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 448, "coefGHGUncertainty": 248}
+    }
+  },
+  "agri5": {
+    "label": "Truies",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 630, "coefGHGUncertainty": 122}
+    }
+  },
+  "agri6": {
+    "label": "Autres porcins",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 584, "coefGHGUncertainty": 101}
+    }
+  },
+  "agri7": {
+    "label": "Chevaux",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 1151, "coefGHGUncertainty": 350}
+    }
+  },
+  "agri8": {
+    "label": "Mules et ânes",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 502, "coefGHGUncertainty": 261}
+    }
+  },
+  "agri9": {
+    "label": "Volailles",
+    "group": "Cheptels",
+    "units": {
+      "U": {"unit": "U", "coefGHG": 8, "coefGHGUncertainty": 436}
+    }
+  },
+  "agri10": {
+    "label": "Epandage d'engrais minéraux",
+    "group": "Epandage",
+    "units": {
+      "kgN": {"unit": "kg d'azote épandu", "coefGHG": 5.57, "coefGHGUncertainty": 400}
+    }
+  },
+  "agri11": {
+    "label": "Epandage d'engrais organiques - déjections animales, végétaux, compost, boues de station d'épuration... ",
+    "group": "Epandage",
+    "units": {
+      "kgN": {"unit": "kg d'azote épandu", "coefGHG": 5.83, "coefGHGUncertainty": 400}
+    }
+  },
+  "agri12": {
+    "label": "Résidu de culture",
+    "group": "Epandage",
+    "units": {
+      "kgN": {"unit": "kg d'azote épandu", "coefGHG": 5.04, "coefGHGUncertainty": 400}
+    }
+  },
+  "agri13": {
+    "label": "Drainage / gestion des sols - sols des cultures organiques tempérées et de prairies",
+    "group": "Drainage",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 3445, "coefGHGUncertainty": 400}
+    }
+  },
+  "agri14": {
+    "label": "Drainage / gestion des sols - sols des forêts organiques tempérées",
+    "group": "Drainage",
+    "units": {
+      "ha": {"unit": "ha", "coefGHG": 239, "coefGHGUncertainty": 400}
+    }
+  }
+}
