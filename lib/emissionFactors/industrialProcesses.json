@@ -1,33 +1,33 @@
 {
-  "industrialProcesses_1":
+  "indusProcess1":
   {
     "label": "Décarbonatation - fabrication du ciment",
     "units": {
       "t": {"unit": "kgCO2e/t","coefGHG": 525, "coefGHGUncertainty": 5}
     } 
   },
-  "industrialProcesses_2":
+  "indusProcess2":
   {
     "label": "Décarbonatation - fabrication de tuiles et briques",
     "units": {
       "t": {"unit": "kgCO2e/t","coefGHG": 40, "coefGHGUncertainty": 20}
     } 
   },
-  "industrialProcesses_3":
+  "indusProcess3":
   {
     "label": "Décarbonatation - fabrication de la dolomie",
     "units": {
       "t": {"unit": "kgCO2e/t","coefGHG": 765, "coefGHGUncertainty": 10}
     } 
   },
-  "industrialProcesses_4":
+  "indusProcess4":
   {
     "label": "Décarbonatation - fabrication de la chaux issue du raffinage des betteraves",
     "units": {
       "t": {"unit": "kgCO2e/t","coefGHG": 157, "coefGHGUncertainty": 10}
     } 
   },
-  "industrialProcesses_5":
+  "indusProcess5":
   {
     "label": "Décarbonatation - fabrication de la chaux hydraulique",
     "units": {
