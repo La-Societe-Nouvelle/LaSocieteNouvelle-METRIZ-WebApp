@@ -1,5 +1,5 @@
 {
-  "s1": {
+  "coolSys1": {
     "label": "Réfrigération commerciale - meuble autonome - charge moyenne",
     "group": "Réfrigération commerciale",
     "fluidQty": 0.3,
@@ -10,7 +10,7 @@
     "annualLeak": 0.5,
     "annualLeakUncertainty": 50
   },
-  "s2": {
+  "coolSys2": {
     "label": "Réfrigération commerciale - surface de vente (120 à 400 m²), alimentation générale, système direct - charge moyenne",
     "group": "Réfrigération commerciale",
     "fluidQty": 5,
@@ -21,7 +21,7 @@
     "annualLeak": 10,
     "annualLeakUncertainty": 50
   },
-  "s3": {
+  "coolSys3": {
     "label": "Réfrigération commerciale - surface de vente (120 à 400 m²), supérette, système direct - charge moyenne",
     "group": "Réfrigération commerciale",
     "fluidQty": 132,
@@ -32,7 +32,7 @@
     "annualLeak": 14,
     "annualLeakUncertainty": 50
   },
-  "s4": {
+  "coolSys4": {
     "label": "Réfrigération commerciale - surface de vente (400 à 2500 m²), système direct - ratio de charge",
     "group": "Réfrigération commerciale",
     "fluidQty": 0.21,
@@ -43,7 +43,7 @@
     "annualLeak": 20,
     "annualLeakUncertainty": 50
   },
-  "s5": {
+  "coolSys5": {
     "label": "Réfrigération commerciale - surface de vente (2500 à 15000 m²), système direct - ratio de charge",
     "group": "Réfrigération commerciale",
     "fluidQty": 0.19,
@@ -54,7 +54,7 @@
     "annualLeak": 27,
     "annualLeakUncertainty": 50
   },
-  "s6": {
+  "coolSys6": {
     "label": "Réfrigération commerciale - toute surface de vente, système indirect - ratio de charge",
     "group": "Réfrigération commerciale",
     "fluidQty": 0.12,
@@ -65,7 +65,7 @@
     "annualLeak": 10,
     "annualLeakUncertainty": 50
   },
-  "s7": {
+  "coolSys7": {
     "label": "Réfrigération industrielle - bière - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
@@ -76,7 +76,7 @@
     "annualLeak": 12,
     "annualLeakUncertainty": 50
   },
-  "s8": {
+  "coolSys8": {
     "label": "Réfrigération industrielle - boissons gazeuses - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
@@ -87,7 +87,7 @@
     "annualLeak": 12,
     "annualLeakUncertainty": 50
   },
-  "s9": {
+  "coolSys9": {
     "label": "Réfrigération industrielle - chocolaterie industrielle - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
@@ -98,7 +98,7 @@
     "annualLeak": 12,
     "annualLeakUncertainty": 50
   },
-  "s10": {
+  "coolSys10": {
     "label": "Réfrigération industrielle - entrepôts frigorifiques - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 6,
@@ -109,7 +109,7 @@
     "annualLeak": 14,
     "annualLeakUncertainty": 50
   },
-  "s11": {
+  "coolSys11": {
     "label": "Réfrigération industrielle - glace hydrique poissons - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 4,
@@ -120,7 +120,7 @@
     "annualLeak": 14,
     "annualLeakUncertainty": 50
   },
-  "s12": {
+  "coolSys12": {
     "label": "Réfrigération industrielle - Industrie viande (abattoirs) - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 5.5,
@@ -131,7 +131,7 @@
     "annualLeak": 14,
     "annualLeakUncertainty": 50
   },
-  "s13": {
+  "coolSys13": {
     "label": "Réfrigération industrielle - produits laitiers - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 1,
@@ -142,7 +142,7 @@
     "annualLeak": 12,
     "annualLeakUncertainty": 50
   },
-  "s14": {
+  "coolSys14": {
     "label": "Réfrigération industrielle - surgelés - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 8.8,
@@ -153,7 +153,7 @@
     "annualLeak": 14,
     "annualLeakUncertainty": 50
   },
-  "s15": {
+  "coolSys15": {
     "label": "Réfrigération industrielle - vin - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
@@ -164,7 +164,7 @@
     "annualLeak": 12,
     "annualLeakUncertainty": 50
   },
-  "s16": {
+  "coolSys16": {
     "label": "Réfrigération industrielle - caoutchouc - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 5.5,
@@ -175,7 +175,7 @@
     "annualLeak": 15,
     "annualLeakUncertainty": 50
   },
-  "s17": {
+  "coolSys17": {
     "label": "Réfrigération industrielle - chimique - ratio de charge",
     "group": "Réfrigération industrielle",
     "fluidQty": 6,
@@ -186,7 +186,7 @@
     "annualLeak": 14,
     "annualLeakUncertainty": 50
   },
-  "s18": {
+  "coolSys18": {
     "label": "Réfrigération industrielle - patinoire fixe - charge moyenne",
     "group": "Réfrigération industrielle",
     "fluidQty": 1000,
@@ -197,7 +197,7 @@
     "annualLeak": 15,
     "annualLeakUncertainty": 50
   },
-  "s19": {
+  "coolSys19": {
     "label": "Réfrigération industrielle - tank à lait - charge moyenne",
     "group": "Réfrigération industrielle",
     "fluidQty": 2.1,
@@ -208,7 +208,7 @@
     "annualLeak": 12,
     "annualLeakUncertainty": 50
   },
-  "s20": {
+  "coolSys20": {
     "label": "Réfrigération fret maritime - conteneur frigorifique 1 evp - charge moyenne",
     "group": "Réfrigération fret",
     "fluidQty": 1000,
@@ -219,7 +219,7 @@
     "annualLeak": 15,
     "annualLeakUncertainty": 50
   },
-  "s21": {
+  "coolSys21": {
     "label": "Réfrigération fret routier - camion, système poulie-courroie - charge moyenne",
     "group": "Réfrigération fret",
     "fluidQty": 2.2,
@@ -230,7 +230,7 @@
     "annualLeak": 22,
     "annualLeakUncertainty": 50
   },
-  "s22": {
+  "coolSys22": {
     "label": "Réfrigération fret routier - conteneur autonomes - charge moyenne",
     "group": "Réfrigération fret",
     "fluidQty": 4.6,
@@ -241,7 +241,7 @@
     "annualLeak": 20,
     "annualLeakUncertainty": 50
   },
-  "s23": {
+  "coolSys23": {
     "label": "Réfrigération fret routier - semi-remorque, système 'moteur thermique' - charge moyenne",
     "group": "Réfrigération fret",
     "fluidQty": 6.5,
