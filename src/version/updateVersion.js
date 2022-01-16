@@ -6,7 +6,7 @@
 
 export const updateVersion = (sessionData) =>
 {
-  switch(session.version)
+  switch(sessionData.version)
   {
     case "1.0.1": break;
     case "1.0.0": updater_1_0_0(sessionData); break;
@@ -17,13 +17,13 @@ export const updateVersion = (sessionData) =>
 const updater_1_0_0 = (sessionData) =>
 {
   // update ghgDetails
-  sessionData.impactsData.ghgDetails.forEach((item) =>
+  Object.entries(sessionData.impactsData.ghgDetails).forEach(([_,itemData]) =>
   {
     // update name factor id
-    item.factorId = item.fuelCode;
+    itemData.factorId = itemData.fuelCode;
     // update prefix id
-    if (/^p/.test(item.factorId)) item.factorId = "fuel"+item.factorId.substring(1);
-    if (/^s/.test(item.factorId)) item.factorId = "coolSys"+item.factorId.substring(1);
-    if (/^industrialProcesses_/.test(item.factorId)) item.factorId = "indusProcess"+item.factorId.substring(20);
+    if (/^p/.test(itemData.factorId)) itemData.factorId = "fuel"+itemData.factorId.substring(1);
+    if (/^s/.test(itemData.factorId)) itemData.factorId = "coolSys"+itemData.factorId.substring(1);
+    if (/^industrialProcesses_/.test(itemData.factorId)) itemData.factorId = "indusProcess"+itemData.factorId.substring(20);
   })
 }
