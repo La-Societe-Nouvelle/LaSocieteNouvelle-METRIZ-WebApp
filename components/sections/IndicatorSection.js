@@ -185,7 +185,7 @@ export class IndicatorSection extends React.Component {
                              comparativeFootprints={this.state}/>
           </div>
 
-        {this.props.session.validations.includes(this.state.indic) &&
+        {(this.props.session.validations.includes(this.state.indic) && this.state.indic=="eco") &&
           <div className="group">
             <h3>Analyse</h3>
             <Analyse indic={this.state.indic} session={this.props.session}/>
