@@ -56,6 +56,26 @@ export function roundValue(value,precision)
   }
 }
 
+/* ----- COMPARISON ----- */
+
+export function compareToReference(value,reference,margin)
+{
+  if (Math.abs(value) >= Math.abs(reference)*(1-margin/100) 
+   && Math.abs(value) <= Math.abs(reference)*(1+margin/100) )
+  {
+    return 0;
+  }
+  else if (value < reference) 
+  {
+    return -1;
+  }
+  else
+  {
+    return 1;
+  }
+}
+
+
 /* ----- ASSIGN ----- */
 
 export function valueOrDefault(value,defaultValue) {

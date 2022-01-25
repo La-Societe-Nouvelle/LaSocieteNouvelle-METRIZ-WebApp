@@ -20,7 +20,7 @@ export const analysisTextWriterECO = (session) =>
   
   currentParagraph.push("L'indicateur renseigne sur la part de la valeur produite en France.");
   
-  analysis.push(currentParagraph);
+  //analysis.push(currentParagraph);
 
   // Impact direct --------------------------------------------------------------------------------- //
 
@@ -41,7 +41,7 @@ export const analysisTextWriterECO = (session) =>
   currentParagraph = [];
   
   // résultat
-  currentParagraph.push("Les consommations intermédiaires contribuent indirectement et à hauteur de "+aggregates.intermediateConsumption.footprint.indicators.eco.getValue()+" % à l'économie nationale, soit un volume de "+printValue(aggregates.intermediateConsumption.footprint.indicators.eco.getGrossImpact(aggregates.intermediateConsumption.amount),0)+" €.");
+  currentParagraph.push("Les consommations intermédiaires proviennent à "+aggregates.intermediateConsumption.footprint.indicators.eco.getValue()+" % d'activités françaises, soit un volume de "+printValue(aggregates.intermediateConsumption.footprint.indicators.eco.getGrossImpact(aggregates.intermediateConsumption.amount),0)+" €.");
   
   analysis.push(currentParagraph);
 
@@ -69,7 +69,7 @@ export const analysisTextWriterECO = (session) =>
 
   currentParagraph = [];
 
-  currentParagraph.push("L'amortissement des immobilisations apportent une contribution indirecte de "+printValue(aggregates.capitalConsumption.footprint.indicators.eco.getGrossImpact(aggregates.capitalConsumption.amount),0)+" €, soit "+aggregates.capitalConsumption.footprint.indicators.eco.getValue()+" % du montant des dotations aux amortissements.");
+  currentParagraph.push("L'amortissement des immobilisations apportent une contribution indirecte de "+printValue(aggregates.capitalConsumption.footprint.indicators.eco.getGrossImpact(aggregates.capitalConsumption.amount),0)+" €, "+aggregates.capitalConsumption.footprint.indicators.eco.getValue()+" % du montant des dotations aux amortissements.");
 
   analysis.push(currentParagraph);
 

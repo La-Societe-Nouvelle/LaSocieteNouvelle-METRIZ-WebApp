@@ -40,8 +40,20 @@ import { AssessmentDIS } from '/components/assessments/AssessmentDIS';
 
 // Export modules
 import { exportIndicPDF } from '/src/writers/Export';
-import { IndicatorIncomeStatementTable } from '../tables/IndicatorIncomeStatementTable';
+
+// Analysis writers
 import { analysisTextWriterECO } from '../../src/writers/analysis/analysisTextWriterECO';
+import { analysisTextWriterGHG } from '../../src/writers/analysis/analysisTextWriterGHG';
+import { analysisTextWriterART } from '../../src/writers/analysis/analysisTextWriterART';
+import { analysisTextWriterDIS } from '../../src/writers/analysis/analysisTextWriterDIS';
+import { analysisTextWriterGEQ } from '../../src/writers/analysis/analysisTextWriterGEQ';
+import { analysisTextWriterHAZ } from '../../src/writers/analysis/analysisTextWriterHAZ';
+import { analysisTextWriterKNW } from '../../src/writers/analysis/analysisTextWriterKNW';
+import { analysisTextWriterMAT } from '../../src/writers/analysis/analysisTextWriterMAT';
+import { analysisTextWriterNRG } from '../../src/writers/analysis/analysisTextWriterNRG';
+import { analysisTextWriterSOC } from '../../src/writers/analysis/analysisTextWriterSOC';
+import { analysisTextWriterWAS } from '../../src/writers/analysis/analysisTextWriterWAS';
+import { analysisTextWriterWAT } from '../../src/writers/analysis/analysisTextWriterWAT';
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -185,7 +197,7 @@ export class IndicatorSection extends React.Component {
                              comparativeFootprints={this.state}/>
           </div>
 
-        {(this.props.session.validations.includes(this.state.indic) && this.state.indic=="eco") &&
+        {(this.props.session.validations.includes(this.state.indic)) &&
           <div className="group">
             <h3>Analyse</h3>
             <Analyse indic={this.state.indic} session={this.props.session}/>
@@ -332,18 +344,18 @@ function getAnalyse(props)
 {
   switch(props.indic) 
   {
-    case "art" : return(analysisTextWriterECO(props.session))
-    case "dis" : return(analysisTextWriterECO(props.session))
+    case "art" : return(analysisTextWriterART(props.session))
+    case "dis" : return(analysisTextWriterDIS(props.session))
     case "eco" : return(analysisTextWriterECO(props.session))
-    case "geq" : return(analysisTextWriterECO(props.session))
-    case "ghg" : return(analysisTextWriterECO(props.session))
-    case "haz" : return(analysisTextWriterECO(props.session))
-    case "knw" : return(analysisTextWriterECO(props.session))
-    case "mat" : return(analysisTextWriterECO(props.session))
-    case "nrg" : return(analysisTextWriterECO(props.session))
-    case "soc" : return(analysisTextWriterECO(props.session))
-    case "was" : return(analysisTextWriterECO(props.session))
-    case "wat" : return(analysisTextWriterECO(props.session))
+    case "geq" : return(analysisTextWriterGEQ(props.session))
+    case "ghg" : return(analysisTextWriterGHG(props.session))
+    case "haz" : return(analysisTextWriterHAZ(props.session))
+    case "knw" : return(analysisTextWriterKNW(props.session))
+    case "mat" : return(analysisTextWriterMAT(props.session))
+    case "nrg" : return(analysisTextWriterNRG(props.session))
+    case "soc" : return(analysisTextWriterSOC(props.session))
+    case "was" : return(analysisTextWriterWAS(props.session))
+    case "wat" : return(analysisTextWriterWAT(props.session))
   }
 }
 
