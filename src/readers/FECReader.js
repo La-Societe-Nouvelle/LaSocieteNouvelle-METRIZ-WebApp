@@ -705,31 +705,27 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
 
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
   
-  if (/^68(1|7)1/.test(ligneCourante.CompteNum))
+  if (/^68(1|7)1/.test(ligneCourante.CompteNum) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
   {
     // lignes des comptes d'amortissements
     let depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
                                                     && ligne.EcritureLib == ligneCourante.EcritureLib
-                                                    && /^68(1|7)1/.test(ligne.CompteNum))
-    let otherDepreciationExpensesOnEntry = depreciationExpenses.length > 1;
+                                                    && /^68(1|7)1/.test(ligne.CompteNum));
+    
     let sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
-
-    let regexPrefixeCompteAmortissements = otherDepreciationExpensesOnEntry ? ( /^68(1|7)11/.test(ligneCourante.CompteNum) ? /^280/
-                                                                              : /^68(1|7)12/.test(ligneCourante.CompteNum) ? /^281/
-                                                                                                                           : /^28/)
-                                                                            : /^28/;
     let lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
                                                    && ligne.EcritureLib == ligneCourante.EcritureLib
-                                                   && regexPrefixeCompteAmortissements.test(ligne.CompteNum));
+                                                   && /^28/.test(ligne.CompteNum));
     
-    // cas basique
-    let equilibre = checkBalance([ligneCourante],lignesDepreciations);
-    if (equilibre) 
+    // case - single depreciation expenses account
+    if (sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
     {
+      let ligneDepreciationExpense = depreciationExpenses[0];
+      
       lignesDepreciations.forEach((ligneDepreciation) =>
       {
         // retrieve depreciation expense item
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneCourante.CompteNum
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneDepreciationExpense.CompteNum
                                                                            && expense.accountAux == ligneDepreciation.CompteNum)[0];
 
         if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
@@ -739,9 +735,9 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
           // depreciation expense data
           let depreciationExpenseData = 
           {
-            label: ligneCourante.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-            account: ligneCourante.CompteNum,
-            accountLib: ligneCourante.CompteLib,
+            label: ligneDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+            account: ligneDepreciationExpense.CompteNum,
+            accountLib: ligneDepreciationExpense.CompteLib,
             accountAux: ligneDepreciation.CompteNum,
             amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
           }
@@ -750,36 +746,91 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         }
       })
     }
-    // case - lignes multiples (un seul numéro de compte utilisé)
-    else if (sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
+    // case - multiple depreciation expenses accounts
+    else if (!sameAccountUsed)
     {
-      lignesDepreciations.forEach((ligneDepreciation) =>
+      // Intangible assets
+      depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
+                                                  && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                  && /^68(1|7)11/.test(ligne.CompteNum));
+      sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+      lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
+                                                 && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                 && /^280/.test(ligne.CompteNum));
+      
+      if (depreciationExpenses.length > 0 && sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
       {
-        // retrieve depreciation expense item
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneCourante.CompteNum
-                                                                           && expense.accountAux == ligneDepreciation.CompteNum)[0];
+        let ligneDepreciationExpense = depreciationExpenses[0];
 
-        if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
-
-        else
+        lignesDepreciations.forEach((ligneDepreciation) =>
         {
-          // depreciation expense data
-          let depreciationExpenseData = 
+          // retrieve depreciation expense item
+          let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneDepreciationExpense.CompteNum
+                                                                              && expense.accountAux == ligneDepreciation.CompteNum)[0];
+
+          if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
+
+          else
           {
-            label: ligneCourante.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-            account: ligneCourante.CompteNum,
-            accountLib: ligneCourante.CompteLib,
-            accountAux: ligneDepreciation.CompteNum,
-            amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
+            // depreciation expense data
+            let depreciationExpenseData = 
+            {
+              label: ligneDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+              account: ligneDepreciationExpense.CompteNum,
+              accountLib: ligneDepreciationExpense.CompteLib,
+              accountAux: ligneDepreciation.CompteNum,
+              amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
+            }
+            // push data
+            data.depreciationExpenses.push(depreciationExpenseData);
           }
-          // push data
-          data.depreciationExpenses.push(depreciationExpenseData);
-        }
-      })
-      data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
+        })
+      }
+      else if (depreciationExpenses.length > 0) throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements).";
+    
+      // Tangible assets
+      depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
+                                                  && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                  && /^68(1|7)12/.test(ligne.CompteNum));
+      sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+      lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
+                                                 && ligne.EcritureLib == ligneCourante.EcritureLib
+                                                 && /^281/.test(ligne.CompteNum));
+
+      if (depreciationExpenses.length > 0 && sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
+      {
+        let ligneDepreciationExpense = depreciationExpenses[0];
+
+        lignesDepreciations.forEach((ligneDepreciation) =>
+        {
+          // retrieve depreciation expense item
+          let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneDepreciationExpense.CompteNum
+                                                                             && expense.accountAux == ligneDepreciation.CompteNum)[0];
+
+          if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
+
+          else
+          {
+            // depreciation expense data
+            let depreciationExpenseData = 
+            {
+              label: ligneDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+              account: ligneDepreciationExpense.CompteNum,
+              accountLib: ligneDepreciationExpense.CompteLib,
+              accountAux: ligneDepreciation.CompteNum,
+              amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
+            }
+            // push data
+            data.depreciationExpenses.push(depreciationExpenseData);
+          }
+        })
+      }
+      else if (depreciationExpenses.length > 0) throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements).";
+
     }
-    else if (data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum)) {}
-    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements)."
+    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements).";
+
+    data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
   }
 
   // Other expenses ----------------------------------------------------------------------------------- //
