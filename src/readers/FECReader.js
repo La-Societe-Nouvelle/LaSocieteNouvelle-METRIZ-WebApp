@@ -709,12 +709,10 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
   {
     // lignes des comptes d'amortissements
     let depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                    && ligne.EcritureLib == ligneCourante.EcritureLib
                                                     && /^68(1|7)1/.test(ligne.CompteNum));
     
     let sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
     let lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                   && ligne.EcritureLib == ligneCourante.EcritureLib
                                                    && /^28/.test(ligne.CompteNum));
     
     // case - single depreciation expenses account
@@ -751,11 +749,9 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
     {
       // Intangible assets
       depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                  && ligne.EcritureLib == ligneCourante.EcritureLib
                                                   && /^68(1|7)11/.test(ligne.CompteNum));
       sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
       lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                 && ligne.EcritureLib == ligneCourante.EcritureLib
                                                  && /^280/.test(ligne.CompteNum));
       
       if (depreciationExpenses.length > 0 && sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
@@ -790,11 +786,9 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
     
       // Tangible assets
       depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                  && ligne.EcritureLib == ligneCourante.EcritureLib
                                                   && /^68(1|7)12/.test(ligne.CompteNum));
       sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
       lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                 && ligne.EcritureLib == ligneCourante.EcritureLib
                                                  && /^281/.test(ligne.CompteNum));
 
       if (depreciationExpenses.length > 0 && sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
