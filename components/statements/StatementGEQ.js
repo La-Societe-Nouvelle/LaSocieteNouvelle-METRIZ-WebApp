@@ -22,8 +22,8 @@ export class StatementGEQ extends React.Component {
 
   componentDidUpdate() 
   {
-    if (this.state.wageGap!=this.props.impactsData.wageGap) {
-      this.setState({wageGap: this.props.impactsData.wageGap});
+    if (this.state.wageGap!=valueOrDefault(this.props.impactsData.wageGap, "")) {
+      this.setState({wageGap: valueOrDefault(this.props.impactsData.wageGap, "")});
     }
   }
 

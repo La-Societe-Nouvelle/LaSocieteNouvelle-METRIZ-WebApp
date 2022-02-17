@@ -21,8 +21,8 @@ export class StatementDIS extends React.Component {
 
   componentDidUpdate() 
   {
-    if (this.state.indexGini!=this.props.impactsData.indexGini) {
-      this.setState({indexGini: this.props.impactsData.indexGini});
+    if (this.state.indexGini!=valueOrDefault(this.props.impactsData.indexGini, "")) {
+      this.setState({indexGini: valueOrDefault(this.props.impactsData.indexGini, "")});
     }
   }
 
