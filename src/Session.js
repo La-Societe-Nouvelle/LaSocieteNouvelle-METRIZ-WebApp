@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-const currentVersion = "1.0.1";
+const currentVersion = "1.0.2";
 
 // Libraries
 import metaIndics from '../lib/indics.json';
