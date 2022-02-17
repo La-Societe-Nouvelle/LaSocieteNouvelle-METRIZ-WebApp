@@ -419,7 +419,7 @@ export class AssessmentNRG extends React.Component {
               itemData.idGHG = id;
             }
             // update values
-            ghgItem.assessmentItem = fuels[ghgItem.factorId].usageSourcesFixes ? "1" : "2";
+            ghgItem.assessmentItem = fuels[itemData.fuelCode].usageSourcesFixes ? "1" : "2";
             ghgItem.label = itemData.label,
             ghgItem.factorId = itemData.fuelCode;
             ghgItem.gaz = "co2e",
@@ -427,7 +427,7 @@ export class AssessmentNRG extends React.Component {
             ghgItem.consumptionUnit = itemData.consumptionUnit;
             ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
             ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
-            ghgItem.getGhgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
+            ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
           })
     // ...total & uncertainty
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
