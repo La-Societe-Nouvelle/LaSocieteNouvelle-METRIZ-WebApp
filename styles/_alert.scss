@@ -1,0 +1,14 @@
+.alert {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    margin: 10px 0;
+}
+
+.alert-info {
+    color: $primary-color;
+    background-color : #dbdef1;
+    border-color: #b8daff;
+}

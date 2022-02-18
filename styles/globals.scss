@@ -3,6 +3,7 @@
 @import 'sections';
 @import 'startSection';
 @import 'financialDataSection';
+@import 'alert';
 
 .font-weight-bold {
   font-weight: $font-weight-bold;
@@ -21,6 +22,10 @@ body {
 
 }
 
+.container-fluid {
+  padding: 0 2.5em;
+}
+
 p{
   font-size: 1em; 
   font-family: 'Roboto', sans-serif;
@@ -34,9 +39,6 @@ p{
   font-size: 0.85rem !important;
 }
 
-.section-container, .section-title, .table-container{
-  padding : 0 200px;
-}
 /* Button */ 
 .btn {
   padding: 0.5rem 2rem;
@@ -334,8 +336,8 @@ select {
   flex-direction: row;
   justify-content: flex-start;
   align-content: center;
-  padding : 20px 50px;
-
+  padding-top : 25px;
+  padding-bottom: 40px;
   .copyright{
     flex: 2 0 auto;
     font-size: smaller;
@@ -508,33 +510,6 @@ table {
     }
 
   }
-
-  // --- Row --- //
-
-  tr {
-
-    // Borders (top & bottom)
-    &.with-bottom-line td {
-      border-bottom: solid $primary-color 2px;
-      padding-bottom: 2px;
-    }
-    &.with-top-line td {
-      border-top: solid $primary-color 2px;
-      padding-top: 2px;
-    }
-
-    // margins (top & bottom)
-    &.with-bottom-margin td {
-      padding-bottom: 10px;
-    }
-    &.with-top-margin td {
-      padding-top: 10px;
-    }
-
-    // cursor
-    cursor: default;
-  }
-
   // --- Cell --- //
 
   td {
@@ -549,15 +524,6 @@ table {
     &.column_value {width: 150px}
     &.column_uncertainty {width: 100px}
 
-    // border
-    &.with-bottom-line {
-      border-bottom: solid $primary-color 1px;
-      padding-bottom: 2px;
-    }
-    &.with-top-line {
-      border-top: solid $primary-color 1px;
-      padding-top: 2px;
-    }
 
     // text align
     &.center {
@@ -599,7 +565,7 @@ table {
 
   thead {
     background-color: #dbdef1;
-    font-weight: 600;
+    font-weight: 700;
   }
 
   // --- Body --- //
