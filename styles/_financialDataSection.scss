@@ -1,0 +1,35 @@
+/* FinancialData Section*/
+.financial {
+    .section-container{
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+      
+      }
+}
+.section-form{
+    .info{
+      font-size: 0.8em;
+      color:#495057;
+      font-weight: 600;
+    }
+  }
+
+  .dropzone{
+    margin-bottom: 20px;
+    padding: 20px;
+    border : 2px dashed #eee;
+    border-radius: 10px;
+    background-color: rgba(235, 243, 250,0.7);
+    outline: none;
+    transition: border .24s ease-in-out;
+    span {
+        display: block;
+        color : lighten($primary-color, 30%);
+        font-size: 0.9em;
+    }
+    p {
+        text-align: center;
+    }
+}
+  

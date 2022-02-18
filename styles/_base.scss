@@ -21,9 +21,17 @@
 
 /* Theming */
 
-$primary-color: #616161;    /* Dark-grey */
-$secondary-color: #818181;  /* Light-grey */
-$tertiary-color: #434343; /* Dark-grey */
+
+$primary-color: #191558;    /* Dark blue */
+$secondary-color: #fa595f;  /* Red */
+$tertiary-color: #5262bc; /* Light blue */  
+$light-color : #E7D9EA;
 $highlight-color: #8B0000;  /* Burgunby */
 $valid-color: #E2EFD9;
 $unvalid-color: #efdcd9;
+
+$font-weight-bold : 600;
+
+// Button 
+
+$btn-primary-hover : #eeeff9; 

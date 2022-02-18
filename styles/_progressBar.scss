@@ -1,0 +1,99 @@
+.progressBar-container {
+    display: flex;
+    flex-wrap: nowrap;
+    padding: 20px 0 20px 20px;
+    font-family: 'Raleway', sans-serif;
+    .logo {
+        img {
+            height: 100px;
+        }
+    }
+    .stepper-wrapper{
+
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-grow: 1;
+        
+        .stepper-item{
+
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+
+        }
+        .stepper-item::before {
+            position: absolute;
+            content: "";
+            border-bottom: 20px solid #9aa2d0;
+            width: 100%;
+            top: 15px;
+            left: -50%;
+            z-index: 2;
+          }
+          
+          .stepper-item::after {
+            position: absolute;
+            content: "";
+            border-bottom: 20px solid #9aa2d0;
+            width: 100%;
+            top: 15px;
+            left: 50%;
+            z-index: 2;
+          }
+          .step-counter {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border:none;
+            background: #9aa2d0;
+            margin-bottom: 6px;
+            font-size: 2em;
+            font-weight: 800;
+            color : #fff;
+
+          }
+
+          .current{
+            background-color: $tertiary-color;
+         
+        }
+        .current + .step-name{
+            font-weight: 800;
+        }
+          .stepper-item.completed .step-counter {
+            background-color: $tertiary-color;
+          }
+          
+          .stepper-item.completed::after {
+            position: absolute;
+            content: "";
+            border-bottom: 20px solid $tertiary-color;
+            width: 100%;
+            top: 15px;
+            left: 50%;
+            z-index: 3;
+          }
+          
+          .stepper-item:first-child::before {
+            content: none;
+          }
+          .stepper-item:last-child::after {
+            width: 65%;
+          }
+        .stepper-item:last-child{
+            margin-right: 50px;
+        }
+
+    
+
+        }
+    }
