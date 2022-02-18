@@ -3,16 +3,17 @@
 // Style
 import styles from '../styles/Home.module.css';
 
+
 // React / Next
 import React from 'react';
 import Head from 'next/head';
+
 
 // Objects
 import { Session } from '/src/Session';
 
 // Sections
 import { StartSection } from '/components/sections/StartSection';
-import { SirenSection } from '/components/sections/SirenSection';
 import { CorporateNameSection } from '../components/sections/CorporateNameSection';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
@@ -22,6 +23,7 @@ import { StatementSection } from '/components/sections/StatementSection';
 
 // Others components
 import { Header } from '/components/Header';
+import { Footer } from '../components/Footer';
 import { getPrevAmountItems } from '/src/utils/Utils';
 import { updateVersion } from '/src/version/updateVersion';
 
@@ -86,9 +88,9 @@ class Metriz extends React.Component {
     return (
       <div className="app-view">
         <Header step={step} stepMax={session.progression} setStep={this.setStep} downloadSession={this.downloadSession}/>
-        <div className="section-container">
           {this.buildSectionView(step)}
-        </div>
+        <Footer step={step}  setStep={this.setStep} stepMax={session.progression} />
+
       </div>
     )
   }
@@ -154,7 +156,7 @@ class Metriz extends React.Component {
     {
       case 0 : return(<StartSection startNewSession={() => this.setStep(1)} 
                                     loadPrevSession={this.loadPrevSession}/>)
-      case 1 : return(<CorporateNameSection {...sectionProps}/>)
+      case 1 : return(<FinancialDataSection {...sectionProps}/>)
       case 2 : return(<FinancialDataSection {...sectionProps}/>)
       case 3 : return(<InitialStatesSection {...sectionProps}/>)
       case 4 : return(<CompaniesSection {...sectionProps}/>)
