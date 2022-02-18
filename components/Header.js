@@ -2,18 +2,32 @@
 
 // React
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import { faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faArrowsRotate}  from '@fortawesome/free-solid-svg-icons'
+import { ProgressBar } from './ProgressBar';
 
 /* -------------------- HEADER -------------------- */
 
 export function Header({step,stepMax,downloadSession,setStep}) 
 {  
   const refresh = () => location.reload(true);
-  const openRepository = () => window.open("https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp","_blank");
+ 
   const openDocumentation = () => window.open("https://lasocietenouvelle.notion.site/METRIZ-GUIDE-D-UTILISATION-ce7af947e69e47b1a3f90697374ad80b","_blank");
-  const redirectToContactForm = () => window.open("https://lasocietenouvelle.org/contact","_blank");
   const saveSession = () => downloadSession();
   const goBack = () => setStep(5);
 
+
+  if (step == 0) {
+    return (
+        <div className="header">
+            <div className="logo">
+                <img src="/logo_la-societe-nouvelle.png" alt="logo" />
+            </div>
+        </div>
+        )
+}
   if (step==6) {
     return(
       <div className="header">
@@ -25,44 +39,35 @@ export function Header({step,stepMax,downloadSession,setStep})
     )
   }
   return (
-    <div className="header">
-
-      <div id="global-actions">
-        <img className="img" src="/resources/icon_refresh.jpg" alt="refresh" onClick={refresh}/>
-        <img className="img" src="/resources/icon_github.png" alt="code" onClick={openRepository}/>
-        <img className="img" src="/resources/icon_doc.svg" alt="doc" onClick={openDocumentation}/>
-        <img className="img" src="/resources/icon_message.png" alt="save" onClick={redirectToContactForm}/>
-        <img className="img" src="/resources/icon_save.png" alt="save" onClick={saveSession}/>
+    <div className="header-steps">
+      <div className="top-bar">
+        <ul className="top-bar-menu">
+          <li>
+            <a href='https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp' title="Github">
+            <FontAwesomeIcon icon={faGithub} />
+              Github</a>
+          </li>
+          <li>
+            <a href='https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp' title="Nous contacter">
+            <FontAwesomeIcon icon={faEnvelope} />
+              Nous contacter</a>
+          </li>
+        </ul>
+          <button className={'btn'} onClick={saveSession}>
+            <FontAwesomeIcon icon={faArrowsRotate} />
+              Sauvegarder ma session
+          </button>
       </div>
-
-      <div id="progression">
-        <div className={"progression-item"+(step==1 ? " current" : "")}>
-          <button disabled={stepMax < 1} onClick={() => setStep(1)}>1</button>
-          <p>Dénomination</p>
+      <div className='progressBar-container'>
+        <div className='logo'>
+          <a href="" onClick={refresh}>
+          <img src="/logo_lsn-small.svg" alt="logo" />
+          </a>
+          
         </div>
-        <Line/>
-        <div className={"progression-item"+(step==2 ? " current" : "")}>
-          <button disabled={stepMax < 2} onClick={() => setStep(2)}>2</button>
-          <p>Ecritures comptables</p>
-        </div>
-        <Line/>
-        <div className={"progression-item"+(step==3 ? " current" : "")}>
-          <button disabled={stepMax < 3} onClick={() => setStep(3)}>3</button>
-          <p>Etats initiaux</p>
-        </div>
-        <Line/>
-        <div className={"progression-item"+(step==4 ? " current" : "")}>
-          <button disabled={stepMax < 4} onClick={() => setStep(4)}>4</button>
-          <p>Fournisseurs</p>
-        </div>
-        <Line/>
-        <div className={"progression-item"+(step==5 ? " current" : "")}>
-          <button disabled={stepMax < 5} onClick={() => setStep(5)}>5</button>
-          <p>Empreintes</p>
-        </div>
+        <ProgressBar step={step} setStep={setStep} stepMax={stepMax} /> 
       </div>
-
-    </div>)
+   </div>
+    )
 }
 
-const Line = () => <svg viewBox="0 0 150 30"><line x1="0" y1="15" x2="150" y2="15"/></svg>
