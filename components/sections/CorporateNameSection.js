@@ -24,13 +24,6 @@ export class CorporateNameSection extends React.Component {
     return (
       <div className="section-view"> 
 
-        <div className="section-view-actions">
-          <div className="sections-actions"></div>
-          <div>
-            <button id="validation-button" disabled={corporateName==""} onClick={this.submitCorporateName}>Valider</button>
-          </div>
-        </div>
-
         <div id="siren-form-container">
           <div className="siren-input input">
             <label>Dénomination sociale : </label>
@@ -40,6 +33,8 @@ export class CorporateNameSection extends React.Component {
                    onKeyPress={this.onEnterPress}/>
           </div>
         </div>
+
+        
         
       </div>)
   }

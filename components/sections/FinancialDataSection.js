@@ -22,6 +22,7 @@ import { MessagePopup, MessagePopupErrors } from "../popups/MessagePopup";
 
 // Readers
 import { FECFileReader, FECDataReader } from "../../src/readers/FECReader";
+import { FECImportSection } from "./FECImportSection";
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -57,7 +58,7 @@ export class FinancialDataSection extends React.Component {
     } = this.state;
 
     const files = this.state.files.map(file => (
-      <div>
+      <div className="files">
         <FontAwesomeIcon icon={faFileExcel} />
          <p key={file.name}>
         {file.name}  
@@ -70,91 +71,86 @@ export class FinancialDataSection extends React.Component {
     if (!this.props.session.financialData.isFinancialDataLoaded) {
       // Render if data not loaded -------------------------------------------------------------------------------- //
       return (
-        <div>
+        <>
             <section className={"section-view financial"}>
-            <div className="section-title">
-              <h2>&Eacute;tape 1 - Importez vos flux comptable</h2>
-            </div> 
-              
+              <div className={"section-title container-fluid "}>
+                <h2>&Eacute;tape 1 - Importez vos flux comptable</h2>
+             </div>
           { 
               importedData 
               ? 
-                <FECImportPopup
+                <FECImportSection
                   FECData={importedData}
                   onValidate={this.loadFECData.bind(this)}
                 />
                 :
                 <>
-                  <h3 className={"subtitle underline section-container"}>C'est parti</h3>
-                <div className="section-container">
-                  <div className="section-illu">
-                    <img src="/resources/illu_financialData.png" alt="" />
-                  </div>
-                <div className="section-form">
-                  <label>Dénomination / Nom du projet</label>
-                  <input
-                  id="siren-input"
-                  className="form-input"
-                  type="text"
-                  value={corporateName}
-                  onChange={this.onCorporateNameChange}
-                  onKeyPress={this.onEnterPress}
-                  />
-
-                  <h3>Importer vos fichiers comptables FEC*</h3>
-
-                    <Dropzone onDrop={this.onDrop}>
-                      {({ getRootProps, getInputProps }) => (
-                        <div className="dropzone-section">
-                          <div {...getRootProps()} className="dropzone">
-                            <input {...getInputProps()} />
-                            <p>
-                              Glisser vos fichiers
-                            <span>ou cliquez ici pour sélectionner votre fichier</span> 
-                            </p>
-                          </div> 
-                          <div>
-                            {files}
-                          </div>
-                        </div>
-                      )}
-                    </Dropzone>
-
-                    <div className="section-info">
-                      <p>
-                      L’importation des écritures comptables s’effectue via un Fichier
-                        d’Ecritures Comptables (FEC). Générez ce fichier <b> à partir de votre
-                        logiciel comptable, ou demandez-le auprès de votre service
-                        comptable.</b>
-                      </p>
-
+                  <h3 className={"subtitle underline container-fluid"}>C'est parti</h3>
+                  <div className={"section-container container-fluid"}>
+                    <div className="section-illu">
+                      <img src="/resources/illu_financialData.png" alt="" />
                     </div>
-                    <p className="info">
-                      * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des
-                      colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
-                    </p>
-                  </div>
-             
+                  <div className="section-form">
+                    <label>Dénomination / Nom du projet</label>
+                    <input
+                    id="siren-input"
+                    className="form-input"
+                    type="text"
+                    value={corporateName}
+                    onChange={this.onCorporateNameChange}
+                    onKeyPress={this.onEnterPress}
+                    />
+
+                    <h3>Importer vos fichiers comptables FEC*</h3>
+
+                      <Dropzone onDrop={this.onDrop}>
+                        {({ getRootProps, getInputProps }) => (
+                          <div className="dropzone-section">
+                            <div {...getRootProps()} className="dropzone">
+                              <input {...getInputProps()} />
+                              <p>
+                                Glisser vos fichiers
+                              <span>ou cliquez ici pour sélectionner votre fichier</span> 
+                              </p>
+                            </div> 
+                              {files}
+                          </div>
+                        )}
+                      </Dropzone>
+
+                      <div className="section-info">
+                        <p>
+                        L’importation des écritures comptables s’effectue via un Fichier
+                          d’Ecritures Comptables (FEC). Générez ce fichier <b> à partir de votre
+                          logiciel comptable, ou demandez-le auprès de votre service
+                          comptable.</b>
+                        </p>
+
+                      </div>
+                      <p className="info">
+                        * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des
+                        colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
+                      </p>
+                    </div>
               
-                </div>
-                <aside className="action">
-                <button
-                  className={"btn btn-secondary"}
-                  onClick={ this.importFECFile}
-                  disabled={this.state.disabled} 
-                >
-                  &Eacute;tape suivante
-                  <FontAwesomeIcon icon={faChevronRight} />
-                </button> 
-       
-          </aside>
+                
+                  </div>
+                  <aside className="action container">
+                    <button
+                      className={"btn btn-secondary"}
+                      onClick={ this.importFECFile}
+                      disabled={this.state.disabled} 
+                    >
+                      &Eacute;tape suivante
+                      <FontAwesomeIcon icon={faChevronRight} />
+                    </button> 
+                  </aside>
               </>
           }
 
           </section>
    
           
-        
             {errorFile && (
               <MessagePopupErrors
                 title="Erreur - Fichier"
@@ -163,58 +159,50 @@ export class FinancialDataSection extends React.Component {
                 closePopup={() => this.setState({ errorFile: false })}
               />
             )}
-        </div>
+        </>
         
       );
     } else {
       // Render if data loaded ------------------------------------------------------------------------------------ //
       return (
-        <div className="section-view">
-          <div className="section-view-actions">
-            <div className="sections-actions">
-
-              <select
-                value={selectedTable}
-                onChange={this.changeFinancialTable}
-              >
-                <option key="1" value="mainAggregates">
-                  Soldes intermédiaires de gestion
-                </option>
-                <option key="2" value="incomeStatement">
-                  Compte de résultat
-                </option>
-                <option key="3" value="immobilisations">
-                  Immobilisations
-                </option>
-                <option key="4" value="expenses">
-                  Charges externes
-                </option>
-                <option key="5" value="stocks">
-                  Stocks
-                </option>
-              </select>
+        <> 
+        <div className="container-fluid">
+            <div className={"section-title"}>
+                <h2>&Eacute;tape 2 - Validez votre import</h2>
+             </div>
+            <div className={"alert alert-info"} role="alert">
+              <strong>Bravo !</strong> Votre import a été réalisé avec succès!
             </div>
             <div>
-              <button id="validation-button" onClick={this.props.submit}>
-                Valider
-              </button>
+              <p>
+                Par mesure de précaution,  vérifiez l’exactitude des agrégats financiers nécessitant une validation manuelle. 
+                La lecture des écritures peut entraîner des exceptions (problèmes de lecture) dans le cas où certains 
+                flux ne peuvent être tracés. 
+                Ces exceptions interviennent notamment en cas d’écriture unique pour les opérations diverses. 
+              </p>
             </div>
-          </div>
+            <div className="table-container"> 
+            <div className="table-menu">
 
-          <div className="section-top-notes">
-            <p>
-              <b>Notes : </b>
-              Merci de vérifier la lecture des écritures comptables et
-              l'exactitude des principaux agrégats financiers. Plusieurs vues
-              sont disponibles via le menu déroulant ci-dessus.
-            </p>
-          </div>
+              <button key={1} value="incomeStatement"  onClick={this.changeFinancialTable} className={(selectedTable == "incomeStatement" || "" ? "active" : "")}>
+                Comptes de résultat
+              </button>
+              <button key={2} value="mainAggregates" onClick={this.changeFinancialTable} className={(selectedTable == "mainAggregates" || "" ? "active" : "")}>
+                Soldes intermédiaires de gestion
+              </button>
+              <button key={3} value="immobilisations"  onClick={this.changeFinancialTable}  className={(selectedTable == "immobilisations" ? "active" : "")}>
+                Immobilisations
+              </button>
+              <button key={4} value="expenses"  onClick={this.changeFinancialTable}  className={(selectedTable == "expenses" ? "active" : "")}>
+               Charges externes
+              </button>
+              <button key={5} value="stocks"  onClick={this.changeFinancialTable}  className={(selectedTable == "stocks" ? "active" : "")}>
+               Stocks
+              </button>
 
-          <div className="section-view-header">
-            <h1>{getTitle(selectedTable)}</h1>
-          </div>
+            </div>
 
-          <div className="section-view-main">
+          <div className="table-data">
             {this.buildtable(selectedTable)}
 
             {importedData != null && (
@@ -232,7 +220,19 @@ export class FinancialDataSection extends React.Component {
               />
             )}
           </div>
+          </div>
         </div>
+        <div className={"action container"}>
+                    <button
+                      className={"btn btn-secondary"}
+                      onClick={ this.props.submit}
+                    >
+                     Valider l'import 
+                      <FontAwesomeIcon icon={faChevronRight} />
+                    </button> 
+
+        </div>
+        </>
       );
     }
   }

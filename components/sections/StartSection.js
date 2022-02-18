@@ -17,7 +17,7 @@ export class StartSection extends React.Component {
 
   render() {
     return (
-        <section className="start-section">
+        <section className="start-section container-fluid">
           <div>
             <h2>
               Mesurez <span className="underline">l'impact carbone</span> de
