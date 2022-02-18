@@ -17,7 +17,7 @@ export function Footer({step}) {
    
     if(step ==0){
         return (
-            <footer className={footer}>
+            <footer className={footer + " container-fluid"}>
                 <div className="copyright">
                     <p className='font-weight-bold'>&copy; {getCurrentYear()} La Société Nouvelle</p>
                     <ul>
@@ -51,7 +51,7 @@ export function Footer({step}) {
     }
     else{
         return (
-            <footer className={footer}>
+            <footer className={footer + " container-fluid"}>
                 <div className="copyright">
                     <p className='font-weight-bold'>&copy; {getCurrentYear()} La Société Nouvelle</p>
                     <ul>
