@@ -4,7 +4,7 @@
     "group": "Réfrigération commerciale",
     "fluidQty": 0.3,
     "units": {
-      "U": {"unit": "U", "coefGHG": 0.15, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 0.0015, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 0.5,
@@ -15,7 +15,7 @@
     "group": "Réfrigération commerciale",
     "fluidQty": 5,
     "units": {
-      "U": {"unit": "U", "coefGHG": 50, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 0.5, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 10,
@@ -26,7 +26,7 @@
     "group": "Réfrigération commerciale",
     "fluidQty": 132,
     "units": {
-      "U": {"unit": "U", "coefGHG": 1848, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 18.48, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 14,
@@ -37,7 +37,7 @@
     "group": "Réfrigération commerciale",
     "fluidQty": 0.21,
     "units": {
-      "m2": {"unit": "m2", "coefGHG": 4.2, "coefGHGUncertainty": 50}
+      "m2": {"unit": "m2", "coefGHG": 0.042, "coefGHGUncertainty": 50}
     },
     "unit": "m2",
     "annualLeak": 20,
@@ -48,7 +48,7 @@
     "group": "Réfrigération commerciale",
     "fluidQty": 0.19,
     "units": {
-      "m2": {"unit": "m2", "coefGHG": 5.13, "coefGHGUncertainty": 50}
+      "m2": {"unit": "m2", "coefGHG": 0.0513, "coefGHGUncertainty": 50}
     },
     "unit": "m2",
     "annualLeak": 27,
@@ -59,7 +59,7 @@
     "group": "Réfrigération commerciale",
     "fluidQty": 0.12,
     "units": {
-      "m2": {"unit": "m2", "coefGHG": 1.2, "coefGHGUncertainty": 50}
+      "m2": {"unit": "m2", "coefGHG": 0.012, "coefGHGUncertainty": 50}
     },
     "unit": "m2",
     "annualLeak": 10,
@@ -70,7 +70,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.24, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 12,
@@ -81,7 +81,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.24, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 12,
@@ -92,7 +92,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.24, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 12,
@@ -103,7 +103,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 6,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 84, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.84, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 14,
@@ -114,7 +114,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 4,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 56, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.56, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 14,
@@ -125,7 +125,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 5.5,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 77, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.77, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 14,
@@ -136,7 +136,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 1,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 12, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.12, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 12,
@@ -147,7 +147,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 8.8,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 123.2, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 1.232, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 14,
@@ -158,7 +158,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 2,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 24, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.24, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 12,
@@ -169,7 +169,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 5.5,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 82.5, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.825, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 15,
@@ -180,7 +180,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 6,
     "units": {
-      "kW": {"unit": "kW", "coefGHG": 84, "coefGHGUncertainty": 50}
+      "kW": {"unit": "kW", "coefGHG": 0.84, "coefGHGUncertainty": 50}
     },
     "unit": "kW",
     "annualLeak": 14,
@@ -191,7 +191,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 1000,
     "units": {
-      "U": {"unit": "U", "coefGHG": 15000, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 150.0, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 15,
@@ -202,7 +202,7 @@
     "group": "Réfrigération industrielle",
     "fluidQty": 2.1,
     "units": {
-      "U": {"unit": "U", "coefGHG": 25.2, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 0.252, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 12,
@@ -213,7 +213,7 @@
     "group": "Réfrigération fret",
     "fluidQty": 1000,
     "units": {
-      "U": {"unit": "U", "coefGHG": 15000, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 150.0, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 15,
@@ -224,7 +224,7 @@
     "group": "Réfrigération fret",
     "fluidQty": 2.2,
     "units": {
-      "U": {"unit": "U", "coefGHG": 48.4, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 0.484, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 22,
@@ -235,7 +235,7 @@
     "group": "Réfrigération fret",
     "fluidQty": 4.6,
     "units": {
-      "U": {"unit": "U", "coefGHG": 92, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 0.92, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 20,
@@ -246,7 +246,7 @@
     "group": "Réfrigération fret",
     "fluidQty": 6.5,
     "units": {
-      "U": {"unit": "U", "coefGHG": 84.5, "coefGHGUncertainty": 50}
+      "U": {"unit": "U", "coefGHG": 0.845, "coefGHGUncertainty": 50}
     },
     "unit": "U",
     "annualLeak": 13,
