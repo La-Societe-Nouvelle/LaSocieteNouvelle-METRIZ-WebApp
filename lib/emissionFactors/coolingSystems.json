@@ -339,5 +339,16 @@
     "unit": "m2",
     "annualLeak": 4,
     "annualLeakUncertainty": 50
+  },
+  "coolSys32": {
+    "label": "Climatisation automobile (R134a)",
+    "group": "Transport de personnes",
+    "fluidQty": 0.52,
+    "units": {
+      "U": {"unit": "U", "coefGHG": 0.026, "coefGHGUncertainty": 50}
+    },
+    "unit": "U",
+    "annualLeak": 5,
+    "annualLeakUncertainty": 50
   }
 }
