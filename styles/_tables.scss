@@ -1,0 +1,173 @@
+/* ---------- TABLE ---------- */
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  flex-grow: 1;
+  gap: 20px;
+}
+.table-container {
+
+    h4 {
+      text-align: center;
+    }
+    .table-header {
+      width: 100%;
+      padding: 5px 2px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+  
+  table {
+    width: 100%;
+    font-size: 0.85em;
+    font-family: "roboto", sans-serif;
+
+    // --- Cell --- //
+  
+    td {
+      padding: 0.75em;
+ 
+      // index
+      &.sub {
+        padding-left: 25px;
+      }
+  
+      // font
+      &.detail {
+        font-style: italic;
+        font-size: 15px;
+      }
+
+
+    }
+  
+    // --- Head --- //
+  
+    thead {
+      background-color: $light-blue;
+      font-weight: 700;
+    }
+  
+    // --- Body --- //
+  
+    tbody {
+      td {
+        background-color: #f3f3f3;
+      }
+      // select
+      select {
+        width: 100%;
+        background-color: white;
+        border: solid 1px $primary-color;
+        //padding: 2px;
+  
+        option {
+          background-color: white;
+          border: solid 1px $primary-color;
+          border-radius: 0;     
+        }
+      }
+  
+      // value
+      .column_value {
+        text-align: right;
+        input {
+          text-align: right;
+        }
+      }
+      
+      // uncertainty
+      .column_uncertainty {
+        text-align: center;
+        font-size: 12px;
+        input {
+          text-align: right;
+          font-size: 15px;
+        }
+      }
+  
+      // background valid/unvalid/default
+      input,select {
+        &.valid {background-color: $valid-color}
+        &.unvalid {background-color: $unvalid-color}
+      }
+  
+      option.default-option {
+        background-color: wheat;
+      }
+    }
+  }
+  
+  .table-navigation {
+    margin: 0 2px;
+    padding: 5px 2px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  
+    button {
+      min-width: 150px;
+    }
+  
+    p {
+      margin: 0;
+    }
+  }
+
+   
+.table-menu {
+    button {
+      background-color: #fff;
+      border:none;
+      padding: 1rem;
+      color: #a7a2a2;
+      font-weight: bold;
+      font-size: 1.05em;
+      border-bottom: 3px solid #a7a2a2;
+      cursor: pointer;
+  
+    }
+     button.active, button:hover, button:focus{
+      background-color: #f7f8f8;
+      color: $tertiary-color;
+      border-color: $tertiary-color;
+    }
+  }
+  
+  .table-btn {
+      text-align: right;
+      .btn {
+          font-weight: normal;
+          font-size: 0.9em;
+          svg{
+              height: 15px;
+          }
+      }
+  }
+  .table-data {
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+  
+    }
+    tbody{
+      td {
+        border-bottom: 1px solid #fff;
+      }
+    }
+    .total td{
+      background-color: $light-blue;
+      font-weight: 700;
+    }
+    .operating-result td {
+      background-color: $tertiary-color;
+      color : #fff;
+    }
+    .profit td, tfoot {
+      background-color: $primary-color;
+      color : #fff;
+    }
+  }

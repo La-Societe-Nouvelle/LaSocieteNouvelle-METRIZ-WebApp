@@ -3,7 +3,7 @@
 // React
 import React from 'react';
 
-export function ProgressBar({step,stepMax,setStep}) 
+export function StepMenu({step,stepMax,setStep}) 
 { 
     const goBack = () => setStep(5);
 

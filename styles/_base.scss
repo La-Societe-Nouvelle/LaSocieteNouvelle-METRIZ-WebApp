@@ -25,6 +25,7 @@
 $primary-color: #191558;    /* Dark blue */
 $secondary-color: #fa595f;  /* Red */
 $tertiary-color: #5262bc; /* Light blue */  
+$light-blue : #dbdef1;
 $light-color : #E7D9EA;
 $highlight-color: #8B0000;  /* Burgunby */
 $valid-color: #E2EFD9;
@@ -35,3 +36,44 @@ $font-weight-bold : 600;
 // Button 
 
 $btn-primary-hover : #eeeff9; 
+
+
+
+// Size.
+$size: (
+  border-radius:		4px,
+  border-width:		1px,
+  element-height:		3em,
+  element-margin:		2em,
+  gutter:				2.5em,
+  field-gutter:		2em,
+  inner:				68em,
+);
+
+
+// Font.
+$font: (
+  family:	('Roboto', Helvetica, sans-serif),
+  weight:				400,
+  weight-bold:		900,
+  weight-bold-alt:	700,
+  letter-spacing:		0.35em,
+  letter-spacing-alt:	-0.035em
+);
+
+// Palette.
+$palette: (
+  bg:					#ffffff,
+  bg-accent:			#333333,
+  bg-alt:				#f6f6f6,
+  fg:					#585858,
+  fg-accent:			#ffffff,
+  border:				#c9c9c9,
+  border-bg:			rgba(144,144,144,0.075),
+  accent1:			#f2849e,
+  accent2:			#7ecaf6,
+  accent3:			#7bd0c1,
+  accent4:			#c75b9b,
+  accent5:			#ae85ca,
+  accent6:			#8499e7,
+);

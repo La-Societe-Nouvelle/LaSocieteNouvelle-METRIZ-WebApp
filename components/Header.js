@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import { faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import { faArrowsRotate}  from '@fortawesome/free-solid-svg-icons'
-import { ProgressBar } from './ProgressBar';
+import { StepMenu } from './StepMenu';
 
 /* -------------------- HEADER -------------------- */
 
@@ -30,12 +30,17 @@ export function Header({step,stepMax,downloadSession,setStep})
 }
   if (step==6) {
     return(
-      <div className="header">
-        <div id="global-actions">
+      <div className="popup">
+      <div className="popup-inner">
+        <h2>Publiez vos résultats</h2>
+     {/* <div id="global-actions">
           <img className="img" src="/resources/icon_back.png" alt="back" onClick={goBack}/>
-        </div>
-        <h1>Formulaire de publication</h1>
+        </div> */}
+          <button>Ok</button>
       </div>
+    </div>
+   
+       
     )
   }
   return (
@@ -65,7 +70,7 @@ export function Header({step,stepMax,downloadSession,setStep})
           </a>
           
         </div>
-        <ProgressBar step={step} setStep={setStep} stepMax={stepMax} /> 
+        <StepMenu step={step} setStep={setStep} stepMax={stepMax} /> 
       </div>
    </div>
     )

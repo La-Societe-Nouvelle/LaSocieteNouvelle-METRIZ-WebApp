@@ -21,68 +21,70 @@ export const MainAggregatesTable = ({financialData}) =>
          netValueAdded} = financialData.aggregates;
   
   return(
-    <div className="table-main">
-
+    <>
     {financialData.isFinancialDataLoaded &&  
       <table>
         <thead>
-          <tr><td>Agrégat</td><td colSpan="2">Montant</td></tr>
+          <tr>
+            <td>Agrégat</td>
+            <td>Montant</td>
+            </tr>
         </thead>
         <tbody>
           
           <tr>
             <td>Production sur l'exercice courant</td>
-            <td className="column_value important">{printValue(production.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td>{printValue(production.amount,0)} &euro;</td>
+            </tr>
           <tr>
             <td>&emsp;Chiffre d'Affaires</td>
-            <td className="column_value">{printValue(revenue.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td >{printValue(revenue.amount,0)} &euro;</td>
+            </tr>
           <tr>
             <td>&emsp;Production stockée</td>
-            <td className="column_value">{printValue(storedProduction.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td >{printValue(storedProduction.amount,0)} &euro;</td>
+            </tr>
           <tr>
             <td>&emsp;Production immobilisée</td>
-            <td className="column_value">{printValue(immobilisedProduction.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>          
+            <td >{printValue(immobilisedProduction.amount,0)} &euro;</td>
+            </tr>          
           
-          <tr className="with-top-line">
+          <tr className="total">
             <td>Consommations intermédiaires</td>
-            <td className="column_value important">{printValue(intermediateConsumption.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className="important">{printValue(intermediateConsumption.amount,0)} &euro;</td>
+            </tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td className="column_value">{printValue(-storedPurchases.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td >{printValue(-storedPurchases.amount,0)} &euro;</td>
+            </tr>
         {externalExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
           <tr key={index}>
             <td>&emsp;{accountLib}</td>
-            <td className="column_value">{printValue(amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td>
+            <td >{printValue(amount,0)} &euro;</td>
+            
           </tr>)}
 
-          <tr className="with-top-line">
+          <tr className="total">
             <td>Consommations de capital fixe</td>
-            <td className="column_value important">{printValue(capitalConsumption.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className=" important">{printValue(capitalConsumption.amount,0)} &euro;</td>
+            </tr>
         {depreciationExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
           <tr key={index}>
             <td>&emsp;{accountLib}</td>
-            <td className="column_value">{printValue(amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td>
+            <td >{printValue(amount,0)} &euro;</td>
+            
           </tr>)}
 
-          <tr className="with-top-line">
+          <tr className="total">
             <td>Valeur ajoutée nette</td>
-            <td className="column_value important">{printValue(netValueAdded.amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className=" important">{printValue(netValueAdded.amount,0)}  &euro;</td>
+            </tr>
           <tr>
             <td>&emsp;dont charges de personnel</td>
-            <td className="column_value detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td className=" detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}  &euro;</td>
+            </tr>
 
         </tbody>
       </table>}
-    </div>)
+    </>)
 }

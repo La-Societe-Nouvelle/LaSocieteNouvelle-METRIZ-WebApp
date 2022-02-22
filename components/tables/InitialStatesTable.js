@@ -2,7 +2,8 @@
 
 // React
 import React, { useState } from 'react';
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSync } from "@fortawesome/free-solid-svg-icons";
 // Utils
 import { printValue } from '/src/utils/Utils';
 
@@ -45,11 +46,11 @@ export class InitialStatesTable extends React.Component {
         <table>
           <thead>
             <tr>
-              <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
-              <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="long" colSpan="2">Empreinte sociétale</td>
-              <td className="short" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant (N-1)</td>
-              <td colSpan="2"></td></tr>
+              <td onClick={() => this.changeColumnSorted("account")}>Compte</td>
+              <td onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+              <td colSpan="2">États initiaux - Empreinte sociétale</td>
+              <td onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              </tr>
           </thead>
           <tbody>
             {accounts.slice(page*nbItems,(page+1)*nbItems)
@@ -175,60 +176,90 @@ function RowTableImmobilisations(props)
   }
 
   if (isDepreciableImmobilisation && hasOutputs) {
-    return (<tr>
-              <td className="short center">{account}</td>
-              <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-              <td colSpan={initialState=="defaultData" ? 1 : 2}>
-                <select className={(initialState=="prevFootprint" || initialState=="currentFootprint" || dataFetched) ? "valid" : ""}
-                        value={initialState}
-                        onChange={onOriginStateChange}>
-                  {initialState=="none" &&          <option key="none" value="none">---</option>}
-                  {initialState=="prevFootprint" && <option key="prevFootprint" value="prevFootprint">Reprise sur exerice précédent</option>}
-                  {hasInputs &&                     <option key="currentFootprint" value="currentFootprint">Estimée sur exerice courant</option>}
-                  <option key="defaultData" value="defaultData">Valeurs par défaut</option>
-                </select>
-              </td>
-            {initialState=="defaultData" &&
-              <td className={"medium"+(dataFetched === true ? " valid" : "")}>
-                <select className={dataFetched ? " valid" : ""}
-                        value={activityCode}
-                        onChange={onActivityCodeChange}>
-                  {Object.entries(branches)
-                         .sort((a,b) => a[0].localeCompare(b[0]))
-                         .map(([code,libelle]) => 
-                    <option className={(activityCode && code==activityCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
-                </select></td>}
-              <td className="short right">{printValue(prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              {initialState=="defaultData" &&
-                <td className="column_icon">
-                  <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-                      onClick={() => syncData()}/></td>}
-            </tr>)
+    return (
+      <tr>
+        <td className="short center">{account}</td>
+        <td className="auto">
+          {accountLib.charAt(0).toUpperCase() +
+            accountLib.slice(1).toLowerCase()}
+        </td>
+        <td colSpan={initialState == "defaultData" ? 1 : 2}>
+          <select
+            className={
+              initialState == "prevFootprint" ||
+              initialState == "currentFootprint" ||
+              dataFetched
+                ? "valid"
+                : ""
+            }
+            value={initialState}
+            onChange={onOriginStateChange}
+          >
+            {initialState == "none" && (
+              <option key="none" value="none">
+                ---
+              </option>
+            )}
+            {initialState == "prevFootprint" && (
+              <option key="prevFootprint" value="prevFootprint">
+                Reprise sur exerice précédent
+              </option>
+            )}
+            {hasInputs && (
+              <option key="currentFootprint" value="currentFootprint">
+                Estimée sur exerice courant
+              </option>
+            )}
+            <option key="defaultData" value="defaultData">
+              Valeurs par défaut
+            </option>
+          </select>
+        </td>
+        {initialState == "defaultData" && (
+          <td className={"medium" + (dataFetched === true ? " valid" : "")}>
+            <select
+              className={dataFetched ? " valid" : ""}
+              value={activityCode}
+              onChange={onActivityCodeChange}
+            >
+              {Object.entries(branches)
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(([code, libelle]) => (
+                  <option
+                    className={
+                      activityCode && code == activityCode
+                        ? "default-option"
+                        : ""
+                    }
+                    key={code}
+                    value={code}
+                  >
+                    {code + " - " + libelle}
+                  </option>
+                ))}
+            </select>
+          </td>
+        )}
+        <td className="short right">{printValue(prevAmount, 0)} &euro;</td>
+  
+      </tr>
+    );
   } 
   else if (isDepreciableImmobilisation) {
     return (<tr>
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
-              <td className="short right">{printValue(prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              {initialState=="defaultData" &&
-                <td className="column_icon">
-                  <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-                        onClick={() => syncData()}/></td>}
+              <td className="short right">{printValue(prevAmount,0)} &euro;</td>
+        
             </tr>)
   } else {
     return (<tr>
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non prise en compte (non amortissable)</td>
-              <td className="short right">{printValue(prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              {initialState=="defaultData" &&
-                <td className="column_icon">
-                  <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-                        onClick={() => syncData()}/></td>}
+              <td className="short right">{printValue(prevAmount,0)} &euro;</td>
+        
             </tr>)
   }
 }
@@ -277,12 +308,8 @@ function RowTableStocks(props)
             {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b))
                                     .map(([code,libelle]) => <option className={(activityCode && code==activityCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
           </select></td>}
-      <td className="short right">{printValue(prevAmount,0)}</td>
-      <td className="column_unit">&nbsp;€</td>
-      {initialState=="defaultData" &&
-        <td className="column_icon">
-          <img className={"img" + (toggleIcon ? " active" : "")} src="/resources/icon_refresh.jpg" alt="sync" 
-               onClick={() => syncData()}/></td>}
+      <td className="short right">{printValue(prevAmount,0)} &euro;</td>
+
     </tr>
   )
 }

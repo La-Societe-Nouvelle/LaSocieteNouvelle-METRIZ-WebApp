@@ -2,8 +2,15 @@
 @import 'progressBar';
 @import 'sections';
 @import 'startSection';
-@import 'financialDataSection';
 @import 'alert';
+@import 'tables';
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Roboto:wght@100;300;400;700&display=swap');
+
+// Base.
+@import 'base/typography';
+
+// Component.
+// Layout.
 
 .font-weight-bold {
   font-weight: $font-weight-bold;
@@ -17,8 +24,8 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: "Raleway", sans-serif;
-  color : $primary-color;
+  font-family: 'Raleway', sans-serif;
+    color : $primary-color;
 
 }
 
@@ -98,10 +105,6 @@ p{
 .btn-secondary {
   background-color: $secondary-color;
   color : #fff;
-  font-weight: $font-weight-bold;
-  padding: 0.5rem 2rem;
-  font-size: 1rem;
-  line-height: 1.5;
   &:hover{
     background-color: lighten($secondary-color, 5%);
     -o-transition: all .4s ease-in-out;
@@ -127,17 +130,34 @@ span {
 
 /* ----- FORM ----- */
 // Input
+table input, table select{
+   padding: 0.5em;
+   background-color: #fff;
+   background-clip: padding-box;
+   border: 1px solid $primary-color;
+   border-radius: 0.35rem;
+
+}
 label{
   font-weight: 600;
-  font-size: 1.1em;
+}
+.form-group {
+  position: relative;
+  label{
+    position: absolute;
+    top : -10px;
+    background-color: #fff;
+    left: 15px;
+    letter-spacing: 1px;
+    padding: 0 10px;
+  }
 }
 .form-input{
-   display: block;
-    width: 100%;
-    padding: 0.375rem 0.75rem;
+   font-family: "roboto", sans-serif;
+   width: 100%;
+    padding: 0.5em 0.75em;
     font-size: 1rem;
     line-height: 1.5;
-    color: #495057;
     background-color: #fff;
     background-clip: padding-box;
     border: 1px solid $primary-color;
@@ -145,6 +165,13 @@ label{
     transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     margin-bottom: 20px;
 }
+select.form-input {
+  padding: 0.75em;
+  color : lighten($primary-color, 20%);
+  margin-bottom: 10px;
+  font-size: 0.9em;
+}
+
 input {
 
   &.input-number {text-align: right;}
@@ -159,12 +186,6 @@ input {
   }
 }
 
-// Select
-
-select {
-  padding: 3px 5px;
-  margin: 0 3px;
-}
 
 // Exposant
 
@@ -471,168 +492,7 @@ select {
   }
 }
 
-/* ---------- TABLE ---------- */
 
-.table-container {
-
-  h4 {
-    text-align: center;
-  }
-  .table-header {
-    width: 100%;
-    padding: 5px 2px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
-
-table {
-
-  margin : 10px auto;
-  text-align: center;
-
-  // specific tags
-  input {
-    width: 100%;
-    padding-right: 2px;
-
-    &.right {text-align: right}
-  }
-
-  img {
-    height: 15px;
-
-    &.active {
-      transform: rotate(-360deg);
-      transition: transform 1000ms;
-    }
-
-  }
-  // --- Cell --- //
-
-  td {
-    padding: 10px;
-
-    // width
-    &.auto {width: auto}
-    &.long {width: 400px}
-    &.medium {width: 200px}
-    &.short {width: 125px}
-
-    &.column_value {width: 150px}
-    &.column_uncertainty {width: 100px}
-
-
-    // text align
-    &.center {
-      input,select {text-align: center;}
-    }
-    &.right {
-      text-align: right;
-      input,select {text-align: right;}
-    }
-
-    // index
-    &.sub {
-      padding-left: 25px;
-    }
-
-    // font
-    &.detail {
-      font-style: italic;
-      font-size: 15px;
-    }
-    &.important {
-      font-weight: bold;
-    }
-
-    // specific style
-    &.column_unit {
-      width: 1%;
-      min-width: 30px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    &.column_icon {
-      width: 15px;
-      min-width: 15px;
-    }
-  }
-
-  // --- Head --- //
-
-  thead {
-    background-color: #dbdef1;
-    font-weight: 700;
-  }
-
-  // --- Body --- //
-
-  tbody {
-    td {
-      background-color: #f3f3f3;
-    }
-    // select
-    select {
-      width: 100%;
-      background-color: white;
-      border: solid 1px $primary-color;
-      //padding: 2px;
-
-      option {
-        background-color: white;
-        border: solid 1px $primary-color;
-        border-radius: 0;     
-      }
-    }
-
-    // value
-    .column_value {
-      text-align: right;
-      input {
-        text-align: right;
-      }
-    }
-    
-    // uncertainty
-    .column_uncertainty {
-      text-align: center;
-      font-size: 12px;
-      input {
-        text-align: right;
-        font-size: 15px;
-      }
-    }
-
-    // background valid/unvalid/default
-    input,select {
-      &.valid {background-color: $valid-color}
-      &.unvalid {background-color: $unvalid-color}
-    }
-
-    option.default-option {
-      background-color: wheat;
-    }
-  }
-}
-
-.table-navigation {
-  margin: 0 2px;
-  padding: 5px 2px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  button {
-    min-width: 150px;
-  }
-
-  p {
-    margin: 0;
-  }
-}
 
 /* ---------- STATEMENT ---------- */
 

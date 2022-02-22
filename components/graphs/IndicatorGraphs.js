@@ -1,7 +1,9 @@
 // La Société Nouvelle
 
 // Modules
-import { Chart } from "react-google-charts";
+//import { Chart } from "react-google-charts";
+import Chart  from 'chart.js/auto';
+import { Bar }  from 'react-chartjs-2';
 
 // Utils
 import { printValue } from '/src/utils/Utils';
@@ -28,6 +30,20 @@ const viewsForIndic = {
 
 export const IndicatorGraphs = ({session,indic,comparativeFootprints}) =>
 {
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Chart.js Bar Chart',
+      },
+    },
+  };
+  const labels = ['Situation', 'Branche', 'France'];
+
   const {financialData} = session;
   const {production,netValueAdded,intermediateConsumption} = financialData.aggregates;
   const {productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint,productionAreaFootprint,valueAddedAreaFootprint} = comparativeFootprints;
@@ -52,15 +68,33 @@ export const IndicatorGraphs = ({session,indic,comparativeFootprints}) =>
     ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
   ]
   
+  const data = {
+    labels,
+    datasets: [
+      {
+        label: 'Production',
+        data: [production.footprint.getIndicator(indic).value , productionSectorFootprint.getIndicator(indic).value ,  productionAreaFootprint.getIndicator(indic).value],
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+      },
+    ],
+  };
+
   const unit = metaIndics[indic].unit;
   const viewWindow = viewsForIndic[indic];
 
   return (
     <div>
+      <div>
+        <Bar
+          data={data}
+          options={options}
+        />
+      </div>
+
       <div className="chart-container" align="center">
-        <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
+        {/* <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
         <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>
-        <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/>
+        <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/> */}
       </div>
 
       <table>
