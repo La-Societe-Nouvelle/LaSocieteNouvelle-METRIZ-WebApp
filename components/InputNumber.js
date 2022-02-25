@@ -6,6 +6,7 @@ export class InputNumber extends React.Component {
     super(props);
     this.state = {
       input: props.value!=undefined ? props.value.toString() || "" : "",
+      placeholder: props.placeholder
     }
   }
 
@@ -21,6 +22,7 @@ export class InputNumber extends React.Component {
     return (
       <input  className="input-number"
               value={this.state.input}
+              placeholder={this.state.placeholder}
               onFocus={this.onFocus}
               onChange={this.onChange}
               onBlur={this.onBlur}
