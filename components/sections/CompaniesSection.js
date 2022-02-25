@@ -38,7 +38,7 @@ export class CompaniesSection extends React.Component {
     if (
       this.state.view == "unsync" &&
       this.state.companies.filter((company) => company.status != 200).length ==
-        0
+      0
     )
       this.setState({ view: "all" });
 
@@ -46,7 +46,7 @@ export class CompaniesSection extends React.Component {
     if (
       this.state.significativeCompanies.length == 0 &&
       this.state.companies.filter((company) => company.status != 200).length ==
-        0
+      0
     ) {
       let significativeCompanies = getSignificativeCompanies(
         this.props.session.financialData
@@ -78,7 +78,8 @@ export class CompaniesSection extends React.Component {
 
     return (
       <>
-        <div className="container-fluid">
+        <section className="container">
+
           <div className={"section-title"}>
             <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
             <h3 className={"subtitle underline"}>
@@ -133,54 +134,54 @@ export class CompaniesSection extends React.Component {
                   <div className="pagination">
                     <div className="form-group">
                       <label> Pagination </label>
-                    <select
-                      value={nbItems}
-                      onChange={this.changeNbItems}
-                      className="form-input"
-                    >
-                      <option key="1" value="20">
-                        20 fournisseurs par page
-                      </option>
-                      <option key="2" value="50">
-                        50 fournisseurs par page
-                      </option>
-                      <option key="3" value="all">
-                        Tous les fournisseurs 
-                      </option>
-                    </select>
-                  </div>
-                    {companies.length > 0 && (
-                       <div className="form-group">
-                      <label> Affichage </label>
                       <select
-                        value={view}
-                        onChange={this.changeView}
+                        value={nbItems}
+                        onChange={this.changeNbItems}
                         className="form-input"
                       >
-                        <option key="1" value="all">
-                          Tous les comptes externes
+                        <option key="1" value="20">
+                          20 fournisseurs par page
                         </option>
-                        <option key="2" value="aux">
-                          Comptes fournisseurs uniquement
+                        <option key="2" value="50">
+                          50 fournisseurs par page
                         </option>
-                        <option key="3" value="expenses">
-                          Autres comptes tiers
-                        </option>
-                        {!isNextStepAvailable && (
-                          <option key="4" value="unsync">
-                            Comptes non synchronisés
-                          </option>
-                        )}
-                        {significativeCompanies.length > 0 && (
-                          <option key="5" value="significative">
-                            Comptes significatifs
-                          </option>
-                        )}
-                        <option key="6" value="defaultActivity">
-                          Comptes tiers non rattachés à un secteur
-                          d'activités
+                        <option key="3" value="all">
+                          Tous les fournisseurs
                         </option>
                       </select>
+                    </div>
+                    {companies.length > 0 && (
+                      <div className="form-group">
+                        <label> Affichage </label>
+                        <select
+                          value={view}
+                          onChange={this.changeView}
+                          className="form-input"
+                        >
+                          <option key="1" value="all">
+                            Tous les comptes externes
+                          </option>
+                          <option key="2" value="aux">
+                            Comptes fournisseurs uniquement
+                          </option>
+                          <option key="3" value="expenses">
+                            Autres comptes tiers
+                          </option>
+                          {!isNextStepAvailable && (
+                            <option key="4" value="unsync">
+                              Comptes non synchronisés
+                            </option>
+                          )}
+                          {significativeCompanies.length > 0 && (
+                            <option key="5" value="significative">
+                              Comptes significatifs
+                            </option>
+                          )}
+                          <option key="6" value="defaultActivity">
+                            Comptes tiers non rattachés à un secteur
+                            d'activités
+                          </option>
+                        </select>
                       </div>
                     )}
                   </div>
@@ -233,7 +234,7 @@ export class CompaniesSection extends React.Component {
               />
             </div>
           )}
-        </div>
+          =        </section>
         <div className={"action container-fluid"}>
           <button
             className={"btn btn-primary"}
@@ -403,10 +404,10 @@ export class CompaniesSection extends React.Component {
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
 const nextStepAvailable = ({ companies }) =>
-  // condition : data fetched for all companies (or no company with data unfetched)
-  {
-    return !(companies.filter((company) => company.status != 200).length > 0);
-  };
+// condition : data fetched for all companies (or no company with data unfetched)
+{
+  return !(companies.filter((company) => company.status != 200).length > 0);
+};
 
 /* ---------- DISPLAY ---------- */
 

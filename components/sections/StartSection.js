@@ -2,8 +2,6 @@
 
 // React
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faEllipsis } from '@fortawesome/free-solid-svg-icons'
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
@@ -17,20 +15,18 @@ export class StartSection extends React.Component {
 
   render() {
     return (
-        <section className="start-section container-fluid">
-          <div>
-            <h2>
+      <div id="start" className="container">
+        <div className="row">
+          <section>
+            <h1>
               Mesurez <span className="underline">l'impact carbone</span> de
               votre entreprise en quelques clics.
-            </h2>
+            </h1>
             <p>
-              Notre objectif est de vous permettre de 
-              <span className="font-weight-bold">connaître</span> et de 
-              <strong>mesurer l’empreinte de la production</strong> de votre
-              entreprise sur des enjeux 
-              <strong>majeurs de développement durable.</strong>
+              Notre objectif est de vous permettre de <b>connaître</b> et de <strong>mesurer l’empreinte de la production</strong> de votre
+              entreprise sur des enjeux <strong>majeurs de développement durable.</strong>
             </p>
-            <div className="start-picto">
+            <div id="section-picto" className="row">
               <div>
                 <img
                   src="resources/pictos/sustainable.svg"
@@ -51,49 +47,26 @@ export class StartSection extends React.Component {
                 <p>Engagements sociaux et environementaux</p>
               </div>
             </div>
+            <button className={"btn btn-primary"} onClick={this.props.startNewSession}>
+              Démarrer mon analyse
+            </button>
+            <button className={"btn btn-secondary"} onClick={this.triggerImportFile}>
+              Reprendre une session
+            </button>
 
-            <div id="start-choices-container">
-              <div id="start-choices">
-                <button
-                  className={"btn btn-link"}
-                  onClick={this.props.startNewSession}
-                >
-                  Je démarre *
-                </button>
-                <button
-                   className={"btn btn-outlined"}
-                  onClick={this.triggerImportFile}
-                >
-                  Reprendre une session
-                </button>
-              </div>
-              <input
-                id="import-session"
-                type="file"
-                accept=".json"
-                onChange={this.importFile}
-                visibility="collapse"
-              />
-              <p className="small-text">
-              *Munissez vous d’un fichier d’export comptable au format FEC, à générer depuis votre outil de comptabilité ou auprès de votre service comptabilité.
-              </p>
-            </div>
-          </div>
-          <div className="start-publish-container">
-            <div>
-            <img src="/resources/team_working.png" alt="Team" />
-              <div className="cta-publish">
-                <p className="icon">
-                <FontAwesomeIcon icon={faPaperPlane} />
-                </p>
-                <a href="#" target="_blank">Publiez vos résultat !
-                <span>Maintenant</span></a>
-
-              </div>
-            </div>
-            
-          </div>
-        </section>
+            <input
+              id="import-session"
+              type="file"
+              accept=".json"
+              onChange={this.importFile}
+              visibility="collapse"
+            />
+          </section>
+          <section>
+          <img src="/resources/team_working.png" alt="Team" />
+          </section>
+        </div>
+      </div>
     );
   }
 

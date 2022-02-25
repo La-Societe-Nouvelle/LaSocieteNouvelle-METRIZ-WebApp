@@ -9,6 +9,8 @@ import divisions from "/lib/divisions";
 // React
 import React from "react";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRuler } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -37,6 +39,8 @@ import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
+
+
 
 // Export modules
 import { exportIndicPDF } from "/src/writers/Export";
@@ -92,6 +96,7 @@ export class IndicatorSection extends React.Component {
     };
   }
 
+
   componentDidMount() {
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
       this.setState({ valueAddedAreaFootprint: footprint })
@@ -104,87 +109,94 @@ export class IndicatorSection extends React.Component {
   render() {
     const { indic } = this.state;
     const { triggerPopup, selectedTable, comparativeDivision } = this.state;
-
     const isPublicationAvailable =
       Object.entries(
         this.props.session.financialData.aggregates.revenue.footprint.indicators
       ).filter(([_, indicator]) => indicator.value != null).length > 0;
 
+
+
     return (
       <div className="indicator-section">
-        <div className="container-fluid">
-          <div className={"section-title"}>
-            <h2>&Eacute;tape 5 - Mesure de l'impact</h2>
-            <p>
-              Primi igitur omnium statuuntur Epigonus et Eusebius ob nominum
-              gentilitatem oppressi. praediximus enim Montium sub ipso vivendi
-              termino his vocabulis appellatos fabricarum culpasse tribunos ut
-              adminicula futurae molitioni pollicitos.
-            </p>
-          </div>
-          <div className="indicator">
-            <p>Sélectionner votre indicateur</p>
-            <div className="form-group">
-              <label>Indicateur de mesure</label>
-              <select
-                className="form-input"
-                id="selection-indicator"
-                value={indic}
-                onChange={this.changeSelectedIndicator}
-              >
-                <option disabled>Création de la valeur</option>
-                <option key="eco" value="eco">
-                  &emsp;&emsp;{metaIndics["eco"].libelle}
-                </option>
-                <option key="art" value="art">
-                  &emsp;&emsp;{metaIndics["art"].libelle}
-                </option>
-                <option key="soc" value="soc">
-                  &emsp;&emsp;{metaIndics["soc"].libelle}
-                </option>
-                <option disabled>Empreinte sociale</option>
-                <option key="dis" value="dis">
-                  &emsp;&emsp;{metaIndics["dis"].libelle}
-                </option>
-                <option key="geq" value="geq">
-                  &emsp;&emsp;{metaIndics["geq"].libelle}
-                </option>
-                <option key="knw" value="knw">
-                  &emsp;&emsp;{metaIndics["knw"].libelle}
-                </option>
-                <option disabled>Empreinte environnementale</option>
-                <option key="ghg" value="ghg">
-                  &emsp;&emsp;{metaIndics["ghg"].libelle}
-                </option>
-                <option key="nrg" value="nrg">
-                  &emsp;&emsp;{metaIndics["nrg"].libelle}
-                </option>
-                <option key="wat" value="wat">
-                  &emsp;&emsp;{metaIndics["wat"].libelle}
-                </option>
-                <option key="mat" value="mat">
-                  &emsp;&emsp;{metaIndics["mat"].libelle}
-                </option>
-                <option key="was" value="was">
-                  &emsp;&emsp;{metaIndics["was"].libelle}
-                </option>
-                <option key="haz" value="haz">
-                  &emsp;&emsp;{metaIndics["haz"].libelle}
-                </option>
-              </select>
+        <section>
+          <div className="container">
+            <div className={"section-title"}>
+              <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 5 - Mesure de l'impact</h2>
+              <p>
+                Primi igitur omnium statuuntur Epigonus et Eusebius ob nominum
+                gentilitatem oppressi. praediximus enim Montium sub ipso vivendi
+                termino his vocabulis appellatos fabricarum culpasse tribunos ut
+                adminicula futurae molitioni pollicitos.
+              </p>
+            </div>
+            <div className="indicator">
+              <h3 className="h6">Sélectionner votre indicateur de mesure: </h3>
+              <div className="form-group">
+                <label>Indicateur de mesure</label>
+                <select
+                  className="form-input"
+                  id="selection-indicator"
+                  value={indic}
+                  onChange={this.changeSelectedIndicator}
+                >
+                  <optgroup label="Création de la valeur">
+
+                  <option key="eco" value="eco">
+                      {metaIndics["eco"].libelle}
+                    </option>
+                    <option key="art" value="art">
+                      {metaIndics["art"].libelle}
+                    </option>
+                    <option key="soc" value="soc">
+                      {metaIndics["soc"].libelle}
+                    </option>
+                  </optgroup>
+                  <optgroup label="Empreinte sociale">
+                    <option key="dis" value="dis">
+                      {metaIndics["dis"].libelle}
+                    </option>
+                    <option key="geq" value="geq">
+                      {metaIndics["geq"].libelle}
+                    </option>
+                    <option key="knw" value="knw">
+                      {metaIndics["knw"].libelle}
+                    </option>
+                  </optgroup>
+                  <optgroup label="Empreinte environnementale">
+                    <option key="ghg" value="ghg">
+                      {metaIndics["ghg"].libelle}
+                    </option>
+                    <option key="nrg" value="nrg">
+                      {metaIndics["nrg"].libelle}
+                    </option>
+                    <option key="wat" value="wat">
+                      {metaIndics["wat"].libelle}
+                    </option>
+                    <option key="mat" value="mat">
+                      {metaIndics["mat"].libelle}
+                    </option>
+                    <option key="was" value="was">
+                      {metaIndics["was"].libelle}
+                    </option>
+                    <option key="haz" value="haz">
+                      {metaIndics["haz"].libelle}
+                    </option>
+                  </optgroup>
+                </select>
+              </div>
             </div>
           </div>
-        </div>
+        </section>
         <section className="selected-indicator">
-          <div className="container-fluid">
-            <p>Indicateur sélectionné :</p>
-            <h3>
-              {metaIndics[indic].libelle}
-            </h3>
-            {metaIndics[indic].isBeta && (
-              <p className="beta">&nbsp;BETA&nbsp;</p>
-            )}
-            <p className="info">
+          <div className="container">
+            <h3 className="h6">Indicateur sélectionné :</h3>
+            <h4 className={"subtitle underline"}>
+              {metaIndics[indic].libelle}             {metaIndics[indic].isBeta && (
+                <span className="beta">&nbsp;BETA&nbsp;</span>
+              )}
+            </h4>
+
+            <p className="legend">
               Grandeur mesurée : Valeur ajoutée nette créée sur le territoire
               français (en euros)
             </p>
@@ -199,20 +211,39 @@ export class IndicatorSection extends React.Component {
               />
             </div>
           </div>
+
+          {triggerPopup == "assessment" && (
+            <div className="modal-overlay">
+              <div className="modal-wrapper">
+                <div className="modal">
+                  <Assessment
+                    indic={indic}
+                    impactsData={this.props.session.impactsData}
+                    onUpdate={this.willNetValueAddedIndicator.bind(this)}
+                    onValidate={this.validateIndicator.bind(this)}
+                    onGoBack={() => this.triggerPopup("")}
+                  />
+                </div>
+              </div>
+            </div>
+
+          )}
         </section>
-        {/* 
-        <div className="section-view-header-odds">
-          {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-"+odd} 
-                                                    src={"/resources/odds/F-WEB-Goal-"+odd+".png"} alt="logo"/>)}
+
+        {/* <div className="section-view-header-odds">
+          {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
+            src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} height="100px;" alt="logo" />)}
         </div> */}
+        <section className="row">
+          <div className="menu-result">
 
+          </div>
+        </section>
         <section className="impact-result">
-          <div className="container-fluid">
-            <h3 className={"subtitle"}>Votre Impact</h3>
+          <div className="container">
+            <h3>Votre Impact</h3>
             <h4>{metaIndics[indic].libelle}</h4>
-
-            {this.buildtable(selectedTable)}
-            <div className="impact-action">
+            <div className="form-group">
               <select
                 className="form-input"
                 value={selectedTable}
@@ -226,22 +257,17 @@ export class IndicatorSection extends React.Component {
                 </option>
                 {/*<option key="3" value="companies">Valeurs publiées - Fournisseurs</option>*/}
               </select>
-              <button
-                className={"btn btn-secondary"}
-                onClick={() =>
-                  exportIndicPDF(this.state.indic, this.props.session)
-                }
-              >
-                Editer le rapport
-              </button>
+
             </div>
+            {this.buildtable(selectedTable)}
+
           </div>
         </section>
         <section className="compare-section">
-          <div className="container-fluid">
-          <h3>Comparaison</h3>
+          <div className="container">
+            <h3>Comparaison</h3>
 
-          <h4>{metaIndics[indic].libelle}</h4>
+            <h4>{metaIndics[indic].libelle}</h4>
             <div className="form-group">
               <label>Sélectionner une activité comparative : </label>
               <select
@@ -258,71 +284,60 @@ export class IndicatorSection extends React.Component {
                   ))}
               </select>
             </div>
+            <div className="graph-section">
+              <div className="container">
+                <IndicatorGraphs
+                  session={this.props.session}
+                  indic={indic}
+                  comparativeFootprints={this.state}
+                />
+              </div>
+            </div>
           </div>
         </section>
-        <section className="graph-section">
-          <div className="container-fluid">
-            <IndicatorGraphs
-              session={this.props.session}
-              indic={indic}
-              comparativeFootprints={this.state}
-            />
-          </div>
-        </section>
+
         <section className="analysis-section">
-          <div className="container-fluid">
+          <div className="container">
             {this.props.session.validations.includes(this.state.indic) && (
-              <>      
+              <>
                 <h3>Clés de decryptage</h3>
                 <h4>{metaIndics[indic].libelle}</h4>
                 <div className="analysis-container">
                   <Analyse
-                  indic={this.state.indic}
-                  session={this.props.session}
-                />
-                <div className="analysis-illu">
-                  <img src="/resources/illustrations_societe_nouvelle.svg" alt="Analyse - Illustration" />
-                </div>
-                
+                    indic={this.state.indic}
+                    session={this.props.session}
+                  />
+
+
                 </div>
 
               </>
-         
+
             )}
 
-            {triggerPopup == "assessment" && (
-              <div className="popup">
-                <div className="popup-inner full-size">
-                  <Assessment
-                    indic={indic}
-                    impactsData={this.props.session.impactsData}
-                    onUpdate={this.willNetValueAddedIndicator.bind(this)}
-                    onValidate={this.validateIndicator.bind(this)}
-                    onGoBack={() => this.triggerPopup("")}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </section>
-       <div className="action">
-       <button
-                className={"btn btn-secondary"}
-                onClick={() =>
-                  exportIndicPDF(this.state.indic, this.props.session)
-                }
-              >
-                Editer le rapport PDF
-              </button>
-              <button
-                className={"btn btn-primary"}
-                id="validation-button"
-                disabled={!isPublicationAvailable}
-                onClick={this.props.publish}
-              >
-               Publier mes résultats
-              </button>
-         </div> 
+        <section className={"action"}>
+          <div className="container-fluid">
+            <button
+              className={"btn btn-secondary"}
+              onClick={() =>
+                exportIndicPDF(this.state.indic, this.props.session)
+              }
+            >
+              Editer le rapport PDF
+            </button>
+            <button
+              className={"btn btn-primary"}
+              id="validation-button"
+              disabled={!isPublicationAvailable}
+              onClick={this.props.publish}
+            >
+              Publier mes résultats
+            </button>
+          </div>
+        </section>
+
       </div>
     );
   }
