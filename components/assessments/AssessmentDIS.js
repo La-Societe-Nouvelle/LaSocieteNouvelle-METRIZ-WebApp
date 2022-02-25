@@ -72,22 +72,22 @@ export class AssessmentDIS extends React.Component {
 
         <div className="group"><h3>Données sociales</h3>
           <div className="actions">
-            <button onClick={() => document.getElementById('import-companies-csv').click()}>
+            <button onClick={() => document.getElementById('import-companies-csv').click()} className="btn">
               Importer un fichier CSV
             </button>
             <input id="import-companies-csv" visibility="collapse"
                     type="file" accept=".csv" 
                     onChange={this.importCSVFile}/>
-            <button onClick={() => document.getElementById('import-companies-xlsx').click()}>
+            <button onClick={() => document.getElementById('import-companies-xlsx').click()} className="btn">
               Importer un fichier XLSX
             </button>
               <input id="import-companies-xlsx" visibility="collapse"
                       type="file" accept=".xlsx" 
                       onChange={this.importXLSXFile}/>
-            <button onClick={this.exportXLSXFile}>
+            <button onClick={this.exportXLSXFile} className="btn">
               Télécharger modèle XLSX
             </button>
-            <button onClick={this.deleteAll}>
+            <button onClick={this.deleteAll} className="btn">
                 Supprimer tout
               </button>
           </div>
@@ -130,9 +130,9 @@ export class AssessmentDIS extends React.Component {
         </div>
 
         <div className="view-footer">
-        <button className="retour" 
+        <button className="btn" 
                   onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className="retour" 
+          <button className={"btn btn-primary"}
                   disabled={!isAllValid}
                   onClick = {() => this.onSubmit()}>Valider</button>
         </div>
