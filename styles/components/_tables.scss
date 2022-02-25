@@ -9,6 +9,7 @@
 
     h4 {
       text-align: center;
+      margin: 1em 0;
     }
     .table-header {
       width: 100%;
@@ -119,6 +120,7 @@
 
    
 .table-menu {
+  margin-bottom: 1em;
     button {
       background-color: #fff;
       border:none;
@@ -158,10 +160,7 @@
         border-bottom: 1px solid #fff;
       }
     }
-    .total td{
-      background-color: $light-blue;
-      font-weight: 700;
-    }
+   
     .operating-result td {
       background-color: $tertiary-color;
       color : #fff;
@@ -169,5 +168,20 @@
     .profit td, tfoot {
       background-color: $primary-color;
       color : #fff;
+    }
+  }
+
+  .total td{
+    background-color: $light-blue;
+    font-weight: 700;
+  }
+
+  // TABLE Assesment 
+
+  .column_icon .btn {
+    padding: 0;
+    background-color: transparent;
+    svg{
+      height: 20px;
     }
   }

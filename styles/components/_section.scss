@@ -1,0 +1,155 @@
+
+  section {
+    padding : 2em 0;
+}
+
+.section-title {
+    h2 {
+      font-size: 2em;
+    }
+    svg{
+        height: 25px;
+        margin-right: 10px;
+       }
+  }
+
+
+  .action {
+    background-color: #f6f6f6;
+    display: flex;
+    justify-content: flex-end;
+    text-align: right;
+   
+    :disabled,
+    :disabled:hover {
+      background: #ccc;
+    }
+  }
+    
+
+  // START SECTION 
+
+#start {
+    background:  no-repeat url('../img/leaves_background.png');
+}
+#section-picto {
+    text-align: center;
+    padding: 2em 0;
+    img{
+        height : 55px;
+    }
+    p {
+        font-size: 0.8em;
+    }
+}
+
+
+// IMPORT SECTION 
+
+#importSection {
+    .row div {
+        flex : 1;
+    }
+}
+
+// INDICATOR SECTION 
+
+.indicator {
+  border: 1px solid #f3f3f3;
+  border-radius: 10px;
+    padding: 2em;
+    margin-top: 2em;
+    width: 50%;
+}
+/* Indicator Section*/
+.indicator-section{ 
+  .h6{
+    font-size : 1.2em;
+    color : $tertiary-color;
+    text-transform: inherit;
+  }
+  h3 {
+    color : $secondary-color;
+    text-transform: uppercase;
+    font-size: 2em;
+    margin-bottom: 0;
+  }
+  h4 {
+    font-size: 1.5em;
+    margin-top: 10px;
+  }
+
+}
+.selected-indicator{
+  background-color: lighten($light-blue, 7%);
+  padding: 2em 0;
+}
+
+.statement-section {
+  background-color: #ffffff;
+  padding: 2em;
+  margin : 1em 0;
+  h4 {
+    text-align: center;
+    color : $tertiary-color;
+    font-size: 1.5em;
+    margin-bottom: 1em;
+  }
+}
+// validation button
+.statement-validation {
+  text-align: right;
+}
+
+
+.impact-result {
+  padding : 1em 0;
+
+}
+
+.graph-section {
+  background-color : #f3f3f3;
+  padding: 1em;
+}
+
+.analysis-container { 
+  display: flex;
+  align-items: flex-start;
+  .analysis-illu img {
+    height: 400px;
+  }
+}
+
+
+// STATEMENT 
+
+/* ---------- STATEMENT ---------- */
+
+.statement {
+  margin: 2px 0;
+  padding: 0px 20px 5px;
+
+  .statement-area {
+    margin-bottom: 15px;
+    padding: 10px;
+    //border: solid 1px $secondary-color;
+  }
+
+  // statement item
+  .statement-item {
+    
+
+  
+
+    // assessment button
+    .assessment-button-container {
+      margin-left: auto;
+
+      .assessment-button {
+        width: 150px;
+      }
+    }
+
+  }
+
+}

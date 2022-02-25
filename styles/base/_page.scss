@@ -1,0 +1,40 @@
+/* Page */
+
+		@-ms-viewport {
+			width: device-width;
+		}
+		html {
+			box-sizing: border-box;
+		}
+		body {
+			overflow-x: hidden;
+		} 
+		body, html {
+			height: 100%;
+		}
+		*, *:before, *:after {
+			box-sizing: inherit;
+		}
+
+	
+/* Media query mixins */
+@mixin xs {
+	@media (max-width: 599px) { @content; }
+  }
+  @mixin sm {
+	@media (min-width: 600px) { @content; }
+  }
+  @mixin md {
+	@media (min-width: 900px) { @content; }
+  }
+  @mixin lg {
+	@media (min-width: 1200px) { @content; }
+  }
+  @mixin xl {
+	@media (min-width: 1800px) { @content; }
+  }
+  @mixin screen-min($width) {
+	@media (min-width:$width) { @content }
+  }
+  
+  

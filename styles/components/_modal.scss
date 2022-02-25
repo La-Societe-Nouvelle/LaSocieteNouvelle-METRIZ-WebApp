@@ -1,0 +1,190 @@
+/* ---------- POPUP ---------- */
+
+.popup-container {
+    margin-left: 10%;
+    margin-right: 10%;
+  
+    .progressbar {
+      height: 25px;
+      width: 500px;
+  
+      .progressbar_shape {
+        height: 100%;
+        width: 100%;
+  
+        rect {
+          height: 100%;
+          fill: $primary-color;
+        }
+      }
+    }
+  }
+  
+  .popup {
+    z-index: 9999;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+  }
+  
+/* ---------- GROUP ---------- */
+
+.group {
+    padding: 1em;
+  
+    .analysis {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  
+    .actions {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+  .btn {
+      margin : 0.5em 0 0.5em 0.5em;
+  }  
+      select {
+        width: 400px;
+        background-color: $primary-color;
+        color: white;
+        border: solid 0px $primary-color;
+        border-radius: 0;
+  
+        option 
+        {
+          background-color: white;
+          color: $primary-color;
+          border: solid 1px $primary-color;
+          border-radius: 0;     
+        }
+      }
+    }
+  }
+  
+  .popup-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    min-width: 550px;
+    padding: 25px;
+    background-color: white;
+    border: 1px solid $tertiary-color;
+    border-radius: 15px;
+    overflow-x: auto;
+
+    &.full-size {
+      width: 90%;
+    }
+  
+    h3 {
+      margin: 5px 0 10px;
+      text-align: center;
+    }
+  
+    .group {
+      max-height: 100%;
+      width: 100%;
+    }
+  
+    .table-main {
+      overflow: auto;
+    }
+  
+    .inputs {
+      margin: 10px 5px;
+  
+      .inline-input {
+        display: flex;
+        flex-direction: row;
+        margin: 5px;
+        align-items: baseline;
+  
+        &.short {
+          input,select {
+            width: 150px;
+          }
+        }
+        &.long {
+          input,select {
+            width: 400px;
+          }
+        }
+  
+        label {
+          min-width: 200px;
+        }
+        input {
+          width: 500px;
+          &.input-number {
+            text-align: right;
+          }
+        }
+        span {
+          font-size: 12px;
+        }
+      }
+    }
+  
+    .input {
+      width: 100%;
+      margin: 5px;
+    }
+  
+    .footer {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+    }
+  }
+
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1040;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .modal {
+    z-index: 100;
+    background: #fff;
+    position: relative;
+    margin: auto;
+    border-radius: 5px;
+    width: 80%;
+    padding: 1rem;
+  }
+
+  .modal-action {
+    text-align: right;
+  }
