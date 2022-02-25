@@ -70,7 +70,7 @@ export class LegalUnit {
       try 
       {
         const endpoint = `${apiBaseUrl}/siren/${this.siren}`;
-        console.log(endpoint);
+        // console.log(endpoint);
         const response = await fetch(endpoint, {method:'get'});
         const data = await response.json();
 
@@ -135,7 +135,7 @@ export class LegalUnit {
       
       // Production
       endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=PRD";
-      console.log(endpoint);
+      // console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
       if (data.header.statut == 200) this.productionSectorFootprint.updateAll(data.empreinteSocietale);
@@ -143,7 +143,7 @@ export class LegalUnit {
       
       // Value Added
       endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=GVA";
-      console.log(endpoint);
+      // console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
       if (data.header.statut == 200) this.valueAddedSectorFootprint.updateAll(data.empreinteSocietale);
@@ -151,7 +151,7 @@ export class LegalUnit {
       
       // Intermediate Consumption
       endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=IC";
-      console.log(endpoint);
+      // console.log(endpoint);
       response = await fetch(endpoint, {method:'get'});
       data = await response.json();
       if (data.header.statut == 200) this.consumptionSectorFootprint.updateAll(data.empreinteSocietale)
@@ -168,7 +168,7 @@ export class LegalUnit {
     
     // PIB+IMP FRA (Available production in FRA)
     endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GAP";
-    console.log(endpoint);
+    // console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
     if (data.header.statut == 200) this.productionAreaFootprint.updateAll(data.empreinteSocietale);
@@ -176,7 +176,7 @@ export class LegalUnit {
 
     // PIB FRA (Value Added in France)
     endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GVA";
-    console.log(endpoint);
+    // console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
     if (data.header.statut == 200) this.valueAddedAreaFootprint.updateAll(data.empreinteSocietale);
@@ -191,7 +191,7 @@ export class LegalUnit {
     
     // PIB+IMP FRA (Available production in FRA)
     endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GAP";
-    console.log(endpoint);
+    // console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
     if (data.header.statut == 200) this.productionAreaFootprint.updateAll(data.empreinteSocietale);
@@ -199,7 +199,7 @@ export class LegalUnit {
 
     // PIB FRA (Value Added in France)
     endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GVA";
-    console.log(endpoint);
+    // console.log(endpoint);
     response = await fetch(endpoint, {method:'get'});
     data = await response.json();
     if (data.header.statut == 200) this.valueAddedAreaFootprint.updateAll(data.empreinteSocietale);
