@@ -40,27 +40,34 @@ export class StatementWAT extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                        <div className="statement-form">
+
+        <div className="form-group">
           <label>Consommation totale d'eau</label>
           <InputNumber value={roundValue(waterConsumption,0)}
-                       onUpdate={this.updateWaterConsumption}/>
-          <span>&nbsp;m3</span>
+                       onUpdate={this.updateWaterConsumption}
+                       placeholder="m³"
+                       />
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Incertitude</label>
           <InputNumber value={roundValue(waterConsumptionUncertainty,0)}
-                       onUpdate={this.updateWaterConsumptionUncertainty}/>
-          <span>&nbsp;%</span>
+                       onUpdate={this.updateWaterConsumptionUncertainty}
+                       placeholder="%"
+                       />
         </div>
+
+        </div>
+        
         <div className="statement-comments">
           <label>Informations complémentaires</label>
-          <textarea type="text" spellCheck="false"
+          <textarea className="form-input" type="text" spellCheck="false"
                     value={info} 
                     onChange={this.updateInfo}
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

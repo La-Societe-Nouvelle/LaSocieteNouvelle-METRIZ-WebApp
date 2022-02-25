@@ -25,22 +25,25 @@ export class StatementSOC extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                        <div className="statement-form">
+
+        <div className="form-group">
           <label>L'entreprise est-elle d'utilité sociale ou dotée d'une raison d'être ?</label>
-          <div className="input-radio">
-            <input type="radio" id="hasSocialPurpose"
+          <div className={"custom-control-inline"}>
+            <input type="radio" id="hasSocialPurpose" className="custom-control-input"
                    value="true"
                    checked={hasSocialPurpose === true}
                    onChange={this.onSocialPurposeChange}/>
-            <label>Oui</label>
+            <label className="custom-control-label">Oui</label>
           </div>
-          <div className="input-radio">
-            <input type="radio" id="hasSocialPurpose"
+          <div className={"custom-control-inline"}>
+            <input type="radio" id="hasSocialPurpose" className="custom-control-input"
                    value="false"
                    checked={hasSocialPurpose === false}
                    onChange={this.onSocialPurposeChange}/>
-            <label>Non</label>
+            <label className="custom-control-label">Non</label>
           </div>
+        </div>
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -50,7 +53,7 @@ export class StatementSOC extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

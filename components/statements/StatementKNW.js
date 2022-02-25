@@ -36,14 +36,12 @@ export class StatementKNW extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+        <div className="form-group">
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
           <InputNumber value={roundValue(researchAndTrainingContribution,1)} 
-                       onUpdate={this.updateResearchAndTrainingContribution}/>
-          <span>&nbsp;€</span>
-          <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
-          </div>
+                       onUpdate={this.updateResearchAndTrainingContribution}
+                       placeholder="&euro;"/>
+            <button className={"btn btn-secondary"} onClick={this.props.toAssessment}>Outil d'évaluation</button>
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -53,7 +51,7 @@ export class StatementKNW extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

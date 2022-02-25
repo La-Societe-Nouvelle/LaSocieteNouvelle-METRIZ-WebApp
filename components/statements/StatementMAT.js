@@ -40,36 +40,43 @@ export class StatementMAT extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                <div className="statement-form">
+
+        <div className="form-group">
           <label>L'entreprise réalisent-elles des activités agricoles ou extractives ?</label>
-          <div className="input-radio">
-            <input type="radio" id="isExtractiveActivities"
+          <div className={"custom-control-inline"}>
+            <input type="radio" id="isExtractiveActivities" className="custom-control-input"
                    value="true"
                    checked={isExtractiveActivities === true}
                    onChange={this.onIsExtractiveActivitiesChange}/>
-            <label>Oui</label>
+            <label className="custom-control-label">Oui</label>
           </div>
-          <div className="input-radio">
-            <input type="radio" id="isExtractiveActivities"
+          <div className={"custom-control-inline"}>
+            <input type="radio" id="isExtractiveActivities" className="custom-control-input"
                    value="false"
                    checked={isExtractiveActivities === false}
                    onChange={this.onIsExtractiveActivitiesChange}/>
-            <label>Non</label>
+            <label className="custom-control-label">Non</label>
           </div>
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Quantité extraite de matières premières</label>
           <InputNumber value={roundValue(materialsExtraction,0)}
                        disabled={isExtractiveActivities === false}
-                       onUpdate={this.updateMaterialsExtraction}/>
-          <span>&nbsp;kg</span>
+                       onUpdate={this.updateMaterialsExtraction}
+                       placeholder="KG"
+                       />
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Incertitude</label>
           <InputNumber value={roundValue(materialsExtractionUncertainty,0)}
                        disabled={isExtractiveActivities === false}
-                       onUpdate={this.updateMaterialsExtractionUncertainty}/>
-          <span>&nbsp;%</span>
+                       onUpdate={this.updateMaterialsExtractionUncertainty}
+                       placeholder="%"
+                       />
+        </div>
+
+
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -79,7 +86,7 @@ export class StatementMAT extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

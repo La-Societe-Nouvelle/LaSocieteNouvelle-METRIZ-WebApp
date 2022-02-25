@@ -40,20 +40,21 @@ export class StatementGHG extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                <div className="statement-form">
+
+        <div className="form-group">
           <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
           <InputNumber value={roundValue(greenhousesGazEmissions,0)}
-                       onUpdate={this.updateGreenhousesGazEmissions}/>
-          <span>&nbsp;kgCO2e</span>
+                       onUpdate={this.updateGreenhousesGazEmissions} placeholder={"kgCO2e"}/>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
           </div>
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Incertitude</label>
           <InputNumber value={roundValue(greenhousesGazEmissionsUncertainty,0)}
-                       onUpdate={this.updateGreenhousesGazEmissionsUncertainty}/>
-          <span>&nbsp;%</span>
+                       onUpdate={this.updateGreenhousesGazEmissionsUncertainty} 
+                       placeholder={"%"}/>
+        </div>
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -63,7 +64,9 @@ export class StatementGHG extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+        <button className={"btn btn-secondary"} onClick={this.props.toAssessment}>Outil d'évaluation</button>
+
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>
