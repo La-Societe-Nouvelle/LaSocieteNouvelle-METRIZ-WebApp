@@ -2,9 +2,15 @@
 .container {
     max-width: 95em; 
     margin: 0 auto;
+    padding-left: 2em;
+    padding-right: 2em; 
 }
 .container-fluid {
     width: 100%;  
     padding-left: 2em;
     padding-right: 2em; 
 }  
+
+.w100 {
+    width: 100%;
+}
