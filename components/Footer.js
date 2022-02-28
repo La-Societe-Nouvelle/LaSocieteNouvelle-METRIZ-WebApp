@@ -18,16 +18,13 @@ export function Footer({ step }) {
         </p>
         <ul>
           <li>
-            <a href="#">Mentions légales</a>
+          <a href="https://lasocietenouvelle.org/" target="_blank">A propos</a>
           </li>
           <li>
-            <a href="#">Politique des cookies</a>
+           <a href="https://lasocietenouvelle.org/mentions-legales" target="_blank">Mentions légales</a>
           </li>
           <li>
-            <a href="#">Politique de confidentialité</a>
-          </li>
-          <li>
-            Design by <a href="#">La quincaillerie</a>
+            Design by <a href="https://la-quincaillerie.fr/" target="_blank">La quincaillerie</a>
           </li>
         </ul>
       </section>
@@ -35,16 +32,16 @@ export function Footer({ step }) {
         <section className="align-center">
           <h3>Vous avez des questions ?</h3>
           <p>
-            <a href="#" className={"btn btn-primary"}>
+            <a href="https://lasocietenouvelle.org/contact" target="_blank" className={"btn btn-primary"}>
               Contactez nous
             </a>
           </p>
           <p>- ou -</p>
           <p>appeller maintenant le</p>
-          <a href="tel:00000000" className="phone-number">
+          <a href="tel:0602362383" className="phone-number">
             <FontAwesomeIcon icon={faPhone} />
-            00 00 00 00 00
-          </a>
+            06 02 36 23 83
+                      </a>
         </section>
       ) : (
         ""
