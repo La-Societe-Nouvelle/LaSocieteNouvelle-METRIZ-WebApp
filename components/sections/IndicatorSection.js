@@ -10,7 +10,7 @@ import divisions from "/lib/divisions";
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRuler, faFileArrowDown, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faRuler, faFileArrowDown } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 

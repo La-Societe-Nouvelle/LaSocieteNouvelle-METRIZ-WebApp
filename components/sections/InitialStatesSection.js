@@ -176,7 +176,6 @@ export class InitialStatesSection extends React.Component {
                       </button> :
                       ""
                   }
-
                   {showMessage && (
                     <MessagePopup
                       title={titlePopup}
@@ -251,8 +250,9 @@ export class InitialStatesSection extends React.Component {
 
   /* ---------- BACK-UP IMPORT ---------- */
 
-  importFile = (event) => {
-    let file = event.target.files[0];
+  importFile = () => {
+
+    let file = this.state.files[0];
 
     let reader = new FileReader();
     reader.onload = async () => {
