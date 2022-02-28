@@ -60,26 +60,22 @@ export class FECImportSection extends React.Component {
                   )
                 }
                 )}
+
             </tbody>
           </table>
-          <div className={"custom-control-inline"}>
-            <div className="form-group">
+          <div className={"custom-control-inline a-nouveaux-input"}>
               <input type="checkbox" className="custom-control-input"
                 checked={noBook}
                 onChange={this.onCheckboxChange} />
               <label htmlFor="certification" className="custom-control-label">&nbsp;Pas de journal A-Nouveaux</label>
-            </div>
           </div>
 
         </div>
     
         <div className={"container align-right"}>
-          <button className={"btn btn-outline"} onClick={refresh}>
-            Recommencer
-          </button>
           <button className={"btn btn-primary"} onClick={() => this.validate()}
             disabled={disabledValidation}>
-            Valider mes A-Nouveaux
+            <FontAwesomeIcon icon={faChevronRight} />Valider mes A-Nouveaux
           </button>
         </div>
       </>
