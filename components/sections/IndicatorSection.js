@@ -10,7 +10,7 @@ import divisions from "/lib/divisions";
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRuler } from "@fortawesome/free-solid-svg-icons";
+import { faRuler, faFileArrowDown } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -141,7 +141,7 @@ export class IndicatorSection extends React.Component {
                 >
                   <optgroup label="Création de la valeur">
 
-                  <option key="eco" value="eco">
+                    <option key="eco" value="eco">
                       {metaIndics["eco"].libelle}
                     </option>
                     <option key="art" value="art">
@@ -242,6 +242,17 @@ export class IndicatorSection extends React.Component {
         <section className="impact-result">
           <div className="container">
             <h3>Votre Impact</h3>
+            <div className="align-right">
+              <button
+                className={"btn btn-secondary"}
+                onClick={() =>
+                  exportIndicPDF(this.state.indic, this.props.session)
+                }
+              >
+                <FontAwesomeIcon icon={faFileArrowDown} /> Editer le rapport PDF
+              </button>
+            </div>
+
             <h4>{metaIndics[indic].libelle}</h4>
             <div className="form-group">
               <select
@@ -301,16 +312,22 @@ export class IndicatorSection extends React.Component {
             {this.props.session.validations.includes(this.state.indic) && (
               <>
                 <h3>Clés de decryptage</h3>
-                <h4>{metaIndics[indic].libelle}</h4>
-                <div className="analysis-container">
-                  <Analyse
-                    indic={this.state.indic}
-                    session={this.props.session}
-                  />
 
+                <div className="row">
+                  <div>
+                    <img src="/resources/illu_analyse.svg" alt="Analyse" />
+                  </div>
+                  <div>
+                    <h4>{metaIndics[indic].libelle}</h4>
+                    <div className="analysis-container">
+                      <Analyse
+                        indic={this.state.indic}
+                        session={this.props.session}
+                      />
+                    </div>
+                  </div>
 
                 </div>
-
               </>
 
             )}
