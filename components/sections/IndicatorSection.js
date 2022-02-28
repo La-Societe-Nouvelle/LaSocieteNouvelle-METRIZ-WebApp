@@ -10,7 +10,7 @@ import divisions from "/lib/divisions";
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRuler, faFileArrowDown } from "@fortawesome/free-solid-svg-icons";
+import { faRuler, faFileArrowDown, faUpload } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -234,83 +234,79 @@ export class IndicatorSection extends React.Component {
           {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
             src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} height="100px;" alt="logo" />)}
         </div> */}
-        <section className="row">
-          <div className="menu-result">
-
-          </div>
-        </section>
-        <section className="impact-result">
-          <div className="container">
-            <h3>Votre Impact</h3>
-            <div className="align-right">
-              <button
-                className={"btn btn-secondary"}
-                onClick={() =>
-                  exportIndicPDF(this.state.indic, this.props.session)
-                }
-              >
-                <FontAwesomeIcon icon={faFileArrowDown} /> Editer le rapport PDF
-              </button>
-            </div>
-
-            <h4>{metaIndics[indic].libelle}</h4>
-            <div className="form-group">
-              <select
-                className="form-input"
-                value={selectedTable}
-                onChange={this.changeShowedTable}
-              >
-                <option key="1" value="mainAggregates">
-                  Soldes intermédiaires de gestion
-                </option>
-                <option key="2" value="expensesAccounts">
-                  Détails - Comptes de charges
-                </option>
-                {/*<option key="3" value="companies">Valeurs publiées - Fournisseurs</option>*/}
-              </select>
-
-            </div>
-            {this.buildtable(selectedTable)}
-
-          </div>
-        </section>
-        <section className="compare-section">
-          <div className="container">
-            <h3>Comparaison</h3>
-
-            <h4>{metaIndics[indic].libelle}</h4>
-            <div className="form-group">
-              <label>Sélectionner une activité comparative : </label>
-              <select
-                className="form-input"
-                value={comparativeDivision}
-                onChange={this.changeComparativeDivision}
-              >
-                {Object.entries(divisions)
-                  .sort((a, b) => parseInt(a) - parseInt(b))
-                  .map(([code, libelle]) => (
-                    <option key={code} value={code}>
-                      {code + " - " + libelle}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <div className="graph-section">
+        {this.props.session.validations.includes(this.state.indic) && (
+          <>
+            <section className="impact-result">
               <div className="container">
-                <IndicatorGraphs
-                  session={this.props.session}
-                  indic={indic}
-                  comparativeFootprints={this.state}
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+                <h3>Votre Impact</h3>
+                <div className="align-right">
+                  <button
+                    className={"btn btn-secondary"}
+                    onClick={() =>
+                      exportIndicPDF(this.state.indic, this.props.session)
+                    }
+                  >
+                    <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
+                  </button>
+                </div>
 
-        <section className="analysis-section">
-          <div className="container">
-            {this.props.session.validations.includes(this.state.indic) && (
-              <>
+                <h4>{metaIndics[indic].libelle}</h4>
+                <div className="form-group">
+                  <select
+                    className="form-input"
+                    value={selectedTable}
+                    onChange={this.changeShowedTable}
+                  >
+                    <option key="1" value="mainAggregates">
+                      Soldes intermédiaires de gestion
+                    </option>
+                    <option key="2" value="expensesAccounts">
+                      Détails - Comptes de charges
+                    </option>
+                    {/*<option key="3" value="companies">Valeurs publiées - Fournisseurs</option>*/}
+                  </select>
+
+                </div>
+                {this.buildtable(selectedTable)}
+
+              </div>
+            </section>
+            <section className="compare-section">
+              <div className="container">
+                <h3>Comparaison</h3>
+
+                <h4>{metaIndics[indic].libelle}</h4>
+                <div className="form-group">
+                  <label>Sélectionner une activité comparative : </label>
+                  <select
+                    className="form-input"
+                    value={comparativeDivision}
+                    onChange={this.changeComparativeDivision}
+                  >
+                    {Object.entries(divisions)
+                      .sort((a, b) => parseInt(a) - parseInt(b))
+                      .map(([code, libelle]) => (
+                        <option key={code} value={code}>
+                          {code + " - " + libelle}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <div className="graph-section">
+                  <div className="container">
+                    <IndicatorGraphs
+                      session={this.props.session}
+                      indic={indic}
+                      comparativeFootprints={this.state}
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section className="analysis-section">
+              <div className="container">
+
                 <h3>Clés de decryptage</h3>
 
                 <div className="row">
@@ -328,21 +324,23 @@ export class IndicatorSection extends React.Component {
                   </div>
 
                 </div>
-              </>
 
-            )}
 
-          </div>
-        </section>
+              </div>
+            </section>
+          </>
+
+        )}
         <section className={"action"}>
           <div className="container-fluid">
             <button
               className={"btn btn-secondary"}
+              disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
               onClick={() =>
                 exportIndicPDF(this.state.indic, this.props.session)
               }
             >
-              Editer le rapport PDF
+              <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
             </button>
             <button
               className={"btn btn-primary"}
@@ -350,7 +348,7 @@ export class IndicatorSection extends React.Component {
               disabled={!isPublicationAvailable}
               onClick={this.props.publish}
             >
-              Publier mes résultats
+              <FontAwesomeIcon icon={faUpload} />Publier mes résultats
             </button>
           </div>
         </section>

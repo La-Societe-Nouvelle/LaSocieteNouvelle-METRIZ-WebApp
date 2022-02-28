@@ -3,7 +3,7 @@
 // React
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 // Components
 import { CompaniesTable } from "../tables/CompaniesTable";
 
@@ -186,6 +186,24 @@ export class CompaniesSection extends React.Component {
                     )}
                   </div>
                 </div>
+                {!isNextStepAvailable && (
+                  <>
+                    <div className={"alert alert-warning"}>
+                      <p>
+                        <FontAwesomeIcon icon={faWarning} /> L'empreinte de
+                        certains comptes ne sont pas initialisés.
+                      </p>
+                      <button
+                        onClick={() => this.synchroniseShowed()}
+                        className={"btn btn-secondary"}
+                      >
+                        <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                        données
+                      </button>
+                    </div>
+
+                  </>
+                )}
                 <CompaniesTable
                   nbItems={
                     nbItems == "all"
@@ -203,25 +221,6 @@ export class CompaniesSection extends React.Component {
                     </p>
                   </div>
                 )}
-                {!isNextStepAvailable && (
-                  <>
-                    <div className={"alert alert-warning"}>
-                      <p>
-                        <FontAwesomeIcon icon={faWarning} /> L'empreinte de
-                        certains comptes ne sont pas initialisés.
-                      </p>
-                    </div>
-                    <div className="table-btn">
-                      <button
-                        onClick={() => this.synchroniseShowed()}
-                        className={"btn btn-secondary"}
-                      >
-                        <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                        données
-                      </button>
-                    </div>
-                  </>
-                )}
               </div>
             )}
           </div>
@@ -234,15 +233,16 @@ export class CompaniesSection extends React.Component {
               />
             </div>
           )}
-          =        </section>
+        </section>
         <div className={"action container-fluid"}>
           <button
-            className={"btn btn-primary"}
+            className={"btn btn-secondary"}
             id="validation-button"
             disabled={!isNextStepAvailable}
             onClick={this.props.submit}
           >
-            Je valide les fournisseurs
+            Valider les fournisseurs
+            <FontAwesomeIcon icon={faChevronRight} />
           </button>
         </div>
       </>
