@@ -123,16 +123,13 @@ export class IndicatorSection extends React.Component {
             <div className={"section-title"}>
               <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 5 - Mesure de l'impact</h2>
               <p>
-                Primi igitur omnium statuuntur Epigonus et Eusebius ob nominum
-                gentilitatem oppressi. praediximus enim Montium sub ipso vivendi
-                termino his vocabulis appellatos fabricarum culpasse tribunos ut
-                adminicula futurae molitioni pollicitos.
+                Pour chaque indicateur, déclarez vos impacts directs et obtenez les éléments d'analyse.
               </p>
             </div>
             <div className="indicator">
-              <h3 className="h6">Sélectionner votre indicateur de mesure: </h3>
+              <h3 className="h6">Sélection de l'indicateur : </h3>
               <div className="form-group">
-                <label>Indicateur de mesure</label>
+                <label>Indicateur </label>
                 <select
                   className="form-input"
                   id="selection-indicator"

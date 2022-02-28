@@ -58,11 +58,8 @@ export class FinancialDataSection extends React.Component {
           <div>
             <p>
               Par mesure de précaution, vérifiez l’exactitude des agrégats
-              financiers nécessitant une validation manuelle. La lecture des
-              écritures peut entraîner des exceptions (problèmes de lecture)
-              dans le cas où certains flux ne peuvent être tracés. Ces
-              exceptions interviennent notamment en cas d’écriture unique pour
-              les opérations diverses.
+              financiers. Des erreurs de lecture peuvent intervenir
+              en cas d'écriture unique regroupant plusieurs opérations.
             </p>
           </div>
           <div className="table-container">

@@ -68,11 +68,10 @@ export class AccountingSection extends React.Component {
                                 <h2>
                                     <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez vos flux comptable
                                 </h2>
-                                <h3 className={"subtitle underline"}>Contrôle de vos a-nouveaux</h3>
+                                <h3 className={"subtitle underline"}>Identification du journal des A-Nouveaux</h3>
                                 <p>
-                                    Fuerit toto in consulatu sine provincia, cui fuerit, antequam designatus est, decreta provincia. Sortietur an non? Nam et
-                                    non sortiri absurdum est, et, quod sortitus sis, non habere. Proficiscetur paludatus? Quo? Quo pervenire ante certam
-                                    diem non licebit. ianuario, Februario, provinciam non habebit; Kalendis ei denique Martiis nascetur repente provincia.
+                                    L'identification du journal des A-Nouveaux est nécessaire à la bonne lecture du fichier d'écritures comptables.
+                                    En cas de premier exercice, validez la sélection sans cocher de case.
                                 </p>
                             </div>
 

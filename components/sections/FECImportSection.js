@@ -27,15 +27,15 @@ export class FECImportSection extends React.Component {
 
       <>
         <div className={"table-container container"}>
-          <h4>Identifiez vos journaux A-Nouveaux : </h4>
+          <h4>Identifiez le journal des A-Nouveaux : </h4>
           <table>
             <thead>
               <tr>
-                <td width="50px">Identification A-Nouveaux</td>
                 <td>Code</td>
                 <td>Libellé</td>
                 <td>Fin</td>
                 <td>Nombre de Lignes</td>
+                <td width="50px">Identification A-Nouveaux</td>
               </tr>
             </thead>
             <tbody>
@@ -75,11 +75,9 @@ export class FECImportSection extends React.Component {
     
         <div className={"container align-right"}>
           <button className={"btn btn-outline"} onClick={refresh}>
-            Recommencer
+            Retour
           </button>
-          <button className={"btn btn-primary"} onClick={() => this.validate()}
-            disabled={disabledValidation}>
-            Valider mes A-Nouveaux
+            Valider la sélection
           </button>
         </div>
       </>

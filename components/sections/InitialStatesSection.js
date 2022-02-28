@@ -72,7 +72,7 @@ export class InitialStatesSection extends React.Component {
                 onClick={this.changeView}
                 value="defaultData"
               >
-                Utiliser les données de mon ancien exercice ou valeur par défaut
+                Initialiser avec des valeurs par défaut
               </button>
 
 
@@ -80,7 +80,7 @@ export class InitialStatesSection extends React.Component {
                 className={this.state.view == "importData" ? "active" : ""}
                 onClick={this.changeView}
               >
-                Importer une sauvegarde de l'année dernière
+                Importer la sauvegarde de l'année dernière
               </button>
 
             </div>
@@ -88,19 +88,17 @@ export class InitialStatesSection extends React.Component {
               this.state.view == "defaultData" ? <>
 
                 <p>
-                  Cognitis enim pilatorum caesorumque funeribus nemo deinde ad has
-                  stationes appulit navem, sed ut Scironis praerupta letalia
-                  declinantes litoribus Cypriis contigui navigabant, quae Isauriae
-                  scopulis sunt controversa.
+                  En cas d'analyse réalisée pour l'exercice précédent, importez le fichier de sauvegarde
+                  via le deuxième onglet.
                 </p>
                 <p>
                   <b>Valeur par défaut :</b> Les valeurs par défaut correspondent
-                  alors aux données disponibles pour la branche économique la plus
-                  proche et relatives à la production disponible en France.
+                  aux données disponibles pour la branche économique la plus
+                  proche.
                 </p>
                 <p>
-                  <b>Estimée sur exercice courant : </b>À partir de votre exercice
-                  courrant, nous estimons vos états initiaux à date.
+                  <b>Estimée sur exercice courant : </b>Nous initialisons l'empreinte du compte en début d'exercice.
+                  à partir des opérations réalisées sur l'exercice courant.
                 </p>
 
                 <div className="table-btn">
