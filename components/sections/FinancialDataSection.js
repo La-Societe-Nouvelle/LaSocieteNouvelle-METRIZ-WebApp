@@ -3,8 +3,10 @@
 // React
 import React from 'react';
 
-// Objects
-import { FinancialData } from '../../src/FinancialData';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faChevronRight,  faFileImport } from "@fortawesome/free-solid-svg-icons";
+
+
 
 // Tables
 import { MainAggregatesTable } from '../tables/MainAggregatesTable';
@@ -14,11 +16,7 @@ import { ExpensesTable } from '../tables/ExpensesTable';
 import { StocksTable } from '../tables/StocksTable';
 
 // Components
-import { FECImportPopup } from '../popups/FECImportPopup';
 import { MessagePopup, MessagePopupErrors } from '../popups/MessagePopup';
-
-// Readers
-import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -26,211 +24,141 @@ import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
 
 export class FinancialDataSection extends React.Component {
 
-  constructor(props) 
-  {
+  constructor(props) {
     super(props);
-    this.state = 
-    {
+
+    this.state = {
       selectedTable: "incomeStatement",
-      importedData: null,
       errorFile: false,
       errorMessage: "",
       errors: [],
-    }
+    };
   }
-    
-  render() 
-  {
-    const {selectedTable,importedData,errorFile,errorMessage,errors} = this.state;
-    
-    if (!this.props.session.financialData.isFinancialDataLoaded) 
-    {
-      // Render if data not loaded -------------------------------------------------------------------------------- //
-      return(
-        <div className="section-view">
 
-          <div className="section-view-actions">
-            <div></div>
-            <div>
-              <button id="validation-button" disabled={true} onClick={this.props.submit}>Valider</button>
-            </div>
+  render() {
+
+    const {
+      selectedTable,
+      errorFile,
+      errorMessage,
+      errors,
+    } = this.state;
+
+
+    return (
+      <>
+        <div className="container">
+          <div className={"section-title"}>
+            <h2>                  <FontAwesomeIcon icon={faFileImport} />
+              &Eacute;tape 2 - Validez votre import</h2>
           </div>
-
-          <div className="section-top-notes">
-            <p><b>Notes : </b>
-              Le fichier FEC doit couvrir l'ensemble de l'exercice. 
-              Il est conseillé de vérifier la validité de la structure du fichier avant l'import.
-              La lecture du fichier peut entraîner des exceptions (écritures complexes, problème de correspondances, etc.). En cas d'erreur(s), n'hésitez pas à nous contacter.
+          <div className={"alert alert-info"} role="alert">
+            <strong>Bravo !</strong> Votre import a été réalisé avec succès!
+          </div>
+          <div>
+            <p>
+              Par mesure de précaution, vérifiez l’exactitude des agrégats
+              financiers nécessitant une validation manuelle. La lecture des
+              écritures peut entraîner des exceptions (problèmes de lecture)
+              dans le cas où certains flux ne peuvent être tracés. Ces
+              exceptions interviennent notamment en cas d’écriture unique pour
+              les opérations diverses.
             </p>
           </div>
-
-          <div id="import-fec-container">
-            <button className="big" onClick={() => {document.getElementById('import-fec').click()}}>
-              Importer un Fichier d'Ecritures Comptables
-            </button>
-            <input className="hidden" id="import-fec" visibility="collapse"
-                    type="file" 
-                    accept=".csv,.txt" 
-                    onChange={this.importFECFile}/>
-          </div>
-
-        {importedData!=null &&
-          <FECImportPopup FECData={importedData}
-                          onValidate={this.loadFECData.bind(this)}/>}
-        {errorFile &&
-          <MessagePopupErrors title="Erreur - Fichier" message={errorMessage} errors={errors} closePopup={() => this.setState({errorFile: false})}/>}
-        </div>)          
-    } 
-    else 
-    {
-      // Render if data loaded ------------------------------------------------------------------------------------ //
-      return (
-        <div className="section-view">
-
-          <div className="section-view-actions">
-            <div className="sections-actions">
-              <button onClick={() => {document.getElementById('import-fec').click()}}>
-                Importer un fichier FEC
+          <div className="table-container">
+            <div className="table-menu">
+              <button
+                key={1}
+                value="incomeStatement"
+                onClick={this.changeFinancialTable}
+                className={
+                  selectedTable == "incomeStatement" || "" ? "active" : ""
+                }
+              >
+                Comptes de résultat
               </button>
-              <input className="hidden" id="import-fec" visibility="collapse"
-                    type="file" 
-                    accept=".csv,.txt" 
-                    onChange={this.importFECFile}/>
-              <select value={selectedTable}
-                            onChange={this.changeFinancialTable}>
-                <option key="1" value="mainAggregates">Soldes intermédiaires de gestion</option>
-                <option key="2" value="incomeStatement">Compte de résultat</option>
-                <option key="3" value="immobilisations">Immobilisations</option>
-                <option key="4" value="expenses">Charges externes</option>
-                <option key="5" value="stocks">Stocks</option>
-              </select>
+              <button
+                key={2}
+                value="mainAggregates"
+                onClick={this.changeFinancialTable}
+                className={
+                  selectedTable == "mainAggregates" || "" ? "active" : ""
+                }
+              >
+                Soldes intermédiaires de gestion
+              </button>
+              <button
+                key={3}
+                value="immobilisations"
+                onClick={this.changeFinancialTable}
+                className={selectedTable == "immobilisations" ? "active" : ""}
+              >
+                Immobilisations
+              </button>
+              <button
+                key={4}
+                value="expenses"
+                onClick={this.changeFinancialTable}
+                className={selectedTable == "expenses" ? "active" : ""}
+              >
+                Charges externes
+              </button>
+              <button
+                key={5}
+                value="stocks"
+                onClick={this.changeFinancialTable}
+                className={selectedTable == "stocks" ? "active" : ""}
+              >
+                Stocks
+              </button>
             </div>
-            <div>
-              <button id="validation-button" onClick={this.props.submit}>Valider</button>
+
+            <div className="table-data">
+              {this.buildtable(selectedTable)}
+
+              {errorFile && (
+                <MessagePopupErrors
+                  title="Erreur - Fichier"
+                  message={errorMessage}
+                  errors={errors}
+                  closePopup={() => this.setState({ errorFile: false })}
+                />
+              )}
             </div>
-          </div>
-
-          <div className="section-top-notes">
-            <p><b>Notes : </b>
-              Merci de vérifier la lecture des écritures comptables et l'exactitude des principaux agrégats financiers.
-              Plusieurs vues sont disponibles via le menu déroulant ci-dessus.
-            </p>
-          </div>
-
-          <div className="section-view-header">
-            <h1>{getTitle(selectedTable)}</h1>
-          </div>
-
-          <div className="section-view-main">
-
-            {this.buildtable(selectedTable)}
-
-            {importedData!=null &&
-              <FECImportPopup FECData={importedData}
-                              onValidate={this.loadFECData.bind(this)}/>}
-            {errorFile &&
-              <MessagePopupErrors title="Erreur - Fichier" message={errorMessage} errors={errors} closePopup={() => this.setState({errorFile: false})}/>}
-
           </div>
         </div>
-      )
-    }
+        <section className={"action"}>
+          <div className="container-fluid">
+
+            <button className={"btn btn-secondary"} onClick={this.props.submit}>
+              Valider l'import
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
+        </section>
+      </>
+
+    )
   }
+
 
   /* ---------- TABLE ---------- */
 
-  buildtable = (selectedTable) => 
-  {
-    switch(selectedTable) 
-    {
-      case "mainAggregates" :   return(<MainAggregatesTable financialData={this.props.session.financialData}/>)       // Soldes intermediaires de gestion
-      case "incomeStatement" :  return(<IncomeStatementTable financialData={this.props.session.financialData}/>)      // Compte de résultat
-      case "immobilisations" :  return(<ImmobilisationsTable financialData={this.props.session.financialData}/>)      // Table des immobilisations
-      case "stocks" :           return(<StocksTable financialData={this.props.session.financialData}/>)               // Table des stocks
-      case "expenses" :         return(<ExpensesTable financialData={this.props.session.financialData}/>)             // Dépenses par compte de charges externes
+  buildtable = (selectedTable) => {
+    switch (selectedTable) {
+      case "mainAggregates": return (<MainAggregatesTable financialData={this.props.session.financialData} />)       // Soldes intermediaires de gestion
+      case "incomeStatement": return (<IncomeStatementTable financialData={this.props.session.financialData} />)      // Compte de résultat
+      case "immobilisations": return (<ImmobilisationsTable financialData={this.props.session.financialData} />)      // Table des immobilisations
+      case "stocks": return (<StocksTable financialData={this.props.session.financialData} />)               // Table des stocks
+      case "expenses": return (<ExpensesTable financialData={this.props.session.financialData} />)             // Dépenses par compte de charges externes
     }
   }
-  
+
   /* ---------- SELECTED TABLE ---------- */
-  
-  changeFinancialTable = (event) => this.setState({selectedTable: event.target.value})
-  
-  /* ---------- FEC IMPORT ---------- */
 
-  // Import FEC File
-  importFECFile = (event) =>                                                              // Load data from file to JSON (stashed in state)
-  {
-    let file = event.target.files[0];                                                     // File
+  changeFinancialTable = (event) => this.setState({ selectedTable: event.target.value })
 
-    let reader = new FileReader();
-    reader.onload = async () =>                                                           // Action after file loaded
-    {
-      try 
-      {
-        let FECData = await FECFileReader(reader.result)                                  // read file (file -> JSON)
-        this.setState({importedData: FECData});                                           // update state with imported data
-      } 
-      catch(error) {this.setState({errorFile: true, errorMessage: error, errors: []});}   // show error(s) (file structure)
-    }
-    
-    try 
-    {
-      reader.readAsText(file, "iso-8859-1");                                              // Read file
-    }
-    catch(error) {this.setState({errorFile: true, errorMessage: error, errors: []});}     // show error (file)
-  }
 
-  // Load imported data into financial data
-  loadFECData = async (FECData) => 
-  {
-    let nextFinancialData = await FECDataReader(FECData);                                                                 // read data from JSON (JSON -> financialData JSON)
 
-    if (nextFinancialData.errors.length > 0)                                                                              // show error(s) (content)
-    {
-      nextFinancialData.errors.forEach(error => console.log(error));
-      this.setState({errorFile: true, errorMessage: "Erreur(s) relvée(s) : ", errors: nextFinancialData.errors, importedData: null});
-    }
-    else 
-    {
-      // load year
-      this.props.session.year = /^[0-9]{8}/.test(FECData.meta.lastDate) ? FECData.meta.lastDate.substring(0,4) : "";
 
-      // load financial data
-      this.props.session.financialData = new FinancialData(nextFinancialData);
-      this.props.session.financialData.companiesInitializer();
-      this.props.session.financialData.initialStatesInitializer();
-
-      // load impacts data
-      this.props.session.impactsData.netValueAdded = this.props.session.financialData.getNetValueAdded();
-      this.props.session.impactsData.knwDetails.apprenticeshipTax = nextFinancialData.KNWData.apprenticeshipTax;
-      this.props.session.impactsData.knwDetails.vocationalTrainingTax = nextFinancialData.KNWData.vocationalTrainingTax;
-
-      // update footprints
-      this.props.session.updateFootprints();
-
-      // update validations
-      this.props.session.checkValidations();
-
-      // update progression
-      this.props.session.progression = 2;
-      
-      // update state
-      this.setState({importedData: null});
-    }
-  }
-
-}
-
-/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
-
-const getTitle = (selectedTable) =>
-{
-  switch(selectedTable)
-  {
-    case "mainAggregates" :   return("Soldes intermédiaires de gestion")
-    case "incomeStatement" :  return("Compte de résultat")
-    case "immobilisations" :  return("Immobilisations")
-    case "expenses" :         return("Comptes de charges externes")
-    case "stocks" :           return("Stocks")
-  }
 }

@@ -40,21 +40,24 @@ export class StatementNRG extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                        <div className="statement-form">
+
+        <div className="form-group">
           <label>Consommation totale d'énergie</label>
           <InputNumber value={roundValue(energyConsumption,0)}
-                       onUpdate={this.updateEnergyConsumption}/>
-          <span>&nbsp;MJ</span>
-          <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
-          </div>
+                       onUpdate={this.updateEnergyConsumption} 
+                       placeholder="MJ" />
+ 
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Incertitude</label>
           <InputNumber value={roundValue(energyConsumptionUncertainty,0)}
-                       onUpdate={this.updateEnergyConsumptionUncertainty}/>
-          <span>&nbsp;%</span>
+                       onUpdate={this.updateEnergyConsumptionUncertainty}
+                       placeholder="%"
+                       />
         </div>
+        </div>
+
         <div className="statement-comments">
           <label>Informations complémentaires</label>
           <textarea type="text" spellCheck="false"
@@ -63,10 +66,12 @@ export class StatementNRG extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+        <button className={"btn btn-secondary"} onClick={this.props.toAssessment}>Outil d'évaluation</button>
+
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
-      </div>
+       </div> 
     ) 
   }
 

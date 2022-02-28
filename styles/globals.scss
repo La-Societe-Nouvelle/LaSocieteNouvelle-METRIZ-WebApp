@@ -1,71 +1,24 @@
-@import 'base';
+/* ---------- Import ---------- */
+@import 'libs/vars';
+@import 'libs/grid';
+@import 'base/reset';
+@import 'base/page';
+@import 'base/typography';
+@import 'layout/header';
+@import 'layout/main';
+@import 'layout/menu';
+@import 'layout/footer';
+@import 'components/section';
+@import 'components/button';
+@import 'components/alert';
+@import 'components/form';
+@import 'components/tables';
+@import 'components/modal'; 
+
+
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Roboto:wght@100;300;400;700&display=swap');
 
 /* ---------- GENERAL STYLE ---------- */
-
-html,
-body {
-  padding: 0;
-  margin: 0;
-  //font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  font-family: "Open Sans", sans-serif;
-}
-
-// Image
-
-img {
-  height: 12px;
-
-  &.icon {  // icon
-    height: 20px;
-    margin: 0 5px;
-  }
-  
-  &.icon-menu { // icon in menu button (tick)
-    height: 14px;
-    margin: 0 0 0 5px;
-  }
-}
-
-// link
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-span {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-// button
-
-button {
-  padding: 3px 20px;
-  margin: 0 3px;
-  color: white;
-  background-color: $primary-color;
-  border: 0;
-
-  &.hidden {
-    visibility: hidden;
-  }
-
-  &:disabled {
-    color: $primary-color;
-    border: solid $primary-color 1px;
-    background-color: white;
-  }
-
-  &.highlight {
-    background-color: $highlight-color;
-    border-color: $highlight-color;
-  }
-}
 
 // Input
 
@@ -98,110 +51,6 @@ sup {
   font-size: 9px;
 }
 
-/* ----- SHARED STYLE ----- */
-
-input,
-select {
-  &.valid {
-    background-color: $valid-color; 
-  }
-  &.unvalid {
-    background-color: $unvalid-color; 
-  }
-}
-
-/* ---------- APP VIEW ---------- */
-
-.app-view {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 100%;
-  height: 100%;
-}
-
-/* ---------- HEADER ---------- */
-
-.header {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-  border-bottom: solid 3px $primary-color;
-
-  h1 {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  #global-actions {
-    position: absolute;
-    top: 15px;
-    left: 10px;
-
-    img {
-      height: 30px;
-      margin-right: 10px;
-    }
-  }
-
-  #progression {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin: 50px 10px 10px;
-    padding: 15px 5% 0;
-    @include md {
-      margin-top: 15px;
-      margin-left: 50px;
-      padding: 0 15%;
-    }
-
-    button {
-      width: 30px;
-      height: 30px;
-      padding: 0;
-    }
-
-    p {
-      margin: 5px 0;
-      position: relative;
-      width: max-content;
-      text-align: center;
-    }
-
-    svg {
-      height: 30px;
-      line {
-        stroke: $primary-color;
-      }
-    }
-
-    .progression-item {
-      width: 50px;
-      min-width: 50px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      &.current {
-        button {
-          background-color: $highlight-color;
-          color: white;
-          //border: solid 1px $highlight-color;
-        }
-      }
-
-      p {
-        @include xs {
-          display: none;
-        }
-      }
-    }
-  }
-
-}
 
 /* ---------- MENU ---------- */
 
@@ -340,37 +189,6 @@ select {
       }
     }
 
-    .section-view-main {
-      padding: 0 25px 25px;
-      width: 100%;
-      overflow: auto;
-
-      .table-container {
-        
-        .table-header {
-
-          select {
-            width: 400px;
-            background-color: $primary-color;
-            color: white;
-            border: solid 0px $primary-color;
-            border-radius: 0;
-      
-            option 
-            {
-              background-color: white;
-              color: $primary-color;
-              border: solid 1px $primary-color;
-              border-radius: 0;     
-            }
-          }
-
-          p {
-            margin: 0;
-          }
-        }
-      }
-    }
 
     .indicator-section-view {
       padding: 0 25px 25px;
@@ -378,80 +196,10 @@ select {
       overflow: auto;
     }
 
-    .statement-section-view {
-      margin: auto;
-      width: 80%;
-
-      .inline-input,
-      .input {
-        margin: 10px 0 15px;
-      }
-
-      .actions {
-        width: 100%;
-        margin-top: 100px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-
-        button {
-          width: 200px;
-        }
-      }
-    }
+  
   }
 }
 
-/* ---------- GROUP ---------- */
-
-.group {
-  display: flex;
-  flex-direction: column;
-  padding: 5px;
-  margin: 30px 0px 30px;
-  border: solid $primary-color 1px;
-
-  > h3 {
-    width: max-content;
-    padding: 0px 10px 0px 5px;
-    margin: 0;
-    position: relative;
-    top: -20px;
-    left: 10px;
-    background-color: white;
-  }
-
-  .analysis {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-
-  .actions {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    margin: 5px 0;
-
-    &.left {justify-content: flex-end;}
-
-    select {
-      width: 400px;
-      background-color: $primary-color;
-      color: white;
-      border: solid 0px $primary-color;
-      border-radius: 0;
-
-      option 
-      {
-        background-color: white;
-        color: $primary-color;
-        border: solid 1px $primary-color;
-        border-radius: 0;     
-      }
-    }
-  }
-}
 
 /* ---------- GROUP ---------- */
 
@@ -478,174 +226,6 @@ select {
   }
 }
 
-table {
-  width: 100%;
-  font-size: 15px;
-  padding: 1px 1px 5px;
-  table-layout: auto;
-  border: solid 1px $secondary-color;
-
-  // specific tags
-  input {
-    width: 100%;
-    padding-right: 2px;
-
-    &.right {text-align: right}
-  }
-
-  img {
-    height: 15px;
-
-    &.active {
-      transform: rotate(-360deg);
-      transition: transform 1000ms;
-    }
-
-  }
-
-  // --- Row --- //
-
-  tr {
-
-    // Borders (top & bottom)
-    &.with-bottom-line td {
-      border-bottom: solid $primary-color 2px;
-      padding-bottom: 2px;
-    }
-    &.with-top-line td {
-      border-top: solid $primary-color 2px;
-      padding-top: 2px;
-    }
-
-    // margins (top & bottom)
-    &.with-bottom-margin td {
-      padding-bottom: 10px;
-    }
-    &.with-top-margin td {
-      padding-top: 10px;
-    }
-
-    // cursor
-    cursor: default;
-  }
-
-  // --- Cell --- //
-
-  td {
-    padding-left: 4px;
-    padding-right: 4px;
-
-    // width
-    &.auto {width: auto}
-    &.long {width: 400px}
-    &.medium {width: 200px}
-    &.short {width: 125px}
-
-    &.column_value {width: 150px}
-    &.column_uncertainty {width: 100px}
-
-    // border
-    &.with-bottom-line {
-      border-bottom: solid $primary-color 1px;
-      padding-bottom: 2px;
-    }
-    &.with-top-line {
-      border-top: solid $primary-color 1px;
-      padding-top: 2px;
-    }
-
-    // text align
-    &.center {
-      text-align: center;
-      input,select {text-align: center;}
-    }
-    &.right {
-      text-align: right;
-      input,select {text-align: right;}
-    }
-
-    // index
-    &.sub {
-      padding-left: 25px;
-    }
-
-    // font
-    &.detail {
-      font-style: italic;
-      font-size: 15px;
-    }
-    &.important {
-      font-weight: bold;
-    }
-
-    // specific style
-    &.column_unit {
-      width: 1%;
-      min-width: 30px;
-      font-size: 12px;
-      white-space: nowrap;
-    }
-    &.column_icon {
-      width: 15px;
-      min-width: 15px;
-    }
-  }
-
-  // --- Head --- //
-
-  thead {
-    background-color: $primary-color;
-    color: white;
-    text-align: center;
-  }
-
-  // --- Body --- //
-
-  tbody {
-
-    // select
-    select {
-      width: 100%;
-      background-color: white;
-      border: solid 1px $primary-color;
-      //padding: 2px;
-
-      option {
-        background-color: white;
-        border: solid 1px $primary-color;
-        border-radius: 0;     
-      }
-    }
-
-    // value
-    .column_value {
-      text-align: right;
-      input {
-        text-align: right;
-      }
-    }
-    
-    // uncertainty
-    .column_uncertainty {
-      text-align: center;
-      font-size: 12px;
-      input {
-        text-align: right;
-        font-size: 15px;
-      }
-    }
-
-    // background valid/unvalid/default
-    input,select {
-      &.valid {background-color: $valid-color}
-      &.unvalid {background-color: $unvalid-color}
-    }
-
-    option.default-option {
-      background-color: wheat;
-    }
-  }
-}
 
 .table-navigation {
   margin: 0 2px;
@@ -663,125 +243,27 @@ table {
   }
 }
 
-/* ---------- STATEMENT ---------- */
 
-.statement {
-  margin: 2px 0;
-  padding: 0px 20px 5px;
-
-  .statement-area {
-    margin-bottom: 15px;
-    padding: 10px;
-    //border: solid 1px $secondary-color;
-  }
-
-  // statement item
-  .statement-item {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 5px;
-    align-items: baseline;
-
-    label {
-      min-width: 600px;
-    }
-
-    input {
-      margin: 0;
-    
-      &.input-value {
-        width: 100px;
-        text-align: right;
-      }
-    }
-
-    span {
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    // specific case - input radio
-    .input-radio {
-      margin-right: 10px;
-
-      label {
-        padding: 0px 5px;
-      }
-    }
-
-    // assessment button
-    .assessment-button-container {
-      margin-left: auto;
-
-      .assessment-button {
-        width: 150px;
-      }
-    }
-
-  }
-
-  .statement-comments {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-bottom: 5px;
-
-    textarea {
-      margin-top: 5px;
-      width: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-        Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-      font-size: 14px;
-    }
-  }
-
-  // validation button
-  .statement-validation {
-    display: flex;
-    flex-direction: row;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    justify-content: right;
-
-    button {
-      width: 150px;
-    }
-  }
-
-  // notes
-  .notes {
-    font-size: 12px;
-    font-style: italic;
-  }
-
-}
 
 /* ---------- ASSESSMENT ---------- */
 
 .assessment {
   width: 100%;
-  height: 100%;
 
   .view-header {  // header in assessment
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    margin: 10px 0;
-
-    button {
-      min-width: 100px;
-    }
   }
   
   .view-footer {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
-    margin: 10px 0;
-
-    button {
-      min-width: 100px;
-    }
+    padding : 1em;
+    .btn {
+      margin : 0.5em 0 0.5em 0.5em;
+  }  
   }
 
 }
@@ -925,126 +407,10 @@ table {
   border: 0px;
 }
 
-/* ---------- POPUP ---------- */
 
-.popup-container {
-  margin-left: 10%;
-  margin-right: 10%;
-
-  .progressbar {
-    height: 25px;
-    width: 500px;
-
-    .progressbar_shape {
-      height: 100%;
-      width: 100%;
-
-      rect {
-        height: 100%;
-        fill: $primary-color;
-      }
-    }
-  }
-}
-
-.popup {
-  z-index: 1;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color:rgba(255,255,255,0.6);
-}
-
-.popup-inner {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: center;
-  min-width: 550px;
-  min-height: 100px;
-  padding: 25px;
-  background-color: white;
-  border: solid $primary-color 1px;
-
-  &.full-size {
-    width: 90%;
-    height: 90%;
-  }
-
-  h3 {
-    margin: 5px 0 10px;
-    text-align: center;
-  }
-
-  .group {
-    max-height: 100%;
-    width: 100%;
-  }
-
-  .table-main {
-    overflow: auto;
-  }
-
-  .inputs {
-    margin: 10px 5px;
-
-    .inline-input {
-      display: flex;
-      flex-direction: row;
-      margin: 5px;
-      align-items: baseline;
-
-      &.short {
-        input,select {
-          width: 150px;
-        }
-      }
-      &.long {
-        input,select {
-          width: 400px;
-        }
-      }
-
-      label {
-        min-width: 200px;
-      }
-      input {
-        width: 500px;
-        &.input-number {
-          text-align: right;
-        }
-      }
-      span {
-        font-size: 12px;
-      }
-    }
-  }
-
-  .input {
-    width: 100%;
-    margin: 5px;
-  }
-
-  .footer {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 5px;
-  }
-}
 
 /* ----- x ----- */
 
 .chart-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  width: 500px;
 }

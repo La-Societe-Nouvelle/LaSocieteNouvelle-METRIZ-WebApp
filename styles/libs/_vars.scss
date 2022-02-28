@@ -1,0 +1,46 @@
+
+/* Media query mixins */
+@mixin xs {
+    @media (max-width: 599px) { @content; }
+  }
+  @mixin sm {
+    @media (min-width: 600px) { @content; }
+  }
+  @mixin md {
+    @media (min-width: 900px) { @content; }
+  }
+  @mixin lg {
+    @media (min-width: 1200px) { @content; }
+  }
+  @mixin xl {
+    @media (min-width: 1800px) { @content; }
+  }
+  @mixin screen-min($width) {
+    @media (min-width:$width) { @content; }
+  }
+  
+
+
+  /* Theming */
+  
+  $primary-color: #191558;    /* Dark-grey */
+  $secondary-color: #fa595f;  /* Light-grey */
+  $tertiary-color: #5262bc; /* Dark-grey */ 
+  $light-blue : #dbdef1;
+  $highlight-color: #8B0000;  /* Burgunby */
+  $valid-color: #E2EFD9;
+  $unvalid-color: #efdcd9;
+
+  
+  // Font.
+  $font-family : 'Raleway', Helvetica, sans-serif !default;
+  $font-family-text : 'Roboto', sans-serif !default;
+  $font-weight : 400 !default;
+  $font-weight-bold : 700 !default;
+  $letter-spacing : 0.3em !default;
+  $text-color : #191558;
+
+  
+$input-color : lighten(#191558, 10%);
+$input-bg :  #ffffff;  
+$input-border-color : #5262bc;

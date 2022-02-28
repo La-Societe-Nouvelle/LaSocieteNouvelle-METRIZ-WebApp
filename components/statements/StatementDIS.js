@@ -35,35 +35,39 @@ export class StatementDIS extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                <div className="statement-form">
+
+        <div className="form-group">
           <label>L'entreprise est-elle employeur ?</label>
-          <div className="input-radio">
-            <input type="radio" id="hasEmployees"
+          <div className={"custom-control-inline"}>
+            <input type="radio" id="hasEmployees" className="custom-control-input"
                    value="true"
                    checked={hasEmployees === true}
                    onChange={this.onHasEmployeesChange}/>
-            <label>Oui</label>
+            <label className="custom-control-label">Oui</label>
           </div>
-          <div className="input-radio">
-            <input type="radio" id="hasEmployees"
+          <div className={"custom-control-inline"}>
+            <input type="radio" id="hasEmployees" className="custom-control-input"
                    value="false"
                    checked={hasEmployees === false}
                    onChange={this.onHasEmployeesChange}/>
-            <label>Non</label>
+            <label className="custom-control-label">Non</label>
           </div>
           {false && <div className="assessment-button-container">
             <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
           </div>}
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Indice de GINI des taux horaires bruts</label>
           <InputNumber value={roundValue(indexGini,1)}
                        disabled={hasEmployees === false}
                        onUpdate={this.updateIndexGini}/>
           <span>&nbsp;/100</span>
           <div className="assessment-button-container">
-            <button className="assessment-button" onClick={this.props.toAssessment}>Outil d'évaluation</button>
+            <button className={"btn btn-secondary"} onClick={this.props.toAssessment} >Outil d'évaluation</button>
           </div>
+        </div>
+
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -73,7 +77,7 @@ export class StatementDIS extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

@@ -4,7 +4,7 @@
 import { sendStatementToAdmin, sendStatementToDeclarant } from '/pages/api/mail-api'
 
 // React
-import React, { useState }  from 'react';
+import React, { useState } from 'react';
 
 // Sources
 import { exportStatementPDF, getBinaryPDF } from '../../src/writers/StatementWriter';
@@ -22,8 +22,7 @@ import metaIndics from '/lib/indics';
 
 export class StatementSection extends React.Component {
 
-  constructor(props) 
-  {
+  constructor(props) {
     super(props);
     this.state =
     {
@@ -54,9 +53,8 @@ export class StatementSection extends React.Component {
     }
   }
 
-  render() 
-  {
-    const {step} = this.state;    
+  render() {
+    const { step } = this.state;
 
     return (
       <div className="section-view">
@@ -67,107 +65,108 @@ export class StatementSection extends React.Component {
     )
   }
 
-  buildView = (step) =>
-  {
-    switch(step)
-    {
+  buildView = (step) => {
+    switch (step) {
       case 0: return <ErrorMessage />
-      case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint}/>
-      case 2: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren}/>
-      case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack}/>
-      case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack}/>
-      case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack}/>
+      case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint} />
+      case 2: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren} />
+      case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack} />
+      case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack} />
+      case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack} />
       case 6: return <StatementSendingMessage />
       case 7: return <StatementSendMessage />
     }
   }
 
-  commit = () => this.setState({step: this.state.step+1})
-  goBack = () => this.setState({step: this.state.step-1})
+  commit = () => this.setState({ step: this.state.step + 1 })
+  goBack = () => this.setState({ step: this.state.step - 1 })
 
   // Commits
 
-  commitSiren = (siren) => this.setState({siren: siren, step: 3})
+  commitSiren = (siren) => this.setState({ siren: siren, step: 3 })
 
-  commitSocialFootprint = (socialFootprint) => this.setState({socialFootprint: socialFootprint, step: 2})
+  commitSocialFootprint = (socialFootprint) => this.setState({ socialFootprint: socialFootprint, step: 2 })
 
-  commitDeclarant = (declarant,email,autorisation) => this.setState({declarant: declarant, email: email, autorisation: autorisation, step: 4})
+  commitDeclarant = (declarant, email, autorisation) => this.setState({ declarant: declarant, email: email, autorisation: autorisation, step: 4 })
 
-  commitPrice = (price) => this.setState({price: price, step: 5})
+  commitPrice = (price) => this.setState({ price: price, step: 5 })
 
   exportStatement = () => exportStatementPDF(this.state);
 
-  submitStatement = async (event) => 
-  {
+  submitStatement = async (event) => {
     event.preventDefault();
-    this.setState({step: 6})
-    
+    this.setState({ step: 6 })
+
     const statementFile = getBinaryPDF(this.state);
 
     const messageToAdmin = mailToAdminWriter(this.state);
-    const resAdmin = await sendStatementToAdmin(messageToAdmin,statementFile);
+    const resAdmin = await sendStatementToAdmin(messageToAdmin, statementFile);
 
     const messageToDeclarant = mailToDeclarantWriter(this.state);
-    const resDeclarant = await sendStatementToDeclarant(this.state.email,messageToDeclarant,statementFile);
+    const resDeclarant = await sendStatementToDeclarant(this.state.email, messageToDeclarant, statementFile);
 
-    if (resAdmin.status<300) this.setState({step: 7})
-    else this.setState({step: 0})
+    if (resAdmin.status < 300) this.setState({ step: 7 })
+    else this.setState({ step: 0 })
   }
 
 }
 
 /* ----- Siren Form ---- */
 
-const SirenInput = ({siren,commitSiren}) => 
-{
+const SirenInput = ({ siren, commitSiren }) => {
   const [sirenInput, setSiren] = useState(siren);
   const onSirenChange = (input) => setSiren(input);
   const onCommit = () => commitSiren(sirenInput)
 
   const isAllValid = /^[0-9]{9}$/.test(sirenInput);
 
-  return(
-    <div className="section-view-main">
+  return (
+    <section className="container">
       <h3>Numéro de siren</h3>
-      <div className="inline-input short">
+      <div className="form-group">
         <label>Numéro de siren (9 chiffres) : </label>
-        <InputText value={sirenInput} 
-                   unvalid={sirenInput!="" && !/^[0-9]{9}$/.test(sirenInput)}
-                   onUpdate={onSirenChange}/>
+        <InputText value={sirenInput}
+          unvalid={sirenInput != "" && !/^[0-9]{9}$/.test(sirenInput)}
+          onUpdate={onSirenChange} />
       </div>
       <div className="actions">
-        <div></div>
-        <button disabled={!isAllValid} onClick={onCommit}>Valider</button>
+        <button disabled={!isAllValid} onClick={onCommit} className={"btn btn-primary"}>Valider</button>
       </div>
-    </div> 
+    </section>
   )
 }
 
 /* ----- Indicator selection ----- */
 
-class IndicatorSelection extends React.Component
-{
-  constructor(props)
-  {
+class IndicatorSelection extends React.Component {
+  constructor(props) {
     super(props);
     const socialFootprint = {};
-    Object.entries(props.revenueFootprint.indicators).filter(([_,indicator]) => indicator.value!=null)
-                                                     .forEach(([indic,indicator]) => socialFootprint[indic] = indicator);
+    Object.entries(props.revenueFootprint.indicators).filter(([_, indicator]) => indicator.value != null)
+      .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
     this.state = {
       socialFootprint: socialFootprint
-    } 
+    }
   }
 
   //didUpdate... when indicator not valid anymore
 
-  render()
-  {
-    const {revenueFootprint,validations} = this.props;
-    const {socialFootprint} = this.state;
+  render() {
+    const { revenueFootprint, validations } = this.props;
+    const { socialFootprint } = this.state;
 
-    return(
-      <div className="section-view-main">
-        <h3>Sélection des indicateurs</h3>
+    return (
+      <section className="container">
+        <div className={"section-title"}>
+
+          <h2 className="subtitle">
+            Publier mes résultats
+          </h2>
+          <h3>Sélection des indicateurs</h3>
+
+        </div>
+
+
         <table>
           <thead>
             <tr>
@@ -178,36 +177,35 @@ class IndicatorSelection extends React.Component
             </tr>
           </thead>
           <tbody>
-            {Object.keys(metaIndics).map(indic =>  
+            {Object.keys(metaIndics).map(indic =>
               <tr key={indic}>
-                <td className="auto">{metaIndics[indic].libelle+(metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
-                <td className="column_value">{printValue(revenueFootprint.indicators[indic].value,metaIndics[indic].nbDecimals)}</td>
+                <td className="auto">{metaIndics[indic].libelle + (metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
+                <td className="column_value">{printValue(revenueFootprint.indicators[indic].value, metaIndics[indic].nbDecimals)}</td>
                 <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
-                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty,0)}&nbsp;%</td>
-                <td><input type="checkbox" 
-                            value={indic}
-                            checked={socialFootprint[indic]!=undefined}
-                            disabled={validations.indexOf(indic) < 0}
-                            onChange={this.onCheckIndicator}/></td>
+                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty, 0)}&nbsp;%</td>
+                <td><input type="checkbox"
+                  value={indic}
+                  checked={socialFootprint[indic] != undefined}
+                  disabled={validations.indexOf(indic) < 0}
+                  onChange={this.onCheckIndicator} /></td>
               </tr>)}
           </tbody>
         </table>
-        <div className="actions">
-        <button onClick={this.props.goBack}>Retour</button>
-          <button disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
+        <div className="align-right">
+          <button className="btn" onClick={this.props.goBack}>Retour</button>
+          <button className={"btn btn-primary"} disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
         </div>
-      </div>)
+      </section>)
   }
 
-  onCheckIndicator = (event) => 
-  {
+  onCheckIndicator = (event) => {
     let footprint = this.state.socialFootprint;
     event.target.checked ? footprint[event.target.value] = this.props.revenueFootprint.indicators[event.target.value] : delete footprint[event.target.value];
-    this.setState({socialFootprint: footprint});
+    this.setState({ socialFootprint: footprint });
   }
 
   onCommit = (event) => this.props.onCommit(this.state.socialFootprint);
-  
+
 }
 
 /* ----- Siren form ----- */
@@ -216,36 +214,34 @@ class SirenForm extends React.Component {
 
   // form for siren number
 
-  constructor(props)
-  {
+  constructor(props) {
     super(props);
     this.state = {
       siren: props.siren
     }
   }
 
-  render()
-  {
-    const {siren} = this.state;
+  render() {
+    const { siren } = this.state;
     const isAllValid = /^[0-9]{9}/.test(siren);
-    
-    return(
-      <div className="section-view-main">
+
+    return (
+      <section className="container">
         <h3>Unité légale</h3>
         <div className="inline-input">
           <label>Numéro de siren </label>
-          <InputText value={siren} 
-                      onUpdate={this.onSirenChange}/>
+          <InputText value={siren}
+            onUpdate={this.onSirenChange} />
         </div>
         <div className="actions">
           <button onClick={this.onGoBack}>Retour</button>
           <button disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
         </div>
-      </div>
+      </section>
     )
   }
 
-  onSirenChange = (input) => { this.setState({siren: input})}
+  onSirenChange = (input) => { this.setState({ siren: input }) }
   onCommit = () => this.props.onCommit(this.state.siren);
   onGoBack = () => this.props.goBack();
 
@@ -258,8 +254,7 @@ class DeclarantForm extends React.Component {
 
   // form for contact details
 
-  constructor(props)
-  {
+  constructor(props) {
     super(props);
     this.state = {
       declarant: props.declarant,
@@ -270,88 +265,86 @@ class DeclarantForm extends React.Component {
     }
   }
 
-  render()
-  {
-    const {declarant,email,autorisation,forThirdParty,declarantOrganisation} = this.state;
-    const isAllValid = declarant.length > 0 
-                    && /^(.*)@(.*)\.(.*)$/.test(email) 
-                    && autorisation
-                    && (!forThirdParty || declarantOrganisation.length > 0);
-    
-    return(
-      <div className="section-view-main">
+  render() {
+    const { declarant, email, autorisation, forThirdParty, declarantOrganisation } = this.state;
+    const isAllValid = declarant.length > 0
+      && /^(.*)@(.*)\.(.*)$/.test(email)
+      && autorisation
+      && (!forThirdParty || declarantOrganisation.length > 0);
+
+    return (
+      <section className="container">
         <h3>Déclarant</h3>
-        <div className="inline-input">
+        <div className="form-group">
           <label>Nom - Prénom </label>
-          <InputText value={declarant} 
-                      onUpdate={this.onDeclarantChange.bind(this)}/>
+          <InputText value={declarant}
+            onUpdate={this.onDeclarantChange.bind(this)} />
         </div>
-        <div className="inline-input">
+        <div className="form-group">
           <label>Adresse e-mail </label>
-          <InputText value={email} 
-                     unvalid={email!="" && !/^(.*)@(.*)\.(.*)$/.test(email)}
-                     onUpdate={this.onEmailChange.bind(this)}/>
-        </div>
-        <div className="input" id="thirdParty">
-          <input type="checkbox" 
-                 onChange={this.onThirdPartyChange}/>
+          <InputText value={email}
+            unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
+            onUpdate={this.onEmailChange.bind(this)} />
+        </div> 
+        <div className="custom-control-inline" id="thirdParty">
+          <input type="checkbox" className="custom-control-input"
+            onChange={this.onThirdPartyChange} />
           <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
         </div>
-      {forThirdParty &&
-        <div className="inline-input">
-          <label>Structure déclarante</label>
-          <InputText value={declarantOrganisation}
-                     onUpdate={this.onDeclarantOrganisationChange.bind(this)}/>
-        </div>}
-        <div className="input" id="certification">
-          <input type="checkbox" 
-                 onChange={this.onAutorisationChange}/>
-            <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
+        {forThirdParty &&
+          <div className="form-group">
+            <label>Structure déclarante</label>
+            <InputText value={declarantOrganisation}
+              onUpdate={this.onDeclarantOrganisationChange.bind(this)} />
+          </div>}
+        <div className="custom-control-inline" id="certification">
+          <input type="checkbox" className="custom-control-input"
+            onChange={this.onAutorisationChange} />
+          <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
         </div>
         <div className="actions">
-          <button onClick={this.onGoBack}>Retour</button>
-          <button disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
+          <button className="btn" onClick={this.onGoBack}>Retour</button>
+          <button className={"btn btn-secondary"} disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
         </div>
-      </div>
+      </section>
     )
   }
 
-  onDeclarantChange = (input) => this.setState({declarant: input})
-  onEmailChange = (input) => this.setState({email: input})
-  onAutorisationChange = () => this.setState({autorisation: !this.state.autorisation})
-  onThirdPartyChange = () => this.setState({forThirdParty: !this.state.forThirdParty})
-  onDeclarantOrganisationChange = (input) => this.setState({declarantOrganisation: input})
-  onCommit = () => this.props.onCommit(this.state.declarant,this.state.email,this.state.autorisation,this.state.forThirdParty,this.state.declarantOrganisation);
+  onDeclarantChange = (input) => this.setState({ declarant: input })
+  onEmailChange = (input) => this.setState({ email: input })
+  onAutorisationChange = () => this.setState({ autorisation: !this.state.autorisation })
+  onThirdPartyChange = () => this.setState({ forThirdParty: !this.state.forThirdParty })
+  onDeclarantOrganisationChange = (input) => this.setState({ declarantOrganisation: input })
+  onCommit = () => this.props.onCommit(this.state.declarant, this.state.email, this.state.autorisation, this.state.forThirdParty, this.state.declarantOrganisation);
   onGoBack = () => this.props.goBack();
 
 }
 
 /* --- Price Input --- */
 
-const PriceInput = ({price,commitPrice,goBack}) => 
-{
+const PriceInput = ({ price, commitPrice, goBack }) => {
   const [priceInput, setPrice] = useState(price);
   const changePrice = (event) => setPrice(event.target.value);
   const onCommit = () => commitPrice(priceInput);
 
-  return(
-    <div className="section-view-main">
+  return (
+    <section className="container">
       <h3>Coût de la formalité</h3>
       <div className="radio-button-input">
-        <div className="input">
-          <input id="price" type="radio" value="0" checked={priceInput=="0"} onChange={changePrice}/>
+        <div className={"custom-control-inline"}>
+          <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input"/>
           <label>Première déclaration : publication offerte</label>
         </div>
-        <div className="input">
-          <input id="price" type="radio" value="25" checked={priceInput=="25"} onChange={changePrice}/>
+        <div className={"custom-control-inline"} >
+          <input id="price" type="radio" value="25" checked={priceInput == "25"} onChange={changePrice} className="custom-control-input" />
           <label>Société unipersonnelle : 25 €</label>
         </div>
-        <div className="input">
-          <input id="price" type="radio" value="50" checked={priceInput=="50"} onChange={changePrice}/>
+        <div className={"custom-control-inline"} >
+          <input id="price" type="radio" value="50" checked={priceInput == "50"} onChange={changePrice} className="custom-control-input" />
           <label>Société : 50 €</label>
         </div>
-        <div className="input">
-          <input id="price" type="radio" value="10" checked={priceInput=="10"} onChange={changePrice}/>
+        <div className={"custom-control-inline"} >
+          <input id="price" type="radio" value="10" checked={priceInput == "10"} onChange={changePrice} className="custom-control-input" />
           <label>Organise à but non lucratif : 10 €</label>
         </div>
       </div>
@@ -359,51 +352,49 @@ const PriceInput = ({price,commitPrice,goBack}) =>
         <p>Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
       </div>
       <div className="actions">
-        <button onClick={goBack}>Retour</button>
-        <button disabled={priceInput==""} onClick={onCommit}>Valider</button>
+        <button className="btn" onClick={goBack}>Retour</button>
+        <button className={"btn btn-secondary"} disabled={priceInput == ""} onClick={onCommit}>Valider</button>
       </div>
-    </div>)
+    </section>)
 }
 
 /* ----- Summary ----- */
 
-const Summary = (props) =>
-{
-  const {siren,denomination,year,declarant,price,socialFootprint} = props;
+const Summary = (props) => {
+  const { siren, denomination, year, declarant, price, socialFootprint } = props;
 
   const isStatementValid = true;
 
   const today = new Date();
-  const todayString = String(today.getDate()).padStart(2,'0')+"/"+String(today.getMonth()+1).padStart(2,'0')+"/"+today.getFullYear();
+  const todayString = String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear();
 
-  return(
-    <div className="section-view-main">
+  return (
+    <section className="container">
       <h3>Récapitulatif</h3>
       <div className="summary">
         <p><b>Siren : </b>{siren}</p>
         <p><b>Dénomination : </b>{denomination}</p>
         <p><b>Année : </b>{year}</p>
         <p><b>Indicateurs : </b></p>
-        {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).map(([indic,_]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
-        {Object.entries(socialFootprint).filter(([_,indicator]) => indicator.value!=null).length == 0 &&
+        {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).map(([indic, _]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
+        {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).length == 0 &&
           <p>&emsp; - </p>}
         <p><b>Fait le : </b>{todayString}</p>
         <p><b>Déclarant : </b>{declarant}</p>
         <p><b>Coût de la formalité : </b>{price} €</p>
-      </div> 
+      </div>
       <div className="actions">
-        <button onClick={props.goBack}>Retour</button>
-        <button onClick={props.exportStatement}>Télécharger</button>
-        <button onClick={props.submitStatement}>Envoyer</button>
-      </div> 
-    </div>)
+        <button className="btn" onClick={props.goBack}>Retour</button>
+        <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
+        <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>
+      </div>
+    </section>)
 }
 
 /* --- End message --- */
 
-const StatementSendingMessage = () => 
-{
-  return(
+const StatementSendingMessage = () => {
+  return (
     <div className="strip">
       <h2>Déclaration validée</h2>
       <div className="form_inner">
@@ -413,9 +404,8 @@ const StatementSendingMessage = () =>
   )
 }
 
-const StatementSendMessage = () => 
-{
-  return(
+const StatementSendMessage = () => {
+  return (
     <div className="strip">
       <h2>Déclaration validée</h2>
       <div className="form_inner">
@@ -425,9 +415,8 @@ const StatementSendMessage = () =>
   )
 }
 
-const ErrorMessage = () => 
-{
-  return(
+const ErrorMessage = () => {
+  return (
     <div className="strip">
       <div className="form_inner">
         <p>Error</p>
@@ -438,28 +427,28 @@ const ErrorMessage = () =>
 
 /* ----- Builder message mails ----- */
 
-const mailToAdminWriter = (statementData) => 
+const mailToAdminWriter = (statementData) =>
 (
-    "Unité légale : "+statementData.siren + "\n"
-  + "Dénomination : "+statementData.denomination + "\n"
-  + "Année : "+statementData.year + "\n"
+  "Unité légale : " + statementData.siren + "\n"
+  + "Dénomination : " + statementData.denomination + "\n"
+  + "Année : " + statementData.year + "\n"
   + "\n"
   + "Valeurs à publier :" + "\n"
   + "\n"
-  + Object.entries(statementData.socialFootprint).map(([_,indicator]) => (indicator.indic+" : "+indicator.value+" +/- "+indicator.uncertainty+" % "))
-                                                 .reduce((a,b) => a+"\r\n"+b,"")
+  + Object.entries(statementData.socialFootprint).map(([_, indicator]) => (indicator.indic + " : " + indicator.value + " +/- " + indicator.uncertainty + " % "))
+    .reduce((a, b) => a + "\r\n" + b, "")
   + "\n"
   + "Déclarant :" + "\n"
-  + "Nom : "+" - " + "\n"
-  + "Mail : "+" - " + "\n"
+  + "Nom : " + " - " + "\n"
+  + "Mail : " + " - " + "\n"
   + "\n"
-  + "Tarif :" +" - " +" €" + "\n"
+  + "Tarif :" + " - " + " €" + "\n"
 )
 
-const mailToDeclarantWriter = (statementData) => 
+const mailToDeclarantWriter = (statementData) =>
 (
-    ""
-  + statementData.declarant+"," + "\n"
+  ""
+  + statementData.declarant + "," + "\n"
   + "\n"
   + "Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration." + "\n"
   + "Le délai de traitement est de 7 jours." + "\n"

@@ -3,6 +3,8 @@
 // React
 import React from 'react';
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 // Utils
 import { InputNumber } from '../InputNumber';
 import { getNewId, getSumItems, printValue } from '/src/utils/Utils';
@@ -77,11 +79,7 @@ export class AssessmentGHG extends React.Component {
 
     return (
       <div className="assessment">
-        <div className="view-header">
-          <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
-        </div>
-
+    
         <div className="group"><h3>Outil de mesure</h3>
 
           <table>
@@ -91,19 +89,27 @@ export class AssessmentGHG extends React.Component {
             <tbody>
               
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" onClick={() => this.addNewLine("1")}/></td>
+                <td className="column_icon">
+                  <button className='btn' onClick={() => this.addNewLine("1")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                </td>
                 <td colSpan="5">Emissions directes des sources fixes de combustion</td>
-                <td className="short right">{printValue(getTotalByAssessmentItem(ghgDetails,"1"),0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(getUncertaintyByAssessmentItem(ghgDetails,"1"),0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td >{printValue(getTotalByAssessmentItem(ghgDetails,"1"),0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(getUncertaintyByAssessmentItem(ghgDetails,"1"),0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>
 
             {Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem=="1").map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">
+                <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                  </td>
                 <td className="sub">
-                  <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                  <select className="form-input"  className="form-input" value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(fuels)
                             .filter(([_,data]) => data.usageSourcesFixes)
                             .map(([_,data]) => data.group)
@@ -116,30 +122,30 @@ export class AssessmentGHG extends React.Component {
                                 .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                       </optgroup>)}
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumption} 
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                  <select onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)} 
+                  <select className="form-input"  onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)} 
                           value={itemData.consumptionUnit}>
                     {Object.entries(fuels[itemData.factorId].units)
                             .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumptionUncertainty} 
                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td ><span>&nbsp;%</span></td>
+                <td >{printValue(itemData.ghgEmissions,0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>)}
 
             {newFactorAssessmentItem=="1" &&
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="0" onChange={(event) => this.addItem("1",event.target.value)}>
+                  <select className="form-input"  value="0" onChange={(event) => this.addItem("1",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(fuels)
                             .filter(([_,data]) => data.usageSourcesFixes)
@@ -157,19 +163,28 @@ export class AssessmentGHG extends React.Component {
               </tr>}
 
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("2")} alt="add"/></td>
+                <td className="column_icon">
+                <button className='btn' onClick={() => this.addNewLine("2")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                  </td>
                 <td colSpan="5">Emissions directes des sources mobiles de combustion</td>
-                <td className="short right">{printValue(getTotalByAssessmentItem(ghgDetails,"2"),0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(getUncertaintyByAssessmentItem(ghgDetails,"2"),0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td >{printValue(getTotalByAssessmentItem(ghgDetails,"2"),0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(getUncertaintyByAssessmentItem(ghgDetails,"2"),0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>
+
 
             {Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem=="2").map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">
+                <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                  </td>
                 <td className="sub">
-                  <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                  <select className="form-input"  value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(fuels)
                             .filter(([_,data]) => data.usageSourcesMobiles)
                             .map(([_,data]) => data.group)
@@ -182,30 +197,30 @@ export class AssessmentGHG extends React.Component {
                                 .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                       </optgroup>)}
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumption} 
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                  <select value={itemData.consumptionUnit}
+                  <select className="form-input"  value={itemData.consumptionUnit}
                           onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
                     {Object.entries(fuels[itemData.factorId].units)
                             .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumptionUncertainty} 
                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td ><span>&nbsp;%</span></td>
+                <td >{printValue(itemData.ghgEmissions,0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>)}
 
             {newFactorAssessmentItem=="2" &&
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="0" onChange={(event) => this.addItem("2",event.target.value)}>
+                  <select className="form-input"  value="0" onChange={(event) => this.addItem("2",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(fuels)
                            .filter(([_,data]) => data.usageSourcesMobiles)
@@ -222,47 +237,57 @@ export class AssessmentGHG extends React.Component {
               </tr>}
 
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" onClick={() => this.addNewLine("3.1")}/></td>
+                <td className="column_icon">
+                <button className='btn' onClick={() => this.addNewLine("3.1")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                  </td>
                 <td colSpan="5">Emissions directes des procédés industriels</td>
-                <td className="short right">{printValue(getTotalByAssessmentItem(ghgDetails,"3.1"),0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(getUncertaintyByAssessmentItem(ghgDetails,"3.1"),0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td >{printValue(getTotalByAssessmentItem(ghgDetails,"3.1"),0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(getUncertaintyByAssessmentItem(ghgDetails,"3.1"),0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>
 
             {Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem=="3.1").map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">
+                <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                  
+                  
+                  </td>
                 <td className="sub">
-                  <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                  <select className="form-input"  value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(industrialProcesses)
                             .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumption} 
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                  <select value={itemData.consumptionUnit} onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
+                  <select className="form-input"  value={itemData.consumptionUnit} onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
                     {Object.entries(industrialProcesses[itemData.factorId].units)
                             .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                     <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumptionUncertainty} 
                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td ><span>&nbsp;%</span></td>
+                <td >{printValue(itemData.ghgEmissions,0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>)}
 
             {newFactorAssessmentItem=="3.1" &&
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="0" onChange={(event) => this.addItem("3.1",event.target.value)}>
+                  <select className="form-input"  value="0" onChange={(event) => this.addItem("3.1",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(industrialProcesses)
                           .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
@@ -270,19 +295,25 @@ export class AssessmentGHG extends React.Component {
               </tr>}
 
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" onClick={() => this.addNewLine("3.2")}/></td>
+                <td className="column_icon">
+                <button className='btn' onClick={() => this.addNewLine("3.2")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                  </td>
                 <td colSpan="5">Emissions directes des procédés agricoles</td>
-                <td className="short right">{printValue(getTotalByAssessmentItem(ghgDetails,"3.2"),0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(getUncertaintyByAssessmentItem(ghgDetails,"3.2"),0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td >{printValue(getTotalByAssessmentItem(ghgDetails,"3.2"),0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(getUncertaintyByAssessmentItem(ghgDetails,"3.2"),0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>
 
             {Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem=="3.2").map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">    <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button></td>
                 <td className="sub">
-                  <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                  <select className="form-input"  value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(agriculturalProcesses)
                            .map(([_,data]) => data.group)
                            .filter((value, index, self) => index === self.findIndex(item => item === value))
@@ -294,31 +325,31 @@ export class AssessmentGHG extends React.Component {
                                .map(([key,data]) => <option key={itemId+"_"+key} value={key}>{data.label}</option>)}
                       </optgroup>)}
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumption} 
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                  <select value={itemData.consumptionUnit} onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
+                  <select className="form-input"  value={itemData.consumptionUnit} onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
                     {Object.entries(agriculturalProcesses[itemData.factorId].units)
                             .map(([unit,_]) => <option key={unit} value={unit}>{unit}</option>)}
                     <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                     <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                   </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumptionUncertainty} 
                                 onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td ><span>&nbsp;%</span></td>
+                <td >{printValue(itemData.ghgEmissions,0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>)}
 
             {newFactorAssessmentItem=="3.2" &&
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="0" onChange={(event) => this.addItem("3.2",event.target.value)}>
+                  <select className="form-input"  value="0" onChange={(event) => this.addItem("3.2",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(agriculturalProcesses)
                            .map(([_,data]) => data.group)
@@ -334,22 +365,28 @@ export class AssessmentGHG extends React.Component {
               </tr>}
               
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" 
-                  onClick={() => this.addNewLine("4")}/></td>
+                <td className="column_icon">
+           
+                   <button className='btn' onClick={() => this.addNewLine("4")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                  </td>
                 <td colSpan="5">Emissions directes fugitives</td>
-                <td className="short right">{printValue(getTotalByAssessmentItem(ghgDetails,"4"),0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(getUncertaintyByAssessmentItem(ghgDetails,"4"),0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td >{printValue(getTotalByAssessmentItem(ghgDetails,"4"),0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(getUncertaintyByAssessmentItem(ghgDetails,"4"),0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>
 
               {Object.entries(ghgDetails)
                      .filter(([_,itemData]) => itemData.assessmentItem=="4")
                      .map(([itemId,itemData]) => 
                 <tr key={itemId}>
-                  <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                  <td className="column_icon">    <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button></td>
                   <td className="sub">
-                    <select value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                    <select className="form-input"  value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                       {Object.entries(coolingSystems)
                              .map(([_,data]) => data.group)
                              .filter((value, index, self) => index === self.findIndex(item => item === value))
@@ -362,40 +399,40 @@ export class AssessmentGHG extends React.Component {
                                  .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                         </optgroup>)}
                     </select></td>
-                  <td className="short right">
+                  <td >
                     <InputNumber value={itemData.consumption} 
                                  onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                   <td>
-                    <select value={itemData.consumptionUnit}
+                    <select className="form-input"  value={itemData.consumptionUnit}
                             onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
                       <option key={coolingSystems[itemData.factorId].unit} value={coolingSystems[itemData.factorId].unit}>{coolingSystems[itemData.factorId].unit}</option>
                       <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                       <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                     </select></td>
                   {(itemData.consumptionUnit=="kgCO2e" || itemData.consumptionUnit=="tCO2e") &&
-                    <td className="short right">
+                    <td >
                       <InputNumber value={itemData.consumptionUncertainty} 
                                   onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>}
-                  {(itemData.consumptionUnit=="kgCO2e" || itemData.consumptionUnit=="tCO2e") && <td className="column_unit"><span>&nbsp;%</span></td>}
+                  {(itemData.consumptionUnit=="kgCO2e" || itemData.consumptionUnit=="tCO2e") && <td ><span>&nbsp;%</span></td>}
                   {(itemData.consumptionUnit!="kgCO2e" && itemData.consumptionUnit!="tCO2e") &&
                     <td colSpan="2">
-                      <select value={itemData.gaz}
+                      <select className="form-input"  value={itemData.gaz}
                               onChange={(event) => this.updateGaz(itemId,event.target.value)}>
                         {Object.entries(greenhouseGases)
                                .filter(([_,data]) => data.label!="")
                                .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                       </select></td>}
-                  <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
-                  <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                  <td className="short right">{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
-                  <td className="column_unit"><span>&nbsp;%</span></td>
+                  <td >{printValue(itemData.ghgEmissions,0)}</td>
+                  <td ><span>&nbsp;kgCO2e</span></td>
+                  <td >{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
+                  <td ><span>&nbsp;%</span></td>
                 </tr>)}
 
             {newFactorAssessmentItem=="4" &&
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="0"
+                  <select className="form-input"  value="0"
                           onChange={(event) => this.addItem("4",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(coolingSystems)
@@ -413,22 +450,27 @@ export class AssessmentGHG extends React.Component {
               </tr>}
               
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" alt="add" 
-                    onClick={() => this.addNewLine("5")}/></td>
+                <td className="column_icon">
+                <button className='btn' onClick={() => this.addNewLine("5")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                  </td>
                 <td colSpan="5">Emissions issues de la biomasse (sols et forêts)</td>
-                <td className="short right">{printValue(getTotalByAssessmentItem(ghgDetails,"5"),0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(getUncertaintyByAssessmentItem(ghgDetails,"5"),0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td >{printValue(getTotalByAssessmentItem(ghgDetails,"5"),0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(getUncertaintyByAssessmentItem(ghgDetails,"5"),0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>
 
             {Object.entries(ghgDetails)
                     .filter(([_,itemData]) => itemData.assessmentItem=="5")
                     .map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">    <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button></td>
                 <td className="sub">
-                    <select value={itemData.sour} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                    <select className="form-input"  value={itemData.sour} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(landChanges)
                            .map(([_,data]) => data.from)
                            .filter((value, index, self) => index === self.findIndex(item => item === value))
@@ -440,31 +482,31 @@ export class AssessmentGHG extends React.Component {
                                .map(([key,data]) => <option key={key} value={key}>{data.label}</option>)}
                       </optgroup>)}
                     </select></td>
-                <td className="short right">
+                <td >
                   <InputNumber value={itemData.consumption}
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                    <select value={itemData.consumptionUnit}
+                    <select className="form-input"  value={itemData.consumptionUnit}
                             onChange={(event) => this.changeConsumptionUnit(itemId,event.target.value)}>
                       <option key={"ha"} value={"ha"}>{"ha"}</option>
                       <option key={"kgCO2e"} value={"kgCO2e"}>{"kgCO2e"}</option>
                       <option key={"tCO2e"} value={"tCO2e"}>{"tCO2e"}</option>
                     </select></td>
-                <td className="short right">
+                <td >
                     <InputNumber value={itemData.consumptionUncertainty} 
                                  onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)(itemId,nextValue)}/></td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissions,0)}</td>
-                <td className="column_unit"><span>&nbsp;kgCO2e</span></td>
-                <td className="short right">{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
-                <td className="column_unit"><span>&nbsp;%</span></td>
+                <td ><span>&nbsp;%</span></td>
+                <td >{printValue(itemData.ghgEmissions,0)}</td>
+                <td ><span>&nbsp;kgCO2e</span></td>
+                <td >{printValue(itemData.ghgEmissionsUncertainty,0)}</td>
+                <td ><span>&nbsp;%</span></td>
               </tr>)}
 
             {newFactorAssessmentItem=="5" &&
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="0" onChange={(event) => this.addItem("5",event.target.value)}>
+                  <select className="form-input"  value="0" onChange={(event) => this.addItem("5",event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(landChanges)
                            .map(([_,data]) => data.from)
@@ -479,15 +521,19 @@ export class AssessmentGHG extends React.Component {
                   </select></td>
               </tr>}
 
-              <tr className="with-top-line">
+              <tr className="total">
                 <td colSpan="6">Total</td>
                 <td className="column_value">{printValue(greenhousesGazEmissions,0)}</td>
-                <td className="column_unit">&nbsp;kgCO2e</td>
+                <td >&nbsp;kgCO2e</td>
                 <td className="column_value">{printValue(greenhousesGazEmissionsUncertainty,0)}</td>
-                <td className="column_unit">&nbsp;%</td></tr>
+                <td >&nbsp;%</td></tr>
 
             </tbody>
           </table>
+        </div>
+        <div className="view-header">
+          <button className="btn" onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className={"btn btn-secondary"} onClick = {() => this.onSubmit()}>Valider</button>
         </div>
       </div>
     ) 

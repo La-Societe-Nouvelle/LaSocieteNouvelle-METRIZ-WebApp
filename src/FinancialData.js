@@ -42,7 +42,7 @@ export class FinancialData {
         if (data==undefined) data = {};
         
         // Print
-        console.log(data);
+        // console.log(data);
 
         // data loaded state
         this.isFinancialDataLoaded = data.isFinancialDataLoaded || false;   
@@ -160,7 +160,7 @@ export class FinancialData {
     async loadInitialStates(data) 
     {        
         // Print
-        console.log(data);
+        // console.log(data);
 
         // Available accounts
         let prevAccountsData = data.financialData.stocks.concat(data.financialData.immobilisations).concat(data.financialData.depreciations);

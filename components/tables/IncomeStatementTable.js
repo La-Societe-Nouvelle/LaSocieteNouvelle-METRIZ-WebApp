@@ -15,129 +15,124 @@ export const IncomeStatementTable = ({financialData}) =>
   const depreciationExpensesAggregates = financialData.getBasicDepreciationExpensesAggregates();
   
   return(
-    <div className="table-main">
-
+    <>
       <table>
         <thead>
-          <tr><td>Agrégat</td><td colSpan="2">Montant</td></tr>
+          <tr>
+            <td>Agrégat</td>
+            <td>Montant</td>
+          </tr>
         </thead>
         <tbody>
-
-          <tr className="with-top-margin">
+          <tr>
             <td>Chiffre d'affaires</td>
-            <td className="column_value">{printValue(financialData.getRevenue(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          
+            <td>{printValue(financialData.getRevenue(),0)} &euro;</td>
+          </tr>
           <tr>
             <td>Production stockée</td>
-            <td className="column_value">{printValue(financialData.getStoredProduction(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td>{printValue(financialData.getStoredProduction(),0)} &euro;</td>
+            </tr>
           <tr>
             <td>Production immobilisée</td>
-            <td className="column_value">{printValue(financialData.getImmobilisedProduction(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-top-margin">
+            <td>{printValue(financialData.getImmobilisedProduction(),0)} &euro;</td>
+</tr>
+          <tr>
             <td>Autres produits d'exploitation</td>
-            <td className="column_value">{printValue(financialData.getAmountOtherOperatingIncomes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line with-top-margin">
-            <td><b>TOTAL DES PRODUITS D'EXPLOITATION</b></td>
-            <td className="column_value important">{printValue(financialData.getAmountOperatingIncomes(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
+            <td>{printValue(financialData.getAmountOtherOperatingIncomes(),0)} &euro;</td>
+</tr>
+          <tr className="total">
+            <td>TOTAL DES PRODUITS D'EXPLOITATION</td>
+            <td >{printValue(financialData.getAmountOperatingIncomes(),0)} &euro;</td>
+          </tr>
           
-          <tr className="with-top-margin">
-            <td>CHARGES EXTERNES</td></tr>
+          <tr>
+            <td><b>Charges externes</b></td>
+            <td >{printValue(financialData.getAmountIntermediateConsumption(),0)} &euro;</td>
+            </tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td>{printValue(-financialData.getVariationPurchasesStocks(),0)} &euro;</td>
+           </tr>
         {externalExpensesAggregates.map(({accountLib,amount},index) => 
           <tr key={index}>
             <td>&emsp;{accountLib}</td>
-            <td className="column_value">{printValue(amount,0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>)}
-          <tr>
-            <td></td>
-            <td className="column_value important with-top-line">{printValue(financialData.getAmountIntermediateConsumption(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
-
-          <tr className="with-top-margin">
-            <td>IMPOTS, TAXES ET VERSEMENTS ASSIMILES</td>
-            <td className="column_value">{printValue(financialData.getAmountTaxes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td>{printValue(amount,0)} &euro;</td>
+         </tr>)}
+          <tr >
+            <td><b>Impots, taxes et versements assimilés</b></td>
+            <td>{printValue(financialData.getAmountTaxes(),0)} &euro;</td>
+         </tr>
           
-          <tr className="with-top-margin">
-            <td>CHARGES DE PERSONNEL</td>
-            <td className="column_value">{printValue(financialData.getAmountPersonnelExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-
-          <tr className="with-top-margin">
-            <td>DOTATIONS D'EXPLOITATION</td></tr>
+          <tr >
+            <td><b>Charges de personnel</b></td>
+            <td>{printValue(financialData.getAmountPersonnelExpenses(),0)} &euro;</td>
+         </tr>
+          <tr >
+            <td><b>Dotations d'exploitation</b></td>
+            <td>{printValue(financialData.getAmountDepreciationExpenses()+financialData.getAmountProvisions(),0)} &euro;</td>
+         </tr>
           <tr>
             <td>&emsp;Dotations aux amortissements sur immobilisations</td>
-            <td className="column_value">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
+            <td>{printValue(financialData.getAmountDepreciationExpenses(),0)} &euro;</td>
+          </tr>
           <tr>
             <td>&emsp;Autres dotations aux amortissements, aux dépréciations et aux provisions</td>
-            <td className="column_value">{printValue(financialData.getAmountProvisions(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
-            <td></td>
-            <td className="column_value important with-top-line">{printValue(financialData.getAmountDepreciationExpenses()+financialData.getAmountProvisions(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
+            <td>{printValue(financialData.getAmountProvisions(),0)} &euro;</td>
+           </tr>
 
-          <tr className="with-top-margin">
-            <td>AUTRES CHARGES D'EXPLOITATION</td>
-            <td className="column_value">{printValue(financialData.getAmountOtherExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
 
-          <tr className="with-bottom-line with-top-margin">
-            <td><b>TOTAL DES CHARGES D'EXPLOITATION</b></td>
-            <td className="column_value important">{printValue(financialData.getAmountOperatingExpenses(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
+          <tr >
+            <td><b>Autres charges d'exploitation</b></td>
+            <td>{printValue(financialData.getAmountOtherExpenses(),0)} &euro;</td>
+          </tr>
 
-          <tr className="with-bottom-line with-top-margin">
-            <td><b>RESULTAT D'EXPLOITATION</b></td>
-            <td className="column_value important">{printValue(financialData.getOperatingResult(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
+          <tr  className="total">
+            <td>TOTAL DES CHARGES D'EXPLOITATION</td>
+            <td>{printValue(financialData.getAmountOperatingExpenses(),0)} &euro;</td>
+           </tr>
 
-          <tr className="with-top-margin">
+          <tr  className={"total operating-result"}>
+            <td>RESULTAT D'EXPLOITATION</td>
+            <td>{printValue(financialData.getOperatingResult(),0)} &euro;</td>
+           </tr>
+
+          <tr >
             <td>PRODUITS FINANCIERS</td>
-            <td className="column_value">{printValue(financialData.getAmountFinancialIncomes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
+            <td>{printValue(financialData.getAmountFinancialIncomes(),0)} &euro;</td>
+           </tr>
+          <tr >
             <td>CHARGES FINANCIERES</td>
-            <td className="column_value">{printValue(financialData.getAmountFinancialExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line with-top-margin">
-            <td><b>RESULTAT FINANCIER</b></td>
-            <td className="column_value important">{printValue(financialData.getFinancialResult(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
-
-          <tr className="with-top-margin">
+            <td>{printValue(financialData.getAmountFinancialExpenses(),0)} &euro;</td>
+            </tr>
+          <tr >
+            <td>RESULTAT FINANCIER</td>
+            <td>{printValue(financialData.getFinancialResult(),0)} &euro;</td>
+         </tr>
+          <tr >
             <td>PRODUITS EXCEPTIONNELS</td>
-            <td className="column_value">{printValue(financialData.getAmountExceptionalIncomes(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr>
+            <td>{printValue(financialData.getAmountExceptionalIncomes(),0)} &euro;</td>
+            </tr>
+          <tr >
             <td>CHARGES EXCEPTIONNELLES</td>
-            <td className="column_value">{printValue(financialData.getAmountExceptionalExpenses(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          <tr className="with-bottom-line with-top-margin">
-            <td><b>RESULTAT EXCEPTIONNEL</b></td>
-            <td className="column_value important">{printValue(financialData.getExceptionalResult(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
+            <td>{printValue(financialData.getAmountExceptionalExpenses(),0)} &euro;</td>
+            </tr>
+          <tr >
+            <td>RESULTAT EXCEPTIONNEL</td>
+            <td>{printValue(financialData.getExceptionalResult(),0)} &euro;</td>
+           </tr>
 
-          <tr className="with-top-margin with-bottom-margin">
+          <tr >
             <td>PARTICIPATION DES SALARIES, IMPOTS SUR LES BENEFICES ET ASSIMILES</td>
-            <td className="column_value">{printValue(financialData.getAmountTaxOnProfits(),0)}</td>
-            <td className="column_unit">&nbsp;€</td></tr>
-          
-          <tr className="with-bottom-line with-top-line">
-            <td><b>BENEFICE OU PERTE</b></td>
-            <td className="column_value important">{printValue(financialData.getProfit(),0)}</td>
-            <td className="column_unit important">&nbsp;€</td></tr>
-
+            <td>{printValue(financialData.getAmountTaxOnProfits(),0)} &euro;</td>
+           </tr>
+       
         </tbody>
+        <tfoot>
+        <tr>
+            <td>BENEFICE OU PERTE</td>
+            <td>{printValue(financialData.getProfit(),0)} &euro;</td>
+          </tr>
+        </tfoot>
       </table>
-    </div>)
+    </>)
 }

@@ -1,0 +1,115 @@
+
+/* Menu */
+
+ul.nav {
+  padding: 0;
+  list-style: none;
+  li {
+    display: inline-block;
+    line-height: 1;
+    padding: 0 0 0 1em;
+    margin: 0 0 0 1em;
+  }
+}
+.top-bar {
+  background-color: #343a40;
+  display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2em;
+  .btn-download {
+    background-color: $tertiary-color;
+    color : #fff;
+    padding : 0.8em;
+    margin : 0.5em 0;
+    
+  }
+  .nav a{
+    color : #fff;
+    font-weight: 600;
+    font-size : 0.9em;
+  }
+}
+#menu {
+  padding-top : 2em;
+}
+#progression{
+        flex-grow: 1;
+        
+        .stepper-item{
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+
+        }
+        .stepper-item::before {
+            position: absolute;
+            content: "";
+            border-bottom: 20px solid #9aa2d0;
+            width: 100%;
+            top: 15px;
+            left: -50%;
+            z-index: 2;
+          }
+          
+          .stepper-item::after {
+            position: absolute;
+            content: "";
+            border-bottom: 20px solid #9aa2d0;
+            width: 100%;
+            top: 15px;
+            left: 50%;
+            z-index: 2;
+          }
+          .step-counter {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border:none;
+            background: #9aa2d0;
+            margin-bottom: 6px;
+            font-size: 2em;
+            font-weight: 800;
+            color : #fff;
+
+          }
+
+          .current{
+            background-color: $tertiary-color;
+         
+        }
+        .current + .step-name{
+            font-weight: 800;
+        }
+          .stepper-item.completed .step-counter {
+            background-color: $tertiary-color;
+          }
+          
+          .stepper-item.completed::after {
+            position: absolute;
+            content: "";
+            border-bottom: 20px solid $tertiary-color;
+            width: 100%;
+            top: 15px;
+            left: 50%;
+            z-index: 3;
+          }
+          
+          .stepper-item:first-child::before {
+            content: none;
+          }
+          .stepper-item:last-child::after {
+            width: 65%;
+          }
+   
+
+    
+    }
+

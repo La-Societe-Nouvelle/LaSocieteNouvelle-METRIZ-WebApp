@@ -40,13 +40,13 @@ export class StatementHAZ extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+        <div className="form-group">
           <label>Utilisation de produits dangereux - santé/environnement</label>
           <InputNumber value={roundValue(hazardousSubstancesConsumption,0)}
                        onUpdate={this.updateHazardousSubstancesConsumption}/>
           <span>&nbsp;kg</span>
         </div>
-        <div className="statement-item">
+        <div className="form-group">
           <label>Incertitude</label>
           <InputNumber value={roundValue(hazardousSubstancesConsumptionUncertainty,0)}
                        onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}/>
@@ -60,7 +60,7 @@ export class StatementHAZ extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

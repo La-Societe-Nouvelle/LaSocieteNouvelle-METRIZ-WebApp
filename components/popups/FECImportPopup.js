@@ -21,19 +21,18 @@ export class FECImportPopup extends React.Component {
     const disabledValidation = !(noBook || Object.entries(meta.books).map(([_,{type}]) => type).includes("ANOUVEAUX"));
     
     return (
-      <div className="popup">
-        <div className="popup-inner">
-          <h3>Journaux disponibles</h3>
+      <> 
+      <div className="table-container">
+        <h3 className={"subtitle underline"}>Contrôle de vos a-nouveaux</h3>
+          <h4>Identifiez vos journaux A-Nouveaux : </h4>
           <table>
             <thead>
               <tr>
-                <td className="short center">Code</td>
-                <td className="long center">Libellé</td>
-                <td className="short center">Début</td>
-                <td className="short center">Fin</td>
-                <td className="short center">Lignes</td>
-                {/*<td className="medium center">Type</td>*/}
-                <td className="medium center">A-Nouveaux</td>
+                <td className="short">Code</td>
+                <td className="long">Libellé</td>
+                <td className="short">Fin</td>
+                <td className="short">Nombre de Lignes</td>
+                <td className="medium">Identification A-Nouveaux</td>
               </tr>
             </thead>
             <tbody>
@@ -46,33 +45,33 @@ export class FECImportPopup extends React.Component {
                   <tr key={code}>
                     <td className="short center">{code}</td>
                     <td className="long left">{label}</td>
-                    <td className="short center">{dateStart.substring(6,8)+"/"+dateStart.substring(4,6)+"/"+dateStart.substring(0,4)}</td>
                     <td className="short center">{dateEnd.substring(6,8)+"/"+dateEnd.substring(4,6)+"/"+dateEnd.substring(0,4)}</td>
                     <td className="short center">{nLines}</td>
                     <td>
-                      <input type="radio" name="ANOUVEAUX" value={code} checked={type=="ANOUVEAUX"} onChange={this.changeJournalANouveaux}/>
+                      <input type="checkbox" name="ANOUVEAUX" value={code} checked={type=="ANOUVEAUX"} onChange={this.changeJournalANouveaux}/>
                     </td>
                   </tr>
                 )}
               )}
             </tbody>
           </table>
-          <div>
-
-          </div>
-          <div className="input">
+          {/* <div className="input">
             <input type="checkbox" 
                    checked={noBook}
                    onChange={this.onCheckboxChange}/>
               <label htmlFor="certification">&nbsp;Pas de journal A-Nouveaux</label>
+          </div> */}
+
           </div>
-          <div className="footer">
-            <div></div>
-            <button onClick={() => this.validate()}
-                    disabled={disabledValidation}>Valider</button>
-          </div>
-        </div>
-      </div>
+                
+          <aside className="action">
+            <button className={"btn btn-outline"} >
+                Recommencer
+            </button>
+            <button className={"btn btn-secondary"} onClick={() => this.validate()}
+                    disabled={disabledValidation}>J'ai identifié l'éventuel journal des A-nouveaux</button>
+          </aside>
+      </>
     )
   }
 

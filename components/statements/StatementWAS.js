@@ -40,21 +40,27 @@ export class StatementWAS extends React.Component {
 
     return (
       <div className="statement">
-        <div className="statement-item">
+                        <div className="statement-form">
+
+        <div className="form-group">
           <label>Productiont totale de déchets (y compris DAOM<sup>1</sup>)</label>
           <InputNumber value={roundValue(wasteProduction,0)} 
-                       onUpdate={this.updateWasteProduction}/>
-          <span>&nbsp;kg</span>
-        </div>
-        <div className="statement-item">
-          <label>Incertitude</label>
-          <InputNumber value={roundValue(wasteProductionUncertainty,0)} 
-                       onUpdate={this.updateWasteProductionUncertainty}/>
-          <span>&nbsp;%</span>
-        </div>
-        <div className="notes">
+                       onUpdate={this.updateWasteProduction}
+                       placeholder="KG"
+                       />
+                               <div className="notes">
           <p><sup>1</sup> Déchets assimilés aux ordures ménagères</p>
         </div>
+        </div>
+        <div className="form-group">
+          <label>Incertitude</label>
+          <InputNumber value={roundValue(wasteProductionUncertainty,0)} 
+                       onUpdate={this.updateWasteProductionUncertainty}
+                       placeholder="%"
+                       />
+        </div>
+        </div>
+
         <div className="statement-comments">
           <label>Informations complémentaires</label>
           <textarea type="text" spellCheck="false"
@@ -63,7 +69,7 @@ export class StatementWAS extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid}
+          <button disabled={!isValid} className={"btn btn-primary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

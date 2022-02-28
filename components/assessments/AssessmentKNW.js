@@ -34,11 +34,7 @@ export class AssessmentKNW extends React.Component {
 
     return (
       <div className="assessment">
-        <div className="view-header">
-          <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
-        </div>
-
+   
         <div className="group"><h3>Outil de mesure</h3>
 
           <table>
@@ -84,6 +80,11 @@ export class AssessmentKNW extends React.Component {
             </tbody>
           </table>
         </div>
+        <div className="modal-action">
+          <button className="btn" onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className={"btn btn-primary"} onClick = {() => this.onSubmit()}>Valider</button>
+        </div>
+
       </div>
     ) 
   }
@@ -114,6 +115,7 @@ export class AssessmentKNW extends React.Component {
     impactsData.researchAndTrainingContribution = this.getSumCosts();
     
     await this.props.onUpdate("knw");
+    await this.props.onGoBack();
   }
 
   getSumCosts() 

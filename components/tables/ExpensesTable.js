@@ -33,26 +33,25 @@ export class ExpensesTable extends React.Component {
     sortExpenses(externalExpensesAccounts,columnSorted,reverseSort);
 
     return (
-      <div className="table-main">
+      <>
         <table>
           <thead>
             <tr>
-              <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
-              <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
+              <td  onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+              <td  onClick={() => this.changeColumnSorted("amount")}>Montant</td>
             </tr>
           </thead>
           <tbody>
             {externalExpensesAccounts.map(({accountNum,amount,accountLib}) => 
               <tr key={accountNum}>
-                <td className="short center">{accountNum}</td>
-                <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                <td className="short right">{printValue(amount,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
+                <td >{accountNum}</td>
+                <td >{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
+                <td >{printValue(amount,0)} &euro;</td>
               </tr>)}
           </tbody>
         </table>
-      </div>
+      </>
     )
   }
 

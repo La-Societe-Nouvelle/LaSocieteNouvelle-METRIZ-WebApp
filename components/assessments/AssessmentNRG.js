@@ -3,6 +3,10 @@
 // React
 import React from 'react';
 
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+
 // Utils
 import { InputNumber } from '../InputNumber';
 import { getNewId, printValue } from '../../src/utils/Utils';
@@ -82,11 +86,6 @@ export class AssessmentNRG extends React.Component {
     return (
       <div className="assessment">
 
-        <div className="view-header">
-          <button className="retour"onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className="retour"onClick = {() => this.onSubmit()}>Valider</button>
-        </div>
-
         <div className="group"><h3>Outil de mesure</h3>
 
           <table>
@@ -103,7 +102,7 @@ export class AssessmentNRG extends React.Component {
                   <InputNumber value={nrgDetails["electricity"].consumption} 
                                onUpdate={(nextValue) => this.updateConsumption.bind(this)("electricity", nextValue)}/></td>
                 <td className="short">
-                  <select value={nrgDetails["electricity"].consumptionUnit}
+                  <select className="form-input" value={nrgDetails["electricity"].consumptionUnit}
                           onChange={(event) => this.changeNrgProductUnit("electricity", event.target.value)}>
                     <option key="MJ" value="MJ">&nbsp;MJ</option>
                     <option key="kWh" value="kWh">&nbsp;kWh</option>
@@ -119,7 +118,11 @@ export class AssessmentNRG extends React.Component {
               </tr>}
               
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("fossil")} alt="add"/></td>
+                <td className="column_icon">
+                <button className='btn' onClick={() => this.addNewLine("fossil")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                  </td>
                 <td colSpan="5">Produits énergétiques fossiles</td>
                 <td className="short right">{printValue(getNrgConsumptionByType(nrgDetails,"fossil"),0)}</td>
                 <td className="column_unit"><span>&nbsp;MJ</span></td>
@@ -131,9 +134,13 @@ export class AssessmentNRG extends React.Component {
                     .filter(([_,data]) => data.type=="fossil")
                     .map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">
+                <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                  </td>
                 <td className="sub">
-                  <select value={itemData.fuelCode}
+                  <select className="form-input" value={itemData.fuelCode}
                           onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
                     {Object.entries(fuels)
                             .filter(([_,data]) => data.type=="fossil")
@@ -143,7 +150,7 @@ export class AssessmentNRG extends React.Component {
                   <InputNumber value={itemData.consumption} 
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                  <select value={itemData.consumptionUnit}
+                  <select className="form-input" value={itemData.consumptionUnit}
                           onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
                       <option key="MJ" value="MJ">&nbsp;MJ</option>
                       <option key="kWh" value="kWh">&nbsp;kWh</option>
@@ -164,7 +171,7 @@ export class AssessmentNRG extends React.Component {
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="none"
+                  <select className="form-input" value="none"
                           onChange={(event) => this.addProduct(event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(fuels)
@@ -174,7 +181,11 @@ export class AssessmentNRG extends React.Component {
               </tr>}
 
               <tr>
-                <td className="column_icon"><img className="img" src="/resources/icon_add.jpg" onClick={() => this.addNewLine("biomass")} alt="add" /></td>
+                <td className="column_icon">
+                <button className='btn' onClick={() => this.addNewLine("biomass")}>
+                  <FontAwesomeIcon icon={faPlus} />
+                  </button>
+                 </td> 
                 <td colSpan="5">Biomasse</td>
                 <td className="short right">{printValue(getNrgConsumptionByType(nrgDetails,"biomass"),0)}</td>
                 <td className="column_unit"><span>&nbsp;MJ</span></td>
@@ -186,9 +197,14 @@ export class AssessmentNRG extends React.Component {
                     .filter(([_,itemData]) => itemData.type=="biomass")
                     .map(([itemId,itemData]) => 
               <tr key={itemId}>
-                <td className="column_icon"><img className="img" src="/resources/icon_delete.jpg" onClick={() => this.deleteItem(itemId)} alt="delete"/></td>
+                <td className="column_icon">
+                  
+                <button className='btn'  onClick={() => this.deleteItem(itemId)}>
+                  <FontAwesomeIcon icon={faTrash} />
+                  </button>                  
+                  </td>
                 <td className="sub">
-                  <select value={itemData.fuelCode}
+                  <select className="form-input" value={itemData.fuelCode}
                           onChange={(event) => this.changeNrgProduct(itemId,event.target.value)}>
                     {Object.entries(fuels)
                             .filter(([_,data]) => data.type=="biomass")
@@ -198,7 +214,7 @@ export class AssessmentNRG extends React.Component {
                   <InputNumber value={itemData.consumption} 
                                 onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId,nextValue)}/></td>
                 <td>
-                  <select value={itemData.consumptionUnit}
+                  <select className="form-input" value={itemData.consumptionUnit}
                           onChange={(event) => this.changeNrgProductUnit(itemId,event.target.value)}>
                     <option key="MJ" value="MJ">&nbsp;MJ</option>
                     <option key="kWh" value="kWh">&nbsp;kWh</option>
@@ -219,7 +235,7 @@ export class AssessmentNRG extends React.Component {
               <tr>
                 <td/>
                 <td className="sub">
-                  <select value="none"
+                  <select className="form-input" value="none"
                           onChange={(event) => this.addProduct(event.target.value)}>
                     <option key="none" value="none">---</option>
                     {Object.entries(fuels)
@@ -236,7 +252,7 @@ export class AssessmentNRG extends React.Component {
                   <InputNumber value={nrgDetails["heat"].consumption} 
                                onUpdate={(nextValue) => this.updateConsumption.bind(this)("heat",nextValue)}/></td>
                 <td className="short">
-                  <select value={nrgDetails["heat"].consumptionUnit}
+                  <select className="form-input" value={nrgDetails["heat"].consumptionUnit}
                           onChange={(event) => this.changeNrgProductUnit("heat",event.target.value)}>
                     <option key="MJ" value="MJ">&nbsp;MJ</option>
                     <option key="kWh" value="kWh">&nbsp;kWh</option>
@@ -259,7 +275,7 @@ export class AssessmentNRG extends React.Component {
                   <InputNumber value={nrgDetails["renewableTransformedEnergy"].consumption} 
                                onUpdate={(nextValue) => this.updateConsumption.bind(this)("renewableTransformedEnergy",nextValue)}/></td>
                 <td className="short">
-                  <select value={nrgDetails["renewableTransformedEnergy"].consumptionUnit}
+                  <select className="form-input" value={nrgDetails["renewableTransformedEnergy"].consumptionUnit}
                           onChange={(event) => this.changeNrgProductUnit("renewableTransformedEnergy",event.target.value)}>
                     <option key="MJ" value="MJ">&nbsp;MJ</option>
                     <option key="kWh" value="kWh">&nbsp;kWh</option>
@@ -274,7 +290,7 @@ export class AssessmentNRG extends React.Component {
                 <td className="column_unit"><span>&nbsp;%</span></td>
               </tr>}
 
-              <tr className="with-top-line">
+              <tr className="total">
                 <td/>
                 <td colSpan="5">Total</td>
                 <td className="column_value">{printValue(energyConsumption,0)}</td>
@@ -284,6 +300,12 @@ export class AssessmentNRG extends React.Component {
               
             </tbody>
           </table>
+          
+        <div className="view-header">
+          <button className="btn" onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className={"btn btn-primary"} onClick = {() => this.onSubmit()}>Valider</button>
+        </div>
+
         </div>
       </div>
     ) 

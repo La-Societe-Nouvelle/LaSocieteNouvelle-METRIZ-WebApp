@@ -27,15 +27,15 @@ export class StocksTable extends React.Component {
     this.sortItems(stocks,columnSorted);
 
     return (
-      <div className="table-main">
+      <>
         <table>
           <thead>
             <tr>
-              <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
-              <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="short center" colSpan="2" >Montant (N)</td>
-              <td className="short center" colSpan="2" >Montant (N-1)</td>
-              <td className="short center" colSpan="2" >Variation</td>
+              <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
+              <td onClick={() => this.changeColumnSorted("label")}>Libellé</td>
+              <td >Montant (N)</td>
+              <td  >Montant (N-1)</td>
+              <td  >Variation</td>
             </tr>
           </thead>
           <tbody>
@@ -48,29 +48,25 @@ export class StocksTable extends React.Component {
                                              .reduce((a,b) => a + b,0);
             return(
               <tr key={account}>
-                <td className="short center">{account}</td>
-                <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                <td className="short right">{printValue(amount-valueLoss,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue(prevAmount-prevValueLoss,0)}</td>
-                <td className="column_unit">&nbsp;€</td>
-                <td className="short right">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}</td>
-                <td className="column_unit">&nbsp;€</td>
+                <td >{account}</td>
+                <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
+                <td >{printValue(amount-valueLoss,0)}  &euro;</td>
+                <td >{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
+                <td >{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
               </tr>)})}
+ 
+          </tbody>
+          <tfoot>
           {stocks.length > 0 &&
             <tr className="with-top-line">
-              <td className="short center"> - </td>
-              <td className="auto">TOTAL</td>
-              <td className="short right">{printValue(aggregates.netAmountStocks.amount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(aggregates.netAmountStocks.prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
-              <td className="short right">{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}</td>
-              <td className="column_unit">&nbsp;€</td>
+              <td colSpan="2"> Total</td>
+              <td >{printValue(aggregates.netAmountStocks.amount,0)}  &euro;</td>
+              <td >{printValue(aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
+              <td >{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
           </tr>}
-          </tbody>
+          </tfoot>
         </table>
-      </div>
+      </>
     )
   }
 
