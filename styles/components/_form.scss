@@ -125,3 +125,12 @@ label {
 .statement-action {
   text-align: right;
 }
+
+.radio-button-input {
+  
+  display: flex;
+  flex-direction: column;
+  div {
+    margin-bottom: 1em;
+  }
+}

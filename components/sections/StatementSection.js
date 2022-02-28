@@ -55,13 +55,10 @@ export class StatementSection extends React.Component {
 
   render() {
     const { step } = this.state;
-
     return (
-      <div className="section-view">
-        <div className="statement-section-view">
+      <>
           {this.buildView(step)}
-        </div>
-      </div>
+      </>
     )
   }
 
@@ -122,9 +119,14 @@ const SirenInput = ({ siren, commitSiren }) => {
 
   return (
     <section className="container">
-      <h3>Numéro de siren</h3>
+       <h2>
+        Vos informations 
+        </h2> 
+
+      <h2>Numéro de siren</h2>
       <div className="form-group">
-        <label>Numéro de siren (9 chiffres) : </label>
+        <label>Entrez votre numéro de siren (9 chiffres) : </label>
+         
         <InputText value={sirenInput}
           unvalid={sirenInput != "" && !/^[0-9]{9}$/.test(sirenInput)}
           onUpdate={onSirenChange} />
@@ -162,7 +164,7 @@ class IndicatorSelection extends React.Component {
           <h2 className="subtitle">
             Publier mes résultats
           </h2>
-          <h3>Sélection des indicateurs</h3>
+          <h2>Sélection des indicateurs</h2>
 
         </div>
 
@@ -192,7 +194,7 @@ class IndicatorSelection extends React.Component {
           </tbody>
         </table>
         <div className="align-right">
-          <button className="btn" onClick={this.props.goBack}>Retour</button>
+          <button className="btn" onClick={this.props.return}>Retour</button>
           <button className={"btn btn-primary"} disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
         </div>
       </section>)
@@ -227,7 +229,8 @@ class SirenForm extends React.Component {
 
     return (
       <section className="container">
-        <h3>Unité légale</h3>
+      
+        <h2>Unité légale</h2>
         <div className="inline-input">
           <label>Numéro de siren </label>
           <InputText value={siren}
@@ -274,7 +277,7 @@ class DeclarantForm extends React.Component {
 
     return (
       <section className="container">
-        <h3>Déclarant</h3>
+        <h2>Déclarant</h2>
         <div className="form-group">
           <label>Nom - Prénom </label>
           <InputText value={declarant}
@@ -329,7 +332,7 @@ const PriceInput = ({ price, commitPrice, goBack }) => {
 
   return (
     <section className="container">
-      <h3>Coût de la formalité</h3>
+      <h2>Coût de la formalité</h2>
       <div className="radio-button-input">
         <div className={"custom-control-inline"}>
           <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input"/>
@@ -370,7 +373,7 @@ const Summary = (props) => {
 
   return (
     <section className="container">
-      <h3>Récapitulatif</h3>
+      <h2>Récapitulatif</h2>
       <div className="summary">
         <p><b>Siren : </b>{siren}</p>
         <p><b>Dénomination : </b>{denomination}</p>
