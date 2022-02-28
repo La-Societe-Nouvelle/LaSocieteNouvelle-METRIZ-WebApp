@@ -15,7 +15,7 @@
 
 
   .action {
-    background-color: #f6f6f6;
+    background-color: $bg-light;
     display: flex;
     justify-content: flex-end;
     text-align: right;
@@ -106,11 +106,7 @@
   padding : 1em 0;
 
 }
-
-.graph-section {
-  background-color : #f3f3f3;
-  padding: 1em;
-}
+// GRAPH
 
 .analysis-container { 
   display: flex;
@@ -152,4 +148,10 @@
 
   }
 
+}
+
+
+.or {
+  text-align: center;
+  font-weight: 800;
 }
