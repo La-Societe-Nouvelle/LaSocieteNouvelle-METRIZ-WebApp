@@ -79,7 +79,7 @@
     }
   },
   "fuel6": {
-    "label": "Essence - Supercarburant sans plomb (95, 95-E10, 98)",
+    "label": "Essence - Sans plomb (95, 95-E10, 98)",
     "group": "Carburant - usage routier",
     "usageSourcesFixes": false,
     "usageSourcesMobiles": true,
@@ -91,7 +91,8 @@
       "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.254, "coefGHGUncertainty": 5},
       "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2907, "coefGHGUncertainty": 5},
       "L" : {"unit": "kgCO2e/L", "coefGHG": 2.2, "coefGHGUncertainty": 10, "coefNRG": 33.220, "coefNRGUncertainty": 5},
-      "t": {"unit": "kgCO2e/t", "coefGHG": 2907, "coefGHGUncertainty": 5, "coefNRG": 44000, "coefNRGUncertainty": 5}
+      "t": {"unit": "kgCO2e/t", "coefGHG": 2907, "coefGHGUncertainty": 5, "coefNRG": 44000, "coefNRGUncertainty": 5},
+      "€": {"unit": "kgCO2e/€", "coefGHG": 1.43, "coefGHGUncertainty": 15, "coefNRG": 21.571, "coefNRGUncertainty": 10}
     }
   },
   "fuel7": {
@@ -107,7 +108,8 @@
       "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.254, "coefGHGUncertainty": 5},
       "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2968, "coefGHGUncertainty": 5},
       "L" : {"unit": "kgCO2e/L", "coefGHG": 2.49, "coefGHGUncertainty": 10, "coefNRG": 35.490, "coefNRGUncertainty": 5},
-      "t": {"unit": "kgCO2e/t", "coefGHG": 3338, "coefGHGUncertainty": 5, "coefNRG": 42000, "coefNRGUncertainty": 5}
+      "t": {"unit": "kgCO2e/t", "coefGHG": 3338, "coefGHGUncertainty": 5, "coefNRG": 42000, "coefNRGUncertainty": 5},
+      "€": {"unit": "kgCO2e/€", "coefGHG": 1.73, "coefGHGUncertainty": 15, "coefNRG": 24.646, "coefNRGUncertainty": 10}
     }
   },
   "fuel8": {
@@ -123,7 +125,8 @@
       "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.249, "coefGHGUncertainty": 5},
       "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2907, "coefGHGUncertainty": 5},
       "L" : {"unit": "kgCO2e/L", "coefGHG": 2.19, "coefGHGUncertainty": 10, "coefNRG": 33.220, "coefNRGUncertainty": 5},
-      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.94, "coefGHGUncertainty": 5, "coefNRG": 44, "coefNRGUncertainty": 5}
+      "kg": {"unit": "kgCO2e/kg", "coefGHG": 2.94, "coefGHGUncertainty": 5, "coefNRG": 44, "coefNRGUncertainty": 5},
+      "€": {"unit": "kgCO2e/€", "coefGHG": 1.42, "coefGHGUncertainty": 15, "coefNRG": 21.571, "coefNRGUncertainty": 10}
     }
   },
   "fuel9": {
@@ -186,7 +189,8 @@
       "GJ": {"unit": "kgCO2e/GJ PCI", "coefGHG": 68.2, "coefGHGUncertainty": 5},
       "kWh": {"unit": "kgCO2e/kWh PCI", "coefGHG": 0.247, "coefGHGUncertainty": 5},
       "tep": {"unit": "kgCO2e/tep PCI", "coefGHG": 2864, "coefGHGUncertainty": 5},
-      "L" : {"unit": "kgCO2e/L", "coefGHG": 2.41, "coefGHGUncertainty": 5, "coefNRG": 35.490, "coefNRGUncertainty": 5}
+      "L": {"unit": "kgCO2e/L", "coefGHG": 2.41, "coefGHGUncertainty": 5, "coefNRG": 35.490, "coefNRGUncertainty": 5},
+      "€": {"unit": "kgCO2e/€", "coefGHG": 1.67, "coefGHGUncertainty": 10, "coefNRG": 24.646, "coefNRGUncertainty": 10}
     }
   },
   "fuel13": {
