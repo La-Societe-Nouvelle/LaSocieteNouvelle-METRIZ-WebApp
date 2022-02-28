@@ -21,8 +21,8 @@ label {
 // Textual form controls
 //
 
-.form-input, .input-number {
-    display: block;
+.form-input, .input-number, table select, table input {
+  display: block;
     width: 100%;
     padding: 0.375rem 0.75rem; 
     line-height: 1.5;

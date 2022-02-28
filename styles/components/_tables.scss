@@ -9,8 +9,9 @@
 
     h4 {
       text-align: center;
-      margin: 1em 0;
-    }
+      color : $secondary-color;
+      font-size: 1.2em;
+        }
     .table-header {
       width: 100%;
       padding: 5px 2px;
@@ -23,7 +24,8 @@
   
   table {
     width: 100%;
-    font-size: 0.85em;
+    white-space: nowrap;
+    font-size: 0.9em;
     font-family: "roboto", sans-serif;
 
     // --- Cell --- //
@@ -56,7 +58,7 @@
   
     tbody {
       td {
-        background-color: #f3f3f3;
+        background-color: $bg-light;
       }
       // select
       select {
