@@ -46,30 +46,21 @@ export class FECImportSection extends React.Component {
                   const dateEnd = books[code][nLines - 1].EcritureDate;
                   return (
                     <tr key={code}>
-                      <td>
-                        <div className="form-check">
-                          <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onChange={this.changeJournalANouveaux} />
-                        </div>
-                      </td>
                       <td>{code}</td>
                       <td>{label}</td>
                       <td>{dateEnd.substring(6, 8) + "/" + dateEnd.substring(4, 6) + "/" + dateEnd.substring(0, 4)}</td>
                       <td>{nLines}</td>
-
+                      <td>
+                        <div className="form-check">
+                          <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onClick={this.changeJournalANouveaux} />
+                        </div>
+                      </td>
                     </tr>
                   )
                 }
                 )}
             </tbody>
           </table>
-          <div className={"custom-control-inline"}>
-            <div className="form-group">
-              <input type="checkbox" className="custom-control-input"
-                checked={noBook}
-                onChange={this.onCheckboxChange} />
-              <label htmlFor="certification" className="custom-control-label">&nbsp;Pas de journal A-Nouveaux</label>
-            </div>
-          </div>
 
         </div>
     
@@ -77,6 +68,7 @@ export class FECImportSection extends React.Component {
           <button className={"btn btn-outline"} onClick={refresh}>
             Retour
           </button>
+          <button className={"btn btn-primary"} onClick={() => this.validate()}>
             Valider la sélection
           </button>
         </div>
@@ -87,10 +79,11 @@ export class FECImportSection extends React.Component {
   /* ----- EDIT ----- */
 
   changeJournalANouveaux = (event) => {
-    let selectedCode = event.target.value;
     let meta = this.state.meta;
-    Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = (code == selectedCode ? "ANOUVEAUX" : ""));
-    this.setState({ meta: meta, noBook: false });
+    let selectedCode = event.target.value;
+    let prevSelectedCode = Object.entries(meta.books).filter(([code, _]) => meta.books[code].type=="ANOUVEAUX").map(([code, _]) => code)[0];
+    Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = (code == selectedCode && selectedCode != prevSelectedCode ? "ANOUVEAUX" : ""));
+    this.setState({ meta: meta, noBook: selectedCode==prevSelectedCode});
   }
 
   onCheckboxChange = (event) => {
