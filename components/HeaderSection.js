@@ -4,7 +4,7 @@
 import React from 'react';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
-import { faSync, faEnvelope } from "@fortawesome/free-solid-svg-icons";   
+import { faSync, faEnvelope, faHome } from "@fortawesome/free-solid-svg-icons";   
 import { faGithub}  from "@fortawesome/free-brands-svg-icons";   
 
 /* -------------------- HEADER -------------------- */
@@ -17,6 +17,7 @@ export function HeaderSection({step,stepMax,setStep, downloadSession})
     <header>  
     <div className="top-bar">
         <ul className="nav">
+        <li><a href="#" onClick={refresh} ><FontAwesomeIcon icon={faHome} /> </a></li>
           <li><a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank"><FontAwesomeIcon icon={faGithub} /> GitHub</a></li>
           <li><a href="https://lasocietenouvelle.org/contact" target="_blank" > <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous</a></li>
         </ul>
