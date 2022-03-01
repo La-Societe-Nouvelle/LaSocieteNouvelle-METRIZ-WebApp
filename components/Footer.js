@@ -2,8 +2,8 @@
 
 // React
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhone } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";   
 
 export function Footer({ step }) {
   const getCurrentYear = () => {
@@ -11,38 +11,33 @@ export function Footer({ step }) {
   };
 
   return (
-    <footer className={"row container-fluid aln-bottom " + (step > 0 ? "footer-step aln-left" : "  ")}>
-      <section>
+    <footer className={"row container-fluid aln-middle " + (step > 0 ? "footer-step aln-left" : "  ")}>
+      <div>
         <p>
           <b>&copy; {getCurrentYear()} La Société Nouvelle</b>
         </p>
         <ul>
           <li>
-          <a href="https://lasocietenouvelle.org/" target="_blank">A propos</a>
+            <a href="https://lasocietenouvelle.org/mentions-legales" target="_blank">Mentions légales</a>
           </li>
           <li>
-           <a href="https://lasocietenouvelle.org/mentions-legales" target="_blank">Mentions légales</a>
+            <a href="http://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.txt" target="_blank">Licence</a>
           </li>
           <li>
-            Design by <a href="https://la-quincaillerie.fr/" target="_blank">La quincaillerie</a>
+            <a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank">Code source</a>
           </li>
         </ul>
-      </section>
+      </div>
       {step == 0 ? (
-        <section className="align-center">
-          <h3>Vous avez des questions ?</h3>
+        <div className="align-center">
+          <h3>Support et Assistance technique</h3>
           <p>
-            <a href="https://lasocietenouvelle.org/contact" target="_blank" className={"btn btn-primary"}>
-              Contactez nous
+            <a href="mailto:support@lasocietenouvelle.org" target="_blank" className={"btn btn-primary"}>
+            <FontAwesomeIcon icon={faEnvelope} /> Contactez nous
             </a>
           </p>
-          <p>- ou -</p>
-          <p>appeller maintenant le</p>
-          <a href="tel:0602362383" className="phone-number">
-            <FontAwesomeIcon icon={faPhone} />
-            06 02 36 23 83
-                      </a>
-        </section>
+
+        </div>
       ) : (
         ""
       )}

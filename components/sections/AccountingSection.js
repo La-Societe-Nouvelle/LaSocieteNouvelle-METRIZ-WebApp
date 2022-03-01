@@ -45,6 +45,7 @@ export class AccountingSection extends React.Component {
             this.importFECFile();
             this.submitCorporateName();
         }
+  
     }
 
     render() {
@@ -80,17 +81,18 @@ export class AccountingSection extends React.Component {
                                 onValidate={this.loadFECData.bind(this)}
                             />
                             {
-                                !disabledNextStep ? 
-                               
-                                <div className={"alert alert-success"}>
-                                <h4> <FontAwesomeIcon icon={faCheck} />  Votre choix a bien été validé ! </h4>
-                            </div>
-                            : 
-                            ""
+                                !disabledNextStep ?
+
+                                    <div className={"alert alert-success"}>
+                                        <h4> <FontAwesomeIcon icon={faCheck} />  Votre choix a bien été validé ! </h4>
+                                    </div>
+                                    :
+                                    ""
                             }
                         </section>
                         <section className={"action"}>
                             <div className="container-fluid">
+                 
                                 <button className={"btn btn-secondary"} disabled={disabledNextStep} onClick={this.props.submit}>
                                     Valider l'import
                                     <FontAwesomeIcon icon={faChevronRight} />
@@ -145,26 +147,6 @@ export class AccountingSection extends React.Component {
                                                 </div>
                                             )}
                                         </Dropzone>
-
-
-                                        <div className={"alert alert-info row aln-center"}>
-                                            <div className="f0">
-                                                <FontAwesomeIcon icon={faInfo} />
-                                            </div>
-                                            <div>
-                                                <p>
-                                                    L’importation des écritures comptables s’effectue via un
-                                                    Fichier d’Ecritures Comptables (FEC). Générez ce fichier{" "}
-                                                    <b>
-                                                        à partir de votre logiciel comptable, ou demandez-le
-                                                        auprès de votre service comptable.
-                                                    </b>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <p className="legend">
-                                            * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
-                                        </p>
                                     </div>
                                     {
                                         (files.length > 0) ?
@@ -186,7 +168,27 @@ export class AccountingSection extends React.Component {
 
                                             :
 
-                                            ""
+                                            <>
+
+                                                <div className={"alert alert-info row aln-center"}>
+                                                    <div className="f0">
+                                                        <FontAwesomeIcon icon={faInfo} />
+                                                    </div>
+                                                    <div>
+                                                        <p>
+                                                            L’importation des écritures comptables s’effectue via un
+                                                            Fichier d’Ecritures Comptables (FEC). Générez ce fichier{" "}
+                                                            <b>
+                                                                à partir de votre logiciel comptable, ou demandez-le
+                                                                auprès de votre service comptable.
+                                                            </b>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <p className="legend">
+                                                    * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
+                                                </p>
+                                            </>
                                     }
                                 </div>
                             </div>
@@ -231,6 +233,7 @@ export class AccountingSection extends React.Component {
     submitCorporateName = () => {
         this.props.session.legalUnit.corporateName = this.state.corporateName;
     };
+
 
 
     /* ---------- FEC IMPORT ---------- */

@@ -1,5 +1,8 @@
 
 /* Menu */
+#menu {
+  padding : 1em 0;
+}
 
 ul.nav {
   padding: 0;
@@ -28,9 +31,7 @@ ul.nav {
     font-size : 0.9em;
   }
 }
-#menu {
-  padding-top : 2em;
-}
+
 #progression{
         flex-grow: 1;
         

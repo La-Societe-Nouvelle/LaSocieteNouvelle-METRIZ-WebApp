@@ -48,7 +48,7 @@ export class CompaniesTable extends React.Component {
               <td
                 onClick={() => this.changeColumnSorted("denomination")}
               >
-                Nom de l'entreprise
+                Libellé
               </td>
               <td
                 onClick={() => this.changeColumnSorted("area")}
@@ -60,7 +60,7 @@ export class CompaniesTable extends React.Component {
               >
                 Activité associée
               </td>
-              <td
+              <td className="align-right"
                 onClick={() => this.changeColumnSorted("amount")}
               >
                 Montant
@@ -310,7 +310,7 @@ class RowTableCompanies extends React.Component {
           </select>
         </td>
 
-        <td>{printValue(amount, 0)} &euro;</td>
+        <td className="align-right">{printValue(amount, 0)} &euro;</td>
       </tr>
     );
   }

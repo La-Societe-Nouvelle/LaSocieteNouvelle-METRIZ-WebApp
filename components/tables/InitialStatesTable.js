@@ -49,7 +49,7 @@ export class InitialStatesTable extends React.Component {
               <td onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td onClick={() => this.changeColumnSorted("label")}>Libellé</td>
               <td colSpan="2">États initiaux - Empreinte sociétale</td>
-              <td onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td className="align-right" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
               </tr>
           </thead>
           <tbody>
@@ -240,7 +240,7 @@ function RowTableImmobilisations(props)
             </select>
           </td>
         )}
-        <td className="short right">{printValue(prevAmount, 0)} &euro;</td>
+        <td className="align-right">{printValue(prevAmount, 0)} &euro;</td>
   
       </tr>
     );
@@ -250,7 +250,7 @@ function RowTableImmobilisations(props)
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
-              <td className="short right">{printValue(prevAmount,0)} &euro;</td>
+              <td className="align-right">{printValue(prevAmount,0)} &euro;</td>
         
             </tr>)
   } else {
@@ -258,7 +258,7 @@ function RowTableImmobilisations(props)
               <td className="short center">{account}</td>
               <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non prise en compte (non amortissable)</td>
-              <td className="short right">{printValue(prevAmount,0)} &euro;</td>
+              <td className="align-right">{printValue(prevAmount,0)} &euro;</td>
         
             </tr>)
   }
@@ -308,7 +308,7 @@ function RowTableStocks(props)
             {Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b))
                                     .map(([code,libelle]) => <option className={(activityCode && code==activityCode) ? "default-option" : ""} key={code} value={code}>{code + " - " +libelle}</option>)}
           </select></td>}
-      <td className="short right">{printValue(prevAmount,0)} &euro;</td>
+      <td className="align-right">{printValue(prevAmount,0)} &euro;</td>
 
     </tr>
   )

@@ -241,12 +241,12 @@ export class CompaniesSection extends React.Component {
           </>
           :
           <div>
-            <p>
+                <p>
                     Cognitis enim pilatorum caesorumque funeribus nemo deinde ad has stationes appulit navem, sed ut Scironis praerupta letalia declinantes
                     litoribus Cypriis contigui navigabant, quae Isauriae scopulis sunt controversa.
                   </p>
                   <h5>
-                    Importer votre fichier de sauvegarde (.json)
+                    Importer votre fichier
                   </h5>
                   <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
                     {({ getRootProps, getInputProps }) => (
@@ -309,7 +309,6 @@ export class CompaniesSection extends React.Component {
   importFile = () => {
     let file = this.state.files[0];
 
-
     let extension = file.name.split(".").pop();
     switch (extension) {
       case "csv":
@@ -336,6 +335,7 @@ export class CompaniesSection extends React.Component {
         )
       );
       this.setState({ companies: this.props.session.financialData.companies });
+      console.log("state : " + this.state.companies)
     };
 
     reader.readAsText(file);
