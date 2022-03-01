@@ -11,6 +11,7 @@ import { MessagePopup } from "../popups/MessagePopup";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faWarning, faSync, faPen, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { updateVersion } from "../../src/version/updateVersion";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -259,10 +260,10 @@ export class InitialStatesSection extends React.Component {
         const prevSession = JSON.parse(reader.result);
 
         // update to current version
-        updateVersion(prevProps);
+        updateVersion(prevSession);
 
         if (
-          prevSession.legalUnit.siren == this.props.session.legalUnit.siren &&
+          //prevSession.legalUnit.siren == this.props.session.legalUnit.siren &&
           parseInt(prevSession.year) == parseInt(this.props.session.year) - 1
         ) {
           // JSON -> session

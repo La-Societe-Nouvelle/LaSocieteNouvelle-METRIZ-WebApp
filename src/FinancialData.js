@@ -175,17 +175,21 @@ export class FinancialData {
                 stock.prevFootprint = new SocialFootprint(prevAccount.footprint);
                 stock.initialState = "prevFootprint";
             }
+            else if (stock.prevAmount > 0)
+            {
+                console.log("New account with previous amount not null");
+            }
             else
             {
                 stock.prevFootprint = new SocialFootprint();
-                stock.initialState = account.isProductionStock ? "currentFootprint" : "defaultData";
+                stock.initialState = "none";
             }
         })
 
         // Expense accounts
         this.expenseAccounts.forEach(account =>
         {
-            let prevProps = data.expenseAccounts.filter(prevAccount => prevAccount.accountNum = account.accountNum)[0];
+            let prevProps = data.financialData.expenseAccounts.filter(prevAccount => prevAccount.accountNum = account.accountNum)[0];
             if (prevProps!=undefined)
             {
                 account.prevFootprint = new SocialFootprint(prevProps.footprint);

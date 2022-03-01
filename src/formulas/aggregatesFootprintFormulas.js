@@ -320,7 +320,7 @@ export const updateProductionItemsFootprints = async (indic,financialData) =>
   
   // ...initial production stock footprint based on current production footprint
   financialData.stocks.filter(stock => stock.isProductionStock)
-                      .filter(stock => stock.initialState == "currentFootprint")
+                      .filter(stock => stock.prevFootprint.indicators[indic].value == null)
                       .forEach(stock => stock.prevFootprint.indicators[indic] = financialData.aggregates.production.footprint.indicators[indic]);
 
   // Stored production
@@ -372,7 +372,7 @@ const updateImmobilisationsIndicator = async (indic,financialData) =>
     // Investments
     let investments = financialData.investments.filter(investment => investment.account == immobilisation.account);
     let amountInvestments = investments.map(investment => investment.amount)
-                                      .reduce((a,b) => a+b,0);
+                                       .reduce((a,b) => a+b,0);
     // Immobilised production
     let immobilisedProductions = financialData.immobilisationProductions.filter(immobilisationProduction => immobilisationProduction.account == immobilisation.account);
     let amountImmobilisedProduction = immobilisedProductions.map(immobilisationProduction => immobilisationProduction.amount)
@@ -381,8 +381,8 @@ const updateImmobilisationsIndicator = async (indic,financialData) =>
     // Merge investments indicator
     let investmentsIndicator = await buildIndicatorAggregate(indic,investments);
     let immobilisationIndicator = investments.length > 0 ? await buildIndicatorMerge(immobilisation.prevFootprint.indicators[indic], immobilisation.amount-amountInvestments-amountImmobilisedProduction,
-                                                                                    investmentsIndicator, amountInvestments) 
-                                                        : immobilisation.prevFootprint.indicators[indic];
+                                                                                     investmentsIndicator, amountInvestments) 
+                                                         : immobilisation.prevFootprint.indicators[indic];
     // Merge immobilised productions indicator
     let immobilisationProductionsIndicator = await buildIndicatorAggregate(indic,immobilisedProductions);
     immobilisationIndicator = immobilisedProductions.length > 0 ? await buildIndicatorMerge(immobilisationIndicator, immobilisation.amount-amountImmobilisedProduction,
