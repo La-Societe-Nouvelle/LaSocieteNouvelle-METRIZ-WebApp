@@ -86,7 +86,7 @@ export class StatementMAT extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-primary"}
+          <button disabled={!isValid} className={"btn btn-secondary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

@@ -114,24 +114,23 @@ export class CompaniesSection extends React.Component {
                 Compléter les numéros de siren à partir d'un fichier externe
               </button>
 
-              {/* <button onClick={this.exportXLSXFile}>Exporter (.xlsx)</button> */}
             </div>
           </div>
           
           {
               this.state.displayView == "defaultData" ? <>
-          <div className="table-container">
-            <p>
-              Les comptes fournisseurs et autres comptes tiers correspondent aux
-              entités exterieures vers lesquelles sont dirigés les charges
-              externes et les investissements. Les "autres comptes tiers" font
-              référence aux comptes par défaut résultants de l'impossibilité
-              d'associer certains flux sortants à un compte fournisseur
-              auxiliaire.
-              <br />
-              L'obtention des empreintes des comptes fournisseurs s'effectuent
-              via leur numéro de siren.
-            </p>
+               <div className="table-container">
+                <p>
+                  Les comptes fournisseurs et autres comptes tiers correspondent aux
+                  entités exterieures vers lesquelles sont dirigés les charges
+                  externes et les investissements. Les "autres comptes tiers" font
+                  référence aux comptes par défaut résultants de l'impossibilité
+                  d'associer certains flux sortants à un compte fournisseur
+                  auxiliaire.
+                  <br />
+                  L'obtention des empreintes des comptes fournisseurs s'effectuent
+                  via leur numéro de siren.
+                </p>
 
             {companies.length > 0 && (
               <div className="table-data">
@@ -245,9 +244,24 @@ export class CompaniesSection extends React.Component {
                     Cognitis enim pilatorum caesorumque funeribus nemo deinde ad has stationes appulit navem, sed ut Scironis praerupta letalia declinantes
                     litoribus Cypriis contigui navigabant, quae Isauriae scopulis sunt controversa.
                   </p>
+
+                  <h4> 
+                     &Eacute;tape 1
+                 </h4>
+                <p>
+                  <b>
+                  Télécharger le tableaux des fournisseurs :
+                    </b> <a href="#" className="link" onClick={this.exportXLSXFile}>
+                    Télécharger ici 
+                    </a>           
+
+                  </p> 
+                  <h4> 
+                     &Eacute;tape 2
+                 </h4>
                   <h5>
-                    Importer votre fichier
-                  </h5>
+                    Importer votre fichier excel
+                    </h5> 
                   <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
                     {({ getRootProps, getInputProps }) => (
                       <div className="dropzone-section">
@@ -308,7 +322,6 @@ export class CompaniesSection extends React.Component {
 
   importFile = () => {
     let file = this.state.files[0];
-
     let extension = file.name.split(".").pop();
     switch (extension) {
       case "csv":
@@ -335,10 +348,13 @@ export class CompaniesSection extends React.Component {
         )
       );
       this.setState({ companies: this.props.session.financialData.companies });
-      console.log("state : " + this.state.companies)
+      this.setState({ displayView: "defaultData" });
+
+
     };
 
     reader.readAsText(file);
+
   };
 
   // Import XLSX File
@@ -354,7 +370,11 @@ export class CompaniesSection extends React.Component {
           )
         )
       );
+      console.log(this.state.displayView);
+
       this.setState({ companies: this.props.session.financialData.companies });
+      this.setState({displayView : "defaultData"})
+      console.log(this.state.displayView);
     };
 
     reader.readAsArrayBuffer(file);
