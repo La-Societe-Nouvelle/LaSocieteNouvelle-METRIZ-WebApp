@@ -4,7 +4,7 @@
 import React from 'react';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faCheckSquare, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 /* ---------- FEC IMPORT  ---------- */
 
@@ -21,7 +21,6 @@ export class FECImportSection extends React.Component {
   render() {
     const { meta, books, noBook } = this.state;
     const disabledValidation = !(noBook || Object.entries(meta.books).map(([_, { type }]) => type).includes("ANOUVEAUX"));
-    const refresh = () => location.reload(true);
 
     return (
 
@@ -52,7 +51,7 @@ export class FECImportSection extends React.Component {
                       <td>{nLines}</td>
                       <td>
                         <div className="form-check">
-                          <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onClick={this.changeJournalANouveaux} />
+                          <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onChange={this.changeJournalANouveaux} />
                         </div>
                       </td>
                     </tr>
@@ -66,15 +65,8 @@ export class FECImportSection extends React.Component {
         </div>
     
         <div className={"container align-right"}>
-          <button className={"btn btn-outline"} onClick={refresh}>
-            Retour
-          </button>
           <button className={"btn btn-primary"} onClick={() => this.validate()}>
-            Valider la sélection
-            </button>
-          <button className={"btn btn-primary"} onClick={() => this.validate()}
-            disabled={disabledValidation}>
-            <FontAwesomeIcon icon={faChevronRight} />Valider mes A-Nouveaux
+            Valider La sélection
           </button>
         </div>
       </>

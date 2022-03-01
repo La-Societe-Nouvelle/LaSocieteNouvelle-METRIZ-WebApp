@@ -23,10 +23,7 @@ export function HeaderSection({step,stepMax,setStep, downloadSession})
         <button className={"btn btn-download btn-secondary"} onClick={saveSession}>  <FontAwesomeIcon icon={faSync} /> Sauvegarder ma session</button>
     </div>
     <div id="menu" className="container-fluid"> 
-      <div className="row">
-      <div className="logo">
-                <img src="/logo_la-societe-nouvelle_s.svg" alt="logo"  onClick={refresh}/>
-            </div>
+ 
       <nav id="progression" className="row">
         <div className={"stepper-item" + (stepMax >= 1 ? " completed" : "")}>
                <button className={"step-counter" + (step == 1 ? " current" : "")} disabled={stepMax < 1} onClick={() => setStep(1)}>1</button>
@@ -50,7 +47,6 @@ export function HeaderSection({step,stepMax,setStep, downloadSession})
         </div>
       </nav>
 
-      </div>
       </div>
 
 

@@ -123,7 +123,8 @@
 
    
 .table-menu {
-  margin-bottom: 1em;
+  margin: 1em 0;
+  text-align: center;
     button {
       background-color: #fff;
       border:none;
@@ -157,6 +158,9 @@
       margin: 20px auto;
       border-collapse: collapse;
   
+    }
+    .fa-circle-info {
+      color : $secondary-color;
     }
     tbody{
       td {

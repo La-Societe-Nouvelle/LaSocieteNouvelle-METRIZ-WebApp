@@ -1,10 +1,10 @@
 /* Header */
 
 	header {
-		border-bottom: 1px solid darken($bg-light, 10%);
+		border-bottom: 1px solid darken($bg-light, 2%);
 		background: $bg-light;
+	
 		.logo {
-			padding: 2em 0;
 				img {
 					display: block;
 					height: 5em;
@@ -13,4 +13,7 @@
 				}
 			
 		} 
+	}
+	.header{
+		padding: 1em 0;
 	}

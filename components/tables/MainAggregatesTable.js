@@ -27,61 +27,60 @@ export const MainAggregatesTable = ({financialData}) =>
         <thead>
           <tr>
             <td>Agrégat</td>
-            <td>Montant</td>
+            <td className="align-right">Montant</td>
             </tr>
         </thead>
-        <tbody>
-          
+        <tbody> 
           <tr>
             <td>Production sur l'exercice courant</td>
-            <td>{printValue(production.amount,0)} &euro;</td>
+            <td className="align-right">{printValue(production.amount,0)} &euro;</td>
             </tr>
           <tr>
-            <td>&emsp;Chiffre d'Affaires</td>
-            <td >{printValue(revenue.amount,0)} &euro;</td>
+            <td>&emsp;Chiffre d'Affaires</td> 
+            <td className="align-right">{printValue(revenue.amount,0)} &euro;</td>
             </tr>
           <tr>
             <td>&emsp;Production stockée</td>
-            <td >{printValue(storedProduction.amount,0)} &euro;</td>
+            <td className="align-right">{printValue(storedProduction.amount,0)} &euro;</td>
             </tr>
           <tr>
             <td>&emsp;Production immobilisée</td>
-            <td >{printValue(immobilisedProduction.amount,0)} &euro;</td>
+            <td className="align-right">{printValue(immobilisedProduction.amount,0)} &euro;</td>
             </tr>          
           
           <tr className="total">
             <td>Consommations intermédiaires</td>
-            <td className="important">{printValue(intermediateConsumption.amount,0)} &euro;</td>
+            <td className={"important align-right"}>{printValue(intermediateConsumption.amount,0)} &euro;</td>
             </tr>
           <tr>
             <td>&emsp;Variation de stocks</td>
-            <td >{printValue(-storedPurchases.amount,0)} &euro;</td>
+            <td className="align-right">{printValue(-storedPurchases.amount,0)} &euro;</td>
             </tr>
         {externalExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
           <tr key={index}>
             <td>&emsp;{accountLib}</td>
-            <td >{printValue(amount,0)} &euro;</td>
+            <td className="align-right">{printValue(amount,0)} &euro;</td>
             
           </tr>)}
 
           <tr className="total">
             <td>Consommations de capital fixe</td>
-            <td className=" important">{printValue(capitalConsumption.amount,0)} &euro;</td>
+            <td className={"important align-right"}>{printValue(capitalConsumption.amount,0)} &euro;</td>
             </tr>
         {depreciationExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
           <tr key={index}>
             <td>&emsp;{accountLib}</td>
-            <td >{printValue(amount,0)} &euro;</td>
+            <td className="align-right">{printValue(amount,0)} &euro;</td>
             
           </tr>)}
 
           <tr className="total">
             <td>Valeur ajoutée nette</td>
-            <td className=" important">{printValue(netValueAdded.amount,0)}  &euro;</td>
+            <td className={"important align-right"}>{printValue(netValueAdded.amount,0)}  &euro;</td>
             </tr>
           <tr>
             <td>&emsp;dont charges de personnel</td>
-            <td className=" detail">{printValue(financialData.getAmountPersonnelExpenses(),0)}  &euro;</td>
+            <td className={"detail align-right"}>{printValue(financialData.getAmountPersonnelExpenses(),0)}  &euro;</td>
             </tr>
 
         </tbody>
