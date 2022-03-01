@@ -11,6 +11,7 @@
       text-align: center;
       color : $secondary-color;
       font-size: 1.2em;
+      margin: 1.5em 0;
         }
     .table-header {
       width: 100%;
@@ -186,4 +187,11 @@
     svg{
       height: 20px;
     }
+  }
+
+  .a-nouveaux-input {
+    margin : 1em 0;
+    width: 100%; 
+    background: $bg-light;
+    padding: 1em;
   }

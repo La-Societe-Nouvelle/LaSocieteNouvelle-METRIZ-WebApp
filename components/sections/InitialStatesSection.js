@@ -10,7 +10,7 @@ import { ProgressBar } from "../popups/ProgressBar";
 import { MessagePopup } from "../popups/MessagePopup";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faPen } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faPen, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -29,7 +29,7 @@ export class InitialStatesSection extends React.Component {
       showMessage: false,
       titlePopup: "",
       message: "",
-      files:[],
+      files: [],
       view: "defaultData"
     };
   }
@@ -100,13 +100,16 @@ export class InitialStatesSection extends React.Component {
                   <b>Estimée sur exercice courant : </b>Nous initialisons l'empreinte du compte en début d'exercice.
                   à partir des opérations réalisées sur l'exercice courant.
                 </p>
-
-                <div className="table-btn">
-                  <button onClick={() => this.synchroniseAll()} className={"btn btn-secondary"}>
-                    <FontAwesomeIcon icon={faSync} /> Synchroniser les données
-                  </button>
-                </div>
-
+                {!isNextStepAvailable && (
+                  <div className={"alert alert-warning"}>
+                    <p>
+                      <FontAwesomeIcon icon={faWarning} /> L'empreinte de certains comptes ne sont pas initialisés.
+                    </p>
+                    <button onClick={() => this.synchroniseAll()} className={"btn btn-secondary"}>
+                      <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                    </button>
+                  </div>
+                )}
                 {financialData.immobilisations.concat(financialData.stocks).length >
                   0 && (
                     <div className="table-data">
@@ -125,13 +128,7 @@ export class InitialStatesSection extends React.Component {
                     </p>
                   </div>
                 )}
-                {!isNextStepAvailable && (
-                  <div className={"alert alert-warning"}>
-                    <p>
-                      <FontAwesomeIcon icon={faWarning} /> L'empreinte de certains comptes ne sont pas initialisés.
-                    </p>
-                  </div>
-                )}
+
 
                 {fetching && (
                   <div className="popup">
@@ -170,14 +167,13 @@ export class InitialStatesSection extends React.Component {
                     )}
                   </Dropzone>
                   {
-                     (files.length > 0) ?
-                     <button className={"btn btn-primary"} onClick={this.importFile}
-                     >
-                       Importer mon fichier
-                     </button> :
-                     ""
+                    (files.length > 0) ?
+                      <button className={"btn btn-primary"} onClick={this.importFile}
+                      >
+                        Importer mon fichier
+                      </button> :
+                      ""
                   }
-               
                   {showMessage && (
                     <MessagePopup
                       title={titlePopup}
@@ -194,12 +190,13 @@ export class InitialStatesSection extends React.Component {
         <section className={"action"}>
           <div className="container-fluid">
 
-            <button className={"btn btn-primary"}
+            <button className={"btn btn-secondary"}
               id="validation-button"
               disabled={!isNextStepAvailable}
               onClick={this.props.submit}
             >
-              Je valide les états initiaux
+              Valider les états initiaux   <FontAwesomeIcon icon={faChevronRight} />
+
             </button>
           </div>
         </section>
@@ -251,8 +248,9 @@ export class InitialStatesSection extends React.Component {
 
   /* ---------- BACK-UP IMPORT ---------- */
 
-  importFile = (event) => {
-    let file = event.target.files[0];
+  importFile = () => {
+
+    let file = this.state.files[0];
 
     let reader = new FileReader();
     reader.onload = async () => {

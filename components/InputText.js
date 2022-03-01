@@ -28,7 +28,7 @@ export class InputText extends React.Component {
     const {input,valid,unvalid} = this.state;
     
     return (
-      <input  className={(valid ? " valid" : unvalid ? "unvalid" : "") + " custom-input"}
+      <input  className={(valid ? " valid" : unvalid ? "unvalid" : "") + " form-input"}
               value={input}
               onChange={this.onChange}
               onBlur={this.onBlur}

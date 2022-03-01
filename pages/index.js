@@ -153,7 +153,7 @@ class Metriz extends React.Component {
       case 3: return (<InitialStatesSection {...sectionProps} />)
       case 4: return (<CompaniesSection {...sectionProps} />)
       case 5: return (<IndicatorSection {...sectionProps} publish={() => this.setStep(6)} />)
-      case 6: return (<StatementSection {...sectionProps} />)
+      case 6: return (<StatementSection {...sectionProps} return={() => this.setStep(5)} />)
    
     }
   }

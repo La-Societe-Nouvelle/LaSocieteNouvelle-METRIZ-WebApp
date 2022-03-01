@@ -2,8 +2,10 @@
 
 // React
 import React from "react";
+import Dropzone from "react-dropzone";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 // Components
 import { CompaniesTable } from "../tables/CompaniesTable";
 
@@ -23,13 +25,18 @@ import { getSignificativeCompanies } from "../../src/formulas/significativeLimit
 export class CompaniesSection extends React.Component {
   constructor(props) {
     super(props);
+    this.onDrop = (files) => {
+      this.setState({ files });
+    };
     this.state = {
       companies: props.session.financialData.companies,
       significativeCompanies: [],
       view: "all",
       nbItems: 20,
       fetching: false,
+      files: [],
       progression: 0,
+      displayView: "defaultData"
     };
   }
 
@@ -63,6 +70,7 @@ export class CompaniesSection extends React.Component {
       nbItems,
       fetching,
       progression,
+      files,
     } = this.state;
     const financialData = this.props.session.financialData;
 
@@ -92,27 +100,26 @@ export class CompaniesSection extends React.Component {
           </div>
           <div className="table-container">
             <div className="table-menu">
-              <button className="active" onClick={this.changeView}>
-                Compléter les numéros de siren sur l'outil
+
+              <button value="defaultData" 
+              className={this.state.displayView == "defaultData" ? "active" : ""}
+                onClick={this.changeDisplayView}>
+                Compléter le numéro Siren sur l'outils
               </button>
-              <button
-                onClick={() =>
-                  document.getElementById("import-companies").click()
-                }
+              
+              <button value="importData"
+                className={this.state.displayView == "importData" ? "active" : ""}
+                onClick={this.changeDisplayView}
               >
                 Compléter les numéros de siren à partir d'un fichier externe
               </button>
-              <input
-                id="import-companies"
-                visibility="collapse"
-                type="file"
-                accept=".csv,.xlsx"
-                onChange={this.importFile}
-              />
+
               {/* <button onClick={this.exportXLSXFile}>Exporter (.xlsx)</button> */}
             </div>
           </div>
-
+          
+          {
+              this.state.displayView == "defaultData" ? <>
           <div className="table-container">
             <p>
               Les comptes fournisseurs et autres comptes tiers correspondent aux
@@ -184,6 +191,24 @@ export class CompaniesSection extends React.Component {
                     )}
                   </div>
                 </div>
+                {!isNextStepAvailable && (
+                  <>
+                    <div className={"alert alert-warning"}>
+                      <p>
+                        <FontAwesomeIcon icon={faWarning} /> L'empreinte de
+                        certains comptes ne sont pas initialisés.
+                      </p>
+                      <button
+                        onClick={() => this.synchroniseShowed()}
+                        className={"btn btn-secondary"}
+                      >
+                        <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                        données
+                      </button>
+                    </div>
+
+                  </>
+                )}
                 <CompaniesTable
                   nbItems={
                     nbItems == "all"
@@ -201,25 +226,6 @@ export class CompaniesSection extends React.Component {
                     </p>
                   </div>
                 )}
-                {!isNextStepAvailable && (
-                  <>
-                    <div className={"alert alert-warning"}>
-                      <p>
-                        <FontAwesomeIcon icon={faWarning} /> L'empreinte de
-                        certains comptes ne sont pas initialisés.
-                      </p>
-                    </div>
-                    <div className="table-btn">
-                      <button
-                        onClick={() => this.synchroniseShowed()}
-                        className={"btn btn-secondary"}
-                      >
-                        <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                        données
-                      </button>
-                    </div>
-                  </>
-                )}
               </div>
             )}
           </div>
@@ -232,20 +238,59 @@ export class CompaniesSection extends React.Component {
               />
             </div>
           )}
-          =        </section>
+          </>
+          :
+          <div>
+            <p>
+                    Cognitis enim pilatorum caesorumque funeribus nemo deinde ad has stationes appulit navem, sed ut Scironis praerupta letalia declinantes
+                    litoribus Cypriis contigui navigabant, quae Isauriae scopulis sunt controversa.
+                  </p>
+                  <h5>
+                    Importer votre fichier de sauvegarde (.json)
+                  </h5>
+                  <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
+                    {({ getRootProps, getInputProps }) => (
+                      <div className="dropzone-section">
+                        <div {...getRootProps()} className="dropzone">
+                          <input {...getInputProps()} />
+                          <p>
+                            Glisser votre fichier
+                            <span>
+                              ou cliquez ici pour sélectionner votre fichier
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </Dropzone>
+                  {
+                    (files.length > 0) ?
+                      <button className={"btn btn-primary"} onClick={this.importFile}
+                      >
+                        Importer mon fichier
+                      </button> :
+                      ""
+                  }
+          </div>
+  }
+        </section>
         <div className={"action container-fluid"}>
           <button
-            className={"btn btn-primary"}
+            className={"btn btn-secondary"}
             id="validation-button"
             disabled={!isNextStepAvailable}
             onClick={this.props.submit}
           >
-            Je valide les fournisseurs
+            Valider les fournisseurs
+            <FontAwesomeIcon icon={faChevronRight} />
           </button>
         </div>
       </>
     );
   }
+   /* ---------- SELECTED VIEW ---------- */
+
+   changeDisplayView = (event) => this.setState({ displayView: event.target.value });
 
   /* ---------- VIEW ---------- */
 
@@ -261,8 +306,9 @@ export class CompaniesSection extends React.Component {
 
   /* ---------- FILE IMPORT ---------- */
 
-  importFile = (event) => {
-    let file = event.target.files[0];
+  importFile = () => {
+    let file = this.state.files[0];
+
 
     let extension = file.name.split(".").pop();
     switch (extension) {

@@ -17,10 +17,10 @@ export function HeaderSection({step,stepMax,setStep, downloadSession})
     <header>  
     <div className="top-bar">
         <ul className="nav">
-          <li><a href=""><FontAwesomeIcon icon={faGithub} /> GitHub</a></li>
-          <li><a href="" > <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous</a></li>
+          <li><a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank"><FontAwesomeIcon icon={faGithub} /> GitHub</a></li>
+          <li><a href="https://lasocietenouvelle.org/contact" target="_blank" > <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous</a></li>
         </ul>
-        <button className={"btn btn-download"} onClick={saveSession}>  <FontAwesomeIcon icon={faSync} /> Sauvegarder ma session</button>
+        <button className={"btn btn-download btn-secondary"} onClick={saveSession}>  <FontAwesomeIcon icon={faSync} /> Sauvegarder ma session</button>
     </div>
     <div id="menu" className="container-fluid"> 
       <div className="row">

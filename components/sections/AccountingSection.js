@@ -5,7 +5,7 @@ import React from 'react';
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowTrendUp, faChevronRight, faInfo, faFileExcel, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faArrowTrendUp, faChevronRight, faInfo, faFileExcel, faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { FECImportSection } from "./FECImportSection";
 
@@ -79,10 +79,18 @@ export class AccountingSection extends React.Component {
                                 FECData={importedData}
                                 onValidate={this.loadFECData.bind(this)}
                             />
+                            {
+                                !disabledNextStep ? 
+                               
+                                <div className={"alert alert-success"}>
+                                <h4> <FontAwesomeIcon icon={faCheck} />  Votre choix a bien été validé ! </h4>
+                            </div>
+                            : 
+                            ""
+                            }
                         </section>
                         <section className={"action"}>
                             <div className="container-fluid">
-
                                 <button className={"btn btn-secondary"} disabled={disabledNextStep} onClick={this.props.submit}>
                                     Valider l'import
                                     <FontAwesomeIcon icon={faChevronRight} />
@@ -112,7 +120,7 @@ export class AccountingSection extends React.Component {
                                             <label>Dénomination / Nom du projet</label>
                                             <input
                                                 id="siren-input"
-                                                className="form-control"
+                                                className="form-input"
                                                 type="text"
                                                 value={corporateName}
                                                 onChange={this.onCorporateNameChange}

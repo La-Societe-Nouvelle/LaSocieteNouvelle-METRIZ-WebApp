@@ -4,7 +4,7 @@
 import React from 'react';
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight,  faFileImport } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faFileImport } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -109,21 +109,82 @@ export class FinancialDataSection extends React.Component {
                 Stocks
               </button>
             </div>
+            <div className={"alert alert-success"} role="alert">
+              <strong>Bravo !</strong> Votre import a été réalisé avec succès!
+            </div>
+            <div>
+              <p>
+                Par mesure de précaution, vérifiez l’exactitude des agrégats
+                financiers nécessitant une validation manuelle. La lecture des
+                écritures peut entraîner des exceptions (problèmes de lecture)
+                dans le cas où certains flux ne peuvent être tracés. Ces
+                exceptions interviennent notamment en cas d’écriture unique pour
+                les opérations diverses.
+              </p>
+            </div>
+            <div className="table-container">
+              <div className="table-menu">
+                <button
+                  key={1}
+                  value="incomeStatement"
+                  onClick={this.changeFinancialTable}
+                  className={
+                    selectedTable == "incomeStatement" || "" ? "active" : ""
+                  }
+                >
+                  Comptes de résultat
+                </button>
+                <button
+                  key={2}
+                  value="mainAggregates"
+                  onClick={this.changeFinancialTable}
+                  className={
+                    selectedTable == "mainAggregates" || "" ? "active" : ""
+                  }
+                >
+                  Soldes intermédiaires de gestion
+                </button>
+                <button
+                  key={3}
+                  value="immobilisations"
+                  onClick={this.changeFinancialTable}
+                  className={selectedTable == "immobilisations" ? "active" : ""}
+                >
+                  Immobilisations
+                </button>
+                <button
+                  key={4}
+                  value="expenses"
+                  onClick={this.changeFinancialTable}
+                  className={selectedTable == "expenses" ? "active" : ""}
+                >
+                  Charges externes
+                </button>
+                <button
+                  key={5}
+                  value="stocks"
+                  onClick={this.changeFinancialTable}
+                  className={selectedTable == "stocks" ? "active" : ""}
+                >
+                  Stocks
+                </button>
+              </div>
 
-            <div className="table-data">
-              {this.buildtable(selectedTable)}
+              <div className="table-data">
+                {this.buildtable(selectedTable)}
 
-              {errorFile && (
-                <MessagePopupErrors
-                  title="Erreur - Fichier"
-                  message={errorMessage}
-                  errors={errors}
-                  closePopup={() => this.setState({ errorFile: false })}
-                />
-              )}
+                {errorFile && (
+                  <MessagePopupErrors
+                    title="Erreur - Fichier"
+                    message={errorMessage}
+                    errors={errors}
+                    closePopup={() => this.setState({ errorFile: false })}
+                  />
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </section>
         <section className={"action"}>
           <div className="container-fluid">
 
@@ -154,8 +215,5 @@ export class FinancialDataSection extends React.Component {
   /* ---------- SELECTED TABLE ---------- */
 
   changeFinancialTable = (event) => this.setState({ selectedTable: event.target.value })
-
-
-
 
 }
