@@ -60,13 +60,6 @@ export class FECImportSection extends React.Component {
           </table>
 
         </div>
-    
-        <div className={"container align-right"}>
-          
-          <button className={"btn btn-primary"} onClick={() => this.validate()}>
-            Valider La sélection
-          </button>
-        </div>
       </>
     )
   }
@@ -79,16 +72,7 @@ export class FECImportSection extends React.Component {
     let prevSelectedCode = Object.entries(meta.books).filter(([code, _]) => meta.books[code].type=="ANOUVEAUX").map(([code, _]) => code)[0];
     Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = (code == selectedCode && selectedCode != prevSelectedCode ? "ANOUVEAUX" : ""));
     this.setState({ meta: meta, noBook: selectedCode==prevSelectedCode});
+    this.props.onChangeJournalANouveaux(meta);
   }
-
-  onCheckboxChange = (event) => {
-    let meta = this.state.meta;
-    if (event.target.checked) Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = "");
-    this.setState({ meta: meta, noBook: event.target.checked });
-  }
-
-  /* ----- PROPS METHODS ----- */
-
-  validate = () => this.props.onValidate({ ...this.state })
 
 }

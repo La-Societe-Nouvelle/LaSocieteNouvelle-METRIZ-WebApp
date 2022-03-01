@@ -80,23 +80,12 @@ export class AccountingSection extends React.Component {
 
                             <FECImportSection
                                 FECData={importedData}
-                                onValidate={this.loadFECData.bind(this)
-                                
-                                }
+                                onChangeJournalANouveaux={this.updateMeta}
                             />
-                            {
-                                !disabledNextStep ?
-
-                                    <div className={"alert alert-success"}>
-                                        <h4> <FontAwesomeIcon icon={faCheck} />  Votre choix a bien été validé ! </h4>
-                                    </div>
-                                    :
-                                    ""
-                            }
                         </section>
                         <section className={"action"}>
                             <div className="container-fluid">
-                                <button className={"btn btn-secondary"} disabled={disabledNextStep} onClick={this.props.submit}>
+                                <button className={"btn btn-secondary"} onClick={this.loadFECData}>
                                     Valider l'import
                                     <FontAwesomeIcon icon={faChevronRight} />
                                 </button>
@@ -238,7 +227,9 @@ export class AccountingSection extends React.Component {
         this.props.session.legalUnit.corporateName = this.state.corporateName;
     };
 
-
+    updateMeta = (meta) => {
+        this.state.importedData.meta = meta;
+      }
 
     /* ---------- FEC IMPORT ---------- */
 
@@ -264,9 +255,9 @@ export class AccountingSection extends React.Component {
     }
 
     // Load imported data into financial data
-    loadFECData = async (FECData) => {
+    loadFECData = async () => {
 
-        let nextFinancialData = await FECDataReader(FECData);                                                                 // read data from JSON (JSON -> financialData JSON)
+        let nextFinancialData = await FECDataReader(this.state.importedData);                                                                 // read data from JSON (JSON -> financialData JSON)
 
         if (nextFinancialData.errors.length > 0)                                                                              // show error(s) (content)
         {
@@ -275,7 +266,7 @@ export class AccountingSection extends React.Component {
         }
         else {
             // load year
-            this.props.session.year = /^[0-9]{8}/.test(FECData.meta.lastDate) ? FECData.meta.lastDate.substring(0, 4) : "";
+            this.props.session.year = /^[0-9]{8}/.test(this.state.importedData.meta.lastDate) ? this.state.importedData.meta.lastDate.substring(0, 4) : "";
 
             // load financial data
             this.props.session.financialData = new FinancialData(nextFinancialData);
@@ -300,6 +291,7 @@ export class AccountingSection extends React.Component {
             // update state
             //this.setState({ importedData: null });
 
+            this.props.submit();
         }
     }
 
