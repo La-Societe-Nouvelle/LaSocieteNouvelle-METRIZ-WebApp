@@ -47,7 +47,7 @@ export class FinancialDataSection extends React.Component {
 
     return (
       <>
-        <div className="container">
+        <section className="container">
           <div className={"section-title"}>
             <h2>                  <FontAwesomeIcon icon={faFileImport} />
               &Eacute;tape 2 - Validez votre import</h2>

@@ -71,6 +71,7 @@ export class FECImportSection extends React.Component {
           </button>
           <button className={"btn btn-primary"} onClick={() => this.validate()}>
             Valider la sélection
+            </button>
           <button className={"btn btn-primary"} onClick={() => this.validate()}
             disabled={disabledValidation}>
             <FontAwesomeIcon icon={faChevronRight} />Valider mes A-Nouveaux
