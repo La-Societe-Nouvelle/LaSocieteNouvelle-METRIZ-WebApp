@@ -30,7 +30,7 @@ const viewsForIndic = {
 
 export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
   const options = {
-    responsive : true,
+    responsive: true,
     plugins: {
       legend: {
         position: 'bottom',
@@ -72,7 +72,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
       {
         label: 'Production',
         data: [production.footprint.getIndicator(indic).value, productionSectorFootprint.getIndicator(indic).value, productionAreaFootprint.getIndicator(indic).value],
-        backgroundColor: 'RGBA(250, 89, 95, 0.8)',
+        backgroundColor: ["RGB(251, 122, 127)","RGB(219, 222, 241)","RGB(219, 222, 241)"],
       },
     ],
   };
@@ -83,7 +83,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
       {
         label: 'Valeur ajoutée',
         data: [netValueAdded.footprint.getIndicator(indic).value, valueAddedSectorFootprint.getIndicator(indic).value, valueAddedAreaFootprint.getIndicator(indic).value],
-        backgroundColor: 'RGBA(250, 89, 95, 0.8)',
+        backgroundColor: ["RGB(251, 122, 127)","RGB(219, 222, 241)","RGB(219, 222, 241)"],
       },
     ],
   };
@@ -93,7 +93,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
       {
         label: 'Consommation',
         data: [intermediateConsumption.footprint.getIndicator(indic).value, consumptionSectorFootprint.getIndicator(indic).value],
-        backgroundColor: 'RGBA(250, 89, 95, 0.8)',
+        backgroundColor: ["RGB(251, 122, 127)","RGB(219, 222, 241)","RGB(219, 222, 241)"],
       },
     ],
   };
@@ -102,31 +102,28 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
   return (
     <>
-    <div className="row"> 
-      <div className="chart-container" >
-        <Bar
-          data={dataProduction}
-          options={options}
-        />
-      </div>
-      <div className="chart-container">
-
-        <Bar
-          data={dataConsumption}
-          options={options}
-        />
-      </div>
-
-      <div className="chart-container">
-
-        <Bar
-          data={dataValueAdded}
-          options={options}
-        />
-        {/* <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
+      <div className="row">
+        <div className="chart-container" >
+          <Bar
+            data={dataProduction}
+            options={options}
+          />
+        </div>
+        <div className="chart-container">
+          <Bar
+            data={dataConsumption}
+            options={options}
+          />
+        </div>
+        <div className="chart-container">
+          <Bar
+            data={dataValueAdded}
+            options={options}
+          />
+          {/* <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
         <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>
         <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/>  */}
-      </div>
+        </div>
       </div>
       <table>
         <thead>

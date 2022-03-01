@@ -2,6 +2,8 @@
 
 // React
 import React from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalculator } from "@fortawesome/free-solid-svg-icons";
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
@@ -57,11 +59,7 @@ export class StatementGEQ extends React.Component {
             <label>Ecart de rémunarations F/H (en % du taux horaire brut moyen)</label>
             <InputNumber value={roundValue(wageGap, 1)}
               disabled={hasEmployees === false}
-              onUpdate={this.updateWageGap} />
-            <span>&nbsp;%</span>
-            <div className="assessment-button-container">
-              <button className={"btn btn-secondary"} onClick={this.props.toAssessment}>Outil d'évaluation</button>
-            </div>
+              onUpdate={this.updateWageGap} placeholder="%"/>
           </div>
 
 
@@ -73,8 +71,11 @@ export class StatementGEQ extends React.Component {
             onChange={this.updateInfo}
             onBlur={this.saveInfo} />
         </div>
-        <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-primary"}
+        <div className="statement-validation"> 
+        <button className={"btn btn-primary"} onClick={this.props.toAssessment} disabled={hasEmployees ? false : true}>
+        <FontAwesomeIcon icon={faCalculator} />
+        Outil d'évaluation</button>
+          <button disabled={!isValid} className={"btn btn-secondary"}
             onClick={this.onValidate}>Valider</button>
         </div>
       </div>

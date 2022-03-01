@@ -40,18 +40,18 @@ export class StatementHAZ extends React.Component {
 
     return (
       <div className="statement">
-        <div className="form-group">
+        <div className={"form-group small-input"}>
           <label>Utilisation de produits dangereux - santé/environnement</label>
           <InputNumber value={roundValue(hazardousSubstancesConsumption,0)}
-                       onUpdate={this.updateHazardousSubstancesConsumption}/>
-          <span>&nbsp;kg</span>
+                       onUpdate={this.updateHazardousSubstancesConsumption}
+                       placeholder="KG"/>
         </div>
-        <div className="form-group">
+        <div className={"form-group small-input"}>
           <label>Incertitude</label>
           <InputNumber value={roundValue(hazardousSubstancesConsumptionUncertainty,0)}
-                       onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}/>
-          <span>&nbsp;%</span>
-        </div>
+                       onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}
+                       placeholder="%"/>
+      </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
           <textarea type="text" spellCheck="false"
@@ -60,7 +60,7 @@ export class StatementHAZ extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-primary"}
+          <button disabled={!isValid} className={"btn btn-secondary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

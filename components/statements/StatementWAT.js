@@ -40,34 +40,33 @@ export class StatementWAT extends React.Component {
 
     return (
       <div className="statement">
-                        <div className="statement-form">
+          <div className="statement-form">
+            <div className="form-group">
+              <label>Consommation totale d'eau</label>
+              <InputNumber value={roundValue(waterConsumption,0)}
+                          onUpdate={this.updateWaterConsumption}
+                          placeholder="m³"
+                          />
+            </div>
+            <div className="form-group">
+              <label>Incertitude</label>
+              <InputNumber value={roundValue(waterConsumptionUncertainty,0)}
+                          onUpdate={this.updateWaterConsumptionUncertainty}
+                          placeholder="%"
+                          />
+            </div>
 
-        <div className="form-group">
-          <label>Consommation totale d'eau</label>
-          <InputNumber value={roundValue(waterConsumption,0)}
-                       onUpdate={this.updateWaterConsumption}
-                       placeholder="m³"
-                       />
-        </div>
-        <div className="form-group">
-          <label>Incertitude</label>
-          <InputNumber value={roundValue(waterConsumptionUncertainty,0)}
-                       onUpdate={this.updateWaterConsumptionUncertainty}
-                       placeholder="%"
-                       />
-        </div>
-
-        </div>
+          </div>
         
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <textarea className="form-input" type="text" spellCheck="false"
-                    value={info} 
-                    onChange={this.updateInfo}
-                    onBlur={this.saveInfo}/>
-        </div>
+          <div className="statement-comments">
+            <label>Informations complémentaires</label>
+            <textarea className="form-input" type="text" spellCheck="false"
+                      value={info} 
+                      onChange={this.updateInfo}
+                      onBlur={this.saveInfo}/>
+          </div>
         <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-primary"}
+          <button disabled={!isValid} className={"btn btn-secondary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

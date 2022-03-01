@@ -102,6 +102,7 @@ label {
 .statement {
   textarea {
     width: 45%;
+    min-height: 100px;
     &:focus, &:focus-visible{
       border-color: $tertiary-color;
     }
@@ -140,4 +141,8 @@ label {
   div {
     margin-bottom: 1em;
   }
+}
+
+.small-input {
+  width: 35%;
 }
