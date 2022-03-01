@@ -19,9 +19,9 @@ export class StartSection extends React.Component {
       <div id="start" className="container">
         <div className="row">
           <div className="col">
-            <h1>
+            <h2>
                <span className="underline">Metriz</span> - Version Partenaire
-            </h1>
+            </h2>
             <p>
               <b>Cabinet : </b>
             </p>
@@ -30,12 +30,11 @@ export class StartSection extends React.Component {
 
             </p>
             <div id="section-picto" className="row">
-
               <div>
-              <img src="/logo_la-societe-nouvelle_s.svg" alt="logo"/>
+                <img src="/logo_la-societe-nouvelle_s.svg" alt="logo" className="logoLSN"/>
               </div>
               <div>
-                <img src="resources/pictos/goals.svg" alt="Engagement" />
+                <img src="resources/logo-partenaires/logo-te-1.png" alt="Terre Entrepreneur" />
               </div>
             </div>
             <button className={"btn btn-primary"} onClick={this.props.startNewSession}>

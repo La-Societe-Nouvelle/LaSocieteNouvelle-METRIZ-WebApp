@@ -9,8 +9,10 @@ export function Header()
 {  
   return (
     <header className="header"> 
-            <div className="logo">
-                <img src="/logo_la-societe-nouvelle.svg" alt="logo" />
+            <div className="text-logo">
+                <h1>
+                  Intiative OpenData OpenSource
+                </h1>
             </div>
     </header>)
 }
