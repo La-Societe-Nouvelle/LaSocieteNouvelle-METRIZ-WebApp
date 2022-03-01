@@ -47,11 +47,67 @@ export class FinancialDataSection extends React.Component {
 
     return (
       <>
-        <section>
-          <div className="container">
-            <div className={"section-title"}>
-              <h2>                  <FontAwesomeIcon icon={faFileImport} />
-                &Eacute;tape 2 - Validez votre import</h2>
+        <div className="container">
+          <div className={"section-title"}>
+            <h2>                  <FontAwesomeIcon icon={faFileImport} />
+              &Eacute;tape 2 - Validez votre import</h2>
+          </div>
+          <div className={"alert alert-info"} role="alert">
+            <strong>Bravo !</strong> Votre import a été réalisé avec succès!
+          </div>
+          <div>
+            <p>
+              Par mesure de précaution, vérifiez l’exactitude des agrégats
+              financiers. Des erreurs de lecture peuvent intervenir
+              en cas d'écriture unique regroupant plusieurs opérations.
+            </p>
+          </div>
+          <div className="table-container">
+            <div className="table-menu">
+              <button
+                key={1}
+                value="incomeStatement"
+                onClick={this.changeFinancialTable}
+                className={
+                  selectedTable == "incomeStatement" || "" ? "active" : ""
+                }
+              >
+                Comptes de résultat
+              </button>
+              <button
+                key={2}
+                value="mainAggregates"
+                onClick={this.changeFinancialTable}
+                className={
+                  selectedTable == "mainAggregates" || "" ? "active" : ""
+                }
+              >
+                Soldes intermédiaires de gestion
+              </button>
+              <button
+                key={3}
+                value="immobilisations"
+                onClick={this.changeFinancialTable}
+                className={selectedTable == "immobilisations" ? "active" : ""}
+              >
+                Immobilisations
+              </button>
+              <button
+                key={4}
+                value="expenses"
+                onClick={this.changeFinancialTable}
+                className={selectedTable == "expenses" ? "active" : ""}
+              >
+                Charges externes
+              </button>
+              <button
+                key={5}
+                value="stocks"
+                onClick={this.changeFinancialTable}
+                className={selectedTable == "stocks" ? "active" : ""}
+              >
+                Stocks
+              </button>
             </div>
             <div className={"alert alert-success"} role="alert">
               <strong>Bravo !</strong> Votre import a été réalisé avec succès!

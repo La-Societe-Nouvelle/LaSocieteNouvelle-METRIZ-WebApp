@@ -94,14 +94,13 @@ export class CompaniesSection extends React.Component {
               Saisie des numéros de Siren
             </h3>
             <p>
-              Primi igitur omnium statuuntur Epigonus et Eusebius ob nominum
-              gentilitatem oppressi. praediximus enim Montium sub ipso vivendi
-              termino his vocabulis appellatos fabricarum culpasse tribunos ut
-              adminicula futurae molitioni pollicitos.
+              Les numéros de siren permettent de récupérer les données relatives aux fournisseurs
+              au sein de notre base de données ouverte.
             </p>
           </div>
           <div className="table-container">
             <div className="table-menu">
+
               <button value="defaultData" 
               className={this.state.displayView == "defaultData" ? "active" : ""}
                 onClick={this.changeDisplayView}>
@@ -112,7 +111,7 @@ export class CompaniesSection extends React.Component {
                 className={this.state.displayView == "importData" ? "active" : ""}
                 onClick={this.changeDisplayView}
               >
-                Importer une sauvegarde de l'année dernière
+                Compléter les numéros de siren à partir d'un fichier externe
               </button>
 
               {/* <button onClick={this.exportXLSXFile}>Exporter (.xlsx)</button> */}

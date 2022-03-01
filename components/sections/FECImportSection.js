@@ -27,15 +27,15 @@ export class FECImportSection extends React.Component {
 
       <>
         <div className={"table-container container"}>
-          <h4>Identifiez vos journaux A-Nouveaux : </h4>
+          <h4>Identifiez le journal des A-Nouveaux : </h4>
           <table>
             <thead>
               <tr>
-                <td width="50px">Identification A-Nouveaux</td>
                 <td>Code</td>
                 <td>Libellé</td>
                 <td>Fin</td>
                 <td>Nombre de Lignes</td>
+                <td width="50px">Identification A-Nouveaux</td>
               </tr>
             </thead>
             <tbody>
@@ -46,16 +46,15 @@ export class FECImportSection extends React.Component {
                   const dateEnd = books[code][nLines - 1].EcritureDate;
                   return (
                     <tr key={code}>
-                      <td>
-                        <div className="form-check">
-                          <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onChange={this.changeJournalANouveaux} />
-                        </div>
-                      </td>
                       <td>{code}</td>
                       <td>{label}</td>
                       <td>{dateEnd.substring(6, 8) + "/" + dateEnd.substring(4, 6) + "/" + dateEnd.substring(0, 4)}</td>
                       <td>{nLines}</td>
-
+                      <td>
+                        <div className="form-check">
+                          <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onClick={this.changeJournalANouveaux} />
+                        </div>
+                      </td>
                     </tr>
                   )
                 }
@@ -63,16 +62,15 @@ export class FECImportSection extends React.Component {
 
             </tbody>
           </table>
-          <div className={"custom-control-inline a-nouveaux-input"}>
-              <input type="checkbox" className="custom-control-input"
-                checked={noBook}
-                onChange={this.onCheckboxChange} />
-              <label htmlFor="certification" className="custom-control-label">&nbsp;Pas de journal A-Nouveaux</label>
-          </div>
 
         </div>
     
         <div className={"container align-right"}>
+          <button className={"btn btn-outline"} onClick={refresh}>
+            Retour
+          </button>
+          <button className={"btn btn-primary"} onClick={() => this.validate()}>
+            Valider la sélection
           <button className={"btn btn-primary"} onClick={() => this.validate()}
             disabled={disabledValidation}>
             <FontAwesomeIcon icon={faChevronRight} />Valider mes A-Nouveaux
@@ -85,10 +83,11 @@ export class FECImportSection extends React.Component {
   /* ----- EDIT ----- */
 
   changeJournalANouveaux = (event) => {
-    let selectedCode = event.target.value;
     let meta = this.state.meta;
-    Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = (code == selectedCode ? "ANOUVEAUX" : ""));
-    this.setState({ meta: meta, noBook: false });
+    let selectedCode = event.target.value;
+    let prevSelectedCode = Object.entries(meta.books).filter(([code, _]) => meta.books[code].type=="ANOUVEAUX").map(([code, _]) => code)[0];
+    Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = (code == selectedCode && selectedCode != prevSelectedCode ? "ANOUVEAUX" : ""));
+    this.setState({ meta: meta, noBook: selectedCode==prevSelectedCode});
   }
 
   onCheckboxChange = (event) => {
