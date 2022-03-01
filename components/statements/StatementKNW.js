@@ -2,6 +2,8 @@
 
 // React
 import React from 'react';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCalculator } from "@fortawesome/free-solid-svg-icons";
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
@@ -36,12 +38,11 @@ export class StatementKNW extends React.Component {
 
     return (
       <div className="statement">
-        <div className="form-group">
+        <div className={"form-group small-input"}>
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
           <InputNumber value={roundValue(researchAndTrainingContribution,1)} 
                        onUpdate={this.updateResearchAndTrainingContribution}
                        placeholder="&euro;"/>
-            <button className={"btn btn-secondary"} onClick={this.props.toAssessment}>Outil d'évaluation</button>
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -51,7 +52,10 @@ export class StatementKNW extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-primary"}
+        <button className={"btn btn-primary"} onClick={this.props.toAssessment}>
+        <FontAwesomeIcon icon={faCalculator} />
+          Outil d'évaluation</button>
+          <button disabled={!isValid} className={"btn btn-secondary"}
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

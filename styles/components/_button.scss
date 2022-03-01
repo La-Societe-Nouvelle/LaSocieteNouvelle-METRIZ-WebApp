@@ -18,7 +18,7 @@
 
 
   .btn-primary {
-      background-color : $primary-color;
+      background-color : lighten($primary-color, 5%);
       color : #fff;
       &:hover{
         background-color: $secondary-color;
