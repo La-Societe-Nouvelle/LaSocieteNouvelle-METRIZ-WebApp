@@ -142,8 +142,10 @@ class Metriz extends React.Component {
 
     const sectionProps = {
       session: session,
-      submit: () => this.validStep(this.state.step)
+      submit: () => this.validStep(this.state.step),
     }
+    
+ 
 
     switch (step) {
       case 0: return (<StartSection startNewSession={() => this.setStep(1)}
@@ -158,7 +160,9 @@ class Metriz extends React.Component {
     }
   }
 
+
   /* ----- PROGESSION ---- */
+
 
   validStep = (step) => {
     // Increase progression

@@ -41,12 +41,14 @@ export class AccountingSection extends React.Component {
         this.isFormValid = () => {
             return this.state.corporateName == '' || this.state.files.length == 0;
         }
+
         this.onClick = () => {
             this.importFECFile();
             this.submitCorporateName();
         }
   
     }
+
 
     render() {
 
@@ -78,7 +80,9 @@ export class AccountingSection extends React.Component {
 
                             <FECImportSection
                                 FECData={importedData}
-                                onValidate={this.loadFECData.bind(this)}
+                                onValidate={this.loadFECData.bind(this)
+                                
+                                }
                             />
                             {
                                 !disabledNextStep ?
@@ -92,7 +96,6 @@ export class AccountingSection extends React.Component {
                         </section>
                         <section className={"action"}>
                             <div className="container-fluid">
-                 
                                 <button className={"btn btn-secondary"} disabled={disabledNextStep} onClick={this.props.submit}>
                                     Valider l'import
                                     <FontAwesomeIcon icon={faChevronRight} />
@@ -196,6 +199,7 @@ export class AccountingSection extends React.Component {
                         </section>
                         <section className="action">
                             <div className="container-fluid">
+        
                                 <button
                                     className={"btn btn-secondary"}
                                     onClick={this.onClick}

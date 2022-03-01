@@ -3,7 +3,14 @@
 	header {
 		border-bottom: 1px solid darken($bg-light, 2%);
 		background: $bg-light;
-	
+		
+		.text-logo {
+			text-align: center;
+			h1{
+				width: 300px;
+				margin: 0 auto;
+			}
+		}
 		.logo {
 				img {
 					display: block;

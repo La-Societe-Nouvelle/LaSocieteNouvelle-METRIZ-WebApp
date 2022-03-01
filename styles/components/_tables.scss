@@ -60,13 +60,13 @@
     tbody {
       td {
         background-color: $bg-light;
+        vertical-align:middle;
       }
       // select
       select {
         width: 100%;
         background-color: white;
         border: solid 1px $primary-color;
-        //padding: 2px;
   
         option {
           background-color: white;

@@ -3,9 +3,6 @@
 // React
 import React from 'react';
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckSquare, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-
 /* ---------- FEC IMPORT  ---------- */
 
 export class FECImportSection extends React.Component {
@@ -65,6 +62,7 @@ export class FECImportSection extends React.Component {
         </div>
     
         <div className={"container align-right"}>
+          
           <button className={"btn btn-primary"} onClick={() => this.validate()}>
             Valider La sélection
           </button>
