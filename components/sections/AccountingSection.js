@@ -26,9 +26,7 @@ export class AccountingSection extends React.Component {
 
     constructor(props) {
         super(props);
-        this.onDrop = (files) => {
-            this.setState({ files });
-        };
+
         this.state = {
             corporateName: props.session.legalUnit.corporateName || "",
             importedData: null,
@@ -41,7 +39,9 @@ export class AccountingSection extends React.Component {
         this.isFormValid = () => {
             return this.state.corporateName == '' || this.state.files.length == 0;
         }
-
+        this.onDrop = (files) => {
+            this.setState({ files });
+        };
         this.onClick = () => {
             this.importFECFile();
             this.submitCorporateName();
@@ -138,7 +138,7 @@ export class AccountingSection extends React.Component {
                                                     </div>
                                                 </div>
                                             )}
-                                        </Dropzone>
+                                        </Dropzone> 
                                     </div>
                                     {
                                         (files.length > 0) ?
@@ -182,6 +182,16 @@ export class AccountingSection extends React.Component {
                                                 </p>
                                             </>
                                     }
+                                       {errorFile && (
+                                           <div className={"alert alert-error"}>
+                                               <h4>Erreur - Fichier</h4>
+                                               <p>{errorMessage}</p>
+                                              <p>{errors}</p>
+
+                                               </div>
+
+                         
+                        )}
                                 </div>
                             </div>
 
@@ -200,14 +210,7 @@ export class AccountingSection extends React.Component {
                             </div>
 
                         </section>
-                        {errorFile && (
-                            <MessagePopupErrors
-                                title="Erreur - Fichier"
-                                message={errorMessage}
-                                errors={errors}
-                                closePopup={() => this.setState({ errorFile: false })}
-                            />
-                        )}
+                     
                     </div>
                 )}
 

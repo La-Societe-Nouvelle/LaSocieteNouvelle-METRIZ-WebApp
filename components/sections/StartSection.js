@@ -12,21 +12,21 @@ export class StartSection extends React.Component {
     super(props);
     this.state = {};
   }
-  
+
   render() {
-    
+
     return (
       <div id="start" className="container">
         <div className="row">
           <div className="col">
             <h2>
-               <span className="underline">Metriz</span> - Version Partenaire
+              <span className="underline">Metriz</span> - Version Partenaire
             </h2>
             <p>
               <b>Cabinet : </b> Terre d'Entrepreneurs
             </p>
             <p>
-            <b> Dernière mise à jour le : </b>  03/03/2022
+              <b> Dernière mise à jour le : </b>  03/03/2022
 
             </p>
             <div id="section-picto" className="row">
@@ -40,10 +40,9 @@ export class StartSection extends React.Component {
             <button className={"btn btn-primary"} onClick={this.props.startNewSession}>
               Nouvelle analyse
             </button>
-            <button className={"btn btn-secondary"} onClick={this.triggerImportFile}>
+            <button className={"btn btn-outline"} onClick={this.triggerImportFile}>
               Reprendre une session
             </button>
-
             <input
               id="import-session"
               type="file"
@@ -53,7 +52,7 @@ export class StartSection extends React.Component {
             />
           </div>
           <div className="col">
-          <img src="/resources/team_working.png" alt="Team" />
+            <img src="/resources/team_working.png" alt="Team" />
           </div>
         </div>
       </div>
