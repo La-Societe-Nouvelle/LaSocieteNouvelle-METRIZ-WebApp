@@ -135,7 +135,6 @@ export class InitialStatesSection extends React.Component {
                   </div>
                 )}
 
-
                 {fetching && (
                   <div className="popup">
                     <ProgressBar
@@ -144,6 +143,7 @@ export class InitialStatesSection extends React.Component {
                     />
                   </div>
                 )}
+                
 
 
               </>
@@ -174,26 +174,27 @@ export class InitialStatesSection extends React.Component {
                       </div>
                     )}
                   </Dropzone>
+
+                  {
+                    (files.length > 0 && message=="") ?
+                      <div className={"alert alert-success"}>
+                        <h4>Votre fichier a bien été importé</h4>
+                        <ul>
+                          {
+                            files.map((file) => (
+                              <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
+                              </li>
+                            ))
+                          }
+                        </ul>
+                      </div>
+                      :
+                      ""
+                  }
                 </>
             }
 
           </div>
-          {
-            (files.length > 0 && message=="") ?
-              <div className={"alert alert-success"}>
-                <h4>Votre fichier a bien été importé</h4>
-                <ul>
-                  {
-                    files.map((file) => (
-                      <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
-                      </li>
-                    ))
-                  }
-                </ul>
-              </div>
-              :
-              ""
-          }
           {
             showMessage ?
               <div className={"alert alert-error"}>
