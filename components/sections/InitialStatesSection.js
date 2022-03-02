@@ -179,7 +179,7 @@ export class InitialStatesSection extends React.Component {
 
           </div>
           {
-            (files.length > 0 && !!this.message) ?
+            (files.length > 0 && message=="") ?
               <div className={"alert alert-success"}>
                 <h4>Votre fichier a bien été importé</h4>
                 <ul>
@@ -288,7 +288,7 @@ export class InitialStatesSection extends React.Component {
           this.props.session.financialData.loadInitialStates(prevSession);
 
           // Update component
-          this.setState({ financialData: this.props.session.financialData, message: "" });
+          this.setState({ financialData: this.props.session.financialData, message: "", showMessage: false });
         }
         else if (
           prevSession.legalUnit.siren != this.props.session.legalUnit.siren
