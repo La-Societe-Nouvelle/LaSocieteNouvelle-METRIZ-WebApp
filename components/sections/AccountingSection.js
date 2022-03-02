@@ -86,7 +86,7 @@ export class AccountingSection extends React.Component {
                         <section className={"action"}>
                             <div className="container-fluid">
                                 <button className={"btn btn-secondary"} onClick={this.loadFECData}>
-                                    Valider l'import
+                                    J'ai identifié le journal des A-Nouveaux
                                     <FontAwesomeIcon icon={faChevronRight} />
                                 </button>
                             </div>
