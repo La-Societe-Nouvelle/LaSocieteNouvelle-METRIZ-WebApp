@@ -11,7 +11,7 @@ export function Header()
     <header className="header"> 
             <div className="text-logo">
                 <h1>
-                  Intiative OpenData OpenSource
+                  Intiative OpenData - OpenSource
                 </h1>
             </div>
     </header>)
