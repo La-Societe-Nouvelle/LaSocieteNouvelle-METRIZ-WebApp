@@ -202,7 +202,7 @@ function RowTableImmobilisations(props)
             )}
             {initialState == "prevFootprint" && (
               <option key="prevFootprint" value="prevFootprint">
-                Reprise sur exerice précédent
+                Reprise sur exercice précédent
               </option>
             )}
             {hasInputs && (
