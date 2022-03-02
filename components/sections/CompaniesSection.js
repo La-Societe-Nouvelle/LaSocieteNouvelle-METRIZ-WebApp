@@ -36,7 +36,7 @@ export class CompaniesSection extends React.Component {
       fetching: false,
       files: [],
       progression: 0,
-      displayView: "defaultData"
+      displayView: "importData"
     };
   }
 
@@ -100,18 +100,18 @@ export class CompaniesSection extends React.Component {
           </div>
           <div className="table-container">
             <div className="table-menu">
-
-              <button value="defaultData" 
-              className={this.state.displayView == "defaultData" ? "active" : ""}
-                onClick={this.changeDisplayView}>
-                Compléter le numéro Siren sur l'outils
-              </button>
               
               <button value="importData"
                 className={this.state.displayView == "importData" ? "active" : ""}
                 onClick={this.changeDisplayView}
               >
                 Compléter les numéros de siren à partir d'un fichier externe
+              </button>
+
+              <button value="defaultData" 
+              className={this.state.displayView == "defaultData" ? "active" : ""}
+                onClick={this.changeDisplayView}>
+                Compléter le numéro Siren sur l'outils
               </button>
 
             </div>
