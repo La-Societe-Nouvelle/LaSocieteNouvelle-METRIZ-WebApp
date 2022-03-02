@@ -28,7 +28,7 @@
 
 	}
 
-	strong, b {
+	strong, b, .font-weight-bold {
 		font-weight: $font-weight-bold;
 	}
 
@@ -129,8 +129,9 @@
 	  .beta{
 		  font-size: 0.8em;
 		  font-weight: 700;
-		  color : #777;
-	  }
+		background-color: $secondary-color;
+		color : #fff;
+		}
 
 	  .link {
 		  color : $tertiary-color;

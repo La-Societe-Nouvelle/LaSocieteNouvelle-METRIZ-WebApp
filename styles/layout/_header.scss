@@ -5,10 +5,11 @@
 		background: $bg-light;
 		
 		.text-logo {
-			text-align: center;
+			text-align: right;
+			margin-right: 2em;
 			h1{
-				width: 300px;
-				margin: 0 auto;
+				font-size: 1em;
+				font-weight: 600;
 			}
 		}
 		.logo {

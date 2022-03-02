@@ -42,8 +42,13 @@
 #section-picto {
     text-align: center;
     padding: 2em 0;
+
     .logoLSN{
-        height : 100px;
+      img {
+        height : 120px;
+      }
+      border-right : 1px solid $light-blue;
+
     }
     p {
         font-size: 0.8em;
@@ -141,9 +146,6 @@
   // statement item
   .statement-item {
     
-
-  
-
     // assessment button
     .assessment-button-container {
       margin-left: auto;
@@ -156,7 +158,6 @@
   }
 
 }
-
 
 .or {
   text-align: center;
