@@ -10,7 +10,7 @@ import { ProgressBar } from "../popups/ProgressBar";
 import { MessagePopup } from "../popups/MessagePopup";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faPen, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel } from "@fortawesome/free-solid-svg-icons";
 import { updateVersion } from "../../src/version/updateVersion";
 
 /* ---------------------------------------------------------------- */
@@ -22,6 +22,7 @@ export class InitialStatesSection extends React.Component {
     super(props);
     this.onDrop = (files) => {
       this.setState({ files });
+      this.importFile();
     };
     this.state = {
       financialData: props.session.financialData,
@@ -31,7 +32,7 @@ export class InitialStatesSection extends React.Component {
       titlePopup: "",
       message: "",
       files: [],
-      view: "defaultData"
+      view: "importData"
     };
   }
 
@@ -43,13 +44,13 @@ export class InitialStatesSection extends React.Component {
       showMessage,
       titlePopup,
       files,
-      message,
+      message
     } = this.state;
     const accountsShowed = financialData.immobilisations.concat(
       financialData.stocks
     );
 
-    const isNextStepAvailable = nextStepAvailable(this.state);
+    const isNextStepAvailable = nextStepAvailable(this.state) && message=="";
 
     return (
       <>
@@ -68,20 +69,20 @@ export class InitialStatesSection extends React.Component {
 
           <div className="table-container">
             <div className="table-menu">
-              <button
-                className={this.state.view == "defaultData" ? "active" : ""}
-                onClick={this.changeView}
-                value="defaultData"
-              >
-                Initialiser avec des valeurs par défaut
-              </button>
-
 
               <button value="importData"
                 className={this.state.view == "importData" ? "active" : ""}
                 onClick={this.changeView}
               >
                 Importer la sauvegarde de l'année dernière
+              </button>
+
+              <button
+                className={this.state.view == "defaultData" ? "active" : ""}
+                onClick={this.changeView}
+                value="defaultData"
+              >
+                Initialiser avec des valeurs par défaut
               </button>
 
             </div>
@@ -145,8 +146,10 @@ export class InitialStatesSection extends React.Component {
                 :
                 <>
                   <p>
-                    Cognitis enim pilatorum caesorumque funeribus nemo deinde ad has stationes appulit navem, sed ut Scironis praerupta letalia declinantes
-                    litoribus Cypriis contigui navigabant, quae Isauriae scopulis sunt controversa.
+                    L'ajout de la sauvegarde de l'analyse sur l'exercice précédent permet d'assurer 
+                    une continuité vis-à-vis de l'exercice en cours. La sauvegarde contient les 
+                    valeurs des indicateurs associés aux comptes de stocks, d'immobilisations et d'amortissements
+                    en fin d'exercice.
                   </p>
                   <h5>
                     Importer votre fichier de sauvegarde (.json)
@@ -169,11 +172,18 @@ export class InitialStatesSection extends React.Component {
                   </Dropzone>
                   {
                     (files.length > 0) ?
-                      <button className={"btn btn-primary"} onClick={this.importFile}
-                      >
-                        Importer mon fichier
-                      </button> :
-                      ""
+                      <div className={"alert alert-success"}>
+                        <h4>Votre fichier a bien été importé</h4>
+                        <ul>
+                            {
+                                files.map((file) => (
+                                    <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
+                                    </li>
+                                ))
+                            }
+                        </ul>
+                      </div> :
+                        ""
                   }
                   {showMessage && (
                     <MessagePopup
@@ -265,19 +275,23 @@ export class InitialStatesSection extends React.Component {
         if (
           //prevSession.legalUnit.siren == this.props.session.legalUnit.siren &&
           parseInt(prevSession.year) == parseInt(this.props.session.year) - 1
-        ) {
+        ) 
+        {
           // JSON -> session
           this.props.session.financialData.loadInitialStates(prevSession);
 
           // Update component
-          this.setState({ financialData: this.props.session.financialData });
-        } else if (
+          this.setState({ financialData: this.props.session.financialData, message: ""});
+        } 
+        else if (
           prevSession.legalUnit.siren != this.props.session.legalUnit.siren
-        ) {
+        ) 
+        {
           this.setState({
             titlePopup: "Erreur - Fichier",
             message: "Les numéros de siren ne correspondent pas.",
             showMessage: true,
+            
           });
         } else {
           this.setState({
