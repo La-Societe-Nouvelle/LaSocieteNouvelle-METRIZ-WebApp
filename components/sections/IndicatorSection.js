@@ -250,7 +250,7 @@ export class IndicatorSection extends React.Component {
                 <h4>{metaIndics[indic].libelle}</h4>
                 <div className="form-group">
                   <select
-                    className="form-input"
+                    className={"form-input small-input"}
                     value={selectedTable}
                     onChange={this.changeShowedTable}
                   >
@@ -276,7 +276,7 @@ export class IndicatorSection extends React.Component {
                 <div className="form-group">
                   <label>Sélectionner une activité comparative : </label>
                   <select
-                    className="form-input"
+                    className={"form-input small-input"}
                     value={comparativeDivision}
                     onChange={this.changeComparativeDivision}
                   >
@@ -303,9 +303,7 @@ export class IndicatorSection extends React.Component {
 
             <section className="analysis-section">
               <div className="container">
-
                 <h3>Clés de decryptage</h3>
-
                 <div className="row">
                   <div>
                     <img src="/resources/illu_analyse.svg" alt="Analyse" />
@@ -319,10 +317,7 @@ export class IndicatorSection extends React.Component {
                       />
                     </div>
                   </div>
-
                 </div>
-
-
               </div>
             </section>
           </>

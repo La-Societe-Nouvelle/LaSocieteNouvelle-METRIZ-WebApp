@@ -47,9 +47,9 @@ export class IndicatorExpensesTable extends React.Component {
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="short center" colSpan="2" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
-              <td className="column_value" colSpan="2">Valeur</td>
-              <td className="column_uncertainty">Incertitude</td>
+              <td className="align-right" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td className="align-right">Valeur</td>
+              <td className="align-right">Incertitude</td>
               {impactAbsolu ? <td className="column_value" colSpan="2">Impact</td> : null}
             </tr>
           </thead>
@@ -61,10 +61,8 @@ export class IndicatorExpensesTable extends React.Component {
                 <tr key={account}>
                   <td className="short center">{account}</td>
                   <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td className="short right">{printValue(amount,0)}</td>
-                  <td className="column_unit">&nbsp;€</td>
-                  <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
-                  <td className="column_unit">&nbsp;{unit}</td>
+                  <td className="align-right">{printValue(amount,0)} &euro;</td>
+                  <td className="column_value">{printValue(indicator.getValue(),nbDecimals)} {unit}</td>
                   <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
                   {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}
                   {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
