@@ -23,10 +23,10 @@ export class StartSection extends React.Component {
                <span className="underline">Metriz</span> - Version Partenaire
             </h2>
             <p>
-              <b>Cabinet : </b>
+              <b>Cabinet : </b> Terre d'Entrepreneurs
             </p>
             <p>
-            <b> Dernière mise à jour le : </b>  {new Date().toLocaleString() + ""}
+            <b> Dernière mise à jour le : </b>  03/03/2022
 
             </p>
             <div id="section-picto" className="row">
