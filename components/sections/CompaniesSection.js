@@ -241,8 +241,10 @@ export class CompaniesSection extends React.Component {
           :
           <div>
                 <p>
-                    Cognitis enim pilatorum caesorumque funeribus nemo deinde ad has stationes appulit navem, sed ut Scironis praerupta letalia declinantes
-                    litoribus Cypriis contigui navigabant, quae Isauriae scopulis sunt controversa.
+                    Exportez un fichier excel contenant la liste des comptes fournisseurs auxiliaires pour 
+                    compléter les numéros de siren, puis réimportez le document. Le fichier permet d'affecter 
+                    les numéros de siren, il est ensuite nécessaire de synchroniser les données pour récupérer 
+                    les données relatives aux fournisseurs.
                   </p>
 
                   <h4> 
