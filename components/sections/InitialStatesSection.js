@@ -20,10 +20,12 @@ import { updateVersion } from "../../src/version/updateVersion";
 export class InitialStatesSection extends React.Component {
   constructor(props) {
     super(props);
+
     this.onDrop = (files) => {
       this.setState({ files });
       this.importFile();
     };
+
     this.state = {
       financialData: props.session.financialData,
       fetching: false,
@@ -34,9 +36,11 @@ export class InitialStatesSection extends React.Component {
       files: [],
       view: "importData"
     };
+
   }
 
   render() {
+
     const {
       financialData,
       fetching,
@@ -46,12 +50,12 @@ export class InitialStatesSection extends React.Component {
       files,
       message
     } = this.state;
+
     const accountsShowed = financialData.immobilisations.concat(
       financialData.stocks
     );
 
-    const isNextStepAvailable = nextStepAvailable(this.state) && message=="";
-
+    const isNextStepAvailable = nextStepAvailable(this.state) && message == "";
     return (
       <>
         <section className="container">
@@ -146,8 +150,8 @@ export class InitialStatesSection extends React.Component {
                 :
                 <>
                   <p>
-                    L'ajout de la sauvegarde de l'analyse sur l'exercice précédent permet d'assurer 
-                    une continuité vis-à-vis de l'exercice en cours. La sauvegarde contient les 
+                    L'ajout de la sauvegarde de l'analyse sur l'exercice précédent permet d'assurer
+                    une continuité vis-à-vis de l'exercice en cours. La sauvegarde contient les
                     valeurs des indicateurs associés aux comptes de stocks, d'immobilisations et d'amortissements
                     en fin d'exercice.
                   </p>
@@ -170,32 +174,36 @@ export class InitialStatesSection extends React.Component {
                       </div>
                     )}
                   </Dropzone>
-                  {
-                    (files.length > 0) ?
-                      <div className={"alert alert-success"}>
-                        <h4>Votre fichier a bien été importé</h4>
-                        <ul>
-                            {
-                                files.map((file) => (
-                                    <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
-                                    </li>
-                                ))
-                            }
-                        </ul>
-                      </div> :
-                        ""
-                  }
-                  {showMessage && (
-                    <MessagePopup
-                      title={titlePopup}
-                      message={message}
-                      closePopup={() => this.setState({ showMessage: false })}
-                    />
-                  )}
                 </>
             }
 
           </div>
+          {
+            (files.length > 0 && !!this.message) ?
+              <div className={"alert alert-success"}>
+                <h4>Votre fichier a bien été importé</h4>
+                <ul>
+                  {
+                    files.map((file) => (
+                      <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+              :
+              ""
+          }
+          {
+            showMessage ?
+              <div className={"alert alert-error"}>
+                <h4>{titlePopup}</h4>
+                <p>
+                  {message}
+                </p>
+              </div> : ""
+          }
+
 
         </section>
         <section className={"action"}>
@@ -275,23 +283,21 @@ export class InitialStatesSection extends React.Component {
         if (
           //prevSession.legalUnit.siren == this.props.session.legalUnit.siren &&
           parseInt(prevSession.year) == parseInt(this.props.session.year) - 1
-        ) 
-        {
+        ) {
           // JSON -> session
           this.props.session.financialData.loadInitialStates(prevSession);
 
           // Update component
-          this.setState({ financialData: this.props.session.financialData, message: ""});
-        } 
+          this.setState({ financialData: this.props.session.financialData, message: "" });
+        }
         else if (
           prevSession.legalUnit.siren != this.props.session.legalUnit.siren
-        ) 
-        {
+        ) {
           this.setState({
             titlePopup: "Erreur - Fichier",
             message: "Les numéros de siren ne correspondent pas.",
             showMessage: true,
-            
+
           });
         } else {
           this.setState({

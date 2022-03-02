@@ -30,8 +30,8 @@ export class StartSection extends React.Component {
 
             </p>
             <div id="section-picto" className="row">
-              <div>
-                <img src="/logo_la-societe-nouvelle_s.svg" alt="logo" className="logoLSN"/>
+              <div className="logoLSN">
+                <img src="/logo_la-societe-nouvelle_s.svg" alt="logo" />
               </div>
               <div>
                 <img src="resources/logo-partenaires/logo-te-1.png" alt="Terre Entrepreneur" />

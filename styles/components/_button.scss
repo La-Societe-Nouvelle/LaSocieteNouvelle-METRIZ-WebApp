@@ -21,7 +21,7 @@
       background-color : lighten($primary-color, 5%);
       color : #fff;
       &:hover{
-        background-color: $secondary-color;
+        background-color: lighten($primary-color, 15%);
         color : #fff;
         -o-transition: all .4s ease-in-out;
         -webkit-transition: all .4s ease-in-out;
@@ -34,7 +34,7 @@
     background-color : $secondary-color;
     color : #fff;
     &:hover{
-      background-color: lighten($secondary-color, 5%);
+      background-color: lighten($secondary-color, 10%);
       color : #fff;
       -o-transition: all .4s ease-in-out;
       -webkit-transition: all .4s ease-in-out;
