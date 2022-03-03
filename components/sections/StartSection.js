@@ -14,27 +14,37 @@ export class StartSection extends React.Component {
   }
 
   render() {
-
     return (
       <div id="start" className="container">
         <div className="row">
           <div className="col">
-            <h2>
-              <span className="underline">Metriz</span> - Version Partenaire
-            </h2>
+            <h1>
+              Mesurez <span className="underline">l'impact carbone</span> de
+              votre entreprise en quelques clics.
+            </h1>
             <p>
-              <b>Cabinet : </b> Terre d'Entrepreneurs
-            </p>
-            <p>
-              <b> Dernière mise à jour le : </b>  03/03/2022
-
+              Notre objectif est de vous permettre de <b>connaître</b> et de <strong>mesurer l’empreinte de la production</strong> de votre
+              entreprise sur des enjeux <strong>majeurs de développement durable.</strong>
             </p>
             <div id="section-picto" className="row">
-              <div className="logoLSN">
-                <img src="/logo_la-societe-nouvelle_s.svg" alt="logo" />
+              <div>
+                <img
+                  src="resources/pictos/sustainable.svg"
+                  alt="Developpement durable"
+                />
+                <p>Développement durable</p>
               </div>
               <div>
-                <img src="resources/logo-partenaires/logo-te-1.png" alt="Terre Entrepreneur" />
+                <img src="resources/pictos/performance.svg" alt="Performance" />
+                <p>Performance extra financière</p>
+              </div>
+              <div>
+                <img src="resources/pictos/compare.svg" alt="Comparaison" />
+                <p>Comparaison dans votre secteur d’activité</p>
+              </div>
+              <div>
+                <img src="resources/pictos/goals.svg" alt="Engagement" />
+                <p>Engagements sociaux et environementaux</p>
               </div>
             </div>
             <button className={"btn btn-primary"} onClick={this.props.startNewSession}>
@@ -43,6 +53,7 @@ export class StartSection extends React.Component {
             <button className={"btn btn-outline"} onClick={this.triggerImportFile}>
               Reprendre une session
             </button>
+
             <input
               id="import-session"
               type="file"
@@ -52,7 +63,7 @@ export class StartSection extends React.Component {
             />
           </div>
           <div className="col">
-            <img src="/resources/team_working.png" alt="Team" />
+          <img src="/resources/team_working.png" alt="Team" />
           </div>
         </div>
       </div>
@@ -65,5 +76,4 @@ export class StartSection extends React.Component {
   importFile = (event) => {
     this.props.loadPrevSession(event.target.files[0]);
   };
-
 }

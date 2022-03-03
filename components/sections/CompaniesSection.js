@@ -111,7 +111,7 @@ export class CompaniesSection extends React.Component {
               <button value="defaultData" 
               className={this.state.displayView == "defaultData" ? "active" : ""}
                 onClick={this.changeDisplayView}>
-                Compléter le numéro Siren sur l'outils
+                Compléter le numéro Siren sur l'outil
               </button>
 
             </div>
