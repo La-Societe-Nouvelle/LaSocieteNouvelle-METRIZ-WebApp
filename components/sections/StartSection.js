@@ -19,11 +19,11 @@ export class StartSection extends React.Component {
         <div className="row">
           <div className="col">
             <h1>
-              Mesurez <span className="underline">l'impact carbone</span> de
+              Mesurez <span className="underline">l'empreinte sociétale</span> de
               votre entreprise en quelques clics.
             </h1>
             <p>
-              Notre objectif est de vous permettre de <b>connaître</b> et de <strong>mesurer l’empreinte de la production</strong> de votre
+              Notre objectif est de vous permettre de <strong>mesurer l’empreinte la production</strong> de votre
               entreprise sur des enjeux <strong>majeurs de développement durable.</strong>
             </p>
             <div id="section-picto" className="row">
@@ -40,11 +40,11 @@ export class StartSection extends React.Component {
               </div>
               <div>
                 <img src="resources/pictos/compare.svg" alt="Comparaison" />
-                <p>Comparaison dans votre secteur d’activité</p>
+                <p>Comparaison par rapport à votre secteur d’activité</p>
               </div>
               <div>
                 <img src="resources/pictos/goals.svg" alt="Engagement" />
-                <p>Engagements sociaux et environementaux</p>
+                <p>Engagements sociaux et environnementaux</p>
               </div>
             </div>
             <button className={"btn btn-primary"} onClick={this.props.startNewSession}>

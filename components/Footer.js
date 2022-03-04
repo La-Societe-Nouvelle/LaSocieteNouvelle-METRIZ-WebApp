@@ -28,19 +28,6 @@ export function Footer({ step }) {
           </li>
         </ul>
       </div>
-      {step == 0 ? (
-        <div className="align-center">
-          <h3>Support et Assistance technique</h3>
-          <p>
-            <a href="mailto:support@lasocietenouvelle.org" target="_blank" className={"btn btn-primary"}>
-            <FontAwesomeIcon icon={faEnvelope} /> Contactez nous
-            </a>
-          </p>
-
-        </div>
-      ) : (
-        ""
-      )}
     </footer>
   );
 
