@@ -72,7 +72,7 @@ export class FinancialDataSection extends React.Component {
                   selectedTable == "incomeStatement" || "" ? "active" : ""
                 }
               >
-                Comptes de résultat
+                Compte de résultat
               </button>
               <button
                 key={2}
