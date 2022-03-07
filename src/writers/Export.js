@@ -137,8 +137,8 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   let xUncertainty = 180;
   let y = 72;
 
-  // first line table
-  doc.setFillColor(229, 219, 241);
+  // first line table RGB(219, 222, 241)
+  doc.setFillColor(219, 222, 241);
   doc.rect(20, 66, 180, 10, 'F');
   doc.setFontSize(8);
   doc.setTextColor(0);
@@ -267,13 +267,13 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   y += 10;
   getStatementNote(doc, 20, y, session.impactsData, indic);
 
-  y += 20;
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(82, 98, 188);
-  doc.text("CLE DE CRYPTAGE", x, y);
+  // y += 20;
+  // doc.setFontSize(12);
+  // doc.setFont("Helvetica", "bold");
+  // doc.setTextColor(82, 98, 188);
+  // doc.text("CLE DE CRYPTAGE", x, y);
 
-  y += 10;
+  // y += 10;
 
   // let analyse = getAnalyse(indic, session);
   // let text = "";
