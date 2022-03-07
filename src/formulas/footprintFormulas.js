@@ -82,12 +82,12 @@ export function buildIndicatorMerge(indicatorA,amountA,
     else if (indicatorA.getValue()!=null && amountA!=null && amountA!=0 && amountB!=null && amountB==0)
     {
         indicator.setValue(indicatorA.getValue());
-        indicator.setUncertainty(indicatorA.getValue());
+        indicator.setUncertainty(indicatorA.getUncertainty());
     }
     else if (indicatorB.getValue()!=null && amountB!=null && amountB!=0 && amountA!=null && amountA==0)
     {
         indicator.setValue(indicatorB.getValue());
-        indicator.setUncertainty(indicatorB.getValue());
+        indicator.setUncertainty(indicatorB.getUncertainty());
     }
      
     return indicator;
