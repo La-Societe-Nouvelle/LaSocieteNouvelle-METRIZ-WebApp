@@ -1,8 +1,9 @@
 // La Société Nouvelle
 
 // Modules
-// import { Chart } from "react-google-charts";
 import Chart from 'chart.js/auto';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(ChartDataLabels);
 import { Bar } from 'react-chartjs-2';
 
 // Utils
@@ -29,42 +30,170 @@ const viewsForIndic = {
 }
 
 export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
-  const options = {
+  const optionsP = {
     responsive: true,
+    maintainAspectRatio: false,
+    devicePixelRatio: 2,
+    scales: {
+      x: {
+        grid: {
+          display: false
+        }
+      },
+      y:
+      {
+        display: false,
+      },
+    },
     plugins: {
+      datalabels: {
+        color: '#555',
+        labels: {
+          title: {
+            font: {
+              weight: 'bold'
+            }
+          },
+        }
+      },
       legend: {
-        position: 'bottom',
+        display: false,
+      },
+      title: {
+        padding: {
+          top: 0,
+          bottom: 25
+        },
+        font: {
+          weight: "bold",
+          size: 15,
+          family: "Roboto",
+        },
+        display: true,
+        align: "start",
+        position: "top",
+        text: "Production",
+        fontColor: "#FFF"
+      },
+
+    },
+
+  };
+
+  const optionsC = {
+    responsive: true,
+    maintainAspectRatio: false,
+    devicePixelRatio: 2,
+    scales: {
+      x: {
+        grid: {
+          display: false
+        }
+      },
+      y:
+      {
+        display: false
+      },
+    },
+    plugins: {
+      datalabels: {
+        color: '#555',
+        labels: {
+          title: {
+            font: {
+              weight: 'bold'
+            }
+          },
+        }
+      },
+      datalabels: {
+        color: '#555',
+        labels: {
+          title: {
+            font: {
+              weight: 'bold'
+            }
+          },
+        }
+      },
+      legend: {
+        display: false,
+      },
+      title: {
+        padding: {
+          top: 0,
+          bottom: 25
+        },
+        font: {
+          weight: "bold",
+          size: 15,
+          family: "Roboto",
+        },
+        display: true,
+        align: "start",
+        position: "top",
+        text: "Consommation intermédiaire",
+      },
+
+    },
+
+  };
+
+
+  const optionsV = {
+    responsive: true,
+    maintainAspectRatio: false,
+    devicePixelRatio: 2,
+    scales: {
+      x: {
+        grid: {
+          display: false
+        }
+      },
+      y:
+      {
+        display: false, 
+      },
+    },
+    plugins: {
+      datalabels: {
+        color: '#555',
+        labels: {
+          title: {
+            font: {
+              weight: 'bold'
+            }
+          },
+        }
+      },
+      legend: {
+        display: false,
       },
       title: {
         display: true,
+        padding: {
+          top: 0,
+          bottom: 25
+        },
+        align: "start",
+        position: "top",
+        font: {
+          weight: "bold",
+          size: 15,
+          family: "Roboto",
+        },
+        text: "Valeur ajoutée",
       },
+
     },
+
   };
-  const labels = ['Situation', 'Branche', 'France'];
+  const labels = [['Exercice', 'en cours'], 'Branche', 'France'];
 
   const { financialData } = session;
   const { production, netValueAdded, intermediateConsumption } = financialData.aggregates;
   const { productionSectorFootprint, valueAddedSectorFootprint, consumptionSectorFootprint, productionAreaFootprint, valueAddedAreaFootprint } = comparativeFootprints;
 
-  // const dataProduction = [
-  //   ["", "title", { role: "style" }],
-  //   ["Situation", production.footprint.getIndicator(indic).value || 0.0, "#616161"],
-  //   ["Branche", productionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  //   ["France", productionAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  // ]
-
-  // const dataValueAdded = [
-  //   ["", "title", { role: "style" }],
-  //   ["Situation", netValueAdded.footprint.getIndicator(indic).value || 0.0, "#616161"],
-  //   ["Branche", valueAddedSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  //   ["France", valueAddedAreaFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  // ]
-
-  // const dataConsumption = [
-  //   ["", "title", { role: "style" }],
-  //   ["Situation", intermediateConsumption.footprint.getIndicator(indic).value || 0.0, "#616161"],
-  //   ["Branche", consumptionSectorFootprint.getIndicator(indic).value || 0.0, "#818181"],
-  // ]
 
   const dataProduction = {
     labels,
@@ -72,7 +201,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
       {
         label: 'Production',
         data: [production.footprint.getIndicator(indic).value, productionSectorFootprint.getIndicator(indic).value, productionAreaFootprint.getIndicator(indic).value],
-        backgroundColor: ["RGB(251, 122, 127)","RGB(219, 222, 241)","RGB(219, 222, 241)"],
+        backgroundColor: ["RGB(251, 122, 127)", "RGB(219, 222, 241)", "RGB(219, 222, 241)"],
       },
     ],
   };
@@ -83,7 +212,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
       {
         label: 'Valeur ajoutée',
         data: [netValueAdded.footprint.getIndicator(indic).value, valueAddedSectorFootprint.getIndicator(indic).value, valueAddedAreaFootprint.getIndicator(indic).value],
-        backgroundColor: ["RGB(251, 122, 127)","RGB(219, 222, 241)","RGB(219, 222, 241)"],
+        backgroundColor: ["RGB(251, 122, 127)", "RGB(219, 222, 241)", "RGB(219, 222, 241)"],
       },
     ],
   };
@@ -93,7 +222,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
       {
         label: 'Consommation',
         data: [intermediateConsumption.footprint.getIndicator(indic).value, consumptionSectorFootprint.getIndicator(indic).value],
-        backgroundColor: ["RGB(251, 122, 127)","RGB(219, 222, 241)","RGB(219, 222, 241)"],
+        backgroundColor: ["RGB(251, 122, 127)", "RGB(219, 222, 241)", "RGB(219, 222, 241)"],
       },
     ],
   };
@@ -102,23 +231,26 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
   return (
     <>
-      <div className="row">
+      <div className="row aln-center">
         <div className="chart-container" >
           <Bar
+            id="Production"
             data={dataProduction}
-            options={options}
+            options={optionsP}
           />
         </div>
         <div className="chart-container">
           <Bar
+            id="Consumption"
             data={dataConsumption}
-            options={options}
+            options={optionsC}
           />
         </div>
         <div className="chart-container">
           <Bar
+            id="Value"
             data={dataValueAdded}
-            options={options}
+            options={optionsV}
           />
           {/* <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
         <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>

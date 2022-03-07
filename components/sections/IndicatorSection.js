@@ -7,7 +7,7 @@ import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
 // React
-import React from "react";
+import React, {useState, setState} from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRuler, faFileArrowDown, faUpload } from "@fortawesome/free-solid-svg-icons";
@@ -93,9 +93,10 @@ export class IndicatorSection extends React.Component {
       productionAreaFootprint: new SocialFootprint(),
       valueAddedAreaFootprint: new SocialFootprint(),
       economicAreaData: null,
+    
     };
-  }
 
+  }
 
   componentDidMount() {
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
@@ -104,17 +105,17 @@ export class IndicatorSection extends React.Component {
     fetchEconomicAreaData("FRA", "GAP").then((footprint) =>
       this.setState({ productionAreaFootprint: footprint })
     );
+
+
   }
 
   render() {
-    const { indic } = this.state;
-    const { triggerPopup, selectedTable, comparativeDivision } = this.state;
+    const { indic, comparativeDivision, triggerPopup, selectedTable } = this.state;
+    
     const isPublicationAvailable =
       Object.entries(
         this.props.session.financialData.aggregates.revenue.footprint.indicators
       ).filter(([_, indicator]) => indicator.value != null).length > 0;
-
-
 
     return (
       <div className="indicator-section">
@@ -240,7 +241,7 @@ export class IndicatorSection extends React.Component {
                   <button
                     className={"btn btn-secondary"}
                     onClick={() =>
-                      exportIndicPDF(this.state.indic, this.props.session)
+                      exportIndicPDF(this.state.indic, this.props.session,this.state.comparativeDivision)
                     }
                   >
                     <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
@@ -329,7 +330,7 @@ export class IndicatorSection extends React.Component {
               className={"btn btn-secondary"}
               disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
               onClick={() =>
-                exportIndicPDF(this.state.indic, this.props.session)
+                exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
               }
             >
               <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
@@ -494,20 +495,22 @@ function Assessment(props) {
 
 /* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
 
+
 const Analyse = (indic, session) => {
   let analyse = getAnalyse(indic, session);
+
   return (
     <div className="analysis">
-      {analyse.map((paragraph) => (
-        <p>{paragraph.reduce((a, b) => a + " " + b, "")}</p>
+      
+      {analyse.map((paragraph, index) => (
+
+        <p key={index}>{paragraph.reduce((a, b) => a + " " + b, "")}</p>
+        
       ))}
     </div>
   );
 };
 
-const Paragraph = (text) => {
-  return <p>{(text.reduce((a, b) => a + " " + b), "")}</p>;
-};
 
 // Display the correct statement view according to the indicator
 function getAnalyse(props) {
@@ -557,7 +560,6 @@ const fetchDivisionData = async (division, flow) => {
     division +
     "&flow=" +
     flow;
-  console.log(endpoint);
   response = await fetch(endpoint, { method: "get" });
   data = await response.json();
   if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
@@ -582,7 +584,6 @@ const fetchEconomicAreaData = async (area, flow) => {
     "&activity=00" +
     "&flow=" +
     flow;
-  console.log(endpoint);
   response = await fetch(endpoint, { method: "get" });
   data = await response.json();
   if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
