@@ -90,8 +90,9 @@ export class IndicatorSection extends React.Component {
       productionSectorFootprint: new SocialFootprint(),
       valueAddedSectorFootprint: new SocialFootprint(),
       consumptionSectorFootprint: new SocialFootprint(),
-      productionAreaFootprint: new SocialFootprint(),
-      valueAddedAreaFootprint: new SocialFootprint(),
+      allSectorsProductionAreaFootprint: new SocialFootprint(),
+      allSectorsValueAddedAreaFootprint: new SocialFootprint(),
+      allSectorsConsumptionFootprint : new SocialFootprint(),
       economicAreaData: null,
     
     };
@@ -99,12 +100,18 @@ export class IndicatorSection extends React.Component {
   }
 
   componentDidMount() {
+
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
-      this.setState({ valueAddedAreaFootprint: footprint })
+      this.setState({ allSectorsValueAddedAreaFootprint: footprint })
     );
-    fetchEconomicAreaData("FRA", "GAP").then((footprint) =>
-      this.setState({ productionAreaFootprint: footprint })
+    fetchEconomicAreaData("FRA", "PRD").then((footprint) =>
+      this.setState({ allSectorsProductionAreaFootprint: footprint })
     );
+
+    fetchEconomicAreaData("FRA", "IC").then((footprint) =>
+    this.setState({ allSectorsConsumptionFootprint: footprint })
+  );
+    
 
 
   }
