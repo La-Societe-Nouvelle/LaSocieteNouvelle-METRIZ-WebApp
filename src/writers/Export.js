@@ -148,11 +148,11 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.setFontSize(8);
   doc.setTextColor(0);
   doc.setFont("Helvetica", "italic");
-  doc.text("(Valeur en " + metaIndics[indic].unit + ")", x + 2, y);
+  doc.text("(*Valeur en " + metaIndics[indic].unit + ")", x + 2, y);
   doc.setFontSize(10);
   doc.setFont("Helvetica", "normal");
   doc.text("Montant", xAmount - 13, y);
-  doc.text("Valeur", xValue - 8, y);
+  doc.text("Valeur*", xValue - 8, y);
   doc.text("Incertitude", xUncertainty, y);
 
 
@@ -163,7 +163,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(8);
   doc.text(printValue(production.amount, 0) + " €", xAmount, y, { align: "right" });
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.text(printValue(production.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
   doc.setFontSize(8);
   doc.text(printValue(production.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -174,7 +174,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.text("\tdont Chiffre d'affaires", x, y);
   doc.setFontSize(8);
   doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, { align: "right" });
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.text(printValue(revenue.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
   doc.setFontSize(8);
   doc.text(printValue(revenue.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -185,7 +185,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.text("\tdont Production stockée", x, y);
   doc.setFontSize(8);
   doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.text(printValue(storedProduction.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
   doc.setFontSize(8);
   doc.text(printValue(storedProduction.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -198,7 +198,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
     doc.text("\tdont production immobilisée", x, 10);
     doc.setFontSize(8);
     doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getValue(), 1), xValue, x, { align: "right" });
     doc.setFontSize(8);
     doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, x, { align: "right" });
@@ -213,7 +213,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(8);
   doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, { align: "right" });
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
   doc.setFontSize(8);
   doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -224,7 +224,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
     doc.text("\tVariation de stocks", 20, y);
     doc.setFontSize(8);
     doc.text(printValue(storedPurchases.amount, 0) + " €", xAmount, y, { align: "right" });
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
     doc.setFontSize(8);
     doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -237,7 +237,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
     doc.text("\t" + aggregate.accountLib, 20, y);
     doc.setFontSize(8);
     doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
     doc.setFontSize(8);
     doc.text(printValue(indicator.getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -252,7 +252,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(8);
   doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, { align: "right" });
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.text(printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
   doc.setFontSize(8);
   doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -264,7 +264,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
     doc.text("\t" + aggregate.accountLib, 20, y);
     doc.setFontSize(8);
     doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
     doc.setFontSize(8);
     doc.text(printValue(indicator.getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
@@ -279,7 +279,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   doc.setFont("Helvetica", "normal");
   doc.setFontSize(8);
   doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, { align: "right" });
-  doc.setFontSize(10);
+  doc.setFontSize(8);
   doc.text(printValue(netValueAdded.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
   doc.setFontSize(8);
   doc.text(printValue(netValueAdded.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
