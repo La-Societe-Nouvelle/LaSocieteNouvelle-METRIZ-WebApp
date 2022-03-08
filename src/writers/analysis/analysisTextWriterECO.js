@@ -62,7 +62,6 @@ export const analysisTextWriterECO = (session) =>
 
   // comptes les plus impactants
   let bestAccount = expenseAccounts.sort((a,b) => b.footprint.indicators.eco.getGrossImpact(b.amount) - a.footprint.indicators.eco.getGrossImpact(a.amount))[0];
-  console.log(bestAccount);
   currentParagraph.push("Le compte de charges \""+bestAccount.accountLib.charAt(0)+bestAccount.accountLib.substring(1).toLowerCase()+"\" représente la plus grosse contribution indirecte de l'entreprise, avec un taux de contribution de "+bestAccount.footprint.indicators.eco.getValue()+" % pour un volume de "+printValue(bestAccount.amount,0)+" €.");
 
   // Investissements ------------------------------------------------------------------------------- //

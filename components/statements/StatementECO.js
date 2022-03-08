@@ -120,9 +120,9 @@ export const writeStatementECO = (doc, x, y, impactsData) => {
   doc.text("Valeur ajoutée nette produite en France : " + printValue(impactsData.domesticProduction, 0) + " €" + (impactsData.isAllActivitiesInFrance ? "*" : ""), x, y);
   if (impactsData.isAllActivitiesInFrance) {
     y += 6;
-    doc.setFont("Calibri", "italic");
+    doc.setFont("Helvetica", "italic");
     doc.text("*Les activités de l'entreprise sont déclarées entièrement localisées en France", x, y);
-    doc.setFont("Calibri", "normal");
+    doc.setFont("Helvetica", "normal");
   }
   return y;
 }
