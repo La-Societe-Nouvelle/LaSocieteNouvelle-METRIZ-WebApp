@@ -5,7 +5,9 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faChevronRight, faFile} from "@fortawesome/free-solid-svg-icons"; 
+
+
 // Components
 import { CompaniesTable } from "../tables/CompaniesTable";
 
@@ -40,6 +42,9 @@ export class CompaniesSection extends React.Component {
     };
   }
 
+  componentDidMount() {
+    window.scrollTo(0, 0)
+  }
   componentDidUpdate() {
     // change view to main if array of companies with data unfetched empty
     if (
@@ -190,6 +195,21 @@ export class CompaniesSection extends React.Component {
                     )}
                   </div>
                 </div>
+                {
+                    (files.length > 0) ?
+                      <div className={"alert alert-success"}>
+                        <h4>Votre fichier a bien été importé</h4>
+                          {
+                            files.map((file) => (
+                              <p key={file.name} > <FontAwesomeIcon icon={faFile} /> {file.name}
+                              </p>
+                            ))
+                          }
+                      </div>
+                      :
+                      ""
+                  }
+
                 {!isNextStepAvailable && (
                   <>
                     <div className={"alert alert-warning"}>

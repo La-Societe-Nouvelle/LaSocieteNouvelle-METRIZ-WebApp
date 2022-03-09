@@ -53,11 +53,14 @@ export class StatementSection extends React.Component {
     }
   }
 
+  componentDidMount() {
+    window.scrollTo(0, 0)
+  }
   render() {
     const { step } = this.state;
     return (
       <>
-          {this.buildView(step)}
+        {this.buildView(step)}
       </>
     )
   }
@@ -119,14 +122,14 @@ const SirenInput = ({ siren, commitSiren }) => {
 
   return (
     <section className="container">
-       <h2>
-        Vos informations 
-        </h2> 
+      <h2>
+        Vos informations
+      </h2>
 
       <h2>Numéro de siren</h2>
       <div className="form-group">
         <label>Entrez votre numéro de siren (9 chiffres) : </label>
-         
+
         <InputText value={sirenInput}
           unvalid={sirenInput != "" && !/^[0-9]{9}$/.test(sirenInput)}
           onUpdate={onSirenChange} />
@@ -229,7 +232,7 @@ class SirenForm extends React.Component {
 
     return (
       <section className="container">
-      
+
         <h2>Unité légale</h2>
         <div className="inline-input">
           <label>Numéro de siren </label>
@@ -288,7 +291,7 @@ class DeclarantForm extends React.Component {
           <InputText value={email}
             unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
             onUpdate={this.onEmailChange.bind(this)} />
-        </div> 
+        </div>
         <div className="custom-control-inline" id="thirdParty">
           <input type="checkbox" className="custom-control-input"
             onChange={this.onThirdPartyChange} />
@@ -335,7 +338,7 @@ const PriceInput = ({ price, commitPrice, goBack }) => {
       <h2>Coût de la formalité</h2>
       <div className="radio-button-input">
         <div className={"custom-control-inline"}>
-          <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input"/>
+          <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input" />
           <label>Première déclaration : publication offerte</label>
         </div>
         <div className={"custom-control-inline"} >

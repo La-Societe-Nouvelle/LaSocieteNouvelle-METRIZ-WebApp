@@ -7,7 +7,7 @@ import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
 // React
-import React, {useState, setState} from "react";
+import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faRuler, faFileArrowDown, faUpload } from "@fortawesome/free-solid-svg-icons";
@@ -100,6 +100,8 @@ export class IndicatorSection extends React.Component {
   }
 
   componentDidMount() {
+
+    window.scrollTo(0, 0);
 
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
       this.setState({ allSectorsValueAddedAreaFootprint: footprint })

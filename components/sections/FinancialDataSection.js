@@ -34,6 +34,9 @@ export class FinancialDataSection extends React.Component {
       errors: [],
     };
   }
+  componentDidMount() {
+    window.scrollTo(0, 0)
+  }
 
   render() {
 

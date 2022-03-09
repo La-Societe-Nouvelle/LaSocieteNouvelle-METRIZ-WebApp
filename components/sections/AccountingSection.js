@@ -46,7 +46,11 @@ export class AccountingSection extends React.Component {
             this.importFECFile();
             this.submitCorporateName();
         }
-  
+
+    }
+
+    componentDidMount() {
+        window.scrollTo(0, 0)
     }
 
 
@@ -138,7 +142,7 @@ export class AccountingSection extends React.Component {
                                                     </div>
                                                 </div>
                                             )}
-                                        </Dropzone> 
+                                        </Dropzone>
                                     </div>
                                     {
                                         (files.length > 0) ?
@@ -182,23 +186,21 @@ export class AccountingSection extends React.Component {
                                                 </p>
                                             </>
                                     }
-                                       {errorFile && (
-                                           <div className={"alert alert-error"}>
-                                               <h4>Erreur - Fichier</h4>
-                                               <p>{errorMessage}</p>
-                                              <p>{errors}</p>
+                                    {errorFile && (
+                                        <div className={"alert alert-error"}>
+                                            <h4>Erreur - Fichier</h4>
+                                            <p>{errorMessage}</p>
+                                            <p>{errors}</p>
 
-                                               </div>
-
-                         
-                        )}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
                         </section>
                         <section className="action">
                             <div className="container-fluid">
-        
+
                                 <button
                                     className={"btn btn-secondary"}
                                     onClick={this.onClick}
@@ -210,7 +212,7 @@ export class AccountingSection extends React.Component {
                             </div>
 
                         </section>
-                     
+
                     </div>
                 )}
 
@@ -232,7 +234,7 @@ export class AccountingSection extends React.Component {
 
     updateMeta = (meta) => {
         this.state.importedData.meta = meta;
-      }
+    }
 
     /* ---------- FEC IMPORT ---------- */
 

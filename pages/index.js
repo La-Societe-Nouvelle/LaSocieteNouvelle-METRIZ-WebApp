@@ -78,17 +78,19 @@ class Metriz extends React.Component {
   render() {
     const { step, session } = this.state;
     return (
-      <div className="wrapper">
-        {step == 0 ? (
-          <Header />
-        ) :
-          (
-            <HeaderSection step={step} stepMax={session.progression} setStep={this.setStep} downloadSession={this.downloadSession} />
-          )
-        }
-        {this.buildSectionView(step)}
+      <>
+        <div className="wrapper" id="wrapper">
+          {step == 0 ? (
+            <Header />
+          ) :
+            (
+              <HeaderSection step={step} stepMax={session.progression} setStep={this.setStep} downloadSession={this.downloadSession} />
+            )
+          }
+          {this.buildSectionView(step)}
+        </div>
         <Footer step={step} />
-      </div>
+      </>
     )
   }
 
@@ -144,8 +146,8 @@ class Metriz extends React.Component {
       session: session,
       submit: () => this.validStep(this.state.step),
     }
-    
- 
+
+
 
     switch (step) {
       case 0: return (<StartSection startNewSession={() => this.setStep(1)}
@@ -156,7 +158,7 @@ class Metriz extends React.Component {
       case 4: return (<CompaniesSection {...sectionProps} />)
       case 5: return (<IndicatorSection {...sectionProps} publish={() => this.setStep(6)} />)
       case 6: return (<StatementSection {...sectionProps} return={() => this.setStep(5)} />)
-   
+
     }
   }
 

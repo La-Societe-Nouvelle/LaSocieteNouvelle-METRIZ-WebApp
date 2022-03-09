@@ -7,7 +7,6 @@ import Dropzone from "react-dropzone";
 // Components
 import { InitialStatesTable } from "/components/tables/InitialStatesTable";
 import { ProgressBar } from "../popups/ProgressBar";
-import { MessagePopup } from "../popups/MessagePopup";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel } from "@fortawesome/free-solid-svg-icons";
@@ -37,6 +36,10 @@ export class InitialStatesSection extends React.Component {
       view: "importData"
     };
 
+  }
+
+  componentDidMount() {
+    window.scrollTo(0, 0)
   }
 
   render() {
@@ -143,9 +146,6 @@ export class InitialStatesSection extends React.Component {
                     />
                   </div>
                 )}
-                
-
-
               </>
                 :
                 <>
@@ -174,7 +174,6 @@ export class InitialStatesSection extends React.Component {
                       </div>
                     )}
                   </Dropzone>
-
                   {
                     (files.length > 0 && message=="") ?
                       <div className={"alert alert-success"}>
