@@ -17,7 +17,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
       <div className="top-bar">
         <ul className="nav">
           <li><a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank"><FontAwesomeIcon icon={faGithub} /> GitHub</a></li>
-          <li><a href="mailto:contact@lasocietenouvelle.org" target="_blank" > <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous</a></li>
+          <li><a href="https://lasocietenouvelle.org/contact" target="_blank" > <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous</a></li>
         </ul>
         <button className={"btn btn-download btn-secondary"} onClick={saveSession}>  <FontAwesomeIcon icon={faSync} /> Sauvegarder ma session</button>
       </div>

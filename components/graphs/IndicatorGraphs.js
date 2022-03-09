@@ -31,9 +31,6 @@ const viewsForIndic = {
 
 export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
-
-
-
   const { financialData } = session;
   const { production, netValueAdded, intermediateConsumption } = financialData.aggregates;
   const { productionSectorFootprint, valueAddedSectorFootprint, consumptionSectorFootprint, allSectorsProductionAreaFootprint, allSectorsValueAddedAreaFootprint, allSectorsConsumptionFootprint } = comparativeFootprints;
@@ -42,10 +39,13 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
   const labelsP = ['France', ['Exercice', 'en cours'], 'Branche'];
 
+
   const dataP = [
-    allSectorsProductionAreaFootprint.getIndicator(indic).value,
-    production.footprint.getIndicator(indic).value,
-    productionSectorFootprint.getIndicator(indic).value]
+
+    roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
+    roundNumber(production.footprint.getIndicator(indic).value),
+    roundNumber(productionSectorFootprint.getIndicator(indic).value),
+  ]
     ;
 
   for (let i = 0; i < dataP.length; i++) {
@@ -125,10 +125,11 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
 
   const labelsC = ['France', ['Exercice', 'en cours'], 'Branche'];
+
   const dataC = [
-    allSectorsConsumptionFootprint.getIndicator(indic).value,
-    intermediateConsumption.footprint.getIndicator(indic).value,
-    consumptionSectorFootprint.getIndicator(indic).value,
+    roundNumber(allSectorsConsumptionFootprint.getIndicator(indic).value),
+    roundNumber(intermediateConsumption.footprint.getIndicator(indic).value),
+    roundNumber(consumptionSectorFootprint.getIndicator(indic).value),
   ]
 
 
@@ -218,10 +219,11 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
   // To Do : round value Number().toFixed(2); // 1.00
   const dataV = [
-    allSectorsValueAddedAreaFootprint.getIndicator(indic).value,
-    valueAddedSectorFootprint.getIndicator(indic).value,
-    netValueAdded.footprint.getIndicator(indic).value,
+    roundNumber(allSectorsValueAddedAreaFootprint.getIndicator(indic).value),
+    roundNumber(netValueAdded.footprint.getIndicator(indic).value),
+    roundNumber(valueAddedSectorFootprint.getIndicator(indic).value),
   ];
+
 
   for (let i = 0; i < dataV.length; i++) {
 
@@ -336,7 +338,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
               printValue(productionSectorFootprint.getIndicator(indic).value, 1)
                 && printValue(consumptionSectorFootprint.getIndicator(indic).value, 1)
                 && printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
-                
+
                 <td className="column_value" >Branche</td> : ""
             }
           </tr>
@@ -347,9 +349,9 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             <td className="short right">{printValue(allSectorsProductionAreaFootprint.getIndicator(indic).value, 1)} {unit}</td>
             <td className="short align-center">{printValue(production.footprint.getIndicator(indic).value, 1)} {unit}</td>
             {
-               printValue(productionSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
-               <td className="short right">{printValue(productionSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
-               : ""
+              printValue(productionSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
+                <td className="short right">{printValue(productionSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
+                : ""
             }
           </tr>
           <tr>
@@ -357,9 +359,9 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             <td className="short right">{printValue(allSectorsConsumptionFootprint.getIndicator(indic).value, 1)} {unit}</td>
             <td className="short align-center">{printValue(intermediateConsumption.footprint.getIndicator(indic).value, 1)} {unit}</td>
             {
-              printValue(consumptionSectorFootprint.getIndicator(indic).value, 1) !== " - " ? 
-              <td className="short right">{printValue(consumptionSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
-              : ""
+              printValue(consumptionSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
+                <td className="short right">{printValue(consumptionSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
+                : ""
             }
           </tr>
           <tr>
@@ -368,8 +370,8 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             <td className="short align-center">{printValue(netValueAdded.footprint.getIndicator(indic).value, 1)} {unit}</td>
             {
               printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
-              <td className="short right">{printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1)} {unit}</td> 
-              : ""
+                <td className="short right">{printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
+                : ""
             }
           </tr>
         </tbody>
@@ -377,6 +379,13 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
     </>)
 }
 
+function roundNumber(num) {
+
+  if (num !== null) {
+    return parseFloat(num.toFixed(1));
+  }
+  return num;
+}
 /* ----- CHARTS ----- */
 
 // function ColumnChart({ title, data, viewWindow }) {
