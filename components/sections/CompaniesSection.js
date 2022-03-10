@@ -5,7 +5,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faChevronRight, faFile} from "@fortawesome/free-solid-svg-icons"; 
+import { faCheck, faWarning, faSync, faChevronRight, faFile } from "@fortawesome/free-solid-svg-icons";
 
 
 // Components
@@ -19,6 +19,7 @@ import { CSVFileReader, processCSVCompaniesData } from "/src/readers/CSVReader";
 import { XLSXFileReader } from "/src/readers/XLSXReader";
 import { ProgressBar } from "../popups/ProgressBar";
 import { getSignificativeCompanies } from "../../src/formulas/significativeLimitFormulas";
+import { DefaultCompaniesTable } from "../tables/DefaultCompaniesTable";
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -38,7 +39,6 @@ export class CompaniesSection extends React.Component {
       fetching: false,
       files: [],
       progression: 0,
-      displayView: "importData"
     };
   }
 
@@ -103,40 +103,64 @@ export class CompaniesSection extends React.Component {
               au sein de notre base de données ouverte.
             </p>
           </div>
-          <div className="table-container">
-            <div className="table-menu">
-              
-              <button value="importData"
-                className={this.state.displayView == "importData" ? "active" : ""}
-                onClick={this.changeDisplayView}
-              >
-                Compléter les numéros de siren à partir d'un fichier externe
-              </button>
+          <div>
+            <p>
+              Exportez un fichier excel contenant la liste des comptes fournisseurs auxiliaires pour
+              compléter les numéros de siren, puis réimportez le document. Le fichier permet d'affecter
+              les numéros de siren, il est ensuite nécessaire de synchroniser les données pour récupérer
+              les données relatives aux fournisseurs.
+            </p>
+            <h4>
+              &Eacute;tape 1 : Télécharger le tableaux des fournisseurs
+            </h4>
+            <p>
+              <b>
+              </b> <a href="#" className="btn btn-outline" onClick={this.exportXLSXFile}>
+                Télécharger ici
+              </a>
 
-              <button value="defaultData" 
-              className={this.state.displayView == "defaultData" ? "active" : ""}
-                onClick={this.changeDisplayView}>
-                Compléter le numéro Siren sur l'outil
-              </button>
+            </p>
+            <h4>
+              &Eacute;tape 2 : Importer le fichier excel complété
+            </h4>
 
-            </div>
+            <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
+              {({ getRootProps, getInputProps }) => (
+                <div className="dropzone-section">
+                  <div {...getRootProps()} className="dropzone">
+                    <input {...getInputProps()} />
+                    <p>
+                      Glisser votre fichier
+                      <span>
+                        ou cliquez ici pour sélectionner votre fichier
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              )}
+            </Dropzone>
+            {
+              (files.length > 0) ?
+                <button className={"btn btn-primary"} onClick={this.importFile}
+                >
+                  Importer mon fichier
+                </button> :
+                ""
+            }
           </div>
-          
-          {
-              this.state.displayView == "defaultData" ? <>
-               <div className="table-container">
-                <p>
-                  Les comptes fournisseurs et autres comptes tiers correspondent aux
-                  entités exterieures vers lesquelles sont dirigés les charges
-                  externes et les investissements. Les "autres comptes tiers" font
-                  référence aux comptes par défaut résultants de l'impossibilité
-                  d'associer certains flux sortants à un compte fournisseur
-                  auxiliaire.
-                  <br />
-                  L'obtention des empreintes des comptes fournisseurs s'effectuent
-                  via leur numéro de siren.
-                </p>
-
+          <h4>&Eacute;tape 3 : Synchroniser vos données</h4>
+          <div className="table-container">
+            {/* <p>
+              Les comptes fournisseurs et autres comptes tiers correspondent aux
+              entités exterieures vers lesquelles sont dirigés les charges
+              externes et les investissements. Les "autres comptes tiers" font
+              référence aux comptes par défaut résultants de l'impossibilité
+              d'associer certains flux sortants à un compte fournisseur
+              auxiliaire.
+              <br />
+              L'obtention des empreintes des comptes fournisseurs s'effectuent
+              via leur numéro de siren.
+            </p> */}
             {companies.length > 0 && (
               <div className="table-data">
                 <div className="table-header">
@@ -196,19 +220,36 @@ export class CompaniesSection extends React.Component {
                   </div>
                 </div>
                 {
-                    (files.length > 0) ?
-                      <div className={"alert alert-success"}>
-                        <h4>Votre fichier a bien été importé</h4>
-                          {
-                            files.map((file) => (
-                              <p key={file.name} > <FontAwesomeIcon icon={faFile} /> {file.name}
-                              </p>
-                            ))
-                          }
-                      </div>
-                      :
-                      ""
-                  }
+                  console.log(this.state.view)
+                }
+
+                {
+                  (files.length > 0) ?
+                    <CompaniesTable
+                      nbItems={
+                        nbItems == "all"
+                          ? companiesShowed.length
+                          : parseInt(nbItems)
+                      }
+                      onUpdate={this.updateFootprints.bind(this)}
+                      companies={companiesShowed}
+                      financialData={financialData}
+                    />
+                    :
+                    <DefaultCompaniesTable
+                      nbItems={
+                        nbItems == "all"
+                          ? companiesShowed.length
+                          : parseInt(nbItems)
+                      }
+                      onUpdate={this.updateFootprints.bind(this)}
+                      companies={companiesShowed}
+                      financialData={financialData}
+                    />
+                }
+
+
+
 
                 {!isNextStepAvailable && (
                   <>
@@ -219,25 +260,16 @@ export class CompaniesSection extends React.Component {
                       </p>
                       <button
                         onClick={() => this.synchroniseShowed()}
-                        className={"btn btn-secondary"}
+                        className={"btn btn-warning"}
                       >
                         <FontAwesomeIcon icon={faSync} /> Synchroniser les
                         données
                       </button>
                     </div>
 
+
                   </>
                 )}
-                <CompaniesTable
-                  nbItems={
-                    nbItems == "all"
-                      ? companiesShowed.length
-                      : parseInt(nbItems)
-                  }
-                  onUpdate={this.updateFootprints.bind(this)}
-                  companies={companiesShowed}
-                  financialData={financialData}
-                />
                 {isNextStepAvailable && (
                   <div className={"alert alert-success"}>
                     <p>
@@ -257,58 +289,6 @@ export class CompaniesSection extends React.Component {
               />
             </div>
           )}
-          </>
-          :
-          <div>
-                <p>
-                    Exportez un fichier excel contenant la liste des comptes fournisseurs auxiliaires pour 
-                    compléter les numéros de siren, puis réimportez le document. Le fichier permet d'affecter 
-                    les numéros de siren, il est ensuite nécessaire de synchroniser les données pour récupérer 
-                    les données relatives aux fournisseurs.
-                  </p>
-
-                  <h4> 
-                     &Eacute;tape 1
-                 </h4>
-                <p>
-                  <b>
-                  Télécharger le tableaux des fournisseurs :
-                    </b> <a href="#" className="link" onClick={this.exportXLSXFile}>
-                    Télécharger ici 
-                    </a>           
-
-                  </p> 
-                  <h4> 
-                     &Eacute;tape 2
-                 </h4>
-                  <h5>
-                    Importer votre fichier excel
-                    </h5> 
-                  <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
-                    {({ getRootProps, getInputProps }) => (
-                      <div className="dropzone-section">
-                        <div {...getRootProps()} className="dropzone">
-                          <input {...getInputProps()} />
-                          <p>
-                            Glisser votre fichier
-                            <span>
-                              ou cliquez ici pour sélectionner votre fichier
-                            </span>
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </Dropzone>
-                  {
-                    (files.length > 0) ?
-                      <button className={"btn btn-primary"} onClick={this.importFile}
-                      >
-                        Importer mon fichier
-                      </button> :
-                      ""
-                  }
-          </div>
-  }
         </section>
         <div className={"action container-fluid"}>
           <button
@@ -324,9 +304,6 @@ export class CompaniesSection extends React.Component {
       </>
     );
   }
-   /* ---------- SELECTED VIEW ---------- */
-
-   changeDisplayView = (event) => this.setState({ displayView: event.target.value });
 
   /* ---------- VIEW ---------- */
 
@@ -395,7 +372,7 @@ export class CompaniesSection extends React.Component {
       console.log(this.state.displayView);
 
       this.setState({ companies: this.props.session.financialData.companies });
-      this.setState({displayView : "defaultData"})
+      this.setState({ displayView: "defaultData" })
       console.log(this.state.displayView);
     };
 

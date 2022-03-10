@@ -89,7 +89,6 @@ export class Session {
     // Update all footprints (after loading data : financial data, initial states, fetching companies data)
     async updateFootprints() 
     {
-        console.log("update footprints");
 
         await Promise.all(Object.keys(metaIndics)
                                 .map((indic) => this.updateIndicator(indic)));
@@ -99,7 +98,6 @@ export class Session {
     // Update indicator
     async updateIndicator(indic) 
     {
-        console.log("update indicator : "+indic);
 
         // Net Value Added
         this.updateNetValueAddedFootprint(indic);
