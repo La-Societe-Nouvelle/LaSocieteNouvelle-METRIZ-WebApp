@@ -46,6 +46,7 @@ export class CompaniesSection extends React.Component {
     window.scrollTo(0, 0)
   }
   componentDidUpdate() {
+ 
     // change view to main if array of companies with data unfetched empty
     if (
       this.state.view == "unsync" &&
@@ -76,6 +77,7 @@ export class CompaniesSection extends React.Component {
       fetching,
       progression,
       files,
+      
     } = this.state;
     const financialData = this.props.session.financialData;
 
@@ -113,13 +115,10 @@ export class CompaniesSection extends React.Component {
             <h4>
               &Eacute;tape 1 : Télécharger le tableaux des fournisseurs
             </h4>
-            <p>
-              <b>
-              </b> <a href="#" className="btn btn-outline" onClick={this.exportXLSXFile}>
-                Télécharger ici
-              </a>
+            <button className="btn btn-secondary" onClick={this.exportXLSXFile}>
+              Télécharger
+            </button>
 
-            </p>
             <h4>
               &Eacute;tape 2 : Importer le fichier excel complété
             </h4>
@@ -147,9 +146,52 @@ export class CompaniesSection extends React.Component {
                 </button> :
                 ""
             }
+            {files.length > 0 && !isNextStepAvailable ?
+              <p className="alert alert-info">
+                Votre fichier a bien été importé ! Vous pouvez synchroniser vos données avec notre base de données pour récupérer les données relatives aux fournisseurs.
+              </p>
+
+              : ""}
           </div>
           <h4>&Eacute;tape 3 : Synchroniser vos données</h4>
           <div className="table-container">
+   
+            {
+              isNextStepAvailable && (
+
+                <p className={"alert alert-success"}>
+                  <FontAwesomeIcon icon={faCheck} /> Vos données ont bien été synchronisées.
+                </p>
+
+              )
+            }
+            {
+              !isNextStepAvailable ?
+                <div className={"alert alert-warning"}>
+                  <p>
+                    <FontAwesomeIcon icon={faWarning} /> L'empreinte de
+                    certains comptes ne sont pas initialisés.
+                  </p>
+
+
+                  <button
+                    onClick={() => this.synchroniseShowed()}
+                    className={"btn btn-warning"}
+                  >
+                    <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                    données
+                  </button>
+                </div> :
+                <div className={"alert alert-warning"}>
+
+                  <button
+                    onClick={() => this.synchroniseShowed()}
+                    className={"btn btn-warning"}
+                  >
+                    <FontAwesomeIcon icon={faSync} /> Synchroniser les nouvelles données
+                  </button>
+                </div>
+            }
             {/* <p>
               Les comptes fournisseurs et autres comptes tiers correspondent aux
               entités exterieures vers lesquelles sont dirigés les charges
@@ -161,6 +203,7 @@ export class CompaniesSection extends React.Component {
               L'obtention des empreintes des comptes fournisseurs s'effectuent
               via leur numéro de siren.
             </p> */}
+
             {companies.length > 0 && (
               <div className="table-data">
                 <div className="table-header">
@@ -200,11 +243,11 @@ export class CompaniesSection extends React.Component {
                           <option key="3" value="expenses">
                             Autres comptes tiers
                           </option>
-                          {!isNextStepAvailable && (
+                          {/* {!isNextStepAvailable && (
                             <option key="4" value="unsync">
                               Comptes non synchronisés
                             </option>
-                          )}
+                          )} */}
                           {significativeCompanies.length > 0 && (
                             <option key="5" value="significative">
                               Comptes significatifs
@@ -219,13 +262,7 @@ export class CompaniesSection extends React.Component {
                     )}
                   </div>
                 </div>
-                {
-                  console.log(this.state.view)
-                }
-
-                {
-                  (files.length > 0) ?
-                    <CompaniesTable
+                <CompaniesTable
                       nbItems={
                         nbItems == "all"
                           ? companiesShowed.length
@@ -234,7 +271,11 @@ export class CompaniesSection extends React.Component {
                       onUpdate={this.updateFootprints.bind(this)}
                       companies={companiesShowed}
                       financialData={financialData}
-                    />
+                    /> 
+                    
+                                   {/* {
+                  isNextStepAvailable  ?
+   
                     :
                     <DefaultCompaniesTable
                       nbItems={
@@ -246,37 +287,8 @@ export class CompaniesSection extends React.Component {
                       companies={companiesShowed}
                       financialData={financialData}
                     />
-                }
+                } */}
 
-
-
-
-                {!isNextStepAvailable && (
-                  <>
-                    <div className={"alert alert-warning"}>
-                      <p>
-                        <FontAwesomeIcon icon={faWarning} /> L'empreinte de
-                        certains comptes ne sont pas initialisés.
-                      </p>
-                      <button
-                        onClick={() => this.synchroniseShowed()}
-                        className={"btn btn-warning"}
-                      >
-                        <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                        données
-                      </button>
-                    </div>
-
-
-                  </>
-                )}
-                {isNextStepAvailable && (
-                  <div className={"alert alert-success"}>
-                    <p>
-                      <FontAwesomeIcon icon={faCheck} /> Données complètes.
-                    </p>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -347,9 +359,6 @@ export class CompaniesSection extends React.Component {
         )
       );
       this.setState({ companies: this.props.session.financialData.companies });
-      this.setState({ displayView: "defaultData" });
-
-
     };
 
     reader.readAsText(file);
@@ -369,11 +378,7 @@ export class CompaniesSection extends React.Component {
           )
         )
       );
-      console.log(this.state.displayView);
-
       this.setState({ companies: this.props.session.financialData.companies });
-      this.setState({ displayView: "defaultData" })
-      console.log(this.state.displayView);
     };
 
     reader.readAsArrayBuffer(file);
@@ -410,11 +415,6 @@ export class CompaniesSection extends React.Component {
 
   /* ---------- FETCHING DATA ---------- */
 
-  // Synchronisation all
-  synchroniseAll = async () => {
-    await this.synchroniseCompanies(this.state.companies);
-  };
-
   // Synchronisation showed
   synchroniseShowed = async () => {
     let { companies, view } = this.state;
@@ -435,7 +435,7 @@ export class CompaniesSection extends React.Component {
     let i = 0;
     let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise) {
-      await company.updateFromRemote();
+        await company.updateFromRemote()
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
@@ -457,7 +457,7 @@ export class CompaniesSection extends React.Component {
       );
 
     // update state
-    this.setState({ fetching: false, progression: 0 });
+    this.setState({ fetching: false, progression: 0 , synchronised : true });
 
     // update session
     this.props.session.updateFootprints();

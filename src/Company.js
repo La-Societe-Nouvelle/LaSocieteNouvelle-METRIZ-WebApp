@@ -194,7 +194,7 @@ export class Company {
   {
     let response = await fetch(endpoint, {method:'get'});
     let data = await response.json();
-    console.log(endpoint+' status:'+data.header.statut);
+    //console.log(endpoint+' status:'+data.header.statut);
     if (data.header.statut == 200) {return data}
     else                           {return null}
   }

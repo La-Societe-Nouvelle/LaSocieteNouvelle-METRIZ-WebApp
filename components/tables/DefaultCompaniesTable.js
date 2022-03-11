@@ -4,7 +4,6 @@
 import React from "react";
 
 // Utils
-import { InputText } from "/components/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 
 /* ---------- COMPANIES TABLE ---------- */
@@ -200,11 +199,8 @@ class RowTableCompanies extends React.Component {
       corporateName,
       account,
       amount,
-      state,
-      status,
     } = this.props;
     const { corporateId } = this.state;
-    const { dataUpdated } = this.state;
 
     return (
       <tr>

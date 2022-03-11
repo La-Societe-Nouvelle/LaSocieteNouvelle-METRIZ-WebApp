@@ -48,8 +48,11 @@ export class CompaniesTable extends React.Component {
               <td
                 onClick={() => this.changeColumnSorted("denomination")}
               >
-                Libellé
+                Libellé du compte fournisseur
               </td>
+              <td>
+                Compte fournisseur
+               </td> 
               <td
                 onClick={() => this.changeColumnSorted("area")}
               >
@@ -226,6 +229,7 @@ class RowTableCompanies extends React.Component {
   render() {
     const {
       corporateName,
+      account,
       amount,
       legalUnitAreaCode,
       legalUnitActivityCode,
@@ -233,7 +237,7 @@ class RowTableCompanies extends React.Component {
       status,
     } = this.props;
     const { corporateId, areaCode, activityCode } = this.state;
-    const { dataUpdated, toggleIcon } = this.state;
+    const { dataUpdated } = this.state;
 
     return (
       <tr>
@@ -245,12 +249,11 @@ class RowTableCompanies extends React.Component {
             onUpdate={this.updateCorporateId.bind(this)}
           />
         </td>
-
         <td>
-          <InputText
-            value={corporateName}
-            onUpdate={this.updateCorporateName.bind(this)}
-          />
+        {corporateName}
+        </td>
+        <td>
+          {account}
         </td>
 
         <td>
