@@ -31,7 +31,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td>Chiffre d'affaires</td>
             <td className="align-right">{printValue(financialData.getRevenue(), 0)} &euro; </td>
             <td className="bg-white">
-              <span class="infobulle" title="Chiffre clé à vérifier">
+              <span className="infobulle" title="Chiffre clé à vérifier">
                 <FontAwesomeIcon icon={faCircleInfo} />
               </span></td>
           </tr>
@@ -39,7 +39,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td>Production stockée</td>
             <td className="align-right">{printValue(financialData.getStoredProduction(), 0)} &euro; </td>
             <td className="bg-white">
-              <span class="infobulle" title="Chiffre clé à vérifier">
+              <span className="infobulle" title="Chiffre clé à vérifier">
                 <FontAwesomeIcon icon={faCircleInfo} />
               </span>
             </td>
@@ -49,7 +49,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td>Production immobilisée</td>
             <td className="align-right">{printValue(financialData.getImmobilisedProduction(), 0)} &euro; </td>
             <td className="bg-white">
-            <span class="infobulle" title="Chiffre clé à vérifier">
+            <span className="infobulle" title="Chiffre clé à vérifier">
                 <FontAwesomeIcon icon={faCircleInfo} />
               </span>
             </td>
@@ -68,7 +68,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td><b>Charges externes</b></td>
             <td className="align-right">{printValue(financialData.getAmountIntermediateConsumption(), 0)} &euro;</td>
             <td className="bg-white">
-            <span class="infobulle" title="Chiffre clé à vérifier">
+            <span className="infobulle" title="Chiffre clé à vérifier">
                 <FontAwesomeIcon icon={faCircleInfo} />
               </span>
             </td>
@@ -99,7 +99,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td>&emsp;Dotations aux amortissements sur immobilisations</td>
             <td className="align-right">{printValue(financialData.getAmountDepreciationExpenses(), 0)} &euro;</td>
             <td className="bg-white">
-            <span class="infobulle" title="Chiffre clé à vérifier">
+            <span className="infobulle" title="Chiffre clé à vérifier">
                 <FontAwesomeIcon icon={faCircleInfo} />
               </span>
                </td>
