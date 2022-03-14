@@ -1,35 +1,78 @@
 /* ---------- TABLE ---------- */
 .pagination {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   flex-grow: 1;
   gap: 20px;
-}
-.table-container {
+  margin-top: 1rem;
 
+  .form-input, label{
+    font-size: 0.85rem;
+    width: auto;
+  }
+}
+
+.table-container {
+  border: 1px solid $light-blue;
+  padding: 0 2em 1em 2em;
+  margin-top: 1em;
     h4 {
       text-align: center;
       color : $secondary-color;
       font-size: 1.2em;
       margin: 1.5em 0;
         }
-    .table-header {
-      width: 100%;
-      padding: 5px 2px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
   }
   
   table {
-    min-width: 60%;
     white-space: nowrap;
-    margin: 1em auto;
     font-size: 0.9em;
     font-family: "roboto", sans-serif;
 
+    .siren {
+      width: 250px;
+    }
+    .siren-input{
+      display: flex;
+      align-content: center;
+      gap: 10px;
+  
+      .fa-triangle-exclamation {
+        color: #ff6207;
+      }
+    }
+    .company {
+      width: 100px;
+    }
+    .success {
+      .fa-circle-check {
+        color : #59b719;
+      }
+      .form-input, .form-input:active, .form-input:focus{
+        border-color: #59b719;
+
+      }
+    }
+    tr.warning {
+      td {
+        background-color: #fff3cd;
+        border-color: #ffeeba;
+      }
+    }
+    
+    p.warning  {
+      color : #ff6207;
+      .form-input, .form-input:active, .form-input:focus{
+        border-color: #ff6207;
+
+      }
+    }
+    select.warning {
+      border-color: #ff6207;
+    }
+    .error {
+      color : red;
+    }
     // --- Cell --- //
   
     td {
@@ -125,7 +168,6 @@
    
 .table-menu {
   margin: 1em 0;
-  text-align: center;
     button {
       background-color: #fff;
       border:none;
@@ -156,7 +198,6 @@
   }
   .table-data {
     table {
-      margin: 20px auto;
       border-collapse: collapse;
   
     }

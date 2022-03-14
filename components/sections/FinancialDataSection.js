@@ -113,7 +113,6 @@ export class FinancialDataSection extends React.Component {
               </button>
             </div>
      
-            <div className="table-container">
          
 
               <div className="table-data">
@@ -128,7 +127,6 @@ export class FinancialDataSection extends React.Component {
                   />
                 )}
               </div>
-            </div>
           </div>
         </section>
         <section className={"action"}>

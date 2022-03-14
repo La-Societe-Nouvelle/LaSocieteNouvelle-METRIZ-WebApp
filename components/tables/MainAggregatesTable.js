@@ -23,7 +23,7 @@ export const MainAggregatesTable = ({financialData}) =>
   return(
     <>
     {financialData.isFinancialDataLoaded &&  
-      <table>
+      <table className='w100'>
         <thead>
           <tr>
             <td>Agrégat</td>

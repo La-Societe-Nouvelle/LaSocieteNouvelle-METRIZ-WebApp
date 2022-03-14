@@ -28,7 +28,7 @@ export class ImmobilisationsTable extends React.Component {
 
     return (
       <>
-        <table>
+        <table className='w100'>
           <thead>
             <tr>
               <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>

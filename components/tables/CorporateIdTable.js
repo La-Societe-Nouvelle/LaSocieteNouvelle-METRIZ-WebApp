@@ -6,16 +6,12 @@ import React from "react";
 // Utils
 import { InputText } from "/components/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
-
-// Libs
-import divisions from "/lib/divisions";
-import areas from "/lib/areas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faCheckCircle, faWarning, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faCheckCircle, faSync,faWarning} from "@fortawesome/free-solid-svg-icons";
 
 /* ---------- COMPANIES TABLE ---------- */
 
-export class CompaniesTable extends React.Component {
+export class CorporateIdTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -43,8 +39,8 @@ export class CompaniesTable extends React.Component {
           <thead>
             <tr>
               <td
-                className="siren"
                 onClick={() => this.changeColumnSorted("identifiant")}
+                className="siren"
               >
                 Siren
               </td>
@@ -54,20 +50,11 @@ export class CompaniesTable extends React.Component {
                 Libellé du compte fournisseur
               </td>
               <td
-                className="company"
+                              className="company"
               >
                 Compte fournisseur
-              </td>
-              <td
-                onClick={() => this.changeColumnSorted("area")}
-              >
-                Espace économique
-              </td>
-              <td
-                onClick={() => this.changeColumnSorted("activity")}
-              >
-                Secteur d'activité
-              </td>
+               </td> 
+
               <td className="align-right"
                 onClick={() => this.changeColumnSorted("amount")}
               >
@@ -83,7 +70,7 @@ export class CompaniesTable extends React.Component {
                   key={"company_" + company.id}
                   {...company}
                   updateCompany={this.updateCompany.bind(this)}
-                  syncCompany={this.updateCompanyFromRemote.bind(this)}
+                  
                 />
               ))}
           </tbody>
@@ -140,8 +127,7 @@ export class CompaniesTable extends React.Component {
           a.getCorporateName().localeCompare(b.getCorporateName())
         );
         break;
-      //case "area": companies.sort((a,b) => a.footprintAreaCode.localeCompare(b.footprintAreaCode)); break;
-      //case "activity": companies.sort((a,b) => a.footprintActivityCode.localeCompare(b.footprintActivityCode)); break;
+
       case "amount":
         companies.sort((a, b) => b.amount - a.amount);
         break;
@@ -164,11 +150,6 @@ export class CompaniesTable extends React.Component {
 
   /* ---------- OPERATIONS ON COMPANY ---------- */
 
-  async fetchDataCompany(company) {
-    await company.fetchData();
-    this.props.financialData.updateCompany(company);
-    this.forceUpdate();
-  }
 
   updateCompany = (nextProps) => {
     let company = this.props.financialData.getCompany(nextProps.id);
@@ -192,19 +173,6 @@ class RowTableCompanies extends React.Component {
     super(props);
     this.state = {
       corporateId: props.corporateId || "",
-      areaCode:
-        props.state != ""
-          ? props.state == "siren"
-            ? props.legalUnitAreaCode
-            : props.footprintAreaCode
-          : "WLD",
-      activityCode:
-        props.state != ""
-          ? props.state == "siren"
-            ? props.legalUnitActivityCode
-            : props.footprintActivityCode
-          : "00",
-
       dataUpdated: props.dataUpdated,
       toggleIcon: false,
     };
@@ -214,18 +182,6 @@ class RowTableCompanies extends React.Component {
     if (this.props != prevProps) {
       this.setState({
         corporateId: this.props.corporateId || "",
-        areaCode:
-          this.props.state != ""
-            ? this.props.state == "siren"
-              ? this.props.legalUnitAreaCode
-              : this.props.footprintAreaCode
-            : "WLD",
-        activityCode:
-          this.props.state != ""
-            ? this.props.state == "siren"
-              ? this.props.legalUnitActivityCode
-              : this.props.footprintActivityCode
-            : "00",
         dataUpdated: false,
       });
     }
@@ -236,96 +192,35 @@ class RowTableCompanies extends React.Component {
       corporateName,
       account,
       amount,
-      legalUnitAreaCode,
-      legalUnitActivityCode,
-      state,
-      status,
     } = this.props;
-    const { corporateId, areaCode, activityCode, dataUpdated } = this.state;
+    const { corporateId} = this.state;
 
     return (
-      <tr className={activityCode == "00" ? "warning" : "success"}>
+      <tr className={!corporateId ? "warning" : "success" }>
         <td className="siren-input">
-        <p>
-            {
-               activityCode == "00"  
-                ?
-                <FontAwesomeIcon icon={faWarning} title="Risque de données" />
-                :
-                <FontAwesomeIcon icon={faCheckCircle} title="Données Complètes" />
+          <p>
+          {
+            corporateId 
+            ?         
+            <FontAwesomeIcon icon={faCheckCircle} title="Prêt à être synchronisé" />
+            :
+            <FontAwesomeIcon icon={faWarning} title="Ce fournisseur ne sera pas synchronisé" />
 
-            }
+          }
           </p>
-          <p >
+          <p  >
           <InputText
             value={corporateId}
-            valid={!dataUpdated && status == 200}
-            unvalid={!dataUpdated && status == 404}
             onUpdate={this.updateCorporateId.bind(this)}
           />
           </p>
+ 
         </td>
         <td>
-          {corporateName}
+        {corporateName}
         </td>
         <td>
           {account}
-        </td>
-        <td>
-          <select
-            className={
-              !dataUpdated && status == 200
-                ? "valid"
-                : "warning"
-            }
-            value={areaCode || "WLD"}
-            onChange={this.onAreaCodeChange}
-          >
-            {Object.entries(areas)
-              .sort()
-              .map(([code, libelle]) => (
-                <option
-                  className={
-                    legalUnitAreaCode && code == legalUnitAreaCode
-                      ? "default-option"
-                      : ""
-                  }
-                  key={code}
-                  value={code}
-                >
-                  {code + " - " + libelle}
-                </option>
-              ))}
-          </select>
-        </td>
-            
-        <td>
-          <select
-            className={
-              !dataUpdated && status == 200
-                ? "valid"
-                : "warning"
-            }
-            value={activityCode.substring(0, 2) || "00"}
-            onChange={this.onActivityCodeChange}
-          >
-            {Object.entries(divisions)
-              .sort((a, b) => parseInt(a) - parseInt(b))
-              .map(([code, libelle]) => (
-                <option
-                  className={
-                    legalUnitActivityCode &&
-                      code == legalUnitActivityCode.substring(0, 2)
-                      ? "default-option"
-                      : ""
-                  }
-                  key={code}
-                  value={code}
-                >
-                  {code + " - " + libelle}
-                </option>
-              ))}
-          </select>
         </td>
 
         <td className="align-right">{printValue(amount, 0)} &euro;</td>
@@ -342,24 +237,5 @@ class RowTableCompanies extends React.Component {
   };
 
 
-  onAreaCodeChange = (event) => {
-    this.setState({ areaCode: event.target.value, dataUpdated: true });
-    this.props.updateCompany({
-      id: this.props.id,
-      footprintAreaCode: event.target.value,
-    });
-  };
-  onActivityCodeChange = (event) => {
-    this.setState({ activityCode: event.target.value, dataUpdated: true });
-    this.props.updateCompany({
-      id: this.props.id,
-      footprintActivityCode: event.target.value,
-    });
-  };
 
-  syncCompany = async () => {
-    this.setState({ toggleIcon: true });
-    await this.props.syncCompany(this.props.id);
-    this.setState({ toggleIcon: false });
-  };
 }
