@@ -5,16 +5,17 @@
     margin-right: 10%;
   
     .progressbar {
-      height: 25px;
+      height: 15px;
       width: 500px;
   
       .progressbar_shape {
         height: 100%;
         width: 100%;
-  
+        border-radius: 40px;
+        background-color: $light-blue;
         rect {
           height: 100%;
-          fill: $primary-color;
+          fill: #5262bc;
         }
       }
     }

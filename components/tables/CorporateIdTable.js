@@ -7,32 +7,33 @@ import React from "react";
 import { InputText } from "/components/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faCheckCircle, faSync,faWarning} from "@fortawesome/free-solid-svg-icons";
+import {faCheckCircle ,faCross,faSyncAlt, faWarning, faXmark, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 
 /* ---------- COMPANIES TABLE ---------- */
 
 export class CorporateIdTable extends React.Component {
   constructor(props) {
+
     super(props);
+
     this.state = {
       companies: props.companies,
-      columnSorted: "amount",
+      columnSorted: "identifiant",
       reverseSort: false,
       page: 0,
     };
-  }
 
+  }
   componentDidUpdate(prevProps) {
-    if (this.props !== prevProps)
-      this.setState({ companies: this.props.companies, page: 0 });
+    if (prevProps.companies !== this.props.companies) {
+      this.setState({ companies: this.props.companies });
+    }
   }
 
   render() {
     const { nbItems } = this.props;
     const { companies, columnSorted, page } = this.state;
-
     this.sortCompanies(companies, columnSorted);
-
     return (
       <div className="table-main">
         <table className="table">
@@ -49,11 +50,9 @@ export class CorporateIdTable extends React.Component {
               >
                 Libellé du compte fournisseur
               </td>
-              <td
-                              className="company"
-              >
+              <td className="company">
                 Compte fournisseur
-               </td> 
+              </td>
 
               <td className="align-right"
                 onClick={() => this.changeColumnSorted("amount")}
@@ -70,7 +69,7 @@ export class CorporateIdTable extends React.Component {
                   key={"company_" + company.id}
                   {...company}
                   updateCompany={this.updateCompany.bind(this)}
-                  
+
                 />
               ))}
           </tbody>
@@ -154,7 +153,6 @@ export class CorporateIdTable extends React.Component {
   updateCompany = (nextProps) => {
     let company = this.props.financialData.getCompany(nextProps.id);
     company.update(nextProps);
-    this.props.onUpdate();
     this.setState({ companies: this.props.companies });
   };
 
@@ -192,32 +190,46 @@ class RowTableCompanies extends React.Component {
       corporateName,
       account,
       amount,
+      status
     } = this.props;
-    const { corporateId} = this.state;
+    const { corporateId } = this.state;
 
+    let icon;
+
+    if (corporateId && status != 200) {
+      icon = <p className="success">
+        <FontAwesomeIcon icon={faSyncAlt} title="Données prêtes à être synchronisées" />
+      </p>
+    }
+
+    if (status == 200) {
+      icon = <p className="success">
+        <FontAwesomeIcon icon={faCheckCircle} title="Données synchronisées" /> </p>
+
+    }
+    if (status == 404) {
+      icon = <p className="error">
+        <FontAwesomeIcon icon={faXmarkCircle} title="Erreur lors la synchronisation" /> </p>
+
+    }
+    if (!corporateId) {
+      icon = <p className="warning"><FontAwesomeIcon icon={faWarning} title="Données non synchronisables" /></p>
+    }
+   
     return (
-      <tr className={!corporateId ? "warning" : "success" }>
+      <tr >
         <td className="siren-input">
-          <p>
-          {
-            corporateId 
-            ?         
-            <FontAwesomeIcon icon={faCheckCircle} title="Prêt à être synchronisé" />
-            :
-            <FontAwesomeIcon icon={faWarning} title="Ce fournisseur ne sera pas synchronisé" />
+          {icon}
+          <p  className={status==200 ? "success" : "warning"} >
+            <InputText
+              value={corporateId}
+              onUpdate={this.updateCorporateId.bind(this)}
+            />
+          </p>
 
-          }
-          </p>
-          <p  >
-          <InputText
-            value={corporateId}
-            onUpdate={this.updateCorporateId.bind(this)}
-          />
-          </p>
- 
         </td>
         <td>
-        {corporateName}
+          {corporateName}
         </td>
         <td>
           {account}

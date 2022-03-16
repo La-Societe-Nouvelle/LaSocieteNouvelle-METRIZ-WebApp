@@ -13,9 +13,7 @@
 }
 
 .table-container {
-  border: 1px solid $light-blue;
-  padding: 0 2em 1em 2em;
-  margin-top: 1em;
+
     h4 {
       text-align: center;
       color : $secondary-color;
@@ -45,12 +43,12 @@
       width: 100px;
     }
     .success {
-      .fa-circle-check {
+      .fa-circle-check, .fa-rotate {
         color : #59b719;
       }
-      .form-input, .form-input:active, .form-input:focus{
+      .form-input, .form-input:active, .form-input:focus, select{
         border-color: #59b719;
-
+        background-color: #ecf9ef;
       }
     }
     tr.warning {

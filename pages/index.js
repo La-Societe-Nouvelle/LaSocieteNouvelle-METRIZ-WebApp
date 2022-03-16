@@ -12,7 +12,7 @@ import { StartSection } from '/components/sections/StartSection';
 import { AccountingSection } from '../components/sections/AccountingSection';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
-import { CompaniesSection } from '/components/sections/CompaniesSection';
+import { CompaniesSection } from '/components/sections/Companies/CompaniesSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
 import { StatementSection } from '/components/sections/StatementSection';
 
@@ -169,7 +169,6 @@ class Metriz extends React.Component {
   validStep = (step) => {
     // Increase progression
     this.state.session.progression = Math.max(step + 1, this.state.session.progression);
-    console.log(this.state.session.progression);
     // skip initial states if first year
     if (this.state.session.progression == 3 &&
       getPrevAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks)) == 0) this.state.session.progression++;

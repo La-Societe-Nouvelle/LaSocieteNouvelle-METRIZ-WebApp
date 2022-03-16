@@ -11,7 +11,7 @@ import { printValue, valueOrDefault } from "/src/utils/Utils";
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faCheckCircle, faWarning, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faSyncAlt, faWarning } from "@fortawesome/free-solid-svg-icons";
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -83,7 +83,6 @@ export class CompaniesTable extends React.Component {
                   key={"company_" + company.id}
                   {...company}
                   updateCompany={this.updateCompany.bind(this)}
-                  syncCompany={this.updateCompanyFromRemote.bind(this)}
                 />
               ))}
           </tbody>
@@ -229,7 +228,7 @@ class RowTableCompanies extends React.Component {
         dataUpdated: false,
       });
     }
-  }
+  } 
 
   render() {
     const {
@@ -238,31 +237,38 @@ class RowTableCompanies extends React.Component {
       amount,
       legalUnitAreaCode,
       legalUnitActivityCode,
-      state,
       status,
     } = this.props;
     const { corporateId, areaCode, activityCode, dataUpdated } = this.state;
 
-    return (
-      <tr className={activityCode == "00" ? "warning" : "success"}>
-        <td className="siren-input">
-        <p>
-            {
-               activityCode == "00"  
-                ?
-                <FontAwesomeIcon icon={faWarning} title="Risque de données" />
-                :
-                <FontAwesomeIcon icon={faCheckCircle} title="Données Complètes" />
+    let icon;
 
-            }
-          </p>
+    if (activityCode == "00") {
+      icon = <p className="warning"><FontAwesomeIcon icon={faWarning} title="Risque de données incomplètes" /></p>
+    }
+    else {
+      if (status == 200) {
+        icon = <p className="success">
+          <FontAwesomeIcon icon={faCheckCircle} title="Données synchronisées" /> </p>
+
+      }
+      else {
+        icon = <p className="success">
+          <FontAwesomeIcon icon={faSyncAlt} title="Données prêtes à être synchronisées" /> </p>
+      }
+    }
+    return (
+      <tr className={activityCode == "00" ? "warning" : ""}>
+        <td className="siren-input">
+
+          {icon}
           <p >
-          <InputText
-            value={corporateId}
-            valid={!dataUpdated && status == 200}
-            unvalid={!dataUpdated && status == 404}
-            onUpdate={this.updateCorporateId.bind(this)}
-          />
+            <InputText
+              value={corporateId}
+              valid={!dataUpdated && status == 200}
+              unvalid={!dataUpdated && status == 404}
+              onUpdate={this.updateCorporateId.bind(this)}
+            />
           </p>
         </td>
         <td>
@@ -276,7 +282,7 @@ class RowTableCompanies extends React.Component {
             className={
               !dataUpdated && status == 200
                 ? "valid"
-                : "warning"
+                : ""
             }
             value={areaCode || "WLD"}
             onChange={this.onAreaCodeChange}
@@ -298,13 +304,13 @@ class RowTableCompanies extends React.Component {
               ))}
           </select>
         </td>
-            
+
         <td>
           <select
             className={
               !dataUpdated && status == 200
                 ? "valid"
-                : "warning"
+                : ""
             }
             value={activityCode.substring(0, 2) || "00"}
             onChange={this.onActivityCodeChange}
@@ -357,9 +363,5 @@ class RowTableCompanies extends React.Component {
     });
   };
 
-  syncCompany = async () => {
-    this.setState({ toggleIcon: true });
-    await this.props.syncCompany(this.props.id);
-    this.setState({ toggleIcon: false });
-  };
+
 }

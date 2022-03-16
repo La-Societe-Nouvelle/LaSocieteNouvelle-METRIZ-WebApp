@@ -5,7 +5,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faChevronRight, faFile } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faSync, faChevronRight, faFile, faFileExport, faFileImport, faWarning } from "@fortawesome/free-solid-svg-icons";
 
 
 // Components
@@ -19,7 +19,7 @@ import { CSVFileReader, processCSVCompaniesData } from "/src/readers/CSVReader";
 import { XLSXFileReader } from "/src/readers/XLSXReader";
 import { ProgressBar } from "../popups/ProgressBar";
 import { getSignificativeCompanies } from "../../src/formulas/significativeLimitFormulas";
-import { DefaultCompaniesTable } from "../tables/DefaultCompaniesTable";
+import { CorporateIdTable } from "../tables/CorporateIdTable";
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -28,9 +28,7 @@ import { DefaultCompaniesTable } from "../tables/DefaultCompaniesTable";
 export class CompaniesSection extends React.Component {
   constructor(props) {
     super(props);
-    this.onDrop = (files) => {
-      this.setState({ files });
-    };
+
     this.state = {
       companies: props.session.financialData.companies,
       significativeCompanies: [],
@@ -39,14 +37,21 @@ export class CompaniesSection extends React.Component {
       fetching: false,
       files: [],
       progression: 0,
+      currentStep: 1,
     };
+
+    this.onDrop = (files) => {
+      this.setState({ files });
+    };
+
   }
 
   componentDidMount() {
     window.scrollTo(0, 0)
   }
   componentDidUpdate() {
- 
+
+
     // change view to main if array of companies with data unfetched empty
     if (
       this.state.view == "unsync" &&
@@ -66,6 +71,8 @@ export class CompaniesSection extends React.Component {
       );
       this.setState({ significativeCompanies });
     }
+
+
   }
 
   render() {
@@ -77,7 +84,7 @@ export class CompaniesSection extends React.Component {
       fetching,
       progression,
       files,
-      
+      currentStep,
     } = this.state;
     const financialData = this.props.session.financialData;
 
@@ -98,29 +105,29 @@ export class CompaniesSection extends React.Component {
           <div className={"section-title"}>
             <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
             <h3 className={"subtitle underline"}>
-              Saisie des numéros de Siren
+              Synchronisation des données
             </h3>
             <p>
-              Les numéros de siren permettent de récupérer les données relatives aux fournisseurs
-              au sein de notre base de données ouverte.
+              Les numéros de siren permettent de récupérer les données relatives aux fournisseurs au sein de notre base de données ouverte.
             </p>
-          </div>
-          <div>
-            <p>
-              Exportez un fichier excel contenant la liste des comptes fournisseurs auxiliaires pour
-              compléter les numéros de siren, puis réimportez le document. Le fichier permet d'affecter
-              les numéros de siren, il est ensuite nécessaire de synchroniser les données pour récupérer
-              les données relatives aux fournisseurs.
-            </p>
-            <h4>
-              &Eacute;tape 1 : Télécharger le tableaux des fournisseurs
-            </h4>
-            <button className="btn btn-secondary" onClick={this.exportXLSXFile}>
-              Télécharger
-            </button>
+            <div>
 
+            </div>
+          </div>
+          <div className="step-company mt-2">
             <h4>
-              &Eacute;tape 2 : Importer le fichier excel complété
+              &Eacute;tape 1 : Téléchargez et complétez le tableaux de vos fournisseurs
+            </h4>
+            <p>
+              Exportez la liste des comptes fournisseurs auxiliaires afin de renseigner les numéros siren de vos fournisseurs.
+            </p>
+            <button className="btn btn-primary" onClick={this.exportXLSXFile}>
+              <FontAwesomeIcon icon={faFileExport} /> Exporter mes comptes fournisseurs
+            </button>
+          </div>
+          <div className="step-company">
+            <h4>
+              &Eacute;tape 2 : Importez le fichier excel complété
             </h4>
 
             <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
@@ -138,169 +145,187 @@ export class CompaniesSection extends React.Component {
                 </div>
               )}
             </Dropzone>
-            {
-              (files.length > 0) ?
-                <button className={"btn btn-primary"} onClick={this.importFile}
-                >
-                  Importer mon fichier
-                </button> :
-                ""
-            }
-            {files.length > 0 && !isNextStepAvailable ?
-              <p className="alert alert-info">
-                Votre fichier a bien été importé ! Vous pouvez synchroniser vos données avec notre base de données pour récupérer les données relatives aux fournisseurs.
+
+            <button className={"btn btn-secondary"} onClick={this.importFile} disabled={files && files.length ? (false) : (true)}
+            >
+              <FontAwesomeIcon icon={faFileImport} />  Importer votre fichier
+            </button>
+            {this.state.importedFile && (
+              <p className="alert alert-success">
+                <b>  Le tableau de vos fournisseurs a bien été complété.</b>
+                Vous pouvez synchroniser les données de vos fournisseurs avec notre base de données.
               </p>
-
-              : ""}
+            )}
           </div>
-          <h4>&Eacute;tape 3 : Synchroniser vos données</h4>
-          <div className="table-container">
-   
+          <div className="step-company">
+            <h4>&Eacute;tape 3 : Synchroniser les données de vos fournisseurs</h4>
             {
-              isNextStepAvailable && (
-
-                <p className={"alert alert-success"}>
-                  <FontAwesomeIcon icon={faCheck} /> Vos données ont bien été synchronisées.
-                </p>
-
+               currentStep == 1 && (
+                 <>
+                  <h5> Synchroniser grâce au numero de siren du compte fournisseur</h5>
+                    <p>
+                    Vous pouvez compléter les derniers numéros de siren manquants.
+                    Appuyez ensuite sur le bouton "Synchroniser les données" pour récupérer les données de vos fournisseurs afin d'initialiser leur empreinte.
+                    Attention, seuls les comptes fournisseurs ayant un numéro de Siren renseigné seront synchronisés.
+                  </p>
+      
+                 </>
               )
             }
-            {
-              !isNextStepAvailable ?
-                <div className={"alert alert-warning"}>
-                  <p>
-                    <FontAwesomeIcon icon={faWarning} /> L'empreinte de
-                    certains comptes ne sont pas initialisés.
-                  </p>
-
-
-                  <button
-                    onClick={() => this.synchroniseShowed()}
-                    className={"btn btn-warning"}
-                  >
-                    <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                    données
-                  </button>
-                </div> :
-                <div className={"alert alert-warning"}>
-
-                  <button
-                    onClick={() => this.synchroniseShowed()}
-                    className={"btn btn-warning"}
-                  >
-                    <FontAwesomeIcon icon={faSync} /> Synchroniser les nouvelles données
-                  </button>
-                </div>
+              {
+               currentStep == 2 && (
+                 <>
+                  <h5> Synchroniser grâce au secteur d'activité</h5>
+                    <p>
+                      Vous pouvez calculer l'empreinte des comptes fournisseurs grâce au secteur d'activité. 
+                      Assurez-vous d'avoir selectionné un secteur pour obtenir un calcul plus précis de l'empreinte du compte fournisseur.
+                    </p>
+                 </>
+              )
             }
-            {/* <p>
-              Les comptes fournisseurs et autres comptes tiers correspondent aux
-              entités exterieures vers lesquelles sont dirigés les charges
-              externes et les investissements. Les "autres comptes tiers" font
-              référence aux comptes par défaut résultants de l'impossibilité
-              d'associer certains flux sortants à un compte fournisseur
-              auxiliaire.
-              <br />
-              L'obtention des empreintes des comptes fournisseurs s'effectuent
-              via leur numéro de siren.
-            </p> */}
-
+        
             {companies.length > 0 && (
-              <div className="table-data">
-                <div className="table-header">
-                  <div className="pagination">
-                    <div className="form-group">
-                      <label> Pagination </label>
-                      <select
-                        value={nbItems}
-                        onChange={this.changeNbItems}
-                        className="form-input"
-                      >
-                        <option key="1" value="20">
-                          20 fournisseurs par page
-                        </option>
-                        <option key="2" value="50">
-                          50 fournisseurs par page
-                        </option>
-                        <option key="3" value="all">
-                          Tous les fournisseurs
-                        </option>
-                      </select>
-                    </div>
-                    {companies.length > 0 && (
+              <>
+
+                <div className="table-container">
+                  <div className="table-data table-company">
+                    <div className="pagination">
+                      {companies.length > 0 && (
+                        <div className="form-group">
+                          <select
+                            value={view}
+                            onChange={this.changeView}
+                            className="form-input"
+                          >
+                            <option key="1" value="all">
+                              Tous les comptes externes
+                            </option>
+                            <option key="2" value="aux">
+                              Comptes fournisseurs uniquement
+                            </option>
+                            <option key="3" value="expenses">
+                              Autres comptes tiers
+                            </option>
+                            {!isNextStepAvailable && (
+                              <option key="4" value="unsync">
+                                Comptes non synchronisés
+                              </option>
+                            )}
+                            {significativeCompanies.length > 0 && (
+                              <option key="5" value="significative">
+                                Comptes significatifs
+                              </option>
+                            )}
+                            <option key="6" value="defaultActivity">
+                              Comptes tiers non rattachés à un secteur
+                              d'activités
+                            </option>
+                          </select>
+                        </div>
+                      )}
                       <div className="form-group">
-                        <label> Affichage </label>
                         <select
-                          value={view}
-                          onChange={this.changeView}
+                          value={nbItems}
+                          onChange={this.changeNbItems}
                           className="form-input"
                         >
-                          <option key="1" value="all">
-                            Tous les comptes externes
+                          <option key="1" value="20">
+                            20 fournisseurs par page
                           </option>
-                          <option key="2" value="aux">
-                            Comptes fournisseurs uniquement
+                          <option key="2" value="50">
+                            50 fournisseurs par page
                           </option>
-                          <option key="3" value="expenses">
-                            Autres comptes tiers
-                          </option>
-                          {/* {!isNextStepAvailable && (
-                            <option key="4" value="unsync">
-                              Comptes non synchronisés
-                            </option>
-                          )} */}
-                          {significativeCompanies.length > 0 && (
-                            <option key="5" value="significative">
-                              Comptes significatifs
-                            </option>
-                          )}
-                          <option key="6" value="defaultActivity">
-                            Comptes tiers non rattachés à un secteur
-                            d'activités
+                          <option key="3" value="all">
+                            Afficher tous les fournisseurs
                           </option>
                         </select>
                       </div>
-                    )}
+                    </div>
+                    {
+                      currentStep == 1 && !isNextStepAvailable ?
+                        <CorporateIdTable
+                          nbItems={
+                            nbItems == "all"
+                              ? companiesShowed.length
+                              : parseInt(nbItems)
+                          }
+                          onUpdate={this.updateFootprints.bind(this)}
+                          companies={companiesShowed}
+                          financialData={financialData}
+                        />
+                        :
+                        <CompaniesTable
+                          nbItems={
+                            nbItems == "all"
+                              ? companiesShowed.length
+                              : parseInt(nbItems)
+                          }
+                          onUpdate={this.updateFootprints.bind(this)}
+                          companies={companiesShowed}
+                          financialData={financialData}
+                        />
+
+                    }
+                    {
+                      isNextStepAvailable
+                      && (
+                        <p className={"alert alert-success"}>
+                          <FontAwesomeIcon icon={faCheck} /> Vos données ont bien été synchronisées.
+                        </p>
+                      )
+                    }
+   
+                    {
+                      // Step 1 : Only synchronise company with Corporate ID 
+                      currentStep == 1 && !isNextStepAvailable
+                      && (
+                        <div className="alert alert-warning">
+                          <p>
+                            <FontAwesomeIcon icon={faWarning} /> L'empreinte de certains comptes ne sont pas initialisés. Attention, seuls les comptes fournisseurs avec un numéro de siren seront synchronisés.
+                          </p>
+                          <button
+                            onClick={() => this.synchroniseCompaniesWithCid()}
+                            className={"btn btn-warning"}
+                          >
+                            <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                            données
+                          </button>
+                        </div>
+                      )
+                    }
+                    {
+                      // Step 2 : Synchronise company with Activity Code
+                      currentStep == 2 && !isNextStepAvailable && (
+
+                        <div className="alert alert-warning">
+                          <p>
+                            <FontAwesomeIcon icon={faWarning} /> L'empreinte de ces comptes ne sont pas initialisés. 
+       
+                          </p>
+                          <button
+                            onClick={() => this.synchroniseShowed()}
+                            className={"btn btn-warning"}
+                          >
+                            <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                          </button>
+                        </div>
+                      )
+
+                    }
                   </div>
                 </div>
-                <CompaniesTable
-                      nbItems={
-                        nbItems == "all"
-                          ? companiesShowed.length
-                          : parseInt(nbItems)
-                      }
-                      onUpdate={this.updateFootprints.bind(this)}
-                      companies={companiesShowed}
-                      financialData={financialData}
-                    /> 
-                    
-                                   {/* {
-                  isNextStepAvailable  ?
-   
-                    :
-                    <DefaultCompaniesTable
-                      nbItems={
-                        nbItems == "all"
-                          ? companiesShowed.length
-                          : parseInt(nbItems)
-                      }
-                      onUpdate={this.updateFootprints.bind(this)}
-                      companies={companiesShowed}
-                      financialData={financialData}
-                    />
-                } */}
+              </>
+            )}
 
+            {fetching && (
+              <div className="popup">
+                <ProgressBar
+                  message="Récupération des données fournisseurs..."
+                  progression={progression}
+                />
               </div>
             )}
           </div>
-
-          {fetching && (
-            <div className="popup">
-              <ProgressBar
-                message="Récupération des données fournisseurs..."
-                progression={progression}
-              />
-            </div>
-          )}
         </section>
         <div className={"action container-fluid"}>
           <button
@@ -358,7 +383,10 @@ export class CompaniesSection extends React.Component {
           )
         )
       );
-      this.setState({ companies: this.props.session.financialData.companies });
+      this.setState({
+        companies: this.props.session.financialData.companies,
+        importedFile: true,
+      });
     };
 
     reader.readAsText(file);
@@ -378,7 +406,10 @@ export class CompaniesSection extends React.Component {
           )
         )
       );
-      this.setState({ companies: this.props.session.financialData.companies });
+      this.setState({
+        companies: this.props.session.financialData.companies,
+        importedFile: true,
+      });
     };
 
     reader.readAsArrayBuffer(file);
@@ -428,6 +459,12 @@ export class CompaniesSection extends React.Component {
     await this.synchroniseCompanies(companiesShowed);
   };
 
+  // Synchronisation companies with corporateID
+  synchroniseCompaniesWithCid = async () => {
+    let companiesToSynchronise = this.state.companies.filter((company) => company.state == "siren");
+    await this.synchroniseCompanies(companiesToSynchronise);
+  };
+
   synchroniseCompanies = async (companiesToSynchronise) => {
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
@@ -435,15 +472,14 @@ export class CompaniesSection extends React.Component {
     let i = 0;
     let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise) {
-        await company.updateFromRemote()
+      await company.updateFromRemote()
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
 
     // update view
     if (
-      this.state.view == "all" &&
-      this.state.companies.filter((company) => company.status != 200).length > 0
+      this.state.companies.filter((company) => company.state == "default").length > 0
     )
       this.state.view = "unsync";
 
@@ -457,8 +493,7 @@ export class CompaniesSection extends React.Component {
       );
 
     // update state
-    this.setState({ fetching: false, progression: 0 , synchronised : true });
-
+    this.setState({ fetching: false, progression: 0, currentStep : 2});
     // update session
     this.props.session.updateFootprints();
   };

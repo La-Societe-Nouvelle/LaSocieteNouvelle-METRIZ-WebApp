@@ -1,13 +1,12 @@
 .alert {
-    position: relative;
     padding: 0.75rem 1.25rem;
     margin-bottom: 1rem;
     border: 1px solid transparent;
     border-radius: 0.25rem;
     margin: 10px 0;
-    p {
-        font-size: 0.85rem;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     svg{
         height: 10px;
     }
@@ -21,7 +20,7 @@
 
 .alert-success {
     color: #155724;
-    background-color: #d4edda;
+    background-color: #ecf9ef;
     border-color: #c3e6cb;
     h4{
         color: #155724 !important;
