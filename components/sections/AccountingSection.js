@@ -69,17 +69,14 @@ export class AccountingSection extends React.Component {
         return (
             <>
                 {importedData ? (
-                    <div id="aNouveauSection">
-                        <section className="container">
-                            <div className={"section-title container"}>
+                    <div id="aNouveauSection" className="container">
+                        <section >
+                            <div className={"section-title"}>
                                 <h2>
                                     <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez vos flux comptable
                                 </h2>
                                 <h3 className={"subtitle underline"}>Identification du journal des A-Nouveaux</h3>
-                                <p>
-                                    L'identification du journal des A-Nouveaux est nécessaire à la bonne lecture du fichier d'écritures comptables.
-                                    En cas de premier exercice, validez la sélection sans cocher de case.
-                                </p>
+                   
                             </div>
 
                             <FECImportSection
@@ -113,7 +110,7 @@ export class AccountingSection extends React.Component {
                                     <img src="/resources/illu_financialData.svg" alt="Financial Data Illustration" />
                                 </div>
                                 <div>
-                                    <div id="form-container">
+                                    <div id="form-container" className='step'>
                                         <div className="form-group">
                                             <label>Dénomination / Nom du projet</label>
                                             <input

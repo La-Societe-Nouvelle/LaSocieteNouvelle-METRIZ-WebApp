@@ -22,8 +22,12 @@ export class FECImportSection extends React.Component {
     return (
 
       <>
-        <div className={"table-container container"}>
+        <div className={"table-container  step"}>
           <h4>Identifiez le journal des A-Nouveaux : </h4>
+          <p>
+            L'identification du journal des A-Nouveaux est nécessaire à la bonne lecture du fichier d'écritures comptables.
+            En cas de premier exercice, validez la sélection sans cocher de case.
+          </p>
           <table>
             <thead>
               <tr>
@@ -69,9 +73,9 @@ export class FECImportSection extends React.Component {
   changeJournalANouveaux = (event) => {
     let meta = this.state.meta;
     let selectedCode = event.target.value;
-    let prevSelectedCode = Object.entries(meta.books).filter(([code, _]) => meta.books[code].type=="ANOUVEAUX").map(([code, _]) => code)[0];
+    let prevSelectedCode = Object.entries(meta.books).filter(([code, _]) => meta.books[code].type == "ANOUVEAUX").map(([code, _]) => code)[0];
     Object.entries(meta.books).forEach(([code, _]) => meta.books[code].type = (code == selectedCode && selectedCode != prevSelectedCode ? "ANOUVEAUX" : ""));
-    this.setState({ meta: meta, noBook: selectedCode==prevSelectedCode});
+    this.setState({ meta: meta, noBook: selectedCode == prevSelectedCode });
     this.props.onChangeJournalANouveaux(meta);
   }
 

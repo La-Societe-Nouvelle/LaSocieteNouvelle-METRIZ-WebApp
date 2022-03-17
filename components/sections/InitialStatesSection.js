@@ -93,6 +93,7 @@ export class InitialStatesSection extends React.Component {
               </button>
 
             </div>
+            <div className="step"> 
             {
               this.state.view == "defaultData" ? <>
 
@@ -192,7 +193,7 @@ export class InitialStatesSection extends React.Component {
                   }
                 </>
             }
-
+          </div>
           </div>
           {
             showMessage ?

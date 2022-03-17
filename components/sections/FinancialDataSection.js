@@ -56,7 +56,9 @@ export class FinancialDataSection extends React.Component {
               &Eacute;tape 2 - Validez votre import</h2>
           </div>
           <div className={"alert alert-success"} role="alert">
-            <strong>Bravo !</strong> Votre import a été réalisé avec succès!
+            <p>
+            Bravo ! Votre import a été réalisé avec succès!
+              </p>
           </div>
           <div>
             <p>
@@ -115,7 +117,7 @@ export class FinancialDataSection extends React.Component {
      
          
 
-              <div className="table-data">
+              <div className="table-data step">
                 {this.buildtable(selectedTable)}
 
                 {errorFile && (
