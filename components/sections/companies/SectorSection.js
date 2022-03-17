@@ -229,7 +229,7 @@ export class SectorSection extends React.Component {
 
   updateFootprints = () => {
     this.props.session.updateFootprints();
-    this.setState({ companies: this.props.session.financialData.companies });
+    this.setState({ companies: this.props.companies });
   };
 
 
