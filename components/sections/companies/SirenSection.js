@@ -133,7 +133,7 @@ export class SirenSection extends React.Component {
                         &Eacute;tape 2 : Importez le fichier excel complété
                     </h4>
 
-                    <Dropzone onDrop={(files) => this.onDrop((files.map((file) => this.importFile(file))))}
+                    <Dropzone onDrop={(files) => {files.map((file) => this.importFile(file))}}
                         maxFiles={1} multiple={false} >
                         {({ getRootProps, getInputProps }) => (
                             <div className="dropzone-section">
