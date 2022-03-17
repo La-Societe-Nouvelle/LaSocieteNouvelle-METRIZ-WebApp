@@ -48,6 +48,10 @@ export class CompaniesSection extends React.Component {
         <SirenSection {...this.props} financialData={financialData} setCompanyStep={this.setCompanyStep} companyStep={companyStep} />
       )
     }
+    console.log("-------------------")
+    
+    console.log("1.Companies section")
+    console.log(defaultCompanies);
    if (companyStep == 2 ) {
       return (
         <SectorSection {...this.props} financialData={financialData} companies={defaultCompanies} companyStep={companyStep} />

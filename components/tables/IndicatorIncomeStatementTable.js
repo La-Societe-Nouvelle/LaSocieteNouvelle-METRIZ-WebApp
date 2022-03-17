@@ -22,7 +22,7 @@ export const IndicatorIncomeStatementTable = ({indic,session}) =>
   const depreciationExpensesAggregates = getBasicDepreciationExpensesGroups(indic,financialData);
 
   return (
-    <table>
+    <table className='w100'>
       <thead>
         <tr>
           <td colSpan="3">Agrégat</td>

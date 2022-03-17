@@ -24,6 +24,9 @@ export function Footer({ step }) {
             <a href="http://www.cecill.info/licences/Licence_CeCILL_V2.1-fr.txt" target="_blank">Licence</a>
           </li>
           <li>
+            <a href="https://docs.lasocietenouvelle.org/" target="_blank">Documentation</a>
+          </li>
+          <li>
             <a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank">Code source</a>
           </li>
         </ul>

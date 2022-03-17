@@ -244,7 +244,8 @@ export class IndicatorSection extends React.Component {
         {this.props.session.validations.includes(this.state.indic) && (
           <>
             <section className="impact-result">
-              <div className="container">
+              <div className="container step">
+                <div className="flex">
                 <h3>Votre Impact</h3>
                 <div className="align-right">
                   <button
@@ -256,6 +257,8 @@ export class IndicatorSection extends React.Component {
                     <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
                   </button>
                 </div>
+                </div>
+          
 
                 <h4>{metaIndics[indic].libelle}</h4>
                 <div className="form-group">
@@ -279,7 +282,7 @@ export class IndicatorSection extends React.Component {
               </div>
             </section>
             <section className="compare-section">
-              <div className="container">
+              <div className="container step">
                 <h3>Comparaison</h3>
 
                 <h4>{metaIndics[indic].libelle}</h4>
@@ -312,7 +315,7 @@ export class IndicatorSection extends React.Component {
             </section>
 
             <section className="analysis-section">
-              <div className="container">
+              <div className="container step">
                 <h3>Clés de decryptage</h3>
                 <div className="row">
                   <div>
@@ -333,8 +336,7 @@ export class IndicatorSection extends React.Component {
           </>
 
         )}
-        <section className={"action"}>
-          <div className="container-fluid">
+        <section className={"container action"}>
             <button
               className={"btn btn-secondary"}
               disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
@@ -352,7 +354,6 @@ export class IndicatorSection extends React.Component {
             >
               <FontAwesomeIcon icon={faUpload} />Publier mes résultats
             </button>
-          </div>
         </section>
 
       </div>

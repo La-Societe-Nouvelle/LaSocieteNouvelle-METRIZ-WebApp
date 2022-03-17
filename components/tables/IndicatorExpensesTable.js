@@ -42,7 +42,7 @@ export class IndicatorExpensesTable extends React.Component {
 
     return (
       <div className="table-main">
-        <table>
+        <table className='w100'>
           <thead>
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>

@@ -21,8 +21,8 @@
 
     .siren {
       width: 250px;
-    }
-    .siren-input{
+    } 
+    .siren-input, .corporate-name{
       display: flex;
       align-content: center;
       gap: 10px;
@@ -43,11 +43,9 @@
         background-color: #ecf9ef;
       }
     }
-    tr.warning {
-      td {
+    tr.warning td, .warning select{
         background-color: #fff3cd;
-        border-color: #ffeeba;
-      }
+        border-color: #ff6207;
     }
     
     p.warning  {

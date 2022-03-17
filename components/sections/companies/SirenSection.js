@@ -2,7 +2,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faSync, faChevronRight, faFileExport, faWarning, faCheckCircle, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faSync, faChevronRight, faFileExport, faCheckCircle, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 
 import { CorporateIdTable } from "../../tables/CorporateIdTable";
@@ -26,20 +26,18 @@ export class SirenSection extends React.Component {
             fetching: false,
             file: null,
             progression: 0,
-            nbCompaniesSynchronised: 0,
-            nbwithoutCorporateId: props.session.financialData.companies.filter((company) => company.state != "siren").length
+            synchronised: 0,
         };
 
     }
 
     componentDidUpdate(prevProps) {
 
-        if (prevProps.session.financialData.companies !== this.state.companies) {
-            this.setState({
-                nbCompaniesSynchronised: this.state.companies.filter((company) => company.status == 200).length,
-                nbwithoutCorporateId: this.state.companies.filter((company) => company.state != "siren").length
-            });
-        }
+        // if (prevProps.session.financialData.companies !== this.props.session.financialData.companies) {
+        //     this.setState({
+        //         synchronised: this.state.companies.filter((company) => company.status == 200).length,
+        //     });
+        // }
 
         // change view to main if array of companies with data unfetched empty
         if (
@@ -65,8 +63,7 @@ export class SirenSection extends React.Component {
             fetching,
             progression,
             file,
-            nbCompaniesSynchronised,
-            nbwithoutCorporateId
+            synchronised,
         } = this.state;
 
         const financialData = this.props.session.financialData;
@@ -84,7 +81,6 @@ export class SirenSection extends React.Component {
         let buttonNextStep;
 
         if (this.state.companies.filter((company) => company.status == 200) == this.state.companies.length
-
         ) {
             buttonNextStep = <button
                 className={"btn btn-secondary"}
@@ -133,7 +129,7 @@ export class SirenSection extends React.Component {
                         &Eacute;tape 2 : Importez le fichier excel complété
                     </h4>
 
-                    <Dropzone onDrop={(files) => {files.map((file) => this.importFile(file))}}
+                    <Dropzone onDrop={(files) => { files.map((file) => this.importFile(file)) }}
                         maxFiles={1} multiple={false} >
                         {({ getRootProps, getInputProps }) => (
                             <div className="dropzone-section">
@@ -156,79 +152,64 @@ export class SirenSection extends React.Component {
                                 <FontAwesomeIcon icon={faCheck} /> Votre fichier a bien été importé.
                             </p>
                         </div>
-
                     }
 
                 </div>
-                <div className="step-company">
+                <div className="step-company" id="step-3">
 
                     <h4>&Eacute;tape 3 : Synchroniser les données de vos fournisseurs</h4>
 
                     <div className="table-container">
                         <div className="table-data table-company">
-                            {companies.length ?
-                                <>
-                                    {
-                                        nbCompaniesSynchronised != companies.length && (
-                                            <div className="alert alert-warning">
-                                                {
-                                                    nbwithoutCorporateId > 0 && (
-                                                        <p>
-                                                            <FontAwesomeIcon icon={faWarning} /> {nbwithoutCorporateId}/{companies.length} comptes ne seront pas initialisés.
-                                                        </p>
-                                                    )
-                                                }
-                                                <button
-                                                    onClick={() => this.synchroniseCompanies()}
-                                                    className={"btn btn-warning"}
-                                                >
-                                                    <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                                                    données
-                                                </button>
-                                            </div>
-                                        )
 
-                                    }
+                            <button
+                                onClick={() => this.synchroniseCompanies()}
+                                className={"btn btn-secondary"}
+                            >
+                                <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                                données
+                            </button>
 
+                            <div className="pagination">
 
-                                    <div className="pagination">
+                                <div className="form-group">
+                                    <select
+                                        value={view}
+                                        onChange={this.changeView}
+                                        className="form-input"
+                                    >
+                                        <option key="1" value="all">
+                                            Tous les comptes externes
+                                        </option>
+                                        <option key="2" value="undefined">
+                                            Comptes sans numéro de siren
+                                        </option>
+                                        <option key="3" value="unsync">
+                                            Non synchronisé
+                                        </option>
+                                    </select>
+                                </div>
 
-                                        <div className="form-group">
-                                            <select
-                                                value={view}
-                                                onChange={this.changeView}
-                                                className="form-input"
-                                            >
-                                                <option key="1" value="all">
-                                                    Tous les comptes externes
-                                                </option>
-                                                <option key="2" value="undefined">
-                                                    Comptes sans numéro de siren
-                                                </option>
-                                                <option key="3" value="unsync">
-                                                    Non synchronisé
-                                                </option>
-                                            </select>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <select
-                                                value={nbItems}
-                                                onChange={this.changeNbItems}
-                                                className="form-input"
-                                            >
-                                                <option key="1" value="20">
-                                                    20 fournisseurs par page
-                                                </option>
-                                                <option key="2" value="50">
-                                                    50 fournisseurs par page
-                                                </option>
-                                                <option key="3" value="all">
-                                                    Afficher tous les fournisseurs
-                                                </option>
-                                            </select>
-                                        </div>
-                                    </div>
+                                <div className="form-group">
+                                    <select
+                                        value={nbItems}
+                                        onChange={this.changeNbItems}
+                                        className="form-input"
+                                    >
+                                        <option key="1" value="20">
+                                            20 fournisseurs par page
+                                        </option>
+                                        <option key="2" value="50">
+                                            50 fournisseurs par page
+                                        </option>
+                                        <option key="3" value="all">
+                                            Afficher tous les fournisseurs
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            {
+                                companies.length && (
 
                                     <CorporateIdTable
                                         nbItems={
@@ -240,31 +221,47 @@ export class SirenSection extends React.Component {
                                         companies={companiesShowed}
                                         financialData={financialData}
                                     />
-
-                                    {
-                                        !isNextStepAvailable && nbCompaniesSynchronised != 0 && (
-                                            <div className="alert alert-error">
-                                                <p>
-                                                    <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont pas pu être synchronisé. Vérifiez le numéro de siren et resynchronisez les données.
-                                                </p>
-                                            </div>
-                                        )
-                                    }
-
-                                    {
-                                        isNextStepAvailable && (
-                                            <div className="alert alert-success">
-                                                <p>
-                                                    <FontAwesomeIcon icon={faCheckCircle} />  Les données ont été synchronisées.
-                                                </p>
-                                            </div>
-                                        )
-                                    }
-
-                                </>
-                                :
-                                ""
+                                )
                             }
+
+                            {
+                                !isNextStepAvailable && synchronised != 0 && (
+                                        <div className="alert alert-error">
+                                            <p>
+                                                <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont pas pu être synchronisés. Vérifiez le numéro de siren et resynchronisez les données.
+                                            </p>
+                         
+                                            <button
+                                                onClick={this.changeView}
+                                                value="unsync"
+                                                className={"btn btn-error"}
+                                            >
+                                                Afficher les données non synchronisées
+                                            </button>
+                                   
+                                        </div>
+                                       
+                                )
+                            }
+
+                            {
+                                isNextStepAvailable && (
+                                    <div className="alert alert-success">
+                                        <p>
+                                            <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
+                                        </p>
+                                        <button
+                                            onClick={this.changeView}
+                                            value="undefined"
+                                            className={"btn btn-success"}
+                                        >
+                                            Afficher les comptes sans siren
+                                        </button>
+                                    </div>
+                                )
+                            }
+
+
                         </div>
                     </div>
 
@@ -293,7 +290,10 @@ export class SirenSection extends React.Component {
 
     /* ---------- VIEW ---------- */
 
-    changeView = (event) => this.setState({ view: event.target.value });
+    changeView = (event) => {
+        this.setState({ view: event.target.value });
+        document.getElementById("step-3").scrollIntoView();
+    }
     changeNbItems = (event) => this.setState({ nbItems: event.target.value });
     /* ---------- UPDATES ---------- */
 
@@ -335,7 +335,6 @@ export class SirenSection extends React.Component {
             );
             this.setState({
                 companies: this.props.session.financialData.companies,
-                nbwithoutCorporateId: this.props.session.financialData.companies.filter((company) => company.state != "siren").length
 
             });
         };
@@ -359,7 +358,6 @@ export class SirenSection extends React.Component {
             );
             this.setState({
                 companies: this.props.session.financialData.companies,
-                nbwithoutCorporateId: this.props.session.financialData.companies.filter((company) => company.state != "siren").length
             });
         };
 
@@ -412,17 +410,15 @@ export class SirenSection extends React.Component {
             this.setState({ progression: Math.round((i / n) * 100) });
         }
 
-        // update view
-        if (
-            this.state.companies.filter((company) => company.status == 404).length > 0
-        )
-            this.state.view = "unsync";
-
-
-
-
         // update state
-        this.setState({ fetching: false, progression: 0, nbCompaniesSynchronised: this.state.companies.filter((company) => company.status == 200).length });
+        this.setState({
+            fetching: false,
+            progression: 0,
+            view: "all",
+            synchronised: this.state.companies.filter((company) => company.status == 200).length
+        });
+        window.scrollTo(0, document.body.scrollHeight);
+
         // update session
         this.props.session.updateFootprints();
     };
@@ -433,12 +429,20 @@ export class SirenSection extends React.Component {
 
 
 const nextStepAvailable = ({ companies }) => {
-    return (companies.filter((company) => company.status == 200).length == companies.filter((company) => company.state == "siren").length);
+
+    let isNextStepAvailable;
+    let nbSirenSynchronised = companies.filter((company) => company.state == "siren" && company.status == 200).length;
+    let nbSiren = companies.filter((company) => company.state == "siren").length;
+
+
+    (nbSirenSynchronised == nbSiren) ? isNextStepAvailable = true : false;
+
+    return isNextStepAvailable;
 };
 
 /* ---------- DISPLAY ---------- */
 
-const filterCompanies = (companies, view, significativeCompanies) => {
+const filterCompanies = (companies, view) => {
     switch (view) {
         case "undefined":
             return companies.filter((company) => company.state != "siren");

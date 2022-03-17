@@ -328,7 +328,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
         </div>
       </div>
 
-      <table>
+      <table className='w100'>
         <thead>
           <tr>
             <td className="auto" colSpan="1">Agrégat</td>

@@ -50,7 +50,7 @@ export class IndicatorCompaniesTable extends React.Component {
         <p>Aucun fournisseur n'a publié ses données</p>}
 
       {companies.length > 0 &&
-        <table>
+        <table className='w100'>
           <thead>
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("identifiant")}>Identifiant</td>

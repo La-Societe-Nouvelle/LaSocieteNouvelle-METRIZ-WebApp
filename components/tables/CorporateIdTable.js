@@ -7,7 +7,7 @@ import React from "react";
 import { InputText } from "/components/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faCheckCircle ,faCross,faSyncAlt, faWarning, faXmark, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import {faCheckCircle ,faSyncAlt, faWarning, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -18,7 +18,7 @@ export class CorporateIdTable extends React.Component {
 
     this.state = {
       companies: props.companies,
-      columnSorted: "identifiant",
+      columnSorted: "amount",
       reverseSort: false,
       page: 0,
     };
@@ -35,7 +35,7 @@ export class CorporateIdTable extends React.Component {
     const { companies, columnSorted, page } = this.state;
     this.sortCompanies(companies, columnSorted);
     return (
-      <div className="table-main">
+      <div className="table-main" id="table">
         <table className="table">
           <thead>
             <tr>

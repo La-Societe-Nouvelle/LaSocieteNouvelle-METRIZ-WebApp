@@ -30,7 +30,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
     netValueAdded } = financialData.aggregates;
 
   return (
-    <table>
+    <table className='w100'> 
       <thead>
         <tr>
           <td colSpan="2">Agrégat</td>

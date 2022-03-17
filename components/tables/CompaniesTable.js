@@ -4,7 +4,6 @@
 import React from "react";
 
 // Utils
-import { InputText } from "/components/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 
 // Libs
@@ -25,29 +24,30 @@ export class CompaniesTable extends React.Component {
       page: 0,
     };
   }
-
-  componentDidUpdate(prevProps) {
-    if (this.props !== prevProps)
-      this.setState({ companies: this.props.companies, page: 0 });
+  componentDidUpdate(nextProps, prevProps) {
+    console.log("3. table")
+    console.log(this.props.companies);
+    console.log(nextProps)
+    console.log(prevProps)
+    if (this.props.companies !== nextProps.companies) { 
+      console.log("different")
+      this.setState({ companies: nextProps.companies, page: 0 });
+    }
+   
   }
-
   render() {
     const { nbItems } = this.props;
     const { companies, columnSorted, page } = this.state;
 
     this.sortCompanies(companies, columnSorted);
+  
 
     return (
       <div className="table-main">
         <table className="table">
           <thead>
             <tr>
-              <td
-                className="siren"
-                onClick={() => this.changeColumnSorted("identifiant")}
-              >
-                Siren
-              </td>
+
               <td
                 onClick={() => this.changeColumnSorted("denomination")}
               >
@@ -239,7 +239,7 @@ class RowTableCompanies extends React.Component {
       legalUnitActivityCode,
       status,
     } = this.props;
-    const { corporateId, areaCode, activityCode, dataUpdated } = this.state;
+    const { areaCode, activityCode, dataUpdated } = this.state;
 
     let icon;
 
@@ -258,26 +258,18 @@ class RowTableCompanies extends React.Component {
       }
     }
     return (
-      <tr className={activityCode == "00" ? "warning" : ""}>
-        <td className="siren-input">
+      <tr>
 
-          {icon}
-          <p >
-            <InputText
-              value={corporateId}
-              valid={!dataUpdated && status == 200}
-              unvalid={!dataUpdated && status == 404}
-              onUpdate={this.updateCorporateId.bind(this)}
-            />
-          </p>
-        </td>
-        <td>
-          {corporateName}
+        <td className="corporate-name">
+          {icon} 
+          <p>
+             {corporateName}
+            </p>
         </td>
         <td>
           {account}
         </td>
-        <td>
+        <td >
           <select
             className={
               !dataUpdated && status == 200
@@ -305,7 +297,7 @@ class RowTableCompanies extends React.Component {
           </select>
         </td>
 
-        <td>
+        <td className={activityCode == "00" ? "warning" : ""}>
           <select
             className={
               !dataUpdated && status == 200

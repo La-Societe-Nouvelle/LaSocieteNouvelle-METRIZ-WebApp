@@ -37,7 +37,14 @@ export class SectorSection extends React.Component {
 
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
+    console.log("2.Sector section")
+    console.log(prevProps.companies);
+    console.log(this.props.companies);
+     if (this.props !== prevProps) { 
+       this.setState({ companies: prevProps.companies, page: 0 });
+     }
+     
 
     // change view to main if array of companies with data unfetched empty
     if (
@@ -71,7 +78,7 @@ export class SectorSection extends React.Component {
 
     } = this.state;
     const financialData = this.props.session.financialData;
-
+  
     // Filter commpanies showed
     const companiesShowed = filterCompanies(
       companies,
@@ -86,7 +93,6 @@ export class SectorSection extends React.Component {
 
         <div className={"section-title"}>
           <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
-
         </div>
 
         <div className="step-company mt-2">
@@ -95,41 +101,31 @@ export class SectorSection extends React.Component {
             2. Synchronisation des données grâce au secteur d'activité
           </h3>
 
-          <p>
-            Vous pouvez calculer l'empreinte des comptes fournisseurs grâce au secteur d'activité.
-            Assurez-vous d'avoir selectionné un secteur pour obtenir un calcul plus précis de l'empreinte du compte fournisseur.
-          </p>
-   
-
           {companies.length > 0 && (
             <>
 
               <div className="table-container">
                 <div className="table-data table-company">
 
-                  <div className="alert alert-warning">
-                    {
-                      console.log( this.state.significativeCompanies)
-                    }
-                    {
-                       this.state.significativeCompanies.length > 0 &&
-                       this.state.companies.filter((company) => company.status != 200).length > 0 ?
-                       <p>
-                       <FontAwesomeIcon icon={faWarning} /> L'empreinte de certains comptes ne sont pas initialisés. 
-                     </p>
- 
-                      :
-                      ""
-                    }
-       
-                    <button
-                      onClick={() => this.synchroniseCompanies()}
-                      className={"btn btn-warning"}
-                    >
-                      <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                      données
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => this.synchroniseCompanies()}
+                    className={"btn btn-secondary"}
+                  >
+                    <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                    données
+                  </button>
+                  {this.state.significativeCompanies.length > 0 &&
+                    this.state.companies.filter((company) => company.status != 200).length > 0 ?
+                    <div className="alert alert-warning">
+                      <p>
+                        <FontAwesomeIcon icon={faWarning} /> Choisissez un secteur d'activité pour un résultat plus précis.
+
+                      </p>
+                    </div>
+                    :
+                    ""
+                  }
+
 
                   <div className="pagination">
 
@@ -207,15 +203,15 @@ export class SectorSection extends React.Component {
             </div>
           )}
         </div>
-     
+
         <div className={"action container-fluid"}>
-        <button
+          <button
             className={"btn btn-secondary"}
             id="validation-button"
             disabled={!isNextStepAvailable}
             onClick={this.props.submit}
           >
-           Mesurer l'impact
+            Mesurer l'impact
             <FontAwesomeIcon icon={faChevronRight} />
           </button>
         </div>
@@ -240,7 +236,7 @@ export class SectorSection extends React.Component {
   /* ---------- FETCHING DATA ---------- */
 
   synchroniseCompanies = async () => {
-    
+
     let companiesToSynchronise = this.state.companies.filter((company) => company.state == "default");
 
     // synchronise data
@@ -253,7 +249,6 @@ export class SectorSection extends React.Component {
       this.setState({ progression: Math.round((i / n) * 100) });
     }
 
-    console.log( this.state.companies.filter((company) => company.status != 200).length );
 
     // update view
     if (
@@ -261,8 +256,8 @@ export class SectorSection extends React.Component {
     ) {
       this.state.view = "unsync";
     }
-  
-     
+
+
     // update signficative companies
     if (
       this.state.companies.filter((company) => company.status != 200).length ==
@@ -295,8 +290,6 @@ const filterCompanies = (companies, view, significativeCompanies) => {
       return companies.filter((company) => !company.isDefaultAccount);
     case "expenses":
       return companies.filter((company) => company.isDefaultAccount);
-    case "undefined":
-      return companies.filter((company) => company.state != "siren");
     case "unsync":
       return companies.filter((company) => company.status != 200);
     case "defaultActivity":
