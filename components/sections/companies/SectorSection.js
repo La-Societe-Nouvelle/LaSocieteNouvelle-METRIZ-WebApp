@@ -42,7 +42,7 @@ export class SectorSection extends React.Component {
     // change view to main if array of companies with data unfetched empty
     if (
       this.state.view == "defaultActivity" &&
-      this.state.companies.filter((company) => company.footprintActivityCode == "00").length > 0
+      this.state.companies.filter((company) => company.footprintActivityCode == "00").length == 0
     )
       this.setState({ view: "all" });
 
