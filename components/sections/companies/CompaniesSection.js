@@ -28,15 +28,13 @@ export class CompaniesSection extends React.Component {
     })
   }
 
-  componentDidMount() {
-    window.scrollTo(0, 0)
-  }
-
+ 
   render() {
 
     const {
       companyStep,
     } = this.state;
+    
     const financialData = this.props.session.financialData;
     // check synchro
     const defaultCompanies = this.state.companies.filter((company) => company.state == "default");
@@ -48,10 +46,7 @@ export class CompaniesSection extends React.Component {
         <SirenSection {...this.props} financialData={financialData} setCompanyStep={this.setCompanyStep} companyStep={companyStep} />
       )
     }
-    console.log("-------------------")
-    
-    console.log("1.Companies section")
-    console.log(defaultCompanies);
+
    if (companyStep == 2 ) {
       return (
         <SectorSection {...this.props} financialData={financialData} companies={defaultCompanies} companyStep={companyStep} />

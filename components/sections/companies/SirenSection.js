@@ -21,6 +21,7 @@ export class SirenSection extends React.Component {
 
         this.state = {
             companies: props.session.financialData.companies,
+            companiesShowed: props.session.financialData.companies,
             view: "all",
             nbItems: 20,
             fetching: false,
@@ -30,31 +31,30 @@ export class SirenSection extends React.Component {
         };
 
     }
+    handleChange = (event) => {
 
-    componentDidUpdate(prevProps) {
+        let view = event.target.value;
 
-        // if (prevProps.session.financialData.companies !== this.props.session.financialData.companies) {
-        //     this.setState({
-        //         synchronised: this.state.companies.filter((company) => company.status == 200).length,
-        //     });
-        // }
+        switch (view) {
+            case "undefined":
+                return this.setState({
+                    companiesShowed: this.state.companies.filter((company) => company.state != "siren"),
+                    view : view,
+                })
+                ;
+            case "unsync":
+                return this.setState({
+                    companiesShowed: this.state.companies.filter((company) => company.status != 200 ),
+                    view : view,
+                });
+            default:
+                return this.setState({
+                    companiesShowed: this.state.companies, 
+                    view : view,
+                });
+        }
 
-        // change view to main if array of companies with data unfetched empty
-        if (
-            this.state.view == "unsync" &&
-            this.state.companies.filter((company) => company.status != 200).length ==
-            0
-        )
-            this.setState({ view: "all" });
-
-        if (
-            this.state.view == "undefined" &&
-            this.state.companies.filter((company) => company.state != "siren").length ==
-            0
-        )
-            this.setState({ view: "all" });
-    }
-
+    };
     render() {
         const {
             companies,
@@ -64,16 +64,11 @@ export class SirenSection extends React.Component {
             progression,
             file,
             synchronised,
+            companiesShowed
         } = this.state;
 
         const financialData = this.props.session.financialData;
         const setCompanyStep = this.props.setCompanyStep;
-
-        // Filter commpanies showed
-        const companiesShowed = filterCompanies(
-            companies,
-            view,
-        );
 
         const isNextStepAvailable = nextStepAvailable(this.state);
 
@@ -161,6 +156,41 @@ export class SirenSection extends React.Component {
 
                     <div className="table-container">
                         <div className="table-data table-company">
+                            {
+                                !isNextStepAvailable && synchronised != 0 && (
+                                    <div className="alert alert-error">
+                                        <p>
+                                            <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont pas pu être synchronisés. Vérifiez le numéro de siren et resynchronisez les données.
+                                        </p>
+                                        <button
+                                            onClick={this.handleChange}
+                                            value="unsync"
+                                            className={"btn btn-error"}
+                                        >
+                                            Afficher les données non synchronisées
+                                        </button>
+
+                                    </div>
+
+                                )
+                            }
+
+                            {
+                                isNextStepAvailable && (
+                                    <div className="alert alert-success">
+                                        <p>
+                                            <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
+                                        </p>
+                                        <button
+                                            onClick={this.handleChange}
+                                            value="undefined"
+                                            className={"btn btn-success"}
+                                        >
+                                            Afficher les comptes sans siren ({ companies.filter((company) => company.state == "default").length}/{companies.length})
+                                        </button>
+                                    </div>
+                                )
+                            }
 
                             <button
                                 onClick={() => this.synchroniseCompanies()}
@@ -174,8 +204,8 @@ export class SirenSection extends React.Component {
 
                                 <div className="form-group">
                                     <select
+                                        onChange={this.handleChange}
                                         value={view}
-                                        onChange={this.changeView}
                                         className="form-input"
                                     >
                                         <option key="1" value="all">
@@ -224,48 +254,9 @@ export class SirenSection extends React.Component {
                                 )
                             }
 
-                            {
-                                !isNextStepAvailable && synchronised != 0 && (
-                                        <div className="alert alert-error">
-                                            <p>
-                                                <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont pas pu être synchronisés. Vérifiez le numéro de siren et resynchronisez les données.
-                                            </p>
-                         
-                                            <button
-                                                onClick={this.changeView}
-                                                value="unsync"
-                                                className={"btn btn-error"}
-                                            >
-                                                Afficher les données non synchronisées
-                                            </button>
-                                   
-                                        </div>
-                                       
-                                )
-                            }
-
-                            {
-                                isNextStepAvailable && (
-                                    <div className="alert alert-success">
-                                        <p>
-                                            <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
-                                        </p>
-                                        <button
-                                            onClick={this.changeView}
-                                            value="undefined"
-                                            className={"btn btn-success"}
-                                        >
-                                            Afficher les comptes sans siren
-                                        </button>
-                                    </div>
-                                )
-                            }
-
 
                         </div>
                     </div>
-
-
                 </div>
 
                 {fetching && (
@@ -290,10 +281,7 @@ export class SirenSection extends React.Component {
 
     /* ---------- VIEW ---------- */
 
-    changeView = (event) => {
-        this.setState({ view: event.target.value });
-        document.getElementById("step-3").scrollIntoView();
-    }
+
     changeNbItems = (event) => this.setState({ nbItems: event.target.value });
     /* ---------- UPDATES ---------- */
 
@@ -405,20 +393,21 @@ export class SirenSection extends React.Component {
         let n = companiesToSynchronise.length;
 
         for (let company of companiesToSynchronise) {
-            await company.updateFromRemote()
+             await company.updateFromRemote()
             i++;
             this.setState({ progression: Math.round((i / n) * 100) });
         }
 
         // update state
+
         this.setState({
             fetching: false,
             progression: 0,
             view: "all",
             synchronised: this.state.companies.filter((company) => company.status == 200).length
         });
-        window.scrollTo(0, document.body.scrollHeight);
 
+        document.getElementById("step-3").scrollIntoView();
         // update session
         this.props.session.updateFootprints();
     };
@@ -434,7 +423,6 @@ const nextStepAvailable = ({ companies }) => {
     let nbSirenSynchronised = companies.filter((company) => company.state == "siren" && company.status == 200).length;
     let nbSiren = companies.filter((company) => company.state == "siren").length;
 
-
     (nbSirenSynchronised == nbSiren) ? isNextStepAvailable = true : false;
 
     return isNextStepAvailable;
@@ -442,13 +430,3 @@ const nextStepAvailable = ({ companies }) => {
 
 /* ---------- DISPLAY ---------- */
 
-const filterCompanies = (companies, view) => {
-    switch (view) {
-        case "undefined":
-            return companies.filter((company) => company.state != "siren");
-        case "unsync":
-            return companies.filter((company) => company.status != 200);
-        default:
-            return companies;
-    }
-};

@@ -25,6 +25,7 @@ export class SectorSection extends React.Component {
 
     this.state = {
       companies: props.companies,
+      companiesShowed: props.companies,
       significativeCompanies: [],
       view: "all",
       nbItems: 20,
@@ -37,35 +38,44 @@ export class SectorSection extends React.Component {
 
   }
 
-  componentDidUpdate(prevProps) {
-    console.log("2.Sector section")
-    console.log(prevProps.companies);
-    console.log(this.props.companies);
-     if (this.props !== prevProps) { 
-       this.setState({ companies: prevProps.companies, page: 0 });
-     }
-     
+  handleChange = (event) => {
 
-    // change view to main if array of companies with data unfetched empty
-    if (
-      this.state.view == "defaultActivity" &&
-      this.state.companies.filter((company) => company.footprintActivityCode == "00").length == 0
-    )
-      this.setState({ view: "all" });
+    let view = event.target.value;
 
-    // update significative companies array
-    if (
-      this.state.significativeCompanies.length == 0 &&
-      this.state.companies.filter((company) => company.status != 200).length ==
-      0
-    ) {
-      let significativeCompanies = getSignificativeCompanies(
-        this.props.session.financialData
-      );
-      this.setState({ significativeCompanies });
+    switch (view) {
+      case "aux":
+        return this.setState({
+          companiesShowed: this.state.companies.filter((company) => !company.isDefaultAccount),
+          view: view,
+        });
+      case "expenses":
+        return this.setState({
+          companiesShowed: this.state.companies.filter((company) => company.isDefaultAccount),
+          view: view,
+        });
+      case "unsync":
+        return this.setState({
+          companiesShowed: this.state.companies.filter((company) => company.status != 200),
+          view: view,
+        });
+      case "defaultActivity":
+        return this.setState({
+          companiesShowed: this.state.companies.filter(
+            (company) =>
+              company.state == "default" &&
+              (company.footprintActivityCode == "00" ||
+                company.footprintActivityCode == "TOTAL")
+          ),
+          view: view,
+        });
+      default:
+        return this.setState({
+          companiesShowed: this.state.companies,
+          view: view,
+        });
     }
 
-  }
+  };
 
   render() {
     const {
@@ -75,17 +85,10 @@ export class SectorSection extends React.Component {
       nbItems,
       fetching,
       progression,
-
+      companiesShowed
     } = this.state;
-    const financialData = this.props.session.financialData;
-  
-    // Filter commpanies showed
-    const companiesShowed = filterCompanies(
-      companies,
-      view,
-      significativeCompanies
-    );
 
+    const financialData = this.props.session.financialData;
     const isNextStepAvailable = nextStepAvailable(this.state);
 
     return (
@@ -133,7 +136,7 @@ export class SectorSection extends React.Component {
                     <div className="form-group">
                       <select
                         value={view}
-                        onChange={this.changeView}
+                        onChange={this.handleChange}
                         className="form-input"
                       >
                         <option key="1" value="all">
@@ -282,26 +285,3 @@ const nextStepAvailable = ({ companies }) =>
   return !(companies.filter((company) => company.status != 200).length > 0);
 };
 
-/* ---------- DISPLAY ---------- */
-
-const filterCompanies = (companies, view, significativeCompanies) => {
-  switch (view) {
-    case "aux":
-      return companies.filter((company) => !company.isDefaultAccount);
-    case "expenses":
-      return companies.filter((company) => company.isDefaultAccount);
-    case "unsync":
-      return companies.filter((company) => company.status != 200);
-    case "defaultActivity":
-      return companies.filter(
-        (company) =>
-          company.state == "default" &&
-          (company.footprintActivityCode == "00" ||
-            company.footprintActivityCode == "TOTAL")
-      );
-    case "significative":
-      return significativeCompanies;
-    default:
-      return companies;
-  }
-};
