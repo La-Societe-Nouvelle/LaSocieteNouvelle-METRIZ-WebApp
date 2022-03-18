@@ -4,7 +4,7 @@
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faWarning, faSync } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faWarning, faSync, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 
 
 // Components
@@ -53,11 +53,6 @@ export class SectorSection extends React.Component {
           companiesShowed: this.state.companies.filter((company) => company.isDefaultAccount),
           view: view,
         });
-      case "unsync":
-        return this.setState({
-          companiesShowed: this.state.companies.filter((company) => company.status != 200),
-          view: view,
-        });
       case "defaultActivity":
         return this.setState({
           companiesShowed: this.state.companies.filter(
@@ -91,6 +86,7 @@ export class SectorSection extends React.Component {
     const financialData = this.props.session.financialData;
     const isNextStepAvailable = nextStepAvailable(this.state);
 
+   
     return (
       <section className="container">
 
@@ -109,20 +105,35 @@ export class SectorSection extends React.Component {
 
               <div className="table-container">
                 <div className="table-data table-company">
+                  {
+                    isNextStepAvailable ?
+                      <div className="alert alert-success">
+                        <p>
+                          <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ont bien été synchronisés.
+                        </p>
+                      </div>
+                      :
+                      <div className="alert alert-warning">
+                        <p>
+                          <FontAwesomeIcon icon={faWarning} />  L'empreinte de certains comptes ne sont pas initialisés.
+
+                        </p>
+
+                      </div>
+
+                  }
 
                   <button
                     onClick={() => this.synchroniseCompanies()}
                     className={"btn btn-secondary"}
                   >
-                    <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                    données
-                  </button>
+                    <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                  </button> 
                   {this.state.significativeCompanies.length > 0 &&
                     this.state.companies.filter((company) => company.status != 200).length > 0 ?
                     <div className="alert alert-warning">
                       <p>
                         <FontAwesomeIcon icon={faWarning} /> Choisissez un secteur d'activité pour un résultat plus précis.
-
                       </p>
                     </div>
                     :
@@ -132,14 +143,14 @@ export class SectorSection extends React.Component {
 
                   <div className="pagination">
 
-
                     <div className="form-group">
                       <select
                         value={view}
-                        onChange={this.handleChange}
+                        onChange={this.handleChange.bind(this)}
                         className="form-input"
                       >
-                        <option key="1" value="all">
+                        <option key="1" value="
+                        ">
                           Tous les comptes externes
                         </option>
                         <option key="2" value="aux">
@@ -240,38 +251,23 @@ export class SectorSection extends React.Component {
 
   synchroniseCompanies = async () => {
 
-    let companiesToSynchronise = this.state.companies.filter((company) => company.state == "default");
+    let companiesToSynchronise = this.state.companies;
 
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
     let i = 0;
     let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise) {
-      await company.updateFromRemote()
+      //await company.updateFromRemote()
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
-
-
-    // update view
-    if (
-      this.state.companies.filter((company) => company.status != 200).length > 0
-    ) {
-      this.state.view = "unsync";
-    }
-
-
-    // update signficative companies
-    if (
-      this.state.companies.filter((company) => company.status != 200).length ==
-      0
-    )
-      this.state.significativeCompanies = getSignificativeCompanies(
-        this.props.session.financialData
-      );
-
+  
+    
+     let significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
+    
     // update state
-    this.setState({ fetching: false, progression: 0, companyStep: 3 });
+    this.setState({ fetching: false, progression: 0, significativeCompanies : significativeCompanies , companyStep: 3 });
     // update session
     this.props.session.updateFootprints();
   };

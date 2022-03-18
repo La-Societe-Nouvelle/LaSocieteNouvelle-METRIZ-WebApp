@@ -2,11 +2,10 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faSync, faChevronRight, faFileExport, faCheckCircle, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faSync, faChevronRight, faFileExport, faCheckCircle, faXmark, faWarning } from "@fortawesome/free-solid-svg-icons";
 
 
 import { CorporateIdTable } from "../../tables/CorporateIdTable";
-
 import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
 
 
@@ -17,6 +16,7 @@ import { ProgressBar } from "../../popups/ProgressBar";
 export class SirenSection extends React.Component {
 
     constructor(props) {
+
         super(props);
 
         this.state = {
@@ -39,18 +39,18 @@ export class SirenSection extends React.Component {
             case "undefined":
                 return this.setState({
                     companiesShowed: this.state.companies.filter((company) => company.state != "siren"),
-                    view : view,
+                    view: view,
                 })
-                ;
+                    ;
             case "unsync":
                 return this.setState({
-                    companiesShowed: this.state.companies.filter((company) => company.status != 200 ),
-                    view : view,
+                    companiesShowed: this.state.companies.filter((company) => company.status != 200),
+                    view: view,
                 });
             default:
                 return this.setState({
-                    companiesShowed: this.state.companies, 
-                    view : view,
+                    companiesShowed: this.state.companies,
+                    view: view,
                 });
         }
 
@@ -174,9 +174,8 @@ export class SirenSection extends React.Component {
 
                                 )
                             }
-
                             {
-                                isNextStepAvailable && (
+                                isNextStepAvailable ?
                                     <div className="alert alert-success">
                                         <p>
                                             <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
@@ -186,10 +185,18 @@ export class SirenSection extends React.Component {
                                             value="undefined"
                                             className={"btn btn-success"}
                                         >
-                                            Afficher les comptes sans siren ({ companies.filter((company) => company.state == "default").length}/{companies.length})
+                                            Afficher les comptes sans siren ({companies.filter((company) => company.state == "default").length}/{companies.length})
                                         </button>
                                     </div>
-                                )
+                                    :
+                                    <div className="alert alert-warning">
+                                        <p>
+                                            <FontAwesomeIcon icon={faWarning} />  L'empreinte de certains comptes ne sont pas initialisés.
+
+                                        </p>
+
+                                    </div>
+
                             }
 
                             <button
@@ -393,7 +400,7 @@ export class SirenSection extends React.Component {
         let n = companiesToSynchronise.length;
 
         for (let company of companiesToSynchronise) {
-             await company.updateFromRemote()
+            await company.updateFromRemote()
             i++;
             this.setState({ progression: Math.round((i / n) * 100) });
         }
@@ -417,13 +424,13 @@ export class SirenSection extends React.Component {
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
 
-const nextStepAvailable = ({ companies }) => {
+const nextStepAvailable = ({ companies, synchronised }) => {
 
     let isNextStepAvailable;
     let nbSirenSynchronised = companies.filter((company) => company.state == "siren" && company.status == 200).length;
     let nbSiren = companies.filter((company) => company.state == "siren").length;
 
-    (nbSirenSynchronised == nbSiren) ? isNextStepAvailable = true : false;
+    (nbSirenSynchronised == nbSiren && nbSirenSynchronised > 0) ? isNextStepAvailable = true : false;
 
     return isNextStepAvailable;
 };

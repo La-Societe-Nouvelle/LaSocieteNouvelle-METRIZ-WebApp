@@ -24,17 +24,7 @@ export class CompaniesTable extends React.Component {
       page: 0,
     };
   }
-  componentDidUpdate(nextProps, prevProps) {
-    console.log("3. table")
-    console.log(this.props.companies);
-    console.log(nextProps)
-    console.log(prevProps)
-    if (this.props.companies !== nextProps.companies) { 
-      console.log("different")
-      this.setState({ companies: nextProps.companies, page: 0 });
-    }
-   
-  }
+  
   render() {
     const { nbItems } = this.props;
     const { companies, columnSorted, page } = this.state;
