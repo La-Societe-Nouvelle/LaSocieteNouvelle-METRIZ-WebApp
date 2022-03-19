@@ -86,7 +86,7 @@ export class SectorSection extends React.Component {
     const financialData = this.props.session.financialData;
     const isNextStepAvailable = nextStepAvailable(this.state);
 
-   
+
     return (
       <section className="container">
 
@@ -102,7 +102,6 @@ export class SectorSection extends React.Component {
 
           {companies.length > 0 && (
             <>
-
               <div className="table-container">
                 <div className="table-data table-company">
                   {
@@ -123,24 +122,30 @@ export class SectorSection extends React.Component {
 
                   }
 
-                  <button
-                    onClick={() => this.synchroniseCompanies()}
-                    className={"btn btn-secondary"}
-                  >
-                    <FontAwesomeIcon icon={faSync} /> Synchroniser les données
-                  </button> 
-                  {this.state.significativeCompanies.length > 0 &&
-                    this.state.companies.filter((company) => company.status != 200).length > 0 ?
+                  {significativeCompanies.length > 0 && significativeCompanies.filter((company) => company.footprintActivityCode == "00") ?
                     <div className="alert alert-warning">
                       <p>
-                        <FontAwesomeIcon icon={faWarning} /> Choisissez un secteur d'activité pour un résultat plus précis.
+                        <FontAwesomeIcon icon={faWarning} /> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.
                       </p>
+                      <button
+                        onClick={this.handleChange}
+                        value="significative"
+                        className={"btn btn-warning"}
+                      >
+                        Afficher les comptes significatifs sans secteur
+                        ({significativeCompanies.filter((company) => company.footprintActivityCode == "00").length}/{significativeCompanies.length})
+                      </button>
                     </div>
                     :
                     ""
                   }
 
-
+                  <button
+                    onClick={() => this.synchroniseCompanies()}
+                    className={"btn btn-secondary"}
+                  >
+                    <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                  </button>
                   <div className="pagination">
 
                     <div className="form-group">
@@ -252,22 +257,23 @@ export class SectorSection extends React.Component {
   synchroniseCompanies = async () => {
 
     let companiesToSynchronise = this.state.companies;
-
+    let significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
     let i = 0;
     let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise) {
-      //await company.updateFromRemote()
+    await company.updateFromRemote()
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
-  
-    
-     let significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
-    
+
+    // check if companies is a significative companies 
+    let result = companiesToSynchronise.filter(o1 => significativeCompanies.some(o2 => o1.account === o2.account));
+
+
     // update state
-    this.setState({ fetching: false, progression: 0, significativeCompanies : significativeCompanies , companyStep: 3 });
+    this.setState({ fetching: false, progression: 0, significativeCompanies: result, companyStep: 3 });
     // update session
     this.props.session.updateFootprints();
   };
