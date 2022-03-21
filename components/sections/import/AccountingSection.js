@@ -5,18 +5,17 @@ import React from 'react';
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowTrendUp, faChevronRight, faInfo, faFileExcel, faUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faArrowTrendUp, faChevronRight, faInfo, faFileExcel, faFileUpload } from "@fortawesome/free-solid-svg-icons";
 
 import { FECImportSection } from "./FECImportSection";
 
 // Objects
-import { FinancialData } from '../../src/FinancialData';
+import { FinancialData } from '/src/FinancialData';
 
 // Components
-import { MessagePopup, MessagePopupErrors } from '../popups/MessagePopup';
 
 // Readers
-import { FECFileReader, FECDataReader } from '../../src/readers/FECReader';
+import { FECFileReader, FECDataReader } from '/src/readers/FECReader';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -63,7 +62,6 @@ export class AccountingSection extends React.Component {
             errorMessage,
             errors,
             files,
-            disabledNextStep,
         } = this.state;
 
         return (
@@ -76,7 +74,7 @@ export class AccountingSection extends React.Component {
                                     <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez vos flux comptable
                                 </h2>
                                 <h3 className={"subtitle underline"}>Identification du journal des A-Nouveaux</h3>
-                   
+
                             </div>
 
                             <FECImportSection
@@ -115,7 +113,7 @@ export class AccountingSection extends React.Component {
                                             <label>Dénomination / Nom du projet</label>
                                             <input
                                                 id="siren-input"
-                                                className="form-input"
+                                                className="form-input w100"
                                                 type="text"
                                                 value={corporateName}
                                                 onChange={this.onCorporateNameChange}
@@ -131,15 +129,25 @@ export class AccountingSection extends React.Component {
                                                     <div {...getRootProps()} className="dropzone">
                                                         <input {...getInputProps()} />
                                                         <p>
-                                                            Glisser votre fichier
-                                                            <span>
-                                                                ou cliquez ici pour sélectionner votre fichier
-                                                            </span>
+                                                            <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
+                                                        </p>
+                                                        <p>
+                                                            Glisser votre fichier ici
+
+                                                        </p>
+                                                        <p>
+                                                            OU
+                                                        </p>
+                                                        <p className="btn btn-primary">
+                                                            Selectionner votre fichier
                                                         </p>
                                                     </div>
                                                 </div>
                                             )}
                                         </Dropzone>
+                                        <p className="legend">
+                                            * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
+                                        </p>
                                     </div>
                                     {
                                         (files.length > 0) ?
@@ -178,9 +186,7 @@ export class AccountingSection extends React.Component {
                                                         </p>
                                                     </div>
                                                 </div>
-                                                <p className="legend">
-                                                    * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
-                                                </p>
+
                                             </>
                                     }
                                     {errorFile && (

@@ -9,10 +9,10 @@ import { Session } from '/src/Session';
 
 // Sections
 import { StartSection } from '/components/sections/StartSection';
-import { AccountingSection } from '../components/sections/AccountingSection';
+import { AccountingSection } from '../components/sections/import/AccountingSection';
 import { FinancialDataSection } from '/components/sections/FinancialDataSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
-import { CompaniesSection } from '/components/sections/Companies/CompaniesSection';
+import { CompaniesSection } from '/components/sections/companies/CompaniesSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
 import { StatementSection } from '/components/sections/StatementSection';
 

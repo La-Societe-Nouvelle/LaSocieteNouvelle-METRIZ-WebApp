@@ -52,21 +52,29 @@ label {
   //
   
   .dropzone {
+    text-align: center;
+    font-weight: 700;
+    .fa-file-arrow-up {
+      height: 45px;
+      color: #5262bc; 
+    }
     margin-bottom: 20px;
     padding: 20px;
-    border: 2px dashed #eee;
+    border: 2px dashed lighten(#5262bc, 15%);
     border-radius: 10px;
-    background-color: rgba(235, 243, 250, 0.7);
     outline: none;
     transition: border 0.24s ease-in-out;
-    span {
-      display: block;
-      color: lighten($primary-color, 30%);
-      font-size: 0.9em;
-    }
+   
     p {
-      text-align: center;
+      margin: 1em 0;
     }
+    .btn {
+      background-color: #5262bc;
+      margin: 0;
+      font-size: 0.8rem;
+    padding: 0.5rem 0.8rem;
+    }
+ 
   }
 
   

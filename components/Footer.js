@@ -2,8 +2,6 @@
 
 // React
 import React from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
-import { faEnvelope } from "@fortawesome/free-solid-svg-icons";   
 
 export function Footer({ step }) {
   const getCurrentYear = () => {
@@ -11,10 +9,9 @@ export function Footer({ step }) {
   };
 
   return (
-    <footer className={"row container-fluid aln-middle " + (step > 0 ? "footer-step aln-left" : "  ")}>
-      <div>
+    <footer className="row container-fluid">
         <p>
-          <b>&copy; {getCurrentYear()} La Société Nouvelle</b>
+          &copy; {getCurrentYear()} La Société Nouvelle
         </p>
         <ul>
           <li>
@@ -30,7 +27,6 @@ export function Footer({ step }) {
             <a href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/" target="_blank">Code source</a>
           </li>
         </ul>
-      </div>
     </footer>
   );
 

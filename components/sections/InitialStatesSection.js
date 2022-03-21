@@ -9,7 +9,7 @@ import { InitialStatesTable } from "/components/tables/InitialStatesTable";
 import { ProgressBar } from "../popups/ProgressBar";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel, faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import { updateVersion } from "../../src/version/updateVersion";
 
 /* ---------------------------------------------------------------- */
@@ -166,11 +166,18 @@ export class InitialStatesSection extends React.Component {
                         <div {...getRootProps()} className="dropzone">
                           <input {...getInputProps()} />
                           <p>
-                            Glisser votre fichier
-                            <span>
-                              ou cliquez ici pour sélectionner votre fichier
-                            </span>
-                          </p>
+                                        <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
+                                    </p>
+                                    <p>
+                                        Glisser votre fichier ici
+
+                                    </p>
+                                    <p>
+                                        OU
+                                    </p>
+                                    <p className="btn btn-primary">
+                                        Selectionner votre fichier
+                                    </p>
                         </div>
                       </div>
                     )}

@@ -22,20 +22,20 @@ export class FECImportSection extends React.Component {
     return (
 
       <>
-        <div className={"table-container  step"}>
+        <div className="table-container step">
           <h4>Identifiez le journal des A-Nouveaux : </h4>
           <p>
             L'identification du journal des A-Nouveaux est nécessaire à la bonne lecture du fichier d'écritures comptables.
             En cas de premier exercice, validez la sélection sans cocher de case.
           </p>
-          <table>
+          <table className="w100">
             <thead>
               <tr>
                 <td>Code</td>
                 <td>Libellé</td>
                 <td>Fin</td>
                 <td>Nombre de Lignes</td>
-                <td width="50px">Identification A-Nouveaux</td>
+                <td>Identification A-Nouveaux</td>
               </tr>
             </thead>
             <tbody>

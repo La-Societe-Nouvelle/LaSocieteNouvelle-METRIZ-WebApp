@@ -24,6 +24,11 @@ export class CompaniesTable extends React.Component {
       page: 0,
     };
   }
+  componentDidUpdate(prevProps) {
+    if (prevProps.companies !== this.props.companies) {
+      this.setState({ companies: this.props.companies });
+    }
+  }
   
   render() {
     const { nbItems } = this.props;

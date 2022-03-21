@@ -56,10 +56,7 @@ export class SectorSection extends React.Component {
       case "defaultActivity":
         return this.setState({
           companiesShowed: this.state.companies.filter(
-            (company) =>
-              company.state == "default" &&
-              (company.footprintActivityCode == "00" ||
-                company.footprintActivityCode == "TOTAL")
+            (company) => company.footprintActivityCode == "00" || company.footprintActivityCode == "TOTAL"
           ),
           view: view,
         });
@@ -122,7 +119,7 @@ export class SectorSection extends React.Component {
 
                   }
 
-                  {significativeCompanies.length > 0 && significativeCompanies.filter((company) => company.footprintActivityCode == "00") ?
+                  {significativeCompanies.filter((company) => company.footprintActivityCode == "00").length > 0 ?
                     <div className="alert alert-warning">
                       <p>
                         <FontAwesomeIcon icon={faWarning} /> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.
@@ -151,12 +148,12 @@ export class SectorSection extends React.Component {
                     <div className="form-group">
                       <select
                         value={view}
-                        onChange={this.handleChange.bind(this)}
+                        onChange={this.handleChange}
                         className="form-input"
                       >
                         <option key="1" value="
                         ">
-                          Tous les comptes externes
+                          Tous les comptes (sans siren)
                         </option>
                         <option key="2" value="aux">
                           Comptes fournisseurs uniquement
@@ -206,8 +203,6 @@ export class SectorSection extends React.Component {
                     companies={companiesShowed}
                     financialData={financialData}
                   />
-
-
                 </div>
               </div>
             </>
@@ -241,7 +236,6 @@ export class SectorSection extends React.Component {
 
   /* ---------- VIEW ---------- */
 
-  changeView = (event) => this.setState({ view: event.target.value });
   changeNbItems = (event) => this.setState({ nbItems: event.target.value });
 
   /* ---------- UPDATES ---------- */

@@ -6,14 +6,11 @@
 
 	body, input, select, textarea {
 		color: $text-color;
-		font-family: $font-family;
+		font-family: $font-family-text;
 		font-size: 1em;
 		font-weight: $font-weight;
 		line-height: 1.75;
 
-	}
-	p {
-		font-family: $font-family-text;
 	}
 
 	a {
@@ -32,25 +29,21 @@
 		font-weight: $font-weight-bold;
 	}
 
-	em, i {
-		font-style: italic;
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: $font-family;
 	}
 
 	h1 {
 		font-size: 2em;
-		font-weight: $font-weight-bold;
 		line-height: 1.3;
 		margin-bottom: 1em;
-		color : lighten($primary-color, 10%);
-		a {
-			color: inherit;
-		}
+		font-weight: $font-weight-bold;
 
 	}
 
 	h2, h3, h4, h5, h6 {
 		font-weight: $font-weight-bold;
-		line-height: 1.5;
 
 		a {
 			color: inherit;
@@ -59,7 +52,7 @@
 	}
  
 	h2 {
-		font-size: 1.5em;
+		font-size: 1.75em;
 	}
 
 	h3 {
@@ -108,7 +101,6 @@
 		  text-transform: uppercase;
 		  font-size: 1.4em;
 		  color : $secondary-color; 
-		  font-weight: 600;
 		  margin-bottom: 1em;
 		  &.underline::after{
 			height: 8px;

@@ -4,9 +4,7 @@
 }
 
 .section-title {
-    h2 {
-      font-size: 2em;
-    }
+  
     svg{
         height: 25px;
         margin-right: 10px;
@@ -61,6 +59,12 @@
 #importSection {
     .row div {
         flex : 1;
+    }
+    .row {
+      align-items: flex-end;
+    }
+    .step {
+      margin-bottom: 0;
     }
 }
 

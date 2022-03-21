@@ -17,7 +17,9 @@
 					display: block;
 					height: 5em;
 					margin: 0 auto;
-
+					&:hover{
+						cursor: pointer;
+					}
 				}
 			
 		} 

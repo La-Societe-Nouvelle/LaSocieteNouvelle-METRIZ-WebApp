@@ -10,7 +10,6 @@ import React from "react";
 export class StartSection extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
   }
 
   render() {
@@ -63,7 +62,7 @@ export class StartSection extends React.Component {
             />
           </div>
           <div className="col">
-          <img src="/resources/team_working.png" alt="Team" />
+            <img src="/resources/team_working.png" alt="Team" />
           </div>
         </div>
       </div>

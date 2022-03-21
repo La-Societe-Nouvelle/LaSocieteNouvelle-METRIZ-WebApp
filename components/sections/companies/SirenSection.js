@@ -1,17 +1,21 @@
 import React from "react";
 import Dropzone from "react-dropzone";
 
+// Icon
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faSync, faChevronRight, faFileExport, faCheckCircle, faXmark, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { faSync, faChevronRight, faFileExport, faCheckCircle, faXmark, faWarning, faFileUpload } from "@fortawesome/free-solid-svg-icons";
 
-
+// Table
 import { CorporateIdTable } from "../../tables/CorporateIdTable";
+
+// Reader & Writers
 import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
-
-
 import { CSVFileReader, processCSVCompaniesData } from "/src/readers/CSVReader";
 import { XLSXFileReader } from "/src/readers/XLSXReader";
+
+// Components
 import { ProgressBar } from "../../popups/ProgressBar";
+import {MessagePopup} from "../../popups/MessagePopup";
 
 export class SirenSection extends React.Component {
 
@@ -31,6 +35,7 @@ export class SirenSection extends React.Component {
         };
 
     }
+
     handleChange = (event) => {
 
         let view = event.target.value;
@@ -55,6 +60,7 @@ export class SirenSection extends React.Component {
         }
 
     };
+
     render() {
         const {
             companies,
@@ -71,9 +77,11 @@ export class SirenSection extends React.Component {
         const setCompanyStep = this.props.setCompanyStep;
 
         const isNextStepAvailable = nextStepAvailable(this.state);
+        const isSynchroniseAvailable = false;
 
 
         let buttonNextStep;
+
 
         if (this.state.companies.filter((company) => company.status == 200) == this.state.companies.length
         ) {
@@ -100,6 +108,7 @@ export class SirenSection extends React.Component {
         }
 
         return (
+
             <section className="container">
 
                 <div className={"section-title"}>
@@ -131,17 +140,28 @@ export class SirenSection extends React.Component {
                                 <div {...getRootProps()} className="dropzone">
                                     <input {...getInputProps()} />
                                     <p>
-                                        Glisser votre fichier
-                                        <span>
-                                            ou cliquez ici pour sélectionner votre fichier
-                                        </span>
+                                        <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
+                                    </p>
+                                    <p>
+                                        Glisser votre fichier ici
+
+                                    </p>
+                                    <p>
+                                        OU
+                                    </p>
+                                    <p className="btn btn-primary">
+                                        Selectionner votre fichier
                                     </p>
                                 </div>
                             </div>
                         )}
                     </Dropzone>
+ 
                     {
                         file && Object.keys(file).length &&
+                        
+                        //<MessagePopup title="Bravo ! " message="Votre fichier a bien été importé !" />
+
                         <div className="alert alert-success">
                             <p>
                                 <FontAwesomeIcon icon={faCheck} /> Votre fichier a bien été importé.
@@ -174,12 +194,14 @@ export class SirenSection extends React.Component {
 
                                 )
                             }
+
                             {
                                 isNextStepAvailable ?
                                     <div className="alert alert-success">
                                         <p>
                                             <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
                                         </p>
+                                        {companies.filter((company) => company.state == "default").length > 0 && ( 
                                         <button
                                             onClick={this.handleChange}
                                             value="undefined"
@@ -187,6 +209,8 @@ export class SirenSection extends React.Component {
                                         >
                                             Afficher les comptes sans siren ({companies.filter((company) => company.state == "default").length}/{companies.length})
                                         </button>
+                                        )
+                            }
                                     </div>
                                     :
                                     <div className="alert alert-warning">
@@ -199,6 +223,7 @@ export class SirenSection extends React.Component {
 
                             }
 
+                            
                             <button
                                 onClick={() => this.synchroniseCompanies()}
                                 className={"btn btn-secondary"}
@@ -290,6 +315,7 @@ export class SirenSection extends React.Component {
 
 
     changeNbItems = (event) => this.setState({ nbItems: event.target.value });
+
     /* ---------- UPDATES ---------- */
 
     updateFootprints = () => {
@@ -423,8 +449,17 @@ export class SirenSection extends React.Component {
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
+const synchroniseAvailable = ({companies}) => {
 
-const nextStepAvailable = ({ companies, synchronised }) => {
+    let isSynchroniseAvailable;
+    
+    companies.filter((company) => company.status != 200 && company.state == "siren").length ? isSynchroniseAvailable = false : isSynchroniseAvailable = true;
+
+    return isSynchroniseAvailable;
+
+}
+
+const nextStepAvailable = ({ companies }) => {
 
     let isNextStepAvailable;
     let nbSirenSynchronised = companies.filter((company) => company.state == "siren" && company.status == 200).length;
@@ -435,5 +470,4 @@ const nextStepAvailable = ({ companies, synchronised }) => {
     return isNextStepAvailable;
 };
 
-/* ---------- DISPLAY ---------- */
 
