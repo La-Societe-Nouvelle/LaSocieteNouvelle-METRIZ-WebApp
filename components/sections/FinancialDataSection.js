@@ -49,25 +49,25 @@ export class FinancialDataSection extends React.Component {
 
 
     return (
-      <>
-        <section className="container">
-          <div className={"section-title"}>
+      <div className="container-fluid">
+        <section className="step">
+          <div className="section-title">
             <h2><FontAwesomeIcon icon={faFileImport} />
               &Eacute;tape 2 - Validez votre import</h2>
           </div>
-          <div className={"alert alert-success"} role="alert">
+          {/* <div className="alert alert-success" role="alert">
             <p>
             Bravo ! Votre import a été réalisé avec succès!
               </p>
-          </div>
+          </div> */}
           <div>
-            <p>
+            <p className="alert alert-info">
               Par mesure de précaution, vérifiez l’exactitude des agrégats
               financiers. Des erreurs de lecture peuvent intervenir
               en cas d'écriture unique regroupant plusieurs opérations.
             </p>
           </div>
-          <div className="table-container">
+          <div className="table-container container">
             <div className="table-menu">
               <button
                 key={1}
@@ -114,10 +114,8 @@ export class FinancialDataSection extends React.Component {
                 Stocks
               </button>
             </div>
-     
-         
 
-              <div className="table-data step">
+              <div className="table-data">
                 {this.buildtable(selectedTable)}
 
                 {errorFile && (
@@ -130,17 +128,14 @@ export class FinancialDataSection extends React.Component {
                 )}
               </div>
           </div>
+          <div className="align-right">
+                <button className={"btn btn-secondary"} onClick={this.props.submit}>
+                  Valider l'import
+                <FontAwesomeIcon icon={faChevronRight} />
+                </button>
+              </div>
         </section>
-        <section className={"action"}>
-          <div className="container-fluid">
-
-            <button className={"btn btn-secondary"} onClick={this.props.submit}>
-              Valider l'import
-              <FontAwesomeIcon icon={faChevronRight} />
-            </button>
-          </div>
-        </section>
-      </>
+      </div>
 
     )
   }

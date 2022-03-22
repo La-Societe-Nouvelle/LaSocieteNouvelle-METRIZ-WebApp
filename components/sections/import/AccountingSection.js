@@ -67,24 +67,21 @@ export class AccountingSection extends React.Component {
         return (
             <>
                 {importedData ? (
-                    <div id="aNouveauSection" className="container">
-                        <section >
-                            <div className={"section-title"}>
+                    <div id="aNouveauSection" className="container-fluid">
+                        <section className="step">
+                            <div className="section-title">
                                 <h2>
                                     <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez vos flux comptable
                                 </h2>
-                                <h3 className={"subtitle underline"}>Identification du journal des A-Nouveaux</h3>
-
+                                <h3 className="subtitle underline">Identification du journal des A-Nouveaux</h3>
                             </div>
 
                             <FECImportSection
                                 FECData={importedData}
                                 onChangeJournalANouveaux={this.updateMeta}
                             />
-                        </section>
-                        <section className={"action"}>
-                            <div className="container-fluid">
-                                <button className={"btn btn-secondary"} onClick={this.loadFECData}>
+                            <div className="align-right">
+                                <button className="btn btn-secondary" onClick={this.loadFECData}>
                                     J'ai identifié le journal des A-Nouveaux
                                     <FontAwesomeIcon icon={faChevronRight} />
                                 </button>
@@ -92,102 +89,88 @@ export class AccountingSection extends React.Component {
                         </section>
                     </div>
                 ) : (
-                    <div id="importSection">
-                        <section className="container">
-                            <div className="section-title">
-                                <h2>
-                                    <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
-                                    vos flux comptable
-                                </h2>
-                                <h3 className={"subtitle underline"}>
-                                    C'est parti
-                                </h3>
-                            </div>
-                            <div className="row aln-center">
+                    <div id="importSection" className="container-fluid">
+                        <section className="step">
+
+                            <div className="row">
                                 <div>
+                                    <div className="section-title">
+                                        <h2>
+                                            <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
+                                            vos flux comptable
+                                        </h2>
+                                        <h3 className="subtitle underline">
+                                            C'est parti !
+                                        </h3>
+                                    </div>
                                     <img src="/resources/illu_financialData.svg" alt="Financial Data Illustration" />
+
                                 </div>
-                                <div>
-                                    <div id="form-container" className='step'>
-                                        <div className="form-group">
-                                            <label>Dénomination / Nom du projet</label>
-                                            <input
-                                                id="siren-input"
-                                                className="form-input w100"
-                                                type="text"
-                                                value={corporateName}
-                                                onChange={this.onCorporateNameChange}
-                                                onKeyPress={this.onEnterPress}
-                                            />
+                                <div className="form-container">
 
-                                        </div>
-                                        <h3>Importer vos fichiers comptables FEC*</h3>
+                                    <div className="form-group">
+                                        <label>Dénomination / Nom du projet</label>
+                                        <input
+                                            id="siren-input"
+                                            className="form-input w100"
+                                            type="text"
+                                            value={corporateName}
+                                            onChange={this.onCorporateNameChange}
+                                            onKeyPress={this.onEnterPress}
+                                        />
 
-                                        <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
-                                            {({ getRootProps, getInputProps }) => (
-                                                <div className="dropzone-section">
-                                                    <div {...getRootProps()} className="dropzone">
-                                                        <input {...getInputProps()} />
-                                                        <p>
-                                                            <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
-                                                        </p>
-                                                        <p>
-                                                            Glisser votre fichier ici
+                                    </div>
+                                    <label>Importer vos fichiers comptables FEC*</label>
 
-                                                        </p>
-                                                        <p>
-                                                            OU
-                                                        </p>
-                                                        <p className="btn btn-primary">
-                                                            Selectionner votre fichier
-                                                        </p>
-                                                    </div>
+                                    <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
+                                        {({ getRootProps, getInputProps }) => (
+                                            <div className="dropzone-section">
+                                                <div {...getRootProps()} className="dropzone">
+                                                    <input {...getInputProps()} />
+                                                    <p>
+                                                        <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
+                                                        Glisser votre fichier ici
+                                                    </p>
+
+                                                    <p className="small-text">
+                                                        OU
+                                                    </p>
+                                                    <p className="btn btn-primary">
+                                                        Selectionner votre fichier
+                                                    </p>
                                                 </div>
-                                            )}
-                                        </Dropzone>
-                                        <p className="legend">
-                                            * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
-                                        </p>
+                                            </div>
+                                        )}
+                                    </Dropzone>
+                                    <p className="legend">
+                                        * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
+                                    </p>
+                                    <div className="alert alert-info">
+                                            <p>
+                                                L’importation des écritures comptables s’effectue via un
+                                                Fichier d’Ecritures Comptables (FEC). Générez ce fichier{" "}
+                                                <b>
+                                                    à partir de votre logiciel comptable, ou demandez-le
+                                                    auprès de votre service comptable.
+                                                </b>
+                                            </p>
                                     </div>
                                     {
-                                        (files.length > 0) ?
+                                        (files.length > 0) &&
 
-                                            <div className={"alert alert-success"}>
-                                                <h4>Votre fichier a bien été importé</h4>
+                                        <div className={"alert alert-success"}>
+                                            <p>Votre fichier a bien été importé</p>
+                                            <ul>
+                                                {
+                                                    files.map((file) => (
+                                                        <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
+                                                        </li>
+                                                    ))
+                                                }
+                                            </ul>
+                                        </div>
 
-                                                <ul>
 
-                                                    {
-
-                                                        files.map((file) => (
-                                                            <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
-                                                            </li>
-                                                        ))
-                                                    }
-                                                </ul>
-                                            </div>
-
-                                            :
-
-                                            <>
-
-                                                <div className={"alert alert-info row aln-center"}>
-                                                    <div className="f0">
-                                                        <FontAwesomeIcon icon={faInfo} />
-                                                    </div>
-                                                    <div>
-                                                        <p>
-                                                            L’importation des écritures comptables s’effectue via un
-                                                            Fichier d’Ecritures Comptables (FEC). Générez ce fichier{" "}
-                                                            <b>
-                                                                à partir de votre logiciel comptable, ou demandez-le
-                                                                auprès de votre service comptable.
-                                                            </b>
-                                                        </p>
-                                                    </div>
-                                                </div>
-
-                                            </>
                                     }
                                     {errorFile && (
                                         <div className={"alert alert-error"}>
@@ -197,21 +180,18 @@ export class AccountingSection extends React.Component {
 
                                         </div>
                                     )}
+                                    <div className="align-right">
+                                        <button
+                                            className={"btn btn-secondary"}
+                                            onClick={this.onClick}
+                                            disabled={this.isFormValid()}
+                                        >
+                                            &Eacute;tape suivante
+                                            <FontAwesomeIcon icon={faChevronRight} />
+                                        </button>
+
+                                    </div>
                                 </div>
-                            </div>
-
-                        </section>
-                        <section className="action">
-                            <div className="container-fluid">
-
-                                <button
-                                    className={"btn btn-secondary"}
-                                    onClick={this.onClick}
-                                    disabled={this.isFormValid()}
-                                >
-                                    &Eacute;tape suivante
-                                    <FontAwesomeIcon icon={faChevronRight} />
-                                </button>
                             </div>
 
                         </section>

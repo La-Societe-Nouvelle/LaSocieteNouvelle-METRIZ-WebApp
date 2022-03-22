@@ -85,151 +85,156 @@ export class SectorSection extends React.Component {
 
 
     return (
-      <section className="container">
+      <div className="container-fluid" id="sector-section"> 
+        <section className="step">
 
-        <div className={"section-title"}>
-          <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
-        </div>
+          <div className="section-title">
+            <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
+            
+            <h3 className="subtitle underline">
+              2. Synchronisation des données grâce au secteur d'activité
+            </h3>
 
-        <div className="step-company mt-2">
+          </div>
 
-          <h3 className={"subtitle underline"}>
-            2. Synchronisation des données grâce au secteur d'activité
-          </h3>
+          <div className="step container">
 
-          {companies.length > 0 && (
-            <>
-              <div className="table-container">
-                <div className="table-data table-company">
-                  {
-                    isNextStepAvailable ?
-                      <div className="alert alert-success">
-                        <p>
-                          <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ont bien été synchronisés.
-                        </p>
-                      </div>
-                      :
+
+            {companies.length > 0 && (
+              <>
+                <div className="table-container">
+                  <div className="table-data table-company">
+                    {
+                      isNextStepAvailable ?
+                        <div className="alert alert-success">
+                          <p>
+                            <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ont bien été synchronisés.
+                          </p>
+                        </div>
+                        :
+                        <div className="alert alert-warning">
+                          <p>
+                            <FontAwesomeIcon icon={faWarning} />  L'empreinte de certains comptes ne sont pas initialisés.
+
+                          </p>
+
+                        </div>
+
+                    }
+
+                    {significativeCompanies.filter((company) => company.footprintActivityCode == "00").length > 0 ?
                       <div className="alert alert-warning">
                         <p>
-                          <FontAwesomeIcon icon={faWarning} />  L'empreinte de certains comptes ne sont pas initialisés.
-
+                          <FontAwesomeIcon icon={faWarning} /> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.
                         </p>
+                        <button
+                          onClick={this.handleChange}
+                          value="significative"
+                          className={"btn btn-warning"}
+                        >
+                          Afficher les comptes significatifs sans secteur
+                          ({significativeCompanies.filter((company) => company.footprintActivityCode == "00").length}/{significativeCompanies.length})
+                        </button>
+                      </div>
+                      :
+                      ""
+                    }
 
+                    <button
+                      onClick={() => this.synchroniseCompanies()}
+                      className={"btn btn-secondary"}
+                    >
+                      <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                    </button>
+                    <div className="pagination">
+
+                      <div className="form-group">
+                        <select
+                          value={view}
+                          onChange={this.handleChange}
+                          className="form-input"
+                        >
+                          <option key="1" value="
+                          ">
+                            Tous les comptes (sans siren)
+                          </option>
+                          <option key="2" value="aux">
+                            Comptes fournisseurs uniquement
+                          </option>
+                          <option key="3" value="expenses">
+                            Autres comptes tiers
+                          </option>
+
+                          {significativeCompanies.length > 0 && (
+                            <option key="5" value="significative">
+                              Comptes significatifs
+                            </option>
+                          )}
+                          <option key="6" value="defaultActivity">
+                            Comptes tiers non rattachés à un secteur
+                            d'activités
+                          </option>
+                        </select>
                       </div>
 
-                  }
-
-                  {significativeCompanies.filter((company) => company.footprintActivityCode == "00").length > 0 ?
-                    <div className="alert alert-warning">
-                      <p>
-                        <FontAwesomeIcon icon={faWarning} /> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.
-                      </p>
-                      <button
-                        onClick={this.handleChange}
-                        value="significative"
-                        className={"btn btn-warning"}
-                      >
-                        Afficher les comptes significatifs sans secteur
-                        ({significativeCompanies.filter((company) => company.footprintActivityCode == "00").length}/{significativeCompanies.length})
-                      </button>
-                    </div>
-                    :
-                    ""
-                  }
-
-                  <button
-                    onClick={() => this.synchroniseCompanies()}
-                    className={"btn btn-secondary"}
-                  >
-                    <FontAwesomeIcon icon={faSync} /> Synchroniser les données
-                  </button>
-                  <div className="pagination">
-
-                    <div className="form-group">
-                      <select
-                        value={view}
-                        onChange={this.handleChange}
-                        className="form-input"
-                      >
-                        <option key="1" value="
-                        ">
-                          Tous les comptes (sans siren)
-                        </option>
-                        <option key="2" value="aux">
-                          Comptes fournisseurs uniquement
-                        </option>
-                        <option key="3" value="expenses">
-                          Autres comptes tiers
-                        </option>
-
-                        {significativeCompanies.length > 0 && (
-                          <option key="5" value="significative">
-                            Comptes significatifs
+                      <div className="form-group">
+                        <select
+                          value={nbItems}
+                          onChange={this.changeNbItems}
+                          className="form-input"
+                        >
+                          <option key="1" value="20">
+                            20 fournisseurs par page
                           </option>
-                        )}
-                        <option key="6" value="defaultActivity">
-                          Comptes tiers non rattachés à un secteur
-                          d'activités
-                        </option>
-                      </select>
+                          <option key="2" value="50">
+                            50 fournisseurs par page
+                          </option>
+                          <option key="3" value="all">
+                            Afficher tous les fournisseurs
+                          </option>
+                        </select>
+                      </div>
                     </div>
 
-                    <div className="form-group">
-                      <select
-                        value={nbItems}
-                        onChange={this.changeNbItems}
-                        className="form-input"
-                      >
-                        <option key="1" value="20">
-                          20 fournisseurs par page
-                        </option>
-                        <option key="2" value="50">
-                          50 fournisseurs par page
-                        </option>
-                        <option key="3" value="all">
-                          Afficher tous les fournisseurs
-                        </option>
-                      </select>
-                    </div>
+                    <CompaniesTable
+                      nbItems={
+                        nbItems == "all"
+                          ? companiesShowed.length
+                          : parseInt(nbItems)
+                      }
+                      onUpdate={this.updateFootprints.bind(this)}
+                      companies={companiesShowed}
+                      financialData={financialData}
+                    />
                   </div>
-
-                  <CompaniesTable
-                    nbItems={
-                      nbItems == "all"
-                        ? companiesShowed.length
-                        : parseInt(nbItems)
-                    }
-                    onUpdate={this.updateFootprints.bind(this)}
-                    companies={companiesShowed}
-                    financialData={financialData}
-                  />
                 </div>
+              </>
+            )}
+
+            {fetching && (
+              <div className="popup">
+                <ProgressBar
+                  message="Récupération des données fournisseurs..."
+                  progression={progression}
+                />
               </div>
-            </>
-          )}
+            )}
+          </div>
 
-          {fetching && (
-            <div className="popup">
-              <ProgressBar
-                message="Récupération des données fournisseurs..."
-                progression={progression}
-              />
-            </div>
-          )}
-        </div>
+          <div className={"action container-fluid"}>
+            <button
+              className={"btn btn-secondary"}
+              id="validation-button"
+              disabled={!isNextStepAvailable}
+              onClick={this.props.submit}
+            >
+              Mesurer l'impact
+              <FontAwesomeIcon icon={faChevronRight} />
+            </button>
+          </div>
+        </section>
 
-        <div className={"action container-fluid"}>
-          <button
-            className={"btn btn-secondary"}
-            id="validation-button"
-            disabled={!isNextStepAvailable}
-            onClick={this.props.submit}
-          >
-            Mesurer l'impact
-            <FontAwesomeIcon icon={faChevronRight} />
-          </button>
-        </div>
-      </section>
+      </div>
 
     );
   }

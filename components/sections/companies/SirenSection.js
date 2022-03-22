@@ -15,7 +15,7 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
-import {MessagePopup} from "../../popups/MessagePopup";
+import { MessagePopup } from "../../popups/MessagePopup";
 
 export class SirenSection extends React.Component {
 
@@ -108,203 +108,200 @@ export class SirenSection extends React.Component {
         }
 
         return (
+            <div className="container-fluid" id="siren-section">
+                <section className="step">
+                    <div className="section-title">
+                        <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
+                        <h3 className={"subtitle underline"}>
+                            Synchronisation des données grâce au numéro de siren
+                        </h3>
+                    </div>
+                    <div className="step container">
+                        <h4>
+                            1. Téléchargez et complétez le tableaux de vos fournisseurs
+                        </h4>
+                        <p>
+                            Exportez la liste des comptes fournisseurs auxiliaires afin de renseigner les numéros siren de vos fournisseurs.
+                        </p>
+                        <button className="btn btn-primary" onClick={this.exportXLSXFile}>
+                            <FontAwesomeIcon icon={faFileExport} /> Exporter mes comptes fournisseurs
+                        </button>
+                    </div>
+                    <div className="step container">
+                        <h4>
+                            2. Importez le fichier excel complété
+                        </h4>
 
-            <section className="container">
+                        <Dropzone onDrop={(files) => { files.map((file) => this.importFile(file)) }}
+                            maxFiles={1} multiple={false} >
+                            {({ getRootProps, getInputProps }) => (
+                                <div className="dropzone-section">
+                                    <div {...getRootProps()} className="dropzone">
+                                        <input {...getInputProps()} />
+                                        <p>
+                                            <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />  Glisser votre fichier ici
 
-                <div className={"section-title"}>
-                    <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
-                    <h3 className={"subtitle underline"}>
-                        1. Synchronisation des données grâce au numéro de siren
-                    </h3>
-                </div>
-                <div className="step-company mt-2">
-                    <h4>
-                        &Eacute;tape 1 : Téléchargez et complétez le tableaux de vos fournisseurs
-                    </h4>
-                    <p>
-                        Exportez la liste des comptes fournisseurs auxiliaires afin de renseigner les numéros siren de vos fournisseurs.
-                    </p>
-                    <button className="btn btn-primary" onClick={this.exportXLSXFile}>
-                        <FontAwesomeIcon icon={faFileExport} /> Exporter mes comptes fournisseurs
-                    </button>
-                </div>
-                <div className="step-company">
-                    <h4>
-                        &Eacute;tape 2 : Importez le fichier excel complété
-                    </h4>
-
-                    <Dropzone onDrop={(files) => { files.map((file) => this.importFile(file)) }}
-                        maxFiles={1} multiple={false} >
-                        {({ getRootProps, getInputProps }) => (
-                            <div className="dropzone-section">
-                                <div {...getRootProps()} className="dropzone">
-                                    <input {...getInputProps()} />
-                                    <p>
-                                        <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
-                                    </p>
-                                    <p>
-                                        Glisser votre fichier ici
-
-                                    </p>
-                                    <p>
-                                        OU
-                                    </p>
-                                    <p className="btn btn-primary">
-                                        Selectionner votre fichier
-                                    </p>
+                                        </p>
+                                        <p className="small-text">
+                                            OU
+                                        </p>
+                                        <p className="btn btn-primary">
+                                            Selectionner votre fichier
+                                        </p>
+                                    </div>
                                 </div>
+                            )}
+                        </Dropzone>
+
+                        {
+                            file && Object.keys(file).length &&
+
+                            //<MessagePopup title="Bravo ! " message="Votre fichier a bien été importé !" />
+
+                            <div className="alert alert-success">
+                                <p>
+                                    <FontAwesomeIcon icon={faCheck} /> Votre fichier a bien été importé.
+                                </p>
                             </div>
-                        )}
-                    </Dropzone>
- 
-                    {
-                        file && Object.keys(file).length &&
-                        
-                        //<MessagePopup title="Bravo ! " message="Votre fichier a bien été importé !" />
+                        }
 
-                        <div className="alert alert-success">
-                            <p>
-                                <FontAwesomeIcon icon={faCheck} /> Votre fichier a bien été importé.
-                            </p>
-                        </div>
-                    }
+                    </div>
+                    <div className="step container" id="step-3">
 
-                </div>
-                <div className="step-company" id="step-3">
+                        <h4>3. Synchroniser les données de vos fournisseurs</h4>
 
-                    <h4>&Eacute;tape 3 : Synchroniser les données de vos fournisseurs</h4>
+                        <div className="table-container">
+                            <div className="table-data table-company">
+                                {
+                                    !isNextStepAvailable && synchronised != 0 && (
+                                        <div className="alert alert-error">
+                                            <p>
+                                                <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont pas pu être synchronisés. Vérifiez le numéro de siren et resynchronisez les données.
+                                            </p>
+                                            <button
+                                                onClick={this.handleChange}
+                                                value="unsync"
+                                                className={"btn btn-error"}
+                                            >
+                                                Afficher les données non synchronisées
+                                            </button>
 
-                    <div className="table-container">
-                        <div className="table-data table-company">
-                            {
-                                !isNextStepAvailable && synchronised != 0 && (
-                                    <div className="alert alert-error">
-                                        <p>
-                                            <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont pas pu être synchronisés. Vérifiez le numéro de siren et resynchronisez les données.
-                                        </p>
-                                        <button
-                                            onClick={this.handleChange}
-                                            value="unsync"
-                                            className={"btn btn-error"}
+                                        </div>
+
+                                    )
+                                }
+
+                                {
+                                    isNextStepAvailable ?
+                                        <div className="alert alert-success">
+                                            <p>
+                                                <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
+                                            </p>
+                                            {companies.filter((company) => company.state == "default").length > 0 && (
+                                                <button
+                                                    onClick={this.handleChange}
+                                                    value="undefined"
+                                                    className={"btn btn-success"}
+                                                >
+                                                    Afficher les comptes sans siren ({companies.filter((company) => company.state == "default").length}/{companies.length})
+                                                </button>
+                                            )
+                                            }
+                                        </div>
+                                        :
+                                        <div className="alert alert-warning">
+                                            <p>
+                                                <FontAwesomeIcon icon={faWarning} />  L'empreinte de certains comptes ne sont pas initialisés.
+
+                                            </p>
+
+                                        </div>
+
+                                }
+
+
+                                <button
+                                    onClick={() => this.synchroniseCompanies()}
+                                    className={"btn btn-secondary"}
+                                >
+                                    <FontAwesomeIcon icon={faSync} /> Synchroniser les
+                                    données
+                                </button>
+
+                                <div className="pagination">
+
+                                    <div className="form-group">
+                                        <select
+                                            onChange={this.handleChange}
+                                            value={view}
+                                            className="form-input"
                                         >
-                                            Afficher les données non synchronisées
-                                        </button>
-
+                                            <option key="1" value="all">
+                                                Tous les comptes externes
+                                            </option>
+                                            <option key="2" value="undefined">
+                                                Comptes sans numéro de siren
+                                            </option>
+                                            <option key="3" value="unsync">
+                                                Non synchronisé
+                                            </option>
+                                        </select>
                                     </div>
 
-                                )
-                            }
-
-                            {
-                                isNextStepAvailable ?
-                                    <div className="alert alert-success">
-                                        <p>
-                                            <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ayant un n° de Siren ont bien été synchronisés.
-                                        </p>
-                                        {companies.filter((company) => company.state == "default").length > 0 && ( 
-                                        <button
-                                            onClick={this.handleChange}
-                                            value="undefined"
-                                            className={"btn btn-success"}
+                                    <div className="form-group">
+                                        <select
+                                            value={nbItems}
+                                            onChange={this.changeNbItems}
+                                            className="form-input"
                                         >
-                                            Afficher les comptes sans siren ({companies.filter((company) => company.state == "default").length}/{companies.length})
-                                        </button>
-                                        )
-                            }
+                                            <option key="1" value="20">
+                                                20 fournisseurs par page
+                                            </option>
+                                            <option key="2" value="50">
+                                                50 fournisseurs par page
+                                            </option>
+                                            <option key="3" value="all">
+                                                Afficher tous les fournisseurs
+                                            </option>
+                                        </select>
                                     </div>
-                                    :
-                                    <div className="alert alert-warning">
-                                        <p>
-                                            <FontAwesomeIcon icon={faWarning} />  L'empreinte de certains comptes ne sont pas initialisés.
-
-                                        </p>
-
-                                    </div>
-
-                            }
-
-                            
-                            <button
-                                onClick={() => this.synchroniseCompanies()}
-                                className={"btn btn-secondary"}
-                            >
-                                <FontAwesomeIcon icon={faSync} /> Synchroniser les
-                                données
-                            </button>
-
-                            <div className="pagination">
-
-                                <div className="form-group">
-                                    <select
-                                        onChange={this.handleChange}
-                                        value={view}
-                                        className="form-input"
-                                    >
-                                        <option key="1" value="all">
-                                            Tous les comptes externes
-                                        </option>
-                                        <option key="2" value="undefined">
-                                            Comptes sans numéro de siren
-                                        </option>
-                                        <option key="3" value="unsync">
-                                            Non synchronisé
-                                        </option>
-                                    </select>
                                 </div>
+                                {
+                                    companies.length && (
 
-                                <div className="form-group">
-                                    <select
-                                        value={nbItems}
-                                        onChange={this.changeNbItems}
-                                        className="form-input"
-                                    >
-                                        <option key="1" value="20">
-                                            20 fournisseurs par page
-                                        </option>
-                                        <option key="2" value="50">
-                                            50 fournisseurs par page
-                                        </option>
-                                        <option key="3" value="all">
-                                            Afficher tous les fournisseurs
-                                        </option>
-                                    </select>
-                                </div>
+                                        <CorporateIdTable
+                                            nbItems={
+                                                nbItems == "all"
+                                                    ? companiesShowed.length
+                                                    : parseInt(nbItems)
+                                            }
+                                            onUpdate={this.updateFootprints.bind(this)}
+                                            companies={companiesShowed}
+                                            financialData={financialData}
+                                        />
+                                    )
+                                }
+
+
                             </div>
-                            {
-                                companies.length && (
-
-                                    <CorporateIdTable
-                                        nbItems={
-                                            nbItems == "all"
-                                                ? companiesShowed.length
-                                                : parseInt(nbItems)
-                                        }
-                                        onUpdate={this.updateFootprints.bind(this)}
-                                        companies={companiesShowed}
-                                        financialData={financialData}
-                                    />
-                                )
-                            }
-
-
                         </div>
                     </div>
-                </div>
 
-                {fetching && (
-                    <div className="popup">
-                        <ProgressBar
-                            message="Récupération des données fournisseurs..."
-                            progression={progression}
-                        />
+                    {fetching && (
+                        <div className="popup">
+                            <ProgressBar
+                                message="Récupération des données fournisseurs..."
+                                progression={progression}
+                            />
+                        </div>
+                    )}
+
+                    <div className="align-right">
+                        {buttonNextStep}
                     </div>
-                )}
 
-                <div className="action">
-                    {buttonNextStep}
-                </div>
-
-            </section>
+                </section>
+            </div>
 
         )
 
@@ -449,10 +446,10 @@ export class SirenSection extends React.Component {
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const synchroniseAvailable = ({companies}) => {
+const synchroniseAvailable = ({ companies }) => {
 
     let isSynchroniseAvailable;
-    
+
     companies.filter((company) => company.status != 200 && company.state == "siren").length ? isSynchroniseAvailable = false : isSynchroniseAvailable = true;
 
     return isSynchroniseAvailable;

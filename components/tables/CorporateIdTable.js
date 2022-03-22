@@ -35,8 +35,9 @@ export class CorporateIdTable extends React.Component {
     const { companies, columnSorted, page } = this.state;
     this.sortCompanies(companies, columnSorted);
     return (
+      
       <div className="table-main" id="table">
-        <table className="table">
+        <table className="table w100">
           <thead>
             <tr>
               <td

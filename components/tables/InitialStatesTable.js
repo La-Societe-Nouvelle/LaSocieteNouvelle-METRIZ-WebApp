@@ -41,9 +41,8 @@ export class InitialStatesTable extends React.Component {
     const nbAccounts = accounts.length;
     
     return (
-      <div className="table-main">
-
-        <table>
+      <>
+        <table className="w100">
           <thead>
             <tr>
               <td onClick={() => this.changeColumnSorted("account")}>Compte</td>
@@ -68,7 +67,7 @@ export class InitialStatesTable extends React.Component {
           <button className={(page+1)*nbItems < nbAccounts.length ? "" : "hidden"} onClick={this.nextPage}>Page suivante</button>
         </div>}
 
-      </div>
+      </>
     )
   }
 

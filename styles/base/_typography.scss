@@ -52,12 +52,11 @@
 	}
  
 	h2 {
-		font-size: 1.75em;
+		font-size: 1.5em;
 	}
 
 	h3 {
 		font-size: 1.2em;
-		text-transform: uppercase;
 	}
 
 	h4 {
@@ -98,13 +97,11 @@
 	  }
 	  .subtitle
 	  {
-		  text-transform: uppercase;
-		  font-size: 1.4em;
 		  color : $secondary-color; 
 		  margin-bottom: 1em;
 		  &.underline::after{
 			height: 8px;
-			width: 6em;
+			width: 5em;
 			  background-color: #f3f3f3; 
 		  }
 	  }
@@ -128,4 +125,8 @@
 	  .link {
 		  color : $tertiary-color;
 		  text-decoration: underline;
+	  }
+
+	  .small-text {
+		  font-size: 0.85rem;
 	  }

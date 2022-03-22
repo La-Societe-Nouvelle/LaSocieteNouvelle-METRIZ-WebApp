@@ -18,7 +18,7 @@ export const IncomeStatementTable = ({ financialData }) => {
 
   return (
     <>
-      <table className='w100'>
+      <table className='w100' style={{marginLeft : "30px"}}>
         <thead>
           <tr>
             <td>Agrégat</td>

@@ -1,6 +1,7 @@
 
   section {
-    padding : 2em 0;
+    padding : 2rem;
+    margin: 1rem 0 3rem 0;
 }
 
 .section-title {
@@ -33,14 +34,21 @@
       justify-content: center;
       align-items: center;
       .col {
-        padding: 0 2em;
+        padding: 0 7em;
       }
+    }
+    .btn {
+      margin-right: 1rem;
     }
 }
 #section-picto {
     text-align: center;
     padding: 2em 0;
 
+    img{
+      height: 38px;
+      width: auto;
+    }
     .logoLSN{
       img {
         height : 120px;
@@ -60,31 +68,31 @@
     .row div {
         flex : 1;
     }
-    .row {
-      align-items: flex-end;
-    }
-    .step {
-      margin-bottom: 0;
-    }
+
 }
 
 // COMPANY SECTION 
-
-.step-company, .step{
+ .step{
   border: 1px solid #dbdef1;
-  padding: 2rem;
-  margin-bottom: 2rem;
   border-radius: 10px;
- h4 {
-    font-size: 1.2em;
-  }
-  h5 {
-    font-size: 1em;
-    margin-bottom: 10px;
-  }
+  background-color: #ffffff;
 }
 
 
+
+#siren-section, #sector-section {
+  .step{
+    margin-bottom: 2rem;
+    padding: 1rem 2rem;
+  }
+  .step ~ .step{
+    margin-bottom: inherit;
+    padding: inherit;
+  }
+  h4 {
+    margin-bottom: 1rem;
+  }
+}
 // INDICATOR SECTION 
 
 .indicator {
@@ -96,19 +104,21 @@
 }
 /* Indicator Section*/
 .indicator-section{ 
-  .h6{
-    font-size : 1.2em;
-    color : $tertiary-color;
-    text-transform: inherit;
+
+  .btn{
+    margin-right : 1rem;
+  }
+  .step {
+    padding: 2rem;
+    margin: 1rem 0;
   }
   h3 {
     color : $secondary-color;
-    text-transform: uppercase;
-    font-size: 2em;
+    font-size: 1.5em;
     margin-bottom: 0;
   }
   h4 {
-    font-size: 1.5em;
+    font-size: 1.2em;
     margin-top: 10px;
   }
 
@@ -119,14 +129,10 @@
 }
 
 .statement-section {
-  background-color: #ffffff;
-  padding: 2em;
-  margin : 1em 0;
+
   h4 {
-    text-align: center;
     color : $tertiary-color;
     font-size: 1.5em;
-    margin-bottom: 1em;
   }
 }
 // validation button
@@ -143,9 +149,17 @@
 
 .analysis-container { 
   display: flex;
-  align-items: flex-start;
-  .analysis-illu img {
-    height: 400px;
+  div {
+    flex: 1 1;
+  }
+  p {
+    text-align: justify;
+  }
+  img {
+    max-height: 300px;
+    display: block;
+    text-align: right;
+    margin: 0 auto;
   }
 }
 
@@ -155,8 +169,7 @@
 /* ---------- STATEMENT ---------- */
 
 .statement {
-  margin: 2px 0;
-  padding: 0px 20px 5px;
+ 
 
   .statement-area {
     margin-bottom: 15px;

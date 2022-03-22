@@ -155,21 +155,23 @@
    
 .table-menu {
   margin: 1em 0;
+  text-align: center;
     button {
+      font-size: 0.9rem;
       background-color: #fff;
+      font-weight: 600;
       border:none;
       padding: 1rem;
       color: #a7a2a2;
-      font-weight: bold;
-      font-size: 1.05em;
-      border-bottom: 3px solid #a7a2a2;
+      border-bottom: 2px solid #a7a2a2;
       cursor: pointer;
   
     }
      button.active, button:hover, button:focus{
-      background-color: #f7f8f8;
-      color: $tertiary-color;
+      background-color: $tertiary-color;
+      color: #ffffff;
       border-color: $tertiary-color;
+    
     }
   }
   

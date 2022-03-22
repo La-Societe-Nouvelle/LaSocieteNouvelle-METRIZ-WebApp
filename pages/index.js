@@ -3,6 +3,7 @@
 // React / Next
 import React from 'react';
 import Head from 'next/head';
+import {BrowserView, MobileView} from 'react-device-detect';
 
 // Objects
 import { Session } from '/src/Session';
@@ -22,6 +23,7 @@ import { HeaderSection } from '../components/HeaderSection';
 import { getPrevAmountItems } from '/src/utils/Utils';
 import { updateVersion } from '/src/version/updateVersion';
 import { Footer } from '../components/Footer';
+import { Mobile} from '../components/Mobile'
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -49,7 +51,12 @@ export default function Home() {
         <meta name="description" content="L'OpenData au service de l'économie" />
         <link rel="icon" href="/favicon.svg" />
       </Head>
-      <Metriz />
+      <BrowserView>
+         <Metriz />
+      </BrowserView>
+      <MobileView>
+        <Mobile/>
+      </MobileView>
     </>
   )
 }

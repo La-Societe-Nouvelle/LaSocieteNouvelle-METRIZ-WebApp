@@ -20,11 +20,8 @@ export class FECImportSection extends React.Component {
     const disabledValidation = !(noBook || Object.entries(meta.books).map(([_, { type }]) => type).includes("ANOUVEAUX"));
 
     return (
-
-      <>
-        <div className="table-container step">
-          <h4>Identifiez le journal des A-Nouveaux : </h4>
-          <p>
+        <div className="table-container">
+          <p className="alert alert-info">
             L'identification du journal des A-Nouveaux est nécessaire à la bonne lecture du fichier d'écritures comptables.
             En cas de premier exercice, validez la sélection sans cocher de case.
           </p>
@@ -34,8 +31,8 @@ export class FECImportSection extends React.Component {
                 <td>Code</td>
                 <td>Libellé</td>
                 <td>Fin</td>
-                <td>Nombre de Lignes</td>
-                <td>Identification A-Nouveaux</td>
+                <td className="align-center">Nombre de Lignes</td>
+                <td className="column_value" width="100px">Identification A-Nouveaux</td>
               </tr>
             </thead>
             <tbody>
@@ -49,8 +46,8 @@ export class FECImportSection extends React.Component {
                       <td>{code}</td>
                       <td>{label}</td>
                       <td>{dateEnd.substring(6, 8) + "/" + dateEnd.substring(4, 6) + "/" + dateEnd.substring(0, 4)}</td>
-                      <td>{nLines}</td>
-                      <td>
+                      <td className="align-center">{nLines}</td>
+                      <td className="column_value">
                         <div className="form-check">
                           <input type="checkbox" id="checked" name="ANOUVEAUX" value={code} checked={type == "ANOUVEAUX"} onChange={this.changeJournalANouveaux} />
                         </div>
@@ -64,7 +61,6 @@ export class FECImportSection extends React.Component {
           </table>
 
         </div>
-      </>
     )
   }
 

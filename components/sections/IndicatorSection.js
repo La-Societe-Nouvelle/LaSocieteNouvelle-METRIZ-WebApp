@@ -92,9 +92,9 @@ export class IndicatorSection extends React.Component {
       consumptionSectorFootprint: new SocialFootprint(),
       allSectorsProductionAreaFootprint: new SocialFootprint(),
       allSectorsValueAddedAreaFootprint: new SocialFootprint(),
-      allSectorsConsumptionFootprint : new SocialFootprint(),
+      allSectorsConsumptionFootprint: new SocialFootprint(),
       economicAreaData: null,
-    
+
     };
 
   }
@@ -111,232 +111,210 @@ export class IndicatorSection extends React.Component {
     );
 
     fetchEconomicAreaData("FRA", "IC").then((footprint) =>
-    this.setState({ allSectorsConsumptionFootprint: footprint })
-  );
-    
+      this.setState({ allSectorsConsumptionFootprint: footprint })
+    );
+
 
 
   }
 
   render() {
     const { indic, comparativeDivision, triggerPopup, selectedTable } = this.state;
-    
+
     const isPublicationAvailable =
       Object.entries(
         this.props.session.financialData.aggregates.revenue.footprint.indicators
       ).filter(([_, indicator]) => indicator.value != null).length > 0;
 
     return (
-      <div className="indicator-section">
-        <section>
-          <div className="container">
-            <div className={"section-title"}>
-              <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 5 - Mesure de l'impact</h2>
-              <p>
-                Pour chaque indicateur, déclarez vos impacts directs et obtenez les éléments d'analyse.
-              </p>
-            </div>
-            <div className="indicator">
-              <h3 className="h6">Sélection de l'indicateur : </h3>
-              <div className="form-group">
-                <label>Indicateur </label>
-                <select
-                  className="form-input"
-                  id="selection-indicator"
-                  value={indic}
-                  onChange={this.changeSelectedIndicator}
-                >
-                  <optgroup label="Création de la valeur">
 
-                    <option key="eco" value="eco">
-                      {metaIndics["eco"].libelle}
-                    </option>
-                    <option key="art" value="art">
-                      {metaIndics["art"].libelle}
-                    </option>
-                    <option key="soc" value="soc">
-                      {metaIndics["soc"].libelle}
-                    </option>
-                  </optgroup>
-                  <optgroup label="Empreinte sociale">
-                    <option key="dis" value="dis">
-                      {metaIndics["dis"].libelle}
-                    </option>
-                    <option key="geq" value="geq">
-                      {metaIndics["geq"].libelle}
-                    </option>
-                    <option key="knw" value="knw">
-                      {metaIndics["knw"].libelle}
-                    </option>
-                  </optgroup>
-                  <optgroup label="Empreinte environnementale">
-                    <option key="ghg" value="ghg">
-                      {metaIndics["ghg"].libelle}
-                    </option>
-                    <option key="nrg" value="nrg">
-                      {metaIndics["nrg"].libelle}
-                    </option>
-                    <option key="wat" value="wat">
-                      {metaIndics["wat"].libelle}
-                    </option>
-                    <option key="mat" value="mat">
-                      {metaIndics["mat"].libelle}
-                    </option>
-                    <option key="was" value="was">
-                      {metaIndics["was"].libelle}
-                    </option>
-                    <option key="haz" value="haz">
-                      {metaIndics["haz"].libelle}
-                    </option>
-                  </optgroup>
-                </select>
-              </div>
-            </div>
-          </div>
-        </section>
-        <section className="selected-indicator">
-          <div className="container">
-            <h3 className="h6">Indicateur sélectionné :</h3>
-            <h4 className={"subtitle underline"}>
-              {metaIndics[indic].libelle}             {metaIndics[indic].isBeta && (
-                <span className="beta">&nbsp;BETA&nbsp;</span>
-              )}
-            </h4>
+      <div className="container-fluid indicator-section">
+        <section className="step">
 
-            <p className="legend">
-              Grandeur mesurée : Valeur ajoutée nette créée sur le territoire
-              français (en euros)
+          <div className="section-title">
+            <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 5 - Mesure de l'impact</h2>
+            <p>
+              Pour chaque indicateur, déclarez vos impacts directs et obtenez les éléments d'analyse.
             </p>
-            <div className="statement-section">
-              <h4>Déclaration des impacts directs</h4>
-              <Statement
-                indic={indic}
-                impactsData={this.props.session.impactsData}
-                onUpdate={this.willNetValueAddedIndicator.bind(this)}
-                onValidate={this.validateIndicator.bind(this)}
-                toAssessment={() => this.triggerPopup("assessment")}
-              />
-            </div>
           </div>
+          <div className="form-group">
+                    <label>Sélectionner un indicateur : </label>
+                    <select
+                      className="form-input"
+                      id="selection-indicator"
+                      value={indic}
+                      onChange={this.changeSelectedIndicator}
+                    >
+                      <optgroup label="Création de la valeur">
 
-          {triggerPopup == "assessment" && (
-            <div className="modal-overlay">
-              <div className="modal-wrapper">
-                <div className="modal">
-                  <Assessment
-                    indic={indic}
-                    impactsData={this.props.session.impactsData}
-                    onUpdate={this.willNetValueAddedIndicator.bind(this)}
-                    onValidate={this.validateIndicator.bind(this)}
-                    onGoBack={() => this.triggerPopup("")}
-                  />
-                </div>
-              </div>
-            </div>
-
-          )}
-        </section>
-
-        {/* <div className="section-view-header-odds">
-          {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
-            src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} height="100px;" alt="logo" />)}
-        </div> */}
-        {this.props.session.validations.includes(this.state.indic) && (
-          <>
-            <section className="impact-result">
-              <div className="container step">
-                <div className="flex">
-                <h3>Votre Impact</h3>
-                <div className="align-right">
-                  <button
-                    className={"btn btn-secondary"}
-                    onClick={() =>
-                      exportIndicPDF(this.state.indic, this.props.session,this.state.comparativeDivision)
-                    }
-                  >
-                    <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
-                  </button>
-                </div>
-                </div>
-          
-
-                <h4>{metaIndics[indic].libelle}</h4>
-                <div className="form-group">
-                  <select
-                    className={"form-input small-input"}
-                    value={selectedTable}
-                    onChange={this.changeShowedTable}
-                  >
-                    <option key="1" value="mainAggregates">
-                      Soldes intermédiaires de gestion
-                    </option>
-                    <option key="2" value="expensesAccounts">
-                      Détails - Comptes de charges
-                    </option>
-                    {/*<option key="3" value="companies">Valeurs publiées - Fournisseurs</option>*/}
-                  </select>
-
-                </div>
-                {this.buildtable(selectedTable)}
-
-              </div>
-            </section>
-            <section className="compare-section">
-              <div className="container step">
-                <h3>Comparaison</h3>
-
-                <h4>{metaIndics[indic].libelle}</h4>
-                <div className="form-group">
-                  <label>Sélectionner une activité comparative : </label>
-                  <select
-                    className={"form-input small-input"}
-                    value={comparativeDivision}
-                    onChange={this.changeComparativeDivision}
-                  >
-                    {Object.entries(divisions)
-                      .sort((a, b) => parseInt(a) - parseInt(b))
-                      .map(([code, libelle]) => (
-                        <option key={code} value={code}>
-                          {code + " - " + libelle}
+                        <option key="eco" value="eco">
+                          {metaIndics["eco"].libelle}
                         </option>
-                      ))}
-                  </select>
-                </div>
-                <div className="graph-section">
-                  <div className="container">
-                    <IndicatorGraphs
-                      session={this.props.session}
+                        <option key="art" value="art">
+                          {metaIndics["art"].libelle}
+                        </option>
+                        <option key="soc" value="soc">
+                          {metaIndics["soc"].libelle}
+                        </option>
+                      </optgroup>
+                      <optgroup label="Empreinte sociale">
+                        <option key="dis" value="dis">
+                          {metaIndics["dis"].libelle}
+                        </option>
+                        <option key="geq" value="geq">
+                          {metaIndics["geq"].libelle}
+                        </option>
+                        <option key="knw" value="knw">
+                          {metaIndics["knw"].libelle}
+                        </option>
+                      </optgroup>
+                      <optgroup label="Empreinte environnementale">
+                        <option key="ghg" value="ghg">
+                          {metaIndics["ghg"].libelle}
+                        </option>
+                        <option key="nrg" value="nrg">
+                          {metaIndics["nrg"].libelle}
+                        </option>
+                        <option key="wat" value="wat">
+                          {metaIndics["wat"].libelle}
+                        </option>
+                        <option key="mat" value="mat">
+                          {metaIndics["mat"].libelle}
+                        </option>
+                        <option key="was" value="was">
+                          {metaIndics["was"].libelle}
+                        </option>
+                        <option key="haz" value="haz">
+                          {metaIndics["haz"].libelle}
+                        </option>
+                      </optgroup>
+                    </select>
+                  </div>
+                              
+                  <h3 className="subtitle underline">
+                    {metaIndics[indic].libelle} {metaIndics[indic].isBeta && (
+                      <span className="beta">&nbsp;BETA&nbsp;</span>
+                    )}
+
+                  </h3>
+          <div className="step">
+  
+                  {/* <p className="legend">
+                    Grandeur mesurée : Valeur ajoutée nette créée sur le territoire
+                    français (en euros)
+                  </p> */}
+                  <h4>Déclaration des impacts directs</h4>
+                    <Statement
                       indic={indic}
-                      comparativeFootprints={this.state}
+                      impactsData={this.props.session.impactsData}
+                      onUpdate={this.willNetValueAddedIndicator.bind(this)}
+                      onValidate={this.validateIndicator.bind(this)}
+                      toAssessment={() => this.triggerPopup("assessment")}
+                    />
+            {triggerPopup == "assessment" && (
+              <div className="modal-overlay">
+                <div className="modal-wrapper">
+                  <div className="modal">
+                    <Assessment
+                      indic={indic}
+                      impactsData={this.props.session.impactsData}
+                      onUpdate={this.willNetValueAddedIndicator.bind(this)}
+                      onValidate={this.validateIndicator.bind(this)}
+                      onGoBack={() => this.triggerPopup("")}
                     />
                   </div>
                 </div>
               </div>
-            </section>
 
-            <section className="analysis-section">
-              <div className="container step">
-                <h3>Clés de decryptage</h3>
-                <div className="row">
-                  <div>
-                    <img src="/resources/illu_analyse.svg" alt="Analyse" />
+            )}
+
+          </div>
+
+          {/* <div className="section-view-header-odds">
+          {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
+            src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} height="100px;" alt="logo" />)}
+        </div> */}
+          {this.props.session.validations.includes(this.state.indic) && (
+            <>
+              <div className="impact-result step">
+                    <h4>Votre Impact</h4>
+                      <button
+                        className={"btn btn-primary"}
+                        onClick={() =>
+                          exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
+                        }
+                      >
+                        <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
+                      </button>
+
+                  <div className="container">
+                  <div className="form-group">
+                    <select
+                      className={"form-input small-input"}
+                      value={selectedTable}
+                      onChange={this.changeShowedTable}
+                    >
+                      <option key="1" value="mainAggregates">
+                        Soldes intermédiaires de gestion
+                      </option>
+                      <option key="2" value="expensesAccounts">
+                        Détails - Comptes de charges
+                      </option>
+                      {/*<option key="3" value="companies">Valeurs publiées - Fournisseurs</option>*/}
+                    </select>
+
                   </div>
-                  <div>
-                    <h4>{metaIndics[indic].libelle}</h4>
-                    <div className="analysis-container">
-                      <Analyse
-                        indic={this.state.indic}
-                        session={this.props.session}
-                      />
-                    </div>
-                  </div>
+                  {this.buildtable(selectedTable)}
                 </div>
               </div>
-            </section>
-          </>
+              <div className="compare-section step">
+                  <h4>Comparaison</h4>
+                  <div className="container">
 
-        )}
-        <section className={"container action"}>
+                  <div className="form-group">
+                    <label>Sélectionner une activité comparative : </label>
+                    <select
+                      className={"form-input small-input"}
+                      value={comparativeDivision}
+                      onChange={this.changeComparativeDivision}
+                    >
+                      {Object.entries(divisions)
+                        .sort((a, b) => parseInt(a) - parseInt(b))
+                        .map(([code, libelle]) => (
+                          <option key={code} value={code}>
+                            {code + " - " + libelle}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                  <div className="graph-section">
+                      <IndicatorGraphs
+                        session={this.props.session}
+                        indic={indic}
+                        comparativeFootprints={this.state}
+                      />
+                  </div>
+                  </div>
+              </div>
+
+              <div className="analysis-section step">
+              <h4>Clés de decryptage</h4>
+                  <div className="analysis-container"> 
+                    <div>
+                        <Analyse
+                          indic={this.state.indic}
+                          session={this.props.session}
+                        />
+                    </div>
+                    <div>
+                      <img src="/resources/illu_analyse.svg" alt="Analyse" />
+                    </div>
+                  </div>
+              </div>
+            </>
+
+          )}
+          <div className="align-right">
             <button
               className={"btn btn-secondary"}
               disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
@@ -354,8 +332,8 @@ export class IndicatorSection extends React.Component {
             >
               <FontAwesomeIcon icon={faUpload} />Publier mes résultats
             </button>
+          </div>
         </section>
-
       </div>
     );
   }
@@ -510,14 +488,13 @@ const Analyse = (indic, session) => {
   let analyse = getAnalyse(indic, session);
 
   return (
-    <div className="analysis">
-      
+    <>
       {analyse.map((paragraph, index) => (
 
         <p key={index}>{paragraph.reduce((a, b) => a + " " + b, "")}</p>
-        
+
       ))}
-    </div>
+    </>
   );
 };
 

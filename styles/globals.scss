@@ -20,6 +20,19 @@
 
 /* ---------- GENERAL STYLE ---------- */
 
+body {
+  background: #fbfbff;
+
+}
+
+hr {
+  border-top : 1px solid #dbdef1;
+  border-bottom: 0;
+  border-left : 0;
+  border-right: 0;
+  background-color: #dbdef1;
+  margin: 2rem auto;
+}
 // Input
 
 input {
@@ -44,46 +57,6 @@ sup {
   font-size: 9px;
 }
 
-
-/* ---------- MENU ---------- */
-
-.menu {
-  margin: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  
-  .menu-items {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .menu-items-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 10px;
-  }
-
-  .menu-button {
-    height: 25px;
-    width: 225px;
-    margin: 2px 0;
-    border: 0;
-    background-color: $primary-color;
-    color: white;
-
-    &.selected {
-      background-color: $highlight-color;
-    }
-    &:disabled {
-      background-color: white;
-      color: $primary-color;
-      border: solid $primary-color 1px;
-    }
-  }
-}
 
 /* ----- SECTION ----- */
 
@@ -207,17 +180,6 @@ sup {
 
 /* ---------- TABLE ---------- */
 
-.table-container {
-
-  .table-header {
-    width: 100%;
-    padding: 5px 2px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-}
 
 
 .table-navigation {

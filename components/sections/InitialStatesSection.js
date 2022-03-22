@@ -9,7 +9,7 @@ import { InitialStatesTable } from "/components/tables/InitialStatesTable";
 import { ProgressBar } from "../popups/ProgressBar";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel, faFileUpload } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel, faFileUpload, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { updateVersion } from "../../src/version/updateVersion";
 
 /* ---------------------------------------------------------------- */
@@ -60,23 +60,21 @@ export class InitialStatesSection extends React.Component {
 
     const isNextStepAvailable = nextStepAvailable(this.state) && message == "";
     return (
-      <>
-        <section className="container">
+      <div className="container-fluid">
+        <section className="step">
 
-          <div className={"section-title"}>
+          <div className="section-title">
             <h2> <FontAwesomeIcon icon={faPen} /> &Eacute;tape 3 - Saisissez vos états initiaux</h2>
-            <p>
+            <p className="alert alert-info">
               Les états initiaux correspondent aux empreintes des comptes de
               stocks et d’immobilisations en début d’exercice. Les empreintes
-              peuvent être saisies sur la base de l’exercice courant / valeurs
-              par défaut (onglet 1), ou reprises de l’exercice précédent (onglet
-              2).
+              peuvent être saisies sur la reprises de l’exercice précédent (onglet
+              1) ou sur la base de l’exercice courant ou valeurs par défaut (onglet 2)
             </p>
           </div>
 
-          <div className="table-container">
+          <div className="table-container container">
             <div className="table-menu">
-
               <button value="importData"
                 className={this.state.view == "importData" ? "active" : ""}
                 onClick={this.changeView}
@@ -93,29 +91,30 @@ export class InitialStatesSection extends React.Component {
               </button>
 
             </div>
-            <div className="step"> 
             {
-              this.state.view == "defaultData" ? <>
-
+              this.state.view == "defaultData" ?
+              <>
+              <div className="small-text">
                 <p>
                   En cas d'analyse réalisée pour l'exercice précédent, importez le fichier de sauvegarde
-                  via le deuxième onglet.
+                  via le premier onglet.
                 </p>
                 <p>
-                  <b>Valeur par défaut :</b> Les valeurs par défaut correspondent
+                  <FontAwesomeIcon icon={faInfoCircle} /> <b>Valeur par défaut :</b> Les valeurs par défaut correspondent
                   aux données disponibles pour la branche économique la plus
                   proche.
                 </p>
                 <p>
-                  <b>Estimée sur exercice courant : </b>Nous initialisons l'empreinte du compte en début d'exercice.
+                <FontAwesomeIcon icon={faInfoCircle} /> <b>Estimée sur exercice courant : </b>Nous initialisons l'empreinte du compte en début d'exercice.
                   à partir des opérations réalisées sur l'exercice courant.
                 </p>
+              </div>
                 {!isNextStepAvailable && (
-                  <div className={"alert alert-warning"}>
+                  <div className="alert alert-warning">
                     <p>
                       <FontAwesomeIcon icon={faWarning} /> L'empreinte de certains comptes ne sont pas initialisés.
                     </p>
-                    <button onClick={() => this.synchroniseAll()} className={"btn btn-secondary"}>
+                    <button onClick={() => this.synchroniseAll()} className="btn btn-warning">
                       <FontAwesomeIcon icon={faSync} /> Synchroniser les données
                     </button>
                   </div>
@@ -150,15 +149,15 @@ export class InitialStatesSection extends React.Component {
               </>
                 :
                 <>
-                  <p>
+                  <p className="small-text">
                     L'ajout de la sauvegarde de l'analyse sur l'exercice précédent permet d'assurer
                     une continuité vis-à-vis de l'exercice en cours. La sauvegarde contient les
                     valeurs des indicateurs associés aux comptes de stocks, d'immobilisations et d'amortissements
                     en fin d'exercice.
                   </p>
-                  <h5>
+                  <label>
                     Importer votre fichier de sauvegarde (.json)
-                  </h5>
+                  </label>
 
                   <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
                     {({ getRootProps, getInputProps }) => (
@@ -166,24 +165,22 @@ export class InitialStatesSection extends React.Component {
                         <div {...getRootProps()} className="dropzone">
                           <input {...getInputProps()} />
                           <p>
-                                        <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
-                                    </p>
-                                    <p>
-                                        Glisser votre fichier ici
+                            <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
+                            Glisser votre fichier ici
 
-                                    </p>
-                                    <p>
-                                        OU
-                                    </p>
-                                    <p className="btn btn-primary">
-                                        Selectionner votre fichier
-                                    </p>
+                          </p>
+                          <p className="small-text">
+                            OU
+                          </p>
+                          <p className="btn btn-primary">
+                            Selectionner votre fichier
+                          </p>
                         </div>
                       </div>
                     )}
                   </Dropzone>
                   {
-                    (files.length > 0 && message=="") ?
+                    (files.length > 0 && message == "") ?
                       <div className={"alert alert-success"}>
                         <h4>Votre fichier a bien été importé</h4>
                         <ul>
@@ -201,21 +198,17 @@ export class InitialStatesSection extends React.Component {
                 </>
             }
           </div>
-          </div>
           {
-            showMessage ?
+            showMessage &&
               <div className={"alert alert-error"}>
                 <h4>{titlePopup}</h4>
                 <p>
                   {message}
                 </p>
-              </div> : ""
+              </div> 
           }
 
-
-        </section>
-        <section className={"action"}>
-          <div className="container-fluid">
+          <div className="align-right">
 
             <button className={"btn btn-secondary"}
               id="validation-button"
@@ -228,7 +221,8 @@ export class InitialStatesSection extends React.Component {
           </div>
         </section>
 
-      </>
+
+      </div>
     );
   }
 
@@ -264,7 +258,7 @@ export class InitialStatesSection extends React.Component {
   }
   /* ---------- SELECTED VIEW ---------- */
 
-  changeView = (event) => this.setState({ view: event.target.value });
+  changeView = (event) => this.setState({ view: event.target.value, files: [], showMessage:false, message:"" });
 
   /* ----- UPDATES ----- */
 

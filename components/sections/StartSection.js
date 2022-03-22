@@ -14,7 +14,7 @@ export class StartSection extends React.Component {
 
   render() {
     return (
-      <div id="start" className="container">
+      <div id="start" className="container-fluid">
         <div className="row">
           <div className="col">
             <h1>
