@@ -31,7 +31,8 @@ export class SirenSection extends React.Component {
             file: null,
             progression: 0,
             synchronised: 0,
-            popup: false
+            popup: false,
+            isDisabled: false
         };
 
     }
@@ -61,10 +62,7 @@ export class SirenSection extends React.Component {
 
     };
 
-    componentDidUpdate(prevProps) {
-                console.log("Test")
-      }
-    
+
     render() {
         const {
             companies,
@@ -74,7 +72,8 @@ export class SirenSection extends React.Component {
             progression,
             synchronised,
             companiesShowed,
-            popup
+            popup,
+            isDisabled
         } = this.state;
 
         const financialData = this.props.session.financialData;
@@ -82,8 +81,8 @@ export class SirenSection extends React.Component {
 
         const isNextStepAvailable = nextStepAvailable(this.state);
 
+        console.log(isDisabled)
         let buttonNextStep;
-
 
         if (this.state.companies.filter((company) => company.status == 200).length == this.state.companies.length
         ) {
@@ -134,8 +133,10 @@ export class SirenSection extends React.Component {
                             2. Importez le fichier excel complété
                         </h4>
 
-                        <Dropzone onDrop={(files) => { files.map(
-                            (file) => this.importFile(file), this.openPopup()) }}
+                        <Dropzone onDrop={(files) => {
+                            files.map(
+                                (file) => this.importFile(file), this.openPopup())
+                        }}
                             maxFiles={1} multiple={false} >
                             {({ getRootProps, getInputProps }) => (
                                 <div className="dropzone-section">
@@ -155,9 +156,9 @@ export class SirenSection extends React.Component {
                                 </div>
                             )}
                         </Dropzone>
-                           
+
                         {
-                             popup && 
+                            popup &&
 
                             <MessagePopup title="Votre fichier a bien été importé !" message="" icon={faCheckCircle} type="success" closePopup={() => this.closePopup()}
                             />
@@ -220,6 +221,7 @@ export class SirenSection extends React.Component {
                                 <button
                                     onClick={() => this.synchroniseCompanies()}
                                     className={"btn btn-secondary"}
+                                    disabled={isDisabled}
                                 >
                                     <FontAwesomeIcon icon={faSync} /> Synchroniser les
                                     données
@@ -279,7 +281,8 @@ export class SirenSection extends React.Component {
                                             onUpdate={this.updateFootprints.bind(this)}
                                             companies={companiesShowed}
                                             financialData={financialData}
-                                            
+                                            checkSync={this.enableButton.bind(this)}
+
                                         />
                                     )
                                 }
@@ -319,9 +322,21 @@ export class SirenSection extends React.Component {
     updateFootprints = () => {
         this.props.session.updateFootprints();
         this.setState({ companies: this.props.session.financialData.companies });
-        console.log("updated");
     };
 
+    enableButton = () => {
+
+    let companies = this.props.session.financialData.companies;
+    
+    let nonSyncWithSiren = companies.filter((company) => company.state == "siren" && company.status != 200);
+
+    let disable;
+    
+    nonSyncWithSiren.length > 0 ? disable = false : disable = true;
+
+     this.setState({ isDisabled : disable });
+    
+    }
 
     /* ---------- FILE IMPORT ---------- */
 
@@ -418,6 +433,7 @@ export class SirenSection extends React.Component {
     synchroniseCompanies = async () => {
 
         let companiesToSynchronise = this.state.companies.filter((company) => company.state == "siren" && company.status != 200);
+
         // synchronise data
         this.setState({ fetching: true, progression: 0 });
 
@@ -437,10 +453,12 @@ export class SirenSection extends React.Component {
             progression: 0,
             view: "all",
             companiesShowed: this.state.companies,
-            synchronised: this.state.companies.filter((company) => company.status == 200).length
+            synchronised: this.state.companies.filter((company) => company.status == 200).length,
         });
 
         document.getElementById("step-3").scrollIntoView();
+
+        this.enableButton();
         // update session
         this.props.session.updateFootprints();
     };
@@ -452,7 +470,6 @@ export class SirenSection extends React.Component {
 
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
-
 
 const nextStepAvailable = ({ companies }) => {
 
