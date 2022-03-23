@@ -371,7 +371,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
 
 
   // Export
-  doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+  doc.output('dataurlnewwindow',"rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
  
 }
 
