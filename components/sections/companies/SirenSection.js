@@ -16,7 +16,6 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
 import { MessagePopup } from "../../popups/MessagePopup";
-
 export class SirenSection extends React.Component {
 
     constructor(props) {
@@ -32,6 +31,7 @@ export class SirenSection extends React.Component {
             file: null,
             progression: 0,
             synchronised: 0,
+            popup: false
         };
 
     }
@@ -61,6 +61,10 @@ export class SirenSection extends React.Component {
 
     };
 
+    componentDidUpdate(prevProps) {
+                console.log("Test")
+      }
+    
     render() {
         const {
             companies,
@@ -68,22 +72,20 @@ export class SirenSection extends React.Component {
             nbItems,
             fetching,
             progression,
-            file,
             synchronised,
-            companiesShowed
+            companiesShowed,
+            popup
         } = this.state;
 
         const financialData = this.props.session.financialData;
         const setCompanyStep = this.props.setCompanyStep;
 
         const isNextStepAvailable = nextStepAvailable(this.state);
-        const isSynchroniseAvailable = false;
-
 
         let buttonNextStep;
 
 
-        if (this.state.companies.filter((company) => company.status == 200) == this.state.companies.length
+        if (this.state.companies.filter((company) => company.status == 200).length == this.state.companies.length
         ) {
             buttonNextStep = <button
                 className={"btn btn-secondary"}
@@ -132,7 +134,8 @@ export class SirenSection extends React.Component {
                             2. Importez le fichier excel complété
                         </h4>
 
-                        <Dropzone onDrop={(files) => { files.map((file) => this.importFile(file)) }}
+                        <Dropzone onDrop={(files) => { files.map(
+                            (file) => this.importFile(file), this.openPopup()) }}
                             maxFiles={1} multiple={false} >
                             {({ getRootProps, getInputProps }) => (
                                 <div className="dropzone-section">
@@ -152,17 +155,12 @@ export class SirenSection extends React.Component {
                                 </div>
                             )}
                         </Dropzone>
-
+                           
                         {
-                            file && Object.keys(file).length &&
+                             popup && 
 
-                            //<MessagePopup title="Bravo ! " message="Votre fichier a bien été importé !" />
-
-                            <div className="alert alert-success">
-                                <p>
-                                    <FontAwesomeIcon icon={faCheck} /> Votre fichier a bien été importé.
-                                </p>
-                            </div>
+                            <MessagePopup title="Votre fichier a bien été importé !" message="" icon={faCheckCircle} type="success" closePopup={() => this.closePopup()}
+                            />
                         }
 
                     </div>
@@ -219,7 +217,6 @@ export class SirenSection extends React.Component {
 
                                 }
 
-
                                 <button
                                     onClick={() => this.synchroniseCompanies()}
                                     className={"btn btn-secondary"}
@@ -227,6 +224,7 @@ export class SirenSection extends React.Component {
                                     <FontAwesomeIcon icon={faSync} /> Synchroniser les
                                     données
                                 </button>
+
 
                                 <div className="pagination">
 
@@ -239,10 +237,13 @@ export class SirenSection extends React.Component {
                                             <option key="1" value="all">
                                                 Tous les comptes externes
                                             </option>
-                                            <option key="2" value="undefined">
+
+                                            <option key="2" value="undefined"
+                                            >
                                                 Comptes sans numéro de siren
                                             </option>
-                                            <option key="3" value="unsync">
+                                            <option key="3" value="unsync"
+                                            >
                                                 Non synchronisé
                                             </option>
                                         </select>
@@ -278,10 +279,10 @@ export class SirenSection extends React.Component {
                                             onUpdate={this.updateFootprints.bind(this)}
                                             companies={companiesShowed}
                                             financialData={financialData}
+                                            
                                         />
                                     )
                                 }
-
 
                             </div>
                         </div>
@@ -318,6 +319,7 @@ export class SirenSection extends React.Component {
     updateFootprints = () => {
         this.props.session.updateFootprints();
         this.setState({ companies: this.props.session.financialData.companies });
+        console.log("updated");
     };
 
 
@@ -434,6 +436,7 @@ export class SirenSection extends React.Component {
             fetching: false,
             progression: 0,
             view: "all",
+            companiesShowed: this.state.companies,
             synchronised: this.state.companies.filter((company) => company.status == 200).length
         });
 
@@ -442,19 +445,14 @@ export class SirenSection extends React.Component {
         this.props.session.updateFootprints();
     };
 
+    /* ----- POP-UP ----- */
+
+    closePopup = () => this.setState({ popup: false });
+    openPopup = () => this.setState({ popup: true });
 
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const synchroniseAvailable = ({ companies }) => {
-
-    let isSynchroniseAvailable;
-
-    companies.filter((company) => company.status != 200 && company.state == "siren").length ? isSynchroniseAvailable = false : isSynchroniseAvailable = true;
-
-    return isSynchroniseAvailable;
-
-}
 
 const nextStepAvailable = ({ companies }) => {
 

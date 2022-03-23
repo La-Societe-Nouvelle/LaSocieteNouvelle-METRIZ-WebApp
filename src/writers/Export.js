@@ -302,8 +302,8 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   // y += 20;
   // doc.setFontSize(12);
   // doc.setFont("Helvetica", "bold");
-  // doc.setTextColor(82, 98, 188);
-  // doc.text("CLE DE CRYPTAGE", x, y);
+  // doc.setTextColor(25, 21, 88);
+  // doc.text("CLE DE DECRYPTAGE", x, y);
 
   // y += 10;
 
@@ -318,7 +318,7 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   // doc.setFontSize(10);
   // doc.setFont("Helvetica", "normal");
   // doc.setTextColor(0, 0, 0);
-  // doc.text(doc.splitTextToSize(text, 150), x, y);
+  // doc.text(doc.splitTextToSize(text, 170), x, y);
 
   // PAGE 2 
   doc.addPage();

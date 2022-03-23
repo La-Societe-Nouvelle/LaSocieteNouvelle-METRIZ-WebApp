@@ -191,7 +191,7 @@ export class IndicatorSection extends React.Component {
                     </select>
                   </div>
                               
-                  <h3 className="subtitle underline">
+                  <h3>
                     {metaIndics[indic].libelle} {metaIndics[indic].isBeta && (
                       <span className="beta">&nbsp;BETA&nbsp;</span>
                     )}
@@ -238,15 +238,6 @@ export class IndicatorSection extends React.Component {
             <>
               <div className="impact-result step">
                     <h4>Votre Impact</h4>
-                      <button
-                        className={"btn btn-primary"}
-                        onClick={() =>
-                          exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
-                        }
-                      >
-                        <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
-                      </button>
-
                   <div className="container">
                   <div className="form-group">
                     <select
@@ -298,7 +289,7 @@ export class IndicatorSection extends React.Component {
               </div>
 
               <div className="analysis-section step">
-              <h4>Clés de decryptage</h4>
+              <h4>Clés de décryptage</h4>
                   <div className="analysis-container"> 
                     <div>
                         <Analyse

@@ -65,7 +65,7 @@
 // IMPORT SECTION 
 
 #importSection {
-    .row div {
+    .row .form-container, .illus-container {
         flex : 1;
     }
 
@@ -114,12 +114,13 @@
   }
   h3 {
     color : $secondary-color;
-    font-size: 1.5em;
-    margin-bottom: 0;
+    font-size: 1.6rem;
+    text-align: center;
   }
   h4 {
-    font-size: 1.2em;
-    margin-top: 10px;
+    font-size: 1.3em;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
   }
 
 }

@@ -25,6 +25,7 @@ export class CorporateIdTable extends React.Component {
 
   }
   componentDidUpdate(prevProps) {
+    
     if (prevProps.companies !== this.props.companies) {
       this.setState({ companies: this.props.companies });
     }
@@ -63,6 +64,7 @@ export class CorporateIdTable extends React.Component {
             </tr>
           </thead>
           <tbody>
+          
             {companies
               .slice(page * nbItems, (page + 1) * nbItems)
               .map((company) => (
@@ -70,12 +72,19 @@ export class CorporateIdTable extends React.Component {
                   key={"company_" + company.id}
                   {...company}
                   updateCompany={this.updateCompany.bind(this)}
-
                 />
               ))}
           </tbody>
         </table>
-
+        {
+      companies.length == 0 && (
+        <p className="small-text
+        ">
+          Aucun résultat
+        </p>
+      )
+      
+    }
         {companies.length > nbItems && (
           <div className="table-navigation">
             <button
@@ -235,7 +244,6 @@ class RowTableCompanies extends React.Component {
         <td>
           {account}
         </td>
-
         <td className="align-right">{printValue(amount, 0)} &euro;</td>
       </tr>
     );

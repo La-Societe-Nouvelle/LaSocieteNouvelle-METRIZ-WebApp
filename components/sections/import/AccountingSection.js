@@ -5,7 +5,7 @@ import React from 'react';
 import Dropzone from "react-dropzone";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowTrendUp, faChevronRight, faInfo, faFileExcel, faFileUpload } from "@fortawesome/free-solid-svg-icons";
+import { faArrowTrendUp, faChevronRight, faInfo, faFileExcel,faCheckCircle, faFileUpload } from "@fortawesome/free-solid-svg-icons";
 
 import { FECImportSection } from "./FECImportSection";
 
@@ -13,6 +13,7 @@ import { FECImportSection } from "./FECImportSection";
 import { FinancialData } from '/src/FinancialData';
 
 // Components
+import { MessagePopup } from "../../popups/MessagePopup";
 
 // Readers
 import { FECFileReader, FECDataReader } from '/src/readers/FECReader';
@@ -33,13 +34,16 @@ export class AccountingSection extends React.Component {
             errorMessage: "",
             errors: [],
             files: [],
-            disabledNextStep: true
+            disabledNextStep: true,
+            popup: false
+
         };
         this.isFormValid = () => {
             return this.state.corporateName == '' || this.state.files.length == 0;
         }
         this.onDrop = (files) => {
-            this.setState({ files });
+            this.setState({ files : files, popup : true });
+
         };
         this.onClick = () => {
             this.importFECFile();
@@ -62,6 +66,7 @@ export class AccountingSection extends React.Component {
             errorMessage,
             errors,
             files,
+            popup,
         } = this.state;
 
         return (
@@ -93,7 +98,7 @@ export class AccountingSection extends React.Component {
                         <section className="step">
 
                             <div className="row">
-                                <div>
+                                <div className="illus-container">
                                     <div className="section-title">
                                         <h2>
                                             <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
@@ -146,20 +151,26 @@ export class AccountingSection extends React.Component {
                                         * Le fichier doit respecter les normes relatives à la structure du fichier (libellés des colonnes, séparateur tabulation ou barre verticale, encodage ISO 8859-15, etc.).
                                     </p>
                                     <div className="alert alert-info">
-                                            <p>
-                                                L’importation des écritures comptables s’effectue via un
-                                                Fichier d’Ecritures Comptables (FEC). Générez ce fichier{" "}
-                                                <b>
-                                                    à partir de votre logiciel comptable, ou demandez-le
-                                                    auprès de votre service comptable.
-                                                </b>
-                                            </p>
+                                        <p>
+                                            L’importation des écritures comptables s’effectue via un
+                                            Fichier d’Ecritures Comptables (FEC). Générez ce fichier{" "}
+                                            <b>
+                                                à partir de votre logiciel comptable, ou demandez-le
+                                                auprès de votre service comptable.
+                                            </b>
+                                        </p>
                                     </div>
                                     {
+                                        popup &&
+
+                                        <MessagePopup title="Votre fichier a bien été importé !" message="" icon={faCheckCircle} type="success" closePopup={() => this.closePopup()}
+                                        />
+                                    }
+     
+     {
                                         (files.length > 0) &&
 
                                         <div className={"alert alert-success"}>
-                                            <p>Votre fichier a bien été importé</p>
                                             <ul>
                                                 {
                                                     files.map((file) => (
@@ -282,5 +293,9 @@ export class AccountingSection extends React.Component {
             this.props.submit();
         }
     }
+    /* ----- POP-UP ----- */
+
+    closePopup = () => this.setState({ popup: false });
+    openPopup = () => this.setState({ popup: true });
 
 }
