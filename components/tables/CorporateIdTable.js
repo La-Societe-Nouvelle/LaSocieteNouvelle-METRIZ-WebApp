@@ -15,7 +15,6 @@ export class CorporateIdTable extends React.Component {
   constructor(props) {
 
     super(props);
-
     this.state = {
       companies: props.companies,
       columnSorted: "amount",
@@ -25,7 +24,7 @@ export class CorporateIdTable extends React.Component {
 
   }
   componentDidUpdate(prevProps) {
-    
+
     if (prevProps.companies !== this.props.companies) {
       this.setState({ companies: this.props.companies });
     }
@@ -159,10 +158,10 @@ export class CorporateIdTable extends React.Component {
 
   /* ---------- OPERATIONS ON COMPANY ---------- */
 
-
   updateCompany = (nextProps) => {
     let company = this.props.financialData.getCompany(nextProps.id);
     company.update(nextProps);
+    this.props.checkSync(nextProps);
     this.setState({ companies: this.props.companies });
   };
 
@@ -187,11 +186,12 @@ class RowTableCompanies extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+
     if (this.props != prevProps) {
       this.setState({
         corporateId: this.props.corporateId || "",
-        dataUpdated: false,
-      });
+        dataUpdated: false
+            });
     }
   }
 
@@ -200,12 +200,10 @@ class RowTableCompanies extends React.Component {
       corporateName,
       account,
       amount,
-      status
+      status,
     } = this.props;
-    const { corporateId } = this.state;
-
+    const { corporateId} = this.state;
     let icon;
-
     if (corporateId && status != 200) {
       icon = <p className="success">
         <FontAwesomeIcon icon={faSyncAlt} title="Données prêtes à être synchronisées" />
@@ -250,7 +248,7 @@ class RowTableCompanies extends React.Component {
   }
 
   updateCorporateId = (nextCorporateId) => {
-    this.setState({ dataUpdated: true });
+    this.setState({ dataUpdated: true});
     this.props.updateCompany({
       id: this.props.id,
       corporateId: nextCorporateId,
