@@ -322,16 +322,13 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             data={dataValueAdded}
             options={optionsV}
           />
-          {/* <ColumnChart title="titre" data={dataProduction} viewWindow={viewWindow} title="Production"/>
-        <ColumnChart title="titre" data={dataConsumption} viewWindow={viewWindow} title="Consommations"/>
-        <ColumnChart title="titre" data={dataValueAdded} viewWindow={viewWindow} title="Valeur Ajoutée"/>  */}
         </div>
       </div>
 
       <table className='w100'>
         <thead>
           <tr>
-            <td className="auto" colSpan="1">Agrégat</td>
+            <td className="auto">Agrégat</td>
             <td className="column_value" >France</td>
             <td className="column_value align-center" >Exercice en cours</td>
             {
@@ -339,7 +336,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
                 && printValue(consumptionSectorFootprint.getIndicator(indic).value, 1)
                 && printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
 
-                <td className="column_value" >Branche</td> : ""
+                <td className="column_value" >Branche</td> : <td></td>
             }
           </tr>
         </thead>
@@ -351,7 +348,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             {
               printValue(productionSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
                 <td className="short right">{printValue(productionSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
-                : ""
+                : <td></td>
             }
           </tr>
           <tr>
@@ -361,7 +358,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             {
               printValue(consumptionSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
                 <td className="short right">{printValue(consumptionSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
-                : ""
+                : <td></td>
             }
           </tr>
           <tr>
@@ -371,7 +368,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             {
               printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1) !== " - " ?
                 <td className="short right">{printValue(valueAddedSectorFootprint.getIndicator(indic).value, 1)} {unit}</td>
-                : ""
+                : <td></td>
             }
           </tr>
         </tbody>
@@ -386,23 +383,3 @@ function roundNumber(num) {
   }
   return num;
 }
-/* ----- CHARTS ----- */
-
-// function ColumnChart({ title, data, viewWindow }) {
-//   return (
-//     <div align="center">
-//       <Chart
-//         height={"200px"}
-//         chartType="ColumnChart"
-//         loader={<div>Chargement</div>}
-//         data={data}
-//         options={{
-//           title: title,
-//           legend: { position: 'none' },
-//           vAxis: { viewWindow: viewWindow, viewWindowMode: "explicit" },
-//           enableInteractivity: false,
-//           animation: { duration: 600, easing: "inAndOut" }
-//         }}
-//       />
-//     </div>)
-// }

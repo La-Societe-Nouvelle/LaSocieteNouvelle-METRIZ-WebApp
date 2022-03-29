@@ -115,12 +115,19 @@
   h3 {
     color : $secondary-color;
     font-size: 1.6rem;
-    text-align: center;
   }
   h4 {
     font-size: 1.3em;
     margin: 0 0 1.5rem 0;
     text-align: center;
+  }
+
+  .indicator-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top : 1px solid $light-blue;
+    padding: 1em 0;
   }
 
 }

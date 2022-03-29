@@ -175,7 +175,7 @@ class IndicatorSelection extends React.Component {
         <table>
           <thead>
             <tr>
-              <td >Indicateur</td>
+              <td>Indicateur</td>
               <td className="column_value" colSpan="2">Valeur</td>
               <td className="column_uncertainty">Incertitude</td>
               <td>Publication</td>

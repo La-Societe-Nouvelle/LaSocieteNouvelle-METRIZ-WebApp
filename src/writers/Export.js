@@ -2,6 +2,8 @@
 
 // Modules
 import { jsPDF } from 'jspdf';
+import  JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 // Fonts 
 
@@ -77,7 +79,7 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   return csvContent;
 }
 
-function exportIndicPDF(indic, session, comparativeDivision) {
+function generatePDF (indic, session, comparativeDivision) {
   const doc = new jsPDF();
   const { financialData, legalUnit } = session;
   // 
@@ -348,7 +350,6 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   let canvasImg = canvas.toDataURL("image/png", 1.0);
   const imgProps = doc.getImageProperties(canvasImg);
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  console.log(pdfHeight);
   doc.addImage(canvasImg, 'PNG', x, y, pdfWidth, pdfHeight);
 
   //Consumption canvas
@@ -368,10 +369,37 @@ function exportIndicPDF(indic, session, comparativeDivision) {
   const pdfVHeight = (imgValueProps.height * pdfWidth) / imgValueProps.width;
 
   doc.addImage(canvasValueImg, 'PNG', x, y, pdfWidth, pdfVHeight);
+  doc.setProperties({ title: "rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() })
+
+  return doc;
+}
+function exportIndicPDF(indic, session, comparativeDivision) {
+  const { legalUnit, year } = session;
+
+  // Zip Export
+  if(Array.isArray(indic)) {
+
+  let zip = new JSZip();
+
+  indic.map((indic) => {
+     let doc =  generatePDF(indic, session, comparativeDivision)
+     zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
+  }
+  );
 
 
-  // Export
-  doc.output('dataurlnewwindow',"rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+zip.generateAsync({type:'blob'}).then(function(content) {
+     saveAs(content, 'livrables_'+ legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
+});
+
+}
+else {
+// PDF Export
+let doc =  generatePDF(indic, session, comparativeDivision)
+doc.output('dataurlnewwindow',"rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+}
+ 
  
 }
 
@@ -421,7 +449,7 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
   }
 }
 
-export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF };
+export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF };
 
 /*function printValue(value,precision) {
   if (value==null) {return "-"}

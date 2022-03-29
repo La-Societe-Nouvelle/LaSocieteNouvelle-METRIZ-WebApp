@@ -10,7 +10,7 @@ import divisions from "/lib/divisions";
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRuler, faFileArrowDown, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { faRuler, faFileArrowDown, faUpload, faFileZipper, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -138,79 +138,87 @@ export class IndicatorSection extends React.Component {
             </p>
           </div>
           <div className="form-group">
-                    <label>Sélectionner un indicateur : </label>
-                    <select
-                      className="form-input"
-                      id="selection-indicator"
-                      value={indic}
-                      onChange={this.changeSelectedIndicator}
-                    >
-                      <optgroup label="Création de la valeur">
+            <label>Sélectionner un indicateur : </label>
+            <select
+              className="form-input"
+              id="selection-indicator"
+              value={indic}
+              onChange={this.changeSelectedIndicator}
+            >
+              <optgroup label="Création de la valeur">
 
-                        <option key="eco" value="eco">
-                          {metaIndics["eco"].libelle}
-                        </option>
-                        <option key="art" value="art">
-                          {metaIndics["art"].libelle}
-                        </option>
-                        <option key="soc" value="soc">
-                          {metaIndics["soc"].libelle}
-                        </option>
-                      </optgroup>
-                      <optgroup label="Empreinte sociale">
-                        <option key="dis" value="dis">
-                          {metaIndics["dis"].libelle}
-                        </option>
-                        <option key="geq" value="geq">
-                          {metaIndics["geq"].libelle}
-                        </option>
-                        <option key="knw" value="knw">
-                          {metaIndics["knw"].libelle}
-                        </option>
-                      </optgroup>
-                      <optgroup label="Empreinte environnementale">
-                        <option key="ghg" value="ghg">
-                          {metaIndics["ghg"].libelle}
-                        </option>
-                        <option key="nrg" value="nrg">
-                          {metaIndics["nrg"].libelle}
-                        </option>
-                        <option key="wat" value="wat">
-                          {metaIndics["wat"].libelle}
-                        </option>
-                        <option key="mat" value="mat">
-                          {metaIndics["mat"].libelle}
-                        </option>
-                        <option key="was" value="was">
-                          {metaIndics["was"].libelle}
-                        </option>
-                        <option key="haz" value="haz">
-                          {metaIndics["haz"].libelle}
-                        </option>
-                      </optgroup>
-                    </select>
-                  </div>
-                              
-                  <h3>
-                    {metaIndics[indic].libelle} {metaIndics[indic].isBeta && (
-                      <span className="beta">&nbsp;BETA&nbsp;</span>
-                    )}
+                <option key="eco" value="eco">
+                  {metaIndics["eco"].libelle}
+                </option>
+                <option key="art" value="art">
+                  {metaIndics["art"].libelle}
+                </option>
+                <option key="soc" value="soc">
+                  {metaIndics["soc"].libelle}
+                </option>
+              </optgroup>
+              <optgroup label="Empreinte sociale">
+                <option key="dis" value="dis">
+                  {metaIndics["dis"].libelle}
+                </option>
+                <option key="geq" value="geq">
+                  {metaIndics["geq"].libelle}
+                </option>
+                <option key="knw" value="knw">
+                  {metaIndics["knw"].libelle}
+                </option>
+              </optgroup>
+              <optgroup label="Empreinte environnementale">
+                <option key="ghg" value="ghg">
+                  {metaIndics["ghg"].libelle}
+                </option>
+                <option key="nrg" value="nrg">
+                  {metaIndics["nrg"].libelle}
+                </option>
+                <option key="wat" value="wat">
+                  {metaIndics["wat"].libelle}
+                </option>
+                <option key="mat" value="mat">
+                  {metaIndics["mat"].libelle}
+                </option>
+                <option key="was" value="was">
+                  {metaIndics["was"].libelle}
+                </option>
+                <option key="haz" value="haz">
+                  {metaIndics["haz"].libelle}
+                </option>
+              </optgroup>
+            </select>
+          </div>
 
-                  </h3>
+          <div className="indicator-title">
+
+            <h3>
+              {metaIndics[indic].libelle} {metaIndics[indic].isBeta && (
+                <span className="beta">&nbsp;BETA&nbsp;</span>
+              )}
+
+            </h3>
+            <div>
+              {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
+                src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} alt="logo" />)}
+            </div>
+
+          </div>
           <div className="step">
-  
-                  {/* <p className="legend">
+
+            {/* <p className="legend">
                     Grandeur mesurée : Valeur ajoutée nette créée sur le territoire
                     français (en euros)
                   </p> */}
-                  <h4>Déclaration des impacts directs</h4>
-                    <Statement
-                      indic={indic}
-                      impactsData={this.props.session.impactsData}
-                      onUpdate={this.willNetValueAddedIndicator.bind(this)}
-                      onValidate={this.validateIndicator.bind(this)}
-                      toAssessment={() => this.triggerPopup("assessment")}
-                    />
+            <h4>Déclaration des impacts directs</h4>
+            <Statement
+              indic={indic}
+              impactsData={this.props.session.impactsData}
+              onUpdate={this.willNetValueAddedIndicator.bind(this)}
+              onValidate={this.validateIndicator.bind(this)}
+              toAssessment={() => this.triggerPopup("assessment")}
+            />
             {triggerPopup == "assessment" && (
               <div className="modal-overlay">
                 <div className="modal-wrapper">
@@ -230,15 +238,12 @@ export class IndicatorSection extends React.Component {
 
           </div>
 
-          {/* <div className="section-view-header-odds">
-          {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
-            src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} height="100px;" alt="logo" />)}
-        </div> */}
+
           {this.props.session.validations.includes(this.state.indic) && (
             <>
               <div className="impact-result step">
-                    <h4>Votre Impact</h4>
-                  <div className="container">
+                <h4>Votre Impact</h4>
+                <div className="container">
                   <div className="form-group">
                     <select
                       className={"form-input small-input"}
@@ -259,8 +264,8 @@ export class IndicatorSection extends React.Component {
                 </div>
               </div>
               <div className="compare-section step">
-                  <h4>Comparaison</h4>
-                  <div className="container">
+                <h4>Comparaison</h4>
+                <div className="container">
 
                   <div className="form-group">
                     <label>Sélectionner une activité comparative : </label>
@@ -279,49 +284,62 @@ export class IndicatorSection extends React.Component {
                     </select>
                   </div>
                   <div className="graph-section">
-                      <IndicatorGraphs
-                        session={this.props.session}
-                        indic={indic}
-                        comparativeFootprints={this.state}
-                      />
+                    <IndicatorGraphs
+                      session={this.props.session}
+                      indic={indic}
+                      comparativeFootprints={this.state}
+                    />
                   </div>
-                  </div>
+                </div>
               </div>
 
               <div className="analysis-section step">
-              <h4>Clés de décryptage</h4>
-                  <div className="analysis-container"> 
-                    <div>
-                        <Analyse
-                          indic={this.state.indic}
-                          session={this.props.session}
-                        />
-                    </div>
-                    <div>
-                      <img src="/resources/illu_analyse.svg" alt="Analyse" />
-                    </div>
+                <h4>Clés de décryptage</h4>
+                <div className="analysis-container">
+                  <div>
+                    <Analyse
+                      indic={this.state.indic}
+                      session={this.props.session}
+                    />
                   </div>
+                  <div>
+                    <img src="/resources/illu_analyse.svg" alt="Analyse" />
+                  </div>
+                </div>
               </div>
             </>
 
           )}
-          <div className="align-right">
+          <div className="step">
+            <h4>Téléchargement</h4>
             <button
-              className={"btn btn-secondary"}
+              className={"btn btn-primary"}
               disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
               onClick={() =>
                 exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
               }
             >
-              <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport (.pdf)
+              <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport sur cet indicateur (.pdf)
             </button>
             <button
               className={"btn btn-primary"}
+              disabled={this.props.session.validations.length > 1 ? false : true}
+              onClick={() =>
+                exportIndicPDF(this.props.session.validations, this.props.session, this.state.comparativeDivision)
+              }
+            >
+              <FontAwesomeIcon icon={faFileZipper} /> Télécharger tous les rapports ({this.props.session.validations.length}/12) (.zip)
+            </button>
+          </div>
+
+          <div className="align-right">
+            <button
+              className={"btn btn-secondary"}
               id="validation-button"
               disabled={!isPublicationAvailable}
               onClick={this.props.publish}
             >
-              <FontAwesomeIcon icon={faUpload} />Publier mes résultats
+              Publier mes résultats <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
         </section>
