@@ -236,7 +236,11 @@ export async function FECDataReader(FECData)
     // Lecture du journal des A-NOUVEAUX
     // -------------------------------------------------- //
 
-    await readBookAsJournalANouveaux(data, FECData.books[codeANouveaux]);
+    try
+    {
+      await readBookAsJournalANouveaux(data, FECData.books[codeANouveaux]);
+    }
+    catch (error) {data.errors.push(error)};
 
     // -------------------------------------------------- //
   }
@@ -260,10 +264,10 @@ export async function FECDataReader(FECData)
         // -------------------------------------------------- //
         
         // Construction des données comptables
-        if (/^2/.test(ligne.CompteNum)) readImmobilisationEntry(data,journal,ligne);
-        if (/^3/.test(ligne.CompteNum)) readStockEntry(data,journal,ligne);
+        if (/^2/.test(ligne.CompteNum)) await readImmobilisationEntry(data,journal,ligne);
+        if (/^3/.test(ligne.CompteNum)) await readStockEntry(data,journal,ligne);
         if (/^6/.test(ligne.CompteNum)) await readExpenseEntry(data,journal,ligne);
-        if (/^7/.test(ligne.CompteNum)) readProductionEntry(data,journal,ligne);
+        if (/^7/.test(ligne.CompteNum)) await readProductionEntry(data,journal,ligne);
       
         // Lecture d'informations supplémentaires
         if (/^63/.test(ligne.CompteNum)) readAddtionalDataEntry(data,journal,ligne);
