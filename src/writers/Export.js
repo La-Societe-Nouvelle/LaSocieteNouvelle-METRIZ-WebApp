@@ -2,8 +2,9 @@
 
 // Modules
 import { jsPDF } from 'jspdf';
-import  JSZip from 'jszip';
+import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import 'jspdf-autotable';
 
 // Fonts 
 
@@ -79,7 +80,7 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   return csvContent;
 }
 
-function generatePDF (indic, session, comparativeDivision) {
+function generatePDF(indic, session, comparativeDivision) {
   const doc = new jsPDF();
   const { financialData, legalUnit } = session;
   // 
@@ -89,7 +90,7 @@ function generatePDF (indic, session, comparativeDivision) {
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
   doc.text("RAPPORT - ANALYSE EXTRA-FINANCIERE", x, 20);
-  doc.setDrawColor(247, 247, 247) 
+  doc.setDrawColor(247, 247, 247)
   doc.setLineWidth(2)
   doc.line(20, 25, 50, 25)
   //let imgData = 'data:image/jpeg;base64,'+ Base64.encode('../public/resources/Logo_N&B.jpg');
@@ -196,7 +197,7 @@ function generatePDF (indic, session, comparativeDivision) {
   // Immobilised production
   if (financialData.getImmobilisedProduction() > 0) {
     x += 6;
-    
+
     doc.text("\tdont production immobilisée", x, 10);
     doc.setFontSize(8);
     doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
@@ -334,17 +335,19 @@ function generatePDF (indic, session, comparativeDivision) {
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(82, 98, 188);
-  
-  {Object.entries(divisions)
+
+  {
+    Object.entries(divisions)
     .sort((a, b) => parseInt(a) - parseInt(b))
     .map(([code, libelle]) => (
-      code == comparativeDivision && code !== "00" ?  doc.text("Branche de référence : " + libelle, x, y + 10) : ""
-    ))}
+      code == comparativeDivision && code !== "00" ? doc.text("Branche de référence : " + libelle, x, y + 10) : ""
+    ))
+  }
 
   y = 40;
 
   //Production canvas
-  const pdfWidth = (doc.internal.pageSize.getWidth()/ 3);
+  const pdfWidth = (doc.internal.pageSize.getWidth() / 3);
 
   let canvas = document.querySelector('#Production');
   let canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -373,36 +376,104 @@ function generatePDF (indic, session, comparativeDivision) {
 
   return doc;
 }
+function generateFootprintPDF(indic, session, comparativeDivision, title, odds) {
+
+  const doc = new jsPDF("landscape");
+  const { financialData, legalUnit, validations } = session;
+
+  doc.setProperties({ title: "rapport_" + title.replaceAll(" ", "-") + "_" + legalUnit.corporateName.replaceAll(" ", "") })
+
+  let x = 20;
+  let y = 20;
+
+  // HEADER
+  doc.setFontSize(15);
+  doc.setFont("Helvetica", "bold");
+  doc.setTextColor(25, 21, 88);
+  doc.text("RAPPORT - " + title.toUpperCase(), x, y);
+
+  // ODD PICTO
+  let imgPos = 200;
+  odds.forEach(element => {      
+    imgPos += 11;
+    let img = new Image();
+    img.src = '/resources/odds/print/F_SDG_PRINT-' + element + '.jpg';
+    doc.addImage(img, "JPEG", imgPos, 15, 10, 10) 
+
+});        
+
+  // Corporate Name
+  y += 10;
+  doc.setTextColor(250, 102, 106);
+  doc.setFontSize(14);
+  doc.text((legalUnit.corporateName.toUpperCase() || " - "), x, y);
+  doc.setFontSize(10);
+
+  y += 7;
+
+  doc.setTextColor(0);
+  doc.setFont("Helvetica", "normal")
+  doc.text("Année de fin d'exercice : " + (session.year != null ? session.year : " - "), x, y);
+  let today = new Date();
+
+  y += 5;
+
+  doc.text("Edition du : " + String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear(), x, y);
+
+  y += 10;
+
+  // TITLE
+  doc.setFontSize(12);
+  doc.setFont("Helvetica", "bold");
+  doc.setTextColor(25, 21, 88);
+  doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, y);
+
+  y += 10;
+
+  // TABLE 
+
+
+
+  return doc;
+}
 function exportIndicPDF(indic, session, comparativeDivision) {
   const { legalUnit, year } = session;
 
   // Zip Export
-  if(Array.isArray(indic)) {
+  if (Array.isArray(indic)) {
 
-  let zip = new JSZip();
+    let zip = new JSZip();
 
-  indic.map((indic) => {
-     let doc =  generatePDF(indic, session, comparativeDivision)
-     zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
+    indic.map((indic) => {
+      let doc = generatePDF(indic, session, comparativeDivision)
+      zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
+    }
+    );
+
+    zip.generateAsync({ type: 'blob' }).then(function (content) {
+      saveAs(content, 'livrables_' + legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
+    });
+
   }
-  );
+  else {
+    // PDF Export
+    let doc = generatePDF(indic, session, comparativeDivision)
+    window.open(doc.output("bloburl"), "_blank");
+    doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+  }
 
-
-zip.generateAsync({type:'blob'}).then(function(content) {
-     saveAs(content, 'livrables_'+ legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
-});
 
 }
-else {
-// PDF Export
-let doc =  generatePDF(indic, session, comparativeDivision)
-doc.output('dataurlnewwindow',"rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
-doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
-}
- 
- 
-}
 
+function exportFootprintPDF(indic,session, comparativeDivision, title, odds) {
+
+    // PDF Export
+    let doc = generateFootprintPDF(indic, session, comparativeDivision, title, odds)
+    window.open(doc.output("bloburl"), "_blank");
+   // doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+
+
+}
 const getAnalyse = (indic, session) => {
   switch (indic) {
     case "art":
@@ -449,7 +520,7 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
   }
 }
 
-export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF };
+export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF, exportFootprintPDF };
 
 /*function printValue(value,precision) {
   if (value==null) {return "-"}

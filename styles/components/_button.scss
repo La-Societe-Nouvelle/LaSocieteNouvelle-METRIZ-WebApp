@@ -10,7 +10,7 @@ button:hover {
     padding: 1rem 2rem;
     font-weight: $font-weight-bold;
     margin : 1em 0em;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     svg{
       height: 13px;
       vertical-align: middle;
@@ -72,3 +72,13 @@ button:hover {
      border : 1px solid #155724;
      background-color: #f6f6f6;
     }
+
+.btn-info {
+  background-color: $secondary-color;
+  color: #ffffff;
+  padding: 0.8rem;
+  font-size: 0.8em;
+  &:hover {
+    color: #ffffff;
+  }
+}
