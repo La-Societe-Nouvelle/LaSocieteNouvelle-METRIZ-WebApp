@@ -10,7 +10,7 @@ import divisions from "/lib/divisions";
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRuler, faFileArrowDown, faUpload, faFileZipper, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faRuler, faFileArrowDown, faUpload, faFileZipper, faChevronRight, faArrowDown, faFilePdf, faInfoCircle, faBook, faCheck } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -58,6 +58,7 @@ import { analysisTextWriterNRG } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterSOC } from "../../src/writers/analysis/analysisTextWriterSOC";
 import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWriterWAS";
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
+import { exportFootprintPDF } from "../../src/writers/Export";
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -114,8 +115,6 @@ export class IndicatorSection extends React.Component {
       this.setState({ allSectorsConsumptionFootprint: footprint })
     );
 
-
-
   }
 
   render() {
@@ -125,6 +124,9 @@ export class IndicatorSection extends React.Component {
       Object.entries(
         this.props.session.financialData.aggregates.revenue.footprint.indicators
       ).filter(([_, indicator]) => indicator.value != null).length > 0;
+
+    const envIndic = ["ghg", "nrg", "wat", "mat","was","haz"];
+    const envOdds = ["6", "7", "12", "13", "14", "15"];
 
     return (
 
@@ -192,14 +194,20 @@ export class IndicatorSection extends React.Component {
           </div>
 
           <div className="indicator-title">
-
-            <h3>
-              {metaIndics[indic].libelle} {metaIndics[indic].isBeta && (
-                <span className="beta">&nbsp;BETA&nbsp;</span>
-              )}
-
-            </h3>
             <div>
+              <h3>
+                {metaIndics[indic].libelle} {metaIndics[indic].isBeta && (
+                  <span className="beta">&nbsp;BETA&nbsp;</span>
+                )}
+
+              </h3>
+              <p >
+              <a className="btn btn-info" href={"https://docs.lasocietenouvelle.org/application-web/declarations/declaration-" + indic} target="_blank">
+              <FontAwesomeIcon icon={faBook} /> Accéder à la documentation
+              </a>
+            </p>
+            </div>
+            <div className="indicator-img">
               {metaIndics[indic].odds.map((odd) => <img key={"logo-odd-" + odd}
                 src={"/resources/odds/F-WEB-Goal-" + odd + ".png"} alt="logo" />)}
             </div>
@@ -212,6 +220,7 @@ export class IndicatorSection extends React.Component {
                     français (en euros)
                   </p> */}
             <h4>Déclaration des impacts directs</h4>
+
             <Statement
               indic={indic}
               impactsData={this.props.session.impactsData}
@@ -219,6 +228,7 @@ export class IndicatorSection extends React.Component {
               onValidate={this.validateIndicator.bind(this)}
               toAssessment={() => this.triggerPopup("assessment")}
             />
+
             {triggerPopup == "assessment" && (
               <div className="modal-overlay">
                 <div className="modal-wrapper">
@@ -235,9 +245,9 @@ export class IndicatorSection extends React.Component {
               </div>
 
             )}
-
+      
           </div>
-
+    
 
           {this.props.session.validations.includes(this.state.indic) && (
             <>
@@ -310,26 +320,85 @@ export class IndicatorSection extends React.Component {
             </>
 
           )}
-          <div className="step">
+          <div className="step download-section">
             <h4>Téléchargement</h4>
-            <button
-              className={"btn btn-primary"}
-              disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
-              onClick={() =>
+              <div className="flex">
+                <h5><a href="" onClick={() =>
+                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
+                } >  <FontAwesomeIcon icon={faFilePdf} /> Rapport sur l'indicateur : {metaIndics[indic].libelle} </a> </h5>
+                <button
+                  className={"btn btn-primary"}
+                  disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
+                  }
+                >
+                  <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.pdf)
+                </button>
+              </div>
+              {this.props.session.validations.length > 1 && (
+              <div className="flex">
+    
+                <div>
+                  <h5>
+                    <a href="" onClick={() =>
+                    exportIndicPDF(this.props.session.validations, this.props.session, this.state.comparativeDivision)
+                  } >   <FontAwesomeIcon icon={faFileZipper} />  Rapports sur les indicateurs : 
+                  </a>
+                  </h5>
+                  <ul>
+                    {
+                      this.props.session.validations.map((indic, index) =>
+                        <li key={index}>
+                          <FontAwesomeIcon icon={faCheck} /> {metaIndics[indic].libelle}
+                        </li>
+                      )
+                    }
+                  </ul>
+                  </div>
+              
+              <button
+                className={"btn btn-primary"}
+                onClick={() =>
+                  exportIndicPDF(this.props.session.validations, this.props.session, this.state.comparativeDivision)
+                }
+              >
+                <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.zip)
+              </button>
+              </div>)
+              }
+      
+            <div className="flex">
+              <h5>
+                <a href="" onClick={() => exportFootprintPDF(envIndic, this.props.session, this.state.comparativeDivision, "Empreinte environnementale", envOdds)} >  
+                  <FontAwesomeIcon icon={faFilePdf} /> Rapport sur l'empreinte environnementale 
+                </a> 
+              </h5>
+              <button
+                className={"btn btn-primary"}
+                disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
+                onClick={() =>
+                  exportFootprintPDF( envIndic ,this.props.session, this.state.comparativeDivision, "Empreinte environnementale", envOdds)
+                }
+              >
+                <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.pdf)
+              </button>
+            </div>
+            <div className="flex">
+              <h5><a href="" onClick={() =>
                 exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
-              }
-            >
-              <FontAwesomeIcon icon={faFileArrowDown} /> Télécharger le rapport sur cet indicateur (.pdf)
-            </button>
-            <button
-              className={"btn btn-primary"}
-              disabled={this.props.session.validations.length > 1 ? false : true}
-              onClick={() =>
-                exportIndicPDF(this.props.session.validations, this.props.session, this.state.comparativeDivision)
-              }
-            >
-              <FontAwesomeIcon icon={faFileZipper} /> Télécharger tous les rapports ({this.props.session.validations.length}/12) (.zip)
-            </button>
+              } >  <FontAwesomeIcon icon={faFilePdf} /> Rapport général </a> </h5>
+              <button
+                className={"btn btn-primary"}
+                disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
+                onClick={() =>
+                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
+                }
+              >
+                <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.pdf)
+              </button>
+            </div>
+    
           </div>
 
           <div className="align-right">
@@ -492,7 +561,6 @@ function Assessment(props) {
 
 /* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
 
-
 const Analyse = (indic, session) => {
   let analyse = getAnalyse(indic, session);
 
@@ -506,7 +574,6 @@ const Analyse = (indic, session) => {
     </>
   );
 };
-
 
 // Display the correct statement view according to the indicator
 function getAnalyse(props) {

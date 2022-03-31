@@ -15,6 +15,8 @@ import { InputText } from '../InputText';
 
 // Libraries
 import metaIndics from '/lib/indics';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRuler } from '@fortawesome/free-solid-svg-icons';
 
 /* ----------------------------------------------------------- */
 /* -------------------- STATEMENT SECTION -------------------- */
@@ -22,234 +24,199 @@ import metaIndics from '/lib/indics';
 
 export class StatementSection extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.state =
-    {
-      // Progression
-      step: 1,
+    constructor(props) {
+        super(props);
+        const socialFootprint = {};
+        Object.entries(props.session.financialData.aggregates.revenue.footprint.indicators).filter(([_, indicator]) => indicator.value != null)
+            .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
 
-      // Legal entity data (steps 1 to 3)
-      siren: props.session.legalUnit.siren || "",
-      denomination: props.session.legalUnit.corporateName || "",
-      year: props.session.year || "",
+        this.state =
+        {
+            socialFootprint: socialFootprint,
+            // Legal entity data (steps 1 to 3)
+            siren: props.session.legalUnit.siren || "",
+            denomination: props.session.legalUnit.corporateName || "",
+            year: props.session.year || "",
 
-      // Statements (step 4)
-      revenueFootprint: props.session.financialData.aggregates.revenue.footprint,
-      validations: props.session.validations,
-      comments: props.session.impactsData.comments || {},
-      socialFootprint: {},
+            // Statements (step 4)
+            revenueFootprint: props.session.financialData.aggregates.revenue.footprint,
+            validations: props.session.validations,
+            comments: props.session.impactsData.comments || {},
 
-      // declarant data (step 5)
-      declarant: "",
-      email: "",
-      phone: "",
-      autorisation: false,
-      forThirdParty: false,
-      declarantOrganisation: "",
+            // declarant data (step 5)
+            declarant: "",
+            email: "",
+            phone: "",
+            autorisation: false,
+            forThirdParty: false,
+            declarantOrganisation: "",
 
-      // tarif (step 6)
-      price: "0"
+            // tarif (step 6)
+            price: "0"
+        }
     }
-  }
 
-  componentDidMount() {
-    window.scrollTo(0, 0)
-  }
-  render() {
-    const { step } = this.state;
-    return (
-      <>
-        {this.buildView(step)}
-      </>
-    )
-  }
-
-  buildView = (step) => {
-    switch (step) {
-      case 0: return <ErrorMessage />
-      case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint} />
-      case 2: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren} />
-      case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack} />
-      case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack} />
-      case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack} />
-      case 6: return <StatementSendingMessage />
-      case 7: return <StatementSendMessage />
+    componentDidMount() {
+        window.scrollTo(0, 0)
     }
-  }
+    render() {
 
-  commit = () => this.setState({ step: this.state.step + 1 })
-  goBack = () => this.setState({ step: this.state.step - 1 })
+        const {
+            revenueFootprint,
+            validations,
+            socialFootprint,
+            siren,
+            denomination,
+            year,
+            comments,
+            declarant,
+            email,
+            phone,
+            autorisation,
+            forThirdParty,
+            declarantOrganisation
+        } = this.state;
+        console.log(this.state)
+        return (
+            <div className="container-fluid statement-section">
 
-  // Commits
+                <div className="section-title">
+                    <h2><FontAwesomeIcon icon={faRuler} /> Publier mes résultats</h2>
+                </div>
+                {/* SELECTION DES INDICATEURS */}
+                <section className="step">
+                    <h3>Liste des indicateurs</h3>
+                    <p>
+                        Sélectionnez les indicateurs que vous souhaitez publier
+                    </p>
+                    <table className="w100">
+                        <thead>
+                            <tr>
+                                <td>Indicateur</td>
+                                <td className="column_value" colSpan="2">Valeur</td>
+                                <td className="column_uncertainty">Incertitude</td>
+                                <td>Publication</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {Object.keys(metaIndics).map(indic =>
+                                <tr key={indic}>
+                                    <td className="auto">{metaIndics[indic].libelle + (metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
+                                    <td className="column_value">{printValue(revenueFootprint.indicators[indic].value, metaIndics[indic].nbDecimals)}</td>
+                                    <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
+                                    <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty, 0)}&nbsp;%</td>
+                                    <td><input type="checkbox"
+                                        value={indic}
+                                        defaultChecked={socialFootprint[indic] != undefined}
+                                        disabled={validations.indexOf(indic) < 0}
+                                        onChange={this.onCheckIndicator} /></td>
+                                </tr>)}
+                        </tbody>
+                    </table>
+                </section>
+                <section className="step">
+                    <h3>Informations</h3>
+                    <div className="form-group">
+                        <h4>Numéro de siren</h4>
+                        <label>Entrez votre numéro de siren (9 chiffres) : </label>
+                        <InputText value={siren}
+                            unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
+                            onUpdate={this.onSirenChange}
+                        />
+                    </div>
 
-  commitSiren = (siren) => this.setState({ siren: siren, step: 3 })
+                    <h4>Déclarant</h4>
+                    <div className="form-group">
+                        <label>Nom - Prénom </label>
+                        <InputText value={declarant}
+                            onUpdate={this.onDeclarantChange} />
+                    </div>
+                    <div className="form-group">
+                        <label>Adresse e-mail </label>
+                        <InputText value={email}
+                            unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
+                            onUpdate={this.onEmailChange} />
+                    </div>
+                    <div className="form-group">
+                        <div className="custom-control-inline" id="thirdParty">
+                            <input type="checkbox" className="custom-control-input"
+                                onChange={this.onThirdPartyChange} />
+                            <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
+                        </div>
 
-  commitSocialFootprint = (socialFootprint) => this.setState({ socialFootprint: socialFootprint, step: 2 })
+                    </div>
+                    {forThirdParty &&
+                        <div className="form-group">
+                            <label>Structure déclarante</label>
+                            <InputText value={declarantOrganisation}
+                                onUpdate={this.onDeclarantOrganisationChange} />
+                        </div>}
+                    <div className="form-group">
+                        <div className="custom-control-inline" id="certification">
+                            <input type="checkbox" className="custom-control-input"
+                                onChange={this.onAutorisationChange} />
+                            <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
+                        </div>
+                    </div>
 
-  commitDeclarant = (declarant, email, autorisation) => this.setState({ declarant: declarant, email: email, autorisation: autorisation, step: 4 })
+                    <PriceInput {...this.state} />
 
-  commitPrice = (price) => this.setState({ price: price, step: 5 })
+                </section>
 
-  exportStatement = () => exportStatementPDF(this.state);
-
-  submitStatement = async (event) => {
-    event.preventDefault();
-    this.setState({ step: 6 })
-
-    const statementFile = getBinaryPDF(this.state);
-
-    const messageToAdmin = mailToAdminWriter(this.state);
-    const resAdmin = await sendStatementToAdmin(messageToAdmin, statementFile);
-
-    const messageToDeclarant = mailToDeclarantWriter(this.state);
-    const resDeclarant = await sendStatementToDeclarant(this.state.email, messageToDeclarant, statementFile);
-
-    if (resAdmin.status < 300) this.setState({ step: 7 })
-    else this.setState({ step: 0 })
-  }
-
-}
-
-/* ----- Siren Form ---- */
-
-const SirenInput = ({ siren, commitSiren }) => {
-  const [sirenInput, setSiren] = useState(siren);
-  const onSirenChange = (input) => setSiren(input);
-  const onCommit = () => commitSiren(sirenInput)
-
-  const isAllValid = /^[0-9]{9}$/.test(sirenInput);
-
-  return (
-    <section className="container">
-      <h2>
-        Vos informations
-      </h2>
-
-      <h2>Numéro de siren</h2>
-      <div className="form-group">
-        <label>Entrez votre numéro de siren (9 chiffres) : </label>
-
-        <InputText value={sirenInput}
-          unvalid={sirenInput != "" && !/^[0-9]{9}$/.test(sirenInput)}
-          onUpdate={onSirenChange} />
-      </div>
-      <div className="actions">
-        <button disabled={!isAllValid} onClick={onCommit} className={"btn btn-primary"}>Valider</button>
-      </div>
-    </section>
-  )
-}
-
-/* ----- Indicator selection ----- */
-
-class IndicatorSelection extends React.Component {
-  constructor(props) {
-    super(props);
-    const socialFootprint = {};
-    Object.entries(props.revenueFootprint.indicators).filter(([_, indicator]) => indicator.value != null)
-      .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
-    this.state = {
-      socialFootprint: socialFootprint
+                <section className="step">
+                    <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} />
+                </section>
+            </div>
+        )
     }
-  }
-
-  //didUpdate... when indicator not valid anymore
-
-  render() {
-    const { revenueFootprint, validations } = this.props;
-    const { socialFootprint } = this.state;
-
-    return (
-      <section className="container">
-        <div className={"section-title"}>
-
-          <h2 className="subtitle">
-            Publier mes résultats
-          </h2>
-          <h2>Sélection des indicateurs</h2>
-
-        </div>
 
 
-        <table>
-          <thead>
-            <tr>
-              <td>Indicateur</td>
-              <td className="column_value" colSpan="2">Valeur</td>
-              <td className="column_uncertainty">Incertitude</td>
-              <td>Publication</td>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.keys(metaIndics).map(indic =>
-              <tr key={indic}>
-                <td className="auto">{metaIndics[indic].libelle + (metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
-                <td className="column_value">{printValue(revenueFootprint.indicators[indic].value, metaIndics[indic].nbDecimals)}</td>
-                <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
-                <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty, 0)}&nbsp;%</td>
-                <td><input type="checkbox"
-                  value={indic}
-                  checked={socialFootprint[indic] != undefined}
-                  disabled={validations.indexOf(indic) < 0}
-                  onChange={this.onCheckIndicator} /></td>
-              </tr>)}
-          </tbody>
-        </table>
-        <div className="align-right">
-          <button className="btn" onClick={this.props.return}>Retour</button>
-          <button className={"btn btn-primary"} disabled={Object.keys(socialFootprint).length == 0} onClick={this.onCommit}>Valider ({Object.keys(socialFootprint).length}/12)</button>
-        </div>
-      </section>)
-  }
-
-  onCheckIndicator = (event) => {
-    let footprint = this.state.socialFootprint;
-    event.target.checked ? footprint[event.target.value] = this.props.revenueFootprint.indicators[event.target.value] : delete footprint[event.target.value];
-    this.setState({ socialFootprint: footprint });
-  }
-
-  onCommit = (event) => this.props.onCommit(this.state.socialFootprint);
-
-}
-
-/* ----- Siren form ----- */
-
-class SirenForm extends React.Component {
-
-  // form for siren number
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      siren: props.siren
+    buildView = (step) => {
+        switch (step) {
+            case 0: return <ErrorMessage />
+            case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint} return={this.props.return} />
+            case 2: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren} />
+            case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack} />
+            case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack} />
+            case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack} />
+            case 6: return <StatementSendingMessage />
+            case 7: return <StatementSendMessage />
+        }
     }
-  }
 
-  render() {
-    const { siren } = this.state;
-    const isAllValid = /^[0-9]{9}/.test(siren);
 
-    return (
-      <section className="container">
+    // Commits
+    onSirenChange = (siren) => this.setState({ siren: siren });
 
-        <h2>Unité légale</h2>
-        <div className="inline-input">
-          <label>Numéro de siren </label>
-          <InputText value={siren}
-            onUpdate={this.onSirenChange} />
-        </div>
-        <div className="actions">
-          <button onClick={this.onGoBack}>Retour</button>
-          <button disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
-        </div>
-      </section>
-    )
-  }
+    onDeclarantChange = (input) => this.setState({ declarant: input })
+    onEmailChange = (input) => this.setState({ email: input })
+    onAutorisationChange = () => this.setState({ autorisation: !this.state.autorisation })
+    onThirdPartyChange = () => this.setState({ forThirdParty: !this.state.forThirdParty })
+    onDeclarantOrganisationChange = (input) => this.setState({ declarantOrganisation: input })
 
-  onSirenChange = (input) => { this.setState({ siren: input }) }
-  onCommit = () => this.props.onCommit(this.state.siren);
-  onGoBack = () => this.props.goBack();
+    commitSocialFootprint = (socialFootprint) => this.setState({ socialFootprint: socialFootprint })
+
+    commitDeclarant = (declarant, email, autorisation) => this.setState({ declarant: declarant, email: email, autorisation: autorisation })
+
+    commitPrice = (price) => this.setState({ price: price })
+
+    exportStatement = () => exportStatementPDF(this.state);
+
+    submitStatement = async (event) => {
+        event.preventDefault();
+        this.setState({ step: 6 })
+
+        const statementFile = getBinaryPDF(this.state);
+
+        const messageToAdmin = mailToAdminWriter(this.state);
+        const resAdmin = await sendStatementToAdmin(messageToAdmin, statementFile);
+
+        const messageToDeclarant = mailToDeclarantWriter(this.state);
+        const resDeclarant = await sendStatementToDeclarant(this.state.email, messageToDeclarant, statementFile);
+
+        if (resAdmin.status < 300) this.setState({ step: 7 })
+        else this.setState({ step: 0 })
+    }
 
 }
 
@@ -258,210 +225,168 @@ class SirenForm extends React.Component {
 
 class DeclarantForm extends React.Component {
 
-  // form for contact details
+    // form for contact details
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      declarant: props.declarant,
-      email: props.declarant,
-      autorisation: props.autorisation,
-      forThirdParty: props.forThirdParty,
-      declarantOrganisation: props.declarantOrganisation
+    constructor(props) {
+        super(props);
+        this.state = {
+            declarant: props.declarant,
+            email: props.declarant,
+            autorisation: props.autorisation,
+            forThirdParty: props.forThirdParty,
+            declarantOrganisation: props.declarantOrganisation
+        }
     }
-  }
 
-  render() {
-    const { declarant, email, autorisation, forThirdParty, declarantOrganisation } = this.state;
-    const isAllValid = declarant.length > 0
-      && /^(.*)@(.*)\.(.*)$/.test(email)
-      && autorisation
-      && (!forThirdParty || declarantOrganisation.length > 0);
+    render() {
+        const { declarant, email, autorisation, forThirdParty, declarantOrganisation } = this.state;
+        const isAllValid = declarant.length > 0
+            && /^(.*)@(.*)\.(.*)$/.test(email)
+            && autorisation
+            && (!forThirdParty || declarantOrganisation.length > 0);
 
-    return (
-      <section className="container">
-        <h2>Déclarant</h2>
-        <div className="form-group">
-          <label>Nom - Prénom </label>
-          <InputText value={declarant}
-            onUpdate={this.onDeclarantChange.bind(this)} />
-        </div>
-        <div className="form-group">
-          <label>Adresse e-mail </label>
-          <InputText value={email}
-            unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
-            onUpdate={this.onEmailChange.bind(this)} />
-        </div>
-        <div className="custom-control-inline" id="thirdParty">
-          <input type="checkbox" className="custom-control-input"
-            onChange={this.onThirdPartyChange} />
-          <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
-        </div>
-        {forThirdParty &&
-          <div className="form-group">
-            <label>Structure déclarante</label>
-            <InputText value={declarantOrganisation}
-              onUpdate={this.onDeclarantOrganisationChange.bind(this)} />
-          </div>}
-        <div className="custom-control-inline" id="certification">
-          <input type="checkbox" className="custom-control-input"
-            onChange={this.onAutorisationChange} />
-          <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
-        </div>
-        <div className="actions">
-          <button className="btn" onClick={this.onGoBack}>Retour</button>
-          <button className={"btn btn-secondary"} disabled={!isAllValid} onClick={this.onCommit}>Valider</button>
-        </div>
-      </section>
-    )
-  }
+        return (
+            <>
 
-  onDeclarantChange = (input) => this.setState({ declarant: input })
-  onEmailChange = (input) => this.setState({ email: input })
-  onAutorisationChange = () => this.setState({ autorisation: !this.state.autorisation })
-  onThirdPartyChange = () => this.setState({ forThirdParty: !this.state.forThirdParty })
-  onDeclarantOrganisationChange = (input) => this.setState({ declarantOrganisation: input })
-  onCommit = () => this.props.onCommit(this.state.declarant, this.state.email, this.state.autorisation, this.state.forThirdParty, this.state.declarantOrganisation);
-  onGoBack = () => this.props.goBack();
+            </>
+        )
+    }
+
+
 
 }
 
 /* --- Price Input --- */
 
-const PriceInput = ({ price, commitPrice, goBack }) => {
-  const [priceInput, setPrice] = useState(price);
-  const changePrice = (event) => setPrice(event.target.value);
-  const onCommit = () => commitPrice(priceInput);
+const PriceInput = ({ price }) => {
+    const [priceInput, setPrice] = useState(price);
+    const changePrice = (event) => setPrice(event.target.value);
 
-  return (
-    <section className="container">
-      <h2>Coût de la formalité</h2>
-      <div className="radio-button-input">
-        <div className={"custom-control-inline"}>
-          <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input" />
-          <label>Première déclaration : publication offerte</label>
-        </div>
-        <div className={"custom-control-inline"} >
-          <input id="price" type="radio" value="25" checked={priceInput == "25"} onChange={changePrice} className="custom-control-input" />
-          <label>Société unipersonnelle : 25 €</label>
-        </div>
-        <div className={"custom-control-inline"} >
-          <input id="price" type="radio" value="50" checked={priceInput == "50"} onChange={changePrice} className="custom-control-input" />
-          <label>Société : 50 €</label>
-        </div>
-        <div className={"custom-control-inline"} >
-          <input id="price" type="radio" value="10" checked={priceInput == "10"} onChange={changePrice} className="custom-control-input" />
-          <label>Organise à but non lucratif : 10 €</label>
-        </div>
-      </div>
-      <div>
-        <p>Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
-      </div>
-      <div className="actions">
-        <button className="btn" onClick={goBack}>Retour</button>
-        <button className={"btn btn-secondary"} disabled={priceInput == ""} onClick={onCommit}>Valider</button>
-      </div>
-    </section>)
+    return (
+        <>
+            <h4>Coût de la formalité*</h4>
+            <div className="radio-button-input">
+                <div className={"custom-control-inline"}>
+                    <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input" />
+                    <label>Première déclaration : publication offerte</label>
+                </div>
+                <div className={"custom-control-inline"} >
+                    <input id="price" type="radio" value="10" checked={priceInput == "10"} onChange={changePrice} className="custom-control-input" />
+                    <label>Organise à but non lucratif : 10 €</label>
+                </div>
+                <div className={"custom-control-inline"} >
+                    <input id="price" type="radio" value="25" checked={priceInput == "25"} onChange={changePrice} className="custom-control-input" />
+                    <label>Société unipersonnelle : 25 €</label>
+                </div>
+                <div className={"custom-control-inline"} >
+                    <input id="price" type="radio" value="50" checked={priceInput == "50"} onChange={changePrice} className="custom-control-input" />
+                    <label>Société : 50 €</label>
+                </div>
+
+            </div>
+            <p className="legend">* Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
+
+        </>)
 }
 
 /* ----- Summary ----- */
 
 const Summary = (props) => {
-  const { siren, denomination, year, declarant, price, socialFootprint } = props;
+    const { siren, denomination, year, declarant, price, socialFootprint } = props;
 
-  const isStatementValid = true;
+    const isStatementValid = true;
 
-  const today = new Date();
-  const todayString = String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear();
+    const today = new Date();
+    const todayString = String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear();
 
-  return (
-    <section className="container">
-      <h2>Récapitulatif</h2>
-      <div className="summary">
-        <p><b>Siren : </b>{siren}</p>
-        <p><b>Dénomination : </b>{denomination}</p>
-        <p><b>Année : </b>{year}</p>
-        <p><b>Indicateurs : </b></p>
-        {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).map(([indic, _]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
-        {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).length == 0 &&
-          <p>&emsp; - </p>}
-        <p><b>Fait le : </b>{todayString}</p>
-        <p><b>Déclarant : </b>{declarant}</p>
-        <p><b>Coût de la formalité : </b>{price} €</p>
-      </div>
-      <div className="actions">
-        <button className="btn" onClick={props.goBack}>Retour</button>
-        <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
-        <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>
-      </div>
-    </section>)
+    return (
+        <section className="container">
+            <h2>Récapitulatif</h2>
+            <div className="summary">
+                <p><b>Siren : </b>{siren}</p>
+                <p><b>Dénomination : </b>{denomination}</p>
+                <p><b>Année : </b>{year}</p>
+                <p><b>Indicateurs : </b></p>
+                {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).map(([indic, _]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
+                {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).length == 0 &&
+                    <p>&emsp; - </p>}
+                <p><b>Fait le : </b>{todayString}</p>
+                <p><b>Déclarant : </b>{declarant}</p>
+                <p><b>Coût de la formalité : </b>{price} €</p>
+            </div>
+            <div className="actions">
+                <button className="btn" onClick={props.goBack}>Retour</button>
+                <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
+                <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>
+            </div>
+        </section>)
 }
 
 /* --- End message --- */
 
 const StatementSendingMessage = () => {
-  return (
-    <div className="strip">
-      <h2>Déclaration validée</h2>
-      <div className="form_inner">
-        <p>Envoi en cours...</p>
-      </div>
-    </div>
-  )
+    return (
+        <div className="strip">
+            <h2>Déclaration validée</h2>
+            <div className="form_inner">
+                <p>Envoi en cours...</p>
+            </div>
+        </div>
+    )
 }
 
 const StatementSendMessage = () => {
-  return (
-    <div className="strip">
-      <h2>Déclaration validée</h2>
-      <div className="form_inner">
-        <p>Demande de publication envoyée ! Merci.</p>
-      </div>
-    </div>
-  )
+    return (
+        <div className="strip">
+            <h2>Déclaration validée</h2>
+            <div className="form_inner">
+                <p>Demande de publication envoyée ! Merci.</p>
+            </div>
+        </div>
+    )
 }
 
 const ErrorMessage = () => {
-  return (
-    <div className="strip">
-      <div className="form_inner">
-        <p>Error</p>
-      </div>
-    </div>
-  )
+    return (
+        <div className="strip">
+            <div className="form_inner">
+                <p>Error</p>
+            </div>
+        </div>
+    )
 }
 
 /* ----- Builder message mails ----- */
 
 const mailToAdminWriter = (statementData) =>
 (
-  "Unité légale : " + statementData.siren + "\n"
-  + "Dénomination : " + statementData.denomination + "\n"
-  + "Année : " + statementData.year + "\n"
-  + "\n"
-  + "Valeurs à publier :" + "\n"
-  + "\n"
-  + Object.entries(statementData.socialFootprint).map(([_, indicator]) => (indicator.indic + " : " + indicator.value + " +/- " + indicator.uncertainty + " % "))
-    .reduce((a, b) => a + "\r\n" + b, "")
-  + "\n"
-  + "Déclarant :" + "\n"
-  + "Nom : " + " - " + "\n"
-  + "Mail : " + " - " + "\n"
-  + "\n"
-  + "Tarif :" + " - " + " €" + "\n"
+    "Unité légale : " + statementData.siren + "\n"
+    + "Dénomination : " + statementData.denomination + "\n"
+    + "Année : " + statementData.year + "\n"
+    + "\n"
+    + "Valeurs à publier :" + "\n"
+    + "\n"
+    + Object.entries(statementData.socialFootprint).map(([_, indicator]) => (indicator.indic + " : " + indicator.value + " +/- " + indicator.uncertainty + " % "))
+        .reduce((a, b) => a + "\r\n" + b, "")
+    + "\n"
+    + "Déclarant :" + "\n"
+    + "Nom : " + " - " + "\n"
+    + "Mail : " + " - " + "\n"
+    + "\n"
+    + "Tarif :" + " - " + " €" + "\n"
 )
 
 const mailToDeclarantWriter = (statementData) =>
 (
-  ""
-  + statementData.declarant + "," + "\n"
-  + "\n"
-  + "Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration." + "\n"
-  + "Le délai de traitement est de 7 jours." + "\n"
-  + "\n"
-  + "Pour modifier ou supprimer les données publiées, contactez-nous directement via l'adresse mail admin@lasocietenouvelle.org" + "\n"
-  + "\n"
-  + "Bien à vous," + "\n"
-  + "\n"
-  + "La Société Nouvelle."
+    ""
+    + statementData.declarant + "," + "\n"
+    + "\n"
+    + "Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration." + "\n"
+    + "Le délai de traitement est de 7 jours." + "\n"
+    + "\n"
+    + "Pour modifier ou supprimer les données publiées, contactez-nous directement via l'adresse mail admin@lasocietenouvelle.org" + "\n"
+    + "\n"
+    + "Bien à vous," + "\n"
+    + "\n"
+    + "La Société Nouvelle."
 )
