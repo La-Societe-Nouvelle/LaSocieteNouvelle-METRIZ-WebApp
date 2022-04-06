@@ -222,3 +222,12 @@
   .modal-action {
     text-align: right;
   }
+
+  #rapport-popup{
+    .modal-wrapper .body, h4 {
+      text-align: left;
+    }
+    p{
+      font-size: 0.8rem;
+    }
+  }

@@ -11,12 +11,11 @@ import { exportStatementPDF, getBinaryPDF } from '../../src/writers/StatementWri
 import { printValue } from '../../src/utils/Utils';
 
 // Utils
-import { InputText } from '../InputText';
+import { InputText } from '../input/InputText';
 
 // Libraries
 import metaIndics from '/lib/indics';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRuler } from '@fortawesome/free-solid-svg-icons';
+
 
 /* ----------------------------------------------------------- */
 /* -------------------- STATEMENT SECTION -------------------- */
@@ -80,9 +79,7 @@ export class StatementSection extends React.Component {
         return (
             <div className="container-fluid statement-section">
 
-                <div className="section-title">
-                    <h2><FontAwesomeIcon icon={faRuler} /> Publier mes résultats</h2>
-                </div>
+        
                 {/* SELECTION DES INDICATEURS */}
                 <section className="step">
                     <h3>Liste des indicateurs</h3>
@@ -151,25 +148,31 @@ export class StatementSection extends React.Component {
                             <InputText value={declarantOrganisation}
                                 onUpdate={this.onDeclarantOrganisationChange} />
                         </div>}
-                    <div className="form-group">
+                
+                </section>
+                <section className="step">
+                <PriceInput {...this.state} />
+                </section>
+                <section className="step">
+                    <h4>Publication</h4>    
+
+                 <div className="form-group">
                         <div className="custom-control-inline" id="certification">
                             <input type="checkbox" className="custom-control-input"
                                 onChange={this.onAutorisationChange} />
                             <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
                         </div>
                     </div>
-
-                    <PriceInput {...this.state} />
-
-                </section>
-
+                    <button className="btn btn-secondary">
+                        Publier mes résultats
+                    </button>
+                </section>            
                 <section className="step">
                     <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} />
                 </section>
             </div>
         )
     }
-
 
     buildView = (step) => {
         switch (step) {

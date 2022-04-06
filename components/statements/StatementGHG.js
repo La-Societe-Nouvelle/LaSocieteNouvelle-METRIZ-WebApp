@@ -8,7 +8,7 @@ import { faCalculator } from "@fortawesome/free-solid-svg-icons";
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
-import { InputNumber } from '../InputNumber';
+import { InputNumber } from '../input/InputNumber';
 
 /* ---------- DECLARATION - INDIC #GHG ---------- */
 

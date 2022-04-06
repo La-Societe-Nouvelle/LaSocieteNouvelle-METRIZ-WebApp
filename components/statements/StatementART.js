@@ -5,7 +5,7 @@ import React from 'react';
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
-import { InputNumber } from '../InputNumber';
+import { InputNumber } from '../input/InputNumber';
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
 

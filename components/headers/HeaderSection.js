@@ -14,7 +14,6 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
   const saveSession = () => downloadSession();
   return (
     <header >
-
       <div className="top-bar">
           <ul className="nav">
             <li>
@@ -54,7 +53,6 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
           </nav>
         </div>
       </div>
-
     </header>)
 }
 

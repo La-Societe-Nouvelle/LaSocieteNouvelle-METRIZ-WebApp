@@ -6,7 +6,7 @@ import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 // Utils
-import { InputNumber } from '../InputNumber';
+import { InputNumber } from '../input/InputNumber';
 import { getNewId, getSumItems, printValue } from '/src/utils/Utils';
 
 // Libraries

@@ -121,8 +121,6 @@ function generatePDF(indic, session, comparativeDivision) {
   doc.setTextColor(25, 21, 88);
   doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, 70);
 
-
-
   /*
   x+=10;
   doc.setFontSize(10);
@@ -379,8 +377,9 @@ function generatePDF(indic, session, comparativeDivision) {
 function generateFootprintPDF(indic, session, comparativeDivision, title, odds) {
 
   const doc = new jsPDF("landscape");
-  const { financialData, legalUnit, validations } = session;
+  console.log(indic);
 
+  const { financialData, legalUnit, validations } = session;
   doc.setProperties({ title: "rapport_" + title.replaceAll(" ", "-") + "_" + legalUnit.corporateName.replaceAll(" ", "") })
 
   let x = 20;
@@ -431,8 +430,22 @@ function generateFootprintPDF(indic, session, comparativeDivision, title, odds) 
   y += 10;
 
   // TABLE 
+  console.log("indic");
 
-
+  doc.autoTable({ 
+    margin: { left: x },
+    startY: y, 
+    tableLineColor: [25, 21, 88],
+    tableLineWidth: 0.5,
+    head: headRows(), 
+    body: bodyRows(13),
+    headStyles: {
+    },
+    bodyStyles: {
+      textColor: [25, 21, 88],
+    },
+    theme: 'grid',
+  })
 
   return doc;
 }
@@ -529,4 +542,50 @@ export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndi
 
 function superscript(doc, x, y, text) {
 
+}
+
+function headRows() {
+  return [
+    { id: '', name: '', email: 'Email', city: 'City', expenses: 'Sum' },
+  ]
+}
+
+function columns() {
+  return [
+    { header: 'ID', dataKey: 'id' },
+    { header: 'Name', dataKey: 'name' },
+    { header: 'Email', dataKey: 'email' },
+    { header: 'City', dataKey: 'city' },
+    { header: 'Exp', dataKey: 'expenses' },
+  ]
+}
+
+function data(rowCount) {
+  rowCount = rowCount || 10
+  var body = []
+  for (var j = 1; j <= rowCount; j++) {
+    body.push({
+      id: j,
+      name: "name",
+      email: "email",
+      city: "city",
+      expenses: "amount",
+    })
+  }
+  return body
+}
+
+function bodyRows(rowCount) {
+  rowCount = rowCount || 10
+  var body = []
+  for (var j = 1; j <= rowCount; j++) {
+    body.push({
+      id: j,
+      name: "name",
+      email: "email",
+      city: "city",
+      expenses: "amount",
+    })
+  }
+  return body
 }

@@ -9,8 +9,8 @@ import { SocialDataContentReader } from '/src/readers/SocialDataContentReader';
 import { XLSXHeaderFileWriter } from '/src/writers/XLSXWriter';
 
 // Utils
-import { InputText } from '/components/InputText';
-import { InputNumber } from '/components/InputNumber';
+import { InputText } from '/components/input/InputText';
+import { InputNumber } from '/components/input/InputNumber';
 import { valueOrDefault } from '/src/utils/Utils';
 import { getNewId,roundValue } from '/src/utils/Utils';
 

@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { InputText } from '../InputText';
+import { InputText } from '../input/InputText';
 
 /* ------------------------------------------------------------ */
 /* -------------------- LEGAL DATA SECTION -------------------- */

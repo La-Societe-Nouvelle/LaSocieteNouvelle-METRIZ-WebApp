@@ -126,7 +126,7 @@ export class AccountingSection extends React.Component {
 
                                     </div>
                                     <label>Importer vos fichiers comptables FEC*</label>
-
+ 
                                     <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
                                         {({ getRootProps, getInputProps }) => (
                                             <div className="dropzone-section">
@@ -168,7 +168,7 @@ export class AccountingSection extends React.Component {
                                     }
      
      {
-                                        (files.length > 0) &&
+                                        (files.length > 0 && !errorFile) &&
 
                                         <div className={"alert alert-success"}>
                                             <ul>
@@ -184,12 +184,17 @@ export class AccountingSection extends React.Component {
 
                                     }
                                     {errorFile && (
-                                        <div className={"alert alert-error"}>
-                                            <h4>Erreur - Fichier</h4>
-                                            <p>{errorMessage}</p>
-                                            <p>{errors}</p>
+                                            <div className={"alert alert-error"}>
+                                                <div>
+                                                    <h4>Erreur - Fichier</h4>
+                                                   <p>
+                                                   <b>{errorMessage}</b>
+                                                       </p> 
+                                                    <p>{errors}</p>
+                                                </div>
 
-                                        </div>
+
+                                            </div>
                                     )}
                                     <div className="align-right">
                                         <button
@@ -264,6 +269,7 @@ export class AccountingSection extends React.Component {
             this.setState({ errorFile: true, errorMessage: "Erreur(s) relvée(s) : ", errors: nextFinancialData.errors, importedData: null });
         }
         else {
+
             // load year
             this.props.session.year = /^[0-9]{8}/.test(this.state.importedData.meta.lastDate) ? this.state.importedData.meta.lastDate.substring(0, 4) : "";
 

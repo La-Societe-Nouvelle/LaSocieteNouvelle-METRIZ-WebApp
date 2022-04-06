@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { InputNumber } from '../InputNumber';
+import { InputNumber } from '../input/InputNumber';
 import { printValue, printValueInput } from '../../src/utils/Utils';
 
 /* -------------------------------------------------------- */

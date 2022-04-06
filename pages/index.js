@@ -18,8 +18,10 @@ import { IndicatorSection } from '/components/sections/IndicatorSection';
 import { StatementSection } from '/components/sections/StatementSection';
 
 // Others components
-import { Header } from '/components/Header';
-import { HeaderSection } from '../components/HeaderSection';
+import { Header } from '/components/headers/Header';
+import { HeaderSection } from '../components/headers/HeaderSection';
+import { HeaderPublish } from '../components/headers/HeaderPublish';
+
 import { getPrevAmountItems } from '/src/utils/Utils';
 import { updateVersion } from '/src/version/updateVersion';
 import { Footer } from '../components/Footer';
@@ -89,6 +91,9 @@ class Metriz extends React.Component {
         <div className="wrapper" id="wrapper">
           {step == 0 ? (
             <Header />
+          ) :
+          step == 6 ? (
+            <HeaderPublish setStep={this.setStep} downloadSession={this.downloadSession} />
           ) :
             (
               <HeaderSection step={step} stepMax={session.progression} setStep={this.setStep} downloadSession={this.downloadSession} />
