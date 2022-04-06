@@ -371,8 +371,9 @@ function exportIndicPDF(indic, session, comparativeDivision) {
 
 
   // Export
-  doc.output('dataurlnewwindow',"rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
- 
+    doc.setProperties({ title: "rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() })
+    window.open(doc.output("bloburl"), "_blank");
+    doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf"); 
 }
 
 const getAnalyse = (indic, session) => {
