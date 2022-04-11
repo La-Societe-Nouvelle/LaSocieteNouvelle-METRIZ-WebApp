@@ -710,7 +710,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         }
       })
     }
-    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture variation de stock)."
+    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture variation de stock).";
   }
 
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
@@ -723,11 +723,11 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
     // ignore entry for futher references
     data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
 
-    let entryDepreciationExpensesData = await readDepreciationExpensesFromEntry(entry);
+    let entryDepreciationExpensesData = readDepreciationExpensesFromEntry(entry);
 
     if (entryDepreciationExpensesData.isExpensesTracked)
     {
-      for (let depreciationExpenseData in entryDepreciationExpensesData.entryData)
+      for (let depreciationExpenseData of entryDepreciationExpensesData.entryData)
       {
         // retrieve depreciation expense item
         let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == depreciationExpenseData.CompteNum
@@ -742,7 +742,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         } 
       }
     }
-    else throw entryDepreciationExpensesData.message
+    else throw entryDepreciationExpensesData.message;
   }
 
   // Other expenses ----------------------------------------------------------------------------------- //
@@ -847,24 +847,24 @@ const readAddtionalDataEntry = async (data,journal,ligneCourante) =>
  *  - message (String) : -
  */
 
-const readDepreciationExpensesFromEntry = async (entry) =>
+const readDepreciationExpensesFromEntry = (entry) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
   // basic case
-  res = await readDepreciationExpenses(entry);
+  res = readDepreciationExpenses(entry);
   if (res.isExpensesTracked) return res;
 
   // group by asset types
-  res = await divideEntryByAssetsTypes(entry);
+  res = divideEntryByAssetsTypes(entry);
   if (res.isExpensesTracked) return res;
 
   // group by labels
-  res = await divideEntryByEntryLabels(entry);
+  res = divideEntryByEntryLabels(entry);
   if (res.isExpensesTracked) return res;
 
   // group by balanced groups
-  res = await divideEntryByBalancedGroups(entry);
+  res = divideEntryByBalancedGroups(entry);
   if (res.isExpensesTracked) return res;
 
   // if reading unsuccessfull
@@ -890,7 +890,7 @@ const readDepreciationExpensesFromEntry = async (entry) =>
   return res;
 }
 
-const readDepreciationExpenses = async (rowsEntry) =>
+const readDepreciationExpenses = (rowsEntry) =>
 {
   // response
   let res = {entryData: [], isExpensesTracked: false, message: ""};
@@ -967,17 +967,17 @@ const readDepreciationExpenses = async (rowsEntry) =>
 }
 
 
-const divideEntryByAssetsTypes = async (rowsEntry) =>
+const divideEntryByAssetsTypes = (rowsEntry) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
   // tangible assets
   let rowsTangibleAssets = rowsEntry.filter(ligne => /^68(1|7)12/.test(ligne.CompteNum) || /^281/.test(ligne.CompteNum));
-  let resTangibleAssets = await readDepreciationExpenses(rowsTangibleAssets);
+  let resTangibleAssets = readDepreciationExpenses(rowsTangibleAssets);
 
   // intangible assets
   let rowsIntangibleAssets = rowsEntry.filter(ligne => /^68(1|7)11/.test(ligne.CompteNum) || /^280/.test(ligne.CompteNum));
-  let resIntangibleAssets = await readDepreciationExpenses(rowsIntangibleAssets);
+  let resIntangibleAssets = readDepreciationExpenses(rowsIntangibleAssets);
 
   if (resTangibleAssets.isExpensesTracked && resIntangibleAssets.isExpensesTracked)
   {
@@ -991,7 +991,7 @@ const divideEntryByAssetsTypes = async (rowsEntry) =>
   return res;
 }
 
-const divideEntryByEntryLabels = async (rowsEntry) =>
+const divideEntryByEntryLabels = (rowsEntry) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
@@ -1002,7 +1002,7 @@ const divideEntryByEntryLabels = async (rowsEntry) =>
   for (let label of entryLabels)
   {
     let rowsLabel = rowsEntry.filter(ligne => ligne.EcritureLib == label);
-    let resLabel = await readDepreciationExpenses(rowsLabel);
+    let resLabel = readDepreciationExpenses(rowsLabel);
 
     if (resLabel.status)
     {
@@ -1019,7 +1019,7 @@ const divideEntryByEntryLabels = async (rowsEntry) =>
   return res;
 }
 
-const divideEntryByBalancedGroups = async (rowsEntry) =>
+const divideEntryByBalancedGroups = (rowsEntry) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
@@ -1045,7 +1045,7 @@ const divideEntryByBalancedGroups = async (rowsEntry) =>
 
   for (let group of groups)
   {
-    let resGroup = await readDepreciationExpenses(group);
+    let resGroup = readDepreciationExpenses(group);
 
     if (resGroup.isExpensesTracked)
     {
