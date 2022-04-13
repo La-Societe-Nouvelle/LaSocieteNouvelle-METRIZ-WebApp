@@ -113,3 +113,39 @@ export const sendSimplifiedAssessment = async (siren,data,message,coordonnees,pa
         return error;
     }
 }
+
+export const sendReportToAdmin = async (file, fileName) => 
+{
+
+  const recipientMail= "admin@lasocietenouvelle.org";
+  const objetMail= "Envoi d'un rapport depuis Metriz WebApp";
+
+  const messageMail = "Rapport envoyé depuis Metriz WebApp";
+
+  const attachments = [{
+    filename: fileName,
+    path: file,
+    contentType: 'application/json',
+    encoding: 'base64'
+  }];
+
+  const contentMail = { recipientMail, objetMail, messageMail, attachments }
+
+  const request = {
+    body: JSON.stringify(contentMail),
+    headers: {'Content-Type': 'application/json'},
+    method: 'POST'
+  }
+  
+  try 
+  {
+      const res = await fetch('/api/mail-sender', request);
+      return res;
+  } 
+  catch (error) {
+    return error;
+  }
+  
+
+}
+

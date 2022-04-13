@@ -4,7 +4,6 @@
 import { jsPDF } from 'jspdf';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import 'jspdf-autotable';
 
 // Fonts 
 
@@ -81,10 +80,12 @@ function exportIndicDataDepreciationsCSV(indic, session) {
 }
 
 function generatePDF(indic, session, comparativeDivision) {
+
   const doc = new jsPDF();
   const { financialData, legalUnit } = session;
-  // 
+
   let x = 20;
+
   // HEADER
   doc.setFontSize(16);
   doc.setFont("Helvetica", "bold");
@@ -93,13 +94,10 @@ function generatePDF(indic, session, comparativeDivision) {
   doc.setDrawColor(247, 247, 247)
   doc.setLineWidth(2)
   doc.line(20, 25, 50, 25)
-  //let imgData = 'data:image/jpeg;base64,'+ Base64.encode('../public/resources/Logo_N&B.jpg');
-  //let imgData = canvas.toDataURL('../public/resources/Logo_N&B.jpg');
-  //doc.addImage(imgData, "JPEG", 100, 100, 50, 50);
 
-  doc.setTextColor(250, 102, 106);
+  doc.setTextColor(250, 89, 95);
   doc.setFontSize(14);
-  doc.text((legalUnit.corporateName || " - "), x, 35);
+  doc.text((legalUnit.corporateName || " - "), x, 30);
   doc.setFontSize(10);
   //doc.text("Numéro de siren : "+(legalUnit.siren!="" ? legalUnit.siren : " - " ),10,y); 
   //y+=10;
@@ -156,7 +154,6 @@ function generatePDF(indic, session, comparativeDivision) {
   doc.text("Valeur*", xValue - 8, y);
   doc.text("Incertitude", xUncertainty, y);
 
-
   // Production
   y += 10;
   doc.setFont("Helvetica", "bold");
@@ -195,7 +192,6 @@ function generatePDF(indic, session, comparativeDivision) {
   // Immobilised production
   if (financialData.getImmobilisedProduction() > 0) {
     x += 6;
-
     doc.text("\tdont production immobilisée", x, 10);
     doc.setFontSize(8);
     doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
@@ -300,26 +296,26 @@ function generatePDF(indic, session, comparativeDivision) {
   y += 10;
   getStatementNote(doc, 20, y, session.impactsData, indic);
 
-  // y += 20;
-  // doc.setFontSize(12);
-  // doc.setFont("Helvetica", "bold");
-  // doc.setTextColor(25, 21, 88);
-  // doc.text("CLE DE DECRYPTAGE", x, y);
+  y += 20;
+  doc.setFontSize(12);
+  doc.setFont("Helvetica", "bold");
+  doc.setTextColor(25, 21, 88);
+  doc.text("CLE DE DECRYPTAGE", x, y);
 
-  // y += 10;
+  y += 10;
 
-  // let analyse = getAnalyse(indic, session);
-  // let text = "";
-  // {
-  //   analyse.map((paragraph) => (
-  //     text += paragraph.reduce((a, b) => a + " " + b, "")
-  //   ))
-  // }
+  let analyse = getAnalyse(indic, session);
+  let text="";
+  {
+    analyse.map((paragraph) => (
+      text += '\n'+paragraph.reduce((a, b) => a + " " + b)
+    ))
+  }
 
-  // doc.setFontSize(10);
-  // doc.setFont("Helvetica", "normal");
-  // doc.setTextColor(0, 0, 0);
-  // doc.text(doc.splitTextToSize(text, 170), x, y);
+  doc.setFontSize(10);
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(0, 0, 0);
+  doc.text(doc.splitTextToSize(text, 180), x, y);
 
   // PAGE 2 
   doc.addPage();
@@ -336,10 +332,10 @@ function generatePDF(indic, session, comparativeDivision) {
 
   {
     Object.entries(divisions)
-    .sort((a, b) => parseInt(a) - parseInt(b))
-    .map(([code, libelle]) => (
-      code == comparativeDivision && code !== "00" ? doc.text("Branche de référence : " + libelle, x, y + 10) : ""
-    ))
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map(([code, libelle]) => (
+        code == comparativeDivision && code !== "00" ? doc.text("Branche de référence : " + libelle, x, y + 10) : ""
+      ))
   }
 
   y = 40;
@@ -374,17 +370,15 @@ function generatePDF(indic, session, comparativeDivision) {
 
   return doc;
 }
-function generateFootprintPDF(indic, session, comparativeDivision, title, odds) {
 
-  const doc = new jsPDF("landscape");
-  console.log(indic);
+function generateFootprintPDF(doc,indic, session, title, odds) {
 
-  const { financialData, legalUnit, validations } = session;
-  doc.setProperties({ title: "rapport_" + title.replaceAll(" ", "-") + "_" + legalUnit.corporateName.replaceAll(" ", "") })
 
-  let x = 20;
+  const { financialData, legalUnit } = session;
+  doc.setProperties({ title: "rapport_empreinte_societale_" + legalUnit.corporateName.replaceAll(" ", "") })
+
+  let x = 10;
   let y = 20;
-
   // HEADER
   doc.setFontSize(15);
   doc.setFont("Helvetica", "bold");
@@ -392,23 +386,23 @@ function generateFootprintPDF(indic, session, comparativeDivision, title, odds) 
   doc.text("RAPPORT - " + title.toUpperCase(), x, y);
 
   // ODD PICTO
-  let imgPos = 200;
-  odds.forEach(element => {      
+  let imgPos = 208;
+  odds.forEach(element => {
     imgPos += 11;
     let img = new Image();
     img.src = '/resources/odds/print/F_SDG_PRINT-' + element + '.jpg';
-    doc.addImage(img, "JPEG", imgPos, 15, 10, 10) 
+    doc.addImage(img, "JPEG", imgPos, 15, 10, 10)
 
-});        
+  });
 
   // Corporate Name
-  y += 10;
+  y += 8;
   doc.setTextColor(250, 102, 106);
   doc.setFontSize(14);
   doc.text((legalUnit.corporateName.toUpperCase() || " - "), x, y);
   doc.setFontSize(10);
 
-  y += 7;
+  y += 8;
 
   doc.setTextColor(0);
   doc.setFont("Helvetica", "normal")
@@ -419,7 +413,7 @@ function generateFootprintPDF(indic, session, comparativeDivision, title, odds) 
 
   doc.text("Edition du : " + String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear(), x, y);
 
-  y += 10;
+  y += 8;
 
   // TITLE
   doc.setFontSize(12);
@@ -427,64 +421,527 @@ function generateFootprintPDF(indic, session, comparativeDivision, title, odds) 
   doc.setTextColor(25, 21, 88);
   doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, y);
 
-  y += 10;
+  y += 8;
 
   // TABLE 
-  console.log("indic");
+ 
+  let xRect = x + 17;
+  doc.setDrawColor(25, 21, 88);
 
-  doc.autoTable({ 
-    margin: { left: x },
-    startY: y, 
-    tableLineColor: [25, 21, 88],
-    tableLineWidth: 0.5,
-    head: headRows(), 
-    body: bodyRows(13),
-    headStyles: {
-    },
-    bodyStyles: {
-      textColor: [25, 21, 88],
-    },
-    theme: 'grid',
-  })
+  // LIBELLE
+  indic.forEach(indic => {
+    doc.rect(xRect += 35, y, 37, 8);
+    let img = new Image();
+    img.src = '/resources/icon-ese-bleues/' + indic + '.png';
+    doc.addImage(img, "PNG",  xRect +1,   y + 1.5, 4.5, 4.5);
+    
+    doc.setFont("Helvetica", "bold");
+    doc.setFontSize(7);
+    doc.text(doc.splitTextToSize(metaIndics[indic].libelleGrandeur, 24), xRect + 18.5, y + 3.5, { align: "center" });
+    xRect += 2;
+  });
 
-  return doc;
-}
-function exportIndicPDF(indic, session, comparativeDivision) {
-  const { legalUnit, year } = session;
+  y += 8;
 
-  // Zip Export
-  if (Array.isArray(indic)) {
+  let height = y;
 
-    let zip = new JSZip();
+  // Header table
 
-    indic.map((indic) => {
-      let doc = generatePDF(indic, session, comparativeDivision)
-      zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
+  doc.setFillColor(240, 240, 248);
+  doc.setDrawColor(240, 240, 248);
+  doc.rect(x, y, 274, 10, 'FD');
+
+  doc.setLineWidth(0.3);
+  doc.setDrawColor(25, 21, 88);
+  doc.line(x, y, x, height);
+
+  // AMOUNT
+  doc.setLineWidth(0.1);
+  doc.line(x + 35, y, x + 35, height);
+  doc.setFontSize(7);
+  doc.text("Montant", 51, y + 6);
+
+  doc.setLineWidth(0.3);
+
+  let xLine = 62;
+  let xUnit = x + 54;
+
+  height += 10;
+  // UNITE
+  indic.forEach(indic => {
+
+    doc.setFontSize(6);
+    doc.setFont("Helvetica", "bold");
+    doc.text(doc.splitTextToSize("Valeur\n" + metaIndics[indic].unit, 9), xUnit + 4.5, y + 5, { align: "center" });
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y, xLine, height);
+
+    doc.setFontSize(5);
+    doc.setFont("Helvetica", "normal");
+    doc.text(doc.splitTextToSize("Incertitude %", 9), xUnit + 17, y + 5, { align: "center" });
+
+    doc.text(doc.splitTextToSize("Impact brut "+  metaIndics[indic].unitAbsolute, 9), xUnit + 29, y + 5, { align: "center" });
+
+    doc.setDrawColor(216, 214, 226);
+    doc.setLineWidth(0.1);
+    doc.line(xLine + 13, y, xLine + 13, height);
+    doc.line(xLine + 25, y, xLine + 25, height);
+
+    xUnit += 37;
+    xLine += 37;
+
+  });
+
+  // FINANCIAL DATA 
+
+  const { production,
+    revenue,
+    storedProduction,
+    immobilisedProduction,
+    intermediateConsumption,
+    storedPurchases,
+    capitalConsumption,
+    netValueAdded } = financialData.aggregates;
+
+
+  let xAmount = 60;
+  let xValue = x + 64;
+
+  // // Production
+
+  y += 14;
+  doc.setFontSize(7);
+  doc.setFont("Helvetica", "bold");
+  doc.text("Production", x + 2, y);
+  doc.setFontSize(6);
+
+  doc.text(printValue(production.amount, 0) + " €", xAmount, y, { align: "right" });
+
+  height += 5;
+  xLine = 62;
+
+  indic.forEach(indic => {
+
+    let  nbDecimals = metaIndics[indic].nbDecimals;
+    doc.setFontSize(6);
+    doc.setFont("Helvetica", "bold");
+    doc.text(printValue(production.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+    doc.setFontSize(5);
+    doc.setFont("Helvetica", "normal");
+    doc.text(printValue(production.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+    doc.text(printValue(production.footprint.indicators[indic].getGrossImpact(production.amount),nbDecimals), xValue + 24, y, { align: "right" });
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y - 4, xLine, height)
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    doc.line(xLine + 13, y - 4, xLine + 13, height);
+    doc.line(xLine + 25, y - 4, xLine + 25, height);
+    xLine += 37;
+    xValue += 37;
+
+  });
+
+
+  // Revenue
+
+  xValue = x + 64;
+  y += 5;
+  doc.setFontSize(7);
+  doc.text("dont Chiffre d'affaires", x + 3, y);
+  doc.setFontSize(6);
+  doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, { align: "right" });
+
+  xLine = 62;
+  height += 5;
+
+  indic.forEach(indic => {
+
+    if(
+      printValue(revenue.footprint.indicators[indic].getValue(), 1) != " - " 
+    )
+    {
+      doc.setFont("Helvetica", "bold");
+      doc.setFillColor(255, 138, 142);
+      doc.rect(xValue - 9, y-2.5, 10, 3, 'F');  
     }
-    );
+  
+    doc.setFontSize(6);
+    doc.text(printValue(revenue.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+   
+    doc.setFont("Helvetica", "normal");
 
-    zip.generateAsync({ type: 'blob' }).then(function (content) {
-      saveAs(content, 'livrables_' + legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
+    doc.setFontSize(5);
+    doc.text(printValue(revenue.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+    doc.text(printValue(revenue.footprint.indicators[indic].getGrossImpact(revenue.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+    xValue += 37;
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y - 4, xLine, height)
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    doc.line(xLine + 13, y - 4, xLine + 13, height);
+    doc.line(xLine + 25, y - 4, xLine + 25, height);
+    xLine += 37;
+
+  });
+
+  // Stock production
+  xValue = x + 64;
+
+  y += 5;
+  doc.setFontSize(7);
+  doc.text("dont Production stockée", x + 3, y);
+
+  doc.setFontSize(6);
+  doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
+  xLine = 62;
+  height += 5;
+
+  indic.forEach(indic => {
+    doc.setFontSize(6);
+    doc.text(printValue(storedProduction.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+    doc.setFontSize(5);
+    doc.text(printValue(storedProduction.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+    doc.text(printValue(storedProduction.footprint.indicators[indic].getGrossImpact(storedProduction.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+    xValue += 37;
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y - 4, xLine, height)
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    doc.line(xLine + 13, y - 4, xLine + 13, height);
+    doc.line(xLine + 25, y - 4, xLine + 25, height);
+    xLine += 37;
+
+  });
+
+  // // Immobilised production
+  if (financialData.getImmobilisedProduction() > 0) {
+    xValue = x + 64;
+    y += 6;
+    doc.setFontSize(7);
+    doc.text("dont production immobilisée", x + 4, y);
+    doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
+    doc.setFontSize(6);
+    xLine = 62;
+    height += 5;
+    indic.forEach(indic => {
+      doc.setFontSize(6);
+      doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+      doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+      doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getGrossImpact(immobilisedProduction.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+      xValue += 37;
+
+      doc.setDrawColor(25, 21, 88);
+      doc.setLineWidth(0.2);
+      doc.line(xLine, y - 4, xLine, height)
+      doc.setLineWidth(0.1);
+      doc.setDrawColor(216, 214, 226);
+      doc.line(xLine + 13, y - 4, xLine + 13, height);
+      doc.line(xLine + 25, y - 4, xLine + 25, height);
+      xLine += 37;
+
+    });
+  }
+
+  // CONSOMMATIONS INTERMEDIAIRES 
+  y += 7;
+
+  doc.setFontSize(7);
+  doc.setFont("Helvetica", "bold");
+  doc.text(doc.splitTextToSize("Consommations intermédiaires", 25), x + 2, y);
+
+  doc.setFontSize(6);
+
+  doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, { align: "right" });
+
+  xLine = 62;
+  height += 10;
+  xValue = x + 64;
+  indic.forEach(indic => {
+
+    doc.setFontSize(6);
+    doc.setFont("Helvetica", "bold");
+    doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+    doc.setFontSize(5);
+    doc.setFont("Helvetica", "normal");
+    doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+    doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getGrossImpact(intermediateConsumption.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+    xValue += 37;
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y - 6, xLine, height)
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    doc.line(xLine + 13, y - 6, xLine + 13, height);
+    doc.line(xLine + 25, y - 6, xLine + 25, height);
+    xLine += 37;
+
+  });
+
+  if (storedPurchases.amount != 0) {
+    y += 7;
+    doc.setFontSize(7);
+    doc.text("Variation de stocks", x + 3, y);
+
+    doc.setFontSize(6);
+    doc.text(printValue(storedPurchases.amount, 0) + " €", xAmount, y, { align: "right" });
+
+    xValue = x + 64;
+    xLine = 62;
+    height += 5;
+
+    indic.forEach(indic => {
+      doc.setFontSize(6);
+      doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+      doc.setFontSize(5);
+      doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+      doc.text(printValue(storedPurchases.footprint.indicators[indic].getGrossImpact(storedPurchases.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+      xValue += 37;
+
+
+      doc.setDrawColor(25, 21, 88);
+      doc.setLineWidth(0.2);
+      doc.line(xLine, y - 3, xLine, height)
+      doc.setLineWidth(0.1);
+      doc.setDrawColor(216, 214, 226);
+      doc.line(xLine + 13, y - 3, xLine + 13, height);
+      doc.line(xLine + 25, y - 3, xLine + 25, height);
+      xLine += 37;
+
     });
 
   }
-  else {
+
+  financialData.getExternalExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+
+    y += 5;
+    doc.setFontSize(7);
+    doc.text(aggregate.accountLib, x + 3, y);
+
+    doc.setFontSize(6);
+    doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
+
+    xValue = x + 64;
+    xLine = 62;
+    height += 5;
+
+    indic.forEach(indic => {
+
+      let indicator = aggregate.footprint.indicators[indic];
+      doc.setFontSize(6);
+      doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
+      doc.setFontSize(5);
+      doc.text(printValue(indicator.getUncertainty(), 0) + " %", xValue + 12, y, { align: "right" });
+      doc.text(printValue(indicator.getGrossImpact(aggregate.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+      xValue += 37;
+
+      doc.setDrawColor(25, 21, 88);
+      doc.setLineWidth(0.2);
+      doc.line(xLine, y - 3, xLine, height)
+      doc.setLineWidth(0.1);
+      doc.setDrawColor(216, 214, 226);
+      doc.line(xLine + 13, y - 3, xLine + 13, height);
+      doc.line(xLine + 25, y - 3, xLine + 25, height);
+      xLine += 37;
+
+    });
+
+  })
+
+  y += 6;
+  doc.setFontSize(7);
+  doc.setFont("Helvetica", "bold");
+  doc.text(doc.splitTextToSize("Dotations aux Amortissements sur immobilisations", 25), x + 2, y);
+  doc.setFontSize(6);
+  doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, { align: "right" });
+  xValue = x + 64;
+  xValue = x + 64;
+  xLine = 62;
+  height += 10;
+
+  indic.forEach(indic => {
+    doc.setFontSize(6);
+    doc.setFont("Helvetica", "bold");
+    doc.text(printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+    doc.setFontSize(5);
+    doc.setFont("Helvetica", "normal");
+    doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+    doc.text(printValue(capitalConsumption.footprint.indicators[indic].getGrossImpact(capitalConsumption.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+    xValue += 37;
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y - 4, xLine, height)
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    doc.line(xLine + 13, y - 4, xLine + 13, height);
+    doc.line(xLine + 25, y - 4, xLine + 25, height);
+    xLine += 37;
+
+  });
+
+  doc.setFontSize(7);
+
+  xLine = 62;
+  height += 10;
+
+  financialData.getBasicDepreciationExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+
+    y += 9;
+    xValue = x + 64;
+
+    doc.text(doc.splitTextToSize(aggregate.accountLib, 30), x + 3, y);
+
+    doc.setFontSize(6);
+    doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
+
+    indic.forEach(indic => {
+
+      let indicator = aggregate.footprint.indicators[indic];
+      doc.setFontSize(6);
+      doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
+      doc.setFontSize(5);
+      doc.text(printValue(indicator.getUncertainty(), 0) + " %", xValue + 12, y, { align: "right" });
+      doc.text(printValue(indicator.getGrossImpact(aggregate.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+      xValue += 37;
+
+      doc.setDrawColor(25, 21, 88);
+      doc.setLineWidth(0.2);
+      doc.line(xLine, y - 3, xLine, height)
+      doc.setLineWidth(0.1);
+      doc.setDrawColor(216, 214, 226);
+      doc.line(xLine + 13, y - 3, xLine + 13, height);
+      doc.line(xLine + 25, y - 3, xLine + 25, height);
+      xLine += 37;
+
+    });
+
+  })
+
+  y += 12;
+
+  doc.setFillColor(251, 251, 255);
+  doc.setDrawColor(251, 251, 255);
+  doc.rect(x, y-3, 274, 6, 'FD');
+  
+  doc.setFontSize(7);
+  doc.setFont("Helvetica", "bold");
+  doc.text("Valeur ajoutée nette", x + 2, y);
+  
+  doc.setFontSize(6);
+  doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, { align: "right" });
+
+  xValue = x + 64;
+  xLine = 62;
+  height += 8;
+  indic.forEach(indic => {
+    doc.setFontSize(6);
+    doc.setFont("Helvetica", "bold");
+    doc.text(printValue(netValueAdded.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
+    doc.setFontSize(5);
+    doc.setFont("Helvetica", "normal");
+    doc.text(printValue(netValueAdded.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
+    doc.text(printValue(netValueAdded.footprint.indicators[indic].getGrossImpact(netValueAdded.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+
+    xValue += 37;
+
+    doc.setDrawColor(25, 21, 88);
+    doc.setLineWidth(0.2);
+    doc.line(xLine, y - 5, xLine, height)
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    doc.line(xLine + 13, y-5 , xLine + 13, height);
+    doc.line(xLine + 25, y-5, xLine + 25, height);
+    xLine += 37;
+
+  });
+
+  // BORDER  TABLE
+  doc.setLineWidth(0.2);
+  doc.setDrawColor(25, 21, 88);
+  // TOP
+   doc.line(x, 65, 284, 65);
+  // LEFT
+  doc.line(x, 65, x, height)
+  // RIGHT 
+  doc.line(xLine, 65, xLine, height)
+  // BOTTOM 
+  doc.line(x, height, 284, height);
+
+
+  // BOTTOM PAGE 
+  y += 40;
+
+  doc.setDrawColor(203);
+  doc.line(x, y, 284, y);
+
+  y += 5;
+
+  doc.setFontSize(7);
+  doc.setFont("Helvetica", "bold");
+  doc.setTextColor(100);
+  doc.text("Publiez votre performance globale !", x, y);
+
+  y += 5;
+  doc.setFont("Helvetica", "normal");
+  doc.text("Nous vous invitons à valoriser votre performance extra-financière en publiant les valeurs associées à votre chiffre d’affaires (données encadrées dans le tableau ci-dessus). \nAucune donnée financière n’est communiquée, seul l’estimation vos impacts par euro de chiffre d’affaires est accessible.", x, y)
+
+  y += 7;
+
+  doc.text("Les données publiées sont accessibles librement, elles permettent à vos clients (et potentiels clients) de mesurer leurs impacts indirects associés à leurs factures, et elles contribuent à la construction d’une économie plus transparente.\n"
+  +"Les données sont modifiables. Pour plus d’informations, contactez admin@lasocietenouvelle.org",x,y)
+  return doc;
+}
+
+
+function exportIndicPDF(indic, session, comparativeDivision) {
+  const { legalUnit, year } = session;
+
     // PDF Export
     let doc = generatePDF(indic, session, comparativeDivision)
     window.open(doc.output("bloburl"), "_blank");
     doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
-  }
-
 
 }
 
-function exportFootprintPDF(indic,session, comparativeDivision, title, odds) {
+function exportFootprintPDF(session) {
+  const doc = new jsPDF("landscape");
 
-    // PDF Export
-    let doc = generateFootprintPDF(indic, session, comparativeDivision, title, odds)
-    window.open(doc.output("bloburl"), "_blank");
-   // doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+  const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
+  const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
 
+  const seOdds = ["5", "8", "9", "10", "12"];
+  const envOdds = ["6", "7", "12", "13", "14", "15"];
+
+  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+
+  generateFootprintPDF(doc, envIndic, session, "Empreinte environnementale", envOdds); 
+
+  doc.addPage();
+
+  // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
+
+  generateFootprintPDF(doc,seIndic, session, "Empreinte économique et sociale", seOdds); 
+
+  window.open(doc.output("bloburl"), "_blank");
+
+  // doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
 
 }
 const getAnalyse = (indic, session) => {
@@ -533,59 +990,15 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
   }
 }
 
-export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF, exportFootprintPDF };
+export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF, exportFootprintPDF, generateFootprintPDF };
 
 /*function printValue(value,precision) {
   if (value==null) {return "-"}
   else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
 }*/
 
-function superscript(doc, x, y, text) {
 
-}
 
-function headRows() {
-  return [
-    { id: '', name: '', email: 'Email', city: 'City', expenses: 'Sum' },
-  ]
-}
 
-function columns() {
-  return [
-    { header: 'ID', dataKey: 'id' },
-    { header: 'Name', dataKey: 'name' },
-    { header: 'Email', dataKey: 'email' },
-    { header: 'City', dataKey: 'city' },
-    { header: 'Exp', dataKey: 'expenses' },
-  ]
-}
 
-function data(rowCount) {
-  rowCount = rowCount || 10
-  var body = []
-  for (var j = 1; j <= rowCount; j++) {
-    body.push({
-      id: j,
-      name: "name",
-      email: "email",
-      city: "city",
-      expenses: "amount",
-    })
-  }
-  return body
-}
 
-function bodyRows(rowCount) {
-  rowCount = rowCount || 10
-  var body = []
-  for (var j = 1; j <= rowCount; j++) {
-    body.push({
-      id: j,
-      name: "name",
-      email: "email",
-      city: "city",
-      expenses: "amount",
-    })
-  }
-  return body
-}
