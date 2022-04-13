@@ -32,17 +32,17 @@ export class StatementSection extends React.Component {
         this.state =
         {
             socialFootprint: socialFootprint,
-            // Legal entity data (steps 1 to 3)
+            // Legal entity data 
             siren: props.session.legalUnit.siren || "",
             denomination: props.session.legalUnit.corporateName || "",
             year: props.session.year || "",
 
-            // Statements (step 4)
+            // Statements 
             revenueFootprint: props.session.financialData.aggregates.revenue.footprint,
             validations: props.session.validations,
             comments: props.session.impactsData.comments || {},
 
-            // declarant data (step 5)
+            // declarant 
             declarant: "",
             email: "",
             phone: "",
@@ -50,14 +50,19 @@ export class StatementSection extends React.Component {
             forThirdParty: false,
             declarantOrganisation: "",
 
-            // tarif (step 6)
-            price: "0"
+            // tarif 
+            price: "0",
+
+            displayRecap : false,
+            messageSend : false,
+            error : ""
         }
     }
 
     componentDidMount() {
         window.scrollTo(0, 0)
     }
+
     render() {
 
         const {
@@ -65,128 +70,119 @@ export class StatementSection extends React.Component {
             validations,
             socialFootprint,
             siren,
-            denomination,
-            year,
-            comments,
             declarant,
             email,
-            phone,
-            autorisation,
             forThirdParty,
-            declarantOrganisation
+            declarantOrganisation,
+            displayRecap,
+            autorisation,
+            error,
+            messageSend,
         } = this.state;
-        console.log(this.state)
-        return (
-            <div className="container-fluid statement-section">
-
-        
-                {/* SELECTION DES INDICATEURS */}
-                <section className="step">
-                    <h3>Liste des indicateurs</h3>
-                    <p>
-                        Sélectionnez les indicateurs que vous souhaitez publier
-                    </p>
-                    <table className="w100">
-                        <thead>
-                            <tr>
-                                <td>Indicateur</td>
-                                <td className="column_value" colSpan="2">Valeur</td>
-                                <td className="column_uncertainty">Incertitude</td>
-                                <td>Publication</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {Object.keys(metaIndics).map(indic =>
-                                <tr key={indic}>
-                                    <td className="auto">{metaIndics[indic].libelle + (metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
-                                    <td className="column_value">{printValue(revenueFootprint.indicators[indic].value, metaIndics[indic].nbDecimals)}</td>
-                                    <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
-                                    <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty, 0)}&nbsp;%</td>
-                                    <td><input type="checkbox"
-                                        value={indic}
-                                        defaultChecked={socialFootprint[indic] != undefined}
-                                        disabled={validations.indexOf(indic) < 0}
-                                        onChange={this.onCheckIndicator} /></td>
-                                </tr>)}
-                        </tbody>
-                    </table>
-                </section>
-                <section className="step">
-                    <h3>Informations</h3>
-                    <div className="form-group">
-                        <h4>Numéro de siren</h4>
-                        <label>Entrez votre numéro de siren (9 chiffres) : </label>
-                        <InputText value={siren}
-                            unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
-                            onUpdate={this.onSirenChange}
-                        />
-                    </div>
-
-                    <h4>Déclarant</h4>
-                    <div className="form-group">
-                        <label>Nom - Prénom </label>
-                        <InputText value={declarant}
-                            onUpdate={this.onDeclarantChange} />
-                    </div>
-                    <div className="form-group">
-                        <label>Adresse e-mail </label>
-                        <InputText value={email}
-                            unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
-                            onUpdate={this.onEmailChange} />
-                    </div>
-                    <div className="form-group">
-                        <div className="custom-control-inline" id="thirdParty">
-                            <input type="checkbox" className="custom-control-input"
-                                onChange={this.onThirdPartyChange} />
-                            <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
-                        </div>
-
-                    </div>
-                    {forThirdParty &&
+      
+        if(!displayRecap){
+            return (
+                <div className="container-fluid statement-section">
+                    <section className="step">
+                        <h3>Liste des indicateurs</h3>
+                        <p>
+                            Sélectionnez les indicateurs que vous souhaitez publier
+                        </p>
+                        <table className="w100">
+                            <thead>
+                                <tr>
+                                    <td>Indicateur</td>
+                                    <td className="column_value" colSpan="2">Valeur</td>
+                                    <td className="column_uncertainty">Incertitude</td>
+                                    <td>Publication</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.keys(metaIndics).map(indic =>
+                                    <tr key={indic}>
+                                        <td className="auto">{metaIndics[indic].libelle + (metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
+                                        <td className="column_value">{printValue(revenueFootprint.indicators[indic].value, metaIndics[indic].nbDecimals)}</td>
+                                        <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
+                                        <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty, 0)}&nbsp;%</td>
+                                        <td><input type="checkbox"
+                                            value={indic}
+                                            defaultChecked={socialFootprint[indic] != undefined}
+                                            disabled={validations.indexOf(indic) < 0}
+                                            onChange={this.onCheckIndicator} /></td>
+                                    </tr>)}
+                            </tbody>
+                        </table>
+                    </section>
+                    <section className="step">
+                        <h3>Informations</h3>
                         <div className="form-group">
-                            <label>Structure déclarante</label>
-                            <InputText value={declarantOrganisation}
-                                onUpdate={this.onDeclarantOrganisationChange} />
-                        </div>}
-                
-                </section>
-                <section className="step">
-                <PriceInput {...this.state} />
-                </section>
-                <section className="step">
-                    <h4>Publication</h4>    
-
-                 <div className="form-group">
-                        <div className="custom-control-inline" id="certification">
-                            <input type="checkbox" className="custom-control-input"
-                                onChange={this.onAutorisationChange} />
-                            <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
+                            <h4>Numéro de siren</h4>
+                            <label>Entrez votre numéro de siren (9 chiffres) : </label>
+                            <InputText value={siren}
+                                unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
+                                onUpdate={this.onSirenChange}
+                            />
                         </div>
-                    </div>
-                    <button className="btn btn-secondary">
-                        Publier mes résultats
-                    </button>
-                </section>            
-                <section className="step">
-                    <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} />
-                </section>
-            </div>
-        )
-    }
-
-    buildView = (step) => {
-        switch (step) {
-            case 0: return <ErrorMessage />
-            case 1: return <IndicatorSelection revenueFootprint={this.state.revenueFootprint} validations={this.state.validations} onCommit={this.commitSocialFootprint} return={this.props.return} />
-            case 2: return <SirenInput siren={this.state.siren} commitSiren={this.commitSiren} />
-            case 3: return <DeclarantForm {...this.state} onCommit={this.commitDeclarant} goBack={this.goBack} />
-            case 4: return <PriceInput {...this.state} commitPrice={this.commitPrice} goBack={this.goBack} />
-            case 5: return <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} goBack={this.goBack} />
-            case 6: return <StatementSendingMessage />
-            case 7: return <StatementSendMessage />
+                        <h4>Déclarant</h4>
+                        <div className="form-group">
+                            <label>Nom - Prénom </label>
+                            <InputText value={declarant}
+                                onUpdate={this.onDeclarantChange} />
+                        </div>
+                        <div className="form-group">
+                            <label>Adresse e-mail </label>
+                            <InputText value={email}
+                                unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
+                                onUpdate={this.onEmailChange} />
+                        </div>
+                        <div className="form-group">
+                            <div className="custom-control-inline" id="thirdParty">
+                                <input type="checkbox" className="custom-control-input"
+                                    onChange={this.onThirdPartyChange} />
+                                <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
+                            </div>
+    
+                        </div>
+                        {forThirdParty &&
+                            <div className="form-group">
+                                <label>Structure déclarante</label>
+                                <InputText value={declarantOrganisation}
+                                    onUpdate={this.onDeclarantOrganisationChange} />
+                            </div>}
+                    
+                    </section>
+                    <section className="step">
+                    <PriceInput {...this.state} />
+                    </section>
+                    <section className="step">
+                        <h4>Publication</h4>    
+    
+                     <div className="form-group">
+                            <div className="custom-control-inline" id="certification">
+                                <input type="checkbox" className="custom-control-input"
+                                    onChange={this.onAutorisationChange} />
+                                <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
+                            </div>
+                        </div>
+                  
+                        <button className="btn btn-secondary" disabled={autorisation ? false : true}  onClick={this.setDisplayRecap} > 
+                            Publier mes résultats
+                        </button>
+                    </section>            
+                 
+                </div>
+            )
         }
-    }
+        else {
+            return(
+                <div className="container-fluid statement-section">
+                         <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} returnPublishForm={this.returnPublishForm} />
+                    </div>
+            )
+        }
 
+       
+    }
 
     // Commits
     onSirenChange = (siren) => this.setState({ siren: siren });
@@ -194,6 +190,8 @@ export class StatementSection extends React.Component {
     onDeclarantChange = (input) => this.setState({ declarant: input })
     onEmailChange = (input) => this.setState({ email: input })
     onAutorisationChange = () => this.setState({ autorisation: !this.state.autorisation })
+    setDisplayRecap = () => this.setState({ displayRecap: true})
+    returnPublishForm = () => this.setState({ displayRecap: false});
     onThirdPartyChange = () => this.setState({ forThirdParty: !this.state.forThirdParty })
     onDeclarantOrganisationChange = (input) => this.setState({ declarantOrganisation: input })
 
@@ -207,7 +205,6 @@ export class StatementSection extends React.Component {
 
     submitStatement = async (event) => {
         event.preventDefault();
-        this.setState({ step: 6 })
 
         const statementFile = getBinaryPDF(this.state);
 
@@ -217,8 +214,8 @@ export class StatementSection extends React.Component {
         const messageToDeclarant = mailToDeclarantWriter(this.state);
         const resDeclarant = await sendStatementToDeclarant(this.state.email, messageToDeclarant, statementFile);
 
-        if (resAdmin.status < 300) this.setState({ step: 7 })
-        else this.setState({ step: 0 })
+        if (resAdmin.status < 300) this.setState({ messageSend: true })
+        else this.setState({ messageSend : false, error: "Erreur lors de l'envoi du message" })
     }
 
 }
@@ -293,9 +290,9 @@ const PriceInput = ({ price }) => {
 }
 
 /* ----- Summary ----- */
-
+ 
 const Summary = (props) => {
-    const { siren, denomination, year, declarant, price, socialFootprint } = props;
+    const { siren, denomination, year, declarant, price, socialFootprint, error, messageSend } = props;
 
     const isStatementValid = true;
 
@@ -303,8 +300,8 @@ const Summary = (props) => {
     const todayString = String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear();
 
     return (
-        <section className="container">
-            <h2>Récapitulatif</h2>
+        <section className="step">
+        <h2>Récapitulatif</h2>
             <div className="summary">
                 <p><b>Siren : </b>{siren}</p>
                 <p><b>Dénomination : </b>{denomination}</p>
@@ -317,47 +314,27 @@ const Summary = (props) => {
                 <p><b>Déclarant : </b>{declarant}</p>
                 <p><b>Coût de la formalité : </b>{price} €</p>
             </div>
-            <div className="actions">
-                <button className="btn" onClick={props.goBack}>Retour</button>
+            
+            {
+                messageSend && 
+                <div className="alert alert-success">
+                     <p>Demande de publication envoyée ! Merci.</p>
+                </div>
+            }
+                  {
+                error && 
+                <div className="alert alert-error">
+                     <p>Erreur lors de l'envoi de la publication. Si l'erreur persiste, contactez le support.</p>
+                </div>
+            }
+            <div className="align-right">
+            <button className={"btn btn-light"}  onClick={props.returnPublishForm}>Retour</button>
                 <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
                 <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>
             </div>
         </section>)
 }
 
-/* --- End message --- */
-
-const StatementSendingMessage = () => {
-    return (
-        <div className="strip">
-            <h2>Déclaration validée</h2>
-            <div className="form_inner">
-                <p>Envoi en cours...</p>
-            </div>
-        </div>
-    )
-}
-
-const StatementSendMessage = () => {
-    return (
-        <div className="strip">
-            <h2>Déclaration validée</h2>
-            <div className="form_inner">
-                <p>Demande de publication envoyée ! Merci.</p>
-            </div>
-        </div>
-    )
-}
-
-const ErrorMessage = () => {
-    return (
-        <div className="strip">
-            <div className="form_inner">
-                <p>Error</p>
-            </div>
-        </div>
-    )
-}
 
 /* ----- Builder message mails ----- */
 
