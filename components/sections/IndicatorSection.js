@@ -58,7 +58,7 @@ import { analysisTextWriterNRG } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterSOC } from "../../src/writers/analysis/analysisTextWriterSOC";
 import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWriterWAS";
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
-import { downloadZip, exportFootprintPDF, generateFootprintPDF, generatePDF } from "../../src/writers/Export";
+import {exportFootprintPDF, generateFootprintPDF, generatePDF } from "../../src/writers/Export";
 import RapportPopup from "../popups/RapportPopup";
 import LoadingSpinner from "../LoadingSpinner";
 import JSZip from "jszip";
@@ -124,11 +124,7 @@ export class IndicatorSection extends React.Component {
   render() {
     const { indic, comparativeDivision, triggerPopup, selectedTable, isLoading } = this.state;
 
-    const isPublicationAvailable =
-      Object.entries(
-        this.props.session.financialData.aggregates.revenue.footprint.indicators
-      ).filter(([_, indicator]) => indicator.value != null).length > 0;
-
+    const isPublicationAvailable = Object.entries(this.props.session.financialData.aggregates.revenue.footprint.indicators).filter(([_, indicator]) => indicator.value != null).length > 0;
 
     return (
 
@@ -624,6 +620,8 @@ const Analyse = (indic, session) => {
     </>
   );
 };
+
+
 
 // Display the correct statement view according to the indicator
 function getAnalyse(props) {
