@@ -30,7 +30,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
             <img src="/logo_la-societe-nouvelle_s.svg" alt="logo" onClick={refresh} />
           </div>
           <div className="action">
-          <button className="btn btn-secondary" onClick={() => setStep(5)}> <FontAwesomeIcon icon={faChevronLeft} /> Retour  </button>
+          <button className="btn btn-secondary" onClick={() => setStep(5)}> <FontAwesomeIcon icon={faChevronLeft} /> Retour à la mesure des impacts </button>
         </div>
           <nav id="progression" className="row">
             <div className={"stepper-item completed"}>
