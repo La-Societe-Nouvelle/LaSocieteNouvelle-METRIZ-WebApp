@@ -1,83 +1,143 @@
 import React, { useState } from 'react'
 import { InputText } from '../input/InputText'
+import { sendReportToAdmin } from '/pages/api/mail-api'
 
 const RapportPopup = (props) => {
 
+  const getCompany = props.session.financialData.getCompany;
 
+  // State
+  const [expenses] = useState(props.session.financialData.expenses);
   const [siren, setSiren] = useState();
   const [activitePrincipale, setActivitePrincipale] = useState();
-  const [expenses] = useState(props.session.financialData.expenses);
-  const [companiesActivityCode, setCompaniesActivityCode] = useState([]);
-  const getCompany = props.session.financialData.getCompany;
-  const [isDisable, setIsDisable] = useState(false);
-  const [totalExpense, setTotalExpense] = useState(0);
-  const [companyExpense, setCompanyExpense] = useState([])
-  const [partOfExpense, setPartOfExpense] = useState([]);
+  const [showSubmit, setShowSubmit] = useState(false);
+  const [listOfExpenses, setListOfExpense] = useState([{}]);
+  const [showRecap, setShowRecap] = useState(false);
+  const [erreur, setErreur] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!siren) return;
-
-    async function fetchData() {
-      const response = await fetch(
-        `https://systema-api.azurewebsites.net/api/v2/siren/${siren}`
-      );
-      const data = await response.json();
-      const APE = data.profil.descriptionUniteLegale.activitePrincipale;
-      setActivitePrincipale(APE);
-    }
-    fetchData();
-    getCompaniesActivityCode(expenses);
-    setIsDisable(true);
-    getExpenseAmount(expenses)
-    getPartOfExpense(totalExpense,companyExpense,companiesActivityCode)
-  };
 
   function handleSiren(siren) {
     setSiren(siren)
   }
 
+  let onChange = (event) => {
 
+    const newValue = event.target.value;
+    setSiren(newValue);    
+  };
 
-  function getPartOfExpense(totalExpense,companyExpense) {
+  const getListOfExpense = async (expenses) => {
 
-    setPartOfExpense([])
-    companyExpense.map((expense) =>
-    setPartOfExpense(partOfExpense => [...partOfExpense, Math.floor(totalExpense/expense)])
-
-  )
-
-
-  }
- 
-  function getExpenseAmount(expenses) {
-    setCompanyExpense([])
     let total = 0;
-    expenses.map((expense) =>
-      setCompanyExpense(companyExpense =>[...companyExpense, expense.amount] )
-    )
-    expenses.map((expense) =>
-      total += expense.amount,
-    )
 
-    setTotalExpense(total)
+    // Total of expenses 
+
+    expenses.map((expense) => {
+      total += expense.amount
+    })
+
+    // Temporary array
+    var arrObj = [];
+
+    expenses.forEach((expense) => {
+
+      let getActivityCode = getCompany(expense.id).legalUnitActivityCode
+        ? getCompany(expense.id).legalUnitActivityCode
+        : getCompany(expense.id).footprintActivityCode;
+
+      let getPartOfExpense = (expense.amount / total).toFixed(10);
+
+      arrObj.push(
+        {
+          activityCode: getActivityCode,
+          partOfExpense: getPartOfExpense
+        }
+      )
+    })
+
+    // Group by activity code and sum amount 
+    var result = [];
+    arrObj.reduce(function (res, value) {
+      if (!res[value.activityCode]) {
+        res[value.activityCode] = { activityCode: value.activityCode, partOfExpense: 0 };
+        result.push(res[value.activityCode])
+      }
+      res[value.activityCode].partOfExpense = (parseFloat(res[value.activityCode].partOfExpense) + parseFloat(value.partOfExpense)).toFixed(10);
+      return res;
+    }, {});
+
+    setListOfExpense(result)
+
   }
 
 
-  function getCompaniesActivityCode(expenses) {
+  const fetchSirenData = async (siren) => {
 
-    setCompaniesActivityCode([])
+    const response = await fetch(
+      `https://systema-api.azurewebsites.net/api/v2/siren/${siren}`
+    );
 
-    expenses.map((expense) =>
 
-      getCompany(expense.id).legalUnitActivityCode ?
-        setCompaniesActivityCode(companiesActivityCode => [...companiesActivityCode, getCompany(expense.id).legalUnitActivityCode])
-        :
-        setCompaniesActivityCode(companiesActivityCode => [...companiesActivityCode, getCompany(expense.id).footprintActivityCode])
+    const data = await response.json();
+    if (data.header.statut == 200) {
+      return data.profil.descriptionUniteLegale.activitePrincipale
+    }
+    else {
+      return false;
+    }
+  };
+
+
+  const getDataOnSubmit = async () => {
+
+    setErreur("");
+    if (!siren) return;
+
+    let APE = await fetchSirenData(siren);
+    if (APE) {
+      await getListOfExpense(expenses)
+      setActivitePrincipale(APE);
+      setShowRecap(true);
+      setShowSubmit(true);
+    } else {
+      setErreur("Erreur lors de la récupération du numéro de Siren");
+    }
+
+  };
+
+  const ButtonRecap = () => {
+
+    return (
+      <button className="btn btn-secondary" disabled={siren ? false : true} onClick={getDataOnSubmit}>
+        Envoyer mon rapport
+      </button>
+    )
+
+  }
+
+  const ButtonSubmit = ({ handleClick }) => {
+    return (
+      <button className="btn btn-secondary" id="submit" onClick={handleClick} >
+        Envoyer mon rapport
+      </button>
     )
   }
+
+
+  const sendReport = async (activitePrincipale, listOfExpenses) => {
+    const json = JSON.stringify({ activitePrincipale: activitePrincipale, listOfExpenses: listOfExpenses});
+    const file = new Blob([json], { type: 'application/json' });
+    const fileName = "rapport_"+activitePrincipale; 
+
+    const res = await sendReportToAdmin(file, fileName);
+
+    res.status < 300 ? setErreur("send") : setErreur("Erreur lors de l'envoi du rapport. Si l'erreur persiste, veuillez contacter le support.");
+  }
+
+
 
   return (
+
     <div className="modal-overlay" id="rapport-popup">
       <div className="modal-wrapper">
         <div className={"modal "}>
@@ -85,7 +145,7 @@ const RapportPopup = (props) => {
             <h3>Contribuez aux rapports statistiques</h3>
           </div>
           <div className="body">
-            <div className="message">
+            <div className="erreur">
               <h4>
                 Numéro de siren de l'entreprise
               </h4>
@@ -96,42 +156,75 @@ const RapportPopup = (props) => {
                 Le détail des informations transmises sera affichée avant confirmation de l’envoi.
               </p>
             </div>
-            <InputText
-              value={siren}
-              unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
-              onUpdate={handleSiren}
-            />
+            <div className="form-group mt-1">
+              <label>Entrer votre numéro de siren</label>
+              <InputText
+                value={siren}
+                unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
+                onUpdate={handleSiren}
+              />
+            </div>
 
             {
-              activitePrincipale && (
-                <div className="step">
+              showRecap && (
+                <div>
                   <h4>Informations envoyées dans le rapport</h4>
-                  <p>Code APE : {activitePrincipale}</p>
-                  <ul>
-                    {companiesActivityCode.map((code, index) => (
-                      <li key={index}>
-                        {code} : {partOfExpense[index]}
-                      </li>
-                    ))}
-                  </ul>
-
+                  <div className="">
+                    <h5>Code APE : {activitePrincipale}</h5>
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>
+                            Code d'activité
+                          </th>
+                          <th>
+                            Part des dépenses
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {listOfExpenses.map(({ activityCode, partOfExpense }, index) => (
+                          <tr key={index}>
+                            <td>
+                              {activityCode}
+                            </td>
+                            <td>
+                              {partOfExpense}
+                            </td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )
             }
-      {
-          console.log(partOfExpense)
-      }
-            {/* <button className="btn" onClick={onGoBack} >Ok</button> */}
+            {
+              erreur && (
+                <div className="alert alert-error">
+                  <p>
+                    {erreur}
+                  </p>
+                </div>
+              )
+            }
           </div>
+
           <div className="footer">
-            <button className="btn btn-secondary"  onClick={handleSubmit}>
-              Envoyer mon rapport
+            {showSubmit ? <ButtonSubmit handleClick={() => sendReport(activitePrincipale, listOfExpenses)} /> : <ButtonRecap />}
+            <button className="btn" onClick={() => props.onGoBack()}>
+              Retour
             </button>
           </div>
+
         </div>
       </div>
     </div>
   )
+
 }
+
+
+
+
 
 export default RapportPopup
