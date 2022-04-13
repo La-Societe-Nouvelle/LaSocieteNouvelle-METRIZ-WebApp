@@ -153,6 +153,9 @@
     color: $primary-color;
     font-size: 1em;
   }
+  .btn {
+    margin-left: 1rem;
+  }
 }
 // validation button
 .statement-validation {
@@ -172,7 +175,7 @@
     flex: 1 1;
   }
   p {
-    text-align: justify;
+    margin-bottom: 0.5rem;
   }
   img {
     max-height: 300px;
