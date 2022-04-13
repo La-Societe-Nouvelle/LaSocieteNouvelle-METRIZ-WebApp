@@ -10,7 +10,7 @@ import divisions from "/lib/divisions";
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRuler, faFileZipper, faChevronRight, faArrowDown, faFilePdf, faBook, faCheck, faShare } from "@fortawesome/free-solid-svg-icons";
+import { faRuler, faFileZipper, faChevronRight, faArrowDown, faFilePdf, faBook, faCheck, faShare, faEye } from "@fortawesome/free-solid-svg-icons";
 // Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -58,8 +58,11 @@ import { analysisTextWriterNRG } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterSOC } from "../../src/writers/analysis/analysisTextWriterSOC";
 import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWriterWAS";
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
-import { exportFootprintPDF } from "../../src/writers/Export";
+import { downloadZip, exportFootprintPDF, generateFootprintPDF, generatePDF } from "../../src/writers/Export";
 import RapportPopup from "../popups/RapportPopup";
+import LoadingSpinner from "../LoadingSpinner";
+import JSZip from "jszip";
+import jsPDF from "jspdf";
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -96,7 +99,7 @@ export class IndicatorSection extends React.Component {
       allSectorsValueAddedAreaFootprint: new SocialFootprint(),
       allSectorsConsumptionFootprint: new SocialFootprint(),
       economicAreaData: null,
-
+      isLoading: false,
     };
 
   }
@@ -119,16 +122,14 @@ export class IndicatorSection extends React.Component {
   }
 
   render() {
-    const { indic, comparativeDivision, triggerPopup, selectedTable } = this.state;
+    const { indic, comparativeDivision, triggerPopup, selectedTable, isLoading } = this.state;
 
     const isPublicationAvailable =
       Object.entries(
         this.props.session.financialData.aggregates.revenue.footprint.indicators
       ).filter(([_, indicator]) => indicator.value != null).length > 0;
 
-    const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-    const envOdds = ["6", "7", "12", "13", "14", "15"];
-    
+
     return (
 
       <div className="container-fluid indicator-section">
@@ -305,7 +306,7 @@ export class IndicatorSection extends React.Component {
                 <h4>Clés de décryptage</h4>
                 <div className="analysis-container">
                   <div>
-                    <Analyse 
+                    <Analyse
                       indic={this.state.indic}
                       session={this.props.session}
                     />
@@ -321,9 +322,7 @@ export class IndicatorSection extends React.Component {
           <div className="step download-section">
             <h4>Téléchargement</h4>
             <div className="flex">
-              <h5><a href="" onClick={() =>
-                exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
-              } >  <FontAwesomeIcon icon={faFilePdf} /> Rapport sur l'indicateur : {metaIndics[indic].libelle} </a> </h5>
+              <h5><FontAwesomeIcon icon={faFilePdf} /> Rapport sur l'indicateur : {metaIndics[indic].libelle} </h5>
               <button
                 className={"btn btn-primary"}
                 disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
@@ -331,7 +330,21 @@ export class IndicatorSection extends React.Component {
                   exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
                 }
               >
-                <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.pdf)
+                <FontAwesomeIcon icon={faEye} /> Visualiser (.pdf)
+              </button>
+            </div>
+
+            <div className="flex">
+              <h5>
+                <FontAwesomeIcon icon={faFilePdf} /> Rapport sur l'empreinte sociétale
+              </h5>
+              <button
+                className={"btn btn-primary"}
+                onClick={() =>
+                  exportFootprintPDF(this.props.session)
+                }
+              >
+                <FontAwesomeIcon icon={faEye} /> Visualiser (.pdf)
               </button>
             </div>
             {this.props.session.validations.length > 1 && (
@@ -339,75 +352,48 @@ export class IndicatorSection extends React.Component {
 
                 <div>
                   <h5>
-                    <a href="" onClick={() =>
-                      exportIndicPDF(this.props.session.validations, this.props.session, this.state.comparativeDivision)
-                    } >   <FontAwesomeIcon icon={faFileZipper} />  Rapports sur les indicateurs :
-                    </a>
+                    <FontAwesomeIcon icon={faFileZipper} />  Télécharger le dossier complet
                   </h5>
+                  {/* TO DO : CREATE GRAPHS TO EXPORT */}
                   <ul>
                     {
                       this.props.session.validations.map((indic, index) =>
                         <li key={index}>
-                          <FontAwesomeIcon icon={faCheck} /> {metaIndics[indic].libelle}
+                          <FontAwesomeIcon icon={faCheck} /> Indicateur : {metaIndics[indic].libelle}
                         </li>
                       )
                     }
+                    <li> <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte sociétale</li>
+                    <li> <FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de la session</li>
                   </ul>
                 </div>
+                {
+                  console.log(isLoading)
 
+                }
                 <button
                   className={"btn btn-primary"}
                   onClick={() =>
-                    exportIndicPDF(this.props.session.validations, this.props.session, this.state.comparativeDivision)
+                    this.downloadReport(this.props.session.validations, this.props.session, this.state.comparativeDivision)
                   }
                 >
-                  <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.zip)
+                  {isLoading ? <LoadingSpinner /> : <FontAwesomeIcon icon={faArrowDown} />}  Télécharger (.zip)
                 </button>
+
               </div>)
             }
 
-            <div className="flex">
-              <h5>
-                <a href="" onClick={() => exportFootprintPDF(envIndic, this.props.session, this.state.comparativeDivision, "Empreinte environnementale", envOdds)} >
-                  <FontAwesomeIcon icon={faFilePdf} /> Rapport sur l'empreinte environnementale
-                </a>
-              </h5>
-              <button
-                className={"btn btn-primary"}
-                disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
-                onClick={() =>
-                  exportFootprintPDF(envIndic, this.props.session, this.state.comparativeDivision, "Empreinte environnementale", envOdds)
-                }
-              >
-                <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.pdf)
-              </button>
-            </div>
-            <div className="flex">
-              <h5><a href="" onClick={() =>
-                exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
-              } >  <FontAwesomeIcon icon={faFilePdf} /> Rapport général </a> </h5>
-              <button
-                className={"btn btn-primary"}
-                disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
-                onClick={() =>
-                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
-                }
-              >
-                <FontAwesomeIcon icon={faArrowDown} /> Télécharger (.pdf)
-              </button>
-            </div>
-
           </div>
           {/* RAPPORT statistiques */}
- 
-          {triggerPopup == "rapport" && ( 
-            <RapportPopup session={this.props.session}   //onGoBack={this.closePopup}
+
+          {triggerPopup == "rapport" && (
+            <RapportPopup session={this.props.session} onGoBack={() => this.triggerPopup("")}
             />
-          )} 
+          )}
 
           <div className="align-right">
             <button
-              className={"btn btn-primary"} 
+              className={"btn btn-primary"}
               onClick={() => this.setState({ triggerPopup: "rapport" })}
             >
               <FontAwesomeIcon icon={faShare} /> Envoyer rapport
@@ -451,6 +437,60 @@ export class IndicatorSection extends React.Component {
         );
     }
   };
+
+
+  /* ---------- ACTIONS ---------- */
+
+  downloadReport = async (indics,session,comparativeDivision) =>  {
+    // // init progression
+    this.setState({ isLoading: true });
+
+   const { legalUnit, year } = session;
+
+    // Zip Export
+    let zip = new JSZip();
+    indics.map((indic) => {
+      let doc = generatePDF(indic,session,comparativeDivision);
+      zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
+    }
+    );
+
+    // add 
+
+    const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
+    const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
+
+    const seOdds = ["5", "8", "9", "10", "12"];
+    const envOdds = ["6", "7", "12", "13", "14", "15"];
+
+
+    // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+    const docEnv = new jsPDF("landscape");
+    generateFootprintPDF(docEnv, envIndic, session, "Empreinte environnementale", envOdds);
+    zip.file("rapport_empreinte_environnementale_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docEnv.output('blob'));
+
+    // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+    const docES = new jsPDF("landscape");
+    generateFootprintPDF(docES, seIndic, session, "Empreinte économique et sociale", seOdds);
+    zip.file("rapport_empreinte_es_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docES.output('blob'));
+
+    // add .json file save 
+    const fileName = "svg_ese_" + session.legalUnit.siren;
+    const json = JSON.stringify(session);
+
+    // build download link & activate
+    const blob = new Blob([json], { type: 'application/json' });
+    zip.file(fileName + '.json', blob);
+
+    zip.generateAsync({ type: 'blob' }).then(function (content) {
+      saveAs(content, 'livrables_' + legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
+    });
+
+    this.setState({
+      isLoading: false,
+
+    });
+  }
 
   /* ----- SELECTED INDICATOR / TABLE ----- */
 
@@ -504,7 +544,7 @@ export class IndicatorSection extends React.Component {
     }
   };
 
-  validateIndicator = async () => { 
+  validateIndicator = async () => {
     // add validation
     if (!this.props.session.validations.includes(this.state.indic))
       this.props.session.validations.push(this.state.indic);
@@ -518,7 +558,7 @@ export class IndicatorSection extends React.Component {
 
   triggerPopup = (popupLabel) => this.setState({ triggerPopup: popupLabel });
 
-  
+
 }
 
 /* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
@@ -579,9 +619,7 @@ const Analyse = (indic, session) => {
   return (
     <>
       {analyse.map((paragraph, index) => (
-
-        <p key={index}>{paragraph.reduce((a, b) => a + " " + b, "")}</p>
-
+        <p key={index}>{paragraph.reduce((a, b) => a + " " + b)}</p>
       ))}
     </>
   );
