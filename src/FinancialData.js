@@ -461,51 +461,57 @@ export class FinancialData {
         // Achats de marchandises
         items = this.expenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Achats de marchandises",items});
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate);
 
         // Variation des stocks de marchandises
         items = this.expenseAccounts.filter(account => /^6037/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de marchandises",items});
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate);
 
         // Achats de matières premières et autres approvisionnements 
         items = this.expenseAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Achats de matières premières et autres approvisionnements",items});
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate);
 
         // Variation des stocks de matières premières et autres approvisionnements 
         items = this.expenseAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de matières premières et autres approvisionnements",items});
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate);
 
         // Autres achats
         items = this.expenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Autres achats",items});
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate);
 
         // Autres charges externes
         items = this.expenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Autres charges externes",items});
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate);
         
         // Impôts, taxes et versements assimilés
         //items = this.expenseAccounts.filter(account => /^63/.test(account.accountNum));
-        aggregate = {accountLib: "Impôts, taxes et versements assimilés", amount: this.getAmountTaxes()};
+        aggregate = {accountLib: "Impôts, taxes et versements assimilés", amount: this.getAmountTaxes(), isToBeChecked: false};
         aggregates.push(aggregate); 
 
         // Charges sociales
         //items = this.expenseAccounts.filter(account => /^64/.test(account.accountNum));
-        aggregate = {accountLib: "Charges sociales", amount: this.getAmountPersonnelExpenses()};
+        aggregate = {accountLib: "Charges sociales", amount: this.getAmountPersonnelExpenses(), isToBeChecked: false};
         aggregates.push(aggregate);
 
         // Dotations aux amortissements, dépréciations et provisions
         //items = this.expenseAccounts.filter(account => /^681/.test(account.accountNum));
-        aggregate = {accountLib: "Dotations aux amortissements, dépréciations et provisions", amount: this.getAmountDepreciationExpenses()+this.getAmountProvisions()};
+        aggregate = {accountLib: "Dotations aux amortissements, dépréciations et provisions", amount: this.getAmountDepreciationExpenses()+this.getAmountProvisions(), isToBeChecked: false};
         aggregates.push(aggregate); 
 
         // Autres charges d'exploitation
         //items = this.expenseAccounts.filter(account => /^65/.test(account.accountNum));
-        aggregate = {accountLib: "Autres charges d'exploitation", amount: this.getAmountOtherExpenses()};
+        aggregate = {accountLib: "Autres charges d'exploitation", amount: this.getAmountOtherExpenses(), isToBeChecked: false};
         aggregates.push(aggregate); 
 
         return aggregates;
