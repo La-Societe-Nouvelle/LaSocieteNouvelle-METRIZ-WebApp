@@ -358,7 +358,160 @@ export class FinancialData {
         if (company!=undefined) company.update({id: company.id,corporateId});
     }
 
-    /* ---------------------------------------- Details ---------------------------------------- */
+    /* ---------------------------------------- Détails - Soldes Intermédiaires de Gestion ---------------------------------------- */
+
+    /** Aggrégats - Consommations intermédiaires :
+     *      607,6097                                Achats de marchandises
+     *      6037                                    Variation des stocks de marchandises
+     *      601,6091,602,6092                       Achats de matières premières et autres approvisionnements
+     *      6031,6032                               Variations de stocks de matières premières et autres approvisionnements
+     *      604,6094,605,6095,606,6096,608,6098     Autres achats
+     *      61,62                                   Autres charges externes
+     * 
+     *  Aggrégats - Consommations de capital fixe :
+     *      68111                                   Dotations aux amortissements sur immobilisations incorporelles
+     *      68112                                   Dotations aux amortissements sur immobilisations corporelles
+     *      6871                                    Dotations aux amortissements exceptionnels des immobilisations
+     */
+
+     getIntermediateConsumptionsAggregates = () =>
+     {
+        let aggregates = [];
+        let aggregate = {};
+        let items = []
+
+        // Achats de marchandises
+        items = this.expenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Achats de marchandises",items});
+        aggregates.push(aggregate);
+
+        // Variation des stocks de marchandises
+        items = this.expenseAccounts.filter(account => /^6037/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de marchandises",items});
+        aggregates.push(aggregate);
+ 
+        // Achats de matières premières et autres approvisionnements 
+        items = this.expenseAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Achats de matières premières et autres approvisionnements",items});
+        aggregates.push(aggregate);
+
+        // Variation des stocks de matières premières et autres approvisionnements 
+        items = this.expenseAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de matières premières et autres approvisionnements",items});
+        aggregates.push(aggregate);
+ 
+        // Autres achats
+        items = this.expenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Autres achats",items});
+        aggregates.push(aggregate);
+ 
+        // Autres charges externes
+        items = this.expenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Autres charges externes",items});
+        aggregates.push(aggregate);      
+ 
+         return aggregates;
+     }
+
+     getFixedCapitalConsumptionsAggregates = () =>
+     {
+        let aggregates = [];
+        let aggregate = {};
+        let items = []
+
+        // Dotations aux amortissements sur immobilisations incorporelles
+        items = this.expenseAccounts.filter(account => /^68111/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations incorporelles",items});
+        aggregates.push(aggregate);
+
+        // Dotations aux amortissements sur immobilisations corporelles
+        items = this.expenseAccounts.filter(account => /^68112/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations corporelles",items});
+        aggregates.push(aggregate);
+ 
+        // Dotations aux amortissements exceptionnels des immobilisations
+        items = this.expenseAccounts.filter(account => /^6871/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements exceptionnels des immobilisations",items});
+        aggregates.push(aggregate);           
+ 
+         return aggregates;
+     }
+
+    /* ---------------------------------------- Details - Charges d'exploitation ---------------------------------------- */
+
+    /** Aggrégats - Charges d'exploitation
+     *      607                                     Achats de marchandises
+     *      6037                                    Variation des stocks de marchandises
+     *      601,6091,602,6092                       Achats de matières premières et autres approvisionnements
+     *      6031,6032                               Variation des stocks de matières premières et autres approvisionnements 
+     *      604,6094,605,6095,606,6096,608,6098     Autres achats
+     *      61,62                                   Autres charges externes
+     *      63                                      Impôts, taxes et versements assimilés
+     *      64                                      Charges sociales
+     *      681                                     Dotations aux amortissements, dépréciations et provisions
+     *      65                                      Autres charges d'exploitation
+     */
+
+    getOperatingExpensesAggregates = () =>
+    {
+        let aggregates = [];
+        let aggregate = {};
+        let items = [];
+ 
+        // Achats de marchandises
+        items = this.expenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Achats de marchandises",items});
+        aggregates.push(aggregate);
+
+        // Variation des stocks de marchandises
+        items = this.expenseAccounts.filter(account => /^6037/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de marchandises",items});
+        aggregates.push(aggregate);
+
+        // Achats de matières premières et autres approvisionnements 
+        items = this.expenseAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Achats de matières premières et autres approvisionnements",items});
+        aggregates.push(aggregate);
+
+        // Variation des stocks de matières premières et autres approvisionnements 
+        items = this.expenseAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de matières premières et autres approvisionnements",items});
+        aggregates.push(aggregate);
+
+        // Autres achats
+        items = this.expenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Autres achats",items});
+        aggregates.push(aggregate);
+
+        // Autres charges externes
+        items = this.expenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Autres charges externes",items});
+        aggregates.push(aggregate);
+        
+        // Impôts, taxes et versements assimilés
+        items = this.expenseAccounts.filter(account => /^63/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Impôts, taxes et versements assimilés",items});
+        aggregates.push(aggregate); 
+
+        // Charges sociales
+        items = this.expenseAccounts.filter(account => /^64/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Charges sociales",items});
+        aggregates.push(aggregate);
+
+        // Dotations aux amortissements, dépréciations et provisions
+        items = this.expenseAccounts.filter(account => /^681/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements, dépréciations et provisions",items});
+        aggregates.push(aggregate); 
+
+        // Autres charges d'exploitation
+        items = this.expenseAccounts.filter(account => /^65/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Autres charges d'exploitation",items});
+        aggregates.push(aggregate); 
+
+        return aggregates;
+    }
+
+    /* ---------------------------------------- Details [OBSOLETE] ---------------------------------------- */
 
     getExternalExpensesAggregates = () =>
     {
