@@ -299,9 +299,9 @@ function generatePDF(indic, session, comparativeDivision, idProductionCanvas, id
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
-  doc.text("CLE DE DECRYPTAGE", x, y);
+  doc.text("NOTE D'ANALYSE", x, y);
 
-  y += 10;
+  y += 5;
 
   let analyse = getAnalyse(indic, session);
   let text = "";

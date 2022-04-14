@@ -310,7 +310,7 @@ export class IndicatorSection extends React.Component {
               </div>
 
               <div className="analysis-section step">
-                <h4>Clés de décryptage</h4>
+                <h4>Note d'analyse</h4>
                 <div className="analysis-container">
                   <div>
                     <Analyse
