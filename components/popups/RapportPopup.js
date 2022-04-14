@@ -20,12 +20,6 @@ const RapportPopup = (props) => {
     setSiren(siren)
   }
 
-  let onChange = (event) => {
-
-    const newValue = event.target.value;
-    setSiren(newValue);    
-  };
-
   const getListOfExpense = async (expenses) => {
 
     let total = 0;
@@ -62,7 +56,7 @@ const RapportPopup = (props) => {
         res[value.activityCode] = { activityCode: value.activityCode, partOfExpense: 0 };
         result.push(res[value.activityCode])
       }
-      res[value.activityCode].partOfExpense = (parseFloat(res[value.activityCode].partOfExpense) + parseFloat(value.partOfExpense)).toFixed(10);
+      res[value.activityCode].partOfExpense = (parseFloat(res[value.activityCode].partOfExpense) + parseFloat(value.partOfExpense)).toFixed(4);
       return res;
     }, {});
 
@@ -109,7 +103,7 @@ const RapportPopup = (props) => {
 
     return (
       <button className="btn btn-secondary" disabled={siren ? false : true} onClick={getDataOnSubmit}>
-        Envoyer mon rapport
+        Consulter les données envoyées
       </button>
     )
 
@@ -125,9 +119,9 @@ const RapportPopup = (props) => {
 
 
   const sendReport = async (activitePrincipale, listOfExpenses) => {
-    const json = JSON.stringify({ activitePrincipale: activitePrincipale, listOfExpenses: listOfExpenses});
+    const json = JSON.stringify({ activitePrincipale: activitePrincipale, listOfExpenses: listOfExpenses });
     const file = new Blob([json], { type: 'application/json' });
-    const fileName = "rapport_"+activitePrincipale; 
+    const fileName = "rapport_" + activitePrincipale;
 
     const res = await sendReportToAdmin(file, fileName);
 
@@ -145,33 +139,14 @@ const RapportPopup = (props) => {
             <h3>Contribuez aux rapports statistiques</h3>
           </div>
           <div className="body">
-            <div className="erreur">
-              <h4>
-                Numéro de siren de l'entreprise
-              </h4>
-              <p>
-                Le numéro de siren permet de récupérer le code APE (disponible au sein du répertoire SIRENE).
-                Le code d’activité principale nécessaire au travail statistique.<br />
-                Le numéro de siren ne sera pas inclu dans le rapport envoyé, seul le code APE sera intégré.
-                Le détail des informations transmises sera affichée avant confirmation de l’envoi.
-              </p>
-            </div>
-            <div className="form-group mt-1">
-              <label>Entrer votre numéro de siren</label>
-              <InputText
-                value={siren}
-                unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
-                onUpdate={handleSiren}
-              />
-            </div>
 
             {
-              showRecap && (
+              showRecap ?
                 <div>
                   <h4>Informations envoyées dans le rapport</h4>
                   <div className="">
                     <h5>Code APE : {activitePrincipale}</h5>
-                    <table>
+                    <table className="w100">
                       <thead>
                         <tr>
                           <th>
@@ -196,7 +171,26 @@ const RapportPopup = (props) => {
                     </table>
                   </div>
                 </div>
-              )
+                :
+                <div>
+                  <h4>
+                    Numéro de siren de l'entreprise
+                  </h4>
+                  <p>
+                    Le numéro de siren permet de récupérer le code APE (disponible au sein du répertoire SIRENE).
+                    Le code d’activité principale nécessaire au travail statistique.<br />
+                    Le numéro de siren ne sera pas inclu dans le rapport envoyé, seul le code APE sera intégré.
+                    Le détail des informations transmises sera affiché avant confirmation de l’envoi.
+                  </p>
+                  <div className="form-group mt-1">
+                    <label>Entrer votre numéro de siren</label>
+                    <InputText
+                      value={siren}
+                      unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
+                      onUpdate={handleSiren}
+                    />
+                  </div>
+                </div>
             }
             {
               erreur && (
@@ -222,9 +216,6 @@ const RapportPopup = (props) => {
   )
 
 }
-
-
-
 
 
 export default RapportPopup
