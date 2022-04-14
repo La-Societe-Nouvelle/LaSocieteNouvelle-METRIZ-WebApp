@@ -223,6 +223,9 @@
   }
 
   #rapport-popup{
+    .modal {
+      width: 800px;
+    }
     .modal-wrapper .body, h4 {
       text-align: left;
     }

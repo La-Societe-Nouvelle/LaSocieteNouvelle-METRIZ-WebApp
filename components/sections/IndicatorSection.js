@@ -40,10 +40,9 @@ import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 
-
-
 // Export modules
 import { exportIndicPDF } from "/src/writers/Export";
+import { downloadReport, exportFootprintPDF, generateFootprintPDF, generatePDF } from "../../src/writers/Export";
 
 // Analysis writers
 import { analysisTextWriterECO } from "../../src/writers/analysis/analysisTextWriterECO";
@@ -58,11 +57,12 @@ import { analysisTextWriterNRG } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterSOC } from "../../src/writers/analysis/analysisTextWriterSOC";
 import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWriterWAS";
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
-import {exportFootprintPDF, generateFootprintPDF, generatePDF } from "../../src/writers/Export";
+
+
 import RapportPopup from "../popups/RapportPopup";
 import LoadingSpinner from "../LoadingSpinner";
-import JSZip from "jszip";
-import jsPDF from "jspdf";
+import { GraphsPDF } from "../graphs/GraphsPDF";
+
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -100,6 +100,7 @@ export class IndicatorSection extends React.Component {
       allSectorsConsumptionFootprint: new SocialFootprint(),
       economicAreaData: null,
       isLoading: false,
+      graphPdf: true
     };
 
   }
@@ -122,15 +123,24 @@ export class IndicatorSection extends React.Component {
   }
 
   render() {
-    const { indic, comparativeDivision, triggerPopup, selectedTable, isLoading } = this.state;
+    const { indic, comparativeDivision, triggerPopup, selectedTable, isLoading, graphPdf } = this.state;
 
     const isPublicationAvailable = Object.entries(this.props.session.financialData.aggregates.revenue.footprint.indicators).filter(([_, indicator]) => indicator.value != null).length > 0;
 
     return (
-
       <div className="container-fluid indicator-section">
         <section className="step">
-
+          {
+            graphPdf && (
+              this.props.session.validations.map((indic, key) =>
+                <GraphsPDF
+                  key={key}
+                  session={this.props.session}
+                  indic={indic}
+                  comparativeFootprints={this.state} />
+              )
+            )
+          }
           <div className="section-title">
             <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 5 - Mesure de l'impact</h2>
             <p>
@@ -294,6 +304,7 @@ export class IndicatorSection extends React.Component {
                       indic={indic}
                       comparativeFootprints={this.state}
                     />
+
                   </div>
                 </div>
               </div>
@@ -323,7 +334,7 @@ export class IndicatorSection extends React.Component {
                 className={"btn btn-primary"}
                 disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
                 onClick={() =>
-                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision)
+                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision, '#Production', '#Consumption', '#Value')
                 }
               >
                 <FontAwesomeIcon icon={faEye} /> Visualiser (.pdf)
@@ -350,7 +361,7 @@ export class IndicatorSection extends React.Component {
                   <h5>
                     <FontAwesomeIcon icon={faFileZipper} />  Télécharger le dossier complet
                   </h5>
-                  {/* TO DO : CREATE GRAPHS TO EXPORT */}
+
                   <ul>
                     {
                       this.props.session.validations.map((indic, index) =>
@@ -363,16 +374,14 @@ export class IndicatorSection extends React.Component {
                     <li> <FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de la session</li>
                   </ul>
                 </div>
-                {
-                  console.log(isLoading)
-
-                }
                 <button
                   className={"btn btn-primary"}
-                  onClick={() =>
-                    this.downloadReport(this.props.session.validations, this.props.session, this.state.comparativeDivision)
+                  onClick={() => {
+                    this.generateGraph(this.props.session.validations, this.props.session, this.state.comparativeDivision)
+                  }
                   }
                 >
+
                   {isLoading ? <LoadingSpinner /> : <FontAwesomeIcon icon={faArrowDown} />}  Télécharger (.zip)
                 </button>
 
@@ -380,7 +389,6 @@ export class IndicatorSection extends React.Component {
             }
 
           </div>
-          {/* RAPPORT statistiques */}
 
           {triggerPopup == "rapport" && (
             <RapportPopup session={this.props.session} onGoBack={() => this.triggerPopup("")}
@@ -403,6 +411,7 @@ export class IndicatorSection extends React.Component {
               Publier mes résultats <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
+
         </section>
       </div>
     );
@@ -437,56 +446,20 @@ export class IndicatorSection extends React.Component {
 
   /* ---------- ACTIONS ---------- */
 
-  downloadReport = async (indics,session,comparativeDivision) =>  {
-    // // init progression
-    this.setState({ isLoading: true });
+  generateGraph = (indics, session, comparativeDivision) => {
 
-   const { legalUnit, year } = session;
+    this.setState(
+      {
+        isLoading: true,
+      },
+      () => {
 
-    // Zip Export
-    let zip = new JSZip();
-    indics.map((indic) => {
-      let doc = generatePDF(indic,session,comparativeDivision);
-      zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
-    }
+        downloadReport(indics, session, comparativeDivision)
+        this.setState({ isLoading: false})
+      }
     );
-
-    // add 
-
-    const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-    const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
-
-    const seOdds = ["5", "8", "9", "10", "12"];
-    const envOdds = ["6", "7", "12", "13", "14", "15"];
-
-
-    // RAPPORT - EMPREINTE ENVIRONNEMENTALE
-    const docEnv = new jsPDF("landscape");
-    generateFootprintPDF(docEnv, envIndic, session, "Empreinte environnementale", envOdds);
-    zip.file("rapport_empreinte_environnementale_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docEnv.output('blob'));
-
-    // RAPPORT - EMPREINTE ENVIRONNEMENTALE
-    const docES = new jsPDF("landscape");
-    generateFootprintPDF(docES, seIndic, session, "Empreinte économique et sociale", seOdds);
-    zip.file("rapport_empreinte_es_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docES.output('blob'));
-
-    // add .json file save 
-    const fileName = "svg_ese_" + session.legalUnit.siren;
-    const json = JSON.stringify(session);
-
-    // build download link & activate
-    const blob = new Blob([json], { type: 'application/json' });
-    zip.file(fileName + '.json', blob);
-
-    zip.generateAsync({ type: 'blob' }).then(function (content) {
-      saveAs(content, 'livrables_' + legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
-    });
-
-    this.setState({
-      isLoading: false,
-
-    });
   }
+
 
   /* ----- SELECTED INDICATOR / TABLE ----- */
 
@@ -553,7 +526,6 @@ export class IndicatorSection extends React.Component {
   /* ----- POP-UP ----- */
 
   triggerPopup = (popupLabel) => this.setState({ triggerPopup: popupLabel });
-
 
 }
 

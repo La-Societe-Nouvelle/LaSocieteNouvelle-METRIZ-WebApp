@@ -33,6 +33,11 @@ hr {
   background-color: #dbdef1;
   margin: 2rem auto;
 }
+
+.hidden {
+ position: absolute;
+ opacity: 0;
+}
 // Input
 
 input {
@@ -382,10 +387,11 @@ sup {
   }
 }
 .loading-spinner {
-  width: 50px;
-  height: 50px;
-  border: 10px solid #f3f3f3; /* Light grey */
-  border-top: 10px solid #383636; /* Black */
+  width: 20px;
+  height: 20px;
+  border: 5px solid #f3f3f3; 
+  border-top: 5px solid ; 
+  float: left;
   border-radius: 50%;
   animation: spinner 1.5s linear infinite;
 }

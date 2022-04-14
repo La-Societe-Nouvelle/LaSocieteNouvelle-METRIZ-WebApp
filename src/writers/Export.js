@@ -2,16 +2,13 @@
 
 // Modules
 import { jsPDF } from 'jspdf';
-import JSZip from 'jszip';
+import JSZip from "jszip";
 import { saveAs } from 'file-saver';
 
 // Fonts 
 
 // Libs
 import metaIndics from '../../lib/indics';
-
-// Sources
-import { buildIndicatorAggregate } from '../formulas/footprintFormulas';
 
 // Utils
 import { printValue } from '/src/utils/Utils';
@@ -79,9 +76,11 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   return csvContent;
 }
 
-function generatePDF(indic, session, comparativeDivision) {
 
-  const doc = new jsPDF();
+
+function generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas) {
+
+  const doc = new jsPDF('p', 'mm', 'a4', true);
   const { financialData, legalUnit } = session;
 
   let x = 20;
@@ -305,10 +304,10 @@ function generatePDF(indic, session, comparativeDivision) {
   y += 10;
 
   let analyse = getAnalyse(indic, session);
-  let text="";
+  let text = "";
   {
     analyse.map((paragraph) => (
-      text += '\n'+paragraph.reduce((a, b) => a + " " + b)
+      text += '\n' + paragraph.reduce((a, b) => a + " " + b)
     ))
   }
 
@@ -343,24 +342,28 @@ function generatePDF(indic, session, comparativeDivision) {
   //Production canvas
   const pdfWidth = (doc.internal.pageSize.getWidth() / 3);
 
-  let canvas = document.querySelector('#Production');
+  let canvas = document.querySelector(idProductionCanvas);
+
   let canvasImg = canvas.toDataURL("image/png", 1.0);
+
   const imgProps = doc.getImageProperties(canvasImg);
+
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  doc.addImage(canvasImg, 'PNG', x, y, pdfWidth, pdfHeight);
+
+  doc.addImage(canvasImg, 'PNG', x, y, pdfWidth, pdfHeight, undefined, 'FAST');
 
   //Consumption canvas
-  let canvasConsumption = document.querySelector('#Consumption');
+  let canvasConsumption = document.querySelector(idConsumptionCanvas);
   let canvasConsumptionImg = canvasConsumption.toDataURL("image/png", 1.0);
   const imgConsumptionProps = doc.getImageProperties(canvasConsumptionImg);
   const pdfCHeight = (imgConsumptionProps.height * pdfWidth) / imgConsumptionProps.width;
 
-  doc.addImage(canvasConsumptionImg, 'PNG', pdfWidth + 40, y, pdfWidth, pdfCHeight);
+  doc.addImage(canvasConsumptionImg, 'PNG', pdfWidth + 40, y, pdfWidth, pdfCHeight, undefined, 'FAST');
 
   y = 110;
 
   //Value canvas
-  let canvasValue = document.querySelector('#Value');
+  let canvasValue = document.querySelector(idValueCanvas);
   let canvasValueImg = canvasValue.toDataURL("image/png", 1.0);
   const imgValueProps = doc.getImageProperties(canvasValueImg);
   const pdfVHeight = (imgValueProps.height * pdfWidth) / imgValueProps.width;
@@ -371,8 +374,7 @@ function generatePDF(indic, session, comparativeDivision) {
   return doc;
 }
 
-function generateFootprintPDF(doc,indic, session, title, odds) {
-
+function generateFootprintPDF(doc, indic, session, title, odds) {
 
   const { financialData, legalUnit } = session;
   doc.setProperties({ title: "rapport_empreinte_societale_" + legalUnit.corporateName.replaceAll(" ", "") })
@@ -391,7 +393,7 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
     imgPos += 11;
     let img = new Image();
     img.src = '/resources/odds/print/F_SDG_PRINT-' + element + '.jpg';
-    doc.addImage(img, "JPEG", imgPos, 15, 10, 10)
+    doc.addImage(img, "JPEG", imgPos, 15, 10, 10, undefined, 'FAST')
 
   });
 
@@ -424,7 +426,7 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
   y += 8;
 
   // TABLE 
- 
+
   let xRect = x + 17;
   doc.setDrawColor(25, 21, 88);
 
@@ -432,9 +434,9 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
   indic.forEach(indic => {
     doc.rect(xRect += 35, y, 37, 8);
     let img = new Image();
-    img.src = '/resources/icon-ese-bleues/' + indic + '.png';
-    doc.addImage(img, "PNG",  xRect +1,   y + 1.5, 4.5, 4.5);
-    
+    img.src = '/resources/icon-ese-bleues/print/' + indic + '.jpg';
+    doc.addImage(img, "JPEG", xRect + 1, y + 1.5, 4.5, 4.5, undefined, 'FAST');
+
     doc.setFont("Helvetica", "bold");
     doc.setFontSize(7);
     doc.text(doc.splitTextToSize(metaIndics[indic].libelleGrandeur, 24), xRect + 18.5, y + 3.5, { align: "center" });
@@ -482,7 +484,7 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
     doc.setFont("Helvetica", "normal");
     doc.text(doc.splitTextToSize("Incertitude %", 9), xUnit + 17, y + 5, { align: "center" });
 
-    doc.text(doc.splitTextToSize("Impact brut "+  metaIndics[indic].unitAbsolute, 9), xUnit + 29, y + 5, { align: "center" });
+    doc.text(doc.splitTextToSize("Impact brut " + metaIndics[indic].unitAbsolute, 9), xUnit + 29, y + 5, { align: "center" });
 
     doc.setDrawColor(216, 214, 226);
     doc.setLineWidth(0.1);
@@ -524,14 +526,14 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
 
   indic.forEach(indic => {
 
-    let  nbDecimals = metaIndics[indic].nbDecimals;
+    let nbDecimals = metaIndics[indic].nbDecimals;
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
     doc.text(printValue(production.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(printValue(production.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
-    doc.text(printValue(production.footprint.indicators[indic].getGrossImpact(production.amount),nbDecimals), xValue + 24, y, { align: "right" });
+    doc.text(printValue(production.footprint.indicators[indic].getGrossImpact(production.amount), nbDecimals), xValue + 24, y, { align: "right" });
 
     doc.setDrawColor(25, 21, 88);
     doc.setLineWidth(0.2);
@@ -560,18 +562,17 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
 
   indic.forEach(indic => {
 
-    if(
-      printValue(revenue.footprint.indicators[indic].getValue(), 1) != " - " 
-    )
-    {
+    if (
+      printValue(revenue.footprint.indicators[indic].getValue(), 1) != " - "
+    ) {
       doc.setFont("Helvetica", "bold");
       doc.setFillColor(255, 138, 142);
-      doc.rect(xValue - 9, y-2.5, 10, 3, 'F');  
+      doc.rect(xValue - 9, y - 2.5, 10, 3, 'F');
     }
-  
+
     doc.setFontSize(6);
     doc.text(printValue(revenue.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
-   
+
     doc.setFont("Helvetica", "normal");
 
     doc.setFontSize(5);
@@ -838,12 +839,12 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
 
   doc.setFillColor(251, 251, 255);
   doc.setDrawColor(251, 251, 255);
-  doc.rect(x, y-3, 274, 6, 'FD');
-  
+  doc.rect(x, y - 3, 274, 6, 'FD');
+
   doc.setFontSize(7);
   doc.setFont("Helvetica", "bold");
   doc.text("Valeur ajoutée nette", x + 2, y);
-  
+
   doc.setFontSize(6);
   doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, { align: "right" });
 
@@ -866,8 +867,8 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
     doc.line(xLine, y - 5, xLine, height)
     doc.setLineWidth(0.1);
     doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y-5 , xLine + 13, height);
-    doc.line(xLine + 25, y-5, xLine + 25, height);
+    doc.line(xLine + 13, y - 5, xLine + 13, height);
+    doc.line(xLine + 25, y - 5, xLine + 25, height);
     xLine += 37;
 
   });
@@ -876,7 +877,7 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
   doc.setLineWidth(0.2);
   doc.setDrawColor(25, 21, 88);
   // TOP
-   doc.line(x, 65, 284, 65);
+  doc.line(x, 65, 284, 65);
   // LEFT
   doc.line(x, 65, x, height)
   // RIGHT 
@@ -905,23 +906,25 @@ function generateFootprintPDF(doc,indic, session, title, odds) {
   y += 7;
 
   doc.text("Les données publiées sont accessibles librement, elles permettent à vos clients (et potentiels clients) de mesurer leurs impacts indirects associés à leurs factures, et elles contribuent à la construction d’une économie plus transparente.\n"
-  +"Les données sont modifiables. Pour plus d’informations, contactez admin@lasocietenouvelle.org",x,y)
+    + "Les données sont modifiables. Pour plus d’informations, contactez admin@lasocietenouvelle.org", x, y)
   return doc;
 }
 
+function exportIndicPDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas) {
 
-function exportIndicPDF(indic, session, comparativeDivision) {
   const { legalUnit, year } = session;
 
-    // PDF Export
-    let doc = generatePDF(indic, session, comparativeDivision)
-    window.open(doc.output("bloburl"), "_blank");
-    doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
+  // PDF Export
+  let doc = generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas);
+
+  window.open(doc.output("bloburl"), "_blank");
+  doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + "_" + year + ".pdf");
 
 }
 
 function exportFootprintPDF(session) {
-  const doc = new jsPDF("landscape");
+
+  const doc = new jsPDF("landscape", 'mm', 'a4', true);
 
   const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
   const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
@@ -931,19 +934,64 @@ function exportFootprintPDF(session) {
 
   // RAPPORT - EMPREINTE ENVIRONNEMENTALE
 
-  generateFootprintPDF(doc, envIndic, session, "Empreinte environnementale", envOdds); 
+  generateFootprintPDF(doc, envIndic, session, "Empreinte environnementale", envOdds);
 
   doc.addPage();
 
   // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
 
-  generateFootprintPDF(doc,seIndic, session, "Empreinte économique et sociale", seOdds); 
+  generateFootprintPDF(doc, seIndic, session, "Empreinte économique et sociale", seOdds);
 
   window.open(doc.output("bloburl"), "_blank");
 
   // doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
 
 }
+
+async function downloadReport(indics, session, comparativeDivision) {
+
+  const { legalUnit, year } = session;
+  // Zip Export
+  let zip = new JSZip();
+  indics.map((indic) => {
+    let doc = generatePDF(indic, session, comparativeDivision, '#print-Production-' + indic, '#print-Consumption-' + indic, '#print-Value-' + indic);
+    zip.file("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + '.pdf', doc.output('blob'));
+  }
+  );
+
+  // add 
+
+  const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
+  const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
+
+  const seOdds = ["5", "8", "9", "10", "12"];
+  const envOdds = ["6", "7", "12", "13", "14", "15"];
+
+  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+  const docEnv = new jsPDF("landscape");
+  generateFootprintPDF(docEnv, envIndic, session, "Empreinte environnementale", envOdds);
+  zip.file("rapport_empreinte_environnementale_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docEnv.output('blob'));
+
+  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+  const docES = new jsPDF("landscape");
+  generateFootprintPDF(docES, seIndic, session, "Empreinte économique et sociale", seOdds);
+  zip.file("rapport_empreinte_es_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docES.output('blob'));
+
+  // add .json file save 
+  const fileName = "svg_ese_" + session.legalUnit.siren;
+  const json = JSON.stringify(session);
+
+  // build download link & activate
+  const blob = new Blob([json], { type: 'application/json' });
+  zip.file(fileName + '.json', blob);
+
+  zip.generateAsync({ type: 'blob' }).then(function (content) {
+    saveAs(content, 'livrables_' + legalUnit.corporateName.replaceAll(" ", "") + "_" + year + '.zip');
+  });
+
+
+}
+
 const getAnalyse = (indic, session) => {
   switch (indic) {
     case "art":
@@ -990,7 +1038,7 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
   }
 }
 
-export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF, exportFootprintPDF, generateFootprintPDF };
+export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF, exportFootprintPDF, generateFootprintPDF, downloadReport };
 
 /*function printValue(value,precision) {
   if (value==null) {return "-"}
