@@ -1049,7 +1049,7 @@ const divideEntryByBalancedGroups = (rowsEntry) =>
 
     if (resGroup.isExpensesTracked)
     {
-      res.entryData.push(resGroup.entryData);
+      res.entryData.push(...resGroup.entryData);
     }
     else
     {
