@@ -754,39 +754,39 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   xLine = 62;
   height += 10;
   
-  financialData.getFixedCapitalConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+  // financialData.getFixedCapitalConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
 
-    y += 9;
-    xValue = x + 64;
+  //   y += 9;
+  //   xValue = x + 64;
 
-    doc.text(doc.splitTextToSize(aggregate.accountLib, 30), x + 3, y);
+  //   doc.text(doc.splitTextToSize(aggregate.accountLib, 30), x + 3, y);
 
-    doc.setFontSize(6);
-    doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
+  //   doc.setFontSize(6);
+  //   doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
 
-    indic.forEach(indic => {
+  //   indic.forEach(indic => {
 
-      let indicator = aggregate.footprint.indicators[indic];
-      doc.setFontSize(6);
-      doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
-      doc.setFontSize(5);
-      doc.text(printValue(indicator.getUncertainty(), 0) + " %", xValue + 12, y, { align: "right" });
-      doc.text(printValue(indicator.getGrossImpact(aggregate.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+  //     let indicator = aggregate.footprint.indicators[indic];
+  //     doc.setFontSize(6);
+  //     doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
+  //     doc.setFontSize(5);
+  //     doc.text(printValue(indicator.getUncertainty(), 0) + " %", xValue + 12, y, { align: "right" });
+  //     doc.text(printValue(indicator.getGrossImpact(aggregate.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
 
-      xValue += 37;
+  //     xValue += 37;
 
-      doc.setDrawColor(25, 21, 88);
-      doc.setLineWidth(0.2);
-      doc.line(xLine, y - 3, xLine, height)
-      doc.setLineWidth(0.1);
-      doc.setDrawColor(216, 214, 226);
-      doc.line(xLine + 13, y - 3, xLine + 13, height);
-      doc.line(xLine + 25, y - 3, xLine + 25, height);
-      xLine += 37;
+  //     doc.setDrawColor(25, 21, 88);
+  //     doc.setLineWidth(0.2);
+  //     doc.line(xLine, y - 3, xLine, height)
+  //     doc.setLineWidth(0.1);
+  //     doc.setDrawColor(216, 214, 226);
+  //     doc.line(xLine + 13, y - 3, xLine + 13, height);
+  //     doc.line(xLine + 25, y - 3, xLine + 25, height);
+  //     xLine += 37;
 
-    });
+  //   });
 
-  })
+  // })
 
   y += 12;
 
