@@ -5,8 +5,7 @@ const transporter = nodemailer.createTransport({
     port: process.env.FORM_SERVER_PORT,
     auth: {
         user: process.env.FORM_SENDER_MAIL,
-        pass: process.env.FORM_SENDER_PASSWD,
-        type: "OAUTH2"
+        pass: process.env.FORM_SENDER_PASSWD
     }
 })
 
