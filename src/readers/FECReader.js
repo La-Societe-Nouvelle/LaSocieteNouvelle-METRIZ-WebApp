@@ -51,11 +51,17 @@ const parseAmount = (stringAmount) => roundValue(parseFloat(stringAmount.replace
 
 /* -------------------- BALANCE CHECKER -------------------- */
 
-const checkBalance = (lignesA,lignesB) =>
+const checkBalanceTwoLists = (lignesA,lignesB) =>
 {
   let amountA = lignesA.map(ligne => parseAmount(ligne.Debit) - parseAmount(ligne.Credit)).reduce((a,b) => a+b,0);
   let amountB = lignesB.map(ligne => parseAmount(ligne.Credit) - parseAmount(ligne.Debit)).reduce((a,b) => a+b,0);
   return Math.round(amountA*100) == Math.round(amountB*100);
+}
+
+const checkBalance = (rows) =>
+{
+  let amount = rows.map(row => parseAmount(row.Debit) - parseAmount(row.Credit)).reduce((a,b) => a+b,0);
+  return Math.round(amount*100) == 0;
 }
 
 /* ----------------------------------------------------- */
@@ -675,7 +681,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
                                             && ligne.EcritureLib == ligneCourante.EcritureLib
                                             && regexPrefixeCompteStocks.test(ligne.CompteNum));  
                                             
-    let equilibre = checkBalance([ligneCourante],lignesStocks);    
+    let equilibre = checkBalanceTwoLists([ligneCourante],lignesStocks);    
     if (equilibre) 
     {
       lignesStocks.forEach((ligneStock) => 
@@ -704,131 +710,39 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         }
       })
     }
-    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture variation de stock)."
+    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture variation de stock).";
   }
 
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
   
   if (/^68(1|7)1/.test(ligneCourante.CompteNum) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
   {
-    // lignes des comptes d'amortissements
-    let depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                    && /^68(1|7)1/.test(ligne.CompteNum));
-    
-    let sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
-    let lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                   && /^28/.test(ligne.CompteNum));
-    
-    // case - single depreciation expenses account
-    if (sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
+    // get entry
+    let entry = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum);
+
+    // ignore entry for futher references
+    data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
+
+    let entryDepreciationExpensesData = readDepreciationExpensesFromEntry(entry);
+
+    if (entryDepreciationExpensesData.isExpensesTracked)
     {
-      let ligneDepreciationExpense = depreciationExpenses[0];
-      
-      lignesDepreciations.forEach((ligneDepreciation) =>
+      for (let depreciationExpenseData of entryDepreciationExpensesData.entryData)
       {
         // retrieve depreciation expense item
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneDepreciationExpense.CompteNum
-                                                                           && expense.accountAux == ligneDepreciation.CompteNum)[0];
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == depreciationExpenseData.CompteNum
+                                                                           && expense.accountAux == depreciationExpenseData.CompteNum)[0];
 
-        if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
+        if (depreciationExpense!=undefined) depreciationExpense.amount+= depreciationExpenseData.amount;
 
         else
         {
-          // depreciation expense data
-          let depreciationExpenseData = 
-          {
-            label: ligneDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-            account: ligneDepreciationExpense.CompteNum,
-            accountLib: ligneDepreciationExpense.CompteLib,
-            accountAux: ligneDepreciation.CompteNum,
-            amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
-          }
           // push data
           data.depreciationExpenses.push(depreciationExpenseData);
-        }
-      })
-    }
-    // case - multiple depreciation expenses accounts
-    else if (!sameAccountUsed)
-    {
-      // Intangible assets
-      depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                  && /^68(1|7)11/.test(ligne.CompteNum));
-      sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
-      lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                 && /^280/.test(ligne.CompteNum));
-      
-      if (depreciationExpenses.length > 0 && sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
-      {
-        let ligneDepreciationExpense = depreciationExpenses[0];
-
-        lignesDepreciations.forEach((ligneDepreciation) =>
-        {
-          // retrieve depreciation expense item
-          let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneDepreciationExpense.CompteNum
-                                                                              && expense.accountAux == ligneDepreciation.CompteNum)[0];
-
-          if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
-
-          else
-          {
-            // depreciation expense data
-            let depreciationExpenseData = 
-            {
-              label: ligneDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-              account: ligneDepreciationExpense.CompteNum,
-              accountLib: ligneDepreciationExpense.CompteLib,
-              accountAux: ligneDepreciation.CompteNum,
-              amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
-            }
-            // push data
-            data.depreciationExpenses.push(depreciationExpenseData);
-          }
-        })
+        } 
       }
-      else if (depreciationExpenses.length > 0) throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements).";
-    
-      // Tangible assets
-      depreciationExpenses = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                  && /^68(1|7)12/.test(ligne.CompteNum));
-      sameAccountUsed = depreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
-      lignesDepreciations = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                                 && /^281/.test(ligne.CompteNum));
-
-      if (depreciationExpenses.length > 0 && sameAccountUsed && checkBalance(depreciationExpenses,lignesDepreciations))
-      {
-        let ligneDepreciationExpense = depreciationExpenses[0];
-
-        lignesDepreciations.forEach((ligneDepreciation) =>
-        {
-          // retrieve depreciation expense item
-          let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == ligneDepreciationExpense.CompteNum
-                                                                             && expense.accountAux == ligneDepreciation.CompteNum)[0];
-
-          if (depreciationExpense!=undefined) depreciationExpense.amount+= parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit);
-
-          else
-          {
-            // depreciation expense data
-            let depreciationExpenseData = 
-            {
-              label: ligneDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-              account: ligneDepreciationExpense.CompteNum,
-              accountLib: ligneDepreciationExpense.CompteLib,
-              accountAux: ligneDepreciation.CompteNum,
-              amount: parseAmount(ligneDepreciation.Credit) - parseAmount(ligneDepreciation.Debit),
-            }
-            // push data
-            data.depreciationExpenses.push(depreciationExpenseData);
-          }
-        })
-      }
-      else if (depreciationExpenses.length > 0) throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements).";
-
     }
-    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture dotation aux amortissements).";
-
-    data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
+    else throw entryDepreciationExpensesData.message;
   }
 
   // Other expenses ----------------------------------------------------------------------------------- //
@@ -922,4 +836,228 @@ const readAddtionalDataEntry = async (data,journal,ligneCourante) =>
   // ...participation formation professionnelle
   if (/^63(1|3)3/.test(ligneCourante.CompteNum)) data.KNWData.vocationalTrainingTax+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------------- */
+/* -------------------------------------------------- DEPRECIATION EXPENSES SCRIPTS -------------------------------------------------- */
+
+/* The function return an object with the following elements :
+ *  - entryData (Array) : data from the entry to add the "main" data object
+ *  - status (Boolean) : status of the reading
+ *  - message (String) : -
+ */
+
+const readDepreciationExpensesFromEntry = (entry) =>
+{
+  let res = {entryData: [], isExpensesTracked: false, message: ""};
+
+  // basic case
+  res = readDepreciationExpenses(entry);
+  if (res.isExpensesTracked) return res;
+
+  // group by asset types
+  res = divideEntryByAssetsTypes(entry);
+  if (res.isExpensesTracked) return res;
+
+  // group by labels
+  res = divideEntryByEntryLabels(entry);
+  if (res.isExpensesTracked) return res;
+
+  // group by balanced groups
+  res = divideEntryByBalancedGroups(entry);
+  if (res.isExpensesTracked) return res;
+
+  // if reading unsuccessfull
+  res.isExpensesTracked = false;
+  
+  // lignes relatives aux comptes de dotations
+  let rowsDepreciationExpenses = entry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
+  let nbDepreciationAccounts = rowsDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+  
+  // lignes relatives aux comtpes d'amortissements
+  let rowsDepreciations = entry.filter(ligne => /^28/.test(ligne.CompteNum));
+  let nbDepreciationExpenseAccounts = rowsDepreciations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+
+  let balanced = checkBalanceTwoLists(rowsDepreciations,rowsDepreciationExpenses);
+
+  // Message
+  res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture dotation(s) aux amortissements). "
+    + "Informations complémentaires : "
+    + nbDepreciationAccounts+" comptes d'amortissements ("+(rowsDepreciations.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + nbDepreciationExpenseAccounts+" comptes de dotations ("+(rowsDepreciationExpenses.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + (balanced ? "montant des dotations égal à la variation des amortissements au sein de l'écriture " : "montant des dotations différent de la variation des amortissements au sein de l'écriture.");
+  
+  return res;
+}
+
+const readDepreciationExpenses = (rowsEntry) =>
+{
+  // response
+  let res = {entryData: [], isExpensesTracked: false, message: ""};
+
+  // lignes relatives aux comptes de dotations
+  let rowsDepreciationExpenses = rowsEntry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
+  // lignes relatives aux comtpes d'amortissements
+  let rowsDepreciations = rowsEntry.filter(ligne => /^28/.test(ligne.CompteNum));
+
+  // Single depreciation account ---------------------------------------------------------------------- //
+
+  let sameDepreciationAccountUsed = rowsDepreciations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+  if (sameDepreciationAccountUsed)
+  {
+    res.isExpensesTracked = true;
+    res.message = "OK";
+
+    // ligne relative au compte d'amortissements
+    let rowDepreciation = rowsDepreciations[0];
+
+    // build data
+    rowsDepreciationExpenses.forEach((rowDepreciationExpense) =>
+    {
+      // depreciation expense data
+      let depreciationExpenseData = 
+      {
+        label: rowDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+        account: rowDepreciationExpense.CompteNum,
+        accountLib: rowDepreciationExpense.CompteLib,
+        accountAux: rowDepreciation.CompteNum,
+        amount: parseAmount(rowDepreciationExpense.Debit) - parseAmount(rowDepreciationExpense.Credit),
+      }
+      // push data
+      res.entryData.push(depreciationExpenseData);
+    })
+
+    // return
+    return res;
+  }
+
+  // Single depreciation expense account & amount balanced with depreciation accounts ----------------- //
+
+  let sameDepreciationExpenseAccountUsed = rowsDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+  if (sameDepreciationExpenseAccountUsed && checkBalanceTwoLists(rowsDepreciationExpenses,rowsDepreciations))
+  {
+    res.isExpensesTracked = true;
+    res.message = "OK";
+
+    // ligne relative au compte de dotations
+    let rowDepreciationExpense = rowsDepreciationExpenses[0];
+
+    // build data
+    rowsDepreciations.forEach((rowDepreciation) =>
+    {
+      // depreciation expense data
+      let depreciationExpenseData = 
+      {
+        label: rowDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+        account: rowDepreciationExpense.CompteNum,
+        accountLib: rowDepreciationExpense.CompteLib,
+        accountAux: rowDepreciation.CompteNum,
+        amount: parseAmount(rowDepreciation.Credit) - parseAmount(rowDepreciation.Debit),
+      }
+      // push data
+      res.entryData.depreciationExpenses.push(depreciationExpenseData);
+    })
+
+    return res;
+  }
+
+  res.isExpensesTracked = false;
+  res.message = sameDepreciationExpenseAccountUsed ? "Un seul compte de dotations mais le montant des dotations ne correspond pas à la variation des amortissements" : "Plusieurs comptes de dotations et d'amortissements.";
+  return res;
+}
+
+
+const divideEntryByAssetsTypes = (rowsEntry) =>
+{
+  let res = {entryData: [], isExpensesTracked: false, message: ""};
+
+  // tangible assets
+  let rowsTangibleAssets = rowsEntry.filter(ligne => /^68(1|7)12/.test(ligne.CompteNum) || /^281/.test(ligne.CompteNum));
+  let resTangibleAssets = readDepreciationExpenses(rowsTangibleAssets);
+
+  // intangible assets
+  let rowsIntangibleAssets = rowsEntry.filter(ligne => /^68(1|7)11/.test(ligne.CompteNum) || /^280/.test(ligne.CompteNum));
+  let resIntangibleAssets = readDepreciationExpenses(rowsIntangibleAssets);
+
+  if (resTangibleAssets.isExpensesTracked && resIntangibleAssets.isExpensesTracked)
+  {
+    res.isExpensesTracked = true;
+    res.entryData = [...resTangibleAssets.entryData, ...resIntangibleAssets.entryData];
+
+    return res;
+  }
+  
+  res.isExpensesTracked = false;
+  return res;
+}
+
+const divideEntryByEntryLabels = (rowsEntry) =>
+{
+  let res = {entryData: [], isExpensesTracked: false, message: ""};
+
+  // get list entry
+  let entryLabels = rowsEntry.map(row => row.EcritureLib)
+                             .filter((value, index, self) => index === self.findIndex(item => item === value));
+  
+  for (let label of entryLabels)
+  {
+    let rowsLabel = rowsEntry.filter(ligne => ligne.EcritureLib == label);
+    let resLabel = readDepreciationExpenses(rowsLabel);
+
+    if (resLabel.status)
+    {
+      res.entryData.push(resLabel.entryData);
+    }
+    else
+    {
+      res.isExpensesTracked = false;
+      return res;
+    }
+  }
+  
+  res.isExpensesTracked = true;
+  return res;
+}
+
+const divideEntryByBalancedGroups = (rowsEntry) =>
+{
+  let res = {entryData: [], isExpensesTracked: false, message: ""};
+
+  // build groups
+  let groups = [];
+  let currentGroup = [];
+  for (let row of rowsEntry)
+  {
+    currentGroup.push(row);
+    if (checkBalance(currentGroup))
+    {
+      groups.push(currentGroup);
+      currentGroup = [];
+    }
+  }
+
+  if (groups.length == 0)
+  {
+    res.isExpensesTracked = false;
+    res.message = "Ecriture non équilibrée.";
+    return res;
+  }
+
+  for (let group of groups)
+  {
+    let resGroup = readDepreciationExpenses(group);
+
+    if (resGroup.isExpensesTracked)
+    {
+      res.entryData.push(resGroup.entryData);
+    }
+    else
+    {
+      res.isExpensesTracked = false;
+      return res;
+    }
+  }
+  
+  res.isExpensesTracked = true;
+  return res;
 }

@@ -98,7 +98,7 @@ Les lignes d'écritures *lues* sont celles relatives aux comptes d'immobilisatio
 *Note : la lecture de certaines lignes peut entraîner une recherche sur d'autres comptes (#40 par exemple dans le cas des dépenses) qui ne font cependant pas l'objet d'une lecture spontanée*
 
 
-### Ecritures relatives aux comptes d'Immobilisation
+### Ecritures relatives aux comptes d'immobilisation
 
 Pour chaque écriture relative à un compte d'immobilisations i.e. comptes #20, #21, #22, #23, #25, #26, #27, la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
@@ -125,7 +125,7 @@ Pour chaque écriture relative à un comtpe d'amortissement ou de déprécation 
 \* *Lorsqu'aucun compte auxiliaire n'est utilisé, un compte fournisseur par défaut est créé à partir du numéro du compte d'immobilisations et avec le libellé "ACQUISTIONS - X" où X est le libellé du compte d'immobilisations.*
 
 
-### Ecritures relatives aux comptes de Stocks
+### Ecritures relatives aux comptes de stocks
 
 Pour chaque écriture relative à un compte de stocks (comptes #31, #32, #33, #34, #35, #37), la variation (Débit - Crédit) est incrémentée au volume courant du compte (initialisé lors de la lecture du journal des A-Nouveaux).
 
@@ -136,7 +136,7 @@ Pour chaque écriture relative à une dépréciation de stock (comptes #39), la 
 *Note : lorsque le compte n'est pas encore répertorié, il est initialisé et son montant en début d'exercice est considérée comme nul (égal à 0)*
 
 
-### Ecritures relatives aux comptes de Charges
+### Ecritures relatives aux comptes de charges
 
 Pour chaque écriture relative aux comptes #60, #61 et #62 (hors #603), sont enregistrées les informations suivantes:
 - Libellé de l'écriture
@@ -170,6 +170,14 @@ Pour chaque écriture relative aux comptes #6811 et #6871 (dotations aux amortis
 - Montant**
 
 Lorsque une dotation concernant les deux comptes (compte de dotation #68 et compte d'amortissement #28) est d'ores-et-déjà présente au sein de la liste des dotations, la variation (Débit - Crédit) est incrémentée au montant courant de la dotation existante.
+
+Du fait de la présence potentielle de plusieurs numéros de comptes de dotations aux amortissements et de comptes d'amortissements au sein de la même écriture comptable, les situations permettant une lecture complète sont les suivants :
+- Unique compte d'amortissements au sein de l'écriture comptable
+- Unique compte de dotations et équilibre entre les débits/crédits du compte de dotations et des comptes d'amortissements
+Si l'écriture ne correspond pas à une de ces deux situations, des conditions supplémentaires de filtrage sont testées pour réaliser des groupements :
+- filtrage par type d'immobilisations (corporelles/incorporelles) 
+- filtrage par libellé d'écriture
+- décomposition de l'écriture par groupe équilibré (balance débit/crédit)
 
 Dans le cas où la dotation concernent plusieurs comptes d'amortissements :
 - Si la lecture des lignes permet d'obtenir un équilibre, la dotation est ventilée pour chaque compte d'amortissement

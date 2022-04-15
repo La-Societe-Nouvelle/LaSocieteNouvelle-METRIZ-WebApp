@@ -266,7 +266,7 @@ export class AccountingSection extends React.Component {
         if (nextFinancialData.errors.length > 0)                                                                              // show error(s) (content)
         {
             nextFinancialData.errors.forEach(error => console.log(error));
-            this.setState({ errorFile: true, errorMessage: "Erreur(s) relvée(s) : ", errors: nextFinancialData.errors, importedData: null });
+            this.setState({ errorFile: true, errorMessage: "Erreur(s) relevée(s) : ", errors: nextFinancialData.errors, importedData: null });
         }
         else {
 

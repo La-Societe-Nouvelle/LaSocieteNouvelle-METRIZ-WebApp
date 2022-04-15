@@ -1,78 +1,94 @@
-
-  section {
-    padding : 2rem;
-    margin: 1rem 0 3rem 0;
+section {
+  padding: 2rem;
+  margin: 1rem 0 3rem 0;
 }
 
 .section-title {
-  
-    svg{
-        height: 25px;
-        margin-right: 10px;
-       }
+
+  svg {
+    height: 25px;
+    margin-right: 10px;
   }
-
-
-  .action {
-    display: flex;
-    justify-content: flex-end;
-    text-align: right;
-   padding: 0;
-    :disabled,
-    :disabled:hover {
-      background: #ccc;
-    }
-  }
-    
-
-  // START SECTION 
-
-#start {
-    background:  no-repeat url('../img/leaves_background.png');
-    padding: 1em;
-    .row {
-      justify-content: center;
-      align-items: center;
-      .col {
-        padding: 0 7em;
-      }
-    }
-    .btn {
-      margin-right: 1rem;
-    }
 }
-#section-picto {
-    text-align: center;
-    padding: 2em 0;
 
-    img{
-      height: 38px;
-      width: auto;
-    }
-    .logoLSN{
-      img {
-        height : 120px;
+
+.action {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+  padding: 0;
+
+  :disabled,
+  :disabled:hover {
+    background: #ccc;
+  }
+}
+
+
+// START SECTION 
+
+	@media (max-width: 1440px) { 
+    #start{
+      .col {
+        padding: 0px 3em !important;
       }
-      border-right : 1px solid $light-blue;
+    }
+   }
+#start {
+  background: no-repeat url('../img/leaves_background.png');
+  padding: 1em;
 
+  .row {
+    justify-content: center;
+    align-items: center;
+
+    .col {
+      padding: 0 7em;
     }
-    p {
-        font-size: 0.8em;
+  }
+
+  .btn {
+    margin-right: 1rem;
+  }
+}
+
+#section-picto {
+  text-align: center;
+  padding: 2em 0;
+
+  img {
+    height: 38px;
+    width: auto;
+  }
+
+  .logoLSN {
+    img {
+      height: 120px;
     }
+
+    border-right : 1px solid $light-blue;
+
+  }
+
+  p {
+    font-size: 0.8em;
+  }
 }
 
 
 // IMPORT SECTION 
 
 #importSection {
-    .row .form-container, .illus-container {
-        flex : 1;
-    }
+
+  .row .form-container,
+  .illus-container {
+    flex: 1;
+  }
 
 }
 
 // COMPANY SECTION 
- .step{
+.step {
   border: 1px solid #dbdef1;
   border-radius: 10px;
   background-color: #ffffff;
@@ -80,42 +96,50 @@
 
 
 
-#siren-section, #sector-section {
-  .step{
+#siren-section,
+#sector-section {
+  .step {
     margin-bottom: 2rem;
     padding: 1rem 2rem;
   }
-  .step ~ .step{
+
+  .step~.step {
     margin-bottom: inherit;
     padding: inherit;
   }
+
   h4 {
     margin-bottom: 1rem;
   }
 }
+
 // INDICATOR SECTION 
 
 .indicator {
   border: 1px solid #f3f3f3;
   border-radius: 10px;
-    padding: 2em;
-    margin-top: 2em;
-    width: 50%;
+  padding: 2em;
+  margin-top: 2em;
+  width: 50%;
 }
-/* Indicator Section*/
-.indicator-section{ 
 
-  .btn{
-    margin-right : 1rem;
+/* Indicator Section*/
+.indicator-section {
+
+  .btn {
+    margin-right: 1rem;
   }
+
   .step {
     padding: 2rem;
     margin: 1rem 0;
   }
+
   h3 {
-    color : $secondary-color;
+    color: $secondary-color;
     font-size: 1.6rem;
   }
+
   h4 {
     font-size: 1.3em;
     margin: 0 0 1.5rem 0;
@@ -134,7 +158,8 @@
   }
 
 }
-.selected-indicator{
+
+.selected-indicator {
   background-color: $light-blue;
   padding: 2em 0;
 }
@@ -157,6 +182,7 @@
     margin-left: 1rem;
   }
 }
+
 // validation button
 .statement-validation {
   text-align: right;
@@ -164,19 +190,23 @@
 
 
 .impact-result {
-  padding : 1em 0;
+  padding: 1em 0;
 
 }
+
 // GRAPH
 
-.analysis-container { 
+.analysis-container {
   display: flex;
+
   div {
     flex: 1 1;
   }
+
   p {
     margin-bottom: 0.5rem;
   }
+
   img {
     max-height: 300px;
     display: block;
@@ -216,7 +246,7 @@
 /* ---------- STATEMENT ---------- */
 
 .statement {
- 
+
 
   .statement-area {
     margin-bottom: 15px;
@@ -226,7 +256,7 @@
 
   // statement item
   .statement-item {
-    
+
     // assessment button
     .assessment-button-container {
       margin-left: auto;
