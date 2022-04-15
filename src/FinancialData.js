@@ -378,33 +378,33 @@ export class FinancialData {
      {
         let aggregates = [];
         let aggregate = {};
-        let items = []
+        let items = [];
 
+        // Achats stockés - Matières premières
+        items = this.expenseAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Matières premières",items});
+        aggregates.push(aggregate);
+
+        // Achats stockés - Autres approvisionnements
+        items = this.expenseAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Autres approvisionnements",items});
+        aggregates.push(aggregate);
+        
         // Achats de marchandises
         items = this.expenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Achats de marchandises",items});
+        aggregate = buildAggregateFromArray({accountLib: "Marchandises",items});
         aggregates.push(aggregate);
 
-        // Variation des stocks de marchandises
-        items = this.expenseAccounts.filter(account => /^6037/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de marchandises",items});
-        aggregates.push(aggregate);
- 
-        // Achats de matières premières et autres approvisionnements 
-        items = this.expenseAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Achats de matières premières et autres approvisionnements",items});
+        // Variation des stocks
+        items = this.expenseAccounts.filter(account => /^603/.test(account.accountNum));
+        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks",items});
         aggregates.push(aggregate);
 
-        // Variation des stocks de matières premières et autres approvisionnements 
-        items = this.expenseAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de matières premières et autres approvisionnements",items});
-        aggregates.push(aggregate);
- 
         // Autres achats
         items = this.expenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Autres achats",items});
         aggregates.push(aggregate);
- 
+
         // Autres charges externes
         items = this.expenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
         aggregate = buildAggregateFromArray({accountLib: "Autres charges externes",items});
