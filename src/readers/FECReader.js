@@ -955,7 +955,7 @@ const readDepreciationExpenses = (rowsEntry) =>
         amount: parseAmount(rowDepreciation.Credit) - parseAmount(rowDepreciation.Debit),
       }
       // push data
-      res.entryData.depreciationExpenses.push(depreciationExpenseData);
+      res.entryData.push(depreciationExpenseData);
     })
 
     return res;
