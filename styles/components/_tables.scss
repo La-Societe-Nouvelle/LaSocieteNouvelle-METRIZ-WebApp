@@ -13,7 +13,14 @@
 }
 
 
-  
+.toChecked {
+  border-right : 2px solid #ff6207;
+}
+
+p.toChecked{
+  font-size: 0.8rem;
+  margin : 1rem 0;
+}
   table {
     white-space: nowrap;
     font-size: 0.85em;
@@ -60,6 +67,7 @@
     .error {
       color : red;
     }
+
     // --- Cell --- //
     th, td {
       padding: 0.75em;
@@ -86,10 +94,15 @@
     thead {
       background-color: $light-blue;
       font-weight: 700;
+      font-size: 1.1em;
     }
   
     // --- Body --- //
-  
+    tfoot  {
+      background-color: darken($bg-light, 2%);
+      font-weight: bold;
+
+    }
     tbody {
       td {
         background-color: $bg-light;
@@ -195,25 +208,21 @@
     .fa-circle-info {
       color : $secondary-color;
     }
-    tbody{
-      td {
-        border-bottom: 1px solid #fff;
-      }
-    }
-   
+
     .operating-result td {
-      background-color: $tertiary-color;
-      color : #fff;
+      border-top : 1px solid $primary-color;
+
     }
 
   }
-  .profit td, tfoot {
-    background-color: lighten($primary-color ,15%);
-    color : #fff;
+  .profit td{
+    border-top : 1px solid $primary-color;
+    border-bottom: 1px solid $primary-color;
   }
-  .total td{
-    background-color: $light-blue;
+  .total, .with-top-line{
     font-weight: 700;
+    border-top : 1px solid $primary-color;
+    border-bottom: 1px solid $primary-color;
   }
 
   // TABLE Assesment 

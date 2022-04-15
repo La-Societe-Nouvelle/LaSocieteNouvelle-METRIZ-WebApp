@@ -131,7 +131,6 @@ function generatePDF(indic, session, comparativeDivision, idProductionCanvas, id
     storedProduction,
     immobilisedProduction,
     intermediateConsumption,
-    storedPurchases,
     capitalConsumption,
     netValueAdded } = financialData.aggregates;
 
@@ -215,19 +214,7 @@ function generatePDF(indic, session, comparativeDivision, idProductionCanvas, id
   doc.text(printValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
   doc.setFontSize(10);
 
-  if (storedPurchases.amount != 0) {
-    y += 6;
-    doc.text("\tVariation de stocks", 20, y);
-    doc.setFontSize(8);
-    doc.text(printValue(storedPurchases.amount, 0) + " €", xAmount, y, { align: "right" });
-    doc.setFontSize(8);
-    doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
-    doc.setFontSize(8);
-    doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
-    doc.setFontSize(10);
-  }
-
-  financialData.getExternalExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+  financialData.getIntermediateConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
     const indicator = aggregate.footprint.indicators[indic];
     y += 6;
     doc.text("\t" + aggregate.accountLib, 20, y);
@@ -254,7 +241,7 @@ function generatePDF(indic, session, comparativeDivision, idProductionCanvas, id
   doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(), 0) + " %", xUncertainty + 13, y, { align: "right" });
   doc.setFontSize(10);
 
-  financialData.getBasicDepreciationExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+  financialData.getFixedCapitalConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
     const indicator = aggregate.footprint.indicators[indic];
     y += 6;
     doc.text("\t" + aggregate.accountLib, 20, y);
@@ -655,7 +642,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   }
 
   // CONSOMMATIONS INTERMEDIAIRES 
-  y += 7;
+  y += 6;
 
   doc.setFontSize(7);
   doc.setFont("Helvetica", "bold");
@@ -691,42 +678,8 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
   });
 
-  if (storedPurchases.amount != 0) {
-    y += 7;
-    doc.setFontSize(7);
-    doc.text("Variation de stocks", x + 3, y);
-
-    doc.setFontSize(6);
-    doc.text(printValue(storedPurchases.amount, 0) + " €", xAmount, y, { align: "right" });
-
-    xValue = x + 64;
-    xLine = 62;
-    height += 5;
-
-    indic.forEach(indic => {
-      doc.setFontSize(6);
-      doc.text(printValue(storedPurchases.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
-      doc.setFontSize(5);
-      doc.text(printValue(storedPurchases.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
-      doc.text(printValue(storedPurchases.footprint.indicators[indic].getGrossImpact(storedPurchases.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
-
-      xValue += 37;
-
-
-      doc.setDrawColor(25, 21, 88);
-      doc.setLineWidth(0.2);
-      doc.line(xLine, y - 3, xLine, height)
-      doc.setLineWidth(0.1);
-      doc.setDrawColor(216, 214, 226);
-      doc.line(xLine + 13, y - 3, xLine + 13, height);
-      doc.line(xLine + 25, y - 3, xLine + 25, height);
-      xLine += 37;
-
-    });
-
-  }
-
-  financialData.getExternalExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+  y+= 2;
+  financialData.getIntermediateConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
 
     y += 5;
     doc.setFontSize(7);
@@ -800,8 +753,8 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
   xLine = 62;
   height += 10;
-
-  financialData.getBasicDepreciationExpensesAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+  
+  financialData.getFixedCapitalConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
 
     y += 9;
     xValue = x + 64;
@@ -887,7 +840,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
 
   // BOTTOM PAGE 
-  y += 40;
+  y += 35;
 
   doc.setDrawColor(203);
   doc.line(x, y, 284, y);
@@ -972,14 +925,31 @@ async function downloadReport(indics, session, comparativeDivision) {
   generateFootprintPDF(docEnv, envIndic, session, "Empreinte environnementale", envOdds);
   zip.file("rapport_empreinte_environnementale_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docEnv.output('blob'));
 
-  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+  // RAPPORT - EMPREINTE ECONOMIQUE ET SOCIALE
   const docES = new jsPDF("landscape");
   generateFootprintPDF(docES, seIndic, session, "Empreinte économique et sociale", seOdds);
   zip.file("rapport_empreinte_es_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docES.output('blob'));
 
+  // RAPPORT - EMPREINTE SOCIETALE
+
+  const docEES = new jsPDF("landscape", 'mm', 'a4', true);
+
+  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+
+  generateFootprintPDF(docEES, envIndic, session, "Empreinte environnementale", envOdds);
+
+  docEES.addPage();
+
+  // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
+
+  generateFootprintPDF(docEES, seIndic, session, "Empreinte économique et sociale", seOdds);
+
+  zip.file("rapport_empreinte_societale_" + legalUnit.corporateName.replaceAll(" ", "") + '.pdf', docEES.output('blob'));
+
   // add .json file save 
-  const fileName = "svg_ese_" + session.legalUnit.siren;
+  const fileName = "enregistrement-ese-" + legalUnit.corporateName.replaceAll(" ", "-");
   const json = JSON.stringify(session);
+
 
   // build download link & activate
   const blob = new Blob([json], { type: 'application/json' });
