@@ -5,7 +5,6 @@ import { printValue } from '/src/utils/Utils';
 
 // Libraries
 import metaIndics from '/lib/indics';
-import { buildIndicatorAggregate } from '../../src/formulas/footprintFormulas';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -17,8 +16,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(indic);
 
-  const expensesAggregates = getBasicExternalExpensesGroups(indic, financialData);
-  const depreciationExpensesAggregates = getBasicDepreciationExpensesGroups(indic, financialData);
+  const intermediateConsumptionsAggregates = getIntermediateConsumptionsAggregatesGroups(financialData);
+  const fixedCapitalConsumptionsAggregates = getFixedCapitalConsumptionsAggregatesGroups(financialData);
 
   const { production,
     revenue,
@@ -83,17 +82,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           {printGrossImpact ? <td className="column_value">{printValue(intermediateConsumption.footprint.indicators[indic].getGrossImpact(intermediateConsumption.amount), nbDecimals)}</td> : null}
           {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
-        {storedPurchases != 0 &&
-          <tr>
-            <td>&emsp;Variation de stocks</td>
-            <td className="column_value">{printValue(-storedPurchases.amount, 0)} &euro;</td>
-            <td className="column_value">{printValue(storedPurchases.footprint.indicators[indic].getValue(), nbDecimals)} {unit}</td>
-            <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(storedPurchases.footprint.indicators[indic].getUncertainty(), 0)}&nbsp;%</td>
-            {printGrossImpact ? <td className="column_value">{printValue(storedPurchases.footprint.indicators[indic].getGrossImpact(-storedPurchases.amount), nbDecimals)}</td> : null}
-            {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
-          </tr>}
 
-        {expensesAggregates.filter(aggregate => aggregate.amount != 0)
+        {intermediateConsumptionsAggregates.filter(aggregate => aggregate.amount != 0)
           .map(({ accountLib, amount, footprint }, index) =>
             <tr key={index}>
               <td>&emsp;{accountLib}</td>
@@ -112,7 +102,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           {printGrossImpact ? <td className="column_value">{printValue(capitalConsumption.footprint.indicators[indic].getGrossImpact(capitalConsumption.amount), nbDecimals)}</td> : null}
           {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
         </tr>
-        {depreciationExpensesAggregates.filter(aggregate => aggregate.amount != 0)
+        {fixedCapitalConsumptionsAggregates.filter(aggregate => aggregate.amount != 0)
           .map(({ accountLib, amount, footprint }, index) =>
             <tr key={index}>
               <td>&emsp;{accountLib}</td>
@@ -131,7 +121,6 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
         {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
       </tr>
       </tbody>
-
     </table>
   )
 }
@@ -139,13 +128,13 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
 /* ----- GROUP FUNCTIONS ----- */
 
 // External expenses
-const getBasicExternalExpensesGroups = (indic, financialData) => {
-  let expensesGroups = financialData.getExternalExpensesAggregates();
+const getIntermediateConsumptionsAggregatesGroups = (financialData) => {
+  let expensesGroups = financialData.getIntermediateConsumptionsAggregates();
   return expensesGroups;
 }
 
 // Depreciation expenses
-const getBasicDepreciationExpensesGroups = (indic, financialData) => {
-  let expensesGroups = financialData.getBasicDepreciationExpensesAggregates();
+const getFixedCapitalConsumptionsAggregatesGroups = (financialData) => {
+  let expensesGroups = financialData.getFixedCapitalConsumptionsAggregates();
   return expensesGroups;
 }

@@ -221,10 +221,7 @@ export class IndicatorSection extends React.Component {
             </div>
           </div>
           <div className="step">
-            {/* <p className="legend">
-                    Grandeur mesurée : Valeur ajoutée nette créée sur le territoire
-                    français (en euros)
-                  </p> */}
+
             <h4>Déclaration des impacts directs</h4>
 
             <Statement
@@ -356,7 +353,6 @@ export class IndicatorSection extends React.Component {
             </div>
             {this.props.session.validations.length > 1 && (
               <div className="flex">
-
                 <div>
                   <h5>
                     <FontAwesomeIcon icon={faFileZipper} />  Télécharger le dossier complet
@@ -370,7 +366,9 @@ export class IndicatorSection extends React.Component {
                         </li>
                       )
                     }
-                    <li> <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte sociétale</li>
+                    <li> <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte environnementale</li>
+                    <li> <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte économique et sociale</li>
+                    <li> <FontAwesomeIcon icon={faCheck} /> Rapport général sur l'empreinte sociétale</li>
                     <li> <FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de la session</li>
                   </ul>
                 </div>
@@ -396,12 +394,12 @@ export class IndicatorSection extends React.Component {
           )}
 
           <div className="align-right">
-            <button
+            {/* <button
               className={"btn btn-primary"}
               onClick={() => this.setState({ triggerPopup: "rapport" })}
             >
               <FontAwesomeIcon icon={faShare} /> Envoyer rapport
-            </button>
+            </button> */}
             <button
               className={"btn btn-secondary"}
               id="validation-button"

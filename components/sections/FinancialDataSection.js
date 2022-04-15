@@ -6,8 +6,6 @@ import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight, faFileImport } from "@fortawesome/free-solid-svg-icons";
 
-
-
 // Tables
 import { MainAggregatesTable } from '../tables/MainAggregatesTable';
 import { ImmobilisationsTable } from '../tables/ImmobilisationsTable';
@@ -16,7 +14,7 @@ import { ExpensesTable } from '../tables/ExpensesTable';
 import { StocksTable } from '../tables/StocksTable';
 
 // Components
-import { MessagePopup, MessagePopupErrors } from '../popups/MessagePopup';
+import {MessagePopupErrors } from '../popups/MessagePopup';
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -55,11 +53,6 @@ export class FinancialDataSection extends React.Component {
             <h2><FontAwesomeIcon icon={faFileImport} />
               &Eacute;tape 2 - Validez votre import</h2>
           </div>
-          {/* <div className="alert alert-success" role="alert">
-            <p>
-            Bravo ! Votre import a été réalisé avec succès!
-              </p>
-          </div> */}
           <div>
             <p className="alert alert-info">
               Par mesure de précaution, vérifiez l’exactitude des agrégats
