@@ -211,6 +211,8 @@ export class StatementSection extends React.Component {
         const messageToAdmin = mailToAdminWriter(this.state);
         const resAdmin = await sendStatementToAdmin(messageToAdmin, statementFile);
 
+        console.log(resAdmin);
+
         const messageToDeclarant = mailToDeclarantWriter(this.state);
         const resDeclarant = await sendStatementToDeclarant(this.state.email, messageToDeclarant, statementFile);
 
