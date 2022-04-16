@@ -351,7 +351,7 @@ export class IndicatorSection extends React.Component {
                 <FontAwesomeIcon icon={faEye} /> Visualiser (.pdf)
               </button>
             </div>
-            {this.props.session.validations.length > 1 && (
+            {this.props.session.validations.length > 0 && (
               <div className="flex">
                 <div>
                   <h5>
