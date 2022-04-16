@@ -871,7 +871,8 @@ function exportIndicPDF(indic, session, comparativeDivision, idProductionCanvas,
   let doc = generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas);
 
   window.open(doc.output("bloburl"), "_blank");
-  doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + "_" + year + ".pdf");
+  
+  //doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + "_" + year + ".pdf");
 
 }
 
