@@ -42,7 +42,7 @@ import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 
 // Export modules
 import { exportIndicPDF } from "/src/writers/Export";
-import { downloadReport, exportFootprintPDF, generateFootprintPDF, generatePDF } from "../../src/writers/Export";
+import { downloadReport, exportFootprintPDF} from "../../src/writers/Export";
 
 // Analysis writers
 import { analysisTextWriterECO } from "../../src/writers/analysis/analysisTextWriterECO";
@@ -59,7 +59,6 @@ import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
 
 
-import RapportPopup from "../popups/RapportPopup";
 import LoadingSpinner from "../LoadingSpinner";
 import { GraphsPDF } from "../graphs/GraphsPDF";
 
@@ -351,7 +350,6 @@ export class IndicatorSection extends React.Component {
                 <FontAwesomeIcon icon={faEye} /> Visualiser (.pdf)
               </button>
             </div>
-            {this.props.session.validations.length > 1 && (
               <div className="flex">
                 <div>
                   <h5>
@@ -383,23 +381,12 @@ export class IndicatorSection extends React.Component {
                   {isLoading ? <LoadingSpinner /> : <FontAwesomeIcon icon={faArrowDown} />}  Télécharger (.zip)
                 </button>
 
-              </div>)
-            }
+              </div>
 
           </div>
 
-          {triggerPopup == "rapport" && (
-            <RapportPopup session={this.props.session} onGoBack={() => this.triggerPopup("")}
-            />
-          )}
-
           <div className="align-right">
-            {/* <button
-              className={"btn btn-primary"}
-              onClick={() => this.setState({ triggerPopup: "rapport" })}
-            >
-              <FontAwesomeIcon icon={faShare} /> Envoyer rapport
-            </button> */}
+
             <button
               className={"btn btn-secondary"}
               id="validation-button"
