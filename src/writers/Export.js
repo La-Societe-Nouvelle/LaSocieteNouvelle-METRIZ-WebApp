@@ -432,7 +432,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
   y += 8;
 
-  let height = y;
+  let height = 73;
 
   // Header table
 
@@ -440,22 +440,15 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   doc.setDrawColor(240, 240, 248);
   doc.rect(x, y, 274, 10, 'FD');
 
-  doc.setLineWidth(0.3);
-  doc.setDrawColor(25, 21, 88);
-  doc.line(x, y, x, height);
-
   // AMOUNT
-  doc.setLineWidth(0.1);
-  doc.line(x + 35, y, x + 35, height);
+ 
   doc.setFontSize(7);
   doc.text("Montant", 51, y + 6);
 
-  doc.setLineWidth(0.3);
+  height += 2; 
 
-  let xLine = 62;
   let xUnit = x + 54;
 
-  height += 10;
   // UNITE
   indic.forEach(indic => {
 
@@ -463,25 +456,17 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
     doc.setFont("Helvetica", "bold");
     doc.text(doc.splitTextToSize("Valeur\n" + metaIndics[indic].unit, 9), xUnit + 4.5, y + 5, { align: "center" });
 
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y, xLine, height);
-
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(doc.splitTextToSize("Incertitude %", 9), xUnit + 17, y + 5, { align: "center" });
 
     doc.text(doc.splitTextToSize("Impact brut " + metaIndics[indic].unitAbsolute, 9), xUnit + 29, y + 5, { align: "center" });
 
-    doc.setDrawColor(216, 214, 226);
-    doc.setLineWidth(0.1);
-    doc.line(xLine + 13, y, xLine + 13, height);
-    doc.line(xLine + 25, y, xLine + 25, height);
-
     xUnit += 37;
-    xLine += 37;
 
   });
+  
+ 
 
   // FINANCIAL DATA 
 
@@ -490,7 +475,6 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
     storedProduction,
     immobilisedProduction,
     intermediateConsumption,
-    storedPurchases,
     capitalConsumption,
     netValueAdded } = financialData.aggregates;
 
@@ -498,7 +482,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   let xAmount = 60;
   let xValue = x + 64;
 
-  // // Production
+  //Production
 
   y += 14;
   doc.setFontSize(7);
@@ -508,8 +492,6 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
   doc.text(printValue(production.amount, 0) + " €", xAmount, y, { align: "right" });
 
-  height += 5;
-  xLine = 62;
 
   indic.forEach(indic => {
 
@@ -521,15 +503,6 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
     doc.setFont("Helvetica", "normal");
     doc.text(printValue(production.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
     doc.text(printValue(production.footprint.indicators[indic].getGrossImpact(production.amount), nbDecimals), xValue + 24, y, { align: "right" });
-
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y - 4, xLine, height)
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y - 4, xLine + 13, height);
-    doc.line(xLine + 25, y - 4, xLine + 25, height);
-    xLine += 37;
     xValue += 37;
 
   });
@@ -538,14 +511,12 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   // Revenue
 
   xValue = x + 64;
-  y += 5;
+  y += 4;
   doc.setFontSize(7);
-  doc.text("dont Chiffre d'affaires", x + 3, y);
+  doc.text("dont Chiffre d'affaires", x + 2, y);
   doc.setFontSize(6);
   doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, { align: "right" });
 
-  xLine = 62;
-  height += 5;
 
   indic.forEach(indic => {
 
@@ -568,28 +539,17 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
     xValue += 37;
 
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y - 4, xLine, height)
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y - 4, xLine + 13, height);
-    doc.line(xLine + 25, y - 4, xLine + 25, height);
-    xLine += 37;
-
   });
 
   // Stock production
   xValue = x + 64;
 
-  y += 5;
+  y += 4;
   doc.setFontSize(7);
-  doc.text("dont Production stockée", x + 3, y);
+  doc.text("dont Production stockée", x + 2, y);
 
   doc.setFontSize(6);
   doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
-  xLine = 62;
-  height += 5;
 
   indic.forEach(indic => {
     doc.setFontSize(6);
@@ -600,60 +560,44 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
     xValue += 37;
 
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y - 4, xLine, height)
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y - 4, xLine + 13, height);
-    doc.line(xLine + 25, y - 4, xLine + 25, height);
-    xLine += 37;
-
   });
+
+  height += 12;
 
   // // Immobilised production
   if (financialData.getImmobilisedProduction() > 0) {
     xValue = x + 64;
-    y += 6;
+    y += 4;
+    height += 4;
+
     doc.setFontSize(7);
-    doc.text("dont production immobilisée", x + 4, y);
-    doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
+    doc.text("dont Production immobilisée", x + 2, y);
     doc.setFontSize(6);
-    xLine = 62;
-    height += 5;
+
+    doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, { align: "right" });
+
     indic.forEach(indic => {
-      doc.setFontSize(6);
       doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
       doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
       doc.text(printValue(immobilisedProduction.footprint.indicators[indic].getGrossImpact(immobilisedProduction.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
 
       xValue += 37;
 
-      doc.setDrawColor(25, 21, 88);
-      doc.setLineWidth(0.2);
-      doc.line(xLine, y - 4, xLine, height)
-      doc.setLineWidth(0.1);
-      doc.setDrawColor(216, 214, 226);
-      doc.line(xLine + 13, y - 4, xLine + 13, height);
-      doc.line(xLine + 25, y - 4, xLine + 25, height);
-      xLine += 37;
-
     });
   }
 
   // CONSOMMATIONS INTERMEDIAIRES 
   y += 6;
+  height += 9;
 
   doc.setFontSize(7);
   doc.setFont("Helvetica", "bold");
-  doc.text(doc.splitTextToSize("Consommations intermédiaires", 25), x + 2, y);
+  doc.text(doc.splitTextToSize("Consommations intermédiaires", 35), x + 2, y);
 
   doc.setFontSize(6);
 
   doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, { align: "right" });
 
-  xLine = 62;
-  height += 10;
   xValue = x + 64;
   indic.forEach(indic => {
 
@@ -667,30 +611,22 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
     xValue += 37;
 
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y - 6, xLine, height)
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y - 6, xLine + 13, height);
-    doc.line(xLine + 25, y - 6, xLine + 25, height);
-    xLine += 37;
-
   });
 
-  y+= 2;
-  financialData.getIntermediateConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
 
-    y += 5;
+  y+= 2.5;
+
+  financialData.getIntermediateConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+    
+    height += 4;
+    y += 4;
     doc.setFontSize(7);
-    doc.text(aggregate.accountLib, x + 3, y);
+    doc.text(aggregate.accountLib, x + 2, y);
 
     doc.setFontSize(6);
     doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
 
     xValue = x + 64;
-    xLine = 62;
-    height += 5;
 
     indic.forEach(indic => {
 
@@ -703,96 +639,61 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
       xValue += 37;
 
-      doc.setDrawColor(25, 21, 88);
-      doc.setLineWidth(0.2);
-      doc.line(xLine, y - 3, xLine, height)
-      doc.setLineWidth(0.1);
-      doc.setDrawColor(216, 214, 226);
-      doc.line(xLine + 13, y - 3, xLine + 13, height);
-      doc.line(xLine + 25, y - 3, xLine + 25, height);
-      xLine += 37;
-
     });
 
   })
 
+  height += 8;
   y += 6;
   doc.setFontSize(7);
   doc.setFont("Helvetica", "bold");
-  doc.text(doc.splitTextToSize("Dotations aux Amortissements sur immobilisations", 25), x + 2, y);
+  doc.text(doc.splitTextToSize("Dotations aux Amortissements sur immobilisations", 40), x + 2, y);
   doc.setFontSize(6);
   doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, { align: "right" });
   xValue = x + 64;
-  xValue = x + 64;
-  xLine = 62;
-  height += 10;
 
   indic.forEach(indic => {
-    doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
     doc.text(printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1), xValue, y, { align: "right" });
-    doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(printValue(capitalConsumption.footprint.indicators[indic].getUncertainty(), 0) + "%", xValue + 12, y, { align: "right" });
     doc.text(printValue(capitalConsumption.footprint.indicators[indic].getGrossImpact(capitalConsumption.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
 
     xValue += 37;
 
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y - 4, xLine, height)
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y - 4, xLine + 13, height);
-    doc.line(xLine + 25, y - 4, xLine + 25, height);
-    xLine += 37;
-
   });
 
-  doc.setFontSize(7);
-
-  xLine = 62;
-  height += 10;
+  y += 6;
   
-  // financialData.getFixedCapitalConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
+  financialData.getFixedCapitalConsumptionsAggregates().filter(aggregate => aggregate.amount != 0).forEach(aggregate => {
 
-  //   y += 9;
-  //   xValue = x + 64;
+    height += 6;
+    xValue = x + 64;
+    doc.setFontSize(6);
+    doc.text(doc.splitTextToSize(aggregate.accountLib, 35), x + 2, y);
+    doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
 
-  //   doc.text(doc.splitTextToSize(aggregate.accountLib, 30), x + 3, y);
+    indic.forEach(indic => {
 
-  //   doc.setFontSize(6);
-  //   doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, { align: "right" });
+      let indicator = aggregate.footprint.indicators[indic];
+      doc.setFontSize(6);
+      doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
+      doc.setFontSize(5);
+      doc.text(printValue(indicator.getUncertainty(), 0) + " %", xValue + 12, y, { align: "right" });
+      doc.text(printValue(indicator.getGrossImpact(aggregate.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
 
-  //   indic.forEach(indic => {
+      xValue += 37;
 
-  //     let indicator = aggregate.footprint.indicators[indic];
-  //     doc.setFontSize(6);
-  //     doc.text(printValue(indicator.getValue(), 1), xValue, y, { align: "right" });
-  //     doc.setFontSize(5);
-  //     doc.text(printValue(indicator.getUncertainty(), 0) + " %", xValue + 12, y, { align: "right" });
-  //     doc.text(printValue(indicator.getGrossImpact(aggregate.amount), metaIndics[indic].nbDecimals), xValue + 24, y, { align: "right" });
+    });
+    y += 6;
+  })
 
-  //     xValue += 37;
-
-  //     doc.setDrawColor(25, 21, 88);
-  //     doc.setLineWidth(0.2);
-  //     doc.line(xLine, y - 3, xLine, height)
-  //     doc.setLineWidth(0.1);
-  //     doc.setDrawColor(216, 214, 226);
-  //     doc.line(xLine + 13, y - 3, xLine + 13, height);
-  //     doc.line(xLine + 25, y - 3, xLine + 25, height);
-  //     xLine += 37;
-
-  //   });
-
-  // })
-
-  y += 12;
+  y += 3;
+  height += 8.5;
 
   doc.setFillColor(251, 251, 255);
   doc.setDrawColor(251, 251, 255);
-  doc.rect(x, y - 3, 274, 6, 'FD');
+  doc.rect(x, y - 3.5, 274, 6, 'FD');
 
   doc.setFontSize(7);
   doc.setFont("Helvetica", "bold");
@@ -802,8 +703,6 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, { align: "right" });
 
   xValue = x + 64;
-  xLine = 62;
-  height += 8;
   indic.forEach(indic => {
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
@@ -815,16 +714,12 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
     xValue += 37;
 
-    doc.setDrawColor(25, 21, 88);
-    doc.setLineWidth(0.2);
-    doc.line(xLine, y - 5, xLine, height)
-    doc.setLineWidth(0.1);
-    doc.setDrawColor(216, 214, 226);
-    doc.line(xLine + 13, y - 5, xLine + 13, height);
-    doc.line(xLine + 25, y - 5, xLine + 25, height);
-    xLine += 37;
 
   });
+
+
+
+
 
   // BORDER  TABLE
   doc.setLineWidth(0.2);
@@ -832,16 +727,36 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   // TOP
   doc.line(x, 65, 284, 65);
   // LEFT
-  doc.line(x, 65, x, height)
+  doc.line(x, 65, x, height);
   // RIGHT 
-  doc.line(xLine, 65, xLine, height)
   // BOTTOM 
   doc.line(x, height, 284, height);
 
+  // COLUMNS 
+
+  let xColumn = x+52;
+
+  for (let index = 0; index < 7; index++) {
+
+    doc.line(xColumn, 65, xColumn, height);
+
+
+    doc.setLineWidth(0.1);
+    doc.setDrawColor(216, 214, 226);
+    
+    doc.line(xColumn + 13, 65, xColumn + 13, height);
+    doc.line(xColumn + 25, 65, xColumn + 25, height);
+
+    
+    doc.setLineWidth(0.2);
+    doc.setDrawColor(25, 21, 88);
+    xColumn += 37;
+  }
+
 
   // BOTTOM PAGE 
+  y = 152;
   y += 35;
-
   doc.setDrawColor(203);
   doc.line(x, y, 284, y);
 
@@ -865,14 +780,11 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
 
 function exportIndicPDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas) {
 
-  const { legalUnit, year } = session;
-
   // PDF Export
   let doc = generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas);
 
   window.open(doc.output("bloburl"), "_blank");
-  doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + "_" + year + ".pdf");
-
+  
 }
 
 function exportFootprintPDF(session) {
@@ -896,8 +808,6 @@ function exportFootprintPDF(session) {
   generateFootprintPDF(doc, seIndic, session, "Empreinte économique et sociale", seOdds);
 
   window.open(doc.output("bloburl"), "_blank");
-
-  // doc.save("rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() + ".pdf");
 
 }
 
@@ -1009,14 +919,5 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
 }
 
 export { exportIndicDataExpensesCSV, exportIndicDataDepreciationsCSV, exportIndicPDF, generatePDF, exportFootprintPDF, generateFootprintPDF, downloadReport };
-
-/*function printValue(value,precision) {
-  if (value==null) {return "-"}
-  else             {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision)).toFixed(precision)}
-}*/
-
-
-
-
 
 
