@@ -837,46 +837,73 @@ const readAddtionalDataEntry = async (data,journal,ligneCourante) =>
 
 const readStockVariationsFromEntry = (entry) =>
 {
-  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
-
-  let rowsEntry = entry.filter(ligne => /^603/.test(ligne.CompteNum) || /^3(1|2|7)/.test(ligne.CompteNum));
-
-  // basic case
-  res = readStockVariations(rowsEntry);
+  // ---------- Entry ---------- //
+  
+  let res = readStockVariations(entry);
   if (res.isStockVariationsTracked) return res;
 
-  // group by asset types
-  res = readStockVariationsByStockTypes(rowsEntry);
+  // ---------- Sub-entries ---------- //
+
+  let subEntries = [];
+
+  // group by stock type
+  subEntries = getSubEntriesByStockType(entry);
+  res = readStockVariationsFromSubEntries(subEntries);
   if (res.isStockVariationsTracked) return res;
 
-  // group by labels
-  res = readStockVariationsByEntryLabels(rowsEntry);
+  // group by label
+  subEntries = getSubEntriesByLabel(entry);
+  res = readStockVariationsFromSubEntries(subEntries);
   if (res.isStockVariationsTracked) return res;
 
-  // group by balanced groups
-  res = readStockVariationsByBalancedGroups(rowsEntry);
+  // group by balanced group
+  subEntries = getSubEntriesByBalancedGroup(entry);
+  res = readStockVariationsFromSubEntries(subEntries);
   if (res.isStockVariationsTracked) return res;
+
+  // ---------- Error ---------- //
 
   // if reading unsuccessfull
   res.isStockVariationsTracked = false;
   
-  // lignes relatives aux comptes de variation de stock
+  // lignes relatives aux comptes de variations des stocks
   let rowsStockVariations = entry.filter(ligne => /^603/.test(ligne.CompteNum));
-  let nbStockVariationsAccounts = rowsStockVariations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+  let stockVariationsAccounts = rowsStockVariations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
   
-  // lignes relatives aux comtpes de stock
+  // lignes relatives aux comtpes de stocks
   let rowsStocks = entry.filter(ligne => /^3(1|2|7)/.test(ligne.CompteNum));
-  let nbStocksAccounts = rowsStocks.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+  let stocksAccounts = rowsStocks.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
 
-  let balanced = checkBalanceTwoLists(rowsStocks,rowsStockVariations);
+  let balanced = checkBalanceTwoLists(rowsStockVariations,rowsStocks);
 
   // Message
-  res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture de variation(s) de stock). "
-    + "Informations complémentaires : "
-    + nbStockVariationsAccounts+" comptes de variation de stock ("+(rowsStockVariations.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
-    + nbStocksAccounts+" comptes de stocks ("+(rowsStocks.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+  res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture de variation(s) de stock) : "
+    + stockVariationsAccounts.length+" compte(s) de variation de stock ("+(stockVariationsAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + stocksAccounts.length+" compte(s) de stocks ("+(stocksAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
     + (balanced ? "montant des variations égal à la variation des stocks au sein de l'écriture " : "montant des variations différent de la variation des stocks au sein de l'écriture.");
   
+  return res;
+}
+
+const readStockVariationsFromSubEntries = (subEntries) =>
+{
+  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
+
+  subEntries.forEach(subEntry =>
+  {
+    let resSubEntry = readStockVariations(subEntry);
+
+    if (resSubEntry.isStockVariationsTracked) res.entryData.push(...resSubEntry.entryData);
+    else
+    {
+      res.isStockVariationsTracked = false;
+      res.message = resSubEntry.message;
+      return res;
+    }
+  })
+  
+  res.isStockVariationsTracked = true;
+  res.message = "OK";
   return res;
 }
 
@@ -887,14 +914,15 @@ const readStockVariations = (rows) =>
 
   // lignes relatives aux variations de stocks
   let rowsStockVariations = rows.filter(ligne => /^603/.test(ligne.CompteNum));
+
   // lignes relatives aux comtpes de stocks
   let rowsStocks = rows.filter(ligne => /^3/.test(ligne.CompteNum));
 
   // Empty entry -------------------------------------------------------------------------------------- //
 
-  if (rows.length == 0)
+  if (rowsStockVariations.length == 0)
   {
-    res.isExpensesTracked = true;
+    res.isStockVariationsTracked = true;
     return res;
   }
 
@@ -968,106 +996,6 @@ const readStockVariations = (rows) =>
   return res;
 }
 
-
-const readStockVariationsByStockTypes = (rowsEntry) =>
-{
-  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
-
-  // sotck 31
-  let rowsRawMaterialsStocks = rowsEntry.filter(ligne => /^6031/.test(ligne.CompteNum) || /^31/.test(ligne.CompteNum));
-  let resRawMaterialsStocks = readStockVariations(rowsRawMaterialsStocks);
-
-  // sotck 32
-  let rowsOtherSuppliesStocks = rowsEntry.filter(ligne => /^6032/.test(ligne.CompteNum) || /^32/.test(ligne.CompteNum));
-  let resOtherSuppliesStocks = readStockVariations(rowsOtherSuppliesStocks);
-
-  // sotck 31
-  let rowsMerchandisesStocks = rowsEntry.filter(ligne => /^6037/.test(ligne.CompteNum) || /^37/.test(ligne.CompteNum));
-  let resMerchandisesStocks = readStockVariations(rowsMerchandisesStocks);
-
-  if (resRawMaterialsStocks.isStockVariationsTracked && resOtherSuppliesStocks.isStockVariationsTracked && resMerchandisesStocks.isStockVariationsTracked)
-  {
-    res.isStockVariationsTracked = true;
-    res.entryData = [...resRawMaterialsStocks.entryData, ...resOtherSuppliesStocks.entryData, ...resMerchandisesStocks.entryData];
-
-    return res;
-  }
-  
-  res.isStockVariationsTracked = false;
-  return res;
-}
-
-const readStockVariationsByEntryLabels = (rowsEntry) =>
-{
-  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
-
-  // get list entry
-  let entryLabels = rowsEntry.map(row => row.EcritureLib)
-                             .filter((value, index, self) => index === self.findIndex(item => item === value));
-  
-  for (let label of entryLabels)
-  {
-    let rowsLabel = rowsEntry.filter(ligne => ligne.EcritureLib == label);
-    let resLabel = readStockVariations(rowsLabel);
-
-    if (resLabel.isStockVariationsTracked)
-    {
-      res.entryData.push(...resLabel.entryData);
-    }
-    else
-    {
-      res.isStockVariationsTracked = false;
-      return res;
-    }
-  }
-  
-  res.isStockVariationsTracked = true;
-  return res;
-}
-
-const readStockVariationsByBalancedGroups = (rowsEntry) =>
-{
-  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
-
-  // build groups
-  let groups = [];
-  let currentGroup = [];
-  for (let row of rowsEntry)
-  {
-    currentGroup.push(row);
-    if (checkBalance(currentGroup))
-    {
-      groups.push(currentGroup);
-      currentGroup = [];
-    }
-  }
-
-  if (groups.length == 0)
-  {
-    res.isStockVariationsTracked = false;
-    res.message = "Ecriture non équilibrée.";
-    return res;
-  }
-
-  for (let group of groups)
-  {
-    let resGroup = readStockVariations(group);
-
-    if (resGroup.isStockVariationsTracked)
-    {
-      res.entryData.push(...resGroup.entryData);
-    }
-    else
-    {
-      res.isStockVariationsTracked = false;
-      return res;
-    }
-  }
-  
-  res.isStockVariationsTracked = true;
-  return res;
-}
-
 /* ----------------------------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- DEPRECIATION EXPENSES SCRIPTS -------------------------------------------------- */
 
@@ -1078,65 +1006,94 @@ const readStockVariationsByBalancedGroups = (rowsEntry) =>
  */
 
 const readDepreciationExpensesFromEntry = (entry) =>
-{
-  let res = {entryData: [], isExpensesTracked: false, message: ""};
-
-  let rowsEntry = entry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum) ||/^28/.test(ligne.CompteNum));
-
-  // basic case
-  res = readDepreciationExpenses(rowsEntry);
+{  
+  // ---------- Entry ---------- //
+  
+  let res = readDepreciationExpenses(entry);
   if (res.isExpensesTracked) return res;
 
-  // group by asset types
-  res = divideEntryByAssetsTypes(rowsEntry);
+  // ---------- Sub-entries ---------- //
+
+  let subEntries = [];
+
+  // group by asset type
+  subEntries = getSubEntriesByAssetType(entry);
+  res = readDepreciationExpensesFromSubEntries(subEntries);
   if (res.isExpensesTracked) return res;
 
-  // group by labels
-  res = divideEntryByEntryLabels(rowsEntry);
+  // group by label
+  subEntries = getSubEntriesByLabel(entry);
+  res = readDepreciationExpensesFromSubEntries(subEntries);
   if (res.isExpensesTracked) return res;
 
-  // group by balanced groups
-  res = divideEntryByBalancedGroups(rowsEntry);
+  // group by balanced group
+  subEntries = getSubEntriesByBalancedGroup(entry);
+  res = readDepreciationExpensesFromSubEntries(subEntries);
   if (res.isExpensesTracked) return res;
+
+  // ---------- Error ---------- //
 
   // if reading unsuccessfull
   res.isExpensesTracked = false;
   
   // lignes relatives aux comptes de dotations
   let rowsDepreciationExpenses = entry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
-  let nbDepreciationAccounts = rowsDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+  let depreciationExpenseAccounts = rowsDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
   
   // lignes relatives aux comtpes d'amortissements
   let rowsDepreciations = entry.filter(ligne => /^28/.test(ligne.CompteNum));
-  let nbDepreciationExpenseAccounts = rowsDepreciations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+  let depreciationAccounts = rowsDepreciations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
 
   let balanced = checkBalanceTwoLists(rowsDepreciations,rowsDepreciationExpenses);
 
   // Message
-  res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture dotation(s) aux amortissements). "
-    + "Informations complémentaires : "
-    + nbDepreciationAccounts+" comptes d'amortissements ("+(rowsDepreciations.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
-    + nbDepreciationExpenseAccounts+" comptes de dotations ("+(rowsDepreciationExpenses.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+  res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture dotation(s) aux amortissements) : "
+    + depreciationAccounts.length+" compte(s) d'amortissements ("+(depreciationAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + depreciationExpenseAccounts.length+" compte(s) de dotations ("+(depreciationExpenseAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
     + (balanced ? "montant des dotations égal à la variation des amortissements au sein de l'écriture " : "montant des dotations différent de la variation des amortissements au sein de l'écriture.");
   
   return res;
 }
 
-const readDepreciationExpenses = (rowsEntry) =>
+const readDepreciationExpensesFromSubEntries = (subEntries) =>
+{
+  let res = {entryData: [], isExpensesTracked: false, message: ""};
+
+  subEntries.forEach(subEntry =>
+  {
+    let resSubEntry = readDepreciationExpenses(subEntry);
+
+    if (resSubEntry.isExpensesTracked) res.entryData.push(...resSubEntry.entryData);
+    else
+    {
+      res.isExpensesTracked = false;
+      res.message = resSubEntry.message;
+      return res;
+    }
+  })
+  
+  res.isExpensesTracked = true;
+  res.message = "OK";
+  return res;
+}
+
+const readDepreciationExpenses = (rows) =>
 {
   // response
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
   // lignes relatives aux comptes de dotations
-  let rowsDepreciationExpenses = rowsEntry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
+  let rowsDepreciationExpenses = rows.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
+
   // lignes relatives aux comtpes d'amortissements
-  let rowsDepreciations = rowsEntry.filter(ligne => /^28/.test(ligne.CompteNum));
+  let rowsDepreciations = rows.filter(ligne => /^28/.test(ligne.CompteNum));
 
   // Empty entry -------------------------------------------------------------------------------------- //
 
-  if (rowsEntry.length == 0)
+  if (rowsDepreciationExpenses.length == 0)
   {
     res.isExpensesTracked = true;
+    res.message = "Aucune dotation aux amortissements sur immobilisations.";
     return res;
   }
 
@@ -1206,98 +1163,76 @@ const readDepreciationExpenses = (rowsEntry) =>
   return res;
 }
 
+/* ----------------------------------------------------------------------- */
+/* ------------------------- SUB-ENTRIES SCRIPTS ------------------------- */
 
-const divideEntryByAssetsTypes = (rowsEntry) =>
+const getSubEntriesByLabel = (entry) =>
 {
-  let res = {entryData: [], isExpensesTracked: false, message: ""};
+  let subEntries = [];
+
+  // get list labels
+  let labels = entry.map(row => row.EcritureLib)
+                    .filter((value, index, self) => index === self.findIndex(item => item === value));
+  
+  for (let label of labels)
+  {
+    let subEntry = entry.filter(ligne => ligne.EcritureLib == label);
+    subEntries.push(subEntry);
+  }
+  
+  return subEntries;
+}
+
+const getSubEntriesByBalancedGroup = (entry) =>
+{
+  let subEntries = [];
+
+  // build subEntries
+  let currentSubEntry = [];
+  for (let row of entry)
+  {
+    currentSubEntry.push(row);
+    if (checkBalance(currentSubEntry))
+    {
+      subEntries.push(currentSubEntry);
+      currentSubEntry = [];
+    }
+  }
+  if (currentSubEntry.length > 0) subEntries.push(currentSubEntry);
+
+  return subEntries;
+}
+
+const getSubEntriesByStockType = (entry) =>
+{
+  let subEntries = [];
+
+  // stock - raw materials
+  let rowsRawMaterialsStock = entry.filter(ligne => /^6031/.test(ligne.CompteNum) || /^31/.test(ligne.CompteNum));
+  subEntries.push(rowsRawMaterialsStock);
+
+  // stock - other supplies
+  let rowsOtherSuppliesStock = entry.filter(ligne => /^6032/.test(ligne.CompteNum) || /^32/.test(ligne.CompteNum));
+  subEntries.push(rowsOtherSuppliesStock);
+
+  // stock - goods
+  let rowsGoodsStock = entry.filter(ligne => /^6037/.test(ligne.CompteNum) || /^37/.test(ligne.CompteNum));
+  subEntries.push(rowsGoodsStock);
+
+  return subEntries;
+}
+
+const getSubEntriesByAssetType = (entry) =>
+{
+  let subEntries = [];
 
   // tangible assets
-  let rowsTangibleAssets = rowsEntry.filter(ligne => /^68(1|7)12/.test(ligne.CompteNum) || /^281/.test(ligne.CompteNum));
-  let resTangibleAssets = readDepreciationExpenses(rowsTangibleAssets);
+  let rowsTangibleAssets = entry.filter(ligne => /^68(1|7)12/.test(ligne.CompteNum) || /^281/.test(ligne.CompteNum));
+  if (rowsTangibleAssets.length > 0) subEntries.push(rowsTangibleAssets);
 
   // intangible assets
-  let rowsIntangibleAssets = rowsEntry.filter(ligne => /^68(1|7)11/.test(ligne.CompteNum) || /^280/.test(ligne.CompteNum));
-  let resIntangibleAssets = readDepreciationExpenses(rowsIntangibleAssets);
+  let rowsIntangibleAssets = entry.filter(ligne => /^68(1|7)11/.test(ligne.CompteNum) || /^280/.test(ligne.CompteNum));
+  if (rowsIntangibleAssets.length > 0) subEntries.push(rowsIntangibleAssets);
 
-  if (resTangibleAssets.isExpensesTracked && resIntangibleAssets.isExpensesTracked)
-  {
-    res.isExpensesTracked = true;
-    res.entryData = [...resTangibleAssets.entryData, ...resIntangibleAssets.entryData];
-
-    return res;
-  }
-  
-  res.isExpensesTracked = false;
-  return res;
-}
-
-const divideEntryByEntryLabels = (rowsEntry) =>
-{
-  let res = {entryData: [], isExpensesTracked: false, message: ""};
-
-  // get list entry
-  let entryLabels = rowsEntry.map(row => row.EcritureLib)
-                             .filter((value, index, self) => index === self.findIndex(item => item === value));
-  
-  for (let label of entryLabels)
-  {
-    let rowsLabel = rowsEntry.filter(ligne => ligne.EcritureLib == label);
-    let resLabel = readDepreciationExpenses(rowsLabel);
-
-    if (resLabel.isExpensesTracked)
-    {
-      res.entryData.push(...resLabel.entryData);
-    }
-    else
-    {
-      res.isExpensesTracked = false;
-      return res;
-    }
-  }
-  
-  res.isExpensesTracked = true;
-  return res;
-}
-
-const divideEntryByBalancedGroups = (rowsEntry) =>
-{
-  let res = {entryData: [], isExpensesTracked: false, message: ""};
-
-  // build groups
-  let groups = [];
-  let currentGroup = [];
-  for (let row of rowsEntry)
-  {
-    currentGroup.push(row);
-    if (checkBalance(currentGroup))
-    {
-      groups.push(currentGroup);
-      currentGroup = [];
-    }
-  }
-
-  if (groups.length == 0 || !checkBalance(rowsEntry))
-  {
-    res.isExpensesTracked = false;
-    res.message = "Ecriture non équilibrée.";
-    return res;
-  }
-
-  for (let group of groups)
-  {
-    let resGroup = readDepreciationExpenses(group);
-
-    if (resGroup.isExpensesTracked)
-    {
-      res.entryData.push(...resGroup.entryData);
-    }
-    else
-    {
-      res.isExpensesTracked = false;
-      return res;
-    }
-  }
-  
-  res.isExpensesTracked = true;
-  return res;
+  return subEntries;
 }
