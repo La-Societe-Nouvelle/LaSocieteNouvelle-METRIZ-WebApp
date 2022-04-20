@@ -191,6 +191,7 @@ export async function FECDataReader(FECData)
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
   data.ignoreDepreciationEntries = [];
+  data.ignoreStockVariationsEntries = [];
   data.errors =[];
 
   // Production / Incomes ------------------------------------------------------------------------------- //
@@ -670,47 +671,34 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
 
   // Stocks variation (603) --------------------------------------------------------------------------- //
 
-  if (/^603/.test(ligneCourante.CompteNum))
-  {    
-    // lignes des comptes de stocks
-    let regexPrefixeCompteStocks = /^6031/.test(ligneCourante.CompteNum) ? /^31/ 
-                                 : /^6032/.test(ligneCourante.CompteNum) ? /^32/ 
-                                 : /^6037/.test(ligneCourante.CompteNum) ? /^37/ 
-                                                                         : /^3/;
-    let lignesStocks = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
-                                            && ligne.EcritureLib == ligneCourante.EcritureLib
-                                            && regexPrefixeCompteStocks.test(ligne.CompteNum));  
-                                            
-    let equilibre = checkBalanceTwoLists([ligneCourante],lignesStocks);    
-    if (equilibre) 
+  if (/^603/.test(ligneCourante.CompteNum) && !data.ignoreStockVariationsEntries.includes(ligneCourante.EcritureNum))
+  {  
+    // entry
+    let entry = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum);
+
+    // ignore entry for futher references
+    data.ignoreStockVariationsEntries.push(ligneCourante.EcritureNum);
+    
+    let entryStockVariationsData = readStockVariationsFromEntry(entry);
+
+    if (entryStockVariationsData.isStockVariationsTracked)
     {
-      lignesStocks.forEach((ligneStock) => 
+      for (let stockVariationData of entryStockVariationsData.entryData)
       {
         // retrieve stock variation item
-        let stockVariation = data.stockVariations.filter(stockVariation => stockVariation.account == ligneCourante.CompteNum
-                                                                        && stockVariation.accountAux == ligneStock.CompteNum)[0];
+        let stockVariation = data.stockVariations.filter(stockVariation => stockVariation.account == stockVariationData.account
+                                                                        && stockVariation.accountAux == stockVariationData.accountAux)[0];
 
-        if (stockVariation!=undefined) stockVariation.amount+= parseAmount(ligneStock.Credit) - parseAmount(ligneStock.Debit);
+        if (stockVariation!=undefined) stockVariation.amount+= stockVariationData.amount;
 
         else
-        {
-          // stock variation data
-          let stockVariationData = 
-          {
-            label: ligneCourante.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-            account: ligneCourante.CompteNum,
-            accountLib: ligneCourante.CompteLib,
-            accountAux: ligneStock.CompteNum,
-            accountAuxLib: ligneStock.CompteLib,
-            isProductionStock: false,
-            amount: parseAmount(ligneStock.Credit) - parseAmount(ligneStock.Debit),
-          }
+        { 
           // push data
           data.stockVariations.push(stockVariationData);
-        }
-      })
+        } 
+      }
     }
-    else throw "L'écriture "+ligneCourante.EcritureNum+" du journal "+ligneCourante.JournalLib+" entraîne une exception (lecture variation de stock).";
+    else throw entryStockVariationsData.message;
   }
 
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
@@ -836,6 +824,248 @@ const readAddtionalDataEntry = async (data,journal,ligneCourante) =>
   // ...participation formation professionnelle
   if (/^63(1|3)3/.test(ligneCourante.CompteNum)) data.KNWData.vocationalTrainingTax+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------ */
+/* -------------------------------------------------- STOCK VARIATIONS SCRIPTS -------------------------------------------------- */
+
+/* The function return an object with the following elements :
+ *  - entryData (Array) : data from the entry to add the "main" data object
+ *  - status (Boolean) : status of the reading
+ *  - message (String) : -
+ */
+
+const readStockVariationsFromEntry = (entry) =>
+{
+  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
+
+  let rowsEntry = entry.filter(ligne => /^603/.test(ligne.CompteNum) || /^3(1|2|7)/.test(ligne.CompteNum));
+
+  // basic case
+  res = readStockVariations(rowsEntry);
+  if (res.isStockVariationsTracked) return res;
+
+  // group by asset types
+  res = readStockVariationsByStockTypes(rowsEntry);
+  if (res.isStockVariationsTracked) return res;
+
+  // group by labels
+  res = readStockVariationsByEntryLabels(rowsEntry);
+  if (res.isStockVariationsTracked) return res;
+
+  // group by balanced groups
+  res = readStockVariationsByBalancedGroups(rowsEntry);
+  if (res.isStockVariationsTracked) return res;
+
+  // if reading unsuccessfull
+  res.isStockVariationsTracked = false;
+  
+  // lignes relatives aux comptes de variation de stock
+  let rowsStockVariations = entry.filter(ligne => /^603/.test(ligne.CompteNum));
+  let nbStockVariationsAccounts = rowsStockVariations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+  
+  // lignes relatives aux comtpes de stock
+  let rowsStocks = entry.filter(ligne => /^3(1|2|7)/.test(ligne.CompteNum));
+  let nbStocksAccounts = rowsStocks.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length;
+
+  let balanced = checkBalanceTwoLists(rowsStocks,rowsStockVariations);
+
+  // Message
+  res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture de variation(s) de stock). "
+    + "Informations complémentaires : "
+    + nbStockVariationsAccounts+" comptes de variation de stock ("+(rowsStockVariations.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + nbStocksAccounts+" comptes de stocks ("+(rowsStocks.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + (balanced ? "montant des variations égal à la variation des stocks au sein de l'écriture " : "montant des variations différent de la variation des stocks au sein de l'écriture.");
+  
+  return res;
+}
+
+const readStockVariations = (rows) =>
+{
+  // response
+  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
+
+  // lignes relatives aux variations de stocks
+  let rowsStockVariations = rows.filter(ligne => /^603/.test(ligne.CompteNum));
+  // lignes relatives aux comtpes de stocks
+  let rowsStocks = rows.filter(ligne => /^3/.test(ligne.CompteNum));
+
+  // Empty entry -------------------------------------------------------------------------------------- //
+
+  if (rows.length == 0)
+  {
+    res.isExpensesTracked = true;
+    return res;
+  }
+
+  // Single stock account ----------------------------------------------------------------------------- //
+
+  let sameStockAccountUsed = rowsStocks.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+  if (sameStockAccountUsed)
+  {
+    res.isStockVariationsTracked = true;
+    res.message = "OK";
+
+    // ligne relative au compte de stock
+    let rowStock = rowsStocks[0];
+
+    // build data
+    rowsStockVariations.forEach((rowStockVariation) =>
+    {
+      // stock variation data
+      let stockVariationData = 
+      {
+        label: rowStockVariation.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+        account: rowStockVariation.CompteNum,
+        accountLib: rowStockVariation.CompteLib,
+        accountAux: rowStock.CompteNum,
+        accountAuxLib: rowStock.CompteLib,
+        isProductionStock: false,
+        amount: parseAmount(rowStockVariation.Debit) - parseAmount(rowStockVariation.Credit),
+      }
+      // push data
+      res.entryData.push(stockVariationData);
+    })
+
+    // return
+    return res;
+  }
+
+  // Single stock variation account & amount balanced with stock accounts ----------------------------- //
+
+  let sameStockVariationAccountUsed = rowsStockVariations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+  if (sameStockVariationAccountUsed && checkBalanceTwoLists(rowsStockVariations,rowsStocks))
+  {
+    res.isStockVariationsTracked = true;
+    res.message = "OK";
+
+    // ligne relative à la variation de stock
+    let rowStockVariation = rowsStockVariations[0];
+
+    // build data
+    rowsStocks.forEach((rowStock) =>
+    {
+      // stock variation data
+      let stockVariationData = 
+      {
+        label: rowStockVariation.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+        account: rowStockVariation.CompteNum,
+        accountLib: rowStockVariation.CompteLib,
+        accountAux: rowStock.CompteNum,
+        accountAuxLib: rowStock.CompteLib,
+        isProductionStock: false,
+        amount: parseAmount(rowStock.Credit) - parseAmount(rowStock.Debit),
+      }
+      // push data
+      res.entryData.push(stockVariationData);
+    })
+
+    return res;
+  }
+
+  res.isStockVariationsTracked = false;
+  res.message = sameStockVariationAccountUsed ? "Un seul compte de variation de stocks mais le montant de la variation ne correspond pas à la variation des stocks" : "Plusieurs comptes de varation de stocks et de stocks.";
+  return res;
+}
+
+
+const readStockVariationsByStockTypes = (rowsEntry) =>
+{
+  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
+
+  // sotck 31
+  let rowsRawMaterialsStocks = rowsEntry.filter(ligne => /^6031/.test(ligne.CompteNum) || /^31/.test(ligne.CompteNum));
+  let resRawMaterialsStocks = readStockVariations(rowsRawMaterialsStocks);
+
+  // sotck 32
+  let rowsOtherSuppliesStocks = rowsEntry.filter(ligne => /^6032/.test(ligne.CompteNum) || /^32/.test(ligne.CompteNum));
+  let resOtherSuppliesStocks = readStockVariations(rowsOtherSuppliesStocks);
+
+  // sotck 31
+  let rowsMerchandisesStocks = rowsEntry.filter(ligne => /^6037/.test(ligne.CompteNum) || /^37/.test(ligne.CompteNum));
+  let resMerchandisesStocks = readStockVariations(rowsMerchandisesStocks);
+
+  if (resRawMaterialsStocks.isStockVariationsTracked && resOtherSuppliesStocks.isStockVariationsTracked && resMerchandisesStocks.isStockVariationsTracked)
+  {
+    res.isStockVariationsTracked = true;
+    res.entryData = [...resRawMaterialsStocks.entryData, ...resOtherSuppliesStocks.entryData, ...resMerchandisesStocks.entryData];
+
+    return res;
+  }
+  
+  res.isStockVariationsTracked = false;
+  return res;
+}
+
+const readStockVariationsByEntryLabels = (rowsEntry) =>
+{
+  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
+
+  // get list entry
+  let entryLabels = rowsEntry.map(row => row.EcritureLib)
+                             .filter((value, index, self) => index === self.findIndex(item => item === value));
+  
+  for (let label of entryLabels)
+  {
+    let rowsLabel = rowsEntry.filter(ligne => ligne.EcritureLib == label);
+    let resLabel = readStockVariations(rowsLabel);
+
+    if (resLabel.isStockVariationsTracked)
+    {
+      res.entryData.push(...resLabel.entryData);
+    }
+    else
+    {
+      res.isStockVariationsTracked = false;
+      return res;
+    }
+  }
+  
+  res.isStockVariationsTracked = true;
+  return res;
+}
+
+const readStockVariationsByBalancedGroups = (rowsEntry) =>
+{
+  let res = {entryData: [], isStockVariationsTracked: false, message: ""};
+
+  // build groups
+  let groups = [];
+  let currentGroup = [];
+  for (let row of rowsEntry)
+  {
+    currentGroup.push(row);
+    if (checkBalance(currentGroup))
+    {
+      groups.push(currentGroup);
+      currentGroup = [];
+    }
+  }
+
+  if (groups.length == 0)
+  {
+    res.isStockVariationsTracked = false;
+    res.message = "Ecriture non équilibrée.";
+    return res;
+  }
+
+  for (let group of groups)
+  {
+    let resGroup = readStockVariations(group);
+
+    if (resGroup.isStockVariationsTracked)
+    {
+      res.entryData.push(...resGroup.entryData);
+    }
+    else
+    {
+      res.isStockVariationsTracked = false;
+      return res;
+    }
+  }
+  
+  res.isStockVariationsTracked = true;
+  return res;
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------------- */
