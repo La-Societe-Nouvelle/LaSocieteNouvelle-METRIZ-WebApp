@@ -889,7 +889,7 @@ const readStockVariationsFromSubEntries = (subEntries) =>
 {
   let res = {entryData: [], isStockVariationsTracked: false, message: ""};
 
-  subEntries.forEach(subEntry =>
+  for (let subEntry of subEntries)
   {
     let resSubEntry = readStockVariations(subEntry);
 
@@ -900,7 +900,7 @@ const readStockVariationsFromSubEntries = (subEntries) =>
       res.message = resSubEntry.message;
       return res;
     }
-  })
+  }
   
   res.isStockVariationsTracked = true;
   res.message = "OK";
@@ -1059,7 +1059,7 @@ const readDepreciationExpensesFromSubEntries = (subEntries) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
-  subEntries.forEach(subEntry =>
+  for (let subEntry of subEntries)
   {
     let resSubEntry = readDepreciationExpenses(subEntry);
 
@@ -1070,7 +1070,7 @@ const readDepreciationExpensesFromSubEntries = (subEntries) =>
       res.message = resSubEntry.message;
       return res;
     }
-  })
+  }
   
   res.isExpensesTracked = true;
   res.message = "OK";
