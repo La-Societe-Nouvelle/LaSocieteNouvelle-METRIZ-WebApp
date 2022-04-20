@@ -1081,20 +1081,22 @@ const readDepreciationExpensesFromEntry = (entry) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
+  let rowsEntry = entry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum) ||/^28/.test(ligne.CompteNum));
+
   // basic case
-  res = readDepreciationExpenses(entry);
+  res = readDepreciationExpenses(rowsEntry);
   if (res.isExpensesTracked) return res;
 
   // group by asset types
-  res = divideEntryByAssetsTypes(entry);
+  res = divideEntryByAssetsTypes(rowsEntry);
   if (res.isExpensesTracked) return res;
 
   // group by labels
-  res = divideEntryByEntryLabels(entry);
+  res = divideEntryByEntryLabels(rowsEntry);
   if (res.isExpensesTracked) return res;
 
   // group by balanced groups
-  res = divideEntryByBalancedGroups(entry);
+  res = divideEntryByBalancedGroups(rowsEntry);
   if (res.isExpensesTracked) return res;
 
   // if reading unsuccessfull
@@ -1129,6 +1131,14 @@ const readDepreciationExpenses = (rowsEntry) =>
   let rowsDepreciationExpenses = rowsEntry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
   // lignes relatives aux comtpes d'amortissements
   let rowsDepreciations = rowsEntry.filter(ligne => /^28/.test(ligne.CompteNum));
+
+  // Empty entry -------------------------------------------------------------------------------------- //
+
+  if (rowsEntry.length == 0)
+  {
+    res.isExpensesTracked = true;
+    return res;
+  }
 
   // Single depreciation account ---------------------------------------------------------------------- //
 
@@ -1234,9 +1244,9 @@ const divideEntryByEntryLabels = (rowsEntry) =>
     let rowsLabel = rowsEntry.filter(ligne => ligne.EcritureLib == label);
     let resLabel = readDepreciationExpenses(rowsLabel);
 
-    if (resLabel.status)
+    if (resLabel.isExpensesTracked)
     {
-      res.entryData.push(resLabel.entryData);
+      res.entryData.push(...resLabel.entryData);
     }
     else
     {
@@ -1266,7 +1276,7 @@ const divideEntryByBalancedGroups = (rowsEntry) =>
     }
   }
 
-  if (groups.length == 0)
+  if (groups.length == 0 || !checkBalance(rowsEntry))
   {
     res.isExpensesTracked = false;
     res.message = "Ecriture non équilibrée.";
