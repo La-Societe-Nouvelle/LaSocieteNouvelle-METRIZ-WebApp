@@ -190,7 +190,7 @@ export class AccountingSection extends React.Component {
                                                    <p>
                                                    <b>{errorMessage}</b>
                                                        </p> 
-                                                    <p>{errors}</p>
+                                                    {errors.map((error,index) => <p key={index}> - {error}</p>)}
                                                 </div>
 
 
