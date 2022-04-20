@@ -730,8 +730,8 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       for (let depreciationExpenseData of entryDepreciationExpensesData.entryData)
       {
         // retrieve depreciation expense item
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == depreciationExpenseData.CompteNum
-                                                                           && expense.accountAux == depreciationExpenseData.CompteNum)[0];
+        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == depreciationExpenseData.account
+                                                                           && expense.accountAux == depreciationExpenseData.accountAux)[0];
 
         if (depreciationExpense!=undefined) depreciationExpense.amount+= depreciationExpenseData.amount;
 
