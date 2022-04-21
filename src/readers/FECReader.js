@@ -354,7 +354,15 @@ async function readBookAsJournalANouveaux(data,book)
         // push data
         data.depreciations.push(depreciationData);
       }
-      else throw "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" ne peut être relié à un compte d'immobilisations.";
+      else 
+      {
+        let immobilisationAccounts = book.filter(ligne => /^2(0|1)/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+        let depreciationAccounts = book.filter(ligne => /^28/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+        let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte d'immobilisations :"
+          +" "+immobilisationAccounts.length+" comptes d'immobilisation(s) ("+immobilisationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+")"
+          +" "+depreciationAccounts.length+" comptes d'amortissement(s) ("+depreciationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
+        throw message;
+      }
     }
 
     /* --- STOCKS --- */
@@ -411,7 +419,13 @@ async function readBookAsJournalANouveaux(data,book)
         // push data
         data.depreciations.push(depreciationData);
       }
-      else throw "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" ne peut être relié à un compte de stocks.";
+      else 
+      {
+        let stockAccounts = book.filter(ligne => /^3/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+        let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte de stocks :"
+          + " "+stockAccounts.length+ " compte(s) de classe 3 ("+stockAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
+        throw message;
+      }
     }
 
   })
@@ -538,7 +552,12 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         // push data
         data.depreciations.push(depreciationData);
       }
-      else throw "Le compte "+ligneCourante.CompteNum+" dans le journal "+ligneCourante.JournalLib+" ne peut être relié à un compte d'immobilisations.";
+      else
+      {
+        let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" ne peut être relié à un compte d'immobilisations :"
+          +" "+data.immobilisations.length+" compte(s) d'immobilisations enregistré(s) ("+data.immobilisations.reduce((a,b) => a.account+", "+b.account,"").substring(2)+").";
+        throw message;
+      } 
     }
   }
 }
