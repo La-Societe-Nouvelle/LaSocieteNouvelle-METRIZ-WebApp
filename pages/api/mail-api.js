@@ -149,3 +149,36 @@ export const sendReportToAdmin = async (file, fileName) =>
 
 }
 
+export const sendReportToSupport = async (errors) => 
+{
+
+  const recipientMail= "support@lasocietenouvelle.org";
+  const objetMail= "Rapport d'erreurs - Lecture du FEC";
+
+  const messageMail = "Rapport envoyé depuis Metriz WebApp\n"
+  + "## Liste des erreurs ## \r ----------------------- \r\n";
+
+   errors.forEach(error => {
+     messageMail += error + "\n";
+   });
+
+  const contentMail = { recipientMail, objetMail, messageMail }
+
+  const request = {
+    body: JSON.stringify(contentMail),
+    headers: {'Content-Type': 'application/json'},
+    method: 'POST'
+  }
+  
+  try 
+  {
+      const res = await fetch('/api/mail-sender', request);
+      return res;
+  } 
+  catch (error) {
+    return error;
+  }
+  
+
+}
+
