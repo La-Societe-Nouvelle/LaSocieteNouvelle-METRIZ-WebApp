@@ -243,11 +243,17 @@ export async function FECDataReader(FECData)
     // Lecture du journal des A-NOUVEAUX
     // -------------------------------------------------- //
 
-    try
+    let journal = FECData.books[codeANouveaux];
+    await journal.sort((a,b) => a.CompteNum.localeCompare(b.CompteNum))
+                 .map(async (ligne) => 
     {
-      await readBookAsJournalANouveaux(data, FECData.books[codeANouveaux]);
-    }
-    catch (error) {data.errors.push(error)};
+      try
+      {
+        await readANouveauxEntry(data,journal,ligne);
+      }
+      catch (error) {data.errors.push(error)};
+      return;
+    })
 
     // -------------------------------------------------- //
   }
@@ -295,140 +301,134 @@ export async function FECDataReader(FECData)
 
 /* ---------- JOURNAL A NOUVEAUX ---------- */
 
-async function readBookAsJournalANouveaux(data,book) 
+async function readANouveauxEntry(data,journal,ligneCourante) 
 {  
-  await book.sort((a,b) => a.CompteNum.localeCompare(b.CompteNum))
-            .forEach((ligneCourante) => 
+  /* --- IMMOBILISATIONS --- */
+
+  /*  LISTE DES COMPTES D'IMMOBILISATIONS - NIV 1
+  ----------------------------------------------------------------------------------------------------
+    Comptes 20 - Immobilisations incorporelles
+    Comptes 21 - Immobilisations corporelles
+    Comptes 22 - Immobilisations mises en concession
+    Comptes 23 - Immobilisations en cours
+    Comptes 25 - Part dans des entreprises liées
+    Comptes 26 - Participations
+    Comptes 27 - Autres immobilisations financières
+    Comptes 28 - Amortissements des immobilisations (non enregistrés) -> valeur comptable
+    Comptes 29 - Dépréciations des immobilisations (non enregistrés)
+  ----------------------------------------------------------------------------------------------------
+    */
+
+  // Comptes d'immobilisations (hors amortissements et dépréciations) --------------------------------- //
+
+  if (/^2[0-7]/.test(ligneCourante.CompteNum))
   {
-    
-    /* --- IMMOBILISATIONS --- */
-
-    /*  LISTE DES COMPTES D'IMMOBILISATIONS - NIV 1
-    ----------------------------------------------------------------------------------------------------
-      Comptes 20 - Immobilisations incorporelles
-      Comptes 21 - Immobilisations corporelles
-      Comptes 22 - Immobilisations mises en concession
-      Comptes 23 - Immobilisations en cours
-      Comptes 25 - Part dans des entreprises liées
-      Comptes 26 - Participations
-      Comptes 27 - Autres immobilisations financières
-      Comptes 28 - Amortissements des immobilisations (non enregistrés) -> valeur comptable
-      Comptes 29 - Dépréciations des immobilisations (non enregistrés)
-    ----------------------------------------------------------------------------------------------------
-     */
-
-    // Comptes d'immobilisations (hors amortissements et dépréciations) --------------------------------- //
-
-    if (/^2[0-7]/.test(ligneCourante.CompteNum))
+    // immobilisation data
+    let immobilisationData = 
     {
-      // immobilisation data
-      let immobilisationData = 
+      account: ligneCourante.CompteNum,
+      accountLib: ligneCourante.CompteLib,
+      isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
+      prevAmount: parseAmount(ligneCourante.Debit),
+      amount: parseAmount(ligneCourante.Debit)
+    }
+    // push data
+    data.immobilisations.push(immobilisationData);
+  }
+
+  // Comptes d'amortissements et de dépréciations ----------------------------------------------------- //
+
+  if (/^2[8-9]/.test(ligneCourante.CompteNum))
+  {
+    // retrieve immobilisation account
+    let immobilisationAccountsAux = journal.filter(ligne => ligne.CompteNum.startsWith("2"+ligneCourante.CompteNum.substring(2)));
+    if (immobilisationAccountsAux.length == 1)
+    {
+      // depreciation data
+      let depreciationData = 
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
-        prevAmount: parseAmount(ligneCourante.Debit),
-        amount: parseAmount(ligneCourante.Debit)
+        accountAux: immobilisationAccountsAux[0].CompteNum,
+        prevAmount: parseAmount(ligneCourante.Credit),
+        amount: parseAmount(ligneCourante.Credit)
       }
       // push data
-      data.immobilisations.push(immobilisationData);
+      data.depreciations.push(depreciationData);
     }
-
-    // Comptes d'amortissements et de dépréciations ----------------------------------------------------- //
-
-    if (/^2[8-9]/.test(ligneCourante.CompteNum))
+    else 
     {
-      // retrieve immobilisation account
-      let immobilisationAccountsAux = book.filter(ligne => ligne.CompteNum.startsWith("2"+ligneCourante.CompteNum.substring(2)));
-      if (immobilisationAccountsAux.length == 1)
-      {
-        // depreciation data
-        let depreciationData = 
-        {
-          account: ligneCourante.CompteNum,
-          accountLib: ligneCourante.CompteLib,
-          accountAux: immobilisationAccountsAux[0].CompteNum,
-          prevAmount: parseAmount(ligneCourante.Credit),
-          amount: parseAmount(ligneCourante.Credit)
-        }
-        // push data
-        data.depreciations.push(depreciationData);
-      }
-      else 
-      {
-        let immobilisationAccounts = book.filter(ligne => /^2(0|1)/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-        let depreciationAccounts = book.filter(ligne => /^28/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-        let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte d'immobilisations :"
-          +" "+immobilisationAccounts.length+" comptes d'immobilisation(s) ("+immobilisationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+")"
-          +" "+depreciationAccounts.length+" comptes d'amortissement(s) ("+depreciationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
-        throw message;
-      }
+      let immobilisationAccounts = journal.filter(ligne => /^2(0|1)/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+      let depreciationAccounts = journal.filter(ligne => /^28/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+      let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte d'immobilisations :"
+        +" "+immobilisationAccounts.length+" comptes d'immobilisation(s) ("+immobilisationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+")"
+        +" "+depreciationAccounts.length+" comptes d'amortissement(s) ("+depreciationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
+      throw message;
     }
+  }
 
-    /* --- STOCKS --- */
+  /* --- STOCKS --- */
 
-    /*  LISTE DES COMPTES DE STOCKS - NIV 1
-    ----------------------------------------------------------------------------------------------------
-      Comptes 31 - Matières premières
-      Comptes 32 - Autres approvisionnements
-      Comptes 33 - En-cours de production de biens [Production]
-      Comptes 34 - En-cours de production de services [Production]
-      Comptes 35 - Stocks de produits [Production]
-      Comptes 36 - Stocks provenant d'immobilisation (non traités)
-      Comptes 37 - Stocks de marchandises
-      Comptes 38 - Stocks en voie d'acheminement (non traités)
-      Comptes 39 - Dépréciations des stocks et en-cours
-    ----------------------------------------------------------------------------------------------------
-     */
-    
-    // Comptes de stocks (hors dépréciations et comptes 36 & 38) ---------------------------------------- //
+  /*  LISTE DES COMPTES DE STOCKS - NIV 1
+  ----------------------------------------------------------------------------------------------------
+    Comptes 31 - Matières premières
+    Comptes 32 - Autres approvisionnements
+    Comptes 33 - En-cours de production de biens [Production]
+    Comptes 34 - En-cours de production de services [Production]
+    Comptes 35 - Stocks de produits [Production]
+    Comptes 36 - Stocks provenant d'immobilisation (non traités)
+    Comptes 37 - Stocks de marchandises
+    Comptes 38 - Stocks en voie d'acheminement (non traités)
+    Comptes 39 - Dépréciations des stocks et en-cours
+  ----------------------------------------------------------------------------------------------------
+    */
+  
+  // Comptes de stocks (hors dépréciations et comptes 36 & 38) ---------------------------------------- //
 
-    if (/^3([1-5]|7)/.test(ligneCourante.CompteNum))
+  if (/^3([1-5]|7)/.test(ligneCourante.CompteNum))
+  {
+    // stock data
+    let stockData = 
     {
-      // stock data
-      let stockData = 
+      account: ligneCourante.CompteNum,
+      accountLib: ligneCourante.CompteLib,
+      accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replaceAll("0$",""),
+      isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
+      amount: parseAmount(ligneCourante.Debit),
+      prevAmount: parseAmount(ligneCourante.Debit)
+    }
+    // push data
+    data.stocks.push(stockData);
+  }
+
+  // Comptes de dépréciations ------------------------------------------------------------------------- //
+
+  if (/^39/.test(ligneCourante.CompteNum))
+  {
+    // retrieve stock account
+    let stockAccountsAux = journal.filter(ligne => ligne.CompteNum.startsWith("3"+ligneCourante.CompteNum.substring(2)));
+    if (stockAccountsAux.length == 1)
+    {
+      // depreciation data
+      let depreciationData = 
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replaceAll("0$",""),
-        isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
-        amount: parseAmount(ligneCourante.Debit),
-        prevAmount: parseAmount(ligneCourante.Debit)
+        accountAux: stockAccountsAux[0].CompteNum,
+        prevAmount: parseAmount(ligneCourante.Credit),
+        amount: parseAmount(ligneCourante.Credit)
       }
       // push data
-      data.stocks.push(stockData);
+      data.depreciations.push(depreciationData);
     }
-
-    // Comptes de dépréciations ------------------------------------------------------------------------- //
-
-    if (/^39/.test(ligneCourante.CompteNum))
+    else 
     {
-      // retrieve stock account
-      let stockAccountsAux = book.filter(ligne => ligne.CompteNum.startsWith("3"+ligneCourante.CompteNum.substring(2)));
-      if (stockAccountsAux.length == 1)
-      {
-        // depreciation data
-        let depreciationData = 
-        {
-          account: ligneCourante.CompteNum,
-          accountLib: ligneCourante.CompteLib,
-          accountAux: stockAccountsAux[0].CompteNum,
-          prevAmount: parseAmount(ligneCourante.Credit),
-          amount: parseAmount(ligneCourante.Credit)
-        }
-        // push data
-        data.depreciations.push(depreciationData);
-      }
-      else 
-      {
-        let stockAccounts = book.filter(ligne => /^3/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-        let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte de stocks :"
-          + " "+stockAccounts.length+ " compte(s) de classe 3 ("+stockAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
-        throw message;
-      }
+      let stockAccounts = journal.filter(ligne => /^3/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+      let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte de stocks :"
+        + " "+stockAccounts.length+ " compte(s) de classe 3 ("+stockAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
+      throw message;
     }
-
-  })
+  }
 }
 
 /* -------------------- ENTRIES READERS ------------------------- */
