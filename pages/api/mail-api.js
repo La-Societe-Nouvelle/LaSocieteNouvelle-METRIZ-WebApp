@@ -155,8 +155,12 @@ export const sendReportToSupport = async (errors) =>
   const recipientMail= "support@lasocietenouvelle.org";
   const objetMail= "Rapport d'erreurs - Lecture du FEC";
 
-  const messageMail = "Liste des erreurs-----------------------\n" + errors  ;
+  const messageMail = "Liste des erreurs-----------------------\n" ;
 
+  errors.forEach(error => {
+    messageMail += "-"+ error+"\n"
+  });
+  
   const contentMail = { recipientMail, objetMail, messageMail }
 
   const request = {
@@ -164,7 +168,6 @@ export const sendReportToSupport = async (errors) =>
     headers: {'Content-Type': 'application/json'},
     method: 'POST'
   }
-  console.log(request);
   
   try 
   {
