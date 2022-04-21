@@ -155,11 +155,7 @@ export const sendReportToSupport = async (errors) =>
   const recipientMail= "support@lasocietenouvelle.org";
   const objetMail= "Rapport d'erreurs - Lecture du FEC";
 
-  const messageMail = "Liste des erreurs-----------------------\n";
-
-   errors.forEach(error => {
-     messageMail += "\n" + error + "\n";
-   });
+  const messageMail = "Liste des erreurs-----------------------\n" + errors  ;
 
   const contentMail = { recipientMail, objetMail, messageMail }
 

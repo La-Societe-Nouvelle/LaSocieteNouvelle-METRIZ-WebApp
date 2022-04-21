@@ -347,7 +347,7 @@ export class AccountingSection extends React.Component {
       ? this.setState({ errorMail: "✔ Le rapport d'erreur a bien été envoyé." })
       : this.setState({
           errorMail:
-            "✖ Erreur lors de l'envoi du rapport. Si l'erreur persiste, veuillez contacter le support.",
+            "✖ Echec lors de l'envoi du rapport d'erreur. Si le problème persiste, veuillez contacter le support.",
         });
   };
 }
