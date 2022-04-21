@@ -52,7 +52,7 @@ export class AccountingSection extends React.Component {
       );
     };
     this.onDrop = (files) => {
-      this.setState({ files: files, popup: true, errorFile: false });
+      this.setState({ files: files, popup: true, errorFile: false, errorMail : false});
     };
     this.onClick = () => {
       this.importFECFile();
