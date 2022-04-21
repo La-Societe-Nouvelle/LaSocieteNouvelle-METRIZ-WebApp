@@ -155,11 +155,10 @@ export const sendReportToSupport = async (errors) =>
   const recipientMail= "support@lasocietenouvelle.org";
   const objetMail= "Rapport d'erreurs - Lecture du FEC";
 
-  const messageMail = "Rapport envoyé depuis Metriz WebApp\n"
-  + "## Liste des erreurs ## \r ----------------------- \r\n";
+  const messageMail = "Liste des erreurs-----------------------\n";
 
    errors.forEach(error => {
-     messageMail += error + "\n";
+     messageMail += "\n" + error + "\n";
    });
 
   const contentMail = { recipientMail, objetMail, messageMail }
@@ -169,10 +168,12 @@ export const sendReportToSupport = async (errors) =>
     headers: {'Content-Type': 'application/json'},
     method: 'POST'
   }
+  console.log(request);
   
   try 
   {
       const res = await fetch('/api/mail-sender', request);
+      console.log(res);
       return res;
   } 
   catch (error) {
