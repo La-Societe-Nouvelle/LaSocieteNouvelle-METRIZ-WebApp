@@ -431,7 +431,98 @@ async function readANouveauxEntry(data,journal,ligneCourante)
   }
 }
 
-/* -------------------- ENTRIES READERS ------------------------- */
+/* ---------------------------------------------------------------------------- */
+/* ------------------------- ACCOUNTS MAPPING SCRIPTS ------------------------- */
+
+const immobilisationAccountsMapping = async (journal) =>
+{
+  // immobilisation accounts
+  let immobilisationAccounts = journal.filter(ligne => /^2(0|1)/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+
+  // amortisation accounts
+  let amortisationAccounts = journal.filter(ligne => /^28/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
+
+  // mapping
+  let res = {accountsMapped: false, mapping: []};
+  amortisationAccounts.forEach(account => res.mapping.push({amortisationAccount: account, mapped: false, immobilisationAccount: ""}));
+
+  // method A - progress
+  let accountLength = journal[0].CompteNum.length;
+  let res2 = mapImmobilisationAccountsWithFirstCharacters(amortisationAccounts,immobilisationAccounts,accountLength);
+
+  // methode B - similarity
+
+  return mapping;
+}
+
+/** Mappings with first characters :
+ *    - mapping
+ *    - if pb -> don't go futher 
+ */
+
+const mapImmobilisationAccountsWithFirstCharacters = (amortisationAccounts,immobilisationAccounts,nCharacters) =>
+{
+  let mapping = {};
+
+  // filter accounts
+  let accountsInDouble = amortisationAccounts.map(account => account.substring(0,nCharacters)).filter((value, index, self) => index !== self.findIndex(item => item === value));
+  amortisationAccounts = amortisationAccounts.filter(account => !accountsInDouble.includes(account.substring(0,nCharacters)));
+  if (amortisationAccounts.length == 0) return res;
+
+  // map
+  for(let amortisationAccount of amortisationAccounts)
+  {
+    let immobilisationAccountsMatching = immobilisationAccounts.filter(immobilisationAccount => immobilisationAccount.startsWith("2"+amortisationAccount.substring(2,nCharacters)));
+    if (immobilisationAccountsMatching.length == 1)
+    {
+      mapping[amortisationAccount] = immobilisationAccountsMatching[0];
+    }
+  }
+
+  let remainingAmortisationAccounts = amortisationAccounts.filter(account => !Object.keys(mapping).includes(account));
+  let remainingImmobilisationAccounts = immobilisationAccounts.filter(account => !Object.values(mapping).includes(account));
+  if (remainingAmortisationAccounts.length > 0 && nCharacters > 2)
+  {
+    let mappingRemainingAccounts = mapImmobilisationAccountsWithFirstCharacters(remainingAmortisationAccounts,remainingImmobilisationAccounts,nCharacters-1);
+    Object.entries(mappingRemainingAccounts).forEach(([amortisationAccount,immobilisationAccount]) => mapping[amortisationAccount] = immobilisationAccount);
+  }
+
+  return mapping;
+}
+
+const mapImmobilisationAccountsWithNumbersDistances = (amortisationAccounts,immobilisationAccounts,nCharacters) =>
+{
+  let mapping = {};
+
+  // filter accounts
+  let accountsInDouble = amortisationAccounts.map(account => account.substring(0,nCharacters)).filter((value, index, self) => index !== self.findIndex(item => item === value));
+  amortisationAccounts = amortisationAccounts.filter(account => !accountsInDouble.includes(account.substring(0,nCharacters)));
+  if (amortisationAccounts.length == 0) return res;
+
+  // map
+  for(let amortisationAccount of amortisationAccounts)
+  {
+    let immobilisationAccountsMatching = immobilisationAccounts.filter(immobilisationAccount => immobilisationAccount.startsWith("2"+amortisationAccount.substring(2,nCharacters)));
+    if (immobilisationAccountsMatching.length == 1)
+    {
+      mapping[amortisationAccount] = immobilisationAccountsMatching[0];
+    }
+  }
+
+  let remainingAmortisationAccounts = amortisationAccounts.filter(account => !Object.keys(mapping).includes(account));
+  let remainingImmobilisationAccounts = immobilisationAccounts.filter(account => !Object.values(mapping).includes(account));
+  if (remainingAmortisationAccounts.length > 0 && nCharacters > 2)
+  {
+    let mappingRemainingAccounts = mapImmobilisationAccountsWithFirstCharacters(remainingAmortisationAccounts,remainingImmobilisationAccounts,nCharacters-1);
+    Object.entries(mappingRemainingAccounts).forEach(([amortisationAccount,immobilisationAccount]) => mapping[amortisationAccount] = immobilisationAccount);
+  }
+
+  return mapping;
+}
+
+/* --------------------------------------------------------------------------------------------------------------------- */
+/* -------------------------------------------------- ENTRIES READERS -------------------------------------------------- */
+/* --------------------------------------------------------------------------------------------------------------------- */
 
 /* ---------- COMPTES D'IMMOBILISATIONS ---------- */
 
