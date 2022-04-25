@@ -121,7 +121,7 @@ export async function FECFileReader(content)
       }
 
       // Mise à jour des métadonnées relatives aux libellés de comptes
-      if (dataFEC.meta.accounts.map(account => account.accountNum).includes(rowData.CompteNum)) dataFEC.meta.accounts.push({accountNum:rowData.CompteNum, accountLib:rowData.CompteLib});
+      if (!dataFEC.meta.accounts.map(account => account.accountNum).includes(rowData.CompteNum)) dataFEC.meta.accounts.push({accountNum:rowData.CompteNum, accountLib:rowData.CompteLib});
       if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
 
       // Date
@@ -135,6 +135,12 @@ export async function FECFileReader(content)
     }
     else if (rowString!="") throw 'Erreur - Ligne incomplète ('+(index+2)+')';
   })
+
+  // Mapping accounts ----------------------------------------------------------------------------------- //
+
+  let mappingAccounts = await initMappingAccounts(dataFEC.meta.accounts);
+  dataFEC.meta.accountsMapped = mappingAccounts.accountsMapped;
+  dataFEC.meta.mappingAccounts = mappingAccounts.mapping;
 
   // Return --------------------------------------------------------------------------------------------- //
   return dataFEC;
@@ -174,6 +180,24 @@ function getDefaultBookType(bookCode,bookLib)
   else if (booksProps.OPERATIONS.codes.includes(bookCode) || booksProps.OPERATIONS.labels.includes(bookLib.toUpperCase())) return "OPERATIONS"
   // ~ Others
   else return "AUTRE";
+}
+
+// check mapping
+async function initMappingAccounts(accounts)
+{
+  let res = {accountsMapped: false, mapping: []};
+
+  let depreciationAccounts = accounts.filter(account => /^2(8|9)/.test(account.accountNum));
+  let immobilisationAccounts = accounts.filter(account => /^2(0|1)/.test(account.accountNum));
+
+  depreciationAccounts.forEach(depreciationAccount =>
+  {
+    let immobilisationAccount = immobilisationAccounts.filter(account => account.accountNum.startsWith("2"+depreciationAccount.accountNum.substring(2)));
+    res.mapping.push({account: depreciationAccount, accountAux: immobilisationAccount.length==1 ? immobilisationAccount[0] : ""});
+  })
+
+  if (res.mapping.length == depreciationAccounts.length) res.accountsMapped = true;
+  return res;
 }
 
 /* ----------------------------------------------------- */
