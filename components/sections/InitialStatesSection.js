@@ -112,7 +112,7 @@ export class InitialStatesSection extends React.Component {
                 {!isNextStepAvailable && (
                   <div className="alert alert-warning">
                     <p>
-                      <FontAwesomeIcon icon={faWarning} /> L'empreinte de certains comptes ne sont pas initialisés.
+                      <FontAwesomeIcon icon={faWarning} /> Les empreintes de certains comptes doivent être synchronisées.
                     </p>
                     <button onClick={() => this.synchroniseAll()} className="btn btn-warning">
                       <FontAwesomeIcon icon={faSync} /> Synchroniser les données
