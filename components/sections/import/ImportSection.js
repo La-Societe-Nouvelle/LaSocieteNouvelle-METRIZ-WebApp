@@ -60,26 +60,18 @@ function ImportSection(props) {
             corporateName={corporateName}
             onClick={() => importFECFile(file)}
           ></ImportForm>
-
         )}
 
-        {view == 1 && (
+        {view == 1 && ( 
           <FECImport
             FECData={importedData}
             onClick={() => loadFECData(importedData)}
           />
         )}
-             {
-          view == 2 &&(
-            <MappedAccounts data={importedData.meta.mappingAccounts}/>
-            )
-        }
-        {
-          view == 3 &&(
-            <FinancialDatas {...props}/>
-          )
-        }
-      
+
+        {view == 2 && <MappedAccounts meta={importedData.meta} />}
+        {view == 3 && <FinancialDatas {...props} />}
+
         {errorFile && (
           <>
             <div className={"alert alert-error"}>
@@ -108,7 +100,6 @@ function ImportSection(props) {
             </div>
           </>
         )}
-       
       </section>
     </Container>
   );
