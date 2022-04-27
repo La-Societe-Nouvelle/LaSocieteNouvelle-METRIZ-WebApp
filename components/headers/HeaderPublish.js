@@ -6,6 +6,7 @@ import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSync, faEnvelope, faBook, faRuler, faBackward, faChevronRight, faChevronLeft, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
+import { Container, Row } from 'react-bootstrap';
 
 /* -------------------- HEADER -------------------- */
 
@@ -13,7 +14,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
   const refresh = () => location.reload(true);
   const saveSession = () => downloadSession();
   return (
-    <header >
+    <header>
       <div className="top-bar">
           <ul className="nav">
             <li>
@@ -24,8 +25,9 @@ export function HeaderPublish({ setStep, downloadSession }) {
           </ul>
           <button className={"btn btn-download btn-secondary"} onClick={saveSession}>  <FontAwesomeIcon icon={faSync} /> Sauvegarder ma session</button>
       </div>
-      <div id="menu" className="container-fluid">
-        <div className="row">
+      <Container fluid id="menu">
+      <Row>
+
           <div className="logo">
             <img src="/logo_la-societe-nouvelle_s.svg" alt="logo" onClick={refresh} />
           </div>
@@ -38,9 +40,9 @@ export function HeaderPublish({ setStep, downloadSession }) {
               <div className="step-name"><h2>Publier mes résultats</h2></div>
             </div>
             </nav>
-        </div>
+        </Row>
 
-      </div>
+      </Container>
     </header>)
 }
 
