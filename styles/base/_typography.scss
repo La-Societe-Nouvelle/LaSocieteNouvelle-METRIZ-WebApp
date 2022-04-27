@@ -14,13 +14,13 @@
 	}
 
 	a {
-		color : lighten($primary-color, 10%);
+		color : lighten($primary, 10%);
 		text-decoration: none;
 		&:hover{
 			-o-transition: color .4s ease-in-out;
 			-webkit-transition: color .4s ease-in-out;
 			transition: color .4s ease-in-out;
-			color : $secondary-color;
+			color : $secondary;
 		}
 
 	}
@@ -62,7 +62,7 @@
 	h4 {
 		font-size: 1.1em;
 		margin : 0.5em 0;
-		color : $tertiary-color;
+		color : $tertiary;
 	}
 
 	h5, h6{
@@ -87,7 +87,7 @@
 		  content: "";
 		  width:100%;
 		  position: absolute;
-		  background-color: $secondary-color;
+		  background-color: $secondary;
 		  height: 10px;
 		  bottom: 0.1rem;
 		  left : 0.1em;
@@ -97,7 +97,7 @@
 	  }
 	  .subtitle
 	  {
-		  color : $secondary-color; 
+		  color : $secondary; 
 		  margin-bottom: 1em;
 		  &.underline::after{
 			height: 8px;
@@ -118,12 +118,12 @@
 	  .beta{
 		  font-size: 0.8em;
 		  font-weight: 700;
-		background-color: $secondary-color;
+		background-color: $secondary;
 		color : #fff;
 		}
 
 	  .link {
-		  color : $tertiary-color;
+		  color : $tertiary;
 		  text-decoration: underline;
 	  }
 

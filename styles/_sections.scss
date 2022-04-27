@@ -19,19 +19,19 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border-bottom: solid 2px $primary-color;
+    border-bottom: solid 2px $primary;
 
     select {
       width: 400px;
-      background-color: $primary-color;
+      background-color: $primary;
       color: white;
-      border: solid 0px $primary-color;
+      border: solid 0px $primary;
       border-radius: 0;
 
       option {
         background-color: white;
-        color: $primary-color;
-        border: solid 1px $primary-color;
+        color: $primary;
+        border: solid 1px $primary;
         border-radius: 0;
       }
     }
@@ -46,15 +46,15 @@
       .table-header {
         select {
           width: 400px;
-          background-color: $primary-color;
+          background-color: $primary;
           color: white;
-          border: solid 0px $primary-color;
+          border: solid 0px $primary;
           border-radius: 0;
 
           option {
             background-color: white;
-            color: $primary-color;
-            border: solid 1px $primary-color;
+            color: $primary;
+            border: solid 1px $primary;
             border-radius: 0;
           }
         }
@@ -145,7 +145,7 @@
           position: relative;
            &::after {
               content: '';
-              background-color: $secondary-color;
+              background-color: $secondary;
               height: 12px;
               display: block;
               position: absolute;
@@ -207,7 +207,7 @@
           height: 25px;
           margin: 0 15px 0 0;
           padding: 5px;
-          background-color: $tertiary-color;
+          background-color: $tertiary;
           border-radius: 50%;
           outline:  solid #a7afb1;
           line-height: 10px;

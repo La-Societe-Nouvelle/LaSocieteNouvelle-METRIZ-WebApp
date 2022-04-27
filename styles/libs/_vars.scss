@@ -23,12 +23,11 @@
 
   /* Theming */
   
-  $primary-color: #191558;    /* Dark-grey */
-  $secondary-color: #fa595f;  /* Light-grey */
-  $tertiary-color: #5262bc; /* Dark-grey */ 
-  $light-blue : #dbdef1;
+  $primary: #191558;    /* Dark-grey */
+  $secondary: #fa595f;  /* Light-grey */
+  $tertiary: #5262bc; /* Dark-grey */ 
+  $light : #dbdef1;
   $bg-light : #fbfbff;
-  $highlight-color: #8B0000;  /* Burgunby */
   $valid-color: #E2EFD9;
   $unvalid-color: #efdcd9;
 
@@ -39,9 +38,14 @@
   $font-weight : 400 !default;
   $font-weight-bold : 700 !default;
   $letter-spacing : 0.3em !default;
-  $text-color : #191558;
+  $text-color : #212529;
+  $headings-color: $primary; 
 
   
 $input-color : lighten(#191558, 10%);
 $input-bg :  #ffffff;  
 $input-border-color : #5262bc;
+
+$table-hover-bg : $bg-light;
+
+@import "~bootstrap/scss/bootstrap";

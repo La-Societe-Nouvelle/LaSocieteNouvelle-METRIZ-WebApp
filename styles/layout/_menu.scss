@@ -81,20 +81,20 @@ ul.nav {
           }
 
           .current{
-            background-color: $tertiary-color;
+            background-color: $tertiary;
          
         }
         .current + .step-name{
             font-weight: 800;
         }
           .stepper-item.completed .step-counter {
-            background-color: $tertiary-color;
+            background-color: $tertiary;
           }
           
           .stepper-item.completed::after {
             position: absolute;
             content: "";
-            border-bottom: 15px solid $tertiary-color;
+            border-bottom: 15px solid $tertiary;
             width: 100%;
             top: 12px;
             left: 50%;

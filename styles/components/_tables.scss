@@ -6,238 +6,236 @@
   gap: 20px;
   margin-top: 1rem;
 
-  .form-input, label{
+  .form-input,
+  label {
     font-size: 0.85rem;
     width: auto;
   }
 }
 
-
 .toChecked {
-  border-right : 2px solid #ff6207;
+  border-right: 2px solid #ff6207;
 }
 
-p.toChecked{
+p.toChecked {
   font-size: 0.8rem;
-  margin : 1rem 0;
+  margin: 1rem 0;
 }
-  table {
-    white-space: nowrap;
-    font-size: 0.85em;
+table {
+  font-size: 0.85em;
 
-    .siren {
-      width: 250px;
-    } 
-    .siren-input, .corporate-name{
-      display: flex;
-      align-content: center;
-      gap: 10px;
-  
-      .fa-triangle-exclamation {
-        color: #ff6207;
-      }
-    }
-    .company {
-      width: 100px;
-    }
-    .success {
-      .fa-circle-check, .fa-rotate {
-        color : #59b719;
-      }
-      .form-input, .form-input:active, .form-input:focus, select{
-        border-color: #59b719;
-        background-color: #ecf9ef;
-      }
-    }
-    tr.warning td, .warning select{
-        background-color: #fff3cd;
-        border-color: #ff6207;
-    }
-    
-    p.warning  {
-      color : #ff6207;
-      .form-input, .form-input:active, .form-input:focus{
-        border-color: #ff6207;
+  .siren {
+    width: 250px;
+  }
+  .siren-input,
+  .corporate-name {
+    display: flex;
+    align-content: center;
+    gap: 10px;
 
-      }
+    .fa-triangle-exclamation {
+      color: #ff6207;
     }
-    select.warning {
+  }
+  .company {
+    width: 100px;
+  }
+  .success {
+    .fa-circle-check,
+    .fa-rotate {
+      color: #59b719;
+    }
+    .form-input,
+    .form-input:active,
+    .form-input:focus,
+    select {
+      border-color: #59b719;
+      background-color: #ecf9ef;
+    }
+  }
+  tr.warning td,
+  .warning select {
+    background-color: #fff3cd;
+    border-color: #ff6207;
+  }
+
+  p.warning {
+    color: #ff6207;
+    .form-input,
+    .form-input:active,
+    .form-input:focus {
       border-color: #ff6207;
     }
-    .error {
-      color : red;
-    }
+  }
+  select.warning {
+    border-color: #ff6207;
+  }
+  .error {
+    color: red;
+  }
 
-    // --- Cell --- //
-    th, td {
-      padding: 0.75em;
-
-    }
-    td {
+  // --- Cell --- //
  
-      // index
-      &.sub {
-        padding-left: 25px;
+  td {
+    // index
+    &.sub {
+      padding-left: 25px;
+    }
+
+    // font
+    &.detail {
+      font-style: italic;
+      font-size: 15px;
+    }
+  }
+
+  // --- Head --- //
+
+  thead {
+    background-color: $light;
+    font-weight: 700;
+    font-size: 1.1em;
+  }
+
+  // --- Body --- //
+  tfoot {
+    background-color: darken($bg-light, 2%);
+    font-weight: bold;
+  }
+  tbody {
+    td {
+      vertical-align: middle;
+    }
+    // select
+    select {
+      width: 100%;
+      background-color: white;
+      border: solid 1px $primary;
+
+      option {
+        background-color: white;
+        border: solid 1px $primary;
+        border-radius: 0;
       }
-  
-      // font
-      &.detail {
-        font-style: italic;
+    }
+
+    // value
+    .column_value {
+      text-align: right;
+      input {
+        text-align: right;
+      }
+    }
+
+    // uncertainty
+    .column_uncertainty {
+      text-align: center;
+      font-size: 12px;
+      input {
+        text-align: right;
         font-size: 15px;
       }
-
-
     }
-  
-    // --- Head --- //
-  
-    thead {
-      background-color: $light-blue;
-      font-weight: 700;
-      font-size: 1.1em;
-    }
-  
-    // --- Body --- //
-    tfoot  {
-      background-color: darken($bg-light, 2%);
-      font-weight: bold;
 
+    // background valid/unvalid/default
+    input,
+    select {
+      &.valid {
+        background-color: $valid-color;
+      }
+      &.unvalid {
+        background-color: $unvalid-color;
+      }
     }
-    tbody {
-      td {
-        background-color: $bg-light;
-        vertical-align:middle;
-      }
-      // select
-      select {
-        width: 100%;
-        background-color: white;
-        border: solid 1px $primary-color;
-  
-        option {
-          background-color: white;
-          border: solid 1px $primary-color;
-          border-radius: 0;     
-        }
-      }
-  
-      // value
-      .column_value {
-        text-align: right;
-        input {
-          text-align: right;
-        }
-      }
-      
-      // uncertainty
-      .column_uncertainty {
-        text-align: center;
-        font-size: 12px;
-        input {
-          text-align: right;
-          font-size: 15px;
-        }
-      }
-  
-      // background valid/unvalid/default
-      input,select {
-        &.valid {background-color: $valid-color}
-        &.unvalid {background-color: $unvalid-color}
-      }
-  
-      option.default-option {
-        background-color: wheat;
-      }
+
+    option.default-option {
+      background-color: wheat;
     }
   }
-  
-  .table-navigation {
-    margin: 0 2px;
-    padding: 5px 2px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  
-    button {
-      min-width: 150px;
-    }
-  
-    p {
-      margin: 0;
-    }
+}
+
+.table-navigation {
+  margin: 0 2px;
+  padding: 5px 2px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  button {
+    min-width: 150px;
   }
 
-   
+  p {
+    margin: 0;
+  }
+}
+
 .table-menu {
   margin: 1em 0;
   text-align: center;
-    button {
-      font-size: 0.9rem;
-      background-color: #fff;
-      font-weight: 600;
-      border:none;
-      padding: 1rem;
-      color: #a7a2a2;
-      border-bottom: 2px solid #a7a2a2;
-      cursor: pointer;
-  
-    }
-     button.active, button:hover, button:focus{
-      background-color: $tertiary-color;
-      color: #ffffff;
-      border-color: $tertiary-color;
-    
-    }
+  button {
+    font-size: 0.9rem;
+    background-color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+    color: #a7a2a2;
+    border-bottom: 2px solid #a7a2a2;
+    cursor: pointer;
   }
-  
-  .table-btn {
-      text-align: right;
-      .btn {
-          font-weight: normal;
-          font-size: 0.9em;
-          svg{
-              height: 15px;
-          }
-      }
+  button.active,
+  button:hover,
+  button:focus {
+    background-color: $tertiary;
+    color: #ffffff;
+    border-color: $tertiary;
   }
-  .table-data {
-    table {
-      border-collapse: collapse;
-  
-    }
-    .fa-circle-info {
-      color : $secondary-color;
-    }
+}
 
-    .operating-result td {
-      border-top : 1px solid $primary-color;
-
-    }
-
-  }
-  .profit td{
-    border-top : 1px solid $primary-color;
-    border-bottom: 1px solid $primary-color;
-  }
-  .total, .with-top-line{
-    font-weight: 700;
-    border-top : 1px solid $primary-color;
-    border-bottom: 1px solid $primary-color;
-  }
-
-  // TABLE Assesment 
-
-  .column_icon .btn {
-    padding: 0;
-    background-color: transparent;
-    svg{
-      height: 20px;
+.table-btn {
+  text-align: right;
+  .btn {
+    font-weight: normal;
+    font-size: 0.9em;
+    svg {
+      height: 15px;
     }
   }
+}
+.table-data {
 
-  .a-nouveaux-input {
-    margin : 1em 0;
-    width: 100%; 
-    background: $bg-light;
-    padding: 1em;
+  .fa-circle-info {
+    color: $secondary;
   }
+
+  .operating-result td {
+    border-top: 1px solid $primary;
+  }
+}
+.profit td {
+  border-top: 1px solid $primary;
+  border-bottom: 1px solid $primary;
+}
+.total,
+.with-top-line {
+  font-weight: 700;
+  border-top: 1px solid $primary;
+  border-bottom: 1px solid $primary;
+}
+
+// TABLE Assesment
+
+.column_icon .btn {
+  padding: 0;
+  background-color: transparent;
+  svg {
+    height: 20px;
+  }
+}
+
+.a-nouveaux-input {
+  margin: 1em 0;
+  width: 100%;
+  background: $bg-light;
+  padding: 1em;
+}

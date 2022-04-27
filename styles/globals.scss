@@ -42,7 +42,7 @@ hr {
 // Input
 
 input {
-  border: solid 1px $primary-color;
+  border: solid 1px $primary;
   padding: 2px;
 
   &.input-number {text-align: right;}
@@ -86,20 +86,20 @@ sup {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
-      border-bottom: solid 2px $primary-color;
+      border-bottom: solid 2px $primary;
 
       select {
         width: 400px;
-        background-color: $primary-color;
+        background-color: $primary;
         color: white;
-        border: solid 0px $primary-color;
+        border: solid 0px $primary;
         border-radius: 0;
   
         option 
         {
           background-color: white;
-          color: $primary-color;
-          border: solid 1px $primary-color;
+          color: $primary;
+          border: solid 1px $primary;
           border-radius: 0;     
         }
       }
@@ -117,7 +117,7 @@ sup {
       width: 100%;
       margin: 5px 5px;
       padding: 10px;
-      border: solid 1px $secondary-color;
+      border: solid 1px $secondary;
 
       p {
         margin: 0;
@@ -139,7 +139,7 @@ sup {
       }
 
       .beta {
-        background-color: $primary-color;
+        background-color: $primary;
         color: white;
         font-weight: bold;
         font-size: 20px;
@@ -291,7 +291,7 @@ sup {
   .vertical-line {
     height: 60px;
     line {
-      stroke: $primary-color;
+      stroke: $primary;
     }
   }
 

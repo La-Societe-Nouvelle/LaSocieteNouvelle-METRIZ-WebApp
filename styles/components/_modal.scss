@@ -12,7 +12,7 @@
         height: 100%;
         width: 100%;
         border-radius: 40px;
-        background-color: $light-blue;
+        background-color: $light;
         rect {
           height: 100%;
           fill: #5262bc;
@@ -55,16 +55,16 @@
   }  
       select {
         width: 400px;
-        background-color: $primary-color;
+        background-color: $primary;
         color: white;
-        border: solid 0px $primary-color;
+        border: solid 0px $primary;
         border-radius: 0;
   
         option 
         {
           background-color: white;
-          color: $primary-color;
-          border: solid 1px $primary-color;
+          color: $primary;
+          border: solid 1px $primary;
           border-radius: 0;     
         }
       }
@@ -79,7 +79,7 @@
     min-width: 550px;
     padding: 25px;
     background-color: white;
-    border: 1px solid $tertiary-color;
+    border: 1px solid $tertiary;
     border-radius: 15px;
     overflow-x: auto;
 
@@ -187,6 +187,7 @@
     .success {
       padding: 0;
       width: 400px;
+      height: auto;
       box-shadow: 5px 5px 10px rgb(0 0 0 / 20%);
       border-radius: 10px;
       animation: open-frame .3s linear;
@@ -203,13 +204,14 @@
         text-transform: uppercase;
         width: 50%;
         color : #fff;
-        margin-top: 2rem;
+        margin: 2rem;
       }
     }
   }
 
   .modal {
     z-index: 100;
+    display: block;
     background: #fff;
     position: relative;
     margin: auto;

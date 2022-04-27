@@ -1,6 +1,6 @@
 section {
   padding: 2rem;
-  margin: 1rem 0 3rem 0;
+  margin-bottom: 3rem;
 }
 
 .section-title {
@@ -11,45 +11,11 @@ section {
   }
 }
 
-
-.action {
-  display: flex;
-  justify-content: flex-end;
-  text-align: right;
-  padding: 0;
-
-  :disabled,
-  :disabled:hover {
-    background: #ccc;
-  }
-}
-
-
 // START SECTION 
 
-	@media (max-width: 1440px) { 
-    #start{
-      .col {
-        padding: 0px 3em !important;
-      }
-    }
-   }
 #start {
   background: no-repeat url('../img/leaves_background.png');
-  padding: 1em;
-
-  .row {
-    justify-content: center;
-    align-items: center;
-
-    .col {
-      padding: 0 7em;
-    }
-  }
-
-  .btn {
-    margin-right: 1rem;
-  }
+  padding: 0 3rem;
 }
 
 #section-picto {
@@ -66,7 +32,7 @@ section {
       height: 120px;
     }
 
-    border-right : 1px solid $light-blue;
+    border-right : 1px solid $light;
 
   }
 
@@ -75,26 +41,12 @@ section {
   }
 }
 
-
-// IMPORT SECTION 
-
-#importSection {
-
-  .row .form-container,
-  .illus-container {
-    flex: 1;
-  }
-
-}
-
 // COMPANY SECTION 
 .step {
   border: 1px solid #dbdef1;
   border-radius: 10px;
   background-color: #ffffff;
 }
-
-
 
 #siren-section,
 #sector-section {
@@ -136,7 +88,7 @@ section {
   }
 
   h3 {
-    color: $secondary-color;
+    color: $secondary;
     font-size: 1.6rem;
   }
 
@@ -150,7 +102,7 @@ section {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top : 1px solid $light-blue;
+    border-top : 1px solid $light;
     padding: 1em 0;
   }
   .indicator-img img{
@@ -160,7 +112,7 @@ section {
 }
 
 .selected-indicator {
-  background-color: $light-blue;
+  background-color: $light;
   padding: 2em 0;
 }
 
@@ -170,12 +122,12 @@ section {
     font-size: 0.8em;
   }
   h3{
-    color : $tertiary-color;
+    color : $tertiary;
     font-size: 1.4rem;
     margin-bottom: 0.5rem;
   }
   h4 {
-    color: $primary-color;
+    color: $primary;
     font-size: 1em;
   }
   .btn {
@@ -227,7 +179,7 @@ section {
     padding: 0.5rem;
   }
   .flex {
-    border-bottom: 1px solid $light-blue;
+    border-bottom: 1px solid $light;
     padding: 1em 0;
     &:last-child{
       border: none;
@@ -251,7 +203,7 @@ section {
   .statement-area {
     margin-bottom: 15px;
     padding: 10px;
-    //border: solid 1px $secondary-color;
+    //border: solid 1px $secondary;
   }
 
   // statement item
