@@ -4,6 +4,8 @@
 import booksProps from '../../lib/books'
 import { roundValue } from '../utils/Utils';
 
+import {distance} from 'fastest-levenshtein';
+
 // FEC colums
 const columnsFEC = ["JournalCode",
                     "JournalLib",
@@ -75,7 +77,7 @@ export async function FECFileReader(content)
 
   let dataFEC = {
     books: [],
-    meta: {books: {},accounts: [], accountsAux: {}, firstDate: null, lastDate: null}
+    meta: {books: {},accounts: {}, accountsAux: {}, firstDate: null, lastDate: null}
   };
 
   // Separator ------------------------------------------------------------------------------------------ //
@@ -121,7 +123,7 @@ export async function FECFileReader(content)
       }
 
       // Mise à jour des métadonnées relatives aux libellés de comptes
-      if (!dataFEC.meta.accounts.map(account => account.accountNum).includes(rowData.CompteNum)) dataFEC.meta.accounts.push({accountNum:rowData.CompteNum, accountLib:rowData.CompteLib});
+      if (!Object.keys(dataFEC.meta.accounts).includes(rowData.CompteNum)) dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
       if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
 
       // Date
@@ -138,11 +140,13 @@ export async function FECFileReader(content)
 
   // Mapping accounts ----------------------------------------------------------------------------------- //
 
-  let mappingAccounts = await initMappingAccounts(dataFEC.meta.accounts);
+  let mappingAccounts = await buildMappingAccounts(dataFEC.meta.accounts);
+  console.log(mappingAccounts);
   dataFEC.meta.accountsMapped = mappingAccounts.accountsMapped;
   dataFEC.meta.mappingAccounts = mappingAccounts.mapping;
 
   // Return --------------------------------------------------------------------------------------------- //
+  console.log(dataFEC);
   return dataFEC;
 }
 
@@ -182,22 +186,168 @@ function getDefaultBookType(bookCode,bookLib)
   else return "AUTRE";
 }
 
-// check mapping
-async function initMappingAccounts(accounts)
-{
-  let res = {accountsMapped: false, mapping: []};
+/* ---------------------------------------------------------------------------- */
+/* ------------------------- ACCOUNTS MAPPING SCRIPTS ------------------------- */
 
-  let depreciationAccounts = accounts.filter(account => /^2(8|9)/.test(account.accountNum));
-  let immobilisationAccounts = accounts.filter(account => /^2(0|1)/.test(account.accountNum));
+// check mapping
+async function buildMappingAccounts(accounts)
+{
+  console.log("start mapping")
+  let res = {accountsMapped: false, mapping: {}};
+
+  let depreciationAccounts = Object.keys(accounts).filter(account => /^2(8|9)/.test(account));
+  let immobilisationAccounts = Object.keys(accounts).filter(account => /^2(0|1)/.test(account));
 
   depreciationAccounts.forEach(depreciationAccount =>
   {
-    let immobilisationAccount = immobilisationAccounts.filter(account => account.accountNum.startsWith("2"+depreciationAccount.accountNum.substring(2)));
-    res.mapping.push({account: depreciationAccount, accountAux: immobilisationAccount.length==1 ? immobilisationAccount[0] : ""});
+    let immobilisationAccount = immobilisationAccounts.filter(account => account.startsWith("2"+depreciationAccount.substring(2)));
+    if (immobilisationAccount.length==1) res.mapping[depreciationAccount] = immobilisationAccount[0]
+    else res.mapping[depreciationAccount] = "";
   })
 
-  if (res.mapping.length == depreciationAccounts.length) res.accountsMapped = true;
+  if (Object.values(res.mapping).filter(item => item=="").length == 0) res.accountsMapped = true
+  else
+  {
+    let distances = [];
+    depreciationAccounts.forEach(depreciationAccount => {immobilisationAccounts.forEach(immobilisationAccount =>
+    {
+      let expectedAccountNum = "2"+depreciationAccount.substring(2);
+      let distanceNum = distance(expectedAccountNum,immobilisationAccount);
+      let distanceLib = distance(accounts[depreciationAccount],accounts[immobilisationAccount]);
+      let prefix = getPrefix(expectedAccountNum,immobilisationAccount);
+      distances.push({account: depreciationAccount, accountAux: immobilisationAccount, distanceNum, distanceLib, prefix, expectedAccount: expectedAccountNum});
+    })});
+
+    console.log(distances.map(distance => distance.staged));
+
+    // method A - progress
+
+    console.log("prefix");
+    let distancesToMap = distances.map(distance => distance);
+    distances.forEach(distance => distance.staged = false);
+    let mappingWithPrefix = await mapAccountsWithPrefix(distancesToMap);
+    console.log(mappingWithPrefix);
+    
+    // methode B - number distances
+    
+    console.log("distance num");
+    distancesToMap = [...distances];
+    distances.forEach(distance => distance.staged = false);
+    let mappingWithNumDistances = await mapAccountsWithNumDistances(distancesToMap);
+    console.log(mappingWithNumDistances);
+    
+    console.log("distance lib");
+    distancesToMap = [...distances];
+    distances.forEach(distance => distance.staged = false);
+    let mappingWithLibDistances = await mapAccountsWithLibDistances(distancesToMap);
+    console.log(mappingWithLibDistances);
+  }
+
   return res;
+}
+
+const getPrefix = (stringA,stringB) =>
+{
+  let prefix = 0;
+  while (stringA[prefix]==stringB[prefix]) prefix++;
+  return prefix;
+}
+
+// Mapping with prefix
+const mapAccountsWithPrefix = async (distances) =>
+{
+  let mapping = {};
+  
+  if (distances.length==0) return mapping;
+
+  let prefixMax = Math.max(...distances.filter(item => !item.staged).map(item => item.prefix));
+  let smallestDistances = distances.filter(item => item.prefix==prefixMax || item.staged);
+  console.log(smallestDistances);
+
+  // mapping if distincts account & accountAux with min distance
+  for (let distance of smallestDistances)
+  {
+    if (smallestDistances.filter(item => item.account==distance.account).length==1 && smallestDistances.filter(item => item.accountAux==distance.accountAux).length==1) mapping[distance.account] = distance.accountAux
+    else distance.staged = true;
+  }
+
+  console.log(mapping);
+  let remainingDistances = distances.filter(item => !Object.keys(mapping).includes(item.account) && !Object.values(mapping).includes(item.accountAux));
+  console.log(remainingDistances);
+  if (remainingDistances.filter(item => !item.staged).length > 0)
+  {
+    let mappingRemainingDistances = await mapAccountsWithPrefix(remainingDistances);
+    return Object.assign(mapping,mappingRemainingDistances);
+  }
+  else
+  {
+    return mapping;
+  }
+}
+
+// Mapping with distances between numbers
+const mapAccountsWithNumDistances = async (distances) =>
+{
+  let mapping = {};
+  console.log(distances);
+
+  if (distances.length==0) return mapping;
+
+  let distanceMin = Math.min(...distances.filter(item => !item.staged).map(item => item.distanceNum));
+  let prefixMax = Math.max(...distances.filter(item => !item.staged).map(item => item.prefix));
+  let smallestDistances = distances.filter(item => (item.distanceNum==distanceMin && item.prefix==prefixMax) || item.staged);
+  console.log(smallestDistances);
+
+  // mapping if distincts account & accountAux with min distance
+  for (let distance of smallestDistances)
+  {
+    if (smallestDistances.filter(item => item.account==distance.account).length == 1 && smallestDistances.filter(item => item.accountAux==distance.accountAux).length == 1) mapping[distance.account] = distance.accountAux
+    else distance.staged = true;
+  }
+
+  console.log(mapping);
+  let remainingDistances = distances.filter(item => !Object.keys(mapping).includes(item.account) && !Object.values(mapping).includes(item.accountAux));
+  if (remainingDistances.filter(item => !item.staged).length > 0)
+  {
+    let mappingRemainingDistances = await mapAccountsWithNumDistances(remainingDistances);
+    return Object.assign(mapping,mappingRemainingDistances);
+  }
+  else
+  {
+    return mapping;
+  }
+}
+
+// Mapping with distances between numbers
+const mapAccountsWithLibDistances = async (distances) =>
+{
+  let mapping = {};
+  console.log(distances);
+
+  if (distances.length==0) return mapping;
+
+  let distanceMin = Math.min(...distances.filter(item => !item.staged).map(item => item.distanceLib));
+  let smallestDistances = distances.filter(item => item.distanceLib==distanceMin || item.staged);
+  console.log(smallestDistances);
+
+  // mapping if distincts account & accountAux with min distance
+  for (let distance of smallestDistances)
+  {
+    if (smallestDistances.filter(item => item.account==distance.account).length==1 && smallestDistances.filter(item => item.accountAux==distance.accountAux).length==1) mapping[distance.account] = distance.accountAux
+    else distance.staged = true;
+  }
+
+  console.log(mapping);
+  let remainingDistances = distances.filter(item => !Object.keys(mapping).includes(item.account) && !Object.values(mapping).includes(item.accountAux));
+  if (remainingDistances.filter(item => !item.staged).length > 0)
+  {
+    let mappingRemainingDistances = await mapAccountsWithLibDistances(remainingDistances);
+    return Object.assign(mapping,mappingRemainingDistances);
+  }
+  else
+  {
+    return mapping;
+  }
 }
 
 /* ----------------------------------------------------- */
@@ -453,95 +603,6 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       throw message;
     }
   }
-}
-
-/* ---------------------------------------------------------------------------- */
-/* ------------------------- ACCOUNTS MAPPING SCRIPTS ------------------------- */
-
-const immobilisationAccountsMapping = async (journal) =>
-{
-  // immobilisation accounts
-  let immobilisationAccounts = journal.filter(ligne => /^2(0|1)/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-
-  // amortisation accounts
-  let amortisationAccounts = journal.filter(ligne => /^28/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-
-  // mapping
-  let res = {accountsMapped: false, mapping: []};
-  amortisationAccounts.forEach(account => res.mapping.push({amortisationAccount: account, mapped: false, immobilisationAccount: ""}));
-
-  // method A - progress
-  let accountLength = journal[0].CompteNum.length;
-  let res2 = mapImmobilisationAccountsWithFirstCharacters(amortisationAccounts,immobilisationAccounts,accountLength);
-
-  // methode B - similarity
-
-  return mapping;
-}
-
-/** Mappings with first characters :
- *    - mapping
- *    - if pb -> don't go futher 
- */
-
-const mapImmobilisationAccountsWithFirstCharacters = (amortisationAccounts,immobilisationAccounts,nCharacters) =>
-{
-  let mapping = {};
-
-  // filter accounts
-  let accountsInDouble = amortisationAccounts.map(account => account.substring(0,nCharacters)).filter((value, index, self) => index !== self.findIndex(item => item === value));
-  amortisationAccounts = amortisationAccounts.filter(account => !accountsInDouble.includes(account.substring(0,nCharacters)));
-  if (amortisationAccounts.length == 0) return res;
-
-  // map
-  for(let amortisationAccount of amortisationAccounts)
-  {
-    let immobilisationAccountsMatching = immobilisationAccounts.filter(immobilisationAccount => immobilisationAccount.startsWith("2"+amortisationAccount.substring(2,nCharacters)));
-    if (immobilisationAccountsMatching.length == 1)
-    {
-      mapping[amortisationAccount] = immobilisationAccountsMatching[0];
-    }
-  }
-
-  let remainingAmortisationAccounts = amortisationAccounts.filter(account => !Object.keys(mapping).includes(account));
-  let remainingImmobilisationAccounts = immobilisationAccounts.filter(account => !Object.values(mapping).includes(account));
-  if (remainingAmortisationAccounts.length > 0 && nCharacters > 2)
-  {
-    let mappingRemainingAccounts = mapImmobilisationAccountsWithFirstCharacters(remainingAmortisationAccounts,remainingImmobilisationAccounts,nCharacters-1);
-    Object.entries(mappingRemainingAccounts).forEach(([amortisationAccount,immobilisationAccount]) => mapping[amortisationAccount] = immobilisationAccount);
-  }
-
-  return mapping;
-}
-
-const mapImmobilisationAccountsWithNumbersDistances = (amortisationAccounts,immobilisationAccounts,nCharacters) =>
-{
-  let mapping = {};
-
-  // filter accounts
-  let accountsInDouble = amortisationAccounts.map(account => account.substring(0,nCharacters)).filter((value, index, self) => index !== self.findIndex(item => item === value));
-  amortisationAccounts = amortisationAccounts.filter(account => !accountsInDouble.includes(account.substring(0,nCharacters)));
-  if (amortisationAccounts.length == 0) return res;
-
-  // map
-  for(let amortisationAccount of amortisationAccounts)
-  {
-    let immobilisationAccountsMatching = immobilisationAccounts.filter(immobilisationAccount => immobilisationAccount.startsWith("2"+amortisationAccount.substring(2,nCharacters)));
-    if (immobilisationAccountsMatching.length == 1)
-    {
-      mapping[amortisationAccount] = immobilisationAccountsMatching[0];
-    }
-  }
-
-  let remainingAmortisationAccounts = amortisationAccounts.filter(account => !Object.keys(mapping).includes(account));
-  let remainingImmobilisationAccounts = immobilisationAccounts.filter(account => !Object.values(mapping).includes(account));
-  if (remainingAmortisationAccounts.length > 0 && nCharacters > 2)
-  {
-    let mappingRemainingAccounts = mapImmobilisationAccountsWithFirstCharacters(remainingAmortisationAccounts,remainingImmobilisationAccounts,nCharacters-1);
-    Object.entries(mappingRemainingAccounts).forEach(([amortisationAccount,immobilisationAccount]) => mapping[amortisationAccount] = immobilisationAccount);
-  }
-
-  return mapping;
 }
 
 /* --------------------------------------------------------------------------------------------------------------------- */

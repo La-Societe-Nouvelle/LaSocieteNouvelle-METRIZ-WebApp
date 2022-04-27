@@ -16,6 +16,7 @@
     "canvas": "^2.8.0",
     "chart.js": "^3.7.1",
     "chartjs-plugin-datalabels": "^2.0.0",
+    "fastest-levenshtein": "^1.0.12",
     "file-saver": "^2.0.5",
     "fs": "0.0.1-security",
     "html-loader": "^2.1.2",
