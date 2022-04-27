@@ -10,8 +10,7 @@ import { Session } from '/src/Session';
 
 // Sections
 import { StartSection } from '/components/sections/StartSection';
-import { AccountingSection } from '../components/sections/import/AccountingSection';
-import { FinancialDataSection } from '/components/sections/FinancialDataSection';
+import ImportSection from '../components/sections/import/ImportSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { CompaniesSection } from '/components/sections/companies/CompaniesSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
@@ -162,11 +161,9 @@ class Metriz extends React.Component {
 
 
     switch (step) {
-      case 0: return (<StartSection startNewSession={() => this.setStep(1)}
-        loadPrevSession={this.loadPrevSession} />)
-      case 1: return (<AccountingSection {...sectionProps} />)
-      case 2: return (<FinancialDataSection {...sectionProps} />)
-      case 3: return (<InitialStatesSection {...sectionProps} />)
+      case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} />)
+      case 1: return (<ImportSection {...sectionProps} />)
+      case 2: return (<InitialStatesSection {...sectionProps} />)
       case 4: return (<CompaniesSection {...sectionProps} />)
       case 5: return (<IndicatorSection {...sectionProps} publish={() => this.setStep(6)} />)
       case 6: return (<StatementSection {...sectionProps} return={() => this.setStep(5)} />)
