@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import { faFile } from "@fortawesome/free-solid-svg-icons";
+import { faBook, faFile } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React from "react";
 import { Button, Col, Container, Image, NavLink, Row } from "react-bootstrap";
@@ -58,17 +58,13 @@ export class StartSection extends React.Component {
               <Button
                 variant="primary"
                 className="me-3"
-                
                 onClick={this.props.startNewSession}
               >
                 Nouvelle analyse
               </Button>
-              <a className="btn btn-secondary me-3" href="https://docs.lasocietenouvelle.org" target="_blank">
-                Documentation
-              </a>
+
               <Button
                 variant="outline-primary"
-                
                 onClick={this.triggerImportFile}
               >
                 Reprendre une session
@@ -85,6 +81,9 @@ export class StartSection extends React.Component {
           </Col>
           <Col lg={4}>
             <Image fluid src="/resources/team_working.png" alt="Team" />
+            <NavLink className="btn btn-secondary" href='https://docs.lasocietenouvelle.org'>
+                <FontAwesomeIcon icon={faBook} /> Consulter la documentation
+          </NavLink>
           </Col>
         </Row>
       </Container>

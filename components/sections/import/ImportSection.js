@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 
 // Icons
 import {
@@ -168,7 +168,7 @@ function ImportSection(props) {
       props.session.checkValidations();
 
       // update progression
-      props.session.progression = 2;
+      // props.session.progression = 2;
 
       setView(2);
       // update state

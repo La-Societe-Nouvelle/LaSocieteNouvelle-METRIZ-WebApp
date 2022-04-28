@@ -91,7 +91,7 @@ class Metriz extends React.Component {
           {step == 0 ? (
             <Header />
           ) :
-          step == 6 ? (
+          step == 5 ? (
             <HeaderPublish setStep={this.setStep} downloadSession={this.downloadSession} />
           ) :
             (
@@ -164,9 +164,9 @@ class Metriz extends React.Component {
       case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} />)
       case 1: return (<ImportSection {...sectionProps} />)
       case 2: return (<InitialStatesSection {...sectionProps} />)
-      case 4: return (<CompaniesSection {...sectionProps} />)
-      case 5: return (<IndicatorSection {...sectionProps} publish={() => this.setStep(6)} />)
-      case 6: return (<StatementSection {...sectionProps} return={() => this.setStep(5)} />)
+      case 3: return (<CompaniesSection {...sectionProps} />)
+      case 4: return (<IndicatorSection {...sectionProps} publish={() => this.setStep(5)} />)
+      case 5: return (<StatementSection {...sectionProps} return={() => this.setStep(4)} />)
 
     }
   }

@@ -109,7 +109,7 @@ export class AssessmentGHG extends React.Component {
                   </button>
                   </td>
                 <td className="sub">
-                  <select className="form-input"  className="form-input" value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
+                  <select className="form-input" value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
                     {Object.entries(fuels)
                             .filter(([_,data]) => data.usageSourcesFixes)
                             .map(([_,data]) => data.group)

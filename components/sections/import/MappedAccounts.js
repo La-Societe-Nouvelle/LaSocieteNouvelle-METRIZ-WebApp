@@ -3,143 +3,85 @@ import { FormSelect, Table } from "react-bootstrap";
 
 function MappedAccounts(props) {
   const [allAccounts] = useState(props.meta.accounts);
+  const accounts = Object.entries(allAccounts);
+
+  let getDepAccounts = accounts.filter(
+    (account) =>
+      /^28/.test(account) || /^29/.test(account) || /^39/.test(account)
+  );
+
+  let getAssetsAccounts = accounts.filter(
+    (account) => /^2(0|1)/.test(account) || /^3[0-8]/.test(account)
+  );
+
+  const [depAccounts] = useState(getDepAccounts);
+  const [assetAccounts] = useState(getAssetsAccounts);
 
   const [mappedAccounts, setMappedAccounts] = useState(
     props.meta.mappingAccounts
   );
 
-  const [assetAmortisationAccounts, setAssetAmortisationAccounts] = useState(
-    {}
-  );
-  const [assetDepreciationAccounts, setAssetDepreciationAccounts] = useState(
-    {}
-  );
 
-  const [stockDepreciationAccounts, setStockDepreciationAccounts] = useState(
-    {}
-  );
+  function handleOnchange(depKey, e) { 
 
-  const [associatedAccounts, setAssociatedAccounts] = useState({});
+    console.log(depKey);
+    
+    let depAccount = depAccounts.filter(([key]) => key == depKey);
 
-  useEffect(() => {
-    splitAccount(allAccounts);
-  },[]);
+    // Object.keys(mappedAccounts)
+    //   .filter((account) =>
+    //     depAccounts.map(
+    //       ([key, value]) => console.log(key)
+    //     )
+    //   )
 
-  function splitAccount(accounts) {
-    let accountsToSplit = accounts;
 
-    // CREATE OBJECT OF ASSET AMORTISATION ACCOUNTS
+  
+    // console.log(e.target.value);
+    // console.log(depKey);
 
-    let assetAmortisationAccounts = {};
+  }
 
-    for (const [key, value] of Object.entries(accountsToSplit)) {
-      if (/^28/.test(key)) {
-        assetAmortisationAccounts[key] = value;
-        delete accountsToSplit[key];
-      }
-    }
-    setAssetAmortisationAccounts(assetAmortisationAccounts);
+  function isSelected(mappedAccounts,depKey, assetKey){
 
-    // CREATE OBJECT OF ASSET DEPRECIATION ACCOUNTS
-    let assetDepreciationAccounts = {};
+    return Object.keys(mappedAccounts).some(
+      () => mappedAccounts[depKey] === assetKey
+    );
 
-    for (const [key, value] of Object.entries(accountsToSplit)) {
-      if (/^29/.test(key)) {
-        assetDepreciationAccounts[key] = value;
-        delete accountsToSplit[key];
-      }
-    }
-    setAssetDepreciationAccounts(assetDepreciationAccounts);
-
-    // CREATE OBJECT LIST OF STOCKS DEPRECIATION ACCOUNT
-
-    let stockDepreciationAccounts = {};
-
-    for (const [key, value] of Object.entries(accountsToSplit)) {
-      if (/^39/.test(key)) {
-        stockDepreciationAccounts[key] = value;
-        delete accountsToSplit[key];
-      }
-    }
-
-    setStockDepreciationAccounts(stockDepreciationAccounts);
-    setAssociatedAccounts(accountsToSplit);
   }
 
   return (
     <div>
-	
       <h3 className="subtitle underline">
-        Associations des comptes d'amortissements et de dépréciations{" "}
+        Associations des comptes d'amortissements et de dépréciations
       </h3>
-
       <Table size="lg" bordered hover>
         <thead>
-          <th>Numéro de compte</th>
-          <th>Libellé du compte</th>
-          <th>Compte associé</th>
+          <tr>
+            <th>Numéro de compte</th>
+            <th>Libellé du compte</th>
+            <th>Compte associé</th>
+          </tr> 
         </thead>
         <tbody>
-
-          {Object.entries(assetAmortisationAccounts).map(
-            ([key, value], index) => {
-		
-              return (
-                <tr key={index}>
-                  <td>{key}</td>
-                  <td>{value}</td>
-                  <td> 
-                    <FormSelect id="accountAux" size="sm">
-                      <option value="default"></option>
-					  {Object.entries(associatedAccounts).map( 
-						     ([key, value], index) => {
-
-								 return(
-									 <option key={index} value={key}  
-									 >
-										 {key} - {value}
-									 </option>
-								 )
-							 }
-					  )}
-
-                    </FormSelect>
-                  </td>
-                </tr>
-              );
-            }
-          )}
-          {Object.entries(assetDepreciationAccounts).map(
-            ([key, value], index) => {
-              return (
-                <tr key={index}>
-                  <td>{key}</td>
-                  <td>{value}</td>
-                  <td>
-                    <FormSelect id="accountAux" size="sm">
-                      <option value="default">Default select</option>
-                    </FormSelect>
-                  </td>
-                </tr>
-              );
-            }
-          )}
-          {Object.entries(stockDepreciationAccounts).map(
-            ([key, value], index) => {
-              return (
-                <tr key={index}>
-                  <td>{key}</td>
-                  <td>{value}</td>
-                  <td>
-                    <FormSelect id="accountAux" size="sm">
-                      <option value="default">Default select</option>
-                    </FormSelect>
-                  </td>
-                </tr>
-              );
-            }
-          )}
-        </tbody>
+        {depAccounts.map(([depKey, depValue], index) => (
+            <tr key={index}>
+              <td>{depKey}</td>
+              <td>{depValue}</td>
+              <td>
+                <FormSelect size="sm" onChange={(e) => handleOnchange(depKey, e)}>
+                  <option value="default"></option>
+                  {assetAccounts.map(([assetKey, assetValue], index) => ( 
+                    <option key={index} value={assetKey} selected={isSelected(mappedAccounts,depKey,assetKey)}>
+                      {assetKey} - {assetValue}
+                    </option>
+                  ))}
+                </FormSelect>
+              </td>
+            </tr>
+          ))}
+          
+          </tbody>
       </Table>
     </div>
   );

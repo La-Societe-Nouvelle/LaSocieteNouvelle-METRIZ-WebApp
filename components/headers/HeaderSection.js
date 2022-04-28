@@ -46,9 +46,9 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
           <Navbar.Brand href="/">
             <img
               src="/logo_la-societe-nouvelle_s.svg"
-              width="100"
-              height="100"
-              className="d-inline-block align-top"
+              width="120"
+              height="120"
+              className="d-inline-block align-top ms-4"
               alt="logo"
               onClick={refresh}
             />

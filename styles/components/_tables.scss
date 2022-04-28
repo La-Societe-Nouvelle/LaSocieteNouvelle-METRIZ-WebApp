@@ -1,4 +1,9 @@
 /* ---------- TABLE ---------- */
+
+.table > :not(:first-child) {
+  border : none;
+}
+
 .pagination {
   display: flex;
   justify-content: flex-start;
@@ -22,6 +27,7 @@ p.toChecked {
   margin: 1rem 0;
 }
 table {
+  border: 1px solid $light;
   font-size: 0.85em;
 
   .siren {
