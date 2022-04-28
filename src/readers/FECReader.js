@@ -414,9 +414,9 @@ const mapAccountsWithLibDistances = async (distances) =>
   }
 }
 
-/* ----------------------------------------------------- */
-/* -------------------- DATA READER -------------------- */
-/* ----------------------------------------------------- */ 
+/* ----------------------------------------------------------------------------------------------------------------- */
+/* -------------------------------------------------- DATA READER -------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------------------------- */ 
 
 export async function FECDataReader(FECData)
 // ...extract data to use in session (JSON -> Session)
@@ -428,6 +428,7 @@ export async function FECDataReader(FECData)
   // Meta ----------------------------------------------------------------------------------------------- //
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
+  data.mappingAccounts = FECData.meta.mappingAccounts;
   data.ignoreDepreciationEntries = [];
   data.ignoreStockVariationsEntries = [];
   data.errors =[];
@@ -578,31 +579,17 @@ async function readANouveauxEntry(data,journal,ligneCourante)
 
   if (/^2[8-9]/.test(ligneCourante.CompteNum))
   {
-    // retrieve immobilisation account
-    let immobilisationAccountsAux = journal.filter(ligne => ligne.CompteNum.startsWith("2"+ligneCourante.CompteNum.substring(2)));
-    if (immobilisationAccountsAux.length == 1)
+    // depreciation data
+    let depreciationData = 
     {
-      // depreciation data
-      let depreciationData = 
-      {
-        account: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        accountAux: immobilisationAccountsAux[0].CompteNum,
-        prevAmount: parseAmount(ligneCourante.Credit),
-        amount: parseAmount(ligneCourante.Credit)
-      }
-      // push data
-      data.depreciations.push(depreciationData);
+      account: ligneCourante.CompteNum,
+      accountLib: ligneCourante.CompteLib,
+      accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+      prevAmount: parseAmount(ligneCourante.Credit),
+      amount: parseAmount(ligneCourante.Credit)
     }
-    else 
-    {
-      let immobilisationAccounts = journal.filter(ligne => /^2(0|1)/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-      let depreciationAccounts = journal.filter(ligne => /^28/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-      let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte d'immobilisations :"
-        +" "+immobilisationAccounts.length+" comptes d'immobilisation(s) ("+immobilisationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+")"
-        +" "+depreciationAccounts.length+" comptes d'amortissement(s) ("+depreciationAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
-      throw message;
-    }
+    // push data
+    data.depreciations.push(depreciationData);
   }
 
   /* --- STOCKS --- */
@@ -643,29 +630,17 @@ async function readANouveauxEntry(data,journal,ligneCourante)
 
   if (/^39/.test(ligneCourante.CompteNum))
   {
-    // retrieve stock account
-    let stockAccountsAux = journal.filter(ligne => ligne.CompteNum.startsWith("3"+ligneCourante.CompteNum.substring(2)));
-    if (stockAccountsAux.length == 1)
+    // depreciation data
+    let depreciationData = 
     {
-      // depreciation data
-      let depreciationData = 
-      {
-        account: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        accountAux: stockAccountsAux[0].CompteNum,
-        prevAmount: parseAmount(ligneCourante.Credit),
-        amount: parseAmount(ligneCourante.Credit)
-      }
-      // push data
-      data.depreciations.push(depreciationData);
+      account: ligneCourante.CompteNum,
+      accountLib: ligneCourante.CompteLib,
+      accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+      prevAmount: parseAmount(ligneCourante.Credit),
+      amount: parseAmount(ligneCourante.Credit)
     }
-    else 
-    {
-      let stockAccounts = journal.filter(ligne => /^3/.test(ligne.CompteNum)).map(ligne => ligne.CompteNum);
-      let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" (A-NOUVEAUX) ne peut être relié à un compte de stocks :"
-        + " "+stockAccounts.length+ " compte(s) de classe 3 ("+stockAccounts.reduce((a,b) => a+", "+b,"").substring(2)+").";
-      throw message;
-    }
+    // push data
+    data.depreciations.push(depreciationData);
   }
 }
 
@@ -776,28 +751,17 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
     // si compte inexistant -> ajout compte
     else
     {
-      // retrieve immobilisation account
-      let immobilisationAccounts = data.immobilisations.filter(immobilisation => immobilisation.account.startsWith("2"+ligneCourante.CompteNum.substring(2)));
-      if (immobilisationAccounts.length == 1)
+      // depreciation data
+      let depreciationData = 
       {
-        // depreciation data
-        let depreciationData = 
-        {
-          account: ligneCourante.CompteNum,
-          accountLib: ligneCourante.CompteLib,
-          accountAux: immobilisationAccounts[0].account,
-          prevAmount: 0.0,
-          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
-        }
-        // push data
-        data.depreciations.push(depreciationData);
+        account: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+        prevAmount: 0.0,
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
       }
-      else
-      {
-        let message = "Le compte "+ligneCourante.CompteNum+" dans le journal \""+ligneCourante.JournalLib+"\" ne peut être relié à un compte d'immobilisations :"
-          +" "+data.immobilisations.length+" compte(s) d'immobilisations enregistré(s) ("+data.immobilisations.reduce((a,b) => a.account+", "+b.account,"").substring(2)+").";
-        throw message;
-      } 
+      // push data
+      data.depreciations.push(depreciationData);
     }
   }
 }
@@ -861,24 +825,17 @@ const readStockEntry = async (data,journal,ligneCourante) =>
     // si compte inexistant -> ajout compte
     else
     {
-      // retrieve stock account
-      let stockAccounts = data.stocks.filter(stock => stock.account.startsWith("3"+ligneCourante.CompteNum.substring(2)));
-
-      if (stockAccounts.length == 1)
+      // depreciation data
+      let depreciationData = 
       {
-        // depreciation data
-        let depreciationData = 
-        {
-          account: ligneCourante.CompteNum,
-          accountLib: ligneCourante.CompteLib,
-          accountAux: stockAccounts[0].account,
-          prevAmount: 0.0,
-          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
-        }
-        // push data
-        data.depreciations.push(depreciationData);
+        account: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+        prevAmount: 0.0,
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
       }
-      else throw "Le compte "+ligneCourante.CompteNum+" dans le journal "+ligneCourante.JournalLib+" ne peut être relié à un compte de stocks.";
+      // push data
+      data.depreciations.push(depreciationData);
     }
   }
 
