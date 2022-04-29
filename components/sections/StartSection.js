@@ -55,35 +55,39 @@ export class StartSection extends React.Component {
                   <p>Engagements sociaux et environnementaux</p>
                 </Col>
               </Row>
-              <Button
-                variant="primary"
-                className="me-3"
-                onClick={this.props.startNewSession}
-              >
-                Nouvelle analyse
-              </Button>
+                  <Button
+                    variant="primary"
+                    className="me-2"
+                    onClick={this.props.startNewSession}
+                  >
+                    Nouvelle analyse
+                  </Button>
 
-              <Button
-                variant="outline-primary"
-                onClick={this.triggerImportFile}
-              >
-                Reprendre une session
-              </Button>
+                  <a
+                    className="btn btn-secondary"
+                    href="https://docs.lasocietenouvelle.org"
+                  >
+                    Documentation
+                  </a>
+                  <span className="vertical-lign"></span>
+                  <Button
+                    variant="outline-primary"
+                    onClick={this.triggerImportFile}
+                  >
+                    Reprendre une session
+                  </Button>
 
-              <input
-                id="import-session"
-                type="file"
-                accept=".json"
-                onChange={this.importFile}
-                visibility="collapse"
-              />
+                  <input
+                    id="import-session"
+                    type="file"
+                    accept=".json"
+                    onChange={this.importFile}
+                    visibility="collapse"
+                  />
             </section>
           </Col>
           <Col lg={4}>
             <Image fluid src="/resources/team_working.png" alt="Team" />
-            <NavLink className="btn btn-secondary" href='https://docs.lasocietenouvelle.org'>
-                <FontAwesomeIcon icon={faBook} /> Consulter la documentation
-          </NavLink>
           </Col>
         </Row>
       </Container>

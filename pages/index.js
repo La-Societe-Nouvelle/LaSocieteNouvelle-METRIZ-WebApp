@@ -117,7 +117,7 @@ class Metriz extends React.Component {
 
     // build download link & activate
     const blob = new Blob([json], { type: 'application/json' });
-    const href = await URL.createObjectURL(blob);
+    const href =  URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = href;
     link.download = fileName + ".json";

@@ -14,6 +14,7 @@ import { ProgressBar } from "../../popups/ProgressBar";
 
 // Readers
 import { getSignificativeCompanies } from "../../../src/formulas/significativeLimitFormulas";
+import { Container } from "react-bootstrap";
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -85,11 +86,11 @@ export class SectorSection extends React.Component {
 
 
     return (
-      <div className="container-fluid" id="sector-section"> 
+      <Container fluid id="sector-section"> 
         <section className="step">
 
           <div className="section-title">
-            <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
+            <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
             
             <h3 className="subtitle underline">
               2. Synchronisation des données grâce au secteur d'activité
@@ -97,7 +98,7 @@ export class SectorSection extends React.Component {
 
           </div>
 
-          <div className="step container">
+          <div className="step">
 
 
             {companies.length > 0 && (
@@ -115,13 +116,10 @@ export class SectorSection extends React.Component {
                         <div className="alert alert-warning">
                           <p>
                             <FontAwesomeIcon icon={faWarning} />   Les empreintes de certains comptes doivent être synchronisées.
-
                           </p>
-
                         </div>
 
                     }
-
                     {significativeCompanies.filter((company) => company.footprintActivityCode == "00").length > 0 ?
                       <div className="alert alert-warning">
                         <p>
@@ -195,7 +193,6 @@ export class SectorSection extends React.Component {
                         </select>
                       </div>
                     </div>
-
                     <CompaniesTable
                       nbItems={
                         nbItems == "all"
@@ -220,8 +217,7 @@ export class SectorSection extends React.Component {
               </div>
             )}
           </div>
-
-          <div className={"action container-fluid"}>
+              <div className="text-end">
             <button
               className={"btn btn-secondary"}
               id="validation-button"
@@ -232,9 +228,8 @@ export class SectorSection extends React.Component {
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
-        </section>
-
-      </div>
+          </section> 
+      </Container>
 
     );
   }

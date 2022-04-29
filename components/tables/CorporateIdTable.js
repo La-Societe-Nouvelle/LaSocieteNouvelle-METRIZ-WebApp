@@ -8,6 +8,7 @@ import { InputText } from "/components/input/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {faCheckCircle ,faSyncAlt, faWarning, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import { Table } from "react-bootstrap";
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -37,7 +38,7 @@ export class CorporateIdTable extends React.Component {
     return (
       
       <div className="table-main" id="table">
-        <table className="table w100">
+        <Table>
           <thead>
             <tr>
               <td
@@ -51,7 +52,7 @@ export class CorporateIdTable extends React.Component {
               >
                 Libellé du compte fournisseur
               </td>
-              <td className="company">
+              <td>
                 Compte fournisseur
               </td>
 
@@ -74,7 +75,7 @@ export class CorporateIdTable extends React.Component {
                 />
               ))}
           </tbody>
-        </table>
+        </Table>
         {
       companies.length == 0 && (
         <p className="small-text

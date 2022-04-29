@@ -2,14 +2,13 @@
 
 // React
 import React, { useState } from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync } from "@fortawesome/free-solid-svg-icons";
 // Utils
 import { printValue } from '/src/utils/Utils';
 
 // Libraries
 import divisions from '/lib/divisions'; 
 import branches from '/lib/branches'; 
+import { Table } from 'react-bootstrap';
 
 /* ---------- INITIAL STATES TABLE ---------- */
 
@@ -42,7 +41,7 @@ export class InitialStatesTable extends React.Component {
     
     return (
       <>
-        <table className="w100">
+        <Table>
           <thead>
             <tr>
               <td onClick={() => this.changeColumnSorted("account")}>Compte</td>
@@ -59,7 +58,7 @@ export class InitialStatesTable extends React.Component {
                    onInitialStateUpdate={this.updateAccount.bind(this)}
                    syncData={this.synchroniseAccount.bind(this)}/>)}
           </tbody>
-        </table>
+        </Table>
 
       {nbAccounts.length > nbItems &&
         <div className="table-navigation">

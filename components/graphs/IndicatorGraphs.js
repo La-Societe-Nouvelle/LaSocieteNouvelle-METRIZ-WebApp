@@ -11,6 +11,7 @@ import { printValue } from '/src/utils/Utils';
 
 // Libraries
 import metaIndics from '/lib/indics';
+import { Table } from 'react-bootstrap';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -325,7 +326,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
         </div>
       </div>
 
-      <table className='w100'>
+      <Table>
         <thead>
           <tr>
             <td className="auto">Agrégat</td>
@@ -372,7 +373,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
             }
           </tr>
         </tbody>
-      </table>
+      </Table>
     </>)
 }
 

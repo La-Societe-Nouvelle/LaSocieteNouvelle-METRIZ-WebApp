@@ -15,6 +15,7 @@ import { InputText } from '../input/InputText';
 
 // Libraries
 import metaIndics from '/lib/indics';
+import { Table } from 'react-bootstrap';
 
 
 /* ----------------------------------------------------------- */
@@ -88,7 +89,7 @@ export class StatementSection extends React.Component {
                         <p>
                             Sélectionnez les indicateurs que vous souhaitez publier
                         </p>
-                        <table className="w100">
+                        <Table size='sm'>
                             <thead>
                                 <tr>
                                     <td>Indicateur</td>
@@ -111,7 +112,7 @@ export class StatementSection extends React.Component {
                                             onChange={this.onCheckIndicator} /></td>
                                     </tr>)}
                             </tbody>
-                        </table>
+                        </Table>
                     </section>
                     <section className="step">
                         <h3>Informations</h3>
@@ -164,10 +165,12 @@ export class StatementSection extends React.Component {
                                 <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
                             </div>
                         </div>
-                  
-                        <button className="btn btn-secondary" disabled={autorisation ? false : true}  onClick={this.setDisplayRecap} > 
-                            Publier mes résultats
-                        </button>
+                            <p className="text-end">
+                            <button className="btn btn-secondary" disabled={autorisation ? false : true}  onClick={this.setDisplayRecap} > 
+                                Publier mes résultats
+                            </button>
+
+                            </p>
                     </section>            
                  
                 </div>

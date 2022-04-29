@@ -16,6 +16,7 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
 import { MessagePopup } from "../../popups/MessagePopup";
+import { Container } from "react-bootstrap";
 export class SirenSection extends React.Component {
 
     constructor(props) {
@@ -109,26 +110,26 @@ export class SirenSection extends React.Component {
         }
 
         return (
-            <div className="container-fluid" id="siren-section">
+            <Container fluid id="siren-section">
                 <section className="step">
                     <div className="section-title">
-                        <h2>&Eacute;tape 4 - Traitement des fournisseurs</h2>
+                        <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
                         <h3 className={"subtitle underline"}>
                             Synchronisation des données grâce au numéro de siren
                         </h3>
                     </div>
-                    <div className="step container">
+                    <div className="step">
                         <h4>
                             1. Téléchargez et complétez le tableaux de vos fournisseurs
                         </h4>
-                        <p>
+                        <p className="form-text">
                             Exportez la liste des comptes fournisseurs auxiliaires afin de renseigner les numéros siren de vos fournisseurs.
                         </p>
-                        <button className="btn btn-primary" onClick={this.exportXLSXFile}>
-                            <FontAwesomeIcon icon={faFileExport} /> Exporter mes comptes fournisseurs
+                        <button className="btn btn-primary mt-3" onClick={this.exportXLSXFile}>
+                            <FontAwesomeIcon icon={faFileExport} /> Exporter mes fournisseurs
                         </button>
                     </div>
-                    <div className="step container">
+                    <div className="step">
                         <h4>
                             2. Importez le fichier excel complété
                         </h4>
@@ -165,7 +166,7 @@ export class SirenSection extends React.Component {
                         }
 
                     </div>
-                    <div className="step container" id="step-3">
+                    <div className="step" id="step-3">
 
                         <h4>3. Synchroniser les données de vos fournisseurs</h4>
 
@@ -300,12 +301,12 @@ export class SirenSection extends React.Component {
                         </div>
                     )}
 
-                    <div className="align-right">
+                    <div className="text-end">
                         {buttonNextStep}
                     </div>
 
                 </section>
-            </div>
+            </Container>
 
         )
 

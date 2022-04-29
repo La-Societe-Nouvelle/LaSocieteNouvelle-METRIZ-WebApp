@@ -8,6 +8,7 @@ import metaIndics from '/lib/indics';
 
 // Utils
 import { printValue } from "../../src/utils/Utils";
+import { Table } from 'react-bootstrap';
 
 /* -------------------- EXPENSES TABLE -------------------- */
 
@@ -42,7 +43,7 @@ export class IndicatorExpensesTable extends React.Component {
 
     return (
       <div className="table-main">
-        <table className='w100'>
+        <Table>
           <thead>
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
@@ -68,7 +69,7 @@ export class IndicatorExpensesTable extends React.Component {
                   {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
                 </tr>)})}
           </tbody>
-        </table>
+        </Table>
       </div>
     )
   }

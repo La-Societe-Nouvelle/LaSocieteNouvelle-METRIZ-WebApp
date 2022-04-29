@@ -11,6 +11,7 @@ import divisions from "/lib/divisions";
 import areas from "/lib/areas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle, faSyncAlt, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { Table } from "react-bootstrap";
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -39,7 +40,7 @@ export class CompaniesTable extends React.Component {
 
     return (
       <div className="table-main">
-        <table className="table">
+        <Table>
           <thead>
             <tr>
 
@@ -49,7 +50,6 @@ export class CompaniesTable extends React.Component {
                 Libellé du compte fournisseur
               </td>
               <td
-                className="company"
               >
                 Compte fournisseur
               </td>
@@ -81,7 +81,7 @@ export class CompaniesTable extends React.Component {
                 />
               ))}
           </tbody>
-        </table>
+        </Table>
 
         {companies.length > nbItems && (
           <div className="table-navigation">

@@ -11,6 +11,7 @@ import { ProgressBar } from "../popups/ProgressBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel, faFileUpload, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { updateVersion } from "../../src/version/updateVersion";
+import { Container } from "react-bootstrap";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -60,11 +61,11 @@ export class InitialStatesSection extends React.Component {
 
     const isNextStepAvailable = nextStepAvailable(this.state) && message == "";
     return (
-      <div className="container-fluid">
+      <Container fluid>
         <section className="step">
 
           <div className="section-title">
-            <h2> <FontAwesomeIcon icon={faPen} /> &Eacute;tape 3 - Saisissez vos états initiaux</h2>
+            <h2> <FontAwesomeIcon icon={faPen} /> &Eacute;tape 2 - Saisissez vos états initiaux</h2>
             <p className="alert alert-info">
               Les états initiaux correspondent aux empreintes des comptes de
               stocks et d’immobilisations en début d’exercice. Les empreintes
@@ -73,7 +74,7 @@ export class InitialStatesSection extends React.Component {
             </p>
           </div>
 
-          <div className="table-container container">
+          <div className="table-container">
             <div className="table-menu">
               <button value="importData"
                 className={this.state.view == "importData" ? "active" : ""}
@@ -222,7 +223,7 @@ export class InitialStatesSection extends React.Component {
         </section>
 
 
-      </div>
+      </Container>
     );
   }
 

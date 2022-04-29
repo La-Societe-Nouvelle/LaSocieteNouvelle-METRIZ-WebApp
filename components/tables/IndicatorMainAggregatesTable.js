@@ -5,6 +5,7 @@ import { printValue } from '/src/utils/Utils';
 
 // Libraries
 import metaIndics from '/lib/indics';
+import { Table } from 'react-bootstrap';
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -24,12 +25,11 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
     storedProduction,
     immobilisedProduction,
     intermediateConsumption,
-    storedPurchases,
     capitalConsumption,
     netValueAdded } = financialData.aggregates;
 
   return (
-    <table className='w100' id="mainAggregates"> 
+    <Table id="mainAggregates"> 
       <thead>
         <tr>
           <td colSpan="2">Agrégat</td>
@@ -121,7 +121,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
         {printGrossImpact ? <td className="column_unit">&nbsp;{unitGrossImpact}</td> : null}
       </tr>
       </tbody>
-    </table>
+    </Table>
   )
 }
 

@@ -8,6 +8,7 @@ import metaIndics from '/lib/indics';
 
 // Utils
 import { printValue } from "../../src/utils/Utils";
+import { Table } from 'react-bootstrap';
 
 /* -------------------- INDICATOR COMPANIES TABLE -------------------- */
 
@@ -50,7 +51,7 @@ export class IndicatorCompaniesTable extends React.Component {
         <p>Aucun fournisseur n'a publié ses données</p>}
 
       {companies.length > 0 &&
-        <table className='w100'>
+        <Table>
           <thead>
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("identifiant")}>Identifiant</td>
@@ -78,7 +79,7 @@ export class IndicatorCompaniesTable extends React.Component {
                   {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
                 </tr>)})}
           </tbody>
-        </table>}
+        </Table>}
       </div>
     )
   }

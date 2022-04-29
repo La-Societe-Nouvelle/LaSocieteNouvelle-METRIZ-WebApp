@@ -61,6 +61,7 @@ import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWr
 
 import LoadingSpinner from "../LoadingSpinner";
 import { GraphsPDF } from "../graphs/GraphsPDF";
+import { Container } from "react-bootstrap";
 
 
 /* ----------------------------------------------------------- */
@@ -127,7 +128,7 @@ export class IndicatorSection extends React.Component {
     const isPublicationAvailable = Object.entries(this.props.session.financialData.aggregates.revenue.footprint.indicators).filter(([_, indicator]) => indicator.value != null).length > 0;
 
     return (
-      <div className="container-fluid indicator-section">
+      <Container fluid className="indicator-section">
         <section className="step">
           {
             graphPdf && (
@@ -141,7 +142,7 @@ export class IndicatorSection extends React.Component {
             )
           }
           <div className="section-title">
-            <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 5 - Mesure de l'impact</h2>
+            <h2><FontAwesomeIcon icon={faRuler} /> &Eacute;tape 4 - Mesure de l'impact</h2>
             <p>
               Pour chaque indicateur, déclarez vos impacts directs et obtenez les éléments d'analyse.
             </p>
@@ -209,7 +210,7 @@ export class IndicatorSection extends React.Component {
 
               </h3>
               <p >
-                <a className="btn btn-info" href={"https://docs.lasocietenouvelle.org/application-web/declarations/declaration-" + indic} target="_blank">
+                <a className="btn btn-secondary" href={"https://docs.lasocietenouvelle.org/application-web/declarations/declaration-" + indic} target="_blank">
                   <FontAwesomeIcon icon={faBook} /> Accéder à la documentation
                 </a>
               </p>
@@ -398,7 +399,7 @@ export class IndicatorSection extends React.Component {
           </div>
 
         </section>
-      </div>
+      </Container>
     );
   }
 
