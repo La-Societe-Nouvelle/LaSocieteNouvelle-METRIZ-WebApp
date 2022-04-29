@@ -16,7 +16,7 @@
   font-size: 0.8rem;
   margin: 0.5rem 0;
   padding: 0.5rem;
-  background-color: lighten($primary, 8%);
+  background-color: $secondary;
 }
 button:hover {
   cursor: pointer;

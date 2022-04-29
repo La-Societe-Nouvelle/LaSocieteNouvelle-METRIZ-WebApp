@@ -48,7 +48,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               src="/logo_la-societe-nouvelle_s.svg"
               width="120"
               height="120"
-              className="d-inline-block align-top ms-4"
+              className="d-inline-block align-top"
               alt="logo"
               onClick={refresh}
             />
@@ -67,33 +67,33 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               </button>
               <div className="step-name">Import comptable</div>
             </div>
+            <div className={"stepper-item" + (stepMax > 2 ? " completed" : "")}>
+              <button
+                className={"step-counter" + (step == 2 ? " current" : "")}
+                disabled={stepMax < 2}
+                onClick={() => setStep(2)}
+              >
+                2
+              </button>
+              <div className="step-name">Saisie des états initiaux</div>
+            </div>
             <div className={"stepper-item" + (stepMax > 3 ? " completed" : "")}>
               <button
                 className={"step-counter" + (step == 3 ? " current" : "")}
                 disabled={stepMax < 3}
                 onClick={() => setStep(3)}
               >
-                2
-              </button>
-              <div className="step-name">Saisie des états initiaux</div>
-            </div>
-            <div className={"stepper-item" + (stepMax > 4 ? " completed" : "")}>
-              <button
-                className={"step-counter" + (step == 4 ? " current" : "")}
-                disabled={stepMax < 4}
-                onClick={() => setStep(4)}
-              >
                 3
               </button>
               <div className="step-name">Traitement des fournisseurs</div>
             </div>
             <div
-              className={"stepper-item" + (stepMax == 5 ? " completed" : "")}
+              className={"stepper-item" + (stepMax == 4 ? " completed" : "")}
             >
               <button
-                className={"step-counter" + (step == 5 ? " current" : "")}
-                disabled={stepMax < 5}
-                onClick={() => setStep(5)}
+                className={"step-counter" + (step == 4 ? " current" : "")}
+                disabled={stepMax < 4}
+                onClick={() => setStep(4)}
               >
                 4
               </button>
