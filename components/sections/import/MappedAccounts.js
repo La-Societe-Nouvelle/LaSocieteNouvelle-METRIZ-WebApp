@@ -16,38 +16,43 @@ function MappedAccounts(props) {
 
   const [depAccounts] = useState(getDepAccounts);
   const [assetAccounts] = useState(getAssetsAccounts);
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const [mappedAccounts, setMappedAccounts] = useState(
     props.meta.mappingAccounts
   );
 
+  useEffect(() => {
+    console.log("updated");
+  }, [isDisabled]);
 
-  function handleOnchange(depKey, e) { 
+  function handleOnchange(depKey, e) {
 
-    console.log(depKey);
-    
-    let depAccount = depAccounts.filter(([key]) => key == depKey);
+    Object.entries(mappedAccounts).map(([key, value]) => {
+      if (value == e.target.value) {
+        delete mappedAccounts[key];
+      }
+    });
 
-    // Object.keys(mappedAccounts)
-    //   .filter((account) =>
-    //     depAccounts.map(
-    //       ([key, value]) => console.log(key)
-    //     )
-    //   )
+    Object.assign(mappedAccounts, {
+      [depKey]: e.target.value,
+    });
 
+    setMappedAccounts(mappedAccounts);
 
-  
-    // console.log(e.target.value);
-    // console.log(depKey);
+    if (Object.keys(mappedAccounts).length == depAccounts.length) {
+      setIsDisabled(false);
+    } else {
+      setIsDisabled(true);
+    }
 
   }
 
-  function isSelected(mappedAccounts,depKey, assetKey){
-
-    return Object.keys(mappedAccounts).some(
-      () => mappedAccounts[depKey] === assetKey
-    );
-
+  function getDefaultValue(depKey) {
+    console.log(depKey);
+    console.log(mappedAccounts)
+    console.log(Object.keys(mappedAccounts).filter((key) => key == depKey))
+    return Object.keys(mappedAccounts).filter((key) => key == depKey);
   }
 
   return (
@@ -61,18 +66,34 @@ function MappedAccounts(props) {
             <th>Numéro de compte</th>
             <th>Libellé du compte</th>
             <th>Compte associé</th>
-          </tr> 
+          </tr>
         </thead>
         <tbody>
-        {depAccounts.map(([depKey, depValue], index) => (
+          {
+            console.log(mappedAccounts)
+
+          }
+                    {
+            console.log("selecteds")
+
+          }
+          {depAccounts.map(([depKey, depValue], index) => (
+
+          console.log(mappedAccounts[depKey]),
             <tr key={index}>
               <td>{depKey}</td>
               <td>{depValue}</td>
               <td>
-                <FormSelect size="sm" onChange={(e) => handleOnchange(depKey, e)}>
-                  <option value="default"></option>
-                  {assetAccounts.map(([assetKey, assetValue], index) => ( 
-                    <option key={index} value={assetKey} selected={isSelected(mappedAccounts,depKey,assetKey)}>
+                <FormSelect
+                  defaultValue={mappedAccounts[depKey]}
+                  size="sm"
+                  onChange={(e) => handleOnchange(depKey, e)}
+                >
+                  <option value="">
+                    Sélectionner un compte...
+                  </option>
+                  {assetAccounts.map(([assetKey, assetValue], index) => (
+                    <option key={index} value={assetKey}>
                       {assetKey} - {assetValue}
                     </option>
                   ))}
@@ -80,9 +101,18 @@ function MappedAccounts(props) {
               </td>
             </tr>
           ))}
-          
-          </tbody>
+        </tbody>
       </Table>
+
+      <div className="text-end">
+        <button
+          className="btn btn-secondary"
+          disabled={isDisabled}
+          onClick={() => props.onClick(mappedAccounts)}
+        >
+          Valider
+        </button>
+      </div>
     </div>
   );
 }

@@ -23,6 +23,9 @@ import { FECImport } from "./ANouveaux";
 import { FinancialData } from "/src/FinancialData";
 
 function ImportSection(props) {
+
+  
+
   //STATE
   const [corporateName, setCorporateName] = useState(
     props.session.legalUnit.corporateName || ""
@@ -44,6 +47,8 @@ function ImportSection(props) {
     setErrors([]);
     setFile(file);
   }
+
+
 
   return (
     <Container fluid>
@@ -69,7 +74,7 @@ function ImportSection(props) {
           />
         )}
 
-        {view == 2 && <MappedAccounts meta={importedData.meta} />}
+        {view == 2 && <MappedAccounts onClick={() => setView(3)} meta={importedData.meta} />}
         {view == 3 && <FinancialDatas {...props} />}
 
         {errorFile && (
@@ -168,7 +173,7 @@ function ImportSection(props) {
       props.session.checkValidations();
 
       // update progression
-      // props.session.progression = 2;
+      props.session.progression = 1;
 
       setView(2);
       // update state
