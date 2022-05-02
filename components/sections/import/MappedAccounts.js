@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FormSelect, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 
 function MappedAccounts(props) {
   const [allAccounts] = useState(props.meta.accounts);
@@ -23,36 +23,43 @@ function MappedAccounts(props) {
   );
 
   useEffect(() => {
-    console.log("updated");
-  }, [isDisabled]);
+
+    if (Object.values(mappedAccounts).some(it => !it.length)) {
+      setIsDisabled(true);
+    } else {
+      setIsDisabled(false);
+    }
+  }, [isDisabled, mappedAccounts]);
+
 
   function handleOnchange(depKey, e) {
 
+
     Object.entries(mappedAccounts).map(([key, value]) => {
-      if (value == e.target.value) {
-        delete mappedAccounts[key];
+
+      // set empty value if value is already associeted to 28xxxx account
+      if ( key.substring(0,2) == "28" && value == e.target.value) {
+
+        Object.assign(mappedAccounts, {
+          [key]: "",
+        })
       }
     });
 
+    // assign new value
     Object.assign(mappedAccounts, {
       [depKey]: e.target.value,
     });
 
     setMappedAccounts(mappedAccounts);
 
-    if (Object.keys(mappedAccounts).length == depAccounts.length) {
-      setIsDisabled(false);
-    } else {
+    // check if all accounts is associated 
+
+    if (Object.values(mappedAccounts).some(it => !it.length)) {
       setIsDisabled(true);
+    } else {
+      setIsDisabled(false);
     }
-
-  }
-
-  function getDefaultValue(depKey) {
-    console.log(depKey);
-    console.log(mappedAccounts)
-    console.log(Object.keys(mappedAccounts).filter((key) => key == depKey))
-    return Object.keys(mappedAccounts).filter((key) => key == depKey);
   }
 
   return (
@@ -69,35 +76,20 @@ function MappedAccounts(props) {
           </tr>
         </thead>
         <tbody>
-          {
-            console.log(mappedAccounts)
-
-          }
-                    {
-            console.log("selecteds")
-
-          }
           {depAccounts.map(([depKey, depValue], index) => (
-
-          console.log(mappedAccounts[depKey]),
             <tr key={index}>
               <td>{depKey}</td>
               <td>{depValue}</td>
               <td>
-                <FormSelect
-                  defaultValue={mappedAccounts[depKey]}
-                  size="sm"
-                  onChange={(e) => handleOnchange(depKey, e)}
-                >
-                  <option value="">
-                    Sélectionner un compte...
-                  </option>
+                <select onChange={(e) => handleOnchange(depKey, e)}>
+                  <option value="">Sélectionner un compte...</option>
                   {assetAccounts.map(([assetKey, assetValue], index) => (
-                    <option key={index} value={assetKey}>
+                    
+                    <option key={index} value={assetKey} selected={mappedAccounts[depKey] == assetKey ? "selected" : ""}>
                       {assetKey} - {assetValue}
                     </option>
                   ))}
-                </FormSelect>
+                </select>
               </td>
             </tr>
           ))}

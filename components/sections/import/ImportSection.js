@@ -55,7 +55,7 @@ function ImportSection(props) {
       <section className="step">
         <h2>
           <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
-          vos flux comptable
+          vos flux comptables
         </h2>
 
         {view == 0 && (
@@ -70,11 +70,11 @@ function ImportSection(props) {
         {view == 1 && ( 
           <FECImport
             FECData={importedData}
-            onClick={() => loadFECData(importedData)}
+            onClick={() => setView(2)}
           />
         )}
 
-        {view == 2 && <MappedAccounts onClick={() => setView(3)} meta={importedData.meta} />}
+        {view == 2 && <MappedAccounts onClick={() => loadFECData(importedData)} meta={importedData.meta} />}
         {view == 3 && <FinancialDatas {...props} />}
 
         {errorFile && (
@@ -136,6 +136,7 @@ function ImportSection(props) {
     } // show error (file)
   }
 
+
   async function loadFECData(importedData) {
     let nextFinancialData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
 
@@ -175,11 +176,7 @@ function ImportSection(props) {
       // update progression
       props.session.progression = 1;
 
-      setView(2);
-      // update state
-      //this.setState({ importedData: null });
-
-      //props.submit();
+      setView(3);
     }
   }
 }
