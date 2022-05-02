@@ -82,7 +82,6 @@ export class SirenSection extends React.Component {
 
         const isNextStepAvailable = nextStepAvailable(this.state);
 
-        console.log(isDisabled)
         let buttonNextStep;
 
         if (this.state.companies.filter((company) => company.status == 200).length == this.state.companies.length
@@ -101,7 +100,6 @@ export class SirenSection extends React.Component {
             buttonNextStep = <button
                 className={"btn btn-secondary"}
                 id="validation-button"
-                disabled={!isNextStepAvailable}
                 onClick={() => setCompanyStep(2)}
             >
                 Valider les fournisseurs

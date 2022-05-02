@@ -42,7 +42,7 @@ export class SectorSection extends React.Component {
   handleChange = (event) => {
 
     let view = event.target.value;
-
+    console.log(view);
     switch (view) {
       case "aux":
         return this.setState({
@@ -54,6 +54,14 @@ export class SectorSection extends React.Component {
           companiesShowed: this.state.companies.filter((company) => company.isDefaultAccount),
           view: view,
         });
+        case "significative":
+
+        return this.setState({
+          companiesShowed: this.state.significativeCompanies.filter(
+            (company) => company.footprintActivityCode == "00" 
+          ),
+          view: view,
+        });      
       case "defaultActivity":
         return this.setState({
           companiesShowed: this.state.companies.filter(
@@ -120,6 +128,9 @@ export class SectorSection extends React.Component {
                         </div>
 
                     }
+                    {
+                      console.log(significativeCompanies)
+                    }
                     {significativeCompanies.filter((company) => company.footprintActivityCode == "00").length > 0 ?
                       <div className="alert alert-warning">
                         <p>
@@ -136,6 +147,9 @@ export class SectorSection extends React.Component {
                       </div>
                       :
                       ""
+                    }
+                    {
+                      console.log(companiesShowed)
                     }
 
                     <button
