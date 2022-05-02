@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Table } from 'react-bootstrap';
 
 // Utils
 import { printValue } from "../../src/utils/Utils";
@@ -34,7 +35,7 @@ export class ExpensesTable extends React.Component {
 
     return (
       <>
-        <table className='w100'>
+        <Table bordered hover>
           <thead>
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
@@ -50,7 +51,7 @@ export class ExpensesTable extends React.Component {
                 <td className="align-right">{printValue(amount,0)} &euro;</td>
               </tr>)}
           </tbody>
-        </table>
+        </Table>
       </>
     )
   }

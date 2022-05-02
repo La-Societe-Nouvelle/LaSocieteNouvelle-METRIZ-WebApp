@@ -5,6 +5,7 @@ import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
 
 // Utils
 import { printValue } from '../../src/utils/Utils';
+import { Table } from "react-bootstrap";
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 
@@ -14,8 +15,7 @@ export const IncomeStatementTable = ({ financialData }) => {
 
   return (
     <>
-
-      <table className='w100'>
+      <Table bordered hover>
         <thead>
           <tr>
             <td>Agrégat</td>
@@ -96,7 +96,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td className="align-right">{printValue(financialData.getProfit(), 0)} &euro;</td>
           </tr>
         </tfoot>
-      </table>
+      </Table>
       <p className="align-right toChecked">
       *Chiffres clés à vérifier
     </p>

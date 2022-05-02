@@ -1,7 +1,8 @@
 // La Société Nouvelle
 
 // Utils
-import { getAmountItems, printValue } from '../../src/utils/Utils';
+import { Table } from 'react-bootstrap';
+import { printValue } from '../../src/utils/Utils';
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 
@@ -23,7 +24,7 @@ export const MainAggregatesTable = ({financialData}) =>
   return(
     <>
     {financialData.isFinancialDataLoaded &&  
-      <table className='w100'>
+      <Table bordered hover>
         <thead>
           <tr>
             <td>Agrégat</td>
@@ -84,6 +85,6 @@ export const MainAggregatesTable = ({financialData}) =>
             </tr>
 
         </tbody>
-      </table>}
+      </Table>}
     </>)
 }

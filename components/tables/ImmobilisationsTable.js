@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Table } from 'react-bootstrap';
 
 // Utils
 import { printValue } from '../../src/utils/Utils';
@@ -28,7 +29,7 @@ export class ImmobilisationsTable extends React.Component {
 
     return (
       <>
-        <table className='w100'>
+        <Table bordered hover>
           <thead>
             <tr>
               <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
@@ -67,7 +68,7 @@ export class ImmobilisationsTable extends React.Component {
               </tr>
             </tfoot>
           }
-        </table>
+        </Table>
       </>
     )
   }

@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Table } from 'react-bootstrap';
 
 // Utils
 import { printValue } from "../../src/utils/Utils";
@@ -28,7 +29,7 @@ export class StocksTable extends React.Component {
 
     return (
       <>
-        <table className='w100'>
+        <Table bordered hover>
           <thead>
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
@@ -65,7 +66,7 @@ export class StocksTable extends React.Component {
               <td className="align-right">{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
           </tr>}
           </tfoot>
-        </table>
+        </Table>
       </>
     )
   }
