@@ -34,11 +34,10 @@ function MappedAccounts(props) {
 
   function handleOnchange(depKey, e) {
 
-
     Object.entries(mappedAccounts).map(([key, value]) => {
 
       // set empty value if value is already associeted to 28xxxx account
-      if ( key.substring(0,2) == "28" && value == e.target.value) {
+      if ( key.substring(0,2) == depKey.substring(0,2) && value == e.target.value) {
 
         Object.assign(mappedAccounts, {
           [key]: "",
@@ -51,7 +50,8 @@ function MappedAccounts(props) {
       [depKey]: e.target.value,
     });
 
-    setMappedAccounts(mappedAccounts);
+    props.meta.mappingAccounts = mappedAccounts;
+    setMappedAccounts({...mappedAccounts});
 
     // check if all accounts is associated 
 
@@ -83,7 +83,7 @@ function MappedAccounts(props) {
               <td>
                 <select onChange={(e) => handleOnchange(depKey, e)}>
                   <option value="">Sélectionner un compte...</option>
-                  {assetAccounts.map(([assetKey, assetValue], index) => (
+                  {assetAccounts.filter(([assetKey,_]) => assetKey[0]==depKey[0]).map(([assetKey, assetValue], index) => (
                     
                     <option key={index} value={assetKey} selected={mappedAccounts[depKey] == assetKey ? "selected" : ""}>
                       {assetKey} - {assetValue}
@@ -100,7 +100,7 @@ function MappedAccounts(props) {
         <button
           className="btn btn-secondary"
           disabled={isDisabled}
-          onClick={() => props.onClick(mappedAccounts)}
+          onClick={() => props.onClick()}
         >
           Valider
         </button>
