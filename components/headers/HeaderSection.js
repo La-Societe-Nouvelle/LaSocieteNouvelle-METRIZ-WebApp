@@ -36,8 +36,8 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
             </a>
           </li>
         </ul>
-        <Button className="download" variant="primary" onClick={saveSession}>
-          <FontAwesomeIcon icon={faSync} className="me-2" /> 
+        <Button className="download me-4" variant="primary" onClick={saveSession}>
+          <FontAwesomeIcon icon={faSync} className="me-2"/> 
           Sauvegarder ma session
         </Button>
       </div>

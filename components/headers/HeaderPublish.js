@@ -47,7 +47,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
             </a>
           </li>
         </ul>
-        <Button className="download" variant="primary" onClick={saveSession}>
+        <Button className="download me-4" variant="primary" onClick={saveSession}>
           <FontAwesomeIcon icon={faSync} className="me-2" />
           Sauvegarder ma session
         </Button>
