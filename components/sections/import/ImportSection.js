@@ -39,6 +39,7 @@ function ImportSection(props) {
   const [errors, setErrors] = useState([]);
 
   function handeCorporateName(corporateName) {
+    props.session.legalUnit.corporateName = corporateName;
     setCorporateName(corporateName);
   }
 
