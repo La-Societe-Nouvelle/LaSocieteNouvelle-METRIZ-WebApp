@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 
 // Icons
 import {
@@ -22,10 +22,10 @@ import { FECImport } from "./ANouveaux";
 // Objects
 import { FinancialData } from "/src/FinancialData";
 
+// Mail Report Error
+import { sendReportToSupport } from "../../../pages/api/mail-api";
+
 function ImportSection(props) {
-
-  
-
   //STATE
   const [corporateName, setCorporateName] = useState(
     props.session.legalUnit.corporateName || ""
@@ -48,35 +48,9 @@ function ImportSection(props) {
     setFile(file);
   }
 
-
-
   return (
     <Container fluid>
       <section className="step">
-        <h2>
-          <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
-          vos flux comptables
-        </h2>
-
-        {view == 0 && (
-          <ImportForm
-            onChangeCorporateName={handeCorporateName}
-            uploadFile={handleFile}
-            corporateName={corporateName}
-            onClick={() => importFECFile(file)}
-          ></ImportForm>
-        )}
-
-        {view == 1 && ( 
-          <FECImport
-            FECData={importedData}
-            onClick={() => setView(2)}
-          />
-        )}
-
-        {view == 2 && <MappedAccounts onClick={() => loadFECData(importedData)} meta={importedData.meta} />}
-        {view == 3 && <FinancialDatas {...props} />}
-
         {errorFile && (
           <>
             <div className={"alert alert-error"}>
@@ -92,19 +66,49 @@ function ImportSection(props) {
               {errors.length > 0 && (
                 <>
                   <button
-                    className="btn btn-primary"
-                    //onClick={() => this.sendErrorReport(errors)}
+                    className="btn btn-secondary mb-2"
+                    onClick={() => sendErrorReport(errors)}
                   >
                     <FontAwesomeIcon icon={faExclamation} /> Envoyer un rapport
                     d'erreur
                   </button>
 
-                  {errorMail && <p className="small-text">{errorMail}</p>}
+                  {errorMail && (
+                    <p className="small-text alert alert-info mb-2">
+                      {errorMail}
+                    </p>
+                  )}
                 </>
               )}
             </div>
           </>
         )}
+
+        <h2>
+          <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
+          vos flux comptables
+        </h2>
+
+        {view == 0 && (
+          <ImportForm
+            onChangeCorporateName={handeCorporateName}
+            uploadFile={handleFile}
+            corporateName={corporateName}
+            onClick={() => importFECFile(file)}
+          ></ImportForm>
+        )}
+
+        {view == 1 && (
+          <FECImport FECData={importedData} onClick={() => setView(2)} />
+        )}
+
+        {view == 2 && (
+          <MappedAccounts
+            onClick={() => loadFECData(importedData)}
+            meta={importedData.meta}
+          />
+        )}
+        {view == 3 && <FinancialDatas {...props} />}
       </section>
     </Container>
   );
@@ -135,7 +139,6 @@ function ImportSection(props) {
       setErrorMessage(error);
     } // show error (file)
   }
-
 
   async function loadFECData(importedData) {
     let nextFinancialData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
@@ -178,6 +181,18 @@ function ImportSection(props) {
 
       setView(3);
     }
+  }
+
+  // Send Errors
+
+  async function sendErrorReport(errors) {
+    const res = await sendReportToSupport(errors);
+
+    res.status < 300
+      ? setErrorMail("✔ Le rapport d'erreur a bien été envoyé.")
+      : setErrorMail(
+          "✖ Echec lors de l'envoi du rapport d'erreur. Si le problème persiste, veuillez contacter le support."
+        );
   }
 }
 
