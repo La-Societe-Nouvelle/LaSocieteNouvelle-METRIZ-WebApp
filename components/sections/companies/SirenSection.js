@@ -86,7 +86,9 @@ export class SirenSection extends React.Component {
 
         if (this.state.companies.filter((company) => company.status == 200).length == this.state.companies.length
         ) {
-            buttonNextStep = <button
+            buttonNextStep = 
+            
+            <button
                 className={"btn btn-secondary"}
                 id="validation-button"
                 onClick={this.props.submit}
@@ -343,6 +345,7 @@ export class SirenSection extends React.Component {
 
         this.setState({ file });
         let extension = file.name.split(".").pop();
+    
         switch (extension) {
             case "csv":
                 this.importCSVFile(file);
@@ -357,7 +360,9 @@ export class SirenSection extends React.Component {
     importCSVFile = (file) => {
         let reader = new FileReader();
         reader.onload = async () => {
-            let CSVData = await CSVFileReader(reader.result);
+
+            let CSVData = await CSVFileReader(reader.result); 
+
             let companiesIds = await processCSVCompaniesData(CSVData);
             await Promise.all(
                 Object.entries(companiesIds).map(async ([corporateName, corporateId]) =>
@@ -381,7 +386,7 @@ export class SirenSection extends React.Component {
     importXLSXFile = (file) => {
         let reader = new FileReader();
         reader.onload = async () => {
-            let XLSXData = XLSXFileReader(reader.result);
+            let XLSXData = await XLSXFileReader(reader.result);
             await Promise.all(
                 XLSXData.map(async ({ denomination, siren }) =>
                     this.props.session.financialData.updateCorporateId(
