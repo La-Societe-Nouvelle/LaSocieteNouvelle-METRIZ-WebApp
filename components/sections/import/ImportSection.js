@@ -17,13 +17,13 @@ import MappedAccounts from "./MappedAccounts";
 import { FinancialDatas } from "./FinancialDatas";
 // Readers
 import { FECFileReader, FECDataReader } from "/src/readers/FECReader";
-import { FECImport } from "./ANouveaux";
 
 // Objects
 import { FinancialData } from "/src/FinancialData";
 
 // Mail Report Error
 import { sendReportToSupport } from "../../../pages/api/mail-api";
+import { FECImport } from "./FECImport";
 
 function ImportSection(props) {
   //STATE
