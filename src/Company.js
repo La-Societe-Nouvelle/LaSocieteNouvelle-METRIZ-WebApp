@@ -43,7 +43,7 @@ export class Company {
     this.state = state || "default";                                    // "" | "siren" | "default"
     this.footprint = new SocialFootprint(footprint);
     this.footprintId = footprintId || this.getDefaultFootprintId();
-    this.footprintAreaCode = footprintAreaCode || "WLD";                // code géographique (valeurs par défaut)
+    this.footprintAreaCode = footprintAreaCode || "FRA";                // code géographique (valeurs par défaut)
     this.footprintActivityCode = footprintActivityCode || "00";         // code d'activité (valeurs par défaut)
     
     // Updates

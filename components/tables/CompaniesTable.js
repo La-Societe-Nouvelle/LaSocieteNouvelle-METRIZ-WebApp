@@ -191,7 +191,7 @@ class RowTableCompanies extends React.Component {
           ? props.state == "siren"
             ? props.legalUnitAreaCode
             : props.footprintAreaCode
-          : "WLD",
+          : "FRA",
       activityCode:
         props.state != ""
           ? props.state == "siren"
@@ -213,7 +213,7 @@ class RowTableCompanies extends React.Component {
             ? this.props.state == "siren"
               ? this.props.legalUnitAreaCode
               : this.props.footprintAreaCode
-            : "WLD",
+            : "FRA",
         activityCode:
           this.props.state != ""
             ? this.props.state == "siren"
@@ -271,7 +271,7 @@ class RowTableCompanies extends React.Component {
                 ? "valid"
                 : ""
             }
-            value={areaCode || "WLD"}
+            value={areaCode || "FRA"}
             onChange={this.onAreaCodeChange}
           >
             {Object.entries(areas)
