@@ -29,7 +29,9 @@ const ImportForm = (props) => {
     if (
       props.corporateName != "" &&
       errorFile == false &&
-      acceptedFileItems.length > 0
+      acceptedFileItems.length > 0 
+      ||
+      props.isDataImported
     ) {
       setDisabled(false);
     } else {
@@ -132,7 +134,9 @@ const ImportForm = (props) => {
             verticale, encodage ISO 8859-15, etc.).
           </p>
         </FormGroup>
+ 
         <div className="text-end">
+  
           <Button
             variant="secondary"
             disabled={disabled}

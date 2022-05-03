@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Icons
 import {
@@ -37,6 +37,7 @@ function ImportSection(props) {
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
+  const [isImported, setIsImported]= useState(false);
 
   function handeCorporateName(corporateName) {
     props.session.legalUnit.corporateName = corporateName;
@@ -49,7 +50,16 @@ function ImportSection(props) {
     setFile(file);
   }
 
-  return (
+  useEffect(() => {
+    if(importedData) {
+      setIsImported(true);
+    } 
+    else{
+      setIsImported(false);
+    }
+  });
+
+   return (
     <Container fluid>
       <section className="step">
         {errorFile && (
@@ -64,7 +74,7 @@ function ImportSection(props) {
               </div>
             </div>
             <div>
-              {errors.length > 0 && (
+         {errors.length > 0 && (
                 <>
                   <button
                     className="btn btn-secondary mb-2"
@@ -96,6 +106,8 @@ function ImportSection(props) {
             uploadFile={handleFile}
             corporateName={corporateName}
             onClick={() => importFECFile(file)}
+            isDataImported = {isImported}
+            nextStep={() => setView(2)}
           ></ImportForm>
         )}
 
