@@ -4,8 +4,13 @@
 import React from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight, faWarning, faSync, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
-
+import {
+  faChevronRight,
+  faWarning,
+  faSync,
+  faCheckCircle,
+  faChevronLeft,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Components
 import { CompaniesTable } from "../../tables/CompaniesTable";
@@ -33,39 +38,40 @@ export class SectorSection extends React.Component {
       fetching: false,
       files: [],
       progression: 0,
-      companyStep: props.companyStep
+      companyStep: props.companyStep,
     };
-
-
   }
 
   handleChange = (event) => {
-
     let view = event.target.value;
-    console.log(view);
     switch (view) {
       case "aux":
         return this.setState({
-          companiesShowed: this.state.companies.filter((company) => !company.isDefaultAccount),
+          companiesShowed: this.state.companies.filter(
+            (company) => !company.isDefaultAccount
+          ),
           view: view,
         });
       case "expenses":
         return this.setState({
-          companiesShowed: this.state.companies.filter((company) => company.isDefaultAccount),
-          view: view,
-        });
-        case "significative":
-
-        return this.setState({
-          companiesShowed: this.state.significativeCompanies.filter(
-            (company) => company.footprintActivityCode == "00" 
+          companiesShowed: this.state.companies.filter(
+            (company) => company.isDefaultAccount
           ),
           view: view,
-        });      
+        });
+      case "significative":
+        return this.setState({
+          companiesShowed: this.state.significativeCompanies.filter(
+            (company) => company.footprintActivityCode == "00"
+          ),
+          view: view,
+        });
       case "defaultActivity":
         return this.setState({
           companiesShowed: this.state.companies.filter(
-            (company) => company.footprintActivityCode == "00" || company.footprintActivityCode == "TOTAL"
+            (company) =>
+              company.footprintActivityCode == "00" ||
+              company.footprintActivityCode == "TOTAL"
           ),
           view: view,
         });
@@ -75,7 +81,6 @@ export class SectorSection extends React.Component {
           view: view,
         });
     }
-
   };
 
   render() {
@@ -86,71 +91,70 @@ export class SectorSection extends React.Component {
       nbItems,
       fetching,
       progression,
-      companiesShowed
+      companiesShowed,
     } = this.state;
 
     const financialData = this.props.session.financialData;
     const isNextStepAvailable = nextStepAvailable(this.state);
-
+    const setCompanyStep = this.props.setCompanyStep;
 
     return (
-      <Container fluid id="sector-section"> 
+      <Container fluid id="sector-section">
         <section className="step">
-
-          <div className="section-title">
+          <div className="section-title mb-3">
             <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
-            
             <h3 className="subtitle underline">
-              2. Synchronisation des données grâce au secteur d'activité
+              Synchronisation des données grâce au secteur d'activité
             </h3>
-
           </div>
 
-          <div className="step">
-
-
+          <div className="step 3">
             {companies.length > 0 && (
               <>
                 <div className="table-container">
                   <div className="table-data table-company">
-                    {
-                      isNextStepAvailable ?
-                        <div className="alert alert-success">
-                          <p>
-                            <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes ont bien été synchronisés.
-                          </p>
-                        </div>
-                        :
-                        <div className="alert alert-warning">
-                          <p>
-                            <FontAwesomeIcon icon={faWarning} />   Les empreintes de certains comptes doivent être synchronisées.
-                          </p>
-                        </div>
-
-                    }
-                    {
-                      console.log(significativeCompanies)
-                    }
-                    {significativeCompanies.filter((company) => company.footprintActivityCode == "00").length > 0 ?
+                    {isNextStepAvailable ? (
+                      <div className="alert alert-success">
+                        <p>
+                          <FontAwesomeIcon icon={faCheckCircle} /> Tous les
+                          comptes ont bien été synchronisés.
+                        </p>
+                      </div>
+                    ) : (
                       <div className="alert alert-warning">
                         <p>
-                          <FontAwesomeIcon icon={faWarning} /> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.
+                          <FontAwesomeIcon icon={faWarning} /> Les empreintes de
+                          certains comptes doivent être synchronisées.
+                        </p>
+                      </div>
+                    )}
+                    {console.log(significativeCompanies)}
+                    {significativeCompanies.filter(
+                      (company) => company.footprintActivityCode == "00"
+                    ).length > 0 ? (
+                      <div className="alert alert-warning">
+                        <p>
+                          <FontAwesomeIcon icon={faWarning} /> Grand risque
+                          d'imprécision pour les comptes significatifs qui ne
+                          sont pas reliés à un secteur d'activité.
                         </p>
                         <button
                           onClick={this.handleChange}
                           value="significative"
                           className={"btn btn-warning"}
                         >
-                          Afficher les comptes significatifs sans secteur
-                          ({significativeCompanies.filter((company) => company.footprintActivityCode == "00").length}/{significativeCompanies.length})
+                          Afficher les comptes significatifs sans secteur (
+                          {
+                            significativeCompanies.filter(
+                              (company) => company.footprintActivityCode == "00"
+                            ).length
+                          }
+                          /{significativeCompanies.length})
                         </button>
                       </div>
-                      :
+                    ) : (
                       ""
-                    }
-                    {
-                      console.log(companiesShowed)
-                    }
+                    )}
 
                     <button
                       onClick={() => this.synchroniseCompanies()}
@@ -159,15 +163,17 @@ export class SectorSection extends React.Component {
                       <FontAwesomeIcon icon={faSync} /> Synchroniser les données
                     </button>
                     <div className="pagination">
-
                       <div className="form-group">
                         <select
                           value={view}
                           onChange={this.handleChange}
                           className="form-input"
                         >
-                          <option key="1" value="
-                          ">
+                          <option
+                            key="1"
+                            value="
+                          "
+                          >
                             Tous les comptes (sans siren)
                           </option>
                           <option key="2" value="aux">
@@ -183,8 +189,7 @@ export class SectorSection extends React.Component {
                             </option>
                           )}
                           <option key="6" value="defaultActivity">
-                            Comptes tiers non rattachés à un secteur
-                            d'activités
+                            Comptes tiers non rattachés à un secteur d'activités
                           </option>
                         </select>
                       </div>
@@ -231,7 +236,14 @@ export class SectorSection extends React.Component {
               </div>
             )}
           </div>
-              <div className="text-end">
+          <div className="text-end">
+            <button
+              onClick={() => setCompanyStep(1)}
+              className={"btn btn-primary me-2"}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="me-1" />
+              Numéros de Siren
+            </button>
             <button
               className={"btn btn-secondary"}
               id="validation-button"
@@ -242,9 +254,8 @@ export class SectorSection extends React.Component {
               <FontAwesomeIcon icon={faChevronRight} />
             </button>
           </div>
-          </section> 
+        </section>
       </Container>
-
     );
   }
 
@@ -259,29 +270,35 @@ export class SectorSection extends React.Component {
     this.setState({ companies: this.props.companies });
   };
 
-
   /* ---------- FETCHING DATA ---------- */
 
   synchroniseCompanies = async () => {
-
     let companiesToSynchronise = this.state.companies;
-    let significativeCompanies = getSignificativeCompanies(this.props.session.financialData);
+    let significativeCompanies = getSignificativeCompanies(
+      this.props.session.financialData
+    );
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
     let i = 0;
     let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise) {
-    await company.updateFromRemote()
+      await company.updateFromRemote();
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
 
-    // check if companies is a significative companies 
-    let result = companiesToSynchronise.filter(o1 => significativeCompanies.some(o2 => o1.account === o2.account));
-
+    // check if companies is a significative companies
+    let result = companiesToSynchronise.filter((o1) =>
+      significativeCompanies.some((o2) => o1.account === o2.account)
+    );
 
     // update state
-    this.setState({ fetching: false, progression: 0, significativeCompanies: result, companyStep: 3 });
+    this.setState({
+      fetching: false,
+      progression: 0,
+      significativeCompanies: result,
+      companyStep: 3,
+    });
     // update session
     this.props.session.updateFootprints();
   };
@@ -290,8 +307,7 @@ export class SectorSection extends React.Component {
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
 const nextStepAvailable = ({ companies }) =>
-// condition : data fetched for all companies (or no company with data unfetched)
-{
-  return !(companies.filter((company) => company.status != 200).length > 0);
-};
-
+  // condition : data fetched for all companies (or no company with data unfetched)
+  {
+    return !(companies.filter((company) => company.status != 200).length > 0);
+  };

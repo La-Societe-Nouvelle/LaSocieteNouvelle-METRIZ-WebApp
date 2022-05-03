@@ -49,7 +49,7 @@ export class CompaniesSection extends React.Component {
 
    if (companyStep == 2 ) {
       return (
-        <SectorSection {...this.props} financialData={financialData} companies={defaultCompanies} companyStep={companyStep} />
+        <SectorSection {...this.props} financialData={financialData} companies={defaultCompanies} companyStep={companyStep} setCompanyStep={this.setCompanyStep} />
 
       )
     }

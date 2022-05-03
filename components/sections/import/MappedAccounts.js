@@ -1,3 +1,5 @@
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
@@ -65,9 +67,9 @@ function MappedAccounts(props) {
   return (
     <div>
       <h3 className="subtitle underline">
-        Associations des comptes d'amortissements et de dépréciations
+        Associez les comptes d'amortissements et de dépréciations
       </h3>
-      <Table size="lg" bordered hover>
+      <Table size="lg" bordered hover className="mt-3">
         <thead>
           <tr>
             <th>Numéro de compte</th>
@@ -97,12 +99,20 @@ function MappedAccounts(props) {
       </Table>
 
       <div className="text-end">
+      <button
+          className="btn btn-primary me-2"
+          onClick={() => props.return()}
+        >
+          <FontAwesomeIcon icon={faChevronLeft} className="me-1"/>
+          Retour aux A-Nouveaux
+        </button>
         <button
           className="btn btn-secondary"
           disabled={isDisabled}
           onClick={() => props.onClick()}
         >
-          Valider
+          Valider mes données
+          <FontAwesomeIcon icon={faChevronRight} />
         </button>
       </div>
     </div>

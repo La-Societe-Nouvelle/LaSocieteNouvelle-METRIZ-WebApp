@@ -122,7 +122,7 @@ export class InitialStatesSection extends React.Component {
                 )}
                 {financialData.immobilisations.concat(financialData.stocks).length >
                   0 && (
-                    <div className="table-data">
+                    <div className="table-data mt-2">
                       <InitialStatesTable
                         financialData={financialData}
                         accountsShowed={accountsShowed}
@@ -150,7 +150,7 @@ export class InitialStatesSection extends React.Component {
               </>
                 :
                 <>
-                  <p className="small-text">
+                  <p className="small-text mb-2">
                     L'ajout de la sauvegarde de l'analyse sur l'exercice précédent permet d'assurer
                     une continuité vis-à-vis de l'exercice en cours. La sauvegarde contient les
                     valeurs des indicateurs associés aux comptes de stocks, d'immobilisations et d'amortissements
@@ -159,7 +159,6 @@ export class InitialStatesSection extends React.Component {
                   <label>
                     Importer votre fichier de sauvegarde (.json)
                   </label>
-
                   <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false} >
                     {({ getRootProps, getInputProps }) => (
                       <div className="dropzone-section">

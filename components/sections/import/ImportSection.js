@@ -100,16 +100,17 @@ function ImportSection(props) {
         )}
 
         {view == 1 && (
-          <FECImport FECData={importedData} onClick={() => setView(2)} />
+          <FECImport  return={() => setView(0)}  FECData={importedData} onClick={() => setView(2)} />
         )}
 
         {view == 2 && (
           <MappedAccounts
+            return={() => setView(1)}
             onClick={() => loadFECData(importedData)}
             meta={importedData.meta}
           />
         )}
-        {view == 3 && <FinancialDatas {...props} />}
+        {view == 3 && <FinancialDatas {...props}   return={() => setView(2)} />}
       </section>
     </Container>
   );

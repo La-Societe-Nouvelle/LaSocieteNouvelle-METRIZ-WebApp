@@ -98,11 +98,14 @@
 	  .subtitle
 	  {
 		  color : $secondary; 
-		  margin-bottom: 1em;
+		  margin-bottom: 0.5px;
+		  z-index: 0;
 		  &.underline::after{
-			height: 8px;
-			width: 5em;
-			  background-color: #f3f3f3; 
+			bottom: 0.2rem;
+			left : 0;
+			height: 6px;
+			width: 4em;
+			  background-color: lighten($secondary, 25%); 
 		  }
 	  }
 
