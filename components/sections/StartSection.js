@@ -1,10 +1,9 @@
 // La Société Nouvelle
 
 // React
-import { faBook, faFile } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import React from "react";
-import { Button, Col, Container, Image, NavLink, Row } from "react-bootstrap";
+import { Button, Col, Container, Image, Row } from "react-bootstrap";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
