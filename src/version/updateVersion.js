@@ -10,13 +10,21 @@ export const updateVersion = (sessionData) =>
 {
   switch(sessionData.version)
   {
-    case "1.0.2": break;
-
+    case "1.0.3" : break;
+    case "1.0.2": updater_1_0_2(sessionData);
     case "1.0.0": updater_1_0_0(sessionData);
     case "1.0.1": updater_1_0_1(sessionData); break;
     
     default : updater_1_0_0(sessionData);
   }
+}
+const updater_1_0_2 = (sessionData) => 
+{
+  // update progression according to current number of steps 
+  if(sessionData.progression > 1){
+    sessionData.progression = sessionData.progression - 1;
+  }
+
 }
 
 const updater_1_0_0 = (sessionData) =>
