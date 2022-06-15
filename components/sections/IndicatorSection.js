@@ -331,7 +331,7 @@ export class IndicatorSection extends React.Component {
                 className={"btn btn-primary"}
                 disabled={this.props.session.validations.includes(this.state.indic) ? false : true}
                 onClick={() =>
-                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision, '#Production', '#Consumption', '#Value')
+                  exportIndicPDF(this.state.indic, this.props.session, this.state.comparativeDivision, '#Production', '#Consumption', '#Value', '#PieChart')
                 }
               >
                 <FontAwesomeIcon icon={faEye} /> Visualiser (.pdf)

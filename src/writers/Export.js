@@ -77,8 +77,7 @@ function exportIndicDataDepreciationsCSV(indic, session) {
 }
 
 
-
-function generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas) {
+function generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas, idPieChart) {
 
   const doc = new jsPDF('p', 'mm', 'a4', true);
   const { financialData, legalUnit } = session;
@@ -358,6 +357,20 @@ function generatePDF(indic, session, comparativeDivision, idProductionCanvas, id
   doc.addImage(canvasValueImg, 'PNG', x, y, pdfWidth, pdfVHeight);
   doc.setProperties({ title: "rapport_" + legalUnit.corporateName.replaceAll(" ", "") + "-" + indic.toUpperCase() })
 
+  y += 70;
+  doc.setFontSize(12);
+  doc.setFont("Helvetica", "bold");
+  doc.setTextColor(25, 21, 88);
+  doc.text("REPARTITION DES IMPACTS BRUTS", x, y);
+
+  y += 10;
+
+    //Pie canvas
+    let canvasPie = document.querySelector(idPieChart);
+    let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
+    const imgPieProps = doc.getImageProperties(canvasPieImg);
+console.log(imgPieProps);   
+    doc.addImage(canvasPieImg, 'JPEG', x, y, 80, 80, 'NONE');
   return doc;
 }
 
@@ -778,10 +791,10 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   return doc;
 }
 
-function exportIndicPDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas) {
+function exportIndicPDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas, idPieChart) {
 
   // PDF Export
-  let doc = generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas);
+  let doc = generatePDF(indic, session, comparativeDivision, idProductionCanvas, idConsumptionCanvas, idValueCanvas, idPieChart);
 
   window.open(doc.output("bloburl"), "_blank");
   
