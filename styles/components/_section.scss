@@ -150,21 +150,15 @@ section {
 
 .analysis-container {
   display: flex;
+  align-items: center;
 
-  div {
-    flex: 1 1;
-  }
 
   p {
     margin-bottom: 0.5rem;
+    font-size: 0.8rem;
   }
 
-  img {
-    max-height: 300px;
-    display: block;
-    text-align: right;
-    margin: 0 auto;
-  }
+ 
 }
 
 .download-section {

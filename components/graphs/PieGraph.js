@@ -3,7 +3,7 @@ import React from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
-import { Doughnut, Pie } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 
 function PieGraph(props) {
   let intermediateConsumption = parseFloat(props.intermediateConsumption);
@@ -15,7 +15,6 @@ function PieGraph(props) {
   intermediateConsumption = (intermediateConsumption / total) * 100;
   capitalConsumption = (capitalConsumption / total) * 100;
   netValueAdded = (netValueAdded / total) * 100;
-
 
   const data = {
     labels: [
@@ -31,15 +30,15 @@ function PieGraph(props) {
           netValueAdded.toFixed(1),
         ],
         datalabels: {
-            color: '#FFF',
-            labels: {
-              title: {
-                font: {
-                  weight: 'bold'
-                }
+          color: "#FFF",
+          labels: {
+            title: {
+              font: {
+                weight: "bold",
               },
-            }
+            },
           },
+        },
         backgroundColor: [
           "RGB(251, 122, 127)",
           "RGB(219, 222, 241)",
@@ -52,20 +51,21 @@ function PieGraph(props) {
   const options = {
     responsive: true,
     plugins: {
-        legend: {
-            position : "bottom",
-            labels: {
-                boxWidth : 10,
-                font: {
-                    size:14
-                }
-            }
-        }
-      }
+      legend: {
+        position: "top",
+        labels: {
+          boxWidth: 10,
+          font: {
+            size: 10,
+          },
+        },
+      },
+    },
   };
 
-
-  return <Pie id="PieChart" data={data} options={options} />;
+  return (
+    <Pie id={props.id ? props.id : "piechart"} data={data} options={options} />
+  );
 }
 
 export default PieGraph;
