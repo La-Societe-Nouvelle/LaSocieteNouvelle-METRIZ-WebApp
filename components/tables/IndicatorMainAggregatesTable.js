@@ -372,24 +372,15 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           </h4>
           <div className="piechart-container">
             <PieGraph
-              intermediateConsumption={printValue(
-                intermediateConsumption.footprint.indicators[
+              intermediateConsumption={intermediateConsumption.footprint.indicators[
                   indic
-                ].getGrossImpact(intermediateConsumption.amount),
-                nbDecimals
-              )}
-              capitalConsumption={printValue(
-                intermediateConsumption.footprint.indicators[
+                ].getGrossImpact(intermediateConsumption.amount)}
+              capitalConsumption={capitalConsumption.footprint.indicators[
                   indic
-                ].getGrossImpact(intermediateConsumption.amount),
-                nbDecimals
-              )}
-              netValueAdded={printValue(
-                netValueAdded.footprint.indicators[indic].getGrossImpact(
+                ].getGrossImpact(capitalConsumption.amount)}
+              netValueAdded={netValueAdded.footprint.indicators[indic].getGrossImpact(
                   netValueAdded.amount
-                ),
-                nbDecimals
-              )}
+                )}
             />
           </div>
         </>

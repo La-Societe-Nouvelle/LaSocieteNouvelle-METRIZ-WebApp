@@ -8,7 +8,7 @@ import { Pie } from "react-chartjs-2";
 function PieGraph(props) {
   let intermediateConsumption = parseFloat(props.intermediateConsumption);
   let capitalConsumption = parseFloat(props.capitalConsumption);
-  let netValueAdded = Number(props.netValueAdded.replace(/\s/g, ""));
+  let netValueAdded = parseFloat(props.netValueAdded);
 
   let total = intermediateConsumption + capitalConsumption + netValueAdded;
 
