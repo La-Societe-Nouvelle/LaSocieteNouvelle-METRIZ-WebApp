@@ -18,7 +18,6 @@ import {
   faFilePdf,
   faBook,
   faCheck,
-  faShare,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
 // Objects
@@ -71,6 +70,7 @@ import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWr
 import LoadingSpinner from "../LoadingSpinner";
 import { GraphsPDF } from "../graphs/GraphsPDF";
 import { Container, FormSelect, Image } from "react-bootstrap";
+import PieGraph from "../graphs/PieGraph";
 
 /* ----------------------------------------------------------- */
 /* -------------------- INDICATOR SECTION -------------------- */
@@ -136,6 +136,21 @@ export class IndicatorSection extends React.Component {
       isLoading,
       graphPdf,
     } = this.state;
+
+    const printGrossImpact = [
+      "ghg",
+      "haz",
+      "mat",
+      "nrg",
+      "was",
+      "wat",
+    ].includes(indic);
+
+    const {
+      intermediateConsumption,
+      capitalConsumption,
+      netValueAdded,
+    } = this.props.session.financialData.aggregates;
 
     const isPublicationAvailable =
       Object.entries(
@@ -299,6 +314,25 @@ export class IndicatorSection extends React.Component {
                   {this.buildtable(selectedTable)}
                 </div>
               </div>
+              {printGrossImpact && (
+                <div className="step">
+                  <h4 className="my-4">Répartition des impacts bruts (en %)</h4>
+                  <div className="piechart-container">
+                    <PieGraph
+                      intermediateConsumption={intermediateConsumption.footprint.indicators[
+                        indic
+                      ].getGrossImpact(intermediateConsumption.amount)}
+                      capitalConsumption={capitalConsumption.footprint.indicators[
+                        indic
+                      ].getGrossImpact(capitalConsumption.amount)}
+                      netValueAdded={netValueAdded.footprint.indicators[
+                        indic
+                      ].getGrossImpact(netValueAdded.amount)}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="compare-section step">
                 <h4>Comparaison</h4>
                 <div className="container">
@@ -399,31 +433,13 @@ export class IndicatorSection extends React.Component {
 
                 <ul>
                   {this.props.session.validations.map((indic, index) => (
-                    <li key={index}>
-                      <FontAwesomeIcon icon={faCheck} /> Indicateur :{" "}
-                      {metaIndics[indic].libelle}
+                    <li key={index}><FontAwesomeIcon icon={faCheck} /> Indicateur : {metaIndics[indic].libelle}
                     </li>
                   ))}
-                  <li>
-                    {" "}
-                    <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte
-                    environnementale
-                  </li>
-                  <li>
-                    {" "}
-                    <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte
-                    économique et sociale
-                  </li>
-                  <li>
-                    {" "}
-                    <FontAwesomeIcon icon={faCheck} /> Rapport général sur
-                    l'empreinte sociétale
-                  </li>
-                  <li>
-                    {" "}
-                    <FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de
-                    la session
-                  </li>
+                  <li><FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte environnementale</li>
+                  <li><FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte économique et sociale</li>
+                  <li><FontAwesomeIcon icon={faCheck} /> Rapport général sur l'empreinte sociétale </li>
+                  <li><FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de la session</li>
                 </ul>
               </div>
               <button

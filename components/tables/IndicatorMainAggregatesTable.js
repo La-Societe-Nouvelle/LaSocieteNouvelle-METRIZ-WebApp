@@ -6,7 +6,6 @@ import { printValue } from "/src/utils/Utils";
 // Libraries
 import metaIndics from "/lib/indics";
 import { Table } from "react-bootstrap";
-import PieGraph from "../graphs/PieGraph";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
@@ -365,26 +364,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           </tr>
         </tbody>
       </Table>
-      {printGrossImpact && (
-        <>
-          <h4 className="my-4">
-            Graphique sur la répartition des impacts bruts (en %)
-          </h4>
-          <div className="piechart-container">
-            <PieGraph
-              intermediateConsumption={intermediateConsumption.footprint.indicators[
-                  indic
-                ].getGrossImpact(intermediateConsumption.amount)}
-              capitalConsumption={capitalConsumption.footprint.indicators[
-                  indic
-                ].getGrossImpact(capitalConsumption.amount)}
-              netValueAdded={netValueAdded.footprint.indicators[indic].getGrossImpact(
-                  netValueAdded.amount
-                )}
-            />
-          </div>
-        </>
-      )}
+
     </>
   );
 };

@@ -64,7 +64,7 @@ function PieGraph(props) {
   };
 
   return (
-    <Pie id={props.id ? props.id : "piechart"} data={data} options={options} />
+    <Pie id={props.id ? props.id : "PieChart"} data={data} options={options} />
   );
 }
 
