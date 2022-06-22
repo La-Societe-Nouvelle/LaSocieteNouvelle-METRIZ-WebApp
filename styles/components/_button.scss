@@ -1,15 +1,24 @@
-.btn {
-  font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.03rem;
-  padding: 0.8rem 1.5rem;
-}
+// .btn {
+//   font-weight: 600;
+//   font-size: 0.9rem;
+//   letter-spacing: 0.03rem;
+//   padding: 0.8rem 1.5rem;
+// }
 .btn-secondary {
   color : #fff;
-  background-color: darken($secondary, 5%);  
+
   &:hover {
     color : #fff;
     background-color: $secondary;
+  }
+}
+.btn-statement {
+  padding: 0.5rem;
+  background-color: #fbfbff;
+  border : 1px solid $primary;
+  svg {
+    height: 10px;
+    margin: 0;
   }
 }
 .download {
@@ -53,4 +62,10 @@ button:hover {
   &:hover {
     color: #ffffff;
   }
+}
+
+.btn-primary:disabled, .btn-primary.disabled {
+  color: $primary;
+  background-color: $light;
+  border-color: $light;
 }

@@ -13,6 +13,7 @@ import { StartSection } from '/components/sections/StartSection';
 import ImportSection from '../components/sections/import/ImportSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { CompaniesSection } from '/components/sections/companies/CompaniesSection';
+import  AssesmentSection  from '../components/sections/assements/AssesmentSection';
 import { IndicatorSection } from '/components/sections/IndicatorSection';
 import { StatementSection } from '/components/sections/StatementSection';
 
@@ -165,8 +166,9 @@ class Metriz extends React.Component {
       case 1: return (<ImportSection {...sectionProps} />)
       case 2: return (<InitialStatesSection {...sectionProps} />)
       case 3: return (<CompaniesSection {...sectionProps} />)
-      case 4: return (<IndicatorSection {...sectionProps} publish={() => this.setStep(5)} />)
+      case 4: return (<AssesmentSection {...sectionProps} publish={() => this.setStep(5)} />)
       case 5: return (<StatementSection {...sectionProps} return={() => this.setStep(4)} />)
+
 
     }
   }

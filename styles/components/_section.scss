@@ -78,18 +78,41 @@ section {
 /* Indicator Section*/
 .indicator-section {
 
+  .card {
+    margin-bottom: 5px;
+    border: none;
+}
+  .card-header {
+    padding: 0.75rem 1rem;
+    background-color: #fff;
+    border: 1px solid  darken(#fbfbff, 5%);
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-radius 0.15s ease;
+
+  }
+  .card-body {
+    background-color: #fbfbff;
+    border-left : 1px solid darken(#fbfbff, 5%);
+    border-right : 1px solid darken(#fbfbff, 5%);
+    border-bottom : 1px solid darken(#fbfbff, 5%);
+
+
+  }
   .btn {
     margin-right: 1rem;
   }
-
+  .icon-success {
+    color: #0c9;
+    margin-right: 0.3rem;
+  }
   .step {
     padding: 2rem;
     margin: 1rem 0;
   }
 
   h3 {
-    color: $secondary;
-    font-size: 1.6rem;
+    font-size: 1.2rem;
+    color :#5262bc;
+    margin : 1.5rem 0;
   }
 
   h4 {
