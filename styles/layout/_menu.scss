@@ -1,17 +1,19 @@
 
 /* Menu */
 
-
-ul.nav {
-  padding: 0;
-  list-style: none;
-  li {
-    display: inline-block;
-    line-height: 1;
-    padding: 0 0 0 1em;
-    margin: 0 0 0 1em;
+header{
+  ul.nav {
+    padding: 0;
+    list-style: none;
+    li {
+      display: inline-block;
+      line-height: 1;
+      padding: 0 0 0 1em;
+      margin: 0 0 0 1em;
+    }
   }
 }
+
 .top-bar {
   background-color: #343a40;
   display: flex;

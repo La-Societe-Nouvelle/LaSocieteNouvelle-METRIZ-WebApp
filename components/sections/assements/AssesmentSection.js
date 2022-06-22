@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Container,
-  FormSelect,
   Accordion,
   useAccordionButton,
   Card,
-  Button,
+  AccordionContext,
+  Modal,
+  Image,
 } from "react-bootstrap";
 
 // Libraries
 import metaIndics from "/lib/indics";
-import divisions from "/lib/divisions";
+
 import {
   StatementART,
   StatementDIS,
@@ -27,25 +28,47 @@ import {
 } from "./indics";
 
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
+import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
+import ResultSection from "./ResultSection";
 
-export default function AssesmentSection(props) {
+
+const AssesmentSection = (props) => {
+
+
+  const [view,setView] = useState("statement");
+  const [indic, setIndic] = useState();
+
+  const handleView = indic => {
+    console.log(indic);
+    setIndic(indic); 
+    setView("result");
+  } 
+
+
+  
+
   return (
     <Container fluid className="indicator-section">
       <section className="step">
-        <div className="section-title">
-          <h2>
-            <i className="bi bi-rulers"></i> &Eacute;tape 4 - Déclaration des impacts
-          </h2>
-          <p>
-            Pour chaque indicateur, déclarez vos impacts directs et obtenez les
-            éléments d'analyse.
-          </p>
-
-          <Indicators
-            impactsData={props.session.impactsData}
-            session={props.session}
-          />
-        </div>
+        {view == "statement" ? (
+          <>
+            <h2>
+              <i className="bi bi-rulers"></i> &Eacute;tape 4 - Déclaration des
+              impacts
+            </h2>
+            <p>
+              Pour chaque indicateur, déclarez vos impacts directs et obtenez
+              les éléments d'analyse.
+            </p>
+            <Indicators
+              impactsData={props.session.impactsData}
+              session={props.session}
+              viewResult={handleView}
+            />
+          </>
+        ) : (
+        <ResultSection session={props.session} indic={indic} />
+        )}
       </section>
     </Container>
   );
@@ -53,12 +76,12 @@ export default function AssesmentSection(props) {
 
 const Indicators = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
-  const [popUp, displayPopup] = useState();
+  const [popUp, setPopUp] = useState();
 
   useEffect(() => {
-    console.log(validations);
-    console.log("changed");
-  }, [validations]); /* ----- CHANGE/VALIDATION HANDLER ----- */
+  }, [validations]);
+  
+  /* ----- CHANGE/VALIDATION HANDLER ----- */
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
@@ -81,8 +104,7 @@ const Indicators = (props) => {
   };
 
   const validateIndicator = async (indic) => {
-    console.log(indic);
-    console.log(validations);
+
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
@@ -95,32 +117,33 @@ const Indicators = (props) => {
   };
 
   /* ----- POP-UP ----- */
+
   const triggerPopup = (indic) => {
-    console.log(indic);
-    displayPopup(indic);
+    setPopUp(indic);
   };
+
+  const handleClose = () => setPopUp("");
 
   return (
     <>
       <h3> Création de la valeur</h3>
 
       <Accordion>
+        {/* --------------------------- ECO ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("eco") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["eco"].libelle}
+                <ArrowToggle eventKey="eco">
+                  {metaIndics["eco"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="eco">
-                  <i className="bi bi-arrow-down"></i> Déclarer 
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("eco") ? false : true}
+                  onClick={()=>props.viewResult("eco")}
+                  
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -147,21 +170,17 @@ const Indicators = (props) => {
             </Card.Body>
           </Accordion.Collapse>
         </Card>
+        {/* --------------------------- ART ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("art") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["art"].libelle}
-                <span className="beta ms-1">BETA</span>
+                <ArrowToggle eventKey="art">
+                  {metaIndics["art"].libelle}
+                  <span className="beta ms-1">BETA</span>
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="art">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("art") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("art") ? false : true}
@@ -191,21 +210,16 @@ const Indicators = (props) => {
             </Card.Body>
           </Accordion.Collapse>
         </Card>
-
+        {/* --------------------------- SOC ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("soc") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["soc"].libelle}
+                <ArrowToggle eventKey="soc">
+                  {metaIndics["soc"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="soc">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("soc") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("soc") ? false : true}
@@ -240,21 +254,17 @@ const Indicators = (props) => {
       <h3>Empreinte sociale</h3>
 
       <Accordion>
+        {/* --------------------------- DIS ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("dis") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["dis"].libelle}{" "}
-                <span className="beta ms-1">BETA</span>
+                <ArrowToggle eventKey="dis">
+                  {metaIndics["dis"].libelle}{" "}
+                  <span className="beta ms-1">BETA</span>
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="dis">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("dis") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("dis") ? false : true}
@@ -267,45 +277,36 @@ const Indicators = (props) => {
           <Accordion.Collapse eventKey="dis">
             <Card.Body>
               <StatementDIS
-                indic={"dis"}
+                indic="dis"
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("dis")}
+                onValidate={() => validateIndicator("dis")}
                 toAssessment={() => triggerPopup("dis")}
               />
 
-              {popUp && popUp == "dis" && (
-                <div className="modal-overlay">
-                  <div className="modal-wrapper">
-                    <div className="modal">
-                      <AssessmentDIS
-                        indic={"dis"}
-                        impactsData={props.impactsData}
-                        onUpdate={willNetValueAddedIndicator.bind("dis")}
-                        onValidate={() => validateIndicator("dis")}
-                        onGoBack={() => triggerPopup("")}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+              <ModalAssesment
+                indic="dis"
+                impactsData={props.impactsData}
+                onUpdate={willNetValueAddedIndicator.bind("dis")}
+                onValidate={() => validateIndicator("dis")}
+                onGoBack={handleClose}
+                popUp={popUp}
+                handleClose={handleClose}
+                title="Données Sociales"
+              />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
+        {/* --------------------------- GEQ ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("geq") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["geq"].libelle}
+                <ArrowToggle eventKey="geq">
+                  {metaIndics["geq"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="geq">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("geq") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("geq") ? false : true}
@@ -318,29 +319,36 @@ const Indicators = (props) => {
           <Accordion.Collapse eventKey="geq">
             <Card.Body>
               <StatementGEQ
-                indic={"geq"}
+                indic="geq"
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("geq")}
+                onValidate={() => validateIndicator("geq")}
+                toAssessment={() => triggerPopup("geq")}
+              />
+
+              <ModalAssesment
+                indic="geq"
+                impactsData={props.impactsData}
+                onUpdate={willNetValueAddedIndicator.bind("geq")}
+                onValidate={() => validateIndicator("geq")}
+                onGoBack={handleClose}
+                popUp={popUp}
+                handleClose={handleClose}
+                title="Données Sociales"
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
-
+        {/* --------------------------- KNW ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("knw") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["knw"].libelle}
+                <ArrowToggle eventKey="knw">
+                  {metaIndics["knw"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="knw">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("knw") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("knw") ? false : true}
@@ -353,10 +361,21 @@ const Indicators = (props) => {
           <Accordion.Collapse eventKey="knw">
             <Card.Body>
               <StatementKNW
-                indic={"knw"}
+                indic="knw"
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("knw")}
+                onValidate={() => validateIndicator("knw")}
+                toAssessment={() => triggerPopup("knw")} 
+              />
+                <ModalAssesment
+                indic="knw"
+                impactsData={props.impactsData}
+                onUpdate={willNetValueAddedIndicator.bind("knw")}
+                onValidate={() => validateIndicator("knw")}
+                popUp={popUp}
+                onGoBack={handleClose}
+                handleClose={handleClose}
+                title="Outil de mesure"
               />
             </Card.Body>
           </Accordion.Collapse>
@@ -366,23 +385,20 @@ const Indicators = (props) => {
       <h3>Empreinte environnementale</h3>
 
       <Accordion>
+        {/* --------------------------- GHG ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("ghg") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["ghg"].libelle}
+                <ArrowToggle eventKey="ghg">
+                  {metaIndics["ghg"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="ghg">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("ghg") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("ghg") ? false : true}
+                  onClick={()=>props.viewResult("ghg")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -394,27 +410,22 @@ const Indicators = (props) => {
               <StatementGHG
                 indic={"ghg"}
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("ghg")}
+                onValidate={() => validateIndicator("ghg")}
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
-
+        {/* --------------------------- NRG ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("nrg") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["nrg"].libelle}
+                <ArrowToggle eventKey="nrg">
+                  {metaIndics["nrg"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="nrg">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("nrg") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("nrg") ? false : true}
@@ -429,27 +440,22 @@ const Indicators = (props) => {
               <StatementNRG
                 indic={"nrg"}
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("nrg")}
+                onValidate={() => validateIndicator("nrg")}
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
-
+        {/* --------------------------- WAT ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("wat") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["wat"].libelle}
+                <ArrowToggle eventKey="wat">
+                  {metaIndics["wat"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="wat">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("wat") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("wat") ? false : true}
@@ -464,28 +470,24 @@ const Indicators = (props) => {
               <StatementWAT
                 indic={"wat"}
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("wat")}
+                onValidate={() => validateIndicator("wat")}
               />
             </Card.Body>
           </Accordion.Collapse>
+          {/* --------------------------- SOC ------------------------------------------*/}
         </Card>
-
+        {/* --------------------------- MAT ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("mat") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["mat"].libelle}{" "}
-                <span className="beta ms-1">BETA</span>
+                <ArrowToggle eventKey="mat">
+                  {metaIndics["mat"].libelle}{" "}
+                  <span className="beta ms-1">BETA</span>
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="mat">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("mat") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("mat") ? false : true}
@@ -500,27 +502,22 @@ const Indicators = (props) => {
               <StatementMAT
                 indic={"mat"}
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("mat")}
+                onValidate={() => validateIndicator("mat")}
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
-
+        {/* --------------------------- WAS ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("was") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["was"].libelle}
+                <ArrowToggle eventKey="was">
+                  {metaIndics["was"].libelle}
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="was">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("was") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("was") ? false : true}
@@ -535,28 +532,23 @@ const Indicators = (props) => {
               <StatementWAS
                 indic={"was"}
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("was")}
+                onValidate={() => validateIndicator("was")}
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
-
+        {/* --------------------------- HAZ ------------------------------------------*/}
         <Card>
           <Card.Header>
             <div className="d-flex justify-content-between align-items-center">
               <div>
-                {validations.includes("haz") && (
-                  <i className="bi bi-check-circle-fill icon-success"></i>
-                )}
-                {metaIndics["haz"].libelle}{" "}
-                <span className="beta ms-1">BETA</span>
+                <ArrowToggle eventKey="haz">
+                  {metaIndics["haz"].libelle}{" "}
+                  <span className="beta ms-1">BETA</span>
+                </ArrowToggle>
               </div>
               <div>
-                <CustomToggle eventKey="haz">
-                  <i className="bi bi-pencil"></i>{" "}
-                  {validations.includes("haz") ? "Modifier" : "Déclarer"}
-                </CustomToggle>
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("haz") ? false : true}
@@ -571,29 +563,75 @@ const Indicators = (props) => {
               <StatementHAZ
                 indic={"haz"}
                 impactsData={props.impactsData}
-                onUpdate={willNetValueAddedIndicator.bind(this)}
-                onValidate={validateIndicator.bind(this)}
+                onUpdate={willNetValueAddedIndicator.bind("haz")}
+                onValidate={() => validateIndicator("haz")}
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
       </Accordion>
+
       <h3>Export des résultats</h3>
     </>
   );
 };
 
-function CustomToggle({ children, eventKey }) {
-  const decoratedOnClick = useAccordionButton(eventKey, () =>
-    console.log("totally custom!")
+function ArrowToggle({ children, eventKey, callback }) {
+  const { activeEventKey } = useContext(AccordionContext);
+
+  const decoratedOnClick = useAccordionButton(
+    eventKey,
+    () => callback && callback(eventKey)
   );
 
+  const isCurrentEventKey = activeEventKey === eventKey;
+
   return (
-    <button
-      className="btn btn-sm btn-secondary"
-      onClick={decoratedOnClick}
-    >
+    <button className="btn btn-link" onClick={decoratedOnClick}>
+      {isCurrentEventKey ? (
+        <i className="bi bi-chevron-up"></i>
+      ) : (
+        <i className="bi bi-chevron-down"></i>
+      )}{" "}
       {children}
     </button>
   );
 }
+
+// Display the correct assessment view according to the indicator
+function ModalAssesment(props) {
+  return (
+    <Modal
+      show={props.popUp == props.indic}
+      onHide={props.handleClose}
+      size="xl"
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>{props.title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        {(() => {
+          switch (props.indic) {
+            case "dis":
+              return <AssessmentDIS {...props} />;
+            case "geq":
+               return <AssessmentDIS {...props} />;
+             case "knw":
+            return <AssessmentKNW {...props} />;
+            // case "ghg":
+            //   return <AssessmentGHG {...props} />;
+
+            // case "nrg":
+            //   return <AssessmentNRG {...props} />;
+            default:
+              return <div></div>;
+          }
+        })()}
+      </Modal.Body>
+    </Modal>
+  );
+}
+
+
+export default AssesmentSection;

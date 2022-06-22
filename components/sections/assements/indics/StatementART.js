@@ -26,7 +26,6 @@ import { InputNumber } from '../../../input/InputNumber';
 export class StatementART extends React.Component {
 
   constructor(props) {
-    console.log(props); 
 
     super(props);
     this.state = {

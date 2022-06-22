@@ -52,11 +52,8 @@ export class StatementKNW extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-        <button className={"btn btn-primary"} onClick={this.props.toAssessment}>
-        <FontAwesomeIcon icon={faCalculator} />
-          Outil d'évaluation</button>
-          <button disabled={!isValid} className={"btn btn-secondary"}
-                  onClick={this.onValidate}>Valider</button>
+        <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment}><i className="bi bi-calculator"></i> Outil d'évaluation</button>
+         <button disabled={!isValid} className="btn btn-secondary btn-sm" onClick={this.onValidate}>Valider</button>
         </div>
       </div>
     ) 

@@ -13,7 +13,7 @@
 @import 'components/alert';
 @import 'components/form';
 @import 'components/tables';
-@import 'components/modal'; 
+//@import 'components/modal'; 
 
 
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Roboto:wght@100;300;400;700&display=swap');
@@ -210,7 +210,6 @@ sup {
 /* ---------- ASSESSMENT ---------- */
 
 .assessment {
-  width: 100%;
 
   .view-header {  // header in assessment
     display: flex;

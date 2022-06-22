@@ -13,6 +13,7 @@ import { InputText } from '/components/input/InputText';
 import { InputNumber } from '/components/input/InputNumber';
 import { valueOrDefault } from '/src/utils/Utils';
 import { getNewId,roundValue } from '/src/utils/Utils';
+import { Table } from 'react-bootstrap';
 
 /* -------------------- ASSESSMENT DIS -------------------- */
 
@@ -70,30 +71,29 @@ export class AssessmentDIS extends React.Component {
     return(
       <div className="assessment">
 
-        <div className="group"><h3>Données sociales</h3>
-          <div className="actions">
-            <button onClick={() => document.getElementById('import-companies-csv').click()} className="btn">
+          <div className="actions text-end mb-1">
+            <button onClick={() => document.getElementById('import-companies-csv').click()} className="btn btn-primary btn-sm me-1">
               Importer un fichier CSV
             </button>
             <input id="import-companies-csv" visibility="collapse"
                     type="file" accept=".csv" 
                     onChange={this.importCSVFile}/>
-            <button onClick={() => document.getElementById('import-companies-xlsx').click()} className="btn">
+            <button onClick={() => document.getElementById('import-companies-xlsx').click()} className="btn btn-primary btn-sm me-1">
               Importer un fichier XLSX
             </button>
               <input id="import-companies-xlsx" visibility="collapse"
                       type="file" accept=".xlsx" 
                       onChange={this.importXLSXFile}/>
-            <button onClick={this.exportXLSXFile} className="btn">
+            <button onClick={this.exportXLSXFile} className="btn btn-primary btn-sm me-1">
               Télécharger modèle XLSX
             </button>
-            <button onClick={this.deleteAll} className="btn">
+            <button onClick={this.deleteAll} className="btn btn-secondary btn-sm">
                 Supprimer tout
               </button>
           </div>
 
           <div className="table-main">
-            <table className="table">
+            <Table className="table" size="sm" >
               <thead>
                 <tr>
                   <td className="auto" 
@@ -123,11 +123,10 @@ export class AssessmentDIS extends React.Component {
                       isNewEmployeeRow={true}
                       updateSocialData={this.updateSocialData.bind(this)}/>
               </tbody>
-            </table>
+            </Table>
 
           </div>
           
-        </div>
 
         <div className="view-footer">
         <button className="btn" 

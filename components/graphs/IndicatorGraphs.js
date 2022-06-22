@@ -32,6 +32,7 @@ const viewsForIndic = {
 
 export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
 
+  console.log(comparativeFootprints)
   const { financialData } = session;
   const { production, netValueAdded, intermediateConsumption } = financialData.aggregates;
   const { productionSectorFootprint, valueAddedSectorFootprint, consumptionSectorFootprint, allSectorsProductionAreaFootprint, allSectorsValueAddedAreaFootprint, allSectorsConsumptionFootprint } = comparativeFootprints;
