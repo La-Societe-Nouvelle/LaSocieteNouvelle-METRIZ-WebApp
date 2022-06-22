@@ -64,6 +64,7 @@ export class StartSection extends React.Component {
               <Button
                 variant="primary"
                 className="me-2"
+                disabled
                 onClick={this.props.startNewSession}
               >
                 Nouvelle analyse
