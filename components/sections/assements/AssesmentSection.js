@@ -30,22 +30,20 @@ import {
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import ResultSection from "./ResultSection";
-
+import { exportIndicPDF } from "../../../src/writers/Export";
+import { GraphsPDF } from "../../graphs/GraphsPDF";
 
 const AssesmentSection = (props) => {
-
-
-  const [view,setView] = useState("statement");
+  const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
 
-  const handleView = indic => {
-    console.log(indic);
-    setIndic(indic); 
+  const handleView = (indic) => {
+    console.log(indic)
+    setIndic(indic);
     setView("result");
-  } 
+  };
 
 
-  
 
   return (
     <Container fluid className="indicator-section">
@@ -64,23 +62,26 @@ const AssesmentSection = (props) => {
               impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
-            />
-          </>
+            /> 
+          </> 
         ) : (
-        <ResultSection session={props.session} indic={indic} />
+          <ResultSection
+            session={props.session}
+            indic={indic}
+            goBack={() => setView("statement")}
+          />
         )}
       </section>
     </Container>
   );
-}
+};
 
 const Indicators = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
   const [popUp, setPopUp] = useState();
 
-  useEffect(() => {
-  }, [validations]);
-  
+  useEffect(() => {}, [validations]);
+
   /* ----- CHANGE/VALIDATION HANDLER ----- */
 
   // check if net value indicator will change with new value & cancel value if necessary
@@ -104,7 +105,6 @@ const Indicators = (props) => {
   };
 
   const validateIndicator = async (indic) => {
-
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
@@ -126,6 +126,19 @@ const Indicators = (props) => {
 
   return (
     <>
+  {
+    console.log(props.session)
+  }
+{/* {validations.length > 0 && 
+            validations.map((indic, key) => (
+              // <GraphsPDF
+              //   key={key}
+              //   session={props.session}
+              //   indic={indic}
+              //   comparativeFootprints={"00"}
+              // />
+            ))} */}
+
       <h3> Création de la valeur</h3>
 
       <Accordion>
@@ -142,8 +155,7 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("eco") ? false : true}
-                  onClick={()=>props.viewResult("eco")}
-                  
+                  onClick={() => props.viewResult("eco")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -184,6 +196,7 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("art") ? false : true}
+                  onClick={() => props.viewResult("art")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -223,6 +236,7 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("soc") ? false : true}
+                  onClick={() => props.viewResult("soc")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -268,6 +282,8 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("dis") ? false : true}
+                  onClick={() => props.viewResult("dis")}
+
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -310,6 +326,8 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("geq") ? false : true}
+                  onClick={() => props.viewResult("geq")}
+
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -352,6 +370,8 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("knw") ? false : true}
+                  onClick={() => props.viewResult("knw")}
+
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -365,9 +385,9 @@ const Indicators = (props) => {
                 impactsData={props.impactsData}
                 onUpdate={willNetValueAddedIndicator.bind("knw")}
                 onValidate={() => validateIndicator("knw")}
-                toAssessment={() => triggerPopup("knw")} 
+                toAssessment={() => triggerPopup("knw")}
               />
-                <ModalAssesment
+              <ModalAssesment
                 indic="knw"
                 impactsData={props.impactsData}
                 onUpdate={willNetValueAddedIndicator.bind("knw")}
@@ -398,9 +418,25 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("ghg") ? false : true}
-                  onClick={()=>props.viewResult("ghg")}
+                  onClick={() => props.viewResult("ghg")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-light btn-sm"
+                  disabled={validations.includes("ghg") ? false : true}
+                  onClick={() => exportIndicPDF(
+                    "ghg",
+                    props.session,
+                    "00",
+                    "#print-Production-ghg" ,
+                    "#print-Consumption-ghg" ,
+                    "#print-Value-ghg" ,
+                    "#piechart-ghg" 
+                  )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -429,6 +465,8 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("nrg") ? false : true}
+                  onClick={() => props.viewResult("nrg")}
+
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -459,6 +497,7 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("wat") ? false : true}
+                  onClick={() => props.viewResult("wat")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -491,6 +530,7 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("mat") ? false : true}
+                  onClick={() => props.viewResult("mat")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -521,6 +561,8 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("was") ? false : true}
+                  onClick={() => props.viewResult("was")}
+
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -552,6 +594,8 @@ const Indicators = (props) => {
                 <button
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("haz") ? false : true}
+                  onClick={() => props.viewResult("haz")}
+
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
@@ -616,9 +660,9 @@ function ModalAssesment(props) {
             case "dis":
               return <AssessmentDIS {...props} />;
             case "geq":
-               return <AssessmentDIS {...props} />;
-             case "knw":
-            return <AssessmentKNW {...props} />;
+              return <AssessmentDIS {...props} />;
+            case "knw":
+              return <AssessmentKNW {...props} />;
             // case "ghg":
             //   return <AssessmentGHG {...props} />;
 
@@ -632,6 +676,5 @@ function ModalAssesment(props) {
     </Modal>
   );
 }
-
 
 export default AssesmentSection;

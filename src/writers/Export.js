@@ -104,15 +104,12 @@ function generatePDF(
   const { financialData, legalUnit } = session;
 
   let x = 20;
-
+  
   // HEADER
   doc.setFontSize(16);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
   doc.text("RAPPORT - ANALYSE EXTRA-FINANCIERE", x, 20);
-  doc.setDrawColor(247, 247, 247);
-  doc.setLineWidth(2);
-  doc.line(20, 25, 50, 25);
 
   doc.setTextColor(250, 89, 95);
   doc.setFontSize(14);
@@ -126,37 +123,33 @@ function generatePDF(
     "Année de fin d'exercice : " +
       (session.year != null ? session.year : " - "),
     x,
-    45
+    40
   );
   let today = new Date();
   doc.text(
-    "Edition du : " +
+    " Edition du : " +
       String(today.getDate()).padStart(2, "0") +
       "/" +
       String(today.getMonth() + 1).padStart(2, "0") +
       "/" +
       today.getFullYear(),
-    x,
-    50
+    158,
+    40
   );
 
   doc.setFontSize(14);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(82, 98, 188);
-  doc.text(metaIndics[indic].libelleGrandeur.toUpperCase(), x, 60);
+  doc.text(metaIndics[indic].libelleGrandeur.toUpperCase(), x, 55);
   doc.setDrawColor(229, 219, 241);
   doc.setLineWidth(0);
 
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
-  doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, 70);
+  doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, 65);
 
-  /*
-  x+=10;
-  doc.setFontSize(10);
-  doc.text("Compte de résultat",10,x);
-  */
+
 
   /* ----- TABLE ----- */
 
@@ -172,12 +165,12 @@ function generatePDF(
 
   let xAmount = 150;
   let xValue = 170;
-  let xUncertainty = 180;
-  let y = 80;
+  let xUncertainty = 178;
+  let y = 75;
 
   // first line table RGB(219, 222, 241)
   doc.setFillColor(219, 222, 241);
-  doc.rect(20, 74, 180, 10, "F");
+  doc.rect(20, 69, 178, 10, "F");
   doc.setFontSize(8);
   doc.setTextColor(0);
   doc.setFont("Helvetica", "italic");
@@ -294,7 +287,7 @@ function generatePDF(
     doc.setFontSize(10);
   }
 
-  doc.line(20, y + 2, 200, y + 2);
+  doc.line(20, y + 2, 198, y + 2);
 
   y += 6;
   doc.setFont("Helvetica", "bold");
@@ -351,7 +344,7 @@ function generatePDF(
       doc.setFontSize(10);
     });
 
-  doc.line(20, y + 2, 200, y + 2); // Depreciations
+  doc.line(20, y + 2, 198, y + 2); // Depreciations
 
   y += 6;
   doc.setFont("Helvetica", "bold");
@@ -405,7 +398,7 @@ function generatePDF(
       doc.setFontSize(10);
     });
 
-  doc.line(20, y + 2, 200, y + 2); // Net Value Added
+  doc.line(20, y + 2, 198, y + 2); // Net Value Added
 
   y += 6;
   doc.setFont("Helvetica", "bold");
@@ -432,7 +425,7 @@ function generatePDF(
   );
   doc.setFontSize(10);
 
-  doc.line(20, y + 2, 200, y + 2);
+  doc.line(20, y + 2, 198, y + 2);
 
   y += 15;
   doc.setFontSize(12);
@@ -446,26 +439,24 @@ function generatePDF(
   y += 10;
   getStatementNote(doc, 20, y, session.impactsData, indic);
 
-  y += 20;
+  y += 10;
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
   doc.text("NOTE D'ANALYSE", x, y);
 
-  y += 5;
-
   let analyse = getAnalyse(indic, session);
   let text = "";
   {
     analyse.map(
-      (paragraph) => (text += "\n" + paragraph.reduce((a, b) => a + " " + b))
+      (paragraph) => (text += "\n\n" + paragraph.reduce((a, b) => a + " " + b))
     );
   }
 
-  doc.setFontSize(10);
+  doc.setFontSize(9);
   doc.setFont("Helvetica", "normal");
   doc.setTextColor(0, 0, 0);
-  doc.text(doc.splitTextToSize(text, 180), x, y);
+  doc.text(doc.splitTextToSize(text, 175), x, y);
 
   // PAGE 2
   doc.addPage();
@@ -481,57 +472,56 @@ function generatePDF(
   doc.setTextColor(82, 98, 188);
 
   {
+    y += 5;
     Object.entries(divisions)
       .sort((a, b) => parseInt(a) - parseInt(b))
       .map(([code, libelle]) =>
         code == comparativeDivision && code !== "00"
-          ? doc.text("Branche de référence : " + libelle, x, y + 10)
+          ? doc.text("Branche de référence : " + libelle, x, y)
           : ""
       );
+      y += 10;
   }
 
-  y = 40;
+  
 
   //Production canvas
   const pdfWidth = doc.internal.pageSize.getWidth() / 3;
 
   let canvas = document.querySelector(idProductionCanvas);
 
-  let canvasImg = canvas.toDataURL("image/png", 1.0);
+  let canvasImg = canvas.toDataURL("image/jpg", 1.0);
 
   const imgProps = doc.getImageProperties(canvasImg);
 
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-  doc.addImage(canvasImg, "PNG", x, y, pdfWidth, pdfHeight, undefined, "FAST");
+  doc.addImage(canvasImg, "JPEG", x, y, pdfWidth, pdfHeight);
 
   //Consumption canvas
   let canvasConsumption = document.querySelector(idConsumptionCanvas);
-  let canvasConsumptionImg = canvasConsumption.toDataURL("image/png", 1.0);
+  let canvasConsumptionImg = canvasConsumption.toDataURL("image/jpg", 1.0);
   const imgConsumptionProps = doc.getImageProperties(canvasConsumptionImg);
   const pdfCHeight =
     (imgConsumptionProps.height * pdfWidth) / imgConsumptionProps.width;
 
   doc.addImage(
     canvasConsumptionImg,
-    "PNG",
+    "JPEG",
     pdfWidth + 40,
     y,
     pdfWidth,
-    pdfCHeight,
-    undefined,
-    "FAST"
-  );
+    pdfCHeight  );
 
-  y = 110;
+  y = 80;
 
   //Value canvas
   let canvasValue = document.querySelector(idValueCanvas);
-  let canvasValueImg = canvasValue.toDataURL("image/png", 1.0);
+  let canvasValueImg = canvasValue.toDataURL("image/jpg", 1.0);
   const imgValueProps = doc.getImageProperties(canvasValueImg);
   const pdfVHeight = (imgValueProps.height * pdfWidth) / imgValueProps.width;
 
-  doc.addImage(canvasValueImg, "PNG", x, y, pdfWidth, pdfVHeight);
+  doc.addImage(canvasValueImg, "JPEG", x, y, pdfWidth, pdfVHeight);
   doc.setProperties({
     title:
       "rapport_" +
@@ -540,7 +530,11 @@ function generatePDF(
       indic.toUpperCase(),
   });
 
-  y += 70;
+  y += 40;
+
+  doc.line(x, y, 200, y);
+  y += 10;
+
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
@@ -552,7 +546,10 @@ function generatePDF(
   let canvasPie = document.querySelector(idPieChart);
   let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
   const imgPieProps = doc.getImageProperties(canvasPieImg);
-  doc.addImage(canvasPieImg, "JPEG", x, y, 80, 80, "NONE");
+
+  const PieHeight = (imgPieProps.height * pdfWidth) / imgPieProps.width;
+
+  doc.addImage(canvasPieImg, "JPEG", x, y, pdfWidth, PieHeight);
   return doc;
 }
 

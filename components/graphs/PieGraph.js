@@ -50,13 +50,14 @@ function PieGraph(props) {
 
   const options = {
     responsive: true,
-    plugins: {
+
+        plugins: {
       legend: {
-        position: "top",
+        position: "bottom",
         labels: {
           boxWidth: 10,
           font: {
-            size: 10,
+            size: 14,
           },
         },
       },
