@@ -88,6 +88,11 @@ const AssesmentSection = (props) => {
     setView("result");
   };
 
+  const isPublicationAvailable =
+  Object.entries(
+   props.session.financialData.aggregates.revenue.footprint.indicators
+  ).filter(([_, indicator]) => indicator.value != null).length > 0;
+
   return (
     <Container fluid className="indicator-section">
       <section className="step">
@@ -113,6 +118,19 @@ const AssesmentSection = (props) => {
                   allSectorsValueAddedAreaFootprint,
               }}
             />
+
+            <hr/>
+        
+            <div className="align-right">
+            <button
+              className={"btn btn-secondary"}
+              id="validation-button"
+              onClick={props.publish}
+              disabled={!isPublicationAvailable}
+            >
+              Publier mes résultats  <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
           </>
         ) : (
           <ResultSection
@@ -860,6 +878,7 @@ const Indicators = (props) => {
                 <i className="bi bi-download"></i> Télécharger
               </Button>
             </div>
+    
     </>
   );
 };
