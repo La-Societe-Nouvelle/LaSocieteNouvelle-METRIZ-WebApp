@@ -1,5 +1,15 @@
+// TO DO : OPTIMISATION 
+
 import React, { useContext, useEffect, useState } from "react";
-import {Container, Accordion, useAccordionButton,Card,AccordionContext,Modal, Button} from "react-bootstrap";
+import {
+  Container,
+  Accordion,
+  useAccordionButton,
+  Card,
+  AccordionContext,
+  Modal,
+  Button,
+} from "react-bootstrap";
 
 // Libraries
 import metaIndics from "/lib/indics";
@@ -24,10 +34,12 @@ import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
 
-
-
 import ResultSection from "./ResultSection";
-import { downloadReport, exportFootprintPDF, exportIndicPDF } from "../../../src/writers/Export";
+import {
+  downloadReport,
+  exportFootprintPDF,
+  exportIndicPDF,
+} from "../../../src/writers/Export";
 import { GraphsPDF } from "../../graphs/GraphsPDF";
 
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
@@ -89,9 +101,9 @@ const AssesmentSection = (props) => {
   };
 
   const isPublicationAvailable =
-  Object.entries(
-   props.session.financialData.aggregates.revenue.footprint.indicators
-  ).filter(([_, indicator]) => indicator.value != null).length > 0;
+    Object.entries(
+      props.session.financialData.aggregates.revenue.footprint.indicators
+    ).filter(([_, indicator]) => indicator.value != null).length > 0;
 
   return (
     <Container fluid className="indicator-section">
@@ -119,18 +131,18 @@ const AssesmentSection = (props) => {
               }}
             />
 
-            <hr/>
-        
+            <hr />
+
             <div className="align-right">
-            <button
-              className={"btn btn-secondary"}
-              id="validation-button"
-              onClick={props.publish}
-              disabled={!isPublicationAvailable}
-            >
-              Publier mes résultats  <i className="bi bi-chevron-right"></i>
-            </button>
-          </div>
+              <button
+                className={"btn btn-secondary"}
+                id="validation-button"
+                onClick={props.publish}
+                disabled={!isPublicationAvailable}
+              >
+                Publier mes résultats <i className="bi bi-chevron-right"></i>
+              </button>
+            </div>
           </>
         ) : (
           <ResultSection
@@ -201,15 +213,15 @@ const Indicators = (props) => {
 
   return (
     <>
-      {validations.length > 0 && 
-            validations.map((indic, key) => (
-              <GraphsPDF
-                key={key}
-                session={props.session}
-                indic={indic}
-                comparativeFootprints={props.comparativeFootprints}
-              />
-            ))}
+      {validations.length > 0 &&
+        validations.map((indic, key) => (
+          <GraphsPDF
+            key={key}
+            session={props.session}
+            indic={indic}
+            comparativeFootprints={props.comparativeFootprints}
+          />
+        ))}
 
       <h3> Création de la valeur</h3>
 
@@ -241,8 +253,7 @@ const Indicators = (props) => {
                       "00",
                       "#print-Production-eco",
                       "#print-Consumption-eco",
-                      "#print-Value-eco",
-                      "#piechart-eco"
+                      "#print-Value-eco"
                     )
                   }
                 >
@@ -299,8 +310,7 @@ const Indicators = (props) => {
                       "00",
                       "#print-Production-art",
                       "#print-Consumption-art",
-                      "#print-Value-art",
-                      "#piechart-art"
+                      "#print-Value-art"
                     )
                   }
                 >
@@ -402,8 +412,7 @@ const Indicators = (props) => {
                       "00",
                       "#print-Production-dis",
                       "#print-Consumption-dis",
-                      "#print-Value-dis",
-                      "#piechart-dis"
+                      "#print-Value-dis"
                     )
                   }
                 >
@@ -462,8 +471,7 @@ const Indicators = (props) => {
                       "00",
                       "#print-Production-geq",
                       "#print-Consumption-geq",
-                      "#print-Value-geq",
-                      "#piechart-geq"
+                      "#print-Value-geq"
                     )
                   }
                 >
@@ -522,8 +530,7 @@ const Indicators = (props) => {
                       "00",
                       "#print-Production-knw",
                       "#print-Consumption-knw",
-                      "#print-Value-knw",
-                      "#piechart-knw"
+                      "#print-Value-knw"
                     )
                   }
                 >
@@ -855,30 +862,25 @@ const Indicators = (props) => {
       <h3>Export des résultats</h3>
 
       <div className="flex">
-              <p>
-                Rapport sur l'empreinte sociétale
-              </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => exportFootprintPDF(props.session)}
-              >
-                <i className="bi bi-download"></i> Télécharger
-              </Button>
-            </div>
-            <div className="flex mt-2">
-              <p>
-               Dossier Complet : Ensemble des livrables et fichier de sauvegarde
-              </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => downloadReport(validations, props.session, "00")}
-              >
-                <i className="bi bi-download"></i> Télécharger
-              </Button>
-            </div>
-    
+        <p>Rapport sur l'empreinte sociétale</p>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => exportFootprintPDF(props.session)}
+        >
+          <i className="bi bi-download"></i> Télécharger
+        </Button>
+      </div>
+      <div className="flex mt-2">
+        <p>Dossier Complet : Ensemble des livrables et fichier de sauvegarde</p>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => downloadReport(validations, props.session, "00")}
+        >
+          <i className="bi bi-download"></i> Télécharger
+        </Button>
+      </div>
     </>
   );
 };
@@ -927,8 +929,8 @@ function ModalAssesment(props) {
             case "knw":
               return <AssessmentKNW {...props} />;
             case "ghg":
-               return <AssessmentGHG {...props} />;
-             case "nrg":
+              return <AssessmentGHG {...props} />;
+            case "nrg":
               return <AssessmentNRG {...props} />;
             default:
               return <div></div>;

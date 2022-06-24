@@ -530,26 +530,19 @@ function generatePDF(
       indic.toUpperCase(),
   });
 
-  y += 40;
 
-  doc.line(x, y, 200, y);
-  y += 10;
-
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(25, 21, 88);
-  doc.text("REPARTITION DES IMPACTS BRUTS", x, y);
-
-  y += 10;
 
   //Pie canvas
-  let canvasPie = document.querySelector(idPieChart);
-  let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
-  const imgPieProps = doc.getImageProperties(canvasPieImg);
-
-  const PieHeight = (imgPieProps.height * pdfWidth) / imgPieProps.width;
-
-  doc.addImage(canvasPieImg, "JPEG", x, y, pdfWidth, PieHeight);
+  if(idPieChart) {
+    
+    let canvasPie = document.querySelector(idPieChart);
+    let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
+    const imgPieProps = doc.getImageProperties(canvasPieImg);
+  
+    const PieHeight = (imgPieProps.height * pdfWidth) / imgPieProps.width;
+  
+    doc.addImage(canvasPieImg, "JPEG", x, y, pdfWidth, PieHeight);
+  }
   return doc;
 }
 

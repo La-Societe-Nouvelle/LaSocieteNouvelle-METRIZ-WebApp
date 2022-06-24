@@ -7,7 +7,6 @@ import { Col, Row } from "react-bootstrap";
 Chart.register(ChartDataLabels);
 import { Bar } from "react-chartjs-2";
 import PieGraph from "./PieGraph";
-import metaIndics from "/lib/indics";
 
 export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const { financialData } = session;
@@ -274,8 +273,6 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
     <div className="row hidden">
       {printGrossImpact && (
         <div className="piechart-container">
-
-          
           
           <PieGraph
             id={"piechart-" + indic}
