@@ -54,17 +54,11 @@ export class StartSection extends React.Component {
                   <p>Engagements sociaux et environnementaux</p>
                 </Col>
               </Row>
-              <Alert variant="error">
-                <p>
-                  L'application Metriz est actuellement indisponible pour des
-                  raisons de maintenance.
-                  <br></br>Veuillez nous excuser pour la gêne occassionée.
-                </p>
-              </Alert>
+
               <Button
                 variant="primary"
                 className="me-2"
-                disabled
+                
                 onClick={this.props.startNewSession}
               >
                 Nouvelle analyse
