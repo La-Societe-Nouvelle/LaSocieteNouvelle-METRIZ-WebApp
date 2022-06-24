@@ -13,10 +13,13 @@ import {
 import PieGraph from "../../graphs/PieGraph";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
+
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
+
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { IndicatorGraphs } from "../../graphs/IndicatorGraphs";
+
 import { analysisTextWriterART } from "../../../src/writers/analysis/analysisTextWriterART";
 import { analysisTextWriterDIS } from "../../../src/writers/analysis/analysisTextWriterDIS";
 import { analysisTextWriterECO } from "../../../src/writers/analysis/analysisTextWriterECO";
@@ -31,43 +34,29 @@ import { analysisTextWriterWAS } from "../../../src/writers/analysis/analysisTex
 import { analysisTextWriterWAT } from "../../../src/writers/analysis/analysisTextWriterWAT";
 import { exportIndicPDF } from "../../../src/writers/Export";
 
+const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
+
 const ResultSection = (props) => {
+
   const [indic, setIndic] = useState(props.indic);
   const [session, setSession] = useState(props.session);
 
   const [comparativeDivision, setComparativeDivision] = useState("00");
-  const [productionSectorFootprint, setProductionSectorFootprint] = useState(
-    new SocialFootprint()
+
+  const [productionSectorFootprint, setProductionSectorFootprint] = useState(new SocialFootprint()
   );
-  const [valueAddedSectorFootprint, setValueAddedSectorFootPrint] = useState(
-    new SocialFootprint()
+  const [valueAddedSectorFootprint, setValueAddedSectorFootPrint] = useState(new SocialFootprint()
   );
-  const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(
-    new SocialFootprint()
+  const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(new SocialFootprint()
   );
 
-  const [allSectorsProductionAreaFootprint, setAllSectorsProductionFootprint] =
-    useState(new SocialFootprint());
-  const [
-    allSectorsValueAddedAreaFootprint,
-    setAllSectorsValueAddedAreaFootprint,
-  ] = useState(new SocialFootprint());
-  const [allSectorsConsumptionFootprint, setAllSectorsConsumptionFootprint] =
-    useState(new SocialFootprint());
+  const [comparativeFootprints, setComparativeFootprints] = useState(props.comparativeFootprints);
 
-  const [printGrossImpact] = useState([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat",
-  ]);
 
-  const { intermediateConsumption, capitalConsumption, netValueAdded } =
-    props.session.financialData.aggregates;
+  const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
 
-  const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
+  const { intermediateConsumption, capitalConsumption, netValueAdded } = props.session.financialData.aggregates;
+
 
   const fetchDivisionData = async (division, flow) => {
     let endpoint;
@@ -92,36 +81,14 @@ const ResultSection = (props) => {
     return footprint;
   };
 
-  const fetchEconomicAreaData = async (area, flow) => {
-    let endpoint;
-    let response;
-    let data;
-
-    // comparative data
-    let footprint = new SocialFootprint();
-    console.log(footprint);
-
-    // Available production
-    endpoint =
-      apiBaseUrl +
-      "/default?" +
-      "area=" +
-      area +
-      "&activity=00" +
-      "&flow=" +
-      flow;
-    response = await fetch(endpoint, { method: "get" });
-    data = await response.json();
-    if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
-    return footprint;
-  };
-
   const changeComparativeDivision = async (event) => {
+
     let division = event.target.value;
 
     setComparativeDivision(division);
 
     if (division != "00") {
+
       let productionSectorFootprint = await fetchDivisionData(division, "PRD");
       let valueAddedSectorFootprint = await fetchDivisionData(division, "GVA");
       let consumptionSectorFootprint = await fetchDivisionData(division, "IC");
@@ -129,28 +96,19 @@ const ResultSection = (props) => {
       setProductionSectorFootprint(productionSectorFootprint);
       setValueAddedSectorFootPrint(valueAddedSectorFootprint);
       setConsumptionSectorFootPrint(consumptionSectorFootprint);
+
     } else {
       setProductionSectorFootprint(new SocialFootprint());
       setValueAddedSectorFootPrint(new SocialFootprint());
       setConsumptionSectorFootPrint(new SocialFootprint());
     }
+
   };
 
-  useEffect(() => {
-    console.log("changed");
-    console.log(session);
 
-    fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
-      setAllSectorsValueAddedAreaFootprint(footprint)
-    );
-    fetchEconomicAreaData("FRA", "PRD").then((footprint) =>
-      setAllSectorsProductionFootprint(footprint)
-    );
 
-    fetchEconomicAreaData("FRA", "IC").then((footprint) =>
-      setAllSectorsConsumptionFootprint(footprint)
-    );
-  }, [indic]);
+
+
   return (
     <>
       <div className="d-flex  align-items-center justify-content-between">
@@ -261,19 +219,15 @@ const ResultSection = (props) => {
           ))}
       </select>
       <div className="mt-5">
+ 
         <IndicatorGraphs
           session={session}
           indic={indic}
-          comparativeFootprints={{
-            allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
-            allSectorsProductionAreaFootprint:
-              allSectorsProductionAreaFootprint,
-            allSectorsValueAddedAreaFootprint:
-              allSectorsValueAddedAreaFootprint,
-            productionSectorFootprint: productionSectorFootprint,
-            consumptionSectorFootprint: consumptionSectorFootprint,
-            valueAddedSectorFootprint: valueAddedSectorFootprint,
-          }}
+          comparativeFootprints={comparativeFootprints}
+          productionSectorFootprint={productionSectorFootprint}
+          valueAddedSectorFootprint={valueAddedSectorFootprint}
+          consumptionSectorFootprint={consumptionSectorFootprint}
+
         />
       </div>
       <hr />

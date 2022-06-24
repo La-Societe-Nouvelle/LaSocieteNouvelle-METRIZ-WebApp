@@ -3,21 +3,21 @@
 // Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { Col, Row } from "react-bootstrap";
 Chart.register(ChartDataLabels);
 import { Bar } from "react-chartjs-2";
-import { printValue } from "../../src/utils/Utils";
 import PieGraph from "./PieGraph";
 import metaIndics from "/lib/indics";
 
 export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
-  const nbDecimals = metaIndics[indic].nbDecimals;
   const { financialData } = session;
-  const { production, netValueAdded, intermediateConsumption } =
-    financialData.aggregates;
+  const { capitalConsumption, netValueAdded, intermediateConsumption, production } = financialData.aggregates;
+
+
   const {
-    productionSectorFootprint,
-    valueAddedSectorFootprint,
-    consumptionSectorFootprint,
+    // productionSectorFootprint,
+    // valueAddedSectorFootprint,
+    // consumptionSectorFootprint,
     allSectorsProductionAreaFootprint,
     allSectorsValueAddedAreaFootprint,
     allSectorsConsumptionFootprint,
@@ -32,7 +32,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const dataP = [
     roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
     roundNumber(production.footprint.getIndicator(indic).value),
-    roundNumber(productionSectorFootprint.getIndicator(indic).value),
+    // roundNumber(productionSectorFootprint.getIndicator(indic).value),
   ];
 
   for (let i = 0; i < dataP.length; i++) {
@@ -111,7 +111,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const dataC = [
     roundNumber(allSectorsConsumptionFootprint.getIndicator(indic).value),
     roundNumber(intermediateConsumption.footprint.getIndicator(indic).value),
-    roundNumber(consumptionSectorFootprint.getIndicator(indic).value),
+    // roundNumber(consumptionSectorFootprint.getIndicator(indic).value),
   ];
 
   for (let i = 0; i < dataC.length; i++) {
@@ -199,7 +199,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const dataV = [
     roundNumber(allSectorsValueAddedAreaFootprint.getIndicator(indic).value),
     roundNumber(netValueAdded.footprint.getIndicator(indic).value),
-    roundNumber(valueAddedSectorFootprint.getIndicator(indic).value),
+    // roundNumber(valueAddedSectorFootprint.getIndicator(indic).value),
   ];
 
   for (let i = 0; i < dataV.length; i++) {
@@ -274,50 +274,50 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
     <div className="row hidden">
       {printGrossImpact && (
         <div className="piechart-container">
+
+          
+          
           <PieGraph
             id={"piechart-" + indic}
-            intermediateConsumption={printValue(
+            intermediateConsumption={
               intermediateConsumption.footprint.indicators[
                 indic
-              ].getGrossImpact(intermediateConsumption.amount),
-              nbDecimals
-            )}
-            capitalConsumption={printValue(
-              intermediateConsumption.footprint.indicators[
+              ].getGrossImpact(intermediateConsumption.amount)}
+            capitalConsumption={
+              capitalConsumption.footprint.indicators[
                 indic
-              ].getGrossImpact(intermediateConsumption.amount),
-              nbDecimals
-            )}
-            netValueAdded={printValue(
+              ].getGrossImpact(capitalConsumption.amount)}
+            netValueAdded={
               netValueAdded.footprint.indicators[indic].getGrossImpact(
                 netValueAdded.amount
-              ),
-              nbDecimals
-            )}
+              )}
           />
         </div>
       )}
-      <div className="chart-container">
-        <Bar
-          id={"print-Production-" + indic}
-          data={dataProduction}
-          options={optionsP}
-        />
-      </div>
-      <div className="chart-container">
-        <Bar
-          id={"print-Consumption-" + indic}
-          data={dataConsumption}
-          options={optionsC}
-        />
-      </div>
-      <div className="chart-container">
-        <Bar
-          id={"print-Value-" + indic}
-          data={dataValueAdded}
-          options={optionsV}
-        />
-      </div>
+
+      <Row className="graphs">
+        <Col>
+          <Bar
+            id={"print-Production-" + indic}
+            data={dataProduction}
+            options={optionsP}
+          />
+        </Col>
+        <Col>
+          <Bar
+            id={"print-Consumption-" + indic}
+            data={dataConsumption}
+            options={optionsC}
+          />
+        </Col>
+        <Col>
+          <Bar
+            id={"print-Value-" + indic}
+            data={dataValueAdded}
+            options={optionsV}
+          />
+        </Col>
+      </Row>
     </div>
   );
 };

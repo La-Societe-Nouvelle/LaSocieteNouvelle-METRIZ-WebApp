@@ -30,14 +30,15 @@ const viewsForIndic = {
   soc: { min: 0, max: 100 },
 };
 
-export const IndicatorGraphs = ({ session, indic, comparativeFootprints }) => {
+// productionSectorFootprint={productionSectorFootprint}
+// valueAddedSectorFootprint={valueAddedSectorFootprint}
+// consumptionSectorFootprint={consumptionSectorFootprint}
+
+export const IndicatorGraphs = ({ session, indic, comparativeFootprints, productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint, }) => {
   const { financialData } = session;
   const { production, netValueAdded, intermediateConsumption } =
     financialData.aggregates;
   const {
-    productionSectorFootprint,
-    valueAddedSectorFootprint,
-    consumptionSectorFootprint,
     allSectorsProductionAreaFootprint,
     allSectorsValueAddedAreaFootprint,
     allSectorsConsumptionFootprint,

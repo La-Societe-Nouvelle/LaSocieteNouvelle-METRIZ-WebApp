@@ -1,13 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  Container,
-  Accordion,
-  useAccordionButton,
-  Card,
-  AccordionContext,
-  Modal,
-  Image,
-} from "react-bootstrap";
+import {Container, Accordion, useAccordionButton,Card,AccordionContext,Modal, Button} from "react-bootstrap";
 
 // Libraries
 import metaIndics from "/lib/indics";
@@ -29,21 +21,72 @@ import {
 
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
+import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
+import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
+
+
+
 import ResultSection from "./ResultSection";
-import { exportIndicPDF } from "../../../src/writers/Export";
+import { downloadReport, exportFootprintPDF, exportIndicPDF } from "../../../src/writers/Export";
 import { GraphsPDF } from "../../graphs/GraphsPDF";
+
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+
+const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 
 const AssesmentSection = (props) => {
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
 
+  const [allSectorsProductionAreaFootprint, setAllSectorsProductionFootprint] =
+    useState(new SocialFootprint());
+
+  const [
+    allSectorsValueAddedAreaFootprint,
+    setAllSectorsValueAddedAreaFootprint,
+  ] = useState(new SocialFootprint());
+  const [allSectorsConsumptionFootprint, setAllSectorsConsumptionFootprint] =
+    useState(new SocialFootprint());
+
+  useEffect(() => {
+    fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
+      setAllSectorsValueAddedAreaFootprint(footprint)
+    );
+    fetchEconomicAreaData("FRA", "PRD").then((footprint) =>
+      setAllSectorsProductionFootprint(footprint)
+    );
+    fetchEconomicAreaData("FRA", "IC").then((footprint) =>
+      setAllSectorsConsumptionFootprint(footprint)
+    );
+  }, []);
+
+  const fetchEconomicAreaData = async (area, flow) => {
+    let endpoint;
+    let response;
+    let data;
+
+    // comparative data
+    let footprint = new SocialFootprint();
+
+    // Available production
+    endpoint =
+      apiBaseUrl +
+      "/default?" +
+      "area=" +
+      area +
+      "&activity=00" +
+      "&flow=" +
+      flow;
+    response = await fetch(endpoint, { method: "get" });
+    data = await response.json();
+    if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
+    return footprint;
+  };
+
   const handleView = (indic) => {
-    console.log(indic)
     setIndic(indic);
     setView("result");
   };
-
-
 
   return (
     <Container fluid className="indicator-section">
@@ -62,13 +105,27 @@ const AssesmentSection = (props) => {
               impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
-            /> 
-          </> 
+              comparativeFootprints={{
+                allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
+                allSectorsProductionAreaFootprint:
+                  allSectorsProductionAreaFootprint,
+                allSectorsValueAddedAreaFootprint:
+                  allSectorsValueAddedAreaFootprint,
+              }}
+            />
+          </>
         ) : (
           <ResultSection
             session={props.session}
             indic={indic}
             goBack={() => setView("statement")}
+            comparativeFootprints={{
+              allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
+              allSectorsProductionAreaFootprint:
+                allSectorsProductionAreaFootprint,
+              allSectorsValueAddedAreaFootprint:
+                allSectorsValueAddedAreaFootprint,
+            }}
           />
         )}
       </section>
@@ -126,18 +183,15 @@ const Indicators = (props) => {
 
   return (
     <>
-  {
-    console.log(props.session)
-  }
-{/* {validations.length > 0 && 
+      {validations.length > 0 && 
             validations.map((indic, key) => (
-              // <GraphsPDF
-              //   key={key}
-              //   session={props.session}
-              //   indic={indic}
-              //   comparativeFootprints={"00"}
-              // />
-            ))} */}
+              <GraphsPDF
+                key={key}
+                session={props.session}
+                indic={indic}
+                comparativeFootprints={props.comparativeFootprints}
+              />
+            ))}
 
       <h3> Création de la valeur</h3>
 
@@ -158,6 +212,23 @@ const Indicators = (props) => {
                   onClick={() => props.viewResult("eco")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("eco") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "eco",
+                      props.session,
+                      "00",
+                      "#print-Production-eco",
+                      "#print-Consumption-eco",
+                      "#print-Value-eco",
+                      "#piechart-eco"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -199,6 +270,23 @@ const Indicators = (props) => {
                   onClick={() => props.viewResult("art")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("art") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "art",
+                      props.session,
+                      "00",
+                      "#print-Production-art",
+                      "#print-Consumption-art",
+                      "#print-Value-art",
+                      "#piechart-art"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -283,9 +371,25 @@ const Indicators = (props) => {
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("dis") ? false : true}
                   onClick={() => props.viewResult("dis")}
-
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("dis") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "dis",
+                      props.session,
+                      "00",
+                      "#print-Production-dis",
+                      "#print-Consumption-dis",
+                      "#print-Value-dis",
+                      "#piechart-dis"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -327,9 +431,25 @@ const Indicators = (props) => {
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("geq") ? false : true}
                   onClick={() => props.viewResult("geq")}
-
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("geq") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "geq",
+                      props.session,
+                      "00",
+                      "#print-Production-geq",
+                      "#print-Consumption-geq",
+                      "#print-Value-geq",
+                      "#piechart-geq"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -371,9 +491,25 @@ const Indicators = (props) => {
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("knw") ? false : true}
                   onClick={() => props.viewResult("knw")}
-
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("knw") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "knw",
+                      props.session,
+                      "00",
+                      "#print-Production-knw",
+                      "#print-Consumption-knw",
+                      "#print-Value-knw",
+                      "#piechart-knw"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -423,17 +559,18 @@ const Indicators = (props) => {
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
                 <button
-                  className="btn btn-light btn-sm"
+                  className="btn btn-secondary btn-sm"
                   disabled={validations.includes("ghg") ? false : true}
-                  onClick={() => exportIndicPDF(
-                    "ghg",
-                    props.session,
-                    "00",
-                    "#print-Production-ghg" ,
-                    "#print-Consumption-ghg" ,
-                    "#print-Value-ghg" ,
-                    "#piechart-ghg" 
-                  )
+                  onClick={() =>
+                    exportIndicPDF(
+                      "ghg",
+                      props.session,
+                      "00",
+                      "#print-Production-ghg",
+                      "#print-Consumption-ghg",
+                      "#print-Value-ghg",
+                      "#piechart-ghg"
+                    )
                   }
                 >
                   <i className="bi bi-download"></i> Livrable
@@ -466,9 +603,25 @@ const Indicators = (props) => {
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("nrg") ? false : true}
                   onClick={() => props.viewResult("nrg")}
-
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("nrg") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "nrg",
+                      props.session,
+                      "00",
+                      "#print-Production-nrg",
+                      "#print-Consumption-nrg",
+                      "#print-Value-nrg",
+                      "#piechart-nrg"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -500,6 +653,23 @@ const Indicators = (props) => {
                   onClick={() => props.viewResult("wat")}
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("wat") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "wat",
+                      props.session,
+                      "00",
+                      "#print-Production-wat",
+                      "#print-Consumption-wat",
+                      "#print-Value-wat",
+                      "#piechart-wat"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -534,6 +704,23 @@ const Indicators = (props) => {
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
                 </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("mat") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "mat",
+                      props.session,
+                      "00",
+                      "#print-Production-mat",
+                      "#print-Consumption-mat",
+                      "#print-Value-mat",
+                      "#piechart-mat"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
+                </button>
               </div>
             </div>
           </Card.Header>
@@ -562,9 +749,25 @@ const Indicators = (props) => {
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("was") ? false : true}
                   onClick={() => props.viewResult("was")}
-
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("was") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "was",
+                      props.session,
+                      "00",
+                      "#print-Production-was",
+                      "#print-Consumption-was",
+                      "#print-Value-was",
+                      "#piechart-was"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -595,9 +798,25 @@ const Indicators = (props) => {
                   className="btn btn-primary btn-sm"
                   disabled={validations.includes("haz") ? false : true}
                   onClick={() => props.viewResult("haz")}
-
                 >
                   <i className="bi bi-clipboard-data"></i> Résultats
+                </button>
+                <button
+                  className="btn btn-secondary btn-sm"
+                  disabled={validations.includes("haz") ? false : true}
+                  onClick={() =>
+                    exportIndicPDF(
+                      "haz",
+                      props.session,
+                      "00",
+                      "#print-Production-haz",
+                      "#print-Consumption-haz",
+                      "#print-Value-haz",
+                      "#piechart-haz"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i> Livrable
                 </button>
               </div>
             </div>
@@ -616,6 +835,31 @@ const Indicators = (props) => {
       </Accordion>
 
       <h3>Export des résultats</h3>
+
+      <div className="flex">
+              <p>
+                Rapport sur l'empreinte sociétale
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => exportFootprintPDF(props.session)}
+              >
+                <i className="bi bi-download"></i> Télécharger
+              </Button>
+            </div>
+            <div className="flex mt-2">
+              <p>
+               Dossier Complet : Ensemble des livrables et fichier de sauvegarde
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => downloadReport(validations, props.session, "00")}
+              >
+                <i className="bi bi-download"></i> Télécharger
+              </Button>
+            </div>
     </>
   );
 };
@@ -663,11 +907,10 @@ function ModalAssesment(props) {
               return <AssessmentDIS {...props} />;
             case "knw":
               return <AssessmentKNW {...props} />;
-            // case "ghg":
-            //   return <AssessmentGHG {...props} />;
-
-            // case "nrg":
-            //   return <AssessmentNRG {...props} />;
+            case "ghg":
+               return <AssessmentGHG {...props} />;
+             case "nrg":
+              return <AssessmentNRG {...props} />;
             default:
               return <div></div>;
           }
