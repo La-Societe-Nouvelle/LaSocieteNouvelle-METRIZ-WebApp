@@ -4,7 +4,7 @@
 import React from 'react';
 
 // Utils
-import { roundValue, valueOrDefault } from '../../../../src/utils/Utils';
+import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
 import { InputNumber } from '../../../input/InputNumber'; 
 
 /* ---------- DECLARATION - INDIC #ECO ---------- */
@@ -79,7 +79,7 @@ export class StatementECO extends React.Component {
             onBlur={this.saveInfo} />
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-secondary"}
+          <button disabled={!isValid} className={"btn btn-secondary btn-sm"}
             onClick={this.onValidate}>Valider</button>
         </div>
       </div>
@@ -119,6 +119,7 @@ export class StatementECO extends React.Component {
 }
 
 export const writeStatementECO = (doc, x, y, impactsData) => {
+  console.log(impactsData)
   doc.text("Valeur ajoutée nette produite en France : " + printValue(impactsData.domesticProduction, 0) + " €" + (impactsData.isAllActivitiesInFrance ? "*" : ""), x, y);
   if (impactsData.isAllActivitiesInFrance) {
     y += 6;

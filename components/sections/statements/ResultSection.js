@@ -105,10 +105,6 @@ const ResultSection = (props) => {
 
   };
 
-
-
-
-
   return (
     <>
       <div className="d-flex  align-items-center justify-content-between">
@@ -124,7 +120,7 @@ const ResultSection = (props) => {
             {Object.entries(metaIndics).map(([key, value]) => {
               if (session.validations.includes(key) && key != indic) {
                 return (
-                  <Dropdown.Item onClick={() => setIndic(key)}>
+                  <Dropdown.Item key={key} onClick={() => setIndic(key)}>
                     {value.libelle}
                   </Dropdown.Item>
                 );
@@ -141,7 +137,7 @@ const ResultSection = (props) => {
                 "#Production",
                 "#Consumption",
                 "#Value",
-                "#PieChart"
+             printGrossImpact.includes(indic) ? "#PieChart" : "" 
               )
             }
           >

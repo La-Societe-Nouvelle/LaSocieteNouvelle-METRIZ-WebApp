@@ -5,8 +5,8 @@ import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalculator } from "@fortawesome/free-solid-svg-icons";
 // Utils
-import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
-import { InputNumber } from '../input/InputNumber';
+import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
+import { InputNumber } from '../../../input/InputNumber'; 
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
 
@@ -67,10 +67,10 @@ export class StatementNRG extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-        <button className={"btn btn-primary"} onClick={this.props.toAssessment}>
-          <FontAwesomeIcon icon={faCalculator} /> Outil d'évaluation</button>
+        <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment}>
+          <i className="bi bi-calculator"></i> Outil d'évaluation</button>
 
-          <button disabled={!isValid} className={"btn btn-secondary"}
+          <button disabled={!isValid} className="btn btn-secondary btn-sm"
                   onClick={this.onValidate}>Valider</button>
         </div>
        </div> 

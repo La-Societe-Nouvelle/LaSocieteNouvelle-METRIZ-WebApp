@@ -8,15 +8,12 @@ Chart.register(ChartDataLabels);
 import { Bar } from "react-chartjs-2";
 import PieGraph from "./PieGraph";
 
-export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
+export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint }) => {
   const { financialData } = session;
   const { capitalConsumption, netValueAdded, intermediateConsumption, production } = financialData.aggregates;
-
-
+  
   const {
-    // productionSectorFootprint,
-    // valueAddedSectorFootprint,
-    // consumptionSectorFootprint,
+
     allSectorsProductionAreaFootprint,
     allSectorsValueAddedAreaFootprint,
     allSectorsConsumptionFootprint,
@@ -31,7 +28,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const dataP = [
     roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
     roundNumber(production.footprint.getIndicator(indic).value),
-    // roundNumber(productionSectorFootprint.getIndicator(indic).value),
+    roundNumber(productionSectorFootprint.getIndicator(indic).value),
   ];
 
   for (let i = 0; i < dataP.length; i++) {
@@ -110,7 +107,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const dataC = [
     roundNumber(allSectorsConsumptionFootprint.getIndicator(indic).value),
     roundNumber(intermediateConsumption.footprint.getIndicator(indic).value),
-    // roundNumber(consumptionSectorFootprint.getIndicator(indic).value),
+    roundNumber(consumptionSectorFootprint.getIndicator(indic).value),
   ];
 
   for (let i = 0; i < dataC.length; i++) {
@@ -198,7 +195,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints }) => {
   const dataV = [
     roundNumber(allSectorsValueAddedAreaFootprint.getIndicator(indic).value),
     roundNumber(netValueAdded.footprint.getIndicator(indic).value),
-    // roundNumber(valueAddedSectorFootprint.getIndicator(indic).value),
+    roundNumber(valueAddedSectorFootprint.getIndicator(indic).value),
   ];
 
   for (let i = 0; i < dataV.length; i++) {

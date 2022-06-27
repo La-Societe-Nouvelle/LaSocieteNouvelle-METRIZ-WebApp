@@ -4,8 +4,8 @@
 import React from 'react';
 
 //Utils
-import { printValue, roundValue, valueOrDefault } from '../../src/utils/Utils';
-import { InputNumber } from '../input/InputNumber';
+import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
+import { InputNumber } from '../../../input/InputNumber'; 
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
 
@@ -69,7 +69,7 @@ export class StatementWAS extends React.Component {
                     onBlur={this.saveInfo}/>
         </div>
         <div className="statement-validation">
-          <button disabled={!isValid} className={"btn btn-secondary"}
+          <button disabled={!isValid} className="btn btn-secondary btn-sm"
                   onClick={this.onValidate}>Valider</button>
         </div>
       </div>

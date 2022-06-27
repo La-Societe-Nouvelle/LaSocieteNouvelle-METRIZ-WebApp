@@ -14,19 +14,18 @@ import metaIndics from "../../lib/indics";
 import { printValue } from "/src/utils/Utils";
 
 // Statement writers
-import { writeStatementART } from "../../components/statements/StatementART";
-import { writeStatementDIS } from "../../components/statements/StatementDIS";
-import { writeStatementECO } from "../../components/statements/StatementECO";
-import { writeStatementGEQ } from "../../components/statements/StatementGEQ";
-import { writeStatementGHG } from "../../components/statements/StatementGHG";
-import { writeStatementHAZ } from "../../components/statements/StatementHAZ";
-import { writeStatementKNW } from "../../components/statements/StatementKNW";
-import { writeStatementMAT } from "../../components/statements/StatementMAT";
-import { writeStatementNRG } from "../../components/statements/StatementNRG";
-import { writeStatementSOC } from "../../components/statements/StatementSOC";
-import { writeStatementWAS } from "../../components/statements/StatementWAS";
-import { writeStatementWAT } from "../../components/statements/StatementWAT";
-
+import { writeStatementART } from "../../components/sections/statements/forms/StatementART";
+import { writeStatementDIS } from "../../components/sections/statements/forms/StatementDIS";
+import { writeStatementECO } from "../../components/sections/statements/forms/StatementECO"; 
+import { writeStatementGEQ } from "../../components/sections/statements/forms/StatementGEQ";
+import { writeStatementGHG } from "../../components/sections/statements/forms/StatementGHG";
+import { writeStatementHAZ } from "../../components/sections/statements/forms/StatementHAZ";
+import { writeStatementKNW } from "../../components/sections/statements/forms/StatementKNW";
+import { writeStatementMAT } from "../../components/sections/statements/forms/StatementMAT";
+import { writeStatementNRG } from "../../components/sections/statements/forms/StatementNRG";
+import { writeStatementSOC } from "../../components/sections/statements/forms/StatementSOC";
+import { writeStatementWAS } from "../../components/sections/statements/forms/StatementWAS";
+import { writeStatementWAT } from "../../components/sections/statements/forms/StatementWAT";
 // Analysis writers
 import { analysisTextWriterECO } from "../../src/writers/analysis/analysisTextWriterECO";
 import { analysisTextWriterGHG } from "../../src/writers/analysis/analysisTextWriterGHG";
@@ -42,6 +41,7 @@ import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
 
 import divisions from "/lib/divisions";
+
 
 function exportIndicDataExpensesCSV(indic, session) {
   let csvContent = "data:text/csv;charset=utf-8,";
@@ -529,7 +529,6 @@ function generatePDF(
       "-" +
       indic.toUpperCase(),
   });
-
 
 
   //Pie canvas

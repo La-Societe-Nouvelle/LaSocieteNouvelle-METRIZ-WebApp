@@ -19,10 +19,10 @@ import { Table } from 'react-bootstrap';
 
 
 /* ----------------------------------------------------------- */
-/* -------------------- STATEMENT SECTION -------------------- */
+/* -------------------- PUBLISH STATEMENT SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class StatementSection extends React.Component {
+export class PublishStatement extends React.Component {
 
     constructor(props) {
         super(props);

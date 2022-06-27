@@ -8,23 +8,22 @@ import {BrowserView, MobileView} from 'react-device-detect';
 // Objects
 import { Session } from '/src/Session';
 
-// Sections
+// Sections 
 import { StartSection } from '/components/sections/StartSection';
 import ImportSection from '../components/sections/import/ImportSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { CompaniesSection } from '/components/sections/companies/CompaniesSection';
-import  AssesmentSection  from '../components/sections/assements/AssesmentSection';
-import { IndicatorSection } from '/components/sections/IndicatorSection';
-import { StatementSection } from '/components/sections/StatementSection';
+import StatementSection from '../components/sections/statements/StatementSection';
+import { PublishStatementSection } from '/components/sections/PublishStatementSection';
 
 // Others components
-import { Header } from '/components/headers/Header';
-import { HeaderSection } from '../components/headers/HeaderSection';
-import { HeaderPublish } from '../components/headers/HeaderPublish';
+import { Header } from '/components/parts/headers/Header';
+import { HeaderSection } from '../components/parts/headers/HeaderSection';
+import { HeaderPublish } from '../components/parts/headers/HeaderPublish';
 
 import { getPrevAmountItems } from '/src/utils/Utils';
 import { updateVersion } from '/src/version/updateVersion';
-import { Footer } from '../components/Footer';
+import { Footer } from '../components/parts/Footer';
 import { Mobile} from '../components/Mobile'
 
 /*   _________________________________________________________________________________________________________
@@ -166,8 +165,8 @@ class Metriz extends React.Component {
       case 1: return (<ImportSection {...sectionProps} />)
       case 2: return (<InitialStatesSection {...sectionProps} />)
       case 3: return (<CompaniesSection {...sectionProps} />)
-      case 4: return (<AssesmentSection {...sectionProps} publish={() => this.setStep(5)} />)
-      case 5: return (<StatementSection {...sectionProps} return={() => this.setStep(4)} />)
+      case 4: return (<StatementSection {...sectionProps} publish={() => this.setStep(5)} />)
+      case 5: return (<PublishStatementSection {...sectionProps} return={() => this.setStep(4)} />)
 
 
     }
