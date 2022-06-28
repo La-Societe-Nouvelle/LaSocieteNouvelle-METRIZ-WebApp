@@ -11,18 +11,20 @@ import {
 
 const ExportResults = (props) => {
 
-  console.log(props.session);
-  
   const [isBuilding, setisBuilding] = useState(false);
 
   const handleDownloadZip = async() => {
-
-   await downloadReport(props.validations, props.session, props.comparativeDivision);
+    if(!props.session.comparativeDivision) {
+      props.session.comparativeDivision = "00";
+    }
+   await downloadReport(props.session.validations, props.session, props.session.comparativeDivision);
   };
+
+  const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
 
   const downloadReport = async (indics, session, comparativeDivision) => {
     setisBuilding(true);
-
+    console.log(indics)
     const { legalUnit, year } = session;
     // Zip Export
     let zip = new JSZip();
@@ -35,7 +37,8 @@ const ExportResults = (props) => {
         "#print-Production-" + indic,
         "#print-Consumption-" + indic,
         "#print-Value-" + indic,
-        "#piechart-" + indic
+        printGrossImpact.includes(indic) ? "#piechart-" + indic : "" 
+        
       );
       zip.file(
         "rapport_" +

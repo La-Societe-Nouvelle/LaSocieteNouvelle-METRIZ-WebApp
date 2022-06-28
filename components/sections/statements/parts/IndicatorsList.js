@@ -62,6 +62,8 @@ const IndicatorsList = (props) => {
       setProductionSectorFootprint(productionSectorFootprint);
       setValueAddedSectorFootPrint(valueAddedSectorFootprint);
       setConsumptionSectorFootPrint(consumptionSectorFootprint);
+
+      props.session.comparativeDivision = comparativeDivision;
     } else {
       setProductionSectorFootprint(new SocialFootprint());
       setValueAddedSectorFootPrint(new SocialFootprint());
@@ -142,17 +144,20 @@ const IndicatorsList = (props) => {
     setComparativeDivision(division);
   };
   const handleDownloadPDF = async (key, comparativeDivision) => {
+    
     if (!comparativeDivision) {
       setIndicToExport(key);
       setPopUp("division");
     } else {
+
       exportIndicPDF(
         key,
         props.session,
         comparativeDivision,
         "#print-Production-" + key,
         "#print-Consumption-" + key,
-        "#print-Value-" + key
+        "#print-Value-" + key,
+        environmentalFootprint.includes(key) ? "#piechart-" + key : ""
       );
       setPopUp("");
     }
@@ -281,14 +286,7 @@ const IndicatorsList = (props) => {
                       className="btn btn-secondary btn-sm"
                       disabled={validations.includes(key) ? false : true}
                       onClick={() =>
-                        exportIndicPDF(
-                          key,
-                          props.session,
-                          "00",
-                          "#print-Production-" + key,
-                          "#print-Consumption-" + key,
-                          "#print-Value-" + key
-                        )
+                        handleDownloadPDF(key, comparativeDivision)
                       }
                     >
                       <i className="bi bi-download"></i> Livrable
@@ -404,14 +402,7 @@ const IndicatorsList = (props) => {
                       className="btn btn-secondary btn-sm"
                       disabled={validations.includes(key) ? false : true}
                       onClick={() =>
-                        exportIndicPDF(
-                          key,
-                          props.session,
-                          "00",
-                          "#print-Production-" + key,
-                          "#print-Consumption-" + key,
-                          "#print-Value-" + key
-                        )
+                        handleDownloadPDF(key, comparativeDivision)
                       }
                     >
                       <i className="bi bi-download"></i> Livrable
@@ -540,8 +531,8 @@ function ModalAssesment(props) {
     <Modal
       show={props.popUp == props.indic}
       onHide={props.handleClose}
-      size="xl"
-      centered
+      fullscreen
+       centered
     >
       <Modal.Header closeButton>
         <Modal.Title>{props.title}</Modal.Title>

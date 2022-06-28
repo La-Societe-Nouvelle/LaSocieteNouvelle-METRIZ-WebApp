@@ -105,6 +105,11 @@ const ResultSection = (props) => {
 
   };
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+  }, [indic]);
+
   return (
     <>
       <div className="d-flex  align-items-center justify-content-between">

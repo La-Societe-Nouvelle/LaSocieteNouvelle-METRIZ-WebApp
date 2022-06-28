@@ -439,7 +439,7 @@ function generatePDF(
   y += 10;
   getStatementNote(doc, 20, y, session.impactsData, indic);
 
-  y += 10;
+  y += 15;
   doc.setFontSize(12);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
@@ -493,9 +493,10 @@ function generatePDF(
   let canvasImg = canvas.toDataURL("image/jpg", 1.0);
 
   const imgProps = doc.getImageProperties(canvasImg);
+  console.log(imgProps);
 
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
+  console.log(pdfHeight);
   doc.addImage(canvasImg, "JPEG", x, y, pdfWidth, pdfHeight);
 
   //Consumption canvas
@@ -533,7 +534,10 @@ function generatePDF(
 
   //Pie canvas
   if(idPieChart) {
-    
+    y += 50;
+    doc.text(" Répartition des impacts bruts (en %)", x, y);
+    y += 10;
+
     let canvasPie = document.querySelector(idPieChart);
     let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
     const imgPieProps = doc.getImageProperties(canvasPieImg);

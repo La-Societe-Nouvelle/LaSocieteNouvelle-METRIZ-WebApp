@@ -27,6 +27,7 @@ const StatementSection = (props) => {
     useState(new SocialFootprint());
 
   useEffect(() => {
+    
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
       setAllSectorsValueAddedAreaFootprint(footprint)
     );
@@ -62,6 +63,7 @@ const StatementSection = (props) => {
   };
 
   const handleView = (indic) => {
+
     setIndic(indic);
     setView("result");
   };
@@ -99,8 +101,18 @@ const StatementSection = (props) => {
             >
 
             </IndicatorsList >
-
-            <ExportResults session={props.session} validations={props.session.validations} />
+            
+            <ExportResults 
+            session={props.session} 
+            validations={props.session.validations}   
+            comparativeFootprints={{
+                allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
+                allSectorsProductionAreaFootprint:
+                  allSectorsProductionAreaFootprint,
+                allSectorsValueAddedAreaFootprint:
+                  allSectorsValueAddedAreaFootprint,
+              }}
+              />
 
             <hr />
 
