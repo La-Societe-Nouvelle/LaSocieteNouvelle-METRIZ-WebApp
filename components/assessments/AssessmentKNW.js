@@ -136,6 +136,8 @@ export class AssessmentKNW extends React.Component {
           </tbody>
         </Table>
         <div className="text-end">
+        <button className="btn btn-sm" 
+                  onClick = {() => this.props.onGoBack()}>Retour</button>
           <button
             className="btn btn-secondary btn-sm"
             onClick={() => this.onSubmit()}

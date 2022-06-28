@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Table } from "react-bootstrap";
 
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -86,9 +87,7 @@ export class AssessmentNRG extends React.Component {
     return (
       <div className="assessment">
 
-        <div className="group"><h3>Outil de mesure</h3>
-
-          <table>
+          <Table responsive>
             <thead>
               <tr><td colSpan="6">Libellé</td><td colSpan="2">Valeur</td><td colSpan="2">Incertitude</td></tr>
             </thead>
@@ -120,7 +119,7 @@ export class AssessmentNRG extends React.Component {
               <tr>
                 <td className="column_icon">
                 <button className='btn' onClick={() => this.addNewLine("fossil")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                   <i className="bi bi-plus-lg"></i>
                   </button>
                   </td>
                 <td colSpan="5">Produits énergétiques fossiles</td>
@@ -136,7 +135,7 @@ export class AssessmentNRG extends React.Component {
               <tr key={itemId}>
                 <td className="column_icon">
                 <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button>
                   </td>
                 <td className="sub">
@@ -183,7 +182,7 @@ export class AssessmentNRG extends React.Component {
               <tr>
                 <td className="column_icon">
                 <button className='btn' onClick={() => this.addNewLine("biomass")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                   <i className="bi bi-plus-lg"></i>
                   </button>
                  </td> 
                 <td colSpan="5">Biomasse</td>
@@ -200,7 +199,7 @@ export class AssessmentNRG extends React.Component {
                 <td className="column_icon">
                   
                 <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button>                  
                   </td>
                 <td className="sub">
@@ -299,14 +298,14 @@ export class AssessmentNRG extends React.Component {
                 <td className="column_unit">&nbsp;%</td></tr>
               
             </tbody>
-          </table>
+          </Table>
           
         <div className="view-header">
-          <button className="btn" onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className={"btn btn-primary"} onClick = {() => this.onSubmit()}>Valider</button>
+          <button className="btn btn-sm" onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className="btn btn-secondary btn-sm" onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 
-        </div>
+        
       </div>
     ) 
   }

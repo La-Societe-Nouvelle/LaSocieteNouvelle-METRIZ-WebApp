@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Table, Form } from 'react-bootstrap';
 
 // Readers / Writers
 import { XLSXFileReader } from '/src/readers/XLSXReader'
@@ -13,7 +14,6 @@ import { InputText } from '/components/input/InputText';
 import { InputNumber } from '/components/input/InputNumber';
 import { valueOrDefault } from '/src/utils/Utils';
 import { getNewId,roundValue } from '/src/utils/Utils';
-import { Table } from 'react-bootstrap';
 
 /* -------------------- ASSESSMENT DIS -------------------- */
 
@@ -93,7 +93,7 @@ export class AssessmentDIS extends React.Component {
           </div>
 
           <div className="table-main">
-            <Table className="table" size="sm" >
+            <Table size="sm" responsive>
               <thead>
                 <tr>
                   <td className="auto" 
@@ -129,9 +129,9 @@ export class AssessmentDIS extends React.Component {
           
 
         <div className="view-footer">
-        <button className="btn" 
+        <button className="btn btn-sm" 
                   onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className={"btn btn-primary"}
+          <button className="btn btn-secondary btn-sm"
                   disabled={!isAllValid}
                   onClick = {() => this.onSubmit()}>Valider</button>
         </div>
@@ -307,15 +307,16 @@ class Row extends React.Component {
         <td className={"long"+(!this.props.isNewEmployeeRow ?  (isValid ? " valid" : " unvalid") : "")}>
           <InputText value={name}
                      onUpdate={this.updateName.bind(this)}/></td>
-
+  {
+    console.log(sex)
+  }
         <td className="short center">
-          <select value={sex}
-                  onChange={this.updateSex}>
+          <Form.Select value={sex} onChange={this.updateSex}>
             <option key="" value=""> - </option>
             <option key="F" value="F">F</option>
             <option key="H" value="H">H</option>
             {sex==null && <option key="" value="">-</option>}
-          </select></td>
+          </Form.Select></td>
 
         <td className="short right">
           <InputNumber value={workingHours}

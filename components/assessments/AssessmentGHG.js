@@ -2,9 +2,9 @@
 
 // React
 import React from 'react';
+import { Table } from "react-bootstrap";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+
 // Utils
 import { InputNumber } from '../input/InputNumber';
 import { getNewId, getSumItems, printValue } from '/src/utils/Utils';
@@ -80,9 +80,7 @@ export class AssessmentGHG extends React.Component {
     return (
       <div className="assessment">
     
-        <div className="group"><h3>Outil de mesure</h3>
-
-          <table>
+          <Table>
             <thead>
               <tr><td colSpan="6">Libellé</td><td colSpan="2">Valeur</td><td colSpan="2">Incertitude</td></tr>
             </thead>
@@ -91,7 +89,7 @@ export class AssessmentGHG extends React.Component {
               <tr>
                 <td className="column_icon">
                   <button className='btn' onClick={() => this.addNewLine("1")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <i className="bi bi-plus-lg"></i>
                   </button>
                 </td>
                 <td colSpan="5">Emissions directes des sources fixes de combustion</td>
@@ -105,7 +103,7 @@ export class AssessmentGHG extends React.Component {
               <tr key={itemId}>
                 <td className="column_icon">
                 <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button>
                   </td>
                 <td className="sub">
@@ -165,7 +163,7 @@ export class AssessmentGHG extends React.Component {
               <tr>
                 <td className="column_icon">
                 <button className='btn' onClick={() => this.addNewLine("2")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <i className="bi bi-plus-lg"></i>
                   </button>
                   </td>
                 <td colSpan="5">Emissions directes des sources mobiles de combustion</td>
@@ -180,7 +178,7 @@ export class AssessmentGHG extends React.Component {
               <tr key={itemId}>
                 <td className="column_icon">
                 <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button>
                   </td>
                 <td className="sub">
@@ -239,7 +237,7 @@ export class AssessmentGHG extends React.Component {
               <tr>
                 <td className="column_icon">
                 <button className='btn' onClick={() => this.addNewLine("3.1")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <i className="bi bi-plus-lg"></i>
                   </button>
                   </td>
                 <td colSpan="5">Emissions directes des procédés industriels</td>
@@ -253,7 +251,7 @@ export class AssessmentGHG extends React.Component {
               <tr key={itemId}>
                 <td className="column_icon">
                 <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button>
                   
                   
@@ -297,7 +295,7 @@ export class AssessmentGHG extends React.Component {
               <tr>
                 <td className="column_icon">
                 <button className='btn' onClick={() => this.addNewLine("3.2")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <i className="bi bi-plus-lg"></i>
                   </button>
                   </td>
                 <td colSpan="5">Emissions directes des procédés agricoles</td>
@@ -310,7 +308,7 @@ export class AssessmentGHG extends React.Component {
             {Object.entries(ghgDetails).filter(([_,itemData]) => itemData.assessmentItem=="3.2").map(([itemId,itemData]) => 
               <tr key={itemId}>
                 <td className="column_icon">    <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button></td>
                 <td className="sub">
                   <select className="form-input"  value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
@@ -368,7 +366,7 @@ export class AssessmentGHG extends React.Component {
                 <td className="column_icon">
            
                    <button className='btn' onClick={() => this.addNewLine("4")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <i className="bi bi-plus-lg"></i>
                   </button>
                   </td>
                 <td colSpan="5">Emissions directes fugitives</td>
@@ -383,7 +381,7 @@ export class AssessmentGHG extends React.Component {
                      .map(([itemId,itemData]) => 
                 <tr key={itemId}>
                   <td className="column_icon">    <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button></td>
                   <td className="sub">
                     <select className="form-input"  value={itemData.factorId} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
@@ -452,7 +450,7 @@ export class AssessmentGHG extends React.Component {
               <tr>
                 <td className="column_icon">
                 <button className='btn' onClick={() => this.addNewLine("5")}>
-                  <FontAwesomeIcon icon={faPlus} />
+                  <i className="bi bi-plus-lg"></i>
                   </button>
                   </td>
                 <td colSpan="5">Emissions issues de la biomasse (sols et forêts)</td>
@@ -467,7 +465,7 @@ export class AssessmentGHG extends React.Component {
                     .map(([itemId,itemData]) => 
               <tr key={itemId}>
                 <td className="column_icon">    <button className='btn'  onClick={() => this.deleteItem(itemId)}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <i className="bi bi-trash"></i>
                   </button></td>
                 <td className="sub">
                     <select className="form-input"  value={itemData.sour} onChange={(event) => this.changeFactor(itemId,event.target.value)}>
@@ -529,11 +527,10 @@ export class AssessmentGHG extends React.Component {
                 <td >&nbsp;%</td></tr>
 
             </tbody>
-          </table>
-        </div>
+          </Table>
         <div className="view-header">
-          <button className="btn" onClick = {() => this.props.onGoBack()}>Retour</button>
-          <button className={"btn btn-secondary"} onClick = {() => this.onSubmit()}>Valider</button>
+          <button className="btn btn-sm" onClick = {() => this.props.onGoBack()}>Retour</button>
+          <button className="btn btn-secondary btn-sm" onClick = {() => this.onSubmit()}>Valider</button>
         </div>
       </div>
     ) 
