@@ -48,6 +48,9 @@ export class Session {
         // Validations 
         this.validations = props.validations || [];
 
+        // Comparative Division 
+        this.comparativeDivision = props.comparativeDivision || "00";
+
     // ---------------------------------------------------------------------------------------------------- //
     }
 
