@@ -11,6 +11,8 @@ import {
   faCheckCircle,
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
+import Select from 'react-select'
+
 
 // Components
 import { CompaniesTable } from "../../tables/CompaniesTable";
@@ -83,6 +85,7 @@ export class SectorSection extends React.Component {
     }
   };
 
+  
   render() {
     const {
       companies,
@@ -128,7 +131,6 @@ export class SectorSection extends React.Component {
                         </p>
                       </div>
                     )}
-                    {console.log(significativeCompanies)}
                     {significativeCompanies.filter(
                       (company) => company.footprintActivityCode == "00"
                     ).length > 0 ? (

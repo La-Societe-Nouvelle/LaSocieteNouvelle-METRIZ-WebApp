@@ -95,12 +95,12 @@ export class SirenSection extends React.Component {
     ) {
       buttonNextStep = (
         <div>
-            <buton 
+            <button 
               onClick={() => setCompanyStep(2)}
             className={"btn btn-primary me-3"}>
             Secteurs d'activité <FontAwesomeIcon icon={faChevronRight} />
 
-            </buton>
+            </button>
           <button
             className={"btn btn-secondary"}
             id="validation-button"

@@ -10,8 +10,13 @@ import { printValue, valueOrDefault } from "/src/utils/Utils";
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheckCircle, faSyncAlt, faWarning } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faSyncAlt,
+  faWarning,
+} from "@fortawesome/free-solid-svg-icons";
 import { Table } from "react-bootstrap";
+import Select from "react-select";
 
 /* ---------- COMPANIES TABLE ---------- */
 
@@ -30,40 +35,33 @@ export class CompaniesTable extends React.Component {
       this.setState({ companies: this.props.companies });
     }
   }
-  
+
   render() {
     const { nbItems } = this.props;
     const { companies, columnSorted, page } = this.state;
 
     this.sortCompanies(companies, columnSorted);
-  
 
     return (
       <div className="table-main">
         <Table>
           <thead>
             <tr>
-
-              <td
-                onClick={() => this.changeColumnSorted("denomination")}
-              >
+              <td onClick={() => this.changeColumnSorted("denomination")}>
                 Libellé du compte fournisseur
               </td>
-              <td
-              >
-                Compte fournisseur
-              </td>
-              <td
-                onClick={() => this.changeColumnSorted("area")}
-              >
+              <td>Compte fournisseur</td>
+              <td className="area-column" onClick={() => this.changeColumnSorted("area")}>
                 Espace économique
               </td>
               <td
+                className="division-column"
                 onClick={() => this.changeColumnSorted("activity")}
               >
                 Secteur d'activité
               </td>
-              <td className="align-right"
+              <td
+                className="text-end"
                 onClick={() => this.changeColumnSorted("amount")}
               >
                 Montant
@@ -201,7 +199,26 @@ class RowTableCompanies extends React.Component {
 
       dataUpdated: props.dataUpdated,
       toggleIcon: false,
+      divisionsOptions: [],
+      areasOptions: [],
     };
+
+    //Divisions select options
+    Object.entries(divisions)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map(([value, label]) =>
+        this.state.divisionsOptions.push({ value: value, label: value + " - " + label })
+      );
+
+    // area select options
+    Object.entries(areas)
+      .sort()
+      .map(([value, label]) =>
+        this.state.areasOptions.push({
+          value: value,
+          label: value + " - " + label,
+        })
+      );
   }
 
   componentDidUpdate(prevProps) {
@@ -223,15 +240,13 @@ class RowTableCompanies extends React.Component {
         dataUpdated: false,
       });
     }
-  } 
+  }
 
   render() {
     const {
       corporateName,
       account,
       amount,
-      legalUnitAreaCode,
-      legalUnitActivityCode,
       status,
     } = this.props;
     const { areaCode, activityCode, dataUpdated } = this.state;
@@ -239,86 +254,66 @@ class RowTableCompanies extends React.Component {
     let icon;
 
     if (activityCode == "00") {
-      icon = <p className="warning"><FontAwesomeIcon icon={faWarning} title="Risque de données incomplètes" /></p>
-    }
-    else {
+      icon = (
+        <p className="warning">
+          <FontAwesomeIcon
+            icon={faWarning}
+            title="Risque de données incomplètes"
+          />
+        </p>
+      );
+    } else {
       if (status == 200) {
-        icon = <p className="success">
-          <FontAwesomeIcon icon={faCheckCircle} title="Données synchronisées" /> </p>
-
-      }
-      else {
-        icon = <p className="success">
-          <FontAwesomeIcon icon={faSyncAlt} title="Données prêtes à être synchronisées" /> </p>
+        icon = (
+          <p className="success">
+            <FontAwesomeIcon
+              icon={faCheckCircle}
+              title="Données synchronisées"
+            />
+          </p>
+        );
+      } else {
+        icon = (
+          <p className="success">
+            <FontAwesomeIcon
+              icon={faSyncAlt}
+              title="Données prêtes à être synchronisées"
+            />
+          </p>
+        );
       }
     }
     return (
       <tr>
-
         <td className="corporate-name">
-          {icon} 
-          <p>
-             {corporateName}
-            </p>
+          {icon}
+          <p>{corporateName}</p>
         </td>
+        <td>{account}</td>
         <td>
-          {account}
-        </td>
-        <td >
-          <select
-            className={
-              !dataUpdated && status == 200
-                ? "valid"
-                : ""
-            }
-            value={areaCode || "FRA"}
+          <Select
+            defaultValue={{
+              label: areaCode + " - " + areas[areaCode],
+              value: areaCode,
+            }}
+            placeholder={"Choisissez un espace économique"}
+            className={!dataUpdated && status == 200 ? "valid" : ""}
+            options={this.state.areasOptions}
             onChange={this.onAreaCodeChange}
-          >
-            {Object.entries(areas)
-              .sort()
-              .map(([code, libelle]) => (
-                <option
-                  className={
-                    legalUnitAreaCode && code == legalUnitAreaCode
-                      ? "default-option"
-                      : ""
-                  }
-                  key={code}
-                  value={code}
-                >
-                  {code + " - " + libelle}
-                </option>
-              ))}
-          </select>
+          />
         </td>
 
         <td className={activityCode == "00" ? "warning" : ""}>
-          <select
-            className={
-              !dataUpdated && status == 200
-                ? "valid"
-                : ""
-            }
-            value={activityCode.substring(0, 2) || "00"}
+          <Select
+            defaultValue={{
+              label: activityCode + " - " + divisions[activityCode],
+              value: activityCode,
+            }}
+            placeholder={"Choisissez un secteur d'activité"}
+            className={!dataUpdated && status == 200 ? "valid" : ""}
+            options={this.state.divisionsOptions}
             onChange={this.onActivityCodeChange}
-          >
-            {Object.entries(divisions)
-              .sort((a, b) => parseInt(a) - parseInt(b))
-              .map(([code, libelle]) => (
-                <option
-                  className={
-                    legalUnitActivityCode &&
-                      code == legalUnitActivityCode.substring(0, 2)
-                      ? "default-option"
-                      : ""
-                  }
-                  key={code}
-                  value={code}
-                >
-                  {code + " - " + libelle}
-                </option>
-              ))}
-          </select>
+          />
         </td>
 
         <td className="align-right">{printValue(amount, 0)} &euro;</td>
@@ -334,21 +329,19 @@ class RowTableCompanies extends React.Component {
     });
   };
 
-
   onAreaCodeChange = (event) => {
-    this.setState({ areaCode: event.target.value, dataUpdated: true });
+    this.setState({ areaCode: event.value, dataUpdated: true });
     this.props.updateCompany({
       id: this.props.id,
-      footprintAreaCode: event.target.value,
+      footprintAreaCode: event.value,
     });
   };
   onActivityCodeChange = (event) => {
-    this.setState({ activityCode: event.target.value, dataUpdated: true });
+    console.log(event.value);
+    this.setState({ activityCode: event.value, dataUpdated: true });
     this.props.updateCompany({
       id: this.props.id,
-      footprintActivityCode: event.target.value,
+      footprintActivityCode: event.value,
     });
   };
-
-
 }

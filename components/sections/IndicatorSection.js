@@ -8,6 +8,7 @@ import divisions from "/lib/divisions";
 
 // React
 import React from "react";
+import Select from "react-select";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -146,16 +147,22 @@ export class IndicatorSection extends React.Component {
       "wat",
     ].includes(indic);
 
-    const {
-      intermediateConsumption,
-      capitalConsumption,
-      netValueAdded,
-    } = this.props.session.financialData.aggregates;
+    const { intermediateConsumption, capitalConsumption, netValueAdded } =
+      this.props.session.financialData.aggregates;
 
     const isPublicationAvailable =
       Object.entries(
         this.props.session.financialData.aggregates.revenue.footprint.indicators
       ).filter(([_, indicator]) => indicator.value != null).length > 0;
+
+    const divisionsOptions = [];
+
+    //Divisions select options
+    Object.entries(divisions)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map(([value, label]) =>
+        divisionsOptions.push({ value: value, label: value + " - " + label })
+      );
 
     return (
       <Container fluid className="indicator-section">
@@ -338,19 +345,19 @@ export class IndicatorSection extends React.Component {
                 <div className="container">
                   <div className="form-group">
                     <label>Sélectionner une activité comparative : </label>
-                    <select
-                      className={"form-input small-input"}
-                      value={comparativeDivision}
+
+                    <Select
+                      defaultValue={{
+                        label:
+                          comparativeDivision +
+                          " - " +
+                          divisions[comparativeDivision],
+                        value: comparativeDivision,
+                      }}
+                      placeholder={"Choisissez un secteur d'activité"}
+                      options={divisionsOptions}
                       onChange={this.changeComparativeDivision}
-                    >
-                      {Object.entries(divisions)
-                        .sort((a, b) => parseInt(a) - parseInt(b))
-                        .map(([code, libelle]) => (
-                          <option key={code} value={code}>
-                            {code + " - " + libelle}
-                          </option>
-                        ))}
-                    </select>
+                    />
                   </div>
                   <div className="graph-section">
                     <IndicatorGraphs
@@ -433,13 +440,27 @@ export class IndicatorSection extends React.Component {
 
                 <ul>
                   {this.props.session.validations.map((indic, index) => (
-                    <li key={index}><FontAwesomeIcon icon={faCheck} /> Indicateur : {metaIndics[indic].libelle}
+                    <li key={index}>
+                      <FontAwesomeIcon icon={faCheck} /> Indicateur :{" "}
+                      {metaIndics[indic].libelle}
                     </li>
                   ))}
-                  <li><FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte environnementale</li>
-                  <li><FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte économique et sociale</li>
-                  <li><FontAwesomeIcon icon={faCheck} /> Rapport général sur l'empreinte sociétale </li>
-                  <li><FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de la session</li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte
+                    environnementale
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} /> Rapport sur l'empreinte
+                    économique et sociale
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} /> Rapport général sur
+                    l'empreinte sociétale{" "}
+                  </li>
+                  <li>
+                    <FontAwesomeIcon icon={faCheck} /> Fichier de sauvegarde de
+                    la session
+                  </li>
                 </ul>
               </div>
               <button
@@ -525,7 +546,7 @@ export class IndicatorSection extends React.Component {
     this.setState({ selectedTable: event.target.value });
 
   changeComparativeDivision = async (event) => {
-    let division = event.target.value;
+    let division = event.value;
     if (division != "00") {
       this.setState({ comparativeDivision: division });
       let productionSectorFootprint = await fetchDivisionData(division, "PRD");
