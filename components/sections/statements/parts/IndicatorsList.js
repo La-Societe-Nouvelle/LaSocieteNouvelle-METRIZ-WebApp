@@ -45,6 +45,7 @@ const IndicatorsList = (props) => {
   );
 
   useEffect(async () => {
+    
     if (comparativeDivision != "00") {
       let productionSectorFootprint = await fetchDivisionData(
         comparativeDivision,
@@ -94,6 +95,9 @@ const IndicatorsList = (props) => {
       props.session.validations = props.session.validations.filter(
         (item) => item != indic
       );
+      SetValidations(validations.filter(
+        (item) => item != indic
+      ))
       // update footprint
       await props.session.updateIndicator(indic);
     }
@@ -187,6 +191,9 @@ const IndicatorsList = (props) => {
         ></ChangeDivision>
       )}
       <h3> Création de la valeur</h3>
+      {
+    console.log(validations)
+   }
       <Accordion>
         {Object.entries(metaIndics)
           .filter((indic) => indic.some((el) => valueCreation.includes(el)))
