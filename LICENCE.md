@@ -208,22 +208,20 @@ aux domaines d'application, étant ci-après précisé que cela comporte:
 
  1.
 
-    la reproduction permanente ou provisoire du Logiciel en tout ou
-    partie par tout moyen et sous toute forme.
+la reproduction permanente ou provisoire du Logiciel en tout ou
+partie par tout moyen et sous toute forme.
 
  2.
 
-    le chargement, l'affichage, l'exécution, ou le stockage du Logiciel
-    sur tout support.
+le chargement, l'affichage, l'exécution, ou le stockage du Logiciel
+sur tout support.
 
  3.
-
-    la possibilité d'en observer, d'en étudier, ou d'en tester le
-    fonctionnement afin de déterminer les idées et principes qui sont à
-    la base de n'importe quel élément de ce Logiciel; et ceci, lorsque
-    le Licencié effectue toute opération de chargement, d'affichage,
-    d'exécution, de transmission ou de stockage du Logiciel qu'il est en
-    droit d'effectuer en vertu du Contrat.
+la possibilité d'en observer, d'en étudier, ou d'en tester le
+fonctionnement afin de déterminer les idées et principes qui sont à
+la base de n'importe quel élément de ce Logiciel; et ceci, lorsque
+d'exécution, de transmission ou de stockage du Logiciel qu'il est en
+droit d'effectuer en vertu du Contrat.
 
 
       5.2 DROIT D'APPORTER DES CONTRIBUTIONS
@@ -257,13 +255,13 @@ soit accompagnée:
 
  1.
 
-    d'un exemplaire du Contrat,
+ d'un exemplaire du Contrat,
 
  2.
 
-    d'un avertissement relatif à la restriction de garantie et de
-    responsabilité du Concédant telle que prévue aux articles 8
-    <#responsabilite> et 9 <#garantie>,
+d'un avertissement relatif à la restriction de garantie et de
+responsabilité du Concédant telle que prévue aux articles 8
+<#responsabilite> et 9 <#garantie>,
 
 et que, dans le cas où seul le Code Objet du Logiciel est redistribué,
 le Licencié permette un accès effectif au Code Source complet du
@@ -285,23 +283,23 @@ accompagnée:
 
  1.
 
-    d'un exemplaire du Contrat,
+d'un exemplaire du Contrat,
 
  2.
 
-    d'un avertissement relatif à la restriction de garantie et de
-    responsabilité du Concédant telle que prévue aux articles 8
-    <#responsabilite> et 9 <#garantie>,
+d'un avertissement relatif à la restriction de garantie et de
+responsabilité du Concédant telle que prévue aux articles 8
+<#responsabilite> et 9 <#garantie>,
 
 et, dans le cas où seul le code objet du Logiciel Modifié est redistribué,
 
  3.
 
-    d'une note précisant les conditions d'accès effectif au code source
-    complet du Logiciel Modifié, pendant une période d'au moins 3 ans à
-    compter de la distribution du Logiciel Modifié, étant entendu que le
-    coût additionnel d'acquisition du code source ne devra pas excéder
-    le simple coût de transfert des données.
+d'une note précisant les conditions d'accès effectif au code source
+complet du Logiciel Modifié, pendant une période d'au moins 3 ans à
+compter de la distribution du Logiciel Modifié, étant entendu que le
+coût additionnel d'acquisition du code source ne devra pas excéder
+le simple coût de transfert des données.
 
 
         5.3.3 DISTRIBUTION DES MODULES EXTERNES
@@ -360,13 +358,13 @@ Le Licencié s'engage expressément:
 
  1.
 
-    à ne pas supprimer ou modifier de quelque manière que ce soit les
-    mentions de propriété intellectuelle apposées sur le Logiciel;
+à ne pas supprimer ou modifier de quelque manière que ce soit les
+mentions de propriété intellectuelle apposées sur le Logiciel;
 
  2.
 
-    à reproduire à l'identique lesdites mentions de propriété
-    intellectuelle sur les copies du Logiciel modifié ou non.
+ à reproduire à l'identique lesdites mentions de propriété
+intellectuelle sur les copies du Logiciel modifié ou non.
 
 Le Licencié s'engage à ne pas porter atteinte, directement ou
 indirectement, aux droits de propriété intellectuelle du Titulaire et/ou
