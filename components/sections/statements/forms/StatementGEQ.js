@@ -56,7 +56,7 @@ export class StatementGEQ extends React.Component {
             </div>
           </div>
           <div className="form-group">
-            <label>Ecart de rémunarations F/H (en % du taux horaire brut moyen)</label>
+            <label>Ecart de rémunérations F/H (en % du taux horaire brut moyen)</label>
             <InputNumber value={roundValue(wageGap, 1)}
               disabled={hasEmployees === false}
               onUpdate={this.updateWageGap} placeholder="%"/>

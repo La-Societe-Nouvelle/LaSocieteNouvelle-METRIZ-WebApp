@@ -3,7 +3,7 @@
 // React
 
 import React from "react";
-import { Button, Col, Container, Image, Row } from "react-bootstrap";
+import { Alert, Button, Col, Container, Image, Row } from "react-bootstrap";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
@@ -54,35 +54,37 @@ export class StartSection extends React.Component {
                   <p>Engagements sociaux et environnementaux</p>
                 </Col>
               </Row>
-                  <Button
-                    variant="primary"
-                    className="me-2"
-                    onClick={this.props.startNewSession}
-                  >
-                    Nouvelle analyse
-                  </Button>
 
-                  <a
-                    className="btn btn-secondary"
-                    href="https://docs.lasocietenouvelle.org"
-                  >
-                    Documentation
-                  </a>
-                  <span className="vertical-lign"></span>
-                  <Button
-                    variant="outline-primary"
-                    onClick={this.triggerImportFile}
-                  >
-                    Reprendre une session
-                  </Button>
+              <Button
+                variant="primary"
+                className="me-2"
+                
+                onClick={this.props.startNewSession}
+              >
+                Nouvelle analyse
+              </Button>
 
-                  <input
-                    id="import-session"
-                    type="file"
-                    accept=".json"
-                    onChange={this.importFile}
-                    visibility="collapse"
-                  />
+              <a
+                className="btn btn-secondary"
+                href="https://docs.lasocietenouvelle.org"
+              >
+                Documentation
+              </a>
+              <span className="vertical-lign"></span>
+              <Button
+                variant="outline-primary"
+                onClick={this.triggerImportFile}
+              >
+                Reprendre une session
+              </Button>
+
+              <input
+                id="import-session"
+                type="file"
+                accept=".json"
+                onChange={this.importFile}
+                visibility="collapse"
+              />
             </section>
           </Col>
           <Col lg={4}>
