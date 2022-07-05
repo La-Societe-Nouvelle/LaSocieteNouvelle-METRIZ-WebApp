@@ -14,7 +14,7 @@ import ImportSection from '../components/sections/import/ImportSection';
 import { InitialStatesSection } from '/components/sections/InitialStatesSection';
 import { CompaniesSection } from '/components/sections/companies/CompaniesSection';
 import StatementSection from '../components/sections/statements/StatementSection';
-import { PublishStatementSection } from '/components/sections/PublishStatementSection';
+import { PublishStatementSection } from '../components/sections/PublishStatementSection';
 
 // Others components
 import { Header } from '/components/parts/headers/Header';
@@ -85,6 +85,7 @@ class Metriz extends React.Component {
 
   render() {
     const { step, session } = this.state;
+    console.log(step);
     return (
       <>
         <div className="wrapper" id="wrapper">
