@@ -1,3 +1,11 @@
+<p align="center">
+    <img src="https://lasocietenouvelle.org/logo.svg" height="100px">  
+</p>
+<p align="center">
+   🍃Système d'Information national sur les impacts des entreprises 🍃
+</p>
+
+
 # LaSocieteNouvelle-METRIZ-WebApp
 
 L'application METRIZ a pour objet de fournir une solution de base pour le calcul de l'empreinte sociétale d'une entreprise.
