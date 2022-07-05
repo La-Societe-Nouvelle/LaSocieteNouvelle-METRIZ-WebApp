@@ -493,10 +493,8 @@ function generatePDF(
   let canvasImg = canvas.toDataURL("image/jpg", 1.0);
 
   const imgProps = doc.getImageProperties(canvasImg);
-  console.log(imgProps);
 
   const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  console.log(pdfHeight);
   doc.addImage(canvasImg, "JPEG", x, y, pdfWidth, pdfHeight);
 
   //Consumption canvas
@@ -1215,7 +1213,7 @@ function exportIndicPDF(
   window.open(doc.output("bloburl"), "_blank");
 }
 
-function exportFootprintPDF(session) {
+async function exportFootprintPDF(session) {
   const doc = new jsPDF("landscape", "mm", "a4", true);
 
   const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];

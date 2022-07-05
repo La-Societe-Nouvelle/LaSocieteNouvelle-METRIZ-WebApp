@@ -119,7 +119,6 @@ export class StatementECO extends React.Component {
 }
 
 export const writeStatementECO = (doc, x, y, impactsData) => {
-  console.log(impactsData)
   doc.text("Valeur ajoutée nette produite en France : " + printValue(impactsData.domesticProduction, 0) + " €" + (impactsData.isAllActivitiesInFrance ? "*" : ""), x, y);
   if (impactsData.isAllActivitiesInFrance) {
     y += 6;

@@ -11,20 +11,29 @@ import {
 
 const ExportResults = (props) => {
 
-  const [isBuilding, setisBuilding] = useState(false);
+  const [isBuildingPDF, setisBuildingPDF] = useState(false);
+  const [isBuildingZIP, setisBuildingZIP] = useState(false);
+  const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
 
-  const handleDownloadZip = async() => {
+
+  const handleDownloadZip = () => {
+    setisBuildingZIP(true);
+    console.log(isBuildingZIP)
     if(!props.session.comparativeDivision) {
       props.session.comparativeDivision = "00";
     }
-   await downloadReport(props.session.validations, props.session, props.session.comparativeDivision);
+    buildZip(props.session.validations, props.session, props.session.comparativeDivision);
+
+   setisBuildingZIP(false);
   };
 
-  const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
+  const buildZip = async(validations, session, comparativeDivision) => {
+    await downloadReport(validations, session, comparativeDivision);
+
+  }
+
 
   const downloadReport = async (indics, session, comparativeDivision) => {
-    setisBuilding(true);
-    console.log(indics)
     const { legalUnit, year } = session;
     // Zip Export
     let zip = new JSZip();
@@ -136,7 +145,6 @@ const ExportResults = (props) => {
     zip
       .generateAsync({ type: "blob" })
       .then(function (content) {
-        setisBuilding(false),
         saveAs(
           content,
           "livrables_" +
@@ -148,32 +156,47 @@ const ExportResults = (props) => {
       });
   };
 
-  const handleDownloadPDF = () => {
-     exportFootprintPDF(props.session);
-  };
+  const handleDownloadPDF = async() => {
+    setisBuildingPDF(true);
+
+     await exportFootprintPDF(props.session);
+     setisBuildingPDF(false);
+
+    };
 
   return (
     <div>
       <h3>Export des résultats</h3>
 
-      <div className="flex">
+        {
+      console.log(isBuildingZIP)
+    }
+      <div className="flex align-items-center">
         <p>Rapport sur l'empreinte sociétale</p>
+        <div>
+     
         <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
-          <i className="bi bi-download"></i> Télécharger
+        {isBuildingPDF ?
+           <LoadingSpinner />
+           : 
+           <i className="bi bi-download"></i>
+       }  Télécharger
         </Button>
+        </div>
       </div>
       <div className="flex mt-2">
         <p>Dossier Complet : Ensemble des livrables et fichier de sauvegarde</p>
-        {isBuilding ? (
-          <Button variant="secondary" size="sm" disabled>
-            Téléchargement en cours <LoadingSpinner />
-          </Button>
-        ) : (
+ 
           <Button variant="secondary" size="sm" onClick={handleDownloadZip}>
-            <i className="bi bi-download"></i> Télécharger
+          {isBuildingZIP ?
+           <LoadingSpinner />
+           : 
+           <i className="bi bi-download"></i>
+       } Télécharger
           </Button>
-        )}
+     
       </div>
+   
     </div>
   );
 };

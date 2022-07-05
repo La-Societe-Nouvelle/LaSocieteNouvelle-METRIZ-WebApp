@@ -269,7 +269,6 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
   return (
     <div className="hidden">
       {printGrossImpact && (
-        console.log("pie"),
         <div className="piechart-container">
           
           <PieGraph
