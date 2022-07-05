@@ -17,14 +17,12 @@ const ExportResults = (props) => {
 
 
   const handleDownloadZip = () => {
-    setisBuildingZIP(true);
-    console.log(isBuildingZIP)
+
     if(!props.session.comparativeDivision) {
       props.session.comparativeDivision = "00";
     }
     buildZip(props.session.validations, props.session, props.session.comparativeDivision);
 
-   setisBuildingZIP(false);
   };
 
   const buildZip = async(validations, session, comparativeDivision) => {
@@ -34,6 +32,7 @@ const ExportResults = (props) => {
 
 
   const downloadReport = async (indics, session, comparativeDivision) => {
+    // TO DO : Optimisation PDF 
     const { legalUnit, year } = session;
     // Zip Export
     let zip = new JSZip();
@@ -168,9 +167,7 @@ const ExportResults = (props) => {
     <div>
       <h3>Export des résultats</h3>
 
-        {
-      console.log(isBuildingZIP)
-    }
+
       <div className="flex align-items-center">
         <p>Rapport sur l'empreinte sociétale</p>
         <div>
