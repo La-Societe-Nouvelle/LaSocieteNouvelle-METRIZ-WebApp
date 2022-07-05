@@ -51,7 +51,7 @@ const ResultSection = (props) => {
   const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(new SocialFootprint()
   );
 
-  const [comparativeFootprints, setComparativeFootprints] = useState(props.comparativeFootprints);
+  const [comparativeFootprints] = useState(props.comparativeFootprints);
 
 
   const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
@@ -130,7 +130,9 @@ const ResultSection = (props) => {
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
-          <DropdownButton id="indic-button" title="Autres résultats">
+           {
+            session.validations > 1 ? 
+            <DropdownButton id="indic-button" title="Autres résultats">
             {Object.entries(metaIndics).map(([key, value]) => {
               if (session.validations.includes(key) && key != indic) {
                 return (
@@ -140,7 +142,13 @@ const ResultSection = (props) => {
                 );
               }
             })}
-          </DropdownButton>
+          </DropdownButton> 
+          :
+          <Button id="indic-button" disabled > {metaIndics[indic].libelle} </Button>
+   
+         
+           }
+ 
           <Button
             variant="secondary"
             onClick={() =>
@@ -161,7 +169,7 @@ const ResultSection = (props) => {
       </div>
 
       <Row>
-        <Col lg="8">
+        <Col lg={session.validations > 1 ?  "8" : "12" }>
           <div className="d-flex align-items-center">
             <Image
               src={"/resources/icon-ese-bleues/" + indic + ".png"}
@@ -229,19 +237,6 @@ const ResultSection = (props) => {
                       onChange={changeComparativeDivision}
                     />
 
-      {/* <select
-        className={"form-input small-input"}
-        value={comparativeDivision}
-        onChange={changeComparativeDivision}
-      >
-        {Object.entries(divisions)
-          .sort((a, b) => parseInt(a) - parseInt(b))
-          .map(([code, libelle]) => (
-            <option key={code} value={code}>
-              {code + " - " + libelle}
-            </option>
-          ))}
-      </select> */}
       <div className="mt-5">
  
         <IndicatorGraphs
@@ -266,17 +261,6 @@ const ResultSection = (props) => {
         <Button variant="light" onClick={props.goBack}>
           <i className="bi bi-chevron-left"></i> Retour
         </Button>
-        <DropdownButton id="indic-button" title="Autres résultats">
-          {Object.entries(metaIndics).map(([key, value]) => {
-            if (session.validations.includes(key) && key != indic) {
-              return (
-                <Dropdown.Item key={key} onClick={() => setIndic(key)}>
-                  {value.libelle}
-                </Dropdown.Item>
-              );
-            }
-          })}
-        </DropdownButton>
         <Button
           variant="secondary"
           onClick={() =>

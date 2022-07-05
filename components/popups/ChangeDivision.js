@@ -5,9 +5,10 @@ import divisions from "/lib/divisions";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 const ChangeDivision = (props) => {
-  const [comparativeDivision, setComparativeDivision] = useState();
+  const [comparativeDivision, setComparativeDivision] = useState("00");
 
   const handleOnClick = () => {
+
     props.handleDownload(props.indic,comparativeDivision);
 
   }
@@ -15,7 +16,7 @@ const ChangeDivision = (props) => {
 
     let division = event.target.value;
     setComparativeDivision(division);
-
+    console.log(division)
     props.handleDivision(division);
     props.handleClose
   };
@@ -23,7 +24,7 @@ const ChangeDivision = (props) => {
   return (
     <Modal show="true" onHide={props.handleClose} size="xl" centered>
       <Modal.Header closeButton>
-        <Modal.Title>Choisissez un secteur d'activité</Modal.Title>
+        <Modal.Title>Sélectionnez une division pour ajouter des valeurs comparative</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form.Select size="sm" className="mb-4"
