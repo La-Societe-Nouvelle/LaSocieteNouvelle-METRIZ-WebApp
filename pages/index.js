@@ -85,7 +85,6 @@ class Metriz extends React.Component {
 
   render() {
     const { step, session } = this.state;
-    console.log(step);
     return (
       <>
         <div className="wrapper" id="wrapper">
