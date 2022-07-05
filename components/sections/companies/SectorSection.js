@@ -11,7 +11,6 @@ import {
   faCheckCircle,
   faChevronLeft,
 } from "@fortawesome/free-solid-svg-icons";
-import Select from 'react-select'
 
 
 // Components

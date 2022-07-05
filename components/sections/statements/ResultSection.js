@@ -9,6 +9,7 @@ import {
   Tab,
   Tabs,
 } from "react-bootstrap";
+import Select from "react-select";
 
 import PieGraph from "../../graphs/PieGraph";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
@@ -54,6 +55,14 @@ const ResultSection = (props) => {
 
 
   const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
+  const divisionsOptions = [];
+
+      //Divisions select options
+      Object.entries(divisions)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map(([value, label]) =>
+        divisionsOptions.push({ value: value, label: value + " - " + label })
+      );
 
   const { intermediateConsumption, capitalConsumption, netValueAdded } = props.session.financialData.aggregates;
 
@@ -83,7 +92,7 @@ const ResultSection = (props) => {
 
   const changeComparativeDivision = async (event) => {
 
-    let division = event.target.value;
+    let division = event.value;
 
     setComparativeDivision(division);
 
@@ -206,7 +215,21 @@ const ResultSection = (props) => {
       </Row>
       <hr></hr>
       <h3>Comparaison par activité</h3>
-      <select
+
+      <Select
+                      defaultValue={{
+                        label:
+                          comparativeDivision +
+                          " - " +
+                          divisions[comparativeDivision],
+                        value: comparativeDivision,
+                      }}
+                      placeholder={"Choisissez un secteur d'activité"}
+                      options={divisionsOptions}
+                      onChange={changeComparativeDivision}
+                    />
+
+      {/* <select
         className={"form-input small-input"}
         value={comparativeDivision}
         onChange={changeComparativeDivision}
@@ -218,7 +241,7 @@ const ResultSection = (props) => {
               {code + " - " + libelle}
             </option>
           ))}
-      </select>
+      </select> */}
       <div className="mt-5">
  
         <IndicatorGraphs
@@ -264,8 +287,8 @@ const ResultSection = (props) => {
               "#Production",
               "#Consumption",
               "#Value",
-              "#PieChart"
-            )
+              printGrossImpact.includes(indic) ? "#PieChart" : "" 
+              )
           }
         >
           Télécharger le rapport <i className="bi bi-download"></i>
