@@ -22,7 +22,7 @@ import { Table } from 'react-bootstrap';
 /* -------------------- PUBLISH STATEMENT SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class PublishStatement extends React.Component {
+export class PublishStatementSection extends React.Component {
 
     constructor(props) {
         super(props);
