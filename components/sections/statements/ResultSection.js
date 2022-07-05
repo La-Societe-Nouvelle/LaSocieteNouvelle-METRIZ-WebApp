@@ -247,7 +247,7 @@ const ResultSection = (props) => {
           {Object.entries(metaIndics).map(([key, value]) => {
             if (session.validations.includes(key) && key != indic) {
               return (
-                <Dropdown.Item onClick={() => setIndic(key)}>
+                <Dropdown.Item key={key} onClick={() => setIndic(key)}>
                   {value.libelle}
                 </Dropdown.Item>
               );
