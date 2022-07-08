@@ -169,7 +169,7 @@ const ResultSection = (props) => {
       </div>
 
       <Row>
-        <Col lg={session.validations > 1 ?  "8" : "12" }>
+        <Col lg={printGrossImpact.includes(indic) ?  "8" : "12" }>
           <div className="d-flex align-items-center">
             <Image
               src={"/resources/icon-ese-bleues/" + indic + ".png"}
@@ -198,9 +198,8 @@ const ResultSection = (props) => {
             </Tab>
           </Tabs>
         </Col>
-        <Col>
           {printGrossImpact.includes(indic) && (
-            <>
+        <Col>
               <h3 className="text-center">
                 Répartition des impacts bruts (en %)
               </h3>
@@ -217,9 +216,8 @@ const ResultSection = (props) => {
                   ].getGrossImpact(netValueAdded.amount)}
                 />
               </div>
-            </>
-          )}
         </Col>
+          )}
       </Row>
       <hr></hr>
       <h3>Comparaison par activité</h3>
