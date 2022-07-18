@@ -66,32 +66,7 @@
 		font-size: 0.8em;
 	}
 
-	.align-left {
-		text-align: left;
-	}
 
-	.align-center {
-		text-align: center;
-	}
-
-	.align-right {
-		text-align: right;
-	}
-
-	.underline {
-		position: relative;
-		&::after {
-		  content: "";
-		  width:100%;
-		  position: absolute;
-		  background-color: $secondary;
-		  height: 10px;
-		  bottom: 0.1rem;
-		  left : 0.1em;
-		  z-index: -1;
-		  opacity: 0.7;
-		}
-	  }
 	  .subtitle
 	  {
 		  color : $secondary; 

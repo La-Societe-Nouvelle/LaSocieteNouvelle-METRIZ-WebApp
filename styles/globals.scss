@@ -1,8 +1,5 @@
 /* ---------- Import ---------- */
 @import 'libs/vars';
-@import 'libs/grid';
-@import 'base/reset';
-@import 'base/page';
 @import 'base/typography';
 @import 'layout/header';
 @import 'layout/main';
@@ -13,7 +10,6 @@
 @import 'components/alert';
 @import 'components/form';
 @import 'components/tables';
-//@import 'components/modal'; 
 
 
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Roboto:wght@100;300;400;700&display=swap');
@@ -54,120 +50,29 @@ input {
   }
 }
 
+// underline 
+.underline{
+  position: relative;
+
+}
+.underline:after {
+  content: "";
+  width: 100%;
+  position: absolute;
+  background-color: #fa595f;
+  height: 10px;
+  bottom: 0.1rem;
+  left: 0.1em;
+  z-index: -1;
+  opacity: .7;
+}
+
 // Exposant
 
 sup {
   font-size: 9px;
 }
 
-
-/* ----- SECTION ----- */
-
-.section-container { // index.js
-  width: 100%;
-  height: 100%;
-
-  .section-view { // section view
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    margin: auto;
-    align-items: center;
-    min-height: 100%;
-
-    .section-view-actions {
-      width: 100%;
-      //height: 30px;
-      padding: 2px 0;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: solid 2px $primary;
-
-      select {
-        width: 400px;
-        background-color: $primary;
-        color: white;
-        border: solid 0px $primary;
-        border-radius: 0;
-  
-        option 
-        {
-          background-color: white;
-          color: $primary;
-          border: solid 1px $primary;
-          border-radius: 0;     
-        }
-      }
-
-      #validation-button {
-        width: 150px;
-      }
-      
-      #selection-indicator {
-        width: 750px;
-      }
-    }
-
-    .section-top-notes {
-      width: 100%;
-      margin: 5px 5px;
-      padding: 10px;
-      border: solid 1px $secondary;
-
-      p {
-        margin: 0;
-        font-size: 14px;
-      }
-    }
-
-    .section-view-header { // header of section view
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      text-align: center;
-      //border-bottom: solid gray 3px;
-
-      h1 {  // title of section
-        margin: 15px 5px 20px 5px;
-      }
-
-      .beta {
-        background-color: $primary;
-        color: white;
-        font-weight: bold;
-        font-size: 20px;
-        margin-left: 5px;
-      }
-
-    }
-
-    .section-view-header-odds { // group of sdg icons
-      position: absolute;
-      top: 160px;
-      right: 25px;
-      margin-top: 10px;
-      
-      img { // sdg icon
-        height: 40px;
-        width: 40px;
-        margin: 2px;
-      }
-    }
-
-
-    .indicator-section-view {
-      padding: 0 25px 25px;
-      width: 100%;
-      overflow: auto;
-    }
-
-  
-  }
-}
 
 
 /* ---------- GROUP ---------- */
@@ -178,26 +83,6 @@ sup {
 
   p {
     margin: 5px 0;
-  }
-}
-
-/* ---------- TABLE ---------- */
-
-
-
-.table-navigation {
-  margin: 0 2px;
-  padding: 5px 2px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-
-  button {
-    min-width: 150px;
-  }
-
-  p {
-    margin: 0;
   }
 }
 
@@ -212,149 +97,13 @@ sup {
     flex-direction: row;
     justify-content: flex-end;
   }
-  
-  .view-footer {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    padding : 1em;
-    .btn {
-      margin : 0.5em 0 0.5em 0.5em;
-  }  
-  }
+
 
 }
 
-/* ---------- SPECIFIC ITEMS ---------- */
 
-#start-choices-container,
-#siren-form-container,
-#import-fec-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: auto;
-
-  #start-choices {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 125px;
-    width: 300px;
-
-  }
-
-  button.big {
-    width: 300px;
-    height: 50px;
-    padding: 0;
-    margin: 0;
-  }
-
-  button.xl {
-    width: 500px;
-    height: 50px;
-    padding: 0;
-    margin: 0;
-  }
-  
-  .siren-input {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-
-    input {
-      text-align: center;
-      width: 500px;
-    }
-  }
-
-}
-
-#logos {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 100px;
-  width: 100%;
-
-  .vertical-line {
-    height: 60px;
-    line {
-      stroke: $primary;
-    }
-  }
-
-  .logos_container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    margin-top: 25px;
-    margin-bottom: 25px;
-    
-    > div {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-
-      &#left {
-        justify-content: flex-end;
-      }
-      &#right {
-        justify-content: flex-start;
-      }
-    }
-    
-  }
-
-  img {
-    height: 75px;
-    margin: 0 25px;
-  }
-
-  p {
-    margin-top: 25px;
-    font-size: 12px;
-  }
-}
-
-/* --- x --- */
-
-.inline-input {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 2px 5px;
-
-  &.short {
-    input {
-      width: 150px;
-    }
-  }
-  label {
-    min-width: 200px;
-  }
-  input {
-    width: 500px;
-  }
-}
-
-#import-expenses,
-#import-depreciations,
-#import-companies,
-#import-states,
 #import-companies-csv,
 #import-companies-xlsx,
-#import-fec,
 #import-session {
   margin: 0px;
   padding: 0px;

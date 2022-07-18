@@ -29,7 +29,9 @@ p.toChecked {
 table {
   border: 1px solid $light;
   font-size: 0.85em;
-
+  td {
+    border : none;
+  }
   .siren {
     width: 250px;
   }
