@@ -104,7 +104,7 @@ function MappedAccounts(props) {
           onClick={() => props.return()}
         >
           <FontAwesomeIcon icon={faChevronLeft} className="me-1"/>
-          Retour aux A-Nouveaux
+          <i class="bi bi-chevron-left"></i> Retour aux A-Nouveaux
         </button>
         <button
           className="btn btn-secondary"

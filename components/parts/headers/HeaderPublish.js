@@ -63,9 +63,8 @@ export function HeaderPublish({ setStep, downloadSession }) {
           </div>
           <div className="action">
             <button className="btn btn-secondary" onClick={() => setStep(4)}>
-              {" "}
-              <FontAwesomeIcon icon={faChevronLeft} /> Retour à la mesure des
-              impacts{" "}
+               <i class="bi bi-chevron-left"></i> Retour à la mesure des
+              impacts
             </button>
           </div>
           <nav id="progression" className="row">
