@@ -301,7 +301,7 @@ export class AssessmentNRG extends React.Component {
           </Table>
           
         <div className="view-header">
-          <button className="btn btn-sm" onClick = {() => this.props.onGoBack()}><i class="bi bi-chevron-left"></i> Retour</button>
+          <button className="btn btn-sm" onClick = {() => this.props.onGoBack()}><i className="bi bi-chevron-left"></i> Retour</button>
           <button className="btn btn-secondary btn-sm" onClick = {() => this.onSubmit()}>Valider</button>
         </div>
 

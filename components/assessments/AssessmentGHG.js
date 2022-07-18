@@ -1063,7 +1063,7 @@ export class AssessmentGHG extends React.Component {
             className="btn btn-sm btn-light me-2"
             onClick={() => this.props.onGoBack()}
           >
-            <i class="bi bi-chevron-left"></i> Retour
+            <i className="bi bi-chevron-left"></i> Retour
           </button>
           <button
             className="btn btn-secondary btn-sm"

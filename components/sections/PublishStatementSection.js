@@ -333,7 +333,7 @@ const Summary = (props) => {
                 </div>
             }
             <div className="align-right">
-            <button className={"btn btn-light"}  onClick={props.returnPublishForm}><i class="bi bi-chevron-left"></i> Retour</button>
+            <button className={"btn btn-light"}  onClick={props.returnPublishForm}><i className="bi bi-chevron-left"></i> Retour</button>
                 <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
                 <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>
             </div>

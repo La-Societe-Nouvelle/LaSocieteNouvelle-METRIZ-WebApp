@@ -63,7 +63,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
           </div>
           <div className="action">
             <button className="btn btn-secondary" onClick={() => setStep(4)}>
-               <i class="bi bi-chevron-left"></i> Retour à la mesure des
+               <i className="bi bi-chevron-left"></i> Retour à la mesure des
               impacts
             </button>
           </div>

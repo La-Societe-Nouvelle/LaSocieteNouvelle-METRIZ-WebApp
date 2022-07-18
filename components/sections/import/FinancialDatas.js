@@ -110,7 +110,7 @@ export class FinancialDatas extends React.Component {
             onClick={() => this.props.return()}
           >
             <FontAwesomeIcon icon={faChevronLeft} className="me-1" />
-            <i class="bi bi-chevron-left"></i> Retour aux comptes d'amortissements
+            <i className="bi bi-chevron-left"></i> Retour aux comptes d'amortissements
           </button>
           <button className={"btn btn-secondary"} onClick={this.props.submit}>
             Valider l'import
