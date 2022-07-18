@@ -1,7 +1,7 @@
-// TO DO : OPTIMISATION 
+// TO DO : OPTIMISATION
 
 import React, { useEffect, useState } from "react";
-import {Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 import ResultSection from "./ResultSection";
 
@@ -63,7 +63,6 @@ const StatementSection = (props) => {
   };
 
   const handleView = (indic) => {
-
     setIndic(indic);
     setView("result");
   };
@@ -75,9 +74,9 @@ const StatementSection = (props) => {
 
   return (
     <Container fluid className="indicator-section">
-      <section className="step">
-        {view == "statement" ? (
-          <>
+      {view == "statement" ? (
+        <>
+          <section className="step">
             <h2>
               <i className="bi bi-rulers"></i> &Eacute;tape 4 - Déclaration des
               impacts
@@ -87,8 +86,7 @@ const StatementSection = (props) => {
               les éléments d'analyse.
             </p>
             <IndicatorsList
-            
-            impactsData={props.session.impactsData}
+              impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
               comparativeFootprints={{
@@ -98,21 +96,24 @@ const StatementSection = (props) => {
                 allSectorsValueAddedAreaFootprint:
                   allSectorsValueAddedAreaFootprint,
               }}
-            >
-
-            </IndicatorsList >
-            
-            <ExportResults 
-            session={props.session} 
-            validations={props.session.validations}   
-            comparativeFootprints={{
+            />
+          </section>
+          <section className="step">
+            <h2>
+              <i className="bi bi-box-arrow-in-right"></i> Export des résultats
+            </h2>
+    
+            <ExportResults
+              session={props.session}
+              validations={props.session.validations}
+              comparativeFootprints={{
                 allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
                 allSectorsProductionAreaFootprint:
                   allSectorsProductionAreaFootprint,
                 allSectorsValueAddedAreaFootprint:
                   allSectorsValueAddedAreaFootprint,
               }}
-              />
+            />
 
             <hr />
 
@@ -126,8 +127,10 @@ const StatementSection = (props) => {
                 Publier mes résultats <i className="bi bi-chevron-right"></i>
               </button>
             </div>
-          </>
-        ) : (
+          </section>
+        </>
+      ) : (
+        <section className="step">
           <ResultSection
             session={props.session}
             indic={indic}
@@ -140,12 +143,10 @@ const StatementSection = (props) => {
                 allSectorsValueAddedAreaFootprint,
             }}
           />
-        )}
-      </section>
+        </section>
+      )}
     </Container>
   );
 };
-
-
 
 export default StatementSection;

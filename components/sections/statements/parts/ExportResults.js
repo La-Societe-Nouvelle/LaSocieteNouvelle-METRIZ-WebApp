@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import jsPDF from "jspdf";
 import JSZip from "jszip";
 import { Button } from "react-bootstrap";
@@ -9,10 +9,9 @@ import {
   generatePDF,
 } from "../../../../src/writers/Export";
 
-const ExportResults = (props) => {
-
+const ExportResults = props => {
   const [isBuildingPDF, setisBuildingPDF] = useState(false);
-  const [isBuildingZIP, setisBuildingZIP] = useState(false);
+  const [isBuildingZIP] = useState(false);
   const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
 
 
@@ -164,14 +163,12 @@ const ExportResults = (props) => {
     };
 
   return (
-    <div>
-      <h3>Export des résultats</h3>
-
-
-      <div className="flex align-items-center">
+    <>
+    <h3>Télécharger les livrables</h3>
+      <div className="dwn-group flex align-items-center">
         <p>Rapport sur l'empreinte sociétale</p>
         <div>
-     
+ 
         <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
         {isBuildingPDF ?
            <LoadingSpinner />
@@ -181,8 +178,11 @@ const ExportResults = (props) => {
         </Button>
         </div>
       </div>
-      <div className="flex mt-2">
+      <div className="dwn-group flex align-items-center">
+        <div>
         <p>Dossier Complet : Ensemble des livrables et fichier de sauvegarde</p>
+      
+        </div>
  
           <Button variant="secondary" size="sm" onClick={handleDownloadZip}>
           {isBuildingZIP ?
@@ -194,7 +194,7 @@ const ExportResults = (props) => {
      
       </div>
    
-    </div>
+    </>
   );
 };
 
