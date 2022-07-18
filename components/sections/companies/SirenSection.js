@@ -232,21 +232,25 @@ export class SirenSection extends React.Component {
                     )}
                   </div>
                 ) : (
-                  <div className="alert alert-warning">
-                    <p>
-                      <FontAwesomeIcon icon={faWarning} /> Les empreintes de
-                      certains comptes doivent être synchronisées.
-                    </p>
-                  </div>
-                )}
-
-                <button
+                  <>
+                    <div className="alert alert-warning">
+                      <p>
+                        <FontAwesomeIcon icon={faWarning} /> Les empreintes de
+                        certains comptes doivent être synchronisées.
+                      </p>
+                    </div>
+                    <button
                   onClick={() => this.synchroniseCompanies()}
                   className={"btn btn-secondary"}
                   disabled={isDisabled}
                 >
                   <FontAwesomeIcon icon={faSync} /> Synchroniser les données
                 </button>
+                  </>
+
+                )}
+
+    
 
                 <div className="pagination">
                   <div className="form-group">
