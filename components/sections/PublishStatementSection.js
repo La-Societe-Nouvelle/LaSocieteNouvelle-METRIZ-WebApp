@@ -332,7 +332,7 @@ const Summary = (props) => {
                      <p>Erreur lors de l'envoi de la publication. Si l'erreur persiste, contactez le support.</p>
                 </div>
             }
-            <div className="align-right">
+            <div className="text-end">
             <button className={"btn btn-light"}  onClick={props.returnPublishForm}><i className="bi bi-chevron-left"></i> Retour</button>
                 <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
                 <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>

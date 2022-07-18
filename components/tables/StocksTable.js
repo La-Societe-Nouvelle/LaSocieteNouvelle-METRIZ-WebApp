@@ -34,9 +34,9 @@ export class StocksTable extends React.Component {
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="align-right">Montant (N)</td>
-              <td  className="align-right">Montant (N-1)</td>
-              <td  className="align-right">Variation</td>
+              <td className="text-end">Montant (N)</td>
+              <td  className="text-end">Montant (N-1)</td>
+              <td  className="text-end">Variation</td>
             </tr>
           </thead>
           <tbody>
@@ -51,9 +51,9 @@ export class StocksTable extends React.Component {
               <tr key={account}>
                 <td >{account}</td>
                 <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                <td className="align-right">{printValue(amount-valueLoss,0)}  &euro;</td>
-                <td className="align-right">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
-                <td className="align-right">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
+                <td className="text-end">{printValue(amount-valueLoss,0)}  &euro;</td>
+                <td className="text-end">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
+                <td className="text-end">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
               </tr>)})}
  
           </tbody>
@@ -61,9 +61,9 @@ export class StocksTable extends React.Component {
           {stocks.length > 0 &&
             <tr className="with-top-line">
               <td colSpan="2"> Total</td>
-              <td className="align-right">{printValue(aggregates.netAmountStocks.amount,0)}  &euro;</td>
-              <td className="align-right">{printValue(aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
-              <td className="align-right">{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
+              <td className="text-end">{printValue(aggregates.netAmountStocks.amount,0)}  &euro;</td>
+              <td className="text-end">{printValue(aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
+              <td className="text-end">{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
           </tr>}
           </tfoot>
         </Table>

@@ -28,7 +28,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
         <ul className="nav">
           <li>
             <a href="https://docs.lasocietenouvelle.org/" target="_blank">
-              {" "}
+              
               <FontAwesomeIcon icon={faBook} /> Documentation
             </a>
           </li>
@@ -42,7 +42,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
           </li>
           <li>
             <a href="https://lasocietenouvelle.org/contact" target="_blank">
-              {" "}
+              
               <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous
             </a>
           </li>
@@ -67,10 +67,10 @@ export function HeaderPublish({ setStep, downloadSession }) {
               impacts
             </button>
           </div>
-          <nav id="progression" className="row">
+          <nav id="progression" className="d-flex">
             <div className={"stepper-item completed"}>
               <p className={"step-counter"}>
-                <FontAwesomeIcon icon={faUpload} />{" "}
+                <FontAwesomeIcon icon={faUpload} />
               </p>
               <div className="step-name">
                 <h2>Publier mes résultats</h2>

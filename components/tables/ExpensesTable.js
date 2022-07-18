@@ -40,7 +40,7 @@ export class ExpensesTable extends React.Component {
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td  onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="align-right" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td className="text-end" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
             </tr>
           </thead>
           <tbody>
@@ -48,7 +48,7 @@ export class ExpensesTable extends React.Component {
               <tr key={accountNum}>
                 <td >{accountNum}</td>
                 <td >{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                <td className="align-right">{printValue(amount,0)} &euro;</td>
+                <td className="text-end">{printValue(amount,0)} &euro;</td>
               </tr>)}
           </tbody>
         </Table>

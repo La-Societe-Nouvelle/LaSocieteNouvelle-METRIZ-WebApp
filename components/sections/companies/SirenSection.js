@@ -129,7 +129,7 @@ export class SirenSection extends React.Component {
         <section className="step">
           <div className="section-title">
             <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
-            <h3 className={"subtitle underline"}>
+            <h3 className={"subtitle "}>
               Synchronisation des données grâce au numéro de siren
             </h3>
           </div>
@@ -164,7 +164,7 @@ export class SirenSection extends React.Component {
                       <FontAwesomeIcon
                         icon={faFileUpload}
                         className="upload-icon"
-                      />{" "}
+                      />
                       Glisser votre fichier ici
                     </p>
                     <p className="small-text">OU</p>

@@ -72,7 +72,7 @@ const ImportForm = (props) => {
   return (
     <Row>
       <Col>
-        <h3 className="subtitle underline">C'est parti !</h3>
+        <h3 className="subtitle ">C'est parti !</h3>
 
         <Image
           fluid

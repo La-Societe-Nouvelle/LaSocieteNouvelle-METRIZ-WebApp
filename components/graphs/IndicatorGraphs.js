@@ -331,11 +331,11 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
               {printValue(
                 allSectorsProductionAreaFootprint.getIndicator(indic).value,
                 1
-              )}{" "}
+              )}
               {unit}
             </td>
             <td className="short align-center">
-              {printValue(production.footprint.getIndicator(indic).value, 1)}{" "}
+              {printValue(production.footprint.getIndicator(indic).value, 1)}
               {unit}
             </td>
             {printValue(
@@ -346,7 +346,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
                 {printValue(
                   productionSectorFootprint.getIndicator(indic).value,
                   1
-                )}{" "}
+                )}
                 {unit}
               </td>
             ) : (
@@ -359,14 +359,14 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
               {printValue(
                 allSectorsConsumptionFootprint.getIndicator(indic).value,
                 1
-              )}{" "}
+              )}
               {unit}
             </td>
             <td className="short align-center">
               {printValue(
                 intermediateConsumption.footprint.getIndicator(indic).value,
                 1
-              )}{" "}
+              )}
               {unit}
             </td>
             {printValue(
@@ -377,7 +377,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
                 {printValue(
                   consumptionSectorFootprint.getIndicator(indic).value,
                   1
-                )}{" "}
+                )}
                 {unit}
               </td>
             ) : (
@@ -391,11 +391,11 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
               {printValue(
                 allSectorsValueAddedAreaFootprint.getIndicator(indic).value,
                 1
-              )}{" "}
+              )}
               {unit}
             </td>
             <td className="short align-center">
-              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}{" "}
+              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}
               {unit}
             </td>
             {printValue(
@@ -406,7 +406,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
                 {printValue(
                   valueAddedSectorFootprint.getIndicator(indic).value,
                   1
-                )}{" "}
+                )}
                 {unit}
               </td>
             ) : (

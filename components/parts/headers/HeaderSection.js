@@ -54,7 +54,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
             />
           </Navbar.Brand>
 
-          <nav id="progression" className="row">
+          <nav id="progression" className="d-flex">
             <div
               className={"stepper-item" + (stepMax >= 1 ? " completed" : "")}
             >

@@ -34,9 +34,9 @@ export class ImmobilisationsTable extends React.Component {
             <tr>
               <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td onClick={() => this.changeColumnSorted("accountLib")}>Libellé</td>
-              <td className="align-right">Montant (N)</td>
-              <td className="align-right">Montant (N-1)</td>
-              <td className="align-right">Variation</td>
+              <td className="text-end">Montant (N)</td>
+              <td className="text-end">Montant (N-1)</td>
+              <td className="text-end">Variation</td>
             </tr>
           </thead>
           <tbody>
@@ -51,9 +51,9 @@ export class ImmobilisationsTable extends React.Component {
                 <tr key={account}>
                   <td >{account}</td>
                   <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td className="align-right">{printValue(amount-valueLoss,0)}  &euro;</td>
-                  <td className="align-right">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
-                  <td className="align-right">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
+                  <td className="text-end">{printValue(amount-valueLoss,0)}  &euro;</td>
+                  <td className="text-end">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
+                  <td className="text-end">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
                 </tr>)})}
 
           </tbody>
@@ -62,9 +62,9 @@ export class ImmobilisationsTable extends React.Component {
              <tfoot>
              <tr>
                 <td colspan="2">TOTAL</td>
-                <td className="align-right">{printValue(aggregates.netAmountImmobilisation.amount,0)} &euro;</td>
-                <td className="align-right">{printValue(aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
-                <td className="align-right">{printValue(aggregates.netAmountImmobilisation.amount-aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
+                <td className="text-end">{printValue(aggregates.netAmountImmobilisation.amount,0)} &euro;</td>
+                <td className="text-end">{printValue(aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
+                <td className="text-end">{printValue(aggregates.netAmountImmobilisation.amount-aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
               </tr>
             </tfoot>
           }

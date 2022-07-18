@@ -48,9 +48,9 @@ export class IndicatorExpensesTable extends React.Component {
             <tr>
               <td className="short center" onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td className="auto" onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="align-right" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
-              <td className="align-right">Valeur</td>
-              <td className="align-right">Incertitude</td>
+              <td className="text-end" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td className="text-end">Valeur</td>
+              <td className="text-end">Incertitude</td>
               {impactAbsolu ? <td className="column_value" colSpan="2">Impact</td> : null}
             </tr>
           </thead>
@@ -62,7 +62,7 @@ export class IndicatorExpensesTable extends React.Component {
                 <tr key={account}>
                   <td className="short center">{account}</td>
                   <td className="auto">{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td className="align-right">{printValue(amount,0)} &euro;</td>
+                  <td className="text-end">{printValue(amount,0)} &euro;</td>
                   <td className="column_value">{printValue(indicator.getValue(),nbDecimals)} {unit}</td>
                   <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
                   {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}</td> : null}

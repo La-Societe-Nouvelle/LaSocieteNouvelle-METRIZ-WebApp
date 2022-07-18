@@ -23,7 +23,7 @@ export class FECImportPopup extends React.Component {
     return (
       <> 
       <div className="table-container">
-        <h3 className={"subtitle underline"}>Contrôle de vos a-nouveaux</h3>
+        <h3 className={"subtitle "}>Contrôle de vos a-nouveaux</h3>
           <h4>Identifiez vos journaux A-Nouveaux : </h4>
           <table>
             <thead>

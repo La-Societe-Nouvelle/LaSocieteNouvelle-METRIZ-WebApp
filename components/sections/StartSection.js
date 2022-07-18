@@ -18,16 +18,16 @@ export class StartSection extends React.Component {
     return (
       <Container fluid id="start">
         <Row>
-          <Col lg={7}>
+          <Col lg="7">
             <section>
               <h1>
-                Mesurez <span className="underline">l'empreinte sociétale</span>{" "}
+                Mesurez <span className="underline">l'empreinte sociétale</span>
                 de votre entreprise en quelques clics.
               </h1>
               <p>
-                Notre objectif est de vous permettre de{" "}
+                Notre objectif est de vous permettre de
                 <strong>mesurer l’empreinte la production</strong> de votre
-                entreprise sur des enjeux{" "}
+                entreprise sur des enjeux
                 <strong>majeurs de développement durable.</strong>
               </p>
               <Row id="section-picto">

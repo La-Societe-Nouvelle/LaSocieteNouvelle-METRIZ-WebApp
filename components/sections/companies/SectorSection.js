@@ -105,7 +105,7 @@ export class SectorSection extends React.Component {
         <section className="step">
           <div className="section-title mb-3">
             <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
-            <h3 className="subtitle underline">
+            <h3 className="subtitle ">
               Synchronisation des données grâce au secteur d'activité
             </h3>
           </div>

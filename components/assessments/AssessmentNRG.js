@@ -177,14 +177,14 @@ export class AssessmentNRG extends React.Component {
               </td>
               <td colSpan="2">Produits énergétiques fossiles</td>
               <td>
-                {printValue(getNrgConsumptionByType(nrgDetails, "fossil"), 0)}{" "}
+                {printValue(getNrgConsumptionByType(nrgDetails, "fossil"), 0)}
                 MJ
               </td>
               <td>
                 {printValue(
                   getNrgConsumptionUncertaintyByType(nrgDetails, "fossil"),
                   0
-                )}{" "}
+                )}
                 %
               </td>
             </tr>
@@ -308,14 +308,14 @@ export class AssessmentNRG extends React.Component {
               </td>
               <td colSpan="2">Biomasse</td>
               <td>
-                {printValue(getNrgConsumptionByType(nrgDetails, "biomass"), 0)}{" "}
+                {printValue(getNrgConsumptionByType(nrgDetails, "biomass"), 0)}
                 MJ
               </td>
               <td>
                 {printValue(
                   getNrgConsumptionUncertaintyByType(nrgDetails, "biomass"),
                   0
-                )}{" "}
+                )}
                 %
               </td>
             </tr>
@@ -474,7 +474,7 @@ export class AssessmentNRG extends React.Component {
                 </td>
                 <td>{printValue(nrgDetails["heat"].nrgConsumption, 0)} MJ</td>
                 <td>
-                  {printValue(nrgDetails["heat"].nrgConsumptionUncertainty, 0)}{" "}
+                  {printValue(nrgDetails["heat"].nrgConsumptionUncertainty, 0)}
                   %
                 </td>
               </tr>
@@ -542,7 +542,7 @@ export class AssessmentNRG extends React.Component {
                   {printValue(
                     nrgDetails["renewableTransformedEnergy"].nrgConsumption,
                     0
-                  )}{" "}
+                  )}
                   MJ
                 </td>
                 <td>
@@ -550,7 +550,7 @@ export class AssessmentNRG extends React.Component {
                     nrgDetails["renewableTransformedEnergy"]
                       .nrgConsumptionUncertainty,
                     0
-                  )}{" "}
+                  )}
                   %
                 </td>
               </tr>

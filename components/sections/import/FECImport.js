@@ -25,7 +25,7 @@ export class FECImport extends React.Component {
 
     return (
       <>
-        <h3 className="subtitle underline">Identifiez les A-Nouveaux</h3>
+        <h3 className="subtitle ">Identifiez les A-Nouveaux</h3>
           <div className="form-text mb-3">
             <p>
               L'identification du journal des A-Nouveaux est nécessaire à la

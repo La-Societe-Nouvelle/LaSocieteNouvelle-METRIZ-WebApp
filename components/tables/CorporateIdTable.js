@@ -56,7 +56,7 @@ export class CorporateIdTable extends React.Component {
                 Compte fournisseur
               </td>
 
-              <td className="align-right"
+              <td className="text-end"
                 onClick={() => this.changeColumnSorted("amount")}
               >
                 Montant
@@ -243,7 +243,7 @@ class RowTableCompanies extends React.Component {
         <td>
           {account}
         </td>
-        <td className="align-right">{printValue(amount, 0)} &euro;</td>
+        <td className="text-end">{printValue(amount, 0)} &euro;</td>
       </tr>
     );
   }

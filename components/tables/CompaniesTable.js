@@ -316,7 +316,7 @@ class RowTableCompanies extends React.Component {
           />
         </td>
 
-        <td className="align-right">{printValue(amount, 0)} &euro;</td>
+        <td className="text-end">{printValue(amount, 0)} &euro;</td>
       </tr>
     );
   }

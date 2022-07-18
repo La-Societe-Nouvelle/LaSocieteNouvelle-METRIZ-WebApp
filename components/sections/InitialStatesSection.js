@@ -208,7 +208,7 @@ export class InitialStatesSection extends React.Component {
               </div> 
           }
 
-          <div className="align-right">
+          <div className="text-end">
 
             <button className={"btn btn-secondary"}
               id="validation-button"
