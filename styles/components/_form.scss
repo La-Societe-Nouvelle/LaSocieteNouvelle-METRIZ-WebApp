@@ -24,13 +24,15 @@ label {
   display: block;
   margin-bottom: .5rem;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 //
 // Textual form controls
 //
-
-.form-input, .input-number, table select, table input {
+.input-group-text {
+  font-size: 0.8rem;
+}
+table select, table input {
     padding: 0.375rem 0.75rem;
     max-height: 35px;
     line-height: 1.5;

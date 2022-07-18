@@ -43,11 +43,7 @@ hr {
 // Input
 
 input {
-  border: solid 1px $primary;
-  padding: 2px;
 
-  &.input-number {text-align: right;}
-  &.input-text {text-align: left;}
 
   &:disabled {
     background-color: #EEEEEE;
