@@ -15,7 +15,7 @@ export const IncomeStatementTable = ({ financialData }) => {
 
   return (
     <>
-      <Table bordered hover>
+      <Table  hover>
         <thead>
           <tr>
             <td>Agrégat</td>

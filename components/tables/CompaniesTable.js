@@ -256,20 +256,16 @@ class RowTableCompanies extends React.Component {
     if (activityCode == "00") {
       icon = (
         <p className="warning">
-          <FontAwesomeIcon
-            icon={faWarning}
-            title="Risque de données incomplètes"
-          />
+          <i className="bi bi-exclamation-triangle"  title="Risque de données incomplètes"></i>
+        
         </p>
       );
     } else {
       if (status == 200) {
         icon = (
           <p className="success">
-            <FontAwesomeIcon
-              icon={faCheckCircle}
-              title="Données synchronisées"
-            />
+            <i class="bi bi-check2"  title="Données synchronisées"></i>
+          
           </p>
         );
       } else {

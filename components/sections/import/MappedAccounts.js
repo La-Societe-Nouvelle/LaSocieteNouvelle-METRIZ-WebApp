@@ -1,5 +1,4 @@
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
@@ -69,7 +68,7 @@ function MappedAccounts(props) {
       <h3 className="subtitle ">
         Associez les comptes d'amortissements et de dépréciations
       </h3>
-      <Table size="lg" bordered hover className="mt-3">
+      <Table size="lg"  hover className="mt-3">
         <thead>
           <tr>
             <th>Numéro de compte</th>
@@ -83,7 +82,7 @@ function MappedAccounts(props) {
               <td>{depKey}</td>
               <td>{depValue}</td>
               <td>
-                <select defaultValue={mappedAccounts[depKey] || ""} onChange={(e) => handleOnchange(depKey, e)}>
+                <select className="form-control" defaultValue={mappedAccounts[depKey] || ""} onChange={(e) => handleOnchange(depKey, e)}>
                   <option value="">Sélectionner un compte...</option>
                   {assetAccounts.filter(([assetKey,_]) => assetKey[0]==depKey[0]).map(([assetKey, assetValue], index) => (
                     
@@ -103,7 +102,6 @@ function MappedAccounts(props) {
           className="btn btn-primary me-2"
           onClick={() => props.return()}
         >
-          <FontAwesomeIcon icon={faChevronLeft} className="me-1"/>
           <i className="bi bi-chevron-left"></i> Retour aux A-Nouveaux
         </button>
         <button
@@ -112,7 +110,7 @@ function MappedAccounts(props) {
           onClick={() => props.onClick()}
         >
           Valider mes données
-          <FontAwesomeIcon icon={faChevronRight} />
+          <i className="bi bi-chevron-right"></i>
         </button>
       </div>
     </div>

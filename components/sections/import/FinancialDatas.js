@@ -3,11 +3,7 @@
 // React
 import React from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+
 
 // Tables
 import { MainAggregatesTable } from "../../tables/MainAggregatesTable";
@@ -109,13 +105,12 @@ export class FinancialDatas extends React.Component {
             className="btn btn-primary me-2"
             onClick={() => this.props.return()}
           >
-            <FontAwesomeIcon icon={faChevronLeft} className="me-1" />
             <i className="bi bi-chevron-left"></i> Retour aux comptes d'amortissements
           </button>
           <button className={"btn btn-secondary"} onClick={this.props.submit}>
             Valider l'import
-            <FontAwesomeIcon icon={faChevronRight} />
-          </button>
+            <i className="bi bi-chevron-right"></i>
+                      </button>
         </div>
       </>
     );

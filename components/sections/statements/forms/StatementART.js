@@ -120,7 +120,7 @@ export class StatementART extends React.Component {
       </FloatingLabel> */}
 
           <label>Informations complémentaires</label>
-          <textarea type="text" spellCheck="false" className="form-input" />
+          <textarea type="text" spellCheck="false" className="form-control" />
         </div>
         <div className="statement-action">
           <button

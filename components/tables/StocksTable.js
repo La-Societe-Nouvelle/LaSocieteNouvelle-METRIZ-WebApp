@@ -29,7 +29,7 @@ export class StocksTable extends React.Component {
 
     return (
       <>
-        <Table bordered hover>
+        <Table  hover>
           <thead>
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>

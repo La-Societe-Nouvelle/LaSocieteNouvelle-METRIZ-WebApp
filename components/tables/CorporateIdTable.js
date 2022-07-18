@@ -7,14 +7,18 @@ import React from "react";
 import { InputText } from "/components/input/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {faCheckCircle ,faSyncAlt, faWarning, faXmarkCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faSyncAlt,
+  faWarning,
+  faXmarkCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import { Table } from "react-bootstrap";
 
 /* ---------- COMPANIES TABLE ---------- */
 
 export class CorporateIdTable extends React.Component {
   constructor(props) {
-
     super(props);
     this.state = {
       companies: props.companies,
@@ -22,10 +26,8 @@ export class CorporateIdTable extends React.Component {
       reverseSort: false,
       page: 0,
     };
-
   }
   componentDidUpdate(prevProps) {
-
     if (prevProps.companies !== this.props.companies) {
       this.setState({ companies: this.props.companies });
     }
@@ -36,7 +38,6 @@ export class CorporateIdTable extends React.Component {
     const { companies, columnSorted, page } = this.state;
     this.sortCompanies(companies, columnSorted);
     return (
-      
       <div className="table-main" id="table">
         <Table>
           <thead>
@@ -47,16 +48,13 @@ export class CorporateIdTable extends React.Component {
               >
                 Siren
               </td>
-              <td
-                onClick={() => this.changeColumnSorted("denomination")}
-              >
+              <td onClick={() => this.changeColumnSorted("denomination")}>
                 Libellé du compte fournisseur
               </td>
-              <td>
-                Compte fournisseur
-              </td>
+              <td>Compte fournisseur</td>
 
-              <td className="text-end"
+              <td
+                className="text-end"
                 onClick={() => this.changeColumnSorted("amount")}
               >
                 Montant
@@ -64,7 +62,6 @@ export class CorporateIdTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-          
             {companies
               .slice(page * nbItems, (page + 1) * nbItems)
               .map((company) => (
@@ -76,15 +73,14 @@ export class CorporateIdTable extends React.Component {
               ))}
           </tbody>
         </Table>
-        {
-      companies.length == 0 && (
-        <p className="small-text
-        ">
-          Aucun résultat
-        </p>
-      )
-      
-    }
+        {companies.length == 0 && (
+          <p
+            className="small-text
+        "
+          >
+            Aucun résultat
+          </p>
+        )}
         {companies.length > nbItems && (
           <div className="table-navigation">
             <button
@@ -187,75 +183,74 @@ class RowTableCompanies extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-
     if (this.props != prevProps) {
       this.setState({
         corporateId: this.props.corporateId || "",
-        dataUpdated: false
-            });
+        dataUpdated: false,
+      });
     }
   }
 
   render() {
-    const {
-      corporateName,
-      account,
-      amount,
-      status,
-    } = this.props;
-    const { corporateId} = this.state;
+    const { corporateName, account, amount, status } = this.props;
+    const { corporateId } = this.state;
     let icon;
     if (corporateId && status != 200) {
-      icon = <p className="success">
-        <FontAwesomeIcon icon={faSyncAlt} title="Données prêtes à être synchronisées" />
-      </p>
+      icon = (
+        <p className="success">
+          <i class="bi bi-arrow-repeat"   title="Données prêtes à être synchronisées"></i>
+   
+        </p>
+      );
     }
 
     if (status == 200) {
-      icon = <p className="success">
-        <FontAwesomeIcon icon={faCheckCircle} title="Données synchronisées" /> </p>
-
+      icon = (
+        <p className="success">
+          <i class="bi bi-check2" title="Données synchronisées"></i>
+        </p>
+      );
     }
     if (status == 404) {
-      icon = <p className="error">
-        <FontAwesomeIcon icon={faXmarkCircle} title="Erreur lors la synchronisation" /> </p>
-
+      icon = (
+        <p className="error">
+             <i className="bi bi-x-lg"  title="Risque de données incomplètes"></i>
+     
+        </p>
+      );
     }
     if (!corporateId) {
-      icon = <p className="warning"><FontAwesomeIcon icon={faWarning} title="Données non synchronisables" /></p>
+      icon = (
+        <p className="warning">
+             <i className="bi bi-exclamation-triangle"  title="Données non synchronisables"></i>
+  
+        </p>
+      );
     }
-   
+
     return (
-      <tr >
+      <tr>
         <td className="siren-input">
           {icon}
-          <p  className={status==200 ? "success" : "warning"} >
+          <p className={status == 200 ? "success" : "warning"}>
             <InputText
               value={corporateId}
               onUpdate={this.updateCorporateId.bind(this)}
             />
           </p>
-
         </td>
-        <td>
-          {corporateName}
-        </td>
-        <td>
-          {account}
-        </td>
+        <td>{corporateName}</td>
+        <td>{account}</td>
         <td className="text-end">{printValue(amount, 0)} &euro;</td>
       </tr>
     );
   }
 
   updateCorporateId = (nextCorporateId) => {
-    this.setState({ dataUpdated: true});
+    this.setState({ dataUpdated: true });
     this.props.updateCompany({
       id: this.props.id,
       corporateId: nextCorporateId,
     });
   };
-
-
-
 }

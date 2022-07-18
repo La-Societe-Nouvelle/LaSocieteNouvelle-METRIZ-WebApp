@@ -3,15 +3,6 @@
 // React
 import React from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronRight,
-  faWarning,
-  faSync,
-  faCheckCircle,
-  faChevronLeft,
-} from "@fortawesome/free-solid-svg-icons";
-
 
 // Components
 import { CompaniesTable } from "../../tables/CompaniesTable";
@@ -118,14 +109,14 @@ export class SectorSection extends React.Component {
                     {isNextStepAvailable ? (
                       <div className="alert alert-success">
                         <p>
-                          <FontAwesomeIcon icon={faCheckCircle} /> Tous les
+                          <i className="bi bi-check2"></i> Tous les
                           comptes ont bien été synchronisés.
                         </p>
                       </div>
                     ) : (
                       <div className="alert alert-warning">
                         <p>
-                          <FontAwesomeIcon icon={faWarning} /> Les empreintes de
+                          <i className="bi bi-exclamation-triangle"></i>  Les empreintes de
                           certains comptes doivent être synchronisées.
                         </p>
                       </div>
@@ -135,7 +126,7 @@ export class SectorSection extends React.Component {
                     ).length > 0 ? (
                       <div className="alert alert-warning">
                         <p>
-                          <FontAwesomeIcon icon={faWarning} /> Grand risque
+                          <i className="bi bi-exclamation-triangle"></i>  Grand risque
                           d'imprécision pour les comptes significatifs qui ne
                           sont pas reliés à un secteur d'activité.
                         </p>
@@ -161,14 +152,14 @@ export class SectorSection extends React.Component {
                       onClick={() => this.synchroniseCompanies()}
                       className={"btn btn-secondary"}
                     >
-                      <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                      <i className="bi bi-arrow-repeat"></i>  Synchroniser les données
                     </button>
                     <div className="pagination">
                       <div className="form-group">
                         <select
                           value={view}
                           onChange={this.handleChange}
-                          className="form-input"
+                          className="form-control"
                         >
                           <option
                             key="1"
@@ -199,7 +190,7 @@ export class SectorSection extends React.Component {
                         <select
                           value={nbItems}
                           onChange={this.changeNbItems}
-                          className="form-input"
+                          className="form-control"
                         >
                           <option key="1" value="20">
                             20 fournisseurs par page
@@ -242,7 +233,7 @@ export class SectorSection extends React.Component {
               onClick={() => setCompanyStep(1)}
               className={"btn btn-primary me-2"}
             >
-              <FontAwesomeIcon icon={faChevronLeft} className="me-1" />
+              <i className="bi bi-chevron-left"></i>
               Numéros de Siren
             </button>
             <button
@@ -252,7 +243,7 @@ export class SectorSection extends React.Component {
               onClick={this.props.submit}
             >
               Mesurer l'impact
-              <FontAwesomeIcon icon={faChevronRight} />
+              <i className="bi bi-chevron-right"></i>
             </button>
           </div>
         </section>

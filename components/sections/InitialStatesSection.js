@@ -8,8 +8,6 @@ import Dropzone from "react-dropzone";
 import { InitialStatesTable } from "/components/tables/InitialStatesTable";
 import { ProgressBar } from "../popups/ProgressBar";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faWarning, faSync, faPen, faChevronRight, faFileExcel, faFileUpload, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { updateVersion } from "../../src/version/updateVersion";
 import { Container } from "react-bootstrap";
 
@@ -65,7 +63,7 @@ export class InitialStatesSection extends React.Component {
         <section className="step">
 
           <div className="section-title">
-            <h2> <FontAwesomeIcon icon={faPen} /> &Eacute;tape 2 - Saisissez vos états initiaux</h2>
+            <h2> <i className="bi bi-pencil-fill"></i> &Eacute;tape 2 - Saisissez vos états initiaux</h2>
             <p className="alert alert-info">
               Les états initiaux correspondent aux empreintes des comptes de
               stocks et d’immobilisations en début d’exercice. Les empreintes
@@ -101,22 +99,22 @@ export class InitialStatesSection extends React.Component {
                   via le premier onglet.
                 </p>
                 <p>
-                  <FontAwesomeIcon icon={faInfoCircle} /> <b>Valeur par défaut :</b> Les valeurs par défaut correspondent
+                  <i className="bi bi-exclamation-circle"></i> <b>Valeur par défaut :</b> Les valeurs par défaut correspondent
                   aux données disponibles pour la branche économique la plus
                   proche.
                 </p>
                 <p>
-                <FontAwesomeIcon icon={faInfoCircle} /> <b>Estimée sur exercice courant : </b>Nous initialisons l'empreinte du compte en début d'exercice.
+                <i className="bi bi-exclamation-circle"></i> <b>Estimée sur exercice courant : </b>Nous initialisons l'empreinte du compte en début d'exercice.
                   à partir des opérations réalisées sur l'exercice courant.
                 </p>
               </div>
                 {!isNextStepAvailable && (
                   <div className="alert alert-warning">
                     <p>
-                      <FontAwesomeIcon icon={faWarning} /> Les empreintes de certains comptes doivent être synchronisées.
+                      <i className="bi bi-exclamation-triangle"></i>  Les empreintes de certains comptes doivent être synchronisées.
                     </p>
                     <button onClick={() => this.synchroniseAll()} className="btn btn-warning">
-                      <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                      <i className="bi bi-arrow-repeat"></i>  Synchroniser les données
                     </button>
                   </div>
                 )}
@@ -134,7 +132,7 @@ export class InitialStatesSection extends React.Component {
                 {isNextStepAvailable && (
                   <div className={"alert alert-success"}>
                     <p>
-                      <FontAwesomeIcon icon={faCheck} /> Données complètes.
+                    <i className="bi bi-check2"></i> Données complètes.
                     </p>
                   </div>
                 )}
@@ -165,8 +163,7 @@ export class InitialStatesSection extends React.Component {
                         <div {...getRootProps()} className="dropzone">
                           <input {...getInputProps()} />
                           <p>
-                            <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
-                            Glisser votre fichier ici
+                          <i className="bi bi-file-arrow-up-fill"></i> Glisser votre fichier ici
 
                           </p>
                           <p className="small-text">
@@ -186,7 +183,7 @@ export class InitialStatesSection extends React.Component {
                         <ul>
                           {
                             files.map((file) => (
-                              <li key={file.name} > <FontAwesomeIcon icon={faFileExcel} /> {file.name}
+                              <li key={file.name} > <i className="bi bi-file-earmark-excel-fill"></i> {file.name}
                               </li>
                             ))
                           }
@@ -215,7 +212,7 @@ export class InitialStatesSection extends React.Component {
               disabled={!isNextStepAvailable}
               onClick={this.props.submit}
             >
-              Valider les états initiaux   <FontAwesomeIcon icon={faChevronRight} />
+              Valider les états initiaux <i className="bi bi-chevron-right"></i>  
 
             </button>
           </div>

@@ -1,9 +1,3 @@
-import {
-  faChevronRight,
-  faFileUpload,
-  faWarning,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 
@@ -50,7 +44,7 @@ const ImportForm = (props) => {
 
   const acceptedFileItems = acceptedFiles.map((file) => (
     <p key={file.path}>
-      <FontAwesomeIcon icon={faFileUpload} /> {file.path}
+      <i className="bi bi-upload"></i> {file.path}
     </p>
   ));
 
@@ -58,7 +52,7 @@ const ImportForm = (props) => {
     <ul>
       {errors.map((e) => (
         <li key={e.code}>
-          <FontAwesomeIcon icon={faWarning}></FontAwesomeIcon> L'extention du
+         <i className="bi bi-exclamation-triangle"></i> L'extention du
           fichier doit être en .txt ou .csv
         </li>
       ))}
@@ -83,7 +77,7 @@ const ImportForm = (props) => {
       <Col>
         <FormGroup>
           <FormLabel>
-            <label>Dénomination / Nom du projet</label>
+            <label>Dénomination / Nom du projet *</label>
           </FormLabel>
           <Form.Control
             type="text"
@@ -98,9 +92,7 @@ const ImportForm = (props) => {
           <div className="form-text">
             <p>
               L’importation des écritures comptables s’effectue via un Fichier
-              d’Ecritures Comptables (FEC). Générez ce fichiers
-              <b>
-                à partir de votre logiciel comptable, ou demandez-le auprès de
+              d’Ecritures Comptables (FEC). Générez ce fichiers <b> à partir de votre logiciel comptable, ou demandez-le auprès de
                 votre service comptable.
               </b>
             </p>
@@ -109,8 +101,7 @@ const ImportForm = (props) => {
           <div {...getRootProps({ className: "dropzone" })}>
             <input {...getInputProps()} />
             <p>
-              <FontAwesomeIcon icon={faFileUpload} className="upload-icon" />
-              Glisser votre fichier ici
+            <i className="bi bi-file-arrow-up-fill"></i> Glisser votre fichier ici
             </p>
 
             <p className="small-text">OU</p>
@@ -129,7 +120,7 @@ const ImportForm = (props) => {
             </div>
           )}
           <p className="legend">
-            * Le fichier doit respecter les normes relatives à la structure du
+          Le fichier doit respecter les normes relatives à la structure du
             fichier (libellés des colonnes, séparateur tabulation ou barre
             verticale, encodage ISO 8859-15, etc.).
           </p>
@@ -142,7 +133,8 @@ const ImportForm = (props) => {
             disabled={disabled}
             onClick={() => props.onClick()}
           >
-            Suivant <FontAwesomeIcon icon={faChevronRight} />
+            Suivant 
+            <i className="bi bi-chevron-right"></i>
           </Button>
         </div>
       </Col>

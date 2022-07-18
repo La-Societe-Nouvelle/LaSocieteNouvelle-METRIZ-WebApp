@@ -1,11 +1,7 @@
 // La Société Nouvelle
 
 // React
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import React from "react";
 import { Table } from "react-bootstrap";
 
@@ -84,7 +80,7 @@ export class FECImport extends React.Component {
               className="btn btn-primary me-2"
               onClick={() => this.props.return()}
             >
-              <FontAwesomeIcon icon={faChevronLeft} className="me-1" />
+              <i className="bi bi-chevron-left"></i>
               Importer un autre FEC
             </button>
             <button
@@ -92,7 +88,7 @@ export class FECImport extends React.Component {
               onClick={() => this.props.onClick()}
             >
               Etape suivante
-              <FontAwesomeIcon icon={faChevronRight} />
+              <i className="bi bi-chevron-right"></i>
             </button>
           </div>
         </div>

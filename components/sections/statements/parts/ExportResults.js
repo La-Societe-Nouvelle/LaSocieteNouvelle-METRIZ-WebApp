@@ -165,8 +165,8 @@ const ExportResults = props => {
   return (
     <>
     <h3>Télécharger les livrables</h3>
-      <div className="dwn-group flex align-items-center">
-        <p>Rapport sur l'empreinte sociétale</p>
+      <div className="dwn-group d-flex align-items-center justify-content-between">
+        <p className="mb-0">Rapport sur l'empreinte sociétale</p>
         <div>
  
         <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
@@ -178,9 +178,9 @@ const ExportResults = props => {
         </Button>
         </div>
       </div>
-      <div className="dwn-group flex align-items-center">
+      <div className="dwn-group d-flex align-items-center justify-content-between">
         <div>
-        <p>Dossier Complet : Ensemble des livrables et fichier de sauvegarde</p>
+        <p className="mb-0">Dossier Complet : Ensemble des livrables et fichier de sauvegarde</p>
       
         </div>
  

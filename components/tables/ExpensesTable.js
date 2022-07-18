@@ -35,7 +35,7 @@ export class ExpensesTable extends React.Component {
 
     return (
       <>
-        <Table bordered hover>
+        <Table  hover>
           <thead>
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>

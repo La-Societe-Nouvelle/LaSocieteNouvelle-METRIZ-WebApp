@@ -24,7 +24,7 @@ export const MainAggregatesTable = ({financialData}) =>
   return(
     <>
     {financialData.isFinancialDataLoaded &&  
-      <Table bordered hover>
+      <Table  hover>
         <thead>
           <tr>
             <td>Agrégat</td>

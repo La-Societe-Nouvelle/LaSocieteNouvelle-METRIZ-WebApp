@@ -39,8 +39,11 @@ table {
   .corporate-name {
     display: flex;
     align-content: center;
+    align-items: center;
     gap: 10px;
-
+    .form-control {
+      margin-bottom: 0 !important;
+    }
     .fa-triangle-exclamation {
       color: #ff6207;
     }
@@ -49,10 +52,7 @@ table {
     width: 100px;
   }
   .success {
-    .fa-circle-check,
-    .fa-rotate {
-      color: #59b719;
-    }
+ 
     .form-input,
     .form-input:active,
     .form-input:focus,

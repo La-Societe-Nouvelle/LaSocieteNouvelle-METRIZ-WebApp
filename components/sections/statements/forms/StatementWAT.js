@@ -75,7 +75,7 @@ export class StatementWAT extends React.Component {
         <div className="statement-comments">
           <label>Informations complémentaires</label>
           <textarea
-            className="form-input"
+            className="form-control"
             type="text"
             spellCheck="false"
             value={info}

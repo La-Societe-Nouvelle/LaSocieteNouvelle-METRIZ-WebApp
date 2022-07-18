@@ -29,7 +29,7 @@ export class ImmobilisationsTable extends React.Component {
 
     return (
       <>
-        <Table bordered hover>
+        <Table  hover>
           <thead>
             <tr>
               <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>

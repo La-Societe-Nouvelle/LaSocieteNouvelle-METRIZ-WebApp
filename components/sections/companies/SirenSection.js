@@ -2,15 +2,8 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 // Icon
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSync,
-  faChevronRight,
-  faFileExport,
   faCheckCircle,
-  faXmark,
-  faWarning,
-  faFileUpload,
 } from "@fortawesome/free-solid-svg-icons";
 
 // Table
@@ -98,7 +91,7 @@ export class SirenSection extends React.Component {
             <button 
               onClick={() => setCompanyStep(2)}
             className={"btn btn-primary me-3"}>
-            Secteurs d'activité <FontAwesomeIcon icon={faChevronRight} />
+            Secteurs d'activité <i className="bi bi-chevron-right"></i>
 
             </button>
           <button
@@ -107,7 +100,7 @@ export class SirenSection extends React.Component {
             onClick={this.props.submit}
           >
             Mesurer mon impact
-            <FontAwesomeIcon icon={faChevronRight} />
+            <i className="bi bi-chevron-right"></i>
           </button>
         </div>
       );
@@ -119,7 +112,7 @@ export class SirenSection extends React.Component {
           onClick={() => setCompanyStep(2)}
         >
           Valider les fournisseurs
-          <FontAwesomeIcon icon={faChevronRight} />
+          <i className="bi bi-chevron-right"></i>
         </button>
       );
     }
@@ -143,7 +136,7 @@ export class SirenSection extends React.Component {
               className="btn btn-primary mt-3"
               onClick={this.exportXLSXFile}
             >
-              <FontAwesomeIcon icon={faFileExport} /> Exporter mes fournisseurs
+              <i className="bi bi-download"></i> Exporter mes fournisseurs
             </button>
           </div>
           <div className="step">
@@ -161,10 +154,7 @@ export class SirenSection extends React.Component {
                   <div {...getRootProps()} className="dropzone">
                     <input {...getInputProps()} />
                     <p>
-                      <FontAwesomeIcon
-                        icon={faFileUpload}
-                        className="upload-icon"
-                      />
+                    <i className="bi bi-file-arrow-up-fill"></i>
                       Glisser votre fichier ici
                     </p>
                     <p className="small-text">OU</p>
@@ -194,7 +184,7 @@ export class SirenSection extends React.Component {
                 {!isNextStepAvailable && synchronised != 0 && (
                   <div className="alert alert-error">
                     <p>
-                      <FontAwesomeIcon icon={faXmark} /> Certains comptes n'ont
+                    <i className="bi bi-x-lg"></i> Certains comptes n'ont
                       pas pu être synchronisés. Vérifiez le numéro de siren et
                       resynchronisez les données.
                     </p>
@@ -211,7 +201,7 @@ export class SirenSection extends React.Component {
                 {isNextStepAvailable ? (
                   <div className="alert alert-success">
                     <p>
-                      <FontAwesomeIcon icon={faCheckCircle} /> Tous les comptes
+                      <i className="bi bi-check2"></i> Tous les comptes
                       ayant un n° de Siren ont bien été synchronisés.
                     </p>
                     {companies.filter((company) => company.state == "default")
@@ -235,7 +225,7 @@ export class SirenSection extends React.Component {
                   <>
                     <div className="alert alert-warning">
                       <p>
-                        <FontAwesomeIcon icon={faWarning} /> Les empreintes de
+                        <i className="bi bi-exclamation-triangle"></i>  Les empreintes de
                         certains comptes doivent être synchronisées.
                       </p>
                     </div>
@@ -244,20 +234,17 @@ export class SirenSection extends React.Component {
                   className={"btn btn-secondary"}
                   disabled={isDisabled}
                 >
-                  <FontAwesomeIcon icon={faSync} /> Synchroniser les données
+                  <i className="bi bi-arrow-repeat"></i>  Synchroniser les données
                 </button>
                   </>
 
                 )}
-
-    
-
                 <div className="pagination">
                   <div className="form-group">
                     <select
                       onChange={this.handleChange}
                       value={view}
-                      className="form-input"
+                      className="form-control"
                     >
                       <option key="1" value="all">
                         Tous les comptes externes
@@ -276,7 +263,7 @@ export class SirenSection extends React.Component {
                     <select
                       value={nbItems}
                       onChange={this.changeNbItems}
-                      className="form-input"
+                      className="form-control"
                     >
                       <option key="1" value="20">
                         20 fournisseurs par page
