@@ -45,7 +45,7 @@ const IndicatorsList = (props) => {
   );
 
   useEffect(async () => {
-    
+
     if (comparativeDivision != "00") {
       let productionSectorFootprint = await fetchDivisionData(
         comparativeDivision,
@@ -83,27 +83,29 @@ const IndicatorsList = (props) => {
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
     // get new value
-    let nextIndicator = props.session.getNetValueAddedIndicator(indic);
+    props.session.getNetValueAddedIndicator(indic);
 
-    if (
-      nextIndicator !==
-      props.session.financialData.aggregates.netValueAdded.footprint.indicators[
-        indic
-      ]
-    ) {
-      // remove validation
-      props.session.validations = props.session.validations.filter(
-        (item) => item != indic
-      );
-      SetValidations(validations.filter(
-        (item) => item != indic
-      ))
-      // update footprint
-      await props.session.updateIndicator(indic);
-    }
+    // if (
+    //   nextIndicator !==
+    //   props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+    //     indic
+    //   ]
+    // ) {
+    //   console.log("remove")
+    //   // remove validation
+    //   props.session.validations = props.session.validations.filter(
+    //     (item) => item != indic
+    //   );
+    //   SetValidations(validations.filter(
+    //     (item) => item != indic
+    //   ))
+    //   // update footprint
+    //   await props.session.updateIndicator(indic);
+    // }
   };
 
   const validateIndicator = async (indic) => {
+
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
