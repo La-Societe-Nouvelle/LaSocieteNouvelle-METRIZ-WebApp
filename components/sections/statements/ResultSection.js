@@ -130,9 +130,7 @@ const ResultSection = (props) => {
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
-          {
-            console.log( session.validations)
-          }
+
            {
             session.validations.length > 1 ? 
             <DropdownButton id="indic-button" title="Autres résultats">
