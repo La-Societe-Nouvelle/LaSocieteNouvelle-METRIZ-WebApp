@@ -2,8 +2,7 @@
 
 // React
 import React from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator } from "@fortawesome/free-solid-svg-icons";
+
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
 import { InputNumber } from '../../../input/InputNumber'; 
@@ -47,7 +46,9 @@ export class StatementNRG extends React.Component {
           <label>Consommation totale d'énergie</label>
           <InputNumber value={roundValue(energyConsumption,0)}
                        onUpdate={this.updateEnergyConsumption} 
-                       placeholder="MJ" />
+                       placeholder="MJ"
+                     />
+          
  
         </div>
         <div className="form-group">

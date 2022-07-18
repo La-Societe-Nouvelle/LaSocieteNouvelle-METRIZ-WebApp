@@ -1,16 +1,22 @@
 // La Société Nouvelle
 
 // React
-import React from 'react';
+import React from "react";
+import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Form from "react-bootstrap/Form";
 
 // Utils
-import { printValueInput, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
-import { InputNumber } from '../../../input/InputNumber'; 
+import {
+  printValueInput,
+  roundValue,
+  valueOrDefault,
+} from "../../../../src/utils/Utils";
+import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
 
 /** Component in IndicatorMainTab
- *  Props : 
+ *  Props :
  *    - impactsData
  *    - onUpdate -> update footprints, update table
  *    - onValidate -> update validations
@@ -24,19 +30,24 @@ import { InputNumber } from '../../../input/InputNumber';
  */
 
 export class StatementART extends React.Component {
-
   constructor(props) {
-
     super(props);
     this.state = {
-      craftedProduction: valueOrDefault(props.impactsData.craftedProduction, ""),
-      info: props.impactsData.comments.art || ""
-    }
+      craftedProduction: valueOrDefault(
+        props.impactsData.craftedProduction,
+        ""
+      ),
+      info: props.impactsData.comments.art || "",
+    };
   }
 
   componentDidUpdate() {
-    if (this.state.craftedProduction != this.props.impactsData.craftedProduction) {
-      this.setState({ craftedProduction: this.props.impactsData.craftedProduction });
+    if (
+      this.state.craftedProduction != this.props.impactsData.craftedProduction
+    ) {
+      this.setState({
+        craftedProduction: this.props.impactsData.craftedProduction,
+      });
     }
   }
 
@@ -53,47 +64,75 @@ export class StatementART extends React.Component {
             <label>L'entreprise est-elle une entreprise artisanale ?</label>
 
             <div className={"custom-control-inline"}>
-              <input type="radio" id="isValueAddedCrafetd" className="custom-control-input"
+              <input
+                type="radio"
+                id="isValueAddedCrafetd"
+                className="custom-control-input"
                 value="true"
                 checked={isValueAddedCrafted === true}
-                onChange={this.onIsValueAddedCraftedChange} />
+                onChange={this.onIsValueAddedCraftedChange}
+              />
               <label className="custom-control-label">Oui</label>
             </div>
             <div className={"custom-control-inline"}>
-              <input type="radio" id="isValueAddedCrafetd" className="custom-control-input"
+              <input
+                type="radio"
+                id="isValueAddedCrafetd"
+                className="custom-control-input"
                 value="null"
-                checked={isValueAddedCrafted === null && craftedProduction !== ""}
-                onChange={this.onIsValueAddedCraftedChange} />
+                checked={
+                  isValueAddedCrafted === null && craftedProduction !== ""
+                }
+                onChange={this.onIsValueAddedCraftedChange}
+              />
               <label className="custom-control-label">Partiellement</label>
             </div>
             <div className={"custom-control-inline"}>
-              <input type="radio" id="isValueAddedCrafetd" className="custom-control-input"
+              <input
+                type="radio"
+                id="isValueAddedCrafetd"
+                className="custom-control-input"
                 value="false"
                 checked={isValueAddedCrafted === false}
-                onChange={this.onIsValueAddedCraftedChange} />
+                onChange={this.onIsValueAddedCraftedChange}
+              />
               <label className="custom-control-label">Non</label>
             </div>
           </div>
           <div className="form-group">
             <label>Part de la valeur ajoutée artisanale</label>
-            <InputNumber value={roundValue(craftedProduction, 0)}
+            <InputNumber
+              value={roundValue(craftedProduction, 0)}
               onUpdate={this.updateCraftedProduction.bind(this)}
-              disabled={isValueAddedCrafted != null} placeholder="&euro;" />
+              disabled={isValueAddedCrafted != null}
+              placeholder="&euro;"
+            />
           </div>
         </div>
         <div className="form-group">
-            <label>Informations complémentaires</label>
-            <textarea type="text" spellCheck="false" className='form-input'
-              value={info}
-              onChange={this.updateInfo}
-              onBlur={this.saveInfo} />
-          </div>
+          {/* <FloatingLabel controlId="floatingTextarea2" label="Comments">
+        <Form.Control
+          as="textarea"
+          value={info}
+          onChange={this.updateInfo}
+          onBlur={this.saveInfo}
+        />
+      </FloatingLabel> */}
+
+          <label>Informations complémentaires</label>
+          <textarea type="text" spellCheck="false" className="form-input" />
+        </div>
         <div className="statement-action">
-          <button disabled={!isValid} className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}>Valider</button>
+          <button
+            disabled={!isValid}
+            className="btn btn-secondary btn-sm"
+            onClick={this.onValidate}
+          >
+            Valider
+          </button>
         </div>
       </div>
-    )
+    );
   }
 
   onIsValueAddedCraftedChange = (event) => {
@@ -101,7 +140,8 @@ export class StatementART extends React.Component {
     switch (radioValue) {
       case "true":
         this.props.impactsData.isValueAddedCrafted = true;
-        this.props.impactsData.craftedProduction = this.props.impactsData.netValueAdded;
+        this.props.impactsData.craftedProduction =
+          this.props.impactsData.netValueAdded;
         break;
       case "null":
         this.props.impactsData.isValueAddedCrafted = null;
@@ -112,30 +152,44 @@ export class StatementART extends React.Component {
         this.props.impactsData.craftedProduction = 0;
         break;
     }
-    this.setState({ craftedProduction: this.props.impactsData.craftedProduction });
+    this.setState({
+      craftedProduction: this.props.impactsData.craftedProduction,
+    });
     this.props.onUpdate("art");
-  }
+  };
 
   updateCraftedProduction = (input) => {
     this.props.impactsData.craftedProduction = input;
-    this.setState({ craftedProduction: this.props.impactsData.craftedProduction });
+    this.setState({
+      craftedProduction: this.props.impactsData.craftedProduction,
+    });
     this.props.onUpdate("art");
-  }
+  };
 
   updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => this.props.impactsData.comments.art = this.state.info;
+  saveInfo = () => (this.props.impactsData.comments.art = this.state.info);
 
-  onValidate = () => this.props.onValidate()
-
+  onValidate = () => this.props.onValidate();
 }
 
 export const writeStatementART = (doc, x, y, impactsData) => {
-  doc.text("Valeur ajoutée artisanale : " + printValueInput(impactsData.craftedProduction, 0) + " €" + (impactsData.isValueAddedCrafted ? "*" : ""), x, y);
+  doc.text(
+    "Valeur ajoutée artisanale : " +
+      printValueInput(impactsData.craftedProduction, 0) +
+      " €" +
+      (impactsData.isValueAddedCrafted ? "*" : ""),
+    x,
+    y
+  );
   if (impactsData.isValueAddedCrafted) {
     y += 6;
     doc.setFont("Helvetica", "italic");
-    doc.text("*Les activités de l'entreprise sont déclarées artisanales / faisant appel à un savoir-faire reconnu", x, y);
+    doc.text(
+      "*Les activités de l'entreprise sont déclarées artisanales / faisant appel à un savoir-faire reconnu",
+      x,
+      y
+    );
     doc.setFont("Helvetica", "normal");
   }
   return y;
-}
+};

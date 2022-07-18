@@ -191,9 +191,7 @@ const IndicatorsList = (props) => {
         ></ChangeDivision>
       )}
       <h3> Création de la valeur</h3>
-      {
-    console.log(validations)
-   }
+
       <Accordion>
         {Object.entries(metaIndics)
           .filter((indic) => indic.some((el) => valueCreation.includes(el)))
