@@ -130,7 +130,7 @@ export class AssessmentDIS extends React.Component {
 
         <div className="view-footer">
         <button className="btn btn-sm" 
-                  onClick = {() => this.props.onGoBack()}>Retour</button>
+                  onClick = {() => this.props.onGoBack()}><i class="bi bi-chevron-left"></i> Retour</button>
           <button className="btn btn-secondary btn-sm"
                   disabled={!isAllValid}
                   onClick = {() => this.onSubmit()}>Valider</button>
