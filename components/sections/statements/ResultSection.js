@@ -130,13 +130,16 @@ const ResultSection = (props) => {
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
+          {
+            console.log( session.validations)
+          }
            {
-            session.validations > 1 ? 
+            session.validations.length > 1 ? 
             <DropdownButton id="indic-button" title="Autres résultats">
             {Object.entries(metaIndics).map(([key, value]) => {
               if (session.validations.includes(key) && key != indic) {
                 return (
-                  <Dropdown.Item key={key} onClick={() => setIndic(key)}>
+                  <Dropdown.Item className="small-text" key={key} onClick={() => setIndic(key)}>
                     {value.libelle}
                   </Dropdown.Item>
                 );
