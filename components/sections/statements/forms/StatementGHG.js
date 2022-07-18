@@ -3,9 +3,6 @@
 // React
 import React from 'react';
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator } from "@fortawesome/free-solid-svg-icons";
-
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
 import { InputNumber } from '../../../input/InputNumber'; 
