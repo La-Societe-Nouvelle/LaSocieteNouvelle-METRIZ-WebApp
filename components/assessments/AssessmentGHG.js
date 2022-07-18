@@ -3,7 +3,6 @@
 // React
 import React from "react";
 import { Table, Row, Col } from "react-bootstrap";
-import Select from "react-select";
 
 // Utils
 import { InputNumber } from "../input/InputNumber";
@@ -1220,7 +1219,6 @@ export class AssessmentGHG extends React.Component {
   // update props
   onSubmit = async () => {
     let impactsData = this.props.impactsData;
-
     // update ghg data
     impactsData.ghgDetails = this.state.ghgDetails;
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
