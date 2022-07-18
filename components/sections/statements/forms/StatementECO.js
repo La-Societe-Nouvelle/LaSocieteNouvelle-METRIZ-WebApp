@@ -62,11 +62,11 @@ export class StatementECO extends React.Component {
             </div>
           </div>
           <div className="form-group">
-            <label>Valeur ajoutée nette produite en France ( en &euro; ) </label>
+            <label>Valeur ajoutée nette produite en France </label>
             <InputNumber value={roundValue(domesticProduction, 0)}
               disabled={isAllActivitiesInFrance != null}
               onUpdate={this.updateDomesticProduction}
-              placeholder="" />
+              placeholder="€" />
           </div>
 
 
