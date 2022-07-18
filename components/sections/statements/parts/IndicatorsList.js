@@ -32,7 +32,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
   const [popUp, setPopUp] = useState();
-  const [comparativeDivision, setComparativeDivision] = useState();
+  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision);
   const [indicToExport, setIndicToExport] = useState();
   const [productionSectorFootprint, setProductionSectorFootprint] = useState(
     new SocialFootprint()
@@ -45,7 +45,7 @@ const IndicatorsList = (props) => {
   );
 
   useEffect(async () => {
-
+    
     if (comparativeDivision != "00") {
       let productionSectorFootprint = await fetchDivisionData(
         comparativeDivision,

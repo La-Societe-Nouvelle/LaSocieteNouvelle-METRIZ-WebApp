@@ -42,7 +42,7 @@ const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
   const [session, setSession] = useState(props.session);
 
-  const [comparativeDivision, setComparativeDivision] = useState("00");
+  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision || "00");
 
   const [productionSectorFootprint, setProductionSectorFootprint] = useState(new SocialFootprint()
   );
@@ -95,6 +95,9 @@ const ResultSection = (props) => {
     let division = event.value;
 
     setComparativeDivision(division);
+
+    // update session 
+    props.session.comparativeDivision = division;
 
     if (division != "00") {
 
@@ -224,6 +227,8 @@ const ResultSection = (props) => {
       <h3>Comparaison par activité</h3>
 
       <Select
+      className="mb-3 small-text"
+
                       defaultValue={{
                         label:
                           comparativeDivision +
