@@ -3,12 +3,13 @@
 // React
 import React from 'react';
 import { Table, Form } from 'react-bootstrap';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 // Readers / Writers
 import { XLSXFileReader } from '/src/readers/XLSXReader'
 import { SocialDataContentReader } from '/src/readers/SocialDataContentReader';
 import { XLSXHeaderFileWriter } from '/src/writers/XLSXWriter';
-
+import {CSVFileReader} from '/src/readers/CSVReader'
 // Utils
 import { InputText } from '/components/input/InputText';
 import { InputNumber } from '/components/input/InputNumber';
@@ -68,76 +69,106 @@ export class AssessmentDIS extends React.Component {
       trainingContract: false
     }
 
-    return(
+    return (
       <div className="assessment">
-
-          <div className="actions text-end mb-1">
-            <button onClick={() => document.getElementById('import-companies-csv').click()} className="btn btn-primary btn-sm me-1">
-              Importer un fichier CSV
-            </button>
-            <input id="import-companies-csv" visibility="collapse"
-                    type="file" accept=".csv" 
-                    onChange={this.importCSVFile}/>
-            <button onClick={() => document.getElementById('import-companies-xlsx').click()} className="btn btn-primary btn-sm me-1">
-              Importer un fichier XLSX
-            </button>
-              <input id="import-companies-xlsx" visibility="collapse"
-                      type="file" accept=".xlsx" 
-                      onChange={this.importXLSXFile}/>
-            <button onClick={this.exportXLSXFile} className="btn btn-primary btn-sm me-1">
-              Télécharger modèle XLSX
-            </button>
-            <button onClick={this.deleteAll} className="btn btn-secondary btn-sm">
-                Supprimer tout
-              </button>
-          </div>
-
-          <div className="table-main">
-            <Table size="sm" responsive>
-              <thead>
-                <tr>
-                  <td className="auto" 
-                      onClick={() => this.changeColumnSorted("name")}>Nom</td>
-                  <td className="short" 
-                      onClick={() => this.changeColumnSorted("sex")}>Sexe</td>
-                  <td className="short" 
-                      onClick={() => this.changeColumnSorted("workingHours")}>Heures travaillées (annuelles)</td>
-                  <td className="short" 
-                      onClick={() => this.changeColumnSorted("wage")}>Rémunération annuelle brute</td>
-                  <td className="short" 
-                      onClick={() => this.changeColumnSorted("hourlyRate")}>Taux horaire</td>
-                  <td className="short" 
-                      onClick={() => this.changeColumnSorted("trainingContract")}>Contrat de formation</td>
-                  <td className="short" 
-                      onClick={() => this.changeColumnSorted("trainingHours")}>Heures de formation</td>
-                </tr>
-              </thead>
-              <tbody>
-                {employees.map((employee) => 
-                  <Row key={"company_"+employee.id} 
-                      {...employee}
-                      isNewEmployeeRow={false}
-                      updateSocialData={this.updateSocialData.bind(this)}/>)}
-                  <Row key="new_employee"
-                      {...newEmployee}
-                      isNewEmployeeRow={true}
-                      updateSocialData={this.updateSocialData.bind(this)}/>
-              </tbody>
-            </Table>
-
-          </div>
-          
-
-        <div className="view-footer">
-        <button className="btn btn-sm" 
-                  onClick = {() => this.props.onGoBack()}><i className="bi bi-chevron-left"></i> Retour</button>
-          <button className="btn btn-secondary btn-sm"
-                  disabled={!isAllValid}
-                  onClick = {() => this.onSubmit()}>Valider</button>
+        <div className="actionstext-end mb-1">
+          <button
+            onClick={() =>
+              document.getElementById("import-companies-csv").click()
+            }
+            className="btn btn-primary btn-sm me-1"
+          >
+            Importer un fichier CSV
+          </button>
+          <input
+            id="import-companies-csv"
+            visibility="collapse"
+            type="file"
+            accept=".csv"
+            onChange={this.importCSVFile}
+          />
+          <button
+            onClick={() =>
+              document.getElementById("import-companies-xlsx").click()
+            }
+            className="btn btn-primary btn-sm me-1"
+          >
+            Importer un fichier XLSX
+          </button>
+          <input
+            id="import-companies-xlsx"
+            visibility="collapse"
+            type="file"
+            accept=".xlsx"
+            onChange={this.importXLSXFile}
+          />
+          <button
+            onClick={this.exportXLSXFile}
+            className="btn btn-primary btn-sm me-1"
+          >
+            Télécharger modèle XLSX
+          </button>
+          <button onClick={this.deleteAll} className="btn btn-secondary btn-sm">
+            Supprimer tout
+          </button>
         </div>
 
+        <div className="table-main">
+          <Table size="sm" responsive>
+            <thead>
+              <tr>
+                <td onClick={() => this.changeColumnSorted("name")}>Nom</td>
+                <td onClick={() => this.changeColumnSorted("sex")}>Sexe</td>
+                <td onClick={() => this.changeColumnSorted("workingHours")}>
+                  Heures travaillées (annuelles)
+                </td>
+                <td onClick={() => this.changeColumnSorted("wage")}>
+                  Rémunération annuelle brute
+                </td>
+                <td onClick={() => this.changeColumnSorted("hourlyRate")}>
+                  Taux horaire
+                </td>
+                <td onClick={() => this.changeColumnSorted("trainingContract")}>
+                  Contrat de formation
+                </td>
+                <td onClick={() => this.changeColumnSorted("trainingHours")}>
+                  Heures de formation
+                </td>
+              </tr>
+            </thead>
+            <tbody>
+              {employees.map((employee) => (
+                <Row
+                  key={"company_" + employee.id}
+                  {...employee}
+                  isNewEmployeeRow={false}
+                  updateSocialData={this.updateSocialData.bind(this)}
+                />
+              ))}
+              <Row
+                key="new_employee"
+                {...newEmployee}
+                isNewEmployeeRow={true}
+                updateSocialData={this.updateSocialData.bind(this)}
+              />
+            </tbody>
+          </Table>
+        </div>
+
+        <div className="view-footer">
+          <button className="btn btn-sm btn-light" onClick={() => this.props.onGoBack()}>
+            <i className="bi bi-chevron-left"></i> Retour
+          </button>
+          <button
+            className="btn btn-secondary btn-sm"
+            disabled={!isAllValid}
+            onClick={() => this.onSubmit()}
+          >
+            Valider
+          </button>
+        </div>
       </div>
-    )
+    );
   }
 
   /* ---------- HEADER ACTIONS ---------- */
@@ -305,42 +336,45 @@ class Row extends React.Component {
     return (
       <tr>
         <td className={"long"+(!this.props.isNewEmployeeRow ?  (isValid ? " valid" : " unvalid") : "")}>
-          <InputText value={name}
+          <InputText  value={name}
                      onUpdate={this.updateName.bind(this)}/></td>
-  {
-    console.log(sex)
-  }
-        <td className="short center">
-          <Form.Select value={sex} onChange={this.updateSex}>
+
+        <td className=" text-center">
+          <Form.Select className="mb-3" value={sex} onChange={this.updateSex}>
             <option key="" value=""> - </option>
             <option key="F" value="F">F</option>
             <option key="H" value="H">H</option>
             {sex==null && <option key="" value="">-</option>}
           </Form.Select></td>
 
-        <td className="short right">
+        <td className="text-end">
           <InputNumber value={workingHours}
                        onUpdate={this.updateWorkingHours.bind(this)}/>
         </td>
 
-        <td className="short right">
+        <td className="text-end">
           <InputNumber value={wage}
                        onUpdate={this.updateWage.bind(this)}/>
         </td>
 
-        <td className="short right">
+        <td className="text-end">
           <InputNumber value={hourlyRate}
                        onUpdate={this.updateHourlyRate.bind(this)}/>
         </td>
 
-        <td className="short">
-          <input type="checkbox"
-                 value={id}
-                 checked={trainingContract}
-                 onChange={this.updateTrainingContract.bind(this)}/>
+        <td className="text-center">
+
+        <Form.Check 
+        type="checkbox"
+        value={id}     
+        checked={trainingContract}
+        onChange={this.updateTrainingContract.bind(this)}   
+        />
+        
+
         </td>
 
-        <td className="short right">
+        <td className="text-end">
           <InputNumber value={trainingHours}
                        disabled={trainingContract}
                        onUpdate={this.updateTrainingHours.bind(this)}/>

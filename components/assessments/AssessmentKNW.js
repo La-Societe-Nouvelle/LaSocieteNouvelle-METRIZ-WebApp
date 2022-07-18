@@ -36,28 +36,28 @@ export class AssessmentKNW extends React.Component {
           <thead>
             <tr>
               <td>Libellé</td>
-              <td className="text-end">Valeur</td>
+              <td >Valeur</td>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td>Taxe d'apprentissage</td>
-              <td className="text-end">
+              <td>
                 <InputNumber
                   value={printValueInput(knwDetails.apprenticeshipTax, 0)}
                   onUpdate={this.updateApprenticesShipTax.bind(this)}
+                  placeholder="&euro;"
                 />
-                &euro;
               </td>
             </tr>
             <tr>
               <td>Participation à la formation professionnelle continue</td>
-              <td className="text-end">
+              <td>
                 <InputNumber
                   value={printValueInput(knwDetails.vocationalTrainingTax, 0)}
                   onUpdate={this.updateVocationalTrainingTax.bind(this)}
+                  placeholder="&euro;"
                 />
-                &euro;
               </td>
             </tr>
             <tr>
@@ -65,20 +65,20 @@ export class AssessmentKNW extends React.Component {
                 Rémunérations liées à des contrats de formation (stage,
                 alternance, etc.)
               </td>
-              <td className="text-end">
+              <td>
                 <InputNumber
                   value={printValueInput(
                     knwDetails.apprenticesRemunerations,
                     0
                   )}
                   onUpdate={this.updateApprenticesRemunerations.bind(this)}
+                  placeholder="&euro;"
                 />
-                &euro;
               </td>
             </tr>
             <tr>
               <td>Rémunérations liées à des heures de suivi d'une formation</td>
-              <td className="text-end">
+              <td>
                 <InputNumber
                   value={printValueInput(
                     knwDetails.employeesTrainingsCompensations,
@@ -87,15 +87,15 @@ export class AssessmentKNW extends React.Component {
                   onUpdate={this.updateEmployeesTrainingsCompensations.bind(
                     this
                   )}
+                  placeholder="&euro;"
                 />
-                &euro;
               </td>
             </tr>
             <tr>
               <td>
                 Rémunérations liées à des activités de recherche ou de formation
               </td>
-              <td className="text-end">
+              <td>
                 <InputNumber
                   value={printValueInput(
                     knwDetails.researchPersonnelRemunerations,
@@ -104,8 +104,8 @@ export class AssessmentKNW extends React.Component {
                   onUpdate={this.updateResearchPersonnelRemunerations.bind(
                     this
                   )}
+                  placeholder="&euro;"
                 />
-                &euro;
               </td>
             </tr>
             <tr className="with-top-line">
@@ -136,7 +136,7 @@ export class AssessmentKNW extends React.Component {
           </tbody>
         </Table>
         <div className="text-end">
-        <button className="btn btn-sm" 
+        <button className="btn btn-sm btn-light me-2" 
                   onClick = {() => this.props.onGoBack()}><i className="bi bi-chevron-left"></i> Retour</button>
           <button
             className="btn btn-secondary btn-sm"
