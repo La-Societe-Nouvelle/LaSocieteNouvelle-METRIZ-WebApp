@@ -9,17 +9,17 @@
 
 
 ## Contexte
-L'application METRIZ a pour objet de fournir une solution de base pour le calcul de l'empreinte sociétale d'une entreprise.
+L'application [METRIZ](https://metriz.lasocietenouvelle.org/) a pour objet de fournir une solution de base pour le calcul de l'empreinte sociétale d'une entreprise.
 Elle mesure et analyse les impacts de valeur produite d'une entreprise à partir de ses écritures comptables, des numéros de siren associés aux comptes tiers fournisseurs et des impacts directs des activités de l'entreprise.
 
 ## Contribution
 
 Metriz.lasocietenouvelle.org est régi par la licence CeCILL soumise au droit français et respectant les principes de diffusion des logiciels libres. 
-Vous souhaitez contribuer à améliorer notre outil ? Lisez notre guide de contribution.
+Vous souhaitez contribuer à améliorer notre outil ? Lisez notre [guide de contribution](https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/blob/opensource/CONTRIBUTING.md).
 
 ## Installation pour le développement
 
-Consultez la liste des prérequis et des technologies utilisées pour le développement l'application Metriz dans notre [guide d'installation].
+Consultez la liste des prérequis et des technologies utilisées pour le développement l'application Metriz dans notre [guide d'installation](https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/blob/opensource/INSTALL.md).
 
 ## En savoir plus
 
