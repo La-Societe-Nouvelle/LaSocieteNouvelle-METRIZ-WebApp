@@ -5,7 +5,7 @@ Metriz est une application web est écrite en Javascript et est exécutée uniqu
 ### Technologies
 
 -   [Npm](https://www.npmjs.com/) pour la gestion des dépendances 
--   [React](https://reactjs.org) pour la gestion de l'interface utilisateur
+-   [nextJS](https://nextjs.org/) pour la création de l'application
 - [Git](https://git-scm.com/) pour la gestion des versions
 - [Github](https://github.com/) pour l'hébergement des dépôts Git et la collaboration à l'évolution de l'outil
 
