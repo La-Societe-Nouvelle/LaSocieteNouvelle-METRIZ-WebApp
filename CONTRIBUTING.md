@@ -14,5 +14,4 @@ N'hésitez pas à vérifier si le problème n'a pas déjà été traité dans un
 
 Si vous souhaitez contribuer au développpement de l'application, vous pouvez consulter la liste des issues labellisées [🟣Good first issues](https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) ou [🟢Help wanted](https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22)
 
-### Pull request
 
