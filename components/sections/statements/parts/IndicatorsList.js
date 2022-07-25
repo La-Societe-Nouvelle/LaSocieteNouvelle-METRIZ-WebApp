@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContext,
+  Button,
   Card,
   Modal,
   useAccordionButton,
@@ -85,24 +86,23 @@ const IndicatorsList = (props) => {
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
     // get new value
-    props.session.getNetValueAddedIndicator(indic);
-     // if (
-    //   nextIndicator !==
-    //   props.session.financialData.aggregates.netValueAdded.footprint.indicators[
-    //     indic
-    //   ]
-    // ) {
-    //   console.log("remove")
-    //   // remove validation
-    //   props.session.validations = props.session.validations.filter(
-    //     (item) => item != indic
-    //   );
-    //   SetValidations(validations.filter(
-    //     (item) => item != indic
-    //   ))
-    //   // update footprint
-    //   await props.session.updateIndicator(indic);
-    // }
+    let nextIndicator = props.session.getNetValueAddedIndicator(indic);
+     if (
+      nextIndicator !==
+      props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+        indic
+      ]
+    ) {
+      // remove validation
+      props.session.validations = props.session.validations.filter(
+        (item) => item != indic
+      );
+      SetValidations(validations.filter(
+        (item) => item != indic
+      ))
+      // update footprint
+      await props.session.updateIndicator(indic);
+    }
 
 
   };
@@ -395,8 +395,19 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
+                 
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
+                      { 
+                        key == 'ghg' && props.impactsData.greenhousesGazEmissions && !validations.includes(key)
+                        
+                        && <span className="icon-warning" title="Informations à valider"><i className=" bi bi-exclamation-triangle me-0"></i></span>
+                      }
+                      {
+                          key == "nrg" && props.impactsData.energyConsumption && !validations.includes(key) 
+                          && <span className="icon-warning" title="Informations à valider"><i className=" bi bi-exclamation-triangle me-0"></i></span>
+
+                      }
                     </ArrowToggle>
                   </div>
                   <div>
@@ -421,7 +432,7 @@ const IndicatorsList = (props) => {
               </Card.Header> 
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
-    
+   
                   {(() => {
                     switch (key) {
                       case "ghg":

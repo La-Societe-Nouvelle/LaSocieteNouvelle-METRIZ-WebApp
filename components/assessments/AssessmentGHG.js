@@ -75,6 +75,8 @@ export class AssessmentGHG extends React.Component {
 
       // adding new factor
       newFactorAssessmentItem: "",
+      // alert message
+      message: false,
     };
   }
 
@@ -84,6 +86,7 @@ export class AssessmentGHG extends React.Component {
       greenhousesGazEmissionsUncertainty,
       ghgDetails,
       newFactorAssessmentItem,
+      message
     } = this.state;
 
     return (
@@ -1057,6 +1060,10 @@ export class AssessmentGHG extends React.Component {
             </tr>
           </tbody>
         </Table>
+        {
+          message && 
+          <p className="small-text p-2 alert-warning"> Attention, certains facteurs d'émissions sont également utilisés pour la mesure de <b>l'intensité de consommation d'énergie</b>. Par conséquent, les valeurs vont être recalculées pour cet indicateur et devront être <b>(re)validées.</b></p>
+        }
         <div className="view-header">
           <button
             className="btn btn-sm btn-light me-2"
@@ -1139,6 +1146,10 @@ export class AssessmentGHG extends React.Component {
   // Consumption
   updateConsumption = (itemId, nextConsumption) => {
     let item = this.state.ghgDetails[itemId];
+    if(item.assessmentItem == "1" || item.assessmentItem == "2")
+    {
+      this.setState({message : true});
+    }
 
     item.consumption = nextConsumption;
 

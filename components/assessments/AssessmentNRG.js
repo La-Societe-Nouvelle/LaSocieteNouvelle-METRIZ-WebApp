@@ -55,6 +55,8 @@ export class AssessmentNRG extends React.Component {
       nrgDetails: props.impactsData.nrgDetails,
       // adding new product
       typeNewProduct: "",
+      // alert message
+      message : false,
     };
   }
 
@@ -91,6 +93,7 @@ export class AssessmentNRG extends React.Component {
       energyConsumptionUncertainty,
       nrgDetails,
       typeNewProduct,
+      message
     } = this.state;
 
     return (
@@ -568,6 +571,10 @@ export class AssessmentNRG extends React.Component {
           </tbody>
         </Table>
 
+        {
+          message && 
+          <p className="small-text p-2 alert-warning"> Attention, ces produits sont également utilisés pour la mesure de <b>l'intensité d'émissions de Gaz à effet de serre</b>. Par conséquent, les valeurs vont être recalculées pour cet indicateur et devront être <b>(re)validées.</b></p>
+        }
         <div className="view-header">
           <button
             className="btn btn-sm btn-light me-2"
@@ -649,8 +656,12 @@ export class AssessmentNRG extends React.Component {
 
   // update nrg consumption
   updateConsumption = (itemId, nextValue) => {
-
     let itemData = this.state.nrgDetails[itemId];
+    if(itemData.type == "fossil" || itemData.type == "biomass")
+    {
+      this.setState({ message: true});
+    }
+
     itemData.consumption = nextValue;
     itemData.nrgConsumption = getNrgConsumption(itemData);
     itemData.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
@@ -697,9 +708,10 @@ export class AssessmentNRG extends React.Component {
       getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
     await this.props.onUpdate("nrg");
 
+
     // update ghg data
     // ...delete
-    Object.entries(impactsData.ghgDetails)
+    Object.entries(impactsData.nrgDetails)
       .filter(([_, itemData]) => itemData.fuelCode != undefined)
       .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
       .forEach(([itemId, _]) => {
@@ -712,6 +724,7 @@ export class AssessmentNRG extends React.Component {
     Object.entries(impactsData.nrgDetails)
       .filter(([_, data]) => data.type == "fossil" || data.type == "biomass")
       .forEach(([itemId, itemData]) => {
+
         let ghgItem = Object.entries(impactsData.ghgDetails)
           .map(([_, ghgItemData]) => ghgItemData)
           .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
@@ -736,15 +749,19 @@ export class AssessmentNRG extends React.Component {
         ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
         ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
       });
-    // ...total & uncertainty
-    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
-      impactsData.ghgDetails
-    );
-    impactsData.greenhousesGazEmissionsUncertainty =
-      getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
-    await this.props.onUpdate("ghg");
 
-    // go bakc
+      if(Object.keys(impactsData.ghgDetails).length > 0) {
+        console.log("total")
+        // ...total & uncertainty
+        impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
+          impactsData.ghgDetails
+        );
+        impactsData.greenhousesGazEmissionsUncertainty =
+          getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
+          await this.props.onUpdate("ghg");
+      }
+
+    // go back
     this.props.onGoBack();
   };
 }

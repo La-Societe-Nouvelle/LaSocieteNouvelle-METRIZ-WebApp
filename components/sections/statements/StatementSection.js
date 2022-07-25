@@ -78,8 +78,7 @@ const StatementSection = (props) => {
         <>
           <section className="step">
             <h2>
-              <i className="bi bi-rulers"></i> &Eacute;tape 4 - Déclaration des
-              impacts
+              <i className="bi bi-rulers"></i> &Eacute;tape 4 - Déclaration des impacts directs
             </h2>
             <p>
               Pour chaque indicateur, déclarez vos impacts directs et obtenez

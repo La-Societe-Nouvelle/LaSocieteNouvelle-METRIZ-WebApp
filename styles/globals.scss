@@ -151,3 +151,15 @@ sup {
   border-radius: 50%;
   animation: spinner 1.5s linear infinite;
 }
+
+/* ---------- Icones ---------- */
+
+.icon-warning {
+  background-color: $warning;
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+  margin-left: 5px;
+
+
+}
