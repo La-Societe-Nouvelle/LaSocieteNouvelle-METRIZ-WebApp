@@ -26,7 +26,6 @@ export class StatementGHG extends React.Component {
         ""
       ),
       info: props.impactsData.comments.ghg || "",
-      isUpdated : false,
     };
   }
 
@@ -59,7 +58,6 @@ export class StatementGHG extends React.Component {
       greenhousesGazEmissions,
       greenhousesGazEmissionsUncertainty,
       info,
-      isUpdated
     } = this.state;
 
     let isValid = greenhousesGazEmissions != null && netValueAdded != null;
@@ -96,9 +94,6 @@ export class StatementGHG extends React.Component {
           />
         </div>
         <div className="statement-validation">
-          {
-            isUpdated && <p className="alert alert-success">✓ La valeur des impacts a été mise à jour.</p>
-          }
           <button
             className="btn btn-primary btn-sm"
             onClick={this.props.toAssessment}

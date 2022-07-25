@@ -2,11 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import {
   Accordion,
   AccordionContext,
-  Button,
   Card,
   Modal,
   useAccordionButton,
 } from "react-bootstrap";
+
 import { exportIndicPDF } from "../../../../src/writers/Export";
 import { GraphsPDF } from "../../../graphs/GraphsPDF";
 import {
@@ -32,6 +32,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
+  const [updatedIndic, setUpdatedIndic] = useState("");
 
   const [popUp, setPopUp] = useState();
   const [comparativeDivision, setComparativeDivision] = useState(
@@ -85,9 +86,10 @@ const IndicatorsList = (props) => {
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
+    setUpdatedIndic();
     // get new value
     let nextIndicator = props.session.getNetValueAddedIndicator(indic);
-     if (
+    if (
       nextIndicator !==
       props.session.financialData.aggregates.netValueAdded.footprint.indicators[
         indic
@@ -97,14 +99,10 @@ const IndicatorsList = (props) => {
       props.session.validations = props.session.validations.filter(
         (item) => item != indic
       );
-      SetValidations(validations.filter(
-        (item) => item != indic
-      ))
+      SetValidations(validations.filter((item) => item != indic));
       // update footprint
       await props.session.updateIndicator(indic);
     }
-
-
   };
 
   const validateIndicator = async (indic) => {
@@ -117,6 +115,8 @@ const IndicatorsList = (props) => {
     props.session.validations.push(indic);
     // update footprint
     await props.session.updateIndicator(indic);
+
+    setUpdatedIndic(indic);
   };
 
   const valueCreation = ["eco", "art", "soc"];
@@ -169,6 +169,26 @@ const IndicatorsList = (props) => {
       setPopUp("");
     }
   };
+
+  // Resusable Components
+
+  const SuccessMessage = () => {
+    return (
+      <p className="mt-4 small-text alert alert-success">✓ La déclaration des impacts a été mise à jour.</p>
+    );
+  };
+
+  const IconWarning = () => {
+    return(
+      <span
+      className="icon-warning"
+      title="Informations à valider"
+    >
+      <i className=" bi bi-exclamation-triangle me-0"></i>
+    </span>
+    );
+  };
+
   return (
     <>
       {validations.length > 0 &&
@@ -230,7 +250,6 @@ const IndicatorsList = (props) => {
               </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
-
                   {(() => {
                     switch (key) {
                       case "eco":
@@ -262,6 +281,8 @@ const IndicatorsList = (props) => {
                         return <div></div>;
                     }
                   })()}
+
+                  {updatedIndic && updatedIndic == key && <SuccessMessage />}
                 </Card.Body>
               </Accordion.Collapse>
             </Card>
@@ -376,6 +397,7 @@ const IndicatorsList = (props) => {
                         return <div></div>;
                     }
                   })()}
+                  {updatedIndic && updatedIndic == key && <SuccessMessage />}
                 </Card.Body>
               </Accordion.Collapse>
             </Card>
@@ -395,19 +417,18 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
-                 
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
-                      { 
-                        key == 'ghg' && props.impactsData.greenhousesGazEmissions && !validations.includes(key)
-                        
-                        && <span className="icon-warning" title="Informations à valider"><i className=" bi bi-exclamation-triangle me-0"></i></span>
-                      }
-                      {
-                          key == "nrg" && props.impactsData.energyConsumption && !validations.includes(key) 
-                          && <span className="icon-warning" title="Informations à valider"><i className=" bi bi-exclamation-triangle me-0"></i></span>
-
-                      }
+                      {key == "ghg" &&
+                        props.impactsData.greenhousesGazEmissions &&
+                        !validations.includes(key) && (
+                        <IconWarning />
+                        )}
+                      {key == "nrg" &&
+                        props.impactsData.energyConsumption &&
+                        !validations.includes(key) && (
+                          <IconWarning />
+                        )}
                     </ArrowToggle>
                   </div>
                   <div>
@@ -429,17 +450,15 @@ const IndicatorsList = (props) => {
                     </button>
                   </div>
                 </div>
-              </Card.Header> 
+              </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
-   
                   {(() => {
                     switch (key) {
                       case "ghg":
                         return (
                           <>
                             <StatementGHG
-                            
                               impactsData={props.impactsData}
                               onUpdate={willNetValueAddedIndicator.bind("ghg")}
                               onValidate={() => validateIndicator("ghg")}
@@ -516,6 +535,7 @@ const IndicatorsList = (props) => {
                         return <div></div>;
                     }
                   })()}
+                  {updatedIndic && updatedIndic == key && <SuccessMessage />}
                 </Card.Body>
               </Accordion.Collapse>
             </Card>

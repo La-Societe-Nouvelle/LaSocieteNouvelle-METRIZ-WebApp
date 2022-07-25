@@ -99,7 +99,7 @@ export class StatementECO extends React.Component {
         this.props.impactsData.domesticProduction = 0;
         break;
     }
-    this.setState({ domesticProduction: valueOrDefault(this.props.impactsData.domesticProduction, "") });
+    this.setState({ domesticProduction: valueOrDefault(this.props.impactsData.domesticProduction, ""), isValid : true });
     this.props.onUpdate("eco");
   }
 
