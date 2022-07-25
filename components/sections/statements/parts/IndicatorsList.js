@@ -31,8 +31,11 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
+
   const [popUp, setPopUp] = useState();
-  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision);
+  const [comparativeDivision, setComparativeDivision] = useState(
+    props.session.comparativeDivision
+  );
   const [indicToExport, setIndicToExport] = useState();
   const [productionSectorFootprint, setProductionSectorFootprint] = useState(
     new SocialFootprint()
@@ -45,7 +48,6 @@ const IndicatorsList = (props) => {
   );
 
   useEffect(async () => {
-    
     if (comparativeDivision != "00") {
       let productionSectorFootprint = await fetchDivisionData(
         comparativeDivision,
@@ -84,8 +86,7 @@ const IndicatorsList = (props) => {
   const willNetValueAddedIndicator = async (indic) => {
     // get new value
     props.session.getNetValueAddedIndicator(indic);
-
-    // if (
+     // if (
     //   nextIndicator !==
     //   props.session.financialData.aggregates.netValueAdded.footprint.indicators[
     //     indic
@@ -102,10 +103,11 @@ const IndicatorsList = (props) => {
     //   // update footprint
     //   await props.session.updateIndicator(indic);
     // }
+
+
   };
 
   const validateIndicator = async (indic) => {
-
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
@@ -149,13 +151,12 @@ const IndicatorsList = (props) => {
   const updateDivision = (division) => {
     setComparativeDivision(division);
   };
+
   const handleDownloadPDF = async (key, comparativeDivision) => {
-    
     if (!comparativeDivision) {
       setIndicToExport(key);
       setPopUp("division");
     } else {
-
       exportIndicPDF(
         key,
         props.session,
@@ -229,6 +230,7 @@ const IndicatorsList = (props) => {
               </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
+
                   {(() => {
                     switch (key) {
                       case "eco":
@@ -416,15 +418,17 @@ const IndicatorsList = (props) => {
                     </button>
                   </div>
                 </div>
-              </Card.Header>
+              </Card.Header> 
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
+    
                   {(() => {
                     switch (key) {
                       case "ghg":
                         return (
                           <>
                             <StatementGHG
+                            
                               impactsData={props.impactsData}
                               onUpdate={willNetValueAddedIndicator.bind("ghg")}
                               onValidate={() => validateIndicator("ghg")}
@@ -539,7 +543,7 @@ function ModalAssesment(props) {
       show={props.popUp == props.indic}
       onHide={props.handleClose}
       fullscreen
-       centered
+      centered
     >
       <Modal.Header closeButton>
         <Modal.Title>{props.title}</Modal.Title>

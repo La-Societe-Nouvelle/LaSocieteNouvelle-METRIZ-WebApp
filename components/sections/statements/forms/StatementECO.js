@@ -12,12 +12,12 @@ import { InputNumber } from '../../../input/InputNumber';
 export class StatementECO extends React.Component {
 
   constructor(props) {
-
   
     super(props);
     this.state = {
       domesticProduction: valueOrDefault(props.impactsData.domesticProduction, ""),
-      info: props.impactsData.comments.eco || ""
+      info: props.impactsData.comments.eco || "",
+      isValid: props.impactsData.domesticProduction != null && props.impactsData.netValueAdded != null
     }
   }
 
@@ -29,14 +29,12 @@ export class StatementECO extends React.Component {
 
   render() {
     const { isAllActivitiesInFrance, netValueAdded } = this.props.impactsData;
-    const { domesticProduction, info } = this.state;
+    const { domesticProduction, info, isValid } = this.state;
 
-    let isValid = domesticProduction != null && netValueAdded != null;
 
     return (
       <div className="statement">
         <div className="statement-form">
-
           <div className="form-group">
             <label>Les activités de l'entreprise sont-elles localisées en France ?</label>
             <div className={"custom-control-inline"}>
@@ -68,8 +66,6 @@ export class StatementECO extends React.Component {
               onUpdate={this.updateDomesticProduction}
               placeholder="€" />
           </div>
-
-
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
@@ -79,6 +75,7 @@ export class StatementECO extends React.Component {
             onBlur={this.saveInfo} />
         </div>
         <div className="statement-validation">
+       
           <button disabled={!isValid} className={"btn btn-secondary btn-sm"}
             onClick={this.onValidate}>Valider</button>
         </div>
@@ -111,8 +108,8 @@ export class StatementECO extends React.Component {
     this.setState({ domesticProduction: this.props.impactsData.domesticProduction });
     this.props.onUpdate("eco");
   }
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
+ 
+  updateInfo = (event) => this.setState({ info: event.target.value, isValid:false });
   saveInfo = () => this.props.impactsData.comments.eco = this.state.info;
 
   onValidate = () => this.props.onValidate()

@@ -40,8 +40,9 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
       <Table id="mainAggregates" size="sm" responsive>
         <thead>
           <tr>
-            <td >Agrégat</td>
-            <td  colSpan="2">Valeur</td>
+            <td>Agrégat</td>
+            <td>Montant</td>
+            <td >Empreinte</td>
             <td >Incertitude</td>
             {printGrossImpact ? (
               <td >
@@ -60,24 +61,24 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               {printValue(
                 production.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}<span className="unit">{unit}</span>
+              )} <span className="unit">{unit}</span>
             </td>
             <td >
-              <u>+</u>&nbsp;
+              <u>+</u>
               {printValue(
                 production.footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              &nbsp;%
+              %
             </td>
             {printGrossImpact ? (
-              <td >
+              <td>
                 {printValue(
                   production.footprint.indicators[indic].getGrossImpact(
                     production.amount
                   ),
                   nbDecimals
-                )} <span className="unit"> {unitGrossImpact}</span>
+                )}<span className="unit"> {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -90,19 +91,18 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               {printValue(
                 revenue.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}
-              <span className="unit">{unit}</span>
+              )} <span className="unit">{unit}</span>
             </td>
             <td >
-              <u>+</u>&nbsp;
+              <u>+</u>
               {printValue(
                 revenue.footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              &nbsp;%
+              %
             </td>
             {printGrossImpact ? (
-              <td >
+              <td>
                 {printValue(
                   revenue.footprint.indicators[indic].getGrossImpact(
                     revenue.amount
@@ -123,16 +123,15 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 {printValue(
                   storedProduction.footprint.indicators[indic].getValue(),
                   nbDecimals
-                )}
-                <span className="unit">{unit}</span>
+                )} <span className="unit">{unit}</span>
               </td>
               <td >
-                <u>+</u>&nbsp;
+                <u>+</u>
                 {printValue(
                   storedProduction.footprint.indicators[indic].getUncertainty(),
                   0
                 )}
-                &nbsp;%
+                %
               </td>
               {printGrossImpact ? (
                 <td >
@@ -157,18 +156,17 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 {printValue(
                   immobilisedProduction.footprint.indicators[indic].getValue(),
                   nbDecimals
-                )}
-                <span className="unit">{unit}</span>
+                )} <span className="unit">{unit}</span>
               </td>
               <td >
-                <u>+</u>&nbsp;
+                <u>+</u>
                 {printValue(
                   immobilisedProduction.footprint.indicators[
                     indic
                   ].getUncertainty(),
                   0
                 )}
-                &nbsp;%
+                %
               </td>
               {printGrossImpact ? (
                 <td >
@@ -194,18 +192,17 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               {printValue(
                 intermediateConsumption.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}
-              <span className="unit">{unit}</span>
+              )} <span className="unit">{unit}</span>
             </td>
             <td >
-              <u>+</u>&nbsp;
+              <u>+</u>
               {printValue(
                 intermediateConsumption.footprint.indicators[
                   indic
                 ].getUncertainty(),
                 0
               )}
-              &nbsp;%
+              %
             </td>
             {printGrossImpact ? (
               <td >
@@ -230,13 +227,12 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}
-                  <span className="unit">{unit}</span>
+                  )} <span className="unit">{unit}</span>
                 </td>
                 <td >
-                  <u>+</u>&nbsp;
+                  <u>+</u>
                   {printValue(footprint.indicators[indic].getUncertainty(), 0)}
-                  &nbsp;%
+                  %
                 </td>
                 {printGrossImpact ? (
                   <td >
@@ -259,15 +255,15 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               {printValue(
                 capitalConsumption.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}<span className="unit">{unit}</span>
+              )} <span className="unit">{unit}</span>
             </td>
             <td >
-              <u>+</u>&nbsp;
+              <u>+</u>
               {printValue(
                 capitalConsumption.footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              &nbsp;%
+              %
             </td>
             {printGrossImpact ? (
               <td >
@@ -290,13 +286,12 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}
-                  <span className="unit">{unit}</span>
+                  )} <span className="unit"> {unit} </span>
                 </td>
                 <td >
-                  <u>+</u>&nbsp;
+                  <u>+</u>
                   {printValue(footprint.indicators[indic].getUncertainty(), 0)}
-                  &nbsp;%
+                  %
                 </td>
                 {printGrossImpact ? (
                   <td >
@@ -318,16 +313,15 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               {printValue(
                 netValueAdded.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}
-              <span className="unit">{unit}</span>
+              )} <span className="unit">{unit}</span>
             </td>
             <td >
-              <u>+</u>&nbsp;
+              <u>+</u>
               {printValue(
                 netValueAdded.footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              &nbsp;%
+              %
             </td>
             {printGrossImpact ? (
               <td >

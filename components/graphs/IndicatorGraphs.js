@@ -34,7 +34,14 @@ const viewsForIndic = {
 // valueAddedSectorFootprint={valueAddedSectorFootprint}
 // consumptionSectorFootprint={consumptionSectorFootprint}
 
-export const IndicatorGraphs = ({ session, indic, comparativeFootprints, productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint, }) => {
+export const IndicatorGraphs = ({
+  session,
+  indic,
+  comparativeFootprints,
+  productionSectorFootprint,
+  valueAddedSectorFootprint,
+  consumptionSectorFootprint,
+}) => {
   const { financialData } = session;
   const { production, netValueAdded, intermediateConsumption } =
     financialData.aggregates;
@@ -94,9 +101,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
         color: "#191558",
         labels: {
           title: {
-            font: {
-             
-            },
+            font: {},
           },
         },
       },
@@ -172,9 +177,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
         color: "#191558",
         labels: {
           title: {
-            font: {
-             
-            },
+            font: {},
           },
         },
       },
@@ -182,9 +185,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
         color: "#191558",
         labels: {
           title: {
-            font: {
-             
-            },
+            font: {},
           },
         },
       },
@@ -210,7 +211,6 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
 
   // VALUE CHART
   const labelsV = ["France", ["Exercice", "en cours"], "Branche"];
-
 
   const dataV = [
     roundNumber(allSectorsValueAddedAreaFootprint.getIndicator(indic).value),
@@ -241,7 +241,6 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
   };
 
   const optionsV = {
-  
     scales: {
       x: {
         grid: {
@@ -257,9 +256,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
         color: "#191558",
         labels: {
           title: {
-            font: {
-             
-            },
+            font: {},
           },
         },
       },
@@ -287,18 +284,17 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
 
   return (
     <>
-
-        <Row className="graphs">
-          <Col>
-            <Bar id="Production" data={dataProduction} options={optionsP} />
-          </Col>
-          <Col>
-            <Bar id="Consumption" data={dataConsumption} options={optionsC} />
-          </Col>
-          <Col>
-            <Bar id="Value" data={dataValueAdded} options={optionsV} />
-          </Col>
-        </Row>
+      <Row className="graphs">
+        <Col>
+          <Bar id="Production" data={dataProduction} options={optionsP} />
+        </Col>
+        <Col>
+          <Bar id="Consumption" data={dataConsumption} options={optionsC} />
+        </Col>
+        <Col>
+          <Bar id="Value" data={dataValueAdded} options={optionsV} />
+        </Col>
+      </Row>
 
       <Table>
         <thead>
@@ -331,12 +327,10 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
               {printValue(
                 allSectorsProductionAreaFootprint.getIndicator(indic).value,
                 1
-              )}
-              {unit}
+              )} <span className="unit">{unit}</span>
             </td>
             <td className="short align-center">
-              {printValue(production.footprint.getIndicator(indic).value, 1)}
-              {unit}
+              {printValue(production.footprint.getIndicator(indic).value, 1)} <span className="unit">{unit}</span>
             </td>
             {printValue(
               productionSectorFootprint.getIndicator(indic).value,
@@ -346,8 +340,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
                 {printValue(
                   productionSectorFootprint.getIndicator(indic).value,
                   1
-                )}
-                {unit}
+                )} <span className="unit">{unit}</span>
               </td>
             ) : (
               <td></td>
@@ -359,15 +352,13 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
               {printValue(
                 allSectorsConsumptionFootprint.getIndicator(indic).value,
                 1
-              )}
-              {unit}
+              )} <span className="unit">{unit}</span>
             </td>
             <td className="short align-center">
               {printValue(
                 intermediateConsumption.footprint.getIndicator(indic).value,
                 1
-              )}
-              {unit}
+              )} <span className="unit">{unit}</span>
             </td>
             {printValue(
               consumptionSectorFootprint.getIndicator(indic).value,
@@ -377,26 +368,22 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
                 {printValue(
                   consumptionSectorFootprint.getIndicator(indic).value,
                   1
-                )}
-                {unit}
+                )} <span className="unit">{unit}</span>
               </td>
             ) : (
               <td></td>
             )}
           </tr>
           <tr>
- 
             <td>Valeur ajoutée</td>
             <td className="short right">
               {printValue(
                 allSectorsValueAddedAreaFootprint.getIndicator(indic).value,
                 1
-              )}
-              {unit}
+              )} <span className="unit">{unit}</span>
             </td>
             <td className="short align-center">
-              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}
-              {unit}
+              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)} <span className="unit">{unit}</span>
             </td>
             {printValue(
               valueAddedSectorFootprint.getIndicator(indic).value,
@@ -406,8 +393,7 @@ export const IndicatorGraphs = ({ session, indic, comparativeFootprints, product
                 {printValue(
                   valueAddedSectorFootprint.getIndicator(indic).value,
                   1
-                )}
-                {unit}
+                )} <span className="unit">{unit}</span>
               </td>
             ) : (
               <td></td>

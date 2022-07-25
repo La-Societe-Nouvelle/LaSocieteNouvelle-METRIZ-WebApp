@@ -130,7 +130,6 @@ const StatementSection = (props) => {
           </section>
         </>
       ) : (
-        <section className="step">
           <ResultSection
             session={props.session}
             indic={indic}
@@ -143,7 +142,6 @@ const StatementSection = (props) => {
                 allSectorsValueAddedAreaFootprint,
             }}
           />
-        </section>
       )}
     </Container>
   );

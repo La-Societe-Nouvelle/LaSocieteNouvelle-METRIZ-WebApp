@@ -104,7 +104,7 @@ const ResultSection = (props) => {
       let productionSectorFootprint = await fetchDivisionData(division, "PRD");
       let valueAddedSectorFootprint = await fetchDivisionData(division, "GVA");
       let consumptionSectorFootprint = await fetchDivisionData(division, "IC");
-
+      console.log(productionSectorFootprint)
       setProductionSectorFootprint(productionSectorFootprint);
       setValueAddedSectorFootPrint(valueAddedSectorFootprint);
       setConsumptionSectorFootPrint(consumptionSectorFootprint);
@@ -117,14 +117,30 @@ const ResultSection = (props) => {
 
   };
 
-  useEffect(() => {
+  useEffect(async() => {
     window.scrollTo(0, 0);
+
+    if (comparativeDivision != "00") {
+
+      let productionSectorFootprint = await fetchDivisionData(comparativeDivision, "PRD");
+      let valueAddedSectorFootprint = await fetchDivisionData(comparativeDivision, "GVA");
+      let consumptionSectorFootprint = await fetchDivisionData(comparativeDivision, "IC");
+
+      setProductionSectorFootprint(productionSectorFootprint);
+      setValueAddedSectorFootPrint(valueAddedSectorFootprint);
+      setConsumptionSectorFootPrint(consumptionSectorFootprint);
+
+    } else {
+      setProductionSectorFootprint(new SocialFootprint());
+      setValueAddedSectorFootPrint(new SocialFootprint());
+      setConsumptionSectorFootPrint(new SocialFootprint());
+    }
 
   }, [indic]);
 
   return (
     <>
-      <div className="d-flex  align-items-center justify-content-between">
+      <div className="step d-flex  align-items-center justify-content-between">
         <h2>
           <i className="bi bi-clipboard-data"></i> Rapport - Analyse
           extra-financière
@@ -171,10 +187,10 @@ const ResultSection = (props) => {
           </Button>
         </div>
       </div>
-
+      <section className="step">
       <Row>
         <Col lg={printGrossImpact.includes(indic) ?  "8" : "12" }>
-          <div className="d-flex align-items-center">
+          <div className="d-flex align-items-center mb-4 rapport-indic">
             <Image
               src={"/resources/icon-ese-bleues/" + indic + ".png"}
               className="icon-ese me-2"
@@ -223,7 +239,8 @@ const ResultSection = (props) => {
         </Col>
           )}
       </Row>
-      <hr></hr>
+      </section>
+        <section className="step">
       <h3>Comparaison par activité</h3>
 
       <Select
@@ -253,13 +270,15 @@ const ResultSection = (props) => {
 
         />
       </div>
-      <hr />
+      </section>
+      <section className="step">
+
       <h3>Note d'analyse</h3>
       <div id="analyse">
         <Analyse indic={indic} session={session} />
       </div>
-
-      <hr></hr>
+                      </section>
+      <section className="step">
 
       <div className="d-flex justify-content-end">
         <Button variant="light" onClick={props.goBack}>
@@ -282,6 +301,7 @@ const ResultSection = (props) => {
           Télécharger le rapport <i className="bi bi-download"></i>
         </Button>
       </div>
+      </section>
     </>
   );
 };

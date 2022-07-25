@@ -80,7 +80,9 @@ export class AssessmentNRG extends React.Component {
           nrgConsumptionUncertainty: 0.0,
         };
       });
-    this.setState({ nrgDetails: nrgDetails });
+    
+      this.setState({ nrgDetails: nrgDetails });
+
   }
 
   render() {
@@ -93,6 +95,7 @@ export class AssessmentNRG extends React.Component {
 
     return (
       <div className="assessment">
+
         <Table responsive>
           <thead>
             <tr>
@@ -572,6 +575,7 @@ export class AssessmentNRG extends React.Component {
           >
             <i className="bi bi-chevron-left"></i> Retour
           </button>
+        
           <button
             className="btn btn-secondary btn-sm"
             onClick={() => this.onSubmit()}
@@ -645,6 +649,7 @@ export class AssessmentNRG extends React.Component {
 
   // update nrg consumption
   updateConsumption = (itemId, nextValue) => {
+
     let itemData = this.state.nrgDetails[itemId];
     itemData.consumption = nextValue;
     itemData.nrgConsumption = getNrgConsumption(itemData);
@@ -681,8 +686,8 @@ export class AssessmentNRG extends React.Component {
 
   // update props
   onSubmit = async () => {
-    let { impactsData } = this.props;
 
+    let { impactsData } = this.props;
     // update ng data
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = getTotalNrgConsumption(
