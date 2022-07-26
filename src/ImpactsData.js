@@ -34,6 +34,7 @@ export class ImpactsData  {
     this.greenhousesGazEmissions = props.greenhousesGazEmissions || null;
     this.greenhousesGazEmissionsUncertainty = props.greenhousesGazEmissionsUncertainty || null;
     this.ghgDetails = props.ghgDetails || {};
+    this.ghgTotal = props.ghgTotal || false;
 
     this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption || null;
     this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty || null;
@@ -45,6 +46,8 @@ export class ImpactsData  {
     this.energyConsumption = props.energyConsumption || null;
     this.energyConsumptionUncertainty = props.energyConsumptionUncertainty || null;
     this.nrgDetails = props.nrgDetails || {};
+    this.nrgTotal = props.nrgTotal || false;
+
 
     this.wasteProduction = props.wasteProduction || null;
     this.wasteProductionUncertainty = props.wasteProductionUncertainty || null;
@@ -55,6 +58,8 @@ export class ImpactsData  {
     /* --- Commentaires --- */
 
     this.comments = props.comments || {};
+
+
     
   // ---------------------------------------------------------------------------------------------------- //
   }
