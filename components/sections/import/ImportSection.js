@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 // Components
-import { Container } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 
 // Views
 import ImportForm from "./ImportForm";
@@ -37,7 +37,7 @@ function ImportSection(props) {
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
-  const [isImported, setIsImported]= useState(false);
+  const [isImported, setIsImported] = useState(false);
 
   function handeCorporateName(corporateName) {
     props.session.legalUnit.corporateName = corporateName;
@@ -51,50 +51,16 @@ function ImportSection(props) {
   }
 
   useEffect(() => {
-    if(importedData) {
+    if (importedData) {
       setIsImported(true);
-    } 
-    else{
+    } else {
       setIsImported(false);
     }
   });
 
-   return (
+  return (
     <Container fluid>
       <section className="step">
-        {errorFile && (
-          <>
-            <div className={"alert alert-error"}>
-              <div>
-                <h4>Erreur</h4>
-                <p>{errorMessage}</p>
-                {errors.map((error, index) => (
-                  <p key={index}> - {error}</p>
-                ))}
-              </div>
-            </div>
-            <div>
-         {errors.length > 0 && (
-                <>
-                  <button
-                    className="btn btn-secondary mb-2"
-                    onClick={() => sendErrorReport(errors)}
-                  >
-                    <FontAwesomeIcon icon={faExclamation} /> Envoyer un rapport
-                    d'erreur
-                  </button>
-
-                  {errorMail && (
-                    <p className="small-text alert alert-info mb-2">
-                      {errorMail}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
-          </>
-        )}
-
         <h2>
           <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
           vos flux comptables
@@ -106,13 +72,51 @@ function ImportSection(props) {
             uploadFile={handleFile}
             corporateName={corporateName}
             onClick={() => importFECFile(file)}
-            isDataImported = {isImported}
+            isDataImported={isImported}
             nextStep={() => setView(2)}
           ></ImportForm>
         )}
+        <Row className="my-3">
+          {errorFile && (
+            <Col lg={{ span: 6, offset: 6 }}>
+              <div className={"alert alert-error"}>
+                <div>
+                  <h4>Erreur</h4>
+                  <p>{errorMessage}</p>
+                  {errors.map((error, index) => (
+                    <p key={index}> - {error}</p>
+                  ))}
+                </div>
+              </div>
+              <div>
+                {errors.length > 0 && (
+                  <>
+                    <button
+                      className="btn btn-secondary mb-2"
+                      onClick={() => sendErrorReport(errors)}
+                    >
+                      <FontAwesomeIcon icon={faExclamation} /> Envoyer un
+                      rapport d'erreur
+                    </button>
+
+                    {errorMail && (
+                      <p className="small-text alert alert-info mb-2">
+                        {errorMail}
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            </Col>
+          )}
+        </Row>
 
         {view == 1 && (
-          <FECImport  return={() => setView(0)}  FECData={importedData} onClick={() => setView(2)} />
+          <FECImport
+            return={() => setView(0)}
+            FECData={importedData}
+            onClick={() => setView(2)}
+          />
         )}
 
         {view == 2 && (
@@ -122,7 +126,7 @@ function ImportSection(props) {
             meta={importedData.meta}
           />
         )}
-        {view == 3 && <FinancialDatas {...props}   return={() => setView(2)} />}
+        {view == 3 && <FinancialDatas {...props} return={() => setView(2)} />}
       </section>
     </Container>
   );
@@ -143,6 +147,7 @@ function ImportSection(props) {
           setImportedData(FECData);
           setView(1);
         } catch (error) {
+          setErrorFile(true);
           setErrorMessage(error);
         } // show error(s) (file structure)
       };
@@ -150,6 +155,7 @@ function ImportSection(props) {
     try {
       reader.readAsText(currentFile, "iso-8859-1"); // Read file
     } catch (error) {
+      setErrorFile(true);
       setErrorMessage(error);
     } // show error (file)
   }
