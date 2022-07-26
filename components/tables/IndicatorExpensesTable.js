@@ -48,10 +48,10 @@ export class IndicatorExpensesTable extends React.Component {
             <tr>
               <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td  onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td  onClick={() => this.changeColumnSorted("amount")}>Montant</td>
-              <td >Empreinte</td>
-              <td >Incertitude</td>
-              {impactAbsolu ? <td>Impact</td> : null}
+              <td className="text-end" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td  className="text-end">Empreinte</td>
+              <td  className="text-end">Incertitude</td>
+              {impactAbsolu ? <td  className="text-end">Impact</td> : null}
             </tr>
           </thead>
           <tbody>
@@ -62,10 +62,10 @@ export class IndicatorExpensesTable extends React.Component {
                 <tr key={account}>
                   <td >{account}</td>
                   <td >{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td >{printValue(amount,0)} &euro;</td>
-                  <td >{printValue(indicator.getValue(),nbDecimals)} <span className="unit"> {unit}</span></td>
-                  <td ><u>+</u>{printValue(indicator.getUncertainty(),0)}%</td>
-                  {impactAbsolu ? <td>{printValue(indicator.getValueAbsolute(amount),nbDecimals)}<span className="unit"> {unitAbsolute}</span></td> : null}
+                  <td  className="text-end">{printValue(amount,0)} &euro;</td>
+                  <td  className="text-end">{printValue(indicator.getValue(),nbDecimals)} <span className="unit"> {unit}</span></td>
+                  <td  className="text-end"><u>+</u>{printValue(indicator.getUncertainty(),0)}%</td>
+                  {impactAbsolu ? <td  className="text-end">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}<span className="unit"> {unitAbsolute}</span></td> : null}
                 </tr>)})}
           </tbody>
         </Table>
