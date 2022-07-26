@@ -15,10 +15,12 @@ import {
   StatementECO,
   StatementGEQ,
   StatementGHG,
+  StatementHAZ,
   StatementKNW,
   StatementMAT,
   StatementNRG,
   StatementSOC,
+  StatementWAS,
   StatementWAT,
 } from "../forms";
 import metaIndics from "/lib/indics";
@@ -517,7 +519,7 @@ const IndicatorsList = (props) => {
                         );
                       case "was":
                         return (
-                          <StatementMAT
+                          <StatementWAS
                             impactsData={props.impactsData}
                             onUpdate={willNetValueAddedIndicator.bind("was")}
                             onValidate={() => validateIndicator("was")}
@@ -525,7 +527,7 @@ const IndicatorsList = (props) => {
                         );
                       case "haz":
                         return (
-                          <StatementMAT
+                          <StatementHAZ
                             impactsData={props.impactsData}
                             onUpdate={willNetValueAddedIndicator.bind("haz")}
                             onValidate={() => validateIndicator("haz")}
