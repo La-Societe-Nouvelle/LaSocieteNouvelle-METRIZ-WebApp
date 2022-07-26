@@ -198,7 +198,7 @@ class RowTableCompanies extends React.Component {
     if (corporateId && status != 200) {
       icon = (
         <p className="success">
-          <i class="bi bi-arrow-repeat"   title="Données prêtes à être synchronisées"></i>
+          <i className="bi bi-arrow-repeat"   title="Données prêtes à être synchronisées"></i>
    
         </p>
       );
@@ -207,7 +207,7 @@ class RowTableCompanies extends React.Component {
     if (status == 200) {
       icon = (
         <p className="success">
-          <i class="bi bi-check2" title="Données synchronisées"></i>
+          <i className="bi bi-check2" title="Données synchronisées"></i>
         </p>
       );
     }

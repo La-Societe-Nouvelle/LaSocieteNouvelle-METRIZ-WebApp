@@ -264,7 +264,7 @@ class RowTableCompanies extends React.Component {
       if (status == 200) {
         icon = (
           <p className="success">
-            <i class="bi bi-check2"  title="Données synchronisées"></i>
+            <i className="bi bi-check2"  title="Données synchronisées"></i>
           
           </p>
         );
