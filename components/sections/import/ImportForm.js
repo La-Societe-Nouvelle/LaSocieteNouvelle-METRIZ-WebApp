@@ -12,12 +12,17 @@ import {
 } from "react-bootstrap";
 
 const ImportForm = (props) => {
+  
   const [errorFile, setErrorFile] = useState(false);
   const [disabled, setDisabled] = useState(true);
 
   useEffect(() => {
+
     if (fileRejections.length > 0) {
       setErrorFile(true);
+    }
+    else{
+      setErrorFile(false);
     }
 
     if (
@@ -49,14 +54,14 @@ const ImportForm = (props) => {
   ));
 
   const fileRejectionItems = fileRejections.map(({ errors }) => (
-    <ul>
+    <>
       {errors.map((e) => (
-        <li key={e.code}>
+        <li key={e.code} className="">
          <i className="bi bi-exclamation-triangle"></i> L'extention du
           fichier doit être en .txt ou .csv
         </li>
       ))}
-    </ul>
+    </>
   ));
 
   function handleChange(event) {
@@ -92,7 +97,7 @@ const ImportForm = (props) => {
           <div className="form-text">
             <p>
               L’importation des écritures comptables s’effectue via un Fichier
-              d’Ecritures Comptables (FEC). Générez ce fichiers <b> à partir de votre logiciel comptable, ou demandez-le auprès de
+              d’Ecritures Comptables (FEC¹). Générez ce fichiers <b> à partir de votre logiciel comptable, ou demandez-le auprès de
                 votre service comptable.
               </b>
             </p>
@@ -110,7 +115,7 @@ const ImportForm = (props) => {
 
           {fileRejectionItems.length > 0 && (
             <div className="alert alert-error">
-              <ul>{fileRejectionItems}</ul>
+              <ul className="list-group list-unstyled">{fileRejectionItems}</ul>
             </div>
           )}
           {acceptedFileItems.length > 0 && (
@@ -119,8 +124,11 @@ const ImportForm = (props) => {
               {acceptedFileItems}
             </div>
           )}
+          <p className="legend mb-0">
+            *Champs obligatoires
+          </p>
           <p className="legend">
-          Le fichier doit respecter les normes relatives à la structure du
+          ¹ Le fichier doit respecter les normes relatives à la structure du
             fichier (libellés des colonnes, séparateur tabulation ou barre
             verticale, encodage ISO 8859-15, etc.).
           </p>
