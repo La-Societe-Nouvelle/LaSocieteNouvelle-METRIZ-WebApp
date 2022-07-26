@@ -94,7 +94,9 @@ export async function FECFileReader(content)
   // Header --------------------------------------------------------------------------------------------- //
   
   // header
-  const header = content.slice(0,content.indexOf('\n')).replace('\r','').split(separator);
+  
+  let header = content.slice(0,content.indexOf('\n')).replace('\r','').split(separator);
+  header = header.slice(0,18);
 
   // Vérification des colonnes
   header.forEach(column => {if (!columnsFEC.includes(column)) throw 'Fichier erroné (libellé(s) incorrect(s))'});
@@ -112,7 +114,10 @@ export async function FECFileReader(content)
   await rows.forEach(async (rowString,index) => 
   {
     // Segmentations des colonnes (String -> JSON)
-    let rowArray = rowString.replace('\r','').split(separator);
+    let row = rowString.replace('\r','').split(separator);
+
+    let rowArray = row.slice(0,18);
+
 
     if (rowArray.length == 18)
     {
@@ -158,9 +163,9 @@ export async function FECFileReader(content)
 // Get separator
 function getSeparator(line)
 {
-  if      (line.split('\t').length == 18) return '\t';
-  else if (line.split('|').length == 18)  return '|';
-  else throw 'Fichier erroné (séparateur ou nombre de colonnes incorrect).';
+  if      (line.split('\t').length > 1) return '\t';
+  else if (line.split('|').length > 1)  return '|';
+  else throw 'Fichier erroné (séparateur incorrect).';
 }
 
 // Read line (Array -> JSON)
@@ -230,25 +235,18 @@ async function buildMappingAccounts(accounts)
         distances.push({account: depreciationAccount, accountAux: assetAccount, distanceNum, distanceLib, prefixLength, expectedAccount: expectedAssetAccount});
       })
     });
-    console.log(distances);
 
     // Map with prefix length
-    console.log("prefix length");
     distances.forEach(distance => distance.stashed = false);
     let mappingWithPrefixLength = await mapAccountsWithPrefixLength(distances);
-    console.log(mappingWithPrefixLength);
     
     // Map with accountNum distance
-    console.log("num distance");
     distances.forEach(distance => distance.stashed = false);
     let mappingWithNumDistances = await mapAccountsWithNumDistances(distances);
-    console.log(mappingWithNumDistances);
     
     // Map with accountLib distance
-    console.log("lib distance");
     distances.forEach(distance => distance.stashed = false);
     let mappingWithLibDistances = await mapAccountsWithLibDistances(distances);
-    console.log(mappingWithLibDistances);
 
     // Merge mapping
     let mappings = [];
@@ -277,7 +275,6 @@ async function buildMappingAccounts(accounts)
     })    
   }
 
-  console.log(res);
   return res;
 }
 
@@ -298,7 +295,6 @@ const mapAccountsWithPrefixLength = async (distances) =>
   // filter distances to map (accounts stashed included)
   let maxPrefixLength = Math.max(...distances.filter(item => !item.stashed).map(item => item.prefixLength)); // max prefixLength of distances not stashed
   let distancesToMap = distances.filter(distance => distance.prefixLength==maxPrefixLength && !distance.stashed);
-  console.log(distancesToMap);
 
   // stashed distances
   let stashedDistances = distances.filter(distance => distance.stashed);
@@ -314,7 +310,6 @@ const mapAccountsWithPrefixLength = async (distances) =>
     else distances.filter(distance => distance.account==distanceToMap.account || distance.accountAux==distanceToMap.accountAux).forEach(distance => distance.stashed = true);
   }
 
-  console.log(mapping);
 
   // filter remaining distances
   let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.account) && !Object.values(mapping).includes(distance.accountAux));
@@ -343,7 +338,6 @@ const mapAccountsWithNumDistances = async (distances) =>
   let distancesWithMinDistance = distances.filter(distance => distance.distanceNum==minDistanceNum && !distance.stashed);
   let maxPrefixLength = Math.max(...distancesWithMinDistance.map(distance => distance.prefixLength)); // max prefixLength of distances with min distanceNum and not stashed
   let distancesToMap = distancesWithMinDistance.filter(distance => distance.prefixLength==maxPrefixLength);
-  console.log(distancesToMap);
 
   // stashed distances
   let stashedDistances = distances.filter(distance => distance.stashed);
@@ -359,7 +353,6 @@ const mapAccountsWithNumDistances = async (distances) =>
     else distances.filter(distance => distance.account==distanceToMap.account || distance.accountAux==distanceToMap.accountAux).forEach(distance => distance.stashed = true);
   }
 
-  console.log(mapping);
 
   // filter remaining distances
   let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.account) && !Object.values(mapping).includes(distance.accountAux));
@@ -388,7 +381,6 @@ const mapAccountsWithLibDistances = async (distances) =>
   let distancesWithMinDistance = distances.filter(distance => distance.distanceLib==minDistanceLib && !distance.stashed);
   let maxPrefixLength = Math.max(...distancesWithMinDistance.map(distance => distance.prefixLength)); // max prefixLength of distances with min distanceLib and not stashed
   let distancesToMap = distancesWithMinDistance.filter(distance => distance.prefixLength==maxPrefixLength);
-  console.log(distancesToMap);
 
   // stashed distances
   let stashedDistances = distances.filter(distance => distance.stashed);
@@ -404,7 +396,6 @@ const mapAccountsWithLibDistances = async (distances) =>
     else distances.filter(distance => distance.account==distanceToMap.account || distance.accountAux==distanceToMap.accountAux).forEach(distance => distance.stashed = true);
   }
 
-  console.log(mapping);
 
   // filter remaining distances
   let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.account) && !Object.values(mapping).includes(distance.accountAux));
