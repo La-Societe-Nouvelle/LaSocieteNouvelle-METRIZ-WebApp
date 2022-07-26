@@ -114,6 +114,9 @@ export class StatementGHG extends React.Component {
   }
 
   updateGreenhousesGazEmissions = (input) => {
+
+   this.props.impactsData.ghgTotal = true;
+ 
     this.props.impactsData.setGreenhousesGazEmissions(input);
     this.setState({
       greenhousesGazEmissionsUncertainty:

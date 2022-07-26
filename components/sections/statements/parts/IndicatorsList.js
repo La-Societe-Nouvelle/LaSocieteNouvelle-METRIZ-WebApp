@@ -36,6 +36,7 @@ const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
 
+
   const [popUp, setPopUp] = useState();
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision
@@ -52,15 +53,19 @@ const IndicatorsList = (props) => {
   );
 
   useEffect(async () => {
+
     if (comparativeDivision != "00") {
+
       let productionSectorFootprint = await fetchDivisionData(
         comparativeDivision,
         "PRD"
       );
+
       let valueAddedSectorFootprint = await fetchDivisionData(
         comparativeDivision,
         "GVA"
       );
+
       let consumptionSectorFootprint = await fetchDivisionData(
         comparativeDivision,
         "IC"
@@ -108,6 +113,7 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
+
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
@@ -117,8 +123,9 @@ const IndicatorsList = (props) => {
     props.session.validations.push(indic);
     // update footprint
     await props.session.updateIndicator(indic);
-
+    
     setUpdatedIndic(indic);
+
   };
 
   const valueCreation = ["eco", "art", "soc"];
@@ -252,6 +259,7 @@ const IndicatorsList = (props) => {
               </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
+   
                   {(() => {
                     switch (key) {
                       case "eco":
@@ -455,6 +463,7 @@ const IndicatorsList = (props) => {
               </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
+
                   {(() => {
                     switch (key) {
                       case "ghg":
@@ -473,7 +482,7 @@ const IndicatorsList = (props) => {
                               onValidate={() => validateIndicator("ghg")}
                               onGoBack={handleClose}
                               popUp={popUp}
-                              handleClose={handleClose}
+                              handleClose={handleClose} 
                               title="Outil de mesure des émissions"
                             />
                           </>

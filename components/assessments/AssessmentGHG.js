@@ -72,7 +72,7 @@ export class AssessmentGHG extends React.Component {
 
       // details
       ghgDetails: props.impactsData.ghgDetails,
-
+      nrgTotal: props.impactsData.nrgTotal,
       // adding new factor
       newFactorAssessmentItem: "",
       // alert message
@@ -86,7 +86,7 @@ export class AssessmentGHG extends React.Component {
       greenhousesGazEmissionsUncertainty,
       ghgDetails,
       newFactorAssessmentItem,
-      message
+      message,
     } = this.state;
 
     return (
@@ -1060,10 +1060,13 @@ export class AssessmentGHG extends React.Component {
             </tr>
           </tbody>
         </Table>
-        {
-          message && 
-          <p className="small-text p-2 alert-warning"> Attention, certains facteurs d'émissions sont également utilisés pour la mesure de <b>l'intensité de consommation d'énergie</b>. Par conséquent, les valeurs vont être recalculées pour cet indicateur et devront être <b>(re)validées.</b></p>
-        }
+        {message && (
+          <p className="small-text p-2 alert-warning">
+            Des modifications ayant été apportées sur la consommation de
+            produits énergétiques (combustibles), la déclaration de consommation
+            directe d'énergie devra être (re)validée.
+          </p>
+        )}
         <div className="view-header">
           <button
             className="btn btn-sm btn-light me-2"
@@ -1146,9 +1149,8 @@ export class AssessmentGHG extends React.Component {
   // Consumption
   updateConsumption = (itemId, nextConsumption) => {
     let item = this.state.ghgDetails[itemId];
-    if(item.assessmentItem == "1" || item.assessmentItem == "2")
-    {
-      this.setState({message : true});
+    if (item.assessmentItem == "1" || item.assessmentItem == "2") {
+      this.setState({ message: true });
     }
 
     item.consumption = nextConsumption;
@@ -1230,6 +1232,8 @@ export class AssessmentGHG extends React.Component {
   // update props
   onSubmit = async () => {
     let impactsData = this.props.impactsData;
+
+    console.log(impactsData.nrgTotal);
     // update ghg data
     impactsData.ghgDetails = this.state.ghgDetails;
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
@@ -1240,54 +1244,55 @@ export class AssessmentGHG extends React.Component {
 
     await this.props.onUpdate("ghg");
 
-    // update nrg data
-    // ...delete
-    Object.entries(impactsData.nrgDetails)
-      .filter(
-        ([_, itemData]) =>
-          itemData.type == "fossil" || itemData.type == "biomass"
-      )
-      .forEach(([itemId, _]) => {
-        let ghgItem = Object.entries(impactsData.ghgDetails)
-          .map(([_, ghgItemData]) => ghgItemData)
-          .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
-        if (ghgItem == undefined) delete impactsData.nrgDetails[itemId];
-      });
-    // ...add & update
-    Object.entries(impactsData.ghgDetails)
-      .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
-      .forEach(([itemId, itemData]) => {
-        let nrgItem = Object.entries(impactsData.nrgDetails)
-          .map(([_, nrgItemData]) => nrgItemData)
-          .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
-        if (nrgItem == undefined) {
-          const id = getNewId(
-            Object.entries(impactsData.nrgDetails)
-              .map(([_, data]) => data)
-              .filter((item) => !isNaN(item.id))
-          );
-          impactsData.nrgDetails[id] = { id: id, idGHG: itemId };
-          nrgItem = impactsData.nrgDetails[id];
-          itemData.idNRG = id;
-        }
-        // update values
-        nrgItem.fuelCode = itemData.factorId;
-        nrgItem.consumption = itemData.consumption;
-        nrgItem.consumptionUnit = itemData.consumptionUnit;
-        nrgItem.consumptionUncertainty = itemData.consumptionUncertainty;
-        nrgItem.nrgConsumption = getNrgConsumption(nrgItem);
-        nrgItem.nrgConsumptionUncertainty =
-          getNrgConsumptionUncertainty(nrgItem);
-        nrgItem.type = fuels[itemData.factorId].type;
-      });
-    // ...total & uncertainty
-    impactsData.energyConsumption = getTotalNrgConsumption(
-      impactsData.nrgDetails
-    );
-    impactsData.energyConsumptionUncertainty =
-      getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
-    await this.props.onUpdate("nrg");
-
+    if (!impactsData.nrgTotal) {
+      // update nrg data
+      // ...delete
+      Object.entries(impactsData.nrgDetails)
+        .filter(
+          ([_, itemData]) =>
+            itemData.type == "fossil" || itemData.type == "biomass"
+        )
+        .forEach(([itemId, _]) => {
+          let ghgItem = Object.entries(impactsData.ghgDetails)
+            .map(([_, ghgItemData]) => ghgItemData)
+            .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
+          if (ghgItem == undefined) delete impactsData.nrgDetails[itemId];
+        });
+      // ...add & update
+      Object.entries(impactsData.ghgDetails)
+        .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
+        .forEach(([itemId, itemData]) => {
+          let nrgItem = Object.entries(impactsData.nrgDetails)
+            .map(([_, nrgItemData]) => nrgItemData)
+            .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
+          if (nrgItem == undefined) {
+            const id = getNewId(
+              Object.entries(impactsData.nrgDetails)
+                .map(([_, data]) => data)
+                .filter((item) => !isNaN(item.id))
+            );
+            impactsData.nrgDetails[id] = { id: id, idGHG: itemId };
+            nrgItem = impactsData.nrgDetails[id];
+            itemData.idNRG = id;
+          }
+          // update values
+          nrgItem.fuelCode = itemData.factorId;
+          nrgItem.consumption = itemData.consumption;
+          nrgItem.consumptionUnit = itemData.consumptionUnit;
+          nrgItem.consumptionUncertainty = itemData.consumptionUncertainty;
+          nrgItem.nrgConsumption = getNrgConsumption(nrgItem);
+          nrgItem.nrgConsumptionUncertainty =
+            getNrgConsumptionUncertainty(nrgItem);
+          nrgItem.type = fuels[itemData.factorId].type;
+        });
+      // ...total & uncertainty
+      impactsData.energyConsumption = getTotalNrgConsumption(
+        impactsData.nrgDetails
+      );
+      impactsData.energyConsumptionUncertainty =
+        getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
+      await this.props.onUpdate("nrg");
+    }
     // back to statement
     this.props.onGoBack();
   };

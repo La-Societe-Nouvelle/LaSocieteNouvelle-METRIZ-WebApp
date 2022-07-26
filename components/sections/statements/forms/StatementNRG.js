@@ -80,9 +80,11 @@ export class StatementNRG extends React.Component {
 
   updateEnergyConsumption = (input) => 
   {
+    this.props.impactsData.nrgTotal = true;
     this.props.impactsData.setEnergyConsumption(input);
     this.setState({energyConsumptionUncertainty: this.props.impactsData.energyConsumptionUncertainty});
     this.props.onUpdate("nrg");
+
   }
 
   updateEnergyConsumptionUncertainty = (input) => 

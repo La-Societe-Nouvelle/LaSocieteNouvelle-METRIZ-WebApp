@@ -573,8 +573,13 @@ export class AssessmentNRG extends React.Component {
 
         {
           message && 
-          <p className="small-text p-2 alert-warning"> Attention, ces produits sont également utilisés pour la mesure de <b>l'intensité d'émissions de Gaz à effet de serre</b>. Par conséquent, les valeurs vont être recalculées pour cet indicateur et devront être <b>(re)validées.</b></p>
+          <p className="small-text p-2 alert-warning"> 
+          Des modifications ayant été apportées 
+          sur la consommation de produits énergétiques (combustibles), 
+          l'intensité d'émissions de Gaz à effet de serre devra être (re)validée.
+          </p>
         }
+
         <div className="view-header">
           <button
             className="btn btn-sm btn-light me-2"
@@ -699,7 +704,10 @@ export class AssessmentNRG extends React.Component {
   onSubmit = async () => {
 
     let { impactsData } = this.props;
-    // update ng data
+
+    console.log(impactsData.ghgTotal);
+
+    // update nrg data
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = getTotalNrgConsumption(
       impactsData.nrgDetails
@@ -709,7 +717,10 @@ export class AssessmentNRG extends React.Component {
     await this.props.onUpdate("nrg");
 
 
-    // update ghg data
+    // update ghg data 
+    
+    if(!impactsData.ghgTotal) {
+
     // ...delete
     Object.entries(impactsData.nrgDetails)
       .filter(([_, itemData]) => itemData.fuelCode != undefined)
@@ -751,7 +762,6 @@ export class AssessmentNRG extends React.Component {
       });
 
       if(Object.keys(impactsData.ghgDetails).length > 0) {
-        console.log("total")
         // ...total & uncertainty
         impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
           impactsData.ghgDetails
@@ -760,7 +770,7 @@ export class AssessmentNRG extends React.Component {
           getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
           await this.props.onUpdate("ghg");
       }
-
+    }
     // go back
     this.props.onGoBack();
   };
