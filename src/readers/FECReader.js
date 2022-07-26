@@ -81,8 +81,15 @@ export async function FECFileReader(content)
   };
 
   // Separator ------------------------------------------------------------------------------------------ //
+  let separator;
+  try {
 
-  let separator = getSeparator(content.slice(0,content.indexOf('\n'))); // throw exception
+   separator = getSeparator(content.slice(0,content.indexOf('\n'))); // throw exception
+    
+  } catch (error) {
+    
+    throw error;
+  }
 
   // Header --------------------------------------------------------------------------------------------- //
   
@@ -90,7 +97,7 @@ export async function FECFileReader(content)
   const header = content.slice(0,content.indexOf('\n')).replace('\r','').split(separator);
 
   // Vérification des colonnes
-  header.forEach(column => {if (!columnsFEC.includes(column)) throw 'Fichier erroné (colonne(s) manquante(s) ou libellé(s) incorrect(s))'});
+  header.forEach(column => {if (!columnsFEC.includes(column)) throw 'Fichier erroné (libellé(s) incorrect(s))'});
   
   // Construction de l'index des colonnes
   let indexColumns = {};
@@ -153,7 +160,7 @@ function getSeparator(line)
 {
   if      (line.split('\t').length == 18) return '\t';
   else if (line.split('|').length == 18)  return '|';
-  else throw 'Fichier erroné (séparateur incorrect ou colonne(s) manquante(s)).';
+  else throw 'Fichier erroné (séparateur ou nombre de colonnes incorrect).';
 }
 
 // Read line (Array -> JSON)
