@@ -93,9 +93,14 @@ const IndicatorsList = (props) => {
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
+    
     setUpdatedIndic();
+
+
     // get new value
     let nextIndicator = props.session.getNetValueAddedIndicator(indic);
+
+
     if (
       nextIndicator !==
       props.session.financialData.aggregates.netValueAdded.footprint.indicators[

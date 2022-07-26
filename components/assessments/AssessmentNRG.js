@@ -705,8 +705,6 @@ export class AssessmentNRG extends React.Component {
 
     let { impactsData } = this.props;
 
-    console.log(impactsData.ghgTotal);
-
     // update nrg data
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = getTotalNrgConsumption(
@@ -717,15 +715,16 @@ export class AssessmentNRG extends React.Component {
     await this.props.onUpdate("nrg");
 
 
-    // update ghg data 
+    // update ghg data if total hasn't been directly filled out
     
     if(!impactsData.ghgTotal) {
-
+      console.log(impactsData.nrgDetails);
     // ...delete
     Object.entries(impactsData.nrgDetails)
       .filter(([_, itemData]) => itemData.fuelCode != undefined)
       .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
       .forEach(([itemId, _]) => {
+        console.log("here");
         let nrgItem = Object.entries(impactsData.nrgDetails)
           .map(([_, nrgItemData]) => nrgItemData)
           .filter((nrgItem) => nrgItem.idGHG == itemId)[0];

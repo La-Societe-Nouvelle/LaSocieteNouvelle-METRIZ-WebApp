@@ -324,7 +324,7 @@ export class AssessmentGHG extends React.Component {
                                 : -1
                             )
                             .map((groupName) => (
-                              <optgroup label={groupName}>
+                              <optgroup label={groupName}  key={groupName}>
                                 {Object.entries(fuels)
                                   .filter(
                                     ([_, data]) =>
@@ -417,7 +417,7 @@ export class AssessmentGHG extends React.Component {
                           : -1
                       )
                       .map((groupName) => (
-                        <optgroup label={groupName}>
+                        <optgroup label={groupName}  key={groupName}>
                           {Object.entries(fuels)
                             .filter(
                               ([_, data]) =>
@@ -621,7 +621,7 @@ export class AssessmentGHG extends React.Component {
                                 : -1
                             )
                             .map((groupName) => (
-                              <optgroup label={groupName}>
+                              <optgroup label={groupName} key={groupName}>
                                 {Object.entries(agriculturalProcesses)
                                   .filter(
                                     ([_, data]) => data.group == groupName
@@ -719,7 +719,7 @@ export class AssessmentGHG extends React.Component {
                           : -1
                       )
                       .map((groupName) => (
-                        <optgroup label={groupName}>
+                        <optgroup label={groupName} key={groupName}>
                           {Object.entries(agriculturalProcesses)
                             .filter(([_, data]) => data.group == groupName)
                             .map(([key, data]) => (
@@ -782,7 +782,7 @@ export class AssessmentGHG extends React.Component {
                             )
                             .sort()
                             .map((groupName) => (
-                              <optgroup label={groupName}>
+                              <optgroup label={groupName} key={groupName}>
                                 {Object.entries(coolingSystems)
                                   .filter(
                                     ([_, data]) => data.group == groupName
@@ -893,7 +893,7 @@ export class AssessmentGHG extends React.Component {
                       )
                       .sort()
                       .map((groupName) => (
-                        <optgroup label={groupName}>
+                        <optgroup label={groupName} key={groupName}>
                           {Object.entries(coolingSystems)
                             .filter(([_, data]) => data.group == groupName)
                             .sort()
@@ -1233,7 +1233,6 @@ export class AssessmentGHG extends React.Component {
   onSubmit = async () => {
     let impactsData = this.props.impactsData;
 
-    console.log(impactsData.nrgTotal);
     // update ghg data
     impactsData.ghgDetails = this.state.ghgDetails;
     impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
