@@ -176,7 +176,7 @@ async function readFECFileRow(indexColumns,rowArray)
   {
     rowData[column] = rowArray[index].replace(/^\"/,"")      // remove quote at the beginning
                                      .replace(/\"$/,"")      // remove quote at the end
-                                     .replace(/ *$/,"");     // remove spaces at the end
+                                     .replace(/^\s+|\s+$/,"");     // remove spaces before and after string
   });
   return rowData;
 }
