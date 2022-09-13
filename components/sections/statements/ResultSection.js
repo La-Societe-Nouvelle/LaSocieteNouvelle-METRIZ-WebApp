@@ -35,6 +35,8 @@ import { analysisTextWriterWAS } from "../../../src/writers/analysis/analysisTex
 import { analysisTextWriterWAT } from "../../../src/writers/analysis/analysisTextWriterWAT";
 import { exportIndicPDF } from "../../../src/writers/Export";
 
+import api from "../../../src/api";
+
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 
 const ResultSection = (props) => {
@@ -67,25 +69,29 @@ const ResultSection = (props) => {
   const { intermediateConsumption, capitalConsumption, netValueAdded } = props.session.financialData.aggregates;
 
 
-  const fetchDivisionData = async (division, flow) => {
-    let endpoint;
-    let response;
-    let data;
+  const fetchDivisionData = async (division, aggregate) => {
 
     // comparative data
     let footprint = new SocialFootprint();
 
-    endpoint =
-      apiBaseUrl +
-      "/default?" +
-      "area=FRA" +
-      "&activity=" +
-      division +
-      "&flow=" +
-      flow;
-    response = await fetch(endpoint, { method: "get" });
-    data = await response.json();
-    if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
+
+    await api
+    .get(
+      "defaultfootprint/?activity=" +
+        division +
+        "&aggregate=" +
+        aggregate +
+        "&area=FRA"
+    )
+    .then((res) => {
+      let status = res.data.header.code;
+      if (status == 200) {
+        let data = res.data;
+        
+        footprint.updateAll(data.footprint);
+      }
+    });
+
 
     return footprint;
   };
@@ -118,7 +124,6 @@ const ResultSection = (props) => {
   };
 
   useEffect(async() => {
-    window.scrollTo(0, 0);
 
     if (comparativeDivision != "00") {
 
