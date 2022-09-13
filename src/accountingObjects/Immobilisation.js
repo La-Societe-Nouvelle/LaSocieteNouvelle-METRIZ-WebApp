@@ -1,61 +1,61 @@
 // La Société Nouvelle
 
 // Imports
-import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 // Utils
-import { getCurrentDateString } from '../utils/Utils';
-
-const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
+import { getCurrentDateString } from "../utils/Utils";
+import api from "../api";
 
 export class Immobilisation {
-
-  constructor({id,
-               account,
-               accountLib,
-               isDepreciableImmobilisation,
-               amount,
-               footprint,
-               prevAmount,
-               prevFootprint,
-               prevFootprintAreaCode,
-               prevFootprintActivityCode,
-               initialState,
-               status,
-               dataFetched,
-               lastUpdateFromRemote})
-  {
-  // ---------------------------------------------------------------------------------------------------- //
+  constructor({
+    id,
+    account,
+    accountLib,
+    isDepreciableImmobilisation,
+    amount,
+    footprint,
+    prevAmount,
+    prevFootprint,
+    prevFootprintAreaCode,
+    prevFootprintActivityCode,
+    initialState,
+    status,
+    dataFetched,
+    lastUpdateFromRemote,
+  }) {
+    // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
 
     this.account = account;
     this.accountLib = accountLib;
 
     this.isDepreciableImmobilisation = isDepreciableImmobilisation || false;
-    
+
     // Footprint
     this.amount = amount || 0;
-    this.footprint = new SocialFootprint(footprint)
+    this.footprint = new SocialFootprint(footprint);
 
     // Previous footprint
     this.prevAmount = prevAmount || 0;
     this.initialState = initialState || "none";
-    this.prevFootprint = new SocialFootprint(prevFootprint)
+    this.prevFootprint = new SocialFootprint(prevFootprint);
     this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
     this.prevFootprintActivityCode = prevFootprintActivityCode || "TOTAL";
 
     // Updates
-    this.status = status || null;                                           // 200 (ok), 404 (not found), 500 (server error)
-    this.dataFetched = dataFetched || false;                                // response received
-    this.lastUpdateFromRemote = lastUpdateFromRemote || null; 
-  // ---------------------------------------------------------------------------------------------------- //
+    this.status = status || null; // 200 (ok), 404 (not found), 500 (server error)
+    this.dataFetched = dataFetched || false; // response received
+    this.lastUpdateFromRemote = lastUpdateFromRemote || null;
+    // ---------------------------------------------------------------------------------------------------- //
   }
 
-  async update(nextProps)
-  {
+  async update(nextProps) {
     // update initial state ----------------------------- //
-    if (nextProps.initialState!=undefined && nextProps.initialState!=this.initialState) 
-    {
+    if (
+      nextProps.initialState != undefined &&
+      nextProps.initialState != this.initialState
+    ) {
       this.initialState = nextProps.initialState;
       // status
       this.dataFetched = false;
@@ -63,70 +63,62 @@ export class Immobilisation {
     }
 
     // update default footprint ------------------------- //
-    if (this.initialState=="defaultData" && 
-        (nextProps.prevFootprintAreaCode!=this.prevFootprintAreaCode || nextProps.prevFootprintActivityCode!=this.prevFootprintActivityCode))
-    {
-      if (nextProps.prevFootprintAreaCode!=undefined) this.prevFootprintAreaCode = nextProps.prevFootprintAreaCode;
-      if (nextProps.prevFootprintActivityCode!=undefined) this.prevFootprintActivityCode = nextProps.prevFootprintActivityCode;
+    if (
+      this.initialState == "defaultData" &&
+      (nextProps.prevFootprintAreaCode != this.prevFootprintAreaCode ||
+        nextProps.prevFootprintActivityCode != this.prevFootprintActivityCode)
+    ) {
+      if (nextProps.prevFootprintAreaCode != undefined)
+        this.prevFootprintAreaCode = nextProps.prevFootprintAreaCode;
+      if (nextProps.prevFootprintActivityCode != undefined)
+        this.prevFootprintActivityCode = nextProps.prevFootprintActivityCode;
       // status
       this.dataFetched = false;
       this.status = null;
     }
   }
 
-  /* ---------- Load Data ---------- */ 
+  /* ---------- Load Data ---------- */
 
-  async loadPreviousFootprint(data)
-  {
+  async loadPreviousFootprint(data) {
     this.footprint.updateAll(data.empreinteSocietale);
     this.initialState = "prevFootprint";
     this.dataFetched = false;
     this.status = 200;
   }
 
-  /* ---------- Fetch Data ---------- */ 
+  /* ---------- Fetch Data ---------- */
 
-  async updatePrevFootprintFromRemote() 
-  {
+  async updatePrevFootprintFromRemote() {
     // Case - Fetch default data -------------------------------------------------------------------------- //
-    if (this.initialState=="defaultData") 
-    {
-      // request
-      let endpoint = apiBaseUrl + "default?" + "area="+this.prevFootprintAreaCode + "&activity="+this.prevFootprintActivityCode +"&flow=PRD";
-      let response = await this.fetchData(endpoint);
-      
-      if (response!=null) // code == 200 ------------------------------ //
-      {
-        let data = response;
-        // footprint ---------------------------------------- //
-        this.prevFootprint.updateAll(data.empreinteSocietale);
-        // state -------------------------------------------- //
-        this.lastUpdateFromRemote = getCurrentDateString();
-        this.dataFetched = true;
-        this.status = 200;
-      } 
-      else // code == 404 --------------------------------------------- //
-      {
-        // footprint ---------------------------------------- //
-        this.prevFootprint = new SocialFootprint();
-        // state -------------------------------------------- //
-        this.lastUpdateFromRemote = "";
-        this.dataFetched = false;
-        this.status = 404;
-      }
+    if (this.initialState == "defaultData") {
+      api
+        .get(
+          "defaultfootprint/?activity=" +
+            this.prevFootprintActivityCode +
+            "&aggregate=PRD&area=" +
+            this.prevFootprintAreaCode
+        )
+        .then((res) => {
+          
+          let status = res.data.header.code;
+
+          if (status == 200) {
+            let data = res.data;
+
+            //footprint ---------------------------------------- //
+            this.prevFootprint.updateAll(data.footprint);
+
+            //state -------------------------------------------- //
+            this.lastUpdateFromRemote = getCurrentDateString();
+            this.dataFetched = true;
+          } else {
+            this.prevFootprint = new SocialFootprint();
+            this.lastUpdateFromRemote = "";
+            this.dataFetched = false;
+          }
+          this.status = status;
+        });
     }
   }
-
-  /* ---------- Fetching data ---------- */
-
-  // Fetch default data
-  async fetchData(endpoint) 
-  {
-    let response = await fetch(endpoint, {method:'get'});
-    let data = await response.json();
-    console.log(endpoint+' status:'+data.header.statut);
-    if (data.header.statut == 200) {return data} 
-    else                           {return null}
-  }
-
 }

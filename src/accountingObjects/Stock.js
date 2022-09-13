@@ -4,7 +4,7 @@
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
 // API url
-const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2/";
+import api from '../api';
 
 export class Stock {
 
@@ -91,42 +91,37 @@ export class Stock {
     // Case - Fetch default data -------------------------------------------------------------------------- //
     if (this.initialState=="defaultData") 
     {
-      // request
-      let endpoint = apiBaseUrl + "default?" + "area="+this.prevFootprintAreaCode + "&activity="+this.prevFootprintActivityCode +"&flow=PRD";
-      let response = await this.fetchData(endpoint);
-      
-      if (response!=null) // code == 200 ------------------------------ //
-      {
-        let data = response;
-        // footprint ---------------------------------------- //
-        this.prevFootprint.updateAll(data.empreinteSocietale);
-        // state -------------------------------------------- //
-        this.lastUpdateFromRemote = getCurrentDateString();
-        this.dataFetched = true;
-        this.status = 200;
-      } 
-      else // code == 404 --------------------------------------------- //
-      {
-        // footprint ---------------------------------------- //
-        this.prevFootprint = new SocialFootprint();
-        // state -------------------------------------------- //
-        this.lastUpdateFromRemote = "";
-        this.dataFetched = false;
-        this.status = 404;
-      }
+      console.log("initialStateStock")
+    
+      api
+      .get(
+        "defaultfootprint/?activity=" +
+          this.prevFootprintActivityCode +
+          "&aggregate=PRD&area=" +
+          this.prevFootprintAreaCode
+      )
+      .then((res) => {
+        let status = res.data.header.code;
+
+        if (status == 200) {
+          let data = res.data;
+
+          //footprint ---------------------------------------- //
+          this.prevFootprint.updateAll(data.footprint);
+
+          //state -------------------------------------------- //
+          this.lastUpdateFromRemote = getCurrentDateString();
+          this.dataFetched = true;
+        } else {
+          this.prevFootprint = new SocialFootprint();
+          this.lastUpdateFromRemote = "";
+          this.dataFetched = false;
+        }
+        this.status = status;
+      });
+
     }
   }
 
-  /* ---------- Fetching data ---------- */
-
-  // Fetch default data
-  async fetchData(endpoint) 
-  {
-    let response = await fetch(endpoint, {method:'get'});
-    let data = await response.json();
-    console.log(endpoint+' status:'+data.header.statut);
-    if (data.header.statut == 200) {return data} 
-    else                           {return null}
-  }
 
 }

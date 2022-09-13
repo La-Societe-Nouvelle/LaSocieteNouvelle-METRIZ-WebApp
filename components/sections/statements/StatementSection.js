@@ -1,10 +1,10 @@
-// TO DO : OPTIMISATION
+import api from "../../../src/api";
+import axios from "axios";
 
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 
 import ResultSection from "./ResultSection";
-
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 import IndicatorsList from "./parts/IndicatorsList";
@@ -13,21 +13,50 @@ import ExportResults from "./parts/ExportResults";
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 
 const StatementSection = (props) => {
+
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
 
-  const [allSectorsProductionAreaFootprint, setAllSectorsProductionFootprint] =
-    useState(new SocialFootprint());
-
-  const [
-    allSectorsValueAddedAreaFootprint,
-    setAllSectorsValueAddedAreaFootprint,
-  ] = useState(new SocialFootprint());
-  const [allSectorsConsumptionFootprint, setAllSectorsConsumptionFootprint] =
-    useState(new SocialFootprint());
+  const [allSectorsProductionAreaFootprint, setAllSectorsProductionFootprint] = useState(new SocialFootprint());
+  const [allSectorsValueAddedAreaFootprint,setAllSectorsValueAddedAreaFootprint] = useState(new SocialFootprint());
+  const [allSectorsConsumptionFootprint, setAllSectorsConsumptionFootprint] = useState(new SocialFootprint());
 
   useEffect(() => {
     
+    const getAllValueAdded =  api.get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA");
+    const getAllProduction = api.get("defaultfootprint/?activity=00&aggregate=PRD&area=FRA");
+    const getAllConsumption = api.get("defaultfootprint/?activity=00&aggregate=IC&area=FRA");
+
+
+    // axios.all([getAllValueAdded, getAllProduction, getAllConsumption]).then(axios.spread((...responses) => {
+     
+    //   const valueAdded = responses[0]
+    //   const production = responses[1]
+    //   const consumption = responses[2]
+
+      
+    //   if(valueAdded.data.header == 200) 
+    //   {
+    //     //insert data in db
+    //     setAllSectorsValueAddedAreaFootprint(valueAdded.data.footprint)
+    //   }
+  
+
+    //   if( production.data.header == 200){
+    //     setAllSectorsProductionFootprint(production.data.footprint)
+    //   }
+
+    //   if( consumption.data.header == 200){
+
+    //     //insert data in db
+    //     setAllSectorsProductionFootprint(consumption.data.footprint)
+    //   }
+
+    // })).catch(errors => {
+    //   console.log(errors);
+    // })
+
+
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
       setAllSectorsValueAddedAreaFootprint(footprint)
     );
@@ -37,6 +66,8 @@ const StatementSection = (props) => {
     fetchEconomicAreaData("FRA", "IC").then((footprint) =>
       setAllSectorsConsumptionFootprint(footprint)
     );
+
+
   }, []);
 
   const fetchEconomicAreaData = async (area, flow) => {

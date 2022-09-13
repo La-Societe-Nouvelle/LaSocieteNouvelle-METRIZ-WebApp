@@ -31,6 +31,7 @@ import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
 import ChangeDivision from "../../../popups/ChangeDivision";
+import api from "../../../../src/api";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
@@ -54,13 +55,13 @@ const IndicatorsList = (props) => {
 
   useEffect(async () => {
 
+
     if (comparativeDivision != "00") {
 
       let productionSectorFootprint = await fetchDivisionData(
         comparativeDivision,
         "PRD"
       );
-
       let valueAddedSectorFootprint = await fetchDivisionData(
         comparativeDivision,
         "GVA"
@@ -70,11 +71,9 @@ const IndicatorsList = (props) => {
         comparativeDivision,
         "IC"
       );
-
       setProductionSectorFootprint(productionSectorFootprint);
       setValueAddedSectorFootPrint(valueAddedSectorFootprint);
       setConsumptionSectorFootPrint(consumptionSectorFootprint);
-
       props.session.comparativeDivision = comparativeDivision;
     } else {
       setProductionSectorFootprint(new SocialFootprint());
@@ -137,27 +136,20 @@ const IndicatorsList = (props) => {
   const socialFootprint = ["dis", "geq", "knw"];
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
 
-  const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 
-  const fetchDivisionData = async (division, flow) => {
-    let endpoint;
-    let response;
-    let data;
+  const fetchDivisionData = async (division, aggregate) => {
 
     // comparative data
     let footprint = new SocialFootprint();
-
-    endpoint =
-      apiBaseUrl +
-      "/default?" +
-      "area=FRA" +
-      "&activity=" +
-      division +
-      "&flow=" +
-      flow;
-    response = await fetch(endpoint, { method: "get" });
-    data = await response.json();
-    if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
+    api
+    .get("defaultfootprint/?activity="+division+"&aggregate="+aggregate+"&area=FRA")
+    .then((res) => {
+      let status = res.data.header.code;
+      if (status == 200) {
+        let data = res.data;
+        footprint.updateAll(data.footprint);
+      } 
+    });
 
     return footprint;
   };

@@ -1,14 +1,13 @@
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+import api from "./api";
 
 const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 
 /* ---------- LEGAL UNIT DATA ---------- */
 export class LegalUnit {
-
-  constructor(props) 
-  {
-    if (props==undefined) props = {};
-  // ---------------------------------------------------------------------------------------------------- //
+  constructor(props) {
+    if (props == undefined) props = {};
+    // ---------------------------------------------------------------------------------------------------- //
 
     // identifiant
     this.siren = props.siren || "";
@@ -30,68 +29,73 @@ export class LegalUnit {
     this.year = props.year || "";
 
     // Sector footprints
-    this.productionSectorFootprint = new SocialFootprint(props.productionSectorFootprint);
-    this.valueAddedSectorFootprint = new SocialFootprint(props.valueAddedSectorFootprint);
-    this.consumptionSectorFootprint = new SocialFootprint(props.consumptionSectorFootprint);
+    this.productionSectorFootprint = new SocialFootprint(
+      props.productionSectorFootprint
+    );
+    this.valueAddedSectorFootprint = new SocialFootprint(
+      props.valueAddedSectorFootprint
+    );
+    this.consumptionSectorFootprint = new SocialFootprint(
+      props.consumptionSectorFootprint
+    );
     // Economic area footprints
-    this.productionAreaFootprint = new SocialFootprint(props.productionAreaFootprint);
-    this.valueAddedAreaFootprint = new SocialFootprint(props.valueAddedAreaFootprint);
+    this.productionAreaFootprint = new SocialFootprint(
+      props.productionAreaFootprint
+    );
+    this.valueAddedAreaFootprint = new SocialFootprint(
+      props.valueAddedAreaFootprint
+    );
 
     // status
-    this.status = props.status || "";                                                             // OK:200 NOT FOUND: 404 ERROR: 500
+    this.status = props.status || ""; // OK:200 NOT FOUND: 404 ERROR: 500
     this.dataFetched = props.dataFetched || false;
 
     // fetch default references
-    if (props.productionAreaFootprint==undefined) this.initFootprintsReferences();
+    if (props.productionAreaFootprint == undefined)
+      this.initFootprintsReferences();
 
-  // ---------------------------------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------------------------------- //
   }
 
   /* ----- SETTERS ----- */
 
-  setSiren = async (siren) =>
-  {
+  setSiren = async (siren) => {
     this.siren = siren;
     this.dataFetched = null;
     // Fetch data
     await this.fetchLegalUnitData();
     await this.fetchFootprintsReferences();
-  }
+  };
 
-  setYear = (year) => this.year = year
+  setYear = (year) => (this.year = year);
 
   /* ----- FETCHING DATA ----- */
 
   // Fetch legal unit data
-  fetchLegalUnitData = async () => 
-  {
-    if (/[0-9]{9}/.test(this.siren)) 
-    {
-      try 
-      {
-        const endpoint = `${apiBaseUrl}/siren/${this.siren}`;
-        // console.log(endpoint);
-        const response = await fetch(endpoint, {method:'get'});
-        const data = await response.json();
+  fetchLegalUnitData = async () => {
+    if (/[0-9]{9}/.test(this.siren)) {
+      // request
+      api.get("legalunitfootprint/" + this.siren).then((res) => {
+        let status = res.data.header.code;
 
-        if (data.header.statut===200) 
-        {
-          this.corporateName = data.profil.descriptionUniteLegale.denomination;
-          this.corporateHeadquarters = data.profil.descriptionUniteLegale.communeSiege + " (" + data.profil.descriptionUniteLegale.codePostalSiege + ")" ;
+        if (status == 200) {
+          this.corporateName = res.data.legalUnit.denominationunitelegale;
+          this.corporateHeadquarters =
+            res.data.legalUnit.libellecommuneetablissement +
+            " (" +
+            res.data.legalUnit.codepostaletablissement +
+            ")";
           this.areaCode = "FRA";
-          this.activityCode = data.profil.descriptionUniteLegale.activitePrincipale;
+          this.activityCode = res.data.legalUnit.activiteprincipaleunitelegale;
+          // TO DO
+          // this.isEmployeur = res.data.legalUnit.isEmployeur;
+          // this.trancheEffectifs = res.data.legalUnit.trancheEffectifs;
+          // this.isEconomieSocialeSolidaire = res.data.legalUnit.isEconomieSocialeSolidaire;
+          // this.isActivitesArtisanales = res.data.legalUnit.isActivitesArtisanales;
+          // this.isLocalisationEtranger = res.data.legalUnit.isLocalisationEtranger;
 
-          this.isEmployeur = data.profil.descriptionUniteLegale.isEmployeur;
-          this.trancheEffectifs = data.profil.descriptionUniteLegale.trancheEffectifs;
-          this.isEconomieSocialeSolidaire = data.profil.descriptionUniteLegale.isEconomieSocialeSolidaire;
-          this.isActivitesArtisanales = data.profil.descriptionUniteLegale.isActivitesArtisanales;
-          this.isLocalisationEtranger = data.profil.descriptionUniteLegale.isLocalisationEtranger;
-
-          this.status = 200;
           this.dataFetched = true;
-        } 
-        else 
-        {
+        } else {
           this.corporateName = "";
           this.corporateHeadquarters = "";
           this.areaCode = "FRA";
@@ -101,14 +105,11 @@ export class LegalUnit {
           this.isEconomieSocialeSolidaire = null;
           this.isActivitesArtisanales = null;
           this.isLocalisationEtranger = null;
-          this.status = 404;
           this.dataFetched = false;
         }
-      } 
-      catch(error) {throw error} // this.status = 500;
-    }
-    else 
-    {
+        this.status = status;
+      });
+    } else {
       this.corporateName = "";
       this.corporateHeadquarters = "";
       this.areaCode = "";
@@ -121,89 +122,134 @@ export class LegalUnit {
       this.status = null;
       this.dataFetched = false;
     }
-  }
+  };
 
   // Fetch consumption CSF data
-  fetchFootprintsReferences = async () =>
-  {
-    let endpoint; let response; let data;
+  fetchFootprintsReferences = async () => {
+
 
     // Fetch sector footprints
-    if (this.activityCode!=null)
-    {
-      let division = this.activityCode.substring(0,2);
-      
-      // Production
-      endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=PRD";
-      // console.log(endpoint);
-      response = await fetch(endpoint, {method:'get'});
-      data = await response.json();
-      if (data.header.statut == 200) this.productionSectorFootprint.updateAll(data.empreinteSocietale);
-      else this.productionSectorFootprint = new SocialFootprint();
-      
+    if (this.activityCode != null) {
+      let division = this.activityCode.substring(0, 2);
+
+      api
+        .get(
+          "defaultfootprint/?activity=" + division + "&aggregate=PRD&area=FRA"
+        )
+        .then((res) => {
+          let status = res.data.header.code;
+
+          if (status == 200) {
+            let data = res.data;
+            this.productionSectorFootprint.updateAll(data.footprint);
+          } else {
+            this.productionSectorFootprint = new SocialFootprint();
+          }
+        });
+
       // Value Added
-      endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=GVA";
-      // console.log(endpoint);
-      response = await fetch(endpoint, {method:'get'});
-      data = await response.json();
-      if (data.header.statut == 200) this.valueAddedSectorFootprint.updateAll(data.empreinteSocietale);
-      else this.valueAddedSectorFootprint = new SocialFootprint();
-      
+      api
+        .get(
+          "defaultfootprint/?activity=" + division + "&aggregate=GVA&area=FRA"
+        )
+        .then((res) => {
+          let status = res.data.header.code;
+
+          if (status == 200) {
+            let data = res.data;
+            this.valueAddedSectorFootprint.updateAll(data.footprint);
+          } else {
+            this.valueAddedSectorFootprint = new SocialFootprint();
+          }
+          this.status = status;
+        });
+
       // Intermediate Consumption
-      endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity="+division +"&flow=IC";
-      // console.log(endpoint);
-      response = await fetch(endpoint, {method:'get'});
-      data = await response.json();
-      if (data.header.statut == 200) this.consumptionSectorFootprint.updateAll(data.empreinteSocietale)
-      else this.consumptionSectorFootprint = new SocialFootprint();
-    }
-    else
-    {
+      api
+        .get(
+          "defaultfootprint/?activity=" + division + "&aggregate=IC&area=FRA"
+        )
+        .then((res) => {
+          let status = res.data.header.code;
+
+          if (status == 200) {
+            let data = res.data;
+            this.consumptionSectorFootprint.updateAll(data.footprint);
+          } else {
+            this.consumptionSectorFootprint = new SocialFootprint();
+          }
+          this.status = status;
+        });
+    } else {
       this.productionSectorFootprint = new SocialFootprint();
       this.valueAddedAreaFootprint = new SocialFootprint();
       this.consumptionSectorFootprint = new SocialFootprint();
     }
 
     // Fetch area footprints
-    
+
     // PIB+IMP FRA (Available production in FRA)
-    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GAP";
-    // console.log(endpoint);
-    response = await fetch(endpoint, {method:'get'});
-    data = await response.json();
-    if (data.header.statut == 200) this.productionAreaFootprint.updateAll(data.empreinteSocietale);
-    else this.productionAreaFootprint = new SocialFootprint();
+
+    api
+      .get("defaultfootprint/?activity=00&aggregate=PRD&area=FRA")
+      .then((res) => {
+        let status = res.data.header.code;
+
+        if (status == 200) {
+          let data = res.data;
+          this.productionAreaFootprint.updateAll(data.footprint);
+        } else {
+          this.productionAreaFootprint = new SocialFootprint();
+        }
+      });
 
     // PIB FRA (Value Added in France)
-    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GVA";
-    // console.log(endpoint);
-    response = await fetch(endpoint, {method:'get'});
-    data = await response.json();
-    if (data.header.statut == 200) this.valueAddedAreaFootprint.updateAll(data.empreinteSocietale);
-    else this.valueAddedAreaFootprint = new SocialFootprint();
-  }
 
-  initFootprintsReferences = async () =>
-  {
-    let endpoint; let response; let data;
+    api
+      .get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA")
+      .then((res) => {
+        let status = res.data.header.code;
+
+        if (status == 200) {
+          let data = res.data;
+          this.valueAddedAreaFootprint.updateAll(data.footprint);
+        } else {
+          this.valueAddedAreaFootprint = new SocialFootprint();
+        }
+      });
+  };
+
+  initFootprintsReferences = async () => {
 
     // Fetch area footprints
-    
+
     // PIB+IMP FRA (Available production in FRA)
-    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GAP";
-    // console.log(endpoint);
-    response = await fetch(endpoint, {method:'get'});
-    data = await response.json();
-    if (data.header.statut == 200) this.productionAreaFootprint.updateAll(data.empreinteSocietale);
-    else this.productionAreaFootprint = new SocialFootprint();
+
+    api
+      .get("defaultfootprint/?activity=00&aggregate=GAP&area=FRA")
+      .then((res) => {
+        let status = res.data.header.code;
+
+        if (status == 200) {
+          let data = res.data;
+          this.productionAreaFootprint.updateAll(data.footprint);
+        } else {
+          this.productionAreaFootprint = new SocialFootprint();
+        }
+      });
 
     // PIB FRA (Value Added in France)
-    endpoint = apiBaseUrl + "/default?" + "area=FRA" + "&activity=00" +"&flow=GVA";
-    // console.log(endpoint);
-    response = await fetch(endpoint, {method:'get'});
-    data = await response.json();
-    if (data.header.statut == 200) this.valueAddedAreaFootprint.updateAll(data.empreinteSocietale);
-    else this.valueAddedAreaFootprint = new SocialFootprint();
-  }
+    api
+      .get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA")
+      .then((res) => {
+        let status = res.data.header.code;
 
+        if (status == 200) {
+          let data = res.data;
+          this.valueAddedAreaFootprint.updateAll(data.footprint);
+        } else {
+          this.valueAddedAreaFootprint = new SocialFootprint();
+        }
+      });
+  };
 }
