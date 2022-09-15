@@ -81,6 +81,11 @@ const IndicatorsList = (props) => {
       setValueAddedSectorFootPrint(new SocialFootprint());
       setConsumptionSectorFootPrint(new SocialFootprint());
     }
+
+    if(validations.length > 0 ) {
+      console.log(props)
+      props.publish();
+    }
   }, [comparativeDivision, validations]);
 
   /* ----- POP-UP ----- */

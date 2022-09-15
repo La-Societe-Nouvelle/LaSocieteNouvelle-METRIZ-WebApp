@@ -15,7 +15,7 @@ const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
 const StatementSection = (props) => {
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
-
+  const [isPublicationAvailable, setPublicationAvailable] = useState(false);
   const [allSectorsProductionAreaFootprint, setAllSectorsProductionFootprint] =
     useState(new SocialFootprint());
 
@@ -27,7 +27,6 @@ const StatementSection = (props) => {
     useState(new SocialFootprint());
 
   useEffect(() => {
-    
     fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
       setAllSectorsValueAddedAreaFootprint(footprint)
     );
@@ -37,6 +36,7 @@ const StatementSection = (props) => {
     fetchEconomicAreaData("FRA", "IC").then((footprint) =>
       setAllSectorsConsumptionFootprint(footprint)
     );
+    
   }, []);
 
   const fetchEconomicAreaData = async (area, flow) => {
@@ -67,10 +67,12 @@ const StatementSection = (props) => {
     setView("result");
   };
 
-  const isPublicationAvailable =
-    Object.entries(
-      props.session.financialData.aggregates.revenue.footprint.indicators
-    ).filter(([_, indicator]) => indicator.value != null).length > 0;
+
+  // const isPublicationAvailable =
+  
+  //   Object.entries(
+  //     props.session.financialData.aggregates.revenue.footprint.indicators
+  //   ).filter(([_, indicator]) => indicator.value != null).length > 0;
 
   return (
     <Container fluid className="indicator-section">
@@ -88,6 +90,7 @@ const StatementSection = (props) => {
               impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
+              publish={()=> setPublicationAvailable(true)}
               comparativeFootprints={{
                 allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
                 allSectorsProductionAreaFootprint:
