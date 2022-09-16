@@ -3,7 +3,7 @@
 // React
 
 import React from "react";
-import { Alert, Button, Col, Container, Image, Row } from "react-bootstrap";
+import { Button, Col, Container, Image, Row } from "react-bootstrap";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */

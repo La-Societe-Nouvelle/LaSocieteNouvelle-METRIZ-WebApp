@@ -1,49 +1,52 @@
 // La Société Nouvelle
 
 // React
-import React from 'react';
+import React from "react";
 
 // Icon
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faChevronRight, faFileExport, faCheckCircle, faXmark, faWarning, faFileUpload, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { Modal } from "react-bootstrap";
 
 /* ---------- MESSAGE POP-UP ---------- */
 
-export const MessagePopup = ({ title, message, closePopup, type, icon }) =>
+export const MessagePopup = ({ title, message, closePopup, type }) => {
+  return (
+    <Modal show="true" onHide={closePopup} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
 
-  <div className="modal-overlay">
-    <div className="modal-wrapper">
-      <div className={"modal " + type}>
-        <div className="header">
-          <FontAwesomeIcon icon={icon} />
-        </div>
-        <div className="body">
-          <h3>{title}</h3>
-          <div className="message">
-            <p>{message}</p>
-          </div>
-        <button className="btn " onClick={closePopup}>Ok</button>
-        </div>
-      </div>
-    </div>
-  </div>
+      <Modal.Body>
+        <p
+          className={
+            type == "success" && "alert alert-success justify-content-start"
+          }
+        >
+          {type == "success" && (
+            <i className="bi bi-check-circle-fill me-1"></i>
+          )}{" "}
+          {message}
+        </p>
+      </Modal.Body>
+    </Modal>
+  );
+};
 
-export const MessagePopupErrors = ({ title, message, errors, closePopup }) =>
+export const MessagePopupErrors = ({ title, message, errors, closePopup }) => {
+  console.log('test')
+  return (
+    <Modal show="true" onHide={closePopup} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
 
-  <div className="modal-overlay">
-    <div className="modal-wrapper">
-      <div className="modal">
-        <h3>{title}</h3>
+      <Modal.Body>
         <div className="message">
           <p>{message}</p>
-          {errors.map((error, index) => <p key={index} >{error}</p>)}
+          {errors && errors.map((error, index) => (
+            <p key={index}>{error}</p>
+          ))}
         </div>
-        <div className="footer">
-          <button className="btn" onClick={closePopup}>Ok</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
+      </Modal.Body>
+    </Modal>
+  );
+};
