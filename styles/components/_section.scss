@@ -240,3 +240,18 @@ section {
   color: $primary;
   font-size: 1.4rem;
 }
+/* ---------- Results ---------- */
+
+.progressbar {
+  width: 100%;
+  height: 20px;
+  border-radius: 15px;
+  background-color: $light;
+}
+
+.progressbar .progression {
+  background-color: $secondary;
+  border-radius: 15px;
+  transition: width 400ms ease-in-out;
+  height: 100%;
+}
