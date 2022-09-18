@@ -1,6 +1,7 @@
 // La Société Nouvelle
 
 // Imports
+import { getCurrentDateString } from '../utils/Utils';
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
 // API url
