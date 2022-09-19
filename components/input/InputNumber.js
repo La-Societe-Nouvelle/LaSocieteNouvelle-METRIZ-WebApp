@@ -25,7 +25,6 @@ export class InputNumber extends React.Component {
         <InputGroup className="mb-3">
           <Form.Control
             value={this.state.input}
-            onFocus={this.onFocus}
             onChange={this.onChange}
             onBlur={this.onBlur}
             onKeyPress={this.onEnterPress}
@@ -46,11 +45,7 @@ export class InputNumber extends React.Component {
     }
   };
 
-  onFocus = () => {
-    if (/^0$/.test(this.state.input)) {
-      this.setState({ input: "" });
-    }
-  };
+
 
   onChange = (event) => {
     this.setState({ input: event.target.value });
