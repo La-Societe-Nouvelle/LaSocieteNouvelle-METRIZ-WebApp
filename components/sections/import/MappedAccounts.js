@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
 function MappedAccounts(props) {
+
   const [allAccounts] = useState(props.meta.accounts);
   const accounts = Object.entries(allAccounts);
 
@@ -82,7 +83,7 @@ function MappedAccounts(props) {
               <td>{depKey}</td>
               <td>{depValue}</td>
               <td>
-                <select className="form-control" defaultValue={mappedAccounts[depKey] || ""} onChange={(e) => handleOnchange(depKey, e)}>
+                <select className="form-control" defaultValue={mappedAccounts[depKey] || ""} onChange={(e) => handleOnchange(depKey, e)} value={mappedAccounts[depKey] || ""}>
                   <option value="">Sélectionner un compte...</option>
                   {assetAccounts.filter(([assetKey,_]) => assetKey[0]==depKey[0]).map(([assetKey, assetValue], index) => (
                     
