@@ -45,7 +45,7 @@ export class SirenSection extends React.Component {
 
   }
 
-  
+
   handleChange = (event) => {
     let view = event.target.value;
 
@@ -64,6 +64,13 @@ export class SirenSection extends React.Component {
           ),
           view: view,
         });
+        case "error":
+          return this.setState({
+            companiesShowed: this.state.companies.filter(
+              (company) => company.status == 404
+            ),
+            view: view,
+          });
       default:
         return this.setState({
           companiesShowed: this.state.companies,
@@ -89,7 +96,7 @@ export class SirenSection extends React.Component {
     const financialData = this.props.session.financialData;
     const setCompanyStep = this.props.setCompanyStep;
 
-    const isNextStepAvailable = nextStepAvailable(this.state);
+    const isNextStepAvailable = nextStepAvailable(companies);
 
     let buttonNextStep;
 
@@ -99,7 +106,7 @@ export class SirenSection extends React.Component {
     ) {
       buttonNextStep = (
         <div>
-            <button 
+            <button
               onClick={() => setCompanyStep(2)}
             className={"btn btn-primary me-3"}>
             Secteurs d'activité <i className="bi bi-chevron-right"></i>
@@ -121,6 +128,7 @@ export class SirenSection extends React.Component {
           className={"btn btn-secondary"}
           id="validation-button"
           onClick={() => setCompanyStep(2)}
+          disabled= {!isNextStepAvailable}
         >
           Valider les fournisseurs
           <i className="bi bi-chevron-right"></i>
@@ -170,12 +178,12 @@ export class SirenSection extends React.Component {
                 </div>
               )}
             </Dropzone>
-             
+
             {errorFile && (
               <p className="alert alert-danger">
                  <i className="bi bi-check-circle-fill me-1"></i> Fichier incorrect
               </p>
-         
+
             )}
             {popup && (
               <MessagePopup
@@ -254,7 +262,7 @@ export class SirenSection extends React.Component {
                     <select
                       onChange={this.handleChange}
                       value={view}
-                      className="form-control"
+                      className="form-select"
                     >
                       <option key="1" value="all">
                         Tous les comptes externes
@@ -266,6 +274,9 @@ export class SirenSection extends React.Component {
                       <option key="3" value="unsync">
                         Non synchronisé
                       </option>
+                      <option key="4" value="error">
+                       Numéros de siren incorrects
+                      </option>
                     </select>
                   </div>
 
@@ -273,7 +284,7 @@ export class SirenSection extends React.Component {
                     <select
                       value={nbItems}
                       onChange={this.changeNbItems}
-                      className="form-control"
+                      className="form-select"
                     >
                       <option key="1" value="20">
                         20 fournisseurs par page
@@ -305,7 +316,7 @@ export class SirenSection extends React.Component {
           </div>
 
           {fetching && (
-     
+
               <ProgressBar
                 message="Récupération des données fournisseurs..."
                 progression={progression}
@@ -477,16 +488,18 @@ export class SirenSection extends React.Component {
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const nextStepAvailable = ({ companies }) => {
-  let isNextStepAvailable;
-  let nbSirenSynchronised = companies.filter(
-    (company) => company.state == "siren" && company.status == 200
-  ).length;
+const nextStepAvailable = (  companies ) => {
+
+
+  let nbSirenSynchronised = companies.filter(company => company.state == "siren" && company.status == 200).length;
+
   let nbSiren = companies.filter((company) => company.state == "siren").length;
 
-  nbSirenSynchronised == nbSiren && nbSirenSynchronised > 0
-    ? (isNextStepAvailable = true)
-    : false;
 
-  return isNextStepAvailable;
+  if(nbSirenSynchronised == nbSiren) {
+    return true;
+  }else{
+    return false;
+  }
+  
 };
