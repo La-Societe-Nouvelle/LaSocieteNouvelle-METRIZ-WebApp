@@ -6,15 +6,17 @@ export class InputNumber extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      input: props.value != undefined ? props.value.toString() || "" : "",
+      input: props.value != undefined ? props.value : null,
       placeholder: props.placeholder,
     };
   }
 
   componentDidUpdate(prevProps) {
+    
     if (this.props.value != prevProps.value) {
+   
       this.setState({
-        input: this.props.value ? this.props.value.toString() || "" : "",
+        input: this.props.value
       });
     }
   }
