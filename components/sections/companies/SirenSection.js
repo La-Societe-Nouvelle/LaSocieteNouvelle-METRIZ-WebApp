@@ -36,6 +36,7 @@ export class SirenSection extends React.Component {
       if(files.length) {
         this.importFile(files[0]);
         this.openPopup();
+        this.setState({isDisabled : false});
       }
       else {
         this.setState({errorFile : true});
