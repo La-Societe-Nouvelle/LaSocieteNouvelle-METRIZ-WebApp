@@ -83,7 +83,6 @@ const IndicatorsList = (props) => {
     }
 
     if(validations.length > 0 ) {
-      console.log(props)
       props.publish();
     }
   }, [comparativeDivision, validations]);
@@ -243,6 +242,7 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
+          
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                     </ArrowToggle>
@@ -315,6 +315,7 @@ const IndicatorsList = (props) => {
         {Object.entries(metaIndics)
           .filter((indic) => indic.some((el) => socialFootprint.includes(el)))
           .map(([key, value]) => (
+            
             <Card key={key}>
               <Card.Header>
                 <div className="d-flex justify-content-between align-items-center">
@@ -437,15 +438,18 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
+                    {
+                        console.log(props.impactsData.greenhousesGazEmissions)
+                      }
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
-                        props.impactsData.greenhousesGazEmissions &&
+                        props.impactsData.greenhousesGazEmissions != 0 &&
                         !validations.includes(key) && (
                         <IconWarning />
                         )}
                       {key == "nrg" &&
-                        props.impactsData.energyConsumption &&
+                        props.impactsData.energyConsumption != 0 &&
                         !validations.includes(key) && (
                           <IconWarning />
                         )}
