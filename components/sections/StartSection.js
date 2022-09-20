@@ -3,7 +3,7 @@
 // React
 
 import React from "react";
-import { Alert, Button, Col, Container, Image, Row } from "react-bootstrap";
+import { Button, Col, Container, Image, Row } from "react-bootstrap";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
@@ -25,10 +25,7 @@ export class StartSection extends React.Component {
                 de votre entreprise en quelques clics.
               </h1>
               <p>
-                Notre objectif est de vous permettre de
-                <strong>mesurer l’empreinte la production</strong> de votre
-                entreprise sur des enjeux
-                <strong>majeurs de développement durable.</strong>
+                Notre objectif est de vous permettre de <strong>mesurer l’empreinte la production</strong> de votre entreprise sur des enjeux <strong>majeurs de développement durable.</strong>
               </p>
               <Row id="section-picto">
                 <Col>

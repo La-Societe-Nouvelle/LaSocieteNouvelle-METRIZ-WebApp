@@ -507,6 +507,7 @@ export class FinancialData {
         // Dotations aux amortissements, dépréciations et provisions
         //items = this.expenseAccounts.filter(account => /^681/.test(account.accountNum));
         aggregate = {accountLib: "Dotations aux amortissements, dépréciations et provisions", amount: this.getAmountDepreciationExpenses()+this.getAmountProvisions(), isToBeChecked: false};
+        aggregate.isToBeChecked = true;
         aggregates.push(aggregate); 
 
         // Autres charges d'exploitation

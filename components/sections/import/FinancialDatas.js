@@ -12,8 +12,6 @@ import { IncomeStatementTable } from "../../tables/IncomeStatementTable";
 import { ExpensesTable } from "../../tables/ExpensesTable";
 import { StocksTable } from "../../tables/StocksTable";
 
-// Components
-import { MessagePopupErrors } from "../../popups/MessagePopup";
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -35,7 +33,7 @@ export class FinancialDatas extends React.Component {
   }
 
   render() {
-    const { selectedTable, errorFile, errorMessage, errors } = this.state;
+    const { selectedTable} = this.state;
 
     return (
       <>
@@ -91,14 +89,6 @@ export class FinancialDatas extends React.Component {
         <div className="table-data">
           {this.buildtable(selectedTable)}
 
-          {errorFile && (
-            <MessagePopupErrors
-              title="Erreur - Fichier"
-              message={errorMessage}
-              errors={errors}
-              closePopup={() => this.setState({ errorFile: false })}
-            />
-          )}
         </div>
         <div className="text-end">
           <button

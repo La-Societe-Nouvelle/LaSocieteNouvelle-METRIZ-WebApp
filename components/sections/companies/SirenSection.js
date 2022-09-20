@@ -1,10 +1,6 @@
 import React from "react";
 import Dropzone from "react-dropzone";
 
-// Icon
-import {
-  faCheckCircle,
-} from "@fortawesome/free-solid-svg-icons";
 
 // Table
 import { CorporateIdTable } from "../../tables/CorporateIdTable";
@@ -16,7 +12,7 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
-import { MessagePopup } from "../../popups/MessagePopup";
+import { MessagePopup, MessagePopupErrors } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 export class SirenSection extends React.Component {
   constructor(props) {
@@ -33,9 +29,23 @@ export class SirenSection extends React.Component {
       synchronised: 0,
       popup: false,
       isDisabled: false,
+      errorFile : false,
     };
+
+    this.onDrop = (files) => {
+      if(files.length) {
+        this.importFile(files[0]);
+        this.openPopup();
+        this.setState({isDisabled : false});
+      }
+      else {
+        this.setState({errorFile : true});
+      }
+    };
+
   }
 
+  
   handleChange = (event) => {
     let view = event.target.value;
 
@@ -73,6 +83,7 @@ export class SirenSection extends React.Component {
       companiesShowed,
       popup,
       isDisabled,
+      errorFile
     } = this.state;
 
     const financialData = this.props.session.financialData;
@@ -142,13 +153,7 @@ export class SirenSection extends React.Component {
           <div className="step">
             <h4>2. Importez le fichier excel complété</h4>
 
-            <Dropzone
-              onDrop={(files) => {
-                files.map((file) => this.importFile(file), this.openPopup());
-              }}
-              maxFiles={1}
-              multiple={false}
-            >
+             <Dropzone onDrop={this.onDrop} accept={[".xlsx", ".csv"]} maxFiles={1} >
               {({ getRootProps, getInputProps }) => (
                 <div className="dropzone-section">
                   <div {...getRootProps()} className="dropzone">
@@ -165,12 +170,17 @@ export class SirenSection extends React.Component {
                 </div>
               )}
             </Dropzone>
-
+             
+            {errorFile && (
+              <p className="alert alert-danger">
+                 <i className="bi bi-check-circle-fill me-1"></i> Fichier incorrect
+              </p>
+         
+            )}
             {popup && (
               <MessagePopup
-                title="Votre fichier a bien été importé !"
-                message=""
-                icon={faCheckCircle}
+                title="Importation des fournisseurs..."
+                message="Votre fichier a bien été importé !"
                 type="success"
                 closePopup={() => this.closePopup()}
               />
@@ -295,12 +305,11 @@ export class SirenSection extends React.Component {
           </div>
 
           {fetching && (
-            <div className="popup">
+     
               <ProgressBar
                 message="Récupération des données fournisseurs..."
                 progression={progression}
               />
-            </div>
           )}
 
           <div className="text-end">{buttonNextStep}</div>

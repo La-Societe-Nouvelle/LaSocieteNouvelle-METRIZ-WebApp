@@ -84,10 +84,10 @@ export class CompaniesTable extends React.Component {
         {companies.length > nbItems && (
           <div className="table-navigation">
             <button
-              className={page == 0 ? "hidden" : ""}
+              className={page == 0 ? "hidden" : "btn btn-primary"}
               onClick={this.prevPage}
             >
-              Page précédente
+               &lsaquo; Page précédente
             </button>
             <div>
               <p>
@@ -96,11 +96,11 @@ export class CompaniesTable extends React.Component {
             </div>
             <button
               className={
-                (page + 1) * nbItems < companies.length ? "" : "hidden"
+                (page + 1) * nbItems < companies.length ? "btn btn-primary" : "hidden"
               }
               onClick={this.nextPage}
             >
-              Page suivante
+              Page suivante &rsaquo;
             </button>
           </div>
         )}
