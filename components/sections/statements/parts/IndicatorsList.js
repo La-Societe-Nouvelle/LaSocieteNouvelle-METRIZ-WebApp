@@ -438,9 +438,6 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
-                    {
-                        console.log(props.impactsData.greenhousesGazEmissions)
-                      }
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
