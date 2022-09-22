@@ -1,6 +1,7 @@
 // La Société Nouvelle
 
 // React
+import { isValid } from 'js-base64';
 import React from 'react';
 
 // Utils
@@ -15,11 +16,26 @@ export class StatementDIS extends React.Component {
     super(props);
     this.state = {
       indexGini: valueOrDefault(props.impactsData.indexGini, ""),
-      info: props.impactsData.comments.dis || ""
+      info: props.impactsData.comments.dis || "",
+      isDisabled : true
     }
   }
 
   componentDidUpdate() {
+
+    if(!this.props.impactsData.hasEmployees && this.props.impactsData.hasEmployees != null) {
+      this.state.isDisabled = false;
+    }
+    if(this.props.impactsData.hasEmployees &&  this.state.indexGini != ''  && this.props.impactsData.netValueAdded != null)
+    {
+      this.state.isDisabled = false;
+    }
+
+     if(this.props.impactsData.hasEmployees &&  this.state.indexGini == '')
+    {
+      this.state.isDisabled = true;
+    }
+
     if (this.state.indexGini != valueOrDefault(this.props.impactsData.indexGini, "")) {
       this.setState({ indexGini: valueOrDefault(this.props.impactsData.indexGini, "") });
     }
@@ -27,9 +43,7 @@ export class StatementDIS extends React.Component {
 
   render() {
     const { hasEmployees, netValueAdded } = this.props.impactsData;
-    const { indexGini, info } = this.state;
-
-    let isValid = indexGini != null && netValueAdded != null;
+    const { indexGini, info, isDisabled } = this.state;
 
     return (
       <div className="statement">
@@ -74,7 +88,7 @@ export class StatementDIS extends React.Component {
         <div className="statement-validation">
           <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment} disabled={hasEmployees ? false : true}>
           <i className="bi bi-calculator"></i> Outil d'évaluation</button>
-          <button disabled={!isValid} className="btn btn-secondary btn-sm"
+          <button disabled={isDisabled} className="btn btn-secondary btn-sm"
             onClick={this.onValidate}>Valider</button>
         </div>
       </div>

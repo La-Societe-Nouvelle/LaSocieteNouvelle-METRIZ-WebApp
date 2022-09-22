@@ -17,22 +17,39 @@ export class StatementGEQ extends React.Component {
     super(props);
     this.state = {
       wageGap: valueOrDefault(props.impactsData.wageGap, ""),
-      info: props.impactsData.comments.geq || ""
+      info: props.impactsData.comments.geq || "",
+      isDisabled : true
+      
     }
   }
 
   componentDidUpdate() 
   {
+
+    if(!this.props.impactsData.hasEmployees && this.props.impactsData.hasEmployees != null) {
+      this.state.isDisabled = false;
+    }
+
+    if(this.props.impactsData.hasEmployees && this.state.wageGap != '' && this.props.impactsData.netValueAdded != null)
+    {
+      this.state.isDisabled = false;
+    }
+
+     if(this.props.impactsData.hasEmployees &&  this.state.wageGap == '')
+    {
+      this.state.isDisabled = true;
+    }
+
+
     if (this.state.wageGap!=valueOrDefault(this.props.impactsData.wageGap, "")) {
       this.setState({wageGap: valueOrDefault(this.props.impactsData.wageGap, "")});
     }
   }
 
   render() {
-    const { hasEmployees, netValueAdded } = this.props.impactsData;
-    const { wageGap, info } = this.state;
+    const { hasEmployees } = this.props.impactsData;
+    const { wageGap, info, isDisabled } = this.state;
 
-    let isValid = wageGap != null && netValueAdded != null;
 
     return (
       <div className="statement">
@@ -74,7 +91,7 @@ export class StatementGEQ extends React.Component {
         <div className="statement-validation"> 
         <button className="btn btn-primary btn-sm"  onClick={this.props.toAssessment} disabled={hasEmployees ? false : true}>
         <i className="bi bi-calculator"></i> Outil d'évaluation</button>
-          <button disabled={!isValid}  className="btn btn-secondary btn-sm"
+          <button disabled={isDisabled}  className="btn btn-secondary btn-sm"
             onClick={this.onValidate}>Valider</button>
         </div>
       </div>
