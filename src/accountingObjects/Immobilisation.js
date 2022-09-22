@@ -92,9 +92,9 @@ export class Immobilisation {
   async updatePrevFootprintFromRemote() {
     // Case - Fetch default data -------------------------------------------------------------------------- //
     if (this.initialState == "defaultData") {
-      api
+     await api
         .get(
-          "defaultfootprint/?activity=" +
+          "defaultfootprint/?code=" +
             this.prevFootprintActivityCode +
             "&aggregate=PRD&area=" +
             this.prevFootprintAreaCode
@@ -102,7 +102,6 @@ export class Immobilisation {
         .then((res) => {
           
           let status = res.data.header.code;
-
           if (status == 200) {
             let data = res.data;
 

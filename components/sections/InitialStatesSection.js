@@ -229,7 +229,7 @@ export class InitialStatesSection extends React.Component {
   async synchroniseAll() {
     // init progression
     this.setState({ fetching: true, syncProgression: 0 });
-
+    console.log(this.state.fetching)
     // accounts
     const accountsToSync = this.props.session.financialData.immobilisations
       .concat(this.props.session.financialData.stocks)
@@ -239,6 +239,7 @@ export class InitialStatesSection extends React.Component {
     let n = accountsToSync.length;
     for (let account of accountsToSync) {
       await account.updatePrevFootprintFromRemote();
+
       i++;
       this.setState({
         syncProgression: Math.round((i / n) * 100),
@@ -252,6 +253,8 @@ export class InitialStatesSection extends React.Component {
       syncProgression: 0,
       financialData: this.props.session.financialData,
     });
+    console.log(this.state.fetching)
+
   }
   /* ---------- SELECTED VIEW ---------- */
 

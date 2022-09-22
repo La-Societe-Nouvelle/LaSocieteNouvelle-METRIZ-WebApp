@@ -10,12 +10,11 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import IndicatorsList from "./parts/IndicatorsList";
 import ExportResults from "./parts/ExportResults";
 
-const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
-
 const StatementSection = (props) => {
 
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
+  const [isPublicationAvailable, setPublicationAvailable] = useState(false);
 
   const [allSectorsProductionAreaFootprint, setAllSectorsProductionFootprint] = useState(new SocialFootprint());
   const [allSectorsValueAddedAreaFootprint,setAllSectorsValueAddedAreaFootprint] = useState(new SocialFootprint());
@@ -25,83 +24,44 @@ const StatementSection = (props) => {
     
     const getAllValueAdded =  api.get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA");
     const getAllProduction = api.get("defaultfootprint/?activity=00&aggregate=PRD&area=FRA");
-    const getAllConsumption = api.get("defaultfootprint/?activity=00&aggregate=IC&area=FRA");
+    const getAllConsumption = api.get("defaultfootprint/?activity=00&aggregate=IC&area=FRA"); 
 
-
-    // axios.all([getAllValueAdded, getAllProduction, getAllConsumption]).then(axios.spread((...responses) => {
+    axios.all([getAllValueAdded, getAllProduction, getAllConsumption]).then(axios.spread((...responses) => {
      
-    //   const valueAdded = responses[0]
-    //   const production = responses[1]
-    //   const consumption = responses[2]
+      const valueAdded = responses[0]
+      const production = responses[1]
+      const consumption = responses[2]
 
-      
-    //   if(valueAdded.data.header == 200) 
-    //   {
-    //     //insert data in db
-    //     setAllSectorsValueAddedAreaFootprint(valueAdded.data.footprint)
-    //   }
+      if(valueAdded.data.header.code == 200) 
+      {
+        setAllSectorsValueAddedAreaFootprint(valueAdded.data.footprint)
+
+      }
   
 
-    //   if( production.data.header == 200){
-    //     setAllSectorsProductionFootprint(production.data.footprint)
-    //   }
+      if( production.data.header.code == 200){
+        setAllSectorsProductionFootprint(production.data.footprint)
+      }
 
-    //   if( consumption.data.header == 200){
+      if( consumption.data.header.code == 200){
 
-    //     //insert data in db
-    //     setAllSectorsProductionFootprint(consumption.data.footprint)
-    //   }
+        setAllSectorsConsumptionFootprint(consumption.data.footprint)
+      }
 
-    // })).catch(errors => {
-    //   console.log(errors);
-    // })
+    })).catch(errors => {
+      console.log(errors);
+    })
 
-
-    fetchEconomicAreaData("FRA", "GVA").then((footprint) =>
-      setAllSectorsValueAddedAreaFootprint(footprint)
-    );
-    fetchEconomicAreaData("FRA", "PRD").then((footprint) =>
-      setAllSectorsProductionFootprint(footprint)
-    );
-    fetchEconomicAreaData("FRA", "IC").then((footprint) =>
-      setAllSectorsConsumptionFootprint(footprint)
-    );
 
 
   }, []);
 
-  const fetchEconomicAreaData = async (area, flow) => {
-    let endpoint;
-    let response;
-    let data;
 
-    // comparative data
-    let footprint = new SocialFootprint();
-
-    // Available production
-    endpoint =
-      apiBaseUrl +
-      "/default?" +
-      "area=" +
-      area +
-      "&activity=00" +
-      "&flow=" +
-      flow;
-    response = await fetch(endpoint, { method: "get" });
-    data = await response.json();
-    if (data.header.statut == 200) footprint.updateAll(data.empreinteSocietale);
-    return footprint;
-  };
 
   const handleView = (indic) => {
     setIndic(indic);
     setView("result");
   };
-
-  const isPublicationAvailable =
-    Object.entries(
-      props.session.financialData.aggregates.revenue.footprint.indicators
-    ).filter(([_, indicator]) => indicator.value != null).length > 0;
 
   return (
     <Container fluid className="indicator-section">
@@ -115,11 +75,13 @@ const StatementSection = (props) => {
               Pour chaque indicateur, déclarez vos impacts directs et obtenez
               les éléments d'analyse.
             </p>
+       
             <IndicatorsList
               impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
-              comparativeFootprints={{
+              publish={()=> setPublicationAvailable(true)}
+              allSectorsFootprints={{
                 allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
                 allSectorsProductionAreaFootprint:
                   allSectorsProductionAreaFootprint,

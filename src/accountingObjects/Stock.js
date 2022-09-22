@@ -92,11 +92,10 @@ export class Stock {
     // Case - Fetch default data -------------------------------------------------------------------------- //
     if (this.initialState=="defaultData") 
     {
-      console.log("initialStateStock")
     
-      api
+     await api
       .get(
-        "defaultfootprint/?activity=" +
+        "defaultfootprint/?code=" +
           this.prevFootprintActivityCode +
           "&aggregate=PRD&area=" +
           this.prevFootprintAreaCode

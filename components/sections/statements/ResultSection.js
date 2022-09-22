@@ -37,12 +37,10 @@ import { exportIndicPDF } from "../../../src/writers/Export";
 
 import api from "../../../src/api";
 
-const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
-
 const ResultSection = (props) => {
 
   const [indic, setIndic] = useState(props.indic);
-  const [session, setSession] = useState(props.session);
+  const [session] = useState(props.session);
 
   const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision || "00");
 
@@ -53,7 +51,7 @@ const ResultSection = (props) => {
   const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(new SocialFootprint()
   );
 
-  const [comparativeFootprints] = useState(props.comparativeFootprints);
+  const [comparativeFootprints, setComparativeFootprint] = useState();
 
 
   const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
@@ -110,7 +108,6 @@ const ResultSection = (props) => {
       let productionSectorFootprint = await fetchDivisionData(division, "PRD");
       let valueAddedSectorFootprint = await fetchDivisionData(division, "GVA");
       let consumptionSectorFootprint = await fetchDivisionData(division, "IC");
-      console.log(productionSectorFootprint)
       setProductionSectorFootprint(productionSectorFootprint);
       setValueAddedSectorFootPrint(valueAddedSectorFootprint);
       setConsumptionSectorFootPrint(consumptionSectorFootprint);
@@ -124,6 +121,9 @@ const ResultSection = (props) => {
   };
 
   useEffect(async() => {
+
+    console.log(props)
+    setComparativeFootprint(props.comparativeFootprints);
 
     if (comparativeDivision != "00") {
 

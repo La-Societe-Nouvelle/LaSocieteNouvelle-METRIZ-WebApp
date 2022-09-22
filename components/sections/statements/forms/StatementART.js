@@ -2,15 +2,10 @@
 
 // React
 import React from "react";
-import FloatingLabel from "react-bootstrap/FloatingLabel";
-import Form from "react-bootstrap/Form";
 
 // Utils
-import {
-  printValueInput,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import {printValueInput, roundValue,valueOrDefault} from "../../../../src/utils/Utils";
+
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
@@ -33,10 +28,7 @@ export class StatementART extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      craftedProduction: valueOrDefault(
-        props.impactsData.craftedProduction,
-        ""
-      ),
+      craftedProduction: valueOrDefault(props.impactsData.craftedProduction,""),
       info: props.impactsData.comments.art || "",
     };
   }
@@ -52,8 +44,9 @@ export class StatementART extends React.Component {
   }
 
   render() {
+
     const { isValueAddedCrafted, netValueAdded } = this.props.impactsData;
-    const { craftedProduction, info } = this.state;
+    const { craftedProduction } = this.state;
 
     let isValid = craftedProduction != null && netValueAdded != null;
 
@@ -110,15 +103,6 @@ export class StatementART extends React.Component {
           </div>
         </div>
         <div className="form-group">
-          {/* <FloatingLabel controlId="floatingTextarea2" label="Comments">
-        <Form.Control
-          as="textarea"
-          value={info}
-          onChange={this.updateInfo}
-          onBlur={this.saveInfo}
-        />
-      </FloatingLabel> */}
-
           <label>Informations complémentaires</label>
           <textarea type="text" spellCheck="false" className="form-control" />
         </div>

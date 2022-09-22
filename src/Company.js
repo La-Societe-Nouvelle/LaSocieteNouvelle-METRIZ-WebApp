@@ -123,10 +123,11 @@ export class Company {
     // Case - Fetch footprint with id --------------------------------------------------------------------- //
     if (this.state == "siren" && /[0-9]{9}/.test(this.footprintId)) {
       // request
-      api.get("legalunitfootprint/" + this.footprintId).then((res) => {
+      await api.get("legalunitfootprint/" + this.footprintId).then((res) => {
         let status = res.data.header.code;
 
         if (status == 200) {
+          console.log(res.data);
           let data = res.data.legalUnit;
           // legal data --------------------------------------- //
           this.legalUnitName = data.denominationunitelegale;

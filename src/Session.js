@@ -28,6 +28,8 @@ import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFo
 
 export class Session {
   constructor(props) {
+    console.log("new session");
+    console.log(props)
     if (props == undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
 

@@ -25,6 +25,9 @@ export const IndicatorGraphs = ({
   const { financialData } = session;
   const { production, netValueAdded, intermediateConsumption } =
     financialData.aggregates;
+
+    console.log("test")
+    console.log(comparativeFootprints);
   const {
     allSectorsProductionAreaFootprint,
     allSectorsValueAddedAreaFootprint,

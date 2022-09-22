@@ -21,8 +21,9 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
     indic
   );
-  // PRODUCTION CHART
 
+  console.log(allSectorsProductionAreaFootprint.getIndicator(indic).value)
+  // PRODUCTION CHART
   const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
 
   const dataP = [

@@ -1,8 +1,6 @@
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import api from "./api";
 
-const apiBaseUrl = "https://systema-api.azurewebsites.net/api/v2";
-
 /* ---------- LEGAL UNIT DATA ---------- */
 export class LegalUnit {
   constructor(props) {
@@ -75,10 +73,13 @@ export class LegalUnit {
   fetchLegalUnitData = async () => {
     if (/[0-9]{9}/.test(this.siren)) {
       // request
-      api.get("legalunitfootprint/" + this.siren).then((res) => {
+      await api.get("legalunitfootprint/" + this.siren).then((res) => {
         let status = res.data.header.code;
 
         if (status == 200) {
+          console.log(status);
+          console.log(res.data);
+
           this.corporateName = res.data.legalUnit.denominationunitelegale;
           this.corporateHeadquarters =
             res.data.legalUnit.libellecommuneetablissement +

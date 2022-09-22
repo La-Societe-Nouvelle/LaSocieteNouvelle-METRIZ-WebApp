@@ -34,6 +34,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 import api from "../../../../src/api";
 
 const IndicatorsList = (props) => {
+
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
 
@@ -43,6 +44,8 @@ const IndicatorsList = (props) => {
     props.session.comparativeDivision
   );
   const [indicToExport, setIndicToExport] = useState();
+
+
   const [productionSectorFootprint, setProductionSectorFootprint] = useState(
     new SocialFootprint()
   );
@@ -55,6 +58,7 @@ const IndicatorsList = (props) => {
 
   useEffect(async () => {
 
+    console.log(props.allSectorsFootprints);
 
     if (comparativeDivision != "00") {
 
@@ -201,7 +205,7 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-      {validations.length > 0 &&
+      {/* {validations.length > 0 &&
         validations.map((indic, key) => (
           <GraphsPDF
             key={key}
@@ -212,7 +216,7 @@ const IndicatorsList = (props) => {
             valueAddedSectorFootprint={valueAddedSectorFootprint}
             consumptionSectorFootprint={consumptionSectorFootprint}
           />
-        ))}
+        ))} */}
       {popUp == "division" && (
         <ChangeDivision
           indic={indicToExport}
@@ -430,9 +434,7 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
-                    {
-                        console.log(props.impactsData.greenhousesGazEmissions)
-                      }
+            
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
