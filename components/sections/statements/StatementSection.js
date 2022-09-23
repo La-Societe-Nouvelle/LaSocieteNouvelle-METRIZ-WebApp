@@ -20,13 +20,14 @@ const StatementSection = (props) => {
   const [allSectorsValueAddedAreaFootprint,setAllSectorsValueAddedAreaFootprint] = useState(new SocialFootprint());
   const [allSectorsConsumptionFootprint, setAllSectorsConsumptionFootprint] = useState(new SocialFootprint());
 
-  useEffect(() => {
+  useEffect(async() => {
     
-    const getAllValueAdded =  api.get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA");
-    const getAllProduction = api.get("defaultfootprint/?activity=00&aggregate=PRD&area=FRA");
-    const getAllConsumption = api.get("defaultfootprint/?activity=00&aggregate=IC&area=FRA"); 
+    const getAllValueAdded =  api.get("defaultfootprint/?code=00&aggregate=GVA&area=FRA");
+    const getAllProduction = api.get("defaultfootprint/?code=00&aggregate=PRD&area=FRA");
+    const getAllConsumption = api.get("defaultfootprint/?code=00&aggregate=IC&area=FRA"); 
 
-    axios.all([getAllValueAdded, getAllProduction, getAllConsumption]).then(axios.spread((...responses) => {
+
+   await axios.all([getAllValueAdded, getAllProduction, getAllConsumption]).then(axios.spread((...responses) => {
      
       const valueAdded = responses[0]
       const production = responses[1]
@@ -34,28 +35,36 @@ const StatementSection = (props) => {
 
       if(valueAdded.data.header.code == 200) 
       {
-        setAllSectorsValueAddedAreaFootprint(valueAdded.data.footprint)
+        let valueAddedFootprint = new SocialFootprint();
+
+        valueAddedFootprint.updateAll(valueAdded.data.footprint);
+
+        setAllSectorsValueAddedAreaFootprint(valueAddedFootprint);
 
       }
-  
 
       if( production.data.header.code == 200){
-        setAllSectorsProductionFootprint(production.data.footprint)
+        let productionFootprint = new SocialFootprint();
+        productionFootprint.updateAll(production.data.footprint);
+        setAllSectorsProductionFootprint(productionFootprint);
+
       }
 
       if( consumption.data.header.code == 200){
 
-        setAllSectorsConsumptionFootprint(consumption.data.footprint)
+        let consumptionFootprint = new SocialFootprint();
+
+        consumptionFootprint.updateAll(consumption.data.footprint);
+
+        setAllSectorsConsumptionFootprint(consumptionFootprint);
       }
 
     })).catch(errors => {
       console.log(errors);
     })
 
-
-
+    //
   }, []);
-
 
 
   const handleView = (indic) => {
@@ -65,6 +74,7 @@ const StatementSection = (props) => {
 
   return (
     <Container fluid className="indicator-section">
+  
       {view == "statement" ? (
         <>
           <section className="step">
@@ -75,7 +85,7 @@ const StatementSection = (props) => {
               Pour chaque indicateur, déclarez vos impacts directs et obtenez
               les éléments d'analyse.
             </p>
-       
+  
             <IndicatorsList
               impactsData={props.session.impactsData}
               session={props.session}
@@ -126,7 +136,7 @@ const StatementSection = (props) => {
             session={props.session}
             indic={indic}
             goBack={() => setView("statement")}
-            comparativeFootprints={{
+            allSectorsFootprints={{
               allSectorsConsumptionFootprint: allSectorsConsumptionFootprint,
               allSectorsProductionAreaFootprint:
                 allSectorsProductionAreaFootprint,

@@ -15,19 +15,16 @@ import { Col, Row, Table } from "react-bootstrap";
 
 
 export const IndicatorGraphs = ({
-  session,
-  indic,
   comparativeFootprints,
-  productionSectorFootprint,
-  valueAddedSectorFootprint,
+  financialData,
+  indic, 
   consumptionSectorFootprint,
-}) => {
-  const { financialData } = session;
-  const { production, netValueAdded, intermediateConsumption } =
-    financialData.aggregates;
+  productionSectorFootprint,
+  valueAddedSectorFootprint}) => {
 
-    console.log("test")
-    console.log(comparativeFootprints);
+  const { production, netValueAdded, intermediateConsumption } = financialData.aggregates;
+
+
   const {
     allSectorsProductionAreaFootprint,
     allSectorsValueAddedAreaFootprint,
@@ -40,8 +37,9 @@ export const IndicatorGraphs = ({
 
   const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
 
+
   const dataP = [
-    roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value, precision),
+    roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
     roundNumber(production.footprint.getIndicator(indic).value, precision),
     roundNumber(productionSectorFootprint.getIndicator(indic).value, precision),
   ];
@@ -61,7 +59,7 @@ export const IndicatorGraphs = ({
         backgroundColor: [
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
+          "RGB(176, 185, 247)",
         ],
       },
     ],
@@ -137,7 +135,7 @@ export const IndicatorGraphs = ({
         backgroundColor: [
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
+          "RGB(176, 185, 247)",
         ],
       },
     ],
@@ -219,7 +217,7 @@ export const IndicatorGraphs = ({
         backgroundColor: [
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
+          "RGB(176, 185, 247)",
         ],
       },
     ],
@@ -265,7 +263,6 @@ export const IndicatorGraphs = ({
     },
   };
 
- 
 
   return (
     <>
@@ -332,9 +329,6 @@ export const IndicatorGraphs = ({
             )}
           </tr>
           <tr>
-            {
-              console.log(precision)
-            }
             <td>Consommations intermédiaires</td>
             <td className="short right">
               {printValue(

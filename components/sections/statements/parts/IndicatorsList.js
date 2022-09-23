@@ -32,9 +32,9 @@ import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
 import ChangeDivision from "../../../popups/ChangeDivision";
 import api from "../../../../src/api";
+import axios from "axios";
 
 const IndicatorsList = (props) => {
-
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
@@ -43,7 +43,7 @@ const IndicatorsList = (props) => {
   );
   const [indicToExport, setIndicToExport] = useState();
 
-
+  const [comparativeFootprints, setComparativeFootprints] = useState();
   const [productionSectorFootprint, setProductionSectorFootprint] = useState(
     new SocialFootprint()
   );
@@ -56,36 +56,70 @@ const IndicatorsList = (props) => {
 
   useEffect(async () => {
 
-    if (comparativeDivision != "00") {
+  
+    // SET ALL SECTORS FOOTPRINTS
+    setComparativeFootprints(props.allSectorsFootprints);
 
-      let productionSectorFootprint = await fetchDivisionData(
-        comparativeDivision,
-        "PRD"
-      );
-      let valueAddedSectorFootprint = await fetchDivisionData(
-        comparativeDivision,
-        "GVA"
-      );
+    // SET COMPARATIVE DIVISIONS  FOOTPRINTS
+    fetchComparativeDivision();
 
-      let consumptionSectorFootprint = await fetchDivisionData(
-        comparativeDivision,
-        "IC"
-      );
-      setProductionSectorFootprint(productionSectorFootprint);
-      setValueAddedSectorFootPrint(valueAddedSectorFootprint);
-      setConsumptionSectorFootPrint(consumptionSectorFootprint);
-      props.session.comparativeDivision = comparativeDivision;
-    } else {
-      setProductionSectorFootprint(new SocialFootprint());
-      setValueAddedSectorFootPrint(new SocialFootprint());
-      setConsumptionSectorFootPrint(new SocialFootprint());
-    }
-
-    if(validations.length > 0 ) {
+    if (validations.length > 0) {
       props.publish();
     }
-  }, [comparativeDivision, validations]);
+  }, [validations, comparativeDivision]);
 
+  // SET COMPARATIVE DIVISIONS  FOOTPRINTS
+
+  const fetchComparativeDivision = async () => {
+
+    const getValueAdded = api.get(
+      "defaultfootprint/?code=" +
+        comparativeDivision +
+        "&aggregate=GVA&area=FRA"
+    );
+    const getProduction = api.get(
+      "defaultfootprint/?code=" +
+        comparativeDivision +
+        "&aggregate=PRD&area=FRA"
+    );
+    const getConsumption = api.get(
+      "defaultfootprint/?code=" + comparativeDivision + "&aggregate=IC&area=FRA"
+    );
+
+    await axios
+      .all([getValueAdded, getProduction, getConsumption])
+      .then(
+        axios.spread((...responses) => {
+          const valueAdded = responses[0];
+          const production = responses[1];
+          const consumption = responses[2];
+
+          if (valueAdded.data.header.code == 200) {
+            let valueAddedFootprint = new SocialFootprint();
+            valueAddedFootprint.updateAll(valueAdded.data.footprint);
+
+            setValueAddedSectorFootPrint(valueAddedFootprint);
+          }
+
+          if (production.data.header.code == 200) {
+            let productionFootprint = new SocialFootprint();
+            productionFootprint.updateAll(production.data.footprint);
+
+            setProductionSectorFootprint(productionFootprint);
+          }
+
+          if (consumption.data.header.code == 200) {
+            let consumptionFootprint = new SocialFootprint();
+            consumptionFootprint.updateAll(consumption.data.footprint);
+
+            setConsumptionSectorFootPrint(consumptionFootprint);
+          }
+        })
+      )
+      .catch((errors) => {
+        console.log(errors);
+      });
+  };
   /* ----- POP-UP ----- */
 
   const triggerPopup = (indic) => {
@@ -96,13 +130,10 @@ const IndicatorsList = (props) => {
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
-    
     setUpdatedIndic();
-
 
     // get new value
     let nextIndicator = props.session.getNetValueAddedIndicator(indic);
-
 
     if (
       nextIndicator !==
@@ -121,7 +152,6 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
-
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
@@ -131,32 +161,14 @@ const IndicatorsList = (props) => {
     props.session.validations.push(indic);
     // update footprint
     await props.session.updateIndicator(indic);
-    
-    setUpdatedIndic(indic);
 
+    setUpdatedIndic(indic);
   };
 
   const valueCreation = ["eco", "art", "soc"];
   const socialFootprint = ["dis", "geq", "knw"];
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
 
-
-  const fetchDivisionData = async (division, aggregate) => {
-
-    // comparative data
-    let footprint = new SocialFootprint();
-    api
-    .get("defaultfootprint/?code="+division+"&aggregate="+aggregate+"&area=FRA")
-    .then((res) => {
-      let status = res.data.header.code;
-      if (status == 200) {
-        let data = res.data;
-        footprint.updateAll(data.footprint);
-      } 
-    });
-
-    return footprint;
-  };
 
   const updateDivision = (division) => {
     setComparativeDivision(division);
@@ -184,35 +196,35 @@ const IndicatorsList = (props) => {
 
   const SuccessMessage = () => {
     return (
-      <p className="mt-4 small-text alert alert-success">✓ La déclaration des impacts a été mise à jour.</p>
+      <p className="mt-4 small-text alert alert-success">
+        ✓ La déclaration des impacts a été mise à jour.
+      </p>
     );
   };
 
   const IconWarning = () => {
-    return(
-      <span
-      className="icon-warning"
-      title="Informations à valider"
-    >
-      <i className=" bi bi-exclamation-triangle me-0"></i>
-    </span>
+    return (
+      <span className="icon-warning" title="Informations à valider">
+        <i className=" bi bi-exclamation-triangle me-0"></i>
+      </span>
     );
   };
 
   return (
     <>
-      {/* {validations.length > 0 &&
+
+      {comparativeFootprints && validations.length > 0 &&
         validations.map((indic, key) => (
           <GraphsPDF
             key={key}
-            session={props.session}
+            financialData={props.session.financialData}
             indic={indic}
-            comparativeFootprints={props.comparativeFootprints}
+            comparativeFootprints={comparativeFootprints}
             productionSectorFootprint={productionSectorFootprint}
             valueAddedSectorFootprint={valueAddedSectorFootprint}
             consumptionSectorFootprint={consumptionSectorFootprint}
           />
-        ))} */}
+        ))}
       {popUp == "division" && (
         <ChangeDivision
           indic={indicToExport}
@@ -234,7 +246,6 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
-          
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                     </ArrowToggle>
@@ -261,7 +272,6 @@ const IndicatorsList = (props) => {
               </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
-   
                   {(() => {
                     switch (key) {
                       case "eco":
@@ -307,7 +317,6 @@ const IndicatorsList = (props) => {
         {Object.entries(metaIndics)
           .filter((indic) => indic.some((el) => socialFootprint.includes(el)))
           .map(([key, value]) => (
-            
             <Card key={key}>
               <Card.Header>
                 <div className="d-flex justify-content-between align-items-center">
@@ -430,19 +439,14 @@ const IndicatorsList = (props) => {
                 <div className="d-flex justify-content-between align-items-center">
                   <div>
                     <ArrowToggle eventKey={key}>
-            
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
                         props.impactsData.greenhousesGazEmissions != 0 &&
-                        !validations.includes(key) && (
-                        <IconWarning />
-                        )}
+                        !validations.includes(key) && <IconWarning />}
                       {key == "nrg" &&
                         props.impactsData.energyConsumption != 0 &&
-                        !validations.includes(key) && (
-                          <IconWarning />
-                        )}
+                        !validations.includes(key) && <IconWarning />}
                     </ArrowToggle>
                   </div>
                   <div>
@@ -467,7 +471,6 @@ const IndicatorsList = (props) => {
               </Card.Header>
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
-
                   {(() => {
                     switch (key) {
                       case "ghg":
@@ -486,7 +489,7 @@ const IndicatorsList = (props) => {
                               onValidate={() => validateIndicator("ghg")}
                               onGoBack={handleClose}
                               popUp={popUp}
-                              handleClose={handleClose} 
+                              handleClose={handleClose}
                               title="Outil de mesure des émissions"
                             />
                           </>

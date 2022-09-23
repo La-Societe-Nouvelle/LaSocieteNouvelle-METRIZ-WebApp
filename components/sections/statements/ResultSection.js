@@ -36,112 +36,115 @@ import { analysisTextWriterWAT } from "../../../src/writers/analysis/analysisTex
 import { exportIndicPDF } from "../../../src/writers/Export";
 
 import api from "../../../src/api";
+import axios from "axios";
 
 const ResultSection = (props) => {
-
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
 
-  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision || "00");
-
-  const [productionSectorFootprint, setProductionSectorFootprint] = useState(new SocialFootprint()
+  const [comparativeDivision, setComparativeDivision] = useState(
+    props.session.comparativeDivision || "00"
   );
-  const [valueAddedSectorFootprint, setValueAddedSectorFootPrint] = useState(new SocialFootprint()
+  const [productionSectorFootprint, setProductionSectorFootprint] = useState(
+    new SocialFootprint()
   );
-  const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(new SocialFootprint()
+  const [valueAddedSectorFootprint, setValueAddedSectorFootPrint] = useState(
+    new SocialFootprint()
+  );
+  const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(
+    new SocialFootprint()
   );
 
-  const [comparativeFootprints, setComparativeFootprint] = useState();
+  const [comparativeFootprints, setComparativeFootprints] = useState(
+    props.allSectorsFootprints
+  );
 
-
-  const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
+  const [printGrossImpact] = useState([
+    "ghg",
+    "haz",
+    "mat",
+    "nrg",
+    "was",
+    "wat",
+  ]);
   const divisionsOptions = [];
 
-      //Divisions select options
-      Object.entries(divisions)
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .map(([value, label]) =>
-        divisionsOptions.push({ value: value, label: value + " - " + label })
-      );
+  //Divisions select options
+  Object.entries(divisions)
+    .sort((a, b) => parseInt(a) - parseInt(b))
+    .map(([value, label]) =>
+      divisionsOptions.push({ value: value, label: value + " - " + label })
+    );
 
   const { intermediateConsumption, capitalConsumption, netValueAdded } = props.session.financialData.aggregates;
 
-
-  const fetchDivisionData = async (division, aggregate) => {
-
-    // comparative data
-    let footprint = new SocialFootprint();
-
-
-    await api
-    .get(
-      "defaultfootprint/?activity=" +
-        division +
-        "&aggregate=" +
-        aggregate +
-        "&area=FRA"
-    )
-    .then((res) => {
-      let status = res.data.header.code;
-      if (status == 200) {
-        let data = res.data;
-        
-        footprint.updateAll(data.footprint);
-      }
-    });
-
-
-    return footprint;
-  };
-
   const changeComparativeDivision = async (event) => {
-
     let division = event.value;
 
     setComparativeDivision(division);
 
-    // update session 
+    await fetchComparativeDivision();
+    // update session
     props.session.comparativeDivision = division;
-
-    if (division != "00") {
-
-      let productionSectorFootprint = await fetchDivisionData(division, "PRD");
-      let valueAddedSectorFootprint = await fetchDivisionData(division, "GVA");
-      let consumptionSectorFootprint = await fetchDivisionData(division, "IC");
-      setProductionSectorFootprint(productionSectorFootprint);
-      setValueAddedSectorFootPrint(valueAddedSectorFootprint);
-      setConsumptionSectorFootPrint(consumptionSectorFootprint);
-
-    } else {
-      setProductionSectorFootprint(new SocialFootprint());
-      setValueAddedSectorFootPrint(new SocialFootprint());
-      setConsumptionSectorFootPrint(new SocialFootprint());
-    }
-
   };
 
-  useEffect(async() => {
+  useEffect(async () => {
+    // SET ALL SECTORS FOOTPRINTS
+    fetchComparativeDivision();
+    setComparativeFootprints(props.allSectorsFootprints);
+  }, [comparativeDivision]);
 
-    console.log(props)
-    setComparativeFootprint(props.comparativeFootprints);
+  const fetchComparativeDivision = async () => {
+    // SET COMPARATIVE DIVISIONS  FOOTPRINTS
 
-    if (comparativeDivision != "00") {
+    const getValueAdded = api.get(
+      "defaultfootprint/?code=" +
+        comparativeDivision +
+        "&aggregate=GVA&area=FRA"
+    );
+    const getProduction = api.get(
+      "defaultfootprint/?code=" +
+        comparativeDivision +
+        "&aggregate=PRD&area=FRA"
+    );
+    const getConsumption = api.get(
+      "defaultfootprint/?code=" + comparativeDivision + "&aggregate=IC&area=FRA"
+    );
 
-      let productionSectorFootprint = await fetchDivisionData(comparativeDivision, "PRD");
-      let valueAddedSectorFootprint = await fetchDivisionData(comparativeDivision, "GVA");
-      let consumptionSectorFootprint = await fetchDivisionData(comparativeDivision, "IC");
+    await axios
+      .all([getValueAdded, getProduction, getConsumption])
+      .then(
+        axios.spread((...responses) => {
+          const valueAdded = responses[0];
+          const production = responses[1];
+          const consumption = responses[2];
 
-      setProductionSectorFootprint(productionSectorFootprint);
-      setValueAddedSectorFootPrint(valueAddedSectorFootprint);
-      setConsumptionSectorFootPrint(consumptionSectorFootprint);
+          if (valueAdded.data.header.code == 200) {
+            let valueAddedFootprint = new SocialFootprint();
+            valueAddedFootprint.updateAll(valueAdded.data.footprint);
 
-    } else {
-      setProductionSectorFootprint(new SocialFootprint());
-      setValueAddedSectorFootPrint(new SocialFootprint());
-      setConsumptionSectorFootPrint(new SocialFootprint());
-    }
+            setValueAddedSectorFootPrint(valueAddedFootprint);
+          }
 
-  }, [indic]);
+          if (production.data.header.code == 200) {
+            let productionFootprint = new SocialFootprint();
+            productionFootprint.updateAll(production.data.footprint);
+
+            setProductionSectorFootprint(productionFootprint);
+          }
+
+          if (consumption.data.header.code == 200) {
+            let consumptionFootprint = new SocialFootprint();
+            consumptionFootprint.updateAll(consumption.data.footprint);
+
+            setConsumptionSectorFootPrint(consumptionFootprint);
+          }
+        })
+      )
+      .catch((errors) => {
+        console.log(errors);
+      });
+  };
 
   return (
     <>
@@ -155,25 +158,29 @@ const ResultSection = (props) => {
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
 
-           {
-            session.validations.length > 1 ? 
+          {session.validations.length > 1 ? (
             <DropdownButton id="indic-button" title="Autres résultats">
-            {Object.entries(metaIndics).map(([key, value]) => {
-              if (session.validations.includes(key) && key != indic) {
-                return (
-                  <Dropdown.Item className="small-text" key={key} onClick={() => setIndic(key)}>
-                    {value.libelle}
-                  </Dropdown.Item>
-                );
-              }
-            })}
-          </DropdownButton> 
-          :
-          <Button id="indic-button" disabled > {metaIndics[indic].libelle} </Button>
-   
-         
-           }
- 
+              {Object.entries(metaIndics).map(([key, value]) => {
+                if (session.validations.includes(key) && key != indic) {
+                  return (
+                    <Dropdown.Item
+                      className="small-text"
+                      key={key}
+                      onClick={() => setIndic(key)}
+                    >
+                      {value.libelle}
+                    </Dropdown.Item>
+                  );
+                }
+              })}
+            </DropdownButton>
+          ) : (
+            <Button id="indic-button" disabled>
+              {" "}
+              {metaIndics[indic].libelle}{" "}
+            </Button>
+          )}
+
           <Button
             variant="secondary"
             onClick={() =>
@@ -184,7 +191,7 @@ const ResultSection = (props) => {
                 "#Production",
                 "#Consumption",
                 "#Value",
-             printGrossImpact.includes(indic) ? "#PieChart" : "" 
+                printGrossImpact.includes(indic) ? "#PieChart" : ""
               )
             }
           >
@@ -193,38 +200,38 @@ const ResultSection = (props) => {
         </div>
       </div>
       <section className="step">
-      <Row>
-        <Col lg={printGrossImpact.includes(indic) ?  "8" : "12" }>
-          <div className="d-flex align-items-center mb-4 rapport-indic">
-            <Image
-              src={"/resources/icon-ese-bleues/" + indic + ".png"}
-              className="icon-ese me-2"
-            />
-            <h3>{metaIndics[indic].libelle}</h3>
-          </div>
+        <Row>
+          <Col lg={printGrossImpact.includes(indic) ? "8" : "12"}>
+            <div className="d-flex align-items-center mb-4 rapport-indic">
+              <Image
+                src={"/resources/icon-ese-bleues/" + indic + ".png"}
+                className="icon-ese me-2"
+              />
+              <h3>{metaIndics[indic].libelle}</h3>
+            </div>
 
-          <Tabs
-            defaultActiveKey="mainAggregates"
-            transition={false}
-            id="noanim-tab-example"
-            className="mb-3"
-          >
-            <Tab
-              eventKey="mainAggregates"
-              title=" Soldes intermédiaires de gestion"
+            <Tabs
+              defaultActiveKey="mainAggregates"
+              transition={false}
+              id="noanim-tab-example"
+              className="mb-3"
             >
-              <IndicatorMainAggregatesTable session={session} indic={indic} />
-            </Tab>
-            <Tab
-              eventKey="expensesAccounts"
-              title=" Détails - Comptes de charges"
-            >
-              <IndicatorExpensesTable session={session} indic={indic} />
-            </Tab>
-          </Tabs>
-        </Col>
+              <Tab
+                eventKey="mainAggregates"
+                title=" Soldes intermédiaires de gestion"
+              >
+                <IndicatorMainAggregatesTable session={session} indic={indic} />
+              </Tab>
+              <Tab
+                eventKey="expensesAccounts"
+                title=" Détails - Comptes de charges"
+              >
+                <IndicatorExpensesTable session={session} indic={indic} />
+              </Tab>
+            </Tabs>
+          </Col>
           {printGrossImpact.includes(indic) && (
-        <Col>
+            <Col>
               <h3 className="text-center">
                 Répartition des impacts bruts (en %)
               </h3>
@@ -241,71 +248,66 @@ const ResultSection = (props) => {
                   ].getGrossImpact(netValueAdded.amount)}
                 />
               </div>
-        </Col>
+            </Col>
           )}
-      </Row>
+        </Row>
       </section>
-        <section className="step">
-      <h3>Comparaison par activité</h3>
+      <section className="step">
+        <h3>Comparaison par activité</h3>
 
-      <Select
-      className="mb-3 small-text"
-
-                      defaultValue={{
-                        label:
-                          comparativeDivision +
-                          " - " +
-                          divisions[comparativeDivision],
-                        value: comparativeDivision,
-                      }}
-                      placeholder={"Choisissez un secteur d'activité"}
-                      options={divisionsOptions}
-                      onChange={changeComparativeDivision}
-                    />
-
-      <div className="mt-5">
- 
-        <IndicatorGraphs
-          session={session}
-          indic={indic}
-          comparativeFootprints={comparativeFootprints}
-          productionSectorFootprint={productionSectorFootprint}
-          valueAddedSectorFootprint={valueAddedSectorFootprint}
-          consumptionSectorFootprint={consumptionSectorFootprint}
-
+        <Select
+          className="mb-3 small-text"
+          defaultValue={{
+            label: comparativeDivision + " - " + divisions[comparativeDivision],
+            value: comparativeDivision,
+          }}
+          placeholder={"Choisissez un secteur d'activité"}
+          options={divisionsOptions}
+          onChange={changeComparativeDivision}
         />
-      </div>
+        <div className="mt-5">
+          {productionSectorFootprint &&
+          valueAddedSectorFootprint &&
+          consumptionSectorFootprint ? (
+            <IndicatorGraphs
+              financialData={session.financialData}
+              indic={indic}
+              comparativeFootprints={comparativeFootprints}
+              productionSectorFootprint={productionSectorFootprint}
+              valueAddedSectorFootprint={valueAddedSectorFootprint}
+              consumptionSectorFootprint={consumptionSectorFootprint}
+            />
+          ) : null}
+        </div>
       </section>
       <section className="step">
-
-      <h3>Note d'analyse</h3>
-      <div id="analyse">
-        <Analyse indic={indic} session={session} />
-      </div>
-                      </section>
+        <h3>Note d'analyse</h3>
+        <div id="analyse">
+          <Analyse indic={indic} session={session} />
+        </div>
+      </section>
       <section className="step">
-
-      <div className="d-flex justify-content-end">
-        <Button variant="light" onClick={props.goBack}>
-          <i className="bi bi-chevron-left"></i> Retour
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={() =>
-            exportIndicPDF(
-              indic,
-              session,
-              comparativeDivision,
-              "#Production",
-              "#Consumption",
-              "#Value",
-              printGrossImpact.includes(indic) ? "#PieChart" : "" 
+        <div className="d-flex justify-content-end">
+          <Button variant="light" onClick={props.goBack}>
+            <i className="bi bi-chevron-left"></i> Retour
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() =>
+              exportIndicPDF(
+                indic,
+                session,
+                comparativeDivision,
+                "#Production",
+                "#Consumption",
+                "#Value",
+                printGrossImpact.includes(indic) ? "#PieChart" : ""
               )
-          }
-        >
-          Télécharger le rapport <i className="bi bi-download"></i>
-        </Button>
-      </div>
+            }
+          >
+            Télécharger le rapport <i className="bi bi-download"></i>
+          </Button>
+        </div>
       </section>
     </>
   );

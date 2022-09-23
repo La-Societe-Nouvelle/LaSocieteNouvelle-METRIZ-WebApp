@@ -8,24 +8,29 @@ Chart.register(ChartDataLabels);
 import { Bar } from "react-chartjs-2";
 import PieGraph from "./PieGraph";
 
-export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSectorFootprint,valueAddedSectorFootprint,consumptionSectorFootprint }) => {
-  const { financialData } = session;
+export const GraphsPDF = ({
+  comparativeFootprints,
+  financialData,
+  indic, 
+  consumptionSectorFootprint,
+  productionSectorFootprint,
+  valueAddedSectorFootprint}) => {
+ 
   const { capitalConsumption, netValueAdded, intermediateConsumption, production } = financialData.aggregates;
-  
   const {
 
     allSectorsProductionAreaFootprint,
     allSectorsValueAddedAreaFootprint,
     allSectorsConsumptionFootprint,
   } = comparativeFootprints;
+
+
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
     indic
   );
-
-  console.log(allSectorsProductionAreaFootprint.getIndicator(indic).value)
-  // PRODUCTION CHART
-  const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
-
+ 
+  // // PRODUCTION CHART
+ const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
   const dataP = [
     roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
     roundNumber(production.footprint.getIndicator(indic).value),
@@ -48,7 +53,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
         backgroundColor: [
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
+          "RGB(176, 185, 247)",
         ],
       },
     ],
@@ -127,7 +132,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
         backgroundColor: [
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
+          "RGB(176, 185, 247)",
         ],
       },
     ],
@@ -215,7 +220,7 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
         backgroundColor: [
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
+          "RGB(176, 185, 247)",
         ],
       },
     ],
@@ -268,7 +273,9 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
   };
 
   return (
+
     <div className="hidden">
+
       {printGrossImpact && (
         <div className="piechart-container">
           
@@ -296,8 +303,8 @@ export const GraphsPDF = ({ session, indic, comparativeFootprints, productionSec
             id={"print-Production-" + indic}
             data={dataProduction}
             options={optionsP}
-          />
-        </Col>
+            />
+         </Col>
         <Col>
           <Bar
             id={"print-Consumption-" + indic}
