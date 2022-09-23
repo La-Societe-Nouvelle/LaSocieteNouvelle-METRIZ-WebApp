@@ -127,7 +127,6 @@ export class Company {
         let status = res.data.header.code;
 
         if (status == 200) {
-          console.log(res.data);
           let data = res.data.legalUnit;
           // legal data --------------------------------------- //
           this.legalUnitName = data.denominationunitelegale;
@@ -167,15 +166,12 @@ export class Company {
     }
     // Case - Fetch default data -------------------------------------------------------------------------- //
     else if (this.state == "default") {
-      api
-        .get(
-          "defaultfootprint/?activity=" +
-            this.footprintActivityCode +
-            "&aggregate=PRD&area=" +
-            this.footprintAreaCode
-        )
+
+      await api
+        .get("defaultfootprint/?code="+this.footprintActivityCode+"&aggregate=PRD&area="+this.footprintAreaCode)
         .then((res) => {
           let status = res.data.header.code;
+          console.log(status);
 
           if (status == 200) {
             let data = res.data;
