@@ -37,8 +37,6 @@ const IndicatorsList = (props) => {
 
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
-
-
   const [popUp, setPopUp] = useState();
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision
@@ -57,8 +55,6 @@ const IndicatorsList = (props) => {
   );
 
   useEffect(async () => {
-
-    console.log(props.allSectorsFootprints);
 
     if (comparativeDivision != "00") {
 
@@ -150,7 +146,7 @@ const IndicatorsList = (props) => {
     // comparative data
     let footprint = new SocialFootprint();
     api
-    .get("defaultfootprint/?activity="+division+"&aggregate="+aggregate+"&area=FRA")
+    .get("defaultfootprint/?code="+division+"&aggregate="+aggregate+"&area=FRA")
     .then((res) => {
       let status = res.data.header.code;
       if (status == 200) {
