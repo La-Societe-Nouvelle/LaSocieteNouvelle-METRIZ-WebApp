@@ -20,8 +20,6 @@ export class LegalUnit {
     this.isEmployeur = props.isEmployeur || null;
     this.trancheEffectifs = props.trancheEffectifs || "";
     this.isEconomieSocialeSolidaire = props.isEconomieSocialeSolidaire || null;
-    this.isActivitesArtisanales = props.isActivitesArtisanales || null;
-    this.isLocalisationEtranger = props.isLocalisationEtranger || null;
 
     // Accounting period
     this.year = props.year || "";
@@ -77,23 +75,19 @@ export class LegalUnit {
         let status = res.data.header.code;
 
         if (status == 200) {
-          console.log(status);
-          console.log(res.data);
 
-          this.corporateName = res.data.legalUnit.denominationunitelegale;
+          this.corporateName = res.data.legalUnit.denomination;
           this.corporateHeadquarters =
-            res.data.legalUnit.libellecommuneetablissement +
+            res.data.legalUnit.communeSiege +
             " (" +
-            res.data.legalUnit.codepostaletablissement +
+            res.data.legalUnit.codePostalSiege +
             ")";
           this.areaCode = "FRA";
-          this.activityCode = res.data.legalUnit.activiteprincipaleunitelegale;
-          // TO DO
-          // this.isEmployeur = res.data.legalUnit.isEmployeur;
-          // this.trancheEffectifs = res.data.legalUnit.trancheEffectifs;
-          // this.isEconomieSocialeSolidaire = res.data.legalUnit.isEconomieSocialeSolidaire;
-          // this.isActivitesArtisanales = res.data.legalUnit.isActivitesArtisanales;
-          // this.isLocalisationEtranger = res.data.legalUnit.isLocalisationEtranger;
+          this.activityCode = res.data.legalUnit.activitePrincipaleCode;
+
+          this.isEmployeur = res.data.legalUnit.caractereEmployeur;
+          this.trancheEffectifs = res.data.legalUnit.trancheEffectifs;
+          this.isEconomieSocialeSolidaire = res.data.legalUnit.economieSocialeSolidaire;
 
           this.dataFetched = true;
         } else {
@@ -104,8 +98,6 @@ export class LegalUnit {
           this.isEmployeur = null;
           this.trancheEffectifs = null;
           this.isEconomieSocialeSolidaire = null;
-          this.isActivitesArtisanales = null;
-          this.isLocalisationEtranger = null;
           this.dataFetched = false;
         }
         this.status = status;
@@ -118,8 +110,6 @@ export class LegalUnit {
       this.isEmployeur = null;
       this.trancheEffectifs = null;
       this.isEconomieSocialeSolidaire = null;
-      this.isActivitesArtisanales = null;
-      this.isLocalisationEtranger = null;
       this.status = null;
       this.dataFetched = false;
     }
@@ -128,14 +118,13 @@ export class LegalUnit {
   // Fetch consumption CSF data
   fetchFootprintsReferences = async () => {
 
-
     // Fetch sector footprints
     if (this.activityCode != null) {
       let division = this.activityCode.substring(0, 2);
 
-      api
+      await api
         .get(
-          "defaultfootprint/?activity=" + division + "&aggregate=PRD&area=FRA"
+          "defaultfootprint/?code=" + division + "&aggregate=PRD&area=FRA"
         )
         .then((res) => {
           let status = res.data.header.code;
@@ -146,12 +135,12 @@ export class LegalUnit {
           } else {
             this.productionSectorFootprint = new SocialFootprint();
           }
-        });
+        }).catch((err)=>{console.log(err)});
 
       // Value Added
-      api
+     await api
         .get(
-          "defaultfootprint/?activity=" + division + "&aggregate=GVA&area=FRA"
+          "defaultfootprint/?code=" + division + "&aggregate=GVA&area=FRA"
         )
         .then((res) => {
           let status = res.data.header.code;
@@ -163,12 +152,12 @@ export class LegalUnit {
             this.valueAddedSectorFootprint = new SocialFootprint();
           }
           this.status = status;
-        });
+        }).catch((err)=>{console.log(err)});
 
       // Intermediate Consumption
-      api
+     await api
         .get(
-          "defaultfootprint/?activity=" + division + "&aggregate=IC&area=FRA"
+          "defaultfootprint/?code=" + division + "&aggregate=IC&area=FRA"
         )
         .then((res) => {
           let status = res.data.header.code;
@@ -180,7 +169,7 @@ export class LegalUnit {
             this.consumptionSectorFootprint = new SocialFootprint();
           }
           this.status = status;
-        });
+        }).catch((err)=>{console.log(err)});
     } else {
       this.productionSectorFootprint = new SocialFootprint();
       this.valueAddedAreaFootprint = new SocialFootprint();
@@ -191,8 +180,8 @@ export class LegalUnit {
 
     // PIB+IMP FRA (Available production in FRA)
 
-    api
-      .get("defaultfootprint/?activity=00&aggregate=PRD&area=FRA")
+    await api
+      .get("defaultfootprint/?code=00&aggregate=PRD&area=FRA")
       .then((res) => {
         let status = res.data.header.code;
 
@@ -202,12 +191,12 @@ export class LegalUnit {
         } else {
           this.productionAreaFootprint = new SocialFootprint();
         }
-      });
+      }).catch((err)=>{console.log(err)});
 
     // PIB FRA (Value Added in France)
 
     api
-      .get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA")
+      .get("defaultfootprint/?code=00&aggregate=GVA&area=FRA")
       .then((res) => {
         let status = res.data.header.code;
 
@@ -217,7 +206,7 @@ export class LegalUnit {
         } else {
           this.valueAddedAreaFootprint = new SocialFootprint();
         }
-      });
+      }).catch((err)=>{console.log(err)});
   };
 
   initFootprintsReferences = async () => {
@@ -226,8 +215,8 @@ export class LegalUnit {
 
     // PIB+IMP FRA (Available production in FRA)
 
-    api
-      .get("defaultfootprint/?activity=00&aggregate=GAP&area=FRA")
+    await api
+      .get("defaultfootprint/?code=00&aggregate=GAP&area=FRA")
       .then((res) => {
         let status = res.data.header.code;
 
@@ -237,11 +226,11 @@ export class LegalUnit {
         } else {
           this.productionAreaFootprint = new SocialFootprint();
         }
-      });
+      }).catch((err)=>{console.log(err)});
 
     // PIB FRA (Value Added in France)
-    api
-      .get("defaultfootprint/?activity=00&aggregate=GVA&area=FRA")
+    await api
+      .get("defaultfootprint/?code=00&aggregate=GVA&area=FRA")
       .then((res) => {
         let status = res.data.header.code;
 
@@ -251,6 +240,6 @@ export class LegalUnit {
         } else {
           this.valueAddedAreaFootprint = new SocialFootprint();
         }
-      });
+      }).catch((err)=>{console.log(err)});
   };
 }
