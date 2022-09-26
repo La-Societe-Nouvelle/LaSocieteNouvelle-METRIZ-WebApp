@@ -9,12 +9,6 @@ import { printValue, valueOrDefault } from "/src/utils/Utils";
 // Libs
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheckCircle,
-  faSyncAlt,
-  faWarning,
-} from "@fortawesome/free-solid-svg-icons";
 import { Table } from "react-bootstrap";
 import Select from "react-select";
 
@@ -265,16 +259,12 @@ class RowTableCompanies extends React.Component {
         icon = (
           <p className="success">
             <i className="bi bi-check2"  title="Données synchronisées"></i>
-          
           </p>
         );
       } else {
         icon = (
           <p className="success">
-            <FontAwesomeIcon
-              icon={faSyncAlt}
-              title="Données prêtes à être synchronisées"
-            />
+            <i className="bi bi-arrow-repeat"></i>
           </p>
         );
       }
@@ -333,7 +323,6 @@ class RowTableCompanies extends React.Component {
     });
   };
   onActivityCodeChange = (event) => {
-    console.log(event.value);
     this.setState({ activityCode: event.value, dataUpdated: true });
     this.props.updateCompany({
       id: this.props.id,
