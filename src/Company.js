@@ -149,6 +149,8 @@ export class Company {
           this.dataFetched = false;
         }
         this.status = status;
+      }).catch((err)=>{
+        throw err;
       });
     }
     // Case - Fetch id not ok ----------------------------------------------------------------------------- //
@@ -188,6 +190,8 @@ export class Company {
             this.dataFetched = false;
           }
           this.status = status;
+        }).catch((err)=>{
+          throw err;
         });
     }
     // ---------------------------------------------------------------------------------------------------- //

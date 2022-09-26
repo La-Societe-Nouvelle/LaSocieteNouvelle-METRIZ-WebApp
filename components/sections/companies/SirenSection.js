@@ -14,6 +14,7 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 import { ProgressBar } from "../../popups/ProgressBar";
 import { MessagePopup, MessagePopupErrors } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
+import { ErrorApi } from "../../ErrorAPI";
 export class SirenSection extends React.Component {
   constructor(props) {
     super(props);
@@ -30,6 +31,7 @@ export class SirenSection extends React.Component {
       popup: false,
       isDisabled: false,
       errorFile : false,
+      error : false,
     };
 
     this.onDrop = (files) => {
@@ -90,7 +92,8 @@ export class SirenSection extends React.Component {
       companiesShowed,
       popup,
       isDisabled,
-      errorFile
+      errorFile,
+      error
     } = this.state;
 
     const financialData = this.props.session.financialData;
@@ -199,7 +202,8 @@ export class SirenSection extends React.Component {
 
             <div className="table-container">
               <div className="table-data table-company">
-                {!isNextStepAvailable && synchronised != 0 && (
+              {error && <ErrorApi />}
+                {!error && !isNextStepAvailable && synchronised != 0 && (
                   <div className="alert alert-error">
                     <p>
                     <i className="bi bi-x-lg"></i> Certains comptes n'ont
@@ -257,6 +261,8 @@ export class SirenSection extends React.Component {
                   </>
 
                 )}
+                             
+
                 <div className="pagination">
                   <div className="form-group">
                     <select
@@ -457,7 +463,14 @@ export class SirenSection extends React.Component {
     let n = companiesToSynchronise.length;
 
     for (let company of companiesToSynchronise) {
-      await company.updateFromRemote();
+
+      try {
+        await company.updateFromRemote();
+        
+      } catch (error) {
+        this.setState({ error: true });
+        break;        
+      }
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }

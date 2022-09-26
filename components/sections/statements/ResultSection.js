@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Button,
   Col,
   Dropdown,
@@ -37,11 +38,12 @@ import { exportIndicPDF } from "../../../src/writers/Export";
 
 import api from "../../../src/api";
 import axios from "axios";
+import { ErrorApi } from "../../ErrorAPI";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
-
+  const [error, setError] = useState(false);
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision || "00"
   );
@@ -76,7 +78,8 @@ const ResultSection = (props) => {
       divisionsOptions.push({ value: value, label: value + " - " + label })
     );
 
-  const { intermediateConsumption, capitalConsumption, netValueAdded } = props.session.financialData.aggregates;
+  const { intermediateConsumption, capitalConsumption, netValueAdded } =
+    props.session.financialData.aggregates;
 
   const changeComparativeDivision = async (event) => {
     let division = event.value;
@@ -86,23 +89,18 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-
     // Fetch comparative division footprint
-    if(comparativeDivision != "00") {
-      console.log("fetch")
+    if (comparativeDivision != "00") {
       fetchComparativeDivision();
-    }
-    else {
-      console.log("test");
-      setProductionSectorFootprint( new SocialFootprint());
-      setConsumptionSectorFootPrint( new SocialFootprint());
-      setValueAddedSectorFootPrint( new SocialFootprint());
+    } else {
+      setProductionSectorFootprint(new SocialFootprint());
+      setConsumptionSectorFootPrint(new SocialFootprint());
+      setValueAddedSectorFootPrint(new SocialFootprint());
     }
     setComparativeFootprints(props.allSectorsFootprints);
   }, [comparativeDivision]);
 
   const fetchComparativeDivision = async () => {
-
     const getValueAdded = api.get(
       "defaultfootprint/?code=" +
         comparativeDivision +
@@ -147,8 +145,8 @@ const ResultSection = (props) => {
           }
         })
       )
-      .catch((errors) => {
-        console.log(errors);
+      .catch(() => {
+        setError(true);
       });
   };
 
@@ -181,7 +179,9 @@ const ResultSection = (props) => {
               })}
             </DropdownButton>
           ) : (
-            <Button id="indic-button" disabled>{metaIndics[indic].libelle}</Button>
+            <Button id="indic-button" disabled>
+              {metaIndics[indic].libelle}
+            </Button>
           )}
 
           <Button
@@ -268,6 +268,9 @@ const ResultSection = (props) => {
           options={divisionsOptions}
           onChange={changeComparativeDivision}
         />
+        {error && (
+           <ErrorApi/>
+        )}
         <div className="mt-5">
           {productionSectorFootprint &&
           valueAddedSectorFootprint &&

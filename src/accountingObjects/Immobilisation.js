@@ -117,7 +117,9 @@ export class Immobilisation {
             this.dataFetched = false;
           }
           this.status = status;
-        }).catch((err)=>{console.log(err)});
+        }).catch((err)=>{
+          throw err;
+        });
     }
   }
 }

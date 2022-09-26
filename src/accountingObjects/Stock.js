@@ -118,7 +118,9 @@ export class Stock {
           this.dataFetched = false;
         }
         this.status = status;
-      }).catch((err)=>this.status = err);
+      }).catch((err)=>{
+        throw err;
+      });
 
     }
   }

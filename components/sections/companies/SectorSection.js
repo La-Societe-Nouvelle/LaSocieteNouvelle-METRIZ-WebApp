@@ -3,7 +3,6 @@
 // React
 import React from "react";
 
-
 // Components
 import { CompaniesTable } from "../../tables/CompaniesTable";
 
@@ -12,6 +11,7 @@ import { ProgressBar } from "../../popups/ProgressBar";
 // Readers
 import { getSignificativeCompanies } from "../../../src/formulas/significativeLimitFormulas";
 import { Container } from "react-bootstrap";
+import { ErrorApi } from "../../ErrorAPI";
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -31,6 +31,7 @@ export class SectorSection extends React.Component {
       files: [],
       progression: 0,
       companyStep: props.companyStep,
+      error: false,
     };
   }
 
@@ -75,7 +76,6 @@ export class SectorSection extends React.Component {
     }
   };
 
-  
   render() {
     const {
       companies,
@@ -85,6 +85,7 @@ export class SectorSection extends React.Component {
       fetching,
       progression,
       companiesShowed,
+      error,
     } = this.state;
 
     const financialData = this.props.session.financialData;
@@ -100,24 +101,28 @@ export class SectorSection extends React.Component {
               Synchronisation des données grâce au secteur d'activité
             </h3>
           </div>
+   
 
           <div className="step 3">
             {companies.length > 0 && (
               <>
                 <div className="table-container">
                   <div className="table-data table-company">
-                    {isNextStepAvailable ? (
+                  {error && <ErrorApi />}
+
+                    {!error && isNextStepAvailable ? (
                       <div className="alert alert-success">
                         <p>
-                          <i className="bi bi-check2"></i> Tous les
-                          comptes ont bien été synchronisés.
+                          <i className="bi bi-check2"></i> Tous les comptes ont
+                          bien été synchronisés.
                         </p>
                       </div>
                     ) : (
                       <div className="alert alert-warning">
                         <p>
-                          <i className="bi bi-exclamation-triangle"></i>  Les empreintes de
-                          certains comptes doivent être synchronisées.
+                          <i className="bi bi-exclamation-triangle"></i> Les
+                          empreintes de certains comptes doivent être
+                          synchronisées.
                         </p>
                       </div>
                     )}
@@ -126,9 +131,9 @@ export class SectorSection extends React.Component {
                     ).length > 0 ? (
                       <div className="alert alert-warning">
                         <p>
-                          <i className="bi bi-exclamation-triangle"></i>  Grand risque
-                          d'imprécision pour les comptes significatifs qui ne
-                          sont pas reliés à un secteur d'activité.
+                          <i className="bi bi-exclamation-triangle"></i> Grand
+                          risque d'imprécision pour les comptes significatifs
+                          qui ne sont pas reliés à un secteur d'activité.
                         </p>
                         <button
                           onClick={this.handleChange}
@@ -152,7 +157,8 @@ export class SectorSection extends React.Component {
                       onClick={() => this.synchroniseCompanies()}
                       className={"btn btn-secondary"}
                     >
-                      <i className="bi bi-arrow-repeat"></i>  Synchroniser les données
+                      <i className="bi bi-arrow-repeat"></i> Synchroniser les
+                      données
                     </button>
                     <div className="pagination">
                       <div className="form-group">
@@ -274,7 +280,12 @@ export class SectorSection extends React.Component {
     let i = 0;
     let n = companiesToSynchronise.length;
     for (let company of companiesToSynchronise) {
-      await company.updateFromRemote();
+      try {
+        await company.updateFromRemote();
+      } catch (error) {
+        this.setState({ error: true });
+        break;
+      }
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
