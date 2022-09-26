@@ -100,7 +100,13 @@ export class StatementGHG extends React.Component {
           >
             <i className="bi bi-calculator"></i> Outil d'évaluation
           </button>
-
+          <a 
+            className="btn btn-tertiary btn-sm"
+            href="https://www.bilans-climat-simplifies.ademe.fr/"
+            target="_blank"
+          >
+           <i className="bi bi-box-arrow-up-right"></i> Outil d'Ademe
+          </a>
           <button
             disabled={!isValid}
             className="btn btn-secondary btn-sm"
