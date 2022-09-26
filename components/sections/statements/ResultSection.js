@@ -80,22 +80,28 @@ const ResultSection = (props) => {
 
   const changeComparativeDivision = async (event) => {
     let division = event.value;
-
     setComparativeDivision(division);
-
-    await fetchComparativeDivision();
     // update session
     props.session.comparativeDivision = division;
   };
 
   useEffect(async () => {
-    // SET ALL SECTORS FOOTPRINTS
-    fetchComparativeDivision();
+
+    // Fetch comparative division footprint
+    if(comparativeDivision != "00") {
+      console.log("fetch")
+      fetchComparativeDivision();
+    }
+    else {
+      console.log("test");
+      setProductionSectorFootprint( new SocialFootprint());
+      setConsumptionSectorFootPrint( new SocialFootprint());
+      setValueAddedSectorFootPrint( new SocialFootprint());
+    }
     setComparativeFootprints(props.allSectorsFootprints);
   }, [comparativeDivision]);
 
   const fetchComparativeDivision = async () => {
-    // SET COMPARATIVE DIVISIONS  FOOTPRINTS
 
     const getValueAdded = api.get(
       "defaultfootprint/?code=" +
@@ -175,10 +181,7 @@ const ResultSection = (props) => {
               })}
             </DropdownButton>
           ) : (
-            <Button id="indic-button" disabled>
-              {" "}
-              {metaIndics[indic].libelle}{" "}
-            </Button>
+            <Button id="indic-button" disabled>{metaIndics[indic].libelle}</Button>
           )}
 
           <Button

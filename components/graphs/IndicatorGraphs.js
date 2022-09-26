@@ -37,7 +37,7 @@ export const IndicatorGraphs = ({
 
   const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
 
-
+console.log(productionSectorFootprint)
   const dataP = [
     roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
     roundNumber(production.footprint.getIndicator(indic).value, precision),
