@@ -105,7 +105,7 @@ export class StatementGHG extends React.Component {
             href="https://www.bilans-climat-simplifies.ademe.fr/"
             target="_blank"
           >
-           <i className="bi bi-box-arrow-up-right"></i> Outil d'Ademe
+           <i className="bi bi-box-arrow-up-right"></i> Outil de l'Ademe
           </a>
           <button
             disabled={!isValid}
