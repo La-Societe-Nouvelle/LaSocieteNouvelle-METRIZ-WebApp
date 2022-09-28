@@ -51,6 +51,10 @@ export class Session {
     // Comparative Division
     this.comparativeDivision = props.comparativeDivision || "00";
 
+    // Comparative Footprint
+    this.comparativeAreaFootprints = props.comparativeAreaFootprints || [];
+    this.comparativeDivisionFootprints = props.comparativeDivisionFootprints || [];
+
     // ---------------------------------------------------------------------------------------------------- //
 
     this.updateFootprints();

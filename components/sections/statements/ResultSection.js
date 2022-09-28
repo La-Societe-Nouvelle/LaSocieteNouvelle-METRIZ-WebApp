@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Button,
   Col,
   Dropdown,
@@ -19,7 +18,6 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
-import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { IndicatorGraphs } from "../../graphs/IndicatorGraphs";
 
 import { analysisTextWriterART } from "../../../src/writers/analysis/analysisTextWriterART";
@@ -47,19 +45,8 @@ const ResultSection = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision || "00"
   );
-  const [productionSectorFootprint, setProductionSectorFootprint] = useState(
-    new SocialFootprint()
-  );
-  const [valueAddedSectorFootprint, setValueAddedSectorFootPrint] = useState(
-    new SocialFootprint()
-  );
-  const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(
-    new SocialFootprint()
-  );
-
-  const [comparativeFootprints, setComparativeFootprints] = useState(
-    props.allSectorsFootprints
-  );
+  const [allSectorFootprint, setAllSectorFootprint] = useState();
+  const [sectorFootprint, setSectorFootprint] = useState();
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -89,30 +76,71 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-    // Fetch comparative division footprint
+
+    props.session.comparativeAreaFootprints.filter((element) =>
+      setAllSectorFootprint(element[indic.toUpperCase()])
+    );
+
+    props.session.comparativeDivisionFootprints.filter((element) =>
+    console.log(element)
+    );
+
     if (comparativeDivision != "00") {
-      fetchComparativeDivision();
+      await getComparativeDivisionFootprint();
+
     } else {
-      setProductionSectorFootprint(new SocialFootprint());
-      setConsumptionSectorFootPrint(new SocialFootprint());
-      setValueAddedSectorFootPrint(new SocialFootprint());
+
+      const productionDivisionFootprint = {
+        year: null,
+        value: null,
+        flag: null,
+      };
+      const valueAddedDivisionFootprint = {
+        year: null,
+        value: null,
+        flag: null,
+      };
+      const consumptionDivisionFootprint = {
+        year: null,
+        value: null,
+        flag: null,
+      };
+
+      setSectorFootprint({
+        productionDivisionFootprint : productionDivisionFootprint,
+        valueAddedDivisionFootprint: valueAddedDivisionFootprint,
+        consumptionDivisionFootprint: consumptionDivisionFootprint
+      }
+      );
     }
-    setComparativeFootprints(props.allSectorsFootprints);
   }, [comparativeDivision]);
 
-  const fetchComparativeDivision = async () => {
+  const getComparativeDivisionFootprint = async () => {
+    let valueAddedFootprint;
+    let productionFootprint;
+    let consumptionFootprint;
+
     const getValueAdded = api.get(
-      "defaultfootprint/?code=" +
+      "serie/MACRO_" +
+        indic.toUpperCase() +
+        "_FRA_DIV/?code=" +
         comparativeDivision +
         "&aggregate=GVA&area=FRA"
     );
     const getProduction = api.get(
-      "defaultfootprint/?code=" +
+      "serie/MACRO_" +
+        indic.toUpperCase() +
+        "_FRA_DIV/?code=" +
         comparativeDivision +
         "&aggregate=PRD&area=FRA"
     );
+
     const getConsumption = api.get(
-      "defaultfootprint/?code=" + comparativeDivision + "&aggregate=IC&area=FRA"
+      "serie/MACRO_" +
+        indic.toUpperCase() +
+        "_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=IC&area=FRA"
     );
 
     await axios
@@ -124,30 +152,28 @@ const ResultSection = (props) => {
           const consumption = responses[2];
 
           if (valueAdded.data.header.code == 200) {
-            let valueAddedFootprint = new SocialFootprint();
-            valueAddedFootprint.updateAll(valueAdded.data.footprint);
-
-            setValueAddedSectorFootPrint(valueAddedFootprint);
+            valueAddedFootprint = valueAdded.data.data[0];
           }
 
           if (production.data.header.code == 200) {
-            let productionFootprint = new SocialFootprint();
-            productionFootprint.updateAll(production.data.footprint);
-
-            setProductionSectorFootprint(productionFootprint);
+            productionFootprint = production.data.data[0];
           }
 
           if (consumption.data.header.code == 200) {
-            let consumptionFootprint = new SocialFootprint();
-            consumptionFootprint.updateAll(consumption.data.footprint);
-
-            setConsumptionSectorFootPrint(consumptionFootprint);
+            consumptionFootprint = consumption.data.data[0];
           }
         })
       )
-      .catch(() => {
-        setError(true);
+      .catch((errors) => {
+        console.log(errors);
       });
+
+    setSectorFootprint({
+      valueAddedDivisionFootprint : valueAddedFootprint,
+      productionDivisionFootprint : productionFootprint,
+      consumptionDivisionFootprint : consumptionFootprint,
+    });
+
   };
 
   return (
@@ -268,22 +294,16 @@ const ResultSection = (props) => {
           options={divisionsOptions}
           onChange={changeComparativeDivision}
         />
-        {error && (
-           <ErrorApi/>
-        )}
+        {error && <ErrorApi />}
         <div className="mt-5">
-          {productionSectorFootprint &&
-          valueAddedSectorFootprint &&
-          consumptionSectorFootprint ? (
+          {allSectorFootprint && (
             <IndicatorGraphs
               financialData={session.financialData}
               indic={indic}
-              comparativeFootprints={comparativeFootprints}
-              productionSectorFootprint={productionSectorFootprint}
-              valueAddedSectorFootprint={valueAddedSectorFootprint}
-              consumptionSectorFootprint={consumptionSectorFootprint}
+              allSectorFootprint={allSectorFootprint}
+              comparativeDivisionFootprint={sectorFootprint}
             />
-          ) : null}
+          )}
         </div>
       </section>
       <section className="step">

@@ -13,23 +13,27 @@ import { printValue } from "/src/utils/Utils";
 import metaIndics from "/lib/indics";
 import { Col, Row, Table } from "react-bootstrap";
 
-
 export const IndicatorGraphs = ({
-  comparativeFootprints,
+  allSectorFootprint,
+  comparativeDivisionFootprint,
   financialData,
-  indic, 
-  consumptionSectorFootprint,
-  productionSectorFootprint,
-  valueAddedSectorFootprint}) => {
-
-  const { production, netValueAdded, intermediateConsumption } = financialData.aggregates;
-
+  indic,
+}) => {
+  const { production, netValueAdded, intermediateConsumption } =
+    financialData.aggregates;
 
   const {
-    allSectorsProductionAreaFootprint,
-    allSectorsValueAddedAreaFootprint,
-    allSectorsConsumptionFootprint,
-  } = comparativeFootprints;
+    productionAreaFootprint,
+    valueAddedAreaFootprint,
+    consumptionAreaFootprint,
+  } = allSectorFootprint;
+
+  const {
+    productionDivisionFootprint,
+    valueAddedDivisionFootprint,
+    consumptionDivisionFootprint,
+  } = comparativeDivisionFootprint;
+
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
 
@@ -37,11 +41,10 @@ export const IndicatorGraphs = ({
 
   const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
 
-console.log(productionSectorFootprint)
   const dataP = [
-    roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
-    roundNumber(production.footprint.getIndicator(indic).value, precision),
-    roundNumber(productionSectorFootprint.getIndicator(indic).value, precision),
+    roundNumber(productionAreaFootprint.value),
+    roundNumber(production.footprint.getIndicator(indic).value),
+    roundNumber(productionDivisionFootprint.value),
   ];
   for (let i = 0; i < dataP.length; i++) {
     if (dataP[i] === null) {
@@ -114,9 +117,9 @@ console.log(productionSectorFootprint)
   const labelsC = ["France", ["Exercice", "en cours"], "Branche"];
 
   const dataC = [
-    roundNumber(allSectorsConsumptionFootprint.getIndicator(indic).value, precision),
-    roundNumber(intermediateConsumption.footprint.getIndicator(indic).value, precision),
-    roundNumber(consumptionSectorFootprint.getIndicator(indic).value, precision),
+    roundNumber(consumptionAreaFootprint.value),
+    roundNumber(intermediateConsumption.footprint.getIndicator(indic).value),
+    roundNumber(consumptionDivisionFootprint.value),
   ];
 
   for (let i = 0; i < dataC.length; i++) {
@@ -196,9 +199,9 @@ console.log(productionSectorFootprint)
   const labelsV = ["France", ["Exercice", "en cours"], "Branche"];
 
   const dataV = [
-    roundNumber(allSectorsValueAddedAreaFootprint.getIndicator(indic).value, precision),
-    roundNumber(netValueAdded.footprint.getIndicator(indic).value, precision),
-    roundNumber(valueAddedSectorFootprint.getIndicator(indic).value, precision),
+    roundNumber(valueAddedAreaFootprint.value),
+    roundNumber(netValueAdded.footprint.getIndicator(indic).value),
+    roundNumber(valueAddedDivisionFootprint.value),
   ];
 
   for (let i = 0; i < dataV.length; i++) {
@@ -263,7 +266,6 @@ console.log(productionSectorFootprint)
     },
   };
 
-
   return (
     <>
       <Row className="graphs">
@@ -284,18 +286,10 @@ console.log(productionSectorFootprint)
             <td className="auto">Agrégat</td>
             <td className="column_value">France</td>
             <td className="column_value align-center">Exercice en cours</td>
-            {printValue(
-              productionSectorFootprint.getIndicator(indic).value,
-              precision
-            ) &&
-            printValue(
-              consumptionSectorFootprint.getIndicator(indic).value,
-              precision
-            ) &&
-            printValue(
-              valueAddedSectorFootprint.getIndicator(indic).value,
-              precision
-            ) !== " - " ? (
+            {printValue(productionDivisionFootprint.value, precision) &&
+            printValue(consumptionDivisionFootprint.value, precision) &&
+            printValue(valueAddedDivisionFootprint.value, precision) !==
+              " - " ? (
               <td className="column_value">Branche</td>
             ) : (
               <td></td>
@@ -306,23 +300,18 @@ console.log(productionSectorFootprint)
           <tr>
             <td>Production</td>
             <td className="short right">
-              {printValue(
-                allSectorsProductionAreaFootprint.getIndicator(indic).value,
-                precision
-              )} <span className="unit">{unit}</span>
+              {printValue(productionAreaFootprint.value, precision)}{" "}
+              <span className="unit">{unit}</span>
             </td>
             <td className="short align-center">
-              {printValue(production.footprint.getIndicator(indic).value, 1)} <span className="unit">{unit}</span>
+              {printValue(production.footprint.getIndicator(indic).value, 1)}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            {printValue(
-              productionSectorFootprint.getIndicator(indic).value,
-              precision
-            ) !== " - " ? (
+            {printValue(productionDivisionFootprint.value, precision) !==
+            " - " ? (
               <td className="short right">
-                {printValue(
-                  productionSectorFootprint.getIndicator(indic).value,
-                  precision
-                )} <span className="unit">{unit}</span>
+                {printValue(productionDivisionFootprint.value, precision)}{" "}
+                <span className="unit">{unit}</span>
               </td>
             ) : (
               <td></td>
@@ -331,25 +320,21 @@ console.log(productionSectorFootprint)
           <tr>
             <td>Consommations intermédiaires</td>
             <td className="short right">
-              {printValue(
-                allSectorsConsumptionFootprint.getIndicator(indic).value, precision
-              )} <span className="unit">{unit}</span>
+              {printValue(consumptionAreaFootprint.value, precision)}{" "}
+              <span className="unit">{unit}</span>
             </td>
             <td className="short align-center">
               {printValue(
                 intermediateConsumption.footprint.getIndicator(indic).value,
                 precision
-              )} <span className="unit">{unit}</span>
+              )}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            {printValue(
-              consumptionSectorFootprint.getIndicator(indic).value,
-              precision
-            ) !== " - " ? (
+            {printValue(consumptionDivisionFootprint.value, precision) !==
+            " - " ? (
               <td className="short right">
-                {printValue(
-                  consumptionSectorFootprint.getIndicator(indic).value,
-                  precision
-                )} <span className="unit">{unit}</span>
+                {printValue(consumptionDivisionFootprint.value, precision)}{" "}
+                <span className="unit">{unit}</span>
               </td>
             ) : (
               <td></td>
@@ -358,23 +343,18 @@ console.log(productionSectorFootprint)
           <tr>
             <td>Valeur ajoutée</td>
             <td className="short right">
-              {printValue(
-                allSectorsValueAddedAreaFootprint.getIndicator(indic).value,
-                precision
-              )} <span className="unit">{unit}</span>
+              {printValue(valueAddedAreaFootprint.value, precision)}{" "}
+              <span className="unit">{unit}</span>
             </td>
             <td className="short align-center">
-              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)} <span className="unit">{unit}</span>
+              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            {printValue(
-              valueAddedSectorFootprint.getIndicator(indic).value,
-              precision
-            ) !== " - " ? (
+            {printValue(valueAddedDivisionFootprint.value, precision) !==
+            " - " ? (
               <td className="short right">
-                {printValue(
-                  valueAddedSectorFootprint.getIndicator(indic).value,
-                  precision
-                )} <span className="unit">{unit}</span>
+                {printValue(valueAddedDivisionFootprint.value, precision)}{" "}
+                <span className="unit">{unit}</span>
               </td>
             ) : (
               <td></td>
