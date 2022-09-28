@@ -9,32 +9,40 @@ import { Bar } from "react-chartjs-2";
 import PieGraph from "./PieGraph";
 
 export const GraphsPDF = ({
-  comparativeFootprints,
+  allSectorFootprint,
+  comparativeDivisionFootprint,
   financialData,
-  indic, 
-  consumptionSectorFootprint,
-  productionSectorFootprint,
-  valueAddedSectorFootprint}) => {
- 
-  const { capitalConsumption, netValueAdded, intermediateConsumption, production } = financialData.aggregates;
+  indic,
+}) => {
   const {
+    capitalConsumption,
+    netValueAdded,
+    intermediateConsumption,
+    production,
+  } = financialData.aggregates;
 
-    allSectorsProductionAreaFootprint,
-    allSectorsValueAddedAreaFootprint,
-    allSectorsConsumptionFootprint,
-  } = comparativeFootprints;
+  const {
+    productionAreaFootprint,
+    valueAddedAreaFootprint,
+    consumptionAreaFootprint,
+  } = allSectorFootprint[indic.toUpperCase()];
 
+  const {
+    productionDivisionFootprint,
+    valueAddedDivisionFootprint,
+    consumptionDivisionFootprint,
+  } = comparativeDivisionFootprint[indic.toUpperCase()];
 
+  
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
     indic
   );
- 
   // // PRODUCTION CHART
- const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
+  const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
   const dataP = [
-    roundNumber(allSectorsProductionAreaFootprint.getIndicator(indic).value),
+    roundNumber(productionAreaFootprint.value),
     roundNumber(production.footprint.getIndicator(indic).value),
-    roundNumber(productionSectorFootprint.getIndicator(indic).value),
+    roundNumber(productionDivisionFootprint.value),
   ];
 
   for (let i = 0; i < dataP.length; i++) {
@@ -111,9 +119,9 @@ export const GraphsPDF = ({
   const labelsC = ["France", ["Exercice", "en cours"], "Branche"];
 
   const dataC = [
-    roundNumber(allSectorsConsumptionFootprint.getIndicator(indic).value),
+    roundNumber(consumptionAreaFootprint.value),
     roundNumber(intermediateConsumption.footprint.getIndicator(indic).value),
-    roundNumber(consumptionSectorFootprint.getIndicator(indic).value),
+    roundNumber(consumptionDivisionFootprint.value),
   ];
 
   for (let i = 0; i < dataC.length; i++) {
@@ -199,9 +207,9 @@ export const GraphsPDF = ({
 
   // To Do : round value Number().toFixed(2); // 1.00
   const dataV = [
-    roundNumber(allSectorsValueAddedAreaFootprint.getIndicator(indic).value),
+    roundNumber(valueAddedAreaFootprint.value),
     roundNumber(netValueAdded.footprint.getIndicator(indic).value),
-    roundNumber(valueAddedSectorFootprint.getIndicator(indic).value),
+    roundNumber(valueAddedDivisionFootprint.value),
   ];
 
   for (let i = 0; i < dataV.length; i++) {
@@ -273,26 +281,20 @@ export const GraphsPDF = ({
   };
 
   return (
-
     <div className="hidden">
-
       {printGrossImpact && (
         <div className="piechart-container">
-          
           <PieGraph
             id={"piechart-" + indic}
-            intermediateConsumption={
-              intermediateConsumption.footprint.indicators[
-                indic
-              ].getGrossImpact(intermediateConsumption.amount)}
-            capitalConsumption={
-              capitalConsumption.footprint.indicators[
-                indic
-              ].getGrossImpact(capitalConsumption.amount)}
-            netValueAdded={
-              netValueAdded.footprint.indicators[indic].getGrossImpact(
-                netValueAdded.amount
-              )}
+            intermediateConsumption={intermediateConsumption.footprint.indicators[
+              indic
+            ].getGrossImpact(intermediateConsumption.amount)}
+            capitalConsumption={capitalConsumption.footprint.indicators[
+              indic
+            ].getGrossImpact(capitalConsumption.amount)}
+            netValueAdded={netValueAdded.footprint.indicators[
+              indic
+            ].getGrossImpact(netValueAdded.amount)}
           />
         </div>
       )}
@@ -303,8 +305,8 @@ export const GraphsPDF = ({
             id={"print-Production-" + indic}
             data={dataProduction}
             options={optionsP}
-            />
-         </Col>
+          />
+        </Col>
         <Col>
           <Bar
             id={"print-Consumption-" + indic}

@@ -81,10 +81,6 @@ const ResultSection = (props) => {
       setAllSectorFootprint(element[indic.toUpperCase()])
     );
 
-    props.session.comparativeDivisionFootprints.filter((element) =>
-    console.log(element)
-    );
-
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
 

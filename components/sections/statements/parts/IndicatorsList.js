@@ -24,7 +24,6 @@ import {
   StatementWAT,
 } from "../forms";
 import metaIndics from "/lib/indics";
-import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
@@ -33,6 +32,7 @@ import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
 import ChangeDivision from "../../../popups/ChangeDivision";
 import api from "../../../../src/api";
 import axios from "axios";
+
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
@@ -43,47 +43,94 @@ const IndicatorsList = (props) => {
   );
   const [indicToExport, setIndicToExport] = useState();
 
-  const [comparativeFootprints, setComparativeFootprints] = useState();
-  const [productionSectorFootprint, setProductionSectorFootprint] = useState(
-    new SocialFootprint()
-  );
-  const [valueAddedSectorFootprint, setValueAddedSectorFootPrint] = useState(
-    new SocialFootprint()
-  );
-  const [consumptionSectorFootprint, setConsumptionSectorFootPrint] = useState(
-    new SocialFootprint()
-  );
+  const [allSectorFootprint, setAllSectorFootprint] = useState(props.session.comparativeAreaFootprints );
+  const [sectorFootprint, setSectorFootprint] = useState(props.session.comparativeDivisionFootprints);
 
   useEffect(async () => {
-
-  
-    // SET ALL SECTORS FOOTPRINTS
-    setComparativeFootprints(props.allSectorsFootprints);
-
-    // SET COMPARATIVE DIVISIONS  FOOTPRINTS
-    fetchComparativeDivision();
 
     if (validations.length > 0) {
       props.publish();
     }
-  }, [validations, comparativeDivision]);
+    if(props.session.comparativeAreaFootprints != allSectorFootprint) {
+      props.session.comparativeAreaFootprints = allSectorFootprint;
+    }
+    console.log(comparativeDivision)
 
-  // SET COMPARATIVE DIVISIONS  FOOTPRINTS
+  }, [validations]);
 
-  const fetchComparativeDivision = async () => {
+  // SET COMPARATIVE ALL DIVISIONS FOOTPRINTS
+
+  const getComparativeAreaFootprint = async (indicator) => {
+
+    let indic = indicator.toUpperCase();
+    let valueAddedFootprint;
+    let productionFootprint;
+    let consumptionFootprint;
+    let footprint = new Object();
 
     const getValueAdded = api.get(
-      "defaultfootprint/?code=" +
-        comparativeDivision +
-        "&aggregate=GVA&area=FRA"
+      "serie/MACRO_"+indic+"_FRA_DIV/?code=00&aggregate=GVA&area=FRA"
     );
     const getProduction = api.get(
-      "defaultfootprint/?code=" +
-        comparativeDivision +
-        "&aggregate=PRD&area=FRA"
-    );
+      "serie/MACRO_"+indic+"_FRA_DIV/?code=00&aggregate=PRD&area=FRA");
+
     const getConsumption = api.get(
-      "defaultfootprint/?code=" + comparativeDivision + "&aggregate=IC&area=FRA"
+       "serie/MACRO_"+indic+"_FRA_DIV/?code=00&aggregate=IC&area=FRA"
+    );
+
+    await axios
+      .all([getValueAdded, getProduction, getConsumption])
+      .then(
+        axios.spread((...responses) => {
+
+          const valueAdded = responses[0];
+          const production = responses[1];
+          const consumption = responses[2];
+
+          if (valueAdded.data.header.code == 200) {
+          
+            valueAddedFootprint = valueAdded.data.data[0];
+          }
+
+          if (production.data.header.code == 200) {
+
+            productionFootprint = production.data.data[0];
+          }
+
+          if (consumption.data.header.code == 200) {
+
+            consumptionFootprint = consumption.data.data[0];
+          }
+        })
+
+       
+      )
+      .catch((errors) => {
+        console.log(errors);
+      });
+
+      Object.assign(footprint, { [indic]: {valueAddedAreaFootprint : valueAddedFootprint, productionAreaFootprint : productionFootprint, consumptionAreaFootprint : consumptionFootprint} })
+      setAllSectorFootprint(oldFootprint => [...oldFootprint,footprint] );
+
+  }
+  
+  // FETCH COMPARATIVE DIVISION FOOTPRINT
+
+  const getComparativeDivisionFootprint = async (indic) => {
+
+    let valueAddedFootprint;
+    let productionFootprint;
+    let consumptionFootprint;
+    let footprint = new Object();
+
+    const getValueAdded = api.get(
+      "serie/MACRO_"+indic+"_FRA_DIV/?code="+comparativeDivision+"&aggregate=GVA&area=FRA"
+    );
+    const getProduction = api.get(
+      "serie/MACRO_"+indic+"_FRA_DIV/?code="+comparativeDivision+"&aggregate=PRD&area=FRA");
+
+    const getConsumption = api.get(
+       "serie/MACRO_"+indic+"_FRA_DIV/?code="+comparativeDivision+"&aggregate=IC&area=FRA"
     );
 
     await axios
@@ -95,30 +142,30 @@ const IndicatorsList = (props) => {
           const consumption = responses[2];
 
           if (valueAdded.data.header.code == 200) {
-            let valueAddedFootprint = new SocialFootprint();
-            valueAddedFootprint.updateAll(valueAdded.data.footprint);
-
-            setValueAddedSectorFootPrint(valueAddedFootprint);
+          
+            valueAddedFootprint = valueAdded.data.data[0];
           }
 
           if (production.data.header.code == 200) {
-            let productionFootprint = new SocialFootprint();
-            productionFootprint.updateAll(production.data.footprint);
 
-            setProductionSectorFootprint(productionFootprint);
+            productionFootprint = production.data.data[0];
           }
 
           if (consumption.data.header.code == 200) {
-            let consumptionFootprint = new SocialFootprint();
-            consumptionFootprint.updateAll(consumption.data.footprint);
 
-            setConsumptionSectorFootPrint(consumptionFootprint);
+            consumptionFootprint = consumption.data.data[0];
           }
         })
       )
       .catch((errors) => {
         console.log(errors);
       });
+
+      
+      Object.assign(footprint, { [indic]: {valueAddedDivisionFootprint : valueAddedFootprint, productionDivisionFootprint : productionFootprint, consumptionDivisionFootprint : consumptionFootprint} })
+    
+    setSectorFootprint(oldFootprint => [...oldFootprint,footprint] );
+
   };
   /* ----- POP-UP ----- */
 
@@ -130,6 +177,7 @@ const IndicatorsList = (props) => {
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
+    
     setUpdatedIndic();
 
     // get new value
@@ -146,12 +194,18 @@ const IndicatorsList = (props) => {
         (item) => item != indic
       );
       SetValidations(validations.filter((item) => item != indic));
+   
+
       // update footprint
       await props.session.updateIndicator(indic);
     }
+
   };
 
   const validateIndicator = async (indic) => {
+         
+    await getComparativeAreaFootprint(indic);
+
     if (!validations.includes(indic)) {
       SetValidations((validations) => [...validations, indic]);
     }
@@ -161,8 +215,8 @@ const IndicatorsList = (props) => {
     props.session.validations.push(indic);
     // update footprint
     await props.session.updateIndicator(indic);
-
     setUpdatedIndic(indic);
+
   };
 
   const valueCreation = ["eco", "art", "soc"];
@@ -170,15 +224,18 @@ const IndicatorsList = (props) => {
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
 
 
-  const updateDivision = (division) => {
+  const updateDivision = async(division) => {
     setComparativeDivision(division);
   };
 
   const handleDownloadPDF = async (key, comparativeDivision) => {
-    if (!comparativeDivision) {
+
+    if (comparativeDivision == "00") {
       setIndicToExport(key);
       setPopUp("division");
     } else {
+     
+             
       exportIndicPDF(
         key,
         props.session,
@@ -212,17 +269,17 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-
-      {comparativeFootprints && validations.length > 0 &&
+  {
+    console.log(sectorFootprint)
+  }
+      {sectorFootprint.length > 0 && validations.length > 0 &&
         validations.map((indic, key) => (
           <GraphsPDF
             key={key}
             financialData={props.session.financialData}
             indic={indic}
-            comparativeFootprints={comparativeFootprints}
-            productionSectorFootprint={productionSectorFootprint}
-            valueAddedSectorFootprint={valueAddedSectorFootprint}
-            consumptionSectorFootprint={consumptionSectorFootprint}
+            allSectorFootprint={allSectorFootprint[key]}
+            comparativeDivisionFootprint={sectorFootprint[key]}
           />
         ))}
       {popUp == "division" && (
