@@ -1,12 +1,4 @@
 import React, { useEffect, useState } from "react";
-
-// Icons
-import {
-  faArrowTrendUp,
-  faExclamation,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 // Components
 import { Col, Container, Row } from "react-bootstrap";
 
@@ -16,7 +8,7 @@ import MappedAccounts from "./MappedAccounts";
 
 import { FinancialDatas } from "./FinancialDatas";
 // Readers
-import { FECFileReader, FECDataReader } from "/src/readers/FECReader";
+import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
 
 // Objects
 import { FinancialData } from "/src/FinancialData";
@@ -62,7 +54,7 @@ function ImportSection(props) {
     <Container fluid>
       <section className="step">
         <h2>
-          <FontAwesomeIcon icon={faArrowTrendUp} /> &Eacute;tape 1 - Importez
+          <i class="bi bi-file-arrow-up-fill"></i>  &Eacute;tape 1 - Importez
           vos flux comptables
         </h2>
 
@@ -95,8 +87,7 @@ function ImportSection(props) {
                       className="btn btn-secondary mb-2"
                       onClick={() => sendErrorReport(errors)}
                     >
-                      <FontAwesomeIcon icon={faExclamation} /> Envoyer un
-                      rapport d'erreur
+                     Envoyer un rapport d'erreur
                     </button>
 
                     {errorMail && (

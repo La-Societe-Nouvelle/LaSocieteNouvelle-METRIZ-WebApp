@@ -1,8 +1,4 @@
 // La Société Nouvelle
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleInfo } from "@fortawesome/free-solid-svg-icons";
-
 // Utils
 import { printValue } from '../../src/utils/Utils';
 import { Table } from "react-bootstrap";

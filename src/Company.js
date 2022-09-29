@@ -173,8 +173,6 @@ export class Company {
         .get("defaultfootprint/?code="+this.footprintActivityCode+"&aggregate=PRD&area="+this.footprintAreaCode)
         .then((res) => {
           let status = res.data.header.code;
-          console.log(status);
-
           if (status == 200) {
             let data = res.data;
 

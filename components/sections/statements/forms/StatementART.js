@@ -72,7 +72,7 @@ export class StatementART extends React.Component {
                 type="radio"
                 id="isValueAddedCrafetd"
                 className="custom-control-input"
-                value="null"
+                value="undefined"
                 checked={
                   isValueAddedCrafted === null && craftedProduction !== ""
                 }

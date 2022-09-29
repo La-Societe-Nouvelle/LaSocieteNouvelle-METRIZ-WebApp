@@ -2,19 +2,6 @@
 
 // React
 import React from "react";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faSync,
-  faEnvelope,
-  faBook,
-  faRuler,
-  faBackward,
-  faChevronRight,
-  faChevronLeft,
-  faUpload,
-} from "@fortawesome/free-solid-svg-icons";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { Button, Container, Row } from "react-bootstrap";
 
 /* -------------------- HEADER -------------------- */
@@ -24,12 +11,11 @@ export function HeaderPublish({ setStep, downloadSession }) {
   const saveSession = () => downloadSession();
   return (
     <header>
-      <div className="top-bar">
+      <div className="top-bar mb-2">
         <ul className="nav">
           <li>
             <a href="https://docs.lasocietenouvelle.org/" target="_blank">
-              
-              <FontAwesomeIcon icon={faBook} /> Documentation
+              <i className="bi bi-book-fill"></i> Documentation
             </a>
           </li>
           <li>
@@ -37,18 +23,21 @@ export function HeaderPublish({ setStep, downloadSession }) {
               href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/"
               target="_blank"
             >
-              <FontAwesomeIcon icon={faGithub} /> GitHub
+              <i className="bi bi-github"></i> GitHub
             </a>
           </li>
           <li>
             <a href="https://lasocietenouvelle.org/contact" target="_blank">
-              
-              <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous
+              <i className="bi bi-envelope-fill"></i> Contactez-nous
             </a>
           </li>
         </ul>
-        <Button className="download me-4" variant="primary" onClick={saveSession}>
-          <FontAwesomeIcon icon={faSync} className="me-2" />
+        <Button
+          className="download me-4"
+          variant="primary"
+          onClick={saveSession}
+        >
+          <i className="bi bi-arrow-down"></i>
           Sauvegarder ma session
         </Button>
       </div>
@@ -63,14 +52,14 @@ export function HeaderPublish({ setStep, downloadSession }) {
           </div>
           <div className="action">
             <button className="btn btn-secondary" onClick={() => setStep(4)}>
-               <i className="bi bi-chevron-left"></i> Retour à la mesure des
+              <i className="bi bi-chevron-left"></i> Retour à la mesure des
               impacts
             </button>
           </div>
           <nav id="progression" className="d-flex">
             <div className={"stepper-item completed"}>
               <p className={"step-counter"}>
-                <FontAwesomeIcon icon={faUpload} />
+                <i class="bi bi-arrow-up"></i>{" "}
               </p>
               <div className="step-name">
                 <h2>Publier mes résultats</h2>

@@ -6,13 +6,6 @@ import React from "react";
 // Utils
 import { InputText } from "/components/input/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCheckCircle,
-  faSyncAlt,
-  faWarning,
-  faXmarkCircle,
-} from "@fortawesome/free-solid-svg-icons";
 import { Table } from "react-bootstrap";
 
 /* ---------- COMPANIES TABLE ---------- */

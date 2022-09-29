@@ -2,10 +2,6 @@
 
 // React
 import React from "react";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSync, faEnvelope, faBook } from "@fortawesome/free-solid-svg-icons";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { Button, Container, Navbar} from "react-bootstrap";
 
 /* -------------------- HEADER -------------------- */
@@ -19,7 +15,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
         <ul className="nav">
           <li>
             <a href="https://docs.lasocietenouvelle.org/" target="_blank">
-              <FontAwesomeIcon icon={faBook} /> Documentation
+            <i className="bi bi-book-fill"></i> Documentation
             </a>
           </li>
           <li>
@@ -27,17 +23,17 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/"
               target="_blank"
             >
-              <FontAwesomeIcon icon={faGithub} /> GitHub
+              <i className="bi bi-github"></i> GitHub
             </a>
           </li>
           <li>
             <a href="https://lasocietenouvelle.org/contact" target="_blank">
-              <FontAwesomeIcon icon={faEnvelope} /> Contactez-nous
+            <i className="bi bi-envelope-fill"></i> Contactez-nous
             </a>
           </li>
         </ul>
         <Button className="download me-4" variant="primary" onClick={saveSession}>
-          <FontAwesomeIcon icon={faSync} className="me-2"/> 
+        <i className="bi bi-arrow-down"></i>
           Sauvegarder ma session
         </Button>
       </div>

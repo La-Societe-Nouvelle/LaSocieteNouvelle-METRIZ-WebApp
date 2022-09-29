@@ -12,7 +12,7 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
-import { MessagePopup, MessagePopupErrors } from "../../popups/MessagePopup";
+import { MessagePopup } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
 export class SirenSection extends React.Component {
@@ -219,8 +219,7 @@ export class SirenSection extends React.Component {
                     </button>
                   </div>
                 )}
-
-                {isNextStepAvailable ? (
+                {isNextStepAvailable && synchronised.length > 0 ? (
                   <div className="alert alert-success">
                     <p>
                       <i className="bi bi-check2"></i> Tous les comptes
@@ -503,11 +502,9 @@ export class SirenSection extends React.Component {
 
 const nextStepAvailable = (  companies ) => {
 
-
   let nbSirenSynchronised = companies.filter(company => company.state == "siren" && company.status == 200).length;
 
   let nbSiren = companies.filter((company) => company.state == "siren").length;
-
 
   if(nbSirenSynchronised == nbSiren) {
     return true;

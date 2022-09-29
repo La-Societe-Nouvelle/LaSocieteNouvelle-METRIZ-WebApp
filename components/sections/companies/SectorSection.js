@@ -165,8 +165,8 @@ export class SectorSection extends React.Component {
                         <select
                           value={view}
                           onChange={this.handleChange}
-                          className="form-control"
-                        >
+                          className="form-select"
+                          >
                           <option
                             key="1"
                             value="
@@ -196,8 +196,8 @@ export class SectorSection extends React.Component {
                         <select
                           value={nbItems}
                           onChange={this.changeNbItems}
-                          className="form-control"
-                        >
+                          className="form-select"
+                          >
                           <option key="1" value="20">
                             20 fournisseurs par page
                           </option>

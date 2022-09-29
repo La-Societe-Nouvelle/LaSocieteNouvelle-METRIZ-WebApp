@@ -2,8 +2,6 @@
 
 // React
 import React from 'react';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalculator } from "@fortawesome/free-solid-svg-icons";
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
@@ -17,8 +15,8 @@ export class StatementKNW extends React.Component {
   {
     super(props);
     this.state = {
-      researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, ""),
-      info : props.impactsData.comments.knw || ""
+      researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, " "),
+      info : props.impactsData.comments.knw || " "
     }
   }
 
@@ -35,7 +33,6 @@ export class StatementKNW extends React.Component {
     const {researchAndTrainingContribution,info} = this.state;
 
     let isValid = researchAndTrainingContribution!=null && netValueAdded!=null;
-
     return (
       <div className="statement">
         <div className={"form-group small-input"}>
