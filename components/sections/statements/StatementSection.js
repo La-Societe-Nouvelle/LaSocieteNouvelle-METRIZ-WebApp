@@ -1,25 +1,16 @@
-import api from "../../../src/api";
-import axios from "axios";
-
 import React, { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 
 import ResultSection from "./ResultSection";
-import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 import IndicatorsList from "./parts/IndicatorsList";
 import ExportResults from "./parts/ExportResults";
-import { ErrorApi } from "../../ErrorAPI";
 
 const StatementSection = (props) => {
 
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
   const [isPublicationAvailable, setPublicationAvailable] = useState(false);
-
-  useEffect(async () => {
-
-  }, []);
 
   const handleView = (indic) => {
     setIndic(indic);

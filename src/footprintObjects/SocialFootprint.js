@@ -30,6 +30,7 @@ export class SocialFootprint {
   // All indicators
   updateAll(data) 
   {
+    console.log(data)
     indics.map((indic) => {this.updateIndic(indic,data[indic.toUpperCase()])})
   }
   

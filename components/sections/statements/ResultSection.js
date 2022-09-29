@@ -45,8 +45,12 @@ const ResultSection = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision || "00"
   );
-  const [allSectorFootprint, setAllSectorFootprint] = useState();
-  const [sectorFootprint, setSectorFootprint] = useState();
+  const [allSectorFootprint, setAllSectorFootprint] = useState(
+    props.session.comparativeAreaFootprints[props.indic.toUpperCase()]
+  );
+  const [divisionFootprint, setDivisionFootprint] = useState(
+    props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
+  );
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -76,38 +80,20 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-
-    props.session.comparativeAreaFootprints.filter((element) =>
-      setAllSectorFootprint(element[indic.toUpperCase()])
-    );
-
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
-
     } else {
-
-      const productionDivisionFootprint = {
-        year: null,
-        value: null,
-        flag: null,
+      props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
+    
+        valueAddedDivisionFootprint: { value: null },
+        productionDivisionFootprint: { value: null },
+        consumptionDivisionFootprint: { value: null },
       };
-      const valueAddedDivisionFootprint = {
-        year: null,
-        value: null,
-        flag: null,
-      };
-      const consumptionDivisionFootprint = {
-        year: null,
-        value: null,
-        flag: null,
-      };
-
-      setSectorFootprint({
-        productionDivisionFootprint : productionDivisionFootprint,
-        valueAddedDivisionFootprint: valueAddedDivisionFootprint,
-        consumptionDivisionFootprint: consumptionDivisionFootprint
-      }
-      );
+      setDivisionFootprint({
+        valueAddedDivisionFootprint: { value: null },
+        productionDivisionFootprint: { value: null },
+        consumptionDivisionFootprint: { value: null },
+      });
     }
   }, [comparativeDivision]);
 
@@ -164,12 +150,17 @@ const ResultSection = (props) => {
         console.log(errors);
       });
 
-    setSectorFootprint({
-      valueAddedDivisionFootprint : valueAddedFootprint,
-      productionDivisionFootprint : productionFootprint,
-      consumptionDivisionFootprint : consumptionFootprint,
-    });
+    props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
+      valueAddedDivisionFootprint: valueAddedFootprint,
+      productionDivisionFootprint: productionFootprint,
+      consumptionDivisionFootprint: consumptionFootprint,
+    };
 
+    setDivisionFootprint({
+      valueAddedDivisionFootprint: valueAddedFootprint,
+      productionDivisionFootprint: productionFootprint,
+      consumptionDivisionFootprint: consumptionFootprint,
+    });
   };
 
   return (
@@ -297,7 +288,7 @@ const ResultSection = (props) => {
               financialData={session.financialData}
               indic={indic}
               allSectorFootprint={allSectorFootprint}
-              comparativeDivisionFootprint={sectorFootprint}
+              comparativeDivisionFootprint={divisionFootprint}
             />
           )}
         </div>

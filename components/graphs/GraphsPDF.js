@@ -25,13 +25,13 @@ export const GraphsPDF = ({
     productionAreaFootprint,
     valueAddedAreaFootprint,
     consumptionAreaFootprint,
-  } = allSectorFootprint[indic.toUpperCase()];
+  } = allSectorFootprint;
 
   const {
     productionDivisionFootprint,
     valueAddedDivisionFootprint,
     consumptionDivisionFootprint,
-  } = comparativeDivisionFootprint[indic.toUpperCase()];
+  } = comparativeDivisionFootprint;
 
   
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
