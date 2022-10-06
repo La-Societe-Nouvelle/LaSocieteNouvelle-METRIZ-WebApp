@@ -50,7 +50,7 @@ section {
 
 #siren-section,
 #sector-section {
-  .step {
+  .step:not(:first-child) {
     margin-bottom: 2rem;
     padding: 1rem 2rem;
   }
@@ -111,7 +111,7 @@ section {
 
   h3 {
     font-size: 1.2rem;
-    color :#5262bc;
+    color :#251f81;
     margin : 1.5rem 0;
   }
 
