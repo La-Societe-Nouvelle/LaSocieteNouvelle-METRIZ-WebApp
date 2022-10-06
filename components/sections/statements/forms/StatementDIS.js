@@ -23,7 +23,7 @@ export class StatementDIS extends React.Component {
 
   componentDidUpdate() {
 
-    if(!this.props.impactsData.hasEmployees && this.props.impactsData.hasEmployees != null) {
+    if(!this.props.impactsData.hasEmployees && this.state.indexGini == 0) {
       this.state.isDisabled = false;
     }
     if(this.props.impactsData.hasEmployees &&  this.state.indexGini != ''  && this.props.impactsData.netValueAdded != null)
@@ -105,6 +105,7 @@ export class StatementDIS extends React.Component {
       case "false":
         this.props.impactsData.setHasEmployees(false);
         this.props.impactsData.wageGap = 0;
+        this.state.isDisabled = false;
         break;
     }
     this.setState({ indexGini: valueOrDefault(this.props.impactsData.indexGini, "") });

@@ -24,10 +24,10 @@ export class StatementGEQ extends React.Component {
   componentDidUpdate() 
   {
 
-    if(!this.props.impactsData.hasEmployees && this.props.impactsData.hasEmployees != null) {
+
+    if(!this.props.impactsData.hasEmployees && this.state.wageGap == 0) {
       this.state.isDisabled = false;
     }
-
     if(this.props.impactsData.hasEmployees && this.state.wageGap != '' && this.props.impactsData.netValueAdded != null)
     {
       this.state.isDisabled = false;
@@ -106,6 +106,7 @@ export class StatementGEQ extends React.Component {
       case "false":
         this.props.impactsData.setHasEmployees(false);
         this.props.impactsData.wageGap = 0;
+        this.state.isDisabled = false;
         break;
     }
     this.setState({ wageGap: valueOrDefault(this.props.impactsData.wageGap, "") });
