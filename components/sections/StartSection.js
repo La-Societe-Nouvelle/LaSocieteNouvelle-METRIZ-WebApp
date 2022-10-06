@@ -21,7 +21,7 @@ export class StartSection extends React.Component {
           <Col lg="7">
             <section>
               <h1>
-                Mesurez <span className="underline">l'empreinte sociétale</span> de votre entreprise.
+                Mesurez <span className="underline">l'empreinte sociétale</span> de votre entreprise
               </h1>
               <p>
                 Notre objectif est de vous permettre de <strong>mesurer l’empreinte de la production</strong> de votre entreprise sur des enjeux <strong>majeurs de développement durable.</strong>
