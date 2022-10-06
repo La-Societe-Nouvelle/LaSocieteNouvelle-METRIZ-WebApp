@@ -93,7 +93,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               >
                 4
               </button>
-              <div className="step-name">Mesure de l'impact</div>
+              <div className="step-name">Déclaration des impacts directs</div>
             </div>
           </nav>
         </Container>
