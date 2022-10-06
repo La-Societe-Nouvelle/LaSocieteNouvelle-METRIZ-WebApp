@@ -176,12 +176,15 @@ class Metriz extends React.Component {
   /* ----- PROGESSION ---- */
 
 
-  validStep = (step) => {
+  validStep = (step) => 
+  {
     // Increase progression
     this.state.session.progression = Math.max(step + 1, this.state.session.progression);
+
     // skip initial states if first year
-    if (this.state.session.progression == 3 &&
-      getPrevAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks)) == 0) this.state.session.progression++;
+    if (this.state.session.progression == 2 && getPrevAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks)) == 0) {
+      this.state.session.progression++;
+    }
 
     // update current step
     this.setStep(this.state.session.progression);

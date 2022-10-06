@@ -76,7 +76,15 @@ button:hover {
     color: #ffffff;
   }
 }
+.btn-tertiary {
+  background-color: $tertiary;
+  color : #fff;
+  &:hover{
+    background-color: darken($tertiary, 5%);
+    color : #fff;
+  }
 
+}
 .btn-primary:disabled, .btn-primary.disabled {
   color: $primary;
   background-color: $light;
