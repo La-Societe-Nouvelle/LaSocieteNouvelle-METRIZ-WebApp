@@ -63,14 +63,10 @@ export class InitialStatesSection extends React.Component {
       <Container fluid>
         <section className="step">
           <div className="section-title">
-            <h2>
-              {" "}
-              <i className="bi bi-pencil-fill"></i> &Eacute;tape 2 - Saisissez
-              vos états initiaux
-            </h2>
-            <p className="alert alert-info">
-              Les états initiaux correspondent aux empreintes des comptes de
-              stocks et d’immobilisations en début d’exercice. Les empreintes
+            <h2 className="mb-3"> Etape 2 - Saisissez vos états initiaux</h2>
+            <p >
+              Les états initiaux correspondent aux <b>empreintes des comptes de
+              stocks et d’immobilisations en début d’exercice</b>. Les empreintes
               peuvent être saisies sur la reprises de l’exercice précédent
               (onglet 1) ou sur la base de l’exercice courant ou valeurs par
               défaut (onglet 2)

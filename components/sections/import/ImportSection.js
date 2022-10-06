@@ -53,10 +53,7 @@ function ImportSection(props) {
   return (
     <Container fluid>
       <section className="step">
-        <h2>
-          <i class="bi bi-file-arrow-up-fill"></i>  &Eacute;tape 1 - Importez
-          vos flux comptables
-        </h2>
+        <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
 
         {view == 0 && (
           <ImportForm

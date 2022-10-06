@@ -22,10 +22,7 @@ const StatementSection = (props) => {
       {view == "statement" ? (
         <>
           <section className="step">
-            <h2>
-              <i className="bi bi-rulers"></i> &Eacute;tape 4 - Déclaration des
-              impacts directs
-            </h2>
+            <h2 className="mb-3">Etape 4 - Déclaration des impacts directs </h2>
             <p>
               Pour chaque indicateur, déclarez vos impacts directs et obtenez
               les éléments d'analyse.

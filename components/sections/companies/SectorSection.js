@@ -96,8 +96,8 @@ export class SectorSection extends React.Component {
       <Container fluid id="sector-section">
         <section className="step">
           <div className="section-title mb-3">
-            <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
-            <h3 className="subtitle ">
+            <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
+            <h3 className="subtitle mb-4 ">
               Synchronisation des données grâce au secteur d'activité
             </h3>
           </div>

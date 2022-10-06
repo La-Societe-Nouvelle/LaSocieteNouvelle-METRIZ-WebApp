@@ -143,8 +143,8 @@ export class SirenSection extends React.Component {
       <Container fluid id="siren-section">
         <section className="step">
           <div className="section-title">
-            <h2>&Eacute;tape 3 - Traitement des fournisseurs</h2>
-            <h3 className={"subtitle "}>
+            <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
+            <h3 className="subtitle mb-4">
               Synchronisation des données grâce au numéro de siren
             </h3>
           </div>
