@@ -342,7 +342,7 @@ export class FinancialData {
     getCompany = (id) => this.companies.filter(company => company.id==id)[0]
     getCompanyByAccount = (accountNum) => this.companies.filter(company => company.account == accountNum)[0]
     getCompanyByName = (name) => this.companies.filter(company => company.corporateName==name)[0]
-
+    
     // Update company
     async updateCompany(nextProps) 
     {
@@ -352,9 +352,17 @@ export class FinancialData {
         await company.update(nextProps);
     }
 
-    updateCorporateId = (corporateName,corporateId) => 
+    updateCorporateId = (account,corporateName,corporateId) => 
     {
-        let company = this.getCompanyByName(corporateName);
+        let company ;
+
+        if(account){
+           company = this.getCompanyByAccount(account);
+        }
+        else {          
+            company = this.getCompanyByName(corporateName);
+        }
+
         if (company!=undefined) company.update({id: company.id,corporateId});
     }
 
