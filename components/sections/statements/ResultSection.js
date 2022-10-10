@@ -51,6 +51,8 @@ const ResultSection = (props) => {
   const [divisionFootprint, setDivisionFootprint] = useState(
     props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
   );
+  
+  const [targetSNBC, setTargetSNBC] = useState();
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -80,6 +82,8 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
+
+    
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
     } else {
@@ -94,6 +98,12 @@ const ResultSection = (props) => {
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
       });
+    }
+
+    // GET TARGET SNCB 2030 VALUE
+    if(indic == "ghg") {
+
+      await getTargetSNBC();
     }
   }, [comparativeDivision]);
 
@@ -132,7 +142,7 @@ const ResultSection = (props) => {
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];
-
+          console.log(production)
           if (valueAdded.data.header.code == 200) {
             valueAddedFootprint = valueAdded.data.data[0];
           }
@@ -155,13 +165,23 @@ const ResultSection = (props) => {
       productionDivisionFootprint: productionFootprint,
       consumptionDivisionFootprint: consumptionFootprint,
     };
-
+    {
+      console.log(productionFootprint)
+    }
     setDivisionFootprint({
       valueAddedDivisionFootprint: valueAddedFootprint,
       productionDivisionFootprint: productionFootprint,
       consumptionDivisionFootprint: consumptionFootprint,
     });
   };
+
+  const getTargetSNBC = async () => {
+    await api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=PRD&area=FRA").then((res) => {
+      console.log(res.data);
+    }).catch((err)=>{
+      throw err;
+    });
+  }
 
   return (
     <>
@@ -251,6 +271,7 @@ const ResultSection = (props) => {
               <h3 className="text-center">
                 Répartition des impacts bruts (en %)
               </h3>
+           
               <div className="p-4">
                 <PieGraph
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
@@ -283,6 +304,7 @@ const ResultSection = (props) => {
         />
         {error && <ErrorApi />}
         <div className="mt-5">
+  
           {allSectorFootprint && (
             <IndicatorGraphs
               financialData={session.financialData}
