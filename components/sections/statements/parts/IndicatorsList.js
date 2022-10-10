@@ -149,15 +149,15 @@ const IndicatorsList = (props) => {
           const consumption = responses[2];
 
           if (valueAdded.data.header.code == 200) {
-            valueAddedFootprint = valueAdded.data.data[0];
+            valueAddedFootprint = valueAdded.data.data.at(-1);
           }
 
           if (production.data.header.code == 200) {
-            productionFootprint = production.data.data[0];
+            productionFootprint = production.data.data.at(-1);
           }
 
           if (consumption.data.header.code == 200) {
-            consumptionFootprint = consumption.data.data[0];
+            consumptionFootprint = consumption.data.data.at(-1);
           }
         })
       )
