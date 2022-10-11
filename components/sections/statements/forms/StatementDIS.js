@@ -115,7 +115,7 @@ export class StatementDIS extends React.Component {
 
   updateIndexGini = (input) => {
     this.props.impactsData.indexGini = input;
-    this.setState({ indexGini: this.props.impactsData.indexGini });
+    this.setState({ indexGini: this.props.impactsData.indexGini , isDisabled : false});
     this.props.onUpdate("dis");
   }
 

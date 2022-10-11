@@ -116,7 +116,7 @@ export class StatementGEQ extends React.Component {
 
   updateWageGap = (input) => {
     this.props.impactsData.wageGap = input;
-    this.setState({ wageGap: this.props.impactsData.wageGap });
+    this.setState({ wageGap: this.props.impactsData.wageGap,  isDisabled : false });
     this.props.onUpdate("geq");
   }
 
