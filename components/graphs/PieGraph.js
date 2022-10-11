@@ -49,7 +49,6 @@ function PieGraph(props) {
   };
 
   const options = {
-    responsive: true,
 
         plugins: {
       legend: {

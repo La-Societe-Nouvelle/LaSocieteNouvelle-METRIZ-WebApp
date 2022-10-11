@@ -82,7 +82,6 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-
     
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
@@ -142,7 +141,6 @@ const ResultSection = (props) => {
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];
-          console.log(production)
           if (valueAdded.data.header.code == 200) {
             valueAddedFootprint =  valueAdded.data.data.at(-1);
            
@@ -158,7 +156,7 @@ const ResultSection = (props) => {
         })
       )
       .catch((errors) => {
-        console.log(errors);
+        setError(true);
       });
 
     props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
@@ -166,9 +164,7 @@ const ResultSection = (props) => {
       productionDivisionFootprint: productionFootprint,
       consumptionDivisionFootprint: consumptionFootprint,
     };
-    {
-      console.log(productionFootprint)
-    }
+
     setDivisionFootprint({
       valueAddedDivisionFootprint: valueAddedFootprint,
       productionDivisionFootprint: productionFootprint,
@@ -177,11 +173,50 @@ const ResultSection = (props) => {
   };
 
   const getTargetSNBC = async () => {
-    await api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=PRD&area=FRA").then((res) => {
-      console.log(res.data);
-    }).catch((err)=>{
-      throw err;
+
+    let valueAddedTarget;
+    let productionTarget;
+    let consumptionTarget;
+
+    const getValueAdded = api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=NVA&area=FRA"
+    );
+    const getProduction = api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=PRD&area=FRA");
+
+    const getConsumption = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=IC&area=FRA"
+    );
+    await axios
+    .all([getValueAdded, getProduction, getConsumption])
+    .then(
+      axios.spread((...responses) => {
+        const valueAdded = responses[0];
+        const production = responses[1];
+        const consumption = responses[2];
+
+        if (valueAdded.data.header.code == 200) {
+          valueAddedTarget =  valueAdded.data.data.at(-1);
+         
+        }
+
+        if (production.data.header.code == 200) {
+          productionTarget = production.data.data.at(-1);
+        }
+
+        if (consumption.data.header.code == 200) {
+          consumptionTarget = consumption.data.data.at(-1);
+        }
+      })
+    )
+    .catch(() => {
+      setError(true);
     });
+
+    setTargetSNBC({
+      valueAddedTarget: valueAddedTarget,
+      productionTarget: productionTarget,
+      consumptionTarget: consumptionTarget,
+    });
+
   }
 
   return (
@@ -268,12 +303,12 @@ const ResultSection = (props) => {
             </Tabs>
           </Col>
           {printGrossImpact.includes(indic) && (
-            <Col>
+            <Col sm={4}>
               <h3 className="text-center">
                 Répartition des impacts bruts (en %)
               </h3>
            
-              <div className="p-4">
+              <div className="p-5">
                 <PieGraph
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
                     indic
@@ -303,16 +338,18 @@ const ResultSection = (props) => {
           options={divisionsOptions}
           onChange={changeComparativeDivision}
         />
+        
         {error && <ErrorApi />}
+        {    console.log(targetSNBC)
+}
         <div className="mt-5">
-  
           {allSectorFootprint && (
             <IndicatorGraphs
               financialData={session.financialData}
               indic={indic}
               allSectorFootprint={allSectorFootprint}
               comparativeDivisionFootprint={divisionFootprint}
-              
+              targetSNBC={targetSNBC}
             />
           )}
         </div>
