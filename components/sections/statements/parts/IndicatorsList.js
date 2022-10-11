@@ -50,8 +50,9 @@ const IndicatorsList = (props) => {
     props.session.comparativeDivisionFootprints
   );
 
-  useEffect(async () => {
+  const [targetSNBC, setTargetSNBC] = useState();
 
+  useEffect(async () => {
     if (validations.length > 0) {
       props.publish();
     }
@@ -64,7 +65,9 @@ const IndicatorsList = (props) => {
     if (props.session.comparativeDivision != comparativeDivision) {
       props.session.comparativeDivision = comparativeDivision
     }
-  
+    if(!targetSNBC && comparativeDivision != '00' && validations.includes('ghg')) {
+      await getTargetSNBC();
+    }
   }, [validations,comparativeDivision]);
 
   // check if net value indicator will change with new value & cancel value if necessary
@@ -96,8 +99,15 @@ const IndicatorsList = (props) => {
     if (!validations.includes(indic)) {
       // Get compartive footprints for all sectors for this indicator
       await getComparativeAreaFootprint(indic);
+
       if(comparativeDivision != '00') {
         await getComparativeDivisionFootprint(indic.toUpperCase(), comparativeDivision)
+      
+        // Get Target SNCB for GHG indic and comparative division
+        if(indic == "ghg") {
+
+          await getTargetSNBC();
+        }
       }
       else {
         let footprint = divisionFootprint;
@@ -121,6 +131,9 @@ const IndicatorsList = (props) => {
     setUpdatedIndic(indic);
   };
 
+  // Get Comparative Footprint for all sectors , division and target SNCB
+
+  // All sectors
   const getComparativeAreaFootprint = async (indicator) => {
 
     let indic = indicator.toUpperCase();
@@ -132,6 +145,7 @@ const IndicatorsList = (props) => {
     const getValueAdded = api.get(
       "serie/MACRO_" + indic + "_FRA_DIV/?code=00&aggregate=GVA&area=FRA"
     );
+
     const getProduction = api.get(
       "serie/MACRO_" + indic + "_FRA_DIV/?code=00&aggregate=PRD&area=FRA"
     );
@@ -151,7 +165,7 @@ const IndicatorsList = (props) => {
           if (valueAdded.data.header.code == 200) {
             valueAddedFootprint = valueAdded.data.data.at(-1);
           }
-
+console.log(valueAdded)
           if (production.data.header.code == 200) {
             productionFootprint = production.data.data.at(-1);
           }
@@ -174,7 +188,7 @@ const IndicatorsList = (props) => {
     });
     setAllSectorFootprint(footprint);
   };
-
+ // Comparative division
   const getComparativeDivisionFootprint = async (indic, division) => {
 
     let valueAddedFootprint;
@@ -249,6 +263,55 @@ const IndicatorsList = (props) => {
   
     setDivisionFootprint(footprint);
   };
+
+  // Target SNBC for comparative division and GHG indicator
+  const getTargetSNBC = async () => {
+
+    let valueAddedTarget;
+    let productionTarget;
+    let consumptionTarget;
+
+    const getValueAdded = api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=NVA&area=FRA"
+    );
+    const getProduction = api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=PRD&area=FRA");
+
+    const getConsumption = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=IC&area=FRA"
+    );
+    await axios
+    .all([getValueAdded, getProduction, getConsumption])
+    .then(
+      axios.spread((...responses) => {
+        const valueAdded = responses[0];
+        const production = responses[1];
+        const consumption = responses[2];
+        console.log(valueAdded)
+
+        if (valueAdded.data.header.code == 200) {
+          valueAddedTarget =  valueAdded.data.data.at(-1);
+         
+        }
+
+        if (production.data.header.code == 200) {
+          productionTarget = production.data.data.at(-1);
+        }
+
+        if (consumption.data.header.code == 200) {
+          consumptionTarget = consumption.data.data.at(-1);
+        }
+      })
+    )
+    .catch(() => {
+      setError(true);
+    });
+
+    setTargetSNBC({
+      valueAddedTarget: valueAddedTarget,
+      productionTarget: productionTarget,
+      consumptionTarget: consumptionTarget,
+    });
+
+  }
   // Update compartive division 
   const updateDivision = async (division) => {
 
@@ -321,6 +384,7 @@ const IndicatorsList = (props) => {
             indic={indic}
             allSectorFootprint={allSectorFootprint[indic.toUpperCase()]}
             comparativeDivisionFootprint={divisionFootprint[indic.toUpperCase()]}
+            targetSNBC={targetSNBC}
           />
         ))}
       {popUp == "division" && (

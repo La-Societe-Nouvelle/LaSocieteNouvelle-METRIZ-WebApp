@@ -18,6 +18,7 @@ export const IndicatorGraphs = ({
   comparativeDivisionFootprint,
   financialData,
   indic,
+  targetSNBC
 }) => {
   const { production, netValueAdded, intermediateConsumption } =
     financialData.aggregates;
@@ -27,35 +28,53 @@ export const IndicatorGraphs = ({
     valueAddedAreaFootprint,
     consumptionAreaFootprint,
   } = allSectorFootprint;
-
   const {
     productionDivisionFootprint,
     valueAddedDivisionFootprint,
     consumptionDivisionFootprint,
   } = comparativeDivisionFootprint;
-
+ 
+  
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
 
+  // TARGET SNBC VALUE
+
+  
+  if(targetSNBC) {
+    productionTargetData = [targetSNBC.productionTarget.value,targetSNBC.productionTarget.value,targetSNBC.productionTarget.value];
+    consumptionTargetData = [targetSNBC.consumptionTarget.value,targetSNBC.consumptionTarget.value,targetSNBC.consumptionTarget.value];
+    valueAddedTargetData = [targetSNBC.valueAddedTarget.value,targetSNBC.valueAddedTarget.value,targetSNBC.valueAddedTarget.value];
+    productionTargetDataS =     targetSNBC.productionTarget.value;
+
+  }
+  
   // PRODUCTION CHART
-
-  const labelsP = ["France", ["Exercice", "en cours"], "Branche"];
-
-  const dataP = [
-    roundNumber(productionAreaFootprint.value),
-    roundNumber(production.footprint.getIndicator(indic).value),
-    roundNumber(productionDivisionFootprint.value),
-  ];
-  for (let i = 0; i < dataP.length; i++) {
-    if (dataP[i] === null) {
-      dataP.splice(i, 1);
-      labelsP.splice(i, 1);
-    }
+  const labelsP = ["France", ["Exercice", "en cours"]];
+  
+  const dataP = [productionAreaFootprint.value.toFixed(precision),production.footprint.getIndicator(indic).value.toFixed(precision)]
+  if(productionDivisionFootprint) {
+    dataP.push(productionDivisionFootprint.value);
+    labelsP.push("Branche");
+  }
+  if(targetSNBC) {
+    dataP.push(targetSNBC.productionTarget.value);
+    labelsP.push("Objectif SNBC")
   }
 
   const dataProduction = {
-    labels: labelsP,
     datasets: [
+      {
+        label: "Trajectoire SNBC",
+        data : dataP,
+        type : 'line',
+        yAxisID: 'y1',
+        xAxisID: 'x1',
+        backgroundColor: "RGBA(255, 152, 7,0.4)",
+        borderWidth : 1,
+        borderColor: "RGB(255, 152, 7)",   
+        pointRadius: [5,5,5,5],    
+      },
       {
         label: "Production",
         data: dataP,
@@ -63,36 +82,69 @@ export const IndicatorGraphs = ({
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
           "RGB(176, 185, 247)",
+          "RGBA(255, 152, 7,0.4)",
         ],
+        borderWidth : 1,
+        borderColor: [
+          "RGB(202, 209, 240)",
+          "RGB(241, 97, 103)",
+          "RGB(146, 159, 249)",
+          "RGBA(255, 152, 7,0.4)"
+        ], 
+        barPercentage: 1,
+        barThickness: 50,
+        type: 'bar',
+        yAxisID: 'y2',
+        xAxisID: 'x2',
       },
+      
     ],
   };
 
   const optionsP = {
-    responsive: true,
-    maintainAspectRatio: false,
-    devicePixelRatio: 2,
+
     scales: {
-      x: {
+      x2: {
+        type: 'category',
+        labels: labelsP,
+        ticks: {
+          color: '#212529',
+        },
         grid: {
-          display: false,
+          display: false
+        }
+      },
+      x1:{
+        labels: labelsP,
+        display : false,
+         
+      },
+      y1: {
+        display: true,
+        position: 'right',
+      },
+      y2: {
+        display: true,
+        title: {
+          display: true,
+          text: unit,
+          color: '#212529',
+        },
+        ticks: {
+          color: '#212529',
+          
         },
       },
-      y: {
-        display: false,
-      },
+      
     },
     plugins: {
-      datalabels: {
-        color: "#191558",
-        labels: {
-          title: {
-            font: {},
-          },
-        },
-      },
       legend: {
-        display: false,
+        display: false
+      },
+      datalabels: {
+        labels: {
+         display : false
+        },
       },
       title: {
         padding: {
@@ -100,38 +152,47 @@ export const IndicatorGraphs = ({
           bottom: 25,
         },
         font: {
-          size: 15,
-          family: "Roboto",
+          size: 18,
+          weight : 'bold',
         },
         display: true,
-        align: "start",
+        align: "center",
         position: "top",
+        color : "#191558",
         text: "Production",
-        fontColor: "#FFF",
       },
     },
   };
 
   // CONSUMPTION CHART
 
-  const labelsC = ["France", ["Exercice", "en cours"], "Branche"];
+  const labelsC = ["France", ["Exercice", "en cours"]];
 
-  const dataC = [
-    roundNumber(consumptionAreaFootprint.value),
-    roundNumber(intermediateConsumption.footprint.getIndicator(indic).value),
-    roundNumber(consumptionDivisionFootprint.value),
-  ];
+  const dataC = [consumptionAreaFootprint.value.toFixed(precision),intermediateConsumption.footprint.getIndicator(indic).value.toFixed(precision)];
+  if(consumptionDivisionFootprint) {
+    dataC.push(consumptionDivisionFootprint.value.toFixed(precision));
+    labelsC.push("Branche")
+  }
 
-  for (let i = 0; i < dataC.length; i++) {
-    if (dataC[i] === null) {
-      dataC.splice(i, 1);
-      labelsC.splice(i, 1);
-    }
+  if(targetSNBC) {
+    dataC.push(targetSNBC.consumptionTarget.value.toFixed(precision));
+    labelsC.push("Objectif SNBC")
   }
 
   const dataConsumption = {
     labels: labelsC,
     datasets: [
+      {
+        label: "Trajectoire SNBC",
+        data : dataC,
+        type : 'line',
+        yAxisID: 'y1',
+        xAxisID: 'x1',
+        backgroundColor: "RGBA(255, 152, 7,0.4)",
+        borderWidth : 1,
+        borderColor: "RGBA(255, 152, 7, 0.7)",       
+        pointRadius: [5,5,5,5],
+      },
       {
         label: "Consommation",
         data: dataC,
@@ -139,44 +200,68 @@ export const IndicatorGraphs = ({
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
           "RGB(176, 185, 247)",
+          "RGBA(255, 152, 7,0.4)",
         ],
+        borderWidth : 1,
+        borderColor: [
+          "RGB(202, 209, 240)",
+          "RGB(241, 97, 103)",
+          "RGB(146, 159, 249)",
+          "RGBA(255, 152, 7,0.4)",
+        ],
+        barPercentage: 1,
+        barThickness: 50,
+        type: 'bar',
+        yAxisID: 'y2',
+        xAxisID: 'x2',
       },
     ],
   };
 
   const optionsC = {
-    responsive: true,
-    maintainAspectRatio: false,
-    devicePixelRatio: 2,
     scales: {
-      x: {
+      x2: {
+        type: 'category',
+        labels: labelsC,
+        ticks: {
+          color: '#212529',
+        },
         grid: {
-          display: false,
+          display: false
+        }
+      },
+      x1:{
+        labels: labelsC,
+        display : false,
+        
+      },
+      y1: {
+        display: false,
+        type: 'linear',
+        position: 'left',
+
+      },
+      y2: {
+        display: true,
+        title: {
+          display: true,
+          text: unit,
+          color: '#212529',
+        },
+        ticks: {
+          color: '#212529',
         },
       },
-      y: {
-        display: false,
-      },
+      
     },
     plugins: {
-      datalabels: {
-        color: "#191558",
-        labels: {
-          title: {
-            font: {},
-          },
-        },
-      },
-      datalabels: {
-        color: "#191558",
-        labels: {
-          title: {
-            font: {},
-          },
-        },
-      },
       legend: {
-        display: false,
+        display: false
+      },
+      datalabels: {
+        labels: {
+         display : false
+        },
       },
       title: {
         padding: {
@@ -184,36 +269,48 @@ export const IndicatorGraphs = ({
           bottom: 25,
         },
         font: {
-          size: 15,
-          family: "Roboto",
+          size: 18,
+          weight : 'bold',
         },
         display: true,
-        align: "start",
+        align: "center",
         position: "top",
+        color : '#191558',
         text: "Consommations intermédiaires",
       },
     },
   };
 
   // VALUE CHART
-  const labelsV = ["France", ["Exercice", "en cours"], "Branche"];
+  const labelsV = ["France", ["Exercice", "en cours"]];
 
-  const dataV = [
-    roundNumber(valueAddedAreaFootprint.value),
-    roundNumber(netValueAdded.footprint.getIndicator(indic).value),
-    roundNumber(valueAddedDivisionFootprint.value),
-  ];
-
-  for (let i = 0; i < dataV.length; i++) {
-    if (dataV[i] === null) {
-      dataV.splice(i, 1);
-      labelsV.splice(i, 1);
-    }
+  const dataV = [valueAddedAreaFootprint.value.toFixed(precision),netValueAdded.footprint.getIndicator(indic).value.toFixed(precision)];
+  if(valueAddedDivisionFootprint) {
+    dataV.push(valueAddedDivisionFootprint.value.toFixed(precision));
+    labelsV.push("Branche")
   }
+
+  if(targetSNBC) {
+    dataV.push(targetSNBC.valueAddedTarget.value.toFixed(precision));
+    labelsV.push("Objectif SNBC")
+  }
+
+
 
   const dataValueAdded = {
     labels: labelsV,
     datasets: [
+      {
+        label: "Trajectoire SNBC",
+        data : dataV,
+        type : 'line',
+        yAxisID: 'y1',
+        xAxisID: 'x1',
+        backgroundColor: "RGBA(255, 152, 7,0.4)",
+        borderWidth : 1,
+        borderColor: "RGB(255, 152, 7)",       
+        pointRadius: [5,5,5,5],
+      },
       {
         label: "Valeur ajoutée",
         data: dataV,
@@ -221,61 +318,96 @@ export const IndicatorGraphs = ({
           "RGB(219, 222, 241)",
           "RGB(251, 122, 127)",
           "RGB(176, 185, 247)",
+          "RGBA(255, 152, 7,0.4)",
         ],
+        borderWidth : 1,
+        borderColor: [
+          "RGB(202, 209, 240)",
+          "RGB(241, 97, 103)",
+          "RGB(146, 159, 249)",
+          "RGBA(255, 152, 7,0.4)",
+        ],
+        barPercentage: 1,
+        barThickness: 50,
+        type: 'bar',
+        yAxisID: 'y2',
+        xAxisID: 'x2',
       },
     ],
   };
 
   const optionsV = {
     scales: {
-      x: {
+      x2: {
+        type: 'category',
+        labels: labelsV,
+        ticks: {
+          color: '#212529',
+        },
         grid: {
-          display: false,
+          display: false
+        }
+      },
+      x1:{
+        labels: labelsV,
+        display : false,        
+      },
+      y1: {
+        display: false,
+        type: 'linear',
+        position: 'left',
+
+      },
+      y2: {
+        display: true,
+        title: {
+          display: true,
+          text: unit,
+          color: '#212529',
+        },
+        ticks: {
+          color: '#212529',
         },
       },
-      y: {
-        display: false,
-      },
+      
     },
     plugins: {
+      legend: false,
       datalabels: {
-        color: "#191558",
         labels: {
-          title: {
-            font: {},
-          },
+         display : false
         },
       },
-      legend: {
-        display: false,
-      },
       title: {
-        display: true,
         padding: {
           top: 0,
           bottom: 25,
         },
-        align: "start",
-        position: "top",
         font: {
-          size: 15,
-          family: "Roboto",
+          size: 18,
+          weight : 'bold',
         },
-        text: "Valeur ajoutée",
+        display: true,
+        align: "center",
+        color : '#191558',
+        position: "top",
+        text: "Valeur ajoutée ",
       },
     },
+   
   };
 
   return (
     <>
       <Row className="graphs">
-        <Col>
+        <Col sm={4} xl={4} lg={4} md={4}>
+        
           <Bar id="Production" data={dataProduction} options={optionsP} />
         </Col>
-        <Col>
+        <Col sm={4} xl={4} lg={4} md={4}>
           <Bar id="Consumption" data={dataConsumption} options={optionsC} />
         </Col>
-        <Col>
+        <Col sm={4} xl={4} lg={4} md={4}>
           <Bar id="Value" data={dataValueAdded} options={optionsV} />
         </Col>
       </Row>
