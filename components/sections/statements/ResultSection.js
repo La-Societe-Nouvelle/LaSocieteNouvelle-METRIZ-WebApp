@@ -101,10 +101,9 @@ const ResultSection = (props) => {
 
     // GET TARGET SNCB 2030 VALUE
     if(indic == "ghg") {
-
       await getTargetSNBC();
     }
-  }, [comparativeDivision]);
+  }, [comparativeDivision, indic]);
 
   const getComparativeDivisionFootprint = async () => {
     let valueAddedFootprint;
@@ -155,7 +154,7 @@ const ResultSection = (props) => {
           }
         })
       )
-      .catch((errors) => {
+      .catch(() => {
         setError(true);
       });
 
@@ -340,8 +339,7 @@ const ResultSection = (props) => {
         />
         
         {error && <ErrorApi />}
-        {    console.log(targetSNBC)
-}
+
         <div className="mt-5">
           {allSectorFootprint && (
             <IndicatorGraphs
