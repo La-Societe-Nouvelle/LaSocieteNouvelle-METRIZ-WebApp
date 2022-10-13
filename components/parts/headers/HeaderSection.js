@@ -71,7 +71,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               >
                 2
               </button>
-              <div className="step-name">Saisie des états initiaux</div>
+              <div className="step-name">Import des états initiaux</div>
             </div>
             <div className={"stepper-item" + (stepMax > 3 ? " completed" : "")}>
               <button
