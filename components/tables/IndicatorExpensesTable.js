@@ -46,9 +46,9 @@ export class IndicatorExpensesTable extends React.Component {
         <Table>
           <thead>
             <tr>
-              <td  onClick={() => this.changeColumnSorted("account")}>Compte</td>
-              <td  onClick={() => this.changeColumnSorted("label")}>Libellé</td>
-              <td className="text-end" onClick={() => this.changeColumnSorted("amount")}>Montant</td>
+              <td  onClick={() => this.changeColumnSorted("account")}> <i className="bi bi-arrow-down-up me-1"></i>Compte</td>
+              <td  onClick={() => this.changeColumnSorted("label")}> <i className="bi bi-arrow-down-up me-1"></i>Libellé</td>
+              <td className="text-end" onClick={() => this.changeColumnSorted("amount")}> <i className="bi bi-arrow-down-up me-1"></i>Montant</td>
               <td  className="text-end">Empreinte</td>
               <td  className="text-end">Incertitude</td>
               {impactAbsolu ? <td  className="text-end">Impact</td> : null}

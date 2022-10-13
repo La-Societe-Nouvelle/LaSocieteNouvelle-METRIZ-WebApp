@@ -403,9 +403,12 @@ export class SirenSection extends React.Component {
     let reader = new FileReader();
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
+      console.log(XLSXData);
+      
       await Promise.all(
-        XLSXData.map(async ({ denomination, siren }) =>
+        XLSXData.map(async ({ account,denomination, siren }) =>
           this.props.session.financialData.updateCorporateId(
+            account,
             denomination,
             siren
           )
@@ -427,8 +430,9 @@ export class SirenSection extends React.Component {
       .filter((company) => company.account.charAt(0) != "_")
       .map((company) => {
         return {
+          account : company.account,
           denomination: company.corporateName,
-          siren: company.corporateId,
+          siren: company.corporateId
         };
       });
     let fileProps = { wsclos: [{ wch: 50 }, { wch: 20 }] };

@@ -42,22 +42,29 @@ export class CompaniesTable extends React.Component {
           <thead>
             <tr>
               <td onClick={() => this.changeColumnSorted("denomination")}>
+                <i className="bi bi-arrow-down-up me-1"></i>
                 Libellé du compte fournisseur
               </td>
               <td>Compte fournisseur</td>
-              <td className="area-column" onClick={() => this.changeColumnSorted("area")}>
+              <td
+                className="area-column"
+                onClick={() => this.changeColumnSorted("area")}
+              >
+                <i className="bi bi-arrow-down-up me-1"></i>
                 Espace économique
               </td>
               <td
                 className="division-column"
                 onClick={() => this.changeColumnSorted("activity")}
               >
+                <i className="bi bi-arrow-down-up me-1"></i>
                 Secteur d'activité
               </td>
               <td
                 className="text-end"
                 onClick={() => this.changeColumnSorted("amount")}
               >
+                <i className="bi bi-arrow-down-up me-1"></i>
                 Montant
               </td>
             </tr>
@@ -81,7 +88,7 @@ export class CompaniesTable extends React.Component {
               className={page == 0 ? "hidden" : "btn btn-primary"}
               onClick={this.prevPage}
             >
-               &lsaquo; Page précédente
+              &lsaquo; Page précédente
             </button>
             <div>
               <p>
@@ -90,7 +97,9 @@ export class CompaniesTable extends React.Component {
             </div>
             <button
               className={
-                (page + 1) * nbItems < companies.length ? "btn btn-primary" : "hidden"
+                (page + 1) * nbItems < companies.length
+                  ? "btn btn-primary"
+                  : "hidden"
               }
               onClick={this.nextPage}
             >
@@ -201,7 +210,10 @@ class RowTableCompanies extends React.Component {
     Object.entries(divisions)
       .sort((a, b) => parseInt(a) - parseInt(b))
       .map(([value, label]) =>
-        this.state.divisionsOptions.push({ value: value, label: value + " - " + label })
+        this.state.divisionsOptions.push({
+          value: value,
+          label: value + " - " + label,
+        })
       );
 
     // area select options
@@ -237,12 +249,7 @@ class RowTableCompanies extends React.Component {
   }
 
   render() {
-    const {
-      corporateName,
-      account,
-      amount,
-      status,
-    } = this.props;
+    const { corporateName, account, amount, status } = this.props;
     const { areaCode, activityCode, dataUpdated } = this.state;
 
     let icon;
@@ -250,15 +257,17 @@ class RowTableCompanies extends React.Component {
     if (activityCode == "00") {
       icon = (
         <p className="warning">
-          <i className="bi bi-exclamation-triangle"  title="Risque de données incomplètes"></i>
-        
+          <i
+            className="bi bi-exclamation-triangle"
+            title="Risque de données incomplètes"
+          ></i>
         </p>
       );
     } else {
       if (status == 200) {
         icon = (
           <p className="success">
-            <i className="bi bi-check2"  title="Données synchronisées"></i>
+            <i className="bi bi-check2" title="Données synchronisées"></i>
           </p>
         );
       } else {

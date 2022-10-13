@@ -541,10 +541,10 @@ const IndicatorsList = (props) => {
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
                         props.impactsData.greenhousesGazEmissions != 0 &&
-                        !validations.includes(key) && <IconWarning />}
+                        validations.includes('nrg') && !validations.includes('ghg') && <IconWarning />}
                       {key == "nrg" &&
                         props.impactsData.energyConsumption != 0 &&
-                        !validations.includes(key) && <IconWarning />}
+                        validations.includes('ghg')  && !validations.includes('nrg') && <IconWarning />}
                     </ArrowToggle>
                   </div>
                   <div>

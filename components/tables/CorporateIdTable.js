@@ -39,9 +39,11 @@ export class CorporateIdTable extends React.Component {
                 onClick={() => this.changeColumnSorted("identifiant")}
                 className="siren"
               >
+              <i className="bi bi-arrow-down-up me-1"></i>
                 Siren
               </td>
               <td onClick={() => this.changeColumnSorted("denomination")}>
+              <i className="bi bi-arrow-down-up me-1"></i>
                 Libellé du compte fournisseur
               </td>
               <td>Compte fournisseur</td>
@@ -50,6 +52,7 @@ export class CorporateIdTable extends React.Component {
                 className="text-end"
                 onClick={() => this.changeColumnSorted("amount")}
               >
+              <i className="bi bi-arrow-down-up me-1"></i>
                 Montant
               </td>
             </tr>
@@ -113,6 +116,7 @@ export class CorporateIdTable extends React.Component {
   }
 
   sortCompanies(companies, columSorted) {
+    
     switch (columSorted) {
       case "identifiant":
         companies.sort((a, b) =>
@@ -126,7 +130,6 @@ export class CorporateIdTable extends React.Component {
           a.getCorporateName().localeCompare(b.getCorporateName())
         );
         break;
-
       case "amount":
         companies.sort((a, b) => b.amount - a.amount);
         break;

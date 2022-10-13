@@ -290,6 +290,7 @@ const ResultSection = (props) => {
               indic={indic}
               allSectorFootprint={allSectorFootprint}
               comparativeDivisionFootprint={divisionFootprint}
+              
             />
           )}
         </div>
