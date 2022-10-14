@@ -12,14 +12,17 @@ import { printValue } from "/src/utils/Utils";
 // Libraries
 import metaIndics from "/lib/indics";
 import { Col, Row, Table } from "react-bootstrap";
-import { ComparativeGraphsData, ComparativeGraphsOptions } from "./ComparativeGraphs.config";
+import {
+  ComparativeGraphsData,
+  ComparativeGraphsOptions,
+} from "./ComparativeGraphs.config";
 
 export const IndicatorGraphs = ({
   allSectorFootprint,
   comparativeDivisionFootprint,
   financialData,
   indic,
-  targetSNBC
+  targetSNBC,
 }) => {
   const { production, netValueAdded, intermediateConsumption } =
     financialData.aggregates;
@@ -34,158 +37,207 @@ export const IndicatorGraphs = ({
     valueAddedDivisionFootprint,
     consumptionDivisionFootprint,
   } = comparativeDivisionFootprint;
- 
-  
+
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
-  
+
   // PRODUCTION CHART
   const labels = ["France", "Exercice en cours"];
-  
-  if(comparativeDivisionFootprint) {
+
+  if (comparativeDivisionFootprint) {
     labels.push("Branche");
   }
 
-  const dataP = [productionAreaFootprint.value.toFixed(precision),production.footprint.getIndicator(indic).value.toFixed(precision)]
-  
+  const dataP = [
+    productionAreaFootprint.value.toFixed(precision),
+    production.footprint.getIndicator(indic).value.toFixed(precision),
+  ];
+
   let dataComparativeP;
 
-  if(productionDivisionFootprint) {
+  if (productionDivisionFootprint) {
     dataP.push(productionDivisionFootprint.value.toFixed(precision));
-    
   }
-  if(targetSNBC) {
+  if (targetSNBC) {
     dataComparativeP = targetSNBC.productionTarget.value.toFixed(precision);
   }
 
-
-  const productionDataConfig = ComparativeGraphsData("Production",labels, dataP, dataComparativeP);
-  const productionOptionConfig = ComparativeGraphsOptions(labels,"Production",unit);
+  const productionDataConfig = ComparativeGraphsData(
+    "Production",
+    dataP,
+    dataComparativeP
+  );
+  const productionOptionConfig = ComparativeGraphsOptions(
+    labels,
+    unit
+  );
 
   // CONSUMPTION CHART
 
-  const dataC = [consumptionAreaFootprint.value.toFixed(precision),intermediateConsumption.footprint.getIndicator(indic).value.toFixed(precision)];
-  if(consumptionDivisionFootprint) {
+  const dataC = [
+    consumptionAreaFootprint.value.toFixed(precision),
+    intermediateConsumption.footprint
+      .getIndicator(indic)
+      .value.toFixed(precision),
+  ];
+  if (consumptionDivisionFootprint) {
     dataC.push(consumptionDivisionFootprint.value.toFixed(precision));
   }
   let dataComparativeC;
 
-  if(targetSNBC) {
+  if (targetSNBC) {
     dataComparativeC = targetSNBC.consumptionTarget.value.toFixed(precision);
   }
 
-  const consumptionDataConfig = ComparativeGraphsData("Consommation",labels, dataC, dataComparativeC);
-  const consumptionOptionConfig = ComparativeGraphsOptions(labels,"Consommations intermédiaires",unit);
+  const consumptionDataConfig = ComparativeGraphsData(
+    "Consommation",
+    dataC,
+    dataComparativeC
+  );
+  const consumptionOptionConfig = ComparativeGraphsOptions(
+    labels,
+    unit
+  );
 
   // VALUE CHART
   let dataComparativeV;
-
-  const dataV = [valueAddedAreaFootprint.value.toFixed(precision),netValueAdded.footprint.getIndicator(indic).value.toFixed(precision)];
-  if(valueAddedDivisionFootprint) {
+   
+  const dataV = [
+    valueAddedAreaFootprint.value.toFixed(precision),
+    netValueAdded.footprint.getIndicator(indic).value.toFixed(precision),
+  ];
+  if (valueAddedDivisionFootprint) {
     dataV.push(valueAddedDivisionFootprint.value.toFixed(precision));
   }
 
-  if(targetSNBC) {
+  if (targetSNBC) {
     dataComparativeV = targetSNBC.valueAddedTarget.value.toFixed(precision);
   }
 
-  const dataValueAddedConfig = ComparativeGraphsData("Valeur ajoutée",labels, dataV, dataComparativeV);
-  const ValueAddedOptionConfig = ComparativeGraphsOptions(labels,"Valeur ajoutée nette",unit);
-
+  const dataValueAddedConfig = ComparativeGraphsData(
+    labels,
+    dataV,
+    dataComparativeV
+  );
+  const ValueAddedOptionConfig = ComparativeGraphsOptions(
+    labels,
+    unit
+  );
 
   return (
     <>
       <Row className="graphs">
-        <Col sm={4} xl={4} lg={4} md={4}>
-        
-          <Bar id="Production" data={productionDataConfig} options={productionOptionConfig} />
+      
+       <Col sm={4} xl={4} lg={4} md={4}>
+          <h5 className="mb-4">▪ Production</h5>
+          <Bar
+            id="Production"
+            data={productionDataConfig}
+            options={productionOptionConfig}
+          />
         </Col>
         <Col sm={4} xl={4} lg={4} md={4}>
-          <Bar id="Consumption" data={consumptionDataConfig} options={consumptionOptionConfig} />
+        <h5 className="mb-4">▪ Consommations intermédiaires</h5>
+          <Bar
+            id="Consumption"
+            data={consumptionDataConfig}
+            options={consumptionOptionConfig}
+          />
         </Col>
         <Col sm={4} xl={4} lg={4} md={4}>
-          <Bar id="Value" data={dataValueAddedConfig} options={ValueAddedOptionConfig} />
+        <h5 className="mb-4">▪ Valeur ajoutée</h5>
+          <Bar
+            id="Value"
+            data={dataValueAddedConfig}
+            options={ValueAddedOptionConfig}
+          />
         </Col>
       </Row>
 
-      <Table>
+      <Table className="mt-5">
         <thead>
           <tr>
-            <td className="auto">Agrégat</td>
-            <td className="column_value">France</td>
-            <td className="column_value align-center">Exercice en cours</td>
+            <td>Agrégat</td>
+            <td>France</td>
+            <td>Exercice en cours</td>
             {printValue(productionDivisionFootprint.value, precision) &&
-            printValue(consumptionDivisionFootprint.value, precision) &&
-            printValue(valueAddedDivisionFootprint.value, precision) !==
-              " - " ? (
-              <td className="column_value">Branche</td>
-            ) : (
-              <td></td>
-            )}
+              printValue(consumptionDivisionFootprint.value, precision) &&
+              printValue(valueAddedDivisionFootprint.value, precision) !==
+                " - " && <td>Branche</td>}
+            {targetSNBC && <td>Objectifs 2030 pour la branche</td>}
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>Production</td>
-            <td className="short right">
-              {printValue(productionAreaFootprint.value, precision)}{" "}
-              <span className="unit">{unit}</span>
+            <td>
+              {printValue(productionAreaFootprint.value, precision)}
+              <span className="unit"> {unit}</span>
             </td>
-            <td className="short align-center">
-              {printValue(production.footprint.getIndicator(indic).value, 1)}{" "}
-              <span className="unit">{unit}</span>
+            <td>
+              {printValue(production.footprint.getIndicator(indic).value, 1)}
+              <span className="unit"> {unit}</span>
             </td>
             {printValue(productionDivisionFootprint.value, precision) !==
-            " - " ? (
-              <td className="short right">
-                {printValue(productionDivisionFootprint.value, precision)}{" "}
-                <span className="unit">{unit}</span>
+              " - " && (
+              <td>
+                {printValue(productionDivisionFootprint.value, precision)}
+                <span className="unit"> {unit}</span>
               </td>
-            ) : (
-              <td></td>
+            )}
+            {targetSNBC && (
+              <td>
+                {dataComparativeP} <span className="unit">{unit}</span>
+              </td>
             )}
           </tr>
           <tr>
             <td>Consommations intermédiaires</td>
-            <td className="short right">
-              {printValue(consumptionAreaFootprint.value, precision)}{" "}
-              <span className="unit">{unit}</span>
+            <td>
+              {printValue(consumptionAreaFootprint.value, precision)}
+              <span className="unit"> {unit}</span>
             </td>
-            <td className="short align-center">
+            <td>
               {printValue(
                 intermediateConsumption.footprint.getIndicator(indic).value,
                 precision
-              )}{" "}
-              <span className="unit">{unit}</span>
+              )}
+              <span className="unit"> {unit}</span>
             </td>
             {printValue(consumptionDivisionFootprint.value, precision) !==
-            " - " ? (
-              <td className="short right">
-                {printValue(consumptionDivisionFootprint.value, precision)}{" "}
+              " - " && (
+              <td>
+                {printValue(consumptionDivisionFootprint.value, precision)}
                 <span className="unit">{unit}</span>
               </td>
-            ) : (
-              <td></td>
+            )}
+            {targetSNBC && (
+              <td>
+                {dataComparativeC} <span className="unit">{unit}</span>
+              </td>
             )}
           </tr>
           <tr>
             <td>Valeur ajoutée</td>
-            <td className="short right">
-              {printValue(valueAddedAreaFootprint.value, precision)}{" "}
-              <span className="unit">{unit}</span>
+            <td>
+              {printValue(valueAddedAreaFootprint.value, precision)}
+              <span className="unit"> {unit}</span>
             </td>
-            <td className="short align-center">
-              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}{" "}
-              <span className="unit">{unit}</span>
+            <td>
+              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}
+              <span className="unit"> {unit}</span>
             </td>
             {printValue(valueAddedDivisionFootprint.value, precision) !==
-            " - " ? (
-              <td className="short right">
-                {printValue(valueAddedDivisionFootprint.value, precision)}{" "}
-                <span className="unit">{unit}</span>
+              " - " && (
+              <td>
+                {printValue(valueAddedDivisionFootprint.value, precision)}
+                <span className="unit"> {unit}</span>
               </td>
-            ) : (
-              <td></td>
+            )}
+            {targetSNBC && (
+              <td>
+                {dataComparativeV} <span className="unit"> {unit}</span>
+              </td>
             )}
           </tr>
         </tbody>
@@ -193,10 +245,3 @@ export const IndicatorGraphs = ({
     </>
   );
 };
-
-function roundNumber(num, nbDecimal) {
-  if (num !== null) {
-    return parseFloat(num.toFixed(nbDecimal));
-  }
-  return num;
-}
