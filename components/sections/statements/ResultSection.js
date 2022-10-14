@@ -9,6 +9,7 @@ import {
   Tab,
   Tabs,
 } from "react-bootstrap";
+
 import Select from "react-select";
 
 import PieGraph from "../../graphs/PieGraph";
@@ -69,7 +70,7 @@ const ResultSection = (props) => {
     .sort((a, b) => parseInt(a) - parseInt(b))
     .map(([value, label]) =>
       divisionsOptions.push({ value: value, label: value + " - " + label })
-    );
+    ); 
 
   const { intermediateConsumption, capitalConsumption, netValueAdded } =
     props.session.financialData.aggregates;
@@ -102,6 +103,9 @@ const ResultSection = (props) => {
     // GET TARGET SNCB 2030 VALUE
     if(indic == "ghg") {
       await getTargetSNBC();
+    }
+    else {
+      setTargetSNBC(null);
     }
   }, [comparativeDivision, indic]);
 
@@ -252,7 +256,7 @@ const ResultSection = (props) => {
             </Button>
           )}
 
-          <Button
+          <Button 
             variant="secondary"
             onClick={() =>
               exportIndicPDF(

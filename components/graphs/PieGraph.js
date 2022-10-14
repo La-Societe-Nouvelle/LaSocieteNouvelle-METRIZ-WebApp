@@ -49,12 +49,13 @@ function PieGraph(props) {
   };
 
   const options = {
-
+    devicePixelRatio: 2,
         plugins: {
       legend: {
         position: "bottom",
         labels: {
           boxWidth: 10,
+          boxHeight : 10,
           font: {
             size: 14,
           },

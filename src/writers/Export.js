@@ -467,7 +467,7 @@ function generatePDF(
   doc.setTextColor(25, 21, 88);
   doc.text("COMPARAISONS ", x, y);
 
-  doc.setFontSize(12);
+  doc.setFontSize(10);
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(82, 98, 188);
 
@@ -486,41 +486,52 @@ function generatePDF(
   
 
   //Production canvas
-  const pdfWidth = doc.internal.pageSize.getWidth() / 3;
+  doc.setFontSize(10);
+  doc.setFont("Helvetica", "normal");
+  doc.setTextColor(25, 21, 88);
 
-  let canvas = document.querySelector(idProductionCanvas);
+  doc.text("Production", x, y);
+  y += 5;
 
-  let canvasImg = canvas.toDataURL("image/jpg", 1.0);
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const imageWidth = (doc.internal.pageSize.getWidth() - (x*2)) / 1.6;
+  let marginX = (pageWidth - imageWidth) / 2;
 
-  const imgProps = doc.getImageProperties(canvasImg);
+  let canvasProduction = document.querySelector(idProductionCanvas);
 
-  const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-  doc.addImage(canvasImg, "JPEG", x, y, pdfWidth, pdfHeight);
+  let imageProduction = canvasProduction.toDataURL("image/jpg", 1.0);
+
+  const imgProps = doc.getImageProperties(imageProduction);
+
+  const pdfHeight = (imgProps.height * imageWidth) / imgProps.width;
+  console.log(pdfHeight);
+  doc.addImage(imageProduction, "JPEG", marginX, y, imageWidth, pdfHeight);
+  
+  y += 60;
 
   //Consumption canvas
+  doc.text("Consommations intermédiaires", x, y);
+  y += 5;
   let canvasConsumption = document.querySelector(idConsumptionCanvas);
   let canvasConsumptionImg = canvasConsumption.toDataURL("image/jpg", 1.0);
   const imgConsumptionProps = doc.getImageProperties(canvasConsumptionImg);
-  const pdfCHeight =
-    (imgConsumptionProps.height * pdfWidth) / imgConsumptionProps.width;
+  const pdfCHeight = (imgConsumptionProps.height * imageWidth) / imgConsumptionProps.width;
 
-  doc.addImage(
-    canvasConsumptionImg,
-    "JPEG",
-    pdfWidth + 40,
-    y,
-    pdfWidth,
-    pdfCHeight  );
+  doc.addImage(canvasConsumptionImg,"JPEG",marginX,y,imageWidth,pdfCHeight  );
 
-  y = 80;
+    y += 60;
 
   //Value canvas
+
+  doc.text("Valeur ajoutée", x, y);
+  y += 5;
+
   let canvasValue = document.querySelector(idValueCanvas);
   let canvasValueImg = canvasValue.toDataURL("image/jpg", 1.0);
   const imgValueProps = doc.getImageProperties(canvasValueImg);
-  const pdfVHeight = (imgValueProps.height * pdfWidth) / imgValueProps.width;
+  const pdfVHeight = (imgValueProps.height * imageWidth) / imgValueProps.width;
 
-  doc.addImage(canvasValueImg, "JPEG", x, y, pdfWidth, pdfVHeight);
+  doc.addImage(canvasValueImg, "JPEG", marginX, y, imageWidth, pdfVHeight);
   doc.setProperties({
     title:
       "rapport_" +
@@ -532,17 +543,20 @@ function generatePDF(
 
   //Pie canvas
   if(idPieChart) {
-    y += 50;
+    y += 65;
     doc.text(" Répartition des impacts bruts (en %)", x, y);
-    y += 10;
+    y += 5;
+
+    const imageWidth = doc.internal.pageSize.getWidth() / 4.5;
+    marginX = (pageWidth - imageWidth) / 2;
 
     let canvasPie = document.querySelector(idPieChart);
     let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
     const imgPieProps = doc.getImageProperties(canvasPieImg);
   
-    const PieHeight = (imgPieProps.height * pdfWidth) / imgPieProps.width;
+    const PieHeight = (imgPieProps.height * imageWidth) / imgPieProps.width;
   
-    doc.addImage(canvasPieImg, "JPEG", x, y, pdfWidth, PieHeight);
+    doc.addImage(canvasPieImg, "JPEG", marginX, y, imageWidth, PieHeight);
   }
   return doc;
 }

@@ -165,7 +165,6 @@ const IndicatorsList = (props) => {
           if (valueAdded.data.header.code == 200) {
             valueAddedFootprint = valueAdded.data.data.at(-1);
           }
-console.log(valueAdded)
           if (production.data.header.code == 200) {
             productionFootprint = production.data.data.at(-1);
           }
