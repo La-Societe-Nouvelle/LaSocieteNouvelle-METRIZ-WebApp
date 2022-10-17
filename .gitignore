@@ -31,5 +31,8 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# API URL
+/src/api.js 
+
 # vercel
 .vercel
