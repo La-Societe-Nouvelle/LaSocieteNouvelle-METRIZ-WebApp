@@ -132,7 +132,7 @@ const ValueAddedOptionConfig = ComparativeGraphsOptions(
 
 
   return (
-    <div className="hidden">
+    <section className="step hidden">
       {printGrossImpact && (
         <div className="piechart-container">
           <PieGraph
@@ -150,7 +150,7 @@ const ValueAddedOptionConfig = ComparativeGraphsOptions(
         </div>
       )}
 
-      <Row className="graphs">
+      <Row className="graphs mt-5">
       <Col sm={4} xl={4} lg={4} md={4}>
           <Bar
             id={"print-Production-" + indic}
@@ -173,7 +173,7 @@ const ValueAddedOptionConfig = ComparativeGraphsOptions(
           />
         </Col>
       </Row>
-    </div>
+    </section>
   );
 };
 

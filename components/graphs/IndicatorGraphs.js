@@ -67,10 +67,7 @@ export const IndicatorGraphs = ({
     dataP,
     dataComparativeP
   );
-  const productionOptionConfig = ComparativeGraphsOptions(
-    labels,
-    unit
-  );
+  const productionOptionConfig = ComparativeGraphsOptions(labels, unit);
 
   // CONSUMPTION CHART
 
@@ -94,14 +91,11 @@ export const IndicatorGraphs = ({
     dataC,
     dataComparativeC
   );
-  const consumptionOptionConfig = ComparativeGraphsOptions(
-    labels,
-    unit
-  );
+  const consumptionOptionConfig = ComparativeGraphsOptions(labels, unit);
 
   // VALUE CHART
   let dataComparativeV;
-   
+
   const dataV = [
     valueAddedAreaFootprint.value.toFixed(precision),
     netValueAdded.footprint.getIndicator(indic).value.toFixed(precision),
@@ -119,16 +113,16 @@ export const IndicatorGraphs = ({
     dataV,
     dataComparativeV
   );
-  const ValueAddedOptionConfig = ComparativeGraphsOptions(
-    labels,
-    unit
-  );
+  const ValueAddedOptionConfig = ComparativeGraphsOptions(labels, unit);
+
+  const productionEvolution =getEvolution(productionDivisionFootprint.value,dataComparativeP);
+  const consumptionEvolution = getEvolution(consumptionDivisionFootprint.value,dataComparativeC);
+  const valueAddedEvolution = getEvolution(valueAddedDivisionFootprint.value,dataComparativeV);
 
   return (
     <>
       <Row className="graphs">
-      
-       <Col sm={4} xl={4} lg={4} md={4}>
+        <Col sm={4} xl={4} lg={4} md={4}>
           <h5 className="mb-4">▪ Production</h5>
           <Bar
             id="Production"
@@ -137,7 +131,7 @@ export const IndicatorGraphs = ({
           />
         </Col>
         <Col sm={4} xl={4} lg={4} md={4}>
-        <h5 className="mb-4">▪ Consommations intermédiaires</h5>
+          <h5 className="mb-4">▪ Consommations intermédiaires</h5>
           <Bar
             id="Consumption"
             data={consumptionDataConfig}
@@ -145,7 +139,7 @@ export const IndicatorGraphs = ({
           />
         </Col>
         <Col sm={4} xl={4} lg={4} md={4}>
-        <h5 className="mb-4">▪ Valeur ajoutée</h5>
+          <h5 className="mb-4">▪ Valeur ajoutée</h5>
           <Bar
             id="Value"
             data={dataValueAddedConfig}
@@ -163,11 +157,26 @@ export const IndicatorGraphs = ({
             {printValue(productionDivisionFootprint.value, precision) &&
               printValue(consumptionDivisionFootprint.value, precision) &&
               printValue(valueAddedDivisionFootprint.value, precision) !==
-                " - " && <td>Branche</td>}
-            {targetSNBC && <td>Objectifs 2030 pour la branche</td>}
+                " - " && (
+                <td colSpan="3">
+                  Branche
+                </td>
+              )}
           </tr>
         </thead>
         <tbody>
+          <tr className="subth">
+            {targetSNBC && (
+              <>
+                <td scope="row">&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td >Valeur</td>
+                <td >Objectif 2030</td>
+                <td >Evolution</td>
+              </>
+            )}
+          </tr>
           <tr>
             <td>Production</td>
             <td>
@@ -180,15 +189,23 @@ export const IndicatorGraphs = ({
             </td>
             {printValue(productionDivisionFootprint.value, precision) !==
               " - " && (
-              <td>
+              <td >
                 {printValue(productionDivisionFootprint.value, precision)}
                 <span className="unit"> {unit}</span>
               </td>
             )}
+
             {targetSNBC && (
-              <td>
-                {dataComparativeP} <span className="unit">{unit}</span>
-              </td>
+              <>
+                <td >
+                  {dataComparativeP} <span className="unit">{unit}</span>
+                </td>
+                <td >
+                  <span className={productionEvolution < 0 ? "negative" : "positive"}>
+                    {productionEvolution} %
+                  </span>
+                </td>
+              </>
             )}
           </tr>
           <tr>
@@ -206,15 +223,23 @@ export const IndicatorGraphs = ({
             </td>
             {printValue(consumptionDivisionFootprint.value, precision) !==
               " - " && (
-              <td>
+              <td >
                 {printValue(consumptionDivisionFootprint.value, precision)}
-                <span className="unit">{unit}</span>
+                <span className="unit"> {unit}</span>
               </td>
             )}
             {targetSNBC && (
-              <td>
-                {dataComparativeC} <span className="unit">{unit}</span>
-              </td>
+              <>
+                <td >
+                  {dataComparativeC} <span className="unit">{unit}</span>
+                </td>
+                <td>
+                <span className={consumptionEvolution < 0 ? "negative" : "positive"}>
+
+                  {consumptionEvolution}   %
+                </span>
+                </td>
+              </>
             )}
           </tr>
           <tr>
@@ -229,15 +254,24 @@ export const IndicatorGraphs = ({
             </td>
             {printValue(valueAddedDivisionFootprint.value, precision) !==
               " - " && (
-              <td>
+              <td >
                 {printValue(valueAddedDivisionFootprint.value, precision)}
                 <span className="unit"> {unit}</span>
               </td>
             )}
             {targetSNBC && (
-              <td>
-                {dataComparativeV} <span className="unit"> {unit}</span>
-              </td>
+              <>
+                <td>
+                  {dataComparativeV} <span className="unit"> {unit}</span>
+                </td>
+                <td >
+                <span className={valueAddedEvolution < 0 ? "negative" : "positive"}>
+
+                  {valueAddedEvolution}
+                  %
+                  </span>
+                </td>
+              </>
             )}
           </tr>
         </tbody>
@@ -245,3 +279,8 @@ export const IndicatorGraphs = ({
     </>
   );
 };
+
+function getEvolution(value, target) {
+  const evolution = ((target - value) / value) * 100;
+  return evolution.toFixed(1);
+}
