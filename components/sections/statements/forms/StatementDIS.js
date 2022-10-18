@@ -3,6 +3,7 @@
 // React
 import { isValid } from 'js-base64';
 import React from 'react';
+import { Form } from 'react-bootstrap';
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
@@ -42,39 +43,44 @@ export class StatementDIS extends React.Component {
   }
 
   render() {
-    const { hasEmployees, netValueAdded } = this.props.impactsData;
+    const { hasEmployees } = this.props.impactsData;
     const { indexGini, info, isDisabled } = this.state;
 
     return (
       <div className="statement">
         <div className="statement-form">
-
           <div className="form-group">
             <label>L'entreprise est-elle employeur ?</label>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="hasEmployees" className="custom-control-input"
+
+            <Form>
+            <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Oui"
                 value="true"
                 checked={hasEmployees === true}
-                onChange={this.onHasEmployeesChange} />
-              <label className="custom-control-label">Oui</label>
-            </div>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="hasEmployees" className="custom-control-input"
+                onChange={this.onHasEmployeesChange}
+              />
+            <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Non"
                 value="false"
                 checked={hasEmployees === false}
-                onChange={this.onHasEmployeesChange} />
-              <label className="custom-control-label">Non</label>
-            </div>
-            {false && <div className="assessment-button-container">
-              <button className="assessment-button" onClick={this.props.toAssessment}>Détails</button>
-            </div>}
+                onChange={this.onHasEmployeesChange}
+              />
+            </Form>
+
           </div>
           <div className="form-group">
             <label>Indice de GINI des taux horaires bruts</label>
             <InputNumber value={roundValue(indexGini, 1)}
               disabled={hasEmployees === false}
               onUpdate={this.updateIndexGini}
-              placeholder="/100" />
+              placeholder="/100" 
+              isInvalid={indexGini>100 ? true : false}/>
           </div>
 
         </div>

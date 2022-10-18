@@ -15,8 +15,8 @@ export class StatementWAS extends React.Component {
   {
     super(props);
     this.state = {
-      wasteProduction: valueOrDefault(props.impactsData.wasteProduction, ""),
-      wasteProductionUncertainty: valueOrDefault(props.impactsData.wasteProductionUncertainty, ""),
+      wasteProduction: valueOrDefault(props.impactsData.wasteProduction, undefined),
+      wasteProductionUncertainty: valueOrDefault(props.impactsData.wasteProductionUncertainty, undefined),
       info : props.impactsData.comments.was || ""
     }
   }
@@ -49,7 +49,7 @@ export class StatementWAS extends React.Component {
                        placeholder="KG"
                        />
                                <div className="notes">
-          <p><sup>1</sup> Déchets assimilés aux ordures ménagères</p>
+          <p className='small'><sup>1</sup> Déchets assimilés aux ordures ménagères</p>
         </div>
         </div>
         <div className="form-group">

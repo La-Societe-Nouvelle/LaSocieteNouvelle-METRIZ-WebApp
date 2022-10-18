@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Form } from 'react-bootstrap';
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
@@ -15,9 +16,8 @@ export class StatementECO extends React.Component {
   
     super(props);
     this.state = {
-      domesticProduction: valueOrDefault(props.impactsData.domesticProduction, ""),
-      info: props.impactsData.comments.eco || "",
-      isValid: props.impactsData.domesticProduction != null && props.impactsData.netValueAdded != null
+      domesticProduction: valueOrDefault(props.impactsData.domesticProduction, undefined),
+      info: props.impactsData.comments.eco || ""
     }
   }
 
@@ -25,46 +25,59 @@ export class StatementECO extends React.Component {
     if (this.state.domesticProduction != this.props.impactsData.domesticProduction) {
       this.setState({ domesticProduction: this.props.impactsData.domesticProduction });
     }
+
+
   }
 
   render() {
     const { isAllActivitiesInFrance, netValueAdded } = this.props.impactsData;
-    const { domesticProduction, info, isValid } = this.state;
+    const { domesticProduction, info } = this.state;
 
-
+    let isValid = netValueAdded != null && (domesticProduction >= 0 && domesticProduction <= netValueAdded);
+    
     return (
       <div className="statement">
         <div className="statement-form">
           <div className="form-group">
             <label>Les activités de l'entreprise sont-elles localisées en France ?</label>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="isAllActivitiesInFrance" className="custom-control-input"
-                value="true"
-                checked={isAllActivitiesInFrance === true}
-                onChange={this.onIsAllActivitiesInFranceChange} />
-              <label className="custom-control-label">Oui</label>
-            </div>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="isAllActivitiesInFrance" className="custom-control-input"
-                value="null"
-                checked={isAllActivitiesInFrance === null && domesticProduction !== ""}
-                onChange={this.onIsAllActivitiesInFranceChange} />
-              <label className="custom-control-label">Partiellement</label>
-            </div>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="isAllActivitiesInFrance" className="custom-control-input"
-                value="false"
-                checked={isAllActivitiesInFrance === false}
-                onChange={this.onIsAllActivitiesInFranceChange} />
-              <label className="custom-control-label">Non</label>
-            </div>
+              <Form>
+                <Form.Check
+                    inline
+                    type="radio"
+                    id="isAllActivitiesInFrance"
+                    label="Oui"
+                    value="true"
+                    checked={isAllActivitiesInFrance === true}
+                    onChange={this.onIsAllActivitiesInFranceChange}
+                  />
+                <Form.Check
+                  inline
+                  type="radio"
+                  id="isAllActivitiesInFrance"
+                  label="Partiellement"
+                  value="null"
+                  checked={isAllActivitiesInFrance === null && domesticProduction !== ""}
+                  onChange={this.onIsAllActivitiesInFranceChange}
+                />
+                <Form.Check
+                  inline
+                  type="radio"
+                  id="isAllActivitiesInFrance"
+                  label="Non"
+                  value="false"
+                  checked={isAllActivitiesInFrance === false}
+                  onChange={this.onIsAllActivitiesInFranceChange}
+                />
+              </Form>
           </div>
           <div className="form-group">
             <label>Valeur ajoutée nette produite en France </label>
             <InputNumber value={roundValue(domesticProduction, 0)}
               disabled={isAllActivitiesInFrance != null}
               onUpdate={this.updateDomesticProduction}
-              placeholder="€" />
+              placeholder="€" 
+              isInvalid={!isValid}
+              />
           </div>
         </div>
         <div className="statement-comments">
@@ -104,15 +117,15 @@ export class StatementECO extends React.Component {
   }
 
   updateDomesticProduction = (input) => {
-    this.props.impactsData.domesticProduction = input;
-    this.setState({ domesticProduction: this.props.impactsData.domesticProduction });
-    this.props.onUpdate("eco");
+  
+      this.props.impactsData.domesticProduction = input;
+      this.setState({ domesticProduction: this.props.impactsData.domesticProduction });
+      this.props.onUpdate("eco");
   }
  
-  updateInfo = (event) => this.setState({ info: event.target.value, isValid:false });
+  updateInfo = (event) => this.setState({ info: event.target.value});
   saveInfo = () => this.props.impactsData.comments.eco = this.state.info;
-
-  onValidate = () => this.props.onValidate()
+  onValidate = () => this.props.onValidate();
 }
 
 export const writeStatementECO = (doc, x, y, impactsData) => {

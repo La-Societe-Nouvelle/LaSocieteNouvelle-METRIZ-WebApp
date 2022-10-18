@@ -2,6 +2,7 @@
 
 // React
 import React from 'react';
+import { Form } from 'react-bootstrap';
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
@@ -24,7 +25,7 @@ export class StatementGEQ extends React.Component {
   componentDidUpdate() 
   {
 
-
+  
     if(!this.props.impactsData.hasEmployees && this.state.wageGap == 0) {
       this.state.isDisabled = false;
     }
@@ -55,28 +56,39 @@ export class StatementGEQ extends React.Component {
 
           <div className="form-group">
             <label>L'entreprise est-elle employeur ?</label>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="hasEmployees" className="custom-control-input"
+
+            <Form>
+            <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Oui"
                 value="true"
                 checked={hasEmployees === true}
-                onChange={this.onHasEmployeesChange} />
-              <label className="custom-control-label">Oui</label>
-            </div>
-            <div className={"custom-control-inline"}>
-              <input type="radio" id="hasEmployees" className="custom-control-input"
+                onChange={this.onHasEmployeesChange}
+              />
+            <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Non"
                 value="false"
                 checked={hasEmployees === false}
-                onChange={this.onHasEmployeesChange} />
-              <label className="custom-control-label">Non</label>
-            </div>
+                onChange={this.onHasEmployeesChange}
+              />
+            </Form>
+           
+       
           </div>
+
           <div className="form-group">
             <label>Ecart de rémunérations F/H (en % du taux horaire brut moyen)</label>
             <InputNumber value={roundValue(wageGap, 1)}
               disabled={hasEmployees === false}
-              onUpdate={this.updateWageGap} placeholder="%"/>
+              onUpdate={this.updateWageGap} placeholder="%"
+              isInvalid={isDisabled}
+              />
           </div>
-
 
         </div>
         <div className="statement-comments">

@@ -1,43 +1,43 @@
 import React from "react";
 import Form from "react-bootstrap/Form";
-import InputGroup from 'react-bootstrap/InputGroup';
+import InputGroup from "react-bootstrap/InputGroup";
 
 export class InputNumber extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      input: props.value != undefined ? props.value : null,
+      input: props.value != undefined ? props.value : " ",
+      isInvalid: props.isInvalid != undefined ? props.isInvalid : false,
       placeholder: props.placeholder,
     };
   }
 
   componentDidUpdate(prevProps) {
-    
     if (this.props.value != prevProps.value) {
-   
       this.setState({
-        input: this.props.value
+        input: this.props.value,
+        isInvalid: this.props.isInvalid,
       });
     }
   }
 
   render() {
+
     return (
-      <>
-        <InputGroup className="mb-3">
-          <Form.Control
-            value={this.state.input}
-            onChange={this.onChange}
-            onBlur={this.onBlur}
-            onKeyPress={this.onEnterPress}
-            disabled={this.props.disabled}
-          />
-          {
-            this.state.placeholder &&  <InputGroup.Text>{this.state.placeholder}</InputGroup.Text>
-          }
-         
-        </InputGroup>
-      </>
+      <InputGroup className="mb-3">
+        <Form.Control
+          value={this.state.input}
+          onChange={this.onChange}
+          onBlur={this.onBlur}
+          onKeyPress={this.onEnterPress}
+          disabled={this.props.disabled}
+          isInvalid={this.state.isInvalid}
+        />
+        {this.state.placeholder && (
+          <InputGroup.Text>{this.state.placeholder}</InputGroup.Text>
+        )}
+      </InputGroup>
     );
   }
 
@@ -46,8 +46,6 @@ export class InputNumber extends React.Component {
       event.target.blur();
     }
   };
-
-
 
   onChange = (event) => {
     this.setState({ input: event.target.value });

@@ -61,7 +61,6 @@ export class StatementGHG extends React.Component {
     } = this.state;
 
     let isValid = greenhousesGazEmissions != null && netValueAdded != null;
-
     return (
       <div className="statement">
         <div className="statement-form">

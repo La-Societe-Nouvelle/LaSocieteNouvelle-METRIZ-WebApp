@@ -17,10 +17,10 @@ export class StatementWAT extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      waterConsumption: valueOrDefault(props.impactsData.waterConsumption, ""),
+      waterConsumption: valueOrDefault(props.impactsData.waterConsumption, undefined),
       waterConsumptionUncertainty: valueOrDefault(
         props.impactsData.waterConsumptionUncertainty,
-        ""
+        undefined
       ),
       info: props.impactsData.comments.wat || "",
     };

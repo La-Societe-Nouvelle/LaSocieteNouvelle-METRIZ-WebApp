@@ -15,7 +15,7 @@ export class StatementKNW extends React.Component {
   {
     super(props);
     this.state = {
-      researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, " "),
+      researchAndTrainingContribution : valueOrDefault(props.impactsData.researchAndTrainingContribution, undefined),
       info : props.impactsData.comments.knw || " "
     }
   }
@@ -39,7 +39,8 @@ export class StatementKNW extends React.Component {
           <label>Valeur ajoutée nette dédiée à la recherche ou à la formation</label>
           <InputNumber value={roundValue(researchAndTrainingContribution,1)} 
                        onUpdate={this.updateResearchAndTrainingContribution}
-                       placeholder="&euro;"/>
+                       placeholder="&euro;"
+                       />
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>

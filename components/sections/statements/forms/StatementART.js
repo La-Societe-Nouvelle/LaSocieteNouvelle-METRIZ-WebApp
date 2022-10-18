@@ -2,9 +2,14 @@
 
 // React
 import React from "react";
+import { Form } from "react-bootstrap";
 
 // Utils
-import {printValueInput, roundValue,valueOrDefault} from "../../../../src/utils/Utils";
+import {
+  printValueInput,
+  roundValue,
+  valueOrDefault,
+} from "../../../../src/utils/Utils";
 
 import { InputNumber } from "../../../input/InputNumber";
 
@@ -28,12 +33,18 @@ export class StatementART extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      craftedProduction: valueOrDefault(props.impactsData.craftedProduction,""),
+      craftedProduction: valueOrDefault(
+        props.impactsData.craftedProduction,
+        undefined
+      ),
       info: props.impactsData.comments.art || "",
     };
   }
 
   componentDidUpdate() {
+    {
+      this.state.craftedProduction
+    }
     if (
       this.state.craftedProduction != this.props.impactsData.craftedProduction
     ) {
@@ -44,67 +55,63 @@ export class StatementART extends React.Component {
   }
 
   render() {
-
     const { isValueAddedCrafted, netValueAdded } = this.props.impactsData;
     const { craftedProduction } = this.state;
 
-    let isValid = craftedProduction != null && netValueAdded != null;
+    let isValid = netValueAdded != null && (craftedProduction >= 0 && craftedProduction <= netValueAdded);
 
     return (
       <div className="statement">
         <div className="statement-form">
           <div className="form-group">
             <label>L'entreprise est-elle une entreprise artisanale ?</label>
-
-            <div className={"custom-control-inline"}>
-              <input
+            <Form>
+            
+              <Form.Check
+                inline
                 type="radio"
-                id="isValueAddedCrafetd"
-                className="custom-control-input"
+                id="hasValueAdded"
+                label="Oui"
                 value="true"
                 checked={isValueAddedCrafted === true}
                 onChange={this.onIsValueAddedCraftedChange}
               />
-              <label className="custom-control-label">Oui</label>
-            </div>
-            <div className={"custom-control-inline"}>
-              <input
+
+              <Form.Check
+                inline
                 type="radio"
-                id="isValueAddedCrafetd"
-                className="custom-control-input"
-                value="undefined"
-                checked={
-                  isValueAddedCrafted === null && craftedProduction !== ""
-                }
+                id="hasValueAdded"
+                label="Partiellement"
+                value="null"
+                checked={isValueAddedCrafted === null}
                 onChange={this.onIsValueAddedCraftedChange}
               />
-              <label className="custom-control-label">Partiellement</label>
-            </div>
-            <div className={"custom-control-inline"}>
-              <input
+              <Form.Check
+                inline
                 type="radio"
-                id="isValueAddedCrafetd"
-                className="custom-control-input"
+                id="hasValueAdded"
+                label="Non"
                 value="false"
                 checked={isValueAddedCrafted === false}
-                onChange={this.onIsValueAddedCraftedChange}
+                onChange={this.onIsValueAddedCraftedChange} 
               />
-              <label className="custom-control-label">Non</label>
-            </div>
+            </Form>
           </div>
           <div className="form-group">
             <label>Part de la valeur ajoutée artisanale</label>
+           
             <InputNumber
               value={roundValue(craftedProduction, 0)}
               onUpdate={this.updateCraftedProduction.bind(this)}
               disabled={isValueAddedCrafted != null}
               placeholder="&euro;"
+              isInvalid={!isValid}
             />
           </div>
         </div>
         <div className="form-group">
           <label>Informations complémentaires</label>
-          <textarea type="text" spellCheck="false" className="form-control" />
+          <textarea type="text" spellCheck="false" className="form-control" onChange={this.updateInfo}/>
         </div>
         <div className="statement-action">
           <button

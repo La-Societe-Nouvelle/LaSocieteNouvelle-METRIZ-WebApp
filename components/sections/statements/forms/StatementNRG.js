@@ -15,8 +15,8 @@ export class StatementNRG extends React.Component {
   {
     super(props);
     this.state = {
-      energyConsumption: valueOrDefault(props.impactsData.energyConsumption, ""),
-      energyConsumptionUncertainty: valueOrDefault(props.impactsData.energyConsumptionUncertainty, ""),
+      energyConsumption: valueOrDefault(props.impactsData.energyConsumption, undefined),
+      energyConsumptionUncertainty: valueOrDefault(props.impactsData.energyConsumptionUncertainty, undefined),
       info : props.impactsData.comments.nrg || ""
     }
   }
