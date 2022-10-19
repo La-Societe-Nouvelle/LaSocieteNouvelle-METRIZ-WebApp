@@ -38,6 +38,7 @@ import api from "../../../src/api";
 import axios from "axios";
 import { ErrorApi } from "../../ErrorAPI";
 import ComparativeGraphs from "../../graphs/ComparativeGraphs";
+import { ComparativeTable } from "../../tables/ComparativeTable";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -87,7 +88,6 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-    console.log(indic);
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
     } else {
@@ -103,7 +103,6 @@ const ResultSection = (props) => {
         consumptionDivisionFootprint: { value: null },
       });
     }
-    console.log(targetSNBC)
     // GET TARGET SNCB 2030 VALUE
     if (indic == "ghg" && comparativeDivision != "00") {
       await getTargetSNBC();
@@ -355,7 +354,6 @@ const ResultSection = (props) => {
         />
 
         {error && <ErrorApi />}
-        {console.log(targetSNBC)}
         <div className="mt-5">
           <Row className="graphs">
             <Col sm={4} xl={4} lg={4} md={4}>
@@ -414,7 +412,25 @@ const ResultSection = (props) => {
             </Col>
           </Row>
         </div>
-
+        <ComparativeTable 
+         financialData={session.financialData}
+         indic={indic}
+         allSectorFootprint={allSectorFootprint}
+         comparativeDivisionFootprint={divisionFootprint}
+         targetSNBC={targetSNBC}
+        />
+        {/* 
+        <div className="mt-5">
+          {allSectorFootprint && (
+            <IndicatorGraphs
+              financialData={session.financialData}
+              indic={indic}
+              allSectorFootprint={allSectorFootprint}
+              comparativeDivisionFootprint={divisionFootprint}
+              targetSNBC={targetSNBC}
+            />
+          )}
+        </div> */}
       </section>
       <section className="step">
         <h3>Note d'analyse</h3>
