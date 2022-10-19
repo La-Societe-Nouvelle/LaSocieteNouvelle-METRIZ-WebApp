@@ -19,7 +19,6 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
-import { IndicatorGraphs } from "../../graphs/IndicatorGraphs";
 
 import { analysisTextWriterART } from "../../../src/writers/analysis/analysisTextWriterART";
 import { analysisTextWriterDIS } from "../../../src/writers/analysis/analysisTextWriterDIS";
@@ -38,6 +37,7 @@ import { exportIndicPDF } from "../../../src/writers/Export";
 import api from "../../../src/api";
 import axios from "axios";
 import { ErrorApi } from "../../ErrorAPI";
+import ComparativeGraphs from "../../graphs/ComparativeGraphs";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -52,8 +52,12 @@ const ResultSection = (props) => {
   const [divisionFootprint, setDivisionFootprint] = useState(
     props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
   );
-  
-  const [targetSNBC, setTargetSNBC] = useState();
+
+  const [targetSNBC, setTargetSNBC] = useState({
+    valueAddedTarget: { value: null },
+    productionTarget: { value: null },
+    consumptionTarget: { value: null },
+  });
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -70,7 +74,7 @@ const ResultSection = (props) => {
     .sort((a, b) => parseInt(a) - parseInt(b))
     .map(([value, label]) =>
       divisionsOptions.push({ value: value, label: value + " - " + label })
-    ); 
+    );
 
   const { intermediateConsumption, capitalConsumption, netValueAdded } =
     props.session.financialData.aggregates;
@@ -83,29 +87,32 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-    
+    console.log(indic);
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
     } else {
       props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
-    
         valueAddedDivisionFootprint: { value: null },
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
       };
+
       setDivisionFootprint({
         valueAddedDivisionFootprint: { value: null },
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
       });
     }
-
+    console.log(targetSNBC)
     // GET TARGET SNCB 2030 VALUE
-    if(indic == "ghg") {
+    if (indic == "ghg" && comparativeDivision != "00") {
       await getTargetSNBC();
-    }
-    else {
-      setTargetSNBC(null);
+    } else {
+      setTargetSNBC({
+        valueAddedTarget: { value: null },
+        productionTarget: { value: null },
+        consumptionTarget: { value: null },
+      });
     }
   }, [comparativeDivision, indic]);
 
@@ -119,7 +126,7 @@ const ResultSection = (props) => {
         indic.toUpperCase() +
         "_FRA_DIV/?code=" +
         comparativeDivision +
-        "&aggregate=GVA&area=FRA"
+        "&aggregate=NVA&area=FRA"
     );
     const getProduction = api.get(
       "serie/MACRO_" +
@@ -145,8 +152,7 @@ const ResultSection = (props) => {
           const production = responses[1];
           const consumption = responses[2];
           if (valueAdded.data.header.code == 200) {
-            valueAddedFootprint =  valueAdded.data.data.at(-1);
-           
+            valueAddedFootprint = valueAdded.data.data.at(-1);
           }
 
           if (production.data.header.code == 200) {
@@ -176,51 +182,57 @@ const ResultSection = (props) => {
   };
 
   const getTargetSNBC = async () => {
-
     let valueAddedTarget;
     let productionTarget;
     let consumptionTarget;
 
-    const getValueAdded = api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=NVA&area=FRA"
+    const getValueAdded = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=NVA&area=FRA"
     );
-    const getProduction = api.get("serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=PRD&area=FRA");
+    const getProduction = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=PRD&area=FRA"
+    );
 
     const getConsumption = api.get(
-      "serie/TARGET_GHG_SNBC_FRA_DIV/?code="+comparativeDivision+"&aggregate=IC&area=FRA"
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=IC&area=FRA"
     );
     await axios
-    .all([getValueAdded, getProduction, getConsumption])
-    .then(
-      axios.spread((...responses) => {
-        const valueAdded = responses[0];
-        const production = responses[1];
-        const consumption = responses[2];
+      .all([getValueAdded, getProduction, getConsumption])
+      .then(
+        axios.spread((...responses) => {
+          const valueAdded = responses[0];
+          const production = responses[1];
+          const consumption = responses[2];
 
-        if (valueAdded.data.header.code == 200) {
-          valueAddedTarget =  valueAdded.data.data.at(-1);
-         
-        }
+          if (valueAdded.data.header.code == 200) {
+            valueAddedTarget = valueAdded.data.data.at(-1);
+          }
 
-        if (production.data.header.code == 200) {
-          productionTarget = production.data.data.at(-1);
-        }
+          if (production.data.header.code == 200) {
+            productionTarget = production.data.data.at(-1);
+          }
 
-        if (consumption.data.header.code == 200) {
-          consumptionTarget = consumption.data.data.at(-1);
-        }
-      })
-    )
-    .catch(() => {
-      setError(true);
-    });
+          if (consumption.data.header.code == 200) {
+            consumptionTarget = consumption.data.data.at(-1);
+          }
+        })
+      )
+      .catch(() => {
+        setError(true);
+      });
 
     setTargetSNBC({
       valueAddedTarget: valueAddedTarget,
       productionTarget: productionTarget,
       consumptionTarget: consumptionTarget,
     });
-
-  }
+  };
 
   return (
     <>
@@ -256,7 +268,7 @@ const ResultSection = (props) => {
             </Button>
           )}
 
-          <Button 
+          <Button
             variant="secondary"
             onClick={() =>
               exportIndicPDF(
@@ -310,7 +322,7 @@ const ResultSection = (props) => {
               <h3 className="text-center">
                 Répartition des impacts bruts (en %)
               </h3>
-           
+
               <div className="p-5">
                 <PieGraph
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
@@ -341,20 +353,68 @@ const ResultSection = (props) => {
           options={divisionsOptions}
           onChange={changeComparativeDivision}
         />
-        
-        {error && <ErrorApi />}
 
+        {error && <ErrorApi />}
+        {console.log(targetSNBC)}
         <div className="mt-5">
-          {allSectorFootprint && (
-            <IndicatorGraphs
-              financialData={session.financialData}
-              indic={indic}
-              allSectorFootprint={allSectorFootprint}
-              comparativeDivisionFootprint={divisionFootprint}
-              targetSNBC={targetSNBC}
-            />
-          )}
+          <Row className="graphs">
+            <Col sm={4} xl={4} lg={4} md={4}>
+              <h5 className="mb-4">▪ Production</h5>
+              <ComparativeGraphs
+                id="Production"
+                sectorData={allSectorFootprint.productionAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.production.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.productionDivisionFootprint.value
+                }
+                titleChart="Production"
+                indic={indic}
+                targetData={targetSNBC.productionTarget.value}
+              />
+            </Col>
+            <Col sm={4} xl={4} lg={4} md={4}>
+              <h5 className="mb-4">▪ Consommations intermédiaires</h5>
+              <ComparativeGraphs
+                 id="Consumption"
+                sectorData={allSectorFootprint.consumptionAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.consumptionDivisionFootprint.value
+                }
+                titleChart="Consommations intérmédiaires"
+                indic={indic}
+                targetData={targetSNBC.consumptionTarget.value}
+              />
+            </Col>
+            <Col sm={4} xl={4} lg={4} md={4}>
+              <h5 className="mb-4">▪ Valeur ajoutée</h5>
+              <ComparativeGraphs
+                  id="Value"
+                sectorData={allSectorFootprint.valueAddedAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.valueAddedDivisionFootprint.value
+                }
+                titleChart="Valeur ajoutée nette"
+                indic={indic}
+                targetData={targetSNBC.valueAddedTarget.value}
+              />
+            </Col>
+          </Row>
         </div>
+
       </section>
       <section className="step">
         <h3>Note d'analyse</h3>
