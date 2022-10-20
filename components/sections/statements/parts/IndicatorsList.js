@@ -10,7 +10,6 @@ import {
 } from "react-bootstrap";
 
 import { exportIndicPDF } from "../../../../src/writers/Export";
-import { GraphsPDF } from "../../../graphs/GraphsPDF";
 import {
   StatementART,
   StatementDIS,
@@ -60,9 +59,7 @@ const IndicatorsList = (props) => {
     consumptionTarget: { value: null },
   });
 
- 
-  useEffect(async() => {
-    console.log(targetSNBC)
+  useEffect(async () => {
     if (validations.length > 0) {
       props.publish();
     }
@@ -75,7 +72,11 @@ const IndicatorsList = (props) => {
     if (props.session.comparativeDivision != comparativeDivision) {
       props.session.comparativeDivision = comparativeDivision;
     }
-    if(comparativeDivision != '00' && validations.includes('ghg') && !targetSNBC.productionTarget.value) {
+    if (
+      comparativeDivision != "00" &&
+      validations.includes("ghg") &&
+      !targetSNBC.productionTarget.value
+    ) {
       await getTargetSNBC();
     }
   }, [validations, comparativeDivision]);
@@ -106,20 +107,22 @@ const IndicatorsList = (props) => {
 
   const validateIndicator = async (indic) => {
     if (!validations.includes(indic)) {
-      // Get compartive footprints for all sectors for this indicator
+      // Get footprint for all sectors
       await getComparativeAreaFootprint(indic);
 
       if (comparativeDivision != "00") {
+        // Get footprint of selected division
         await getComparativeDivisionFootprint(
           indic.toUpperCase(),
           comparativeDivision
         );
 
-        // Get Target SNCB for GHG indic and comparative division
+        // Get Target SNCB for GHG indic
         if (indic == "ghg") {
           await getTargetSNBC();
         }
       } else {
+        // Assign null value for all other indicators
         let footprint = divisionFootprint;
         Object.assign(footprint, {
           [indic.toUpperCase()]: {
@@ -324,7 +327,7 @@ const IndicatorsList = (props) => {
       consumptionTarget: consumptionTarget,
     });
   };
-  // Update compartive division
+  // Update comparative division
   const updateDivision = async (division) => {
     await getComparativeDivisionFootprint(
       indicToExport.toUpperCase(),
@@ -335,7 +338,9 @@ const IndicatorsList = (props) => {
 
   // Export pdf on click
   const handleDownloadPDF = async (key, comparativeDivision) => {
+    // Display pop up to choose a comparative division
     if (comparativeDivision == "00") {
+      // Pass indic to export to download PDF directly from PopUp
       setIndicToExport(key);
       setPopUp("division");
     } else {
@@ -384,7 +389,7 @@ const IndicatorsList = (props) => {
   const socialFootprint = ["dis", "geq", "knw"];
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
 
-  //
+  // Pie Graph component to print in PDF
 
   const PieGraphRow = (props) => {
     let indic = props.indic;
@@ -392,7 +397,7 @@ const IndicatorsList = (props) => {
     let capitalConsumption = props.aggregates.capitalConsumption;
     let netValueAdded = props.aggregates.netValueAdded;
 
-    return environmentalFootprint.includes(indic) ? (
+    return (
       <Row>
         <div className="piechart-container">
           <PieGraph
@@ -409,100 +414,101 @@ const IndicatorsList = (props) => {
           />
         </div>
       </Row>
-    ) : (
-      <></>
     );
   };
+
   return (
     <>
-      {validations.length > 0 && comparativeDivision != '00' &&
-        validations.map(
-          (indic, key) =>
-              <div className="hidden" key={key}>
-                <Row className="graphs">
-                  <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-Production-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .productionAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .productionDivisionFootprint.value
-                      }
-                      titleChart="Production"
-                      indic={indic}
-                      targetData={
-                        indic == "ghg"
-                          ? targetSNBC.productionTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-                  <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-Consumption-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .consumptionAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .consumptionDivisionFootprint.value
-                      }
-                      titleChart="Consommations intérmédiaires"
-                      indic={indic}
-                      targetData={
-                        indic == "ghg"
-                          ? targetSNBC.consumptionTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-                  <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-Value-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .valueAddedAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .valueAddedDivisionFootprint.value
-                      }
-                      titleChart="Valeur ajoutée nette"
-                      indic={indic}
-                      targetData={
-                        indic == "ghg"
-                          ? targetSNBC.valueAddedTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-                </Row>
-                <PieGraphRow
+      {/* Display all graphs by indicator to print them in PDF*/}
+      {validations.length > 0 &&
+        comparativeDivision != "00" &&
+        validations.map((indic, key) => (
+          <div className="hidden" key={key}>
+            <Row className="graphs">
+              {/* Production Graph */}
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-Production-" + indic}
+                  sectorData={
+                    allSectorFootprint[indic.toUpperCase()]
+                      .productionAreaFootprint.value
+                  }
+                  legalunitData={
+                    props.session.financialData.aggregates.production.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
+                  divisionData={
+                    divisionFootprint[indic.toUpperCase()]
+                      .productionDivisionFootprint.value
+                  }
+                  titleChart="Production"
                   indic={indic}
-                  aggregates={props.session.financialData.aggregates}
+                  targetData={
+                    indic == "ghg" ? targetSNBC.productionTarget.value : null
+                  }
                 />
-              </div>
-            
-        )}
+              </Col>
+              {/* Intermediate Consumption Graph */}
+
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-Consumption-" + indic}
+                  sectorData={
+                    allSectorFootprint[indic.toUpperCase()]
+                      .consumptionAreaFootprint.value
+                  }
+                  legalunitData={
+                    props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
+                  divisionData={
+                    divisionFootprint[indic.toUpperCase()]
+                      .consumptionDivisionFootprint.value
+                  }
+                  titleChart="Consommations intérmédiaires"
+                  indic={indic}
+                  targetData={
+                    indic == "ghg" ? targetSNBC.consumptionTarget.value : null
+                  }
+                />
+              </Col>
+              {/* Net Value Added Graph */}
+
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-Value-" + indic}
+                  sectorData={
+                    allSectorFootprint[indic.toUpperCase()]
+                      .valueAddedAreaFootprint.value
+                  }
+                  legalunitData={
+                    props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
+                  divisionData={
+                    divisionFootprint[indic.toUpperCase()]
+                      .valueAddedDivisionFootprint.value
+                  }
+                  titleChart="Valeur ajoutée nette"
+                  indic={indic}
+                  targetData={
+                    indic == "ghg" ? targetSNBC.valueAddedTarget.value : null
+                  }
+                />
+              </Col>
+            </Row>
+            {/* Distribution of gross impacts Graph for environnemental indicators*/}
+            {environmentalFootprint.includes(indic) && (
+              <PieGraphRow
+                indic={indic}
+                aggregates={props.session.financialData.aggregates}
+              />
+            )}
+          </div>
+        ))}
       {popUp == "division" && (
         <ChangeDivision
           indic={indicToExport}

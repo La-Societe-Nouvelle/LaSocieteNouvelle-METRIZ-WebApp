@@ -12,14 +12,11 @@ import {
 
 import Select from "react-select";
 
-import PieGraph from "../../graphs/PieGraph";
-import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
-import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
-
+// Meta
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
-
+// Texts imports
 import { analysisTextWriterART } from "../../../src/writers/analysis/analysisTextWriterART";
 import { analysisTextWriterDIS } from "../../../src/writers/analysis/analysisTextWriterDIS";
 import { analysisTextWriterECO } from "../../../src/writers/analysis/analysisTextWriterECO";
@@ -34,11 +31,19 @@ import { analysisTextWriterWAS } from "../../../src/writers/analysis/analysisTex
 import { analysisTextWriterWAT } from "../../../src/writers/analysis/analysisTextWriterWAT";
 import { exportIndicPDF } from "../../../src/writers/Export";
 
+// API
 import api from "../../../src/api";
 import axios from "axios";
 import { ErrorApi } from "../../ErrorAPI";
+
+// Graphs
 import ComparativeGraphs from "../../graphs/ComparativeGraphs";
+import PieGraph from "../../graphs/PieGraph";
+
+// Tables
 import { ComparativeTable } from "../../tables/ComparativeTable";
+import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
+import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -47,7 +52,7 @@ const ResultSection = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision || "00"
   );
-  const [allSectorFootprint, setAllSectorFootprint] = useState(
+  const [allSectorFootprint] = useState(
     props.session.comparativeAreaFootprints[props.indic.toUpperCase()]
   );
   const [divisionFootprint, setDivisionFootprint] = useState(
@@ -88,6 +93,7 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
+  
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
     } else {
@@ -114,6 +120,7 @@ const ResultSection = (props) => {
       });
     }
   }, [comparativeDivision, indic]);
+
 
   const getComparativeDivisionFootprint = async () => {
     let valueAddedFootprint;
@@ -419,18 +426,6 @@ const ResultSection = (props) => {
          comparativeDivisionFootprint={divisionFootprint}
          targetSNBC={targetSNBC}
         />
-        {/* 
-        <div className="mt-5">
-          {allSectorFootprint && (
-            <IndicatorGraphs
-              financialData={session.financialData}
-              indic={indic}
-              allSectorFootprint={allSectorFootprint}
-              comparativeDivisionFootprint={divisionFootprint}
-              targetSNBC={targetSNBC}
-            />
-          )}
-        </div> */}
       </section>
       <section className="step">
         <h3>Note d'analyse</h3>
