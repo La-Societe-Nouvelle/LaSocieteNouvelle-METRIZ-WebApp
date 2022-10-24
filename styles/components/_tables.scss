@@ -104,7 +104,12 @@ table {
     font-weight: 700;
     font-size: 1.1em;
   }
-
+  .subth {
+    background-color: #f4f5ff;
+    border-bottom: 1px solid $light;
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
   // --- Body --- //
   tfoot {
     background-color: darken($bg-light, 2%);

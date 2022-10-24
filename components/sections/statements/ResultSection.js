@@ -9,17 +9,14 @@ import {
   Tab,
   Tabs,
 } from "react-bootstrap";
+
 import Select from "react-select";
 
-import PieGraph from "../../graphs/PieGraph";
-import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
-import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
-
+// Meta
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
-import { IndicatorGraphs } from "../../graphs/IndicatorGraphs";
-
+// Texts imports
 import { analysisTextWriterART } from "../../../src/writers/analysis/analysisTextWriterART";
 import { analysisTextWriterDIS } from "../../../src/writers/analysis/analysisTextWriterDIS";
 import { analysisTextWriterECO } from "../../../src/writers/analysis/analysisTextWriterECO";
@@ -34,9 +31,19 @@ import { analysisTextWriterWAS } from "../../../src/writers/analysis/analysisTex
 import { analysisTextWriterWAT } from "../../../src/writers/analysis/analysisTextWriterWAT";
 import { exportIndicPDF } from "../../../src/writers/Export";
 
+// API
 import api from "../../../src/api";
 import axios from "axios";
 import { ErrorApi } from "../../ErrorAPI";
+
+// Graphs
+import ComparativeGraphs from "../../graphs/ComparativeGraphs";
+import PieGraph from "../../graphs/PieGraph";
+
+// Tables
+import { ComparativeTable } from "../../tables/ComparativeTable";
+import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
+import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -45,12 +52,18 @@ const ResultSection = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision || "00"
   );
-  const [allSectorFootprint, setAllSectorFootprint] = useState(
+  const [allSectorFootprint] = useState(
     props.session.comparativeAreaFootprints[props.indic.toUpperCase()]
   );
   const [divisionFootprint, setDivisionFootprint] = useState(
     props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
   );
+
+  const [targetSNBC, setTargetSNBC] = useState({
+    valueAddedTarget: { value: null },
+    productionTarget: { value: null },
+    consumptionTarget: { value: null },
+  });
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -80,22 +93,34 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
+  
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
     } else {
       props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
-    
         valueAddedDivisionFootprint: { value: null },
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
       };
+
       setDivisionFootprint({
         valueAddedDivisionFootprint: { value: null },
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
       });
     }
-  }, [comparativeDivision]);
+    // GET TARGET SNCB 2030 VALUE
+    if (indic == "ghg" && comparativeDivision != "00") {
+      await getTargetSNBC();
+    } else {
+      setTargetSNBC({
+        valueAddedTarget: { value: null },
+        productionTarget: { value: null },
+        consumptionTarget: { value: null },
+      });
+    }
+  }, [comparativeDivision, indic]);
+
 
   const getComparativeDivisionFootprint = async () => {
     let valueAddedFootprint;
@@ -107,7 +132,7 @@ const ResultSection = (props) => {
         indic.toUpperCase() +
         "_FRA_DIV/?code=" +
         comparativeDivision +
-        "&aggregate=GVA&area=FRA"
+        "&aggregate=NVA&area=FRA"
     );
     const getProduction = api.get(
       "serie/MACRO_" +
@@ -132,10 +157,8 @@ const ResultSection = (props) => {
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];
-
           if (valueAdded.data.header.code == 200) {
-            valueAddedFootprint =  valueAdded.data.data.at(-1);
-           
+            valueAddedFootprint = valueAdded.data.data.at(-1);
           }
 
           if (production.data.header.code == 200) {
@@ -147,8 +170,8 @@ const ResultSection = (props) => {
           }
         })
       )
-      .catch((errors) => {
-        console.log(errors);
+      .catch(() => {
+        setError(true);
       });
 
     props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
@@ -161,6 +184,59 @@ const ResultSection = (props) => {
       valueAddedDivisionFootprint: valueAddedFootprint,
       productionDivisionFootprint: productionFootprint,
       consumptionDivisionFootprint: consumptionFootprint,
+    });
+  };
+
+  const getTargetSNBC = async () => {
+    let valueAddedTarget;
+    let productionTarget;
+    let consumptionTarget;
+
+    const getValueAdded = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=NVA&area=FRA"
+    );
+    const getProduction = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=PRD&area=FRA"
+    );
+
+    const getConsumption = api.get(
+      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
+        comparativeDivision +
+        "&aggregate=IC&area=FRA"
+    );
+    await axios
+      .all([getValueAdded, getProduction, getConsumption])
+      .then(
+        axios.spread((...responses) => {
+          const valueAdded = responses[0];
+          const production = responses[1];
+          const consumption = responses[2];
+
+          if (valueAdded.data.header.code == 200) {
+            valueAddedTarget = valueAdded.data.data.at(-1);
+          }
+
+          if (production.data.header.code == 200) {
+            productionTarget = production.data.data.at(-1);
+          }
+
+          if (consumption.data.header.code == 200) {
+            consumptionTarget = consumption.data.data.at(-1);
+          }
+        })
+      )
+      .catch(() => {
+        setError(true);
+      });
+
+    setTargetSNBC({
+      valueAddedTarget: valueAddedTarget,
+      productionTarget: productionTarget,
+      consumptionTarget: consumptionTarget,
     });
   };
 
@@ -248,11 +324,12 @@ const ResultSection = (props) => {
             </Tabs>
           </Col>
           {printGrossImpact.includes(indic) && (
-            <Col>
+            <Col sm={4}>
               <h3 className="text-center">
                 Répartition des impacts bruts (en %)
               </h3>
-              <div className="p-4">
+
+              <div className="p-5">
                 <PieGraph
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
                     indic
@@ -282,18 +359,73 @@ const ResultSection = (props) => {
           options={divisionsOptions}
           onChange={changeComparativeDivision}
         />
+
         {error && <ErrorApi />}
         <div className="mt-5">
-          {allSectorFootprint && (
-            <IndicatorGraphs
-              financialData={session.financialData}
-              indic={indic}
-              allSectorFootprint={allSectorFootprint}
-              comparativeDivisionFootprint={divisionFootprint}
-              
-            />
-          )}
+          <Row className="graphs">
+            <Col sm={4} xl={4} lg={4} md={4}>
+              <h5 className="mb-4">▪ Production</h5>
+              <ComparativeGraphs
+                id="Production"
+                sectorData={allSectorFootprint.productionAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.production.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.productionDivisionFootprint.value
+                }
+                titleChart="Production"
+                indic={indic}
+                targetData={targetSNBC.productionTarget.value}
+              />
+            </Col>
+            <Col sm={4} xl={4} lg={4} md={4}>
+              <h5 className="mb-4">▪ Consommations intermédiaires</h5>
+              <ComparativeGraphs
+                 id="Consumption"
+                sectorData={allSectorFootprint.consumptionAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.consumptionDivisionFootprint.value
+                }
+                titleChart="Consommations intérmédiaires"
+                indic={indic}
+                targetData={targetSNBC.consumptionTarget.value}
+              />
+            </Col>
+            <Col sm={4} xl={4} lg={4} md={4}>
+              <h5 className="mb-4">▪ Valeur ajoutée</h5>
+              <ComparativeGraphs
+                  id="Value"
+                sectorData={allSectorFootprint.valueAddedAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.valueAddedDivisionFootprint.value
+                }
+                titleChart="Valeur ajoutée nette"
+                indic={indic}
+                targetData={targetSNBC.valueAddedTarget.value}
+              />
+            </Col>
+          </Row>
         </div>
+        <ComparativeTable 
+         financialData={session.financialData}
+         indic={indic}
+         allSectorFootprint={allSectorFootprint}
+         comparativeDivisionFootprint={divisionFootprint}
+         targetSNBC={targetSNBC}
+        />
       </section>
       <section className="step">
         <h3>Note d'analyse</h3>

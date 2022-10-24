@@ -54,6 +54,7 @@ export class Session {
     // Comparative Footprint
     this.comparativeAreaFootprints = props.comparativeAreaFootprints || {};
     this.comparativeDivisionFootprints = props.comparativeDivisionFootprints || {};
+    this.targetSNCB = props.targetSNCB || {};
 
     // ---------------------------------------------------------------------------------------------------- //
 
