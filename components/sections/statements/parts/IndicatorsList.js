@@ -38,6 +38,7 @@ import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
 
 const IndicatorsList = (props) => {
+
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
@@ -45,7 +46,6 @@ const IndicatorsList = (props) => {
     props.session.comparativeDivision
   );
   const [indicToExport, setIndicToExport] = useState();
-
   const [allSectorFootprint, setAllSectorFootprint] = useState(
     props.session.comparativeAreaFootprints
   );
@@ -58,6 +58,7 @@ const IndicatorsList = (props) => {
     productionTarget: { value: null },
     consumptionTarget: { value: null },
   });
+
 
   useEffect(async () => {
     if (validations.length > 0) {
@@ -106,7 +107,9 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
+
     if (!validations.includes(indic)) {
+
       // Get footprint for all sectors
       await getComparativeAreaFootprint(indic);
 
@@ -148,15 +151,14 @@ const IndicatorsList = (props) => {
 
   // All sectors
   const getComparativeAreaFootprint = async (indicator) => {
+
     let indic = indicator.toUpperCase();
     let valueAddedFootprint;
     let productionFootprint;
     let consumptionFootprint;
     let footprint = allSectorFootprint;
 
-    const getValueAdded = api.get(
-      "serie/MACRO_" + indic + "_FRA_DIV/?code=00&aggregate=NVA&area=FRA"
-    );
+    const getValueAdded = api.get("serie/MACRO_" + indic + "_FRA_DIV/?code=00&aggregate=NVA&area=FRA");
 
     const getProduction = api.get(
       "serie/MACRO_" + indic + "_FRA_DIV/?code=00&aggregate=PRD&area=FRA"
@@ -197,6 +199,7 @@ const IndicatorsList = (props) => {
         consumptionAreaFootprint: consumptionFootprint,
       },
     });
+
     setAllSectorFootprint(footprint);
   };
   // Comparative division
@@ -302,7 +305,6 @@ const IndicatorsList = (props) => {
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];
-          console.log(valueAdded);
 
           if (valueAdded.data.header.code == 200) {
             valueAddedTarget = valueAdded.data.data.at(-1);
@@ -426,6 +428,7 @@ const IndicatorsList = (props) => {
           <div className="hidden" key={key}>
             <Row className="graphs">
               {/* Production Graph */}
+      
               <Col sm={4} xl={4} lg={4} md={4}>
                 <ComparativeGraphs
                   id={"print-Production-" + indic}

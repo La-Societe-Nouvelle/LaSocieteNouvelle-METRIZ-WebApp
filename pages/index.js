@@ -125,18 +125,16 @@ class Metriz extends React.Component {
   }
 
   // import session (JSON data -> session)
-  loadPrevSession = (file) => {
+  loadPrevSession = async(file) => {
     const reader = new FileReader();
     reader.onload = async () => {
       // text -> JSON
       const prevProps = JSON.parse(reader.result);
 
       // update to current version
-      updateVersion(prevProps);
-
+      await updateVersion(prevProps);
       // JSON -> session
       const session = new Session(prevProps);
-
       this.setState({
         session: session,
         step: session.progression,

@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-const currentVersion = "1.0.3";
+const currentVersion = "1.0.4";
 
 // Libraries
 import metaIndics from "../lib/indics.json";
@@ -30,7 +30,6 @@ export class Session {
   constructor(props) {
     if (props == undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
-
     // Version
     this.version = currentVersion;
 
@@ -47,18 +46,18 @@ export class Session {
 
     // Validations
     this.validations = props.validations || [];
-
     // Comparative Division
     this.comparativeDivision = props.comparativeDivision || "00";
-
-    // Comparative Footprint
+    // Comparative Footprint  
     this.comparativeAreaFootprints = props.comparativeAreaFootprints || {};
+
     this.comparativeDivisionFootprints = props.comparativeDivisionFootprints || {};
     this.targetSNCB = props.targetSNCB || {};
 
     // ---------------------------------------------------------------------------------------------------- //
-
+    
     this.updateFootprints();
+
   }
 
   /* -------------------- PROGRESSION -------------------- */
@@ -115,6 +114,7 @@ export class Session {
     return;
   }
 
+ 
   // Update indicator
   async updateIndicator(indic) {
     // Net Value Added
