@@ -52,7 +52,7 @@ export class Session {
     this.comparativeAreaFootprints = props.comparativeAreaFootprints || {};
 
     this.comparativeDivisionFootprints = props.comparativeDivisionFootprints || {};
-    this.targetSNBC = props.targetSNBC || {};
+    this.targetSNBC = props.targetSNBC || {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
 
     // ---------------------------------------------------------------------------------------------------- //
     
