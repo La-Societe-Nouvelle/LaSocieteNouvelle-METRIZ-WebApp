@@ -42,25 +42,18 @@ const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
-  const [comparativeDivision, setComparativeDivision] = useState(
-    props.session.comparativeDivision
+  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision
   );
   const [indicToExport, setIndicToExport] = useState();
-  const [allSectorFootprint, setAllSectorFootprint] = useState(
-    props.session.comparativeAreaFootprints
-  );
-  const [divisionFootprint, setDivisionFootprint] = useState(
-    props.session.comparativeDivisionFootprints
-  );
+  const [allSectorFootprint, setAllSectorFootprint] = useState(props.session.comparativeAreaFootprints);
+  const [divisionFootprint, setDivisionFootprint] = useState(props.session.comparativeDivisionFootprints);
 
-  const [targetSNBC, setTargetSNBC] = useState({
-    valueAddedTarget: { value: null },
-    productionTarget: { value: null },
-    consumptionTarget: { value: null },
-  });
+  const [targetSNBC, setTargetSNBC] = useState({valueAddedTarget: { value: null },productionTarget: { value: null },
+    consumptionTarget: { value: null }});
 
 
   useEffect(async () => {
+
     if (validations.length > 0) {
       props.publish();
     }
@@ -204,6 +197,7 @@ const IndicatorsList = (props) => {
   };
   // Comparative division
   const getComparativeDivisionFootprint = async (indic, division) => {
+    
     let valueAddedFootprint;
     let productionFootprint;
     let consumptionFootprint;
@@ -421,6 +415,7 @@ const IndicatorsList = (props) => {
 
   return (
     <>
+      {console.log(divisionFootprint)}
       {/* Display all graphs by indicator to print them in PDF*/}
       {validations.length > 0 &&
         comparativeDivision != "00" &&

@@ -18,8 +18,7 @@ const StatementSection = (props) => {
     setView("result");
   };
 
-  useEffect(()=>{
-  },[])
+
   return (
     <Container fluid className="indicator-section">
       {view == "statement" ? (
@@ -30,12 +29,12 @@ const StatementSection = (props) => {
               Pour chaque indicateur, déclarez vos impacts directs et obtenez
               les éléments d'analyse.
             </p>
-            {/* <IndicatorsList
+          <IndicatorsList
               impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
               publish={() => setPublicationAvailable(true)}
-                     /> */}
+                     />  
           </section>
           <section className="step">
             <h2>

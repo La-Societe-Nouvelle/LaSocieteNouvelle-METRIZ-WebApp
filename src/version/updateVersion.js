@@ -55,8 +55,6 @@ const updater_1_0_3 = async (sessionData) => {
           const divisionFootprint = await retrieveDivisionFootprint(indic,code);
           Object.assign(comparativeDivisionFootprints,divisionFootprint);
         }
-        console.log(indic);
-        console.log(code)
         if(indic='ghg' && code != '00') {
           const target = await retrieveTargetFootprint(code);
           Object.assign(targetSNBC,target);
