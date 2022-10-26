@@ -16,7 +16,7 @@ import { printValue } from "/src/utils/Utils";
 // Statement writers
 import { writeStatementART } from "../../components/sections/statements/forms/StatementART";
 import { writeStatementDIS } from "../../components/sections/statements/forms/StatementDIS";
-import { writeStatementECO } from "../../components/sections/statements/forms/StatementECO"; 
+import { writeStatementECO } from "../../components/sections/statements/forms/StatementECO";
 import { writeStatementGEQ } from "../../components/sections/statements/forms/StatementGEQ";
 import { writeStatementGHG } from "../../components/sections/statements/forms/StatementGHG";
 import { writeStatementHAZ } from "../../components/sections/statements/forms/StatementHAZ";
@@ -41,7 +41,6 @@ import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWr
 import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
 
 import divisions from "/lib/divisions";
-
 
 function exportIndicDataExpensesCSV(indic, session) {
   let csvContent = "data:text/csv;charset=utf-8,";
@@ -104,7 +103,7 @@ function generatePDF(
   const { financialData, legalUnit } = session;
 
   let x = 20;
-  
+
   // HEADER
   doc.setFontSize(16);
   doc.setFont("Helvetica", "bold");
@@ -148,8 +147,6 @@ function generatePDF(
   doc.setFont("Helvetica", "bold");
   doc.setTextColor(25, 21, 88);
   doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, 65);
-
-
 
   /* ----- TABLE ----- */
 
@@ -480,10 +477,8 @@ function generatePDF(
           ? doc.text("Branche de référence : " + libelle, x, y)
           : ""
       );
-      y += 10;
+    y += 10;
   }
-
-  
 
   //Production canvas
   doc.setFontSize(10);
@@ -494,7 +489,7 @@ function generatePDF(
   y += 5;
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const imageWidth = (doc.internal.pageSize.getWidth() - (x*2)) / 1.6;
+  const imageWidth = (doc.internal.pageSize.getWidth() - x * 2) / 1.6;
   let marginX = (pageWidth - imageWidth) / 2;
 
   let canvasProduction = document.querySelector(idProductionCanvas);
@@ -504,9 +499,8 @@ function generatePDF(
   const imgProps = doc.getImageProperties(imageProduction);
 
   const pdfHeight = (imgProps.height * imageWidth) / imgProps.width;
-  console.log(pdfHeight);
   doc.addImage(imageProduction, "JPEG", marginX, y, imageWidth, pdfHeight);
-  
+
   y += 60;
 
   //Consumption canvas
@@ -515,11 +509,19 @@ function generatePDF(
   let canvasConsumption = document.querySelector(idConsumptionCanvas);
   let canvasConsumptionImg = canvasConsumption.toDataURL("image/jpg", 1.0);
   const imgConsumptionProps = doc.getImageProperties(canvasConsumptionImg);
-  const pdfCHeight = (imgConsumptionProps.height * imageWidth) / imgConsumptionProps.width;
+  const pdfCHeight =
+    (imgConsumptionProps.height * imageWidth) / imgConsumptionProps.width;
 
-  doc.addImage(canvasConsumptionImg,"JPEG",marginX,y,imageWidth,pdfCHeight  );
+  doc.addImage(
+    canvasConsumptionImg,
+    "JPEG",
+    marginX,
+    y,
+    imageWidth,
+    pdfCHeight
+  );
 
-    y += 60;
+  y += 60;
 
   //Value canvas
 
@@ -540,22 +542,27 @@ function generatePDF(
       indic.toUpperCase(),
   });
 
-
   //Pie canvas
-  if(idPieChart) {
-    y += 65;
-    doc.text(" Répartition des impacts bruts (en %)", x, y);
-    y += 5;
+  if (idPieChart) {
+    // PAGE 2
+    doc.addPage();
 
-    const imageWidth = doc.internal.pageSize.getWidth() / 4.5;
+    y = 20;
+    doc.setFontSize(12);
+    doc.setFont("Helvetica", "bold");
+    doc.setTextColor(25, 21, 88);
+    doc.text("Répartition des impacts bruts en pourcentage ", x, y);
+    y += 20;
+
+    const imageWidth = doc.internal.pageSize.getWidth() / 2.6;
     marginX = (pageWidth - imageWidth) / 2;
 
     let canvasPie = document.querySelector(idPieChart);
     let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
     const imgPieProps = doc.getImageProperties(canvasPieImg);
-  
+
     const PieHeight = (imgPieProps.height * imageWidth) / imgPieProps.width;
-  
+
     doc.addImage(canvasPieImg, "JPEG", marginX, y, imageWidth, PieHeight);
   }
   return doc;
@@ -748,7 +755,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
         production.footprint.indicators[indic].getGrossImpact(
           production.amount
         ),
-        nbDecimals
+        0
       ),
       xValue + 24,
       y,
@@ -797,7 +804,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
     doc.text(
       printValue(
         revenue.footprint.indicators[indic].getGrossImpact(revenue.amount),
-        metaIndics[indic].nbDecimals
+       0
       ),
       xValue + 24,
       y,
@@ -842,7 +849,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
         storedProduction.footprint.indicators[indic].getGrossImpact(
           storedProduction.amount
         ),
-        metaIndics[indic].nbDecimals
+       0
       ),
       xValue + 24,
       y,
@@ -892,7 +899,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
           immobilisedProduction.footprint.indicators[indic].getGrossImpact(
             immobilisedProduction.amount
           ),
-          metaIndics[indic].nbDecimals
+          0
         ),
         xValue + 24,
         y,
@@ -946,7 +953,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
         intermediateConsumption.footprint.indicators[indic].getGrossImpact(
           intermediateConsumption.amount
         ),
-        metaIndics[indic].nbDecimals
+       0
       ),
       xValue + 24,
       y,
@@ -990,7 +997,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
         doc.text(
           printValue(
             indicator.getGrossImpact(aggregate.amount),
-            metaIndics[indic].nbDecimals
+            0
           ),
           xValue + 24,
           y,
@@ -1039,7 +1046,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
         capitalConsumption.footprint.indicators[indic].getGrossImpact(
           capitalConsumption.amount
         ),
-        metaIndics[indic].nbDecimals
+        0
       ),
       xValue + 24,
       y,
@@ -1079,7 +1086,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
         doc.text(
           printValue(
             indicator.getGrossImpact(aggregate.amount),
-            metaIndics[indic].nbDecimals
+            0
           ),
           xValue + 24,
           y,
@@ -1128,12 +1135,13 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
       y,
       { align: "right" }
     );
+
     doc.text(
       printValue(
         netValueAdded.footprint.indicators[indic].getGrossImpact(
           netValueAdded.amount
         ),
-        metaIndics[indic].nbDecimals
+       0
       ),
       xValue + 24,
       y,
