@@ -41,16 +41,32 @@ export const updateVersion = (sessionData) => {
 
 const updater_1_0_3 = async (sessionData) => {
 
- let areaFootprint = {};
- 
+
+
+ let comparativeAreaFootprints = {};
+ let comparativeDivisionFootprints = {};
+ let targetSNBC = {};
+let code = sessionData.comparativeDivision;
+
     await Promise.all(
       sessionData.validations.map(async (indic) => {
-        const footprint = await retrieveAreaFootprint(indic,sessionData.comparativeAreaFootprints);
-        Object.assign(areaFootprint, footprint)
+        const footprint = await retrieveSectorFootprint(indic,"00");
+        Object.assign(comparativeAreaFootprints, footprint);
+
+        if(code!='00'){
+          const divisionFootprint = await retrieveSectorFootprint(indic,code);
+          Object.assign(comparativeDivisionFootprints,divisionFootprint);
+        }
+        if(indic='ghg' && code != '00') {
+          const target = await retrieveTargetFootprint(code);
+          Object.assign(targetSNBC,target);
+        }
       })
     );
 
-    sessionData.comparativeAreaFootprints = areaFootprint;
+    
+    Object.assign(sessionData, {comparativeAreaFootprints : comparativeAreaFootprints,
+    comparativeDivisionFootprints : comparativeDivisionFootprints, targetSNBC : targetSNBC})
 
 };
 
@@ -91,7 +107,7 @@ const updater_1_0_1 = (sessionData) => {
     getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
-const retrieveAreaFootprint = async (indicator) => {
+const retrieveSectorFootprint = async (indicator, code) => {
 
   let indic = indicator.toUpperCase();
   let valueAddedFootprint;
@@ -100,11 +116,11 @@ const retrieveAreaFootprint = async (indicator) => {
   let footprint = {};
 
 
-  const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
+  const getValueAdded = SerieDataService.getMacroData(indic, code, "NVA");
 
-  const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
+  const getProduction = SerieDataService.getMacroData(indic, code, "PRD");
 
-  const getConsumption = SerieDataService.getMacroData(indic, "00", "IC");
+  const getConsumption = SerieDataService.getMacroData(indic, code, "IC");
 
   await axios
     .all([getValueAdded, getProduction, getConsumption])
@@ -139,4 +155,57 @@ const retrieveAreaFootprint = async (indicator) => {
   });
 
   return footprint;
+};
+
+
+const retrieveTargetFootprint = async (code) => {
+
+    let valueAddedTarget;
+    let productionTarget;
+    let consumptionTarget;
+    let target = {};
+
+    const id = 'TARGET_GHG_SNBC_FRA_DIV';
+
+    const getValueAdded = SerieDataService.getSerieData(id, code, "NVA");
+    const getProduction = SerieDataService.getSerieData(id, code, "PRD");
+    const getConsumption = SerieDataService.getSerieData(id, code, "IC");
+
+    await axios
+      .all([getValueAdded, getProduction, getConsumption])
+      .then(
+        axios.spread((...responses) => {
+          const valueAdded = responses[0];
+          const production = responses[1];
+          const consumption = responses[2];
+
+          if (valueAdded.data.header.code == 200) {
+            valueAddedTarget = valueAdded.data.data.at(-1);
+          }
+
+          if (production.data.header.code == 200) {
+            productionTarget = production.data.data.at(-1);
+          }
+
+          if (consumption.data.header.code == 200) {
+            consumptionTarget = consumption.data.data.at(-1);
+          }
+        })
+      )
+      .catch(() => {
+        setError(true);
+      });
+
+      Object.assign(target, {
+        
+          valueAddedTarget: valueAddedTarget,
+          productionTarget: productionTarget,
+          consumptionTarget: consumptionTarget,
+        
+      });
+
+
+
+
+  return target;
 };
