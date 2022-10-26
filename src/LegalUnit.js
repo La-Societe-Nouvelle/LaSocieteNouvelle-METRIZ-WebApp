@@ -216,7 +216,7 @@ export class LegalUnit {
     // PIB+IMP FRA (Available production in FRA)
 
     await api
-      .get("defaultfootprint/?code=00&aggregate=GAP&area=FRA")
+      .get("defaultfootprint/?code=00&aggregate=TRESS&area=FRA")
       .then((res) => {
         let status = res.data.header.code;
 
