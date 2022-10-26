@@ -190,7 +190,6 @@ export class SirenSection extends React.Component {
             )}
             {popup && (
               <MessagePopup
-                title="Importation des fournisseurs..."
                 message="Votre fichier a bien été importé !"
                 type="success"
                 closePopup={() => this.closePopup()}
