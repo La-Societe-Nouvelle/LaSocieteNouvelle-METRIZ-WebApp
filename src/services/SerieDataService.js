@@ -4,7 +4,12 @@ class SerieDataService {
 
     getMacroData(indic,code,aggregate){
         return api.get(`/serie/MACRO_${indic}_FRA_DIV?code=${code}&aggregate=${aggregate}&area=FRA`);
-    }    
+    } 
+    
+    getSerieData(id,code,aggregate){
+
+        return api.get(`/serie/${id}?code=${code}&aggregate=${aggregate}&area=FRA`);        
+    }
     
 
 

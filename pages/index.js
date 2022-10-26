@@ -129,19 +129,19 @@ class Metriz extends React.Component {
     const reader = new FileReader();
     reader.onload = async () => {
       // text -> JSON
-      const prevProps = JSON.parse(reader.result);
-
+      const prevProps = await JSON.parse(reader.result);
+     
       // update to current version
       await updateVersion(prevProps);
       // JSON -> session
-      const session = new Session(prevProps);
+      const session =  new Session(prevProps);
+      
       this.setState({
         session: session,
         step: session.progression,
         selectedSection: "legalData"
       })
     }
-
     reader.readAsText(file);
   }
 
