@@ -11,13 +11,13 @@ import SerieDataService from "../services/SerieDataService";
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
-export const updateVersion = (sessionData) => {
+export const updateVersion = async(sessionData) => {
 
 
   switch (sessionData.version) {
 
     case "1.0.3":
-      updater_1_0_3(sessionData);
+      await updater_1_0_3(sessionData);
       break;
     case "1.0.2":
       updater_1_0_2(sessionData);
@@ -26,13 +26,13 @@ export const updateVersion = (sessionData) => {
     case "1.0.1":
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
-      updater_1_0_3(sessionData);
+      await updater_1_0_3(sessionData);
       break;
     case "1.0.0":
       updater_1_0_0(sessionData);
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
-      updater_1_0_3(sessionData);
+      await updater_1_0_3(sessionData);
       break;
     default:
       break;
@@ -41,30 +41,28 @@ export const updateVersion = (sessionData) => {
 
 const updater_1_0_3 = async (sessionData) => {
 
-
-
  let comparativeAreaFootprints = {};
  let comparativeDivisionFootprints = {};
  let targetSNBC = {};
-let code = sessionData.comparativeDivision;
+ let code = sessionData.comparativeDivision;
 
     await Promise.all(
       sessionData.validations.map(async (indic) => {
-        const footprint = await retrieveSectorFootprint(indic,"00");
+        const footprint = await retrieveAreaFootprint(indic);
         Object.assign(comparativeAreaFootprints, footprint);
 
         if(code!='00'){
-          const divisionFootprint = await retrieveSectorFootprint(indic,code);
+          const divisionFootprint = await retrieveDivisionFootprint(indic,code);
           Object.assign(comparativeDivisionFootprints,divisionFootprint);
         }
+        console.log(indic);
+        console.log(code)
         if(indic='ghg' && code != '00') {
           const target = await retrieveTargetFootprint(code);
           Object.assign(targetSNBC,target);
         }
       })
     );
-
-    
     Object.assign(sessionData, {comparativeAreaFootprints : comparativeAreaFootprints,
     comparativeDivisionFootprints : comparativeDivisionFootprints, targetSNBC : targetSNBC})
 
@@ -107,7 +105,8 @@ const updater_1_0_1 = (sessionData) => {
     getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
-const retrieveSectorFootprint = async (indicator, code) => {
+
+const retrieveAreaFootprint = async (indicator) => {
 
   let indic = indicator.toUpperCase();
   let valueAddedFootprint;
@@ -116,11 +115,11 @@ const retrieveSectorFootprint = async (indicator, code) => {
   let footprint = {};
 
 
-  const getValueAdded = SerieDataService.getMacroData(indic, code, "NVA");
+  const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
 
-  const getProduction = SerieDataService.getMacroData(indic, code, "PRD");
+  const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
 
-  const getConsumption = SerieDataService.getMacroData(indic, code, "IC");
+  const getConsumption = SerieDataService.getMacroData(indic, "00", "IC");
 
   await axios
     .all([getValueAdded, getProduction, getConsumption])
@@ -151,6 +150,56 @@ const retrieveSectorFootprint = async (indicator, code) => {
       valueAddedAreaFootprint: valueAddedFootprint,
       productionAreaFootprint: productionFootprint,
       consumptionAreaFootprint: consumptionFootprint,
+    },
+  });
+
+  return footprint;
+};
+
+const retrieveDivisionFootprint = async (indicator) => {
+
+  let indic = indicator.toUpperCase();
+  let valueAddedFootprint;
+  let productionFootprint;
+  let consumptionFootprint;
+  let footprint = {};
+
+
+  const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
+
+  const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
+
+  const getConsumption = SerieDataService.getMacroData(indic, "00", "IC");
+
+  await axios
+    .all([getValueAdded, getProduction, getConsumption])
+    .then(
+      axios.spread((...responses) => {
+        const valueAdded = responses[0];
+        const production = responses[1];
+        const consumption = responses[2];
+
+        if (valueAdded.data.header.code == 200) {
+          valueAddedFootprint = valueAdded.data.data.at(-1);
+        }
+        if (production.data.header.code == 200) {
+          productionFootprint = production.data.data.at(-1);
+        }
+
+        if (consumption.data.header.code == 200) {
+          consumptionFootprint = consumption.data.data.at(-1);
+        }
+      })
+    )
+    .catch((errors) => {
+      console.log(errors);
+    });
+
+  Object.assign(footprint, {
+    [indic]: {
+      valueAddedDivisionFootprint: valueAddedFootprint,
+      productionDivisionFootprint: productionFootprint,
+      consumptionDivisionFootprint: consumptionFootprint,
     },
   });
 
