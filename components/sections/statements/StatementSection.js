@@ -5,7 +5,6 @@ import ResultSection from "./ResultSection";
 
 import IndicatorsList from "./parts/IndicatorsList";
 import ExportResults from "./parts/ExportResults";
-import { useEffect } from "react";
 
 const StatementSection = (props) => {
 

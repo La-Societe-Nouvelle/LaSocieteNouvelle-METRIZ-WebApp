@@ -32,8 +32,6 @@ import { analysisTextWriterWAT } from "../../../src/writers/analysis/analysisTex
 import { exportIndicPDF } from "../../../src/writers/Export";
 
 // API
-import api from "../../../src/api";
-import axios from "axios";
 import { ErrorApi } from "../../ErrorAPI";
 
 // Graphs
@@ -44,26 +42,19 @@ import PieGraph from "../../graphs/PieGraph";
 import { ComparativeTable } from "../../tables/ComparativeTable";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
+import retrieveDivisionFootprint from "../../../src/footprintObjects/divisionFootprint";
+import retrieveTargetFootprint from "../../../src/footprintObjects/TargetFootprint";
 
 const ResultSection = (props) => {
+
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
-  const [error, setError] = useState(false);
-  const [comparativeDivision, setComparativeDivision] = useState(
-    props.session.comparativeDivision || "00"
-  );
-  const [allSectorFootprint] = useState(
-    props.session.comparativeAreaFootprints[props.indic.toUpperCase()]
-  );
-  const [divisionFootprint, setDivisionFootprint] = useState(
-    props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
-  );
+  const [error] = useState(false);
+  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision || "00");
+  const [allSectorFootprint] = useState(props.session.comparativeAreaFootprints[props.indic.toUpperCase()]);
+  const [divisionFootprint, setDivisionFootprint] = useState(props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]);
 
-  const [targetSNBC, setTargetSNBC] = useState({
-    valueAddedTarget: { value: null },
-    productionTarget: { value: null },
-    consumptionTarget: { value: null },
-  });
+  const [targetSNBC, setTargetSNBC] = useState(props.session.targetSNBC);
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -111,7 +102,10 @@ const ResultSection = (props) => {
     }
     // GET TARGET SNCB 2030 VALUE
     if (indic == "ghg" && comparativeDivision != "00") {
-      await getTargetSNBC();
+      const target =  await retrieveTargetFootprint(comparativeDivision);
+      setTargetSNBC(target);
+    props.session.targetSNBC = target;
+
     } else {
       setTargetSNBC({
         valueAddedTarget: { value: null },
@@ -123,56 +117,15 @@ const ResultSection = (props) => {
 
 
   const getComparativeDivisionFootprint = async () => {
-    let valueAddedFootprint;
-    let productionFootprint;
-    let consumptionFootprint;
 
-    const getValueAdded = api.get(
-      "serie/MACRO_" +
-        indic.toUpperCase() +
-        "_FRA_DIV/?code=" +
-        comparativeDivision +
-        "&aggregate=NVA&area=FRA"
-    );
-    const getProduction = api.get(
-      "serie/MACRO_" +
-        indic.toUpperCase() +
-        "_FRA_DIV/?code=" +
-        comparativeDivision +
-        "&aggregate=PRD&area=FRA"
+   const divisionFootprint = await retrieveDivisionFootprint(
+      indic,
+      comparativeDivision
     );
 
-    const getConsumption = api.get(
-      "serie/MACRO_" +
-        indic.toUpperCase() +
-        "_FRA_DIV/?code=" +
-        comparativeDivision +
-        "&aggregate=IC&area=FRA"
-    );
-
-    await axios
-      .all([getValueAdded, getProduction, getConsumption])
-      .then(
-        axios.spread((...responses) => {
-          const valueAdded = responses[0];
-          const production = responses[1];
-          const consumption = responses[2];
-          if (valueAdded.data.header.code == 200) {
-            valueAddedFootprint = valueAdded.data.data.at(-1);
-          }
-
-          if (production.data.header.code == 200) {
-            productionFootprint = production.data.data.at(-1);
-          }
-
-          if (consumption.data.header.code == 200) {
-            consumptionFootprint = consumption.data.data.at(-1);
-          }
-        })
-      )
-      .catch(() => {
-        setError(true);
-      });
+    let valueAddedFootprint  = divisionFootprint[indic.toUpperCase()].valueAddedDivisionFootprint ;
+    let productionFootprint = divisionFootprint[indic.toUpperCase()].productionDivisionFootprint;
+    let consumptionFootprint = divisionFootprint[indic.toUpperCase()].consumptionDivisionFootprint;
 
     props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
       valueAddedDivisionFootprint: valueAddedFootprint,
@@ -187,58 +140,6 @@ const ResultSection = (props) => {
     });
   };
 
-  const getTargetSNBC = async () => {
-    let valueAddedTarget;
-    let productionTarget;
-    let consumptionTarget;
-
-    const getValueAdded = api.get(
-      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
-        comparativeDivision +
-        "&aggregate=NVA&area=FRA"
-    );
-    const getProduction = api.get(
-      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
-        comparativeDivision +
-        "&aggregate=PRD&area=FRA"
-    );
-
-    const getConsumption = api.get(
-      "serie/TARGET_GHG_SNBC_FRA_DIV/?code=" +
-        comparativeDivision +
-        "&aggregate=IC&area=FRA"
-    );
-    await axios
-      .all([getValueAdded, getProduction, getConsumption])
-      .then(
-        axios.spread((...responses) => {
-          const valueAdded = responses[0];
-          const production = responses[1];
-          const consumption = responses[2];
-
-          if (valueAdded.data.header.code == 200) {
-            valueAddedTarget = valueAdded.data.data.at(-1);
-          }
-
-          if (production.data.header.code == 200) {
-            productionTarget = production.data.data.at(-1);
-          }
-
-          if (consumption.data.header.code == 200) {
-            consumptionTarget = consumption.data.data.at(-1);
-          }
-        })
-      )
-      .catch(() => {
-        setError(true);
-      });
-
-    setTargetSNBC({
-      valueAddedTarget: valueAddedTarget,
-      productionTarget: productionTarget,
-      consumptionTarget: consumptionTarget,
-    });
-  };
 
   return (
     <>

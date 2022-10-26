@@ -403,7 +403,6 @@ export class SirenSection extends React.Component {
     let reader = new FileReader();
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
-      console.log(XLSXData);
       
       await Promise.all(
         XLSXData.map(async ({ account,denomination, siren }) =>
