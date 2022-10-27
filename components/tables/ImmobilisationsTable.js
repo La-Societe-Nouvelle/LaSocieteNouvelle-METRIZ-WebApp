@@ -61,7 +61,7 @@ export class ImmobilisationsTable extends React.Component {
           {immobilisations.length > 0 &&
              <tfoot>
              <tr>
-                <td colspan="2">TOTAL</td>
+                <td colSpan="2">TOTAL</td>
                 <td className="text-end">{printValue(aggregates.netAmountImmobilisation.amount,0)} &euro;</td>
                 <td className="text-end">{printValue(aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
                 <td className="text-end">{printValue(aggregates.netAmountImmobilisation.amount-aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
