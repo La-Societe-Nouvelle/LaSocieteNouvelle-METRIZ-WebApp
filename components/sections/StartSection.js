@@ -4,6 +4,7 @@
 
 import React from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
+import { Loader } from "../popups/Loader";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
@@ -87,6 +88,8 @@ export class StartSection extends React.Component {
             <Image fluid src="/resources/team_working.png" alt="Team" />
           </Col>
         </Row>
+        {this.props.isLoading && <Loader />
+ }
       </Container>
     );
   }

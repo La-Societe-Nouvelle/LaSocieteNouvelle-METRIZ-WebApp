@@ -79,7 +79,8 @@ class Metriz extends React.Component {
     this.state =
     {
       session: new Session(),
-      step: 0
+      step: 0,
+      loading : false
     }
   }
 
@@ -126,7 +127,10 @@ class Metriz extends React.Component {
 
   // import session (JSON data -> session)
   loadPrevSession = async(file) => {
+
+    this.setState({loading : true});
     const reader = new FileReader();
+
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
@@ -139,7 +143,7 @@ class Metriz extends React.Component {
       this.setState({
         session: session,
         step: session.progression,
-        selectedSection: "legalData"
+        loading : false,
       })
     }
     reader.readAsText(file);
@@ -156,10 +160,8 @@ class Metriz extends React.Component {
       submit: () => this.validStep(this.state.step),
     }
 
-
-
     switch (step) {
-      case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} />)
+      case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} isLoading={this.state.loading} />)
       case 1: return (<ImportSection {...sectionProps} />)
       case 2: return (<InitialStatesSection {...sectionProps} />)
       case 3: return (<CompaniesSection {...sectionProps} />)
