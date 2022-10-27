@@ -5,9 +5,9 @@ import {
   getTotalGhgEmissionsUncertainty,
 } from "../../components/assessments/AssessmentGHG";
 
-import retrieveAreaFootprint from "../footprintObjects/AreaFootprint";
+import retrieveAreaFootprint from "../footprintObjects/areaFootprint";
 import retrieveDivisionFootprint from "../footprintObjects/divisionFootprint";
-import retrieveTargetFootprint from "../footprintObjects/TargetFootprint";
+import retrieveTargetFootprint from "../footprintObjects/targetFootprint";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */

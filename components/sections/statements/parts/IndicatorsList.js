@@ -35,9 +35,9 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
-import retrieveAreaFootprint from "../../../../src/footprintObjects/AreaFootprint";
+import retrieveAreaFootprint from "../../../../src/footprintObjects/areaFootprint";
 import retrieveDivisionFootprint from "../../../../src/footprintObjects/divisionFootprint";
-import retrieveTargetFootprint from "../../../../src/footprintObjects/TargetFootprint";
+import retrieveTargetFootprint from "../../../../src/footprintObjects/targetFootprint";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);

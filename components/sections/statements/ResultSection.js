@@ -43,7 +43,7 @@ import { ComparativeTable } from "../../tables/ComparativeTable";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
 import retrieveDivisionFootprint from "../../../src/footprintObjects/divisionFootprint";
-import retrieveTargetFootprint from "../../../src/footprintObjects/TargetFootprint";
+import retrieveTargetFootprint from "../../../src/footprintObjects/targetFootprint";
 
 const ResultSection = (props) => {
   const [isLoading, setIsLoading] = useState(false);
