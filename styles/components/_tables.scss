@@ -261,3 +261,11 @@ table {
 .area-column {
   width: 250px;
 }
+
+
+.comparative-table {
+  .border-left {
+    border-left: 2px solid lighten( $light, 5%);
+}
+ 
+}

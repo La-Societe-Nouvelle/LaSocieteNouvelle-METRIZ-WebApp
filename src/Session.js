@@ -52,8 +52,8 @@ export class Session {
     this.comparativeAreaFootprints = props.comparativeAreaFootprints || {};
 
     this.comparativeDivisionFootprints = props.comparativeDivisionFootprints || {};
-    this.targetSNBC = props.targetSNBC || {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
-
+    this.targetSNBCbranch = props.targetSNBCbranch || {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
+    this.targetSNBCarea = props.targetSNBCarea  || {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
     // ---------------------------------------------------------------------------------------------------- //
     
     this.updateFootprints();

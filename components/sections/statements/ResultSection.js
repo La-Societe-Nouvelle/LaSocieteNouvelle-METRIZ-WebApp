@@ -46,15 +46,26 @@ import retrieveDivisionFootprint from "../../../src/footprintObjects/divisionFoo
 import retrieveTargetFootprint from "../../../src/footprintObjects/TargetFootprint";
 
 const ResultSection = (props) => {
-
+  const [isLoading, setIsLoading] = useState(false);
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
   const [error] = useState(false);
-  const [comparativeDivision, setComparativeDivision] = useState(props.session.comparativeDivision || "00");
-  const [allSectorFootprint] = useState(props.session.comparativeAreaFootprints[props.indic.toUpperCase()]);
-  const [divisionFootprint, setDivisionFootprint] = useState(props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]);
+  const [comparativeDivision, setComparativeDivision] = useState(
+    props.session.comparativeDivision || "00"
+  );
+  const [allSectorFootprint] = useState(
+    props.session.comparativeAreaFootprints[props.indic.toUpperCase()]
+  );
+  const [divisionFootprint, setDivisionFootprint] = useState(
+    props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
+  );
 
-  const [targetSNBC, setTargetSNBC] = useState(props.session.targetSNBC);
+  const [targetSNBCbranch, setTargetSNBCbranch] = useState(
+    props.session.targetSNBCbranch
+  );
+  const [targetSNBCarea, setTargetSNBCarea] = useState(
+    props.session.targetSNBCarea
+  );
 
   const [printGrossImpact] = useState([
     "ghg",
@@ -84,7 +95,16 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-  
+
+
+    await getComparativeValues();
+
+    setIsLoading(false);
+
+  }, [comparativeDivision, indic]);
+
+  const getComparativeValues = async() => {
+    setIsLoading(true);
     if (comparativeDivision != "00") {
       await getComparativeDivisionFootprint();
     } else {
@@ -102,30 +122,44 @@ const ResultSection = (props) => {
     }
     // GET TARGET SNCB 2030 VALUE
     if (indic == "ghg" && comparativeDivision != "00") {
-      const target =  await retrieveTargetFootprint(comparativeDivision);
-      setTargetSNBC(target);
-    props.session.targetSNBC = target;
-
+      const target = await retrieveTargetFootprint(comparativeDivision);
+      setTargetSNBCbranch(target);
+      props.session.targetSNBCbranch = target;
     } else {
-      setTargetSNBC({
+      setTargetSNBCbranch({
         valueAddedTarget: { value: null },
         productionTarget: { value: null },
         consumptionTarget: { value: null },
       });
     }
-  }, [comparativeDivision, indic]);
 
+    // GET TARGET SNCB 2030 VALUE
+    if (indic == "ghg") {
+      // TARGET SNCB 2030 FOR ALL SECTORS
+      const targetArea = await retrieveTargetFootprint("00");
+      setTargetSNBCarea(targetArea);
 
+      props.session.targetSNBCarea = targetArea;
+    } else {
+      setTargetSNBCarea({
+        valueAddedTarget: { value: null },
+        productionTarget: { value: null },
+        consumptionTarget: { value: null },
+      });
+    }
+  }
   const getComparativeDivisionFootprint = async () => {
-
-   const divisionFootprint = await retrieveDivisionFootprint(
+    const divisionFootprint = await retrieveDivisionFootprint(
       indic,
       comparativeDivision
     );
 
-    let valueAddedFootprint  = divisionFootprint[indic.toUpperCase()].valueAddedDivisionFootprint ;
-    let productionFootprint = divisionFootprint[indic.toUpperCase()].productionDivisionFootprint;
-    let consumptionFootprint = divisionFootprint[indic.toUpperCase()].consumptionDivisionFootprint;
+    let valueAddedFootprint =
+      divisionFootprint[indic.toUpperCase()].valueAddedDivisionFootprint;
+    let productionFootprint =
+      divisionFootprint[indic.toUpperCase()].productionDivisionFootprint;
+    let consumptionFootprint =
+      divisionFootprint[indic.toUpperCase()].consumptionDivisionFootprint;
 
     props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
       valueAddedDivisionFootprint: valueAddedFootprint,
@@ -139,7 +173,6 @@ const ResultSection = (props) => {
       consumptionDivisionFootprint: consumptionFootprint,
     });
   };
-
 
   return (
     <>
@@ -262,7 +295,8 @@ const ResultSection = (props) => {
         />
 
         {error && <ErrorApi />}
-        <div className="mt-5">
+        {!isLoading && <>
+          <div className="mt-5">
           <Row className="graphs">
             <Col sm={4} xl={4} lg={4} md={4}>
               <h5 className="mb-4">▪ Production</h5>
@@ -279,13 +313,14 @@ const ResultSection = (props) => {
                 }
                 titleChart="Production"
                 indic={indic}
-                targetData={targetSNBC.productionTarget.value}
+                targetBranchData={targetSNBCbranch.productionTarget.value}
+                targetAreaData={targetSNBCarea.productionTarget.value}
               />
             </Col>
             <Col sm={4} xl={4} lg={4} md={4}>
               <h5 className="mb-4">▪ Consommations intermédiaires</h5>
               <ComparativeGraphs
-                 id="Consumption"
+                id="Consumption"
                 sectorData={allSectorFootprint.consumptionAreaFootprint.value}
                 legalunitData={
                   session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
@@ -297,13 +332,14 @@ const ResultSection = (props) => {
                 }
                 titleChart="Consommations intérmédiaires"
                 indic={indic}
-                targetData={targetSNBC.consumptionTarget.value}
+                targetBranchData={targetSNBCbranch.consumptionTarget.value}
+                targetAreaData={targetSNBCarea.consumptionTarget.value}
               />
             </Col>
             <Col sm={4} xl={4} lg={4} md={4}>
               <h5 className="mb-4">▪ Valeur ajoutée</h5>
               <ComparativeGraphs
-                  id="Value"
+                id="Value"
                 sectorData={allSectorFootprint.valueAddedAreaFootprint.value}
                 legalunitData={
                   session.financialData.aggregates.netValueAdded.footprint.getIndicator(
@@ -315,18 +351,22 @@ const ResultSection = (props) => {
                 }
                 titleChart="Valeur ajoutée nette"
                 indic={indic}
-                targetData={targetSNBC.valueAddedTarget.value}
+                targetBranchData={targetSNBCbranch.valueAddedTarget.value}
+                targetAreaData={targetSNBCarea.valueAddedTarget.value}
               />
             </Col>
           </Row>
         </div>
-        <ComparativeTable 
-         financialData={session.financialData}
-         indic={indic}
-         allSectorFootprint={allSectorFootprint}
-         comparativeDivisionFootprint={divisionFootprint}
-         targetSNBC={targetSNBC}
+        <ComparativeTable
+          financialData={session.financialData}
+          indic={indic}
+          allSectorFootprint={allSectorFootprint}
+          comparativeDivisionFootprint={divisionFootprint}
+          targetSNBCbranch={targetSNBCbranch}
+          targetSNBCarea={targetSNBCarea}
         />
+        </>}
+   
       </section>
       <section className="step">
         <h3>Note d'analyse</h3>
