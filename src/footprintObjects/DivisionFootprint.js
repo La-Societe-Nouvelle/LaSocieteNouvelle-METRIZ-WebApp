@@ -9,13 +9,9 @@ const retrieveDivisionFootprint = async (indicator, code) => {
     let consumptionFootprint;
     let footprint = {};
   
-  
     const getValueAdded = SerieDataService.getMacroData(indic, code, "NVA");
-
     const getProduction = SerieDataService.getMacroData(indic, code, "PRD");
-  
     const getConsumption = SerieDataService.getMacroData(indic,code, "IC");
-  
   
     await axios
       .all([getValueAdded, getProduction, getConsumption])

@@ -1,5 +1,3 @@
-import { ifDefined } from "/src/utils/Utils";
-
 export class Indicator {
 
   constructor(props) 

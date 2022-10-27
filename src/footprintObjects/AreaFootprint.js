@@ -9,7 +9,6 @@ const retrieveAreaFootprint = async (indicator) => {
     let consumptionFootprint;
     let footprint = {};
   
-  
     const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
   
     const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
