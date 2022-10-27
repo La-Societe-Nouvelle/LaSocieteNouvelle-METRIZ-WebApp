@@ -42,8 +42,8 @@ import PieGraph from "../../graphs/PieGraph";
 import { ComparativeTable } from "../../tables/ComparativeTable";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
-import retrieveDivisionFootprint from "/src/footprintObjects/divisionFootprint";
-import retrieveTargetFootprint from "/src/footprintObjects/targetFootprint";
+import retrieveTargetFootprint from "/src/services/responses/targetFootprint";
+import retrieveDivisionFootprint from "/src/services/responses/divisionFootprint";
 
 const ResultSection = (props) => {
   const [isLoading, setIsLoading] = useState(false);

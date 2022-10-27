@@ -1,5 +1,5 @@
 import axios from "axios";
-import SerieDataService from "../services/SerieDataService";
+import SerieDataService from "../SerieDataService";
 
 const retrieveTargetFootprint = async (code) => {
 

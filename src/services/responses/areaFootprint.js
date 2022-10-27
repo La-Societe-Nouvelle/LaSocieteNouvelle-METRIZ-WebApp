@@ -1,7 +1,7 @@
 import axios from "axios";
-import SerieDataService from "../services/SerieDataService";
+import SerieDataService from "../SerieDataService";
 
-const retrieveDivisionFootprint = async (indicator, code) => {
+const retrieveAreaFootprint = async (indicator) => {
 
     let indic = indicator.toUpperCase();
     let valueAddedFootprint;
@@ -9,9 +9,11 @@ const retrieveDivisionFootprint = async (indicator, code) => {
     let consumptionFootprint;
     let footprint = {};
   
-    const getValueAdded = SerieDataService.getMacroData(indic, code, "NVA");
-    const getProduction = SerieDataService.getMacroData(indic, code, "PRD");
-    const getConsumption = SerieDataService.getMacroData(indic,code, "IC");
+    const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
+  
+    const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
+  
+    const getConsumption = SerieDataService.getMacroData(indic, "00", "IC");
   
     await axios
       .all([getValueAdded, getProduction, getConsumption])
@@ -39,13 +41,13 @@ const retrieveDivisionFootprint = async (indicator, code) => {
   
     Object.assign(footprint, {
       [indic]: {
-        valueAddedDivisionFootprint: valueAddedFootprint,
-        productionDivisionFootprint: productionFootprint,
-        consumptionDivisionFootprint: consumptionFootprint,
+        valueAddedAreaFootprint: valueAddedFootprint,
+        productionAreaFootprint: productionFootprint,
+        consumptionAreaFootprint: consumptionFootprint,
       },
     });
   
     return footprint;
   };
-
-export default retrieveDivisionFootprint
+  
+export default retrieveAreaFootprint
