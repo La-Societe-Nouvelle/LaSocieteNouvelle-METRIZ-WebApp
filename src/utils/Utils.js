@@ -46,6 +46,13 @@ export function getPrevAmountItems(items)
   return getSumItems(items.map(item => item.prevAmount))
 }
 
+/* ----- UNCERTAINTY ----- */
+
+export function getUncertainty(value,valueMin,valueMax)
+{
+  return Math.round((Math.max( valueMax-value , value-valueMin) / value) * 100);
+}
+
 /* ----- ROUND ----- */
 
 export function roundValue(value,precision) 
