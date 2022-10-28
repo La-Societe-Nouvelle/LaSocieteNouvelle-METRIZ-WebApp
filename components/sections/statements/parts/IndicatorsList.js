@@ -54,13 +54,18 @@ const IndicatorsList = (props) => {
     props.session.comparativeDivisionFootprints
   );
 
-  const [targetSNBC, setTargetSNBC] = useState(props.session.targetSNBC);
+  const [targetSNBCbranch, setTargetSNBCbranch] = useState(
+    props.session.targetSNBCbranch
+  );
+  const [targetSNBCarea, setTargetSNBCarea] = useState(
+    props.session.targetSNBCarea
+  );
 
   useEffect(async () => {
-
     if (validations.length > 0) {
       props.publish();
     }
+    // Update fooprints in session
     if (props.session.comparativeAreaFootprints != allSectorFootprint) {
       props.session.comparativeAreaFootprints = allSectorFootprint;
     }
@@ -70,11 +75,12 @@ const IndicatorsList = (props) => {
     if (props.session.comparativeDivision != comparativeDivision) {
       props.session.comparativeDivision = comparativeDivision;
     }
-    if (props.session.targetSNBC != targetSNBC) {
-      props.session.targetSNBC = targetSNBC;
+    if (props.session.targetSNBCbranch != targetSNBCbranch) {
+      props.session.targetSNBCbranch = targetSNBCbranch;
     }
- 
- 
+    if (props.session.targetSNBCarea != targetSNBCarea) {
+      props.session.targetSNBCarea = targetSNBCarea;
+    }
   }, [validations, comparativeDivision]);
 
   // check if net value indicator will change with new value & cancel value if necessary
@@ -110,6 +116,7 @@ const IndicatorsList = (props) => {
       Object.assign(indicsAreaFootprint, areaFootprint);
 
       setAllSectorFootprint(indicsAreaFootprint);
+
       if (comparativeDivision != "00") {
         let indicsDivisionFootprint = divisionFootprint;
         // Get footprint of selected division
@@ -124,9 +131,14 @@ const IndicatorsList = (props) => {
         setDivisionFootprint(indicsDivisionFootprint);
 
         // Get Target SNCB for GHG indic
+
         if (indic == "ghg") {
-         const target =  await retrieveTargetFootprint(comparativeDivision);
-         setTargetSNBC(target);
+          const target = await retrieveTargetFootprint(comparativeDivision);
+          setTargetSNBCbranch(target);
+
+          // TARGET SNCB 2030 FOR ALL SECTORS
+          const targetArea = await retrieveTargetFootprint("00");
+          setTargetSNBCarea(targetArea);
         }
       } else {
         // Assign null value for all other indicators
@@ -151,17 +163,18 @@ const IndicatorsList = (props) => {
     setUpdatedIndic(indic);
   };
 
-
   // Update comparative division
   const updateDivision = async (division) => {
-
-    
     // Set TARGET 2030 for GHG indic
-    if(indicToExport == 'ghg') {
-      const target =  await retrieveTargetFootprint(division);
-      setTargetSNBC(target);
-  }
- 
+    if (indicToExport == "ghg") {
+      const target = await retrieveTargetFootprint(division);
+      setTargetSNBCbranch(target);
+
+      // TARGET SNCB 2030 FOR ALL SECTORS
+      const targetArea = await retrieveTargetFootprint("00");
+      setTargetSNBCarea(targetArea);
+    }
+
     let indicsDivisionFootprint = divisionFootprint;
 
     // Get footprint of selected division
@@ -170,11 +183,9 @@ const IndicatorsList = (props) => {
       division
     );
     Object.assign(indicsDivisionFootprint, divisionFootprint);
+
     setDivisionFootprint(indicsDivisionFootprint);
-
-
     setComparativeDivision(division);
-
   };
 
   // Export pdf on click
@@ -260,15 +271,13 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-    {console.log(targetSNBC)}
       {/* Display all graphs by indicator to print them in PDF*/}
       {validations.length > 0 &&
         comparativeDivision != "00" &&
         validations.map(
           (indic, key) =>
             allSectorFootprint[indic.toUpperCase()] &&
-            divisionFootprint[indic.toUpperCase()] && 
-             (
+            divisionFootprint[indic.toUpperCase()] && (
               <div className="hidden" key={key}>
                 <Row className="graphs">
                   {/* Production Graph */}
@@ -291,9 +300,14 @@ const IndicatorsList = (props) => {
                       }
                       titleChart="Production"
                       indic={indic}
-                      targetData={
+                      targetBranchData={
                         indic == "ghg"
-                          ? targetSNBC.productionTarget.value
+                          ? targetSNBCbranch.productionTarget.value
+                          : null
+                      }
+                      targetAreaData={
+                        indic == "ghg"
+                          ? targetSNBCarea.productionTarget.value
                           : null
                       }
                     />
@@ -318,9 +332,14 @@ const IndicatorsList = (props) => {
                       }
                       titleChart="Consommations intérmédiaires"
                       indic={indic}
-                      targetData={
+                      targetBranchData={
                         indic == "ghg"
-                          ? targetSNBC.consumptionTarget.value
+                          ? targetSNBCbranch.consumptionTarget.value
+                          : null
+                      }
+                      targetAreaData={
+                        indic == "ghg"
+                          ? targetSNBCarea.consumptionTarget.value
                           : null
                       }
                     />
@@ -345,9 +364,14 @@ const IndicatorsList = (props) => {
                       }
                       titleChart="Valeur ajoutée nette"
                       indic={indic}
-                      targetData={
+                      targetBranchData={
                         indic == "ghg"
-                          ? targetSNBC.valueAddedTarget.value
+                          ? targetSNBCbranch.valueAddedTarget.value
+                          : null
+                      }
+                      targetAreaData={
+                        indic == "ghg"
+                          ? targetSNBCarea.valueAddedTarget.value
                           : null
                       }
                     />

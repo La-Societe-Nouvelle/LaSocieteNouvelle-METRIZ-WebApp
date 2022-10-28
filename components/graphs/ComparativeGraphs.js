@@ -9,7 +9,9 @@ const ComparativeGraphs = (props) => {
   const [sectorData, setSectorData] = useState(props.sectorData);
   const [legalunitData, setLegalUnitData] = useState(props.legalunitData);
   const [divisionData, setDivisionData] = useState(props.divisionData);
-  const [targetData, setTargetData] = useState(props.targetData);
+  const [targetBranchData, setTargetBranchData] = useState(props.targetBranchData);
+  const [targetAreaData, setTargetAreaData] = useState(props.targetAreaData);
+
   const [titleChart] = useState(props.titleChart);
   const [id, setId] = useState(props.id);
   const [unit, setUnit] = useState();
@@ -23,10 +25,11 @@ const ComparativeGraphs = (props) => {
       labels.push("Branche");
     }
     const valuesTarget = [];
-    if(targetData) {
-        valuesTarget.push(targetData.toFixed(precision));
+
+    if(targetBranchData) {
+        valuesTarget.push(targetAreaData.toFixed(precision));
         valuesTarget.push(0);
-        valuesTarget.push(targetData.toFixed(precision));
+        valuesTarget.push(targetBranchData.toFixed(precision));
     }
     setChartData({
       labels: labels,
@@ -64,11 +67,12 @@ const ComparativeGraphs = (props) => {
     setDivisionData(props.divisionData);
     setLegalUnitData(props.legalunitData);
     setSectorData(props.sectorData);
-    setTargetData(props.targetData);
+    setTargetBranchData(props.targetBranchData);
+    setTargetAreaData(props.targetAreaData);
     setId(props.id);
  
      chart();
-  }, [props, targetData, divisionData, legalunitData, sectorData]);
+  }, [props, targetBranchData, divisionData, legalunitData, sectorData]);
   return (
   
       <Bar

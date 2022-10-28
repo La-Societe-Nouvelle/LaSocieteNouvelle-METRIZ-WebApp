@@ -3,7 +3,6 @@ import SerieDataService from "../services/SerieDataService";
 
 const retrieveTargetFootprint = async (code) => {
 
-  console.log(code);
   
     let valueAddedTarget;
     let productionTarget;

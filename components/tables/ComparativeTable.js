@@ -1,6 +1,5 @@
 // La Société Nouvelle
 
-
 // Utils
 import { printValue } from "/src/utils/Utils";
 
@@ -8,163 +7,185 @@ import { printValue } from "/src/utils/Utils";
 import metaIndics from "/lib/indics";
 import { Table } from "react-bootstrap";
 
-
 export const ComparativeTable = ({
   allSectorFootprint,
   comparativeDivisionFootprint,
   financialData,
   indic,
-  targetSNBC,
+  targetSNBCbranch,
+  targetSNBCarea,
 }) => {
+  const { production, netValueAdded, intermediateConsumption } =
+    financialData.aggregates;
 
-  const { production, netValueAdded, intermediateConsumption } = financialData.aggregates;
+  const {
+    productionAreaFootprint,
+    valueAddedAreaFootprint,
+    consumptionAreaFootprint,
+  } = allSectorFootprint;
 
-  const { productionAreaFootprint,valueAddedAreaFootprint,consumptionAreaFootprint} = allSectorFootprint;
-  const { productionDivisionFootprint,valueAddedDivisionFootprint,consumptionDivisionFootprint} = comparativeDivisionFootprint;
-  const { productionTarget, valueAddedTarget, consumptionTarget} = targetSNBC;
+  const {
+    productionDivisionFootprint,
+    valueAddedDivisionFootprint,
+    consumptionDivisionFootprint,
+  } = comparativeDivisionFootprint;
 
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
 
-  const productionEvolution =getEvolution(productionDivisionFootprint.value,productionTarget.value);
-  const consumptionEvolution = getEvolution(consumptionDivisionFootprint.value, consumptionTarget.value);
-  const valueAddedEvolution = getEvolution(valueAddedDivisionFootprint.value,valueAddedTarget.value);
+  const productionEvolutionBranch = getEvolution(
+    productionDivisionFootprint.value,
+    targetSNBCbranch.productionTarget.value
+  );
+  const consumptionEvolutionBranch = getEvolution(
+    consumptionDivisionFootprint.value,
+    targetSNBCbranch.consumptionTarget.value
+  );
+  const valueAddedEvolutionBranch = getEvolution(
+    valueAddedDivisionFootprint.value,
+    targetSNBCbranch.valueAddedTarget.value
+  );
 
   return (
-   
-      <Table className="mt-5">
-        <thead>
-          <tr>
-            <td>Agrégat</td>
-            <td>France</td>
-            <td>Exercice en cours</td>
-            {printValue(productionDivisionFootprint.value, precision) &&
-              printValue(consumptionDivisionFootprint.value, precision) &&
-              printValue(valueAddedDivisionFootprint.value, precision) !==
-                " - " && (
-                <td colSpan="3">
-                  Branche
-                </td>
-              )}
-          </tr>
-        </thead>
-        <tbody>
+    <Table className="mt-5  comparative-table">
+      <thead>
+        <tr>
+          <td>Agrégat</td>
+          {targetSNBCarea.valueAddedTarget.value ? (
+            <td colSpan="2" className="border-left">France</td>
+          ) : (
+            <td className="border-left">France</td>
+          )}
+
+          <td className="border-left">Exercice en cours</td>
+          {printValue(productionDivisionFootprint.value, precision) &&
+            printValue(consumptionDivisionFootprint.value, precision) &&
+            printValue(valueAddedDivisionFootprint.value, precision) !==
+              " - " && <td colSpan="3" className="border-left">Branche</td>}
+        </tr>
+      </thead>
+      <tbody>
+        {indic == "ghg" && (
           <tr className="subth">
-            {indic == 'ghg' && productionDivisionFootprint.value && (
+            <td scope="row"></td>
+            <td className="border-left">Valeur</td>
+            <td>Objectif 2030</td>
+            <td className="border-left">Valeur</td>
+            {productionDivisionFootprint.value && (
               <>
-                <td scope="row">&nbsp;</td>
-                <td>&nbsp;</td>
-                <td>&nbsp;</td>
-                <td >Valeur</td>
-                <td >Objectif 2030</td>
-                <td >Evolution</td>
+                <td className="border-left">Valeur</td>
+                <td>Objectif 2030</td>
+                <td>Evolution</td>
               </>
             )}
           </tr>
-          <tr>
-            <td>Production</td>
-            <td>
-              {printValue(productionAreaFootprint.value, precision)}
+        )}
+        <tr>
+          <td>Production</td>
+          <td className="border-left">
+            {printValue(productionAreaFootprint.value, precision)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {indic == "ghg"  && (
+              <td>
+                {Math.round(targetSNBCarea.productionTarget.value)} <span className="unit">{unit}</span>
+              </td>
+          )}
+          <td className="border-left">
+            {printValue(production.footprint.getIndicator(indic).value, 1)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {printValue(productionDivisionFootprint.value, precision) !==
+            " - " && (
+            <td className="border-left">
+              {printValue(productionDivisionFootprint.value, precision)}
               <span className="unit"> {unit}</span>
             </td>
-            <td>
-              {printValue(production.footprint.getIndicator(indic).value, 1)}
+          )}
+          {indic == "ghg" && productionDivisionFootprint.value && (
+            <>
+              <td>
+                {Math.round(targetSNBCbranch.productionTarget.value)}
+                <span className="unit">{unit}</span>
+              </td>
+              <td>{productionEvolutionBranch} %</td>
+            </>
+          )}
+        </tr>
+        <tr>
+          <td>Consommations intermédiaires</td>
+          <td className="border-left">
+            {printValue(consumptionAreaFootprint.value, precision)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {indic == "ghg"  && (
+              <td>
+                {Math.round(targetSNBCarea.consumptionTarget.value)} <span className="unit">{unit}</span>
+              </td>
+          )}
+          <td className="border-left">
+            {printValue(
+              intermediateConsumption.footprint.getIndicator(indic).value,
+              precision
+            )}
+            <span className="unit"> {unit}</span>
+          </td>
+          {printValue(consumptionDivisionFootprint.value, precision) !==
+            " - " && (
+            <td className="border-left">
+              {printValue(consumptionDivisionFootprint.value, precision)}
               <span className="unit"> {unit}</span>
             </td>
-            {printValue(productionDivisionFootprint.value, precision) !==
-              " - " && (
-              <td >
-                {printValue(productionDivisionFootprint.value, precision)}
+          )}
+          {indic == "ghg" && productionDivisionFootprint.value && (
+            <>
+              <td>
+                {Math.round(targetSNBCbranch.consumptionTarget.value)}
+                <span className="unit">{unit}</span>
+              </td>
+              <td>{consumptionEvolutionBranch} %</td>
+            </>
+          )}
+        </tr>
+        <tr>
+          <td>Valeur ajoutée</td>
+          <td className="border-left">
+            {printValue(valueAddedAreaFootprint.value, precision)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {indic == "ghg"  && (
+              <td>
+                {Math.round(targetSNBCarea.valueAddedTarget.value)}
+                <span className="unit">{unit}</span>
+              </td>
+          )}
+          <td className="border-left">
+            {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {printValue(valueAddedDivisionFootprint.value, precision) !==
+            " - " && (
+            <td className="border-left">
+              {printValue(valueAddedDivisionFootprint.value, precision)}
+              <span className="unit"> {unit}</span>
+            </td>
+          )}
+          {indic == "ghg" && productionDivisionFootprint.value && (
+            <>
+              <td>
+                {Math.round(targetSNBCbranch.valueAddedTarget.value)}
                 <span className="unit"> {unit}</span>
               </td>
-            )}
-
-            {indic == 'ghg' && productionDivisionFootprint.value  && (
-              <>
-                <td >
-                  {targetSNBC.productionTarget.value} <span className="unit">{unit}</span>
-                </td>
-                <td >
-                  <span className={productionEvolution < 0 ? "negative" : "positive"}>
-                    {productionEvolution} %
-                  </span>
-                </td>
-              </>
-            )}
-          </tr>
-          <tr>
-            <td>Consommations intermédiaires</td>
-            <td>
-              {printValue(consumptionAreaFootprint.value, precision)}
-              <span className="unit"> {unit}</span>
-            </td>
-            <td>
-              {printValue(
-                intermediateConsumption.footprint.getIndicator(indic).value,
-                precision
-              )}
-              <span className="unit"> {unit}</span>
-            </td>
-            {printValue(consumptionDivisionFootprint.value, precision) !==
-              " - " && (
-              <td >
-                {printValue(consumptionDivisionFootprint.value, precision)}
-                <span className="unit"> {unit}</span>
-              </td>
-            )}
-            {indic == 'ghg' && productionDivisionFootprint.value  && (
-              <>
-                <td >
-                  {targetSNBC.consumptionTarget.value} <span className="unit">{unit}</span>
-                </td>
-                <td>
-                <span className={consumptionEvolution < 0 ? "negative" : "positive"}>
-
-                  {consumptionEvolution}   %
-                </span>
-                </td>
-              </>
-            )}
-          </tr>
-          <tr>
-            <td>Valeur ajoutée</td>
-            <td>
-              {printValue(valueAddedAreaFootprint.value, precision)}
-              <span className="unit"> {unit}</span>
-            </td>
-            <td>
-              {printValue(netValueAdded.footprint.getIndicator(indic).value, 1)}
-              <span className="unit"> {unit}</span>
-            </td>
-            {printValue(valueAddedDivisionFootprint.value, precision) !==
-              " - " && (
-              <td >
-                {printValue(valueAddedDivisionFootprint.value, precision)}
-                <span className="unit"> {unit}</span>
-              </td>
-            )}
-            {indic == 'ghg' && productionDivisionFootprint.value  && (
-              <>
-                <td>
-                  {targetSNBC.valueAddedTarget.value} <span className="unit"> {unit}</span>
-                </td>
-                <td >
-                <span className={valueAddedEvolution < 0 ? "negative" : "positive"}>
-
-                  {valueAddedEvolution}
-                  %
-                  </span>
-                </td>
-              </>
-            )}
-          </tr>
-        </tbody>
-      </Table>
-
+              <td>{valueAddedEvolutionBranch}%</td>
+            </>
+          )}
+        </tr>
+      </tbody>
+    </Table>
   );
 };
 
 function getEvolution(value, target) {
   const evolution = ((target - value) / value) * 100;
-  return evolution.toFixed(1);
+  return Math.round(evolution);
 }
