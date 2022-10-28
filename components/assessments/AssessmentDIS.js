@@ -14,6 +14,7 @@ import { InputText } from "/components/input/InputText";
 import { InputNumber } from "/components/input/InputNumber";
 import { valueOrDefault } from "/src/utils/Utils";
 import { getNewId, roundValue } from "/src/utils/Utils";
+import { XLSXSocialDataBuilder } from "../../src/readers/SocialDataContentReader";
 
 /* -------------------- ASSESSMENT DIS -------------------- */
 
@@ -244,7 +245,8 @@ export class AssessmentDIS extends React.Component {
     let reader = new FileReader();
     reader.onload = async () =>
       XLSXFileReader(reader.result)
-        .then((XLSXData) => SocialDataContentReader(XLSXData))
+        .then((XLSXData) => XLSXSocialDataBuilder(XLSXData))
+        .then((socialData) => SocialDataContentReader(socialData))
         .then((data) => (this.props.impactsData.employees = data.employees))
         .then(() =>
           this.setState({ employees: this.props.impactsData.employees })
@@ -545,40 +547,43 @@ class Row extends React.Component {
 
 /* -------------------- LOADER -------------------- */
 
-const SocialDataContentReader_ = async (content) =>
-  // ...build data from JSON content
-  {
-    let employees = [];
+// const SocialDataContentReader_ = async (content) =>
+//   // ...build data from JSON content
+//   {
+//     console.log(content);
 
-    Object.entries(content).forEach(([index, contentItem]) => {
-      let employeeData = {
-        id: index,
-        name: contentItem["Nom - Prénom"] || contentItem.nom || "",
-        sex: contentItem["Sexe (F/H)"] || contentItem.sexe || "",
-        workingHours:
-          contentItem["Heures travaillées"] ||
-          contentItem.heuresTravail ||
-          null,
-        wage:
-          contentItem["Rémunérations brutes"] ||
-          contentItem.remuneration ||
-          null,
-        hourlyRate:
-          contentItem["Taux horaire"] || contentItem.tauxHoraire || null,
-        trainingContract:
-          contentItem["Contrat de formation (O/N)"] ||
-          contentItem.contratFormation ||
-          false,
-        trainingHours:
-          contentItem["Heures de formation"] ||
-          contentItem.heuresFormation ||
-          0,
-      };
-      employees.push(employeeData);
-    });
+//     let employees = [];
 
-    return { employees };
-  };
+//     Object.entries(content).forEach(([index, contentItem]) => 
+//     {
+//       let employeeData = {
+//         id: index,
+//         name: contentItem["Nom - Prénom"] || contentItem.nom || "",
+//         sex: /^(F|H)$/.match(contentItem["Sexe (F/H)"]) ? contentItem.sexe : "",
+//         workingHours:
+//           contentItem["Heures travaillées"] ||
+//           contentItem.heuresTravail ||
+//           null,
+//         wage:
+//           contentItem["Rémunérations brutes"] ||
+//           contentItem.remuneration ||
+//           null,
+//         hourlyRate:
+//           contentItem["Taux horaire"] || contentItem.tauxHoraire || null,
+//         trainingContract:
+//           contentItem["Contrat de formation (O/N)"] ||
+//           contentItem.contratFormation ||
+//           false,
+//         trainingHours:
+//           contentItem["Heures de formation"] ||
+//           contentItem.heuresFormation ||
+//           0,
+//       };
+//       employees.push(employeeData);
+//     });
+
+//     return { employees };
+//   };
 
 /* -------------------- FORMULAS -------------------- */
 
