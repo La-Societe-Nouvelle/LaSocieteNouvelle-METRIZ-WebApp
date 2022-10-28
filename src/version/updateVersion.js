@@ -46,11 +46,12 @@ const updater_1_0_3 = async (sessionData) => {
 
  let comparativeAreaFootprints = {};
  let comparativeDivisionFootprints = {};
- let targetSNBCbranch = {};
- let targetSNBCarea = {};
+ let targetSNBCbranch = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
+ let targetSNBCarea = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
  let code = sessionData.comparativeDivision;
 
     await Promise.all(
+
       sessionData.validations.map(async (indic) => {
         const footprint = await retrieveAreaFootprint(indic);
         Object.assign(comparativeAreaFootprints, footprint);
@@ -63,6 +64,9 @@ const updater_1_0_3 = async (sessionData) => {
         if(indic='ghg' && code != '00') {
           const target = await retrieveTargetFootprint(code);
           Object.assign(targetSNBCbranch,target);
+        }
+        else{
+
         }
         // TARGET SNCB 2030 FOR ALL SECTORS
         if(indic='ghg') {
