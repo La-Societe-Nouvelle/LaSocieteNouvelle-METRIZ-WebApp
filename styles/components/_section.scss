@@ -346,6 +346,9 @@ section {
   }
 }
 
-.graph-container {
+.graph-container .loader-container{
   min-height: 300px;
-}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} 

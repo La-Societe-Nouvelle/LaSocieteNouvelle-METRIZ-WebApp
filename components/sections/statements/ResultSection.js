@@ -297,7 +297,7 @@ const ResultSection = (props) => {
         {error && <ErrorApi />}
         <div className="graph-container">
 
-        {!isLoading && <>
+        {!isLoading ?
           <div className="mt-5">
           <Row className="graphs">
             <Col sm={4} xl={4} lg={4} md={4}>
@@ -359,6 +359,12 @@ const ResultSection = (props) => {
             </Col>
           </Row>
         </div>
+        :
+        <div className="loader-container">
+        <div className="dot-pulse m-auto"></div>
+      </div>
+      }
+         </div>
         <ComparativeTable
           financialData={session.financialData}
           indic={indic}
@@ -367,8 +373,7 @@ const ResultSection = (props) => {
           targetSNBCbranch={targetSNBCbranch}
           targetSNBCarea={targetSNBCarea}
         />
-        </>}
-        </div>
+     
 
       </section>
       <section className="step">
