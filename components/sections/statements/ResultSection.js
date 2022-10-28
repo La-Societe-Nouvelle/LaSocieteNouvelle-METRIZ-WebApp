@@ -295,6 +295,8 @@ const ResultSection = (props) => {
         />
 
         {error && <ErrorApi />}
+        <div className="graph-container">
+
         {!isLoading && <>
           <div className="mt-5">
           <Row className="graphs">
@@ -366,7 +368,8 @@ const ResultSection = (props) => {
           targetSNBCarea={targetSNBCarea}
         />
         </>}
-   
+        </div>
+
       </section>
       <section className="step">
         <h3>Note d'analyse</h3>

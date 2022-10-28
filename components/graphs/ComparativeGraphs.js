@@ -5,6 +5,7 @@ import { Bar } from "react-chartjs-2";
 import metaIndics from "/lib/indics";
 
 const ComparativeGraphs = (props) => {
+
   const [chartData, setChartData] = useState({ datasets: [] });
   const [sectorData, setSectorData] = useState(props.sectorData);
   const [legalunitData, setLegalUnitData] = useState(props.legalunitData);
@@ -14,8 +15,8 @@ const ComparativeGraphs = (props) => {
 
   const [titleChart] = useState(props.titleChart);
   const [id, setId] = useState(props.id);
-  const [unit, setUnit] = useState();
-  const [precision, setPrecision] = useState();
+  const [unit, setUnit] = useState(metaIndics[props.indic].unit);
+  const [precision, setPrecision] = useState(metaIndics[props.indic].nbDecimals);
 
   const chart = () => {
     const values = [sectorData, legalunitData];
@@ -62,6 +63,7 @@ const ComparativeGraphs = (props) => {
   };
 
   useEffect(async() => {
+
     setUnit(metaIndics[props.indic].unit);
     setPrecision(metaIndics[props.indic].nbDecimals);
     setDivisionData(props.divisionData);
@@ -73,6 +75,7 @@ const ComparativeGraphs = (props) => {
  
      chart();
   }, [props, targetBranchData, divisionData, legalunitData, sectorData]);
+
   return (
   
       <Bar
