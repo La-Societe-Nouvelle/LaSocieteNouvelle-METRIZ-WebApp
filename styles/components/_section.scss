@@ -345,3 +345,10 @@ section {
     box-shadow: 10014px 0 0 -5px $secondary;
   }
 }
+
+.graph-container .loader-container{
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+} 
