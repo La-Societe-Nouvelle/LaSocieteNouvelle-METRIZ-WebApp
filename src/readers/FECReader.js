@@ -202,6 +202,8 @@ function getDefaultBookType(bookCode,bookLib)
 // check mapping
 async function buildMappingAccounts(accounts)
 {
+  // accountsMapped : true if not all accounts have direct matching
+  // mapping: "depAccount": {accountAux:"immobilisationAccount", directMatching: (true|false)}
   let res = {accountsMapped: false, mapping: {}};
 
   // depreciation accounts
@@ -213,22 +215,24 @@ async function buildMappingAccounts(accounts)
   // try simple mapping
   depreciationAccounts.forEach(account =>
   {
+    // get asset account matching default ppattern
     let accountAux = assetAccounts.filter(account => account.startsWith(account[0]+account.substring(2)));
-    if (accountAux.length==1) res.mapping[account] = accountAux[0]
-    else res.mapping[account] = "";
+    // build res.mapping
+    if (accountAux.length==1) res.mapping[account] = {accountAux: accountAux[0], directMatching: true}
+    else res.mapping[account] = {accountAux: "", directMatching: false};
   })
 
-  if (Object.values(res.mapping).filter(item => item=="").length == 0) res.accountsMapped = true
+  if (Object.values(res.mapping).filter(item => !item.directMatching).length == 0) res.accountsMapped = true
   else
   {
-    // build distances between accounts
+    // build distances between accounts for all possible associations
     let distances = [];
     depreciationAccounts.forEach(depreciationAccount => 
     {
       assetAccounts.filter(assetAccount => assetAccount[0]==depreciationAccount[0]) // asset account from the same accouting class
                    .forEach(assetAccount =>
       {
-        let expectedAssetAccount = depreciationAccount[0]+depreciationAccount.substring(2);
+        let expectedAssetAccount = depreciationAccount[0]+depreciationAccount.substring(2); // ref account num
         let distanceNum = distance(expectedAssetAccount,assetAccount);
         let distanceLib = distance(accounts[depreciationAccount],accounts[assetAccount]);
         let prefixLength = getPrefixLength(expectedAssetAccount,assetAccount);
@@ -238,7 +242,7 @@ async function buildMappingAccounts(accounts)
 
     // Map with prefix length
     distances.forEach(distance => distance.stashed = false);
-    let mappingWithPrefixLength = await mapAccountsWithPrefixLength(distances);
+    let mappingWithPrefixLength = await mapAccountsWithPrefixLength(distances); // return JSON with mappings
     
     // Map with accountNum distance
     distances.forEach(distance => distance.stashed = false);
@@ -248,7 +252,7 @@ async function buildMappingAccounts(accounts)
     distances.forEach(distance => distance.stashed = false);
     let mappingWithLibDistances = await mapAccountsWithLibDistances(distances);
 
-    // Merge mapping
+    // Merge mapping (can have duplicates)
     let mappings = [];
     depreciationAccounts.forEach(depreciationAccount =>
     {
@@ -258,20 +262,21 @@ async function buildMappingAccounts(accounts)
         mappingWithNumDistances[depreciationAccount],
         mappingWithLibDistances[depreciationAccount]
       ];
-      assetAccounts.filter(assetAccount => assetAccount).forEach(assetAccount => mappings.push({account: depreciationAccount, accountAux: assetAccount}));
+      assetAccounts.filter(assetAccount => assetAccount) // remove empty string or undefined
+                   .forEach(assetAccount => mappings.push({account: depreciationAccount, accountAux: assetAccount}));
     });
 
     // build res
     depreciationAccounts.forEach(depreciationAccount =>
     {
-      let assetAccounts = mappings.filter(mapping => mapping.account == depreciationAccount)
+      let assetAccounts = mappings.filter(mapping => mapping.account == depreciationAccount)  // get all solutions for depreciation account
                                   .map(mapping => mapping.accountAux)
-                                  .filter((value, index, self) => index === self.findIndex(item => item === value));
-      if (assetAccounts.length == 1 && mappings.filter(mapping => mapping.account!=depreciationAccount && mapping.accountAux==assetAccounts[0]).length == 0)
+                                  .filter((value, index, self) => index === self.findIndex(item => item === value)); // remove duplicates
+      if (assetAccounts.length == 1 && mappings.filter(mapping => mapping.account!=depreciationAccount && mapping.accountAux==assetAccounts[0]).length == 0) //if result and asset account not used for another depreciation account
       {
-        res.mapping[depreciationAccount] = assetAccounts[0];
+        res.mapping[depreciationAccount] = {accountAux: assetAccounts[0], directMatching: res.mapping[depreciationAccount].directMatching}; // rewrite res.mapping but keep directMatching
       }
-      else res.mapping[depreciationAccount] = "";
+      else res.mapping[depreciationAccount] = {accountAux: "", directMatching: false};
     })    
   }
 
