@@ -206,20 +206,18 @@ async function buildMappingAccounts(accounts)
   // mapping: "depAccount": {accountAux:"immobilisationAccount", directMatching: (true|false)}
   let res = {accountsMapped: false, mapping: {}};
 
-  // depreciation accounts
-  let depreciationAccounts = Object.keys(accounts).filter(account => /^(2[8-9]|39)/.test(account));
-
-  // immobilisation & stock accounts
-  let assetAccounts = Object.keys(accounts).filter(account => /^(2[0-1]|3[0-8])/.test(account));
+  let depreciationAccounts = Object.keys(accounts).filter(account => /^(2[8-9]|39)/.test(account)); // depreciation accounts
+  let assetAccounts = Object.keys(accounts).filter(account => /^(2[0-1]|3[0-8])/.test(account)); // immobilisation & stock accounts
 
   // try simple mapping
-  depreciationAccounts.forEach(account =>
+  depreciationAccounts.forEach(depAccount =>
   {
-    // get asset account matching default ppattern
-    let accountAux = assetAccounts.filter(account => account.startsWith(account[0]+account.substring(2)));
+    // get asset account matching default pattern
+    let accountAux = assetAccounts.filter(assetAccount => assetAccount.startsWith(depAccount[0]+depAccount.substring(2)));
+
     // build res.mapping
-    if (accountAux.length==1) res.mapping[account] = {accountAux: accountAux[0], directMatching: true}
-    else res.mapping[account] = {accountAux: "", directMatching: false};
+    if (accountAux.length==1) res.mapping[depAccount] = {accountAux: accountAux[0], directMatching: true}
+    else res.mapping[depAccount] = {accountAux: "", directMatching: false};
   })
 
   if (Object.values(res.mapping).filter(item => !item.directMatching).length == 0) res.accountsMapped = true
@@ -257,7 +255,7 @@ async function buildMappingAccounts(accounts)
     depreciationAccounts.forEach(depreciationAccount =>
     {
       let assetAccounts = [
-        res.mapping[depreciationAccount],
+        res.mapping[depreciationAccount].accountAux,
         mappingWithPrefixLength[depreciationAccount],
         mappingWithNumDistances[depreciationAccount],
         mappingWithLibDistances[depreciationAccount]
@@ -272,7 +270,9 @@ async function buildMappingAccounts(accounts)
       let assetAccounts = mappings.filter(mapping => mapping.account == depreciationAccount)  // get all solutions for depreciation account
                                   .map(mapping => mapping.accountAux)
                                   .filter((value, index, self) => index === self.findIndex(item => item === value)); // remove duplicates
-      if (assetAccounts.length == 1 && mappings.filter(mapping => mapping.account!=depreciationAccount && mapping.accountAux==assetAccounts[0]).length == 0) //if result and asset account not used for another depreciation account
+
+      // if only one asste account match and if that asset account is not used for another depreciation account
+      if (assetAccounts.length == 1 && mappings.filter(mapping => mapping.account!=depreciationAccount && mapping.accountAux==assetAccounts[0]).length == 0)
       {
         res.mapping[depreciationAccount] = {accountAux: assetAccounts[0], directMatching: res.mapping[depreciationAccount].directMatching}; // rewrite res.mapping but keep directMatching
       }
@@ -587,7 +587,7 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     {
       account: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
-      accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+      accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
       amount: parseAmount(ligneCourante.Credit)
     }
@@ -638,7 +638,7 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     {
       account: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
-      accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+      accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
       amount: parseAmount(ligneCourante.Credit)
     }
@@ -759,7 +759,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+        accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
         prevAmount: 0.0,
         amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
       }
@@ -833,7 +833,7 @@ const readStockEntry = async (data,journal,ligneCourante) =>
       {
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: data.mappingAccounts[ligneCourante.CompteNum],
+        accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
         prevAmount: 0.0,
         amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
       }

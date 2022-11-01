@@ -2,62 +2,44 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
-function MappedAccounts(props) {
+function MappedAccounts(props) 
+{
+  const accounts = Object.entries(props.meta.accounts);
 
-  const [allAccounts] = useState(props.meta.accounts);
-  const accounts = Object.entries(allAccounts);
+  const depAccounts = accounts.filter((account) => /^28/.test(account) || /^29/.test(account) || /^39/.test(account));
+  const assetAccounts = accounts.filter((account) => /^2(0|1)/.test(account) || /^3[0-8]/.test(account));
 
-  let getDepAccounts = accounts.filter(
-    (account) =>
-      /^28/.test(account) || /^29/.test(account) || /^39/.test(account)
-  );
-
-  let getAssetsAccounts = accounts.filter(
-    (account) => /^2(0|1)/.test(account) || /^3[0-8]/.test(account)
-  );
-
-  const [depAccounts] = useState(getDepAccounts);
-  const [assetAccounts] = useState(getAssetsAccounts);
   const [isDisabled, setIsDisabled] = useState(true);
+  const [mappedAccounts, setMappedAccounts] = useState(props.meta.mappingAccounts);
 
-  const [mappedAccounts, setMappedAccounts] = useState(
-    props.meta.mappingAccounts
-  );
-
-  useEffect(() => {
-
-    if (Object.values(mappedAccounts).some(it => !it.length)) {
+  // disabled if one account is not mapped i.e. enabled if all accounts are mapped
+  useEffect(() => 
+  {
+    if (Object.values(mappedAccounts).some(it => !it.accountAux)) {
       setIsDisabled(true);
     } else {
       setIsDisabled(false);
     }
   }, [isDisabled, mappedAccounts]);
 
-
-  function handleOnchange(depKey, e) {
-
-    Object.entries(mappedAccounts).map(([key, value]) => {
-
-      // set empty value if value is already associeted to 28xxxx account
-      if ( key.substring(0,2) == depKey.substring(0,2) && value == e.target.value) {
-
-        Object.assign(mappedAccounts, {
-          [key]: "",
-        })
+  function handleOnchange(depAccountNum, nextAccountAuxNum) 
+  {
+    // remove association if a dep/amort. account is already associated with account aux
+    Object.entries(mappedAccounts).map(([key, {accountAux}]) => 
+    {
+      if ( key.substring(0,2) == depAccountNum.substring(0,2) && accountAux == nextAccountAuxNum) {
+        Object.assign(mappedAccounts, {[key]: {accountAux: "", directMatching: false},})
       }
     });
 
-    // assign new value
-    Object.assign(mappedAccounts, {
-      [depKey]: e.target.value,
-    });
+    // add association
+    Object.assign(mappedAccounts, {[depAccountNum]: {accountAux: nextAccountAuxNum, directMatching: true},});
 
-    props.meta.mappingAccounts = mappedAccounts;
+    props.meta.mappingAccounts = mappedAccounts; // ?
     setMappedAccounts({...mappedAccounts});
 
-    // check if all accounts is associated 
-
-    if (Object.values(mappedAccounts).some(it => !it.length)) {
+    // check if all accounts are associated 
+    if (Object.values(mappedAccounts).some(it => !it.accountAux)) {
       setIsDisabled(true);
     } else {
       setIsDisabled(false);
@@ -74,21 +56,22 @@ function MappedAccounts(props) {
           <tr>
             <th>Numéro de compte</th>
             <th>Libellé du compte</th>
+            <th></th>
             <th>Compte associé</th>
           </tr>
         </thead>
         <tbody>
-          {depAccounts.map(([depKey, depValue], index) => (
+          {depAccounts.map(([depAccountNum, depAccountLib], index) => (
             <tr key={index}>
-              <td>{depKey}</td>
-              <td>{depValue}</td>
+              <td>{depAccountNum}</td>
+              <td>{depAccountLib}</td>
+              <td>{!mappedAccounts[depAccountNum].directMatching && <IconWarning />}</td>
               <td>
-                <select className="form-control" onChange={(e) => handleOnchange(depKey, e)} value={mappedAccounts[depKey] || ""}>
+                <select className="form-control" onChange={(e) => handleOnchange(depAccountNum, e.target.value)} value={mappedAccounts[depAccountNum].accountAux || ""}>
                   <option value="">Sélectionner un compte...</option>
-                  {assetAccounts.filter(([assetKey,_]) => assetKey[0]==depKey[0]).map(([assetKey, assetValue], index) => (
-                    
-                    <option key={index} value={assetKey}>
-                      {assetKey} - {assetValue}
+                  {assetAccounts.filter(([assetAccountNum,_]) => assetAccountNum[0]==depAccountNum[0]).map(([assetAccountNum, assetAccountLib], index) => (
+                    <option key={index} value={assetAccountNum}>
+                      {assetAccountNum} - {assetAccountLib}
                     </option>
                   ))}
                 </select>
@@ -119,3 +102,11 @@ function MappedAccounts(props) {
 }
 
 export default MappedAccounts;
+
+const IconWarning = () => {
+  return (
+    <span className="icon-warning" title="Informations à valider">
+      <i className=" bi bi-exclamation-triangle me-0"></i>
+    </span>
+  );
+};
