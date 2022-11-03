@@ -61,7 +61,7 @@ const updater_1_0_3 = async (sessionData) => {
           Object.assign(comparativeDivisionFootprints,divisionFootprint);
         }
         // TARGET SNCB 2030 FOR SPECIFIC SECTOR
-        if(indic='ghg' && code != '00') {
+        if(indic =='ghg' && code != '00') {
           const target = await retrieveTargetFootprint(code);
           Object.assign(targetSNBCbranch,target);
         }
@@ -69,7 +69,7 @@ const updater_1_0_3 = async (sessionData) => {
 
         }
         // TARGET SNCB 2030 FOR ALL SECTORS
-        if(indic='ghg') {
+        if(indic =='ghg') {
           const targetArea = await retrieveTargetFootprint("00");
           Object.assign(targetSNBCarea,targetArea);
         }
