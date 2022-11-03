@@ -27,10 +27,10 @@ const ChangeDivision = (props) => {
     );
 
   return (
-    <Modal show="true" onHide={props.handleClose} size="xl" centered>
+    <Modal show="true" onHide={props.handleClose} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title>
-          Sélectionnez une division pour ajouter des valeurs comparative
+        <Modal.Title >
+          Sélectionnez un secteur d'activité pour ajouter des valeurs comparatives
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
