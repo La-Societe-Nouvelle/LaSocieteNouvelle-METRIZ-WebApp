@@ -64,7 +64,7 @@ table {
   tr.warning td,
   .warning select {
     background-color: #fff3cd;
-    border-color: #ff6207;
+    border-color: #ffc107;
   }
 
   p.warning {
@@ -76,7 +76,8 @@ table {
     }
   }
   select.warning {
-    border-color: #ff6207;
+    background-color: #fffdf6;
+    border-color: #ffc107;
   }
   .error {
     color: red;
