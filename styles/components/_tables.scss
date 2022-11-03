@@ -19,7 +19,7 @@
 }
 
 .toChecked {
-  border-right: 2px solid #ff6207;
+  border-right: 2px solid #ffc107;
 }
 
 p.toChecked {
@@ -45,7 +45,7 @@ table {
       margin-bottom: 0 !important;
     }
     .fa-triangle-exclamation {
-      color: #ff6207;
+      color: #ffc107;
     }
   }
   .company {
@@ -68,11 +68,11 @@ table {
   }
 
   p.warning {
-    color: #ff6207;
+    color: #ffc107;
     .form-input,
     .form-input:active,
     .form-input:focus {
-      border-color: #ff6207;
+      border-color: #ffc107;
     }
   }
   select.warning {
