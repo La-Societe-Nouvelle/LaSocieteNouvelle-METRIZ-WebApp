@@ -790,7 +790,10 @@ export const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consum
   const value = getNrgConsumption({consumption, consumptionUnit, fuelCode});
   const valueMax = getNrgConsumptionMax({consumption, consumptionUnit, consumptionUncertainty, fuelCode});
   const valueMin = getNrgConsumptionMin({consumption, consumptionUnit, consumptionUncertainty, fuelCode});
-  return getUncertainty(value,valueMin,valueMax);
+
+
+  return value != 0 ? getUncertainty(value,valueMin,valueMax) : 0;
+
 };
 
 export const getTotalNrgConsumption = (nrgDetails) => 
