@@ -42,9 +42,7 @@ export class StatementART extends React.Component {
   }
 
   componentDidUpdate() {
-    {
-      this.state.craftedProduction
-    }
+
     if (
       this.state.craftedProduction != this.props.impactsData.craftedProduction
     ) {

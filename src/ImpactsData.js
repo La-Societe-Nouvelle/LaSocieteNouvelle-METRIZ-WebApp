@@ -10,13 +10,13 @@ export class ImpactsData  {
 
     /* --- Value Creation --- */
 
-    this.isAllActivitiesInFrance = props.isAllActivitiesInFrance || null;
-    this.domesticProduction = props.domesticProduction || null;
+    this.isAllActivitiesInFrance = props.isAllActivitiesInFrance !== undefined ? props.isAllActivitiesInFrance : null;
+    this.domesticProduction = props.domesticProduction !== undefined ? props.domesticProduction : null;
 
-    this.isValueAddedCrafted = props.isValueAddedCrafted || null;
-    this.craftedProduction = props.craftedProduction || null;
+    this.isValueAddedCrafted = props.isValueAddedCrafted !== undefined ? props.isValueAddedCrafted : null;
+    this.craftedProduction =  props.craftedProduction !== undefined ? props.craftedProduction : null;
 
-    this.hasSocialPurpose = props.hasSocialPurpose || null;
+    this.hasSocialPurpose = props.hasSocialPurpose !== undefined ? props.hasSocialPurpose : null;
 
     /* --- Social Data --- */
 
