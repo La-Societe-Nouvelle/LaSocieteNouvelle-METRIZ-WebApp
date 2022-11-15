@@ -115,7 +115,7 @@ export class InitialStatesSection extends React.Component {
               </div>
 
               {error && <ErrorApi />}
-              {!isNextStepAvailable && (
+              {!isNextStepAvailable ? (
                 <div className="alert alert-warning">
                   <p>
                     <i className="bi bi-exclamation-triangle"></i> Les
@@ -129,7 +129,11 @@ export class InitialStatesSection extends React.Component {
                     données
                   </button>
                 </div>
-              )}
+              ) :  <div className={"alert alert-success"}>
+              <p>
+                <i className="bi bi-check2"></i> Les données ont bien été synchronisées.
+              </p>
+            </div>}
               {financialData.immobilisations.concat(financialData.stocks)
                 .length > 0 && (
                 <div className="table-data mt-2">
@@ -138,14 +142,6 @@ export class InitialStatesSection extends React.Component {
                     accountsShowed={accountsShowed}
                     onUpdate={this.updateFootprints.bind(this)}
                   />
-                </div>
-              )}
-
-              {isNextStepAvailable && (
-                <div className={"alert alert-success"}>
-                  <p>
-                    <i className="bi bi-check2"></i> Données complètes.
-                  </p>
                 </div>
               )}
 

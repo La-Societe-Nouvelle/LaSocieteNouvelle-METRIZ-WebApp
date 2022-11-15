@@ -505,7 +505,6 @@ const nextStepAvailable = (companies) => {
   ).length;
 
   let nbSiren = companies.filter((company) => company.state == "siren").length;
-console.log(nbSiren)
   if (nbSirenSynchronised == nbSiren && nbSiren != 0) {
     return true;
   } else {
