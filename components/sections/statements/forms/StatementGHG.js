@@ -19,11 +19,11 @@ export class StatementGHG extends React.Component {
     this.state = {
       greenhousesGazEmissions: valueOrDefault(
         props.impactsData.greenhousesGazEmissions,
-        ""
+        undefined
       ),
       greenhousesGazEmissionsUncertainty: valueOrDefault(
         props.impactsData.greenhousesGazEmissionsUncertainty,
-        ""
+        undefined
       ),
       info: props.impactsData.comments.ghg || "",
     };

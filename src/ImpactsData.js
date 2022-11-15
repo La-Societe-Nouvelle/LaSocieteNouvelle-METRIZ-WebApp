@@ -20,12 +20,12 @@ export class ImpactsData  {
 
     /* --- Social Data --- */
 
-    this.hasEmployees = props.hasEmployees || null;
+    this.hasEmployees = props.hasEmployees !== undefined ? props.hasEmployees : null;
     this.employees = props.employees || [];
 
-    this.indexGini = props.indexGini || null;
-    this.wageGap = props.wageGap || null;
-    this.researchAndTrainingContribution = props.researchAndTrainingContribution || null;
+    this.indexGini = props.indexGini !== undefined ? props.indexGini : null;
+    this.wageGap =  props.wageGap !== undefined ? props.wageGap : null;
+    this.researchAndTrainingContribution = props.researchAndTrainingContribution !== undefined ? props.researchAndTrainingContribution : null;
 
     this.knwDetails = props.knwDetails || {};
 
@@ -36,12 +36,12 @@ export class ImpactsData  {
     this.ghgDetails = props.ghgDetails || {};
     this.ghgTotal = props.ghgTotal || false;
 
-    this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption || null;
-    this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty || null;
+    this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption !== undefined ? props.hazardousSubstancesConsumption : null;
+    this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty !== undefined ? props.hazardousSubstancesConsumptionUncertainty : null;
 
-    this.isExtractiveActivities = props.isExtractiveActivities || null;
-    this.materialsExtraction = props.materialsExtraction || null;
-    this.materialsExtractionUncertainty = props.materialsExtractionUncertainty || null;
+    this.isExtractiveActivities = props.isExtractiveActivities !== undefined ? props.isExtractiveActivities : null;
+    this.materialsExtraction =  props.materialsExtraction !== undefined ? props.materialsExtraction : null;
+    this.materialsExtractionUncertainty = props.materialsExtractionUncertainty !== undefined ? props.materialsExtractionUncertainty : null;
 
     this.energyConsumption = props.energyConsumption || null;
     this.energyConsumptionUncertainty = props.energyConsumptionUncertainty || null;
@@ -49,8 +49,8 @@ export class ImpactsData  {
     this.nrgTotal = props.nrgTotal || false;
 
 
-    this.wasteProduction = props.wasteProduction || null;
-    this.wasteProductionUncertainty = props.wasteProductionUncertainty || null;
+    this.wasteProduction = props.wasteProduction !== undefined ? props.wasteProduction : null;
+    this.wasteProductionUncertainty = props.wasteProductionUncertainty !== undefined ? props.wasteProductionUncertainty : null;
 
     this.waterConsumption = props.waterConsumption || null;
     this.waterConsumptionUncertainty = props.waterConsumptionUncertainty || null;
