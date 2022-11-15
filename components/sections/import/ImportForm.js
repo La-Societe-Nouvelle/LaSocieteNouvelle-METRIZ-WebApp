@@ -119,8 +119,8 @@ const ImportForm = (props) => {
             </div>
           )}
           {acceptedFileItems.length > 0 && (
-            <div className={"alert alert-info"}>
-              <h4 className="h5">Fichier à analyser : </h4>
+            <div className="alert alert-info">
+              <p className="font-weight-bold">Fichier à analyser : </p>
               {acceptedFileItems}
             </div>
           )}

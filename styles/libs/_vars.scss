@@ -1,27 +1,29 @@
+/* Theming */
 
-  /* Theming */
-  
-  $primary: #191558;    /* Dark-grey */
-  $secondary: #fa595f;  /* Light-grey */
-  $tertiary: #251f81; /* Dark-grey */ 
-  $light : #dbdef1;
-  $bg-light : #fbfbff;
-  $valid-color: #E2EFD9;
-  $unvalid-color: #efdcd9;
+$primary: #191558;
+$secondary: #fa595f;
+$tertiary: #251f81;
+$light : #dbdef1;
+$bg-light : #fbfbff;
+$valid-color: #E2EFD9;
+$unvalid-color: #efdcd9;
+$success : #36c575;
+$error : #f65656;
+$warning : #ffc107;
+$info:  #8994d1;
 
-  
-  // Font.
-  $font-family : 'Raleway', Helvetica, sans-serif !default;
-  $font-family-text : 'Roboto', sans-serif !default;
-  $font-weight : 400 !default;
-  $font-weight-bold : 700 !default;
-  $letter-spacing : 0.3em !default;
-  $text-color : #212529;
-  $headings-color: $primary; 
-  $body-color : $text-color; 
-  
+// Font.
+$font-family : 'Raleway',Helvetica,sans-serif !default;
+$font-family-text : 'Roboto', sans-serif !default;
+$font-weight : 400 !default;
+$font-weight-bold : 700 !default;
+$letter-spacing : 0.3em !default;
+$text-color : #212529;
+$headings-color: $primary;
+$body-color : $text-color;
+
 $input-color : lighten(#191558, 10%);
-$input-bg :  #ffffff;  
+$input-bg : #ffffff;
 $input-border-color : #cfcff7;
 $table-hover-bg : $bg-light;
 $input-font-size : 0.9rem;

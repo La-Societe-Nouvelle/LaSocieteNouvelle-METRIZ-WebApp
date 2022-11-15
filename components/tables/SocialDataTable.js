@@ -184,7 +184,7 @@ class Row extends React.Component {
 
     return (
       <tr>
-        <td className={"long"+(!this.props.isNewEmployeeRow ?  (isValid ? " valid" : " unvalid") : "")}>
+        <td className={"long "+(!this.props.isNewEmployeeRow ?  (isValid ? "success" : "error") : "")}>
           <InputText value={name}
                      onUpdate={this.updateName.bind(this)}/></td>
 

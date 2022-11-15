@@ -52,19 +52,18 @@ button:hover {
 .btn-warning {
 
   color: #212529;
-    background-color: #ffc107;
-    border-color: #ffc107;
+    background-color: $warning;
+    border-color: $warning;
 }
 
 .btn-error {
-  color: #721c24;
+  color: $error;
   background-color: #f6f6f6;
-  border : 1px solid #721c24;
+  border : 1px solid $error;
 }
 .btn-success {
-     color: #212529;
-     border : 1px solid #155724;
-     background-color: #f6f6f6;
+     border : 1px solid $success;
+     background-color: $success;
     }
 
 .btn-info {

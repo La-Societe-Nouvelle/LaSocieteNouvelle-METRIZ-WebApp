@@ -256,25 +256,19 @@ class RowTableCompanies extends React.Component {
 
     if (activityCode == "00") {
       icon = (
-        <p className="warning">
           <i
-            className="bi bi-exclamation-triangle"
+            className="bi bi-exclamation-triangle text-warning"
             title="Risque de données incomplètes"
           ></i>
-        </p>
       );
     } else {
       if (status == 200) {
         icon = (
-          <p className="success">
-            <i className="bi bi-check2" title="Données synchronisées"></i>
-          </p>
+            <i className="bi bi-check2 text-success" title="Données synchronisées"></i>
         );
       } else {
         icon = (
-          <p className="success">
-            <i className="bi bi-arrow-repeat"></i>
-          </p>
+            <i className="bi bi-arrow-repeat text-success"></i>
         );
       }
     }
@@ -282,7 +276,7 @@ class RowTableCompanies extends React.Component {
       <tr>
         <td className="corporate-name">
           {icon}
-          <p>{corporateName}</p>
+         {corporateName}
         </td>
         <td>{account}</td>
         <td>
@@ -292,20 +286,20 @@ class RowTableCompanies extends React.Component {
               value: areaCode,
             }}
             placeholder={"Choisissez un espace économique"}
-            className={!dataUpdated && status == 200 ? "valid" : ""}
+            className={!dataUpdated && status == 200 ? "success" : ""}
             options={this.state.areasOptions}
             onChange={this.onAreaCodeChange}
           />
         </td>
 
-        <td className={activityCode == "00" ? "warning" : ""}>
+        <td >
           <Select
             defaultValue={{
               label: activityCode + " - " + divisions[activityCode],
               value: activityCode,
             }}
             placeholder={"Choisissez un secteur d'activité"}
-            className={!dataUpdated && status == 200 ? "valid" : ""}
+            className={!dataUpdated && status == 200 ? "success" : ""}
             options={this.state.divisionsOptions}
             onChange={this.onActivityCodeChange}
           />

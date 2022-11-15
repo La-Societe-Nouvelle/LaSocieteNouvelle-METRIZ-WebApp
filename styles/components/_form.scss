@@ -4,18 +4,17 @@
 input,
 select {
 
-
-  &.valid {
-    background-color: $valid-color; 
+  &.success {
+    border: 1px solid $success;
   }
-  &.unvalid {
-    background-color: $unvalid-color; 
+  &.error {
+    border: 1px solid $error;
   }
 }
 
-.valid .css-1s2u09g-control {
-  background-color: #f6ffef;
-  border: 1px solid #c3e6cb;
+.success .css-1s2u09g-control {
+  background-color: lighten($success,48%);
+  border: 1px solid $success;
 }
 
 label {

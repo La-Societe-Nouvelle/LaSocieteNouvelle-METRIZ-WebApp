@@ -14,31 +14,26 @@
 
 .alert-info {
     color: $primary;
-    background-color : #ebf3fa;
-    border-color: #ebf3fa;
+    border-left : 6px solid #8994d1;
+    border-radius: 4px;
 }
 
 .alert-success {
-    color: #155724;
-    background-color: #ecf9ef;
-    border-color: #c3e6cb;
-    h4{
-        color: #155724 !important;
-        text-align: left !important;
-    }
+    border-left : 6px solid $success;
+    border-radius: 4px;
+  
 }
 
 .alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeeba;
+    color: darken($warning, 15%);
+    background-color: lighten($warning, 45%);
+    border-left : 6px solid $warning;
+    border-radius: 4px;
 }
 
-.alert-error {
-    color: #721c24;
-    background-color: #f8d7da;
-    border-color: #f5c6cb;
-    h4{
-        color: #721c24;
-    }
+.alert-danger {
+
+    border-left : 6px solid $error;
+    border-radius: 4px;
+
 }

@@ -194,34 +194,26 @@ class RowTableCompanies extends React.Component {
     let icon;
     if (corporateId && status != 200) {
       icon = (
-        <p className="success">
-          <i className="bi bi-arrow-repeat"   title="Données prêtes à être synchronisées"></i>
-   
-        </p>
+        <i className="bi bi-arrow-repeat text-success"   title="Données prêtes à être synchronisées"></i>
+
       );
     }
 
     if (status == 200) {
       icon = (
-        <p className="success">
-          <i className="bi bi-check2" title="Données synchronisées"></i>
-        </p>
+        <i className="bi bi-check2 text-success" title="Données synchronisées"></i>
+
       );
     }
     if (status == 404) {
       icon = (
-        <p className="error">
-             <i className="bi bi-x-lg"  title="Risque de données incomplètes"></i>
-     
-        </p>
+        <i className="bi bi-x-lg text-error"  title="Erreur lors de la synchronisation"></i>
+
       );
     }
     if (!corporateId) {
       icon = (
-        <p className="warning">
-             <i className="bi bi-exclamation-triangle"  title="Données non synchronisables"></i>
-  
-        </p>
+        <i className="bi bi-exclamation-triangle text-warning"  title="Données non synchronisables"></i>
       );
     }
 
@@ -229,12 +221,10 @@ class RowTableCompanies extends React.Component {
       <tr>
         <td className="siren-input">
           {icon}
-          <p className={status == 200 ? "success" : "warning"}>
-            <InputText
+          <InputText
               value={corporateId}
               onUpdate={this.updateCorporateId.bind(this)}
             />
-          </p>
         </td>
         <td>{corporateName}</td>
         <td>{account}</td>

@@ -11,12 +11,11 @@ import { Modal } from "react-bootstrap";
 export const MessagePopup = ({ message, closePopup, type }) => {
   return (
     <Modal show="true" onHide={closePopup} size="md" centered>
-      <Modal.Header closeButton>
-      </Modal.Header>
+   
       <Modal.Body>
         <p className="text-center">
           {type == "success" && (
-            <i className="display-3 positive bi bi-check-circle"></i>
+            <i className="display-3 success bi bi-check-circle"></i>
           )}
         </p>
         <p className="h3 text-center my-1">{message}</p>
@@ -31,10 +30,9 @@ export const MessagePopup = ({ message, closePopup, type }) => {
 };
 
 export const MessagePopupErrors = ({ title, message, errors, closePopup }) => {
-  console.log("test");
   return (
     <Modal show="true" onHide={closePopup} size="md" centered>
-      <Modal.Header closeButton>
+      <Modal.Header >
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
 

@@ -51,7 +51,7 @@ input {
 }
 
 p.success {
-  color : #00d230;
+  color : $success;
   margin : 0;
 }
 // underline 
@@ -166,13 +166,17 @@ sup {
 
 /* ---------- Icones ---------- */
 
-.positive {
-  color : #63c988;
-}
-.negative {
-  color : red; 
+i.success {
+  color : $success;
 }
 
+i.warning {
+  color : $warning;
+}
+
+i.error {
+  color : $error;
+}
 .hidden canvas {
   min-height: 500px;
 }

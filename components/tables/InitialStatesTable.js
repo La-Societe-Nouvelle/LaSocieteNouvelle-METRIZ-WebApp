@@ -238,7 +238,7 @@ function RowTableImmobilisations(props)
               initialState == "prevFootprint" ||
               initialState == "currentFootprint" ||
               dataFetched
-                ? "valid"
+                ? "success"
                 : ""
             }
             options={getInitialStateOption(initialState, hasInputs)}
@@ -248,7 +248,7 @@ function RowTableImmobilisations(props)
           
         </td>
         {initialState == "defaultData" && (
-          <td className={dataFetched === true ? " valid" : ""}>
+          <td className={dataFetched === true ? " success" : ""}>
 
         <Select
             defaultValue={{
@@ -256,7 +256,7 @@ function RowTableImmobilisations(props)
               value: activityCode,
             }}
             placeholder={"Choisissez une branche"}
-            className={dataFetched ? " valid" : ""}
+            className={dataFetched ? " success" : ""}
             options={branchesOptions}
             onChange={onActivityCodeChange}
           
@@ -361,7 +361,7 @@ function RowTableStocks(props)
               initialState == "prevFootprint" ||
               initialState == "currentFootprint" ||
               dataFetched
-                ? "valid"
+                ? "success"
                 : ""
             }
             options={getInitialStateOption(initialState, hasInputs)}
@@ -377,7 +377,7 @@ function RowTableStocks(props)
               defaultValue={{label:"Estimée sur exercice courant", value:"none"}}
               className={
                 initialState == "currentFootprint" 
-                  ? "valid"
+                  ? "success"
                   : ""
               }
               options={[{label:"Estimée sur exercice courant", value:"none"}]}
@@ -385,7 +385,7 @@ function RowTableStocks(props)
             />
           </td>}
       {initialState=="defaultData" &&
-          <td className={dataFetched === true ? " valid" : ""}>
+          <td className={dataFetched === true ? "success" : ""}>
 
       <Select
             defaultValue={{
@@ -393,7 +393,7 @@ function RowTableStocks(props)
               value: activityCode,
             }}
             placeholder={"Choisissez une division"}
-            className={dataFetched ? " valid" : ""}
+            className={dataFetched ? "success" : ""}
             options={divisionsOptions}
             onChange={onActivityCodeChange}
           
