@@ -5,7 +5,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 // Utils
-import { printValue } from '../../src/utils/Utils';
+import { getAmountItems, printValue } from '../../src/utils/Utils';
 
 /* ---------- IMMOBILISATIONS TABLE ---------- */
 
@@ -22,7 +22,7 @@ export class ImmobilisationsTable extends React.Component {
 
   render() 
   {
-    const {immobilisations,depreciations,aggregates} = this.props.financialData;
+    const {immobilisations,investments,aggregates} = this.props.financialData;
     const {columnSorted} = this.state;
     
     this.sortItems(immobilisations,columnSorted);
@@ -34,37 +34,37 @@ export class ImmobilisationsTable extends React.Component {
             <tr>
               <td className="short" onClick={() => this.changeColumnSorted("account")}>Compte</td>
               <td onClick={() => this.changeColumnSorted("accountLib")}>Libellé</td>
-              <td className="text-end">Montant (N)</td>
-              <td className="text-end">Montant (N-1)</td>
-              <td className="text-end">Variation</td>
+              <td className="text-end">Valeur brute au début de l'exercice</td>
+              <td className="text-end">Augmentations</td>
+              <td className="text-end">Diminutions</td>
+              <td className="text-end">Valeur brute à la fin de l'exercice</td>
             </tr>
           </thead>
           <tbody>
             {immobilisations.map(({account,accountLib,amount,prevAmount}) => {
-              let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
-                                           .map(depreciation => depreciation.amount)
-                                           .reduce((a,b) => a + b,0);
-              let prevValueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
-                                           .map(depreciation => depreciation.prevAmount)
-                                           .reduce((a,b) => a + b,0);
+              let augmentation = investments.filter(investment => investment.account==account)
+                                            .map(investment => investment.amount)
+                                            .reduce((a,b) => a + b,0);
+              let dimininution = prevAmount+augmentation-amount;
               return(
                 <tr key={account}>
                   <td >{account}</td>
                   <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td className="text-end">{printValue(amount-valueLoss,0)}  &euro;</td>
-                  <td className="text-end">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
-                  <td className="text-end">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
+                  <td className="text-end">{printValue(prevAmount,0)}  &euro;</td>
+                  <td className="text-end">{printValue(augmentation,0)}  &euro;</td>
+                  <td className="text-end">{printValue(dimininution,0)}  &euro;</td>
+                  <td className="text-end">{printValue(amount,0)}  &euro;</td>
                 </tr>)})}
-
           </tbody>
                       
           {immobilisations.length > 0 &&
-             <tfoot>
+            <tfoot>
              <tr>
                 <td colSpan="2">TOTAL</td>
-                <td className="text-end">{printValue(aggregates.netAmountImmobilisation.amount,0)} &euro;</td>
-                <td className="text-end">{printValue(aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
-                <td className="text-end">{printValue(aggregates.netAmountImmobilisation.amount-aggregates.netAmountImmobilisation.prevAmount,0)}  &euro;</td>
+                <td className="text-end">{printValue(aggregates.grossAmountImmobilisation.prevAmount,0)} &euro;</td>
+                <td className="text-end">{printValue(getAmountItems(investments),0)}  &euro;</td>
+                <td className="text-end">{printValue(aggregates.grossAmountImmobilisation.prevAmount+getAmountItems(investments)-aggregates.grossAmountImmobilisation.amount,0)}  &euro;</td>
+                <td className="text-end">{printValue(aggregates.grossAmountImmobilisation.amount,0)}  &euro;</td>
               </tr>
             </tfoot>
           }

@@ -8,6 +8,8 @@ import React from "react";
 // Tables
 import { MainAggregatesTable } from "../../tables/MainAggregatesTable";
 import { ImmobilisationsTable } from "../../tables/ImmobilisationsTable";
+import { AmortisationsTable } from "../../tables/AmortisationsTable";
+import { DepreciationsTable } from "../../tables/DepreciationsTable";
 import { IncomeStatementTable } from "../../tables/IncomeStatementTable";
 import { ExpensesTable } from "../../tables/ExpensesTable";
 import { StocksTable } from "../../tables/StocksTable";
@@ -124,9 +126,17 @@ export class FinancialDatas extends React.Component {
         ); // Compte de résultat
       case "immobilisations":
         return (
-          <ImmobilisationsTable
-            financialData={this.props.session.financialData}
-          />
+          <>
+            <ImmobilisationsTable
+              financialData={this.props.session.financialData}
+            />
+            <AmortisationsTable
+              financialData={this.props.session.financialData}
+            />
+            <DepreciationsTable
+              financialData={this.props.session.financialData}
+            />
+          </>
         ); // Table des immobilisations
       case "stocks":
         return <StocksTable financialData={this.props.session.financialData} />; // Table des stocks
