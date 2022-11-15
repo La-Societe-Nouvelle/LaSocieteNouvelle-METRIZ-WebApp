@@ -428,11 +428,11 @@ class Row extends React.Component {
       <>
         <td
           className={
-            "long" +
+            "long " +
             (!this.props.isNewEmployeeRow
               ? isValid
-                ? " valid"
-                : " unvalid"
+                ? "success"
+                : "error"
               : "")
           }
         >

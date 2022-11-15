@@ -5,6 +5,7 @@
 }
 
 .pagination {
+
   display: flex;
   justify-content: flex-start;
   flex-grow: 1;
@@ -19,7 +20,7 @@
 }
 
 .toChecked {
-  border-right: 2px solid #ffc107;
+  border-right: 2px solid $warning;
 }
 
 p.toChecked {
@@ -29,9 +30,11 @@ p.toChecked {
 table {
   border: 1px solid $light;
   font-size: 0.85em;
+
   td {
     border : none;
   }
+  
   .siren {
     width: 250px;
   }
@@ -45,7 +48,7 @@ table {
       margin-bottom: 0 !important;
     }
     .fa-triangle-exclamation {
-      color: #ffc107;
+      color: $warning;
     }
   }
   .company {
@@ -64,23 +67,23 @@ table {
   tr.warning td,
   .warning select {
     background-color: #fff3cd;
-    border-color: #ffc107;
+    border-color: $warning;
   }
 
   p.warning {
-    color: #ffc107;
+    color: $warning;
     .form-input,
     .form-input:active,
     .form-input:focus {
-      border-color: #ffc107;
+      border-color: $warning;
     }
   }
   select.warning {
     background-color: #fffdf6;
-    border-color: #ffc107;
+    border-color: $warning;
   }
   .error {
-    color: red;
+    color: $error;
   }
 
   // --- Cell --- //
@@ -106,7 +109,7 @@ table {
     font-size: 1.1em;
   }
   .subth {
-    background-color: #f4f5ff;
+    background-color: $info;
     border-bottom: 1px solid $light;
     font-weight: 600;
     font-size: 0.8rem;
@@ -185,17 +188,26 @@ table {
 }
 
 .table-menu {
-  margin: 1em 0;
+  margin: 2em 0 0.5rem 0;
   text-align: center;
   button {
     font-size: 0.9rem;
-    background-color: #fff;
+    background-color: $bg-light;
     font-weight: 600;
-    border: none;
+    border : none;
     padding: 1rem;
-    color: #a7a2a2;
-    border-bottom: 2px solid #a7a2a2;
+    color: $primary;
+    border-top:  1px solid $light;
+    border-bottom: 2px solid $light;
     cursor: pointer;
+  }
+  button:first-child {
+    border-left : 1px solid $light;
+    border-radius : 5px 0 0 5px;
+  }
+  button:last-child {
+    border-right: 1px solid $light;
+    border-radius : 0px 5px 5px 0;
   }
   button.active,
   button:hover,

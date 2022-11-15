@@ -1,7 +1,6 @@
 import React from "react";
 import Dropzone from "react-dropzone";
 
-
 // Table
 import { CorporateIdTable } from "../../tables/CorporateIdTable";
 
@@ -30,23 +29,21 @@ export class SirenSection extends React.Component {
       synchronised: 0,
       popup: false,
       isDisabled: false,
-      errorFile : false,
-      error : false,
+      errorFile: false,
+      error: false,
     };
 
     this.onDrop = (files) => {
-      if(files.length) {
+      if (files.length) {
         this.importFile(files[0]);
         this.openPopup();
-        this.setState({isDisabled : false});
-      }
-      else {
-        this.setState({errorFile : true});
+        this.setState({ isDisabled: false });
+        this.setState({ errorFile: false });
+      } else {
+        this.setState({ errorFile: true });
       }
     };
-
   }
-
 
   handleChange = (event) => {
     let view = event.target.value;
@@ -66,13 +63,13 @@ export class SirenSection extends React.Component {
           ),
           view: view,
         });
-        case "error":
-          return this.setState({
-            companiesShowed: this.state.companies.filter(
-              (company) => company.status == 404
-            ),
-            view: view,
-          });
+      case "error":
+        return this.setState({
+          companiesShowed: this.state.companies.filter(
+            (company) => company.status == 404
+          ),
+          view: view,
+        });
       default:
         return this.setState({
           companiesShowed: this.state.companies,
@@ -93,7 +90,7 @@ export class SirenSection extends React.Component {
       popup,
       isDisabled,
       errorFile,
-      error
+      error,
     } = this.state;
 
     const financialData = this.props.session.financialData;
@@ -109,12 +106,12 @@ export class SirenSection extends React.Component {
     ) {
       buttonNextStep = (
         <div>
-            <button
-              onClick={() => setCompanyStep(2)}
-            className={"btn btn-primary me-3"}>
+          <button
+            onClick={() => setCompanyStep(2)}
+            className={"btn btn-primary me-3"}
+          >
             Secteurs d'activité <i className="bi bi-chevron-right"></i>
-
-            </button>
+          </button>
           <button
             className={"btn btn-secondary"}
             id="validation-button"
@@ -131,7 +128,7 @@ export class SirenSection extends React.Component {
           className={"btn btn-secondary"}
           id="validation-button"
           onClick={() => setCompanyStep(2)}
-          disabled= {!isNextStepAvailable}
+          disabled={!isNextStepAvailable}
         >
           Valider les fournisseurs
           <i className="bi bi-chevron-right"></i>
@@ -164,13 +161,17 @@ export class SirenSection extends React.Component {
           <div className="step">
             <h4>2. Importez le fichier excel complété</h4>
 
-             <Dropzone onDrop={this.onDrop} accept={[".xlsx", ".csv"]} maxFiles={1} >
+            <Dropzone
+              onDrop={this.onDrop}
+              accept={[".xlsx", ".csv"]}
+              maxFiles={1}
+            >
               {({ getRootProps, getInputProps }) => (
                 <div className="dropzone-section">
                   <div {...getRootProps()} className="dropzone">
                     <input {...getInputProps()} />
                     <p>
-                    <i className="bi bi-file-arrow-up-fill"></i>
+                      <i className="bi bi-file-arrow-up-fill"></i>
                       Glisser votre fichier ici
                     </p>
                     <p className="small-text">OU</p>
@@ -183,10 +184,12 @@ export class SirenSection extends React.Component {
             </Dropzone>
 
             {errorFile && (
-              <p className="alert alert-danger">
-                 <i className="bi bi-check-circle-fill me-1"></i> Fichier incorrect
-              </p>
-
+              <div className="alert alert-danger">
+                <p>
+                  {" "}
+                  <i className="bi bi-x-octagon"></i> Fichier incorrect
+                </p>
+              </div>
             )}
             {popup && (
               <MessagePopup
@@ -201,37 +204,37 @@ export class SirenSection extends React.Component {
 
             <div className="table-container">
               <div className="table-data table-company">
-              {error && <ErrorApi />}
+                {error && <ErrorApi />}
                 {!error && !isNextStepAvailable && synchronised != 0 && (
-                  <div className="alert alert-error">
+                  <div className="alert alert-danger">
                     <p>
-                    <i className="bi bi-x-lg"></i> Certains comptes n'ont
-                      pas pu être synchronisés. Vérifiez le numéro de siren et
+                      <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas
+                       été synchronisés. Vérifiez le numéro de siren et
                       resynchronisez les données.
                     </p>
                     <button
                       onClick={this.handleChange}
                       value="unsync"
-                      className={"btn btn-error"}
+                      className="btn btn-secondary"
                     >
-                      Afficher les données non synchronisées
+                      Comptes non synchronisées
                     </button>
                   </div>
                 )}
-                {isNextStepAvailable && synchronised.length > 0 ? (
+                {isNextStepAvailable ? (
                   <div className="alert alert-success">
                     <p>
-                      <i className="bi bi-check2"></i> Tous les comptes
-                      ayant un n° de Siren ont bien été synchronisés.
+                      <i className="bi bi-check2 me-2"></i> Tous les comptes ayant un
+                      n° de Siren ont bien été synchronisés.
                     </p>
                     {companies.filter((company) => company.state == "default")
                       .length > 0 && (
                       <button
                         onClick={this.handleChange}
                         value="undefined"
-                        className={"btn btn-success"}
+                        className={"btn btn-tertiary"}
                       >
-                        Afficher les comptes sans siren (
+                        Comptes sans numéro de siren (
                         {
                           companies.filter(
                             (company) => company.state == "default"
@@ -241,25 +244,22 @@ export class SirenSection extends React.Component {
                       </button>
                     )}
                   </div>
-                ) : (
-                  <>
-                    <div className="alert alert-warning">
-                      <p>
-                        <i className="bi bi-exclamation-triangle"></i>  Les empreintes de
-                        certains comptes doivent être synchronisées.
-                      </p>
-                    </div>
-                    <button
+                ) : 
+                <div className="alert alert-warning">
+                <p>
+                  <i className="bi bi-exclamation-triangle"></i> Les
+                  empreintes de certains comptes doivent être synchronisées.
+                </p>
+                <button
                   onClick={() => this.synchroniseCompanies()}
-                  className={"btn btn-secondary"}
+                  className="btn btn-warning"
                   disabled={isDisabled}
                 >
-                  <i className="bi bi-arrow-repeat"></i>  Synchroniser les données
+                  <i className="bi bi-arrow-repeat"></i> Synchroniser les
+                  données
                 </button>
-                  </>
+              </div>}
 
-                )}
-                             
 
                 <div className="pagination">
                   <div className="form-group">
@@ -279,7 +279,7 @@ export class SirenSection extends React.Component {
                         Non synchronisé
                       </option>
                       <option key="4" value="error">
-                       Numéros de siren incorrects
+                        Numéros de siren incorrects
                       </option>
                     </select>
                   </div>
@@ -320,11 +320,10 @@ export class SirenSection extends React.Component {
           </div>
 
           {fetching && (
-
-              <ProgressBar
-                message="Récupération des données fournisseurs..."
-                progression={progression}
-              />
+            <ProgressBar
+              message="Récupération des données fournisseurs..."
+              progression={progression}
+            />
           )}
 
           <div className="text-end">{buttonNextStep}</div>
@@ -402,9 +401,9 @@ export class SirenSection extends React.Component {
     let reader = new FileReader();
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
-      
+
       await Promise.all(
-        XLSXData.map(async ({ account,denomination, siren }) =>
+        XLSXData.map(async ({ account, denomination, siren }) =>
           this.props.session.financialData.updateCorporateId(
             account,
             denomination,
@@ -428,9 +427,9 @@ export class SirenSection extends React.Component {
       .filter((company) => company.account.charAt(0) != "_")
       .map((company) => {
         return {
-          account : company.account,
+          account: company.account,
           denomination: company.corporateName,
-          siren: company.corporateId
+          siren: company.corporateId,
         };
       });
     let fileProps = { wsclos: [{ wch: 50 }, { wch: 20 }] };
@@ -464,13 +463,11 @@ export class SirenSection extends React.Component {
     let n = companiesToSynchronise.length;
 
     for (let company of companiesToSynchronise) {
-
       try {
         await company.updateFromRemote();
-        
       } catch (error) {
         this.setState({ error: true });
-        break;        
+        break;
       }
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
@@ -502,16 +499,16 @@ export class SirenSection extends React.Component {
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const nextStepAvailable = (  companies ) => {
-
-  let nbSirenSynchronised = companies.filter(company => company.state == "siren" && company.status == 200).length;
+const nextStepAvailable = (companies) => {
+  let nbSirenSynchronised = companies.filter(
+    (company) => company.state == "siren" && company.status == 200
+  ).length;
 
   let nbSiren = companies.filter((company) => company.state == "siren").length;
-
-  if(nbSirenSynchronised == nbSiren) {
+console.log(nbSiren)
+  if (nbSirenSynchronised == nbSiren && nbSiren != 0) {
     return true;
-  }else{
+  } else {
     return false;
   }
-  
 };

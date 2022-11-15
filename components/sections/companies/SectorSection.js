@@ -113,18 +113,25 @@ export class SectorSection extends React.Component {
                     {!error && isNextStepAvailable ? (
                       <div className="alert alert-success">
                         <p>
-                          <i className="bi bi-check2"></i> Tous les comptes ont
+                        <i className="bi bi-check2-all"></i> Tous les comptes ont
                           bien été synchronisés.
                         </p>
                       </div>
                     ) : (
                       <div className="alert alert-warning">
-                        <p>
-                          <i className="bi bi-exclamation-triangle"></i> Les
-                          empreintes de certains comptes doivent être
-                          synchronisées.
-                        </p>
-                      </div>
+                      <p>
+                        <i className="bi bi-exclamation-triangle"></i> Les
+                        empreintes de certains comptes doivent être synchronisées.
+                      </p>
+    
+                      <button
+                      onClick={() => this.synchroniseCompanies()}
+                      className={"btn btn-warning"}
+                    >
+                      <i className="bi bi-arrow-repeat"></i> Synchroniser les
+                      données
+                    </button>
+                    </div>
                     )}
                     {significativeCompanies.filter(
                       (company) => company.footprintActivityCode == "00"
@@ -153,13 +160,6 @@ export class SectorSection extends React.Component {
                       ""
                     )}
 
-                    <button
-                      onClick={() => this.synchroniseCompanies()}
-                      className={"btn btn-secondary"}
-                    >
-                      <i className="bi bi-arrow-repeat"></i> Synchroniser les
-                      données
-                    </button>
                     <div className="pagination">
                       <div className="form-group">
                         <select
