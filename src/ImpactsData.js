@@ -31,8 +31,8 @@ export class ImpactsData  {
 
     /* --- Environnemental Data */
 
-    this.greenhousesGazEmissions = props.greenhousesGazEmissions || null;
-    this.greenhousesGazEmissionsUncertainty = props.greenhousesGazEmissionsUncertainty || null;
+    this.greenhousesGazEmissions =  props.greenhousesGazEmissions !== undefined ? props.greenhousesGazEmissions : null;
+    this.greenhousesGazEmissionsUncertainty =  props.greenhousesGazEmissionsUncertainty !== undefined ? props.greenhousesGazEmissionsUncertainty : null;
     this.ghgDetails = props.ghgDetails || {};
     this.ghgTotal = props.ghgTotal || false;
 
@@ -43,8 +43,8 @@ export class ImpactsData  {
     this.materialsExtraction =  props.materialsExtraction !== undefined ? props.materialsExtraction : null;
     this.materialsExtractionUncertainty = props.materialsExtractionUncertainty !== undefined ? props.materialsExtractionUncertainty : null;
 
-    this.energyConsumption = props.energyConsumption || null;
-    this.energyConsumptionUncertainty = props.energyConsumptionUncertainty || null;
+    this.energyConsumption = props.energyConsumption !== undefined ? props.energyConsumption : null;
+    this.energyConsumptionUncertainty = props.energyConsumptionUncertainty !== undefined ? props.energyConsumptionUncertainty : null;
     this.nrgDetails = props.nrgDetails || {};
     this.nrgTotal = props.nrgTotal || false;
 
@@ -52,8 +52,8 @@ export class ImpactsData  {
     this.wasteProduction = props.wasteProduction !== undefined ? props.wasteProduction : null;
     this.wasteProductionUncertainty = props.wasteProductionUncertainty !== undefined ? props.wasteProductionUncertainty : null;
 
-    this.waterConsumption = props.waterConsumption || null;
-    this.waterConsumptionUncertainty = props.waterConsumptionUncertainty || null;
+    this.waterConsumption =  props.waterConsumption !== undefined ? props.waterConsumption : null;
+    this.waterConsumptionUncertainty =  props.waterConsumptionUncertainty !== undefined ? props.waterConsumptionUncertainty : null;
 
     /* --- Commentaires --- */
 
