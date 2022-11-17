@@ -572,7 +572,8 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       accountLib: ligneCourante.CompteLib,
       isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
       prevAmount: parseAmount(ligneCourante.Debit),
-      amount: parseAmount(ligneCourante.Debit)
+      amount: parseAmount(ligneCourante.Debit),
+      entries: []
     }
     // push data
     data.immobilisations.push(immobilisationData);
@@ -589,7 +590,8 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       accountLib: ligneCourante.CompteLib,
       accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
-      amount: parseAmount(ligneCourante.Credit)
+      amount: parseAmount(ligneCourante.Credit),
+      entries: []
     }
     // push data
     data.depreciations.push(depreciationData);
@@ -623,7 +625,8 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replaceAll("0$",""),
       isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
       amount: parseAmount(ligneCourante.Debit),
-      prevAmount: parseAmount(ligneCourante.Debit)
+      prevAmount: parseAmount(ligneCourante.Debit),
+      entries: []
     }
     // push data
     data.stocks.push(stockData);
@@ -640,7 +643,8 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       accountLib: ligneCourante.CompteLib,
       accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
-      amount: parseAmount(ligneCourante.Credit)
+      amount: parseAmount(ligneCourante.Credit),
+      entries: []
     }
     // push data
     data.depreciations.push(depreciationData);
@@ -679,7 +683,15 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
     let immobilisation = data.immobilisations.filter(immobilisation => immobilisation.account == ligneCourante.CompteNum)[0];
 
     // si compte existant -> variation de la valeur de l'immobilisation
-    if (immobilisation!=undefined) immobilisation.amount+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+    if (immobilisation!=undefined) 
+    {
+      immobilisation.amount+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+      immobilisation.entries.push({
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate
+      })
+    }
     
     // si compte inexistant -> ajout compte
     else 
@@ -691,7 +703,12 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         accountLib: ligneCourante.CompteLib,
         isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
         prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit)
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        entries: [{
+          entryNum: ligneCourante.EcritureNum,
+          amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+          date: ligneCourante.EcritureDate
+        }]
       }
       // push data
       data.immobilisations.push(immobilisationData);
@@ -707,6 +724,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       // investment data
       let investmentData = 
       {
+        entryNum: ligneCourante.EcritureNum,
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
@@ -714,6 +732,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         accountAuxLib : ligneFournisseur.CompAuxLib || "ACQUISTIONS "+ligneCourante.CompteLib,
         isDefaultAccountAux: ligneFournisseur.CompAuxNum ? false : true,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate
       }
       // push data
       data.investments.push(investmentData);
@@ -729,12 +748,14 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       // investment data
       let immobilisationProductionData = 
       {
+        entryNum: ligneCourante.EcritureNum,
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         account: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         accountAux: ligneProduction.CompteNum,
         accountAuxLib : ligneProduction.CompteLib,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate
       }
       // push data
       data.immobilisationProductions.push(immobilisationProductionData);
@@ -749,7 +770,15 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
     let depreciation = data.depreciations.filter(depreciation => depreciation.account == ligneCourante.CompteNum)[0];
     
     // si compte existant -> variation de la valeur de l'immobilisation
-    if (depreciation!=undefined) depreciation.amount+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    if (depreciation!=undefined) 
+    {
+      depreciation.amount+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+      depreciation.entries.push({
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+        date: ligneCourante.EcritureDate
+      })
+    }
 
     // si compte inexistant -> ajout compte
     else
@@ -761,7 +790,12 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         accountLib: ligneCourante.CompteLib,
         accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
         prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+        entries: [{
+          entryNum: ligneCourante.EcritureNum,
+          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+          date: ligneCourante.EcritureDate
+        }]
       }
       // push data
       data.depreciations.push(depreciationData);
