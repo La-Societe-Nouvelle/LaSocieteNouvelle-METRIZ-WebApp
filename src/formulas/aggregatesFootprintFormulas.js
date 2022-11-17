@@ -269,6 +269,7 @@ export const updateAggregatesFootprints = async (indic,financialData) =>
            externalExpenses,
            storedPurchases,
            intermediateConsumption,
+           grossFixedCapitalFormation,
            capitalConsumption,
            grossValueAdded,
            production} = financialData.aggregates;
@@ -285,7 +286,11 @@ export const updateAggregatesFootprints = async (indic,financialData) =>
     let expensesAccounts = financialData.expenseAccounts.filter(account => /^6(0|1|2)/.test(account.accountNum));
     intermediateConsumption.footprint.indicators[indic] = await buildIndicatorAggregate(indic,expensesAccounts);;
     
-    // Dépreciation expenses
+    // Formation brute de capital fixe
+    let investments = financialData.investments;
+    grossFixedCapitalFormation.footprint.indicators[indic] = await buildIndicatorAggregate(indic,investments);
+
+    // Capital consumption
     let depreciationExpensesAccounts = financialData.expenseAccounts.filter(account => /^68/.test(account.accountNum));
     capitalConsumption.footprint.indicators[indic] = await buildIndicatorAggregate(indic,depreciationExpensesAccounts);
     

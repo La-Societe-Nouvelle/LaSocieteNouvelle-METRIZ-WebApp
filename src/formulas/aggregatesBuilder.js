@@ -110,6 +110,12 @@ export const aggregatesBuilder = (financialData) =>
 
   // IMMOBILISATIONS ----------------------------------------- //
 
+  // Formation brute de capital fixe
+  aggregates.grossFixedCapitalFormation = new Aggregate({
+    label: "Formation brute de capital fixe",
+    amount: getAmountItems(financialData.investments)
+  });
+
   // Immobilisation
   aggregates.grossAmountImmobilisation = new Aggregate({
       label: "Immobilisations",

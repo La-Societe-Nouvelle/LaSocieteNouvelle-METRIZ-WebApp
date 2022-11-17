@@ -17,14 +17,19 @@ import retrieveTargetFootprint from "../services/responses/targetFootprint";
 export const updateVersion = async(sessionData) => {
 
 
-  switch (sessionData.version) {
-
+  switch (sessionData.version) 
+  {
+    case "1.0.4":
+      await updater_1_0_4(sessionData);
+      break;
     case "1.0.3":
       await updater_1_0_3(sessionData);
+      await updater_1_0_4(sessionData);
       break;
     case "1.0.2":
       updater_1_0_2(sessionData);
       updater_1_0_3(sessionData);
+      await updater_1_0_4(sessionData);
       break;
     case "1.0.1":
       updater_1_0_1(sessionData);
@@ -36,11 +41,25 @@ export const updateVersion = async(sessionData) => {
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
       await updater_1_0_3(sessionData);
+      await updater_1_0_4(sessionData);
       break;
     default:
       break;
   }
 };
+
+const updater_1_0_4 = async (sessionData) => 
+{
+  let investments = sessionData.financialData.investments ? sessionData.financialData.investments.map((props,index) => new Expense({id: index, ...props})) : [];
+  let investmentsFootprint = new SocialFootprint();
+  Object.keys(metaIndics).forEach(async (indic) => investmentsFootprint[indic] = await buildIndicatorAggregate(indic,investments));
+  let dataGrossFixedCapitalFormationAggregate = {
+    label : "Formation brute de capital fixe",
+    amount : getAmountItems(investments),
+    footprint : investmentsFootprint
+  }
+  sessionData.financialData.aggregates.grossFixedCapitalFormation = dataGrossFixedCapitalFormationAggregate;
+}
 
 const updater_1_0_3 = async (sessionData) => {
 
