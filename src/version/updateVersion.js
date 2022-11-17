@@ -1,13 +1,19 @@
 // La Société Nouvelle
 
+import metaIndics from "/lib/indics.json";
+
 import {
   getGhgEmissionsUncertainty,
   getTotalGhgEmissionsUncertainty,
 } from "../../components/assessments/AssessmentGHG";
+import { buildIndicatorAggregate } from "../formulas/footprintFormulas";
 import retrieveAreaFootprint from "../services/responses/areaFootprint";
 import retrieveDivisionFootprint from "../services/responses/divisionFootprint";
 import retrieveTargetFootprint from "../services/responses/targetFootprint";
+import { getAmountItems } from "../utils/Utils";
 
+import { Expense } from '/src/accountingObjects/Expense';
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 
 /* ----------------------------------------------------------------- */
