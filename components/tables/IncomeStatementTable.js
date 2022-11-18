@@ -35,7 +35,7 @@ export const IncomeStatementTable = ({ financialData }) => {
             <td>Autres produits d'exploitation</td>
             <td className="text-end">{printValue(financialData.getAmountOtherOperatingIncomes(), 0)} &euro;</td>
           </tr>
-          <tr className="total">
+          <tr className="fw-bold border-top">
             <td>TOTAL DES PRODUITS D'EXPLOITATION</td>
             <td className="text-end">{printValue(financialData.getAmountOperatingIncomes(), 0)} &euro;</td>
           </tr>
@@ -46,12 +46,12 @@ export const IncomeStatementTable = ({ financialData }) => {
               <td title={ isToBeChecked ? "Chiffre clé à vérifier" : ""} className={ isToBeChecked ? "toChecked text-end" : "text-end"}>{printValue(amount, 0)} &euro;</td>
             </tr>)}
 
-          <tr className="total">
+          <tr className="fw-bold border-top">
             <td>TOTAL DES CHARGES D'EXPLOITATION</td>
             <td className="text-end">{printValue(financialData.getAmountOperatingExpenses(), 0)} &euro;</td>
           </tr>
 
-          <tr className={"total"}>
+          <tr className={"fw-bold border-top"}>
             <td>RESULTAT D'EXPLOITATION</td>
             <td className="text-end">{printValue(financialData.getOperatingResult(), 0)} &euro;</td>
           </tr>
