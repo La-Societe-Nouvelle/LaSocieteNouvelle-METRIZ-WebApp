@@ -22,11 +22,14 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 export const updateVersion = async(sessionData) => {
 
-
   switch (sessionData.version) 
   {
+    case "1.0.5":
+      await updater_1_0_3(sessionData);
+      break;
     case "1.0.4":
       await updater_1_0_4(sessionData);
+      await updater_1_0_3(sessionData);
       break;
     case "1.0.3":
       await updater_1_0_3(sessionData);
@@ -71,8 +74,8 @@ const updater_1_0_3 = async (sessionData) => {
 
  let comparativeAreaFootprints = {};
  let comparativeDivisionFootprints = {};
- let targetSNBCbranch = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
- let targetSNBCarea = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },};
+ let targetSNBCbranch = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },capitalConsumptionTarget: { value: null }};
+ let targetSNBCarea = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },capitalConsumptionTarget: { value: null }};
  let code = sessionData.comparativeDivision;
 
     await Promise.all(
@@ -90,9 +93,7 @@ const updater_1_0_3 = async (sessionData) => {
           const target = await retrieveTargetFootprint(code);
           Object.assign(targetSNBCbranch,target);
         }
-        else{
-
-        }
+   
         // TARGET SNCB 2030 FOR ALL SECTORS
         if(indic =='ghg') {
           const targetArea = await retrieveTargetFootprint("00");

@@ -15,19 +15,19 @@ export const ComparativeTable = ({
   targetSNBCbranch,
   targetSNBCarea,
 }) => {
-  const { production, netValueAdded, intermediateConsumption } =
+  const { production, netValueAdded, intermediateConsumption, capitalConsumption } =
     financialData.aggregates;
-
   const {
     productionAreaFootprint,
     valueAddedAreaFootprint,
     consumptionAreaFootprint,
+    capitalConsumptionAreaFootprint
   } = allSectorFootprint;
-
   const {
     productionDivisionFootprint,
     valueAddedDivisionFootprint,
     consumptionDivisionFootprint,
+    capitalConsumptionDivisionFootprint,
   } = comparativeDivisionFootprint;
 
   const unit = metaIndics[indic].unit;
@@ -46,6 +46,11 @@ export const ComparativeTable = ({
     targetSNBCbranch.valueAddedTarget.value
   );
 
+  const capitalConsumptionEvolutionBranch = getEvolution(
+    capitalConsumptionDivisionFootprint.value,
+    targetSNBCbranch.capitalConsumptionTarget.value
+  );
+
   return (
     <Table className="mt-5  comparative-table">
       <thead>
@@ -62,6 +67,7 @@ export const ComparativeTable = ({
             printValue(consumptionDivisionFootprint.value, precision) &&
             printValue(valueAddedDivisionFootprint.value, precision) !==
               " - " && <td colSpan="3" className="border-left text-center">Branche</td>}
+
         </tr>
       </thead>
       <tbody>
@@ -177,6 +183,39 @@ export const ComparativeTable = ({
                 <span className="unit"> {unit}</span>
               </td>
               <td className="text-end">{valueAddedEvolutionBranch}%</td>
+            </>
+          )}
+        </tr>
+        <tr>
+          <td>Consommation de capital fixe</td>
+          <td className="border-left text-end">
+            {printValue(capitalConsumptionAreaFootprint.value, precision)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {indic == "ghg"  && (
+              <td className="text-end">
+                {Math.round(targetSNBCarea.capitalConsumptionTarget.value)}
+                <span className="unit"> {unit}</span>
+              </td>
+          )}
+          <td className="border-left text-end">
+            {printValue(capitalConsumption.footprint.getIndicator(indic).value, precision)}
+            <span className="unit"> {unit}</span>
+          </td>
+          {printValue(capitalConsumptionDivisionFootprint.value, precision) !==
+            null && (
+            <td className="border-left text-end">
+              {printValue(capitalConsumptionDivisionFootprint.value, precision)}
+              <span className="unit"> {unit}</span>
+            </td>
+          )}
+          {indic == "ghg" && capitalConsumptionDivisionFootprint.value && (
+            <>
+              <td className="text-end">
+                {Math.round(targetSNBCbranch.capitalConsumptionTarget.value)}
+                <span className="unit"> {unit}</span>
+              </td>
+              <td className="text-end">{capitalConsumptionEvolutionBranch}%</td>
             </>
           )}
         </tr>

@@ -7,6 +7,7 @@ const retrieveAreaFootprint = async (indicator) => {
     let valueAddedFootprint;
     let productionFootprint;
     let consumptionFootprint;
+    let capitalConsumptionFootprint;
     let footprint = {};
   
     const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
@@ -14,15 +15,19 @@ const retrieveAreaFootprint = async (indicator) => {
     const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
   
     const getConsumption = SerieDataService.getMacroData(indic, "00", "IC");
+
+    const getCapitalConsumption = SerieDataService.getMacroData(indic, "00", "CFC");
+
   
     await axios
-      .all([getValueAdded, getProduction, getConsumption])
+      .all([getValueAdded, getProduction, getConsumption, getCapitalConsumption])
       .then(
         axios.spread((...responses) => {
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];
-  
+          const capitalConsumption = responses[3];
+
           if (valueAdded.data.header.code == 200) {
             valueAddedFootprint = valueAdded.data.data.at(-1);
           }
@@ -32,6 +37,10 @@ const retrieveAreaFootprint = async (indicator) => {
   
           if (consumption.data.header.code == 200) {
             consumptionFootprint = consumption.data.data.at(-1);
+          }
+
+          if (capitalConsumption.data.header.code == 200) {
+            capitalConsumptionFootprint = capitalConsumption.data.data.at(-1);
           }
         })
       )
@@ -44,6 +53,7 @@ const retrieveAreaFootprint = async (indicator) => {
         valueAddedAreaFootprint: valueAddedFootprint,
         productionAreaFootprint: productionFootprint,
         consumptionAreaFootprint: consumptionFootprint,
+        capitalConsumptionAreaFootprint : capitalConsumptionFootprint || {value : null}
       },
     });
   

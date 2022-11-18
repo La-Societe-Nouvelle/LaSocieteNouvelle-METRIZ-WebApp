@@ -7,20 +7,21 @@ const retrieveDivisionFootprint = async (indicator, code) => {
     let valueAddedFootprint;
     let productionFootprint;
     let consumptionFootprint;
+    let capitalConsumptionFootprint;
     let footprint = {};
   
     const getValueAdded = SerieDataService.getMacroData(indic, code, "NVA");
     const getProduction = SerieDataService.getMacroData(indic, code, "PRD");
     const getConsumption = SerieDataService.getMacroData(indic,code, "IC");
-  
+    const getCapitalConsumption = SerieDataService.getMacroData(indic, code, "CFC");
     await axios
-      .all([getValueAdded, getProduction, getConsumption])
+      .all([getValueAdded, getProduction, getConsumption, getCapitalConsumption])
       .then(
         axios.spread((...responses) => {
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];
-  
+          const capitalConsumption = responses[3];
           if (valueAdded.data.header.code == 200) {
             valueAddedFootprint = valueAdded.data.data.at(-1);
           }
@@ -30,6 +31,11 @@ const retrieveDivisionFootprint = async (indicator, code) => {
   
           if (consumption.data.header.code == 200) {
             consumptionFootprint = consumption.data.data.at(-1);
+          }
+
+          if (capitalConsumption.data.header.code == 200) {
+            console.log(capitalConsumption)
+            capitalConsumptionFootprint = capitalConsumption.data.data.at(-1);
           }
         })
       )
@@ -42,6 +48,7 @@ const retrieveDivisionFootprint = async (indicator, code) => {
         valueAddedDivisionFootprint: valueAddedFootprint,
         productionDivisionFootprint: productionFootprint,
         consumptionDivisionFootprint: consumptionFootprint,
+        capitalConsumptionDivisionFootprint : capitalConsumptionFootprint || {value : null}
       },
     });
   
