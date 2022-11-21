@@ -289,3 +289,25 @@ table {
 }
  
 }
+
+  // --- Immobilisations Table --- //
+
+.immobilisationsTable {
+
+  caption-side: top;
+
+  caption {
+    background-color: lighten($primary, 10%);
+    color : #fff;
+    font-weight: 700;
+    font-size: 1.1em;  
+    padding: 0.5rem 0.5rem;
+    border: 1px solid #dbdef1;
+  }
+  
+  thead {
+    background-color: $light;
+    color : $text-color;
+    font-weight: normal;
+  }
+} 
