@@ -203,7 +203,7 @@ export const ComparativeTable = ({
             <span className="unit"> {unit}</span>
           </td>
           {printValue(capitalConsumptionDivisionFootprint.value, precision) !==
-            null && (
+            " - " && (
             <td className="border-left text-end">
               {printValue(capitalConsumptionDivisionFootprint.value, precision)}
               <span className="unit"> {unit}</span>
