@@ -442,6 +442,9 @@ export async function FECDataReader(FECData)
   data.immobilisedProduction = 0;         // 72
   data.otherOperatingIncomes = 0;         // 74, 75, 781, 791
 
+  // Production / Incomes ------------------------------------------------------------------------------- //
+  data.sales = 0;                         // 70
+
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = [];                       // stock 31, 32, 33, 34, 35, 37
   data.stockVariations = [];              // stock flows 603 <-> 31-32-37 & 71 <-> 33-34-35
@@ -829,7 +832,15 @@ const readStockEntry = async (data,journal,ligneCourante) =>
     let stock = data.stocks.filter(stock => stock.account == ligneCourante.CompteNum)[0];
 
     // si compte existant -> variation de la valeur du stock
-    if (stock!=undefined) stock.amount+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+    if (stock!=undefined) 
+    {
+      stock.amount+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+      stock.entries.push({
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate
+      })
+    }
 
     // si compte inexistant -> ajout compte
     else
@@ -842,7 +853,12 @@ const readStockEntry = async (data,journal,ligneCourante) =>
         accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replaceAll("0$",""),
         isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
         prevAmount: 0,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit)
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        entries: [{
+          entryNum: ligneCourante.EcritureNum,
+          amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+          date: ligneCourante.EcritureDate
+        }]
       }
       // push data
       data.stocks.push(stockData);
@@ -857,7 +873,15 @@ const readStockEntry = async (data,journal,ligneCourante) =>
     let depreciation = data.depreciations.filter(depreciation => depreciation.account == ligneCourante.CompteNum)[0];
     
     // si compte existant -> variation de la valeur de l'immobilisation
-    if (depreciation!=undefined) depreciation.amount+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    if (depreciation!=undefined) 
+    {
+      depreciation.amount+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+      depreciation.entries.push({
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+        date: ligneCourante.EcritureDate
+      })
+    }
 
     // si compte inexistant -> ajout compte
     else
@@ -869,7 +893,12 @@ const readStockEntry = async (data,journal,ligneCourante) =>
         accountLib: ligneCourante.CompteLib,
         accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
         prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit)
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+        entries: [{
+          entryNum: ligneCourante.EcritureNum,
+          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+          date: ligneCourante.EcritureDate
+        }]
       }
       // push data
       data.depreciations.push(depreciationData);
@@ -917,6 +946,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       accountAuxLib: ligneFournisseur.CompAuxLib || "DEPENSES "+ligneCourante.CompteLib,
       isDefaultAccountAux: ligneFournisseur.CompAuxNum ? false : true,
       amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+      date: ligneCourante.EcritureDate
     }
     // push data
     data.expenses.push(expenseData);
@@ -942,11 +972,24 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         let stockVariation = data.stockVariations.filter(stockVariation => stockVariation.account == stockVariationData.account
                                                                         && stockVariation.accountAux == stockVariationData.accountAux)[0];
 
-        if (stockVariation!=undefined) stockVariation.amount+= stockVariationData.amount;
+        if (stockVariation!=undefined) 
+        {
+          stockVariation.amount+= stockVariationData.amount;
+          stockVariation.entries.push({
+            entryNum: ligneCourante.EcritureNum,
+            amount: stockVariationData.amount,
+            date: ligneCourante.EcritureDate
+          })
+        }
 
         else
         { 
           // push data
+          stockVariation.entries = [{
+            entryNum: ligneCourante.EcritureNum,
+            amount: stockVariationData.amount,
+            date: ligneCourante.EcritureDate
+          }]
           data.stockVariations.push(stockVariationData);
         } 
       }
@@ -974,11 +1017,24 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == depreciationExpenseData.account
                                                                            && expense.accountAux == depreciationExpenseData.accountAux)[0];
 
-        if (depreciationExpense!=undefined) depreciationExpense.amount+= depreciationExpenseData.amount;
+        if (depreciationExpense!=undefined) 
+        {
+          depreciationExpense.amount+= depreciationExpenseData.amount;
+          depreciationExpense.entries.push({
+            entryNum: ligneCourante.EcritureNum,
+            amount: depreciationExpenseData.amount,
+            date: ligneCourante.EcritureDate
+          })
+        }
 
         else
         {
           // push data
+          data.entries = [{
+            entryNum: ligneCourante.EcritureNum,
+            amount: depreciationExpenseData.amount,
+            date: ligneCourante.EcritureDate
+          }]
           data.depreciationExpenses.push(depreciationExpenseData);
         } 
       }
@@ -1030,6 +1086,13 @@ const readProductionEntry = async (data,journal,ligneCourante) =>
   // Revenue ------------------------------------------------------------------------------------------ //
 
   if (/^70/.test(ligneCourante.CompteNum))      data.revenue+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^70/.test(ligneCourante.CompteNum)) {
+    sales.push({
+      entryNum: ligneCourante.EcritureNum,
+      amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+      date: ligneCourante.EcritureDate
+    })
+  }
   
   // Stored/Unstored Production ----------------------------------------------------------------------- //
 
