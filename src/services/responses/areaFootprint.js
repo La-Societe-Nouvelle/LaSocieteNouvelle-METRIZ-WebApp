@@ -1,63 +1,57 @@
 import axios from "axios";
+import { ComparativeData, updateAreaFootprint, updateComparativeData } from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
-const retrieveAreaFootprint = async (indicator) => {
+const retrieveAreaFootprint = async (indic,comparativeData) => {
 
-    let indic = indicator.toUpperCase();
-    let valueAddedFootprint;
+    let netValueAddedFootprint;
     let productionFootprint;
-    let consumptionFootprint;
-    let capitalConsumptionFootprint;
-    let footprint = {};
+    let intermediateConsumptionFootprint;
+    let fixedCapitalConsumptionFootprint;
   
-    const getValueAdded = SerieDataService.getMacroData(indic, "00", "NVA");
+    const getnetValueAdded = SerieDataService.getMacroData(indic.toUpperCase(), "00", "NVA");
   
-    const getProduction = SerieDataService.getMacroData(indic, "00", "PRD");
+    const getProduction = SerieDataService.getMacroData(indic.toUpperCase(), "00", "PRD");
   
-    const getConsumption = SerieDataService.getMacroData(indic, "00", "IC");
+    const getIntermediateConsumption = SerieDataService.getMacroData(indic.toUpperCase(), "00", "IC");
 
-    const getCapitalConsumption = SerieDataService.getMacroData(indic, "00", "CFC");
+    const getFixedCapitalConsumption = SerieDataService.getMacroData(indic.toUpperCase(), "00", "CFC");
 
   
     await axios
-      .all([getValueAdded, getProduction, getConsumption, getCapitalConsumption])
+      .all([getnetValueAdded, getProduction, getIntermediateConsumption, getFixedCapitalConsumption])
       .then(
         axios.spread((...responses) => {
-          const valueAdded = responses[0];
+          const netValueAdded = responses[0];
           const production = responses[1];
-          const consumption = responses[2];
-          const capitalConsumption = responses[3];
+          const intermediateConsumption = responses[2];
+          const fixedCapitalConsumption = responses[3];
 
-          if (valueAdded.data.header.code == 200) {
-            valueAddedFootprint = valueAdded.data.data.at(-1);
+          if (netValueAdded.data.header.code == 200) {
+            netValueAddedFootprint = netValueAdded.data.data.at(-1);
           }
           if (production.data.header.code == 200) {
             productionFootprint = production.data.data.at(-1);
           }
   
-          if (consumption.data.header.code == 200) {
-            consumptionFootprint = consumption.data.data.at(-1);
+          if (intermediateConsumption.data.header.code == 200) {
+            intermediateConsumptionFootprint = intermediateConsumption.data.data.at(-1);
           }
 
-          if (capitalConsumption.data.header.code == 200) {
-            capitalConsumptionFootprint = capitalConsumption.data.data.at(-1);
+          if (fixedCapitalConsumption.data.header.code == 200) {
+            fixedCapitalConsumptionFootprint = fixedCapitalConsumption.data.data.at(-1);
           }
         })
       )
       .catch((errors) => {
         console.log(errors);
       });
-  
-    Object.assign(footprint, {
-      [indic]: {
-        valueAddedAreaFootprint: valueAddedFootprint,
-        productionAreaFootprint: productionFootprint,
-        consumptionAreaFootprint: consumptionFootprint,
-        capitalConsumptionAreaFootprint : capitalConsumptionFootprint || {value : null}
-      },
-    });
-  
-    return footprint;
+
+  const areaFootprint = await updateAreaFootprint(indic,comparativeData,fixedCapitalConsumptionFootprint,intermediateConsumptionFootprint,productionFootprint,netValueAddedFootprint);
+
+
+
+    return areaFootprint;
   };
   
 export default retrieveAreaFootprint
