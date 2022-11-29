@@ -73,21 +73,28 @@ const updater_1_0_4 = async (sessionData) =>
 
 const updater_1_0_3 = async (sessionData) => {
 
- let newComparativeData = new ComparativeData(); 
+  // delete old objects from session
 
- let code = sessionData.comparativeDivision;
+  delete sessionData.comparativeAreaFootprints;
+  delete sessionData.comparativeDivision;
+  delete sessionData.targetSNBCarea;
+  delete sessionData.targetSNBCbranch;
+
+  let newComparativeData = new ComparativeData(); 
+
+  let code = sessionData.comparativeDivision;
  
- for await (const indic of sessionData.validations) {
-  // update comparative data according to validated indicators
- const updatedData =  await updateComparativeData(indic,code, newComparativeData)
+  for await (const indic of sessionData.validations) {
 
- newComparativeData = updatedData;
+    // update comparative data according to validated indicators
+    const updatedData =  await updateComparativeData(indic,code, newComparativeData)
+    newComparativeData = updatedData;
 
-}
+  }
 
   // update session with new values 
-sessionData.comparativeData = newComparativeData;
-sessionData.comparativeData.activityCode = code;
+  sessionData.comparativeData = newComparativeData;
+  sessionData.comparativeData.activityCode = code;
 
 };
 
