@@ -83,3 +83,46 @@ const getExpensesByCompanies = (expenses) =>
     })
     return expensesByCompanies;
 }
+
+// Work in progress new significative function
+
+export function getSignificativeCompaniesBisByIndic(indic,trackedExpenses,companiesToCheck,expensesByCompanies,minFpt,maxFpt,limit) 
+{
+  // sort companies by expenses (absolute value)
+  companiesToCheck.sort((a,b) => Math.abs(expensesByCompanies[a.account]) - Math.abs(expensesByCompanies[b.account]));
+
+  let significativeGap = false;
+  let index = 0;
+  let limitAmount = 0;
+
+  while (!significativeGap && index < companiesToCheck.length)
+  {
+    // get "unsignificative" companies limit (amount)
+    limitAmount = Math.abs(companiesToCheck[index].amount);
+    
+    // build impact for tracked expenses (with siren number and data already fetched)
+    let impactTrackedExpenses = trackedExpenses.footprint.indicators[indic].value*trackedExpenses.amount;
+
+    // build impact for upper limit companies (mininum footprint case)
+    let upperLimitCompanies = companiesToCheck.filter(company => Math.abs(expensesByCompanies[company.account]) > limitAmount);
+    let impactUpperLimitCompanies = getSumItems(upperLimitCompanies.map(company => company.footprintActivityCode=="00" 
+    ? minFpt.indicators[indic].value*expensesByCompanies[company.account]
+    : company.footprint.indicators[indic].value*expensesByCompanies[company.account]));
+    
+    // build impact for under limit companies (maximum footprint case)
+    let underLimitCompanies = companiesToCheck.filter(company => Math.abs(expensesByCompanies[company.account]) <= limitAmount);
+    let impactUnderLimitCompanies = getSumItems(underLimitCompanies.map(company => company.footprintActivityCode=="00" 
+      ? maxFpt.indicators[indic].value*expensesByCompanies[company.account]
+      : company.footprint.indicators[indic].value*expensesByCompanies[company.account]));
+
+    // check if impact of under limit companies represent more than [limit] % of tracked expenses and upper limit companies impacts
+    if (Math.abs(impactUnderLimitCompanies) >= Math.abs(impactTrackedExpenses + impactUpperLimitCompanies)*limit) significativeGap = true;
+
+    if (!significativeGap) index++;
+  }
+
+  // Retrieve list of companies
+  let significativeCompanies = companiesToCheck.filter(company => company.amount >= limitAmount);
+
+  return significativeCompanies;
+}
