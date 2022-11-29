@@ -14,6 +14,7 @@ import { getAmountItems } from "../utils/Utils";
 
 import { Expense } from '/src/accountingObjects/Expense';
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+import { ComparativeData } from "../ComparativeData";
 
 
 /* ----------------------------------------------------------------- */
@@ -72,37 +73,21 @@ const updater_1_0_4 = async (sessionData) =>
 
 const updater_1_0_3 = async (sessionData) => {
 
- let comparativeAreaFootprints = {};
- let comparativeDivisionFootprints = {};
- let targetSNBCbranch = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },capitalConsumptionTarget: { value: null }};
- let targetSNBCarea = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },capitalConsumptionTarget: { value: null }};
+ let newComparativeData = new ComparativeData(); 
+
  let code = sessionData.comparativeDivision;
+ 
+ for await (const indic of sessionData.validations) {
+  // update comparative data according to validated indicators
+ const updatedData =  await updateComparativeData(indic,code, newComparativeData)
 
-    await Promise.all(
+ newComparativeData = updatedData;
 
-      sessionData.validations.map(async (indic) => {
-        const footprint = await retrieveAreaFootprint(indic);
-        Object.assign(comparativeAreaFootprints, footprint);
+}
 
-        if(code!='00'){
-          const divisionFootprint = await retrieveDivisionFootprint(indic,code);
-          Object.assign(comparativeDivisionFootprints,divisionFootprint);
-        }
-        // TARGET SNCB 2030 FOR SPECIFIC SECTOR
-        if(indic =='ghg' && code != '00') {
-          const target = await retrieveTargetFootprint(code);
-          Object.assign(targetSNBCbranch,target);
-        }
-   
-        // TARGET SNCB 2030 FOR ALL SECTORS
-        if(indic =='ghg') {
-          const targetArea = await retrieveTargetFootprint("00");
-          Object.assign(targetSNBCarea,targetArea);
-        }
-      })
-    );
-    Object.assign(sessionData, {comparativeAreaFootprints : comparativeAreaFootprints,
-    comparativeDivisionFootprints : comparativeDivisionFootprints, targetSNBCbranch : targetSNBCbranch, targetSNBCarea : targetSNBCarea})
+  // update session with new values 
+sessionData.comparativeData = newComparativeData;
+sessionData.comparativeData.activityCode = code;
 
 };
 
@@ -144,5 +129,31 @@ const updater_1_0_1 = (sessionData) => {
 };
 
 
+ async function updateComparativeData(indic,comparativeDivision,comparativeData) {
 
+  let newComparativeData = await retrieveAreaFootprint(
+    indic,
+    comparativeData
+  );
 
+  newComparativeData = await retrieveTargetFootprint(
+    "00",
+    indic,
+    newComparativeData
+  );
+
+  if (comparativeDivision) {
+    newComparativeData = await retrieveDivisionFootprint(
+      indic,
+      comparativeDivision,
+      newComparativeData
+    );
+
+    newComparativeData = await retrieveTargetFootprint(
+      comparativeDivision,
+      indic,
+      newComparativeData
+    );
+  }
+  return newComparativeData;
+}
