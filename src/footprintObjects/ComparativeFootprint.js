@@ -14,24 +14,6 @@ export class ComparativeFootprint {
   // ---------------------------------------------------------------------------------------------------- //
   }
 
-  /* --------- Getters ---------- */
-
-  getIndicator(indic) {return this.indicators[indic]}
-
-  /* ---------- Updaters ---------- */
-  
-  // All indicators
-  updateAll(data) 
-  {
-    indics.map((indic) => {this.updateIndic(indic,data[indic.toUpperCase()])})
-  }
-  
-  // Specific indicator
-  updateIndic(indic, data) 
-  {
- 
-    this.indicators[indic].update(data);
-  }
 
 
 }
