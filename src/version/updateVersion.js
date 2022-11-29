@@ -76,7 +76,6 @@ const updater_1_0_3 = async (sessionData) => {
   // delete old objects from session
 
   delete sessionData.comparativeAreaFootprints;
-  delete sessionData.comparativeDivision;
   delete sessionData.targetSNBCarea;
   delete sessionData.targetSNBCbranch;
 
@@ -92,6 +91,8 @@ const updater_1_0_3 = async (sessionData) => {
 
   }
 
+  // delete comparative division
+  delete sessionData.comparativeDivision;
   // update session with new values 
   sessionData.comparativeData = newComparativeData;
   sessionData.comparativeData.activityCode = code;
