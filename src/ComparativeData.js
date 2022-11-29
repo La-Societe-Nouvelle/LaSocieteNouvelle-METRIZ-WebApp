@@ -4,8 +4,11 @@ export class ComparativeData {
   constructor(props) {
     if (props == undefined) props = {};
 
-    this.activityCode = props.activityCode || null;
-    // // Aggregates
+    // Activity Code for comparative division 
+    this.activityCode = props.activityCode || "00";
+
+    //Get Comparative footprint for each aggreagate 
+
     this.fixedCapitalConsumption = props.fixedCapitalConsumption || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
@@ -351,3 +354,5 @@ export class ComparativeData {
 
     return updatedTargetFootprint;
   }
+
+
