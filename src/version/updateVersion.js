@@ -7,24 +7,21 @@ import {
   getTotalGhgEmissionsUncertainty,
 } from "../../components/assessments/AssessmentGHG";
 import { buildIndicatorAggregate } from "../formulas/footprintFormulas";
-import retrieveAreaFootprint from "../services/responses/areaFootprint";
-import retrieveDivisionFootprint from "../services/responses/divisionFootprint";
-import retrieveTargetFootprint from "../services/responses/targetFootprint";
-import { getAmountItems } from "../utils/Utils";
 
-import { Expense } from '/src/accountingObjects/Expense';
+import { getAmountItems, getTargetSerieId } from "../utils/Utils";
+
+import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { ComparativeData } from "../ComparativeData";
-
+import retrieveSerieFootprint from "../services/responses/serieFootprint";
+import retrieveMacroFootprint from "../services/responses/macroFootprint";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
-export const updateVersion = async(sessionData) => {
-
-  switch (sessionData.version) 
-  {
+export const updateVersion = async (sessionData) => {
+  switch (sessionData.version) {
     case "1.0.5":
       await updater_1_0_3(sessionData);
       break;
@@ -58,45 +55,54 @@ export const updateVersion = async(sessionData) => {
   }
 };
 
-const updater_1_0_4 = async (sessionData) => 
-{
-  let investments = sessionData.financialData.investments ? sessionData.financialData.investments.map((props,index) => new Expense({id: index, ...props})) : [];
+const updater_1_0_4 = async (sessionData) => {
+  let investments = sessionData.financialData.investments
+    ? sessionData.financialData.investments.map(
+        (props, index) => new Expense({ id: index, ...props })
+      )
+    : [];
   let investmentsFootprint = new SocialFootprint();
-  Object.keys(metaIndics).forEach(async (indic) => investmentsFootprint[indic] = await buildIndicatorAggregate(indic,investments));
+  Object.keys(metaIndics).forEach(
+    async (indic) =>
+      (investmentsFootprint[indic] = await buildIndicatorAggregate(
+        indic,
+        investments
+      ))
+  );
   let dataGrossFixedCapitalFormationAggregate = {
-    label : "Formation brute de capital fixe",
-    amount : getAmountItems(investments),
-    footprint : investmentsFootprint
-  }
-  sessionData.financialData.aggregates.grossFixedCapitalFormation = dataGrossFixedCapitalFormationAggregate;
-}
+    label: "Formation brute de capital fixe",
+    amount: getAmountItems(investments),
+    footprint: investmentsFootprint,
+  };
+  sessionData.financialData.aggregates.grossFixedCapitalFormation =
+    dataGrossFixedCapitalFormationAggregate;
+};
 
 const updater_1_0_3 = async (sessionData) => {
-
   // delete old objects from session
 
   delete sessionData.comparativeAreaFootprints;
   delete sessionData.targetSNBCarea;
   delete sessionData.targetSNBCbranch;
 
-  let newComparativeData = new ComparativeData(); 
+  let newComparativeData = new ComparativeData();
 
   let code = sessionData.comparativeDivision;
- 
+
   for await (const indic of sessionData.validations) {
-
     // update comparative data according to validated indicators
-    const updatedData =  await updateComparativeData(indic,code, newComparativeData)
+    const updatedData = await updateComparativeData(
+      indic,
+      code,
+      newComparativeData
+    );
     newComparativeData = updatedData;
-
   }
-
   // delete comparative division
   delete sessionData.comparativeDivision;
-  // update session with new values 
+  // update session with new values
   sessionData.comparativeData = newComparativeData;
   sessionData.comparativeData.activityCode = code;
-
 };
 
 const updater_1_0_2 = (sessionData) => {
@@ -136,32 +142,38 @@ const updater_1_0_1 = (sessionData) => {
     getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
+async function updateComparativeData(
+  indic,
+  comparativeDivision,
+  comparativeData
+) {
+  let idTarget = getTargetSerieId(indic);
 
- async function updateComparativeData(indic,comparativeDivision,comparativeData) {
+  let newComparativeData = await retrieveMacroFootprint(indic,"00",comparativeData,'areaFootprint');
 
-  let newComparativeData = await retrieveAreaFootprint(
-    indic,
-    comparativeData
-  );
-
-  newComparativeData = await retrieveTargetFootprint(
-    "00",
-    indic,
-    newComparativeData
-  );
-
-  if (comparativeDivision) {
-    newComparativeData = await retrieveDivisionFootprint(
+  // Target Area Footprint
+  if (idTarget) {
+    newComparativeData = await retrieveSerieFootprint(
+      idTarget,
+      "00",
       indic,
-      comparativeDivision,
-      newComparativeData
+      newComparativeData,
+      "targetAreaFootprint"
     );
+  }
+  if (comparativeDivision != "00") {
 
-    newComparativeData = await retrieveTargetFootprint(
-      comparativeDivision,
-      indic,
-      newComparativeData
-    );
+    newComparativeData =  await retrieveMacroFootprint(indic,comparativeDivision,newComparativeData,'divisionFootprint');
+
+    if (idTarget) {
+      newComparativeData = await retrieveSerieFootprint(
+        idTarget,
+        comparativeDivision,
+        indic,
+        newComparativeData,
+        "targetDivisionFootprint"
+      );
+    }
   }
   return newComparativeData;
 }

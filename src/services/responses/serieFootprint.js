@@ -1,50 +1,17 @@
 import axios from "axios";
-import { updateTargetAreaFootprint, updateTargetDivisionFootprint } from "../../ComparativeData";
+import { updateAggregatesFootprint} from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
-const retrieveTargetFootprint = async (code,indic,comparativeData) => {
+const retrieveSerieFootprint = async (id,code,indic,comparativeData, serie) => {
 
+  console.log(id);
     let netValueAddedTarget;
     let productionTarget;
     let intermediateConsumptionTarget;
     let fixedCapitalConsumptionTarget;
-    let id;
-    
-  switch (indic) {
-    case "dis":
-      id = "MACRO_TARGET_DIS_LSN_FRA_DIVISION";
-      break;
-    case "geq":
-      id = "MACRO_TARGET_GEQ_LSN_FRA_DIVISION";
-      break;
-    case "ghg":
-      id = "MACRO_TARGET_GHG_SNBC_FRA_DIVISION";
-      break;
-    case "knw":
-      id = "MACRO_TARGET_KNW_LSN_FRA_DIVISION";
-      break;
-    case "mat":
-      id = "MACRO_TARGET_MAT_LSN_FRA_DIVISION";
-      break;
-    case "nrg":
-      id = "MACRO_TARGET_NRG_PPE_FRA_DIVISION";
-      break;
-    case "soc":
-      id = "MACRO_TARGET_SOC_LSN_FRA_DIVISION";
-      break;
-    case "was":
-      id = "MACRO_TARGET_WAS_PNPD_FRA_DIVISION";
-      break;
-    case "wat":
-      id = "MACRO_TARGET_WAT_LSN_FRA_DIVISION";
-      break;
-    default:
-      break;
-  }
 
-  if(!id) {
-    return comparativeData;
-  }
+
+
     const getValueAdded = SerieDataService.getSerieData(id, code, "NVA");
     const getProduction = SerieDataService.getSerieData(id, code, "PRD");
     const getConsumption = SerieDataService.getSerieData(id, code, "IC");
@@ -79,18 +46,11 @@ const retrieveTargetFootprint = async (code,indic,comparativeData) => {
         setError(true);
       });
 
-      let targetFootprint;
-      if(code == '00') {
-        targetFootprint = await updateTargetAreaFootprint(indic,comparativeData,fixedCapitalConsumptionTarget,intermediateConsumptionTarget,productionTarget,netValueAddedTarget);
-      }
-      else 
-      {
-          targetFootprint = await updateTargetDivisionFootprint(indic,comparativeData,fixedCapitalConsumptionTarget,intermediateConsumptionTarget,productionTarget,netValueAddedTarget);
-      
-      }
+      const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionTarget,intermediateConsumption : intermediateConsumptionTarget, production : productionTarget, netValueAdded : netValueAddedTarget}
+      const serieFootprint = await updateAggregatesFootprint(indic,comparativeData, newComparativeData, serie)
 
 
-  return targetFootprint;
+  return serieFootprint;
 };
 
-export default retrieveTargetFootprint
+export default retrieveSerieFootprint
