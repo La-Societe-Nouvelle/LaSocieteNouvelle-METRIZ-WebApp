@@ -45,6 +45,7 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
 import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
 import { getTargetSerieId } from "../../../src/utils/Utils";
+import TrendsGraph from "../../graphs/TrendsGraph";
 
 const ResultSection = (props) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -119,134 +120,129 @@ const ResultSection = (props) => {
   };
 
   return (
-      <>
-        <div className="step d-flex  align-items-center justify-content-between">
-          <h2>
-            <i className="bi bi-clipboard-data"></i> Rapport - Analyse
-            extra-financière
-          </h2>
-          <div className="d-flex">
-            <Button variant="light" onClick={props.goBack}>
-              <i className="bi bi-chevron-left"></i> Retour
-            </Button>
+    <>
+      <div className="step d-flex  align-items-center justify-content-between">
+        <h2>
+          <i className="bi bi-clipboard-data"></i> Rapport - Analyse
+          extra-financière
+        </h2>
+        <div className="d-flex">
+          <Button variant="light" onClick={props.goBack}>
+            <i className="bi bi-chevron-left"></i> Retour
+          </Button>
 
-            {session.validations.length > 1 ? (
-              <DropdownButton id="indic-button" title="Autres résultats">
-                {Object.entries(metaIndics).map(([key, value]) => {
-                  if (session.validations.includes(key) && key != indic) {
-                    return (
-                      <Dropdown.Item
-                        className="small-text"
-                        key={key}
-                        onClick={() => setIndic(key)}
-                      >
-                        {value.libelle}
-                      </Dropdown.Item>
-                    );
-                  }
-                })}
-              </DropdownButton>
-            ) : (
-              <Button id="indic-button" disabled>
-                {metaIndics[indic].libelle}
-              </Button>
-            )}
-
-            <Button
-              variant="secondary"
-              onClick={() =>
-                exportIndicPDF(
-                  indic,
-                  session,
-                  comparativeDivision,
-                  "#Production",
-                  "#Consumption",
-                  "#Value",
-                  "#CapitalConsumption",
-                  printGrossImpact.includes(indic) ? "#PieChart" : ""
-                )
-              }
-            >
-              Télécharger le rapport <i className="bi bi-download"></i>
+          {session.validations.length > 1 ? (
+            <DropdownButton id="indic-button" title="Autres résultats">
+              {Object.entries(metaIndics).map(([key, value]) => {
+                if (session.validations.includes(key) && key != indic) {
+                  return (
+                    <Dropdown.Item
+                      className="small-text"
+                      key={key}
+                      onClick={() => setIndic(key)}
+                    >
+                      {value.libelle}
+                    </Dropdown.Item>
+                  );
+                }
+              })}
+            </DropdownButton>
+          ) : (
+            <Button id="indic-button" disabled>
+              {metaIndics[indic].libelle}
             </Button>
-          </div>
+          )}
+
+          <Button
+            variant="secondary"
+            onClick={() =>
+              exportIndicPDF(
+                indic,
+                session,
+                comparativeDivision,
+                "#Production",
+                "#Consumption",
+                "#Value",
+                "#CapitalConsumption",
+                printGrossImpact.includes(indic) ? "#PieChart" : ""
+              )
+            }
+          >
+            Télécharger le rapport <i className="bi bi-download"></i>
+          </Button>
         </div>
-        <section className="step">
-          <Row>
-            <Col lg={printGrossImpact.includes(indic) ? "8" : "12"}>
-              <div className="d-flex align-items-center mb-4 rapport-indic">
-                <Image
-                  src={"/resources/icon-ese-bleues/" + indic + ".png"}
-                  className="icon-ese me-2"
-                />
-                <h3>{metaIndics[indic].libelle}</h3>
-              </div>
+      </div>
+      <section className="step">
+        <Row>
+          <Col lg={printGrossImpact.includes(indic) ? "8" : "12"}>
+            <div className="d-flex align-items-center mb-4 rapport-indic">
+              <Image
+                src={"/resources/icon-ese-bleues/" + indic + ".png"}
+                className="icon-ese me-2"
+              />
+              <h3>{metaIndics[indic].libelle}</h3>
+            </div>
 
-              <Tabs
-                defaultActiveKey="mainAggregates"
-                transition={false}
-                id="noanim-tab-example"
-                className="mb-3"
+            <Tabs
+              defaultActiveKey="mainAggregates"
+              transition={false}
+              id="noanim-tab-example"
+              className="mb-3"
+            >
+              <Tab
+                eventKey="mainAggregates"
+                title=" Soldes intermédiaires de gestion"
               >
-                <Tab
-                  eventKey="mainAggregates"
-                  title=" Soldes intermédiaires de gestion"
-                >
-                  <IndicatorMainAggregatesTable
-                    session={session}
-                    indic={indic}
-                  />
-                </Tab>
-                <Tab
-                  eventKey="expensesAccounts"
-                  title=" Détails - Comptes de charges"
-                >
-                  <IndicatorExpensesTable session={session} indic={indic} />
-                </Tab>
-              </Tabs>
+                <IndicatorMainAggregatesTable session={session} indic={indic} />
+              </Tab>
+              <Tab
+                eventKey="expensesAccounts"
+                title=" Détails - Comptes de charges"
+              >
+                <IndicatorExpensesTable session={session} indic={indic} />
+              </Tab>
+            </Tabs>
+          </Col>
+          {printGrossImpact.includes(indic) && (
+            <Col sm={4}>
+              <h3 className="text-center">
+                Répartition des impacts bruts (en %)
+              </h3>
+
+              <div className="p-5">
+                <PieGraph
+                  intermediateConsumption={intermediateConsumption.footprint.indicators[
+                    indic
+                  ].getGrossImpact(intermediateConsumption.amount)}
+                  capitalConsumption={capitalConsumption.footprint.indicators[
+                    indic
+                  ].getGrossImpact(capitalConsumption.amount)}
+                  netValueAdded={netValueAdded.footprint.indicators[
+                    indic
+                  ].getGrossImpact(netValueAdded.amount)}
+                />
+              </div>
             </Col>
-            {printGrossImpact.includes(indic) && (
-              <Col sm={4}>
-                <h3 className="text-center">
-                  Répartition des impacts bruts (en %)
-                </h3>
+          )}
+        </Row>
+      </section>
+      <section className="step">
+        <h3>Comparaison par activité</h3>
 
-                <div className="p-5">
-                  <PieGraph
-                    intermediateConsumption={intermediateConsumption.footprint.indicators[
-                      indic
-                    ].getGrossImpact(intermediateConsumption.amount)}
-                    capitalConsumption={capitalConsumption.footprint.indicators[
-                      indic
-                    ].getGrossImpact(capitalConsumption.amount)}
-                    netValueAdded={netValueAdded.footprint.indicators[
-                      indic
-                    ].getGrossImpact(netValueAdded.amount)}
-                  />
-                </div>
-              </Col>
-            )}
-          </Row>
-        </section>
-        <section className="step">
-          <h3>Comparaison par activité</h3>
+        <Select
+          className="mb-3 small-text"
+          defaultValue={{
+            label: comparativeDivision + " - " + divisions[comparativeDivision],
+            value: comparativeDivision,
+          }}
+          placeholder={"Choisissez un secteur d'activité"}
+          options={divisionsOptions}
+          onChange={changeComparativeDivision}
+        />
 
-          <Select
-            className="mb-3 small-text"
-            defaultValue={{
-              label:
-                comparativeDivision + " - " + divisions[comparativeDivision],
-              value: comparativeDivision,
-            }}
-            placeholder={"Choisissez un secteur d'activité"}
-            options={divisionsOptions}
-            onChange={changeComparativeDivision}
-          />
-
-          {error && <ErrorApi />}
-          <div className="graph-container">
+        {error && <ErrorApi />}
+        <div className="graph-container">
           <div className="mt-5">
-        
             <Row className="graphs">
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Production</h5>
@@ -255,21 +251,21 @@ const ResultSection = (props) => {
                   comparativeData={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
-                      session.financialData.aggregates.production.footprint.getIndicator(
+                    session.financialData.aggregates.production.footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.production.divisionFootprint.indicators[indic]
-                      .value,
+                    comparativeData.production.divisionFootprint.indicators[
+                      indic
+                    ].value,
                   ]}
                   targetData={[
                     comparativeData.production.targetAreaFootprint.indicators[
                       indic
                     ].value,
                     null,
-                    comparativeData.production.targetDivisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}  
+                    comparativeData.production.targetDivisionFootprint
+                      .indicators[indic].value,
+                  ]}
                   indic={indic}
                 />
               </Col>
@@ -278,49 +274,44 @@ const ResultSection = (props) => {
                 <ComparativeGraphs
                   id="Consumption"
                   comparativeData={[
-                    comparativeData.intermediateConsumption.areaFootprint.indicators[indic]
-                      .value,
-                      session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    comparativeData.intermediateConsumption.areaFootprint
+                      .indicators[indic].value,
+                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.intermediateConsumption.divisionFootprint.indicators[indic]
-                      .value,
+                    comparativeData.intermediateConsumption.divisionFootprint
+                      .indicators[indic].value,
                   ]}
                   targetData={[
-                    comparativeData.intermediateConsumption.targetAreaFootprint.indicators[
-                      indic
-                    ].value,
+                    comparativeData.intermediateConsumption.targetAreaFootprint
+                      .indicators[indic].value,
                     null,
-                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}  
+                    comparativeData.intermediateConsumption
+                      .targetDivisionFootprint.indicators[indic].value,
+                  ]}
                   indic={indic}
                 />
-        
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommation de capital fixe</h5>
                 <ComparativeGraphs
                   id="CapitalConsumption"
                   comparativeData={[
-                    comparativeData.fixedCapitalConsumption.areaFootprint.indicators[indic]
-                      .value,
-                      session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                    comparativeData.fixedCapitalConsumption.areaFootprint
+                      .indicators[indic].value,
+                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.fixedCapitalConsumption.divisionFootprint.indicators[indic]
-                      .value,
+                    comparativeData.fixedCapitalConsumption.divisionFootprint
+                      .indicators[indic].value,
                   ]}
                   targetData={[
-                    comparativeData.fixedCapitalConsumption.targetAreaFootprint.indicators[
-                      indic
-                    ].value,
+                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                      .indicators[indic].value,
                     null,
-                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}  
+                    comparativeData.fixedCapitalConsumption
+                      .targetDivisionFootprint.indicators[indic].value,
+                  ]}
                   indic={indic}
                 />
               </Col>
@@ -330,71 +321,110 @@ const ResultSection = (props) => {
                 <ComparativeGraphs
                   id="Value"
                   comparativeData={[
-                    comparativeData.netValueAdded.areaFootprint.indicators[indic]
-                      .value,
-                      session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    comparativeData.netValueAdded.areaFootprint.indicators[
+                      indic
+                    ].value,
+                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.netValueAdded.divisionFootprint.indicators[indic]
-                      .value,
+                    comparativeData.netValueAdded.divisionFootprint.indicators[
+                      indic
+                    ].value,
                   ]}
                   targetData={[
-                    comparativeData.netValueAdded.targetAreaFootprint.indicators[
-                      indic
-                    ].value,
+                    comparativeData.netValueAdded.targetAreaFootprint
+                      .indicators[indic].value,
                     null,
-                    comparativeData.netValueAdded.targetDivisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}  
+                    comparativeData.netValueAdded.targetDivisionFootprint
+                      .indicators[indic].value,
+                  ]}
                   indic={indic}
                 />
-    
               </Col>
-              
-
             </Row>
-           
-        </div>
           </div>
-     
-      <ComparativeTable
+        </div>
+
+        <ComparativeTable
           financialData={session.financialData}
           indic={indic}
           comparativeData={comparativeData}
         />
-         
-        </section>
-        <section className="step">
-          <h3>Note d'analyse</h3>
-          <div id="analyse">
-            <Analyse indic={indic} session={session} />
-          </div>
-        </section>
-        <section className="step">
-          <div className="d-flex justify-content-end">
-            <Button variant="light" onClick={props.goBack}>
-              <i className="bi bi-chevron-left"></i> Retour
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() =>
-                exportIndicPDF(
-                  indic,
-                  session,
-                  comparativeDivision,
-                  "#Production",
-                  "#Consumption",
-                  "#Value",
-                  printGrossImpact.includes(indic) ? "#PieChart" : ""
-                )
+      </section>
+      <section className="step">
+        <h3>Evolution des tendances</h3>
+
+        <Row className="graphs">
+          <Col>
+            <TrendsGraph
+                        title="Production"
+                        unit={metaIndics[indic].unit}
+              comparativeData={
+                comparativeData.production.trendsFootprint.indicators[indic]
               }
-            >
-              Télécharger le rapport <i className="bi bi-download"></i>
-            </Button>
-          </div>
-        </section>
-      </>
+            />
+          </Col>
+          <Col>
+            <TrendsGraph
+            title="Consommations intermédiaires"
+            unit={metaIndics[indic].unit}
+              comparativeData={
+                comparativeData.intermediateConsumption.trendsFootprint.indicators[indic]
+              }
+            />
+          </Col>
+          <Col>
+            <TrendsGraph
+                        title="Consommation de capital fixe"
+                        unit={metaIndics[indic].unit}
+
+              comparativeData={
+                comparativeData.fixedCapitalConsumption.trendsFootprint.indicators[indic]
+              }
+            />
+          </Col>
+          <Col>
+            <TrendsGraph
+                        title="Valeur ajoutée nette"
+                        unit={metaIndics[indic].unit}
+
+              comparativeData={
+                comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+              }
+            />
+          </Col>
+        </Row>
+      </section>
+      <section className="step">
+        <h3>Note d'analyse</h3>
+        <div id="analyse">
+          <Analyse indic={indic} session={session} />
+        </div>
+      </section>
+      <section className="step">
+        <div className="d-flex justify-content-end">
+          <Button variant="light" onClick={props.goBack}>
+            <i className="bi bi-chevron-left"></i> Retour
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() =>
+              exportIndicPDF(
+                indic,
+                session,
+                comparativeDivision,
+                "#Production",
+                "#Consumption",
+                "#Value",
+                printGrossImpact.includes(indic) ? "#PieChart" : ""
+              )
+            }
+          >
+            Télécharger le rapport <i className="bi bi-download"></i>
+          </Button>
+        </div>
+      </section>
+    </>
   );
 };
 
