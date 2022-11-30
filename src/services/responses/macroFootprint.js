@@ -1,8 +1,8 @@
 import axios from "axios";
-import { updateDivisionFootprint } from "../../ComparativeData";
+import { updateAggregatesFootprint, updateDivisionFootprint } from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
-const retrieveDivisionFootprint = async (indic, code,comparativeData) => {
+const retrieveMacroFootprint = async (indic, code,comparativeData,serie) => {
 
     let netValueAddedFootprint;
     let productionFootprint;
@@ -42,9 +42,13 @@ const retrieveDivisionFootprint = async (indic, code,comparativeData) => {
         console.log(errors);
       });
   
-      const divisionFootprint = await updateDivisionFootprint(indic,comparativeData,fixedCapitalConsumptionFootprint,intermediateConsumptionFootprint,productionFootprint,netValueAddedFootprint);
+      const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionFootprint,intermediateConsumption : intermediateConsumptionFootprint, production : productionFootprint, netValueAdded : netValueAddedFootprint}
+      const divisionFootprint = await updateAggregatesFootprint(indic,comparativeData, newComparativeData, serie)
 
-    return divisionFootprint;
+
+      //const divisionFootprint = await updateDivisionFootprint(indic,comparativeData,fixedCapitalConsumptionFootprint,intermediateConsumptionFootprint,productionFootprint,netValueAddedFootprint);
+
+      return divisionFootprint;
   };
 
-export default retrieveDivisionFootprint
+export default retrieveMacroFootprint

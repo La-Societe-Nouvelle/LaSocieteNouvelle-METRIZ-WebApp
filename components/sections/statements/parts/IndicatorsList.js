@@ -35,9 +35,9 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
-import retrieveAreaFootprint from "/src/services/responses/areaFootprint";
-import retrieveDivisionFootprint from "/src/services/responses/divisionFootprint";
-import retrieveTargetFootprint from "/src/services/responses/targetFootprint";
+import { getTargetSerieId } from "/src/utils/Utils";
+import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
+import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
@@ -61,29 +61,36 @@ const IndicatorsList = (props) => {
 
 const updateComparativeData = async (indic) => {
 
-      let newComparativeData = await retrieveAreaFootprint(
-        indic,
-        comparativeData
-      );
+  let idTarget = getTargetSerieId(indic);
 
-      newComparativeData = await retrieveTargetFootprint(
-        "00",
-        indic,
-        newComparativeData
-      );
+  let newComparativeData = await retrieveMacroFootprint(indic,"00",comparativeData,'areaFootprint');
+
+
+        // Target Area Footprint
+        if (idTarget) {
+          newComparativeData = await retrieveSerieFootprint(
+            idTarget,
+            "00",
+            indic,
+            newComparativeData,
+            "targetAreaFootprint"
+          );
+        }
+
 
       if (comparativeDivision) {
-        newComparativeData = await retrieveDivisionFootprint(
-          indic,
-          comparativeDivision,
-          newComparativeData
-        );
 
-        newComparativeData = await retrieveTargetFootprint(
-          comparativeDivision,
-          indic,
-          newComparativeData
-        );
+        newComparativeData =  await retrieveMacroFootprint(indic,comparativeDivision,newComparativeData,'divisionFootprint');
+
+        if (idTarget) {
+          newComparativeData = await retrieveSerieFootprint(
+            idTarget,
+            comparativeDivision,
+            indic,
+            newComparativeData,
+            "targetDivisionFootprint"
+          );
+        }
       }
       props.session.comparativeData = newComparativeData;
       setComparativeData(newComparativeData);

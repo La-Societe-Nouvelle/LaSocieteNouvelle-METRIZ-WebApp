@@ -41,318 +41,86 @@ export class ComparativeData {
       trendsFootprint: new ComparativeFootprint(),
     };
   }
+
+
+
 }
 
 
   // Update Comparative Data
-  export async function updateAreaFootprint(indic, 
-    comparativeData, 
-    fixedCapitalConsumption,
-    intermediateConsumption,
-    production,netValueAdded) {
+
+
+  export async function updateAggregatesFootprint(indic,prevComparativeData, newComparativeData, serie) {
     
-
-    const newFixedCapitalConsumption = Object.assign({}, comparativeData.fixedCapitalConsumption.areaFootprint.indicators, {
-      ...comparativeData.fixedCapitalConsumption.areaFootprint.indicators,
+    const newFixedCapitalConsumption = Object.assign({}, prevComparativeData.fixedCapitalConsumption[serie].indicators, {
+      ...prevComparativeData.fixedCapitalConsumption[serie].indicators,
         [indic] : {
-          value : fixedCapitalConsumption ? fixedCapitalConsumption.value : null,
-          flag : fixedCapitalConsumption ? fixedCapitalConsumption.flag : null,
+          value : newComparativeData.fixedCapitalConsumption ? newComparativeData.fixedCapitalConsumption.value : null,
+          flag : newComparativeData.fixedCapitalConsumption ? newComparativeData.fixedCapitalConsumption.flag : null,
         }
      
     }
     );
 
-    const newIntermediateConsumption = Object.assign({}, comparativeData.intermediateConsumption.areaFootprint.indicators, {
-      ...comparativeData.intermediateConsumption.areaFootprint.indicators,
+
+    const newIntermediateConsumption = Object.assign({}, prevComparativeData.intermediateConsumption[serie].indicators, {
+      ...prevComparativeData.intermediateConsumption[serie].indicators,
         [indic] : {
-          value : intermediateConsumption ?  intermediateConsumption.value : null,
-          flag : intermediateConsumption ? intermediateConsumption.flag : null,
+          value :  newComparativeData.intermediateConsumption ?   newComparativeData.intermediateConsumption.value : null,
+          flag :  newComparativeData.intermediateConsumption ?  newComparativeData.intermediateConsumption.flag : null,
         }
      
     }
     );
 
-    const newProduction = Object.assign({}, comparativeData.production.areaFootprint.indicators, {
-      ...comparativeData.production.areaFootprint.indicators,
+    const newProduction = Object.assign({}, prevComparativeData.production[serie].indicators, {
+      ...prevComparativeData.production[serie].indicators,
         [indic] : {
-          value : production ? production.value : null,
-          flag : production ? production.flag : null,
+          value :  newComparativeData.production ?  newComparativeData.production.value : null,
+          flag :  newComparativeData.production ?  newComparativeData.production.flag : null,
         }
      
     }
     );
 
-    const newNetValueAdded = Object.assign({}, comparativeData.netValueAdded.areaFootprint.indicators, {
-      ...comparativeData.netValueAdded.areaFootprint.indicators,
+    const newNetValueAdded = Object.assign({}, prevComparativeData.netValueAdded[serie].indicators, {
+      ...prevComparativeData.netValueAdded[serie].indicators,
         [indic] : {
-          value : netValueAdded ? netValueAdded.value : null,
-          flag : netValueAdded ? netValueAdded.flag : null,
+          value :  newComparativeData.netValueAdded ? newComparativeData.netValueAdded.value : null,
+          flag :  newComparativeData.netValueAdded ?  newComparativeData.netValueAdded.flag : null,
         }
      
     }
     );
 
-    const updatedAreaFootprint = Object.assign({}, comparativeData, {
+    const updatedAggregatesFootprint = Object.assign({}, prevComparativeData, {
       fixedCapitalConsumption: {
-        ...comparativeData.fixedCapitalConsumption,
-        areaFootprint : {
+        ...prevComparativeData.fixedCapitalConsumption,
+        [serie] : {
           indicators : newFixedCapitalConsumption
         }
        },
        intermediateConsumption: {
-        ...comparativeData.intermediateConsumption,
-        areaFootprint : {
+        ...prevComparativeData.intermediateConsumption,
+        [serie] : {
             indicators : newIntermediateConsumption
                 },
        },
        netValueAdded: {
-        ...comparativeData.netValueAdded,
-        areaFootprint : {
+        ...prevComparativeData.netValueAdded,
+        [serie] : {
             indicators : newNetValueAdded
         },
        },
        production: {
-        ...comparativeData.production,
-        areaFootprint : {
-            indicators : newProduction
-        },
-       },
-    }); 
-    return updatedAreaFootprint;
-  }
-
-  export async function updateTargetAreaFootprint(indic, 
-    comparativeData, 
-    fixedCapitalConsumption,
-    intermediateConsumption,
-    production,netValueAdded) {
-    
-
-    const newFixedCapitalConsumption = Object.assign({}, comparativeData.fixedCapitalConsumption.targetAreaFootprint.indicators, {
-      ...comparativeData.fixedCapitalConsumption.targetAreaFootprint.indicators,
-        [indic] : {
-          value : fixedCapitalConsumption ? fixedCapitalConsumption.value : null,
-          flag : fixedCapitalConsumption ? fixedCapitalConsumption.flag : null,
-        }
-     
-    }
-    );
-
-    const newIntermediateConsumption = Object.assign({}, comparativeData.intermediateConsumption.targetAreaFootprint.indicators, {
-      ...comparativeData.intermediateConsumption.targetAreaFootprint.indicators,
-        [indic] : {
-          value : intermediateConsumption ? intermediateConsumption.value : null,
-          flag : intermediateConsumption ? intermediateConsumption.flag : null,
-        }
-     
-    }
-    );
-
-    const newProduction = Object.assign({}, comparativeData.production.targetAreaFootprint.indicators, {
-      ...comparativeData.production.targetAreaFootprint.indicators,
-        [indic] : {
-          value : production ? production.value : null,
-          flag : production ? production.flag : null,
-        }
-     
-    }
-    );
-
-    const newNetValueAdded = Object.assign({}, comparativeData.netValueAdded.targetAreaFootprint.indicators, {
-      ...comparativeData.netValueAdded.targetAreaFootprint.indicators,
-        [indic] : {
-          value : netValueAdded ? netValueAdded.value : null,
-          flag : netValueAdded ? netValueAdded.flag : null,
-        }
-     
-    }
-    );
-
-
-    const updatedTargetFootprint = Object.assign({}, comparativeData, {
-      fixedCapitalConsumption: {
-        ...comparativeData.fixedCapitalConsumption,
-        targetAreaFootprint : {
-          indicators : newFixedCapitalConsumption
-        }
-       },
-       intermediateConsumption: {
-        ...comparativeData.intermediateConsumption,
-        targetAreaFootprint : {
-            indicators : newIntermediateConsumption
-        },
-       },
-       netValueAdded: {
-        ...comparativeData.netValueAdded,
-        targetAreaFootprint : {
-            indicators : newNetValueAdded
-        },
-       },
-       production: {
-        ...comparativeData.production,
-        targetAreaFootprint : {
+        ...prevComparativeData.production,
+        [serie] : {
             indicators : newProduction
         },
        },
     }); 
 
-    return updatedTargetFootprint;
+    return updatedAggregatesFootprint;
+
   }
-
-  export async function updateDivisionFootprint(indic, 
-    comparativeData, 
-    fixedCapitalConsumption,
-    intermediateConsumption,
-    production,netValueAdded) {
-    
-
-    const newFixedCapitalConsumption = Object.assign({}, comparativeData.fixedCapitalConsumption.divisionFootprint.indicators, {
-      ...comparativeData.fixedCapitalConsumption.divisionFootprint.indicators,
-        [indic] : {
-          value : fixedCapitalConsumption ? fixedCapitalConsumption.value : null,
-          flag : fixedCapitalConsumption ? fixedCapitalConsumption.flag : null,
-        }
-     
-    }
-    );
-
-    const newIntermediateConsumption = Object.assign({}, comparativeData.intermediateConsumption.divisionFootprint.indicators, {
-      ...comparativeData.intermediateConsumption.divisionFootprint.indicators,
-        [indic] : {
-          value : intermediateConsumption ? intermediateConsumption.value : null,
-          flag : intermediateConsumption ? intermediateConsumption.flag : null,
-        }
-     
-    }
-    );
-
-    const newProduction = Object.assign({}, comparativeData.production.divisionFootprint.indicators, {
-      ...comparativeData.production.divisionFootprint.indicators,
-        [indic] : {
-          value : production ? production.value : null,
-          flag : production ? production.flag : null,
-        }
-     
-    }
-    );
-
-    const newNetValueAdded = Object.assign({}, comparativeData.netValueAdded.divisionFootprint.indicators, {
-      ...comparativeData.netValueAdded.divisionFootprint.indicators,
-        [indic] : {
-          value : netValueAdded ? netValueAdded.value : null,
-          flag : netValueAdded ? netValueAdded.flag : null,
-        }
-     
-    }
-    );
-
-
-    const updatedDivisionFootprint = Object.assign({}, comparativeData, {
-      fixedCapitalConsumption: {
-        ...comparativeData.fixedCapitalConsumption,
-        divisionFootprint : {
-          indicators : newFixedCapitalConsumption
-        }
-       },
-       intermediateConsumption: {
-        ...comparativeData.intermediateConsumption,
-        divisionFootprint : {
-            indicators : newIntermediateConsumption
-        },
-       },
-       netValueAdded: {
-        ...comparativeData.netValueAdded,
-        divisionFootprint : {
-            indicators : newNetValueAdded
-        },
-       },
-       production: {
-        ...comparativeData.production,
-        divisionFootprint : {
-            indicators : newProduction
-        },
-       },
-    }); 
-
-    return updatedDivisionFootprint;
-  }
-
-  export async function updateTargetDivisionFootprint(indic, 
-    comparativeData, 
-    fixedCapitalConsumption,
-    intermediateConsumption,
-    production,netValueAdded) {
-    
-
-    const newFixedCapitalConsumption = Object.assign({}, comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators, {
-      ...comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators,
-        [indic] : {
-          value : fixedCapitalConsumption ? fixedCapitalConsumption.value : null,
-          flag : fixedCapitalConsumption ? fixedCapitalConsumption.flag : null,
-        }
-     
-    }
-    );
-
-    const newIntermediateConsumption = Object.assign({}, comparativeData.intermediateConsumption.targetDivisionFootprint.indicators, {
-      ...comparativeData.intermediateConsumption.targetDivisionFootprint.indicators,
-        [indic] : {
-          value : intermediateConsumption ? intermediateConsumption.value : null,
-          flag : intermediateConsumption ? intermediateConsumption.flag : null,
-        }
-     
-    }
-    );
-
-    const newProduction = Object.assign({}, comparativeData.production.targetDivisionFootprint.indicators, {
-      ...comparativeData.production.targetDivisionFootprint.indicators,
-        [indic] : {
-          value : production ? production.value : null,
-          flag : production ? production.flag : null,
-        }
-     
-    }
-    );
-
-    const newNetValueAdded = Object.assign({}, comparativeData.netValueAdded.targetDivisionFootprint.indicators, {
-      ...comparativeData.netValueAdded.targetDivisionFootprint.indicators,
-        [indic] : {
-          value : netValueAdded ? netValueAdded.value : null,
-          flag : netValueAdded ? netValueAdded.flag : null,
-        }
-     
-    }
-    );
-
-
-    const updatedTargetFootprint = Object.assign({}, comparativeData, {
-      fixedCapitalConsumption: {
-        ...comparativeData.fixedCapitalConsumption,
-        targetDivisionFootprint : {
-          indicators : newFixedCapitalConsumption
-        }
-       },
-       intermediateConsumption: {
-        ...comparativeData.intermediateConsumption,
-        targetDivisionFootprint : {
-            indicators : newIntermediateConsumption
-        },
-       },
-       netValueAdded: {
-        ...comparativeData.netValueAdded,
-        targetDivisionFootprint : {
-            indicators : newNetValueAdded
-        },
-       },
-       production: {
-        ...comparativeData.production,
-        targetDivisionFootprint : {
-            indicators : newProduction
-        },
-       },
-    }); 
-
-    return updatedTargetFootprint;
-  }
-
 

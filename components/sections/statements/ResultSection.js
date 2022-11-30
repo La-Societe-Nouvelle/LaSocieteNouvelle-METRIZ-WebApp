@@ -42,8 +42,9 @@ import PieGraph from "../../graphs/PieGraph";
 import { ComparativeTable } from "../../tables/ComparativeTable";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
-import retrieveDivisionFootprint from "/src/services/responses/divisionFootprint";
-import retrieveTargetFootprint from "/src/services/responses/targetFootprint";
+import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
+import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
+import { getTargetSerieId } from "../../../src/utils/Utils";
 
 const ResultSection = (props) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -93,19 +94,24 @@ const ResultSection = (props) => {
   const updateComparativeData = async (division) => {
 
     setIsLoading(true);
+
+    let idTarget = getTargetSerieId(indic);
+
     let newComparativeData = comparativeData; 
 
-      newComparativeData = await retrieveDivisionFootprint(
-        indic,
-        division,
-        newComparativeData
-      );
+    newComparativeData =  await retrieveMacroFootprint(indic,division,newComparativeData,'divisionFootprint');
 
-      newComparativeData = await retrieveTargetFootprint(
-        division,
-        indic,
-        newComparativeData
-      );
+
+      
+      if (idTarget) {
+        newComparativeData = await retrieveSerieFootprint(
+          idTarget,
+          division,
+          indic,
+          newComparativeData,
+          "targetDivisionFootprint"
+        );
+      }
 
     props.session.comparativeData = newComparativeData;
     setComparativeData(newComparativeData);
