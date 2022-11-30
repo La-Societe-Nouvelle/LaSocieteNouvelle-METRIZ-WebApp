@@ -4,13 +4,10 @@ import SerieDataService from "../SerieDataService";
 
 const retrieveSerieFootprint = async (id,code,indic,comparativeData, serie) => {
 
-  console.log(id);
     let netValueAddedTarget;
     let productionTarget;
     let intermediateConsumptionTarget;
     let fixedCapitalConsumptionTarget;
-
-
 
     const getValueAdded = SerieDataService.getSerieData(id, code, "NVA");
     const getProduction = SerieDataService.getSerieData(id, code, "PRD");
@@ -45,8 +42,9 @@ const retrieveSerieFootprint = async (id,code,indic,comparativeData, serie) => {
       .catch(() => {
         setError(true);
       });
-
       const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionTarget,intermediateConsumption : intermediateConsumptionTarget, production : productionTarget, netValueAdded : netValueAddedTarget}
+      
+
       const serieFootprint = await updateAggregatesFootprint(indic,comparativeData, newComparativeData, serie)
 
 
