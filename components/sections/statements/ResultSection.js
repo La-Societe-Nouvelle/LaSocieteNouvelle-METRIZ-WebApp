@@ -44,11 +44,12 @@ import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
 import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
 import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
+import retrieveHistoricalSerie from "/src/services/responses/historicalFootprint";
+
 import { getTargetSerieId } from "../../../src/utils/Utils";
 import TrendsGraph from "../../graphs/TrendsGraph";
 
 const ResultSection = (props) => {
-  const [isLoading, setIsLoading] = useState(true);
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
   const [error] = useState(false);
@@ -76,47 +77,54 @@ const ResultSection = (props) => {
       divisionsOptions.push({ value: value, label: value + " - " + label })
     );
 
-  const { intermediateConsumption, capitalConsumption, netValueAdded, production } = props.session.financialData.aggregates;
+  const {
+    intermediateConsumption,
+    capitalConsumption,
+    netValueAdded,
+  } = props.session.financialData.aggregates;
 
   const changeComparativeDivision = async (event) => {
     let division = event.value;
     // update session
     props.session.comparativeData.activityCode = division;
 
-    await updateComparativeData(division)
+    await updateComparativeData(division);
     setComparativeDivision(division);
   };
 
-  useEffect(async () => {
-
-    setIsLoading(false);
-  }, [comparativeDivision, indic]);
-
+ 
   const updateComparativeData = async (division) => {
-
-    setIsLoading(true);
 
     let idTarget = getTargetSerieId(indic);
 
-    let newComparativeData = comparativeData; 
+    let newComparativeData = comparativeData;
 
-    newComparativeData =  await retrieveMacroFootprint(indic,division,newComparativeData,'divisionFootprint');
+    newComparativeData = await retrieveMacroFootprint(
+      indic,
+      division,
+      newComparativeData,
+      "divisionFootprint"
+    );
+        
+    newComparativeData = await retrieveHistoricalSerie(
+      division,
+      indic,
+      newComparativeData,
+      "trendsFootprint"
+    );
 
-
-      
-      if (idTarget) {
-        newComparativeData = await retrieveSerieFootprint(
-          idTarget,
-          division,
-          indic,
-          newComparativeData,
-          "targetDivisionFootprint"
-        );
-      }
+    if (idTarget) {
+      newComparativeData = await retrieveSerieFootprint(
+        idTarget,
+        division,
+        indic,
+        newComparativeData,
+        "targetDivisionFootprint"
+      );
+    }
 
     props.session.comparativeData = newComparativeData;
     setComparativeData(newComparativeData);
-
   };
 
   return (
@@ -357,8 +365,8 @@ const ResultSection = (props) => {
         <Row className="graphs">
           <Col>
             <TrendsGraph
-                        title="Production"
-                        unit={metaIndics[indic].unit}
+              title="Production"
+              unit={metaIndics[indic].unit}
               comparativeData={
                 comparativeData.production.trendsFootprint.indicators[indic]
               }
@@ -366,28 +374,28 @@ const ResultSection = (props) => {
           </Col>
           <Col>
             <TrendsGraph
-            title="Consommations intermédiaires"
-            unit={metaIndics[indic].unit}
+              title="Consommations intermédiaires"
+              unit={metaIndics[indic].unit}
               comparativeData={
-                comparativeData.intermediateConsumption.trendsFootprint.indicators[indic]
+                comparativeData.intermediateConsumption.trendsFootprint
+                  .indicators[indic]
               }
             />
           </Col>
           <Col>
             <TrendsGraph
-                        title="Consommation de capital fixe"
-                        unit={metaIndics[indic].unit}
-
+              title="Consommation de capital fixe"
+              unit={metaIndics[indic].unit}
               comparativeData={
-                comparativeData.fixedCapitalConsumption.trendsFootprint.indicators[indic]
+                comparativeData.fixedCapitalConsumption.trendsFootprint
+                  .indicators[indic]
               }
             />
           </Col>
           <Col>
             <TrendsGraph
-                        title="Valeur ajoutée nette"
-                        unit={metaIndics[indic].unit}
-
+              title="Valeur ajoutée nette"
+              unit={metaIndics[indic].unit}
               comparativeData={
                 comparativeData.netValueAdded.trendsFootprint.indicators[indic]
               }

@@ -38,6 +38,7 @@ import PieGraph from "../../../graphs/PieGraph";
 import { getTargetSerieId } from "/src/utils/Utils";
 import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
 import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
+import retrieveHistoricalSerie from "/src/services/responses/historicalFootprint";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
@@ -55,47 +56,63 @@ const IndicatorsList = (props) => {
   useEffect(async () => {
     if (validations.length > 0) {
       props.publish();
-
     }
   }, [validations]);
 
-const updateComparativeData = async (indic) => {
+  const updateComparativeAreaData = async (indic) => {
+    let idTarget = getTargetSerieId(indic);
+    let newComparativeData = await retrieveMacroFootprint(
+      indic,
+      "00",
+      comparativeData,
+      "areaFootprint"
+    );
+    // Target Area Footprint
+    if (idTarget) {
+      newComparativeData = await retrieveSerieFootprint(
+        idTarget,
+        "00",
+        indic,
+        newComparativeData,
+        "targetAreaFootprint"
+      );
+    }
 
-  let idTarget = getTargetSerieId(indic);
+    return newComparativeData;
+  };
+  const updateComparativeDivisionData = async (
+    indic,
+    newComparativeData,
+    comparativeDivision
+  ) => {
+    let idTarget = getTargetSerieId(indic);
 
-  let newComparativeData = await retrieveMacroFootprint(indic,"00",comparativeData,'areaFootprint');
+    console.log(newComparativeData);
+    newComparativeData = await retrieveMacroFootprint(
+      indic,
+      comparativeDivision,
+      newComparativeData,
+      "divisionFootprint"
+    );
+    newComparativeData = await retrieveHistoricalSerie(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "trendsFootprint"
+    );
 
+    if (idTarget) {
+      newComparativeData = await retrieveSerieFootprint(
+        idTarget,
+        comparativeDivision,
+        indic,
+        newComparativeData,
+        "targetDivisionFootprint"
+      );
+    }
 
-        // Target Area Footprint
-        if (idTarget) {
-          newComparativeData = await retrieveSerieFootprint(
-            idTarget,
-            "00",
-            indic,
-            newComparativeData,
-            "targetAreaFootprint"
-          );
-        }
-
-
-      if (comparativeDivision) {
-
-        newComparativeData =  await retrieveMacroFootprint(indic,comparativeDivision,newComparativeData,'divisionFootprint');
-
-        if (idTarget) {
-          newComparativeData = await retrieveSerieFootprint(
-            idTarget,
-            comparativeDivision,
-            indic,
-            newComparativeData,
-            "targetDivisionFootprint"
-          );
-        }
-      }
-      props.session.comparativeData = newComparativeData;
-      setComparativeData(newComparativeData);
-
-}
+    return newComparativeData;
+  };
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
@@ -125,8 +142,16 @@ const updateComparativeData = async (indic) => {
     setDisplayGraph(false);
     if (!validations.includes(indic)) {
       // Get footprint for all sectors
-
-      await updateComparativeData(indic);
+      let newComparativeData = await updateComparativeAreaData(indic);
+      if (comparativeDivision != "00") {
+        newComparativeData = await updateComparativeDivisionData(
+          indic,
+          newComparativeData,
+          comparativeDivision
+        );
+      }
+      props.session.comparativeData = newComparativeData;
+      setComparativeData(newComparativeData);
 
       SetValidations((validations) => [...validations, indic]);
     }
@@ -143,8 +168,23 @@ const updateComparativeData = async (indic) => {
   // Update comparative division
   const updateDivision = async (division) => {
     props.session.comparativeData.activityCode = division;
-    setComparativeDivision(division);
 
+    let newComparativeData = comparativeData;
+
+    for await (const indic of validations) {
+      // update comparative data according to validated indicators
+      const updatedData = await updateComparativeDivisionData(
+        indic,
+        newComparativeData,
+        division
+      );
+      newComparativeData = updatedData;
+    }
+
+    props.session.comparativeData = newComparativeData;
+    setComparativeData(newComparativeData);
+
+    setComparativeDivision(division);
   };
 
   // Export pdf on click
@@ -231,116 +271,111 @@ const updateComparativeData = async (indic) => {
 
   return (
     <>
-
-      {validations.length > 0 && displayGraph &&
+      {validations.length > 0 &&
+        displayGraph &&
         validations.map((indic, key) => (
           <div className="hidden" key={key}>
-
-          <Row className="graphs" >
-            <Col sm={4} xl={4} lg={4} md={4}>
-              <ComparativeGraphs
-                id={"print-Production-" + indic}
-                comparativeData={[
-                  comparativeData.production.areaFootprint.indicators[indic]
-                    .value,
-                  props.session.financialData.aggregates.production.footprint.getIndicator(
-                    indic
-                  ).value,
-                  comparativeData.production.divisionFootprint.indicators[indic]
-                    .value,
-                ]}
-                targetData={[
-                  comparativeData.production.targetAreaFootprint.indicators[
-                    indic
-                  ].value,
-                  null,
-                  comparativeData.production.targetDivisionFootprint.indicators[
-                    indic
-                  ].value,
-                ]}  
-                titleChart="Production"
+            <Row className="graphs">
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-Production-" + indic}
+                  comparativeData={[
+                    comparativeData.production.areaFootprint.indicators[indic]
+                      .value,
+                    props.session.financialData.aggregates.production.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.production.divisionFootprint.indicators[
+                      indic
+                    ].value,
+                  ]}
+                  targetData={[
+                    comparativeData.production.targetAreaFootprint.indicators[
+                      indic
+                    ].value,
+                    null,
+                    comparativeData.production.targetDivisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  titleChart="Production"
+                  indic={indic}
+                />
+              </Col>
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-Consumption-" + indic}
+                  comparativeData={[
+                    comparativeData.intermediateConsumption.areaFootprint
+                      .indicators[indic].value,
+                    props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.intermediateConsumption.divisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  targetData={[
+                    comparativeData.intermediateConsumption.targetAreaFootprint
+                      .indicators[indic].value,
+                    null,
+                    comparativeData.intermediateConsumption
+                      .targetDivisionFootprint.indicators[indic].value,
+                  ]}
+                  indic={indic}
+                />
+              </Col>
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-CapitalConsumption-" + indic}
+                  comparativeData={[
+                    comparativeData.fixedCapitalConsumption.areaFootprint
+                      .indicators[indic].value,
+                    props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.fixedCapitalConsumption.divisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  targetData={[
+                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                      .indicators[indic].value,
+                    null,
+                    comparativeData.fixedCapitalConsumption
+                      .targetDivisionFootprint.indicators[indic].value,
+                  ]}
+                  indic={indic}
+                />
+              </Col>
+              <Col sm={4} xl={4} lg={4} md={4}>
+                <ComparativeGraphs
+                  id={"print-Value-" + indic}
+                  comparativeData={[
+                    comparativeData.netValueAdded.areaFootprint.indicators[
+                      indic
+                    ].value,
+                    props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.netValueAdded.divisionFootprint.indicators[
+                      indic
+                    ].value,
+                  ]}
+                  targetData={[
+                    comparativeData.netValueAdded.targetAreaFootprint
+                      .indicators[indic].value,
+                    null,
+                    comparativeData.netValueAdded.targetDivisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  indic={indic}
+                />
+              </Col>
+            </Row>
+            {environmentalFootprint.includes(indic) && (
+              <PieGraphRow
                 indic={indic}
+                aggregates={props.session.financialData.aggregates}
               />
-            </Col>
-            <Col sm={4} xl={4} lg={4} md={4}>
-              <ComparativeGraphs
-                id={"print-Consumption-" + indic}
-                comparativeData={[
-                  comparativeData.intermediateConsumption.areaFootprint.indicators[indic]
-                    .value,
-                  props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                    indic
-                  ).value,
-                  comparativeData.intermediateConsumption.divisionFootprint.indicators[indic]
-                    .value,
-                ]}
-                targetData={[
-                  comparativeData.intermediateConsumption.targetAreaFootprint.indicators[
-                    indic
-                  ].value,
-                  null,
-                  comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
-                    indic
-                  ].value,
-                ]}  
-                indic={indic}
-              />
-            </Col>
-            <Col sm={4} xl={4} lg={4} md={4}>
-              <ComparativeGraphs
-                id={"print-CapitalConsumption-" + indic}
-                comparativeData={[
-                  comparativeData.fixedCapitalConsumption.areaFootprint.indicators[indic]
-                    .value,
-                  props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                    indic
-                  ).value,
-                  comparativeData.fixedCapitalConsumption.divisionFootprint.indicators[indic]
-                    .value,
-                ]}
-                targetData={[
-                  comparativeData.fixedCapitalConsumption.targetAreaFootprint.indicators[
-                    indic
-                  ].value,
-                  null,
-                  comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
-                    indic
-                  ].value,
-                ]}  
-                indic={indic}
-              />
-            </Col>
-            <Col sm={4} xl={4} lg={4} md={4}>
-              <ComparativeGraphs
-                id={"print-Value-" + indic}
-                comparativeData={[
-                  comparativeData.netValueAdded.areaFootprint.indicators[indic]
-                    .value,
-                  props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                    indic
-                  ).value,
-                  comparativeData.netValueAdded.divisionFootprint.indicators[indic]
-                    .value,
-                ]}
-                targetData={[
-                  comparativeData.netValueAdded.targetAreaFootprint.indicators[
-                    indic
-                  ].value,
-                  null,
-                  comparativeData.netValueAdded.targetDivisionFootprint.indicators[
-                    indic
-                  ].value,
-                ]}  
-                indic={indic}
-              />
-            </Col>
-          </Row>
-          {environmentalFootprint.includes(indic) && (
-                  <PieGraphRow
-                    indic={indic}
-                    aggregates={props.session.financialData.aggregates}
-                  />
-                )}
+            )}
           </div>
         ))}
 

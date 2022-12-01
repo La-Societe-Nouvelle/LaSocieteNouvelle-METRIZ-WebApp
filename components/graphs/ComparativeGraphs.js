@@ -64,20 +64,30 @@ const ComparativeGraphs = (props) => {
               display: true,
               text: unit,
               color: "#191558",
+              font : {
+                size: 8,
+                weight : 'bold'
+              }
             },
             ticks: {
               color: "#191558",
+              font : {
+                size: 10,
+              }
             },
             grid: {
-              color: "#dbdef1",
+              color: "#ececff",
             },
           },
           x: {
             ticks: {
               color: "#191558",
+              font : {
+                size: 10,
+              }
             },
             grid: {
-              color: "#dbdef1",
+              color: "#ececff",
             },
           },
         },
