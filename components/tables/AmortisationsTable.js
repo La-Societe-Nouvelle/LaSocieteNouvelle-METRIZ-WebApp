@@ -128,7 +128,7 @@ export class AmortisationsTable extends React.Component {
                   &euro;
                 </td>
                 <td className="text-end">
-                  {printValue(getAmountItems(amortisationExpenses), 0)} &euro;
+                  {printValue(getAmountItems(amortisations), 0)} &euro;
                 </td>
               </tr>
             </tfoot>
