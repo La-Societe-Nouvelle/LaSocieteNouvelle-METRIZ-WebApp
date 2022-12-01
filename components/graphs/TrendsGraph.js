@@ -7,7 +7,6 @@ import { Line } from "react-chartjs-2";
 
 function TrendsGraph(props) {
 
-    console.log(props)
     const data = {
         labels:  props.comparativeData.map(data => data.year) ,
         datasets: [{
@@ -29,21 +28,30 @@ function TrendsGraph(props) {
                 display: true,
                 text: props.unit,
                 color: "#191558",
+                font : {
+                  size: 8,
+                  weight : 'bold'
+                }
               },
               ticks: {
                 color: "#191558",
+                font : {
+                  size: 10,
+                }
               },
               grid: {
-                color: '#dbdef1'
+                color: '#ececff'
               }
             },
             x: {
                 ticks: {
                   color: "#191558",
-
+                  font : {
+                    size: 10,
+                  }
                 },
                 grid: {
-                    color: '#dbdef1'
+                    color: '#ececff'
                   }
               },
           },
@@ -62,6 +70,7 @@ function TrendsGraph(props) {
               display: true,
               text : props.title,
               color: "#191558",
+              padding : 20
             },
           },
       };
