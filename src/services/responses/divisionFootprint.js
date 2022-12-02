@@ -34,7 +34,6 @@ const retrieveDivisionFootprint = async (indicator, code) => {
           }
 
           if (capitalConsumption.data.header.code == 200) {
-            console.log(capitalConsumption)
             capitalConsumptionFootprint = capitalConsumption.data.data.at(-1);
           }
         })

@@ -59,7 +59,6 @@ const ResultSection = (props) => {
   const [divisionFootprint, setDivisionFootprint] = useState(
     props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
   );
-    console.log( props.session.targetSNBCbranch)
   const [targetSNBCbranch, setTargetSNBCbranch] = useState(
     props.session.targetSNBCbranch
   );
@@ -95,7 +94,6 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-    console.log()
     await getComparativeValues();
 
     setIsLoading(false);

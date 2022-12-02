@@ -11,7 +11,6 @@ const transporter = nodemailer.createTransport({
 
 export default async (req,res) => 
 {
-    console.log(req);
     const {objetMail, messageMail} = req.body;
 
     if (objetMail==="" || messageMail==="") {
