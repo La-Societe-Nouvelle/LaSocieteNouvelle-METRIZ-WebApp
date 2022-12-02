@@ -15,6 +15,7 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { ComparativeData } from "../ComparativeData";
 import retrieveSerieFootprint from "../services/responses/serieFootprint";
 import retrieveMacroFootprint from "../services/responses/macroFootprint";
+import retrieveHistoricalSerie from "../services/responses/historicalFootprint";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -88,7 +89,7 @@ const updater_1_0_3 = async (sessionData) => {
   let newComparativeData = new ComparativeData();
 
   let code = sessionData.comparativeDivision;
-
+  
   for await (const indic of sessionData.validations) {
     // update comparative data according to validated indicators
     const updatedData = await updateComparativeData(
@@ -149,6 +150,8 @@ async function updateComparativeData(
 ) {
   let idTarget = getTargetSerieId(indic);
 
+
+  // Area Footprint
   let newComparativeData = await retrieveMacroFootprint(indic,"00",comparativeData,'areaFootprint');
 
   // Target Area Footprint
@@ -161,10 +164,21 @@ async function updateComparativeData(
       "targetAreaFootprint"
     );
   }
+
+  
   if (comparativeDivision != "00") {
 
+    // Division Footprint
     newComparativeData =  await retrieveMacroFootprint(indic,comparativeDivision,newComparativeData,'divisionFootprint');
-
+   
+    
+    newComparativeData = await retrieveHistoricalSerie(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "trendsFootprint"
+    );
+    // Target Division Footprint
     if (idTarget) {
       newComparativeData = await retrieveSerieFootprint(
         idTarget,
@@ -174,6 +188,8 @@ async function updateComparativeData(
         "targetDivisionFootprint"
       );
     }
+
+
   }
   return newComparativeData;
 }
