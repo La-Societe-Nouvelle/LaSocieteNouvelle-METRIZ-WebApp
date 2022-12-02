@@ -66,14 +66,7 @@ const ResultSection = (props) => {
     "was",
     "wat",
   ]);
-  const divisionsOptions = [];
-
-  //Divisions select options
-  Object.entries(divisions)
-    .sort((a, b) => parseInt(a) - parseInt(b))
-    .map(([value, label]) =>
-      divisionsOptions.push({ value: value, label: value + " - " + label })
-    );
+  const [divisionsOptions, setDivisionsOptions] = useState([]);
 
   const { intermediateConsumption, capitalConsumption, netValueAdded, production } = props.session.financialData.aggregates;
 
@@ -86,6 +79,23 @@ const ResultSection = (props) => {
     setComparativeDivision(division);
   };
 
+  useEffect(()=>{
+    
+  let options = [];
+  //Divisions select options
+  Object.entries(divisions)
+  .sort((a, b) => parseInt(a) - parseInt(b))
+  .map(([value, label]) =>     
+  {
+    if(value != '00') {
+
+      options.push({ value: value, label: value + " - " + label })
+    }
+  }
+  );
+
+  setDivisionsOptions(options);
+  },[])
   useEffect(async () => {
 
     setIsLoading(false);
@@ -171,16 +181,17 @@ const ResultSection = (props) => {
             </Button>
           </div>
         </div>
-        <section className="step">
-          <Row>
-            <Col lg={printGrossImpact.includes(indic) ? "8" : "12"}>
-              <div className="d-flex align-items-center mb-4 rapport-indic">
+        <section className="step">              
+          <div className="d-flex align-items-center mb-4 rapport-indic ">
                 <Image
                   src={"/resources/icon-ese-bleues/" + indic + ".png"}
                   className="icon-ese me-2"
                 />
                 <h3>{metaIndics[indic].libelle}</h3>
-              </div>
+           </div>
+          <Row>
+            <Col lg={printGrossImpact.includes(indic) ? "9" : "12"}>
+
 
               <Tabs
                 defaultActiveKey="mainAggregates"
@@ -206,23 +217,26 @@ const ResultSection = (props) => {
               </Tabs>
             </Col>
             {printGrossImpact.includes(indic) && (
-              <Col sm={4}>
-                <h3 className="text-center">
-                  Répartition des impacts bruts (en %)
-                </h3>
+              <Col sm={3}>
+                <div className="border mt-5">
+                  <h3 className="text-center">
+                    Répartition des impacts bruts (en %)
+                  </h3>
 
-                <div className="p-5">
-                  <PieGraph
-                    intermediateConsumption={intermediateConsumption.footprint.indicators[
-                      indic
-                    ].getGrossImpact(intermediateConsumption.amount)}
-                    capitalConsumption={capitalConsumption.footprint.indicators[
-                      indic
-                    ].getGrossImpact(capitalConsumption.amount)}
-                    netValueAdded={netValueAdded.footprint.indicators[
-                      indic
-                    ].getGrossImpact(netValueAdded.amount)}
-                  />
+                  <div className="">
+                    <PieGraph
+                      intermediateConsumption={intermediateConsumption.footprint.indicators[
+                        indic
+                      ].getGrossImpact(intermediateConsumption.amount)}
+                      capitalConsumption={capitalConsumption.footprint.indicators[
+                        indic
+                      ].getGrossImpact(capitalConsumption.amount)}
+                      netValueAdded={netValueAdded.footprint.indicators[
+                        indic
+                      ].getGrossImpact(netValueAdded.amount)}
+                    />
+                  </div>
+
                 </div>
               </Col>
             )}
