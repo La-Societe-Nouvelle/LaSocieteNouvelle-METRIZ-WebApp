@@ -86,31 +86,55 @@ const getExpensesByCompanies = (expenses) =>
 
 // Work in progress new significative function
 
-export function getSignificativeCompaniesBisByIndic(indic,trackedExpenses,companiesToCheck,expensesByCompanies,minFpt,maxFpt,limit) 
+export function getSignificativeCompaniesBis(companies,minFpt,maxFpt)
+{
+  if (minFpt==null || maxFpt==null) {
+    return companies.filter(company => company.state != "siren" && company.footprintActivityCode == "00");
+  }
+
+  let expensesByCompanies = getExpensesByCompanies(expenses);
+  let companiesCompleted = companies.filter(company => company.state == "siren" || company.footprintActivityCode != "00");
+  let companiesUncompleted = companies.filter(company => company.state != "siren" && company.footprintActivityCode == "00");
+
+  let significativeCompaniesForExpenses = Object.keys(metaIndics)
+    .map(async (indic) => await getSignificativeCompaniesByIndic(indic,companiesCompleted,companiesUncompleted,expensesByCompanies,minFpt,maxFpt,limit))
+    .reduce((a,b) => a.concat(b),[])
+    .filter((value, index, self) => index === self.findIndex(item => item.account === value.account));
+
+  // significative companies for investments
+  let significativeCompaniesForInvestments = companies.filter(company => investments.filter(investment => investment.accountAux == company.account).length > 0);
+
+  // Merge
+  let significativeCompanies = significativeCompaniesForExpenses.concat(significativeCompaniesForInvestments)
+                                                                .filter((value, index, self) => index === self.findIndex(item => item.account === value.account));
+  return significativeCompanies;
+}
+
+const getSignificativeCompaniesByIndic = async (indic,companiesCompleted,companiesUncompleted,expensesByCompanies,minFpt,maxFpt,limit) =>
 {
   // sort companies by expenses (absolute value)
-  companiesToCheck.sort((a,b) => Math.abs(expensesByCompanies[a.account]) - Math.abs(expensesByCompanies[b.account]));
+  companiesUncompleted.sort((a,b) => Math.abs(expensesByCompanies[a.account]) - Math.abs(expensesByCompanies[b.account]));
 
   let significativeGap = false;
   let index = 0;
   let limitAmount = 0;
 
-  while (!significativeGap && index < companiesToCheck.length)
+  while (!significativeGap && index < companiesUncompleted.length)
   {
     // get "unsignificative" companies limit (amount)
-    limitAmount = Math.abs(companiesToCheck[index].amount);
+    limitAmount = Math.abs(companiesUncompleted[index].amount);
     
     // build impact for tracked expenses (with siren number and data already fetched)
-    let impactTrackedExpenses = trackedExpenses.footprint.indicators[indic].value*trackedExpenses.amount;
+    let impactTrackedExpenses = companiesCompleted.footprint.indicators[indic].value*companiesCompleted.amount;
 
     // build impact for upper limit companies (mininum footprint case)
-    let upperLimitCompanies = companiesToCheck.filter(company => Math.abs(expensesByCompanies[company.account]) > limitAmount);
+    let upperLimitCompanies = companiesUncompleted.filter(company => Math.abs(expensesByCompanies[company.account]) > limitAmount);
     let impactUpperLimitCompanies = getSumItems(upperLimitCompanies.map(company => company.footprintActivityCode=="00" 
     ? minFpt.indicators[indic].value*expensesByCompanies[company.account]
     : company.footprint.indicators[indic].value*expensesByCompanies[company.account]));
     
     // build impact for under limit companies (maximum footprint case)
-    let underLimitCompanies = companiesToCheck.filter(company => Math.abs(expensesByCompanies[company.account]) <= limitAmount);
+    let underLimitCompanies = companiesUncompleted.filter(company => Math.abs(expensesByCompanies[company.account]) <= limitAmount);
     let impactUnderLimitCompanies = getSumItems(underLimitCompanies.map(company => company.footprintActivityCode=="00" 
       ? maxFpt.indicators[indic].value*expensesByCompanies[company.account]
       : company.footprint.indicators[indic].value*expensesByCompanies[company.account]));
@@ -122,7 +146,7 @@ export function getSignificativeCompaniesBisByIndic(indic,trackedExpenses,compan
   }
 
   // Retrieve list of companies
-  let significativeCompanies = companiesToCheck.filter(company => company.amount >= limitAmount);
+  let significativeCompanies = companiesUncompleted.filter(company => company.amount >= limitAmount);
 
   return significativeCompanies;
 }
