@@ -86,7 +86,7 @@ const getExpensesByCompanies = (expenses) =>
 
 // Work in progress new significative function
 
-export function getSignificativeCompaniesBis(companies,minFpt,maxFpt)
+export function getSignificativeCompaniesBis(companies,expenses,investments,minFpt,maxFpt)
 {
   if (minFpt==null || maxFpt==null) {
     return companies.filter(company => company.state != "siren" && company.footprintActivityCode == "00");
@@ -125,7 +125,7 @@ const getSignificativeCompaniesByIndic = async (indic,companiesCompleted,compani
     limitAmount = Math.abs(companiesUncompleted[index].amount);
     
     // build impact for tracked expenses (with siren number and data already fetched)
-    let impactTrackedExpenses = companiesCompleted.footprint.indicators[indic].value*companiesCompleted.amount;
+    let impactTrackedExpenses = getSumItems(companiesCompleted.map(company => company.footprint.indicators[indic].value*company.amount));
 
     // build impact for upper limit companies (mininum footprint case)
     let upperLimitCompanies = companiesUncompleted.filter(company => Math.abs(expensesByCompanies[company.account]) > limitAmount);
