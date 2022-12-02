@@ -9,9 +9,12 @@ import { CompaniesTable } from "../../tables/CompaniesTable";
 import { ProgressBar } from "../../popups/ProgressBar";
 
 // Readers
-import { getSignificativeCompanies } from "../../../src/formulas/significativeLimitFormulas";
+import { getSignificativeCompanies, getSignificativeCompaniesBis } from "../../../src/formulas/significativeLimitFormulas";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
+
+import api from "/src/api";
+
 
 /* ----------------------------------------------------------- */
 /* -------------------- COMPANIES SECTION -------------------- */
@@ -270,10 +273,15 @@ export class SectorSection extends React.Component {
 
   /* ---------- FETCHING DATA ---------- */
 
-  synchroniseCompanies = async () => {
+  synchroniseCompanies = async () => 
+  {
     let companiesToSynchronise = this.state.companies;
-    let significativeCompanies = getSignificativeCompanies(
-      this.props.session.financialData
+    let minFpt = await fetchMinFootprint();
+    let maxFpt = await fetchMaxFootprint();
+    let significativeCompanies = getSignificativeCompaniesBis(
+      this.props.session.financialData.companies,
+      minFpt,
+      maxFpt
     );
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
@@ -310,7 +318,47 @@ export class SectorSection extends React.Component {
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
 const nextStepAvailable = ({ companies }) =>
-  // condition : data fetched for all companies (or no company with data unfetched)
-  {
-    return !(companies.filter((company) => company.status != 200).length > 0);
-  };
+// condition : data fetched for all companies (or no company with data unfetched)
+{
+  return !(companies.filter((company) => company.status != 200).length > 0);
+};
+
+const fetchMinFootprint = async () =>
+{
+  await api
+      .get("defaultfootprint?code=FPT_MIN_DIVISION&aggregate=TRESS&area=FRA")
+      .then((res) => 
+      {
+        let status = res.data.header.code;
+        if (status == 200) {
+          let data = res.data;
+          let footprint = new SocialFootprint(data.footprint);
+          return footprint;
+        } else {
+          return null;
+        }
+      }).catch((err) => {
+        console.log(err);
+        return null;
+      });
+}
+
+const fetchMaxFootprint = async () =>
+{
+  await api
+      .get("defaultfootprint?code=FPT_MAX_DIVISION&aggregate=TRESS&area=FRA")
+      .then((res) => 
+      {
+        let status = res.data.header.code;
+        if (status == 200) {
+          let data = res.data;
+          let footprint = new SocialFootprint(data.footprint);
+          return footprint;
+        } else {
+          return null;
+        }
+      }).catch((err) => {
+        console.log(err);
+        return null;
+      });
+}
