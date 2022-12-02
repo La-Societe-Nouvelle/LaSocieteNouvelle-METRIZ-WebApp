@@ -56,7 +56,6 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
       ? false
       : true;
 
-  console.log(displayTargetColumn);
   return (
     <Table className="mt-5  comparative-table">
       <thead>

@@ -83,7 +83,7 @@ const ComparativeGraphs = (props) => {
             ticks: {
               color: "#191558",
               font : {
-                size: 10,
+                size: 12,
               }
             },
             grid: {

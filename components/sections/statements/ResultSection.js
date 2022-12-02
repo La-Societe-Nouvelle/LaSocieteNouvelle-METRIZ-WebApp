@@ -359,50 +359,89 @@ const ResultSection = (props) => {
           comparativeData={comparativeData}
         />
       </section>
-      <section className="step">
-        <h3>Evolution des tendances</h3>
+      {
+        Array.isArray(comparativeData.production.trendsFootprint.indicators[indic]) &&
+        <section className="step">
+    
+          <h3>Courbes d'évolution</h3>
+    
+          <Row>
+            <Col lg={6}>
+                <TrendsGraph
+                  title="Production"
+                  unit={metaIndics[indic].unit}
+                  trends={
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                  }
+                  target={
+                    comparativeData.production.targetDivisionFootprint.indicators[indic]
+                  }
+                  current={
+                    session.financialData.aggregates.production.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
+                />
+              </Col>
 
-        <Row className="graphs">
-          <Col>
-            <TrendsGraph
-              title="Production"
-              unit={metaIndics[indic].unit}
-              comparativeData={
-                comparativeData.production.trendsFootprint.indicators[indic]
-              }
-            />
-          </Col>
-          <Col>
-            <TrendsGraph
-              title="Consommations intermédiaires"
-              unit={metaIndics[indic].unit}
-              comparativeData={
-                comparativeData.intermediateConsumption.trendsFootprint
-                  .indicators[indic]
-              }
-            />
-          </Col>
-          <Col>
-            <TrendsGraph
-              title="Consommation de capital fixe"
-              unit={metaIndics[indic].unit}
-              comparativeData={
-                comparativeData.fixedCapitalConsumption.trendsFootprint
-                  .indicators[indic]
-              }
-            />
-          </Col>
-          <Col>
-            <TrendsGraph
-              title="Valeur ajoutée nette"
-              unit={metaIndics[indic].unit}
-              comparativeData={
-                comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-              }
-            />
-          </Col>
-        </Row>
+            <Col lg={6}>
+              <TrendsGraph
+                title="Consommations intermédiaires"
+                unit={metaIndics[indic].unit}
+                trends={
+                  comparativeData.intermediateConsumption.trendsFootprint
+                    .indicators[indic]
+                }
+                target={
+                  comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[indic]
+                }
+                current={
+                  session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+              />
+            </Col>
+            <Col lg={6}>
+              <TrendsGraph
+                title="Consommation de capital fixe"
+                unit={metaIndics[indic].unit}
+                trends={
+                  comparativeData.fixedCapitalConsumption.trendsFootprint
+                    .indicators[indic]
+                }
+                target={
+                  comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[indic]
+                }
+                current={
+                  session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                
+              />
+            </Col>
+            <Col lg={6}>
+              <TrendsGraph
+                title="Valeur ajoutée nette"
+                unit={metaIndics[indic].unit}
+                trends={
+                  comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+                }
+                target={
+                  comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic]
+                }
+                current={
+                  session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+              />
+            </Col>
+          </Row>
       </section>
+        }
+    
       <section className="step">
         <h3>Note d'analyse</h3>
         <div id="analyse">
