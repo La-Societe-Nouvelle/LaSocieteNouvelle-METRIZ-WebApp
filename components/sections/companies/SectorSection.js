@@ -13,6 +13,8 @@ import { getSignificativeCompanies, getSignificativeCompaniesBis } from "../../.
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
 
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+
 import api from "/src/api";
 
 
@@ -36,6 +38,20 @@ export class SectorSection extends React.Component {
       companyStep: props.companyStep,
       error: false,
     };
+  }
+
+  componentDidMount = async () => 
+  {
+    let minFpt = await fetchMinFootprint();
+    let maxFpt = await fetchMaxFootprint();
+    let significativeCompanies = getSignificativeCompaniesBis(
+      this.props.session.financialData.companies,
+      this.props.session.financialData.expenses,
+      this.props.session.financialData.investments,
+      minFpt,
+      maxFpt
+    );
+    this.setState({significativeCompanies})
   }
 
   handleChange = (event) => {
@@ -325,40 +341,42 @@ const nextStepAvailable = ({ companies }) =>
 
 const fetchMinFootprint = async () =>
 {
-  await api
-      .get("defaultfootprint?code=FPT_MIN_DIVISION&aggregate=TRESS&area=FRA")
-      .then((res) => 
-      {
-        let status = res.data.header.code;
-        if (status == 200) {
-          let data = res.data;
-          let footprint = new SocialFootprint(data.footprint);
-          return footprint;
-        } else {
-          return null;
-        }
-      }).catch((err) => {
-        console.log(err);
+  let footprint = await api.get("defaultfootprint?code=FPT_MIN_DIVISION&aggregate=TRESS&area=FRA")
+    .then((res) => 
+    {
+      let status = res.data.header.code;
+      if (status == 200) {
+        let data = res.data;
+        let footprint = new SocialFootprint();
+        footprint.updateAll(data.footprint);
+        return footprint;
+      } else {
         return null;
-      });
+      }
+    }).catch((err) => {
+      return null;
+    });
+  
+  return footprint;
 }
 
 const fetchMaxFootprint = async () =>
 {
-  await api
-      .get("defaultfootprint?code=FPT_MAX_DIVISION&aggregate=TRESS&area=FRA")
-      .then((res) => 
-      {
-        let status = res.data.header.code;
-        if (status == 200) {
-          let data = res.data;
-          let footprint = new SocialFootprint(data.footprint);
-          return footprint;
-        } else {
-          return null;
-        }
-      }).catch((err) => {
-        console.log(err);
+  let footprint = await api.get("defaultfootprint?code=FPT_MAX_DIVISION&aggregate=TRESS&area=FRA")
+    .then((res) => 
+    {
+      let status = res.data.header.code;
+      if (status == 200) {
+        let data = res.data;
+        let footprint = new SocialFootprint();
+        footprint.updateAll(data.footprint);
+        return footprint;
+      } else {
         return null;
-      });
+      }
+    }).catch((err) => {
+      return null;
+    });
+
+  return footprint;
 }
