@@ -12,7 +12,8 @@ import { SirenSection } from "./SirenSection";
 /* -------------------- COMPANIES SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class CompaniesSection extends React.Component {
+export class CompaniesSection extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
@@ -21,42 +22,66 @@ export class CompaniesSection extends React.Component {
     };
 
   }
-  setCompanyStep = (step) => {
 
+  setCompanyStep = (step) => {
     this.setState({
       companyStep: step
     })
   }
 
- 
-  render() {
+  nextStep = () => 
+  {
+    // if current state is for identified companies
+    if (this.state.companyStep==1) {
+      const unidentifiedCompanies = this.state.companies.filter((company) => company.state == "default");
+      if (unidentifiedCompanies.length > 0) {
+        this.setState({companyStep: 2});
+      } else {
+        this.props.submit();
+      }
+    }
+    // if current state is for unidentified companies
+    else if (this.companyStep==2) {
+      this.props.submit()
+    }
+  }
 
+  prevStep = () => 
+  {
+    // if current state is for unidentified companies
+    if (this.state.companyStep==2) {
+      this.setState({companyStep: 1})
+    }
+  }
+ 
+  render() 
+  {
     const {
       companyStep,
     } = this.state;
     
     const financialData = this.props.session.financialData;
-    // check synchro
-    const defaultCompanies = this.state.companies.filter((company) => company.state == "default");
+    const unidentifiedCompanies = this.state.companies.filter((company) => company.state == "default");
 
     // Synchro with corporate ID 
 
     if (companyStep == 1) {
       return (
-        <SirenSection {...this.props} financialData={financialData} setCompanyStep={this.setCompanyStep} companyStep={companyStep} />
+        <SirenSection {...this.props}
+          financialData={financialData} 
+          nextStep={this.nextStep}/>
       )
     }
 
-   if (companyStep == 2 ) {
+   if (companyStep == 2) {
       return (
-        <SectorSection {...this.props} financialData={financialData} companies={defaultCompanies} companyStep={companyStep} setCompanyStep={this.setCompanyStep} />
-
+        <SectorSection {...this.props}
+          financialData={financialData} 
+          unidentifiedCompanies={unidentifiedCompanies} 
+          prevStep={this.prevStep} 
+          nextStep={this.nextStep}/>
       )
     }
 
   }
 }
-/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
-
-
-
