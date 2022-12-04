@@ -94,6 +94,9 @@ export class FinancialData {
         data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : aggregatesBuilder(this);
         
     // ---------------------------------------------------------------------------------------------------- //
+        buildImmobilisationsPeriods(this.immobilisations);
+        buildAmortisationsPeriods(this.depreciations);
+        buildAmortisationsExpensesPeriods(this.depreciationExpenses);
     }
 
     /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
@@ -571,4 +574,126 @@ export class FinancialData {
                  exceptionalDepreciationsExpensesAggregate]);
     }
 
+}
+
+/* -------------------------------------------------- PERIODS -------------------------------------------------- */
+
+const buildImmobilisationsPeriods = (immobilisations) =>
+{
+    immobilisations.forEach(immobilisation => 
+    {
+        let currentAmount = immobilisation.prevAmount;
+        let dateStart = "";
+
+        immobilisation.periods = [];
+
+        // entries
+        let entries = immobilisation.entries.sort((a,b) => parseInt(a.date) > parseInt(b.date));
+        for (let entry of entries) 
+        {
+            // end current period
+            immobilisation.periods.push({
+                dateStart: dateStart,
+                dateEnd: entry.date,
+                amount: currentAmount
+            });
+            // update current values
+            currentAmount+= entry.amount;
+            dateStart = entry.date;
+        }
+
+        // add last period
+        immobilisation.periods.push({
+            dateStart: dateStart,
+            dateEnd: "",
+            amount: currentAmount
+        });
+    })
+}
+
+const buildAmortisationsPeriods = (amortisations) =>
+{
+    amortisations.forEach(amortisation => 
+    {
+        let currentAmount = amortisation.prevAmount;
+        let dateStart = "";
+
+        amortisation.periods = [];
+
+        // entries
+        let entries = amortisation.entries.sort((a,b) => parseInt(a.date) > parseInt(b.date));
+        for (let entry of entries) 
+        {
+            // end current period
+            amortisation.periods.push({
+                dateStart: dateStart,
+                dateEnd: entry.date,
+                amount: currentAmount
+            });
+            // update current values
+            currentAmount+= entry.amount;
+            dateStart = entry.date;
+        }
+
+        // add last period
+        amortisation.periods.push({
+            dateStart: dateStart,
+            dateEnd: "",
+            amount: currentAmount
+        });
+    })
+}
+
+const buildAmortisationsExpensesPeriods = (expenses) =>
+{
+    expenses.forEach(expense => 
+    {
+        let currentAmount = 0;
+        let cumul = 0
+        let dateStart = "";
+
+        expense.periods = [];
+
+        // entries
+        let flows = getFlowsByDate(expense.entries);
+        for (let flow of flows) 
+        {
+            currentAmount+= flow.amount;
+
+            if (currentAmount > cumul) 
+            {
+                let amountPeriod = currentAmount-cumul;
+                cumul = currentAmount;
+                // end current period
+                expense.periods.push({
+                    dateStart: dateStart,
+                    dateEnd: flow.date,
+                    amount: amountPeriod
+                });
+            }
+            // update current values
+            dateStart = flow.date;
+        }
+
+        if (currentAmount < cumul) {
+            // add last period
+            expense.periods.push({
+                dateStart: dateStart,
+                dateEnd: "",
+                amount: currentAmount-cumul
+            });
+        }
+    })
+}
+
+const getFlowsByDate = (entries) => 
+{
+    let flows = [];
+    entries.forEach((entry) => 
+    {
+        let flow = flows.filter(flow => flow.date==entry.date)[0];
+        if (flow == undefined) flows.push({date: entry.date, amount: entry.amount})
+        else flow.amount+= entry.amount;
+    })
+    return flows.sort((a,b) => parseInt(a.date) > parseInt(b.date));
 }

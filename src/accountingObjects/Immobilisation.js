@@ -23,6 +23,7 @@ export class Immobilisation {
     status,
     dataFetched,
     lastUpdateFromRemote,
+    entries
   }) {
     // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
@@ -47,6 +48,9 @@ export class Immobilisation {
     this.status = status || null; // 200 (ok), 404 (not found), 500 (server error)
     this.dataFetched = dataFetched || false; // response received
     this.lastUpdateFromRemote = lastUpdateFromRemote || null;
+
+    // entries
+    this.entries = entries || [];
     // ---------------------------------------------------------------------------------------------------- //
   }
 

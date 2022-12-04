@@ -12,7 +12,8 @@ export class Expense {
                accountAuxLib,
                isDefaultAccountAux,
                amount,
-               footprint}) 
+               footprint,
+               entries}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
@@ -25,6 +26,8 @@ export class Expense {
 
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint);
+
+    this.entries = entries || [];
   // ---------------------------------------------------------------------------------------------------- //
   }
 

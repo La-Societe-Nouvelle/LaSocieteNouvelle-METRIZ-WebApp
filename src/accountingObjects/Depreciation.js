@@ -13,7 +13,8 @@ export class Depreciation {
                footprint,
                prevAmount,
                prevFootprint,
-               initialState}) 
+               initialState,
+               entries}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = id;                                                   // id
@@ -23,11 +24,13 @@ export class Depreciation {
     this.accountAux = accountAux;                                   // Immobilisation account (#2)
 
     this.amount = amount || 0;                                      // amount at the end
-    this.footprint = new SocialFootprint(footprint);           //
+    this.footprint = new SocialFootprint(footprint);                //
 
     this.prevAmount = prevAmount || 0;                              // amount at the beginning
-    this.prevFootprint = new SocialFootprint(prevFootprint);   //
+    this.prevFootprint = new SocialFootprint(prevFootprint);        //
     this.initialState = initialState || "currentFootprint";         //
+
+    this.entries = entries || [];
   // ---------------------------------------------------------------------------------------------------- //
   }
 

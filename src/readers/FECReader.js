@@ -443,7 +443,7 @@ export async function FECDataReader(FECData)
   data.otherOperatingIncomes = 0;         // 74, 75, 781, 791
 
   // Production / Incomes ------------------------------------------------------------------------------- //
-  data.sales = 0;                         // 70
+  data.sales = [];                         // 70
 
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = [];                       // stock 31, 32, 33, 34, 35, 37
@@ -985,7 +985,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         else
         { 
           // push data
-          stockVariation.entries = [{
+          stockVariationData.entries = [{
             entryNum: ligneCourante.EcritureNum,
             amount: stockVariationData.amount,
             date: ligneCourante.EcritureDate
@@ -1030,7 +1030,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
         else
         {
           // push data
-          data.entries = [{
+          depreciationExpenseData.entries = [{
             entryNum: ligneCourante.EcritureNum,
             amount: depreciationExpenseData.amount,
             date: ligneCourante.EcritureDate
@@ -1087,7 +1087,7 @@ const readProductionEntry = async (data,journal,ligneCourante) =>
 
   if (/^70/.test(ligneCourante.CompteNum))      data.revenue+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
   if (/^70/.test(ligneCourante.CompteNum)) {
-    sales.push({
+    data.sales.push({
       entryNum: ligneCourante.EcritureNum,
       amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
       date: ligneCourante.EcritureDate
