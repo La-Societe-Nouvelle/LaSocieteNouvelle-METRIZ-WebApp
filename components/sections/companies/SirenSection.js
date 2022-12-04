@@ -94,7 +94,6 @@ export class SirenSection extends React.Component {
     } = this.state;
 
     const financialData = this.props.session.financialData;
-    const setCompanyStep = this.props.setCompanyStep;
 
     const isNextStepAvailable = nextStepAvailable(companies);
 
@@ -107,7 +106,7 @@ export class SirenSection extends React.Component {
       buttonNextStep = (
         <div>
           <button
-            onClick={() => setCompanyStep(2)}
+            onClick={() => this.props.nextStep()}
             className={"btn btn-primary me-3"}
           >
             Secteurs d'activité <i className="bi bi-chevron-right"></i>
@@ -127,9 +126,8 @@ export class SirenSection extends React.Component {
         <button
           className={"btn btn-secondary"}
           id="validation-button"
-          onClick={() => setCompanyStep(2)}
-          disabled={!isNextStepAvailable}
-        >
+          onClick={() => this.props.nextStep()}
+          disabled={!isNextStepAvailable}>
           Valider les fournisseurs
           <i className="bi bi-chevron-right"></i>
         </button>

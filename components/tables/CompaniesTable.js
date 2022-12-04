@@ -14,71 +14,80 @@ import Select from "react-select";
 
 /* ---------- COMPANIES TABLE ---------- */
 
-export class CompaniesTable extends React.Component {
+export class CompaniesTable extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
       companies: props.companies,
+      significativeCompanies: props.significativeCompanies,
       columnSorted: "amount",
       reverseSort: false,
       page: 0,
+      nbItems: props.nbItems
     };
   }
-  componentDidUpdate(prevProps) {
+
+  componentDidUpdate(prevProps) 
+  {
     if (prevProps.companies !== this.props.companies) {
-      this.setState({ companies: this.props.companies });
+      this.setState({companies: this.props.companies});
+    }
+    if (prevProps.nbItems !== this.props.nbItems) {
+      this.setState({nbItems: this.props.nbItems});
+    }
+    if (prevProps.significativeCompanies !== this.props.significativeCompanies) {
+      this.setState({significativeCompanies: this.props.significativeCompanies});
     }
   }
 
-  render() {
-    const { nbItems } = this.props;
-    const { companies, columnSorted, page } = this.state;
+  render() 
+  {
+    const { companies, significativeCompanies, columnSorted, page, nbItems } = this.state;
 
+    // sort companies
     this.sortCompanies(companies, columnSorted);
+    let showedCompanies = companies.slice(page * nbItems, (page + 1) * nbItems);
 
     return (
       <div className="table-main">
         <Table>
           <thead>
             <tr>
-              <td onClick={() => this.changeColumnSorted("denomination")}>
-                <i className="bi bi-arrow-down-up me-1"></i>
-                Libellé du compte fournisseur
+              <td 
+                onClick={() => this.changeColumnSorted("denomination")}>
+                <i className="bi bi-arrow-down-up me-1"></i>Libellé du compte fournisseur
               </td>
-              <td>Compte fournisseur</td>
+              <td>
+                Compte fournisseur
+              </td>
               <td
                 className="area-column"
-                onClick={() => this.changeColumnSorted("area")}
-              >
-                <i className="bi bi-arrow-down-up me-1"></i>
-                Espace économique
+                onClick={() => this.changeColumnSorted("area")}>
+                <i className="bi bi-arrow-down-up me-1"></i>Espace économique
               </td>
               <td
                 className="division-column"
-                onClick={() => this.changeColumnSorted("activity")}
-              >
-                <i className="bi bi-arrow-down-up me-1"></i>
-                Secteur d'activité
+                onClick={() => this.changeColumnSorted("activity")}>
+                <i className="bi bi-arrow-down-up me-1"></i>Secteur d'activité
               </td>
               <td
                 className="text-end"
-                onClick={() => this.changeColumnSorted("amount")}
-              >
-                <i className="bi bi-arrow-down-up me-1"></i>
-                Montant
+                onClick={() => this.changeColumnSorted("amount")}>
+                <i className="bi bi-arrow-down-up me-1"></i>Montant
               </td>
             </tr>
           </thead>
           <tbody>
-            {companies
-              .slice(page * nbItems, (page + 1) * nbItems)
-              .map((company) => (
-                <RowTableCompanies
-                  key={"company_" + company.id}
-                  {...company}
-                  updateCompany={this.updateCompany.bind(this)}
-                />
+
+            {showedCompanies.map((company) => (
+              <RowTableCompanies
+                key={"company_" + company.id}
+                {...company}
+                isSignificative = {significativeCompanies.includes(company.account)}
+                updateCompany={this.updateCompany.bind(this)}/>
               ))}
+
           </tbody>
         </Table>
 
@@ -86,23 +95,15 @@ export class CompaniesTable extends React.Component {
           <div className="table-navigation">
             <button
               className={page == 0 ? "hidden" : "btn btn-primary"}
-              onClick={this.prevPage}
-            >
+              onClick={this.prevPage}>
               &lsaquo; Page précédente
             </button>
             <div>
-              <p>
-                {page + 1}/{parseInt(companies.length / nbItems + 1)}
-              </p>
+              <p>{page + 1}/{parseInt(companies.length / nbItems + 1)}</p>
             </div>
             <button
-              className={
-                (page + 1) * nbItems < companies.length
-                  ? "btn btn-primary"
-                  : "hidden"
-              }
-              onClick={this.nextPage}
-            >
+              className={(page + 1) * nbItems < companies.length ? "btn btn-primary" : "hidden"}
+              onClick={this.nextPage}>
               Page suivante &rsaquo;
             </button>
           </div>
@@ -121,22 +122,16 @@ export class CompaniesTable extends React.Component {
     }
   }
 
-  sortCompanies(companies, columSorted) {
-    switch (columSorted) {
+  sortCompanies(companies, columSorted) 
+  {
+    switch (columSorted) 
+    {
       case "identifiant":
-        companies.sort((a, b) =>
-          valueOrDefault(a.corporateId, "").localeCompare(
-            valueOrDefault(b.corporateId, "")
-          )
-        );
+        companies.sort((a, b) => valueOrDefault(a.corporateId, "").localeCompare(valueOrDefault(b.corporateId, "")));
         break;
       case "denomination":
-        companies.sort((a, b) =>
-          a.getCorporateName().localeCompare(b.getCorporateName())
-        );
+        companies.sort((a, b) => a.getCorporateName().localeCompare(b.getCorporateName()));
         break;
-      //case "area": companies.sort((a,b) => a.footprintAreaCode.localeCompare(b.footprintAreaCode)); break;
-      //case "activity": companies.sort((a,b) => a.footprintActivityCode.localeCompare(b.footprintActivityCode)); break;
       case "amount":
         companies.sort((a, b) => b.amount - a.amount);
         break;
@@ -147,15 +142,16 @@ export class CompaniesTable extends React.Component {
   /* ---------- NAVIGATION ---------- */
 
   prevPage = () => {
-    if (this.state.page > 0) this.setState({ page: this.state.page - 1 });
-  };
+    if (this.state.page > 0) {
+      this.setState({page: this.state.page - 1})
+    }
+  }
+
   nextPage = () => {
-    if (
-      (this.state.page + 1) * this.props.nbItems <
-      this.props.financialData.companies.length
-    )
+    if ((this.state.page + 1) * this.props.nbItems < this.props.financialData.companies.length) {
       this.setState({ page: this.state.page + 1 });
-  };
+    }
+  }
 
   /* ---------- OPERATIONS ON COMPANY ---------- */
 
@@ -182,24 +178,14 @@ export class CompaniesTable extends React.Component {
 
 /* ----- COMPANY ROW ----- */
 
-class RowTableCompanies extends React.Component {
+class RowTableCompanies extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
       corporateId: props.corporateId || "",
-      areaCode:
-        props.state != ""
-          ? props.state == "siren"
-            ? props.legalUnitAreaCode
-            : props.footprintAreaCode
-          : "FRA",
-      activityCode:
-        props.state != ""
-          ? props.state == "siren"
-            ? props.legalUnitActivityCode
-            : props.footprintActivityCode
-          : "00",
-
+      areaCode: props.state != "" ? props.footprintAreaCode : "FRA",
+      activityCode: props.state != "" ? props.footprintActivityCode : "00",
       dataUpdated: props.dataUpdated,
       toggleIcon: false,
       divisionsOptions: [],
@@ -227,84 +213,53 @@ class RowTableCompanies extends React.Component {
       );
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps) 
+  {
     if (this.props != prevProps) {
       this.setState({
         corporateId: this.props.corporateId || "",
-        areaCode:
-          this.props.state != ""
-            ? this.props.state == "siren"
-              ? this.props.legalUnitAreaCode
-              : this.props.footprintAreaCode
-            : "FRA",
-        activityCode:
-          this.props.state != ""
-            ? this.props.state == "siren"
-              ? this.props.legalUnitActivityCode
-              : this.props.footprintActivityCode
-            : "00",
+        areaCode: this.props.state != "" ? this.props.footprintAreaCode : "FRA",
+        activityCode: this.props.state != "" ? this.props.footprintActivityCode : "00",
         dataUpdated: false,
       });
     }
   }
 
-  render() {
+  render() 
+  {
     const { corporateName, account, amount, status } = this.props;
     const { areaCode, activityCode, dataUpdated } = this.state;
+    let isSignificative = this.props.isSignificative;
 
     let icon;
-
-    if (activityCode == "00") {
-      icon = (
-          <i
-            className="bi bi-exclamation-triangle text-warning"
-            title="Risque de données incomplètes"
-          ></i>
-      );
+    if (isSignificative && activityCode == "00") {
+      icon = (<i className="bi bi-exclamation-triangle text-warning"></i>);
+    } else if (status == 200) {
+      icon = (<i className="bi bi-check2 text-success" title="Données synchronisées"></i>);
     } else {
-      if (status == 200) {
-        icon = (
-            <i className="bi bi-check2 text-success" title="Données synchronisées"></i>
-        );
-      } else {
-        icon = (
-            <i className="bi bi-arrow-repeat text-success"></i>
-        );
-      }
+      icon = (<i className="bi bi-arrow-repeat text-success"></i>);
     }
+
     return (
       <tr>
-        <td className="corporate-name">
-          {icon}
-         {corporateName}
-        </td>
+        <td className="corporate-name">{icon}{corporateName}</td>
         <td>{account}</td>
         <td>
           <Select
-            defaultValue={{
-              label: areaCode + " - " + areas[areaCode],
-              value: areaCode,
-            }}
+            defaultValue={{label: areaCode + " - " + areas[areaCode], value: areaCode}}
             placeholder={"Choisissez un espace économique"}
             className={!dataUpdated && status == 200 ? "success" : ""}
             options={this.state.areasOptions}
-            onChange={this.onAreaCodeChange}
-          />
+            onChange={this.onAreaCodeChange}/>
         </td>
-
         <td >
           <Select
-            defaultValue={{
-              label: activityCode + " - " + divisions[activityCode],
-              value: activityCode,
-            }}
+            defaultValue={{label: activityCode + " - " + divisions[activityCode],  value: activityCode}}
             placeholder={"Choisissez un secteur d'activité"}
             className={!dataUpdated && status == 200 ? "success" : ""}
             options={this.state.divisionsOptions}
-            onChange={this.onActivityCodeChange}
-          />
+            onChange={this.onActivityCodeChange}/>
         </td>
-
         <td className="text-end">{printValue(amount, 0)} &euro;</td>
       </tr>
     );
@@ -316,7 +271,7 @@ class RowTableCompanies extends React.Component {
       id: this.props.id,
       corporateId: nextCorporateId,
     });
-  };
+  }
 
   onAreaCodeChange = (event) => {
     this.setState({ areaCode: event.value, dataUpdated: true });
@@ -324,12 +279,13 @@ class RowTableCompanies extends React.Component {
       id: this.props.id,
       footprintAreaCode: event.value,
     });
-  };
+  }
+
   onActivityCodeChange = (event) => {
     this.setState({ activityCode: event.value, dataUpdated: true });
     this.props.updateCompany({
       id: this.props.id,
       footprintActivityCode: event.value,
     });
-  };
+  }
 }
