@@ -54,7 +54,6 @@ export class StatementGEQ extends React.Component {
     const { hasEmployees } = this.props.impactsData;
     const { wageGap, info, isDisabled } = this.state;
 
-    console.log(this.props.impactsData.hasEmployees);
 
     return (
       <div className="statement">

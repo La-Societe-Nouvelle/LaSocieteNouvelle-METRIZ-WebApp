@@ -34,7 +34,13 @@ table {
   td {
     border : none;
   }
+
+  tr.fw-bold td {
+   padding: 0.5rem 0.25rem;
+   background-color:darken($bg-light, 1%);
+  }
   
+
   .siren {
     width: 250px;
   }
@@ -100,16 +106,17 @@ table {
       font-size: 15px;
     }
   }
-
+  
   // --- Head --- //
 
   thead {
-    background-color: $light;
+    background-color: lighten($primary, 10%);
+    color : #fff;
     font-weight: 700;
     font-size: 1.1em;
   }
   .subth {
-    background-color: $info;
+    background-color: darken($bg-light, 1%);
     border-bottom: 1px solid $light;
     font-weight: 600;
     font-size: 0.8rem;
@@ -282,3 +289,25 @@ table {
 }
  
 }
+
+  // --- Immobilisations Table --- //
+
+.immobilisationsTable {
+
+  caption-side: top;
+
+  caption {
+    background-color: lighten($primary, 10%);
+    color : #fff;
+    font-weight: 700;
+    font-size: 1.1em;  
+    padding: 0.5rem 0.5rem;
+    border: 1px solid #dbdef1;
+  }
+  
+  thead {
+    background-color: $light;
+    color : $text-color;
+    font-weight: normal;
+  }
+} 

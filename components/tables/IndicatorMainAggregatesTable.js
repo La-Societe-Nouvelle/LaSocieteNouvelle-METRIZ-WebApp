@@ -52,8 +52,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td className="font-weight-bold">Production</td>
+          <tr  className="fw-bold">
+            <td >Production</td>
             <td  className="text-end">
               {printValue(production.amount, 0)} &euro;
             </td>
@@ -183,8 +183,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               ) : null}
             </tr>
           )}
-          <tr className="with-top-line">
-            <td className="font-weight-bold">Consommations intermédiaires</td>
+          <tr className="border-top  fw-bold">
+            <td>Consommations intermédiaires</td>
             <td className="text-end">
               {printValue(intermediateConsumption.amount, 0)} &euro;
             </td>
@@ -246,8 +246,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               </tr>
             ))}
 
-          <tr className="with-top-line">
-            <td className="font-weight-bold"> Consommations de capital fixe</td>
+          <tr className="border-top  fw-bold">
+            <td> Consommations de capital fixe</td>
             <td  className="text-end">
               {printValue(capitalConsumption.amount, 0)} &euro;
             </td>
@@ -304,8 +304,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 ) : null}
               </tr>
             ))}
-          <tr>
-            <td className="font-weight-bold">Valeur ajoutée nette</td>
+          <tr className="border-top  fw-bold">
+            <td>Valeur ajoutée nette</td>
             <td  className="text-end">
               {printValue(netValueAdded.amount, 0)} &euro;
             </td>
@@ -324,7 +324,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               %
             </td>
             {printGrossImpact ? (
-              <td  className="text-end">
+              <td className="text-end" title="Impact direct de l'entreprise">
                 {printValue(
                   netValueAdded.footprint.indicators[indic].getGrossImpact(
                     netValueAdded.amount

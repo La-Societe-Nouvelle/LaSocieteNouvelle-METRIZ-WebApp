@@ -133,7 +133,6 @@ export class AssessmentDIS extends React.Component {
                 </td>
               </tr>
             </thead>
-            {console.log(employees)}
             <tbody>
               {employees.map((employee, index) => (
                 <tr key={index}>

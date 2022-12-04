@@ -32,7 +32,7 @@ export const MainAggregatesTable = ({financialData}) =>
             </tr>
         </thead>
         <tbody> 
-          <tr>
+          <tr className="fw-bold border-top">
             <td>Production sur l'exercice courant</td>
             <td className="text-end">{printValue(production.amount,0)} &euro;</td>
             </tr>
@@ -49,7 +49,7 @@ export const MainAggregatesTable = ({financialData}) =>
             <td className="text-end">{printValue(immobilisedProduction.amount,0)} &euro;</td>
             </tr>          
           
-          <tr className="total">
+          <tr className="fw-bold border-top">
             <td>Consommations intermédiaires</td>
             <td className={"important text-end"}>{printValue(intermediateConsumption.amount,0)} &euro;</td>
             </tr>
@@ -64,7 +64,7 @@ export const MainAggregatesTable = ({financialData}) =>
             
           </tr>)}
 
-          <tr className="total">
+          <tr className="fw-bold border-top">
             <td>Consommations de capital fixe</td>
             <td className={"important text-end"}>{printValue(capitalConsumption.amount,0)} &euro;</td>
             </tr>
@@ -75,7 +75,7 @@ export const MainAggregatesTable = ({financialData}) =>
             
           </tr>)}
 
-          <tr className="total">
+          <tr className="fw-bold border-top">
             <td>Valeur ajoutée nette</td>
             <td className={"important text-end"}>{printValue(netValueAdded.amount,0)}  &euro;</td>
             </tr>

@@ -97,6 +97,7 @@ function generatePDF(
   idProductionCanvas,
   idConsumptionCanvas,
   idValueCanvas,
+  idCapitalConsumptionCanvas,
   idPieChart
 ) {
   const doc = new jsPDF("p", "mm", "a4", true);
@@ -489,7 +490,7 @@ function generatePDF(
   y += 5;
 
   const pageWidth = doc.internal.pageSize.getWidth();
-  const imageWidth = (doc.internal.pageSize.getWidth() - x * 2) / 1.6;
+  const imageWidth = (doc.internal.pageSize.getWidth() - x * 2) / 1.8;
   let marginX = (pageWidth - imageWidth) / 2;
 
   let canvasProduction = document.querySelector(idProductionCanvas);
@@ -534,6 +535,21 @@ function generatePDF(
   const pdfVHeight = (imgValueProps.height * imageWidth) / imgValueProps.width;
 
   doc.addImage(canvasValueImg, "JPEG", marginX, y, imageWidth, pdfVHeight);
+
+  y += 60;
+
+  //Capital Consumption canvas
+
+  doc.text("Consommation de capital fixe", x, y);
+  y += 5;
+
+  let canvasCapitalConsumption = document.querySelector(idCapitalConsumptionCanvas);
+  let canvasCapitalConsumptionImg = canvasCapitalConsumption.toDataURL("image/jpg", 1.0);
+  const imgCapitalConsumptionProps = doc.getImageProperties(canvasCapitalConsumptionImg);
+  const pdfCCHeight = (imgCapitalConsumptionProps.height * imageWidth) / imgCapitalConsumptionProps.width;
+
+  doc.addImage(canvasCapitalConsumptionImg, "JPEG", marginX, y, imageWidth, pdfCCHeight);
+
   doc.setProperties({
     title:
       "rapport_" +
@@ -541,6 +557,8 @@ function generatePDF(
       "-" +
       indic.toUpperCase(),
   });
+
+    //Value canvas
 
   //Pie canvas
   if (idPieChart) {
@@ -1219,6 +1237,7 @@ function exportIndicPDF(
   idProductionCanvas,
   idConsumptionCanvas,
   idValueCanvas,
+  idCapitalConsumptionCanvas,
   idPieChart
 ) {
   // PDF Export
@@ -1229,6 +1248,7 @@ function exportIndicPDF(
     idProductionCanvas,
     idConsumptionCanvas,
     idValueCanvas,
+    idCapitalConsumptionCanvas,
     idPieChart
   );
 

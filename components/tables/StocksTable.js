@@ -59,7 +59,7 @@ export class StocksTable extends React.Component {
           </tbody>
           <tfoot>
           {stocks.length > 0 &&
-            <tr className="with-top-line">
+            <tr className="border-top">
               <td colSpan="2"> Total</td>
               <td className="text-end">{printValue(aggregates.netAmountStocks.amount,0)}  &euro;</td>
               <td className="text-end">{printValue(aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>

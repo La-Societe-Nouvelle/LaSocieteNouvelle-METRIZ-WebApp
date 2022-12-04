@@ -685,7 +685,6 @@ export class AssessmentNRG extends React.Component
     await this.props.onUpdate("nrg");
 
     // update ghg data if total hasn't been directly filled out
-    console.log(impactsData.ghgTotal);
     if(!impactsData.ghgTotal) 
     {
       // ...delete

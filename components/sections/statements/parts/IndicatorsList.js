@@ -148,6 +148,8 @@ const IndicatorsList = (props) => {
             valueAddedDivisionFootprint: { value: null },
             productionDivisionFootprint: { value: null },
             consumptionDivisionFootprint: { value: null },
+            capitalConsumptionDivisionFootprint: { value: null },
+
           },
         });
         setDivisionFootprint(footprint);
@@ -203,6 +205,7 @@ const IndicatorsList = (props) => {
         "#print-Production-" + key,
         "#print-Consumption-" + key,
         "#print-Value-" + key,
+        "#print-CapitalConsumption-" + key,
         environmentalFootprint.includes(key) ? "#piechart-" + key : ""
       );
       setPopUp("");
@@ -372,6 +375,39 @@ const IndicatorsList = (props) => {
                       targetAreaData={
                         indic == "ghg"
                           ? targetSNBCarea.valueAddedTarget.value
+                          : null
+                      }
+                    />
+                  </Col>
+
+                       {/* Capital Consumtion Graph */}
+
+                       <Col sm={4} xl={4} lg={4} md={4}>
+                    <ComparativeGraphs
+                      id={"print-CapitalConsumption-" + indic}
+                      sectorData={
+                        allSectorFootprint[indic.toUpperCase()]
+                          .capitalConsumptionAreaFootprint.value
+                      }
+                      legalunitData={
+                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                          indic
+                        ).value
+                      }
+                      divisionData={
+                        divisionFootprint[indic.toUpperCase()]
+                          .capitalConsumptionDivisionFootprint.value
+                      }
+                      titleChart="Valeur ajoutée nette"
+                      indic={indic}
+                      targetBranchData={
+                        indic == "ghg"
+                          ? targetSNBCbranch.capitalConsumptionTarget.value
+                          : null
+                      }
+                      targetAreaData={
+                        indic == "ghg"
+                          ? targetSNBCarea.capitalConsumptionTarget.value
                           : null
                       }
                     />

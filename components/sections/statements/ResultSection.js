@@ -59,7 +59,6 @@ const ResultSection = (props) => {
   const [divisionFootprint, setDivisionFootprint] = useState(
     props.session.comparativeDivisionFootprints[props.indic.toUpperCase()]
   );
-
   const [targetSNBCbranch, setTargetSNBCbranch] = useState(
     props.session.targetSNBCbranch
   );
@@ -95,8 +94,6 @@ const ResultSection = (props) => {
   };
 
   useEffect(async () => {
-
-
     await getComparativeValues();
 
     setIsLoading(false);
@@ -112,12 +109,15 @@ const ResultSection = (props) => {
         valueAddedDivisionFootprint: { value: null },
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
+        capitalConsumptionDivisionFootprint: { value: null },
+
       };
 
       setDivisionFootprint({
         valueAddedDivisionFootprint: { value: null },
         productionDivisionFootprint: { value: null },
         consumptionDivisionFootprint: { value: null },
+        capitalConsumptionDivisionFootprint: { value: null },
       });
     }
     // GET TARGET SNCB 2030 VALUE
@@ -130,6 +130,8 @@ const ResultSection = (props) => {
         valueAddedTarget: { value: null },
         productionTarget: { value: null },
         consumptionTarget: { value: null },
+        capitalConsumptionTarget: { value: null },
+
       });
     }
 
@@ -145,6 +147,8 @@ const ResultSection = (props) => {
         valueAddedTarget: { value: null },
         productionTarget: { value: null },
         consumptionTarget: { value: null },
+        capitalConsumptionTarget: { value: null },
+
       });
     }
   }
@@ -159,18 +163,23 @@ const ResultSection = (props) => {
     let productionFootprint =
       divisionFootprint[indic.toUpperCase()].productionDivisionFootprint;
     let consumptionFootprint =
-      divisionFootprint[indic.toUpperCase()].consumptionDivisionFootprint;
-
+      divisionFootprint[indic.toUpperCase()].consumptionDivisionFootprint; 
+      let capitalConsumptionDivisionFootprint =
+      divisionFootprint[indic.toUpperCase()].capitalConsumptionDivisionFootprint; 
+      
+      
     props.session.comparativeDivisionFootprints[indic.toUpperCase()] = {
       valueAddedDivisionFootprint: valueAddedFootprint,
       productionDivisionFootprint: productionFootprint,
       consumptionDivisionFootprint: consumptionFootprint,
+      capitalConsumptionDivisionFootprint : capitalConsumptionDivisionFootprint,
     };
 
     setDivisionFootprint({
       valueAddedDivisionFootprint: valueAddedFootprint,
       productionDivisionFootprint: productionFootprint,
       consumptionDivisionFootprint: consumptionFootprint,
+      capitalConsumptionDivisionFootprint : capitalConsumptionDivisionFootprint,
     });
   };
 
@@ -218,6 +227,7 @@ const ResultSection = (props) => {
                 "#Production",
                 "#Consumption",
                 "#Value",
+                '#CapitalConsumption',
                 printGrossImpact.includes(indic) ? "#PieChart" : ""
               )
             }
@@ -300,7 +310,7 @@ const ResultSection = (props) => {
         {!isLoading ?
           <div className="mt-5">
           <Row className="graphs">
-            <Col sm={4} xl={4} lg={4} md={4}>
+            <Col sm={3} xl={3} lg={3} md={3}>
               <h5 className="mb-4">▪ Production</h5>
               <ComparativeGraphs
                 id="Production"
@@ -319,7 +329,7 @@ const ResultSection = (props) => {
                 targetAreaData={targetSNBCarea.productionTarget.value}
               />
             </Col>
-            <Col sm={4} xl={4} lg={4} md={4}>
+            <Col sm={3} xl={3} lg={3} md={3}>
               <h5 className="mb-4">▪ Consommations intermédiaires</h5>
               <ComparativeGraphs
                 id="Consumption"
@@ -338,7 +348,7 @@ const ResultSection = (props) => {
                 targetAreaData={targetSNBCarea.consumptionTarget.value}
               />
             </Col>
-            <Col sm={4} xl={4} lg={4} md={4}>
+            <Col sm={3} xl={3} lg={3} md={3}>
               <h5 className="mb-4">▪ Valeur ajoutée</h5>
               <ComparativeGraphs
                 id="Value"
@@ -355,6 +365,26 @@ const ResultSection = (props) => {
                 indic={indic}
                 targetBranchData={targetSNBCbranch.valueAddedTarget.value}
                 targetAreaData={targetSNBCarea.valueAddedTarget.value}
+              />
+            </Col>
+            
+            <Col sm={3} xl={3} lg={3} md={3}>
+              <h5 className="mb-4">▪ Consommation de capital fixe</h5>
+              <ComparativeGraphs
+                id="CapitalConsumption"
+                sectorData={allSectorFootprint.capitalConsumptionAreaFootprint.value}
+                legalunitData={
+                  session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+                divisionData={
+                  divisionFootprint.capitalConsumptionDivisionFootprint.value
+                }
+                titleChart="Valeur ajoutée nette"
+                indic={indic}
+                targetBranchData={targetSNBCbranch.capitalConsumptionTarget.value}
+                targetAreaData={targetSNBCarea.capitalConsumptionTarget.value}
               />
             </Col>
           </Row>

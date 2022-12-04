@@ -3,15 +3,14 @@
 // React
 import React from "react";
 
-
-
 // Tables
 import { MainAggregatesTable } from "../../tables/MainAggregatesTable";
 import { ImmobilisationsTable } from "../../tables/ImmobilisationsTable";
+import { AmortisationsTable } from "../../tables/AmortisationsTable";
+import { DepreciationsTable } from "../../tables/DepreciationsTable";
 import { IncomeStatementTable } from "../../tables/IncomeStatementTable";
 import { ExpensesTable } from "../../tables/ExpensesTable";
 import { StocksTable } from "../../tables/StocksTable";
-
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */
@@ -33,7 +32,7 @@ export class FinancialDatas extends React.Component {
   }
 
   render() {
-    const { selectedTable} = this.state;
+    const { selectedTable } = this.state;
 
     return (
       <>
@@ -86,21 +85,19 @@ export class FinancialDatas extends React.Component {
           </button>
         </div>
 
-        <div className="table-data">
-          {this.buildtable(selectedTable)}
-
-        </div>
+        <div className="table-data">{this.buildtable(selectedTable)}</div>
         <div className="text-end">
           <button
             className="btn btn-primary me-2"
             onClick={() => this.props.return()}
           >
-            <i className="bi bi-chevron-left"></i> Retour aux comptes d'amortissements
+            <i className="bi bi-chevron-left"></i> Retour aux comptes
+            d'amortissements
           </button>
           <button className={"btn btn-secondary"} onClick={this.props.submit}>
             Valider l'import
             <i className="bi bi-chevron-right"></i>
-                      </button>
+          </button>
         </div>
       </>
     );
@@ -124,9 +121,19 @@ export class FinancialDatas extends React.Component {
         ); // Compte de résultat
       case "immobilisations":
         return (
-          <ImmobilisationsTable
-            financialData={this.props.session.financialData}
-          />
+          <>
+            <ImmobilisationsTable
+              financialData={this.props.session.financialData}
+            />
+            <hr></hr>
+            <AmortisationsTable
+              financialData={this.props.session.financialData}
+            />
+            <hr></hr>
+            <DepreciationsTable
+              financialData={this.props.session.financialData}
+            />
+          </>
         ); // Table des immobilisations
       case "stocks":
         return <StocksTable financialData={this.props.session.financialData} />; // Table des stocks

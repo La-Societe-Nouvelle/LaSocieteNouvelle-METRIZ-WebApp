@@ -5,11 +5,15 @@ import React from "react";
 import { Table } from "react-bootstrap";
 
 // Utils
-import { getAmountItems, printValue } from "../../src/utils/Utils";
+import {
+  getAmountItems,
+  getPrevAmountItems,
+  printValue,
+} from "../../src/utils/Utils";
 
 /* ---------- IMMOBILISATIONS TABLE ---------- */
 
-export class ImmobilisationsTable extends React.Component {
+export class AmortisationsTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,16 +23,23 @@ export class ImmobilisationsTable extends React.Component {
   }
 
   render() {
-    const { immobilisations, investments, aggregates } =
+    const { immobilisations, depreciations, depreciationExpenses } =
       this.props.financialData;
     const { columnSorted } = this.state;
+
+    const amortisations = depreciations.filter((depreciation) =>
+      /^28/.test(depreciation.account)
+    );
+    const amortisationExpenses = depreciationExpenses.filter((expense) =>
+      /^28/.test(expense.accountAux)
+    );
 
     this.sortItems(immobilisations, columnSorted);
 
     return (
       <>
         <Table hover className="immobilisationsTable">
-          <caption>Tableau des immobilisations</caption>
+          <caption>Tableau des amortissements</caption>
           <thead>
             <tr>
               <td
@@ -47,13 +58,17 @@ export class ImmobilisationsTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {immobilisations.map(
-              ({ account, accountLib, amount, prevAmount }) => {
-                let augmentation = investments
-                  .filter((investment) => investment.account == account)
-                  .map((investment) => investment.amount)
-                  .reduce((a, b) => a + b, 0);
-                let dimininution = prevAmount + augmentation - amount;
+            {immobilisations.map(({ account, accountLib }) => {
+              let amortisation = amortisations.filter(
+                (amortisation) => amortisation.accountAux == account
+              )[0];
+              if (amortisation != undefined) {
+                let expenses = amortisationExpenses.filter(
+                  (expense) => expense.accountAux == amortisation.account
+                );
+                let augmentation = getAmountItems(expenses);
+                let dimininution =
+                  amortisation.prevAmount + augmentation - amortisation.amount;
                 return (
                   <tr key={account}>
                     <td>{account}</td>
@@ -62,7 +77,7 @@ export class ImmobilisationsTable extends React.Component {
                         accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end">
-                      {printValue(prevAmount, 0)} &euro;
+                      {printValue(amortisation.prevAmount, 0)} &euro;
                     </td>
                     <td className="text-end">
                       {printValue(augmentation, 0)} &euro;
@@ -70,11 +85,27 @@ export class ImmobilisationsTable extends React.Component {
                     <td className="text-end">
                       {printValue(dimininution, 0)} &euro;
                     </td>
-                    <td className="text-end">{printValue(amount, 0)} &euro;</td>
+                    <td className="text-end">
+                      {printValue(amortisation.amount, 0)} &euro;
+                    </td>
+                  </tr>
+                );
+              } else {
+                return (
+                  <tr key={account}>
+                    <td>{account}</td>
+                    <td>
+                      {accountLib.charAt(0).toUpperCase() +
+                        accountLib.slice(1).toLowerCase()}
+                    </td>
+                    <td className="text-end"></td>
+                    <td className="text-end"></td>
+                    <td className="text-end"></td>
+                    <td className="text-end"></td>
                   </tr>
                 );
               }
-            )}
+            })}
           </tbody>
 
           {immobilisations.length > 0 && (
@@ -82,27 +113,22 @@ export class ImmobilisationsTable extends React.Component {
               <tr>
                 <td colSpan="2">TOTAL</td>
                 <td className="text-end">
+                  {printValue(getPrevAmountItems(amortisations), 0)} &euro;
+                </td>
+                <td className="text-end">
+                  {printValue(getAmountItems(amortisationExpenses), 0)} &euro;
+                </td>
+                <td className="text-end">
                   {printValue(
-                    aggregates.grossAmountImmobilisation.prevAmount,
+                    getPrevAmountItems(amortisations) +
+                      getAmountItems(amortisationExpenses) -
+                      getAmountItems(amortisations),
                     0
                   )}{" "}
                   &euro;
                 </td>
                 <td className="text-end">
-                  {printValue(getAmountItems(investments), 0)} &euro;
-                </td>
-                <td className="text-end">
-                  {printValue(
-                    aggregates.grossAmountImmobilisation.prevAmount +
-                      getAmountItems(investments) -
-                      aggregates.grossAmountImmobilisation.amount,
-                    0
-                  )}{" "}
-                  &euro;
-                </td>
-                <td className="text-end">
-                  {printValue(aggregates.grossAmountImmobilisation.amount, 0)}{" "}
-                  &euro;
+                  {printValue(getAmountItems(amortisations), 0)} &euro;
                 </td>
               </tr>
             </tfoot>

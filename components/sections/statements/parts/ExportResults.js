@@ -44,6 +44,7 @@ const ExportResults = props => {
         "#print-Production-" + indic,
         "#print-Consumption-" + indic,
         "#print-Value-" + indic,
+        "#print-CapitalConsumption-" + indic,
         printGrossImpact.includes(indic) ? "#piechart-" + indic : "" 
         
       );
