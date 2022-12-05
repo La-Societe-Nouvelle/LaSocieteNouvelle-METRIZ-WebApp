@@ -97,6 +97,7 @@ export class FinancialData {
         buildImmobilisationsPeriods(this.immobilisations);
         buildAmortisationsPeriods(this.depreciations);
         buildAmortisationsExpensesPeriods(this.depreciationExpenses);
+        mergePeriods(this.immobilisations, this.depreciations, this.depreciationExpenses);
     }
 
     /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
@@ -670,12 +671,13 @@ const buildAmortisationsExpensesPeriods = (expenses) =>
                     dateEnd: flow.date,
                     amount: amountPeriod
                 });
+
+                // update current values
+                dateStart = flow.date;
             }
-            // update current values
-            dateStart = flow.date;
         }
 
-        if (currentAmount < cumul) {
+        if (currentAmount <= cumul) {
             // add last period
             expense.periods.push({
                 dateStart: dateStart,
@@ -696,4 +698,74 @@ const getFlowsByDate = (entries) =>
         else flow.amount+= entry.amount;
     })
     return flows.sort((a,b) => parseInt(a.date) > parseInt(b.date));
+}
+
+const mergePeriods = (immobilisations,amortisations,depreciationExpenses) =>
+{
+    amortisations.forEach(amortisation =>
+    {
+        let immobilisation = immobilisations.filter(immobilisation => immobilisation.account == amortisation.accountAux)[0];
+        let expenses = depreciationExpenses.filter(expense => expense.accountAux == amortisation.account);
+
+        let dates = amortisation.periods
+            .concat(immobilisation.periods)
+            .concat(expenses.map(expense => expense.periods).reduce((a,b) => a.concat(b),[]))
+            .map(period => [period.dateStart,period.dateEnd])
+            .reduce((a,b) => a.concat(b),[])
+            .filter((value, index, self) => index === self.findIndex(item => item === value))
+            .filter(date => date != "")
+            .sort((a,b) => parseInt(a) > parseInt(b));
+        
+        updatePeriods(amortisation.periods,dates);
+        updatePeriods(immobilisation.periods,dates);
+        expenses.forEach(expense => updateExpensesPeriods(expense.periods,immobilisation.periods,amortisation.periods,dates))
+    })
+}
+
+const updatePeriods = (periods,dates) =>
+{
+    let datesStart = periods.map(period => period.dateStart);
+    dates.forEach(date =>
+    {
+        if (!datesStart.includes(date)) {
+            let period = periods.filter(period => (period.dateStart=="" || parseInt(period.dateStart) < parseInt(date)) && (period.dateEnd=="" || parseInt(period.dateEnd) > parseInt(date)))[0];
+            periods.push({
+                dateStart: date,
+                dateEnd: period.dateEnd,
+                amount: period.amount
+            })
+            period.dateEnd = date;
+        }
+    })
+}
+
+const updateExpensesPeriods = (periods,immobilisationPeriods,amortisationPeriods,dates) =>
+{
+    let datesStart = periods.map(period => period.dateStart);
+    dates.forEach(date =>
+    {
+        if (!datesStart.includes(date)) {
+
+            let period = periods.filter(period => (period.dateStart=="" || parseInt(period.dateStart) < parseInt(date)) && (period.dateEnd=="" || parseInt(period.dateEnd) > parseInt(date)))[0];
+            
+            let prevPeriodImmobilisation = immobilisationPeriods.filter(period => period.dateEnd==date)[0];
+            let prevPeriodAmortisation = amortisationPeriods.filter(period => period.dateEnd==date)[0];
+            let prevAmount = prevPeriodImmobilisation.amount-prevPeriodAmortisation.amount;
+
+            let nextPeriodImmobilisation = immobilisationPeriods.filter(period => period.dateStart==date)[0];
+            let nextPeriodAmortisation = amortisationPeriods.filter(period => period.dateStart==date)[0];
+            let nextAmount = nextPeriodImmobilisation.amount-nextPeriodAmortisation.amount;
+
+            let prevProportion = prevAmount/(prevAmount+nextAmount);
+            let nextProportion = nextAmount/(prevAmount+nextAmount);
+
+            periods.push({
+                dateStart: date,
+                dateEnd: period.dateEnd,
+                amount: period.amount*nextProportion
+            })
+            period.dateEnd = date;
+            period.amount = period.amount*prevProportion;
+        }
+    })
 }
