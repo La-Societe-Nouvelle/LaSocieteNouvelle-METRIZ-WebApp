@@ -13,9 +13,9 @@ import { getAmountItems, getTargetSerieId } from "../utils/Utils";
 import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { ComparativeData } from "../ComparativeData";
-import retrieveSerieFootprint from "../services/responses/serieFootprint";
-import retrieveMacroFootprint from "../services/responses/macroFootprint";
-import retrieveHistoricalSerie from "../services/responses/historicalFootprint";
+import getTargetSerieData from "/src/services/responses/TargetSerieData";
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -152,11 +152,11 @@ async function updateComparativeData(
 
 
   // Area Footprint
-  let newComparativeData = await retrieveMacroFootprint(indic,"00",comparativeData,'areaFootprint');
+  let newComparativeData = await getMacroSerieData(indic,"00",comparativeData,'areaFootprint');
 
   // Target Area Footprint
   if (idTarget) {
-    newComparativeData = await retrieveSerieFootprint(
+    newComparativeData = await getTargetSerieData(
       idTarget,
       "00",
       indic,
@@ -169,10 +169,10 @@ async function updateComparativeData(
   if (comparativeDivision != "00") {
 
     // Division Footprint
-    newComparativeData =  await retrieveMacroFootprint(indic,comparativeDivision,newComparativeData,'divisionFootprint');
+    newComparativeData =  await getMacroSerieData(indic,comparativeDivision,newComparativeData,'divisionFootprint');
    
     
-    newComparativeData = await retrieveHistoricalSerie(
+    newComparativeData = await getHistoricalSerieData(
       comparativeDivision,
       indic,
       newComparativeData,
@@ -180,7 +180,7 @@ async function updateComparativeData(
     );
     // Target Division Footprint
     if (idTarget) {
-      newComparativeData = await retrieveSerieFootprint(
+      newComparativeData = await getTargetSerieData(
         idTarget,
         comparativeDivision,
         indic,

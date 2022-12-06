@@ -35,10 +35,10 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
-import { getTargetSerieId } from "/src/utils/Utils";
-import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
-import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
-import retrieveHistoricalSerie from "/src/services/responses/historicalFootprint";
+import getTargetSerieId from "/src/utils/Utils";
+import getTargetSerieData from "/src/services/responses/TargetSerieData";
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 const IndicatorsList = (props) => {
   const [validations, SetValidations] = useState(props.session.validations);
@@ -60,16 +60,19 @@ const IndicatorsList = (props) => {
   }, [validations]);
 
   const updateComparativeAreaData = async (indic) => {
+
     let idTarget = getTargetSerieId(indic);
-    let newComparativeData = await retrieveMacroFootprint(
+    
+    let newComparativeData = await getMacroSerieData(
       indic,
       "00",
       comparativeData,
       "areaFootprint"
     );
+
     // Target Area Footprint
     if (idTarget) {
-      newComparativeData = await retrieveSerieFootprint(
+      newComparativeData = await getTargetSerieData(
         idTarget,
         "00",
         indic,
@@ -85,32 +88,28 @@ const IndicatorsList = (props) => {
     newComparativeData,
     comparativeDivision
   ) => {
-    let idTarget = getTargetSerieId(indic);
 
-    console.log(newComparativeData);
-    newComparativeData = await retrieveMacroFootprint(
+    newComparativeData = await getMacroSerieData(
       indic,
       comparativeDivision,
       newComparativeData,
       "divisionFootprint"
     );
-    newComparativeData = await retrieveHistoricalSerie(
+    newComparativeData = await getHistoricalSerieData(
       comparativeDivision,
       indic,
       newComparativeData,
       "trendsFootprint"
     );
 
-    if (idTarget) {
-      newComparativeData = await retrieveSerieFootprint(
-        idTarget,
+      newComparativeData = await getHistoricalSerieData(
         comparativeDivision,
         indic,
         newComparativeData,
         "targetDivisionFootprint"
       );
-    }
-
+ 
+        console.log(newComparativeData)
     return newComparativeData;
   };
 
@@ -167,6 +166,9 @@ const IndicatorsList = (props) => {
 
   // Update comparative division
   const updateDivision = async (division) => {
+
+    setDisplayGraph(false);
+
     props.session.comparativeData.activityCode = division;
 
     let newComparativeData = comparativeData;
@@ -183,8 +185,8 @@ const IndicatorsList = (props) => {
 
     props.session.comparativeData = newComparativeData;
     setComparativeData(newComparativeData);
-
     setComparativeDivision(division);
+    setDisplayGraph(true);
   };
 
   // Export pdf on click
@@ -271,9 +273,11 @@ const IndicatorsList = (props) => {
 
   return (
     <>
+  
       {validations.length > 0 &&
         displayGraph &&
         validations.map((indic, key) => (
+    
           <div className="hidden" key={key}>
             <Row className="graphs">
               <Col sm={4} xl={4} lg={4} md={4}>
@@ -295,7 +299,7 @@ const IndicatorsList = (props) => {
                     ].value,
                     null,
                     comparativeData.production.targetDivisionFootprint
-                      .indicators[indic].value,
+                      .indicators[indic].at(-1).value,
                   ]}
                   titleChart="Production"
                   indic={indic}
@@ -318,7 +322,7 @@ const IndicatorsList = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.intermediateConsumption
-                      .targetDivisionFootprint.indicators[indic].value,
+                      .targetDivisionFootprint.indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -340,7 +344,7 @@ const IndicatorsList = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.fixedCapitalConsumption
-                      .targetDivisionFootprint.indicators[indic].value,
+                      .targetDivisionFootprint.indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -364,7 +368,7 @@ const IndicatorsList = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.netValueAdded.targetDivisionFootprint
-                      .indicators[indic].value,
+                      .indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />

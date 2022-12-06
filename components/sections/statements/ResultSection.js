@@ -42,11 +42,10 @@ import PieGraph from "../../graphs/PieGraph";
 import { ComparativeTable } from "../../tables/ComparativeTable";
 import { IndicatorExpensesTable } from "../../tables/IndicatorExpensesTable";
 import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregatesTable";
-import retrieveSerieFootprint from "/src/services/responses/serieFootprint";
-import retrieveMacroFootprint from "/src/services/responses/macroFootprint";
-import retrieveHistoricalSerie from "/src/services/responses/historicalFootprint";
 
-import { getTargetSerieId } from "../../../src/utils/Utils";
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
+
 import TrendsGraph from "../../graphs/TrendsGraph";
 
 const ResultSection = (props) => {
@@ -71,11 +70,22 @@ const ResultSection = (props) => {
 
   const [divisionsOptions, setDivisionsOptions] = useState([]);
 
-  const {
-    intermediateConsumption,
-    capitalConsumption,
-    netValueAdded,
-  } = props.session.financialData.aggregates;
+  useEffect(() => {
+    let options = [];
+    //Divisions select options
+    Object.entries(divisions)
+      .sort((a, b) => parseInt(a) - parseInt(b))
+      .map(([value, label]) => {
+        if (value != "00") {
+          options.push({ value: value, label: value + " - " + label });
+        }
+      });
+
+    setDivisionsOptions(options);
+  }, []);
+
+  const { intermediateConsumption, capitalConsumption, netValueAdded } =
+    props.session.financialData.aggregates;
 
   const changeComparativeDivision = async (event) => {
     let division = event.value;
@@ -86,58 +96,30 @@ const ResultSection = (props) => {
     setComparativeDivision(division);
   };
 
-  useEffect(()=>{
-    
-      let options = [];
-      //Divisions select options
-      Object.entries(divisions)
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .map(([value, label]) =>     
-      {
-        if(value != '00') {
-          options.push({ value: value, label: value + " - " + label })
-        }
-      }
-      );
-
-      setDivisionsOptions(options);
-  },[]);
-
-  useEffect(async () => {
-
-    setIsLoading(false);
-  }, [comparativeDivision, indic]);
-
- 
   const updateComparativeData = async (division) => {
-
-    let idTarget = getTargetSerieId(indic);
 
     let newComparativeData = comparativeData;
 
-    newComparativeData = await retrieveMacroFootprint(
+    newComparativeData = await getMacroSerieData(
       indic,
       division,
       newComparativeData,
       "divisionFootprint"
     );
-        
-    newComparativeData = await retrieveHistoricalSerie(
+
+    newComparativeData = await getHistoricalSerieData(
       division,
       indic,
       newComparativeData,
       "trendsFootprint"
     );
 
-    if (idTarget) {
-      newComparativeData = await retrieveSerieFootprint(
-        idTarget,
-        division,
-        indic,
-        newComparativeData,
-        "targetDivisionFootprint"
-      );
-    }
+    newComparativeData = await getHistoricalSerieData(
+      division,
+      indic,
+      newComparativeData,
+      "targetDivisionFootprint"
+    );
 
     props.session.comparativeData = newComparativeData;
     setComparativeData(newComparativeData);
@@ -195,18 +177,17 @@ const ResultSection = (props) => {
             Télécharger le rapport <i className="bi bi-download"></i>
           </Button>
         </div>
-        <section className="step">              
-          <div className="d-flex align-items-center mb-4 rapport-indic ">
-                <Image
-                  src={"/resources/icon-ese-bleues/" + indic + ".png"}
-                  className="icon-ese me-2"
-                />
-                <h3>{metaIndics[indic].libelle}</h3>
-           </div>
-          <Row>
-            <Col lg={printGrossImpact.includes(indic) ? "9" : "12"}>
-
-
+      </div>
+      <section className="step">
+        <div className="d-flex align-items-center mb-4 rapport-indic">
+          <Image
+            src={"/resources/icon-ese-bleues/" + indic + ".png"}
+            className="icon-ese me-2"
+          />
+          <h3>{metaIndics[indic].libelle}</h3>
+        </div>
+        <Row>
+          <Col lg={printGrossImpact.includes(indic) ? "9" : "12"}>
             <Tabs
               defaultActiveKey="mainAggregates"
               transition={false}
@@ -227,35 +208,41 @@ const ResultSection = (props) => {
               </Tab>
             </Tabs>
           </Col>
-    
-            {printGrossImpact.includes(indic) && (
-              <Col sm={3}>
-                <div className="border mt-5">
-                  <h3 className="text-center">
-                    Répartition des impacts bruts (en %)
-                  </h3>
+          {printGrossImpact.includes(indic) && (
+            <Col sm={3}>
+              <div className="border mt-5">
+                <h3 className="text-center">
+                  Répartition des impacts bruts (en %)
+                </h3>
+                <PieGraph
+                  intermediateConsumption={intermediateConsumption.footprint.indicators[
+                    indic
+                  ].getGrossImpact(intermediateConsumption.amount)}
+                  capitalConsumption={capitalConsumption.footprint.indicators[
+                    indic
+                  ].getGrossImpact(capitalConsumption.amount)}
+                  netValueAdded={netValueAdded.footprint.indicators[
+                    indic
+                  ].getGrossImpact(netValueAdded.amount)}
+                />
+              </div>
+            </Col>
+          )}
+        </Row>
+      </section>
+      <section className="step">
+        <h3>Comparaison par activité</h3>
 
-                  <div className="">
-                    <PieGraph
-                      intermediateConsumption={intermediateConsumption.footprint.indicators[
-                        indic
-                      ].getGrossImpact(intermediateConsumption.amount)}
-                      capitalConsumption={capitalConsumption.footprint.indicators[
-                        indic
-                      ].getGrossImpact(capitalConsumption.amount)}
-                      netValueAdded={netValueAdded.footprint.indicators[
-                        indic
-                      ].getGrossImpact(netValueAdded.amount)}
-                    />
-                  </div>
-
-                </div>
-              </Col>
-            )}
-          </Row>
-        </section>
-        <section className="step">
-          <h3>Comparaison par activité</h3>
+        <Select
+          className="mb-3 small-text"
+          defaultValue={{
+            label: comparativeDivision + " - " + divisions[comparativeDivision],
+            value: comparativeDivision,
+          }}
+          placeholder={"Choisissez un secteur d'activité"}
+          options={divisionsOptions}
+          onChange={changeComparativeDivision}
+        />
 
         {error && <ErrorApi />}
         <div className="graph-container">
@@ -281,7 +268,7 @@ const ResultSection = (props) => {
                     ].value,
                     null,
                     comparativeData.production.targetDivisionFootprint
-                      .indicators[indic].value,
+                      .indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -304,7 +291,7 @@ const ResultSection = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.intermediateConsumption
-                      .targetDivisionFootprint.indicators[indic].value,
+                      .targetDivisionFootprint.indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -327,7 +314,7 @@ const ResultSection = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.fixedCapitalConsumption
-                      .targetDivisionFootprint.indicators[indic].value,
+                      .targetDivisionFootprint.indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -353,7 +340,7 @@ const ResultSection = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.netValueAdded.targetDivisionFootprint
-                      .indicators[indic].value,
+                      .indicators[indic].at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -368,89 +355,93 @@ const ResultSection = (props) => {
           comparativeData={comparativeData}
         />
       </section>
-      {
-        Array.isArray(comparativeData.production.trendsFootprint.indicators[indic]) &&
+      {Array.isArray(
+        comparativeData.production.trendsFootprint.indicators[indic]
+      ) && (
         <section className="step">
-    
           <h3>Courbes d'évolution</h3>
-    
           <Row>
-            <Col lg={6}>
+            <Col lg={8}>
+              <TrendsGraph
+                title="Production"
+                unit={metaIndics[indic].unit}
+                trends={
+                  comparativeData.production.trendsFootprint.indicators[indic]
+                }
+                target={
+                  comparativeData.production.targetDivisionFootprint.indicators[
+                    indic
+                  ]
+                }
+                current={
+                  session.financialData.aggregates.production.footprint.getIndicator(
+                    indic
+                  ).value
+                }
+              />
+              <div className="hidden">
                 <TrendsGraph
-                  title="Production"
+                  title="Consommations intermédiaires"
                   unit={metaIndics[indic].unit}
                   trends={
-                    comparativeData.production.trendsFootprint.indicators[indic]
+                    comparativeData.intermediateConsumption.trendsFootprint
+                      .indicators[indic]
                   }
                   target={
-                    comparativeData.production.targetDivisionFootprint.indicators[indic]
+                    comparativeData.intermediateConsumption
+                      .targetDivisionFootprint.indicators[indic]
                   }
                   current={
-                    session.financialData.aggregates.production.footprint.getIndicator(
+                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
                       indic
                     ).value
                   }
                 />
-              </Col>
-
-            <Col lg={6}>
-              <TrendsGraph
-                title="Consommations intermédiaires"
-                unit={metaIndics[indic].unit}
-                trends={
-                  comparativeData.intermediateConsumption.trendsFootprint
-                    .indicators[indic]
-                }
-                target={
-                  comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[indic]
-                }
-                current={
-                  session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                    indic
-                  ).value
-                }
-              />
-            </Col>
-            <Col lg={6}>
-              <TrendsGraph
-                title="Consommation de capital fixe"
-                unit={metaIndics[indic].unit}
-                trends={
-                  comparativeData.fixedCapitalConsumption.trendsFootprint
-                    .indicators[indic]
-                }
-                target={
-                  comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[indic]
-                }
-                current={
-                  session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                    indic
-                  ).value
-                }
-                
-              />
-            </Col>
-            <Col lg={6}>
-              <TrendsGraph
-                title="Valeur ajoutée nette"
-                unit={metaIndics[indic].unit}
-                trends={
-                  comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-                }
-                target={
-                  comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic]
-                }
-                current={
-                  session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                    indic
-                  ).value
-                }
-              />
+              </div>
+              <div className="hidden">
+                <TrendsGraph
+                  title="Consommation de capital fixe"
+                  unit={metaIndics[indic].unit}
+                  trends={
+                    comparativeData.fixedCapitalConsumption.trendsFootprint
+                      .indicators[indic]
+                  }
+                  target={
+                    comparativeData.fixedCapitalConsumption
+                      .targetDivisionFootprint.indicators[indic]
+                  }
+                  current={
+                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
+                />
+              </div>
+              <div className="hidden">
+                <TrendsGraph
+                  title="Valeur ajoutée nette"
+                  unit={metaIndics[indic].unit}
+                  trends={
+                    comparativeData.netValueAdded.trendsFootprint.indicators[
+                      indic
+                    ]
+                  }
+                  target={
+                    comparativeData.netValueAdded.targetDivisionFootprint
+                      .indicators[indic]
+                  }
+                  current={
+                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
+                />
+              </div>
             </Col>
           </Row>
-         </section>
-        }
-    
+        </section>
+      )}
+
       <section className="step">
         <h3>Note d'analyse</h3>
         <div id="analyse">
@@ -480,7 +471,6 @@ const ResultSection = (props) => {
           </Button>
         </div>
       </section>
-      </div>
     </>
   );
 };

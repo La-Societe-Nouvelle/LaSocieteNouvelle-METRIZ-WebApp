@@ -1,4 +1,5 @@
 import { ComparativeFootprint } from "./footprintObjects/ComparativeFootprint";
+import { HistoricalFootprint } from "./footprintObjects/HistoricalFootprint";
 
 export class ComparativeData {
   constructor(props) {
@@ -13,32 +14,32 @@ export class ComparativeData {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
-      targetDivisionFootprint: new ComparativeFootprint(),
-      trendsFootprint: new ComparativeFootprint(),
-    };
+      targetDivisionFootprint: new HistoricalFootprint(),
+      trendsFootprint: new HistoricalFootprint(),
+    };  
 
     this.intermediateConsumption = props.intermediateConsumption || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
-      targetDivisionFootprint: new ComparativeFootprint(),
-      trendsFootprint: new ComparativeFootprint(),
+      targetDivisionFootprint: new HistoricalFootprint(),
+      trendsFootprint: new HistoricalFootprint(),
     };
 
     this.production = props.production || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
-      targetDivisionFootprint: new ComparativeFootprint(),
-      trendsFootprint: new ComparativeFootprint(),
+      targetDivisionFootprint: new HistoricalFootprint(),
+      trendsFootprint: new HistoricalFootprint(),
     };
 
     this.netValueAdded = props.intermediateConsumption || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
-      targetDivisionFootprint: new ComparativeFootprint(),
-      trendsFootprint: new ComparativeFootprint(),
+      targetDivisionFootprint: new HistoricalFootprint(),
+      trendsFootprint: new HistoricalFootprint(),
     };
   }
 }
