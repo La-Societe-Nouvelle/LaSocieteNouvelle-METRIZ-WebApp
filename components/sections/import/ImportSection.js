@@ -24,7 +24,7 @@ function ImportSection(props) {
   );
   const [file, setFile] = useState([]);
   const [importedData, setImportedData] = useState(null);
-  const [view, setView] = useState(0);
+  const [view, setView] = useState(  props.session.progression > 1  ? 3 : 0);
   const [errorFile, setErrorFile] = useState(false);
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -54,7 +54,6 @@ function ImportSection(props) {
     <Container fluid>
       <section className="step">
         <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
-
         {view == 0 && (
           <ImportForm
             onChangeCorporateName={handeCorporateName}
@@ -114,7 +113,7 @@ function ImportSection(props) {
             meta={importedData.meta}
           />
         )}
-        {view == 3 && <FinancialDatas {...props} return={() => setView(2)} />}
+        {view == 3 && <FinancialDatas {...props} return={() => setView(2)} reset={() => setView(0)} />}
       </section>
     </Container>
   );
