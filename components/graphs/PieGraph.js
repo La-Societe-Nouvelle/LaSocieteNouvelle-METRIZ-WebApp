@@ -46,18 +46,20 @@ function PieGraph(props) {
     devicePixelRatio: 2,
 
     plugins: {
+
       legend: {
         position: "bottom",
         align : "start",
+        fullSize	: false,
         labels: {
-          boxWidth: 10,
-          boxHeight : 10,
           font: {
-            size: 12,
+            size: 13,
           },
         },
       },
+      
     },
+    
   };
 
   return (
