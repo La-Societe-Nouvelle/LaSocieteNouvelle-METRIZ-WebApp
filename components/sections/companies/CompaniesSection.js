@@ -31,6 +31,7 @@ export class CompaniesSection extends React.Component
 
   nextStep = () => 
   {
+
     // if current state is for identified companies
     if (this.state.companyStep==1) {
       const unidentifiedCompanies = this.state.companies.filter((company) => company.state == "default");
@@ -41,7 +42,7 @@ export class CompaniesSection extends React.Component
       }
     }
     // if current state is for unidentified companies
-    else if (this.companyStep==2) {
+    else if (this.state.companyStep==2) {
       this.props.submit()
     }
   }

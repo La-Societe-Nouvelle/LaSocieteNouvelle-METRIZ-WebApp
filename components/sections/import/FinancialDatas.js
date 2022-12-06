@@ -107,7 +107,7 @@ export class FinancialDatas extends React.Component {
           }
       
           <button className={"btn btn-secondary"} onClick={this.props.submit}>
-          { this.props.session.progression > 1 ?  "Continuer mon analyse" : "Valider l'import" }
+          { this.props.session.progression > 1 ?  "Reprendre mon analyse" : "Valider l'import" }
             <i className="bi bi-chevron-right"></i>
           </button>
         </div>

@@ -10,7 +10,7 @@ import { Table } from "react-bootstrap";
 
 /* ---------- COMPANIES TABLE ---------- */
 
-export class CorporateIdTable extends React.Component {
+export class IdentifiedCompaniesTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -35,6 +35,7 @@ export class CorporateIdTable extends React.Component {
         <Table>
           <thead>
             <tr>
+              <td width={10}></td>
               <td
                 onClick={() => this.changeColumnSorted("identifiant")}
                 className="siren"
@@ -189,12 +190,12 @@ class RowTableCompanies extends React.Component {
   }
 
   render() {
-    const { corporateName, account, amount, status } = this.props;
+    const { corporateName, account, amount, status, isDefaultAccount } = this.props;
     const { corporateId } = this.state;
     let icon;
     if (corporateId && status != 200) {
       icon = (
-        <i className="bi bi-arrow-repeat text-success"   title="Données prêtes à être synchronisées"></i>
+        <i className="bi bi-arrow-repeat text-success" title="Données prêtes à être synchronisées"></i>
 
       );
     }
@@ -207,20 +208,22 @@ class RowTableCompanies extends React.Component {
     }
     if (status == 404) {
       icon = (
-        <i className="bi bi-x-lg text-error"  title="Erreur lors de la synchronisation"></i>
+        <i className="bi bi-x-lg text-danger"  title="Erreur lors de la synchronisation"></i>
 
       );
     }
-    if (!corporateId) {
+    if (!corporateId && !isDefaultAccount) {
       icon = (
-        <i className="bi bi-exclamation-triangle text-warning"  title="Données non synchronisables"></i>
+        <i className="bi bi-exclamation-circle text-info"  title="Donnée manquante"></i>
       );
     }
 
     return (
       <tr>
+       <td>
+       {icon}
+        </td> 
         <td className="siren-input">
-          {icon}
           <InputText
               value={corporateId}
               onUpdate={this.updateCorporateId.bind(this)}

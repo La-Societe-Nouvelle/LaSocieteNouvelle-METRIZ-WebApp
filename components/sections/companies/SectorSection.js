@@ -4,7 +4,7 @@
 import React from "react";
 
 // Components
-import { CompaniesTable } from "../../tables/CompaniesTable";
+import { UnidentifiedCompaniesTable } from "../../tables/UnidentifiedCompaniesTable";
 import { ProgressBar } from "../../popups/ProgressBar";
 
 // Readers
@@ -117,7 +117,6 @@ export class SectorSection extends React.Component
             <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
             <h3 className="subtitle mb-4 ">Synchronisation des données grâce au secteur d'activité</h3>
           </div>
-   
           <div className="step 3">
             <div className="table-container">
               <div className="table-data table-company">
@@ -131,16 +130,16 @@ export class SectorSection extends React.Component
                   </div>}
                 {/* ---------- Show message missing data ---------- */}
                 {(!error && !isNextStepAvailable) &&
-                  <div className="alert alert-warning">
-                  <p><i className="bi bi-exclamation-triangle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
-                  <button className={"btn btn-warning"}
+                  <div className="alert alert-syncronise">
+                  <p><i className="bi bi bi-exclamation-circle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
+                  <button className={"btn btn-secondary"}
                     onClick={() => this.synchroniseCompanies()}>
                     <i className="bi bi-arrow-repeat"></i> Synchroniser les données
                   </button>
                 </div>}
                 {/* ---------- Show message significative accounts have default activity ---------- */}
                 {isSignificativeCompaniesWithoutActivity &&
-                  <div className="alert alert-warning">
+                  <div className="alert alert-warning"> 
                     <p><i className="bi bi-exclamation-triangle"></i> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.</p>
                     <button
                       className={"btn btn-warning"}
@@ -178,7 +177,7 @@ export class SectorSection extends React.Component
                 </div>
 
                 {/* ---------- Table ---------- */}
-                <CompaniesTable
+                <UnidentifiedCompaniesTable
                   nbItems={nbItems == "all" ? unidentifiedCompanies.length : parseInt(nbItems)}
                   onUpdate={this.updateFootprints.bind(this)}
                   companies={companiesShowed}
@@ -208,7 +207,7 @@ export class SectorSection extends React.Component
               id="validation-button"
               disabled={!isNextStepAvailable}
               onClick={this.props.nextStep}>
-              <i className="bi bi-chevron-right"></i>Mesurer l'impact
+              Mesurer l'impact <i className="bi bi-chevron-right"></i>
             </button>
           </div>
         </section>
