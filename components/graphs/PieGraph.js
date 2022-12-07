@@ -57,6 +57,11 @@ function PieGraph(props) {
           },
         },
       },
+      tooltip: {
+        backgroundColor: '#191558',
+        padding : 10,
+        cornerRadius: 2
+      }
       
     },
     

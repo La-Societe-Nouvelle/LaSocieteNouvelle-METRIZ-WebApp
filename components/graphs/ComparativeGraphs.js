@@ -5,55 +5,52 @@ import { Bar } from "react-chartjs-2";
 import metaIndics from "/lib/indics";
 
 const ComparativeGraphs = (props) => {
-  const [chartData, setChartData] = useState({ datasets: [] });
 
-  const [id] = useState(props.id);
-  const [unit] = useState(metaIndics[props.indic].unit);
+  const id  = props.id;
+  const unit  = metaIndics[props.indic].unit;
+  const precision = metaIndics[props.indic].nbDecimals;
 
-console.log( props.targetData)
-  const chart = () => {
-    const labels = ["France", "Exercice en cours", "Branche"];
+  const labels = ["France", "Exercice en cours", "Branche"];
+  const data = props.graphDataset.map(data => data ? data.toFixed(precision) : null);
+  const targetData = props.targetData.map(data => data ? data.toFixed(precision) : null);
+  // Remove "Branche" label if no comparative division selected
+  if(props.graphDataset[2] == null) {
+    labels.pop()
+  }
 
-    if(props.comparativeData[2] == null) {
-      labels.pop()
-    }
-    setChartData({
-      labels: labels,
-      datasets: [
-        {
-          data: props.comparativeData,
-          skipNull: true,
-          backgroundColor: [
-            "RGBA(176,185,247,1)",
-            "RGBA(250,89,95,1)",
-            "RGBA(255,214,156,1)",
-          ],
-          borderWidth: 0,
-          type: "bar",
-          barPercentage: 0.6,
-          categoryPercentage: 0.6,
-        },
-        {
-          label: "Objectifs 2030",
-          data: props.targetData,
-          skipNull: true,
-          backgroundColor: [
-            "RGBA(215,220,251,1)",
-            "RGBA(215,220,251,1)",
-            "RGBA(255,234,205,1)",
-          ],
-          borderWidth: 0,
-          barPercentage: 0.6,
-          categoryPercentage: 0.6,
-        },
-      ],
-    });
+  // Data for chart 
+  const chartData = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Valeur ",
+        data: data,
+        skipNull: true,
+        backgroundColor: [
+          "RGBA(176,185,247,1)",
+          "RGBA(250,89,95,1)",
+          "RGBA(255,214,156,1)",
+        ],
+        borderWidth: 0,
+        type: "bar",
+        barPercentage: 0.6,
+        categoryPercentage: 0.6,
+      },
+      {
+        label: "Objectif ",
+        data: targetData,
+        skipNull: true,
+        backgroundColor: [
+          "RGBA(215,220,251,1)",
+          "RGBA(215,220,251,1)",
+          "RGBA(255,234,205,1)",
+        ],
+        borderWidth: 0,
+        barPercentage: 0.6,
+        categoryPercentage: 0.6,
+      },
+    ],
   };
-
-  useEffect(() => {
-    chart();
-  }, [props.indic, props.comparativeData]);
-
   return (
     <Bar
       id={id}
@@ -68,8 +65,8 @@ console.log( props.targetData)
               text: unit,
               color: "#191558",
               font : {
-                size: 8,
-                weight : 'bold'
+                size: 10,
+                weight : 'bolder'
               }
             },
             ticks: {
@@ -107,7 +104,13 @@ console.log( props.targetData)
           title: {
             display: false,
           },
+          tooltip: {
+            backgroundColor: '#191558',
+            padding : 10,
+            cornerRadius: 2
+          }
         },
+     
       }}
     />
   );
