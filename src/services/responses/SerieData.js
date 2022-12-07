@@ -4,7 +4,7 @@ import {
 } from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
-const getTargetSerieData = async (
+const getSerieData = async (
   id,
   code,
   indic,
@@ -85,4 +85,4 @@ const getTargetSerieData = async (
   return serieFootprint;
 };
 
-export default getTargetSerieData;
+export default getSerieData;

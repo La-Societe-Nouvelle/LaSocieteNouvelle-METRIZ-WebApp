@@ -13,7 +13,7 @@ import { getAmountItems, getTargetSerieId } from "../utils/Utils";
 import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { ComparativeData } from "../ComparativeData";
-import getTargetSerieData from "/src/services/responses/TargetSerieData";
+import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
@@ -79,19 +79,28 @@ const updater_1_0_4 = async (sessionData) => {
     dataGrossFixedCapitalFormationAggregate;
 };
 
-const updater_1_0_3 = async (sessionData) => {
-  // delete old objects from session
+// ------------------------------------------------------------------
+// Updater
+// ------------------------------------------------------------------
 
+const updater_1_0_3 = async (sessionData) => {
+
+  // ----------------------------------------------------------------
+  // Get comparative data (Division, Target & Trends) 
+  // for each aggregate and update session for each validated indicators
+  // ----------------------------------------------------------------
+
+  // delete old objects from session
   delete sessionData.comparativeAreaFootprints;
   delete sessionData.targetSNBCarea;
   delete sessionData.targetSNBCbranch;
 
   let newComparativeData = new ComparativeData();
-
+  // get old comparative division code
   let code = sessionData.comparativeDivision;
-  
+
   for await (const indic of sessionData.validations) {
-    // update comparative data according to validated indicators
+    // update comparative data for each validated indicators
     const updatedData = await updateComparativeData(
       indic,
       code,
@@ -99,11 +108,13 @@ const updater_1_0_3 = async (sessionData) => {
     );
     newComparativeData = updatedData;
   }
-  // delete comparative division
+
+  // delete old property and assign division code into comparative data object
   delete sessionData.comparativeDivision;
+  sessionData.comparativeData.activityCode = code;
+
   // update session with new values
   sessionData.comparativeData = newComparativeData;
-  sessionData.comparativeData.activityCode = code;
 };
 
 const updater_1_0_2 = (sessionData) => {
@@ -143,6 +154,10 @@ const updater_1_0_1 = (sessionData) => {
     getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
+
+
+// ----------------------------------------------------------------
+
 async function updateComparativeData(
   indic,
   comparativeDivision,
@@ -150,13 +165,17 @@ async function updateComparativeData(
 ) {
   let idTarget = getTargetSerieId(indic);
 
-
   // Area Footprint
-  let newComparativeData = await getMacroSerieData(indic,"00",comparativeData,'areaFootprint');
+  let newComparativeData = await getMacroSerieData(
+    indic,
+    "00",
+    comparativeData,
+    "areaFootprint"
+  );
 
   // Target Area Footprint
   if (idTarget) {
-    newComparativeData = await getTargetSerieData(
+    newComparativeData = await getSerieData(
       idTarget,
       "00",
       indic,
@@ -165,13 +184,15 @@ async function updateComparativeData(
     );
   }
 
-  
   if (comparativeDivision != "00") {
-
     // Division Footprint
-    newComparativeData =  await getMacroSerieData(indic,comparativeDivision,newComparativeData,'divisionFootprint');
-   
-    
+    newComparativeData = await getMacroSerieData(
+      indic,
+      comparativeDivision,
+      newComparativeData,
+      "divisionFootprint"
+    );
+
     newComparativeData = await getHistoricalSerieData(
       comparativeDivision,
       indic,
@@ -179,17 +200,12 @@ async function updateComparativeData(
       "trendsFootprint"
     );
     // Target Division Footprint
-    if (idTarget) {
-      newComparativeData = await getTargetSerieData(
-        idTarget,
-        comparativeDivision,
-        indic,
-        newComparativeData,
-        "targetDivisionFootprint"
-      );
-    }
-
-
+    newComparativeData = await getHistoricalSerieData(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "targetDivisionFootprint"
+    );
   }
   return newComparativeData;
 }

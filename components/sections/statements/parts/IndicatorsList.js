@@ -36,7 +36,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
 import {getTargetSerieId} from "/src/utils/Utils";
-import getTargetSerieData from "/src/services/responses/TargetSerieData";
+import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
@@ -72,7 +72,7 @@ const IndicatorsList = (props) => {
 
     // Target Area Footprint
     if (idTarget) {
-      newComparativeData = await getTargetSerieData(
+      newComparativeData = await getSerieData(
         idTarget,
         "00",
         indic,
@@ -109,7 +109,7 @@ const IndicatorsList = (props) => {
         "targetDivisionFootprint"
       );
  
-        console.log(newComparativeData)
+
     return newComparativeData;
   };
 
