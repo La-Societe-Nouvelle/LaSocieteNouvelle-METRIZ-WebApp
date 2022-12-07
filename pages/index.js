@@ -165,7 +165,7 @@ class Metriz extends React.Component {
       case 1: return (<ImportSection {...sectionProps} />)
       case 2: return (<InitialStatesSection {...sectionProps} return={() => this.setStep(1)}/>)
       case 3: return (<CompaniesSection {...sectionProps} />)
-      case 4: return (<StatementSection {...sectionProps} return={() => this.setStep(3)} />)
+      case 4: return (<StatementSection {...sectionProps} publish={() => this.setStep(5)} />)
       case 5: return (<PublishStatementSection {...sectionProps} return={() => this.setStep(4)} />)
 
     }

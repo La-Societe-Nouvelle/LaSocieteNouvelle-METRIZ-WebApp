@@ -58,7 +58,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
           <nav id="progression" className="d-flex">
             <div className={"stepper-item completed"}>
               <p className={"step-counter"}>
-                <i class="bi bi-arrow-up"></i>{" "}
+                <i className="bi bi-arrow-up"></i>{" "}
               </p>
               <div className="step-name">
                 <h2>Publier mes résultats</h2>
