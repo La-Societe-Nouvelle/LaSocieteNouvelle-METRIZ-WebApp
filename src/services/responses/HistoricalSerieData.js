@@ -18,7 +18,6 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
 
       id = getTargetSerieId(indic);
     }
-    console.log(id);
     const getValueAdded = SerieDataService.getSerieData(id, code, "NVA");
     const getProduction = SerieDataService.getSerieData(id, code, "PRD");
     const getConsumption = SerieDataService.getSerieData(id, code, "IC");
@@ -40,12 +39,10 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
 
           if (production.data.header.code == 200) {
             productionHistorical = production.data.data;
-            console.log(productionHistorical);
 
           }
           else{
             productionHistorical = [{year: null, value: null, flag: null}]
-            console.log(productionHistorical);
 
           }
 

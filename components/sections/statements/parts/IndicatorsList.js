@@ -35,7 +35,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
-import getTargetSerieId from "/src/utils/Utils";
+import {getTargetSerieId} from "/src/utils/Utils";
 import getTargetSerieData from "/src/services/responses/TargetSerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
@@ -283,7 +283,7 @@ const IndicatorsList = (props) => {
               <Col sm={4} xl={4} lg={4} md={4}>
                 <ComparativeGraphs
                   id={"print-Production-" + indic}
-                  comparativeData={[
+                  graphDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
                     props.session.financialData.aggregates.production.footprint.getIndicator(
@@ -308,7 +308,7 @@ const IndicatorsList = (props) => {
               <Col sm={4} xl={4} lg={4} md={4}>
                 <ComparativeGraphs
                   id={"print-Consumption-" + indic}
-                  comparativeData={[
+                  graphDataset={[
                     comparativeData.intermediateConsumption.areaFootprint
                       .indicators[indic].value,
                     props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
@@ -330,7 +330,7 @@ const IndicatorsList = (props) => {
               <Col sm={4} xl={4} lg={4} md={4}>
                 <ComparativeGraphs
                   id={"print-CapitalConsumption-" + indic}
-                  comparativeData={[
+                  graphDataset={[
                     comparativeData.fixedCapitalConsumption.areaFootprint
                       .indicators[indic].value,
                     props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
@@ -352,7 +352,7 @@ const IndicatorsList = (props) => {
               <Col sm={4} xl={4} lg={4} md={4}>
                 <ComparativeGraphs
                   id={"print-Value-" + indic}
-                  comparativeData={[
+                  graphDataset={[
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
                     ].value,

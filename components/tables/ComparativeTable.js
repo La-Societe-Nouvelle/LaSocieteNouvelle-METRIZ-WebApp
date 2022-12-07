@@ -6,6 +6,7 @@ import { printValue } from "/src/utils/Utils";
 // Libraries
 import metaIndics from "/lib/indics";
 import { Table } from "react-bootstrap";
+import { useEffect } from "react";
 
 export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
   const {
@@ -14,6 +15,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
     intermediateConsumption,
     capitalConsumption,
   } = financialData.aggregates;
+
 
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
@@ -39,22 +41,28 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
       .value,
     comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[indic].at(-1).value
   );
+
+
   const displayTargetColumn =
-    comparativeData.production.targetAreaFootprint.indicators[indic].value ==
+    comparativeData.production.targetDivisionFootprint.indicators[indic].at(-1).value ==
       null &&
-    comparativeData.netValueAdded.targetAreaFootprint.indicators[indic].value ==
+    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].at(-1).value ==
       null &&
-    comparativeData.intermediateConsumption.targetAreaFootprint.indicators[
+    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
       indic
-    ].value == null &&
-    comparativeData.fixedCapitalConsumption.targetAreaFootprint.indicators[
+    ].at(-1).value == null &&
+    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
       indic
-    ].value == null
+    ].at(-1).value == null
+      ? false
+      : true;
+
+      const displayDivisionColumn =  comparativeData.production.divisionFootprint.indicators[indic].value == null && comparativeData.netValueAdded.divisionFootprint.indicators[indic].value == null && comparativeData.intermediateConsumption.divisionFootprint.indicators[indic].value == null && comparativeData.fixedCapitalConsumption.divisionFootprint.indicators[indic].value == null
       ? false
       : true;
 
   return (
-    <Table className="mt-5  comparative-table">
+    <Table className="mt-5 comparative-table">
       <thead>
         <tr>
           <td>Agrégat</td>
@@ -67,12 +75,16 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
           </td>
 
           <td className="border-left text-center">Exercice en cours</td>
-          <td
+          {
+            displayDivisionColumn && 
+            <td
             colSpan={displayTargetColumn ? 3 : 2}
             className="border-left text-center"
           >
             Branche
           </td>
+          }
+    
         </tr>
       </thead>
       <tbody>
@@ -114,7 +126,8 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
             )}
             <span className="unit"> {unit}</span>
           </td>
-
+          {
+            displayDivisionColumn && 
           <td className="border-left text-end">
             {getValue(
               comparativeData.production.divisionFootprint.indicators[indic]
@@ -123,6 +136,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               precision
             )}
           </td>
+}
           {displayTargetColumn && (
             <>
               <td className="text-end">
@@ -169,7 +183,8 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
             )}
             <span className="unit"> {unit}</span>
           </td>
-
+          {
+            displayDivisionColumn && 
           <td className="border-left text-end">
             {getValue(
               comparativeData.intermediateConsumption.divisionFootprint
@@ -178,6 +193,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               precision
             )}
           </td>
+}
           {displayTargetColumn && (
             <>
               <td className="text-end">
@@ -224,7 +240,8 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
             )}
             <span className="unit"> {unit}</span>
           </td>
-
+          {
+            displayDivisionColumn && 
           <td className="border-left text-end">
             {getValue(
               comparativeData.fixedCapitalConsumption.divisionFootprint
@@ -233,6 +250,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               precision
             )}
           </td>
+}
           {displayTargetColumn && (
             <>
               <td className="text-end">
@@ -278,7 +296,8 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
             )}
             <span className="unit"> {unit}</span>
           </td>
-
+          {
+            displayDivisionColumn && 
           <td className="border-left text-end">
             {getValue(
               comparativeData.netValueAdded.divisionFootprint.indicators[indic]
@@ -287,6 +306,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               precision
             )}
           </td>
+}
           {displayTargetColumn && (
             <>
               <td className="text-end">

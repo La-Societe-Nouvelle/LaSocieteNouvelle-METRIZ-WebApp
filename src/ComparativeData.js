@@ -34,7 +34,7 @@ export class ComparativeData {
       trendsFootprint: new HistoricalFootprint(),
     };
 
-    this.netValueAdded = props.intermediateConsumption || {
+    this.netValueAdded = props.netValueAdded || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
