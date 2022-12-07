@@ -576,7 +576,12 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
       prevAmount: parseAmount(ligneCourante.Debit),
       amount: parseAmount(ligneCourante.Debit),
-      entries: []
+      entries: [{
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Debit),
+        date: ligneCourante.EcritureDate,
+        isANouveaux: true
+      }]
     }
     // push data
     data.immobilisations.push(immobilisationData);
@@ -594,7 +599,12 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
       amount: parseAmount(ligneCourante.Credit),
-      entries: []
+      entries: [{
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate,
+        isANouveaux: true
+      }]
     }
     // push data
     data.depreciations.push(depreciationData);
@@ -629,7 +639,12 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
       amount: parseAmount(ligneCourante.Debit),
       prevAmount: parseAmount(ligneCourante.Debit),
-      entries: []
+      entries: [{
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Debit),
+        date: ligneCourante.EcritureDate,
+        isANouveaux: true
+      }]
     }
     // push data
     data.stocks.push(stockData);
@@ -647,7 +662,12 @@ async function readANouveauxEntry(data,journal,ligneCourante)
       accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
       amount: parseAmount(ligneCourante.Credit),
-      entries: []
+      entries: [{
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate,
+        isANouveaux: true
+      }]
     }
     // push data
     data.depreciations.push(depreciationData);

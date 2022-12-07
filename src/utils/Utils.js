@@ -122,3 +122,14 @@ export const getCurrentDateString = () => // dd-MM-yyyy hh:mm
                    + today.getMinutes();
   return dateString
 }
+
+/* ----- DATE ----- */
+
+export const getDateFromString = (stringDate) =>
+{
+  if (/^[0-9]{8}$/.test(stringDate)) {
+    return new Date(parseInt(stringDate.substring(0,4)), parseInt(stringDate.substring(4,6)), parseInt(stringDate.substring(6,8)));
+  } else {
+    return null;
+  }
+}
