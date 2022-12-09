@@ -29,7 +29,7 @@ function TrendsGraph(props) {
     const data = {
       datasets: [
         {
-          label: "Tendance de la branche (Code " + props.code + ")",
+          label: "Tendance de la branche",
           data: trendsData,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -82,12 +82,16 @@ function TrendsGraph(props) {
             font: {
               size: 12,
               weight: "bold",
+              family : 'Roboto'
+
             },
           },
           ticks: {
             color: "#191558",
             font: {
               size: 11,
+              family : 'Roboto'
+
             },
           },
           grid: {
@@ -152,7 +156,20 @@ function TrendsGraph(props) {
             display: false,
           },
         },
-
+        title: {
+          display: true,
+          text: props.title, 
+          color: "#251f81",
+          font: {
+            size: 15,
+            weight : 'bold',
+            family : 'Raleway'
+          },
+          padding: {
+                    top: 10,
+                    bottom: 30
+                }
+      },
         tooltip: {
           backgroundColor: 'rgba(25,21,88,0.9)',
           padding: 15,

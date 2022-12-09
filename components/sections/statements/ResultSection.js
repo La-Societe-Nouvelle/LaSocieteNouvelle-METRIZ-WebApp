@@ -404,8 +404,8 @@ const ResultSection = (props) => {
 
             <div className={ trendGraphView.value != 'prd' ? "hidden" : "border rounded p-4"}>
               <TrendsGraph
-                title="Production"
-                unit={metaIndics[indic].unit}
+                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
+                  unit={metaIndics[indic].unit}
                 code={comparativeDivision}
                 trends={
                   comparativeData.production.trendsFootprint.indicators[indic]
@@ -424,7 +424,7 @@ const ResultSection = (props) => {
               </div>
               <div className={ trendGraphView.value != 'ic' ? "hidden" : "border rounded p-4"}>
                 <TrendsGraph
-                  title="Consommations intermédiaires"
+                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -444,7 +444,7 @@ const ResultSection = (props) => {
               </div>
               <div className={ trendGraphView.value != 'cfc' ? "hidden" : "border rounded p-4"}>
                 <TrendsGraph
-                  title="Consommation de capital fixe"
+                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -464,7 +464,7 @@ const ResultSection = (props) => {
               </div>
               <div className={ trendGraphView.value != 'nva' ? "hidden" : "border rounded p-4"}>
                 <TrendsGraph
-                  title="Valeur ajoutée nette"
+                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -486,18 +486,20 @@ const ResultSection = (props) => {
             </Col>
             <Col lg={3}>
               <div className="border rounded p-4">
-                  <h4>Notes</h4>
+                  <h4 className="h5">Notes</h4>
                   {console.log(comparativeData)}
-                  <ul className="p-0">
-                    <li>
-                    {comparativeData.production.trendsFootprint.indicators[indic].meta.label}
-                    </li>
+                    
+                  {comparativeData.production.targetDivisionFootprint.indicators[indic].meta ? 
+                    <p>▪ Tendance et objectifs pour la branche : {divisions[comparativeDivision]}</p>
+                    :
+                    <p>▪ Tendance de la branche : {divisions[comparativeDivision]}</p>
+                  }
+
                     {comparativeData.production.targetDivisionFootprint.indicators[indic].meta && 
-                      <li>
-                      {comparativeData.production.targetDivisionFootprint.indicators[indic].meta.label} ({comparativeData.production.targetDivisionFootprint.indicators[indic].meta.info})
-                      </li>
+                      <p className="mt-">
+                     ▪ {comparativeData.production.targetDivisionFootprint.indicators[indic].meta.info}
+                      </p>
                     }
-                  </ul>
                   <hr/>
                   <p className="small-text">
                     Source :  {comparativeData.production.trendsFootprint.indicators[indic].meta.source} 
