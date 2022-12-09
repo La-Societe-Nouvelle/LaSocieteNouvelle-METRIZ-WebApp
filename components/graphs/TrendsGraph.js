@@ -29,54 +29,65 @@ function TrendsGraph(props) {
     const data = {
       datasets: [
         {
-          label: "Tendance",
+          label: "Tendance de la branche (Code " + props.code + ")",
           data: trendsData,
-          fill: false,
-          borderColor: "rgba(255,214,156,1)",
-          backgroundColor: "rgba(255,214,156,0.5)",
-          tension: 0.1,
-          borderDash: [5, 0],
+          borderColor: "rgb(255, 182, 66)",
+          backgroundColor: "rgb(255, 182, 66)",
           order: 2,
+          borderWidth: 4,
         },
         {
           label: "Evolution de la tendance",
           data: trendsDataForecast,
-          fill: false,
-          borderColor: "rgba(255,214,156,1)",
-          backgroundColor: "rgb(255,255,255)",
-          tension: 0.1,
-          borderDash: [5, 5],
+          borderColor: "rgb(255, 182, 66)",
+          backgroundColor: "rgb(255, 182, 66)",
+          borderWidth: 4,
+          borderDash: [5, 8],
           order: 3,
         },
         {
           type: "bubble",
-          label: "Exercice en cours",
+          label: "Unité légale analysée",
           data: [{ x: "2021", y: props.current, r: 5 }],
           backgroundColor: "rgb(250,89,95)",
+          borderColor: "rgb(250,89,95)",
+          borderWidth: 4,
           order: 1,
         },
       ],
     };
 
+    if (targetData.length > 1) {
+      data.datasets.push({
+        label: "Objectif de la branche",
+        data: targetData,
+        skipNull: true,
+        borderColor: "rgb(255, 238, 200)",
+        backgroundColor: "rgb(255, 238, 200)",
+        borderWidth: 4,
+        order: 4,
+      });
+    }
     const options = {
       pointRadius: 0,
       scales: {
         y: {
           display: true,
-          min: 0,
+          min: 0, 
+          suggestedMax: 100,
           title: {
             display: true,
             text: props.unit,
             color: "#191558",
             font: {
-              size: 10,
+              size: 12,
               weight: "bold",
             },
           },
           ticks: {
             color: "#191558",
             font: {
-              size: 10,
+              size: 11,
             },
           },
           grid: {
@@ -87,7 +98,7 @@ function TrendsGraph(props) {
           ticks: {
             color: "#191558",
             font: {
-              size: 10,
+              size: 11,
             },
           },
           grid: {
@@ -99,6 +110,41 @@ function TrendsGraph(props) {
         legend: {
           display: true,
           position: "right",
+          labels: {
+            usePointStyle: true,
+            fullsize: true,
+            color: "#191558",
+
+            generateLabels: function (chart) {
+              const dataset = chart.data.datasets;
+              return dataset
+                .map((data, i) => ({
+                  hidden: !chart.getDataVisibility(i),
+                  index: i,
+                  lineWidth: 3,
+                  lineDashOffset: i == 1 ? 10 : 0,
+                  lineDash: i == 1 ? [5, 3] : [],
+                  order: data.order,
+                  pointStyle: "line",
+                  strokeStyle: data.borderColor,
+                  text: data.label,
+                }))
+                .sort((a, b) => a.order - b.order);
+            },
+
+          },
+
+          onClick(click, legendItem, legend) {
+            legend.chart.toggleDataVisibility(legendItem.index);
+
+            if (legend.chart.getDatasetMeta(legendItem.index).hidden == true) {
+              legend.chart.getDatasetMeta(legendItem.index).hidden = false;
+            } else {
+              legend.chart.getDatasetMeta(legendItem.index).hidden = true;
+            }
+            legend.chart.update();
+            return;
+          },
         },
 
         datalabels: {
@@ -108,12 +154,13 @@ function TrendsGraph(props) {
         },
 
         tooltip: {
-          backgroundColor: "#191558",
-          padding: 10,
-          cornerRadius: 2,
+          backgroundColor: 'rgba(25,21,88,0.9)',
+          padding: 15,
+          cornerRadius: 3,
+          usePointStyle: true,
           callbacks: {
             label: function (context) {
-              let label = "Valeur : " + context.parsed.y;
+              let label = " " + context.parsed.y + " " + props.unit;
               return label;
             },
           },
@@ -121,19 +168,6 @@ function TrendsGraph(props) {
       },
     };
 
-    if (targetData.length > 1) {
-      data.datasets.push({
-        label: "Objectif de la branche",
-        data: targetData,
-        skipNull: true,
-        fill: false,
-        borderColor: "rgba(255,234,205,1)",
-        backgroundColor: "rgba(255,234,205,0.5)",
-        tension: 0.1,
-        borderDash: [5, 0],
-        order: 4,
-      });
-    }
     setData(data);
     setOptions(options);
   }, [props]);

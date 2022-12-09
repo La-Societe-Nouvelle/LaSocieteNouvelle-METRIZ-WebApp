@@ -11,8 +11,7 @@ const ComparativeGraphs = (props) => {
   const precision = metaIndics[props.indic].nbDecimals;
 
   const labels = ["France", "Exercice en cours", "Branche"];
-  const data = props.graphDataset.map(data => data ? data.toFixed(precision) : null);
-  const targetData = props.targetData.map(data => data ? data.toFixed(precision) : null);
+
   // Remove "Branche" label if no comparative division selected
   if(props.graphDataset[2] == null) {
     labels.pop()
@@ -24,12 +23,13 @@ const ComparativeGraphs = (props) => {
     datasets: [
       {
         label: "Valeur ",
-        data: data,
+        data: props.graphDataset.map(data => data ? data.toFixed(precision) : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
           "RGBA(250,89,95,1)",
-          "RGBA(255,214,156,1)",
+          "rgb(255, 182, 66)",
+         
         ],
         borderWidth: 0,
         type: "bar",
@@ -38,12 +38,12 @@ const ComparativeGraphs = (props) => {
       },
       {
         label: "Objectif ",
-        data: targetData,
+        data: props.targetData.map(data => data ? data.toFixed(precision) : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
           "RGBA(215,220,251,1)",
-          "RGBA(255,234,205,1)",
+          "rgb(255 220 141)",
         ],
         borderWidth: 0,
         barPercentage: 0.6,

@@ -109,12 +109,12 @@ const updater_1_0_3 = async (sessionData) => {
     newComparativeData = updatedData;
   }
 
-  // delete old property and assign division code into comparative data object
-  delete sessionData.comparativeDivision;
-  sessionData.comparativeData.activityCode = code;
-
   // update session with new values
   sessionData.comparativeData = newComparativeData;
+
+    // delete old property and assign division code into comparative data object
+    sessionData.comparativeData.activityCode = code;
+    delete sessionData.comparativeDivision;
 };
 
 const updater_1_0_2 = (sessionData) => {
