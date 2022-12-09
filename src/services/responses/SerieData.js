@@ -11,6 +11,7 @@ const getSerieData = async (
   comparativeData,
   serie
 ) => {
+
   let netValueAddedSerie;
   let productionSerie;
   let intermediateConsumptionSerie;
@@ -45,7 +46,6 @@ const getSerieData = async (
         const production = responses[1];
         const intermediateConsumption = responses[2];
         const fixedCapitalConsumption = responses[3];
-
         if (netValueAdded.data.header.code == 200) {
           netValueAddedSerie = netValueAdded.data.data.at(-1);
         }
@@ -68,6 +68,9 @@ const getSerieData = async (
     .catch(() => {
       setError(true);
     });
+
+
+
   const newComparativeData = {
     fixedCapitalConsumption: fixedCapitalConsumptionSerie,
     intermediateConsumption: intermediateConsumptionSerie,
@@ -79,7 +82,7 @@ const getSerieData = async (
     indic,
     comparativeData,
     newComparativeData,
-    serie
+    serie,
   );
 
   return serieFootprint;

@@ -10,6 +10,7 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
     let intermediateConsumptionHistorical;
     let fixedCapitalConsumptionHistorical;
     let id;
+
     if(serie == 'trendsFootprint') {
       id = "MACRO_HISTORICALDATA_TREND_"+indic.toUpperCase()+"_FRA_DIVISION";
     }
@@ -32,6 +33,8 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
           const fixedCapitalConsumption = responses[3];
           if (netValueAdded.data.header.code == 200) {
             netValueAddedHistorical = netValueAdded.data.data;
+            netValueAddedHistorical.meta =  netValueAdded.data.meta;
+
           }
           else{
             netValueAddedHistorical = [{year: null, value: null, flag: null}]
@@ -39,7 +42,7 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
 
           if (production.data.header.code == 200) {
             productionHistorical = production.data.data;
-
+            productionHistorical.meta =  production.data.meta;
           }
           else{
             productionHistorical = [{year: null, value: null, flag: null}]
@@ -48,6 +51,8 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
 
           if (consumption.data.header.code == 200) {
             intermediateConsumptionHistorical = consumption.data.data;
+            intermediateConsumptionHistorical.meta =  consumption.data.meta;
+
           }
           else{
             intermediateConsumptionHistorical = [{year: null, value: null, flag: null}]
@@ -55,6 +60,7 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
 
           if (fixedCapitalConsumption.data.header.code == 200) {
             fixedCapitalConsumptionHistorical = fixedCapitalConsumption.data.data;
+            fixedCapitalConsumptionHistorical.meta =  fixedCapitalConsumption.data.meta;
           }
           else{
             fixedCapitalConsumptionHistorical = [{year: null, value: null, flag: null}]
@@ -64,8 +70,9 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
       .catch(() => {
         setError(true);
       });
-      const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionHistorical,intermediateConsumption : intermediateConsumptionHistorical, production : productionHistorical, netValueAdded : netValueAddedHistorical}
-      
+
+
+      const newComparativeData = {  fixedCapitalConsumption : fixedCapitalConsumptionHistorical,intermediateConsumption : intermediateConsumptionHistorical, production : productionHistorical, netValueAdded : netValueAddedHistorical}  
       const historicalFootprint = await updateAggregatesHistoricalFootprint(indic,comparativeData, newComparativeData, serie)
 
 

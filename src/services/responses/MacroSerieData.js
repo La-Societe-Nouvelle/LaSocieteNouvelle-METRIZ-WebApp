@@ -8,7 +8,7 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
     let productionFootprint;
     let intermediateConsumptionFootprint;
     let fixedCapitalConsumptionFootprint;
-  
+    
     const getNetValueAdded = SerieDataService.getMacroData(indic.toUpperCase(), code, "NVA");
     const getProduction = SerieDataService.getMacroData(indic.toUpperCase(), code, "PRD");
     const getIntermediateConsumption = SerieDataService.getMacroData(indic.toUpperCase(),code, "IC");
@@ -42,6 +42,8 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
         console.log(errors);
       });
   
+
+
       const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionFootprint,intermediateConsumption : intermediateConsumptionFootprint, production : productionFootprint, netValueAdded : netValueAddedFootprint}
       const divisionFootprint = await updateAggregatesFootprint(indic,comparativeData, newComparativeData, serie)
 

@@ -90,6 +90,8 @@ const ResultSection = (props) => {
   const [comparativeData, setComparativeData] = useState(
     props.session.comparativeData
   );
+
+
   /* ---------- Update Comparative division ---------- */
 
   const changeComparativeDivision = async (event) => {
@@ -233,7 +235,7 @@ const ResultSection = (props) => {
 
           {printGrossImpact.includes(indic) && (
             <Col sm={3}>
-              <div className="border mt-5">
+              <div className="border rounded mt-5">
                 <h3 className="text-center">
                   Répartition des impacts bruts (en %)
                 </h3>
@@ -388,10 +390,7 @@ const ResultSection = (props) => {
       {comparativeDivision != "00" && (
         <section className="step">
           <h3>Courbes d'évolution</h3>
-   
-          <Row>
-            <Col lg={8}>
-              <div style={{width: '300px'}}>
+          <div style={{width: '300px'}}>
               <Select
               className="mb-3 small-text"
               defaultValue={{label : trendGraphView.label , value: trendGraphView.value}}
@@ -399,11 +398,15 @@ const ResultSection = (props) => {
               onChange={changeTrendGraphView}
         />
               </div>
-        
-            <div className={ trendGraphView.value != 'prd' ? "hidden" : "border p-4"}>
+          <Row>
+            <Col lg={9}>
+
+
+            <div className={ trendGraphView.value != 'prd' ? "hidden" : "border rounded p-4"}>
               <TrendsGraph
                 title="Production"
                 unit={metaIndics[indic].unit}
+                code={comparativeDivision}
                 trends={
                   comparativeData.production.trendsFootprint.indicators[indic]
                 }
@@ -419,10 +422,11 @@ const ResultSection = (props) => {
                 }
               />
               </div>
-              <div className={ trendGraphView.value != 'ic' ? "hidden" : "border p-4"}>
+              <div className={ trendGraphView.value != 'ic' ? "hidden" : "border rounded p-4"}>
                 <TrendsGraph
                   title="Consommations intermédiaires"
                   unit={metaIndics[indic].unit}
+                  code={comparativeDivision}
                   trends={
                     comparativeData.intermediateConsumption.trendsFootprint
                       .indicators[indic]
@@ -438,10 +442,11 @@ const ResultSection = (props) => {
                   }
                 />
               </div>
-              <div className={ trendGraphView.value != 'cfc' ? "hidden" : "border p-4"}>
+              <div className={ trendGraphView.value != 'cfc' ? "hidden" : "border rounded p-4"}>
                 <TrendsGraph
                   title="Consommation de capital fixe"
                   unit={metaIndics[indic].unit}
+                  code={comparativeDivision}
                   trends={
                     comparativeData.fixedCapitalConsumption.trendsFootprint
                       .indicators[indic]
@@ -457,10 +462,11 @@ const ResultSection = (props) => {
                   }
                 />
               </div>
-              <div className={ trendGraphView.value != 'nva' ? "hidden" : "border p-4"}>
+              <div className={ trendGraphView.value != 'nva' ? "hidden" : "border rounded p-4"}>
                 <TrendsGraph
                   title="Valeur ajoutée nette"
                   unit={metaIndics[indic].unit}
+                  code={comparativeDivision}
                   trends={
                     comparativeData.netValueAdded.trendsFootprint.indicators[
                       indic
@@ -476,6 +482,27 @@ const ResultSection = (props) => {
                     ).value.toFixed(metaIndics[indic].nbDecimals)
                   }
                 />
+              </div>
+            </Col>
+            <Col lg={3}>
+              <div className="border rounded p-4">
+                  <h4>Notes</h4>
+                  {console.log(comparativeData)}
+                  <ul className="p-0">
+                    <li>
+                    {comparativeData.production.trendsFootprint.indicators[indic].meta.label}
+                    </li>
+                    {comparativeData.production.targetDivisionFootprint.indicators[indic].meta && 
+                      <li>
+                      {comparativeData.production.targetDivisionFootprint.indicators[indic].meta.label} ({comparativeData.production.targetDivisionFootprint.indicators[indic].meta.info})
+                      </li>
+                    }
+                  </ul>
+                  <hr/>
+                  <p className="small-text">
+                    Source :  {comparativeData.production.trendsFootprint.indicators[indic].meta.source} 
+                    {comparativeData.production.targetDivisionFootprint.indicators[indic].meta && ", " + comparativeData.production.targetDivisionFootprint.indicators[indic].meta.source}
+                  </p>
               </div>
             </Col>
           </Row>
