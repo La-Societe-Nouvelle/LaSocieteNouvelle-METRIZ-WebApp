@@ -192,6 +192,8 @@ const DSNDataReader = async (dataDSN) =>
       getBloc(rows,index,blocCode);
     }
   }
+
+  return dsn;
 }
 
 const getBloc = (rows,index,blocCode) =>
