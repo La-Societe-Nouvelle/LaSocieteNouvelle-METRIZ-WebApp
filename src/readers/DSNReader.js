@@ -13,10 +13,11 @@ const getLastBloc = (array) =>
 /* -------------------- FILE READER -------------------- */
 /* ----------------------------------------------------- */
 
-const DSNFileReader = async () =>
+export const DSNFileReader = async (content) =>
 {
   // Segmentations des lignes
-  const rows = content.slice(content.indexOf('\n')+1).split('\n');
+  const rows = content.replaceAll('\r','').split('\n');
+  console.log(rows.length);
 
   const dataDSN = {
     rows: [],
@@ -26,7 +27,7 @@ const DSNFileReader = async () =>
   // Lecture des lignes
   for (let row of rows)
   {
-    if (/^S[0-9]{2}.G[0-9]{2}.[0-9]{2}.[0-9]{3},'[.*]'$/.test(row)) // ex. S20.G00.05.002,'01'
+    if (/^S[0-9]{2}\.G[0-9]{2}\.[0-9]{2}\.[0-9]{3},'.*'/.test(row)) // ex. S20.G00.05.002,'01'
     {
       // get code rubrique
       let blocCode = row.substring(0,10);
@@ -50,7 +51,7 @@ const DSNFileReader = async () =>
 /* -------------------------------------------------- DATA READER -------------------------------------------------- */
 /* ----------------------------------------------------------------------------------------------------------------- */
 
-const DSNDataReader = async (dataDSN) =>
+export const DSNDataReader = async (dataDSN) =>
 {
   // rows
   const rows = dataDSN.rows;
@@ -62,15 +63,20 @@ const DSNDataReader = async (dataDSN) =>
   while (index < rows.length)
   {
     let row = rows[index];
+    let blocCode = row.blocCode;
 
     // Déclaration -------------------------------------- //
 
-    if (row.blocCode=="S20.G00.05")
+    if (blocCode=="S20.G00.05")
     {
       let bloc = getBloc(rows,index,blocCode);
       let declaration = {
         nature: bloc["S20.G00.05.001"],
-        type: bloc["S20.G00.05.002"]
+        type: bloc["S20.G00.05.002"],
+        fraction: bloc["S20.G00.05.003"],
+        ordre: bloc["S20.G00.05.004"],
+        mois: bloc["S20.G00.05.005"],
+        devise: bloc["S20.G00.05.010"]
       };
       // add to dsn
       dsn.declaration = declaration;
@@ -78,7 +84,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Entreprise --------------------------------------- //
 
-    else if (row.blocCode=="S21.G00.06")
+    else if (blocCode=="S21.G00.06")
     {
       let bloc = getBloc(rows,index,blocCode);
       let entreprise = {
@@ -90,7 +96,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Etablissement ------------------------------------ //
 
-    else if (row.blocCode=="S21.G00.11")
+    else if (blocCode=="S21.G00.11")
     {
       let bloc = getBloc(rows,index,blocCode);
       let etablissement = {
@@ -103,7 +109,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Individu ----------------------------------------- //
 
-    else if (row.blocCode=="S21.G00.30")
+    else if (blocCode=="S21.G00.30")
     {
       let bloc = getBloc(rows,index,blocCode);
       let individu = {
@@ -121,7 +127,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Contrat ------------------------------------------ //
 
-    else if (row.blocCode=="S21.G00.40")
+    else if (blocCode=="S21.G00.40")
     {
       let bloc = getBloc(rows,index,blocCode);
       let contrat = {
@@ -135,7 +141,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Versement ---------------------------------------- //
 
-    else if (row.blocCode=="S21.G00.50")
+    else if (blocCode=="S21.G00.50")
     {
       let bloc = getBloc(rows,index,blocCode);
       let versement = {
@@ -150,7 +156,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Remuneration ------------------------------------- //
 
-    else if (row.blocCode=="S21.G00.51")
+    else if (blocCode=="S21.G00.51")
     {
       let bloc = getBloc(rows,index,blocCode);
       let remuneration = {
@@ -170,7 +176,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // Activite ----------------------------------------- //
 
-    else if (row.blocCode=="S21.G00.53")
+    else if (blocCode=="S21.G00.53")
     {
       let bloc = getBloc(rows,index,blocCode);
       let activite = {
@@ -187,10 +193,7 @@ const DSNDataReader = async (dataDSN) =>
 
     // -------------------------------------------------- //
 
-    else
-    {
-      getBloc(rows,index,blocCode);
-    }
+    while (index < rows.length && rows[index].blocCode==blocCode) index+=1;
   }
 
   return dsn;
@@ -199,7 +202,7 @@ const DSNDataReader = async (dataDSN) =>
 const getBloc = (rows,index,blocCode) =>
 {
   let bloc = {};
-  while (index < rows.length && rows[index].startWith(blocCode))
+  while (index < rows.length && rows[index].blocCode==blocCode)
   {
     let row = rows[index];
     bloc[row.rubriqueCode] = row.value;

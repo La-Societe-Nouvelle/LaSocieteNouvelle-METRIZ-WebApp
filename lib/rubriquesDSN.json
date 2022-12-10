@@ -1,0 +1,10 @@
+{
+  "declaration": {
+    "nature": {
+      "01": "DSN Mensuelle",
+      "02": "Signalement Fin du contrat de travail",
+      "04": "Signalement Arrêt de travail",
+      "05": "Signalement Reprise suite à arrêt de travail"
+    }
+  }
+}

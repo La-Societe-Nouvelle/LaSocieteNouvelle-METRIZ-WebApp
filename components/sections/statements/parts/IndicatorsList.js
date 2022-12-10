@@ -30,6 +30,7 @@ import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
+import { ImportDSN } from "../../../assessments/ImportDSN";
 
 import ChangeDivision from "../../../popups/ChangeDivision";
 
@@ -553,9 +554,10 @@ const IndicatorsList = (props) => {
                           <>
                             <StatementDIS
                               impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("dis")}
-                              onValidate={() => validateIndicator("dis")}
-                              toAssessment={() => triggerPopup("dis")}
+                              onUpdate     = {willNetValueAddedIndicator.bind("dis")}
+                              onValidate   = {() => validateIndicator("dis")}
+                              toAssessment = {() => triggerPopup("dis")}
+                              toImportDSN  = {() => triggerPopup("dsn")}
                             />
                             <ModalAssesment
                               indic="dis"
@@ -566,6 +568,16 @@ const IndicatorsList = (props) => {
                               popUp={popUp}
                               handleClose={handleClose}
                               title="Données Sociales"
+                            />
+                            <ModalAssesment
+                              indic="dsn"
+                              impactsData={props.impactsData}
+                              onUpdate={willNetValueAddedIndicator.bind("dis")}
+                              onValidate={() => validateIndicator("dis")}
+                              onGoBack={handleClose}
+                              popUp={popUp}
+                              handleClose={handleClose}
+                              title="Déclarations Sociales Nominatives"
                             />
                           </>
                         );
@@ -810,6 +822,8 @@ function ModalAssesment(props) {
               return <AssessmentGHG {...props} />;
             case "nrg":
               return <AssessmentNRG {...props} />;
+            case "dsn":
+              return <ImportDSN {...props} />;
             default:
               return <div></div>;
           }
