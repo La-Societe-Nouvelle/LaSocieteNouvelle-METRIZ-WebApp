@@ -32,6 +32,7 @@ export const DSNFileReader = async (content) =>
       // get code rubrique
       let blocCode = row.substring(0,10);
       let rubriqueCode = row.substring(0,14);
+      let valueCode = row.substring(11,14);
 
       // value
       let value = row.substring(16,row.length-1);
@@ -39,6 +40,7 @@ export const DSNFileReader = async (content) =>
       dataDSN.rows.push({
         blocCode,
         rubriqueCode,
+        valueCode,
         value
       })
     }
@@ -64,6 +66,7 @@ export const DSNDataReader = async (dataDSN) =>
   {
     let row = rows[index];
     let blocCode = row.blocCode;
+    let valueCode = row.valueCode;
 
     // Déclaration -------------------------------------- //
 
@@ -76,6 +79,8 @@ export const DSNDataReader = async (dataDSN) =>
         fraction: bloc["S20.G00.05.003"],
         ordre: bloc["S20.G00.05.004"],
         mois: bloc["S20.G00.05.005"],
+        dateFichier: bloc["S20.G00.05.007"],
+        champ: bloc["S20.G00.05.008"],
         devise: bloc["S20.G00.05.010"]
       };
       // add to dsn
@@ -89,6 +94,7 @@ export const DSNDataReader = async (dataDSN) =>
       let bloc = getBloc(rows,index,blocCode);
       let entreprise = {
         siren: bloc["S21.G00.06.001"],
+        nic: bloc["S21.G00.06.002"],
       };
       // add to dsn
       dsn.declaration.entreprise = entreprise;
@@ -100,7 +106,7 @@ export const DSNDataReader = async (dataDSN) =>
     {
       let bloc = getBloc(rows,index,blocCode);
       let etablissement = {
-        nic: bloc["S21.G00.06.001"],
+        nic: bloc["S21.G00.11.001"],
         individus: []
       };
       // add to dsn
@@ -131,8 +137,15 @@ export const DSNDataReader = async (dataDSN) =>
     {
       let bloc = getBloc(rows,index,blocCode);
       let contrat = {
+        dateDebut: bloc["S21.G00.40.001"],
+        statutConventionnel: bloc["S21.G00.40.002"],
+        pcsEse: bloc["S21.G00.40.004"],
+        complementPcsEse: bloc["S21.G00.40.005"],
         nature: bloc["S21.G00.40.007"],
-        uniteMesure: bloc["S21.G00.40.011"]
+        uniteMesure: bloc["S21.G00.40.011"],
+        quotiteCategorie: bloc["S21.G00.40.012"],
+        quotite: bloc["S21.G00.40.013"],
+        modaliteTemps: bloc["S21.G00.40.014"]
       };
       // add to dsn
       let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
@@ -146,7 +159,9 @@ export const DSNDataReader = async (dataDSN) =>
       let bloc = getBloc(rows,index,blocCode);
       let versement = {
         date: bloc["S21.G00.50.001"],
-        remunerations: []
+        remunerations: [],
+        primes: [],
+        revenuAutres: []
       };
       // add sub items
       // add to dsn
@@ -191,9 +206,42 @@ export const DSNDataReader = async (dataDSN) =>
       remuneration.activites.push(activite);
     }
 
+    // Prime -------------------------------------------- //
+
+    else if (blocCode=="S21.G00.52")
+    {
+      let bloc = getBloc(rows,index,blocCode);
+      let prime = {
+        type: bloc["S21.G00.52.001"],
+        montant: bloc["S21.G00.52.002"]
+      };
+      // add to dsn
+      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let versement = getLastBloc(individu.versements);
+      versement.primes.push(prime);
+    }
+
+    // Revenu autre ------------------------------------- //
+
+    else if (blocCode=="S21.G00.53")
+    {
+      let bloc = getBloc(rows,index,blocCode);
+      let revenuAutre = {
+        type: bloc["S21.G00.54.001"],
+        montant: bloc["S21.G00.54.002"],
+      };
+      // add to dsn
+      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let versement = getLastBloc(individu.versements);
+      versement.revenuAutres.push(revenuAutre);
+    }
+
     // -------------------------------------------------- //
 
-    while (index < rows.length && rows[index].blocCode==blocCode) index+=1;
+    while (index < rows.length && rows[index].blocCode==blocCode && parseInt(rows[index].valueCode)>=parseInt(valueCode)) {
+      valueCode = index < rows.length ? rows[index].valueCode : "001";
+      index+=1;
+    }
   }
 
   return dsn;
@@ -202,10 +250,12 @@ export const DSNDataReader = async (dataDSN) =>
 const getBloc = (rows,index,blocCode) =>
 {
   let bloc = {};
-  while (index < rows.length && rows[index].blocCode==blocCode)
+  let valueCode = rows[index].valueCode;
+  while (index < rows.length && rows[index].blocCode==blocCode && parseInt(rows[index].valueCode)>=parseInt(valueCode))
   {
     let row = rows[index];
     bloc[row.rubriqueCode] = row.value;
+    valueCode = row.valueCode;
     index+=1;
   }
   return bloc;
