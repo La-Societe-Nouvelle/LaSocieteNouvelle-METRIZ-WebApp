@@ -486,18 +486,16 @@ const ResultSection = (props) => {
             </Col>
             <Col lg={3}>
               <div className="border rounded p-4">
-                  <h4 className="h5">Notes</h4>
-                  {console.log(comparativeData)}
-                    
+                  <h4 className="h5">Notes</h4>                    
                   {comparativeData.production.targetDivisionFootprint.indicators[indic].meta ? 
-                    <p>▪ Tendance et objectifs pour la branche : {divisions[comparativeDivision]}</p>
+                    <p>Tendance et objectifs pour la branche "{divisions[comparativeDivision]}"</p>
                     :
-                    <p>▪ Tendance de la branche : {divisions[comparativeDivision]}</p>
+                    <p>Tendance de la branche "{divisions[comparativeDivision]}"</p>
                   }
 
                     {comparativeData.production.targetDivisionFootprint.indicators[indic].meta && 
                       <p className="mt-">
-                     ▪ {comparativeData.production.targetDivisionFootprint.indicators[indic].meta.info}
+                     {comparativeData.production.targetDivisionFootprint.indicators[indic].meta.info}
                       </p>
                     }
                   <hr/>

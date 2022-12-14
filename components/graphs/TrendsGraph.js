@@ -10,6 +10,7 @@ function TrendsGraph(props) {
   const [options, setOptions] = useState({});
 
   useEffect(() => {
+    
     const trendsData = props.trends.map((data) =>
       data.year <= 2020
         ? { x: data.year, y: data.value }
@@ -29,7 +30,7 @@ function TrendsGraph(props) {
     const data = {
       datasets: [
         {
-          label: "Tendance de la branche",
+          label: "Historique",
           data: trendsData,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -37,7 +38,7 @@ function TrendsGraph(props) {
           borderWidth: 4,
         },
         {
-          label: "Evolution de la tendance",
+          label: "Tendance",
           data: trendsDataForecast,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -59,7 +60,7 @@ function TrendsGraph(props) {
 
     if (targetData.length > 1) {
       data.datasets.push({
-        label: "Objectif de la branche",
+        label: "Objectif",
         data: targetData,
         skipNull: true,
         borderColor: "rgb(255, 238, 200)",
@@ -68,6 +69,7 @@ function TrendsGraph(props) {
         order: 4,
       });
     }
+    
     const options = {
       pointRadius: 0,
       scales: {
@@ -187,6 +189,7 @@ function TrendsGraph(props) {
 
     setData(data);
     setOptions(options);
+
   }, [props]);
 
   return data && options && <Line data={data} options={options} />;
