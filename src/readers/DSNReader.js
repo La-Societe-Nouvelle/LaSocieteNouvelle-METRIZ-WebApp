@@ -58,7 +58,7 @@ export const DSNDataReader = async (dataDSN) =>
   // rows
   const rows = dataDSN.rows;
 
-  let dsn = {};
+  let declaration = {};
 
   // Lecture des lignes
   let index = 0;
@@ -73,7 +73,7 @@ export const DSNDataReader = async (dataDSN) =>
     if (blocCode=="S20.G00.05")
     {
       let bloc = getBloc(rows,index,blocCode);
-      let declaration = {
+      declaration = {
         nature: bloc["S20.G00.05.001"],
         type: bloc["S20.G00.05.002"],
         fraction: bloc["S20.G00.05.003"],
@@ -83,8 +83,6 @@ export const DSNDataReader = async (dataDSN) =>
         champ: bloc["S20.G00.05.008"],
         devise: bloc["S20.G00.05.010"]
       };
-      // add to dsn
-      dsn.declaration = declaration;
     }
 
     // Entreprise --------------------------------------- //
@@ -97,7 +95,7 @@ export const DSNDataReader = async (dataDSN) =>
         nic: bloc["S21.G00.06.002"],
       };
       // add to dsn
-      dsn.declaration.entreprise = entreprise;
+      declaration.entreprise = entreprise;
     }
 
     // Etablissement ------------------------------------ //
@@ -110,7 +108,7 @@ export const DSNDataReader = async (dataDSN) =>
         individus: []
       };
       // add to dsn
-      dsn.declaration.entreprise.etablissement = etablissement;
+      declaration.entreprise.etablissement = etablissement;
     }
 
     // Individu ----------------------------------------- //
@@ -128,7 +126,7 @@ export const DSNDataReader = async (dataDSN) =>
         versements: []
       };
       // add to dsn
-      dsn.declaration.entreprise.etablissement.individus.push(individu);
+      declaration.entreprise.etablissement.individus.push(individu);
     }
 
     // Contrat ------------------------------------------ //
@@ -148,7 +146,7 @@ export const DSNDataReader = async (dataDSN) =>
         modaliteTemps: bloc["S21.G00.40.014"]
       };
       // add to dsn
-      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       individu.contrats.push(contrat);
     }
 
@@ -165,7 +163,7 @@ export const DSNDataReader = async (dataDSN) =>
       };
       // add sub items
       // add to dsn
-      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       individu.versements.push(versement);
     }
 
@@ -184,7 +182,7 @@ export const DSNDataReader = async (dataDSN) =>
         activites: []
       };
       // add to dsn
-      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       let versement = getLastBloc(individu.versements);
       versement.remunerations.push(remuneration);
     }
@@ -200,7 +198,7 @@ export const DSNDataReader = async (dataDSN) =>
         unite: bloc["S21.G00.53.003"]
       };
       // add to dsn
-      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       let versement = getLastBloc(individu.versements);
       let remuneration = getLastBloc(versement.remunerations);
       remuneration.activites.push(activite);
@@ -216,7 +214,7 @@ export const DSNDataReader = async (dataDSN) =>
         montant: bloc["S21.G00.52.002"]
       };
       // add to dsn
-      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       let versement = getLastBloc(individu.versements);
       versement.primes.push(prime);
     }
@@ -231,7 +229,7 @@ export const DSNDataReader = async (dataDSN) =>
         montant: bloc["S21.G00.54.002"],
       };
       // add to dsn
-      let individu = getLastBloc(dsn.declaration.entreprise.etablissement.individus);
+      let individu = getLastBloc(declaration.entreprise.etablissement.individus);
       let versement = getLastBloc(individu.versements);
       versement.revenuAutres.push(revenuAutre);
     }
@@ -244,7 +242,7 @@ export const DSNDataReader = async (dataDSN) =>
     }
   }
 
-  return dsn;
+  return declaration;
 }
 
 const getBloc = (rows,index,blocCode) =>
