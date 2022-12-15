@@ -1,4 +1,5 @@
 import axios from "axios";
+import { cpSync } from "fs";
 import SerieDataService from "../SerieDataService";
 
 const retrieveAreaFootprint = async (indicator) => {
@@ -18,11 +19,11 @@ const retrieveAreaFootprint = async (indicator) => {
 
     const getCapitalConsumption = SerieDataService.getMacroData(indic, "00", "CFC");
 
-  
     await axios
       .all([getValueAdded, getProduction, getConsumption, getCapitalConsumption])
       .then(
         axios.spread((...responses) => {
+          
           const valueAdded = responses[0];
           const production = responses[1];
           const consumption = responses[2];

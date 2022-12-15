@@ -79,7 +79,7 @@ export class StatementIDR extends React.Component {
             <InputNumber value={roundValue(interdecileRange, 1)}
               disabled={hasEmployees === false}
               onUpdate={this.updateInterdecileRange}
-              placeholder="/100" 
+              placeholder=" " 
               isInvalid={interdecileRange>100 ? true : false}/>
           </div>
 

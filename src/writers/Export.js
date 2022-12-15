@@ -15,7 +15,7 @@ import { printValue } from "/src/utils/Utils";
 
 // Statement writers
 import { writeStatementART } from "../../components/sections/statements/forms/StatementART";
-import { writeStatementDIS } from "../../components/sections/statements/forms/StatementDIS";
+import { writeStatementIDR } from "../../components/sections/statements/forms/StatementIDR";
 import { writeStatementECO } from "../../components/sections/statements/forms/StatementECO";
 import { writeStatementGEQ } from "../../components/sections/statements/forms/StatementGEQ";
 import { writeStatementGHG } from "../../components/sections/statements/forms/StatementGHG";
@@ -30,7 +30,7 @@ import { writeStatementWAT } from "../../components/sections/statements/forms/St
 import { analysisTextWriterECO } from "../../src/writers/analysis/analysisTextWriterECO";
 import { analysisTextWriterGHG } from "../../src/writers/analysis/analysisTextWriterGHG";
 import { analysisTextWriterART } from "../../src/writers/analysis/analysisTextWriterART";
-import { analysisTextWriterDIS } from "../../src/writers/analysis/analysisTextWriterDIS";
+import { analysisTextWriterIDR } from "../../src/writers/analysis/analysisTextWriterIDR";
 import { analysisTextWriterGEQ } from "../../src/writers/analysis/analysisTextWriterGEQ";
 import { analysisTextWriterHAZ } from "../../src/writers/analysis/analysisTextWriterHAZ";
 import { analysisTextWriterKNW } from "../../src/writers/analysis/analysisTextWriterKNW";
@@ -172,7 +172,7 @@ function generatePDF(
   doc.setFontSize(8);
   doc.setTextColor(0);
   doc.setFont("Helvetica", "italic");
-  doc.text("(*Valeur en " + metaIndics[indic].unit + ")", x + 2, y);
+  doc.text(metaIndics[indic].unit!="" ? "(* Valeur en " + metaIndics[indic].unit + ")" : "(* Valeur sans unité)", x + 2, y);
   doc.setFontSize(10);
   doc.setFont("Helvetica", "normal");
   doc.text("Montant", xAmount - 13, y);
@@ -1259,7 +1259,7 @@ async function exportFootprintPDF(session) {
   const doc = new jsPDF("landscape", "mm", "a4", true);
 
   const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-  const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
+  const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
 
   const seOdds = ["5", "8", "9", "10", "12"];
   const envOdds = ["6", "7", "12", "13", "14", "15"];
@@ -1316,7 +1316,7 @@ async function downloadReport(indics, session, comparativeDivision) {
   // add
 
   const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-  const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
+  const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
 
   const seOdds = ["5", "8", "9", "10", "12"];
   const envOdds = ["6", "7", "12", "13", "14", "15"];
@@ -1411,8 +1411,8 @@ const getAnalyse = (indic, session) => {
   switch (indic) {
     case "art":
       return analysisTextWriterART(session);
-    case "dis":
-      return analysisTextWriterDIS(session);
+    case "idr":
+      return analysisTextWriterIDR(session);
     case "eco":
       return analysisTextWriterECO(session);
     case "geq":
@@ -1440,8 +1440,8 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
   switch (indic) {
     case "art":
       return writeStatementART(doc, x, y, impactsData);
-    case "dis":
-      return writeStatementDIS(doc, x, y, impactsData);
+    case "idr":
+      return writeStatementIDR(doc, x, y, impactsData);
     case "eco":
       return writeStatementECO(doc, x, y, impactsData);
     case "geq":

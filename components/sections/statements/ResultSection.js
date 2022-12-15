@@ -53,6 +53,7 @@ const ResultSection = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeDivision || "00"
   );
+  console.log(props.session.comparativeAreaFootprints);
   const [allSectorFootprint] = useState(
     props.session.comparativeAreaFootprints[props.indic.toUpperCase()]
   );
@@ -182,6 +183,9 @@ const ResultSection = (props) => {
       capitalConsumptionDivisionFootprint : capitalConsumptionDivisionFootprint,
     });
   };
+
+  console.log(allSectorFootprint);
+  console.log(allSectorFootprint.productionAreaFootprint);
 
   return (
     <>
