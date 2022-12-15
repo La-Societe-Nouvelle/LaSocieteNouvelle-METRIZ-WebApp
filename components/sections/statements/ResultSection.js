@@ -522,7 +522,7 @@ const ResultSection = (props) => {
               <div className="border rounded p-4">
                   <h4 className="h5">Notes</h4>                    
                   {comparativeData.production.targetDivisionFootprint.indicators[indic].meta ? 
-                    <p>Tendance et objectifs pour la branche "{divisions[comparativeDivision]}"</p>
+                    <p>Tendance et objectif pour la branche "{divisions[comparativeDivision]}"</p>
                     :
                     <p>Tendance de la branche "{divisions[comparativeDivision]}"</p>
                   }

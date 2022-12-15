@@ -6,26 +6,31 @@ Chart.register(ChartDataLabels);
 import { Line } from "react-chartjs-2";
 
 function TrendsGraph(props) {
+
   const [data, setData] = useState({ datasets: [] });
   const [options, setOptions] = useState({});
+
   useEffect(() => {
     
     const trendsData = props.trends.data.map((data) =>
-      data.year <= 2020
+      data.flag == 'e'
         ? { x: data.year, y: data.value }
         : { x: data.year, y: null }
     );
+    let lastNonNull = trendsData.findLast((element) => element.y != null);
+
     const trendsDataForecast = props.trends.data.map((data) =>
-      data.year >= 2020
+      data.flag == 'f' || data.year == lastNonNull.x
         ? { x: data.year, y: data.value }
         : { x: data.year, y: null }
     );
 
+    console.log(trendsDataForecast);
     const targetData = props.target.data.map((data) => ({
       x: data.year,
       y: data.value,
     }));
-
+console.log(props.unit)
     const data = {
       datasets: [
         {
@@ -75,7 +80,7 @@ function TrendsGraph(props) {
         y: {
           display: true,
           min: 0, 
-          suggestedMax: 100,
+          suggestedMax: props.unit == '%' ? 100 : null,
           title: {
             display: true,
             text: props.unit,
