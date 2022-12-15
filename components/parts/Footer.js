@@ -10,7 +10,7 @@ export function Footer() {
   };
 
   return (
-    <footer>
+    <footer className="px-4">
       <Container fluid>
         <Row>
           <Col>

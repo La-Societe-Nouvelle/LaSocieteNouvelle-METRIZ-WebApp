@@ -88,7 +88,7 @@ class Metriz extends React.Component {
     const { step, session } = this.state;
     return (
       <>
-        <div className="wrapper" id="wrapper">
+        <div className={step == 0 ? "wrapper bg-white" : "wrapper"} id="wrapper" >
           {step == 0 ? (
             <Header />
           ) :
