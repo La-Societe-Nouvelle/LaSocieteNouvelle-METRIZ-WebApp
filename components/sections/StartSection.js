@@ -94,7 +94,7 @@ export class StartSection extends React.Component {
             </Row>
           </Container>
         </div>
-        <div className="px-4">
+        <div className="px-5">
           <Container fluid>
             <Row>
               <Col>
@@ -147,7 +147,7 @@ export class StartSection extends React.Component {
                     src="/resources/version.svg"
                     alt="Icone Versions spécifique"
                   />
-                  <h3>Besoin d’une version spécifique ?</h3>
+                  <h3>Des besoins spécifiques?</h3>
                   <p>
                     Contactez-nous pour bénéficier d'une version plus adaptée à 
                     vos activités commerciales
