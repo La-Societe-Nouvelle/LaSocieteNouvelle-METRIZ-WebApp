@@ -17,6 +17,7 @@ function TrendsGraph(props) {
         ? { x: data.year, y: data.value }
         : { x: data.year, y: null }
     );
+
     let lastNonNull = trendsData.findLast((element) => element.y != null);
 
     const trendsDataForecast = props.trends.data.map((data) =>
@@ -25,12 +26,10 @@ function TrendsGraph(props) {
         : { x: data.year, y: null }
     );
 
-    console.log(trendsDataForecast);
     const targetData = props.target.data.map((data) => ({
       x: data.year,
       y: data.value,
     }));
-console.log(props.unit)
     const data = {
       datasets: [
         {
@@ -74,13 +73,40 @@ console.log(props.unit)
       });
     }
     
+    
+    let suggestedMax;
+    if (props.unit == "%") {
+      let max = Math.max(...props.trends.data.map((o) => o.value));
+
+      if(max < 10) {
+        suggestedMax = 10;
+      }
+     
+      switch (true) {
+        case max < 10:
+           suggestedMax = 10;
+          break;
+        case max > 10 && max < 25:
+           suggestedMax = 25;
+          break;
+        case max > 25 && max < 50:
+           suggestedMax = 50;
+          break;
+        default:
+          suggestedMax = 100;
+          break;
+      }
+    } else {
+      suggestedMax = null;
+    }
+
     const options = {
       pointRadius: 0,
       scales: {
         y: {
           display: true,
           min: 0, 
-          suggestedMax: props.unit == '%' ? 100 : null,
+          suggestedMax: suggestedMax,
           title: {
             display: true,
             text: props.unit,
