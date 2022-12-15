@@ -5,7 +5,7 @@ import { compareToReference, printValue } from "../../utils/Utils";
 export const analysisTextWriterIDR = (session) =>
 {
   const {impactsData,
-         legalUnit,
+         comparativeData,
          financialData} = session;
   const {aggregates,
          expenseAccounts} = financialData;
@@ -26,7 +26,7 @@ export const analysisTextWriterIDR = (session) =>
   
   currentParagraph = [];
 
-  currentParagraph.push("Le rapport interdécile associé à la valeur produite est de "+printValue(aggregates.production.footprint.indicators.idr.getValue(),1)+".")
+  currentParagraph.push("Le rapport interdécile associé à la valeur produite est de "+printValue(aggregates.production.footprint.indicators.idr.value,1)+".")
   
   analysis.push(currentParagraph);
 
@@ -54,7 +54,7 @@ export const analysisTextWriterIDR = (session) =>
   currentParagraph = [];
   
   // résultat
-  currentParagraph.push("Le rapport interdécile associé aux consommations intermédiaires est de "+printValue(aggregates.intermediateConsumption.footprint.indicators.idr.getValue(),1)+".");
+  currentParagraph.push("Le rapport interdécile associé aux consommations intermédiaires est de "+printValue(aggregates.intermediateConsumption.footprint.indicators.idr.value,1)+".");
   
   analysis.push(currentParagraph);
 
@@ -68,7 +68,7 @@ export const analysisTextWriterIDR = (session) =>
 
   currentParagraph = [];
 
-  currentParagraph.push("La rapport interdécile associé à l'amortissement des immobilisations est de "+printValue(aggregates.capitalConsumption.footprint.indicators.idr.getValue(),1)+".");
+  currentParagraph.push("La rapport interdécile associé à l'amortissement des immobilisations est de "+printValue(aggregates.capitalConsumption.footprint.indicators.idr.value,1)+".");
 
   analysis.push(currentParagraph);
 

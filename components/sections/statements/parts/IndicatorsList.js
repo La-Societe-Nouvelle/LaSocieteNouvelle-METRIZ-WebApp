@@ -140,7 +140,6 @@ const IndicatorsList = (props) => {
 
   const validateIndicator = async (indic) => {
     setDisplayGraph(false);
-    
     if (!validations.includes(indic)) {
       // Get footprint for all sectors
       let newComparativeData = await updateComparativeAreaData(indic);
@@ -151,6 +150,7 @@ const IndicatorsList = (props) => {
           comparativeDivision
         );
       }
+
       props.session.comparativeData = newComparativeData;
       setComparativeData(newComparativeData);
 

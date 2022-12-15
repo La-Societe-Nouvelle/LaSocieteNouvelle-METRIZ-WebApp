@@ -143,7 +143,7 @@ export class StatementGEQ extends React.Component {
       wageGap: valueOrDefault(this.props.impactsData.wageGap, ""),
     });
     this.props.onUpdate("geq");
-    this.props.onUpdate("dis");
+    this.props.onUpdate("idr");
   };
 
   updateWageGap = (input) => {

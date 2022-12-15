@@ -104,8 +104,8 @@ const ResultSection = (props) => {
       comparativeData
     );
 
+    setComparativeData(newComparativeData);
     setComparativeDivision(division);
-    setComparativeData(newComparativeData); 
 
   };
   /* ---------- Update comparative data according to comparative division ---------- */
@@ -114,9 +114,8 @@ const ResultSection = (props) => {
   useEffect(async() => {
 
     if(comparativeDivision != props.session.comparativeData.activityCode) {
-      console.log("different");
-
-      props.session.comparativeData.activityCode = comparativeDivision;
+      
+      //props.session.comparativeData.activityCode = comparativeDivision;
 
       let newComparativeData = comparativeData;
       
@@ -135,7 +134,8 @@ const ResultSection = (props) => {
   
       // Update session with comparative data for all validated indicators
 
-    props.session.comparativeData = newComparativeData;
+      props.session.comparativeData = newComparativeData;
+      props.session.comparativeData.activityCode = comparativeDivision;
 
     }
 
@@ -156,14 +156,13 @@ const ResultSection = (props) => {
       newComparativeData,
       "trendsFootprint"
     );
-
+    
     newComparativeData = await getHistoricalSerieData(
       code,
       indic,
       newComparativeData,
       "targetDivisionFootprint"
-    );
-
+      );      
     return newComparativeData;
   };
 
@@ -181,6 +180,7 @@ const ResultSection = (props) => {
     const changeTrendGraphView = (option) => {
       setTrendGraphView(option);
     };
+
   return (
     <>
       {/* Head Section */}

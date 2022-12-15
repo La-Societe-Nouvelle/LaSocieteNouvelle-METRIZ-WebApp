@@ -5,7 +5,7 @@ import { compareToReference, printValue } from "../../utils/Utils";
 export const analysisTextWriterDIS = (session) =>
 {
   const {impactsData,
-         legalUnit,
+         comparativeData,
          financialData} = session;
   const {aggregates,
          expenseAccounts} = financialData;

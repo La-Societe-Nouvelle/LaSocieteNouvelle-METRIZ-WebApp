@@ -1,6 +1,6 @@
 import {Indicator} from './Indicator';
 
-const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
+const indics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
 
 export class HistoricalFootprint {
 

@@ -136,11 +136,9 @@ export class ImpactsData  {
     this.hasEmployees = hasEmployees;
     if (!hasEmployees) {
       this.interdecileRange = 1;
-      this.indexGini = 0;
       this.wageGap = 0;
     } else {
       this.interdecileRange = null;
-      this.indexGini = null;
       this.wageGap = null;
     }
   }

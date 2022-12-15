@@ -5,7 +5,7 @@ import { compareToReference, printValue } from "../../utils/Utils";
 export const analysisTextWriterWAS = (session) =>
 {
   const {impactsData,
-         legalUnit,
+         comparativeData,
          financialData} = session;
   const {aggregates,
          expenseAccounts} = financialData;
@@ -26,9 +26,9 @@ export const analysisTextWriterWAS = (session) =>
   
   currentParagraph = [];
 
-  currentParagraph.push("L'intensité de production de déchets de la valeur produite est de "+printValue(aggregates.production.footprint.indicators.was.getValue(),0)+" g/€.")
-  if (aggregates.production.footprint.indicators.was.getValue()!=aggregates.revenue.footprint.indicators.was.getValue()) {
-    currentParagraph.push("La valeur est de "+printValue(aggregates.revenue.footprint.indicators.was.getValue(),0)+" g/€ pour le chiffre d'affaires, en prenant compte des stocks de production.")
+  currentParagraph.push("L'intensité de production de déchets de la valeur produite est de "+printValue(aggregates.production.footprint.indicators.was.value,0)+" g/€.")
+  if (aggregates.production.footprint.indicators.was.value!=aggregates.revenue.footprint.indicators.was.value) {
+    currentParagraph.push("La valeur est de "+printValue(aggregates.revenue.footprint.indicators.was.value,0)+" g/€ pour le chiffre d'affaires, en prenant compte des stocks de production.")
   } else {
     currentParagraph.push("La valeur est identique pour le chiffre d'affaires.")
   }
@@ -46,7 +46,7 @@ export const analysisTextWriterWAS = (session) =>
   else 
   {
     currentParagraph.push("La production directe de déchets est de "+printValue(impactsData.wasteProduction,0)+" kg,"
-      + " soit une intensité de "+printValue(aggregates.netValueAdded.footprint.indicators.was.getValue(),0)+" g/€ pour la valeur ajoutée.");
+      + " soit une intensité de "+printValue(aggregates.netValueAdded.footprint.indicators.was.value,0)+" g/€ pour la valeur ajoutée.");
     currentParagraph.push("Ils représentent "+printValue(impactsData.wasteProduction/aggregates.production.footprint.indicators.was.getGrossImpact(aggregates.production.amount)*100,0)+" % de la production de déchets liée à la production (économique).");
   }
 
@@ -58,7 +58,7 @@ export const analysisTextWriterWAS = (session) =>
   
   // résultat
   currentParagraph.push("Les consommations intermédiaires sont à l'orgine de "+printValue(aggregates.intermediateConsumption.footprint.indicators.was.getGrossImpact(aggregates.intermediateConsumption.amount),0)+" kg de déchets,"
-    + " ce qui correspond à une intensité de "+printValue(aggregates.intermediateConsumption.footprint.indicators.was.getValue(),0)+" g/€.");
+    + " ce qui correspond à une intensité de "+printValue(aggregates.intermediateConsumption.footprint.indicators.was.value,0)+" g/€.");
   currentParagraph.push("Les déchets produits indirectement représentent "+printValue(aggregates.intermediateConsumption.footprint.indicators.was.getGrossImpact(aggregates.intermediateConsumption.amount)/aggregates.production.footprint.indicators.was.getGrossImpact(aggregates.production.amount)*100,0)+" % de l'empreinte déchets liée à la production.");
   
   analysis.push(currentParagraph);
