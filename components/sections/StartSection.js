@@ -106,7 +106,7 @@ export class StartSection extends React.Component {
                   />
                   <h3>Code source ouvert</h3>
                   <p>
-                    Le code source est ouvert, vous pouvez y accéder librement
+                    Le code source est ouvert, vous pouvez y accéder
                     via notre répertoire GitHub
                   </p>
                 </div>
@@ -150,7 +150,7 @@ export class StartSection extends React.Component {
                   <h3>Des besoins spécifiques?</h3>
                   <p>
                     Contactez-nous pour bénéficier d'une version plus adaptée à 
-                    vos activités commerciales
+                    vos activités
                   </p>
                 </div>
               </Col>
