@@ -67,7 +67,7 @@ export class Indicator {
   getValueMax() {
     if (this.value!=null & this.getUncertainty()!=null) {
         let coef = 1.0 + this.getUncertainty()/100;
-        if (["art","dis","eco","geq","knw","soc"].includes(this.indic)) {
+        if (["art","eco","geq","knw","soc"].includes(this.indic)) {
             return Math.min(this.value*coef,100.0);
         } else {
             return this.value*coef;

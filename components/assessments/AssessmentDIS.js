@@ -194,8 +194,12 @@ export class AssessmentDIS extends React.Component {
     let impactsData = this.props.impactsData;
 
     // update dis data
-    impactsData.indexGini = getIndexGini(impactsData.employees);
-    await this.props.onUpdate("dis");
+    //impactsData.indexGini = getIndexGini(impactsData.employees);
+    //await this.props.onUpdate("dis");
+
+    // update dis data
+    impactsData.interdecileRange = getInterdecileRange(impactsData.employees);
+    await this.props.onUpdate("idr");
 
     // update geq data
     impactsData.wageGap = getGenderWageGap(impactsData.employees);
@@ -673,3 +677,38 @@ const getEmployeesTrainingCompensations = (employees) => {
     .reduce((a, b) => a + b, 0);
   return roundValue(employeesTrainingsCompensations, 0);
 };
+
+
+const getInterdecileRange = async (employees) =>
+{
+  employees = employees.filter(employee => employee.hourlyRate!=null).sort((a,b) => a.hourlyRate - b.hourlyRate);
+  let totalHours = getSumItems(employees.map(employee => employee.workingHours));
+
+  if (employees.length < 2 || totalHours==0) return 1;
+
+  // Limits
+  let limitD1 = Math.round(totalHours*0.1);
+  let limitD9 = Math.round(totalHours*0.9);
+
+  // D1
+  let indexEmployeeD1 = 0;
+  let hoursD1 = employees[indexEmployeeD1].workingHours;
+  while (hoursD1 < limitD1 && indexEmployeeD1 < employees.length) {
+    indexEmployeeD1+=1;
+    hoursD1+= employees[indexEmployeeD1].workingHours;
+  }
+  let hourlyRateD1 = employees[indexEmployeeD1].hourlyRate;
+
+  // D9
+  let indexEmployeeD9 = 0;
+  let hoursD9 = employees[indexEmployeeD9].workingHours;
+  while (hoursD9 < limitD9 && indexEmployeeD9 < employees.length) {
+    indexEmployeeD9+=1;
+    hoursD9+= employees[indexEmployeeD9].workingHours;
+  }
+  let hourlyRateD9 = employees[indexEmployeeD9].hourlyRate;
+
+  // Interdecile range
+  let interdecileRange = roundValue(hourlyRateD9/hourlyRateD1,2);
+  return interdecileRange;
+}

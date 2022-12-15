@@ -12,7 +12,7 @@ import {
 import { exportIndicPDF } from "../../../../src/writers/Export";
 import {
   StatementART,
-  StatementDIS,
+  StatementIDR,
   StatementECO,
   StatementGEQ,
   StatementGHG,
@@ -242,7 +242,7 @@ const IndicatorsList = (props) => {
 
   //  INDICATORS CATEGORIES
   const valueCreation = ["eco", "art", "soc"];
-  const socialFootprint = ["dis", "geq", "knw"];
+  const socialFootprint = ["idr", "geq", "knw"];
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
 
   // Pie Graph component to print in PDF
@@ -549,21 +549,21 @@ const IndicatorsList = (props) => {
                 <Card.Body>
                   {(() => {
                     switch (key) {
-                      case "dis":
+                      case "idr":
                         return (
                           <>
-                            <StatementDIS
+                            <StatementIDR
                               impactsData={props.impactsData}
-                              onUpdate     = {willNetValueAddedIndicator.bind("dis")}
-                              onValidate   = {() => validateIndicator("dis")}
-                              toAssessment = {() => triggerPopup("dis")}
+                              onUpdate     = {willNetValueAddedIndicator.bind("idr")}
+                              onValidate   = {() => validateIndicator("idr")}
+                              toAssessment = {() => triggerPopup("idr")}
                               toImportDSN  = {() => triggerPopup("dsn")}
                             />
                             <ModalAssesment
-                              indic="dis"
+                              indic="idr"
                               impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("dis")}
-                              onValidate={() => validateIndicator("dis")}
+                              onUpdate={willNetValueAddedIndicator.bind("idr")}
+                              onValidate={() => validateIndicator("idr")}
                               onGoBack={handleClose}
                               popUp={popUp}
                               handleClose={handleClose}
@@ -572,8 +572,8 @@ const IndicatorsList = (props) => {
                             <ModalAssesment
                               indic="dsn"
                               impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("dis")}
-                              onValidate={() => validateIndicator("dis")}
+                              onUpdate={willNetValueAddedIndicator.bind("idr")}
+                              onValidate={() => validateIndicator("idr")}
                               onGoBack={handleClose}
                               popUp={popUp}
                               handleClose={handleClose}
@@ -812,7 +812,7 @@ function ModalAssesment(props) {
       <Modal.Body>
         {(() => {
           switch (props.indic) {
-            case "dis":
+            case "idr":
               return <AssessmentDIS {...props} />;
             case "geq":
               return <AssessmentDIS {...props} />;

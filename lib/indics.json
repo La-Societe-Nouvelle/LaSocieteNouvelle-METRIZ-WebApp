@@ -11,17 +11,17 @@
     "unit": "%",
     "unitAbsolute": "€"
   },
-  "dis": {
-    "isBeta": true,
-    "libelle": "Indice de répartition des rémunérations",
+  "idr": {
+    "isBeta": false,
+    "libelle": "Indice d'écart des rémunérations",
     "libelleDeclaredValue": "",
-    "libelleGrandeur": "Répartition des rémunérations",
-    "libelleMenu": "Répartition des rémunérations",
-    "nbDecimals": 1,
+    "libelleGrandeur": "Ecart des rémunérations",
+    "libelleMenu": "Ecart des rémunérations",
+    "nbDecimals": 2,
     "odds": ["08","10"],
     "type": "indice",
-    "unit": "/100",
-    "unitAbsolute": "/100"
+    "unit": "",
+    "unitAbsolute": ""
   },
   "eco": {
     "isBeta": false,

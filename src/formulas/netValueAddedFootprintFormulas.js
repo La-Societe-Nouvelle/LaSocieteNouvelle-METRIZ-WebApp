@@ -14,7 +14,7 @@ export function buildNetValueAddedIndicator(indic,impactsData)
     switch(indic)
     {
         case "art": buildValueART(indicator,impactsData); break;
-        case "dis": buildValueDIS(indicator,impactsData); break;
+        case "idr": buildValueIDR(indicator,impactsData); break;
         case "eco": buildValueECO(indicator,impactsData); break;
         case "geq": buildValueGEQ(indicator,impactsData); break;
         case "ghg": buildValueGHG(indicator,impactsData); break;
@@ -37,10 +37,10 @@ const buildValueART = (indicator,impactsData) =>
     }
 }
 
-const buildValueDIS = (indicator,impactsData) => 
+const buildValueIDR = (indicator,impactsData) => 
 {
-    if (impactsData.indexGini!=null) {
-        indicator.setValue(impactsData.indexGini);
+    if (impactsData.interdecileRange!=null) {
+        indicator.setValue(impactsData.interdecileRange);
         indicator.setUncertainty(0);
     }
 }

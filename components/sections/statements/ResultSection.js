@@ -18,7 +18,7 @@ import divisions from "/lib/divisions";
 
 // Texts imports
 import { analysisTextWriterART } from "../../../src/writers/analysis/analysisTextWriterART";
-import { analysisTextWriterDIS } from "../../../src/writers/analysis/analysisTextWriterDIS";
+import { analysisTextWriterIDR } from "../../../src/writers/analysis/analysisTextWriterIDR";
 import { analysisTextWriterECO } from "../../../src/writers/analysis/analysisTextWriterECO";
 import { analysisTextWriterGEQ } from "../../../src/writers/analysis/analysisTextWriterGEQ";
 import { analysisTextWriterGHG } from "../../../src/writers/analysis/analysisTextWriterGHG";
@@ -458,8 +458,8 @@ function getAnalyse(props) {
   switch (props.indic) {
     case "art":
       return analysisTextWriterART(props.session);
-    case "dis":
-      return analysisTextWriterDIS(props.session);
+    case "idr":
+      return analysisTextWriterIDR(props.session);
     case "eco":
       return analysisTextWriterECO(props.session);
     case "geq":

@@ -3,7 +3,7 @@ import { buildIndicatorAggregate } from "../formulas/footprintFormulas";
 import { getAmountItems, getPrevAmountItems } from "../utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-const indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
+const indics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
 
 export class Account {
 

@@ -61,7 +61,7 @@ const ExportResults = props => {
     // add
 
     const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-    const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
+    const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
 
     const seOdds = ["5", "8", "9", "10", "12"];
     const envOdds = ["6", "7", "12", "13", "14", "15"];

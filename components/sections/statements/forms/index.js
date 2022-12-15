@@ -2,7 +2,7 @@
 import { StatementART } from "./StatementART";
 import { StatementECO } from "./StatementECO";
 import { StatementSOC } from "./StatementSOC";
-import { StatementDIS } from "./StatementDIS";
+import { StatementIDR } from "./StatementIDR";
 import { StatementGEQ } from "./StatementGEQ";
 import { StatementKNW } from "./StatementKNW";
 import { StatementGHG } from "./StatementGHG";
@@ -16,7 +16,7 @@ export  {
     StatementART,
     StatementECO,
     StatementSOC,
-    StatementDIS,
+    StatementIDR,
     StatementGEQ,
     StatementKNW,
     StatementGHG,
