@@ -1,5 +1,5 @@
 import axios from "axios";
-import { updateAggregatesFootprint } from "../../ComparativeData";
+import { updateComparativeFootprint } from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
 const getMacroSerieData = async (indic, code,comparativeData,serie) => {
@@ -45,7 +45,7 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
 
 
       const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionFootprint,intermediateConsumption : intermediateConsumptionFootprint, production : productionFootprint, netValueAdded : netValueAddedFootprint}
-      const divisionFootprint = await updateAggregatesFootprint(indic,comparativeData, newComparativeData, serie)
+      const divisionFootprint = await updateComparativeFootprint(indic,comparativeData, newComparativeData, serie)
 
       return divisionFootprint;
   };

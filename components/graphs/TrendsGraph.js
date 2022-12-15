@@ -8,21 +8,20 @@ import { Line } from "react-chartjs-2";
 function TrendsGraph(props) {
   const [data, setData] = useState({ datasets: [] });
   const [options, setOptions] = useState({});
-
   useEffect(() => {
     
-    const trendsData = props.trends.map((data) =>
+    const trendsData = props.trends.data.map((data) =>
       data.year <= 2020
         ? { x: data.year, y: data.value }
         : { x: data.year, y: null }
     );
-    const trendsDataForecast = props.trends.map((data) =>
+    const trendsDataForecast = props.trends.data.map((data) =>
       data.year >= 2020
         ? { x: data.year, y: data.value }
         : { x: data.year, y: null }
     );
 
-    const targetData = props.target.map((data) => ({
+    const targetData = props.target.data.map((data) => ({
       x: data.year,
       y: data.value,
     }));

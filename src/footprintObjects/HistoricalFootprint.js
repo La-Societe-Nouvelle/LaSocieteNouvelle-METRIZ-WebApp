@@ -10,8 +10,10 @@ export class HistoricalFootprint {
   if (props==undefined) props = {indicators: {}};
     // indicators
     this.indicators = {};
-    indics.forEach(indic => this.indicators[indic] = new Array(1).fill(new Indicator({indic,...props.indicators[indic]}))
-    )
+
+    indics.forEach(indic => this.indicators[indic] = {data : new Array(1).fill(new Indicator({indic,...props.indicators[indic]})), meta : {}})
+
+    
   // ---------------------------------------------------------------------------------------------------- //
   }
 

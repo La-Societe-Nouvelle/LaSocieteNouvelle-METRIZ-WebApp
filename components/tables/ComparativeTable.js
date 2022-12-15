@@ -22,38 +22,38 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
   
   const productionEvolutionBranch = getEvolution(
     comparativeData.production.divisionFootprint.indicators[indic].value,
-    comparativeData.production.targetDivisionFootprint.indicators[indic].at(-1).value
+    comparativeData.production.targetDivisionFootprint.indicators[indic].data.at(-1).value
   );
   const consumptionEvolutionBranch = getEvolution(
     comparativeData.intermediateConsumption.divisionFootprint.indicators[indic]
       .value,
     comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
       indic
-    ].at(-1).value
+    ].data.at(-1).value
   );
   const valueAddedEvolutionBranch = getEvolution(
     comparativeData.netValueAdded.divisionFootprint.indicators[indic].value,
-    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].at(-1).value
+    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].data.at(-1).value
   );
 
   const capitalConsumptionEvolutionBranch = getEvolution(
     comparativeData.fixedCapitalConsumption.divisionFootprint.indicators[indic]
       .value,
-    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[indic].at(-1).value
+    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[indic].data.at(-1).value
   );
 
 
   const displayTargetColumn =
-    comparativeData.production.targetDivisionFootprint.indicators[indic].at(-1).value ==
+    comparativeData.production.targetDivisionFootprint.indicators[indic].data.at(-1).value ==
       null &&
-    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].at(-1).value ==
+    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].data.at(-1).value ==
       null &&
     comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
       indic
-    ].at(-1).value == null &&
+    ].data.at(-1).value == null &&
     comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
       indic
-    ].at(-1).value == null
+    ].data.at(-1).value == null
       ? false
       : true;
 
@@ -143,7 +143,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
                 {getValue(
                   comparativeData.production.targetDivisionFootprint.indicators[
                     indic
-                  ].at(-1).value,
+                  ].data.at(-1).value,
                   unit,
                   precision
                 )}
@@ -199,7 +199,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               <td className="text-end">
                 {getValue(
                   comparativeData.intermediateConsumption
-                    .targetDivisionFootprint.indicators[indic].at(-1).value,
+                    .targetDivisionFootprint.indicators[indic].data.at(-1).value,
                   unit,
                   precision
                 )}
@@ -256,7 +256,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               <td className="text-end">
                 {getValue(
                   comparativeData.fixedCapitalConsumption
-                    .targetDivisionFootprint.indicators[indic].at(-1).value,
+                    .targetDivisionFootprint.indicators[indic].data.at(-1).value,
                   unit,
                   precision
                 )}
@@ -312,7 +312,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               <td className="text-end">
                 {getValue(
                   comparativeData.netValueAdded.targetDivisionFootprint
-                    .indicators[indic].at(-1).value,
+                    .indicators[indic].data.at(-1).value,
                   unit,
                   precision
                 )}

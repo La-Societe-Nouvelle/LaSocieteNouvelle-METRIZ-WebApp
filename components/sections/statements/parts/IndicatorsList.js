@@ -139,6 +139,7 @@ const IndicatorsList = (props) => {
 
   const validateIndicator = async (indic) => {
     setDisplayGraph(false);
+    
     if (!validations.includes(indic)) {
       // Get footprint for all sectors
       let newComparativeData = await updateComparativeAreaData(indic);
@@ -299,7 +300,7 @@ const IndicatorsList = (props) => {
                     ].value,
                     null,
                     comparativeData.production.targetDivisionFootprint
-                      .indicators[indic].at(-1).value,
+                      .indicators[indic].data.at(-1).value,
                   ]}
                   titleChart="Production"
                   indic={indic}
@@ -322,7 +323,7 @@ const IndicatorsList = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.intermediateConsumption
-                      .targetDivisionFootprint.indicators[indic].at(-1).value,
+                      .targetDivisionFootprint.indicators[indic].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -344,7 +345,7 @@ const IndicatorsList = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.fixedCapitalConsumption
-                      .targetDivisionFootprint.indicators[indic].at(-1).value,
+                      .targetDivisionFootprint.indicators[indic].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -368,7 +369,7 @@ const IndicatorsList = (props) => {
                       .indicators[indic].value,
                     null,
                     comparativeData.netValueAdded.targetDivisionFootprint
-                      .indicators[indic].at(-1).value,
+                      .indicators[indic].data.at(-1).value,
                   ]}
                   indic={indic}
                 />

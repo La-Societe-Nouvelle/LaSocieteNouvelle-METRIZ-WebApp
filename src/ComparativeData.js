@@ -45,15 +45,14 @@ export class ComparativeData {
 }
 
 // Update Comparative Data
-
-export async function updateAggregatesHistoricalFootprint(
+export async function updateHistoricalFootprint(
   indic,
   prevComparativeData,
   newComparativeData,
   serie
 ) {
   let newFixedCapitalConsumption;
-
+  
   newFixedCapitalConsumption = Object.assign(
     {},
     prevComparativeData.fixedCapitalConsumption[serie].indicators,
@@ -90,7 +89,7 @@ export async function updateAggregatesHistoricalFootprint(
     }
   );
 
-  const updatedAggregatesFootprint = Object.assign({}, prevComparativeData, {
+  const updatedHistoricalFootprint = Object.assign({}, prevComparativeData, {
     fixedCapitalConsumption: {
       ...prevComparativeData.fixedCapitalConsumption,
       [serie]: {
@@ -117,10 +116,10 @@ export async function updateAggregatesHistoricalFootprint(
     },
   });
 
-  return updatedAggregatesFootprint;
+  return updatedHistoricalFootprint;
 }
 
-export async function updateAggregatesFootprint(
+export async function updateComparativeFootprint(
   indic,
   prevComparativeData,
   newComparativeData,

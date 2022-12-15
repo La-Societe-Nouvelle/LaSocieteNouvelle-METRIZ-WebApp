@@ -1,7 +1,5 @@
 import axios from "axios";
-import {
-  updateAggregatesFootprint,
-} from "../../ComparativeData";
+import {updateComparativeFootprint} from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
 const getSerieData = async (
@@ -78,7 +76,7 @@ const getSerieData = async (
     netValueAdded: netValueAddedSerie,
   };
 
-  serieFootprint = await updateAggregatesFootprint(
+  serieFootprint = await updateComparativeFootprint(
     indic,
     comparativeData,
     newComparativeData,

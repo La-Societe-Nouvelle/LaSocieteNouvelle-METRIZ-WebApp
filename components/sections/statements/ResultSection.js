@@ -95,41 +95,76 @@ const ResultSection = (props) => {
   /* ---------- Update Comparative division ---------- */
 
   const changeComparativeDivision = async (event) => {
+    
     let division = event.value;
-    // update session
-    props.session.comparativeData.activityCode = division;
 
-    await updateComparativeData(division);
+    const newComparativeData =  await updateComparativeData(
+      indic,
+      division,
+      comparativeData
+    );
+
     setComparativeDivision(division);
-  };
-  /* ---------- Update comparative data according to comparative division number ---------- */
+    setComparativeData(newComparativeData); 
 
-  const updateComparativeData = async (division) => {
-    let newComparativeData = comparativeData;
+  };
+  /* ---------- Update comparative data according to comparative division ---------- */
+
+  
+  useEffect(async() => {
+
+    if(comparativeDivision != props.session.comparativeData.activityCode) {
+      console.log("different");
+
+      props.session.comparativeData.activityCode = comparativeDivision;
+
+      let newComparativeData = comparativeData;
+      
+    for await (const indic of props.session.validations) {
+      
+      // update comparative data for each  indicators
+      const updatedData = await updateComparativeData(
+        indic,
+        comparativeDivision,
+        newComparativeData
+      );
+    
+      newComparativeData = updatedData;
+        
+    }
+  
+      // Update session with comparative data for all validated indicators
+
+    props.session.comparativeData = newComparativeData;
+
+    }
+
+  }, [comparativeDivision]);
+
+  const updateComparativeData = async (indic,code,newComparativeData) => {
 
     newComparativeData = await getMacroSerieData(
       indic,
-      division,
+      code,
       newComparativeData,
       "divisionFootprint"
     );
 
     newComparativeData = await getHistoricalSerieData(
-      division,
+      code,
       indic,
       newComparativeData,
       "trendsFootprint"
     );
 
     newComparativeData = await getHistoricalSerieData(
-      division,
+      code,
       indic,
       newComparativeData,
       "targetDivisionFootprint"
     );
 
-    props.session.comparativeData = newComparativeData;
-    setComparativeData(newComparativeData);
+    return newComparativeData;
   };
 
     /* ---------- Display trend graph by aggregate ---------- */
@@ -270,7 +305,6 @@ const ResultSection = (props) => {
           options={divisionsOptions}
           onChange={changeComparativeDivision}
         />
-
         {error && <ErrorApi />}
         <div className="graph-container">
           <div className="mt-5">
@@ -296,7 +330,7 @@ const ResultSection = (props) => {
                     null,
                     comparativeData.production.targetDivisionFootprint.indicators[
                       indic
-                    ].at(-1).value,
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -320,7 +354,7 @@ const ResultSection = (props) => {
                     null,
                     comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
                       indic
-                    ].at(-1).value,
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -344,7 +378,7 @@ const ResultSection = (props) => {
                     null,
                     comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
                       indic
-                    ].at(-1).value,
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -371,7 +405,7 @@ const ResultSection = (props) => {
                     null,
                     comparativeData.netValueAdded.targetDivisionFootprint.indicators[
                       indic
-                    ].at(-1).value,
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
