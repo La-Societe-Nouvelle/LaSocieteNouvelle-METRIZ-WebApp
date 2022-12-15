@@ -764,7 +764,7 @@ function ModalAssesment(props) {
     <Modal
       show={props.popUp == props.indic}
       onHide={props.handleClose}
-      fullscreen
+      size="xl"
       centered
     >
       <Modal.Header closeButton>
