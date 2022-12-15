@@ -22,8 +22,11 @@ export class ImpactsData  {
 
     this.hasEmployees = props.hasEmployees !== undefined ? props.hasEmployees : null;
     this.employees = props.employees || [];
+    this.socialStatements = props.socialStatements || [];
+    this.individualsData = props.individualsData || [];
 
     this.indexGini = props.indexGini !== undefined ? props.indexGini : null;
+    this.interdecileRange = props.interdecileRange !== undefined ? props.interdecileRange : null;
     this.wageGap =  props.wageGap !== undefined ? props.wageGap : null;
     this.researchAndTrainingContribution = props.researchAndTrainingContribution !== undefined ? props.researchAndTrainingContribution : null;
 

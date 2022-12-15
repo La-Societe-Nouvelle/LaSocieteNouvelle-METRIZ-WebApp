@@ -22,7 +22,7 @@ export class ImportDSN extends React.Component
     super(props);
     this.state = {
       files: [],
-      socialStatements: []
+      socialStatements: props.impactsData.socialStatements || []
     };
   }
 
@@ -207,14 +207,17 @@ export class ImportDSN extends React.Component
   {
     let impactsData = this.props.impactsData;
   
-    let individualsData = getIndividualsData(this.state.socialStatements);
+    let individualsData = await getIndividualsData(this.state.socialStatements);
+
+    impactsData.socialStatements = this.state.socialStatements;
+    impactsData.individualsData = individualsData;
 
     // update idr data
-    impactsData.interdecileRange = getInterdecileRange(individualsData);
+    impactsData.interdecileRange = await getInterdecileRange(individualsData);
     //await this.props.onUpdate("idr");
 
     // update idr data
-    impactsData.wageGap = getGenderWageGap(individualsData);
+    impactsData.wageGap = await getGenderWageGap(individualsData);
     await this.props.onUpdate("geq");
   
     this.props.onGoBack();
