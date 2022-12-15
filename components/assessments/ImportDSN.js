@@ -93,6 +93,13 @@ export class ImportDSN extends React.Component
           <h4>Fichiers importés</h4>
           {alerts.filter(alert => alert.type=="duplicate").length > 0 && <p>DOUBLON</p>}
           {alerts.filter(alert => alert.type=="missing").length > 0 && <p>MISSING</p>}
+          
+          <button
+            className="btn btn-light me-2"
+            onClick={() => this.deleteAll()}>
+            <i className="bi bi-trash3-fill"></i>
+            &nbsp;Supprimer tout
+          </button>
           <div className="table-main">
             <Table size="sm" responsive>
               <thead>
@@ -103,6 +110,7 @@ export class ImportDSN extends React.Component
                   <td>Fraction</td>
                   <td>Ecart D1/D9</td>
                   <td>Ecart F/H</td>
+                  <td></td>
                 </tr>
               </thead>
               <tbody>
@@ -114,6 +122,14 @@ export class ImportDSN extends React.Component
                     <td>{socialStatement.fraction.charAt(0)+"/"+socialStatement.fraction.charAt(1)}</td>
                     <td>{socialStatement.interdecileRange}</td>
                     <td>{socialStatement.genderWageGap} %</td>
+                    <td>
+                      <button
+                        className="btn btn-light me-2"
+                        onClick={() => this.deleteStatement(socialStatement.id)}>
+                        <i className="bi bi-trash3-fill"></i>
+                        &nbsp;Supprimer
+                      </button>
+                    </td>
                   </tr>
                 )}
               </tbody>
@@ -200,6 +216,16 @@ export class ImportDSN extends React.Component
 
       reader.readAsText(file);
     }
+  }
+
+  deleteAll = () =>
+  {
+    this.setState({ socialStatements: []});
+  }
+
+  deleteStatement = (id) =>
+  {
+    this.setState({ socialStatements: this.state.socialStatements.filter(statement => statement.id!=id) })
   }
   
   // Submit
