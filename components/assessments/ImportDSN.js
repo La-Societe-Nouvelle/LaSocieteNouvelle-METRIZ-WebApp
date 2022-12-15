@@ -30,12 +30,37 @@ export class ImportDSN extends React.Component
   {
     const {socialStatements} = this.state
 
-    const monthlyStatements = socialStatements.filter(statement => statement.nature=="01");
-    const distinctStatements = monthlyStatements.filter((value, index, self) => index === self.findIndex(item => item.mois == value.mois && item.fraction==value.fraction));
-    const duplicate = monthlyStatements.length > distinctStatements.length;
+    let alerts = [];
 
-    const missingMonth = distinctStatements.filter((value, index, self) => index === self.findIndex(item => item.mois == value.mois)).length==12;
-    const missingFraction = checkFractions(monthlyStatements);
+    const monthlyStatements = socialStatements.filter(statement => statement.nature=="01");
+    let distinctStatements = monthlyStatements.filter((value, index, self) => index === self.findIndex(item => item.nicEtablissement==value.nicEtablissement && item.mois==value.mois && item.fraction==value.fraction));
+    const duplicate = monthlyStatements.length > distinctStatements.length;
+    if (duplicate) {
+      alerts.push({
+        type: "duplicate",
+        message: "Plusieurs déclarations sont identiques"
+      })
+    }
+
+    let etablissements = monthlyStatements.map(statement => statement.nicEtablissement).filter((value, index, self) => index === self.findIndex(item => item==value));
+    etablissements.forEach(etablissement =>
+    {
+      let etablissementStatements = distinctStatements.filter(statement => statement.nicEtablissement==etablissement);
+      let missingMonth = etablissementStatements.filter((value, index, self) => index === self.findIndex(item => item.mois == value.mois)).length!=12;
+      if (missingMonth) {
+        alerts.push({
+          type: "missing",
+          message: "Déclaration mensuelle manquante (année incomplète) pour l'établissement n°"+etablissement
+        })
+      }
+      let missingFraction = checkFractions(etablissementStatements);
+      if (missingFraction) {
+        alerts.push({
+          type: "missing",
+          message: "Déclaration mensuelle manquante (fraction incomplète) pour l'établissement n°"+etablissement
+        })
+      }
+    })
 
     socialStatements.sort((a,b) => compare(a,b))
 
@@ -66,6 +91,8 @@ export class ImportDSN extends React.Component
 
         <div className="step">
           <h4>Fichiers importés</h4>
+          {alerts.filter(alert => alert.type=="duplicate").length > 0 && <p>DOUBLON</p>}
+          {alerts.filter(alert => alert.type=="missing").length > 0 && <p>MISSING</p>}
           <div className="table-main">
             <Table size="sm" responsive>
               <thead>
@@ -146,6 +173,7 @@ export class ImportDSN extends React.Component
               socialStatement.interdecileRange = await getInterdecileRange(individualsData);
               socialStatement.genderWageGap = await getGenderWageGap(individualsData);
               socialStatement.id = getNewId(this.state.socialStatements);
+              socialStatement.nicEtablissement = socialStatement.entreprise.etablissement.nic;
               socialStatement.error = false;
               this.setState({ socialStatements : this.state.socialStatements.concat([socialStatement]) });
             }
@@ -154,6 +182,7 @@ export class ImportDSN extends React.Component
               socialStatement.interdecileRange = null;
               socialStatement.genderWageGap = null;
               socialStatement.id = getNewId(this.state.socialStatements);
+              socialStatement.nicEtablissement = "";
               socialStatement.error = true;
               this.setState({ socialStatements: this.state.socialStatements.concat([socialStatement]) });
             }
