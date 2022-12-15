@@ -17,7 +17,6 @@ export const DSNFileReader = async (content) =>
 {
   // Segmentations des lignes
   const rows = content.replaceAll('\r','').split('\n');
-  console.log(rows.length);
 
   const dataDSN = {
     rows: [],
@@ -122,6 +121,7 @@ export const DSNDataReader = async (dataDSN) =>
         nomUsage: bloc["S21.G00.30.003"],
         prenoms: bloc["S21.G00.30.004"],
         sexe: bloc["S21.G00.30.005"],
+        identifiantTechnique: bloc["S21.G00.30.020"],
         contrats: [],
         versements: []
       };
@@ -140,6 +140,7 @@ export const DSNDataReader = async (dataDSN) =>
         pcsEse: bloc["S21.G00.40.004"],
         complementPcsEse: bloc["S21.G00.40.005"],
         nature: bloc["S21.G00.40.007"],
+        numero: bloc["S21.G00.40.009"],
         uniteMesure: bloc["S21.G00.40.011"],
         quotiteCategorie: bloc["S21.G00.40.012"],
         quotite: bloc["S21.G00.40.013"],
