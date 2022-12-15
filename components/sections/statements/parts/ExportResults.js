@@ -13,13 +13,20 @@ const ExportResults = props => {
   const [isBuildingPDF, setisBuildingPDF] = useState(false);
   const [isBuildingZIP] = useState(false);
   const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
+  const [isDisabled, setIsDisabled] = useState(true);
 
+  useEffect(() => {
+    if(props.session.validations.length > 0) {
+      setIsDisabled(false);
+    }
+  },[props])
 
   const handleDownloadZip = () => {
 
     if(!props.session.comparativeDivision) {
       props.session.comparativeDivision = "00";
     }
+   
     buildZip(props.session.validations, props.session, props.session.comparativeDivision);
 
   };
@@ -185,7 +192,7 @@ const ExportResults = props => {
       
         </div>
  
-          <Button variant="secondary" size="sm" onClick={handleDownloadZip}>
+          <Button variant="secondary" size="sm" onClick={handleDownloadZip} disabled={isDisabled}>
           {isBuildingZIP ?
            <LoadingSpinner />
            : 

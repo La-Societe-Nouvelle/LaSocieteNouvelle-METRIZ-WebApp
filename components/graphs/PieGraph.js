@@ -31,13 +31,7 @@ function PieGraph(props) {
         ],
         datalabels: {
           color: "#FFF",
-          labels: {
-            title: {
-              font: {
-                weight: "bold",
-              },
-            },
-          },
+       
         },
         backgroundColor: [
           "RGB(251, 122, 127)",
@@ -50,18 +44,27 @@ function PieGraph(props) {
 
   const options = {
     devicePixelRatio: 2,
-        plugins: {
+
+    plugins: {
+
       legend: {
         position: "bottom",
+        align : "start",
+        fullSize	: false,
         labels: {
-          boxWidth: 10,
-          boxHeight : 10,
           font: {
-            size: 14,
+            size: 13,
           },
         },
       },
+      tooltip: {
+        backgroundColor: '#191558',
+        padding : 10,
+        cornerRadius: 2
+      }
+      
     },
+    
   };
 
   return (

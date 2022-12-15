@@ -6,128 +6,175 @@ import { printValue } from "/src/utils/Utils";
 // Libraries
 import metaIndics from "/lib/indics";
 import { Table } from "react-bootstrap";
+import { useEffect } from "react";
 
-export const ComparativeTable = ({
-  allSectorFootprint,
-  comparativeDivisionFootprint,
-  financialData,
-  indic,
-  targetSNBCbranch,
-  targetSNBCarea,
-}) => {
-  const { production, netValueAdded, intermediateConsumption, capitalConsumption } =
-    financialData.aggregates;
+export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
   const {
-    productionAreaFootprint,
-    valueAddedAreaFootprint,
-    consumptionAreaFootprint,
-    capitalConsumptionAreaFootprint
-  } = allSectorFootprint;
-  const {
-    productionDivisionFootprint,
-    valueAddedDivisionFootprint,
-    consumptionDivisionFootprint,
-    capitalConsumptionDivisionFootprint,
-  } = comparativeDivisionFootprint;
+    production,
+    netValueAdded,
+    intermediateConsumption,
+    capitalConsumption,
+  } = financialData.aggregates;
+
 
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
-
+  
   const productionEvolutionBranch = getEvolution(
-    productionDivisionFootprint.value,
-    targetSNBCbranch.productionTarget.value
+    comparativeData.production.divisionFootprint.indicators[indic].value,
+    comparativeData.production.targetDivisionFootprint.indicators[indic].data.at(-1).value
   );
   const consumptionEvolutionBranch = getEvolution(
-    consumptionDivisionFootprint.value,
-    targetSNBCbranch.consumptionTarget.value
+    comparativeData.intermediateConsumption.divisionFootprint.indicators[indic]
+      .value,
+    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+      indic
+    ].data.at(-1).value
   );
   const valueAddedEvolutionBranch = getEvolution(
-    valueAddedDivisionFootprint.value,
-    targetSNBCbranch.valueAddedTarget.value
+    comparativeData.netValueAdded.divisionFootprint.indicators[indic].value,
+    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].data.at(-1).value
   );
 
   const capitalConsumptionEvolutionBranch = getEvolution(
-    capitalConsumptionDivisionFootprint.value,
-    targetSNBCbranch.capitalConsumptionTarget.value
+    comparativeData.fixedCapitalConsumption.divisionFootprint.indicators[indic]
+      .value,
+    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[indic].data.at(-1).value
   );
 
+
+  const displayTargetColumn =
+    comparativeData.production.targetDivisionFootprint.indicators[indic].data.at(-1).value ==
+      null &&
+    comparativeData.netValueAdded.targetDivisionFootprint.indicators[indic].data.at(-1).value ==
+      null &&
+    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+      indic
+    ].data.at(-1).value == null &&
+    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+      indic
+    ].data.at(-1).value == null
+      ? false
+      : true;
+
+      const displayDivisionColumn =  comparativeData.production.divisionFootprint.indicators[indic].value == null && comparativeData.netValueAdded.divisionFootprint.indicators[indic].value == null && comparativeData.intermediateConsumption.divisionFootprint.indicators[indic].value == null && comparativeData.fixedCapitalConsumption.divisionFootprint.indicators[indic].value == null
+      ? false
+      : true;
+
   return (
-    <Table className="mt-5  comparative-table">
+    <Table className="mt-5 comparative-table">
       <thead>
         <tr>
           <td>Agrégat</td>
-          {targetSNBCarea.valueAddedTarget.value ? (
-            <td colSpan="2" className="border-left text-center">France</td>
-          ) : (
-            <td className="border-left text-center">France</td>
-          )}
+
+          <td
+            colSpan={displayTargetColumn ? 2 : 0}
+            className="border-left text-center"
+          >
+            France
+          </td>
 
           <td className="border-left text-center">Exercice en cours</td>
-          {printValue(productionDivisionFootprint.value, precision) &&
-            printValue(consumptionDivisionFootprint.value, precision) &&
-            printValue(valueAddedDivisionFootprint.value, precision) !==
-              " - " && <td colSpan="3" className="border-left text-center">Branche</td>}
-
+          {
+            displayDivisionColumn && 
+            <td
+            colSpan={displayTargetColumn ? 3 : 2}
+            className="border-left text-center"
+          >
+            Branche
+          </td>
+          }
+    
         </tr>
       </thead>
       <tbody>
-        {indic == "ghg" && (
+        {displayTargetColumn && (
           <tr className="subth">
             <td scope="row"></td>
             <td className="border-left text-end">Valeur</td>
             <td className="text-end">Objectif 2030</td>
             <td className="border-left text-end">Valeur</td>
-            {productionDivisionFootprint.value && (
-              <>
-                <td className="border-left text-end">Valeur</td>
-                <td className="text-end">Objectif 2030</td>
-                <td className="text-end">Evolution</td>
-              </>
-            )}
+            <td className="border-left text-end">Valeur</td>
+            <td className="text-end">Objectif 2030</td>
+            <td className="text-end">Evolution</td>
           </tr>
         )}
+
         <tr>
           <td>Production</td>
           <td className="border-left text-end">
-            {printValue(productionAreaFootprint.value, precision)}
-            <span className="unit"> {unit}</span>
+            {getValue(
+              comparativeData.production.areaFootprint.indicators[indic].value,
+              unit,
+              precision
+            )}
           </td>
-          {indic == "ghg"  && (
-              <td className="text-end">
-                {Math.round(targetSNBCarea.productionTarget.value)} <span className="unit">{unit}</span>
-              </td>
-          )}
-          <td className="border-left text-end">
-            {printValue(production.footprint.getIndicator(indic).value, 1)}
-            <span className="unit"> {unit}</span>
-          </td>
-          {printValue(productionDivisionFootprint.value, precision) !==
-            " - " && (
-            <td className="border-left text-end">
-              {printValue(productionDivisionFootprint.value, precision)}
-              <span className="unit"> {unit}</span>
+          {displayTargetColumn && (
+            <td className="text-end">
+              {getValue(
+                comparativeData.production.targetAreaFootprint.indicators[indic]
+                  .value,
+                unit,
+                precision
+              )}
             </td>
           )}
-          {indic == "ghg" && productionDivisionFootprint.value && (
+          <td className="border-left text-end">
+            {printValue(
+              production.footprint.getIndicator(indic).value,
+              precision
+            )}
+            <span className="unit"> {unit}</span>
+          </td>
+          {
+            displayDivisionColumn && 
+          <td className="border-left text-end">
+            {getValue(
+              comparativeData.production.divisionFootprint.indicators[indic]
+                .value,
+              unit,
+              precision
+            )}
+          </td>
+}
+          {displayTargetColumn && (
             <>
               <td className="text-end">
-                {Math.round(targetSNBCbranch.productionTarget.value)}
-                <span className="unit"> {unit}</span>
+                {getValue(
+                  comparativeData.production.targetDivisionFootprint.indicators[
+                    indic
+                  ].data.at(-1).value,
+                  unit,
+                  precision
+                )}
               </td>
-              <td className="text-end">{productionEvolutionBranch} %</td>
+              <td className="text-end">
+                {productionEvolutionBranch}
+                {productionEvolutionBranch != '-' && "%"}
+              </td>
             </>
           )}
         </tr>
         <tr>
           <td>Consommations intermédiaires</td>
           <td className="border-left text-end">
-            {printValue(consumptionAreaFootprint.value, precision)}
-            <span className="unit"> {unit}</span>
+            {getValue(
+              comparativeData.intermediateConsumption.areaFootprint.indicators[
+                indic
+              ].value,
+              unit,
+              precision
+            )}
           </td>
-          {indic == "ghg"  && (
-              <td className="text-end">
-                {Math.round(targetSNBCarea.consumptionTarget.value)} <span className="unit">{unit}</span>
-              </td>
+          {displayTargetColumn && (
+            <td className="text-end">
+              {getValue(
+                comparativeData.intermediateConsumption.targetAreaFootprint
+                  .indicators[indic].value,
+                unit,
+                precision
+              )}
+            </td>
           )}
           <td className="border-left text-end">
             {printValue(
@@ -136,86 +183,145 @@ export const ComparativeTable = ({
             )}
             <span className="unit"> {unit}</span>
           </td>
-          {printValue(consumptionDivisionFootprint.value, precision) !==
-            " - " && (
-            <td className="border-left text-end">
-              {printValue(consumptionDivisionFootprint.value, precision)}
-              <span className="unit"> {unit}</span>
-            </td>
-          )}
-          {indic == "ghg" && productionDivisionFootprint.value && (
+          {
+            displayDivisionColumn && 
+          <td className="border-left text-end">
+            {getValue(
+              comparativeData.intermediateConsumption.divisionFootprint
+                .indicators[indic].value,
+              unit,
+              precision
+            )}
+          </td>
+}
+          {displayTargetColumn && (
             <>
               <td className="text-end">
-                {Math.round(targetSNBCbranch.consumptionTarget.value)}
-                <span className="unit"> {unit}</span>
+                {getValue(
+                  comparativeData.intermediateConsumption
+                    .targetDivisionFootprint.indicators[indic].data.at(-1).value,
+                  unit,
+                  precision
+                )}
               </td>
-              <td className="text-end">{consumptionEvolutionBranch} %</td>
-            </>
-          )}
-        </tr>
-        <tr>
-          <td>Valeur ajoutée</td>
-          <td className="border-left text-end">
-            {printValue(valueAddedAreaFootprint.value, precision)}
-            <span className="unit"> {unit}</span>
-          </td>
-          {indic == "ghg"  && (
               <td className="text-end">
-                {Math.round(targetSNBCarea.valueAddedTarget.value)}
-                <span className="unit"> {unit}</span>
+                {consumptionEvolutionBranch}
+                               {consumptionEvolutionBranch != '-' && "%"}
+
               </td>
-          )}
-          <td className="border-left text-end">
-            {printValue(netValueAdded.footprint.getIndicator(indic).value, precision)}
-            <span className="unit"> {unit}</span>
-          </td>
-          {printValue(valueAddedDivisionFootprint.value, precision) !==
-            " - " && (
-            <td className="border-left text-end">
-              {printValue(valueAddedDivisionFootprint.value, precision)}
-              <span className="unit"> {unit}</span>
-            </td>
-          )}
-          {indic == "ghg" && productionDivisionFootprint.value && (
-            <>
-              <td className="text-end">
-                {Math.round(targetSNBCbranch.valueAddedTarget.value)}
-                <span className="unit"> {unit}</span>
-              </td>
-              <td className="text-end">{valueAddedEvolutionBranch}%</td>
             </>
           )}
         </tr>
         <tr>
           <td>Consommation de capital fixe</td>
           <td className="border-left text-end">
-            {printValue(capitalConsumptionAreaFootprint.value, precision)}
-            <span className="unit"> {unit}</span>
+            {getValue(
+              comparativeData.fixedCapitalConsumption.areaFootprint.indicators[
+                indic
+              ].value,
+              unit,
+              precision
+            )}
           </td>
-          {indic == "ghg"  && (
-              <td className="text-end">
-                {Math.round(targetSNBCarea.capitalConsumptionTarget.value)}
-                <span className="unit"> {unit}</span>
-              </td>
-          )}
-          <td className="border-left text-end">
-            {printValue(capitalConsumption.footprint.getIndicator(indic).value, precision)}
-            <span className="unit"> {unit}</span>
-          </td>
-          {printValue(capitalConsumptionDivisionFootprint.value, precision) !==
-            " - " && (
-            <td className="border-left text-end">
-              {printValue(capitalConsumptionDivisionFootprint.value, precision)}
-              <span className="unit"> {unit}</span>
+          {displayTargetColumn && (
+            <td className="text-end">
+              {getValue(
+                comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                  .indicators[indic].value,
+                unit,
+                precision
+              )}
             </td>
           )}
-          {indic == "ghg" && capitalConsumptionDivisionFootprint.value && (
+          <td className="border-left text-end">
+            {printValue(
+              capitalConsumption.footprint.getIndicator(indic).value,
+              precision
+            )}
+            <span className="unit"> {unit}</span>
+          </td>
+          {
+            displayDivisionColumn && 
+          <td className="border-left text-end">
+            {getValue(
+              comparativeData.fixedCapitalConsumption.divisionFootprint
+                .indicators[indic].value,
+              unit,
+              precision
+            )}
+          </td>
+}
+          {displayTargetColumn && (
             <>
               <td className="text-end">
-                {Math.round(targetSNBCbranch.capitalConsumptionTarget.value)}
-                <span className="unit"> {unit}</span>
+                {getValue(
+                  comparativeData.fixedCapitalConsumption
+                    .targetDivisionFootprint.indicators[indic].data.at(-1).value,
+                  unit,
+                  precision
+                )}
               </td>
-              <td className="text-end">{capitalConsumptionEvolutionBranch}%</td>
+              <td className="text-end">
+                {capitalConsumptionEvolutionBranch}
+                {capitalConsumptionEvolutionBranch != "-" && "%"}
+              </td>
+            </>
+          )}
+        </tr>
+        <tr>
+          <td>Valeur ajoutée</td>
+          <td className="border-left text-end">
+            {getValue(
+              comparativeData.netValueAdded.areaFootprint.indicators[indic]
+                .value,
+              unit,
+              precision
+            )}
+          </td>
+          {displayTargetColumn && (
+            <td className="text-end">
+              {getValue(
+                comparativeData.netValueAdded.targetAreaFootprint.indicators[
+                  indic
+                ].value,
+                unit,
+                precision
+              )}
+            </td>
+          )}
+          <td className="border-left text-end">
+            {printValue(
+              netValueAdded.footprint.getIndicator(indic).value,
+              precision
+            )}
+            <span className="unit"> {unit}</span>
+          </td>
+          {
+            displayDivisionColumn && 
+          <td className="border-left text-end">
+            {getValue(
+              comparativeData.netValueAdded.divisionFootprint.indicators[indic]
+                .value,
+              unit,
+              precision
+            )}
+          </td>
+}
+          {displayTargetColumn && (
+            <>
+              <td className="text-end">
+                {getValue(
+                  comparativeData.netValueAdded.targetDivisionFootprint
+                    .indicators[indic].data.at(-1).value,
+                  unit,
+                  precision
+                )}
+              </td>
+              <td className="text-end">
+                {valueAddedEvolutionBranch}
+                {valueAddedEvolutionBranch != "-" && "%"}{" "}
+
+              </td>
             </>
           )}
         </tr>
@@ -225,6 +331,23 @@ export const ComparativeTable = ({
 };
 
 function getEvolution(value, target) {
-  const evolution = ((target - value) / value) * 100;
-  return Math.round(evolution);
+  if (target) {
+    const evolution = ((target - value) / value) * 100;
+    return evolution.toFixed(0);
+  } else {
+    return "-";
+  }
+}
+
+function getValue(value, unit, precision) {
+  if (value !== null) {
+    return (
+      <>
+        {printValue(value, precision)}
+        <span className="unit"> {unit}</span>
+      </>
+    );
+  } else {
+    return <>{printValue(value, precision)}</>;
+  }
 }

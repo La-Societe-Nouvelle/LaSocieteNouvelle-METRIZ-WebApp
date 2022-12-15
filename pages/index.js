@@ -113,7 +113,7 @@ class Metriz extends React.Component {
   downloadSession = async () => {
     // build JSON
     const session = this.state.session;
-    const fileName = "svg_ese_" + session.legalUnit.siren; // To update
+    const fileName =  session.legalUnit.siren ?  "svg_ese_" +  session.legalUnit.siren : "svg_ese_" + session.legalUnit.corporateName; // To update
     const json = JSON.stringify(session);
 
     // build download link & activate

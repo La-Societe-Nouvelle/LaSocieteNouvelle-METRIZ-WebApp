@@ -7,23 +7,22 @@ import {
   getTotalGhgEmissionsUncertainty,
 } from "../../components/assessments/AssessmentGHG";
 import { buildIndicatorAggregate } from "../formulas/footprintFormulas";
-import retrieveAreaFootprint from "../services/responses/areaFootprint";
-import retrieveDivisionFootprint from "../services/responses/divisionFootprint";
-import retrieveTargetFootprint from "../services/responses/targetFootprint";
-import { getAmountItems } from "../utils/Utils";
 
-import { Expense } from '/src/accountingObjects/Expense';
+import { getAmountItems, getTargetSerieId } from "../utils/Utils";
+
+import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
-
+import { ComparativeData } from "../ComparativeData";
+import getSerieData from "/src/services/responses/SerieData";
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
-export const updateVersion = async(sessionData) => {
-
-  switch (sessionData.version) 
-  {
+export const updateVersion = async (sessionData) => {
+  switch (sessionData.version) {
     case "1.0.5":
       await updater_1_0_3(sessionData);
       break;
@@ -57,53 +56,65 @@ export const updateVersion = async(sessionData) => {
   }
 };
 
-const updater_1_0_4 = async (sessionData) => 
-{
-  let investments = sessionData.financialData.investments ? sessionData.financialData.investments.map((props,index) => new Expense({id: index, ...props})) : [];
+const updater_1_0_4 = async (sessionData) => {
+  let investments = sessionData.financialData.investments
+    ? sessionData.financialData.investments.map(
+        (props, index) => new Expense({ id: index, ...props })
+      )
+    : [];
   let investmentsFootprint = new SocialFootprint();
-  Object.keys(metaIndics).forEach(async (indic) => investmentsFootprint[indic] = await buildIndicatorAggregate(indic,investments));
+  Object.keys(metaIndics).forEach(
+    async (indic) =>
+      (investmentsFootprint[indic] = await buildIndicatorAggregate(
+        indic,
+        investments
+      ))
+  );
   let dataGrossFixedCapitalFormationAggregate = {
-    label : "Formation brute de capital fixe",
-    amount : getAmountItems(investments),
-    footprint : investmentsFootprint
-  }
-  sessionData.financialData.aggregates.grossFixedCapitalFormation = dataGrossFixedCapitalFormationAggregate;
-}
+    label: "Formation brute de capital fixe",
+    amount: getAmountItems(investments),
+    footprint: investmentsFootprint,
+  };
+  sessionData.financialData.aggregates.grossFixedCapitalFormation =
+    dataGrossFixedCapitalFormationAggregate;
+};
+
+// ------------------------------------------------------------------
+// Updater
+// ------------------------------------------------------------------
 
 const updater_1_0_3 = async (sessionData) => {
 
- let comparativeAreaFootprints = {};
- let comparativeDivisionFootprints = {};
- let targetSNBCbranch = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },capitalConsumptionTarget: { value: null }};
- let targetSNBCarea = {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null },capitalConsumptionTarget: { value: null }};
- let code = sessionData.comparativeDivision;
+  // ----------------------------------------------------------------
+  // Get comparative data (Division, Target & Trends) 
+  // for each aggregate and update session for each validated indicators
+  // ----------------------------------------------------------------
 
-    await Promise.all(
+  // delete old objects from session
+  delete sessionData.comparativeAreaFootprints;
+  delete sessionData.targetSNBCarea;
+  delete sessionData.targetSNBCbranch;
 
-      sessionData.validations.map(async (indic) => {
-        const footprint = await retrieveAreaFootprint(indic);
-        Object.assign(comparativeAreaFootprints, footprint);
+  let newComparativeData = new ComparativeData();
+  // get old comparative division code
+  let code = sessionData.comparativeDivision;
 
-        if(code!='00'){
-          const divisionFootprint = await retrieveDivisionFootprint(indic,code);
-          Object.assign(comparativeDivisionFootprints,divisionFootprint);
-        }
-        // TARGET SNCB 2030 FOR SPECIFIC SECTOR
-        if(indic =='ghg' && code != '00') {
-          const target = await retrieveTargetFootprint(code);
-          Object.assign(targetSNBCbranch,target);
-        }
-   
-        // TARGET SNCB 2030 FOR ALL SECTORS
-        if(indic =='ghg') {
-          const targetArea = await retrieveTargetFootprint("00");
-          Object.assign(targetSNBCarea,targetArea);
-        }
-      })
+  for await (const indic of sessionData.validations) {
+    // update comparative data for each validated indicators
+    const updatedData = await updateComparativeData(
+      indic,
+      code,
+      newComparativeData
     );
-    Object.assign(sessionData, {comparativeAreaFootprints : comparativeAreaFootprints,
-    comparativeDivisionFootprints : comparativeDivisionFootprints, targetSNBCbranch : targetSNBCbranch, targetSNBCarea : targetSNBCarea})
+    newComparativeData = updatedData;
+  }
 
+  // update session with new values
+  sessionData.comparativeData = newComparativeData;
+
+    // delete old property and assign division code into comparative data object
+    sessionData.comparativeData.activityCode = code;
+    delete sessionData.comparativeDivision;
 };
 
 const updater_1_0_2 = (sessionData) => {
@@ -145,4 +156,56 @@ const updater_1_0_1 = (sessionData) => {
 
 
 
+// ----------------------------------------------------------------
 
+async function updateComparativeData(
+  indic,
+  comparativeDivision,
+  comparativeData
+) {
+  let idTarget = getTargetSerieId(indic);
+
+  // Area Footprint
+  let newComparativeData = await getMacroSerieData(
+    indic,
+    "00",
+    comparativeData,
+    "areaFootprint"
+  );
+
+  // Target Area Footprint
+  if (idTarget) {
+    newComparativeData = await getSerieData(
+      idTarget,
+      "00",
+      indic,
+      newComparativeData,
+      "targetAreaFootprint"
+    );
+  }
+
+  if (comparativeDivision != "00") {
+    // Division Footprint
+    newComparativeData = await getMacroSerieData(
+      indic,
+      comparativeDivision,
+      newComparativeData,
+      "divisionFootprint"
+    );
+
+    newComparativeData = await getHistoricalSerieData(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "trendsFootprint"
+    );
+    // Target Division Footprint
+    newComparativeData = await getHistoricalSerieData(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "targetDivisionFootprint"
+    );
+  }
+  return newComparativeData;
+}
