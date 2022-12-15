@@ -53,7 +53,7 @@ export class StartSection extends React.Component {
               </Row>
 
               <Button
-                variant="primary"
+                variant="secondary"
                 className="me-2"
                 
                 onClick={this.props.startNewSession}
@@ -62,7 +62,7 @@ export class StartSection extends React.Component {
               </Button>
 
               <a
-                className="btn btn-secondary"
+                className="btn btn-primary"
                 href="https://docs.lasocietenouvelle.org"
               >
                 Documentation

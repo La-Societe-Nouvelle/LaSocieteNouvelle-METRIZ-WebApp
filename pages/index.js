@@ -163,7 +163,7 @@ class Metriz extends React.Component {
     switch (step) {
       case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} isLoading={this.state.loading} />)
       case 1: return (<ImportSection {...sectionProps} />)
-      case 2: return (<InitialStatesSection {...sectionProps} />)
+      case 2: return (<InitialStatesSection {...sectionProps} return={() => this.setStep(1)}/>)
       case 3: return (<CompaniesSection {...sectionProps} />)
       case 4: return (<StatementSection {...sectionProps} publish={() => this.setStep(5)} />)
       case 5: return (<PublishStatementSection {...sectionProps} return={() => this.setStep(4)} />)

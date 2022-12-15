@@ -19,7 +19,6 @@ import { ErrorApi } from "../ErrorAPI";
 export class InitialStatesSection extends React.Component {
   constructor(props) {
     super(props);
-
     this.onDrop = (files) => {
       this.setState({ files });
       this.importFile();
@@ -101,13 +100,13 @@ export class InitialStatesSection extends React.Component {
                   le fichier de sauvegarde via le premier onglet.
                 </p>
                 <p>
-                  <i className="bi bi-exclamation-circle"></i>{" "}
+                  <i className="bi bi-info-circle"></i>{" "}
                   <b>Valeur par défaut :</b> Les valeurs par défaut
                   correspondent aux données disponibles pour la branche
                   économique la plus proche.
                 </p>
                 <p>
-                  <i className="bi bi-exclamation-circle"></i>{" "}
+                  <i className="bi  bi-info-circle"></i>{" "}
                   <b>Estimée sur exercice courant : </b>Nous initialisons
                   l'empreinte du compte en début d'exercice. à partir des
                   opérations réalisées sur l'exercice courant.
@@ -116,14 +115,14 @@ export class InitialStatesSection extends React.Component {
 
               {error && <ErrorApi />}
               {!isNextStepAvailable ? (
-                <div className="alert alert-warning">
+                <div className="alert alert-syncronise">
                   <p>
-                    <i className="bi bi-exclamation-triangle"></i> Les
+                    <i className="bi bi-exclamation-circle"></i> Les
                     empreintes de certains comptes doivent être synchronisées.
                   </p>
                   <button
                     onClick={() => this.synchroniseAll()}
-                    className="btn btn-warning"
+                    className="btn btn-secondary"
                   >
                     <i className="bi bi-arrow-repeat"></i> Synchroniser les
                     données
@@ -205,6 +204,12 @@ export class InitialStatesSection extends React.Component {
           )}
 
           <div className="text-end">
+            <button
+                className={"btn btn-primary me-2"}
+                onClick={this.props.return}
+              >
+              <i className="bi bi-chevron-left"></i>Etape précédente
+              </button>
             <button
               className={"btn btn-secondary"}
               id="validation-button"

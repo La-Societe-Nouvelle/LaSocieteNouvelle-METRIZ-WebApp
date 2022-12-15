@@ -224,7 +224,7 @@ function RowTableImmobilisations(props)
   if (isDepreciableImmobilisation && hasOutputs) {
     return (
       <tr>
-        <td className="text-center">{account}</td>
+        <td >{account}</td>
         <td>
           {accountLib.charAt(0).toUpperCase() +
             accountLib.slice(1).toLowerCase()}
@@ -272,7 +272,7 @@ function RowTableImmobilisations(props)
   } 
   else if (isDepreciableImmobilisation) {
     return (<tr>
-              <td className=" text-center">{account}</td>
+              <td>{account}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
               <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
@@ -280,7 +280,7 @@ function RowTableImmobilisations(props)
             </tr>)
   } else {
     return (<tr>
-              <td className=" text-center">{account}</td>
+              <td >{account}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non prise en compte (non amortissable)</td>
               <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
@@ -350,7 +350,7 @@ function RowTableStocks(props)
 
   return (
     <tr>
-      <td className=" text-center">{account}</td>
+      <td >{account}</td>
       <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
       {!isProductionStock &&
         <td colSpan={initialState=="defaultData" ? 1 : 2}>
