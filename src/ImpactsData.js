@@ -137,9 +137,11 @@ export class ImpactsData  {
   setHasEmployees(hasEmployees) {
     this.hasEmployees = hasEmployees;
     if (!hasEmployees) {
+      this.interdecileRange = 0;
       this.indexGini = 0;
       this.wageGap = 0;
     } else {
+      this.interdecileRange = null;
       this.indexGini = null;
       this.wageGap = null;
     }
