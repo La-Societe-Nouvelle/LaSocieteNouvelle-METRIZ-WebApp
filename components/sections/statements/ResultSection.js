@@ -424,41 +424,55 @@ const ResultSection = (props) => {
       {comparativeDivision != "00" && (
         <section className="step">
           <h3>Courbes d'évolution</h3>
-          <div style={{width: '300px'}}>
-              <Select
+          <div style={{ width: "300px" }}>
+            <Select
               className="mb-3 small-text"
-              defaultValue={{label : trendGraphView.label , value: trendGraphView.value}}
+              defaultValue={{
+                label: trendGraphView.label,
+                value: trendGraphView.value,
+              }}
               options={graphViewOptions}
               onChange={changeTrendGraphView}
-        />
-              </div>
+            />
+          </div>
           <Row>
-            <Col lg={9}>
-
-
-            <div className={ trendGraphView.value != 'prd' ? "hidden" : "border rounded p-4"}>
-              <TrendsGraph
-                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
-                  unit={metaIndics[indic].unit}
-                code={comparativeDivision}
-                trends={
-                  comparativeData.production.trendsFootprint.indicators[indic]
+            <Col lg={8}>
+              <div
+                className={
+                  trendGraphView.value != "prd"
+                    ? "hidden"
+                    : "border rounded p-4"
                 }
-                target={
-                  comparativeData.production.targetDivisionFootprint.indicators[
-                    indic
-                  ]
-                }
-                current={
-                  session.financialData.aggregates.production.footprint.getIndicator(
-                    indic
-                  ).value.toFixed(metaIndics[indic].nbDecimals)
-                }
-              />
-              </div>
-              <div className={ trendGraphView.value != 'ic' ? "hidden" : "border rounded p-4"}>
+              >
                 <TrendsGraph
-                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
+                  title={
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                      .meta.label
+                  }
+                  unit={metaIndics[indic].unit}
+                  code={comparativeDivision}
+                  trends={
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                  }
+                  target={
+                    comparativeData.production.targetDivisionFootprint
+                      .indicators[indic]
+                  }
+                  current={session.financialData.aggregates.production.footprint
+                    .getIndicator(indic)
+                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                />
+              </div>
+              <div
+                className={
+                  trendGraphView.value != "ic" ? "hidden" : "border rounded p-4"
+                }
+              >
+                <TrendsGraph
+                  title={
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                      .meta.label
+                  }
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -469,16 +483,23 @@ const ResultSection = (props) => {
                     comparativeData.intermediateConsumption
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={
-                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                      indic
-                    ).value.toFixed(metaIndics[indic].nbDecimals)
-                  }
+                  current={session.financialData.aggregates.intermediateConsumption.footprint
+                    .getIndicator(indic)
+                    .value.toFixed(metaIndics[indic].nbDecimals)}
                 />
               </div>
-              <div className={ trendGraphView.value != 'cfc' ? "hidden" : "border rounded p-4"}>
+              <div
+                className={
+                  trendGraphView.value != "cfc"
+                    ? "hidden"
+                    : "border rounded p-4"
+                }
+              >
                 <TrendsGraph
-                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
+                  title={
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                      .meta.label
+                  }
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -489,16 +510,23 @@ const ResultSection = (props) => {
                     comparativeData.fixedCapitalConsumption
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={
-                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                      indic
-                    ).value.toFixed(metaIndics[indic].nbDecimals)
-                  }
+                  current={session.financialData.aggregates.capitalConsumption.footprint
+                    .getIndicator(indic)
+                    .value.toFixed(metaIndics[indic].nbDecimals)}
                 />
               </div>
-              <div className={ trendGraphView.value != 'nva' ? "hidden" : "border rounded p-4"}>
+              <div
+                className={
+                  trendGraphView.value != "nva"
+                    ? "hidden"
+                    : "border rounded p-4"
+                }
+              >
                 <TrendsGraph
-                  title={comparativeData.production.trendsFootprint.indicators[indic].meta.label }
+                  title={
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                      .meta.label
+                  }
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -510,33 +538,60 @@ const ResultSection = (props) => {
                     comparativeData.netValueAdded.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={
-                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                      indic
-                    ).value.toFixed(metaIndics[indic].nbDecimals)
-                  }
+                  current={session.financialData.aggregates.netValueAdded.footprint
+                    .getIndicator(indic)
+                    .value.toFixed(metaIndics[indic].nbDecimals)}
                 />
               </div>
             </Col>
-            <Col lg={3}>
-              <div className="border rounded p-4">
-                  <h4 className="h5">Notes</h4>                    
-                  {comparativeData.production.targetDivisionFootprint.indicators[indic].meta ? 
-                    <p>Tendance et objectif pour la branche "{divisions[comparativeDivision]}"</p>
-                    :
-                    <p>Tendance de la branche "{divisions[comparativeDivision]}"</p>
-                  }
+            <Col lg={4}>
+              <div className="border rounded  p-4">
+                <h4 className="h5">Notes</h4>
 
-                    {comparativeData.production.targetDivisionFootprint.indicators[indic].meta && 
-                      <p className="mt-">
-                     {comparativeData.production.targetDivisionFootprint.indicators[indic].meta.info}
-                      </p>
-                    }
-                  <hr/>
-                  <p className="small-text">
-                    Source :  {comparativeData.production.trendsFootprint.indicators[indic].meta.source} 
-                    {comparativeData.production.targetDivisionFootprint.indicators[indic].meta && ", " + comparativeData.production.targetDivisionFootprint.indicators[indic].meta.source}
-                  </p>
+                <h5>
+                  Tendance de la branche "{divisions[comparativeDivision]}" : 
+                </h5>
+
+                <p className="small-text">
+                  La courbe de tendance représente une projection statistique
+                  des valeurs observées. Concrètement, il s'agit de prolonger
+                  les empreintes associées à la valeur ajoutée nette (impacts
+                  directs) et d'en déduire, par modèle entrées-sorties, les
+                  valeurs projetées des autres agrégats, en posant l'hypothèse
+                  de structure macroéconomique inchangé.
+                </p>
+                <p className="small-text">
+                  Des travaux sont en cours pour proposer des valeurs tenant
+                  compte de l'évolution tendancielle de la structure de
+                  l'économie nationale, ses interactions avec l'extérieur et de
+                  la dynamique des prix par branche.
+                </p>
+                {comparativeData.production.targetDivisionFootprint.indicators[
+                  indic
+                ].meta.info && (
+                  <>
+                    <h5>Objectifs :</h5>
+                    <p className="small-text">
+                      {
+                        comparativeData.production.targetDivisionFootprint
+                          .indicators[indic].meta.info
+                      }
+                    </p>
+                  </>
+                )}
+                <hr />
+                <p className="small-text">
+                  Source :
+                  {
+                    comparativeData.production.trendsFootprint.indicators[indic]
+                      .meta.source
+                  }
+                  {comparativeData.production.targetDivisionFootprint
+                    .indicators[indic].meta.source &&
+                    ", " +
+                      comparativeData.production.targetDivisionFootprint
+                        .indicators[indic].meta.source}
+                </p>
               </div>
             </Col>
           </Row>
@@ -567,7 +622,7 @@ const ResultSection = (props) => {
                 "#Production",
                 "#Consumption",
                 "#Value",
-                '#CapitalConsumption',
+                "#CapitalConsumption",
                 printGrossImpact.includes(indic) ? "#PieChart" : ""
               )
             }
