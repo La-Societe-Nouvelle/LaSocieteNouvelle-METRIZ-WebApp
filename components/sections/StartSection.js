@@ -29,7 +29,7 @@ export class StartSection extends React.Component {
             </div>
           </Container>
         </div>
-        <div className="mb-5 mt-5 pt-5 pb-3 ">
+        <div className="mb-5 mt-5 py-5 ">
           <Container fluid>
             <Row>
               <Col>
