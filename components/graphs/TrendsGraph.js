@@ -4,6 +4,7 @@ import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Line } from "react-chartjs-2";
+import 'chartjs-adapter-moment';
 
 function TrendsGraph(props) {
 
@@ -14,22 +15,24 @@ function TrendsGraph(props) {
     
     const trendsData = props.trends.data.map((data) =>
       data.flag == 'e'
-        ? { x: data.year, y: data.value }
-        : { x: data.year, y: null }
+      ? { x: new Date(data.year), y: data.value }
+      : { x: new Date(data.year), y: null }
     );
 
     let lastNonNull = trendsData.findLast((element) => element.y != null);
+    let lastYear = lastNonNull.x.getFullYear();
 
     const trendsDataForecast = props.trends.data.map((data) =>
-      data.flag == 'f' || data.year == lastNonNull.x
-        ? { x: data.year, y: data.value }
-        : { x: data.year, y: null }
+      data.flag == 'f' || data.year == lastYear
+      ? { x: new Date(data.year), y: data.value }
+      : { x: new Date(data.year), y: null }
     );
 
     const targetData = props.target.data.map((data) => ({
       x: data.year,
       y: data.value,
     }));
+
     const data = {
       datasets: [
         {
@@ -100,6 +103,8 @@ function TrendsGraph(props) {
       suggestedMax = null;
     }
 
+    let minYear = trendsData[0].x.getFullYear();
+
     const options = {
       pointRadius: 0,
       scales: {
@@ -131,6 +136,7 @@ function TrendsGraph(props) {
           },
         },
         x: {
+          min: minYear.toString(),
           ticks: {
             color: "#191558",
             font: {
@@ -140,6 +146,12 @@ function TrendsGraph(props) {
           grid: {
             color: "#ececff",
           },
+          type: 'time',
+          time: {
+               time: {
+                    unit: 'year'
+                }
+          }
         },
       },
       plugins: {
@@ -150,7 +162,6 @@ function TrendsGraph(props) {
             usePointStyle: true,
             fullsize: true,
             color: "#191558",
-
             generateLabels: function (chart) {
               const dataset = chart.data.datasets;
               return dataset
