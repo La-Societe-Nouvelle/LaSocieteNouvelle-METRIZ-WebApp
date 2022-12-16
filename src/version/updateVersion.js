@@ -16,11 +16,11 @@ import { ComparativeData } from "../ComparativeData";
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
+import { Company } from "../Company";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
-
 
 export const updateVersion = async (sessionData) => {
   switch (sessionData.version) {
@@ -57,22 +57,21 @@ export const updateVersion = async (sessionData) => {
   }
 };
 
-
 const updater_1_0_5 = async (sessionData) => {
-
   // ----------------------------------------------------------------
-  // Get comparative data (Division, Target & Trends) 
+  // Get comparative data (Division, Target & Trends)
   // for each aggregate and update session for each validated indicators
   // ----------------------------------------------------------------
 
-  // delete old objects from session
+  // delete useless objects from  previous session
   delete sessionData.comparativeAreaFootprints;
   delete sessionData.targetSNBCarea;
   delete sessionData.targetSNBCbranch;
 
-  let newComparativeData = new ComparativeData();
-  // get old comparative division code
+  // get previous session division code
   let code = sessionData.comparativeDivision;
+
+  let newComparativeData = new ComparativeData();
 
   for await (const indic of sessionData.validations) {
     // update comparative data for each validated indicators
@@ -86,12 +85,19 @@ const updater_1_0_5 = async (sessionData) => {
 
   // update session with new values
   sessionData.comparativeData = newComparativeData;
+  sessionData.comparativeData.activityCode = code;
+  // delete old property and assign division code into comparative data object
+  delete sessionData.comparativeDivision;
 
-    // delete old property and assign division code into comparative data object
-    sessionData.comparativeData.activityCode = code;
-    delete sessionData.comparativeDivision;
+  // ----------------------------------------------------------------
+  // Get latest updated data for companies (Wip)
+  // ----------------------------------------------------------------
+
+  const companiesUpdated = await updateCompaniesData(sessionData);
+
+  sessionData.financialData.companies = companiesUpdated;
+
 };
-
 
 const updater_1_0_4 = async (sessionData) => {
   let investments = sessionData.financialData.investments
@@ -157,8 +163,6 @@ const updater_1_0_1 = (sessionData) => {
     getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
-
-
 // ----------------------------------------------------------------
 
 async function updateComparativeData(
@@ -212,3 +216,26 @@ async function updateComparativeData(
   }
   return newComparativeData;
 }
+
+const updateCompaniesData = async (session) => {
+  let companies = session.financialData.companies
+    ? session.financialData.companies.map(
+        (props, index) => new Company({ id: index, ...props })
+      )
+    : [];
+
+  let companiesToSynchronise = companies.filter(
+    (company) => company.state == "siren"
+  );
+
+  for (let company of companiesToSynchronise) {
+    try {
+      await company.updateFromRemote();
+    } catch (error) {
+      console.log(error);
+      break;
+    }
+  }
+
+  return companies;
+};
