@@ -101,8 +101,8 @@ export class AssessmentGHG extends React.Component {
           </thead>
           <tbody>
             <tr>
-              <td width="50">
-                <button className="btn" onClick={() => this.addNewLine("1")}>
+              <td width="30px">
+                <button className="btn btn-sm" onClick={() => this.addNewLine("1")}>
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -121,9 +121,9 @@ export class AssessmentGHG extends React.Component {
               .filter(([_, itemData]) => itemData.assessmentItem == "1")
               .map(([itemId, itemData]) => (
                 <tr key={itemId}>
-                  <td>
+                  <td width="30px">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -133,7 +133,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control mb-3 "
+                          className="form-control small-text mb-3 "
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -185,7 +185,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control mb-3"
+                          className="form-control small-text mb-3"
                           onChange={(event) =>
                             this.changeConsumptionUnit(
                               itemId,
@@ -227,7 +227,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control"
+                    className="form-control small-text"
                     value="0"
                     onChange={(event) => this.addItem("1", event.target.value)}
                   >
@@ -270,8 +270,8 @@ export class AssessmentGHG extends React.Component {
             )}
 
             <tr>
-              <td>
-                <button className="btn" onClick={() => this.addNewLine("2")}>
+              <td width="30px">
+                <button className="btn btn-sm" onClick={() => this.addNewLine("2")}>
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -290,9 +290,9 @@ export class AssessmentGHG extends React.Component {
               .filter(([_, itemData]) => itemData.assessmentItem == "2")
               .map(([itemId, itemData]) => (
                 <tr key={itemId}>
-                  <td>
+                  <td width="30px">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -302,7 +302,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -353,7 +353,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -395,7 +395,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control"
+                    className="form-control small-text"
                     value="0"
                     onChange={(event) => this.addItem("2", event.target.value)}
                   >
@@ -437,8 +437,8 @@ export class AssessmentGHG extends React.Component {
             )}
 
             <tr>
-              <td>
-                <button className="btn" onClick={() => this.addNewLine("3.1")}>
+              <td width="30px">
+                <button className="btn btn-sm" onClick={() => this.addNewLine("3.1")}>
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -460,9 +460,9 @@ export class AssessmentGHG extends React.Component {
               .filter(([_, itemData]) => itemData.assessmentItem == "3.1")
               .map(([itemId, itemData]) => (
                 <tr key={itemId}>
-                  <td>
+                  <td width="30px">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -472,7 +472,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -497,7 +497,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -545,7 +545,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control"
+                    className="form-control small-text"
                     value="0"
                     onChange={(event) =>
                       this.addItem("3.1", event.target.value)
@@ -565,8 +565,8 @@ export class AssessmentGHG extends React.Component {
             )}
 
             <tr>
-              <td>
-                <button className="btn" onClick={() => this.addNewLine("3.2")}>
+              <td width="30px">
+                <button className="btn btn-sm" onClick={() => this.addNewLine("3.2")}>
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -588,9 +588,9 @@ export class AssessmentGHG extends React.Component {
               .filter(([_, itemData]) => itemData.assessmentItem == "3.2")
               .map(([itemId, itemData]) => (
                 <tr key={itemId}>
-                  <td>
+                  <td width="30px">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -600,7 +600,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -648,7 +648,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -696,7 +696,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control"
+                    className="form-control small-text"
                     value="0"
                     onChange={(event) =>
                       this.addItem("3.2", event.target.value)
@@ -735,8 +735,8 @@ export class AssessmentGHG extends React.Component {
             )}
 
             <tr>
-              <td>
-                <button className="btn" onClick={() => this.addNewLine("4")}>
+              <td width="30px">
+                <button className="btn btn-sm" onClick={() => this.addNewLine("4")}>
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -755,9 +755,9 @@ export class AssessmentGHG extends React.Component {
               .filter(([_, itemData]) => itemData.assessmentItem == "4")
               .map(([itemId, itemData]) => (
                 <tr key={itemId}>
-                  <td>
+                  <td width="30px">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -767,7 +767,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -807,7 +807,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control"
+                          className="form-control small-text"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -850,7 +850,7 @@ export class AssessmentGHG extends React.Component {
                         itemData.consumptionUnit != "tCO2e" && (
                           <Col>
                             <select
-                              className="form-control mb-3"
+                              className="form-control small-text mb-3"
                               value={itemData.gaz}
                               onChange={(event) =>
                                 this.updateGaz(itemId, event.target.value)
@@ -878,7 +878,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control"
+                    className="form-control small-text"
                     value="0"
                     onChange={(event) => this.addItem("4", event.target.value)}
                   >
@@ -910,8 +910,8 @@ export class AssessmentGHG extends React.Component {
             )}
 
             <tr>
-              <td>
-                <button className="btn" onClick={() => this.addNewLine("5")}>
+              <td width="30px">
+                <button className="btn btn-sm" onClick={() => this.addNewLine("5")}>
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -930,9 +930,9 @@ export class AssessmentGHG extends React.Component {
               .filter(([_, itemData]) => itemData.assessmentItem == "5")
               .map(([itemId, itemData]) => (
                 <tr key={itemId}>
-                  <td>
+                  <td width="30px">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -942,7 +942,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control mb-3"
+                          className="form-control small-text mb-3"
                           value={itemData.sour}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -979,7 +979,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control mb-3"
+                          className="form-control small-text mb-3"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -1023,7 +1023,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control"
+                    className="form-control small-text"
                     value="0"
                     onChange={(event) => this.addItem("5", event.target.value)}
                   >

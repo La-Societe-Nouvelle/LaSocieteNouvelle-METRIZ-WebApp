@@ -114,6 +114,8 @@ table {
     color : #fff;
     font-weight: 700;
     font-size: 1.1em;
+    border: 1px solid lighten($primary, 10%);
+
   }
   .subth {
     background-color: darken($bg-light, 1%);
