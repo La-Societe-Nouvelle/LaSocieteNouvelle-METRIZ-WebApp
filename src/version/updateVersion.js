@@ -21,69 +21,44 @@ import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData"
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
+
 export const updateVersion = async (sessionData) => {
   switch (sessionData.version) {
     case "1.0.5":
-      await updater_1_0_3(sessionData);
+      await updater_1_0_5(sessionData);
       break;
     case "1.0.4":
       await updater_1_0_4(sessionData);
-      await updater_1_0_3(sessionData);
+      await updater_1_0_5(sessionData);
       break;
     case "1.0.3":
-      await updater_1_0_3(sessionData);
       await updater_1_0_4(sessionData);
+      await updater_1_0_5(sessionData);
       break;
     case "1.0.2":
       updater_1_0_2(sessionData);
-      updater_1_0_3(sessionData);
+      updater_1_0_5(sessionData);
       await updater_1_0_4(sessionData);
       break;
     case "1.0.1":
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
-      await updater_1_0_3(sessionData);
+      await updater_1_0_5(sessionData);
       break;
     case "1.0.0":
       updater_1_0_0(sessionData);
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
-      await updater_1_0_3(sessionData);
       await updater_1_0_4(sessionData);
+      await updater_1_0_5(sessionData);
       break;
     default:
       break;
   }
 };
 
-const updater_1_0_4 = async (sessionData) => {
-  let investments = sessionData.financialData.investments
-    ? sessionData.financialData.investments.map(
-        (props, index) => new Expense({ id: index, ...props })
-      )
-    : [];
-  let investmentsFootprint = new SocialFootprint();
-  Object.keys(metaIndics).forEach(
-    async (indic) =>
-      (investmentsFootprint[indic] = await buildIndicatorAggregate(
-        indic,
-        investments
-      ))
-  );
-  let dataGrossFixedCapitalFormationAggregate = {
-    label: "Formation brute de capital fixe",
-    amount: getAmountItems(investments),
-    footprint: investmentsFootprint,
-  };
-  sessionData.financialData.aggregates.grossFixedCapitalFormation =
-    dataGrossFixedCapitalFormationAggregate;
-};
 
-// ------------------------------------------------------------------
-// Updater
-// ------------------------------------------------------------------
-
-const updater_1_0_3 = async (sessionData) => {
+const updater_1_0_5 = async (sessionData) => {
 
   // ----------------------------------------------------------------
   // Get comparative data (Division, Target & Trends) 
@@ -116,6 +91,34 @@ const updater_1_0_3 = async (sessionData) => {
     sessionData.comparativeData.activityCode = code;
     delete sessionData.comparativeDivision;
 };
+
+
+const updater_1_0_4 = async (sessionData) => {
+  let investments = sessionData.financialData.investments
+    ? sessionData.financialData.investments.map(
+        (props, index) => new Expense({ id: index, ...props })
+      )
+    : [];
+  let investmentsFootprint = new SocialFootprint();
+  Object.keys(metaIndics).forEach(
+    async (indic) =>
+      (investmentsFootprint[indic] = await buildIndicatorAggregate(
+        indic,
+        investments
+      ))
+  );
+  let dataGrossFixedCapitalFormationAggregate = {
+    label: "Formation brute de capital fixe",
+    amount: getAmountItems(investments),
+    footprint: investmentsFootprint,
+  };
+  sessionData.financialData.aggregates.grossFixedCapitalFormation =
+    dataGrossFixedCapitalFormationAggregate;
+};
+
+// ------------------------------------------------------------------
+// Updater
+// ------------------------------------------------------------------
 
 const updater_1_0_2 = (sessionData) => {
   // update progression according to current number of steps
