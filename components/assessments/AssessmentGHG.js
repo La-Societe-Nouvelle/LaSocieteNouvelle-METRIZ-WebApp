@@ -133,7 +133,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text mb-3 "
+                          className="form-control small-text "
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -185,7 +185,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text mb-3"
+                          className="form-control small-text"
                           onChange={(event) =>
                             this.changeConsumptionUnit(
                               itemId,
@@ -850,7 +850,7 @@ export class AssessmentGHG extends React.Component {
                         itemData.consumptionUnit != "tCO2e" && (
                           <Col>
                             <select
-                              className="form-control small-text mb-3"
+                              className="form-control small-text"
                               value={itemData.gaz}
                               onChange={(event) =>
                                 this.updateGaz(itemId, event.target.value)
@@ -942,7 +942,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text mb-3"
+                          className="form-control small-text"
                           value={itemData.sour}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -979,7 +979,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text mb-3"
+                          className="form-control small-text"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
