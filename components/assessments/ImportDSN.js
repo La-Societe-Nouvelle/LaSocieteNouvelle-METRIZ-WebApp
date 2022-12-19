@@ -163,7 +163,7 @@ export class ImportDSN extends React.Component {
                   <td>Nom du fichier</td>
                   <td>Mois</td>
                   <td>Fraction</td>
-                  <td>Ecart D1/D9</td>
+                  <td>Ecart D9/D1</td>
                   <td>Ecart F/H</td>
                   <td></td>
                 </tr>

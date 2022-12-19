@@ -108,11 +108,11 @@ export class StatementIDR extends React.Component {
             disabled={disableStatement}/>
         </div>
         <div className="statement-validation">
-          <button className="btn btn-primary btn-sm" onClick={this.props.toImportDSN} disabled={hasEmployees || !disableStatement? false : true}>
+          <button className="btn btn-primary btn-sm" onClick={this.props.toImportDSN} disabled={hasEmployees && !disableStatement? false : true}>
             <i className="bi bi-calculator"></i>
             &nbsp;Import Fichiers DSN
           </button>
-          <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment} disabled={hasEmployees || !disableStatement ? false : true}>
+          <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment} disabled={hasEmployees && !disableStatement ? false : true}>
             <i className="bi bi-calculator"></i>
             &nbsp;Outil d'évaluation
           </button>
