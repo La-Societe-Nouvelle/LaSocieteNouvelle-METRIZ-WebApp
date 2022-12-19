@@ -1,6 +1,6 @@
 {
   "art": {
-    "isBeta": true,
+    "isBeta": false,
     "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Métiers d'Art et aux Savoir-Faire",
@@ -91,7 +91,7 @@
     "isAvailable" : true
   },
   "mat": {
-    "isBeta": true,
+    "isBeta": false,
     "libelle": "Intensité d'Extraction de Matières premières",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Extraction de matières premières",
