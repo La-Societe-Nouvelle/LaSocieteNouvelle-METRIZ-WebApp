@@ -568,6 +568,7 @@ const IndicatorsList = (props) => {
                               onUpdate={willNetValueAddedIndicator.bind("geq")}
                               onValidate={() => validateIndicator("geq")}
                               toAssessment={() => triggerPopup("geq")}
+                              toImportDSN={() => triggerPopup("dsn")}
                             />
 
                             <ModalAssesment
@@ -579,6 +580,16 @@ const IndicatorsList = (props) => {
                               popUp={popUp}
                               handleClose={handleClose}
                               title="Données Sociales"
+                            />
+                            <ModalAssesment
+                              indic="dsn"
+                              impactsData={props.impactsData}
+                              onUpdate={willNetValueAddedIndicator.bind("geq")}
+                              onValidate={() => validateIndicator("geq")}
+                              onGoBack={handleClose}
+                              popUp={popUp}
+                              handleClose={handleClose}
+                              title="Déclarations Sociales Nominatives"
                             />
                           </>
                         );
