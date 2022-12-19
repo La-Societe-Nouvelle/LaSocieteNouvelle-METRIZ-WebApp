@@ -547,30 +547,22 @@ const ResultSection = (props) => {
             <Col lg={4}>
               <div className="border rounded  p-4">
                 <h4 className="h5">Notes</h4>
-
+                  <p className="small-text">Données pour la branche "{divisions[comparativeDivision]}"</p>
                 <h5>
-                  Tendance de la branche "{divisions[comparativeDivision]}" : 
+                  Tendance de la branche : 
                 </h5>
-
                 <p className="small-text">
-                  La courbe de tendance représente une projection statistique
-                  des valeurs observées. Concrètement, il s'agit de prolonger
-                  les empreintes associées à la valeur ajoutée nette (impacts
-                  directs) et d'en déduire, par modèle entrées-sorties, les
-                  valeurs projetées des autres agrégats, en posant l'hypothèse
-                  de structure macroéconomique inchangé.
+                {
+                         comparativeData.production.trendsFootprint
+                         .indicators[indic].meta.info
+                      }
                 </p>
-                <p className="small-text">
-                  Des travaux sont en cours pour proposer des valeurs tenant
-                  compte de l'évolution tendancielle de la structure de
-                  l'économie nationale, ses interactions avec l'extérieur et de
-                  la dynamique des prix par branche.
-                </p>
+                    
                 {comparativeData.production.targetDivisionFootprint.indicators[
                   indic
                 ].meta.info && (
                   <>
-                    <h5>Objectifs :</h5>
+                    <h5>Objectif de la branche :</h5>
                     <p className="small-text">
                       {
                         comparativeData.production.targetDivisionFootprint
@@ -581,16 +573,16 @@ const ResultSection = (props) => {
                 )}
                 <hr />
                 <p className="small-text">
-                  Source :
+                  Source :&nbsp;
                   {
                     comparativeData.production.trendsFootprint.indicators[indic]
-                      .meta.source
-                  }
+                      .meta.source +  " (Tendance)"
+                  } 
                   {comparativeData.production.targetDivisionFootprint
                     .indicators[indic].meta.source &&
                     ", " +
                       comparativeData.production.targetDivisionFootprint
-                        .indicators[indic].meta.source}
+                        .indicators[indic].meta.source + " (Objectif)"}
                 </p>
               </div>
             </Col>
