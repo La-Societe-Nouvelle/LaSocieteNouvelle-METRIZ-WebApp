@@ -1,9 +1,8 @@
 // La Société Nouvelle
 
 // React
-import { isValid } from 'js-base64';
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Alert, Form } from 'react-bootstrap';
 
 // Utils
 import { printValue, roundValue, valueOrDefault } from '../../../../src/utils/Utils';
@@ -18,12 +17,16 @@ export class StatementIDR extends React.Component {
     this.state = {
       interdecileRange: valueOrDefault(props.impactsData.interdecileRange, ""),
       info: props.impactsData.comments.idr || "",
-      isDisabled : true
+      isDisabled : true,
+      disableStatement : props.disableStatement
     }
   }
 
   componentDidUpdate() {
 
+    if(this.state.disableStatement != this.props.disableStatement) {
+      this.setState({disableStatement : this.props.disableStatement})
+    }
     if(!this.props.impactsData.hasEmployees && this.state.interdecileRange == 1) {
       this.state.isDisabled = false;
     }
@@ -44,14 +47,21 @@ export class StatementIDR extends React.Component {
 
   render() {
     const { hasEmployees } = this.props.impactsData;
-    const { interdecileRange, info, isDisabled } = this.state;
-
+    const { interdecileRange, info, isDisabled, disableStatement } = this.state;
     return (
       <div className="statement">
+              {
+              disableStatement && 
+              <Alert variant="warning"> 
+                 <p>
+                 <i className="bi bi-exclamation-circle  me-2"></i>Indicateur indisponible lors de la précédente analyse
+                 </p>
+              </Alert>
+            }
         <div className="statement-form">
           <div className="form-group">
             <label>L'entreprise est-elle employeur ?</label>
-
+      
             <Form>
             <Form.Check
                 inline
@@ -61,6 +71,7 @@ export class StatementIDR extends React.Component {
                 value="true"
                 checked={hasEmployees === true}
                 onChange={this.onHasEmployeesChange}
+                disabled={disableStatement}
               />
             <Form.Check
                 inline
@@ -70,6 +81,7 @@ export class StatementIDR extends React.Component {
                 value="false"
                 checked={hasEmployees === false}
                 onChange={this.onHasEmployeesChange}
+                disabled={disableStatement}
               />
             </Form>
 
@@ -77,10 +89,13 @@ export class StatementIDR extends React.Component {
           <div className="form-group">
             <label>Rapport interdécile D9/D1 des taux horaires bruts</label>
             <InputNumber value={roundValue(interdecileRange, 1)}
-              disabled={hasEmployees === false}
+              disabled={hasEmployees === false || disableStatement}
               onUpdate={this.updateInterdecileRange}
               placeholder=" " 
-              isInvalid={interdecileRange>100 ? true : false}/>
+              isInvalid={interdecileRange>100 ? true : false}
+              
+              />
+                           
           </div>
 
         </div>
@@ -89,18 +104,19 @@ export class StatementIDR extends React.Component {
           <textarea type="text" spellCheck="false"
             value={info}
             onChange={this.updateInfo}
-            onBlur={this.saveInfo} />
+            onBlur={this.saveInfo} 
+            disabled={disableStatement}/>
         </div>
         <div className="statement-validation">
-          <button className="btn btn-primary btn-sm" onClick={this.props.toImportDSN} disabled={hasEmployees ? false : true}>
+          <button className="btn btn-primary btn-sm" onClick={this.props.toImportDSN} disabled={hasEmployees || !disableStatement? false : true}>
             <i className="bi bi-calculator"></i>
             &nbsp;Import Fichiers DSN
           </button>
-          <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment} disabled={hasEmployees ? false : true}>
+          <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment} disabled={hasEmployees || !disableStatement ? false : true}>
             <i className="bi bi-calculator"></i>
             &nbsp;Outil d'évaluation
           </button>
-          <button disabled={isDisabled} className="btn btn-secondary btn-sm"
+          <button disabled={isDisabled || disableStatement} className="btn btn-secondary btn-sm"
             onClick={this.onValidate}>Valider</button>
         </div>
       </div>

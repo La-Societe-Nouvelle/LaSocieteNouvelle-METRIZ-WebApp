@@ -135,7 +135,6 @@ export class ImportDSN extends React.Component {
 
         <div>
           <h4>Fichiers importés</h4>
-          {console.log(this.state.errorFile)}
           {this.state.errorFile == true && (
             <Alert variant="danger"> Format de fichier incorrect.</Alert>
           )}

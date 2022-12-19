@@ -18,6 +18,9 @@ import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import { Company } from "../Company";
 
+
+const prevIndics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
+
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
@@ -96,6 +99,9 @@ const updater_1_0_5 = async (sessionData) => {
   const companiesUpdated = await updateCompaniesData(sessionData);
 
   sessionData.financialData.companies = companiesUpdated;
+
+  // set previous analysis to True to disable new indicators assessment with missing data
+  sessionData.indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 
 };
 

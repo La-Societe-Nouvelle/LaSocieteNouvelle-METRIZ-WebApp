@@ -33,7 +33,7 @@ export class Session {
     // ---------------------------------------------------------------------------------------------------- //
     // Version
     this.version = currentVersion;
-
+    
     // Session
     this.progression = props.progression || 0;
 
@@ -49,6 +49,9 @@ export class Session {
     this.validations = props.validations || [];
     this.comparativeData =  new ComparativeData(props.comparativeData);
     this.updateFootprints();
+
+    // Indicators list
+    this.indics = props.indics || Object.keys(metaIndics)
 
   }
 

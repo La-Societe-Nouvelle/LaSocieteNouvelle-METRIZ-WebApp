@@ -36,12 +36,15 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
-import {getTargetSerieId} from "/src/utils/Utils";
+import { getTargetSerieId } from "/src/utils/Utils";
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 const IndicatorsList = (props) => {
+  const [prevIndics] = useState(props.session.indics);
+  const [notAvailableIndics, setnotAvailableIndics] = useState([]);
+
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
@@ -60,10 +63,19 @@ const IndicatorsList = (props) => {
     }
   }, [validations]);
 
-  const updateComparativeAreaData = async (indic) => {
+  useEffect(() => {
+    // return indics not included in available list of indicators
+    const filteredIndics = Object.keys(metaIndics).filter(
+      (key) => !prevIndics.includes(key)
+    );
+    if (filteredIndics.length > 0) {
+      setnotAvailableIndics(filteredIndics);
+    }
+  }, []);
 
+  const updateComparativeAreaData = async (indic) => {
     let idTarget = getTargetSerieId(indic);
-    
+
     let newComparativeData = await getMacroSerieData(
       indic,
       "00",
@@ -89,7 +101,6 @@ const IndicatorsList = (props) => {
     newComparativeData,
     comparativeDivision
   ) => {
-
     newComparativeData = await getMacroSerieData(
       indic,
       comparativeDivision,
@@ -103,13 +114,12 @@ const IndicatorsList = (props) => {
       "trendsFootprint"
     );
 
-      newComparativeData = await getHistoricalSerieData(
-        comparativeDivision,
-        indic,
-        newComparativeData,
-        "targetDivisionFootprint"
-      );
- 
+    newComparativeData = await getHistoricalSerieData(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "targetDivisionFootprint"
+    );
 
     return newComparativeData;
   };
@@ -168,7 +178,6 @@ const IndicatorsList = (props) => {
 
   // Update comparative division
   const updateDivision = async (division) => {
-
     setDisplayGraph(false);
 
     props.session.comparativeData.activityCode = division;
@@ -275,11 +284,9 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-  
       {validations.length > 0 &&
         displayGraph &&
         validations.map((indic, key) => (
-    
           <div className="hidden" key={key}>
             <Row className="graphs">
               <Col sm={4} xl={4} lg={4} md={4}>
@@ -300,8 +307,9 @@ const IndicatorsList = (props) => {
                       indic
                     ].value,
                     null,
-                    comparativeData.production.targetDivisionFootprint
-                      .indicators[indic].data.at(-1).value,
+                    comparativeData.production.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
                   ]}
                   titleChart="Production"
                   indic={indic}
@@ -323,8 +331,9 @@ const IndicatorsList = (props) => {
                     comparativeData.intermediateConsumption.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.intermediateConsumption
-                      .targetDivisionFootprint.indicators[indic].data.at(-1).value,
+                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -345,8 +354,9 @@ const IndicatorsList = (props) => {
                     comparativeData.fixedCapitalConsumption.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.fixedCapitalConsumption
-                      .targetDivisionFootprint.indicators[indic].data.at(-1).value,
+                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -369,8 +379,9 @@ const IndicatorsList = (props) => {
                     comparativeData.netValueAdded.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.netValueAdded.targetDivisionFootprint
-                      .indicators[indic].data.at(-1).value,
+                    comparativeData.netValueAdded.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
                   ]}
                   indic={indic}
                 />
@@ -483,6 +494,9 @@ const IndicatorsList = (props) => {
                   <div>
                     <ArrowToggle eventKey={key}>
                       {value.libelle}
+                      {notAvailableIndics.includes(key) && (
+                        <i className="ms-1 bi bi-exclamation-circle warning"></i>
+                      )}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                     </ArrowToggle>
                   </div>
@@ -506,6 +520,7 @@ const IndicatorsList = (props) => {
                   </div>
                 </div>
               </Card.Header>
+
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
                   {(() => {
@@ -515,10 +530,13 @@ const IndicatorsList = (props) => {
                           <>
                             <StatementIDR
                               impactsData={props.impactsData}
-                              onUpdate     = {willNetValueAddedIndicator.bind("idr")}
-                              onValidate   = {() => validateIndicator("idr")}
-                              toAssessment = {() => triggerPopup("idr")}
-                              toImportDSN  = {() => triggerPopup("dsn")}
+                              disableStatement={notAvailableIndics.includes(
+                                key
+                              )}
+                              onUpdate={willNetValueAddedIndicator.bind("idr")}
+                              onValidate={() => validateIndicator("idr")}
+                              toAssessment={() => triggerPopup("idr")}
+                              toImportDSN={() => triggerPopup("dsn")}
                             />
                             <ModalAssesment
                               indic="idr"
