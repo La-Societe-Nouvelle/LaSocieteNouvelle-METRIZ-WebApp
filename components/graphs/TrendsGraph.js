@@ -10,6 +10,7 @@ function TrendsGraph(props) {
 
   const [data, setData] = useState({ datasets: [] });
   const [options, setOptions] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     
@@ -107,8 +108,7 @@ function TrendsGraph(props) {
 
     const options = {
       pointRadius: 0,
-      responsive:true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: true,
       scales: {
         y: {
           display: true,
@@ -130,7 +130,6 @@ function TrendsGraph(props) {
             font: {
               size: 11,
               family : 'Roboto'
-
             },
           },
           grid: {
@@ -160,6 +159,10 @@ function TrendsGraph(props) {
         legend: {
           display: true,
           position: "right",
+          font: {
+            size: 10,
+
+          },
           labels: {
             usePointStyle: true,
             fullsize: true,
@@ -200,6 +203,7 @@ function TrendsGraph(props) {
           labels: {
             display: false,
           },
+          
         },
         title: {
           display: true,
@@ -208,7 +212,7 @@ function TrendsGraph(props) {
           font: {
             size: 15,
             weight : 'bold',
-            family : 'Raleway'
+            family : 'Raleway' 
           },
           padding: {
                     top: 10,
@@ -221,6 +225,12 @@ function TrendsGraph(props) {
           cornerRadius: 3,
           usePointStyle: true,
           callbacks: {
+            title: function(tooltipItems, data) {
+              let date = new Date(tooltipItems[0].label); 
+              let year = date.getFullYear();
+              //Return value for title
+              return year;
+          },
             label: function (context) {
               let label = " " + context.parsed.y + " " + props.unit;
               return label;
@@ -232,10 +242,10 @@ function TrendsGraph(props) {
 
     setData(data);
     setOptions(options);
-
+    setIsLoading(false);
   }, [props]);
 
-  return data && options && <Line data={data} options={options} />;
+  return !isLoading && <Line data={data} options={options} />;
 }
 
 export default TrendsGraph;

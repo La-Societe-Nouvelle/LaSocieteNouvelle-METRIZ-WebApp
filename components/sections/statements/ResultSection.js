@@ -436,11 +436,11 @@ const ResultSection = (props) => {
             />
           </div>
           <Row>
-            <Col lg={8}>
+            <Col lg={8} sm={8} xs={8} className="charts-container ">
               <div
                 className={
                   trendGraphView.value != "prd"
-                    ? "hidden"
+                    ? "hidden rounded p-4"
                     : "border rounded p-4"
                 }
               >
@@ -465,7 +465,7 @@ const ResultSection = (props) => {
               </div>
               <div
                 className={
-                  trendGraphView.value != "ic" ? "hidden" : "border rounded p-4"
+                  trendGraphView.value != "ic" ? "hidden rounded p-4" : "border rounded p-4"
                 }
               >
                 <TrendsGraph
@@ -491,7 +491,7 @@ const ResultSection = (props) => {
               <div
                 className={
                   trendGraphView.value != "cfc"
-                    ? "hidden"
+                    ? "hidden rounded p-4"
                     : "border rounded p-4"
                 }
               >
@@ -518,7 +518,7 @@ const ResultSection = (props) => {
               <div
                 className={
                   trendGraphView.value != "nva"
-                    ? "hidden"
+                    ? "hidden rounded p-4"
                     : "border rounded p-4"
                 }
               >
@@ -544,7 +544,7 @@ const ResultSection = (props) => {
                 />
               </div>
             </Col>
-            <Col lg={4}>
+            <Col lg={4} sm={4} xs={4}>
               <div className="border rounded  p-4">
                 <h4 className="h5">Notes</h4>
                   <p className="small-text">Données pour la branche "{divisions[comparativeDivision]}"</p>
