@@ -49,8 +49,13 @@ export default function Home() {
     <>
       <Head>
         <title>METRIZ by La Société Nouvelle</title>
-        <meta name="description" content="L'OpenData au service de l'économie" />
-        <link rel="icon" href="/favicon.svg" />
+        <meta name="description" content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs." />
+        <meta property="og:title" content="Metriz by La Société Nouvelle" />
+        <meta property="og:description" content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs."/>
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://metriz.lasocietenouvelle.org" />
+        <meta property="og:image" content="/metriz_illus.jpg" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <BrowserView>
          <Metriz />
