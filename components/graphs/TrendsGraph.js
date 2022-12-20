@@ -107,6 +107,8 @@ function TrendsGraph(props) {
 
     const options = {
       pointRadius: 0,
+      responsive:true,
+      maintainAspectRatio: false,
       scales: {
         y: {
           display: true,

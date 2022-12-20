@@ -16,7 +16,9 @@
     #start .row .col {
         padding: 0 1em;
     }
-
+    .btn-group button {
+        padding: 0.2rem 0.3rem;
+    }
 }
 
 @media (min-width: 1200px) {

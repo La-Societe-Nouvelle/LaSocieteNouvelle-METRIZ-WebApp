@@ -32,7 +32,7 @@ export class StartSection extends React.Component {
         <div className="mb-5 mt-5 py-5 ">
           <Container fluid>
             <Row>
-              <Col>
+              <Col lg={{ span: 6, order: 1 }} sm={{ span: 12, order: 2 }}>
                 <div className="ps-5">
                   <h2 className=" mb-4">
                     Mesurez <b>l’empreinte sociétale</b> de votre entreprise
@@ -44,10 +44,10 @@ export class StartSection extends React.Component {
                   </p>
                   <p>
                     Vous pouvez <b>comparer vos résultats</b> avec votre branche
-                    d’activité et, si vous le souhaitez, <b>valoriser votre empreinte</b> en la publiant au sein de notre base de
+                    d'activité et, si vous le souhaitez, <b>valoriser votre empreinte</b> en la publiant au sein de notre base de
                     données ouverte.
                   </p>
-                  <div className="mt-5">
+                  <div className="mt-5 btn-group">
                     <Button
                       variant="secondary"
                       className="me-2"
@@ -56,16 +56,17 @@ export class StartSection extends React.Component {
                       Nouvelle analyse
                     </Button>
 
-                    <a
-                      className="btn btn-primary"
+                    <Button
+                      variant="primary"
                       href="https://docs.lasocietenouvelle.org/application-web/tutorial"
                       target="_blank"
                     >
                       Guide d'utilisation
-                    </a>
+                    </Button>
                     <span className="vertical-lign"></span>
                     <Button
                       variant="outline-primary"
+                      className="me-2"
                       onClick={this.triggerImportFile}
                     >
                       Reprendre une session
@@ -81,7 +82,7 @@ export class StartSection extends React.Component {
                   </div>
                 </div>
               </Col>
-              <Col>
+              <Col lg={{ span: 6, order: 2 }} sm={{ span: 12, order: 1 }}>
               <div className="text-end pe-5">
                   <Image
                     className="w-75"
