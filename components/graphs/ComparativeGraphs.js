@@ -6,112 +6,113 @@ import metaIndics from "/lib/indics";
 
 const ComparativeGraphs = (props) => {
 
-  const [chartData, setChartData] = useState({ datasets: [] });
-  const [sectorData, setSectorData] = useState(props.sectorData);
-  const [legalunitData, setLegalUnitData] = useState(props.legalunitData);
-  const [divisionData, setDivisionData] = useState(props.divisionData);
-  const [targetBranchData, setTargetBranchData] = useState(props.targetBranchData);
-  const [targetAreaData, setTargetAreaData] = useState(props.targetAreaData);
+  const id  = props.id;
+  const unit  = metaIndics[props.indic].unit;
+  const precision = metaIndics[props.indic].nbDecimals;
 
-  const [titleChart] = useState(props.titleChart);
-  const [id, setId] = useState(props.id);
-  const [unit, setUnit] = useState(metaIndics[props.indic].unit);
-  const [precision, setPrecision] = useState(metaIndics[props.indic].nbDecimals);
+  const labels = ["France", ["Exercice", "en cours"], "Branche"];
 
-  const chart = () => {
-    const values = [sectorData, legalunitData];
-    const labels = ["France", "Exercice en cours"];
-    if (divisionData) {
-      values.push(divisionData);
-      labels.push("Branche");
-    }
-    const valuesTarget = [];
+  // Remove "Branche" label if no comparative division selected
+  if(props.graphDataset[2] == null) {
+    labels.pop()
+  }
 
-    if(targetBranchData) {
-        valuesTarget.push(targetAreaData.toFixed(precision));
-        valuesTarget.push(0);
-        valuesTarget.push(targetBranchData.toFixed(precision));
-    }
-    setChartData({
-      labels: labels,
-      datasets: [
-        {
-          label: titleChart,
-          data: values.map((value) =>
-            value ? value.toFixed(precision) : null
-          ),
-          backgroundColor: [
-            "RGBA(176,185,247,1)",
-            "RGBA(250,89,95,1)",
-            "RGBA(255,214,156,1)",
-          ],
-          borderWidth: 0,
-          type: "bar",
-          barPercentage: 0.8,
-          categoryPercentage: 0.8,
-        },
-        {
-          label: "Objectifs 2030",
-          data: valuesTarget,
-          backgroundColor: ["RGBA(215,220,251,1)", null, "RGBA(255,234,205,1)"],
-          borderWidth: 0,
-          barPercentage: 1,
-          categoryPercentage: 0.3,
-        },
-      ],
-    });
+  // Data for chart 
+  const chartData = {
+    labels: labels,
+    datasets: [
+      {
+        label: "Valeur ",
+        data: props.graphDataset.map(data => data ? data.toFixed(precision) : null),
+        skipNull: true,
+        backgroundColor: [
+          "RGBA(176,185,247,1)",
+          "RGBA(250,89,95,1)",
+          "rgb(255, 182, 66)",
+         
+        ],
+        borderWidth: 0,
+        type: "bar",
+        barPercentage: 0.6,
+        categoryPercentage: 0.6,
+      },
+      {
+        label: "Objectif ",
+        data: props.targetData.map(data => data ? data.toFixed(precision) : null),
+        skipNull: true,
+        backgroundColor: [
+          "RGBA(215,220,251,1)",
+          "RGBA(215,220,251,1)",
+          "rgb(255 220 141)",
+        ],
+        borderWidth: 0,
+        barPercentage: 0.6,
+        categoryPercentage: 0.6,
+      },
+    ],
   };
-
-  useEffect(async() => {
-
-    setUnit(metaIndics[props.indic].unit);
-    setPrecision(metaIndics[props.indic].nbDecimals);
-    setDivisionData(props.divisionData);
-    setLegalUnitData(props.legalunitData);
-    setSectorData(props.sectorData);
-    setTargetBranchData(props.targetBranchData);
-    setTargetAreaData(props.targetAreaData);
-    setId(props.id);
- 
-     chart();
-  }, [props, targetBranchData, divisionData, legalunitData, sectorData]);
-
   return (
-  
-      <Bar
-        id={id}
-        data={chartData}
-        options={{
-          devicePixelRatio: 2,
-          scales: {
-            y: {
-              display: true,
-              title: {
-                display: true,
-                text: unit,
-                color: "#191558",
-              },
-              ticks: {
-                color: "#191558",
-              },
-            },
-          },
-          plugins: {
-            legend: {
-              display: false,
-            },
-            datalabels: {
-              labels: {
-                display: false,
-              },
-            },
+    <Bar
+      id={id}
+      data={chartData}
+      options={{
+        devicePixelRatio: 2,
+        scales: {
+          y: {
+            display: true,
             title: {
+              display: true,
+              text: unit,
+              color: "#191558",
+              font : {
+                size: 10,
+                weight : 'bolder'
+              }
+            },
+            ticks: {
+              color: "#191558",
+              font : {
+                size: 10,
+              },
+              
+            },
+            grid: {
+              color: "#ececff",
+            },
+          },
+          x: {
+            ticks: {
+              color: "#191558",
+              font : {
+                size: 12,
+              }
+            },
+            grid: {
+              color: "#ececff",
+            },
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          datalabels: {
+            labels: {
               display: false,
             },
           },
-        }}
-      />
- 
+          title: {
+            display: false,
+          },
+          tooltip: {
+            backgroundColor: '#191558',
+            padding : 10,
+            cornerRadius: 2
+          }
+        },
+     
+      }}
+    />
   );
 };
 

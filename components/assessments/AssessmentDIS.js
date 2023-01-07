@@ -49,15 +49,16 @@ export class AssessmentDIS extends React.Component {
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.impactsData.employee != this.state.employees) {
+  componentDidUpdate(prevProps) 
+  {
+    if (prevProps.impactsData.employees != this.state.employees) {
       this.props.impactsData.employees = this.state.employees;
     }
   }
 
-  render() {
+  render() 
+  {
     const { employees, columnSorted } = this.state;
-
     const isAllValid = employees
       .map(
         (employee) =>
@@ -65,17 +66,14 @@ export class AssessmentDIS extends React.Component {
       )
       .reduce((a, b) => a && b, true);
 
-    this.sortCompanies(employees, columnSorted);
+    //this.sortCompanies(employees, columnSorted);
 
     return (
       <div className="assessment">
         <div className="text-end mb-3">
           <button
-            onClick={() =>
-              document.getElementById("import-companies-csv").click()
-            }
             className="btn btn-light btn-sm me-1"
-          >
+            onClick={() => document.getElementById("import-companies-csv").click()}>
             <i className="bi bi-upload"></i> Importer un fichier CSV
           </button>
           <input
@@ -86,11 +84,8 @@ export class AssessmentDIS extends React.Component {
             onChange={this.importCSVFile}
           />
           <button
-            onClick={() =>
-              document.getElementById("import-companies-xlsx").click()
-            }
             className="btn btn-light btn-sm me-1"
-          >
+            onClick={() => document.getElementById("import-companies-xlsx").click()}>
              <i className="bi bi-upload"></i>  Importer un fichier XLSX
           </button>
           <input
@@ -101,9 +96,8 @@ export class AssessmentDIS extends React.Component {
             onChange={this.importXLSXFile}
           />
           <button
-            onClick={this.exportXLSXFile}
             className="btn btn-light btn-sm me-1"
-          >
+            onClick={this.exportXLSXFile}>
              <i className="bi bi-download"></i> Télécharger modèle XLSX
           </button>
 
@@ -133,24 +127,21 @@ export class AssessmentDIS extends React.Component {
                 </td>
               </tr>
             </thead>
-            {console.log(employees)}
             <tbody>
               {employees.map((employee, index) => (
                 <tr key={index}>
                   <td>
                     <i
                       className="bi bi-trash3-fill"
-                      onClick={() => this.deleteEmployee(index)}
-                    ></i>
+                      onClick={() => this.deleteEmployee(index)}/>
                   </td>
                   <Row
                     {...employee}
                     isNewEmployeeRow={false}
-                    updateSocialData={this.updateSocialData.bind(this)}
-                  />
+                    updateSocialData={this.updateSocialData.bind(this)}/>
                 </tr>
               ))}
-                     {employees.length == 0 && (
+              {/* {employees.length == 0 && (
                 <tr>
                   <td></td>
                   <Row
@@ -159,21 +150,20 @@ export class AssessmentDIS extends React.Component {
                     updateSocialData={this.updateSocialData.bind(this)}
                   />
                 </tr>
-              )}
+              )} */}
          
             </tbody>
           </Table>
           <div className="">
             <button
               className="btn btn-primary btn-sm me-2"
-              onClick={this.addEmployee}
-            >
+              onClick={this.addEmployee}>
               <i className="bi bi-plus-lg"></i> Ajouter
             </button>
             <button onClick={this.deleteAll} className="btn btn-secondary btn-sm">
-            <i
-                      className="bi bi-trash3-fill"
-                    ></i> Supprimer tout
+              <i 
+                className="bi bi-trash3-fill"/>
+              Supprimer tout
           </button>
           </div>
         </div>
@@ -181,15 +171,14 @@ export class AssessmentDIS extends React.Component {
         <div className="view-footer text-end mt-2">
           <button
             className="btn btn-light me-2"
-            onClick={() => this.props.onGoBack()}
-          >
-            <i className="bi bi-chevron-left"></i> Retour
+            onClick={() => this.props.onGoBack()}>
+            <i className="bi bi-chevron-left"></i>
+            Retour
           </button>
           <button
             className="btn btn-secondary "
             disabled={!isAllValid || employees.length == 0}
-            onClick={() => this.onSubmit()}
-          >
+            onClick={() => this.onSubmit()}>
             Valider
           </button>
         </div>
@@ -200,22 +189,25 @@ export class AssessmentDIS extends React.Component {
   /* ---------- HEADER ACTIONS ---------- */
 
   // Submit
-  onSubmit = async () => {
+  onSubmit = async () => 
+  {
     let impactsData = this.props.impactsData;
 
     // update dis data
-    (impactsData.indexGini = getIndexGini(impactsData.employees)), 1;
-    await this.props.onUpdate("dis");
+    //impactsData.indexGini = getIndexGini(impactsData.employees);
+    //await this.props.onUpdate("dis");
+
+    // update dis data
+    impactsData.interdecileRange = getInterdecileRange(impactsData.employees);
+    await this.props.onUpdate("idr");
 
     // update geq data
     impactsData.wageGap = getGenderWageGap(impactsData.employees);
     await this.props.onUpdate("geq");
 
     // update knw data
-    impactsData.knwDetails.apprenticesRemunerations =
-      getApprenticesRemunerations(impactsData.employees);
-    impactsData.knwDetails.employeesTrainingsCompensations =
-      getEmployeesTrainingCompensations(impactsData.employees);
+    impactsData.knwDetails.apprenticesRemunerations = getApprenticesRemunerations(impactsData.employees);
+    impactsData.knwDetails.employeesTrainingsCompensations = getEmployeesTrainingCompensations(impactsData.employees);
     await this.props.onUpdate("knw");
 
     this.props.onGoBack();
@@ -224,22 +216,22 @@ export class AssessmentDIS extends React.Component {
   /* ---------- TABLE ACTIONS ---------- */
 
   // Import CSV File
-  importCSVFile = (event) => {
+  importCSVFile = (event) => 
+  {
     let file = event.target.files[0];
 
     let reader = new FileReader();
     reader.onload = async () =>
       CSVFileReader(reader.result)
         .then((content) => SocialDataContentReader(content))
-        .then((data) => (this.props.impactsData.employees = data.employees))
-        .then(() =>
-          this.setState({ employees: this.props.impactsData.employees })
-        );
+        .then((data) => this.setState({employees: data.employees}));
+    
     reader.readAsText(file);
   };
 
   // Import XLSX File
-  importXLSXFile = (event) => {
+  importXLSXFile = (event) => 
+  {
     let file = event.target.files[0];
 
     let reader = new FileReader();
@@ -247,43 +239,24 @@ export class AssessmentDIS extends React.Component {
       XLSXFileReader(reader.result)
         .then((XLSXData) => XLSXSocialDataBuilder(XLSXData))
         .then((socialData) => SocialDataContentReader(socialData))
-        .then((data) => (this.props.impactsData.employees = data.employees))
-        .then(() =>
-          this.setState({ employees: this.props.impactsData.employees })
-        );
+        .then((data) => this.setState({employees: data.employees}));
+
     reader.readAsArrayBuffer(file);
   };
 
-  // Export XLSX File
-  exportXLSXFile = async () => {
-    let arrayHeader = [
-      [
-        "Nom - Prénom",
-        "Sexe (F/H)",
-        "Heures travaillées",
-        "Rémunérations brutes",
-        "Taux horaire",
-        "Contrat de formation (O/N)",
-        "Heures de formation",
-      ],
-    ];
-    let fileProps = {
-      wsclos: [
-        { wch: 40 },
-        { wch: 15 },
-        { wch: 25 },
-        { wch: 25 },
-        { wch: 25 },
-        { wch: 25 },
-        { wch: 25 },
-      ],
-    };
+  // Export XLSX File (empty)
+  exportXLSXFile = async () => 
+  {
+    let arrayHeader = [["Nom - Prénom", "Sexe (F/H)", "Heures travaillées", "Rémunérations brutes", "Taux horaire", "Contrat de formation (O/N)", "Heures de formation",,]];
+    let fileProps = { wsclos: [ { wch: 40 }, { wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 }, { wch: 25 },,]};
+
     // write file (Array -> ArrayBuffer)
     let file = await XLSXHeaderFileWriter(
       fileProps,
       "Collaborateurs",
       arrayHeader
     );
+
     // trig download
     let blob = new Blob([file], { type: "application/octet-stream" });
     let link = document.createElement("a");
@@ -293,20 +266,12 @@ export class AssessmentDIS extends React.Component {
   };
 
   // Delete all
-  deleteAll = () => {
-    this.props.impactsData.employees = [];
-    this.setState({ employees: [] });
-  };
+  deleteAll = () => this.setState({ employees: [] })
 
-  deleteEmployee = (index) => {
-    this.setState({
-      employees: this.state.employees.filter((_, i) => i !== index),
-    });
-    this.props.impactsData.employees.splice(index, 1);
-  };
+  deleteEmployee = (index) => this.setState({employees: this.state.employees.filter((_, i) => i !== index)}); // use id instead
 
-  addEmployee = () => {
-    
+  addEmployee = () => 
+  {
     const newEmployee = {
       id: getNewId(this.state.employees),
       name: "",
@@ -317,10 +282,9 @@ export class AssessmentDIS extends React.Component {
       trainingHours: null,
       trainingContract: false,
     };
-    this.setState({
-      employees: [...this.state.employees, newEmployee],
-    });
+    this.setState({employees: this.state.employees.concat([newEmployee])});
   };
+
   /* ---------- TABLE DISPLAY ---------- */
 
   // Column for sorting
@@ -349,36 +313,26 @@ export class AssessmentDIS extends React.Component {
 
   /* ---------- ROW ACTIONS ---------- */
 
-  // Update
-  updateSocialData = (nextProps) => {
-    let employee = this.props.impactsData.employees.filter(
-      (employee) => employee.id == nextProps.id
-    )[0];
+  // Update -> needed ?
+  updateSocialData = (nextProps) => 
+  {
+    let employee = this.props.impactsData.employees.filter((employee) => employee.id == nextProps.id)[0];
     if (employee == undefined) {
-      employee = {
-        id: getNewId(this.props.impactsData.employees),
-        name: nextProps.name || "",
-        sex: "",
-        wage: null,
-        workingHours: null,
-        hourlyRate: null,
-        trainingHours: null,
-        trainingContract: false,
-      };
-      this.state.employees.push(employee);
+      this.addEmployee();
     } else {
-      Object.entries(nextProps).forEach(
-        ([propName, propValue]) => (employee[propName] = propValue)
-      );
+      employee = {...employee, ...nextProps};
+      //Object.entries(nextProps).forEach(([propName, propValue]) => employee[propName] = propValue);
     }
-    this.setState({ employees: this.props.impactsData.employees });
+    //this.setState({ employees: this.props.impactsData.employees });
   };
 }
 
 /* -------------------- EMPLOYEE ROW -------------------- */
 
-class Row extends React.Component {
-  constructor(props) {
+class Row extends React.Component 
+{
+  constructor(props) 
+  {
     super(props);
     this.state = {
       name: props.name || "",
@@ -389,14 +343,10 @@ class Row extends React.Component {
       trainingHours: props.trainingHours || null,
       trainingContract: props.trainingContract || false,
     };
-    this.updateName = this.updateName.bind(this);
-    this.updateWorkingHours = this.updateWorkingHours.bind(this);
-    this.updateWage = this.updateWage.bind(this);
-    this.updateHourlyRate = this.updateHourlyRate.bind(this);
-    this.updateTrainingHours = this.updateTrainingHours.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps) 
+  {
     if (prevProps !== this.props) {
       this.setState({
         name: this.props.isNewEmployeeRow ? "" : this.props.name || "",
@@ -410,7 +360,8 @@ class Row extends React.Component {
     }
   }
 
-  render() {
+  render() 
+  {
     const { id } = this.props;
     const {
       name,
@@ -426,68 +377,49 @@ class Row extends React.Component {
 
     return (
       <>
-        <td
-          className={
-            "long " +
-            (!this.props.isNewEmployeeRow
-              ? isValid
-                ? "success"
-                : "error"
-              : "")
-          }
-        >
-          <InputText value={name} onUpdate={this.updateName} />
+        <td  className={"long "+(!this.props.isNewEmployeeRow ? isValid ? "success" : "error" : "")}>
+        <InputText 
+          value={name} 
+          onUpdate={this.updateName}/>
         </td>
-
         <td className=" text-center">
-          <Form.Select className="mb-3" value={sex} onChange={this.updateSex}>
-            <option key="" value="">
-              {" "}
-              -{" "}
-            </option>
-            <option key="F" value="F">
-              F
-            </option>
-            <option key="H" value="H">
-              H
-            </option>
-            {sex == null && (
-              <option key="" value="">
-                -
-              </option>
-            )}
-          </Form.Select>
+        <Form.Select 
+          className="mb-3" 
+          value={sex} 
+          onChange={this.updateSex}>
+            <option key="" value="">{" "}-{" "}</option>
+            <option key="F" value="F">F</option>
+            <option key="H" value="H">H</option>
+            {sex == null && (<option key="" value=""> - </option>)}
+        </Form.Select>
         </td>
         <td className="text-end">
           <InputNumber
             value={workingHours}
-            onUpdate={this.updateWorkingHours}
-          />
+            onUpdate={this.updateWorkingHours}/>
         </td>
         <td className="text-end">
-          <InputNumber value={wage} onUpdate={this.updateWage} />
+          <InputNumber 
+            value={wage} 
+            onUpdate={this.updateWage}/>
         </td>
-
         <td className="text-end">
           <InputNumber
             value={hourlyRate}
-            onUpdate={this.updateHourlyRate}
-          />
+            onUpdate={this.updateHourlyRate}/>
         </td>
         <td className="text-center">
           <Form.Check
             type="checkbox"
             value={id}
             checked={trainingContract}
-            onChange={this.updateTrainingContract.bind(this)}
-          />
+            onChange={this.updateTrainingContract}/>
         </td>
         <td className="text-end">
           <InputNumber
             value={trainingHours}
             disabled={trainingContract}
-            onUpdate={this.updateTrainingHours}
-          />
+            onUpdate={this.updateTrainingHours}/>
         </td>
       </>
     );
@@ -496,53 +428,107 @@ class Row extends React.Component {
   /* --- UPDATES --- */
 
   updateName = (input) => {
-    this.props.updateSocialData({ id: this.props.id, name: input });
     this.setState({ name: input });
+    this.props.updateSocialData({ id: this.props.id, name: input });
   };
 
-  updateSex = (input) =>
+  updateSex = (input) =>{
     this.props.updateSocialData({ id: this.props.id, sex: input.target.value });
+  }
 
-  updateWage = (input) => {
-    this.state.wage = roundValue(input, 0);
-    if (input == null) this.updateHourlyRate(null);
-    else if (this.state.workingHours > 0)
-      this.updateHourlyRate(input / this.state.workingHours);
-    else if (this.state.workingHours == null && this.state.hourlyRate > 0)
-      this.updateWorkingHours(input / this.state.hourlyRate);
-    this.props.updateSocialData({ id: this.props.id, ...this.state });
+  updateWage = (input) => 
+  {
+    let wage = roundValue(input, 2);
+
+    if (wage == null) {
+      this.props.updateSocialData({ id: this.props.id, wage: null, hourlyRate: null });
+    }
+    else if (wage == 0) {
+      this.props.updateSocialData({ id: this.props.id, wage: 0, workingHours: 0, hourlyRate: 0 });
+    }
+    else if (this.state.workingHours >= 0) {
+      let hourlyRate = this.state.workingHours > 0 ? roundValue(wage / this.state.hourlyRate, 2) : null;
+      this.props.updateSocialData({ id: this.props.id, wage, hourlyRate });
+    }
+    else if (this.state.hourlyRate >= 0) {
+      let workingHours = this.state.hourlyRate > 0 ? roundValue(wage * this.state.hourlyRate, 2) : null;
+      this.props.updateSocialData({ id: this.props.id, wage, workingHours });
+    }
+    else {
+      this.props.updateSocialData({ id: this.props.id, wage });
+    }
   };
 
-  updateWorkingHours = (input) => {
-    this.state.workingHours = parseInt(input);
-    if (input == null || input == 0) this.updateHourlyRate(null);
-    else if (this.state.wage != null)
-      this.updateHourlyRate(this.state.wage / input);
-    else if (this.state.hourlyRate != null)
-      this.updateWage(this.state.hourlyRate * input);
-    this.props.updateSocialData({ id: this.props.id, ...this.state });
+  updateWorkingHours = (input) => 
+  {
+    let workingHours = parseInt(input);
+
+    if (workingHours == null) {
+      this.props.updateSocialData({ id: this.props.id, workingHours: null, hourlyRate: null });
+    }
+    else if (workingHours == 0) {
+      this.props.updateSocialData({ id: this.props.id, workingHours: 0, wage: 0, hourlyRate: 0 });
+    } 
+    else if (this.state.wage >= 0) {
+      let hourlyRate = roundValue(this.state.wage / workingHours, 2);
+      this.props.updateSocialData({ id: this.props.id, workingHours, hourlyRate });
+    }
+    else if (this.state.hourlyRate >= 0) {
+      let wage = roundValue(workingHours * this.state.hourlyRate, 2);
+      this.props.updateSocialData({ id: this.props.id, workingHours, wage });
+    }
+    else {
+      this.props.updateSocialData({ id: this.props.id, workingHours });
+    }
+
   };
 
-  updateHourlyRate = (input) => {
-    this.state.hourlyRate = roundValue(input, 1);
-    if (input == null && this.state.wage != null) this.updateWage(null);
-    else if (this.state.workingHours != null)
-      this.state.wage = input * this.state.workingHours;
-    else if (this.state.wage != null && input > 0)
-      this.state.workingHours = this.state.wage / input;
-    this.props.updateSocialData({ id: this.props.id, ...this.state });
+  updateHourlyRate = (input) => 
+  {
+    let hourlyRate = roundValue(input, 2);
+
+    if (hourlyRate == null) {
+      this.props.updateSocialData({ id: this.props.id, hourlyRate: null, wage: null });
+    }
+    else if (hourlyRate == 0) {
+      this.props.updateSocialData({ id: this.props.id, hourlyRate: 0, wage: 0 });
+    } 
+    else if (this.state.workingHours >= 0) {
+      let wage = roundValue(this.state.workingHours * hourlyRate, 2);
+      this.props.updateSocialData({ id: this.props.id, hourlyRate, wage });
+    }
+    else if (this.state.wage >= 0) {
+      let workingHours = roundValue(this.state.wage / hourlyRate, 2);
+      this.props.updateSocialData({ id: this.props.id, hourlyRate, workingHours });
+    }
+    else {
+      this.props.updateSocialData({ id: this.props.id, hourlyRate });
+    }
   };
 
-  updateTrainingContract = (event) => {
-    this.props.updateSocialData({
-      id: this.props.id,
-      trainingContract: event.target.checked,
-    });
-    if (event.target.checked) this.updateTrainingHours(null);
+  updateTrainingContract = (event) => 
+  {
+    let trainingContract = event.target.checked;
+    if (trainingContract) {
+      this.props.updateSocialData({ id: this.props.id, trainingContract, trainingHours: null })
+    } else {
+      this.props.updateSocialData({ id: this.props.id, trainingContract, trainingHours: 0})
+    }
   };
 
-  updateTrainingHours = (input) =>
-    this.props.updateSocialData({ id: this.props.id, trainingHours: input });
+  updateTrainingHours = (input) => {
+    let trainingHours = parseInt(input);
+
+    if (trainingHours == null || this.state.workingHours == null) {
+      this.props.updateSocialData({ id: this.props.id, trainingHours: 0 })
+    }
+    else if (trainingHours > this.state.workingHours) {
+      this.props.updateSocialData({ id: this.props.id, trainingHours: this.state.workingHours })
+    }
+    else {
+      this.props.updateSocialData({ id: this.props.id, trainingHours });
+    }
+  }
 }
 
 /* -------------------- LOADER -------------------- */
@@ -691,3 +677,38 @@ const getEmployeesTrainingCompensations = (employees) => {
     .reduce((a, b) => a + b, 0);
   return roundValue(employeesTrainingsCompensations, 0);
 };
+
+
+const getInterdecileRange = async (employees) =>
+{
+  employees = employees.filter(employee => employee.hourlyRate!=null).sort((a,b) => a.hourlyRate - b.hourlyRate);
+  let totalHours = getSumItems(employees.map(employee => employee.workingHours));
+
+  if (employees.length < 2 || totalHours==0) return 1;
+
+  // Limits
+  let limitD1 = Math.round(totalHours*0.1);
+  let limitD9 = Math.round(totalHours*0.9);
+
+  // D1
+  let indexEmployeeD1 = 0;
+  let hoursD1 = employees[indexEmployeeD1].workingHours;
+  while (hoursD1 < limitD1 && indexEmployeeD1 < employees.length) {
+    indexEmployeeD1+=1;
+    hoursD1+= employees[indexEmployeeD1].workingHours;
+  }
+  let hourlyRateD1 = employees[indexEmployeeD1].hourlyRate;
+
+  // D9
+  let indexEmployeeD9 = 0;
+  let hoursD9 = employees[indexEmployeeD9].workingHours;
+  while (hoursD9 < limitD9 && indexEmployeeD9 < employees.length) {
+    indexEmployeeD9+=1;
+    hoursD9+= employees[indexEmployeeD9].workingHours;
+  }
+  let hourlyRateD9 = employees[indexEmployeeD9].hourlyRate;
+
+  // Interdecile range
+  let interdecileRange = roundValue(hourlyRateD9/hourlyRateD1,2);
+  return interdecileRange;
+}

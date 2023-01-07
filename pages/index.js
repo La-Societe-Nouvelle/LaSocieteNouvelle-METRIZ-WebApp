@@ -49,8 +49,13 @@ export default function Home() {
     <>
       <Head>
         <title>METRIZ by La Société Nouvelle</title>
-        <meta name="description" content="L'OpenData au service de l'économie" />
-        <link rel="icon" href="/favicon.svg" />
+        <meta name="description" content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs." />
+        <meta property="og:title" content="Metriz by La Société Nouvelle" />
+        <meta property="og:description" content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs."/>
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://metriz.lasocietenouvelle.org" />
+        <meta property="og:image" content="/metriz_illus.jpg" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
       <BrowserView>
          <Metriz />
@@ -88,7 +93,7 @@ class Metriz extends React.Component {
     const { step, session } = this.state;
     return (
       <>
-        <div className="wrapper" id="wrapper">
+        <div className={step == 0 ? "wrapper bg-white" : "wrapper"} id="wrapper" >
           {step == 0 ? (
             <Header />
           ) :
@@ -113,7 +118,7 @@ class Metriz extends React.Component {
   downloadSession = async () => {
     // build JSON
     const session = this.state.session;
-    const fileName = "svg_ese_" + session.legalUnit.siren; // To update
+    const fileName =  session.legalUnit.siren ?  "svg_ese_" +  session.legalUnit.siren : "svg_ese_" + session.legalUnit.corporateName; // To update
     const json = JSON.stringify(session);
 
     // build download link & activate
@@ -163,7 +168,7 @@ class Metriz extends React.Component {
     switch (step) {
       case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} isLoading={this.state.loading} />)
       case 1: return (<ImportSection {...sectionProps} />)
-      case 2: return (<InitialStatesSection {...sectionProps} />)
+      case 2: return (<InitialStatesSection {...sectionProps} return={() => this.setStep(1)}/>)
       case 3: return (<CompaniesSection {...sectionProps} />)
       case 4: return (<StatementSection {...sectionProps} publish={() => this.setStep(5)} />)
       case 5: return (<PublishStatementSection {...sectionProps} return={() => this.setStep(4)} />)

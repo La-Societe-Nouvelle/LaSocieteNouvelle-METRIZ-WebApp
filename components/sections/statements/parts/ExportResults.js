@@ -13,13 +13,20 @@ const ExportResults = props => {
   const [isBuildingPDF, setisBuildingPDF] = useState(false);
   const [isBuildingZIP] = useState(false);
   const [printGrossImpact] = useState(["ghg","haz", "mat","nrg","was","wat",]);
+  const [isDisabled, setIsDisabled] = useState(true);
 
+  useEffect(() => {
+    if(props.session.validations.length > 0) {
+      setIsDisabled(false);
+    }
+  },[props])
 
   const handleDownloadZip = () => {
 
     if(!props.session.comparativeDivision) {
       props.session.comparativeDivision = "00";
     }
+   
     buildZip(props.session.validations, props.session, props.session.comparativeDivision);
 
   };
@@ -44,6 +51,7 @@ const ExportResults = props => {
         "#print-Production-" + indic,
         "#print-Consumption-" + indic,
         "#print-Value-" + indic,
+        "#print-CapitalConsumption-" + indic,
         printGrossImpact.includes(indic) ? "#piechart-" + indic : "" 
         
       );
@@ -60,7 +68,7 @@ const ExportResults = props => {
     // add
 
     const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-    const seIndic = ["eco", "art", "soc", "dis", "geq", "knw"];
+    const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
 
     const seOdds = ["5", "8", "9", "10", "12"];
     const envOdds = ["6", "7", "12", "13", "14", "15"];
@@ -184,7 +192,7 @@ const ExportResults = props => {
       
         </div>
  
-          <Button variant="secondary" size="sm" onClick={handleDownloadZip}>
+          <Button variant="secondary" size="sm" onClick={handleDownloadZip} disabled={isDisabled}>
           {isBuildingZIP ?
            <LoadingSpinner />
            : 

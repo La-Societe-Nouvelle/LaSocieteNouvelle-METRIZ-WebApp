@@ -5,7 +5,7 @@ import { compareToReference, printValue } from "../../utils/Utils";
 export const analysisTextWriterSOC = (session) =>
 {
   const {impactsData,
-         legalUnit,
+         comparativeData,
          financialData} = session;
   const {aggregates,
          expenseAccounts} = financialData;
@@ -26,7 +26,7 @@ export const analysisTextWriterSOC = (session) =>
   
   currentParagraph = [];
 
-  currentParagraph.push("Le taux de contribution de la valeur produite est de "+printValue(aggregates.production.footprint.indicators.soc.getValue(),0)+" %.")
+  currentParagraph.push("Le taux de contribution de la valeur produite est de "+printValue(aggregates.production.footprint.indicators.soc.value,0)+" %.")
   
   analysis.push(currentParagraph);
 
@@ -51,7 +51,7 @@ export const analysisTextWriterSOC = (session) =>
   currentParagraph = [];
   
   // résultat
-  currentParagraph.push(printValue(aggregates.intermediateConsumption.footprint.indicators.soc.getValue(),0)+" % du volume des consommations intermédiaires contribue aux acteurs d'intérêt social,"
+  currentParagraph.push(printValue(aggregates.intermediateConsumption.footprint.indicators.soc.value,0)+" % du volume des consommations intermédiaires contribue aux acteurs d'intérêt social,"
     +" soit un montant de "+printValue(aggregates.intermediateConsumption.footprint.indicators.soc.getGrossImpact(aggregates.intermediateConsumption.amount),0)+" €"
     +" et "+printValue(aggregates.intermediateConsumption.footprint.indicators.soc.getGrossImpact(aggregates.intermediateConsumption.amount)/aggregates.production.footprint.indicators.soc.getGrossImpact(aggregates.production.amount)*100,0)+" % de la contribution brute totale.");
   
@@ -66,7 +66,7 @@ export const analysisTextWriterSOC = (session) =>
 
   currentParagraph = [];
 
-  currentParagraph.push("L'amortissement des immobilisations contribue à hauteur de "+printValue(aggregates.capitalConsumption.footprint.indicators.soc.getGrossImpact(aggregates.capitalConsumption.amount),0)+" €, soit "+printValue(aggregates.capitalConsumption.footprint.indicators.soc.getValue(),0)+" % du volume des dotations aux amortissements.");
+  currentParagraph.push("L'amortissement des immobilisations contribue à hauteur de "+printValue(aggregates.capitalConsumption.footprint.indicators.soc.getGrossImpact(aggregates.capitalConsumption.amount),0)+" €, soit "+printValue(aggregates.capitalConsumption.footprint.indicators.soc.value,0)+" % du volume des dotations aux amortissements.");
 
   analysis.push(currentParagraph);
 

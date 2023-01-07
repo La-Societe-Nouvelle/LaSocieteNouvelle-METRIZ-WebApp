@@ -172,7 +172,6 @@ export const sendReportToSupport = async (errors) =>
   try 
   {
       const res = await fetch('/api/mail-sender', request);
-      console.log(res);
       return res;
   } 
   catch (error) {

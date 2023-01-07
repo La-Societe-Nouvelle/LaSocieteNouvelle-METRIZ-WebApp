@@ -5,7 +5,7 @@ import { compareToReference, printValue } from "../../utils/Utils";
 export const analysisTextWriterKNW = (session) =>
 {
   const {impactsData,
-         legalUnit,
+         comparativeData,
          financialData} = session;
   const {aggregates,
          expenseAccounts} = financialData;
@@ -26,7 +26,7 @@ export const analysisTextWriterKNW = (session) =>
   
   currentParagraph = [];
 
-  currentParagraph.push("Le taux de contribution de la valeur produite pour l'évolution des compétences et des connaissances est de "+printValue(aggregates.production.footprint.indicators.knw.getValue(),0)+" %,"
+  currentParagraph.push("Le taux de contribution de la valeur produite pour l'évolution des compétences et des connaissances est de "+printValue(aggregates.production.footprint.indicators.knw.value,0)+" %,"
     + " soit un montant total de "+printValue(aggregates.production.footprint.indicators.knw.getGrossImpact(aggregates.production.amount),0)+" €.")
   
   analysis.push(currentParagraph);
@@ -41,7 +41,7 @@ export const analysisTextWriterKNW = (session) =>
   }
   else 
   {
-    currentParagraph.push(printValue(aggregates.netValueAdded.footprint.indicators.knw.getValue(),0)+" % des charges internes contribuent à la formation ou à la recherche,"
+    currentParagraph.push(printValue(aggregates.netValueAdded.footprint.indicators.knw.value,0)+" % des charges internes contribuent à la formation ou à la recherche,"
       + " soit une contribution directe de "+printValue(impactsData.researchAndTrainingContribution,0)+" €.");
     currentParagraph.push("La contribution directe compte pour "+printValue(aggregates.netValueAdded.footprint.indicators.knw.getGrossImpact(aggregates.netValueAdded.amount)/aggregates.production.footprint.indicators.knw.getGrossImpact(aggregates.production.amount)*100,0)+" % de la contributon brute totale.")
   }
@@ -53,7 +53,7 @@ export const analysisTextWriterKNW = (session) =>
   currentParagraph = [];
   
   // résultat
-  currentParagraph.push("Au niveau des consommations intermédiaires, "+printValue(aggregates.intermediateConsumption.footprint.indicators.knw.getValue(),0)+" % de la valeur est contributrice,"
+  currentParagraph.push("Au niveau des consommations intermédiaires, "+printValue(aggregates.intermediateConsumption.footprint.indicators.knw.value,0)+" % de la valeur est contributrice,"
     + "soit un volume de "+printValue(aggregates.intermediateConsumption.footprint.indicators.knw.getGrossImpact(aggregates.intermediateConsumption.amount),0)+" €.");
   currentParagraph.push("Les consommations intermédiaires sont à l'origine de "+printValue(aggregates.intermediateConsumption.footprint.indicators.knw.getGrossImpact(aggregates.intermediateConsumption.amount)/aggregates.production.footprint.indicators.knw.getGrossImpact(aggregates.production.amount)*100,0)+" % de la contributon brute totale.")
 
@@ -68,7 +68,7 @@ export const analysisTextWriterKNW = (session) =>
   currentParagraph = [];
 
   currentParagraph.push("Enfin, l'amortissement des immobilisations contribue à hauteur de "+printValue(aggregates.capitalConsumption.footprint.indicators.knw.getGrossImpact(aggregates.capitalConsumption.amount),0)+" €,"
-    + " soit "+printValue(aggregates.capitalConsumption.footprint.indicators.knw.getValue(),0)+" % du volume des dotations aux amortissements"
+    + " soit "+printValue(aggregates.capitalConsumption.footprint.indicators.knw.value,0)+" % du volume des dotations aux amortissements"
     + " et "+printValue(aggregates.capitalConsumption.footprint.indicators.knw.getGrossImpact(aggregates.capitalConsumption.amount)/aggregates.production.footprint.indicators.knw.getGrossImpact(aggregates.production.amount)*100,0)+" % de la contribution brute total.");
 
   analysis.push(currentParagraph);

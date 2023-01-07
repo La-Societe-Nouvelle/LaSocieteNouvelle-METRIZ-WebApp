@@ -16,7 +16,16 @@
     #start .row .col {
         padding: 0 1em;
     }
+    .btn-group button {
+        padding: 0.2rem 0.3rem;
+    }
 
+}
+
+@media (min-width: 1200px) {
+    .modal-xl {
+        max-width: 1400px;
+    }
 }
 
 .container, .container-fluid{
@@ -38,4 +47,8 @@
 .vertical-lign {
     border-left : 2px solid $light;
     margin: 0 1rem;
+}
+
+.charts-container {
+    position: relative;
 }

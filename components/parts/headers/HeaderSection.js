@@ -14,7 +14,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
       <div className="top-bar">
         <ul className="nav">
           <li>
-            <a href="https://docs.lasocietenouvelle.org/" target="_blank">
+            <a href="https://docs.lasocietenouvelle.org/application-web" target="_blank">
             <i className="bi bi-book-fill"></i> Documentation
             </a>
           </li>

@@ -92,8 +92,14 @@ export class StatementDIS extends React.Component {
             onBlur={this.saveInfo} />
         </div>
         <div className="statement-validation">
+          <button className="btn btn-primary btn-sm" onClick={this.props.toImportDSN} disabled={hasEmployees ? false : true}>
+            <i className="bi bi-calculator"></i>
+            &nbsp;Import Fichiers DSN
+          </button>
           <button className="btn btn-primary btn-sm" onClick={this.props.toAssessment} disabled={hasEmployees ? false : true}>
-          <i className="bi bi-calculator"></i> Outil d'évaluation</button>
+            <i className="bi bi-calculator"></i>
+            &nbsp;Outil d'évaluation
+          </button>
           <button disabled={isDisabled} className="btn btn-secondary btn-sm"
             onClick={this.onValidate}>Valider</button>
         </div>

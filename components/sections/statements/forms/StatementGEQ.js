@@ -23,8 +23,6 @@ export class StatementGEQ extends React.Component {
     };
   }
 
-
-
   componentDidUpdate() {
     if (!this.props.impactsData.hasEmployees && this.state.wageGap == 0) {
       this.state.isDisabled = false;
@@ -53,7 +51,6 @@ export class StatementGEQ extends React.Component {
   render() {
     const { hasEmployees } = this.props.impactsData;
     const { wageGap, info, isDisabled } = this.state;
-
 
     return (
       <div className="statement">
@@ -109,6 +106,14 @@ export class StatementGEQ extends React.Component {
         <div className="statement-validation">
           <button
             className="btn btn-primary btn-sm"
+            onClick={this.props.toImportDSN}
+            disabled={hasEmployees ? false : true}
+          >
+            <i className="bi bi-calculator"></i>
+            &nbsp;Import Fichiers DSN
+          </button>
+          <button
+            className="btn btn-primary btn-sm"
             onClick={this.props.toAssessment}
             disabled={hasEmployees ? false : true}
           >
@@ -143,7 +148,7 @@ export class StatementGEQ extends React.Component {
       wageGap: valueOrDefault(this.props.impactsData.wageGap, ""),
     });
     this.props.onUpdate("geq");
-    this.props.onUpdate("dis");
+    this.props.onUpdate("idr");
   };
 
   updateWageGap = (input) => {

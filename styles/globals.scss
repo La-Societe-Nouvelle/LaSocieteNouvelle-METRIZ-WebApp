@@ -20,6 +20,7 @@
 body {
   background: #fbfbff;
   overflow-x: hidden;
+  color : $primary;
 }
 
 hr {
@@ -179,4 +180,8 @@ i.error {
 }
 .hidden canvas {
   min-height: 500px;
+}
+
+canvas{
+  width: 100% !important;
 }

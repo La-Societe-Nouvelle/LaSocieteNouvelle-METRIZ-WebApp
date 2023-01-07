@@ -1,0 +1,27 @@
+{
+  "declaration": {
+    "nature": {
+      "01": "DSN Mensuelle",
+      "02": "Signalement Fin du contrat de travail",
+      "04": "Signalement Arrêt de travail",
+      "05": "Signalement Reprise suite à arrêt de travail"
+    }
+  },
+  "activite": {
+    "uniteMesure": {
+      "10": "heure",
+      "12": "journée",
+      "20": "forfait jour",
+      "21": "forfait heure",
+      "31": "à la pige",
+      "32": "à la vacation",
+      "33": "à la tâche",
+      "35": "heures intermittents du spectacle",
+      "36": "cahcets groupés",
+      "37": "cachets isolés",
+      "38": "jour CRPNPAC",
+      "39": "cachet",
+      "40": "jours calendaires de la période d’emploi pris en compte dans le calcul du plafond de Sécurité Sociale"
+    }
+  }
+}
