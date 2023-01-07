@@ -47,6 +47,7 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 // Fetch API data
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
+import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
 
 
 const ResultSection = (props) => {
@@ -232,6 +233,18 @@ const ResultSection = (props) => {
             }
           >
             Télécharger le rapport <i className="bi bi-download"></i>
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() =>
+              exportIndicXLSX(
+                indic,
+                session,
+                comparativeDivision
+              )
+            }
+          >
+            Télécharger les données <i className="bi bi-download"></i>
           </Button>
         </div>
       </div>

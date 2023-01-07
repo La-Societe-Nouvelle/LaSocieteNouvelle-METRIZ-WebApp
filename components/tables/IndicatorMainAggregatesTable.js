@@ -9,7 +9,7 @@ import { Table } from "react-bootstrap";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
-export const IndicatorMainAggregatesTable = ({ indic, session }) => {
+export const IndicatorMainAggregatesTable = ({ indic, session }) => { 
 
   const financialData = session.financialData;
 
