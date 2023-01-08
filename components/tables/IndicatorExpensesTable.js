@@ -93,7 +93,7 @@ export class IndicatorExpensesTable extends React.Component {
 
 }
 
-const getExpensesGroupByAccount = (expenses) =>  
+export const getExpensesGroupByAccount = (expenses) =>  
 {
     let expensesByAccount = {};
     expenses.forEach(({account,accountLib,amount}) => 

@@ -346,13 +346,13 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
 /* ----- GROUP FUNCTIONS ----- */
 
 // External expenses
-const getIntermediateConsumptionsAggregatesGroups = (financialData) => {
+export const getIntermediateConsumptionsAggregatesGroups = (financialData) => {
   let expensesGroups = financialData.getIntermediateConsumptionsAggregates();
   return expensesGroups;
 };
 
 // Depreciation expenses
-const getFixedCapitalConsumptionsAggregatesGroups = (financialData) => {
+export const getFixedCapitalConsumptionsAggregatesGroups = (financialData) => {
   let expensesGroups = financialData.getFixedCapitalConsumptionsAggregates();
   return expensesGroups;
 };
