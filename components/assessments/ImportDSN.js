@@ -320,46 +320,81 @@ export class ImportDSN extends React.Component {
 
 /* -------------------- FORMULAS -------------------- */
 
-//
-const getIndividualsData = async (declarations) => {
+/** Individuals Data -> return array with each individual and data needed for assessment, from DSN files
+ *  Elements in json for each individual :
+ *    - id
+ *    - sex (1 for man & 2 for woman)
+ *    - pay
+ *    - hours (nb)
+ *    - hourlyRate
+ */
+
+const getIndividualsData = async (declarations) => 
+{
+  // array of data
   let individualsData = [];
-  declarations.forEach((declaration) => {
+
+  declarations.forEach((declaration) => 
+  {
+    // list of individuals
     let individus = declaration.entreprise.etablissement.individus;
-    individus.forEach((individu) => {
+    
+    individus.forEach((individu) => 
+    {
+      // get id
       let id = individu.identifiant || individu.identifiantTechnique;
+      // get sex
       let sex = individu.sexe
-        ? parseInt(individu.sexe)
-        : parseInt(individu.identifiant.charAt(0));
+        ? parseInt(individu.sexe)                   // use "sexe" variable
+        : parseInt(individu.identifiant.charAt(0)); // use first character of social security id
+      
       let montantDeclaration = 0;
       let heuresDeclaration = 0;
 
+      // versements
       let versements = individu.versements;
-      versements.forEach((versement) => {
-        // Rémunérations
+      versements.forEach((versement) => 
+      {
+        // Rémunérations ------------------------------------ //
+
         let remunerations = versement.remunerations;
+
+        // get total amount
+        // -> type 001 : "Rémunération brute non plafonnée"
         remunerations
           .filter((remuneration) => remuneration.type == "001")
           .forEach((remuneration) => {
             montantDeclaration += parseFloat(remuneration.montant);
           });
+
+        // get nb hours
+        // -> type 002 : "Salaire brut soumis à contributions d'Assurance chômage"
         remunerations
           .filter((remuneration) => remuneration.type == "002")
           .forEach((remuneration) => {
+            // retrieve contract & measure unit
             let contrat = individu.contrats.filter(
               (contrat) => contrat.numero == remuneration.numeroContrat
             )[0];
             let uniteContrat = contrat.uniteMesure;
+            // browse activities
+            // -> type 01 : "Travail rémunéré"
             let activites = remuneration.activites;
             activites
               .filter((activite) => activite.type == "01")
               .forEach((activite) => {
                 heuresDeclaration += getQuotiteTravail(
-                  parseInt(activite.mesure),
-                  activite.uniteMesure,
-                  uniteContrat
+                  parseInt(activite.mesure),  // quantity
+                  activite.uniteMesure,       // unit (in activity bloc)
+                  uniteContrat                // unit (in contract bloc)
                 );
               });
           });
+
+        // -> type 012 : "Heures d’équivalence" 
+        // -> type 013 : "Heures d’habillage, déshabillage, pause"
+        // -> type 017 : "Heures supplémentaires ou complémentaires aléatoires"
+        // -> type 018 : "Heures supplémentaires structurelles"
         remunerations
           .filter((remuneration) =>
             ["012", "013", "017", "018"].includes(remuneration.type)
@@ -368,6 +403,7 @@ const getIndividualsData = async (declarations) => {
             montantDeclaration += parseFloat(remuneration.montant);
             heuresDeclaration += parseInt(remuneration.nombreHeures);
           });
+        
         // Primes
         let primes = versement.primes;
         primes
