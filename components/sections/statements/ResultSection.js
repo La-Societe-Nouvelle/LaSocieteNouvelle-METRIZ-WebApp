@@ -234,18 +234,6 @@ const ResultSection = (props) => {
           >
             Télécharger le rapport <i className="bi bi-download"></i>
           </Button>
-          <Button
-            variant="secondary"
-            onClick={() =>
-              exportIndicXLSX(
-                indic,
-                session,
-                comparativeDivision
-              )
-            }
-          >
-            Télécharger les données <i className="bi bi-download"></i>
-          </Button>
         </div>
       </div>
       {/* ---------- Main aggregate and expenses table ----------  */}
@@ -278,6 +266,22 @@ const ResultSection = (props) => {
                 <IndicatorExpensesTable session={session} indic={indic} />
               </Tab>
             </Tabs>
+             <div className="text-end">
+              <Button
+              variant="tertiary"
+              size="sm"
+              className="me-0"
+              onClick={() =>
+                exportIndicXLSX(
+                  indic,
+                  session,
+                  comparativeDivision
+                )
+              }
+            >
+              Télécharger les données <i className="bi bi-download"></i>
+            </Button>
+              </div> 
           </Col>
           {/* ----------Gross Impact Pie Chart ----------  */}
 
