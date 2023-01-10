@@ -11,31 +11,39 @@ import { DSNDataReader, DSNFileReader } from "/src/readers/DSNReader";
 
 import metaRubriques from "/lib/rubriquesDSN";
 
-const primesIncludedInPay = ["026", "027", "028", "029", "030"];
+const primesIncludedInPay = [
+  // ginore : Indemnités fin de contrat & assimilés
+  "026",  // Prime exceptionnelle liée à l'activité avec période de rattachement spécifique
+  "027",  // Prime liée à l'activité avec période de rattachement spécifique
+  "028",  // Prime non liée à l'activité
+  "029",  // Prime liée au rachat des jours de RTT avec période de rattachement spécifique
+  "030"   // Prime rachat CET
+];
 const revenuAutresIncludedInPay = [
-  "02",
-  "03",
-  "04",
-  "05",
-  "06",
-  "10",
-  "11",
-  "12",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "25",
-  "26",
-  "27",
-  "31",
-  "33",
-  "90",
-  "91",
-  "92",
-  "93",
+  "02",   // Avantage en nature : repas
+  "03",   // Avantage en nature : logement
+  "04",   // Avantage en nature : véhicule
+  "05",   // Avantage en nature : NTIC
+  "06",   // Avantage en nature : autres
+  // ignore : Frais professionnels remboursés &assimilés
+  "10",   // Déduction forfaitaire spécifique
+  "11",   // Participation y compris supplément
+  "12",   // ntéressement y compris supplément
+  "14",   // Abondement au plan d'épargne entreprise (PEE)
+  "15",   // Abondement au plan d'épargne interentreprises (PEI)
+  "16",   // Abondement au plan d'épargne pour la retraite collectif (PERCO)
+  "17",   // Participation patronale au financement des titres-restaurant
+  "18",   // Participation patronale aux frais de transports publics
+  "19",   // Participation patronale aux frais de transports personnels
+  "25",   // Droit d'auteur
+  "26",   // Droit de doublage
+  "27",   // Droit de rediffusion
+  "31",   // Avantages de préretraite versés par l’employeur
+  "33",   // Sommes provenant d'un CET et réaffectées à un PERCO ou à un régime de retraite supplémentaire
+  "90",   // Participation au financement des services à la personne
+  "91",   // Montant de la participation de l'employeur aux chèques vacances
+  "92",   // Cotisation frais de santé
+  "93"    // Cotisation prévoyance et retraite supplémentaire
 ];
 
 /* -------------------- IMPORT DSN FILE -------------------- */
@@ -411,7 +419,9 @@ const getIndividualsData = async (declarations) =>
           .forEach((prime) => {
             montantDeclaration += parseFloat(prime);
           });
+        
         // Autres revenus
+        //  -
         let revenuAutres = versement.revenuAutres;
         revenuAutres
           .filter((revenuAutre) =>
@@ -422,6 +432,7 @@ const getIndividualsData = async (declarations) =>
           });
       });
 
+      // add data to individuals array
       let individual = individualsData.filter(
         (individual) => individual.id == id
       )[0];
@@ -439,6 +450,7 @@ const getIndividualsData = async (declarations) =>
     });
   });
 
+  // add hourly rate
   individualsData.forEach(
     (individual) =>
       (individual.hourlyRate =
@@ -450,10 +462,14 @@ const getIndividualsData = async (declarations) =>
   return individualsData;
 };
 
-const getInterdecileRange = async (individualsData) => {
+const getInterdecileRange = async (individualsData) => 
+{
+  // sort individuals by hourly rate
   individualsData = individualsData
     .filter((individual) => individual.hourlyRate != null)
     .sort((a, b) => a.hourlyRate - b.hourlyRate);
+  
+  // get nb total hours
   let totalHours = getSumItems(
     individualsData.map((individual) => individual.hours)
   );
@@ -492,15 +508,15 @@ const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
   switch (unite) {
     case null:
       return 0;
-    case "10":
+    case "10":  // heure
       return mesure;
-    case "12":
+    case "12":  // journée
       return mesure * 7;
-    case "20":
+    case "20":  // forfait jour
       return mesure * 7;
-    case "21":
+    case "21":  // forfait heure
       return mesure;
-    case "35":
+    case "35":  // heures intermittents du spectacle
       return mesure;
     default:
       return 0;
