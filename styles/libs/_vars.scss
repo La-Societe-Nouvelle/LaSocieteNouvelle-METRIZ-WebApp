@@ -15,12 +15,15 @@ $info:  #8994d1;
 // Font.
 $font-family : 'Raleway',Helvetica,sans-serif !default;
 $font-family-text : 'Roboto', sans-serif !default;
+$body-font-family : $font-family-text;
+$font-sans-serif :  'Roboto', sans-serif !default;
 $font-weight : 400 !default;
 $font-weight-bold : 700 !default;
 $letter-spacing : 0.3em !default;
 $text-color : #212529;
 $headings-color: $primary;
-$body-color : $text-color;
+$body-color : $text-color; 
+$body-bg : $bg-light;
 
 $input-color : lighten(#191558, 10%);
 $input-bg : #ffffff;
@@ -29,5 +32,10 @@ $table-hover-bg : $bg-light;
 $table-border-color : #cac9de;
 $input-font-size : 0.9rem;
 $input-group-addon-bg : #f4f4fb;
+
+
+
+ $hr-margin-y : 2rem;
+ $hr-color : #dbdef1 ; 
 
 @import "~bootstrap/scss/bootstrap";
