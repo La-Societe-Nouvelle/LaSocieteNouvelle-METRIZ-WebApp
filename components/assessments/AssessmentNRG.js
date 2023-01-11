@@ -196,9 +196,39 @@ export class AssessmentNRG extends React.Component
                         value={itemData.fuelCode}
                         onChange={(event) => this.changeNrgProduct(itemId, event.target.value)}
                       >
-                        {Object.entries(fuels).filter(([_, data]) => data.type == "fossil").map(([key, data]) => (
-                          <option key={itemId + "_" + key} value={key}>{data.label}</option>
-                        ))}
+                        {Object.entries(fuels) 
+                            .filter(([_, data]) => data.type == "fossil")
+                            .map(([_, data]) => data.group)
+                            .filter(
+                              (value, index, self) =>
+                                index ===
+                                self.findIndex((item) => item === value)
+                            )
+                            .sort((a, b) =>
+                              a != "Autres" && b != "Autres"
+                                ? a.localeCompare(b)
+                                : a == "Autres"
+                                ? 1
+                                : -1
+                            )
+                            .map((groupName) => (
+                              <optgroup label={groupName} key={groupName}>
+                                {Object.entries(fuels)
+                                  .filter(
+                                    ([_, data]) =>
+                                      data.type == "fossil" &&
+                                      data.group == groupName
+                                  )
+                                  .map(([key, data]) => (
+                                    <option
+                                      key={itemId + "_" + key}
+                                      value={key}
+                                    >
+                                      {data.label}
+                                    </option>
+                                  ))}
+                              </optgroup>
+                            ))}
                       </select>
                     </Col>
                     <Col lg="2">
@@ -264,13 +294,39 @@ export class AssessmentNRG extends React.Component
                     <option key="none" value="none">
                       ---
                     </option>
-                    {Object.entries(fuels)
-                      .filter(([_, data]) => data.type == "fossil")
-                      .map(([key, data]) => (
-                        <option key={key} value={key}>
-                          {data.label}
-                        </option>
-                      ))}
+                    {Object.entries(fuels) 
+                            .filter(([_, data]) => data.type == "fossil")
+                            .map(([_, data]) => data.group)
+                            .filter(
+                              (value, index, self) =>
+                                index ===
+                                self.findIndex((item) => item === value)
+                            )
+                            .sort((a, b) =>
+                              a != "Autres" && b != "Autres"
+                                ? a.localeCompare(b)
+                                : a == "Autres"
+                                ? 1
+                                : -1
+                            )
+                            .map((groupName) => (
+                              <optgroup label={groupName} key={groupName}>
+                                {Object.entries(fuels)
+                                  .filter(
+                                    ([_, data]) =>
+                                      data.type == "fossil" &&
+                                      data.group == groupName
+                                  )
+                                  .map(([key, data]) => (
+                                    <option
+                                      key={"_" + key}
+                                      value={key}
+                                    >
+                                      {data.label}
+                                    </option>
+                                  ))}
+                              </optgroup>
+                            ))}
                   </select>
                 </td>
               </tr>
@@ -321,12 +377,38 @@ export class AssessmentNRG extends React.Component
                             this.changeNrgProduct(itemId, event.target.value)
                           }
                         >
-                          {Object.entries(fuels)
+                          {Object.entries(fuels) 
                             .filter(([_, data]) => data.type == "biomass")
-                            .map(([key, data]) => (
-                              <option key={itemId + "_" + key} value={key}>
-                                {data.label}
-                              </option>
+                            .map(([_, data]) => data.group)
+                            .filter(
+                              (value, index, self) =>
+                                index ===
+                                self.findIndex((item) => item === value)
+                            )
+                            .sort((a, b) =>
+                              a != "Autres" && b != "Autres"
+                                ? a.localeCompare(b)
+                                : a == "Autres"
+                                ? 1
+                                : -1
+                            )
+                            .map((groupName) => (
+                              <optgroup label={groupName} key={groupName}>
+                                {Object.entries(fuels)
+                                  .filter(
+                                    ([_, data]) =>
+                                      data.type == "biomass" &&
+                                      data.group == groupName
+                                  )
+                                  .map(([key, data]) => (
+                                    <option
+                                      key={itemId + "_" + key}
+                                      value={key}
+                                    >
+                                      {data.label}
+                                    </option>
+                                  ))}
+                              </optgroup>
                             ))}
                         </select>
                       </Col>
@@ -395,13 +477,39 @@ export class AssessmentNRG extends React.Component
                     <option key="none" value="none">
                       ---
                     </option>
-                    {Object.entries(fuels)
-                      .filter(([_, data]) => data.type == "biomass")
-                      .map(([key, data]) => (
-                        <option key={key} value={key}>
-                          {data.label}
-                        </option>
-                      ))}
+                    {Object.entries(fuels) 
+                            .filter(([_, data]) => data.type == "biomass")
+                            .map(([_, data]) => data.group)
+                            .filter(
+                              (value, index, self) =>
+                                index ===
+                                self.findIndex((item) => item === value)
+                            )
+                            .sort((a, b) =>
+                              a != "Autres" && b != "Autres"
+                                ? a.localeCompare(b)
+                                : a == "Autres"
+                                ? 1
+                                : -1
+                            )
+                            .map((groupName) => (
+                              <optgroup label={groupName} key={groupName}>
+                                {Object.entries(fuels)
+                                  .filter(
+                                    ([_, data]) =>
+                                      data.type == "biomass" &&
+                                      data.group == groupName
+                                  )
+                                  .map(([key, data]) => (
+                                    <option
+                                      key={"_" + key}
+                                      value={key}
+                                    >
+                                      {data.label}
+                                    </option>
+                                  ))}
+                              </optgroup>
+                            ))}
                   </select>
                 </td>
               </tr>
