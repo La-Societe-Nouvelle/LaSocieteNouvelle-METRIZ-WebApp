@@ -242,7 +242,7 @@
   },
   "fuel16": {
     "label": "HFO (Heavy Fuel Oil) - ISO 8217 classes RME à RMK",
-    "group": "Carburant - usage maritime et fuvial",
+    "group": "Carburant - usage maritime et fluvial",
     "usageSourcesFixes": false,
     "usageSourcesMobiles": true,
     "category": "liquides",
@@ -258,7 +258,7 @@
   },
   "fuel17": {
     "label": "LFO (Light Fuel Oil) - ISO 8217 classes RMA à RMD (maritime)",
-    "group": "Carburant - usage maritime et fuvial",
+    "group": "Carburant - usage maritime et fluvial",
     "usageSourcesFixes": false,
     "usageSourcesMobiles": true,
     "category": "liquides",
@@ -274,7 +274,7 @@
   },
   "fuel18": {
     "label": "MDO (Marine Diesel Oil) - ISO 8217 classes DMX à DMC",
-    "group": "Carburant - usage maritime et fuvial",
+    "group": "Carburant - usage maritime et fluvial",
     "usageSourcesFixes": false,
     "usageSourcesMobiles": true,
     "category": "liquides",

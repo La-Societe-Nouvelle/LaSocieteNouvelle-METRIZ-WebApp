@@ -32,6 +32,24 @@ const emissionFactors = {
   ...landChanges,
 };
 
+const orderGroupsAssessmentItem_1 = [
+  "Gaz",
+  "Fioul",
+  "Bio-gaz",
+  "Biomasse",
+  "Charbon",
+  "Autres"
+]
+
+const orderGroupsAssessmentItem_2 = [
+  "Carburant - usage routier",
+  "Bio-carburants",
+  "Gaz",
+  "Carburant - usage maritime et fluvial",
+  "Carburant - usage aérien",
+  "Autres"
+]
+
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT GHG -------------------- */
 /* -------------------------------------------------------- */
@@ -147,13 +165,7 @@ export class AssessmentGHG extends React.Component {
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) =>
-                              a != "Autres" && b != "Autres"
-                                ? a.localeCompare(b)
-                                : a == "Autres"
-                                ? 1
-                                : -1
-                            )
+                            .sort((a, b) => orderGroupsAssessmentItem_1.indexOf(a) - orderGroupsAssessmentItem_1.indexOf(b))
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -241,13 +253,7 @@ export class AssessmentGHG extends React.Component {
                         (value, index, self) =>
                           index === self.findIndex((item) => item === value)
                       )
-                      .sort((a, b) =>
-                        a != "Autres" && b != "Autres"
-                          ? a.localeCompare(b)
-                          : a == "Autres"
-                          ? 1
-                          : -1
-                      )
+                      .sort((a, b) => orderGroupsAssessmentItem_1.indexOf(a) - orderGroupsAssessmentItem_1.indexOf(b))
                       .map((groupName) => (
                         <optgroup label={groupName} key={groupName}>
                           {Object.entries(fuels)
@@ -316,13 +322,7 @@ export class AssessmentGHG extends React.Component {
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) =>
-                              a != "Autres" && b != "Autres"
-                                ? a.localeCompare(b)
-                                : a == "Autres"
-                                ? 1
-                                : -1
-                            )
+                            .sort((a, b) => orderGroupsAssessmentItem_2.indexOf(a) - orderGroupsAssessmentItem_2.indexOf(b))
                             .map((groupName) => (
                               <optgroup label={groupName}  key={groupName}>
                                 {Object.entries(fuels)
@@ -409,13 +409,7 @@ export class AssessmentGHG extends React.Component {
                         (value, index, self) =>
                           index === self.findIndex((item) => item === value)
                       )
-                      .sort((a, b) =>
-                        a != "Autres" && b != "Autres"
-                          ? a.localeCompare(b)
-                          : a == "Autres"
-                          ? 1
-                          : -1
-                      )
+                      .sort((a, b) => orderGroupsAssessmentItem_2.indexOf(a) - orderGroupsAssessmentItem_2.indexOf(b))
                       .map((groupName) => (
                         <optgroup label={groupName}  key={groupName}>
                           {Object.entries(fuels)

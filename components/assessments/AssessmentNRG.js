@@ -17,6 +17,22 @@ import {
   getTotalGhgEmissionsUncertainty,
 } from "./AssessmentGHG";
 
+const orderGroupsFossilFuels = [
+  "Gaz",
+  "Fioul",
+  "Carburant - usage routier",
+  "Carburant - usage maritime et fluvial",
+  "Carburant - usage aérien",
+  "Charbon",
+  "Autres",
+]
+
+const orderGroupsBiomassFuels = [
+  "Biomasse",
+  "Bio-gaz",
+  "Bio-carburants"
+]
+
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT NRG -------------------- */
 /* -------------------------------------------------------- */
@@ -204,13 +220,7 @@ export class AssessmentNRG extends React.Component
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) =>
-                              a != "Autres" && b != "Autres"
-                                ? a.localeCompare(b)
-                                : a == "Autres"
-                                ? 1
-                                : -1
-                            )
+                            .sort((a, b) => orderGroupsFossilFuels.indexOf(a) - orderGroupsFossilFuels.indexOf(b))
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -302,13 +312,7 @@ export class AssessmentNRG extends React.Component
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) =>
-                              a != "Autres" && b != "Autres"
-                                ? a.localeCompare(b)
-                                : a == "Autres"
-                                ? 1
-                                : -1
-                            )
+                            .sort((a, b) => orderGroupsFossilFuels.indexOf(a) - orderGroupsFossilFuels.indexOf(b))
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -385,13 +389,7 @@ export class AssessmentNRG extends React.Component
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) =>
-                              a != "Autres" && b != "Autres"
-                                ? a.localeCompare(b)
-                                : a == "Autres"
-                                ? 1
-                                : -1
-                            )
+                            .sort((a, b) => orderGroupsBiomassFuels.indexOf(a) - orderGroupsBiomassFuels.indexOf(b))
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -485,13 +483,7 @@ export class AssessmentNRG extends React.Component
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) =>
-                              a != "Autres" && b != "Autres"
-                                ? a.localeCompare(b)
-                                : a == "Autres"
-                                ? 1
-                                : -1
-                            )
+                            .sort((a, b) => orderGroupsBiomassFuels.indexOf(a) - orderGroupsBiomassFuels.indexOf(b))
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
