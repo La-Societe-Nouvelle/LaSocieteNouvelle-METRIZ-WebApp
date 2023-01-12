@@ -222,7 +222,7 @@ export const DSNDataReader = async (dataDSN) =>
 
     // Revenu autre ------------------------------------- //
 
-    else if (blocCode=="S21.G00.53")
+    else if (blocCode=="S21.G00.54")
     {
       let bloc = getBloc(rows,index,blocCode);
       let revenuAutre = {
