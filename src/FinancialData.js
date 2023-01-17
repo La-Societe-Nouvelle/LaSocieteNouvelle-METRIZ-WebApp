@@ -206,7 +206,6 @@ export class FinancialData {
     getProduction = () => this.getRevenue() + this.getStoredProduction() + this.getImmobilisedProduction()
     getAmountIntermediateConsumption = () => this.getAmountExternalExpenses() - this.getVariationPurchasesStocks()
     getGrossValueAdded = () => this.getProduction() - this.getAmountIntermediateConsumption()
-    getAmountCapitalConsumption = () => this.getAmountDepreciationExpenses()
     getNetValueAdded = () => this.getGrossValueAdded() - this.getAmountDepreciationExpenses()
 
     // PRODUCTION ---------------------------------------------- //
@@ -218,35 +217,21 @@ export class FinancialData {
     // EXPENSES ------------------------------------------------ //
 
     // External penses
-    getAmountExternalExpenses = () => getSumItems(this.expenses.map(expense => expense.amount))
-    getAmountExpensesByAccountAux = (accountNum) => getSumItems(this.expenses.filter(expense => expense.accountAux.startsWith(accountNum)).map(expense => expense.amount))
+    getAmountExternalExpenses = () => getSumItems(this.expenses.map(expense => expense.amount), 2)
     
     // Depreciation expenses
-    getAmountDepreciationExpenses = () => getSumItems(this.depreciationExpenses.map(expense => expense.amount))
-    getAmountOperatingDepreciationExpenses = () => getSumItems(this.depreciationExpenses.filter(expense => /^6811/.test(expense.account)).map(expense => expense.amount))
-    getAmountExceptionalDepreciationExpenses = () => getSumItems(this.depreciationExpenses.filter(expense => /^6871/.test(expense.account)).map(expense => expense.amount))
-    getAmountDepreciationExpensesByAccountAux = (accountNum) => getSumItems(this.depreciationExpenses.filter(expense => expense.accountAux.startsWith(accountNum)).map(expense => expense.amount))
+    getAmountDepreciationExpenses = () => getSumItems(this.depreciationExpenses.map(expense => expense.amount), 2)
 
     // STOCKS -------------------------------------------------- //
     
-    // All stocks
-    getVariationStocks = () => this.getFinalAmountStocks() - this.getInitialAmountStocks()
-    getInitialAmountStocks = () => getPrevAmountItems(this.stocks)
-    getFinalAmountStocks = () => getAmountItems(this.stocks)
-
     // Purchases stocks
     getVariationPurchasesStocks = () => this.getFinalAmountPurchasesStocks() - this.getInitialAmountPurchasesStocks()
-    getInitialAmountPurchasesStocks = () => this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.prevAmount).reduce((a,b) => a + b,0)
-    getFinalAmountPurchasesStocks = () => this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.amount).reduce((a,b) => a + b,0)
-
-    // Production stocks
-    getVariationProductionStocks = () => this.getFinalAmountProductionStocks() - this.getInitialAmountProductionStocks()
-    getInitialAmountProductionStocks = () => this.stocks.filter(stock => stock.isProductionStock).map(stock => stock.prevAmount).reduce((a,b) => a + b,0)
-    getFinalAmountProductionStocks = () => this.stocks.filter(stock => stock.isProductionStock).map(stock => stock.amount).reduce((a,b) => a + b,0)
+    getInitialAmountPurchasesStocks = () => getSumItems(this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.prevAmount).reduce((a,b) => a + b,0), 2)
+    getFinalAmountPurchasesStocks = () => getSumItems(this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.amount).reduce((a,b) => a + b,0), 2)
     
     // Net amount
-    getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.account)))
-    getFinalNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.amount - this.getFinalValueLossStock(stock.account)))
+    getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.account)), 2)
+    getFinalNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.amount - this.getFinalValueLossStock(stock.account)), 2)
 
     // Value loss
     getInitialValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount)[0] || 0;
@@ -254,14 +239,10 @@ export class FinancialData {
 
 
     // IMMOBILISATIONS ----------------------------------------- //
-    
-    // Net amount
-    getInitialNetAmountImmobilisations = () => this.immobilisations.map(immobilisation => immobilisation.prevAmount - this.getInitialValueLossImmobilisation(immobilisation.account)).reduce((a,b) => a + b,0)
-    getFinalNetAmountImmobilisations = () => this.immobilisations.map(immobilisation => immobilisation.amount - this.getFinalValueLossImmobilisation(immobilisation.account)).reduce((a,b) => a + b,0)
-    
+        
     // Value loss
-    getInitialValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount))
-    getFinalValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux==accountNum).map(depreciation => depreciation.amount))
+    getInitialValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount), 2)
+    getFinalValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux==accountNum).map(depreciation => depreciation.amount), 2)
 
     // OTHER KEY FIGURES --------------------------------------- //
 
@@ -277,7 +258,6 @@ export class FinancialData {
 
     getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountOperatingExpenses();
 
-    
     // Financial section
     
     getAmountFinancialIncomes = () => this.financialIncomes;
@@ -303,22 +283,15 @@ export class FinancialData {
     getStock = (id) => this.stocks.filter(stock => stock.id==id)[0]
     getStockByAccount = (account) => this.stocks.filter(stock => stock.account==account)[0]
     updateStock = (nextProps) => this.getStock(nextProps.id).update(nextProps)    
-
-    /* ----- Stock Variation ----- */
       
-    getStockVariation = (id) => this.stockVariations.filter(expense => expense.id==id)[0]    
-    updateStockVariation = (nextProps) => this.getStockVariation(nextProps.id).update(nextProps)    
-
     /* ---------- Expenses ---------- */
 
     getExpense = (id) => this.expenses.filter(expense => expense.id==id)[0]
-    updateExpense = (nextProps) => this.getExpense(nextProps.id).update(nextProps)
 
     /* ---------- Depreciations ---------- */
     
     getDepreciationExpense = (id) => this.depreciationExpenses.filter(expense => expense.getId()==id)[0]
     getDepreciationExpenseByAccountAux = (accountNum) => this.depreciationExpenses.filter(expense => expense.accountAux==accountNum)[0]    
-    updateDepreciationExpense = (nextProps) => this.getAmountDepreciationExpense(nextProps.id).update(nextProps)
 
     /* ---------- Immobilisations ---------- */
 
@@ -330,27 +303,12 @@ export class FinancialData {
     
     getDepreciation = (id) => this.depreciations.filter(depreciation => depreciation.id==id)[0]
     getDepreciationByAccount = (accountNum) => this.depreciations.filter(depreciation => depreciation.account==accountNum)[0]
-    updateDepreciation = (nextProps) => this.getDepreciation(nextProps.id).update(nextProps)
-
-    /* ---------- Investments ---------- */
-    
-    getInvestment = (id) => this.investments.filter(investment => investment.id==id)[0]
-    updateInvestment = (nextProps) => this.getInvestment(nextProps.id).update(nextProps)    
-    
+        
     /* ---------- Companies ---------- */
 
     getCompany = (id) => this.companies.filter(company => company.id==id)[0]
     getCompanyByAccount = (accountNum) => this.companies.filter(company => company.account == accountNum)[0]
     getCompanyByName = (name) => this.companies.filter(company => company.corporateName==name)[0]
-    
-    // Update company
-    async updateCompany(nextProps) 
-    {
-        // Retrieve company
-        let company = this.getCompany(nextProps.id);
-        // Update company
-        await company.update(nextProps);
-    }
 
     updateCorporateId = (account,corporateName,corporateId) => 
     {

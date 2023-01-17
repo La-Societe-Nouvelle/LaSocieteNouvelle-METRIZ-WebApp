@@ -18,6 +18,8 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
 {
     let indicator = new Indicator({indic});
     
+    let precision = metaIndics[indic].nbDecimals;
+
     let totalAmount = 0.0;
     let grossImpact = 0.0;
     let grossImpactMax = 0.0;
@@ -41,8 +43,8 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
     })
 
     if (!missingData && totalAmount != 0) { 
-        indicator.setValue(roundValue(grossImpact/totalAmount,metaIndics[indic].nbDecimals));
-        let uncertainty = Math.abs(grossImpact) > 0 ? roundValue(Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100 ,0) : 0;
+        indicator.setValue(roundValue(grossImpact/totalAmount, precision));
+        let uncertainty = Math.abs(grossImpact) > 0 ? roundValue(Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) ) / Math.abs(grossImpact) * 100, 0) : 0;
         indicator.setUncertainty(uncertainty);
     } else if (elements.length == 0) {
         indicator.setValue(0); 
@@ -60,6 +62,8 @@ export function buildIndicatorMerge(indicatorA,amountA,
 {
     let indicator = new Indicator({indic: indicatorA.getIndic()});
 
+    let precision = metaIndics[indicator.indic].nbDecimals;
+
     if (indicatorA.getValue()!=null && amountA!=null && amountA!=0
      && indicatorB.getValue()!=null && amountB!=null && amountB!=0)
     {
@@ -71,8 +75,8 @@ export function buildIndicatorMerge(indicatorA,amountA,
                            + Math.min(indicatorB.getValueMax()*amountB, indicatorB.getValueMin()*amountB);
 
         if (totalAmount != 0) {
-            indicator.setValue(roundValue(grossImpact/totalAmount,metaIndics[indicator.indic].nbDecimals));
-            let uncertainty = Math.abs(grossImpact) > 0 ? roundValue(Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) *100,0) : 0;
+            indicator.setValue(roundValue(grossImpact/totalAmount, precision));
+            let uncertainty = Math.abs(grossImpact) > 0 ? roundValue( Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) )/Math.abs(grossImpact) * 100 , 0) : 0;
             indicator.setUncertainty(uncertainty);
         } else {
             indicator.setValue(null); 

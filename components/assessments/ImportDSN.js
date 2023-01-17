@@ -419,7 +419,7 @@ const getInterdecileRange = async (individualsData) => {
     .filter((individual) => individual.hourlyRate != null)
     .sort((a, b) => a.hourlyRate - b.hourlyRate);
   let totalHours = getSumItems(
-    individualsData.map((individual) => individual.hours)
+    individualsData.map((individual) => individual.hours), 2
   );
 
   if (individualsData.length < 2 || totalHours == 0) return 1;
@@ -484,13 +484,13 @@ const getGenderWageGap = async (individualsData) => {
   if (men.length == 0 || women.length == 0) return 0;
 
   // Men
-  let payMen = getSumItems(men.map((individual) => individual.pay));
-  let hoursMen = getSumItems(men.map((individual) => individual.hours));
+  let payMen = getSumItems(men.map((individual) => individual.pay), 2);
+  let hoursMen = getSumItems(men.map((individual) => individual.hours), 2);
   let hourlyRateMen = roundValue(payMen / hoursMen, 2);
 
   // Men
-  let payWomen = getSumItems(women.map((individual) => individual.pay));
-  let hoursWomen = getSumItems(women.map((individual) => individual.hours));
+  let payWomen = getSumItems(women.map((individual) => individual.pay), 2);
+  let hoursWomen = getSumItems(women.map((individual) => individual.hours), 2);
   let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
 
   // All
@@ -520,13 +520,13 @@ const getGenderWageGap_pctHourlyRateMen = async (individualsData) => {
   if (men.length == 0 || women.length == 0) return 0;
 
   // Men
-  let payMen = getSumItems(men.map((individual) => individual.pay));
-  let hoursMen = getSumItems(men.map((individual) => individual.hours));
+  let payMen = getSumItems(men.map((individual) => individual.pay), 2);
+  let hoursMen = getSumItems(men.map((individual) => individual.hours), 2);
   let hourlyRateMen = roundValue(payMen / hoursMen, 2);
 
   // Men
-  let payWomen = getSumItems(women.map((individual) => individual.pay));
-  let hoursWomen = getSumItems(women.map((individual) => individual.hours));
+  let payWomen = getSumItems(women.map((individual) => individual.pay), 2);
+  let hoursWomen = getSumItems(women.map((individual) => individual.hours), 2);
   let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
 
   // Interdecile range
