@@ -226,8 +226,8 @@ export class FinancialData {
     
     // Purchases stocks
     getVariationPurchasesStocks = () => this.getFinalAmountPurchasesStocks() - this.getInitialAmountPurchasesStocks()
-    getInitialAmountPurchasesStocks = () => getSumItems(this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.prevAmount).reduce((a,b) => a + b,0), 2)
-    getFinalAmountPurchasesStocks = () => getSumItems(this.stocks.filter(stock => !stock.isProductionStock).map(stock => stock.amount).reduce((a,b) => a + b,0), 2)
+    getInitialAmountPurchasesStocks = () => getPrevAmountItems(this.stocks.filter(stock => !stock.isProductionStock), 2)
+    getFinalAmountPurchasesStocks = () => getAmountItems(this.stocks.filter(stock => !stock.isProductionStock), 2)
     
     // Net amount
     getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.account)), 2)
