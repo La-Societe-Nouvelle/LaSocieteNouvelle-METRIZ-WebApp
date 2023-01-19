@@ -12,35 +12,12 @@ import { DSNDataReader, DSNFileReader } from "/src/readers/DSNReader";
 import metaRubriques from "/lib/rubriquesDSN";
 
 const primesIncludedInPay = ["026", "027", "028", "029", "030"];
-const revenuAutresIncludedInPay = [
-  "02",
-  "03",
-  "04",
-  "05",
-  "06",
-  "10",
-  "11",
-  "12",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "25",
-  "26",
-  "27",
-  "31",
-  "33",
-  "90",
-  "91",
-  "92",
-  "93",
-];
+const revenuAutresIncludedInPay = ["02","03","04","05","06","10","11","12","14","15","16","17","18","19","25","26","27","31","33","90","91","92","93"];
 
 /* -------------------- IMPORT DSN FILE -------------------- */
 
-export class ImportDSN extends React.Component {
+export class ImportDSN extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
@@ -50,14 +27,17 @@ export class ImportDSN extends React.Component {
     };
   }
 
-  render() {
+  render() 
+  {
     const { socialStatements } = this.state;
 
     let alerts = [];
 
+    // filtre déclarations mensuelles
     const monthlyStatements = socialStatements.filter(
       (statement) => statement.nature == "01"
     );
+    // filtre déclarations mensuelles uniques
     let distinctStatements = monthlyStatements.filter(
       (value, index, self) =>
         index ===
@@ -76,6 +56,7 @@ export class ImportDSN extends React.Component {
       });
     }
 
+    // liste des établissements concernés par les DSN
     let etablissements = monthlyStatements
       .map((statement) => statement.nicEtablissement)
       .filter(
@@ -86,6 +67,7 @@ export class ImportDSN extends React.Component {
       let etablissementStatements = distinctStatements.filter(
         (statement) => statement.nicEtablissement == etablissement
       );
+      // verification mois
       let missingMonth =
         etablissementStatements.filter(
           (value, index, self) =>
@@ -99,6 +81,7 @@ export class ImportDSN extends React.Component {
             etablissement,
         });
       }
+      // Vérification fractions
       let missingFraction = checkFractions(etablissementStatements);
       if (missingFraction) {
         alerts.push({
@@ -110,6 +93,7 @@ export class ImportDSN extends React.Component {
       }
     });
 
+    // tri par mois et fraction
     socialStatements.sort((a, b) => compare(a, b));
 
     return (
@@ -232,26 +216,29 @@ export class ImportDSN extends React.Component {
     }
   };
 
-  importFile = async (file) => {
+  importFile = async (file) => 
+  {
     let extension = file.name.split(".").pop();
     if (extension == "edi") {
       let reader = new FileReader();
       reader.onload = async () => {
         try {
+          // DSN file -> array of rows (grouped by bloc)
           let dataDSN = await DSNFileReader(reader.result);
           try {
+            // rows -> json 
             let socialStatement = await DSNDataReader(dataDSN);
             try {
-              let individualsData = await getIndividualsData([socialStatement]);
+              // check if data measurable
               socialStatement.interdecileRange = await getInterdecileRange(
-                individualsData
+                [socialStatement]
               );
               socialStatement.genderWageGap = await getGenderWageGap(
-                individualsData
+                [socialStatement]
               );
+              // add to list of statements
               socialStatement.id = getNewId(this.state.socialStatements);
-              socialStatement.nicEtablissement =
-                socialStatement.entreprise.etablissement.nic;
+              socialStatement.nicEtablissement = socialStatement.entreprise.etablissement.nic;
               socialStatement.error = false;
               this.setState({
                 socialStatements: this.state.socialStatements.concat([
@@ -298,21 +285,23 @@ export class ImportDSN extends React.Component {
   };
 
   // Submit
-  onSubmit = async () => {
+  onSubmit = async () => 
+  {
     let impactsData = this.props.impactsData;
 
-    let individualsData = await getIndividualsData(this.state.socialStatements);
-
     impactsData.socialStatements = this.state.socialStatements;
-    impactsData.individualsData = individualsData;
 
     // update idr data
-    impactsData.interdecileRange = await getInterdecileRange(individualsData);
-    //await this.props.onUpdate("idr");
+    impactsData.interdecileRange = await getInterdecileRange(impactsData.socialStatements);
+    await this.props.onUpdate("idr");
 
-    // update idr data
-    impactsData.wageGap = await getGenderWageGap(individualsData);
+    // update geq data
+    impactsData.wageGap = await getGenderWageGap(impactsData.socialStatements);
     await this.props.onUpdate("geq");
+
+    // update knw data
+    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(impactsData.socialStatements);
+    await this.props.onUpdate("knw");
 
     this.props.onGoBack();
   };
@@ -320,106 +309,48 @@ export class ImportDSN extends React.Component {
 
 /* -------------------- FORMULAS -------------------- */
 
-//
-const getIndividualsData = async (declarations) => {
+const getInterdecileRange = async (declarations) => 
+{
+  // retrieve working hours & pay for each individual
   let individualsData = [];
-  declarations.forEach((declaration) => {
+  for (let declaration of declarations) 
+  {
     let individus = declaration.entreprise.etablissement.individus;
-    individus.forEach((individu) => {
+    for (let individu of individus) {
       let id = individu.identifiant || individu.identifiantTechnique;
-      let sex = individu.sexe
-        ? parseInt(individu.sexe)
-        : parseInt(individu.identifiant.charAt(0));
-      let montantDeclaration = 0;
-      let heuresDeclaration = 0;
+      let workingHours = await getIndividualWorkingHours(individu);
+      let wage = await getIndividualWage(individu);
 
-      let versements = individu.versements;
-      versements.forEach((versement) => {
-        // Rémunérations
-        let remunerations = versement.remunerations;
-        remunerations
-          .filter((remuneration) => remuneration.type == "001")
-          .forEach((remuneration) => {
-            montantDeclaration += parseFloat(remuneration.montant);
-          });
-        remunerations
-          .filter((remuneration) => remuneration.type == "002")
-          .forEach((remuneration) => {
-            let contrat = individu.contrats.filter(
-              (contrat) => contrat.numero == remuneration.numeroContrat
-            )[0];
-            let uniteContrat = contrat.uniteMesure;
-            let activites = remuneration.activites;
-            activites
-              .filter((activite) => activite.type == "01")
-              .forEach((activite) => {
-                heuresDeclaration += getQuotiteTravail(
-                  parseInt(activite.mesure),
-                  activite.uniteMesure,
-                  uniteContrat
-                );
-              });
-          });
-        remunerations
-          .filter((remuneration) =>
-            ["012", "013", "017", "018"].includes(remuneration.type)
-          )
-          .forEach((remuneration) => {
-            montantDeclaration += parseFloat(remuneration.montant);
-            heuresDeclaration += parseInt(remuneration.nombreHeures);
-          });
-        // Primes
-        let primes = versement.primes;
-        primes
-          .filter((prime) => primesIncludedInPay.includes(prime.type))
-          .forEach((prime) => {
-            montantDeclaration += parseFloat(prime);
-          });
-        // Autres revenus
-        let revenuAutres = versement.revenuAutres;
-        revenuAutres
-          .filter((revenuAutre) =>
-            revenuAutresIncludedInPay.includes(revenuAutre.type)
-          )
-          .forEach((revenuAutre) => {
-            montantDeclaration += parseFloat(revenuAutre);
-          });
-      });
-
-      let individual = individualsData.filter(
-        (individual) => individual.id == id
-      )[0];
+      let individual = individualsData.filter((individual) => individual.id == id)[0];
       if (individual != undefined) {
-        individual.pay += montantDeclaration;
-        individual.hours += heuresDeclaration;
+        individual.workingHours += workingHours;
+        individual.wage += wage;
       } else {
         individualsData.push({
           id: id,
-          sex: sex,
-          pay: montantDeclaration,
-          hours: heuresDeclaration,
+          workingHours: workingHours,
+          wage: wage
         });
       }
-    });
-  });
+    }
+  };
 
+  // build hourly rate
   individualsData.forEach(
     (individual) =>
       (individual.hourlyRate =
-        individual.hours > 0
-          ? roundValue(individual.pay / individual.hours, 2)
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
           : null)
   );
 
-  return individualsData;
-};
-
-const getInterdecileRange = async (individualsData) => {
+  // filter individuals without hourlyRate
   individualsData = individualsData
     .filter((individual) => individual.hourlyRate != null)
     .sort((a, b) => a.hourlyRate - b.hourlyRate);
+  
   let totalHours = getSumItems(
-    individualsData.map((individual) => individual.hours)
+    individualsData.map((individual) => individual.workingHours)
   );
 
   if (individualsData.length < 2 || totalHours == 0) return 1;
@@ -430,19 +361,19 @@ const getInterdecileRange = async (individualsData) => {
 
   // D1
   let indexIndividualD1 = 0;
-  let hoursD1 = individualsData[indexIndividualD1].hours;
+  let hoursD1 = individualsData[indexIndividualD1].workingHours;
   while (hoursD1 < limitD1 && indexIndividualD1 < individualsData.length) {
     indexIndividualD1 += 1;
-    hoursD1 += individualsData[indexIndividualD1].hours;
+    hoursD1 += individualsData[indexIndividualD1].workingHours;
   }
   let hourlyRateD1 = individualsData[indexIndividualD1].hourlyRate;
 
   // D9
   let indexIndividualD9 = 0;
-  let hoursD9 = individualsData[indexIndividualD9].hours;
+  let hoursD9 = individualsData[indexIndividualD9].workingHours;
   while (hoursD9 < limitD9 && indexIndividualD9 < individualsData.length) {
     indexIndividualD9 += 1;
-    hoursD9 += individualsData[indexIndividualD9].hours;
+    hoursD9 += individualsData[indexIndividualD9].workingHours;
   }
   let hourlyRateD9 = individualsData[indexIndividualD9].hourlyRate;
 
@@ -450,6 +381,305 @@ const getInterdecileRange = async (individualsData) => {
   let interdecileRange = roundValue(hourlyRateD9 / hourlyRateD1, 2);
   return interdecileRange;
 };
+
+const getGenderWageGap = async (declarations) => 
+{
+  // retrieve sex, working hours & pay for each individual
+  let individualsData = [];
+  for (let declaration of declarations) 
+  {
+    let individus = declaration.entreprise.etablissement.individus;
+    for (let individu of individus) {
+      let id = individu.identifiant || individu.identifiantTechnique;
+      let sex = getIndividualSex(individu);
+      let workingHours = await getIndividualWorkingHours(individu);
+      let wage = await getIndividualWage(individu);
+
+      let individual = individualsData.filter((individual) => individual.id == id)[0];
+      if (individual != undefined) {
+        individual.workingHours += workingHours;
+        individual.wage += wage;
+      } else {
+        individualsData.push({
+          id: id,
+          sex: sex,
+          workingHours: workingHours,
+          wage: wage
+        });
+      }
+    }
+  };
+
+  // build hourly rate
+  individualsData.forEach(
+    (individual) =>
+      (individual.hourlyRate =
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
+          : null)
+  );
+
+  // filter individuals without hourly rate or defined sex
+  individualsData = individualsData.filter(
+    (individual) =>
+      individual.hourlyRate != null &&
+      (individual.sex == 1 || individual.sex == 2)
+  );
+
+  let men = individualsData.filter((individual) => individual.sex == 1);
+  let women = individualsData.filter((individual) => individual.sex == 2);
+
+  if (men.length == 0 || women.length == 0) return 0;
+
+  // Men
+  let payMen = getSumItems(men.map((individual) => individual.wage));
+  let hoursMen = getSumItems(men.map((individual) => individual.workingHours));
+  let hourlyRateMen = roundValue(payMen / hoursMen, 2);
+
+  // Men
+  let payWomen = getSumItems(women.map((individual) => individual.wage));
+  let hoursWomen = getSumItems(women.map((individual) => individual.workingHours));
+  let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
+
+  // All
+  let hourlyRateAll = roundValue(
+    (payMen + payWomen) / (hoursMen + hoursWomen),
+    2
+  );
+
+  // Interdecile range
+  let genderWageGap = roundValue(
+    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll,
+    2
+  );
+  return genderWageGap;
+};
+
+const getGenderWageGap_pctHourlyRateMen = async (declarations) => 
+{
+  // retrieve sex, working hours & pay for each individual
+  let individualsData = [];
+  for (let declaration of declarations) 
+  {
+    let individus = declaration.entreprise.etablissement.individus;
+    for (let individu of individus) {
+      let id = individu.identifiant || individu.identifiantTechnique;
+      let sex = getIndividualSex(individu);
+      let workingHours = await getIndividualWorkingHours(individu);
+      let wage = await getIndividualWage(individu);
+
+      let individual = individualsData.filter((individual) => individual.id == id)[0];
+      if (individual != undefined) {
+        individual.workingHours += workingHours;
+        individual.wage += wage;
+      } else {
+        individualsData.push({
+          id: id,
+          sex: sex,
+          workingHours: workingHours,
+          wage: wage
+        });
+      }
+    }
+  };
+
+  // build hourly rate
+  individualsData.forEach(
+    (individual) =>
+      (individual.hourlyRate =
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
+          : null)
+  );
+
+  // filter individuals without hourly rate or defined sex
+  individualsData = individualsData.filter(
+    (individual) =>
+      individual.hourlyRate != null &&
+      (individual.sex == 1 || individual.sex == 2)
+  );
+
+  let men = individualsData.filter((individual) => individual.sex == 1);
+  let women = individualsData.filter((individual) => individual.sex == 2);
+
+  if (men.length == 0 || women.length == 0) return 0;
+
+  // Men
+  let payMen = getSumItems(men.map((individual) => individual.wage));
+  let hoursMen = getSumItems(men.map((individual) => individual.workingHours));
+  let hourlyRateMen = roundValue(payMen / hoursMen, 2);
+
+  // Men
+  let payWomen = getSumItems(women.map((individual) => individual.wage));
+  let hoursWomen = getSumItems(women.map((individual) => individual.workingHours));
+  let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
+
+  // Interdecile range
+  let genderWageGap = roundValue(
+    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateMen,
+    2
+  );
+  return genderWageGap;
+};
+
+// Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
+const getApprenticeshipRemunerations = async (declarations) => 
+{
+  // retrieve sex, working hours & pay for each individual
+  let individualsData = [];
+  for (let declaration of declarations) 
+  {
+    let individus = declaration.entreprise.etablissement.individus;
+    for (let individu of individus) {
+      let id = individu.identifiant || individu.identifiantTechnique;
+      let workingHours = await getIndividualWorkingHours(individu);
+      let apprenticeshipHours = await getIndividualApprenticeshipHours(individu);
+      let wage = await getIndividualWage(individu);
+
+      let individual = individualsData.filter((individual) => individual.id == id)[0];
+      if (individual != undefined) {
+        individual.workingHours += workingHours;
+        individual.apprenticeshipHours += apprenticeshipHours;
+        individual.wage += wage;
+      } else {
+        individualsData.push({
+          id: id,
+          workingHours: workingHours,
+          apprenticeshipHours: apprenticeshipHours,
+          wage: wage
+        });
+      }
+    }
+  };
+
+  // build hourly rate
+  individualsData.forEach(
+    (individual) =>
+      (individual.hourlyRate =
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
+          : null)
+  );
+
+  // filter individuals without hourly rate or defined sex
+  individualsData = individualsData.filter(
+    (individual) =>
+      individual.hourlyRate != null
+  );
+
+  let apprenticesRemunerations = individualsData
+    .map(({hourlyRate,apprenticeshipHours}) => hourlyRate*apprenticeshipHours)
+    .reduce((a, b) => a + b, 0);
+  
+  return roundValue(apprenticesRemunerations, 0);
+};
+
+/* -------------------- STATEMENTS GETTERS -------------------- */
+
+const getIndividualSex = (individu) =>
+{
+  let sex = individu.sexe
+        ? parseInt(individu.sexe)
+        : parseInt(individu.identifiant.charAt(0));
+  return sex;
+}
+
+/** Heures de travail
+ *  Conditions - Heures associées à la recherche/formation
+ *    - Heures d'activités
+ *    - 012
+ *    - 013
+ *    - 017
+ *    - 018
+ */
+
+const getIndividualWage = (individu) =>
+{
+  let montantDeclaration = 0;
+
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "001")
+      .forEach((remuneration) => {
+        montantDeclaration += parseFloat(remuneration.montant);
+      });
+    remunerations
+      .filter((remuneration) =>
+        ["012", "013", "017", "018"].includes(remuneration.type)
+      )
+      .forEach((remuneration) => {
+        montantDeclaration += parseFloat(remuneration.montant);
+      });
+    // Primes
+    let primes = versement.primes;
+    primes
+      .filter((prime) => primesIncludedInPay.includes(prime.type))
+      .forEach((prime) => {
+        montantDeclaration += parseFloat(prime.montant);
+      });
+    // Autres revenus
+    let revenuAutres = versement.revenuAutres;
+    revenuAutres
+      .filter((revenuAutre) =>
+        revenuAutresIncludedInPay.includes(revenuAutre.type)
+      )
+      .forEach((revenuAutre) => {
+        montantDeclaration += parseFloat(revenuAutre.montant);
+      });
+  });
+
+  return roundValue(montantDeclaration,2);
+}
+
+/** Heures de travail
+ *  Conditions - Heures associées à la recherche/formation
+ *    - Heures d'activités
+ *    - 012
+ *    - 013
+ *    - 017
+ *    - 018
+ */
+
+const getIndividualWorkingHours = (individu) =>
+{
+  let heuresDeclaration = 0;
+
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "002")
+      .forEach((remuneration) => {
+        let contrat = individu.contrats.filter(
+          (contrat) => contrat.numero == remuneration.numeroContrat
+        )[0];
+        let uniteContrat = contrat.uniteMesure;
+        let activites = remuneration.activites;
+        activites
+          .filter((activite) => activite.type == "01")
+          .forEach((activite) => {
+            heuresDeclaration += getQuotiteTravail(
+              parseInt(activite.mesure),
+              activite.uniteMesure,
+              uniteContrat
+            );
+          });
+      });
+    remunerations
+      .filter((remuneration) =>
+        ["012", "013", "017", "018"].includes(remuneration.type) // add to doc
+      )
+      .forEach((remuneration) => {
+        heuresDeclaration += parseInt(remuneration.nombreHeures);
+      });
+  });
+
+  return roundValue(heuresDeclaration,2);
+}
 
 const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
   const unite = uniteActivite || uniteContrat || null;
@@ -471,71 +701,50 @@ const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
   }
 };
 
-const getGenderWageGap = async (individualsData) => {
-  individualsData = individualsData.filter(
-    (individual) =>
-      individual.hourlyRate != null &&
-      (individual.sex == 1 || individual.sex == 2)
-  );
+/** Conditions - Heures associées à la recherche/formation
+ *    - nature "29" : Stage
+ *    - dispositif politique "61" : Contrat de Professionnalisation
+ *    - dispositif politique "64" : Contrat d'apprentissage entreprises artisanales ou de moins de 11 salariés (loi du 3 janvier 1979)
+ *    - dispositif politique "65" : Contrat d’apprentissage entreprises non inscrites au répertoire des métiers d’au moins 11 salariés (loi de 1987)
+ *    - dispositif politique "66" : Convention industrielle de formation par la recherche en entreprise (CIFRE)
+ *    - dispositif politique "81" : Contrat d'apprentissage secteur public (Loi de 1992)
+ *    - dispositif politique "92" : Stage de la formation professionnelle
+ */
 
-  let men = individualsData.filter((individual) => individual.sex == 1);
-  let women = individualsData.filter((individual) => individual.sex == 2);
+const getIndividualApprenticeshipHours = (individu) =>
+{
+  let trainingHours = 0;
 
-  if (men.length == 0 || women.length == 0) return 0;
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "002")
+      .forEach((remuneration) => {
+        let contrat = individu.contrats.filter(
+          (contrat) => contrat.numero == remuneration.numeroContrat
+        )[0];
+        if (contrat.nature == "29" || ["61","64","65","66","81","92"].includes(contrat.dispositifPolitique)) {
+          let uniteContrat = contrat.uniteMesure;
+          let activites = remuneration.activites;
+          activites
+            .filter((activite) => activite.type == "01")
+            .forEach((activite) => {
+              trainingHours += getQuotiteTravail(
+                parseInt(activite.mesure),
+                activite.uniteMesure,
+                uniteContrat
+              );
+            });
+        }
+      });
+  });
 
-  // Men
-  let payMen = getSumItems(men.map((individual) => individual.pay));
-  let hoursMen = getSumItems(men.map((individual) => individual.hours));
-  let hourlyRateMen = roundValue(payMen / hoursMen, 2);
+  return roundValue(trainingHours,2);
+}
 
-  // Men
-  let payWomen = getSumItems(women.map((individual) => individual.pay));
-  let hoursWomen = getSumItems(women.map((individual) => individual.hours));
-  let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
-
-  // All
-  let hourlyRateAll = roundValue(
-    (payMen + payWomen) / (hoursMen + hoursWomen),
-    2
-  );
-
-  // Interdecile range
-  let genderWageGap = roundValue(
-    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll,
-    2
-  );
-  return genderWageGap;
-};
-
-const getGenderWageGap_pctHourlyRateMen = async (individualsData) => {
-  individualsData = individualsData.filter(
-    (individual) =>
-      individual.hourlyRate != null &&
-      (individual.sex == 1 || individual.sex == 2)
-  );
-
-  let men = individualsData.filter((individual) => individual.sex == 1);
-  let women = individualsData.filter((individual) => individual.sex == 2);
-
-  if (men.length == 0 || women.length == 0) return 0;
-
-  // Men
-  let payMen = getSumItems(men.map((individual) => individual.pay));
-  let hoursMen = getSumItems(men.map((individual) => individual.hours));
-  let hourlyRateMen = roundValue(payMen / hoursMen, 2);
-
-  // Men
-  let payWomen = getSumItems(women.map((individual) => individual.pay));
-  let hoursWomen = getSumItems(women.map((individual) => individual.hours));
-  let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
-
-  // Interdecile range
-  let genderWageGap = roundValue(
-    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateMen,
-    2
-  );
-  return genderWageGap;
-};
+/* -------------------- OTHER FUNCTIONS -------------------- */
 
 const checkFractions = (socialStatements) => {
   let missingFraction = false;
