@@ -753,12 +753,16 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
     let nbDecimals = metaIndics[indic].nbDecimals;
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
+  
     doc.text(
       printValue(production.footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
     );
+
+    
+
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(

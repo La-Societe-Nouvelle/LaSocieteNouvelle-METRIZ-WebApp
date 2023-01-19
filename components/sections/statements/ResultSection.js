@@ -48,6 +48,8 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
+import { generateIndicPDF } from "../../../src/writers/deliverables/generateIndicPDF";
+
 
 
 const ResultSection = (props) => {
@@ -182,6 +184,7 @@ const ResultSection = (props) => {
       setTrendGraphView(option);
     };
 
+    const analyseText =  getAnalyse(props.indic, props.session);
   return (
     <>
       {/* Head Section */}
@@ -329,7 +332,7 @@ const ResultSection = (props) => {
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Production</h5>
                 <ComparativeGraphs
-                  id="Production"
+                  id={"production-" + indic }
                   graphDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
@@ -355,7 +358,7 @@ const ResultSection = (props) => {
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommations intermédiaires</h5>
                 <ComparativeGraphs
-                  id="Consumption"
+                  id={"intermediateConsumption-" + indic }
                   graphDataset={[
                     comparativeData.intermediateConsumption.areaFootprint
                       .indicators[indic].value,
@@ -379,7 +382,7 @@ const ResultSection = (props) => {
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommation de capital fixe</h5>
                 <ComparativeGraphs
-                  id="CapitalConsumption"
+                  id={"capitalConsumption-" + indic }
                   graphDataset={[
                     comparativeData.fixedCapitalConsumption.areaFootprint
                       .indicators[indic].value,
@@ -404,7 +407,7 @@ const ResultSection = (props) => {
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Valeur ajoutée nette</h5>
                 <ComparativeGraphs
-                  id="Value"
+                  id={"netValueAdded-" + indic }
                   graphDataset={[
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
@@ -617,9 +620,15 @@ const ResultSection = (props) => {
       {/* ---------- Footer section ----------  */}
 
       <section className="step">
+      
         <div className="d-flex justify-content-end">
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
+          </Button>
+          <Button
+             onClick={() => generateIndicPDF(indic,metaIndics[indic].libelle, metaIndics[indic].unit,session.legalUnit, session.year, session.financialData, session.impactsData, session.comparativeData, divisions[comparativeDivision])}
+          >
+              PDF MAKE
           </Button>
           <Button
             variant="secondary"
