@@ -1407,13 +1407,13 @@ const getUncertaintyByAssessmentItem = (ghgDetails, assessmentItem) => {
 };
 
 const getGhgEmissionsItems = (items) => {
-  const sum = getSumItems(items.map((item) => item.ghgEmissions));
+  const sum = getSumItems(items.map((item) => item.ghgEmissions), 0);
   return sum;
 };
 
 const getGhgEmissionsUncertaintyItems = (items) => {
   if (items.length > 0) {
-    const value = getSumItems(items.map((item) => item.ghgEmissions));
+    const value = getSumItems(items.map((item) => item.ghgEmissions), 0);
     if (value != 0) {
       const valueMax = getSumItems(
         items.map((item) =>
@@ -1421,7 +1421,7 @@ const getGhgEmissionsUncertaintyItems = (items) => {
             item.ghgEmissions * (1 + item.ghgEmissionsUncertainty / 100),
             item.ghgEmissions * (1 - item.ghgEmissionsUncertainty / 100)
           )
-        )
+        ), 0
       );
       const valueMin = getSumItems(
         items.map((item) =>
@@ -1431,7 +1431,7 @@ const getGhgEmissionsUncertaintyItems = (items) => {
             item.ghgEmissions *
               Math.max(1 - item.ghgEmissionsUncertainty / 100, 0)
           )
-        )
+        ), 0
       );
       return Math.round(
         (Math.max(Math.abs(valueMax - value), Math.abs(value - valueMin)) /
