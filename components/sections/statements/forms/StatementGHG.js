@@ -146,16 +146,4 @@ export class StatementGHG extends React.Component {
 
 }
 
-export const writeStatementGHG = (doc, x, y, impactsData) => {
-  doc.text(
-    "Emissions directes de gaz à effet de serre : " +
-      printValue(impactsData.greenhousesGazEmissions, 0) +
-      " kgCO2e +/- " +
-      printValue(impactsData.greenhousesGazEmissionsUncertainty, 0) +
-      " %",
-    x,
-    y
-  );
-  // détail si existant
-  return y;
-};
+
