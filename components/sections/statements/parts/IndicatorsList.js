@@ -9,7 +9,6 @@ import {
   useAccordionButton,
 } from "react-bootstrap";
 
-import { exportIndicPDF } from "../../../../src/writers/Export";
 import {
   StatementART,
   StatementIDR,
@@ -24,7 +23,9 @@ import {
   StatementWAS,
   StatementWAT,
 } from "../forms";
+
 import metaIndics from "/lib/indics";
+import divisions from "/lib/divisions";
 
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
@@ -36,12 +37,16 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import PieGraph from "../../../graphs/PieGraph";
+
 import { getTargetSerieId } from "/src/utils/Utils";
+import { basicPDFReport } from "../../../../src/writers/deliverables/PDFGenerator";
+
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 const IndicatorsList = (props) => {
+  
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
@@ -208,16 +213,17 @@ const IndicatorsList = (props) => {
       setIndicToExport(key);
       setPopUp("division");
     } else {
-      exportIndicPDF(
+      basicPDFReport(
         key,
-        props.session,
-        comparativeDivision,
-        "#print-Production-" + key,
-        "#print-Consumption-" + key,
-        "#print-Value-" + key,
-        "#print-CapitalConsumption-" + key,
-        environmentalFootprint.includes(key) ? "#piechart-" + key : ""
+        metaIndics[key].libelle,
+        metaIndics[key].unit,
+        props.session.financialData,
+        props.session.impactsData,
+        props.session.comparativeData,
+        divisions[comparativeDivision],
+        true
       );
+
       setPopUp("");
     }
   };
@@ -284,117 +290,118 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-      {validations.length > 0 &&
-        displayGraph &&
-        validations.map((indic, key) => (
-          <div className="hidden" key={key}>
-            <Row className="graphs">
-              <Col sm={4} xl={4} lg={4} md={4}>
-                <ComparativeGraphs
-                  id={"print-Production-" + indic}
-                  graphDataset={[
-                    comparativeData.production.areaFootprint.indicators[indic]
-                      .value,
-                    props.session.financialData.aggregates.production.footprint.getIndicator(
-                      indic
-                    ).value,
-                    comparativeData.production.divisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}
-                  targetData={[
-                    comparativeData.production.targetAreaFootprint.indicators[
-                      indic
-                    ].value,
-                    null,
-                    comparativeData.production.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  titleChart="Production"
+      {validations.length > 0 && displayGraph && (
+        <div className="hidden">
+          {validations.map((indic, key) => (
+            <>
+              <Row className="graphs" key={key}>
+                <Col sm={3} xl={3} lg={3} md={3}>
+                  <ComparativeGraphs
+                    id={"production-" + indic}
+                    graphDataset={[
+                      comparativeData.production.areaFootprint.indicators[indic]
+                        .value,
+                      props.session.financialData.aggregates.production.footprint.getIndicator(
+                        indic
+                      ).value,
+                      comparativeData.production.divisionFootprint.indicators[
+                        indic
+                      ].value,
+                    ]}
+                    targetData={[
+                      comparativeData.production.targetAreaFootprint.indicators[
+                        indic
+                      ].value,
+                      null,
+                      comparativeData.production.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    titleChart="Production"
+                    indic={indic}
+                  />
+                </Col>
+                <Col sm={3} xl={3} lg={3} md={3}>
+                  <ComparativeGraphs
+                    id={"intermediateConsumption-" + indic}
+                    graphDataset={[
+                      comparativeData.intermediateConsumption.areaFootprint
+                        .indicators[indic].value,
+                      props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                        indic
+                      ).value,
+                      comparativeData.intermediateConsumption.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    targetData={[
+                      comparativeData.intermediateConsumption
+                        .targetAreaFootprint.indicators[indic].value,
+                      null,
+                      comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    indic={indic}
+                  />
+                </Col>
+                <Col sm={3} xl={3} lg={3} md={3}>
+                  <ComparativeGraphs
+                    id={"capitalConsumption-" + indic}
+                    graphDataset={[
+                      comparativeData.fixedCapitalConsumption.areaFootprint
+                        .indicators[indic].value,
+                      props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                        indic
+                      ).value,
+                      comparativeData.fixedCapitalConsumption.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    targetData={[
+                      comparativeData.fixedCapitalConsumption
+                        .targetAreaFootprint.indicators[indic].value,
+                      null,
+                      comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    indic={indic}
+                  />
+                </Col>
+                <Col sm={3} xl={3} lg={3} md={3}>
+                  <ComparativeGraphs
+                    id={"netValueAdded-" + indic}
+                    graphDataset={[
+                      comparativeData.netValueAdded.areaFootprint.indicators[
+                        indic
+                      ].value,
+                      props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                        indic
+                      ).value,
+                      comparativeData.netValueAdded.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    targetData={[
+                      comparativeData.netValueAdded.targetAreaFootprint
+                        .indicators[indic].value,
+                      null,
+                      comparativeData.netValueAdded.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    indic={indic}
+                  />
+                </Col>
+              </Row>
+              {environmentalFootprint.includes(indic) && (
+                <PieGraphRow
                   indic={indic}
+                  aggregates={props.session.financialData.aggregates}
                 />
-              </Col>
-              <Col sm={4} xl={4} lg={4} md={4}>
-                <ComparativeGraphs
-                  id={"print-Consumption-" + indic}
-                  graphDataset={[
-                    comparativeData.intermediateConsumption.areaFootprint
-                      .indicators[indic].value,
-                    props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                      indic
-                    ).value,
-                    comparativeData.intermediateConsumption.divisionFootprint
-                      .indicators[indic].value,
-                  ]}
-                  targetData={[
-                    comparativeData.intermediateConsumption.targetAreaFootprint
-                      .indicators[indic].value,
-                    null,
-                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  indic={indic}
-                />
-              </Col>
-              <Col sm={4} xl={4} lg={4} md={4}>
-                <ComparativeGraphs
-                  id={"print-CapitalConsumption-" + indic}
-                  graphDataset={[
-                    comparativeData.fixedCapitalConsumption.areaFootprint
-                      .indicators[indic].value,
-                    props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                      indic
-                    ).value,
-                    comparativeData.fixedCapitalConsumption.divisionFootprint
-                      .indicators[indic].value,
-                  ]}
-                  targetData={[
-                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
-                      .indicators[indic].value,
-                    null,
-                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  indic={indic}
-                />
-              </Col>
-              <Col sm={4} xl={4} lg={4} md={4}>
-                <ComparativeGraphs
-                  id={"print-Value-" + indic}
-                  graphDataset={[
-                    comparativeData.netValueAdded.areaFootprint.indicators[
-                      indic
-                    ].value,
-                    props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                      indic
-                    ).value,
-                    comparativeData.netValueAdded.divisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}
-                  targetData={[
-                    comparativeData.netValueAdded.targetAreaFootprint
-                      .indicators[indic].value,
-                    null,
-                    comparativeData.netValueAdded.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  indic={indic}
-                />
-              </Col>
-            </Row>
-            {environmentalFootprint.includes(indic) && (
-              <PieGraphRow
-                indic={indic}
-                aggregates={props.session.financialData.aggregates}
-              />
-            )}
-          </div>
-        ))}
+              )}
+            </>
+          ))}
+        </div>
+      )}
 
       {popUp == "division" && (
         <ChangeDivision

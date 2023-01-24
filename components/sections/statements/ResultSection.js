@@ -16,9 +16,6 @@ import Select from "react-select";
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 
-
-import { exportIndicPDF } from "../../../src/writers/Export";
-
 // Errors
 import { ErrorApi } from "../../ErrorAPI";
 
@@ -36,7 +33,7 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
-import { generateIndicPDF } from "../../../src/writers/deliverables/generateIndicPDF";
+import { basicPDFReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
 
 const ResultSection = (props) => {
@@ -197,23 +194,23 @@ const ResultSection = (props) => {
             </Button>
           )}
 
-<Button
+          <Button
             variant="secondary"
             onClick={() =>
-              generateIndicPDF(
+              basicPDFReport(
                 indic,
                 metaIndics[indic].libelle,
                 metaIndics[indic].unit,
                 session.financialData,
                 session.impactsData,
                 session.comparativeData,
-                divisions[comparativeDivision]
+                divisions[comparativeDivision],
+                true
               )
             }
           >
-          Télécharger le rapport <i className="bi bi-download"></i>
+            Télécharger le rapport <i className="bi bi-download"></i>
           </Button>
-
         </div>
       </div>
       {/* ---------- Main aggregate and expenses table ----------  */}
@@ -601,18 +598,18 @@ const ResultSection = (props) => {
           <Button
             variant="secondary"
             onClick={() =>
-              generateIndicPDF(
+              basicPDFReport(
                 indic,
                 metaIndics[indic].libelle,
                 metaIndics[indic].unit,
                 session.financialData,
                 session.impactsData,
                 session.comparativeData,
-                divisions[comparativeDivision]
+                true
               )
             }
           >
-          Télécharger le rapport <i className="bi bi-download"></i>
+            Télécharger le rapport <i className="bi bi-download"></i>
           </Button>
         </div>
       </section>
@@ -622,8 +619,13 @@ const ResultSection = (props) => {
 
 /* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
 
-const Analyse = ({indic, session}) => {
-  let analyse = getAnalyse(session.impactsData, session.financialData, session.comparativeData, indic);
+const Analyse = ({ indic, session }) => {
+  let analyse = getAnalyse(
+    session.impactsData,
+    session.financialData,
+    session.comparativeData,
+    indic
+  );
 
   return (
     <>
@@ -633,6 +635,5 @@ const Analyse = ({indic, session}) => {
     </>
   );
 };
-
 
 export default ResultSection;

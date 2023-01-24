@@ -753,7 +753,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
     let nbDecimals = metaIndics[indic].nbDecimals;
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
-  
+
     doc.text(
       printValue(production.footprint.indicators[indic].getValue(), 1),
       xValue,
@@ -761,7 +761,7 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
       { align: "right" }
     );
 
-    
+
 
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
@@ -1234,30 +1234,6 @@ function generateFootprintPDF(doc, indic, session, title, odds) {
   return doc;
 }
 
-function exportIndicPDF(
-  indic,
-  session,
-  comparativeDivision,
-  idProductionCanvas,
-  idConsumptionCanvas,
-  idValueCanvas,
-  idCapitalConsumptionCanvas,
-  idPieChart
-) {
-  // PDF Export
-  let doc = generatePDF(
-    indic,
-    session,
-    comparativeDivision,
-    idProductionCanvas,
-    idConsumptionCanvas,
-    idValueCanvas,
-    idCapitalConsumptionCanvas,
-    idPieChart
-  );
-
-  window.open(doc.output("bloburl"), "_blank");
-}
 
 async function exportFootprintPDF(session) {
   const doc = new jsPDF("landscape", "mm", "a4", true);
@@ -1472,7 +1448,6 @@ const getStatementNote = (doc, x, y, impactsData, indic) => {
 export {
   exportIndicDataExpensesCSV,
   exportIndicDataDepreciationsCSV,
-  exportIndicPDF,
   generatePDF,
   exportFootprintPDF,
   generateFootprintPDF,
