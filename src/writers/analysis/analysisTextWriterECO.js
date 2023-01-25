@@ -118,7 +118,7 @@ export const analysisTextWriterECO = (session) => {
   currentParagraph = [];
 
   currentParagraph.push(
-    "L'amortissement des immobilisations apportent une contribution indirecte de " +
+    "L'amortissement des immobilisations apporte une contribution indirecte de " +
       printValue(
         aggregates.capitalConsumption.footprint.indicators.eco.getGrossImpact(
           aggregates.capitalConsumption.amount

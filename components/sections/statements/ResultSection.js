@@ -198,6 +198,8 @@ const ResultSection = (props) => {
             variant="secondary"
             onClick={() =>
               basicPDFReport(
+                session.year,
+                session.legalUnit.corporateName,
                 indic,
                 metaIndics[indic].libelle,
                 metaIndics[indic].unit,
@@ -599,6 +601,8 @@ const ResultSection = (props) => {
             variant="secondary"
             onClick={() =>
               basicPDFReport(
+                session.year,
+                session.legalUnit.corporateName,
                 indic,
                 metaIndics[indic].libelle,
                 metaIndics[indic].unit,

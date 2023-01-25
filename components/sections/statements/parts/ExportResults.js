@@ -4,7 +4,6 @@ import ZipGenerator from "../../../../src/writers/deliverables/ZIPGenerator";
 
 import { exportFootprintPDF } from "../../../../src/writers/Export";
 
-
 const ExportResults = (props) => {
   const [printGrossImpact] = useState([
     "ghg",
@@ -172,6 +171,8 @@ const ExportResults = (props) => {
           </p>
         </div>
         <ZipGenerator
+          year={props.session.year}
+          legalUnit={props.session.legalUnit.corporateName}
           validations={props.session.validations}
           financialData={props.session.financialData}
           impactsData={props.session.impactsData}

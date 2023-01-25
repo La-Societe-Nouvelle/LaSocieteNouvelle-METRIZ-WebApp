@@ -6,6 +6,8 @@ import { basicPDFReport } from "./PDFGenerator";
 import metaIndics from "/lib/indics";
 
 const ZipGenerator = ({
+  year,
+  legalUnit,
   validations,
   financialData,
   impactsData,
@@ -37,6 +39,8 @@ const ZipGenerator = ({
     Promise.all(
       validations.map((indic) =>
         basicPDFReport(
+          year,
+          legalUnit.corporateName,
           indic,
           metaIndics[indic].libelle,
           metaIndics[indic].unit,

@@ -1,10 +1,6 @@
-
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import {
-  getAnalyse,
-  getStatementNote,
-} from "../../utils/Writers";
+import { getAnalyse, getStatementNote } from "../../utils/Writers";
 import { generateIndicTableBody } from "./generateTableBody";
 
 // --------------------------------------------------------------------------
@@ -29,14 +25,19 @@ pdfMake.fonts = {
 };
 
 export const basicPDFReport = (
+  year,
+  legalUnit,
   indic,
-  title,
+  label,
   unit,
   financialData,
   impactsData,
   comparativeData,
   download
 ) => {
+  // ---------------------------------------------------------------
+
+  // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
   const canvasValueAdded = document.getElementById("netValueAdded-" + indic);
   const canvasIntermediateConsumption = document.getElementById(
@@ -53,7 +54,11 @@ export const basicPDFReport = (
   const canvasFixedCapitalConsumptionImage =
     canvasFixedCapitalConsumption.toDataURL("image/png");
 
+  // ---------------------------------------------------------------
+  // Text Generation
+
   const statementNotes = getStatementNote(impactsData, indic);
+
   const analysisNotes = getAnalyse(
     impactsData,
     financialData,
@@ -61,9 +66,12 @@ export const basicPDFReport = (
     indic
   );
 
+  // ---------------------------------------------------------------
+  // Document Property
+
   const margins = {
-    top: 40,
-    bottom: 40,
+    top: 50,
+    bottom: 50,
     left: 40,
     right: 40,
   };
@@ -71,9 +79,38 @@ export const basicPDFReport = (
     width: 595.28,
     height: 841.89,
   };
+
+  const documentTitle =
+    "Rapport_" +
+    year +
+    "_" +
+    legalUnit.replaceAll(" ", "") +
+    "-" +
+    indic.toUpperCase();
+
+  // ---------------------------------------------------------------
+  // PDF Content and Layout
   const docDefinition = {
     pageSize: pageSize,
-    pageMargins: [margins.top, margins.right, margins.bottom, margins.left],
+    // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
+    pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
+    header: {
+      columns: [
+        { text: legalUnit, margin: [20, 15, 0, 0] },
+        {
+          text: "Exercice  " + year,
+          alignment: "right",
+          margin: [0, 15, 20, 0],
+        },
+      ],
+    },
+    footer: function (currentPage, pageCount) {
+      return {
+        text: "Page " + currentPage.toString() + " sur " + pageCount,
+        alignment: "right",
+        margin: [0, 25, 20, 0],
+      };
+    },
     background: function () {
       return {
         canvas: [
@@ -87,23 +124,30 @@ export const basicPDFReport = (
           },
           {
             type: "rect",
-            x: margins.left - 10,
-            y: margins.top - 10,
-            w: pageSize.width - margins.left - margins.right + 20,
-            h: pageSize.height - margins.top - margins.bottom,
+            x: margins.left - 20,
+            y: margins.top - 20,
+            w: pageSize.width - margins.left - margins.right + 40,
+            h: pageSize.height - margins.top - 10,
             color: "#FFFFFF",
             r: 10,
           },
         ],
       };
     },
+    info: {
+      label: documentTitle,
+      author: legalUnit,
+      subject: "Rapport des impacts de votre entreprise",
+      creator: "Metriz - La Société Nouvelle",
+      producer: "Metriz - La Societé Nouvelle",
+    },
     content: [
-      { text: "Rapport des impacts de votre entreprise", style: "header" },
+      { text: "Résultat - " + label, style: "header" },
       {
-        text: title,
+        text: "Empreinte de vos Soldes Intermédiaires de Gestion",
         style: "h2",
+        margin: [0, 10, 0, 20],
       },
-      { text: "Vue de vos Soldes Intermédiaires de Gestion", style: "h3" },
       {
         style: "table",
         table: {
@@ -126,27 +170,44 @@ export const basicPDFReport = (
               ? 1
               : 0;
           },
+
           vLineWidth: function (i, node) {
-            return 0;
+            return i === 0 || i === node.table.widths.length ? 1 : 0;
+          },
+          vLineColor: function (i, node) {
+            return i === 0 || i === node.table.widths.length ? "#f0f0f8" : "";
           },
           hLineColor: function (i, node) {
             return i === 0 ? "#191558" : "#f0f0f8";
           },
         },
       },
-      { text: "Impacts directs", style: "h3" },
+      { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
       statementNotes.map((note) => note),
-      { text: "Note d'analyse", style: "h3" },
+
+      // -- PAGE 2-------------------------------------------------------------------------
+      {
+        text: "Analyse - " + label,
+        style: "header",
+        pageBreak: "before",
+      },
+
+      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
       analysisNotes.map((note) => ({ text: note, style: "text" })),
-      { text: "Déclaration des impacts directs", style: "h3" },
+      {
+        text: "Déclaration des impacts directs",
+        style: "h2",
+        margin: [0, 30, 0, 10],
+      },
       {
         columns: [
           {
             stack: [
-              { text: "Production ", style: "h5" },
+              { text: "Production ", style: "h4" },
               {
                 image: productionChartImage,
-                width: 100,
+                width: 225,
+                margin: [0, 10, 0, 20],
               },
             ],
           },
@@ -154,23 +215,29 @@ export const basicPDFReport = (
             stack: [
               {
                 text: "Valeur ajoutée",
-                style: "h5",
+                style: "h4",
               },
               {
                 image: canvasValueAddedImage,
-                width: 100,
+                width: 225,
+                margin: [0, 10, 0, 20],
               },
             ],
           },
+        ],
+      },
+      {
+        columns: [
           {
             stack: [
               {
                 text: "Consommations intermédiaires ",
-                style: "h5",
+                style: "h4",
               },
               {
                 image: canvasIntermediateConsumptionImage,
-                width: 100,
+                width: 225,
+                margin: [0, 10, 0, 20],
               },
             ],
           },
@@ -178,11 +245,12 @@ export const basicPDFReport = (
             stack: [
               {
                 text: "Consommation de Capital Fixe ",
-                style: "h5",
+                style: "h4",
               },
               {
                 image: canvasFixedCapitalConsumptionImage,
-                width: 100,
+                width: 225,
+                margin: [0, 10, 0, 20],
               },
             ],
           },
@@ -191,58 +259,45 @@ export const basicPDFReport = (
       ,
     ],
     defaultStyle: {
-      fontSize: 9,
+      fontSize: 10,
       color: "#191558",
     },
     styles: {
       header: {
-        fontSize: 20,
-        font: "Raleway",
-        color: "#fa595f",
-        bold: true,
-        alignment: "center",
-        margin: [0, 5, 0, 0],
-      },
-      h2: {
         fontSize: 16,
         font: "Raleway",
         color: "#191558",
         bold: true,
-        alignment: "center",
-        margin: [0, 15, 0, 15],
+        margin: [0, 10, 0, 10],
       },
-      h3: {
-        fontSize: 13,
+      h2: {
+        fontSize: 14,
         font: "Raleway",
         color: "#fa595f",
         bold: true,
-        margin: [0, 20, 0, 10],
+      },
+      h3: {
+        fontSize: 12,
+        font: "Raleway",
+        color: "#191558",
+        bold: true,
+        margin: [0, 0, 0, 10],
       },
       h4: {
         fontSize: 10,
         font: "Raleway",
-        color: "#191558",
-        margin: [0, 0, 0, 20],
-      },
-      h5: {
-        fontSize: 7,
-        font: "Raleway",
         margin: [0, 10, 0, 10],
         bold: true,
       },
-      legalUnit: {
-        font: "Raleway",
-        fontSize: 16,
-        color: "#fa595f",
-        bold: true,
-      },
+
       text: {
         alignment: "justify",
         lineHeight: 1.5,
       },
       table: {
         alignment: "right",
-        fontSize: 8,
+        fontSize: 9,
+        margin: [0, 0, 0, 10],
       },
       tableHeader: {
         fillColor: "#f0f0f8",
@@ -264,12 +319,11 @@ export const basicPDFReport = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        // Télécharger le PDF
-        saveAs(blob, `${title}.pdf`);
+        //pdfMake.createPdf(docDefinition).open();
+        saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);
     });
   });
-  //pdfMake.createPdf(docDefinition).open();
 };

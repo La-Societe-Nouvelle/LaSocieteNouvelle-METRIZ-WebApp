@@ -214,6 +214,8 @@ const IndicatorsList = (props) => {
       setPopUp("division");
     } else {
       basicPDFReport(
+        props.session.year,
+        props.session.legalUnit.corporateName,
         key,
         metaIndics[key].libelle,
         metaIndics[key].unit,
