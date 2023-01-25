@@ -109,7 +109,7 @@ const ImportForm = (props) => {
             <i className="bi bi-file-arrow-up-fill"></i> Glisser votre fichier ici
             </p>
 
-            <p className="small-text">OU</p>
+            <p className="small">OU</p>
             <p className="btn btn-primary">Selectionner votre fichier</p>
           </div>
 
@@ -124,10 +124,10 @@ const ImportForm = (props) => {
               {acceptedFileItems}
             </div>
           )}
-          <p className="legend mb-0">
+          <p className="small fst-italic mb-0">
             *Champs obligatoires
           </p>
-          <p className="legend">
+          <p className="small fst-italic">
           ¹ Le fichier doit respecter les normes relatives à la structure du
             fichier (libellés des colonnes, séparateur tabulation ou barre
             verticale, encodage ISO 8859-15, etc.).

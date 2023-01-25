@@ -226,7 +226,7 @@ const IndicatorsList = (props) => {
 
   const SuccessMessage = () => {
     return (
-      <p className="mt-4 small-text alert alert-success">
+      <p className="mt-4 small alert alert-success">
         ✓ La déclaration des impacts a été mise à jour.
       </p>
     );

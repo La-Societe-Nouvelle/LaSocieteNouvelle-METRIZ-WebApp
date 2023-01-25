@@ -36,7 +36,7 @@ export class FinancialDatas extends React.Component {
 
     return (
       <>
-        <h3 className="subtitle ">Vérifiez les agrégats financiers</h3>
+        <h3 className=" ">Vérifiez les agrégats financiers</h3>
         <p className="form-text">
           Par mesure de précaution, vérifiez l’exactitude des agrégats
           financiers. Des erreurs de lecture peuvent intervenir en cas

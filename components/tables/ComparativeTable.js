@@ -124,7 +124,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               production.footprint.getIndicator(indic).value,
               precision
             )}
-            <span className="unit"> {unit}</span>
+            <span > {unit}</span>
           </td>
           {
             displayDivisionColumn && 
@@ -181,7 +181,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               intermediateConsumption.footprint.getIndicator(indic).value,
               precision
             )}
-            <span className="unit"> {unit}</span>
+            <span > {unit}</span>
           </td>
           {
             displayDivisionColumn && 
@@ -238,7 +238,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               capitalConsumption.footprint.getIndicator(indic).value,
               precision
             )}
-            <span className="unit"> {unit}</span>
+            <span > {unit}</span>
           </td>
           {
             displayDivisionColumn && 
@@ -294,7 +294,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
               netValueAdded.footprint.getIndicator(indic).value,
               precision
             )}
-            <span className="unit"> {unit}</span>
+            <span > {unit}</span>
           </td>
           {
             displayDivisionColumn && 
@@ -344,7 +344,7 @@ function getValue(value, unit, precision) {
     return (
       <>
         {printValue(value, precision)}
-        <span className="unit"> {unit}</span>
+        <span > {unit}</span>
       </>
     );
   } else {

@@ -1,6 +1,5 @@
 /* ---------- Import ---------- */
 @import 'libs/vars';
-@import 'base/typography';
 @import 'layout/header';
 @import 'layout/main';
 @import 'layout/menu';
@@ -19,6 +18,17 @@
 
 body {
   overflow-x: hidden;
+}
+
+.svg-inline--fa {
+	height: 15px;
+	vertical-align: middle;
+}
+
+.beta {
+	font-size: 0.6em;
+	font-weight: 600;
+	color: $secondary;
 }
 
 

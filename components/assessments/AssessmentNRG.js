@@ -542,7 +542,7 @@ export class AssessmentNRG extends React.Component
 
         {
           message && 
-          <p className="small-text p-2 alert-warning"> 
+          <p className="small p-2 alert-warning"> 
           Des modifications ayant été apportées 
           sur la consommation de produits énergétiques (combustibles), 
           l'intensité d'émissions de Gaz à effet de serre devra être (re)validée.
