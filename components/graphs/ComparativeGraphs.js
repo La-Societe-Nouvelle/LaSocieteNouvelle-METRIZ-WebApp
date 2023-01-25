@@ -23,7 +23,7 @@ const ComparativeGraphs = (props) => {
     datasets: [
       {
         label: "Valeur ",
-        data: props.graphDataset.map(data => data ? data.toFixed(precision) : null),
+        data: props.graphDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
@@ -38,7 +38,7 @@ const ComparativeGraphs = (props) => {
       },
       {
         label: "Objectif ",
-        data: props.targetData.map(data => data ? data.toFixed(precision) : null),
+        data: props.targetData.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
