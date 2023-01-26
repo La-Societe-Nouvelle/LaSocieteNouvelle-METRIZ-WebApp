@@ -53,7 +53,15 @@ const ZipGenerator = ({
     )
       .then((pdfs) => {
         pdfs.forEach((pdf, index) => {
-          zip.file(`${validations[index]}.pdf`, pdf, {
+          let title = 
+          "Rapport_" +
+          year +
+          "_" +
+          legalUnit.replaceAll(" ", "") +
+          "-" +
+          validations[index].toUpperCase();
+      
+          zip.file(`${title}.pdf`, pdf, {
             binary: true,
           });
 
@@ -66,7 +74,7 @@ const ZipGenerator = ({
           .generateAsync({ type: "blob" })
           .then((content) => {
             // Télécharger le zip
-            saveAs(content, "pdfs.zip");
+            saveAs(content, "Rapports_Empreinte_sociétale_" + legalUnit +"_" + year + ".zip");
           })
           .finally(() => {
             // Masquer le modal et réinitialiser l'état

@@ -323,8 +323,8 @@ export const basicPDFReport = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-      pdfMake.createPdf(docDefinition).open();
-       // saveAs(blob, `${documentTitle}.pdf`);
+      //pdfMake.createPdf(docDefinition).open();
+       saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);
