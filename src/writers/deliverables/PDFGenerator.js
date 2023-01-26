@@ -125,9 +125,9 @@ export const basicPDFReport = (
           {
             type: "rect",
             x: margins.left - 20,
-            y: margins.top - 20,
+            y: margins.top - 15,
             w: pageSize.width - margins.left - margins.right + 40,
-            h: pageSize.height - margins.top - 10,
+            h: pageSize.height - margins.top - 15,
             color: "#FFFFFF",
             r: 10,
           },
@@ -195,7 +195,7 @@ export const basicPDFReport = (
       { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
       analysisNotes.map((note) => ({ text: note, style: "text" })),
       {
-        text: "Déclaration des impacts directs",
+        text: "Comparaisons",
         style: "h2",
         margin: [0, 30, 0, 10],
       },
@@ -208,6 +208,7 @@ export const basicPDFReport = (
                 image: productionChartImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
+                alignment : "center"
               },
             ],
           },
@@ -221,6 +222,7 @@ export const basicPDFReport = (
                 image: canvasValueAddedImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
+                alignment : "center"
               },
             ],
           },
@@ -238,6 +240,7 @@ export const basicPDFReport = (
                 image: canvasIntermediateConsumptionImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
+                alignment : "center"
               },
             ],
           },
@@ -251,6 +254,7 @@ export const basicPDFReport = (
                 image: canvasFixedCapitalConsumptionImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
+                alignment : "center"
               },
             ],
           },
@@ -268,7 +272,7 @@ export const basicPDFReport = (
         font: "Raleway",
         color: "#191558",
         bold: true,
-        margin: [0, 10, 0, 10],
+        margin: [0, 5, 0, 10],
       },
       h2: {
         fontSize: 14,
@@ -319,8 +323,8 @@ export const basicPDFReport = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        //pdfMake.createPdf(docDefinition).open();
-        saveAs(blob, `${documentTitle}.pdf`);
+      pdfMake.createPdf(docDefinition).open();
+       // saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);

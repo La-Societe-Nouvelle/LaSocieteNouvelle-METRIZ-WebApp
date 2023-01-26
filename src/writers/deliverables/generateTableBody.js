@@ -20,8 +20,9 @@ export const generateIndicTableBody = (
   const tableBody = [
     [
       {
-        text: "",
+        text: "Agrégat",
         style: "tableHeader",
+        alignment : "left",
         border: [false, false, true, false],
       },
       {
@@ -192,7 +193,7 @@ export const generateIndicTableBody = (
       },
       {
         text:
-          printValue(netValueAdded.footprint.indicators[indic].value, 1) +
+          printValue(netValueAdded.footprint.indicators[indic].value, 0) +
           " " +
           unit,
           bold: true,
@@ -221,7 +222,7 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit) => {
         margin: [15, 0, 0, 0],
       },
       {
-        text: printValue(immobilisedProduction.amount, 0) + "€",
+        text: printValue(immobilisedProduction.amount, 0) + " €",
         margin: [2, 2, 2, 2],
       },
       {
@@ -236,7 +237,7 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit) => {
           printValue(
             immobilisedProduction.footprint.indicators[indic].uncertainty,
             0
-          ) + "%",
+          ) + " %",
         margin: [2, 2, 2, 2],
       }
     );
@@ -258,7 +259,7 @@ const getAggregateRow = (aggregates, indic, unit) => {
           margin: [15, 0, 0, 0],
         },
         {
-          text: printValue(aggregate.amount, 0) + "€",
+          text: printValue(aggregate.amount, 0) + " €",
           margin: [2, 2, 2, 2],
         },
         {
@@ -271,7 +272,7 @@ const getAggregateRow = (aggregates, indic, unit) => {
         {
           text:
             printValue(aggregate.footprint.indicators[indic].uncertainty, 0) +
-            "%",
+            " %",
           margin: [2, 2, 2, 2],
         }
       );
