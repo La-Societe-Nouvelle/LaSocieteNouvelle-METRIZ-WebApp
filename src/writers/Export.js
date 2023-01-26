@@ -2,8 +2,7 @@
 
 // Modules
 import { jsPDF } from "jspdf";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
+
 
 // Fonts
 
@@ -13,32 +12,7 @@ import metaIndics from "../../lib/indics";
 // Utils
 import { printValue } from "/src/utils/Utils";
 
-// Statement writers
-import { writeStatementART } from "../../components/sections/statements/forms/StatementART";
-import { writeStatementIDR } from "../../components/sections/statements/forms/StatementIDR";
-import { writeStatementECO } from "../../components/sections/statements/forms/StatementECO";
-import { writeStatementGEQ } from "../../components/sections/statements/forms/StatementGEQ";
-import { writeStatementGHG } from "../../components/sections/statements/forms/StatementGHG";
-import { writeStatementHAZ } from "../../components/sections/statements/forms/StatementHAZ";
-import { writeStatementKNW } from "../../components/sections/statements/forms/StatementKNW";
-import { writeStatementMAT } from "../../components/sections/statements/forms/StatementMAT";
-import { writeStatementNRG } from "../../components/sections/statements/forms/StatementNRG";
-import { writeStatementSOC } from "../../components/sections/statements/forms/StatementSOC";
-import { writeStatementWAS } from "../../components/sections/statements/forms/StatementWAS";
-import { writeStatementWAT } from "../../components/sections/statements/forms/StatementWAT";
-// Analysis writers
-import { analysisTextWriterECO } from "../../src/writers/analysis/analysisTextWriterECO";
-import { analysisTextWriterGHG } from "../../src/writers/analysis/analysisTextWriterGHG";
-import { analysisTextWriterART } from "../../src/writers/analysis/analysisTextWriterART";
-import { analysisTextWriterIDR } from "../../src/writers/analysis/analysisTextWriterIDR";
-import { analysisTextWriterGEQ } from "../../src/writers/analysis/analysisTextWriterGEQ";
-import { analysisTextWriterHAZ } from "../../src/writers/analysis/analysisTextWriterHAZ";
-import { analysisTextWriterKNW } from "../../src/writers/analysis/analysisTextWriterKNW";
-import { analysisTextWriterMAT } from "../../src/writers/analysis/analysisTextWriterMAT";
-import { analysisTextWriterNRG } from "../../src/writers/analysis/analysisTextWriterNRG";
-import { analysisTextWriterSOC } from "../../src/writers/analysis/analysisTextWriterSOC";
-import { analysisTextWriterWAS } from "../../src/writers/analysis/analysisTextWriterWAS";
-import { analysisTextWriterWAT } from "../../src/writers/analysis/analysisTextWriterWAT";
+
 
 import divisions from "/lib/divisions";
 
@@ -90,501 +64,501 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   return csvContent;
 }
 
-function generatePDF(
-  indic,
-  session,
-  comparativeDivision,
-  idProductionCanvas,
-  idConsumptionCanvas,
-  idValueCanvas,
-  idCapitalConsumptionCanvas,
-  idPieChart
-) {
-  const doc = new jsPDF("p", "mm", "a4", true);
-  const { financialData, legalUnit } = session;
+// function generatePDF(
+//   indic,
+//   session,
+//   comparativeDivision,
+//   idProductionCanvas,
+//   idConsumptionCanvas,
+//   idValueCanvas,
+//   idCapitalConsumptionCanvas,
+//   idPieChart
+// ) {
+//   const doc = new jsPDF("p", "mm", "a4", true);
+//   const { financialData, legalUnit } = session;
 
-  let x = 20;
+//   let x = 20;
 
-  // HEADER
-  doc.setFontSize(16);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(25, 21, 88);
-  doc.text("RAPPORT - ANALYSE EXTRA-FINANCIERE", x, 20);
+//   // HEADER
+//   doc.setFontSize(16);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(25, 21, 88);
+//   doc.text("RAPPORT - ANALYSE EXTRA-FINANCIERE", x, 20);
 
-  doc.setTextColor(250, 89, 95);
-  doc.setFontSize(14);
-  doc.text(legalUnit.corporateName || " - ", x, 30);
-  doc.setFontSize(10);
-  //doc.text("Numéro de siren : "+(legalUnit.siren!="" ? legalUnit.siren : " - " ),10,y);
-  //y+=10;
-  doc.setTextColor(0);
-  doc.setFont("Helvetica", "normal");
-  doc.text(
-    "Année de fin d'exercice : " +
-      (session.year != null ? session.year : " - "),
-    x,
-    40
-  );
-  let today = new Date();
-  doc.text(
-    " Edition du : " +
-      String(today.getDate()).padStart(2, "0") +
-      "/" +
-      String(today.getMonth() + 1).padStart(2, "0") +
-      "/" +
-      today.getFullYear(),
-    158,
-    40
-  );
+//   doc.setTextColor(250, 89, 95);
+//   doc.setFontSize(14);
+//   doc.text(legalUnit.corporateName || " - ", x, 30);
+//   doc.setFontSize(10);
+//   //doc.text("Numéro de siren : "+(legalUnit.siren!="" ? legalUnit.siren : " - " ),10,y);
+//   //y+=10;
+//   doc.setTextColor(0);
+//   doc.setFont("Helvetica", "normal");
+//   doc.text(
+//     "Année de fin d'exercice : " +
+//       (session.year != null ? session.year : " - "),
+//     x,
+//     40
+//   );
+//   let today = new Date();
+//   doc.text(
+//     " Edition du : " +
+//       String(today.getDate()).padStart(2, "0") +
+//       "/" +
+//       String(today.getMonth() + 1).padStart(2, "0") +
+//       "/" +
+//       today.getFullYear(),
+//     158,
+//     40
+//   );
 
-  doc.setFontSize(14);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(82, 98, 188);
-  doc.text(metaIndics[indic].libelleGrandeur.toUpperCase(), x, 55);
-  doc.setDrawColor(229, 219, 241);
-  doc.setLineWidth(0);
+//   doc.setFontSize(14);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(82, 98, 188);
+//   doc.text(metaIndics[indic].libelleGrandeur.toUpperCase(), x, 55);
+//   doc.setDrawColor(229, 219, 241);
+//   doc.setLineWidth(0);
 
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(25, 21, 88);
-  doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, 65);
+//   doc.setFontSize(12);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(25, 21, 88);
+//   doc.text("SOLDES INTERMEDIAIRES DE GESTION", x, 65);
 
-  /* ----- TABLE ----- */
+//   /* ----- TABLE ----- */
 
-  const {
-    production,
-    revenue,
-    storedProduction,
-    immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
-    netValueAdded,
-  } = financialData.aggregates;
+//   const {
+//     production,
+//     revenue,
+//     storedProduction,
+//     immobilisedProduction,
+//     intermediateConsumption,
+//     capitalConsumption,
+//     netValueAdded,
+//   } = financialData.aggregates;
 
-  let xAmount = 150;
-  let xValue = 170;
-  let xUncertainty = 178;
-  let y = 75;
+//   let xAmount = 150;
+//   let xValue = 170;
+//   let xUncertainty = 178;
+//   let y = 75;
 
-  // first line table RGB(219, 222, 241)
-  doc.setFillColor(219, 222, 241);
-  doc.rect(20, 69, 178, 10, "F");
-  doc.setFontSize(8);
-  doc.setTextColor(0);
-  doc.setFont("Helvetica", "italic");
-  doc.text(metaIndics[indic].unit!="" ? "(* Valeur en " + metaIndics[indic].unit + ")" : "(* Valeur sans unité)", x + 2, y);
-  doc.setFontSize(10);
-  doc.setFont("Helvetica", "normal");
-  doc.text("Montant", xAmount - 13, y);
-  doc.text("Valeur*", xValue - 8, y);
-  doc.text("Incertitude", xUncertainty, y);
+//   // first line table RGB(219, 222, 241)
+//   doc.setFillColor(219, 222, 241);
+//   doc.rect(20, 69, 178, 10, "F");
+//   doc.setFontSize(8);
+//   doc.setTextColor(0);
+//   doc.setFont("Helvetica", "italic");
+//   doc.text(metaIndics[indic].unit!="" ? "(* Valeur en " + metaIndics[indic].unit + ")" : "(* Valeur sans unité)", x + 2, y);
+//   doc.setFontSize(10);
+//   doc.setFont("Helvetica", "normal");
+//   doc.text("Montant", xAmount - 13, y);
+//   doc.text("Valeur*", xValue - 8, y);
+//   doc.text("Incertitude", xUncertainty, y);
 
-  // Production
-  y += 10;
-  doc.setFont("Helvetica", "bold");
-  doc.text("Production", x, y);
-  doc.setFont("Helvetica", "normal");
-  doc.setFontSize(8);
-  doc.text(printValue(production.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
-  doc.setFontSize(8);
-  doc.text(
-    printValue(production.footprint.indicators[indic].getValue(), 1),
-    xValue,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(8);
-  doc.text(
-    printValue(production.footprint.indicators[indic].getUncertainty(), 0) +
-      " %",
-    xUncertainty + 13,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(10);
+//   // Production
+//   y += 10;
+//   doc.setFont("Helvetica", "bold");
+//   doc.text("Production", x, y);
+//   doc.setFont("Helvetica", "normal");
+//   doc.setFontSize(8);
+//   doc.text(printValue(production.amount, 0) + " €", xAmount, y, {
+//     align: "right",
+//   });
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(production.footprint.indicators[indic].getValue(), 1),
+//     xValue,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(production.footprint.indicators[indic].getUncertainty(), 0) +
+//       " %",
+//     xUncertainty + 13,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(10);
 
-  // Revenue
-  y += 6;
-  doc.text("\tdont Chiffre d'affaires", x, y);
-  doc.setFontSize(8);
-  doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
-  doc.setFontSize(8);
-  doc.text(
-    printValue(revenue.footprint.indicators[indic].getValue(), 1),
-    xValue,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(8);
-  doc.text(
-    printValue(revenue.footprint.indicators[indic].getUncertainty(), 0) + " %",
-    xUncertainty + 13,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(10);
+//   // Revenue
+//   y += 6;
+//   doc.text("\tdont Chiffre d'affaires", x, y);
+//   doc.setFontSize(8);
+//   doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, {
+//     align: "right",
+//   });
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(revenue.footprint.indicators[indic].getValue(), 1),
+//     xValue,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(revenue.footprint.indicators[indic].getUncertainty(), 0) + " %",
+//     xUncertainty + 13,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(10);
 
-  // Stock production
-  y += 6;
-  doc.text("\tdont Production stockée", x, y);
-  doc.setFontSize(8);
-  doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
-  doc.setFontSize(8);
-  doc.text(
-    printValue(storedProduction.footprint.indicators[indic].getValue(), 1),
-    xValue,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(8);
-  doc.text(
-    printValue(
-      storedProduction.footprint.indicators[indic].getUncertainty(),
-      0
-    ) + " %",
-    xUncertainty + 13,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(10);
+//   // Stock production
+//   y += 6;
+//   doc.text("\tdont Production stockée", x, y);
+//   doc.setFontSize(8);
+//   doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, {
+//     align: "right",
+//   });
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(storedProduction.footprint.indicators[indic].getValue(), 1),
+//     xValue,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(
+//       storedProduction.footprint.indicators[indic].getUncertainty(),
+//       0
+//     ) + " %",
+//     xUncertainty + 13,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(10);
 
-  // Immobilised production
-  if (financialData.getImmobilisedProduction() > 0) {
-    x += 6;
-    doc.text("\tdont production immobilisée", x, 10);
-    doc.setFontSize(8);
-    doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, {
-      align: "right",
-    });
-    doc.setFontSize(8);
-    doc.text(
-      printValue(
-        immobilisedProduction.footprint.indicators[indic].getValue(),
-        1
-      ),
-      xValue,
-      x,
-      { align: "right" }
-    );
-    doc.setFontSize(8);
-    doc.text(
-      printValue(
-        immobilisedProduction.footprint.indicators[indic].getUncertainty(),
-        0
-      ) + " %",
-      xUncertainty + 13,
-      x,
-      { align: "right" }
-    );
-    doc.setFontSize(10);
-  }
+//   // Immobilised production
+//   if (financialData.getImmobilisedProduction() > 0) {
+//     x += 6;
+//     doc.text("\tdont production immobilisée", x, 10);
+//     doc.setFontSize(8);
+//     doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, {
+//       align: "right",
+//     });
+//     doc.setFontSize(8);
+//     doc.text(
+//       printValue(
+//         immobilisedProduction.footprint.indicators[indic].getValue(),
+//         1
+//       ),
+//       xValue,
+//       x,
+//       { align: "right" }
+//     );
+//     doc.setFontSize(8);
+//     doc.text(
+//       printValue(
+//         immobilisedProduction.footprint.indicators[indic].getUncertainty(),
+//         0
+//       ) + " %",
+//       xUncertainty + 13,
+//       x,
+//       { align: "right" }
+//     );
+//     doc.setFontSize(10);
+//   }
 
-  doc.line(20, y + 2, 198, y + 2);
+//   doc.line(20, y + 2, 198, y + 2);
 
-  y += 6;
-  doc.setFont("Helvetica", "bold");
-  doc.text("Consommations intermédiaires", x, y);
-  doc.setFont("Helvetica", "normal");
-  doc.setFontSize(8);
-  doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
-  doc.setFontSize(8);
-  doc.text(
-    printValue(
-      intermediateConsumption.footprint.indicators[indic].getValue(),
-      1
-    ),
-    xValue,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(8);
-  doc.text(
-    printValue(
-      intermediateConsumption.footprint.indicators[indic].getUncertainty(),
-      0
-    ) + " %",
-    xUncertainty + 13,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(10);
+//   y += 6;
+//   doc.setFont("Helvetica", "bold");
+//   doc.text("Consommations intermédiaires", x, y);
+//   doc.setFont("Helvetica", "normal");
+//   doc.setFontSize(8);
+//   doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, {
+//     align: "right",
+//   });
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(
+//       intermediateConsumption.footprint.indicators[indic].getValue(),
+//       1
+//     ),
+//     xValue,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(
+//       intermediateConsumption.footprint.indicators[indic].getUncertainty(),
+//       0
+//     ) + " %",
+//     xUncertainty + 13,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(10);
 
-  financialData
-    .getIntermediateConsumptionsAggregates()
-    .filter((aggregate) => aggregate.amount != 0)
-    .forEach((aggregate) => {
-      const indicator = aggregate.footprint.indicators[indic];
-      y += 6;
-      doc.text("\t" + aggregate.accountLib, 20, y);
-      doc.setFontSize(8);
-      doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
-        align: "right",
-      });
-      doc.setFontSize(8);
-      doc.text(printValue(indicator.getValue(), 1), xValue, y, {
-        align: "right",
-      });
-      doc.setFontSize(8);
-      doc.text(
-        printValue(indicator.getUncertainty(), 0) + " %",
-        xUncertainty + 13,
-        y,
-        { align: "right" }
-      );
-      doc.setFontSize(10);
-    });
+//   financialData
+//     .getIntermediateConsumptionsAggregates()
+//     .filter((aggregate) => aggregate.amount != 0)
+//     .forEach((aggregate) => {
+//       const indicator = aggregate.footprint.indicators[indic];
+//       y += 6;
+//       doc.text("\t" + aggregate.accountLib, 20, y);
+//       doc.setFontSize(8);
+//       doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
+//         align: "right",
+//       });
+//       doc.setFontSize(8);
+//       doc.text(printValue(indicator.getValue(), 1), xValue, y, {
+//         align: "right",
+//       });
+//       doc.setFontSize(8);
+//       doc.text(
+//         printValue(indicator.getUncertainty(), 0) + " %",
+//         xUncertainty + 13,
+//         y,
+//         { align: "right" }
+//       );
+//       doc.setFontSize(10);
+//     });
 
-  doc.line(20, y + 2, 198, y + 2); // Depreciations
+//   doc.line(20, y + 2, 198, y + 2); // Depreciations
 
-  y += 6;
-  doc.setFont("Helvetica", "bold");
-  doc.text("Dotations aux Amortissements sur immobilisations", 20, y);
-  doc.setFont("Helvetica", "normal");
-  doc.setFontSize(8);
-  doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
-  doc.setFontSize(8);
-  doc.text(
-    printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1),
-    xValue,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(8);
-  doc.text(
-    printValue(
-      capitalConsumption.footprint.indicators[indic].getUncertainty(),
-      0
-    ) + " %",
-    xUncertainty + 13,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(10);
+//   y += 6;
+//   doc.setFont("Helvetica", "bold");
+//   doc.text("Dotations aux Amortissements sur immobilisations", 20, y);
+//   doc.setFont("Helvetica", "normal");
+//   doc.setFontSize(8);
+//   doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, {
+//     align: "right",
+//   });
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1),
+//     xValue,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(
+//       capitalConsumption.footprint.indicators[indic].getUncertainty(),
+//       0
+//     ) + " %",
+//     xUncertainty + 13,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(10);
 
-  financialData
-    .getFixedCapitalConsumptionsAggregates()
-    .filter((aggregate) => aggregate.amount != 0)
-    .forEach((aggregate) => {
-      const indicator = aggregate.footprint.indicators[indic];
-      y += 6;
-      doc.text("\t" + aggregate.accountLib, 20, y);
-      doc.setFontSize(8);
-      doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
-        align: "right",
-      });
-      doc.setFontSize(8);
-      doc.text(printValue(indicator.getValue(), 1), xValue, y, {
-        align: "right",
-      });
-      doc.setFontSize(8);
-      doc.text(
-        printValue(indicator.getUncertainty(), 0) + " %",
-        xUncertainty + 13,
-        y,
-        { align: "right" }
-      );
-      doc.setFontSize(10);
-    });
+//   financialData
+//     .getFixedCapitalConsumptionsAggregates()
+//     .filter((aggregate) => aggregate.amount != 0)
+//     .forEach((aggregate) => {
+//       const indicator = aggregate.footprint.indicators[indic];
+//       y += 6;
+//       doc.text("\t" + aggregate.accountLib, 20, y);
+//       doc.setFontSize(8);
+//       doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
+//         align: "right",
+//       });
+//       doc.setFontSize(8);
+//       doc.text(printValue(indicator.getValue(), 1), xValue, y, {
+//         align: "right",
+//       });
+//       doc.setFontSize(8);
+//       doc.text(
+//         printValue(indicator.getUncertainty(), 0) + " %",
+//         xUncertainty + 13,
+//         y,
+//         { align: "right" }
+//       );
+//       doc.setFontSize(10);
+//     });
 
-  doc.line(20, y + 2, 198, y + 2); // Net Value Added
+//   doc.line(20, y + 2, 198, y + 2); // Net Value Added
 
-  y += 6;
-  doc.setFont("Helvetica", "bold");
-  doc.text("Valeur ajoutée nette", 20, y);
-  doc.setFont("Helvetica", "normal");
-  doc.setFontSize(8);
-  doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
-  doc.setFontSize(8);
-  doc.text(
-    printValue(netValueAdded.footprint.indicators[indic].getValue(), 1),
-    xValue,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(8);
-  doc.text(
-    printValue(netValueAdded.footprint.indicators[indic].getUncertainty(), 0) +
-      " %",
-    xUncertainty + 13,
-    y,
-    { align: "right" }
-  );
-  doc.setFontSize(10);
+//   y += 6;
+//   doc.setFont("Helvetica", "bold");
+//   doc.text("Valeur ajoutée nette", 20, y);
+//   doc.setFont("Helvetica", "normal");
+//   doc.setFontSize(8);
+//   doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, {
+//     align: "right",
+//   });
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(netValueAdded.footprint.indicators[indic].getValue(), 1),
+//     xValue,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(8);
+//   doc.text(
+//     printValue(netValueAdded.footprint.indicators[indic].getUncertainty(), 0) +
+//       " %",
+//     xUncertainty + 13,
+//     y,
+//     { align: "right" }
+//   );
+//   doc.setFontSize(10);
 
-  doc.line(20, y + 2, 198, y + 2);
+//   doc.line(20, y + 2, 198, y + 2);
 
-  y += 15;
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(25, 21, 88);
-  doc.text("DECLARATION DES IMPACTS DIRECTS", x, y);
-  doc.setFont("Helvetica", "normal");
+//   y += 15;
+//   doc.setFontSize(12);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(25, 21, 88);
+//   doc.text("DECLARATION DES IMPACTS DIRECTS", x, y);
+//   doc.setFont("Helvetica", "normal");
 
-  doc.setTextColor(0);
-  doc.setFontSize(10);
-  y += 10;
-  getStatementNote(doc, 20, y, session.impactsData, indic);
+//   doc.setTextColor(0);
+//   doc.setFontSize(10);
+//   y += 10;
+//   getStatementNote(doc, 20, y, session.impactsData, indic);
 
-  y += 15;
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(25, 21, 88);
-  doc.text("NOTE D'ANALYSE", x, y);
+//   y += 15;
+//   doc.setFontSize(12);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(25, 21, 88);
+//   doc.text("NOTE D'ANALYSE", x, y);
 
-  let analyse = getAnalyse(indic, session);
-  let text = "";
-  {
-    analyse.map(
-      (paragraph) => (text += "\n\n" + paragraph.reduce((a, b) => a + " " + b))
-    );
-  }
+//   let analyse = getAnalyse(indic, session);
+//   let text = "";
+//   {
+//     analyse.map(
+//       (paragraph) => (text += "\n\n" + paragraph.reduce((a, b) => a + " " + b))
+//     );
+//   }
 
-  doc.setFontSize(9);
-  doc.setFont("Helvetica", "normal");
-  doc.setTextColor(0, 0, 0);
-  doc.text(doc.splitTextToSize(text, 175), x, y);
+//   doc.setFontSize(9);
+//   doc.setFont("Helvetica", "normal");
+//   doc.setTextColor(0, 0, 0);
+//   doc.text(doc.splitTextToSize(text, 175), x, y);
 
-  // PAGE 2
-  doc.addPage();
+//   // PAGE 2
+//   doc.addPage();
 
-  y = 20;
-  doc.setFontSize(12);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(25, 21, 88);
-  doc.text("COMPARAISONS ", x, y);
+//   y = 20;
+//   doc.setFontSize(12);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(25, 21, 88);
+//   doc.text("COMPARAISONS ", x, y);
 
-  doc.setFontSize(10);
-  doc.setFont("Helvetica", "bold");
-  doc.setTextColor(82, 98, 188);
+//   doc.setFontSize(10);
+//   doc.setFont("Helvetica", "bold");
+//   doc.setTextColor(82, 98, 188);
 
-  {
-    y += 5;
-    Object.entries(divisions)
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .map(([code, libelle]) =>
-        code == comparativeDivision && code !== "00"
-          ? doc.text("Branche de référence : " + libelle, x, y)
-          : ""
-      );
-    y += 10;
-  }
+//   {
+//     y += 5;
+//     Object.entries(divisions)
+//       .sort((a, b) => parseInt(a) - parseInt(b))
+//       .map(([code, libelle]) =>
+//         code == comparativeDivision && code !== "00"
+//           ? doc.text("Branche de référence : " + libelle, x, y)
+//           : ""
+//       );
+//     y += 10;
+//   }
 
-  //Production canvas
-  doc.setFontSize(10);
-  doc.setFont("Helvetica", "normal");
-  doc.setTextColor(25, 21, 88);
+//   //Production canvas
+//   doc.setFontSize(10);
+//   doc.setFont("Helvetica", "normal");
+//   doc.setTextColor(25, 21, 88);
 
-  doc.text("Production", x, y);
-  y += 5;
+//   doc.text("Production", x, y);
+//   y += 5;
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const imageWidth = (doc.internal.pageSize.getWidth() - x * 2) / 1.8;
-  let marginX = (pageWidth - imageWidth) / 2;
+//   const pageWidth = doc.internal.pageSize.getWidth();
+//   const imageWidth = (doc.internal.pageSize.getWidth() - x * 2) / 1.8;
+//   let marginX = (pageWidth - imageWidth) / 2;
 
-  let canvasProduction = document.querySelector(idProductionCanvas);
+//   let canvasProduction = document.querySelector(idProductionCanvas);
 
-  let imageProduction = canvasProduction.toDataURL("image/jpg", 1.0);
+//   let imageProduction = canvasProduction.toDataURL("image/jpg", 1.0);
 
-  const imgProps = doc.getImageProperties(imageProduction);
+//   const imgProps = doc.getImageProperties(imageProduction);
 
-  const pdfHeight = (imgProps.height * imageWidth) / imgProps.width;
-  doc.addImage(imageProduction, "JPEG", marginX, y, imageWidth, pdfHeight);
+//   const pdfHeight = (imgProps.height * imageWidth) / imgProps.width;
+//   doc.addImage(imageProduction, "JPEG", marginX, y, imageWidth, pdfHeight);
 
-  y += 60;
+//   y += 60;
 
-  //Consumption canvas
-  doc.text("Consommations intermédiaires", x, y);
-  y += 5;
-  let canvasConsumption = document.querySelector(idConsumptionCanvas);
-  let canvasConsumptionImg = canvasConsumption.toDataURL("image/jpg", 1.0);
-  const imgConsumptionProps = doc.getImageProperties(canvasConsumptionImg);
-  const pdfCHeight =
-    (imgConsumptionProps.height * imageWidth) / imgConsumptionProps.width;
+//   //Consumption canvas
+//   doc.text("Consommations intermédiaires", x, y);
+//   y += 5;
+//   let canvasConsumption = document.querySelector(idConsumptionCanvas);
+//   let canvasConsumptionImg = canvasConsumption.toDataURL("image/jpg", 1.0);
+//   const imgConsumptionProps = doc.getImageProperties(canvasConsumptionImg);
+//   const pdfCHeight =
+//     (imgConsumptionProps.height * imageWidth) / imgConsumptionProps.width;
 
-  doc.addImage(
-    canvasConsumptionImg,
-    "JPEG",
-    marginX,
-    y,
-    imageWidth,
-    pdfCHeight
-  );
+//   doc.addImage(
+//     canvasConsumptionImg,
+//     "JPEG",
+//     marginX,
+//     y,
+//     imageWidth,
+//     pdfCHeight
+//   );
 
-  y += 60;
+//   y += 60;
 
-  //Value canvas
+//   //Value canvas
 
-  doc.text("Valeur ajoutée", x, y);
-  y += 5;
+//   doc.text("Valeur ajoutée", x, y);
+//   y += 5;
 
-  let canvasValue = document.querySelector(idValueCanvas);
-  let canvasValueImg = canvasValue.toDataURL("image/jpg", 1.0);
-  const imgValueProps = doc.getImageProperties(canvasValueImg);
-  const pdfVHeight = (imgValueProps.height * imageWidth) / imgValueProps.width;
+//   let canvasValue = document.querySelector(idValueCanvas);
+//   let canvasValueImg = canvasValue.toDataURL("image/jpg", 1.0);
+//   const imgValueProps = doc.getImageProperties(canvasValueImg);
+//   const pdfVHeight = (imgValueProps.height * imageWidth) / imgValueProps.width;
 
-  doc.addImage(canvasValueImg, "JPEG", marginX, y, imageWidth, pdfVHeight);
+//   doc.addImage(canvasValueImg, "JPEG", marginX, y, imageWidth, pdfVHeight);
 
-  y += 60;
+//   y += 60;
 
-  //Capital Consumption canvas
+//   //Capital Consumption canvas
 
-  doc.text("Consommation de capital fixe", x, y);
-  y += 5;
+//   doc.text("Consommation de capital fixe", x, y);
+//   y += 5;
 
-  let canvasCapitalConsumption = document.querySelector(idCapitalConsumptionCanvas);
-  let canvasCapitalConsumptionImg = canvasCapitalConsumption.toDataURL("image/jpg", 1.0);
-  const imgCapitalConsumptionProps = doc.getImageProperties(canvasCapitalConsumptionImg);
-  const pdfCCHeight = (imgCapitalConsumptionProps.height * imageWidth) / imgCapitalConsumptionProps.width;
+//   let canvasCapitalConsumption = document.querySelector(idCapitalConsumptionCanvas);
+//   let canvasCapitalConsumptionImg = canvasCapitalConsumption.toDataURL("image/jpg", 1.0);
+//   const imgCapitalConsumptionProps = doc.getImageProperties(canvasCapitalConsumptionImg);
+//   const pdfCCHeight = (imgCapitalConsumptionProps.height * imageWidth) / imgCapitalConsumptionProps.width;
 
-  doc.addImage(canvasCapitalConsumptionImg, "JPEG", marginX, y, imageWidth, pdfCCHeight);
+//   doc.addImage(canvasCapitalConsumptionImg, "JPEG", marginX, y, imageWidth, pdfCCHeight);
 
-  doc.setProperties({
-    title:
-      "rapport_" +
-      legalUnit.corporateName.replaceAll(" ", "") +
-      "-" +
-      indic.toUpperCase(),
-  });
+//   doc.setProperties({
+//     title:
+//       "rapport_" +
+//       legalUnit.corporateName.replaceAll(" ", "") +
+//       "-" +
+//       indic.toUpperCase(),
+//   });
 
-    //Value canvas
+//     //Value canvas
 
-  //Pie canvas
-  if (idPieChart) {
-    // PAGE 2
-    doc.addPage();
+//   //Pie canvas
+//   if (idPieChart) {
+//     // PAGE 2
+//     doc.addPage();
 
-    y = 20;
-    doc.setFontSize(12);
-    doc.setFont("Helvetica", "bold");
-    doc.setTextColor(25, 21, 88);
-    doc.text("Répartition des impacts bruts en pourcentage ", x, y);
-    y += 20;
+//     y = 20;
+//     doc.setFontSize(12);
+//     doc.setFont("Helvetica", "bold");
+//     doc.setTextColor(25, 21, 88);
+//     doc.text("Répartition des impacts bruts en pourcentage ", x, y);
+//     y += 20;
 
-    const imageWidth = doc.internal.pageSize.getWidth() / 2.6;
-    marginX = (pageWidth - imageWidth) / 2;
+//     const imageWidth = doc.internal.pageSize.getWidth() / 2.6;
+//     marginX = (pageWidth - imageWidth) / 2;
 
-    let canvasPie = document.querySelector(idPieChart);
-    let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
-    const imgPieProps = doc.getImageProperties(canvasPieImg);
+//     let canvasPie = document.querySelector(idPieChart);
+//     let canvasPieImg = canvasPie.toDataURL("image/jpg", 1.0);
+//     const imgPieProps = doc.getImageProperties(canvasPieImg);
 
-    const PieHeight = (imgPieProps.height * imageWidth) / imgPieProps.width;
+//     const PieHeight = (imgPieProps.height * imageWidth) / imgPieProps.width;
 
-    doc.addImage(canvasPieImg, "JPEG", marginX, y, imageWidth, PieHeight);
-  }
-  return doc;
-}
+//     doc.addImage(canvasPieImg, "JPEG", marginX, y, imageWidth, PieHeight);
+//   }
+//   return doc;
+// }
 
 function generateFootprintPDF(doc, indic, session, title, odds) {
   const { financialData, legalUnit } = session;
@@ -1269,187 +1243,129 @@ async function exportFootprintPDF(session) {
   window.open(doc.output("bloburl"), "_blank");
 }
 
-async function downloadReport(indics, session, comparativeDivision) {
-  const { legalUnit, year } = session;
-  // Zip Export
-  let zip = new JSZip();
-  indics.map((indic) => {
-    let doc = generatePDF(
-      indic,
-      session,
-      comparativeDivision,
-      "#print-Production-" + indic,
-      "#print-Consumption-" + indic,
-      "#print-Value-" + indic,
-      "#piechart-" + indic
-    );
-    zip.file(
-      "rapport_" +
-        legalUnit.corporateName.replaceAll(" ", "") +
-        "-" +
-        indic.toUpperCase() +
-        ".pdf",
-      doc.output("blob")
-    );
-  });
+// async function downloadReport(indics, session, comparativeDivision) {
+//   const { legalUnit, year } = session;
+//   // Zip Export
+//   let zip = new JSZip();
+//   indics.map((indic) => {
+//     let doc = generatePDF(
+//       indic,
+//       session,
+//       comparativeDivision,
+//       "#print-Production-" + indic,
+//       "#print-Consumption-" + indic,
+//       "#print-Value-" + indic,
+//       "#piechart-" + indic
+//     );
+//     zip.file(
+//       "rapport_" +
+//         legalUnit.corporateName.replaceAll(" ", "") +
+//         "-" +
+//         indic.toUpperCase() +
+//         ".pdf",
+//       doc.output("blob")
+//     );
+//   });
 
-  // add
+//   // add
 
-  const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-  const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
+//   const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
+//   const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
 
-  const seOdds = ["5", "8", "9", "10", "12"];
-  const envOdds = ["6", "7", "12", "13", "14", "15"];
+//   const seOdds = ["5", "8", "9", "10", "12"];
+//   const envOdds = ["6", "7", "12", "13", "14", "15"];
 
-  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
-  const docEnv = new jsPDF("landscape");
-  generateFootprintPDF(
-    docEnv,
-    envIndic,
-    session,
-    "Empreinte environnementale",
-    envOdds
-  );
-  zip.file(
-    "rapport_empreinte_environnementale_" +
-      legalUnit.corporateName.replaceAll(" ", "") +
-      ".pdf",
-    docEnv.output("blob")
-  );
+//   // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+//   const docEnv = new jsPDF("landscape");
+//   generateFootprintPDF(
+//     docEnv,
+//     envIndic,
+//     session,
+//     "Empreinte environnementale",
+//     envOdds
+//   );
+//   zip.file(
+//     "rapport_empreinte_environnementale_" +
+//       legalUnit.corporateName.replaceAll(" ", "") +
+//       ".pdf",
+//     docEnv.output("blob")
+//   );
 
-  // RAPPORT - EMPREINTE ECONOMIQUE ET SOCIALE
-  const docES = new jsPDF("landscape");
-  generateFootprintPDF(
-    docES,
-    seIndic,
-    session,
-    "Empreinte économique et sociale",
-    seOdds
-  );
-  zip.file(
-    "rapport_empreinte_es_" +
-      legalUnit.corporateName.replaceAll(" ", "") +
-      ".pdf",
-    docES.output("blob")
-  );
+//   // RAPPORT - EMPREINTE ECONOMIQUE ET SOCIALE
+//   const docES = new jsPDF("landscape");
+//   generateFootprintPDF(
+//     docES,
+//     seIndic,
+//     session,
+//     "Empreinte économique et sociale",
+//     seOdds
+//   );
+//   zip.file(
+//     "rapport_empreinte_es_" +
+//       legalUnit.corporateName.replaceAll(" ", "") +
+//       ".pdf",
+//     docES.output("blob")
+//   );
 
-  // RAPPORT - EMPREINTE SOCIETALE
+//   // RAPPORT - EMPREINTE SOCIETALE
 
-  const docEES = new jsPDF("landscape", "mm", "a4", true);
+//   const docEES = new jsPDF("landscape", "mm", "a4", true);
 
-  // RAPPORT - EMPREINTE ENVIRONNEMENTALE
+//   // RAPPORT - EMPREINTE ENVIRONNEMENTALE
 
-  generateFootprintPDF(
-    docEES,
-    envIndic,
-    session,
-    "Empreinte environnementale",
-    envOdds
-  );
+//   generateFootprintPDF(
+//     docEES,
+//     envIndic,
+//     session,
+//     "Empreinte environnementale",
+//     envOdds
+//   );
 
-  docEES.addPage();
+//   docEES.addPage();
 
-  // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
+//   // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
 
-  generateFootprintPDF(
-    docEES,
-    seIndic,
-    session,
-    "Empreinte économique et sociale",
-    seOdds
-  );
+//   generateFootprintPDF(
+//     docEES,
+//     seIndic,
+//     session,
+//     "Empreinte économique et sociale",
+//     seOdds
+//   );
 
-  zip.file(
-    "rapport_empreinte_societale_" +
-      legalUnit.corporateName.replaceAll(" ", "") +
-      ".pdf",
-    docEES.output("blob")
-  );
+//   zip.file(
+//     "rapport_empreinte_societale_" +
+//       legalUnit.corporateName.replaceAll(" ", "") +
+//       ".pdf",
+//     docEES.output("blob")
+//   );
 
-  // add .json file save
-  const fileName =
-    "enregistrement-ese-" + legalUnit.corporateName.replaceAll(" ", "-");
-  const json = JSON.stringify(session);
+//   // add .json file save
+//   const fileName =
+//     "enregistrement-ese-" + legalUnit.corporateName.replaceAll(" ", "-");
+//   const json = JSON.stringify(session);
 
-  // build download link & activate
-  const blob = new Blob([json], { type: "application/json" });
-  zip.file(fileName + ".json", blob);
+//   // build download link & activate
+//   const blob = new Blob([json], { type: "application/json" });
+//   zip.file(fileName + ".json", blob);
 
-  zip.generateAsync({ type: "blob" }).then(function (content) {
-    saveAs(
-      content,
-      "livrables_" +
-        legalUnit.corporateName.replaceAll(" ", "") +
-        "_" +
-        year +
-        ".zip"
-    );
-  });
-}
+//   zip.generateAsync({ type: "blob" }).then(function (content) {
+//     saveAs(
+//       content,
+//       "livrables_" +
+//         legalUnit.corporateName.replaceAll(" ", "") +
+//         "_" +
+//         year +
+//         ".zip"
+//     );
+//   });
+// }
 
-const getAnalyse = (indic, session) => {
-  switch (indic) {
-    case "art":
-      return analysisTextWriterART(session);
-    case "idr":
-      return analysisTextWriterIDR(session);
-    case "eco":
-      return analysisTextWriterECO(session);
-    case "geq":
-      return analysisTextWriterGEQ(session);
-    case "ghg":
-      return analysisTextWriterGHG(session);
-    case "haz":
-      return analysisTextWriterHAZ(session);
-    case "knw":
-      return analysisTextWriterKNW(session);
-    case "mat":
-      return analysisTextWriterMAT(session);
-    case "nrg":
-      return analysisTextWriterNRG(session);
-    case "soc":
-      return analysisTextWriterSOC(session);
-    case "was":
-      return analysisTextWriterWAS(session);
-    case "wat":
-      return analysisTextWriterWAT(session);
-  }
-};
 
-const getStatementNote = (doc, x, y, impactsData, indic) => {
-  switch (indic) {
-    case "art":
-      return writeStatementART(doc, x, y, impactsData);
-    case "idr":
-      return writeStatementIDR(doc, x, y, impactsData);
-    case "eco":
-      return writeStatementECO(doc, x, y, impactsData);
-    case "geq":
-      return writeStatementGEQ(doc, x, y, impactsData);
-    case "ghg":
-      return writeStatementGHG(doc, x, y, impactsData);
-    case "haz":
-      return writeStatementHAZ(doc, x, y, impactsData);
-    case "knw":
-      return writeStatementKNW(doc, x, y, impactsData);
-    case "mat":
-      return writeStatementMAT(doc, x, y, impactsData);
-    case "nrg":
-      return writeStatementNRG(doc, x, y, impactsData);
-    case "soc":
-      return writeStatementSOC(doc, x, y, impactsData);
-    case "was":
-      return writeStatementWAS(doc, x, y, impactsData);
-    case "wat":
-      return writeStatementWAT(doc, x, y, impactsData);
-  }
-};
 
 export {
   exportIndicDataExpensesCSV,
   exportIndicDataDepreciationsCSV,
-  generatePDF,
   exportFootprintPDF,
   generateFootprintPDF,
-  downloadReport,
 };
