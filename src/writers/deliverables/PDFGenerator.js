@@ -7,10 +7,11 @@ import { generateIndicTableBody } from "./generateTableBody";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
+const currentUrl = window.location.href;
 pdfMake.fonts = {
   Raleway: {
-    normal: "http://localhost:3000/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "http://localhost:3000/fonts/Raleway/Raleway-bold.ttf",
+    normal: currentUrl + "fonts/Raleway/Raleway-Regular.ttf",
+    bold: currentUrl + "fonts/Raleway/Raleway-bold.ttf",
   },
   // download default Roboto font from cdnjs.com
   Roboto: {
