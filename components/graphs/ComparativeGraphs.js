@@ -11,7 +11,6 @@ const ComparativeGraphs = (props) => {
   const unit  = metaIndics[props.indic].unit;
   const precision = metaIndics[props.indic].nbDecimals;
 
-  console.log(props.graphDataset)
   const labels = ["France", ["Exercice", "en cours"], "Branche"];
 
   // Remove "Branche" label if no comparative division selected

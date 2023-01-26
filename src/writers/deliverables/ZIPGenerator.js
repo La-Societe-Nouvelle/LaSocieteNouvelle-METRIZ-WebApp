@@ -40,7 +40,7 @@ const ZipGenerator = ({
       validations.map((indic) =>
         basicPDFReport(
           year,
-          legalUnit.corporateName,
+          legalUnit,
           indic,
           metaIndics[indic].libelle,
           metaIndics[indic].unit,
