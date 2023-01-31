@@ -9,7 +9,6 @@ import {
   useAccordionButton,
 } from "react-bootstrap";
 
-import { exportIndicPDF } from "../../../../src/writers/Export";
 import {
   StatementART,
   StatementIDR,
@@ -24,7 +23,9 @@ import {
   StatementWAS,
   StatementWAT,
 } from "../forms";
+
 import metaIndics from "/lib/indics";
+import divisions from "/lib/divisions";
 
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
@@ -35,8 +36,10 @@ import { ImportDSN } from "../../../assessments/ImportDSN";
 import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
-import PieGraph from "../../../graphs/PieGraph";
+
 import { getTargetSerieId } from "/src/utils/Utils";
+import { basicPDFReport } from "../../../../src/writers/deliverables/PDFGenerator";
+
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
@@ -208,16 +211,19 @@ const IndicatorsList = (props) => {
       setIndicToExport(key);
       setPopUp("division");
     } else {
-      exportIndicPDF(
+      basicPDFReport(
+        props.session.year,
+        props.session.legalUnit.corporateName,
         key,
-        props.session,
-        comparativeDivision,
-        "#print-Production-" + key,
-        "#print-Consumption-" + key,
-        "#print-Value-" + key,
-        "#print-CapitalConsumption-" + key,
-        environmentalFootprint.includes(key) ? "#piechart-" + key : ""
+        metaIndics[key].libelle,
+        metaIndics[key].unit,
+        props.session.financialData,
+        props.session.impactsData,
+        props.session.comparativeData,
+        divisions[comparativeDivision],
+        true
       );
+
       setPopUp("");
     }
   };
@@ -254,44 +260,16 @@ const IndicatorsList = (props) => {
   const socialFootprint = ["idr", "geq", "knw"];
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
 
-  // Pie Graph component to print in PDF
-
-  const PieGraphRow = (props) => {
-    let indic = props.indic;
-    let intermediateConsumption = props.aggregates.intermediateConsumption;
-    let capitalConsumption = props.aggregates.capitalConsumption;
-    let netValueAdded = props.aggregates.netValueAdded;
-
-    return (
-      <Row>
-        <div className="piechart-container">
-          <PieGraph
-            id={"piechart-" + indic}
-            intermediateConsumption={intermediateConsumption.footprint.indicators[
-              indic
-            ].getGrossImpact(intermediateConsumption.amount)}
-            capitalConsumption={capitalConsumption.footprint.indicators[
-              indic
-            ].getGrossImpact(capitalConsumption.amount)}
-            netValueAdded={netValueAdded.footprint.indicators[
-              indic
-            ].getGrossImpact(netValueAdded.amount)}
-          />
-        </div>
-      </Row>
-    );
-  };
-
   return (
     <>
       {validations.length > 0 &&
         displayGraph &&
         validations.map((indic, key) => (
-          <div className="hidden" key={key}>
-            <Row className="graphs">
-              <Col sm={4} xl={4} lg={4} md={4}>
+          <div key={key} className="hidden">
+            <Row>
+              <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"print-Production-" + indic}
+                  id={"production-" + indic}
                   graphDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
@@ -315,9 +293,9 @@ const IndicatorsList = (props) => {
                   indic={indic}
                 />
               </Col>
-              <Col sm={4} xl={4} lg={4} md={4}>
+              <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"print-Consumption-" + indic}
+                  id={"intermediateConsumption-" + indic}
                   graphDataset={[
                     comparativeData.intermediateConsumption.areaFootprint
                       .indicators[indic].value,
@@ -338,9 +316,9 @@ const IndicatorsList = (props) => {
                   indic={indic}
                 />
               </Col>
-              <Col sm={4} xl={4} lg={4} md={4}>
+              <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"print-CapitalConsumption-" + indic}
+                  id={"capitalConsumption-" + indic}
                   graphDataset={[
                     comparativeData.fixedCapitalConsumption.areaFootprint
                       .indicators[indic].value,
@@ -361,9 +339,9 @@ const IndicatorsList = (props) => {
                   indic={indic}
                 />
               </Col>
-              <Col sm={4} xl={4} lg={4} md={4}>
+              <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"print-Value-" + indic}
+                  id={"netValueAdded-" + indic}
                   graphDataset={[
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
@@ -387,12 +365,6 @@ const IndicatorsList = (props) => {
                 />
               </Col>
             </Row>
-            {environmentalFootprint.includes(indic) && (
-              <PieGraphRow
-                indic={indic}
-                aggregates={props.session.financialData.aggregates}
-              />
-            )}
           </div>
         ))}
 
@@ -421,6 +393,7 @@ const IndicatorsList = (props) => {
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                     </ArrowToggle>
                   </div>
+
                   <div>
                     <button
                       className="btn btn-primary btn-sm"

@@ -153,13 +153,3 @@ export class StatementIDR extends React.Component {
   onValidate = () => this.props.onValidate()
 }
 
-export const writeStatementIDR = (doc, x, y, impactsData) => {
-  doc.text("Rapport interdécile D9/D1 interne : " + printValue(impactsData.interdecileRange, 2) + " " + (!impactsData.hasEmployees ? "*" : ""), x, y);
-  if (!impactsData.hasEmployees) {
-    y += 6;
-    doc.setFont("Helvetica", "italic");
-    doc.text("*L'entreprise est déclarée non-employeur", x, y);
-    doc.setFont("Helvetica", "normal");
-  }
-  return y;
-}

@@ -166,20 +166,3 @@ export class StatementGEQ extends React.Component {
   onValidate = () => this.props.onValidate();
 }
 
-export const writeStatementGEQ = (doc, x, y, impactsData) => {
-  doc.text(
-    "Ecart interne de rémunérations F/H : " +
-      printValue(impactsData.wageGap, 0) +
-      " %" +
-      (!impactsData.hasEmployees ? "*" : ""),
-    x,
-    y
-  );
-  if (!impactsData.hasEmployees) {
-    y += 6;
-    doc.setFont("Helvetica", "italic");
-    doc.text("*L'entreprise est déclarée non-employeur", x, y);
-    doc.setFont("Helvetica", "normal");
-  }
-  return y;
-};

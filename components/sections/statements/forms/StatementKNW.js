@@ -69,9 +69,3 @@ export class StatementKNW extends React.Component {
   onValidate = () => this.props.onValidate()
 }
 
-export const writeStatementKNW = (doc,x,y,impactsData) =>
-{
-  doc.text("Contribution directe à l'évolution des compétences et des connaissances : "+printValue(impactsData.researchAndTrainingContribution,0)+" €",x,y);
-
-  return y;
-}
