@@ -2,6 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { getAnalyse, getStatementNote } from "../../utils/Writers";
 import { generateIndicTableBody } from "./utils/generateTableBody";
+import divisions from "/lib/divisions";
 
 // --------------------------------------------------------------------------
 
@@ -199,7 +200,11 @@ export const basicPDFReport = (
         text: "Comparaisons",
         style: "h2",
         margin: [0, 30, 0, 10],
-      },
+      }, 
+      comparativeData.activityCode !== "00" ? (
+      {
+        text: "Branche de référence : " + divisions[comparativeData.activityCode], margin: [0, 0, 0, 10], font : "Raleway", decoration : "underline"
+      }) : "",
       {
         columns: [
           {
