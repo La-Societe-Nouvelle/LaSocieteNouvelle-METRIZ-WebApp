@@ -7,17 +7,23 @@ import IndicatorsList from "./parts/IndicatorsList";
 import ExportResults from "./parts/ExportResults";
 
 const StatementSection = (props) => {
-
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
   const [isPublicationAvailable, setPublicationAvailable] = useState(false);
+  const [validationsState, setValidationsState] = useState(
+    props.session.validations
+  );
 
   const handleView = (indic) => {
     setIndic(indic);
     setView("result");
   };
 
-
+  const handleValidation = (newValidation) => {
+    if (!validationsState.includes(newValidation)) {
+      setValidationsState([...validationsState, newValidation]);
+    }
+  };
   return (
     <Container fluid className="indicator-section">
       {view == "statement" ? (
@@ -28,12 +34,13 @@ const StatementSection = (props) => {
               Pour chaque indicateur, déclarez vos impacts directs et obtenez
               les éléments d'analyse.
             </p>
-          <IndicatorsList
+            <IndicatorsList
+              onValidation={handleValidation}
               impactsData={props.session.impactsData}
               session={props.session}
               viewResult={handleView}
               publish={() => setPublicationAvailable(true)}
-                     />  
+            />
           </section>
           <section className="step">
             <h2>
@@ -42,8 +49,7 @@ const StatementSection = (props) => {
 
             <ExportResults
               session={props.session}
-              validations={props.session.validations}
-     
+              validations={validationsState}
             />
 
             <hr />
@@ -65,7 +71,6 @@ const StatementSection = (props) => {
           session={props.session}
           indic={indic}
           goBack={() => setView("statement")}
-
         />
       )}
     </Container>

@@ -5,14 +5,7 @@ import ZipGenerator from "../../../../src/writers/deliverables/ZIPGenerator";
 import { exportFootprintPDF } from "../../../../src/writers/Export";
 
 const ExportResults = (props) => {
-  const [printGrossImpact] = useState([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat",
-  ]);
+ 
   const [isDisabled, setIsDisabled] = useState(true);
 
   useEffect(() => {
@@ -28,6 +21,7 @@ const ExportResults = (props) => {
 
   return (
     <>
+    {console.log(props.validations)}
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
         <p className="mb-0">Rapport sur l'empreinte sociétale</p>
@@ -47,7 +41,7 @@ const ExportResults = (props) => {
         <ZipGenerator
           year={props.session.year}
           legalUnit={props.session.legalUnit.corporateName}
-          validations={props.session.validations}
+          validations={props.validations}
           financialData={props.session.financialData}
           impactsData={props.session.impactsData}
           comparativeData={props.session.comparativeData}

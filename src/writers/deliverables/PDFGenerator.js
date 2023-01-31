@@ -9,8 +9,8 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 pdfMake.fonts = {
   Raleway: {
-    normal: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-bold.ttf",
+    normal: "http://localhost:3000/fonts/Raleway/Raleway-Regular.ttf",
+    bold: "http://localhost:3000/fonts/Raleway/Raleway-bold.ttf",
   },
   // download default Roboto font from cdnjs.com
   Roboto: {
