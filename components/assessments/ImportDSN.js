@@ -109,7 +109,7 @@ export class ImportDSN extends React.Component
                     <i className="bi bi-file-arrow-up-fill"></i>
                     Glisser votre fichier ici
                   </p>
-                  <p className="small-text">OU</p>
+                  <p className="small">OU</p>
                   <p className="btn btn-primary">Selectionner votre fichier</p>
                 </div>
               </div>

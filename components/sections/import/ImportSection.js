@@ -87,7 +87,7 @@ function ImportSection(props) {
                     </button>
 
                     {errorMail && (
-                      <p className="small-text alert alert-info mb-2">
+                      <p className="small alert alert-info mb-2">
                         {errorMail}
                       </p>
                     )}

@@ -287,7 +287,7 @@ const PriceInput = ({ price }) => {
                 </div>
 
             </div>
-            <p className="legend">* Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
+            <p className="small fst-italic">* Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
 
         </>)
 }

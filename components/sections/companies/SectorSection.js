@@ -115,7 +115,7 @@ export class SectorSection extends React.Component
         <section className="step">
           <div className="section-title mb-3">
             <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
-            <h3 className="subtitle mb-4 ">Synchronisation des données grâce au secteur d'activité</h3>
+            <h3 className=" mb-4 ">Synchronisation des données grâce au secteur d'activité</h3>
           </div>
           <div className="step 3">
             <div className="table-container">
@@ -130,7 +130,7 @@ export class SectorSection extends React.Component
                   </div>}
                 {/* ---------- Show message missing data ---------- */}
                 {(!error && !isNextStepAvailable) &&
-                  <div className="alert alert-syncronise">
+                  <div className="alert alert-info">
                   <p><i className="bi bi bi-exclamation-circle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
                   <button className={"btn btn-secondary"}
                     onClick={() => this.synchroniseCompanies()}>

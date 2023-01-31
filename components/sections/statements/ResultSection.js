@@ -178,7 +178,7 @@ const ResultSection = (props) => {
                 if (session.validations.includes(key) && key != indic) {
                   return (
                     <Dropdown.Item
-                      className="small-text"
+                      className="small"
                       key={key}
                       onClick={() => setIndic(key)}
                     >
@@ -288,7 +288,7 @@ const ResultSection = (props) => {
         <h3>Comparaison par activité</h3>
 
         <Select
-          className="mb-3 small-text"
+          className="mb-3 small"
           defaultValue={{
             label: comparativeDivision + " - " + divisions[comparativeDivision],
             value: comparativeDivision,
@@ -418,7 +418,7 @@ const ResultSection = (props) => {
           <h3>Courbes d'évolution</h3>
           <div style={{ width: "300px" }}>
             <Select
-              className="mb-3 small-text"
+              className="mb-3 small"
               defaultValue={{
                 label: trendGraphView.label,
                 value: trendGraphView.value,
@@ -557,7 +557,7 @@ const ResultSection = (props) => {
                 ].meta.info && (
                   <>
                     <h5>Objectif de la branche :</h5>
-                    <p className="small-text">
+                    <p className="small">
                       {
                         comparativeData.production.targetDivisionFootprint
                           .indicators[indic].meta.info
@@ -566,7 +566,7 @@ const ResultSection = (props) => {
                   </>
                 )}
                 <hr />
-                <p className="small-text">
+                <p className="small">
                   Source :&nbsp;
                   {comparativeData.production.trendsFootprint.indicators[indic]
                     .meta.source + " (Tendance)"}

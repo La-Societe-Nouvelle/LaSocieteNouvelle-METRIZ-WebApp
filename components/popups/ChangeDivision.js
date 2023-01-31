@@ -35,7 +35,7 @@ const ChangeDivision = (props) => {
       </Modal.Header>
       <Modal.Body>
         <Select
-          className="mb-3 small-text"
+          className="mb-3 small"
           placeholder={"Choisissez un secteur d'activité"}
           options={divisionsOptions}
           onChange={changeComparativeDivision}

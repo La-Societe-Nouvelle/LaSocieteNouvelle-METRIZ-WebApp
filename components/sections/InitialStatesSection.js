@@ -94,7 +94,7 @@ export class InitialStatesSection extends React.Component {
           </div>
           {this.state.view == "defaultData" ? (
             <section className="step">
-              <div className="small-text">
+              <div className="small">
                 <p>
                   En cas d'analyse réalisée pour l'exercice précédent, importez
                   le fichier de sauvegarde via le premier onglet.
@@ -115,7 +115,7 @@ export class InitialStatesSection extends React.Component {
 
               {error && <ErrorApi />}
               {!isNextStepAvailable ? (
-                <div className="alert alert-syncronise">
+                <div className="alert alert-info">
                   <p>
                     <i className="bi bi-exclamation-circle"></i> Les
                     empreintes de certains comptes doivent être synchronisées.
@@ -155,7 +155,7 @@ export class InitialStatesSection extends React.Component {
             </section>
           ) : (
             <section className="step">
-              <p className="small-text mb-2">
+              <p className="small mb-2">
                 L'ajout de la sauvegarde de l'analyse sur l'exercice précédent
                 permet d'assurer une continuité vis-à-vis de l'exercice en
                 cours. La sauvegarde contient les valeurs des indicateurs
@@ -172,7 +172,7 @@ export class InitialStatesSection extends React.Component {
                         <i className="bi bi-file-arrow-up-fill"></i> Glisser
                         votre fichier ici
                       </p>
-                      <p className="small-text">OU</p>
+                      <p className="small">OU</p>
                       <p className="btn btn-primary">
                         Selectionner votre fichier
                       </p>
