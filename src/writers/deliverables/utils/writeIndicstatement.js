@@ -1,4 +1,4 @@
-import { printValue, printValueInput } from "../../utils/Utils";
+import { printValue, printValueInput } from "../../../utils/Utils";
 
 export const writeStatementECO = (impactsData) => {
   const textStatement = [

@@ -1,17 +1,16 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { getAnalyse, getStatementNote } from "../../utils/Writers";
-import { generateIndicTableBody } from "./generateTableBody";
+import { generateIndicTableBody } from "./utils/generateTableBody";
 
 // --------------------------------------------------------------------------
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const currentUrl = window.location.href;
 pdfMake.fonts = {
   Raleway: {
-    normal: currentUrl + "fonts/Raleway/Raleway-Regular.ttf",
-    bold: currentUrl + "fonts/Raleway/Raleway-bold.ttf",
+    normal: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
+    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-bold.ttf",
   },
   // download default Roboto font from cdnjs.com
   Roboto: {
@@ -143,6 +142,7 @@ export const basicPDFReport = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
+      // TO DO : Create external function to create content to import
       { text: "Résultat - " + label, style: "header" },
       {
         text: "Empreinte de vos Soldes Intermédiaires de Gestion",
@@ -209,7 +209,7 @@ export const basicPDFReport = (
                 image: productionChartImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
-                alignment : "center"
+                alignment: "center",
               },
             ],
           },
@@ -223,7 +223,7 @@ export const basicPDFReport = (
                 image: canvasValueAddedImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
-                alignment : "center"
+                alignment: "center",
               },
             ],
           },
@@ -241,7 +241,7 @@ export const basicPDFReport = (
                 image: canvasIntermediateConsumptionImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
-                alignment : "center"
+                alignment: "center",
               },
             ],
           },
@@ -255,7 +255,7 @@ export const basicPDFReport = (
                 image: canvasFixedCapitalConsumptionImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
-                alignment : "center"
+                alignment: "center",
               },
             ],
           },
@@ -324,8 +324,8 @@ export const basicPDFReport = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-      //pdfMake.createPdf(docDefinition).open();
-       saveAs(blob, `${documentTitle}.pdf`);
+        //pdfMake.createPdf(docDefinition).open();
+        saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);

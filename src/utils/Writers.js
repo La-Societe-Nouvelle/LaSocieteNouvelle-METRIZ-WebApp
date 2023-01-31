@@ -26,7 +26,7 @@ import {
   writeStatementSOC,
   writeStatementWAS,
   writeStatementWAT,
-} from "../writers/deliverables/writeIndicstatement";
+} from "../writers/deliverables/utils/writeIndicstatement";
 
 export const getStatementNote = (impactsData, indic) => {
   switch (indic) {

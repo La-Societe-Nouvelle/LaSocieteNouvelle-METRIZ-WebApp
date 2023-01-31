@@ -1,4 +1,4 @@
-import { printValue } from "../../utils/Utils";
+import { printValue } from "../../../utils/Utils";
 
 export const generateIndicTableBody = (
   aggregates,
