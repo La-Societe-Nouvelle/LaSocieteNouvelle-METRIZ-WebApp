@@ -452,7 +452,7 @@ const ResultSection = (props) => {
                   }
                   current={session.financialData.aggregates.production.footprint
                     .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                    .value}
                 />
               </div>
               <div
@@ -479,7 +479,7 @@ const ResultSection = (props) => {
                   }
                   current={session.financialData.aggregates.intermediateConsumption.footprint
                     .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                    .value}
                 />
               </div>
               <div
@@ -506,7 +506,7 @@ const ResultSection = (props) => {
                   }
                   current={session.financialData.aggregates.capitalConsumption.footprint
                     .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                    .value}
                 />
               </div>
               <div
@@ -534,7 +534,7 @@ const ResultSection = (props) => {
                   }
                   current={session.financialData.aggregates.netValueAdded.footprint
                     .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                    .value}
                 />
               </div>
             </Col>
