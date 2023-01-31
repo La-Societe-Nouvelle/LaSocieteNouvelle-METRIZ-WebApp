@@ -136,7 +136,7 @@ const ComparativeGraphs = (props) => {
               bottom: 20
           },
             align : "start",
-            text: "En " + unit,
+            text: unit,
             color: "#191558",
             font : {
               size: 10,

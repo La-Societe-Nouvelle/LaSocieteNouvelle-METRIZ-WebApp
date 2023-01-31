@@ -5,23 +5,12 @@ import ZipGenerator from "../../../../src/writers/deliverables/ZIPGenerator";
 import { exportFootprintPDF } from "../../../../src/writers/Export";
 
 const ExportResults = (props) => {
- 
-  const [isDisabled, setIsDisabled] = useState(true);
-
-  useEffect(() => {
-    if (props.session.validations.length > 0) {
-      setIsDisabled(false);
-    }
-  }, [props]);
-
-
   const handleDownloadPDF = async () => {
     await exportFootprintPDF(props.session);
   };
 
   return (
     <>
-    {console.log(props.validations)}
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
         <p className="mb-0">Rapport sur l'empreinte sociétale</p>
