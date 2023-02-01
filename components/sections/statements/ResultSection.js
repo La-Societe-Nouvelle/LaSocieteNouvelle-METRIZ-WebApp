@@ -35,6 +35,7 @@ import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData"
 import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
 import { basicPDFReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
+import { artBrochureGenerator } from "../../../src/writers/deliverables/artBrochureGenerator";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -193,7 +194,24 @@ const ResultSection = (props) => {
               {metaIndics[indic].libelle}
             </Button>
           )}
-
+         <Button
+            variant="secondary"
+            onClick={() =>
+              artBrochureGenerator(
+                session.year,
+                session.legalUnit.corporateName,
+                indic,
+                metaIndics[indic].libelle,
+                metaIndics[indic].unit,
+                session.financialData,
+                session.impactsData,
+                session.comparativeData,
+                true
+              )
+            }
+          >
+            Télécharger la fiche <i className="bi bi-download"></i>
+          </Button>
           <Button
             variant="secondary"
             onClick={() =>
