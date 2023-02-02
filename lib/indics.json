@@ -40,10 +40,10 @@
   },
   "geq": {
     "isBeta": false,
-    "libelle": "Indice d'écart de rémunérations F/H",
+    "libelle": "Indice d'écart de rémunérations Femmes/Hommes",
     "libelleDeclaredValue": "",
-    "libelleGrandeur": "Écart de rémunérations F/H",
-    "libelleMenu": "Ecart de rémunérations F/H",
+    "libelleGrandeur": "Écart de rémunérations Femmes/Hommes",
+    "libelleMenu": "Ecart de rémunérations Femmes/Hommes",
     "nbDecimals": 1,
     "odds": ["05","10"],
     "type": "indice",

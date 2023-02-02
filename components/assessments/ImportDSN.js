@@ -178,7 +178,7 @@ export class ImportDSN extends React.Component {
                   <td>Mois</td>
                   <td>Fraction</td>
                   <td>Ecart D9/D1</td>
-                  <td>Ecart F/H</td>
+                  <td>Ecart Femmes/Hommes</td>
                   <td></td>
                 </tr>
               </thead>

@@ -36,15 +36,15 @@ export const analysisTextWriterGEQ = (session) => {
 
   if (!impactsData.hasEmployees) {
     currentParagraph.push(
-      "L'entreprise n'étant pas employeuse, l'écart de rémunération F/H associé à la valeur ajoutée est de 0 %."
+      "L'entreprise n'étant pas employeuse, l'écart de rémunération Femmes/Hommes associé à la valeur ajoutée est de 0 %."
     );
   } else if (impactsData.employees == 1) {
     currentParagraph.push(
-      "L'entreprise n'employant qu'une seule personne, l'écart de rémunération F/H associé à la valeur ajoutée est de 0 %."
+      "L'entreprise n'employant qu'une seule personne, l'écart de rémunération Femmes/Hommes associé à la valeur ajoutée est de 0 %."
     );
   } else {
     currentParagraph.push(
-      "L'écart de rémunération F/H est de " +
+      "L'écart de rémunération Femmes/Hommes est de " +
         impactsData.wageGap +
         " % au sein de l'entreprise."
     );
@@ -58,7 +58,7 @@ export const analysisTextWriterGEQ = (session) => {
 
   // résultat
   currentParagraph.push(
-    "L'écart de rémunération F/H moyen associé des consommations intermédiaires est de " +
+    "L'écart de rémunération Femmes/Hommes moyen associé des consommations intermédiaires est de " +
       printValue(
         aggregates.intermediateConsumption.footprint.indicators.geq.getValue(),
         0
@@ -77,7 +77,7 @@ export const analysisTextWriterGEQ = (session) => {
   currentParagraph = [];
 
   currentParagraph.push(
-    "L'écart de rémunération F/H moyen associé à l'amortissement des immobilisations est de " +
+    "L'écart de rémunération Femmes/Hommes moyen associé à l'amortissement des immobilisations est de " +
       printValue(
         aggregates.capitalConsumption.footprint.indicators.geq.getValue(),
         0
