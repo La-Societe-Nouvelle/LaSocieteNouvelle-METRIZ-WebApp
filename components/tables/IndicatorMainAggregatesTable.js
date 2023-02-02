@@ -5,12 +5,15 @@ import { printValue } from "/src/utils/Utils";
 
 // Libraries
 import metaIndics from "/lib/indics";
-import { Table } from "react-bootstrap";
+
+//
+import { Button, Col, Row, Table } from "react-bootstrap";
+import DoughnutChart from "../graphs/DoughnutChart";
+import { exportIndicXLSX } from "../../src/writers/ExportXLSX";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
-export const IndicatorMainAggregatesTable = ({ indic, session }) => { 
-
+export const IndicatorMainAggregatesTable = ({ indic, session }) => {
   const financialData = session.financialData;
 
   const nbDecimals = metaIndics[indic].nbDecimals;
@@ -41,29 +44,26 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
         <thead>
           <tr>
             <td>Agrégat</td>
-            <td  className="text-end">Montant</td>
-            <td  className="text-end">Empreinte</td>
-            <td  className="text-end">Incertitude</td>
-            {printGrossImpact ? (
-              <td  className="text-end">
-                Impact
-              </td>
-            ) : null}
+            <td className="text-end">Montant</td>
+            <td className="text-end">Empreinte</td>
+            <td className="text-end">Incertitude</td>
+            {printGrossImpact ? <td className="text-end">Impact</td> : null}
           </tr>
         </thead>
         <tbody>
-          <tr  className="fw-bold">
-            <td >Production</td>
-            <td  className="text-end">
+          <tr className="fw-bold">
+            <td>Production</td>
+            <td className="text-end">
               {printValue(production.amount, 0)} &euro;
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               {printValue(
                 production.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )} <span className="unit">{unit}</span>
+              )}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               <u>+</u>
               {printValue(
                 production.footprint.indicators[indic].getUncertainty(),
@@ -72,28 +72,28 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               %
             </td>
             {printGrossImpact ? (
-              <td  className="text-end">
+              <td className="text-end">
                 {printValue(
                   production.footprint.indicators[indic].getGrossImpact(
                     production.amount
                   ),
                   nbDecimals
-                )}<span className="unit"> {unitGrossImpact}</span>
+                )}
+                <span className="unit"> {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
           <tr>
             <td>&emsp;Production vendue</td>
-            <td  className="text-end">
-              {printValue(revenue.amount, 0)} &euro;
-            </td>
-            <td  className="text-end">
+            <td className="text-end">{printValue(revenue.amount, 0)} &euro;</td>
+            <td className="text-end">
               {printValue(
                 revenue.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )} <span className="unit">{unit}</span>
+              )}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               <u>+</u>
               {printValue(
                 revenue.footprint.indicators[indic].getUncertainty(),
@@ -102,7 +102,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               %
             </td>
             {printGrossImpact ? (
-              <td  className="text-end">
+              <td className="text-end">
                 {printValue(
                   revenue.footprint.indicators[indic].getGrossImpact(
                     revenue.amount
@@ -116,16 +116,17 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           {storedProduction != 0 && (
             <tr>
               <td>&emsp;Production stockée</td>
-              <td  className="text-end" >
+              <td className="text-end">
                 {printValue(storedProduction.amount, 0)} &euro;
               </td>
-              <td  className="text-end">
+              <td className="text-end">
                 {printValue(
                   storedProduction.footprint.indicators[indic].getValue(),
                   nbDecimals
-                )} <span className="unit">{unit}</span>
+                )}{" "}
+                <span className="unit">{unit}</span>
               </td>
-              <td  className="text-end" >
+              <td className="text-end">
                 <u>+</u>
                 {printValue(
                   storedProduction.footprint.indicators[indic].getUncertainty(),
@@ -134,7 +135,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 %
               </td>
               {printGrossImpact ? (
-                <td  className="text-end">
+                <td className="text-end">
                   {printValue(
                     storedProduction.footprint.indicators[indic].getGrossImpact(
                       storedProduction.amount
@@ -149,16 +150,17 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           {immobilisedProduction.amount > 0 && (
             <tr>
               <td>&emsp;Production immobilisée</td>
-              <td  className="text-end">
+              <td className="text-end">
                 ({printValue(immobilisedProduction.amount, 0)}) &euro;
               </td>
-              <td  className="text-end">
+              <td className="text-end">
                 {printValue(
                   immobilisedProduction.footprint.indicators[indic].getValue(),
                   nbDecimals
-                )} <span className="unit">{unit}</span>
+                )}{" "}
+                <span className="unit">{unit}</span>
               </td>
-              <td  className="text-end">
+              <td className="text-end">
                 <u>+</u>
                 {printValue(
                   immobilisedProduction.footprint.indicators[
@@ -169,7 +171,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 %
               </td>
               {printGrossImpact ? (
-                <td  className="text-end" >
+                <td className="text-end">
                   (
                   {printValue(
                     immobilisedProduction.footprint.indicators[
@@ -177,8 +179,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                     ].getGrossImpact(immobilisedProduction.amount),
                     nbDecimals
                   )}
-                  )
-                  <span className="unit"> {unitGrossImpact}</span>
+                  )<span className="unit"> {unitGrossImpact}</span>
                 </td>
               ) : null}
             </tr>
@@ -188,13 +189,14 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             <td className="text-end">
               {printValue(intermediateConsumption.amount, 0)} &euro;
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               {printValue(
                 intermediateConsumption.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )} <span className="unit">{unit}</span>
+              )}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               <u>+</u>
               {printValue(
                 intermediateConsumption.footprint.indicators[
@@ -205,7 +207,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               %
             </td>
             {printGrossImpact ? (
-              <td  className="text-end">
+              <td className="text-end">
                 {printValue(
                   intermediateConsumption.footprint.indicators[
                     indic
@@ -222,20 +224,20 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             .map(({ accountLib, amount, footprint }, index) => (
               <tr key={index}>
                 <td>&emsp;{accountLib}</td>
-                <td  className="text-end">{printValue(amount, 0)} &euro;</td>
-                <td  className="text-end">
+                <td className="text-end">{printValue(amount, 0)} &euro;</td>
+                <td className="text-end">
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )} <span className="unit">{unit}</span>
+                  )}{" "}
+                  <span className="unit">{unit}</span>
                 </td>
-                <td  className="text-end">
+                <td className="text-end">
                   <u>+</u>
-                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}
-                  %
+                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}%
                 </td>
                 {printGrossImpact ? (
-                  <td  className="text-end">
+                  <td className="text-end">
                     {printValue(
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
@@ -248,16 +250,17 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
 
           <tr className="border-top  fw-bold">
             <td> Consommations de capital fixe</td>
-            <td  className="text-end">
+            <td className="text-end">
               {printValue(capitalConsumption.amount, 0)} &euro;
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               {printValue(
                 capitalConsumption.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )} <span className="unit">{unit}</span>
+              )}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               <u>+</u>
               {printValue(
                 capitalConsumption.footprint.indicators[indic].getUncertainty(),
@@ -266,13 +269,14 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
               %
             </td>
             {printGrossImpact ? (
-              <td  className="text-end">
+              <td className="text-end">
                 {printValue(
                   capitalConsumption.footprint.indicators[indic].getGrossImpact(
                     capitalConsumption.amount
                   ),
                   nbDecimals
-                )} <span className="unit"> {unitGrossImpact}</span>
+                )}{" "}
+                <span className="unit"> {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -281,20 +285,20 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             .map(({ accountLib, amount, footprint }, index) => (
               <tr key={index}>
                 <td>&emsp;{accountLib}</td>
-                <td  className="text-end">{printValue(amount, 0)} &euro;</td>
-                <td  className="text-end">
+                <td className="text-end">{printValue(amount, 0)} &euro;</td>
+                <td className="text-end">
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )} <span className="unit"> {unit} </span>
+                  )}{" "}
+                  <span className="unit"> {unit} </span>
                 </td>
-                <td  className="text-end">
+                <td className="text-end">
                   <u>+</u>
-                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}
-                  %
+                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}%
                 </td>
                 {printGrossImpact ? (
-                  <td  className="text-end">
+                  <td className="text-end">
                     {printValue(
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
@@ -306,16 +310,17 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             ))}
           <tr className="border-top  fw-bold">
             <td>Valeur ajoutée nette</td>
-            <td  className="text-end">
+            <td className="text-end">
               {printValue(netValueAdded.amount, 0)} &euro;
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               {printValue(
                 netValueAdded.footprint.indicators[indic].getValue(),
                 nbDecimals
-              )} <span className="unit">{unit}</span>
+              )}{" "}
+              <span className="unit">{unit}</span>
             </td>
-            <td  className="text-end">
+            <td className="text-end">
               <u>+</u>
               {printValue(
                 netValueAdded.footprint.indicators[indic].getUncertainty(),
@@ -334,11 +339,78 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 <span className="unit"> {unitGrossImpact}</span>
               </td>
             ) : null}
-
           </tr>
         </tbody>
       </Table>
-
+      <div className="text-end">
+        <Button
+          variant="tertiary"
+          size="sm"
+          className="me-0"
+          onClick={() => exportIndicXLSX(indic, session)}
+        >
+          Télécharger les données <i className="bi bi-download"></i>
+        </Button>
+      </div>
+      {metaIndics[indic].type == "proportion" && (
+        <>
+          <hr />
+          <div className="my-4 d-flex ">
+            <div className="pe-5">
+              <h5 className="mb-4">▪ Production</h5>
+              <div className="doughtnut-chart-container">
+                <DoughnutChart
+                  value={printValue(
+                    production.footprint.indicators[indic].value,
+                    nbDecimals
+                  )}
+                  title={"Production"}
+                  id={"prd-" + indic}
+                />
+              </div>
+            </div>
+            <div className="px-5">
+              <h5 className="mb-4">▪ Consommations intermédiaires</h5>
+              <div className="doughtnut-chart-container">
+                <DoughnutChart
+                  value={printValue(
+                    intermediateConsumption.footprint.indicators[indic].value,
+                    nbDecimals
+                  )}
+                  title={"Consommations intermédiaires"}
+                  id={"ic-" + indic}
+                />
+              </div>
+            </div>
+            <div className="px-5">
+              <h5 className="mb-4">▪ Consommation de capital fixe</h5>
+              <div className="doughtnut-chart-container">
+                <DoughnutChart
+                  value={printValue(
+                    capitalConsumption.footprint.indicators[indic].value,
+                    nbDecimals
+                  )}
+                  title={"Consommation de capital fixe"}
+                  id={"ccf-" + indic}
+                />
+              </div>
+            </div>
+            <div className="ps-5">
+              <h5 className="mb-4">▪ Valeur ajoutée nette</h5>
+              <div className="doughtnut-chart-container">
+                <DoughnutChart
+                  value={printValue(
+                    netValueAdded.footprint.indicators[indic].getValue(),
+                    nbDecimals
+                  )}
+                  title={"Valeur ajoutée nette"}
+                  id={"nva-" + indic}
+                />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 };

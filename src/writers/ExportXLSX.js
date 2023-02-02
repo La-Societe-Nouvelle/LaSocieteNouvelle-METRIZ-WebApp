@@ -1,14 +1,13 @@
 import * as XLSX from 'xlsx';
 import { getExpensesGroupByAccount } from '../../components/tables/IndicatorExpensesTable';
 import { getFixedCapitalConsumptionsAggregatesGroups, getIntermediateConsumptionsAggregatesGroups } from '../../components/tables/IndicatorMainAggregatesTable';
-import { printValue, roundValue } from '../utils/Utils';
+import {  roundValue } from '../utils/Utils';
 
 import metaIndics from "/lib/indics";
 
 async function exportIndicXLSX(
   indic,
   session,
-  comparativeDivision
 ) {
   // Build file
   let file = await IndicXLSXFileWriter(

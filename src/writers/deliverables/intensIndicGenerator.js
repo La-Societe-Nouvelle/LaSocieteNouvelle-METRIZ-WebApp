@@ -1,5 +1,7 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { printValue } from "../../utils/Utils";
+import { sortExpensesByFootprintIndicator } from "./utils/utils";
 
 // --------------------------------------------------------------------------
 
@@ -22,7 +24,7 @@ pdfMake.fonts = {
   },
 };
 
-export const artBrochureGenerator = (
+export const intensIndicGenerator = (
   year,
   legalUnit,
   indic,
@@ -35,11 +37,50 @@ export const artBrochureGenerator = (
 ) => {
   // ---------------------------------------------------------------
 
+  const {
+    production,
+    revenue,
+    storedProduction,
+    immobilisedProduction,
+    intermediateConsumption,
+    capitalConsumption,
+    netValueAdded,
+  } = financialData.aggregates;
+
+  const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
+    financialData.expenses,
+    indic,
+    "desc"
+  ).slice(0, 3);
+  const leastImpactfulExpenses = sortExpensesByFootprintIndicator(
+    financialData.expenses,
+    indic,
+    "asc"
+  ).slice(0, 3);
+
+  console.log(mostImpactfulExpenses);
+  console.log(mostImpactfulExpenses.accountAuxLib);
+
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
   const productionChartImage = canvasProduction.toDataURL("image/png");
 
+  const doughtnutIC = document.getElementById("dn-ic-" + indic);
+  const doughtnutICImage = doughtnutIC.toDataURL("image/png");
+
+  const doughtnutCCF = document.getElementById("dn-ccf-" + indic);
+  const doughtnutCCFImage = doughtnutCCF.toDataURL("image/png");
+
+  const doughtnutNVA = document.getElementById("dn-nva-" + indic);
+  const doughtnutNVAImage = doughtnutNVA.toDataURL("image/png");
+
   // ---------------------------------------------------------------
+
+  const totalRevenue = revenue.amount;
+  const contributionPercentage = revenue.footprint.indicators[indic].value;
+  const contributionAmount = (contributionPercentage / 100) * totalRevenue;
+  const contributionPerEuro = contributionAmount / totalRevenue;
+
   // Document Property
 
   const margins = {
@@ -118,12 +159,13 @@ export const artBrochureGenerator = (
             lineColor: "#f1f0f4",
             r: 10,
           },
+          // Box Vue de vos Soldes Intermediaires de Gestion
           {
             type: "rect",
             x: 30,
             y: 242,
             w: 535,
-            h: 110,
+            h: 120,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -133,7 +175,7 @@ export const artBrochureGenerator = (
             x: 30,
             y: 392,
             w: 220,
-            h: 310,
+            h: 280,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -143,7 +185,17 @@ export const artBrochureGenerator = (
             x: 275,
             y: 392,
             w: 290,
-            h: 310,
+            h: 220,
+            lineWidth: 2,
+            lineColor: "#f1f0f4",
+            r: 10,
+          },
+          {
+            type: "rect",
+            x: 275,
+            y: 632,
+            w: 290,
+            h: 90,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -159,7 +211,6 @@ export const artBrochureGenerator = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      // TO DO : Create external function to create content to import
       { text: "Rapport - " + label, style: "header" },
       {
         columns: [
@@ -167,7 +218,7 @@ export const artBrochureGenerator = (
             margin: [0, 30, 0, 30],
             stack: [
               {
-                text: "3 477 466 €",
+                text: printValue(totalRevenue, 0) + "€",
                 alignment: "center",
                 style: "numbers",
               },
@@ -177,25 +228,27 @@ export const artBrochureGenerator = (
               },
             ],
           },
+
           {
             margin: [0, 15, 0, 30],
             stack: [
               {
                 text: "Pour 1€ de chiffre d'affaires",
                 alignment: "center",
+                background: "#FFFFFF",
               },
               {
                 margin: [0, 5, 0, 0],
-                text: "0,86€",
+                text: contributionPerEuro.toFixed(2) + " €",
                 alignment: "center",
                 style: "numbers",
               },
               {
-                text: "contribuent aux",
+                text: "contribue aux",
                 alignment: "center",
               },
               {
-                text: "Métiers d'Arts et aux Savoir faire",
+                text: label,
                 alignment: "center",
               },
             ],
@@ -205,37 +258,103 @@ export const artBrochureGenerator = (
       {
         text: "L'indicateur permet de rendre compte de la part de la valeur produite par des entreprises artisanales, créatives ou dont le savoir-faire est reconnu.",
       },
+      // Box Vue de vos Soldes Intérmediaires de Gestion
       {
         text: "Vue de vos Soldes Intérmediaires de Gestion",
         style: "h2",
       },
       {
-        margin: [0, 10, 0, 10],
+        margin: [0, 0, 0, 10],
         columns: [
           {
             width: 150,
             margin: [10, 0, 10, 0],
             stack: [
               {
-                text: "86%",
+                text:
+                  printValue(production.footprint.indicators[indic].value, 0) +
+                  "%",
                 alignment: "center",
                 style: "bigNumber",
               },
               {
-                text: "de votre production contribuent aux Métiers d'Art et du Savoir Faire",
+                text: "de votre production contribuent " + label,
                 alignment: "center",
                 bold: true,
               },
             ],
           },
           {
-            stack: [],
+            stack: [
+              {
+                image: doughtnutICImage,
+                alignment: "center",
+                width: 60,
+              },
+              {
+                text: "Consommations",
+                alignment: "center",
+                bold: true,
+                fontSize: 8,
+                margin: [0, 5, 0, 0],
+              },
+              {
+                text: "intermédiaires",
+                alignment: "center",
+                bold: true,
+                fontSize: 8,
+              },
+            ],
+          },
+          {
+            stack: [
+              {
+                image: doughtnutCCFImage,
+                alignment: "center",
+                width: 60,
+              },
+              {
+                text: "Consommation",
+                alignment: "center",
+                bold: true,
+                fontSize: 8,
+                margin: [0, 5, 0, 0],
+              },
+              {
+                text: "de capital fixe",
+                alignment: "center",
+                bold: true,
+                fontSize: 8,
+              },
+            ],
+          },
+          {
+            stack: [
+              {
+                image: doughtnutNVAImage,
+                width: 60,
+                alignment: "center",
+              },
+              {
+                text: "Valeur ajoutée",
+                alignment: "center",
+                bold: true,
+                fontSize: 8,
+                margin: [0, 5, 0, 0],
+              },
+              {
+                text: "nette",
+                alignment: "center",
+                bold: true,
+                fontSize: 8,
+              },
+            ],
           },
         ],
       },
       {
-        margin: [0, 40, 0, 0],
-        columnGap : 40,
+        margin: [0, 30, 0, 0],
+        columnGap: 40,
         columns: [
           {
             width: 200,
@@ -247,7 +366,7 @@ export const artBrochureGenerator = (
               },
               {
                 image: productionChartImage,
-                width: 180,
+                width: 200,
                 alignment: "center",
               },
               {
@@ -285,45 +404,44 @@ export const artBrochureGenerator = (
               {
                 text: "Les comptes de charges les plus impactants",
                 style: "h2",
-                margin: [0, 0, 0, 10]
+                margin: [0, 0, 0, 10],
               },
 
               {
                 text: "Les plus contributifs ",
                 fontSize: 10,
-                bold : true,
+                bold: true,
                 margin: [10, 0, 0, 10],
               },
-              {
-                text: "000 Fournitures informatiques ",
+
+              mostImpactfulExpenses.map((expense) => ({
+                text:  expense.account + " - " + expense.accountLib,
                 margin: [10, 0, 0, 10],
-              },
-              {
-                text: "000 Fournitures informatiques ",
-                margin: [10, 0, 0, 10],
-              },
-              {
-                text: "000 Fournitures informatiques ",
-                margin: [10, 0, 0, 10],
-              },
+              })),
+             
               {
                 text: "Les moins contributifs ",
                 fontSize: 10,
-                bold : true,
+                bold: true,
                 margin: [10, 15, 0, 10],
               },
-              {
-                text: "000 Fournitures informatiques ",
+              leastImpactfulExpenses.map((expense) => ({
+                text:  expense.account + " - " + expense.accountLib,
                 margin: [10, 0, 0, 10],
-              },
+              })),
+             
+              // ACTIVITES FOURNISSEURS
               {
-                text: "000 Fournitures informatiques ",
-                margin: [10, 0, 0, 10],
+                text: "Type d'activité des fournisseurs",
+                style: "h2",
+                margin: [0, 30, 0, 10],
               },
-              {
-                text: "000 Fournitures informatiques ",
+              mostImpactfulExpenses.map((expense) => ({
+                text:  expense.accountAux + " - " + expense.accountAuxLib,
                 margin: [10, 0, 0, 10],
-              },
+              })),
+             
+            
             ],
           },
         ],

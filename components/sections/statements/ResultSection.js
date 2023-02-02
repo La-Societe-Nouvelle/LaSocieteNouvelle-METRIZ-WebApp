@@ -32,24 +32,15 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 // Fetch API data
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
+
 import { basicPDFReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
-import { artBrochureGenerator } from "../../../src/writers/deliverables/artBrochureGenerator";
+import { intensIndicGenerator } from "../../../src/writers/deliverables/intensIndicGenerator";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
   const [error] = useState(false);
-
-  const [printGrossImpact] = useState([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat",
-  ]);
 
   const [divisionsOptions, setDivisionsOptions] = useState([]);
 
@@ -194,10 +185,10 @@ const ResultSection = (props) => {
               {metaIndics[indic].libelle}
             </Button>
           )}
-         <Button
+          <Button
             variant="secondary"
             onClick={() =>
-              artBrochureGenerator(
+              intensIndicGenerator(
                 session.year,
                 session.legalUnit.corporateName,
                 indic,
@@ -243,7 +234,7 @@ const ResultSection = (props) => {
           <h3>{metaIndics[indic].libelle}</h3>
         </div>
         <Row>
-          <Col lg={printGrossImpact.includes(indic) ? "9" : "12"}>
+          <Col>
             <Tabs
               defaultActiveKey="mainAggregates"
               transition={false}
@@ -263,22 +254,10 @@ const ResultSection = (props) => {
                 <IndicatorExpensesTable session={session} indic={indic} />
               </Tab>
             </Tabs>
-            <div className="text-end">
-              <Button
-                variant="tertiary"
-                size="sm"
-                className="me-0"
-                onClick={() =>
-                  exportIndicXLSX(indic, session, comparativeDivision)
-                }
-              >
-                Télécharger les données <i className="bi bi-download"></i>
-              </Button>
-            </div>
           </Col>
           {/* ----------Gross Impact Pie Chart ----------  */}
 
-          {printGrossImpact.includes(indic) && (
+          {metaIndics[indic].type == "intensité" && (
             <Col sm={3}>
               <div className="border rounded mt-5">
                 <h3 className="text-center">
@@ -609,7 +588,7 @@ const ResultSection = (props) => {
         </div>
       </section>
       {/* ---------- Footer section ----------  */}
-
+            
       <section className="step">
         <div className="d-flex justify-content-end">
           <Button variant="light" onClick={props.goBack}>

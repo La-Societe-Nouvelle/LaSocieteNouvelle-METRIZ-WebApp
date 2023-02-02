@@ -131,6 +131,7 @@ const ComparativeGraphs = (props) => {
           },
           title: {
             display: true,
+            text: "Valeur ajoutée nette",
             padding: {
               top: 10,
               bottom: 20
