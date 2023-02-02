@@ -213,7 +213,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
           )}
         </tr>
         <tr>
-          <td>Consommation de capital fixe</td>
+          <td>Consommations de capital fixe</td>
           <td className="border-left text-end">
             {getValue(
               comparativeData.fixedCapitalConsumption.areaFootprint.indicators[

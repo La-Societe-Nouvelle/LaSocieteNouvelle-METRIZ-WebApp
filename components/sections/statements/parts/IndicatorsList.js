@@ -297,6 +297,7 @@ const IndicatorsList = (props) => {
                   ]}
                   titleChart="Production"
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -320,6 +321,7 @@ const IndicatorsList = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -343,6 +345,7 @@ const IndicatorsList = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -368,6 +371,7 @@ const IndicatorsList = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
             </Row>

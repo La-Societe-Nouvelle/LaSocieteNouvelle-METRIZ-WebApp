@@ -1,4 +1,5 @@
 import { printValue } from "../../../utils/Utils";
+import metaIndics from "/lib/indics";
 
 export const generateIndicTableBody = (
   aggregates,
@@ -17,12 +18,15 @@ export const generateIndicTableBody = (
     capitalConsumption,
     netValueAdded,
   } = aggregates;
+
+  const precision = metaIndics[indic].nbDecimals;
+
   const tableBody = [
     [
       {
         text: "Agrégat",
         style: "tableHeader",
-        alignment : "left",
+        alignment: "left",
         border: [false, false, true, false],
       },
       {
@@ -49,18 +53,27 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
       {
-        text:
-          printValue(production.footprint.indicators[indic].value, 1) +
-          " " +
-          unit,
-          bold: true,
+        columns: [
+          {
+            text: [
+              {
+                text:
+                  printValue(production.footprint.indicators[indic].value, precision) +
+                  " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
+        bold: true,
         margin: [2, 2, 2, 2],
       },
       {
         text:
-          printValue(production.footprint.indicators[indic].uncertainty, 1) +
+          printValue(production.footprint.indicators[indic].uncertainty, 0) +
           " %",
-          bold: true,
+        bold: true,
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
@@ -75,15 +88,27 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
       {
-        text:
-          printValue(revenue.footprint.indicators[indic].value, 1) + " " + unit,
-
+        columns: [
+          {
+            text: [
+              
+              {
+                text:
+                  printValue(revenue.footprint.indicators[indic].value, precision) +
+                  " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
+        fillColor: "#fa595f",
+        fillOpacity : 0.3,
         margin: [2, 2, 2, 2],
       },
       {
         text:
-          printValue(revenue.footprint.indicators[indic].uncertainty, 1) + " %",
-
+          printValue(revenue.footprint.indicators[indic].uncertainty, 0) + " %",
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
@@ -99,24 +124,33 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
       {
-        text:
-          printValue(storedProduction.footprint.indicators[indic].value, 1) +
-          " " +
-          unit,
-
+        columns: [
+          {
+            text: [
+              {
+                text:
+                  printValue(
+                    storedProduction.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
         margin: [2, 2, 2, 2],
       },
       {
         text:
           printValue(
             storedProduction.footprint.indicators[indic].uncertainty,
-            1
+            0
           ) + " %",
-
+          fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getImmobilisedProductionRow(immobilisedProduction, indic, unit),
+    ...getImmobilisedProductionRow(immobilisedProduction, indic, unit, precision),
     [
       {
         text: "Consommations intermédiaires",
@@ -128,31 +162,40 @@ export const generateIndicTableBody = (
         bold: true,
         margin: [2, 2, 2, 2],
       },
+
       {
-        text:
-          printValue(
-            intermediateConsumption.footprint.indicators[indic].value,
-            1
-          ) +
-          " " +
-          unit,
-          bold: true,
+        columns: [
+          {
+            text: [
+              {
+                text:
+                  printValue(
+                    intermediateConsumption.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
+        bold: true,
         margin: [2, 2, 2, 2],
       },
       {
         text:
           printValue(
             intermediateConsumption.footprint.indicators[indic].uncertainty,
-            1
+            0
           ) + " %",
-          bold: true,
+        bold: true,
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getAggregateRow(intermediateConsumptionAggregates, indic, unit),
+    ...getAggregateRow(intermediateConsumptionAggregates, indic, unit, precision),
     [
       {
-        text: "Dotations aux Amortissements sur immobilisations",
+        text: "Consommations de capital fixe",
         style: "tableBold",
         margin: [2, 2, 2, 2],
       },
@@ -162,12 +205,22 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
       {
-        text:
-          printValue(capitalConsumption.footprint.indicators[indic].value, 1) +
-          " " +
-          unit,
-          bold: true,
+        bold: true,
         margin: [2, 2, 2, 2],
+        columns: [
+          {
+            text: [
+              {
+                text:
+                  printValue(
+                    capitalConsumption.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
       },
       {
         text:
@@ -175,11 +228,12 @@ export const generateIndicTableBody = (
             capitalConsumption.footprint.indicators[indic].uncertainty,
             0
           ) + " %",
-          bold: true,
+        bold: true,
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getAggregateRow(fixedCapitalConsumptionsAggregates, indic, unit),
+    ...getAggregateRow(fixedCapitalConsumptionsAggregates, indic, unit, precision),
     [
       {
         text: "Valeur ajoutée nette",
@@ -192,18 +246,29 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
       {
-        text:
-          printValue(netValueAdded.footprint.indicators[indic].value, 0) +
-          " " +
-          unit,
-          bold: true,
+        columns: [
+          {
+            text: [
+              {
+                text:
+                  printValue(
+                    netValueAdded.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
+        bold: true,
         margin: [2, 2, 2, 2],
       },
       {
         text:
           printValue(netValueAdded.footprint.indicators[indic].uncertainty, 0) +
           " %",
-          bold: true,
+        bold: true,
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
@@ -211,7 +276,7 @@ export const generateIndicTableBody = (
   return tableBody;
 };
 
-const getImmobilisedProductionRow = (immobilisedProduction, indic, unit) => {
+const getImmobilisedProductionRow = (immobilisedProduction, indic, unit, precision) => {
   const immobilisedProductionRow = [];
   // Immobilised production
   if (immobilisedProduction > 0) {
@@ -226,10 +291,21 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit) => {
         margin: [2, 2, 2, 2],
       },
       {
-        text: printValue(
-          immobilisedProduction.footprint.indicators[indic].value + " " + unit,
-          1
-        ),
+        columns: [
+          {
+            text: [
+              {
+                text:
+                  printValue(
+                    immobilisedProduction.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
+              },
+              { text: unit, fontSize: "7" },
+            ],
+          },
+        ],
+
         margin: [2, 2, 2, 2],
       },
       {
@@ -238,6 +314,7 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit) => {
             immobilisedProduction.footprint.indicators[indic].uncertainty,
             0
           ) + " %",
+          fontSize: "7",
         margin: [2, 2, 2, 2],
       }
     );
@@ -246,7 +323,7 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit) => {
   return immobilisedProductionRow;
 };
 
-const getAggregateRow = (aggregates, indic, unit) => {
+const getAggregateRow = (aggregates, indic, unit, precision) => {
   let rows = [];
   aggregates
     .filter((aggregate) => aggregate.amount != 0)
@@ -263,16 +340,25 @@ const getAggregateRow = (aggregates, indic, unit) => {
           margin: [2, 2, 2, 2],
         },
         {
-          text:
-            printValue(aggregate.footprint.indicators[indic].value, 1) +
-            " " +
-            unit,
+          columns: [
+            {
+              text: [
+                {
+                  text:
+                    printValue(aggregate.footprint.indicators[indic].value, precision) +
+                    " ",
+                },
+                { text: unit, fontSize: "7" },
+              ],
+            },
+          ],
           margin: [2, 2, 2, 2],
         },
         {
           text:
             printValue(aggregate.footprint.indicators[indic].uncertainty, 0) +
             " %",
+            fontSize: "7",
           margin: [2, 2, 2, 2],
         }
       );

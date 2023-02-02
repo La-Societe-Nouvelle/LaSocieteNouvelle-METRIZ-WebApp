@@ -38,6 +38,10 @@ export const basicPDFReport = (
 ) => {
   // ---------------------------------------------------------------
 
+  const currentDate = new Date();
+  const month = currentDate.toLocaleString("default", { month: "long" });
+  const year = currentDate.getFullYear();
+
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
   const canvasValueAdded = document.getElementById("netValueAdded-" + indic);
@@ -97,19 +101,27 @@ export const basicPDFReport = (
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0] },
+        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + year,
           alignment: "right",
           margin: [0, 15, 20, 0],
+          bold: true,
         },
       ],
     },
     footer: function (currentPage, pageCount) {
       return {
-        text: "Page " + currentPage.toString() + " sur " + pageCount,
-        alignment: "right",
-        margin: [0, 25, 20, 0],
+        columns: [
+          { text: "Edité en " + month + " " + year, margin: [20, 25, 0, 0] },
+          {
+            text: "Page " + currentPage.toString() + " sur " + pageCount,
+            alignment: "right",
+            margin: [0, 25, 20, 0],
+          },
+        ],
+
+        fontSize: 7,
       };
     },
     background: function () {
@@ -146,7 +158,7 @@ export const basicPDFReport = (
       // TO DO : Create external function to create content to import
       { text: "Résultat - " + label, style: "header" },
       {
-        text: "Empreinte de vos Soldes Intermédiaires de Gestion",
+        text: "Empreintes de vos Soldes Intermédiaires de Gestion",
         style: "h2",
         margin: [0, 10, 0, 20],
       },
@@ -186,6 +198,7 @@ export const basicPDFReport = (
       },
       { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
       statementNotes.map((note) => note),
+      { text: impactsData.comments[indic], margin: [0, 10, 0, 10] },
 
       // -- PAGE 2-------------------------------------------------------------------------
       {
@@ -200,11 +213,15 @@ export const basicPDFReport = (
         text: "Comparaisons",
         style: "h2",
         margin: [0, 30, 0, 10],
-      }, 
-      comparativeData.activityCode !== "00" ? (
-      {
-        text: "Branche de référence : " + divisions[comparativeData.activityCode], margin: [0, 0, 0, 10], font : "Raleway", decoration : "underline"
-      }) : "",
+      },
+      comparativeData.activityCode !== "00"
+        ? {
+            text:
+              "Branche d'activité : " + divisions[comparativeData.activityCode],
+            margin: [0, 0, 0, 10],
+            font: "Raleway",
+          }
+        : "",
       {
         columns: [
           {
@@ -253,7 +270,7 @@ export const basicPDFReport = (
           {
             stack: [
               {
-                text: "Consommation de Capital Fixe ",
+                text: "Consommations de capital fixe ",
                 style: "h4",
               },
               {
@@ -262,10 +279,68 @@ export const basicPDFReport = (
                 margin: [0, 10, 0, 20],
                 alignment: "center",
               },
+              { 
+                columns: [
+                  
+                  {
+                    stack: [
+                      {
+                        width: 5,
+                        height: 5,
+                        canvas: [{
+                          type: 'rect',
+                          x: 0,
+                          y: 0,
+                          w: 5,
+                          h: 5,
+                          color: 'red'
+                        }]
+                      },
+                      {
+                        width: 5,
+                        height: 5,
+                        canvas: [{
+                          type: 'rect',
+                          x: 0,
+                          y: 0,
+                          w: 5,
+                          h: 5,
+                          color: 'red'
+                        }]
+                      },
+                    ],
+                  },
+             
+                  {
+                    text: ' Valeur pour la France',
+                    style: 'text',
+                    fontSize : 5
+                  },
+                  {
+                    width: 5,
+                    height: 5,
+                    canvas: [{
+                      type: 'rect',
+                      x: 0,
+                      y: 0,
+                      w: 5,
+                      h: 5,
+                      color: 'red'
+                    }]
+                  },
+                  {
+                    text: ' Valeur pour la France',
+                    style: 'text',
+                    fontSize : 5
+                  }
+                  
+                ]
+              }
             ],
           },
         ],
       },
+   
       ,
     ],
     defaultStyle: {
@@ -299,7 +374,6 @@ export const basicPDFReport = (
         margin: [0, 10, 0, 10],
         bold: true,
       },
-
       text: {
         alignment: "justify",
         lineHeight: 1.5,

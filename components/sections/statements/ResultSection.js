@@ -151,7 +151,7 @@ const ResultSection = (props) => {
   const graphViewOptions = [
     { value: "prd", label: "Production" },
     { value: "ic", label: "Consommations intermédiaires" },
-    { value: "cfc", label: "Consommation de capital fixe" },
+    { value: "cfc", label: "Consommations de capital fixe" },
     { value: "nva", label: "Valeur ajoutée nette" },
   ];
 
@@ -325,6 +325,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -349,6 +350,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -373,6 +375,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
 
@@ -400,6 +403,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
             </Row>
@@ -450,9 +454,11 @@ const ResultSection = (props) => {
                     comparativeData.production.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={session.financialData.aggregates.production.footprint
-                    .getIndicator(indic)
-                    .value}
+                  current={
+                    session.financialData.aggregates.production.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
               <div
@@ -477,9 +483,11 @@ const ResultSection = (props) => {
                     comparativeData.intermediateConsumption
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={session.financialData.aggregates.intermediateConsumption.footprint
-                    .getIndicator(indic)
-                    .value}
+                  current={
+                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
               <div
@@ -504,9 +512,11 @@ const ResultSection = (props) => {
                     comparativeData.fixedCapitalConsumption
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={session.financialData.aggregates.capitalConsumption.footprint
-                    .getIndicator(indic)
-                    .value}
+                  current={
+                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
               <div
@@ -532,9 +542,11 @@ const ResultSection = (props) => {
                     comparativeData.netValueAdded.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={session.financialData.aggregates.netValueAdded.footprint
-                    .getIndicator(indic)
-                    .value}
+                  current={
+                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
             </Col>

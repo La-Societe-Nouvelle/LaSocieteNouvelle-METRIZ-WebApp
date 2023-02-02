@@ -10,8 +10,9 @@ const ComparativeGraphs = (props) => {
   const id  = props.id;
   const unit  = metaIndics[props.indic].unit;
   const precision = metaIndics[props.indic].nbDecimals;
+  const year = props.year;
 
-  const labels = ["France", ["Exercice", "en cours"], "Branche"];
+  const labels = ["France", ["Exercice " + year], "Branche"];
 
   // Remove "Branche" label if no comparative division selected
   if(props.graphDataset[2] == null) {

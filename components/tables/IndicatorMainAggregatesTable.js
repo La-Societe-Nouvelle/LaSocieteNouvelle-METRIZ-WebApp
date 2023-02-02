@@ -304,6 +304,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                 ) : null}
               </tr>
             ))}
+
           <tr className="border-top  fw-bold">
             <td>Valeur ajoutée nette</td>
             <td  className="text-end">

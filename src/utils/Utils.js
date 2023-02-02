@@ -12,7 +12,8 @@ export function printValue(value,precision)
   if (value===null || value===undefined || value==="") {return " - "}
   else 
   {
-    let roundedValue = Math.round(value*Math.pow(10,precision))/Math.pow(10,precision);
+    let roundedValue = (Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)).toFixed(precision);
+
     if (roundedValue < 0) {
       return "("+(-roundedValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")+")";
     } else {
