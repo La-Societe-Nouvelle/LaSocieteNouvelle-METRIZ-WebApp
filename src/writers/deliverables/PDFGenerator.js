@@ -269,6 +269,122 @@ export const basicPDFReport = (
                 margin: [0, 10, 0, 20],
                 alignment: "center",
               },
+              ///
+              {
+                table: {
+                  widths: [1, "*"],
+                  heights: [4, 4, 4, 4],
+                  body: [
+                    [
+                      {
+                        text: "",
+                        fillColor: "#b0b9f7",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Valeur pour la France",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        text: "",
+                        fillColor: "#d7dcfb",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Objectifs 2030 pour la France",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        text: "",
+                        fillColor: "#ffb642",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Valeur pour la branche",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        text: "",
+                        fillColor: "#ffdc8d",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Objectifs 2030 pour la branche",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                  ],
+                  layout: {
+                    defaultBorder: false,
+                    hLineWidth: function (i, node) {
+                      return i === 0 || i === node.table.body.length ? 2 : 1;
+                    },
+                    vLineWidth: function (i, node) {
+                      return i === 0 || i === node.table.widths.length ? 2 : 1;
+                    },
+                    hLineColor: function (i, node) {
+                      return i === 0 || i === node.table.body.length
+                        ? "white"
+                        : "white";
+                    },
+                    vLineColor: function (i, node) {
+                      return i === 0 || i === node.table.widths.length
+                        ? "white"
+                        : "white";
+                    },
+                  },
+                },
+              },
             ],
           },
           {
@@ -286,90 +402,6 @@ export const basicPDFReport = (
             ],
           },
         ],
-      },
-      {
-        table: {
-          widths: [4, "*"],
-          heights: [4, 4, 4, 4],
-          body: [
-            [
-              {
-                text: "",
-                fillColor: "#b0b9f7",
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-              {
-                text: "Valeur pour la France",
-                fontSize: 5,
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-            ],
-            [
-              {
-                text: "",
-                fillColor: "#d7dcfb",
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-              {
-                text: "Objectifs 2030 pour la France",
-                fontSize: 5,
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-            ],
-            [
-              {
-                text: "",
-                fillColor: "#ffb642",
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-              {
-                text: "Valeur pour la branche",
-                fontSize: 5,
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-            ],
-            [
-              {
-                text: "",
-                fillColor: "#ffdc8d",
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-              },
-              {
-                text: "Objectifs 2030 pour la branche",
-                fontSize: 5,
-                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-                margin : [0,0,0,0]
-
-              },
-            ],
-          ],
-          layout: {
-            defaultBorder: false,
-            hLineWidth: function (i, node) {
-              return i === 0 || i === node.table.body.length ? 2 : 1;
-            },
-            vLineWidth: function (i, node) {
-              return i === 0 || i === node.table.widths.length ? 2 : 1;
-            },
-            hLineColor: function (i, node) {
-              return i === 0 || i === node.table.body.length
-                ? "white"
-                : "white";
-            },
-            vLineColor: function (i, node) {
-              return i === 0 || i === node.table.widths.length
-                ? "white"
-                : "white";
-            },
-          },
-        },
       },
     ],
     defaultStyle: {
