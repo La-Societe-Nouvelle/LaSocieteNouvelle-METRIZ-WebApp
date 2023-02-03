@@ -39,8 +39,9 @@ export const basicPDFReport = (
   // ---------------------------------------------------------------
 
   const currentDate = new Date();
-  const month = currentDate.toLocaleString("default", { month: "long" });
-  const year = currentDate.getFullYear();
+  const month = currentDate.toLocaleString("default", { month: "2-digit" });
+  const currentYear = currentDate.getFullYear();
+  const day = currentDate.getDay();
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -113,7 +114,10 @@ export const basicPDFReport = (
     footer: function (currentPage, pageCount) {
       return {
         columns: [
-          { text: "Edité en " + month + " " + year, margin: [20, 25, 0, 0] },
+          {
+            text: "Edité le " + day + "/" + month + "/" + currentYear,
+            margin: [20, 25, 0, 0],
+          },
           {
             text: "Page " + currentPage.toString() + " sur " + pageCount,
             alignment: "right",
@@ -208,7 +212,7 @@ export const basicPDFReport = (
       },
 
       { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
-      analysisNotes.map((note) => ({ text: note, style: "text" })),
+      analysisNotes.map((note) => ({ text: note, style: "text", fontSize: 9 })),
       {
         text: "Comparaisons",
         style: "h2",
@@ -279,69 +283,94 @@ export const basicPDFReport = (
                 margin: [0, 10, 0, 20],
                 alignment: "center",
               },
-              { 
-                columns: [
-                  
-                  {
-                    stack: [
-                      {
-                        width: 5,
-                        height: 5,
-                        canvas: [{
-                          type: 'rect',
-                          x: 0,
-                          y: 0,
-                          w: 5,
-                          h: 5,
-                          color: 'red'
-                        }]
-                      },
-                      {
-                        width: 5,
-                        height: 5,
-                        canvas: [{
-                          type: 'rect',
-                          x: 0,
-                          y: 0,
-                          w: 5,
-                          h: 5,
-                          color: 'red'
-                        }]
-                      },
-                    ],
-                  },
-             
-                  {
-                    text: ' Valeur pour la France',
-                    style: 'text',
-                    fontSize : 5
-                  },
-                  {
-                    width: 5,
-                    height: 5,
-                    canvas: [{
-                      type: 'rect',
-                      x: 0,
-                      y: 0,
-                      w: 5,
-                      h: 5,
-                      color: 'red'
-                    }]
-                  },
-                  {
-                    text: ' Valeur pour la France',
-                    style: 'text',
-                    fontSize : 5
-                  }
-                  
-                ]
-              }
             ],
           },
         ],
       },
-   
-      ,
+      {
+        table: {
+          widths: [4, "*"],
+          heights: [4, 4, 4, 4],
+          body: [
+            [
+              {
+                text: "",
+                fillColor: "#b0b9f7",
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+              {
+                text: "Valeur pour la France",
+                fontSize: 5,
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+            ],
+            [
+              {
+                text: "",
+                fillColor: "#d7dcfb",
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+              {
+                text: "Objectifs 2030 pour la France",
+                fontSize: 5,
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+            ],
+            [
+              {
+                text: "",
+                fillColor: "#ffb642",
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+              {
+                text: "Valeur pour la branche",
+                fontSize: 5,
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+            ],
+            [
+              {
+                text: "",
+                fillColor: "#ffdc8d",
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+              },
+              {
+                text: "Objectifs 2030 pour la branche",
+                fontSize: 5,
+                borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+                margin : [0,0,0,0]
+
+              },
+            ],
+          ],
+          layout: {
+            defaultBorder: false,
+            hLineWidth: function (i, node) {
+              return i === 0 || i === node.table.body.length ? 2 : 1;
+            },
+            vLineWidth: function (i, node) {
+              return i === 0 || i === node.table.widths.length ? 2 : 1;
+            },
+            hLineColor: function (i, node) {
+              return i === 0 || i === node.table.body.length
+                ? "white"
+                : "white";
+            },
+            vLineColor: function (i, node) {
+              return i === 0 || i === node.table.widths.length
+                ? "white"
+                : "white";
+            },
+          },
+        },
+      },
     ],
     defaultStyle: {
       fontSize: 10,
@@ -397,14 +426,18 @@ export const basicPDFReport = (
       tableLeft: {
         alignment: "left",
       },
+      legendText: {
+        fontSize: 7,
+        margin: [0, 10, 0, 0],
+      },
     },
   };
 
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        //pdfMake.createPdf(docDefinition).open();
-        saveAs(blob, `${documentTitle}.pdf`);
+        pdfMake.createPdf(docDefinition).open();
+        //saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);
