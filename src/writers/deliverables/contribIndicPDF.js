@@ -1,7 +1,7 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { printValue } from "../../utils/Utils";
-import { sortExpensesByFootprintIndicator } from "./utils/utils";
+import { getIndicDescription, sortExpensesByFootprintIndicator } from "./utils/utils";
 
 // --------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ pdfMake.fonts = {
   },
 };
 
-export const intensIndicGenerator = (
+export const CreateContribIndicatorPDF = (
   year,
   legalUnit,
   indic,
@@ -37,6 +37,8 @@ export const intensIndicGenerator = (
 ) => {
   // ---------------------------------------------------------------
 
+const indicDescription = getIndicDescription(indic);
+console.log(indicDescription)
   const {
     production,
     revenue,
@@ -58,8 +60,7 @@ export const intensIndicGenerator = (
     "asc"
   ).slice(0, 3);
 
-  console.log(mostImpactfulExpenses);
-  console.log(mostImpactfulExpenses.accountAuxLib);
+
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -244,7 +245,7 @@ export const intensIndicGenerator = (
                 style: "numbers",
               },
               {
-                text: "contribue aux",
+                text: " de ",
                 alignment: "center",
               },
               {
@@ -256,7 +257,7 @@ export const intensIndicGenerator = (
         ],
       },
       {
-        text: "L'indicateur permet de rendre compte de la part de la valeur produite par des entreprises artisanales, créatives ou dont le savoir-faire est reconnu.",
+        text: indicDescription
       },
       // Box Vue de vos Soldes Intérmediaires de Gestion
       {
@@ -278,7 +279,7 @@ export const intensIndicGenerator = (
                 style: "bigNumber",
               },
               {
-                text: "de votre production contribuent " + label,
+                text: "de votre production pour la " + label,
                 alignment: "center",
                 bold: true,
               },

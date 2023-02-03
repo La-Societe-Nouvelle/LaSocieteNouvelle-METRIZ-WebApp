@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import jsZip from "jszip";
 import { Button, Modal, ProgressBar } from "react-bootstrap";
-import { basicPDFReport } from "./PDFGenerator";
+import { createIndicReport } from "./PDFGenerator";
 // Meta
 import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
@@ -42,7 +42,7 @@ const ZipGenerator = ({
     // Générer les PDFs et les ajouter au zip
     Promise.all(
       validations.map((indic) =>
-        basicPDFReport(
+        createIndicReport(
           year,
           legalUnit,
           indic,

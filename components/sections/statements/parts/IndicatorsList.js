@@ -38,7 +38,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 
 import { getTargetSerieId } from "/src/utils/Utils";
-import { basicPDFReport } from "../../../../src/writers/deliverables/PDFGenerator";
+import { createIndicReport } from "../../../../src/writers/deliverables/PDFGenerator";
 
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
@@ -211,7 +211,7 @@ const IndicatorsList = (props) => {
       setIndicToExport(key);
       setPopUp("division");
     } else {
-      basicPDFReport(
+      createIndicReport(
         props.session.year,
         props.session.legalUnit.corporateName,
         key,

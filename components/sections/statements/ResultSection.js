@@ -33,9 +33,10 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
-import { basicPDFReport } from "../../../src/writers/deliverables/PDFGenerator";
+import { createIndicReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
-import { intensIndicGenerator } from "../../../src/writers/deliverables/intensIndicGenerator";
+import { CreateContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
+import { CreateIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -151,6 +152,40 @@ const ResultSection = (props) => {
     setTrendGraphView(option);
   };
 
+  const handlePDFGenerator = async () => {
+    const type = metaIndics[indic].type;
+
+    switch (type) {
+      case "proportion":
+        await CreateContribIndicatorPDF(
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].libelle,
+          metaIndics[indic].unit,
+          session.financialData,
+          session.impactsData,
+          session.comparativeData,
+          true
+        );
+        break;
+      case "intensité":
+        await CreateIntensIndicatorPDF(
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].libelle,
+          metaIndics[indic].unit,
+          session.financialData,
+          session.impactsData,
+          session.comparativeData,
+          true
+        );
+        break;
+      default:
+        break;
+    }
+  };
   return (
     <>
       {/* Head Section */}
@@ -185,28 +220,13 @@ const ResultSection = (props) => {
               {metaIndics[indic].libelle}
             </Button>
           )}
-          <Button
-            variant="secondary"
-            onClick={() =>
-              intensIndicGenerator(
-                session.year,
-                session.legalUnit.corporateName,
-                indic,
-                metaIndics[indic].libelle,
-                metaIndics[indic].unit,
-                session.financialData,
-                session.impactsData,
-                session.comparativeData,
-                true
-              )
-            }
-          >
+          <Button variant="secondary" onClick={handlePDFGenerator}>
             Télécharger la fiche <i className="bi bi-download"></i>
           </Button>
           <Button
             variant="secondary"
             onClick={() =>
-              basicPDFReport(
+              createIndicReport(
                 session.year,
                 session.legalUnit.corporateName,
                 indic,
@@ -588,7 +608,7 @@ const ResultSection = (props) => {
         </div>
       </section>
       {/* ---------- Footer section ----------  */}
-            
+
       <section className="step">
         <div className="d-flex justify-content-end">
           <Button variant="light" onClick={props.goBack}>
@@ -597,7 +617,7 @@ const ResultSection = (props) => {
           <Button
             variant="secondary"
             onClick={() =>
-              basicPDFReport(
+              createIndicReport(
                 session.year,
                 session.legalUnit.corporateName,
                 indic,
