@@ -3,18 +3,45 @@ import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 // Libraries
 import metaIndics from "/lib/indics";
+import { printValue } from "../../src/utils/Utils";
 
 const ComparativeGraphs = (props) => {
 
   const id  = props.id;
   const unit  = metaIndics[props.indic].unit;
   const precision = metaIndics[props.indic].nbDecimals;
+  const year = props.year;
 
-  const labels = ["France", ["Exercice", "en cours"], "Branche"];
+  const labels = ["France", ["Exercice " + year], "Branche"];
 
   // Remove "Branche" label if no comparative division selected
   if(props.graphDataset[2] == null) {
     labels.pop()
+  }
+  let suggestedMax;
+  if (unit == "%") {
+    let max = Math.max(... props.graphDataset.map((o) => o));
+
+    if(max < 10) {
+      suggestedMax = 10;
+    }
+   
+    switch (true) {
+      case max < 10:
+         suggestedMax = 10;
+        break;
+      case max > 10 && max < 25:
+         suggestedMax = 25;
+        break;
+      case max > 25 && max < 50:
+         suggestedMax = 50;
+        break;
+      default:
+        suggestedMax = 100;
+        break;
+    }
+  } else {
+    suggestedMax = null;
   }
 
   // Data for chart 
@@ -23,7 +50,7 @@ const ComparativeGraphs = (props) => {
     datasets: [
       {
         label: "Valeur ",
-        data: props.graphDataset.map(data => data ? data.toFixed(precision) : null),
+        data: props.graphDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
@@ -38,7 +65,7 @@ const ComparativeGraphs = (props) => {
       },
       {
         label: "Objectif ",
-        data: props.targetData.map(data => data ? data.toFixed(precision) : null),
+        data: props.targetData.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
@@ -60,21 +87,13 @@ const ComparativeGraphs = (props) => {
         scales: {
           y: {
             display: true,
-            title: {
-              display: true,
-              text: unit,
-              color: "#191558",
-              font : {
-                size: 10,
-                weight : 'bolder'
-              }
-            },
+            min : 0,
+            suggestedMax: suggestedMax,
             ticks: {
               color: "#191558",
               font : {
                 size: 10,
               },
-              
             },
             grid: {
               color: "#ececff",
@@ -97,12 +116,32 @@ const ComparativeGraphs = (props) => {
             display: false,
           },
           datalabels: {
-            labels: {
-              display: false,
+            anchor: "end",
+            align: "top",
+            formatter: function (value, context) 
+            {
+              if(value) {
+                return  printValue(value, precision) ;
+              }
+            },
+            color: "#191558",
+            font: {
+              size: 12,
+              family: "Roboto",
             },
           },
           title: {
-            display: false,
+            display: true,
+            padding: {
+              top: 10,
+              bottom: 20
+          },
+            align : "start",
+            text: unit,
+            color: "#191558",
+            font : {
+              size: 10,
+            }
           },
           tooltip: {
             backgroundColor: '#191558',

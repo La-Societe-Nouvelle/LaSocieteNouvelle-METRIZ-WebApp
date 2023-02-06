@@ -94,12 +94,4 @@ export class StatementSOC extends React.Component {
   onValidate = () => this.props.onValidate();
 }
 
-export const writeStatementSOC = (doc, x, y, impactsData) => {
-  doc.text(
-    "Acteur doté d'une raison sociale : " +
-      (impactsData.hasSocialPurpose ? "oui" : "non"),
-    x,
-    y
-  );
-  return y;
-};
+

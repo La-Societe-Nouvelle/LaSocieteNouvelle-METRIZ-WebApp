@@ -161,6 +161,7 @@ export class PublishStatementSection extends React.Component {
                      <div className="form-group">
                             <div className="custom-control-inline" id="certification">
                                 <input type="checkbox" className="custom-control-input"
+                                    checked={autorisation}
                                     onChange={this.onAutorisationChange} />
                                 <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
                             </div>
@@ -287,7 +288,7 @@ const PriceInput = ({ price }) => {
                 </div>
 
             </div>
-            <p className="legend">* Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
+            <p className="small fst-italic">* Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
 
         </>)
 }

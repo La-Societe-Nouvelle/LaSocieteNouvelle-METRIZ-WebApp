@@ -115,16 +115,3 @@ export class StatementWAT extends React.Component {
 
   onValidate = () => this.props.onValidate();
 }
-
-export const writeStatementWAT = (doc, x, y, impactsData) => {
-  doc.text(
-    "Consommation d'eau déclarée : " +
-      printValue(impactsData.waterConsumption, 0) +
-      " m3 +/- " +
-      printValue(impactsData.waterConsumptionUncertainty, 0) +
-      " %",
-    x,
-    y
-  );
-  return y;
-};

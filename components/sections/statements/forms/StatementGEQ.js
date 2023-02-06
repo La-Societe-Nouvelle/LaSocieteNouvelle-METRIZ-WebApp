@@ -82,7 +82,7 @@ export class StatementGEQ extends React.Component {
 
           <div className="form-group">
             <label>
-              Ecart de rémunérations F/H (en % du taux horaire brut moyen)
+              Ecart de rémunérations Femmes/Hommes (en % du taux horaire brut moyen)
             </label>
             <InputNumber
               value={roundValue(wageGap, 1)}
@@ -166,20 +166,3 @@ export class StatementGEQ extends React.Component {
   onValidate = () => this.props.onValidate();
 }
 
-export const writeStatementGEQ = (doc, x, y, impactsData) => {
-  doc.text(
-    "Ecart interne de rémunérations F/H : " +
-      printValue(impactsData.wageGap, 0) +
-      " %" +
-      (!impactsData.hasEmployees ? "*" : ""),
-    x,
-    y
-  );
-  if (!impactsData.hasEmployees) {
-    y += 6;
-    doc.setFont("Helvetica", "italic");
-    doc.text("*L'entreprise est déclarée non-employeur", x, y);
-    doc.setFont("Helvetica", "normal");
-  }
-  return y;
-};

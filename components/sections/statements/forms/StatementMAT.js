@@ -176,16 +176,3 @@ export class StatementMAT extends React.Component {
 
   onValidate = () => this.props.onValidate();
 }
-
-export const writeStatementMAT = (doc, x, y, impactsData) => {
-  doc.text(
-    "Quantité extraite de matières premières : " +
-      printValue(impactsData.materialsExtraction, 0) +
-      " kg +/- " +
-      printValue(impactsData.materialsExtractionUncertainty, 0) +
-      " %",
-    x,
-    y
-  );
-  return y;
-};

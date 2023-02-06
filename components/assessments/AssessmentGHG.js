@@ -151,7 +151,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text "
+                          className="form-control small "
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -197,7 +197,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           onChange={(event) =>
                             this.changeConsumptionUnit(
                               itemId,
@@ -239,7 +239,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small-text"
+                    className="form-control small"
                     value="0"
                     onChange={(event) => this.addItem("1", event.target.value)}
                   >
@@ -308,7 +308,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -353,7 +353,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -395,7 +395,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small-text"
+                    className="form-control small"
                     value="0"
                     onChange={(event) => this.addItem("2", event.target.value)}
                   >
@@ -466,7 +466,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -491,7 +491,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -539,7 +539,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small-text"
+                    className="form-control small"
                     value="0"
                     onChange={(event) =>
                       this.addItem("3.1", event.target.value)
@@ -594,7 +594,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -642,7 +642,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -690,7 +690,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small-text"
+                    className="form-control small"
                     value="0"
                     onChange={(event) =>
                       this.addItem("3.2", event.target.value)
@@ -761,7 +761,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -801,7 +801,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -844,7 +844,7 @@ export class AssessmentGHG extends React.Component {
                         itemData.consumptionUnit != "tCO2e" && (
                           <Col>
                             <select
-                              className="form-control small-text"
+                              className="form-control small"
                               value={itemData.gaz}
                               onChange={(event) =>
                                 this.updateGaz(itemId, event.target.value)
@@ -872,7 +872,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small-text"
+                    className="form-control small"
                     value="0"
                     onChange={(event) => this.addItem("4", event.target.value)}
                   >
@@ -936,7 +936,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.sour}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -973,7 +973,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small-text"
+                          className="form-control small"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -1017,7 +1017,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small-text"
+                    className="form-control small"
                     value="0"
                     onChange={(event) => this.addItem("5", event.target.value)}
                   >
@@ -1055,7 +1055,7 @@ export class AssessmentGHG extends React.Component {
           </tbody>
         </Table>
         {message && (
-          <p className="small-text p-2 alert-warning">
+          <p className="small p-2 alert-warning">
             Des modifications ayant été apportées sur la consommation de
             produits énergétiques (combustibles), la déclaration de consommation
             directe d'énergie devra être (re)validée.

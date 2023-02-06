@@ -72,7 +72,7 @@ export class IdentifiedCompaniesTable extends React.Component {
         </Table>
         {companies.length == 0 && (
           <p
-            className="small-text
+            className="small
         "
           >
             Aucun résultat
