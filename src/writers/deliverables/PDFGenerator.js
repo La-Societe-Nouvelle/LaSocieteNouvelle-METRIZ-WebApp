@@ -10,8 +10,9 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 pdfMake.fonts = {
   Raleway: {
-    normal: "http://localhost:3000/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "http://localhost:3000/fonts/Raleway/Raleway-bold.ttf",
+    normal:
+      "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
+    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-bold.ttf",
   },
   // download default Roboto font from cdnjs.com
   Roboto: {
@@ -39,9 +40,11 @@ export const basicPDFReport = (
   // ---------------------------------------------------------------
 
   const currentDate = new Date();
-  const month = currentDate.toLocaleString("default", { month: "2-digit" });
-  const currentYear = currentDate.getFullYear();
-  const day = currentDate.getDay();
+  const date = currentDate.toLocaleString("fr-FR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -115,7 +118,7 @@ export const basicPDFReport = (
       return {
         columns: [
           {
-            text: "Edité le " + day + "/" + month + "/" + currentYear,
+            text: "Edité le " + date,
             margin: [20, 25, 0, 0],
           },
           {
@@ -468,10 +471,8 @@ export const basicPDFReport = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        pdfMake.createPdf(docDefinition).open();
-        //saveAs(blob, `${documentTitle}.pdf`);
+        saveAs(blob, `${documentTitle}.pdf`);
       }
-
       resolve(blob);
     });
   });
