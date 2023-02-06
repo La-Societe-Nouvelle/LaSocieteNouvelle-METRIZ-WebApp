@@ -31,12 +31,11 @@ function PieGraph(props) {
         ],
         datalabels: {
           color: "#FFF",
-       
         },
         backgroundColor: [
+          "rgb(25, 21, 88)",
+          "rgba(25, 21, 88, 0.5)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
-          "RGB(82, 98, 188)",
         ],
       },
     ],
@@ -46,29 +45,35 @@ function PieGraph(props) {
     devicePixelRatio: 2,
 
     plugins: {
-
       legend: {
         position: "bottom",
-        align : "start",
-        fullSize	: false,
+        align: "start",
+        fullSize: false,
         labels: {
+          padding: 10 ,
           font: {
             size: 13,
           },
+          boxWidth : 20,
+          boxHeight : 20,
+          useBorderRadius : true,
+          borderRadius: 10
         },
       },
       tooltip: {
-        backgroundColor: '#191558',
-        padding : 10,
-        cornerRadius: 2
-      }
-      
+        backgroundColor: "#191558",
+        padding: 10,
+        cornerRadius: 2,
+      },
     },
-    
   };
 
   return (
-    <Doughnut id={props.id ? props.id : "PieChart"} data={data} options={options} />
+    <Doughnut
+      id={props.id ? props.id : "PieChart"}
+      data={data}
+      options={options}
+    />
   );
 }
 

@@ -13,7 +13,6 @@ export function sortExpensesByFootprintIndicator(expenses, indicator, order) {
 }
 
 export function getIndicDescription(indic) {
-
   let description;
 
   switch (indic) {
@@ -25,6 +24,10 @@ export function getIndicDescription(indic) {
       description =
         "L'indicateur permet de rendre compte de la part de la valeur produite en France et celle issue des importations.";
       break;
+    case "soc":
+      description =
+        "L'indicateur permet de rendre compte de la part de la valeur produite dans un intérêt social défini.";
+      break;
     case "ghg":
       description =
         "L'indicateur informe sur la quantité de gaz à effet de serre liée à la production de l'entreprise avec pour objectif d'identifier les entreprises les plus performantes.";
@@ -33,6 +36,5 @@ export function getIndicDescription(indic) {
       description = null;
       break;
   }
-  console.log(description);
   return description;
 }

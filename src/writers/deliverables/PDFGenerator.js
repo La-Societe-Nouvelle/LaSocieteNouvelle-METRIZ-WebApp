@@ -2,6 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { getAnalyse, getStatementNote } from "../../utils/Writers";
 import { generateIndicTableBody } from "./utils/generateTableBody";
+import divisions from "/lib/divisions";
 
 // --------------------------------------------------------------------------
 
@@ -9,8 +10,9 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 pdfMake.fonts = {
   Raleway: {
-    normal: "http://localhost:3000/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "http://localhost:3000/fonts/Raleway/Raleway-bold.ttf",
+    normal:
+      "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
+    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Bold.ttf",
   },
   // download default Roboto font from cdnjs.com
   Roboto: {
@@ -36,6 +38,13 @@ export const createIndicReport = (
   download
 ) => {
   // ---------------------------------------------------------------
+
+  const currentDate = new Date();
+  const date = currentDate.toLocaleString("fr-FR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -96,19 +105,30 @@ export const createIndicReport = (
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0] },
+        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + year,
           alignment: "right",
           margin: [0, 15, 20, 0],
+          bold: true,
         },
       ],
     },
     footer: function (currentPage, pageCount) {
       return {
-        text: "Page " + currentPage.toString() + " sur " + pageCount,
-        alignment: "right",
-        margin: [0, 25, 20, 0],
+        columns: [
+          {
+            text: "Edité le " + date,
+            margin: [20, 25, 0, 0],
+          },
+          {
+            text: "Page " + currentPage.toString() + " sur " + pageCount,
+            alignment: "right",
+            margin: [0, 25, 20, 0],
+          },
+        ],
+
+        fontSize: 7,
       };
     },
     background: function () {
@@ -145,7 +165,7 @@ export const createIndicReport = (
       // TO DO : Create external function to create content to import
       { text: "Résultat - " + label, style: "header" },
       {
-        text: "Empreinte de vos Soldes Intermédiaires de Gestion",
+        text: "Empreintes de vos Soldes Intermédiaires de Gestion",
         style: "h2",
         margin: [0, 10, 0, 20],
       },
@@ -185,6 +205,7 @@ export const createIndicReport = (
       },
       { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
       statementNotes.map((note) => note),
+      { text: impactsData.comments[indic], margin: [0, 10, 0, 10] },
 
       // -- PAGE 2-------------------------------------------------------------------------
       {
@@ -194,12 +215,20 @@ export const createIndicReport = (
       },
 
       { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
-      analysisNotes.map((note) => ({ text: note, style: "text" })),
+      analysisNotes.map((note) => ({ text: note, style: "text", fontSize: 9 })),
       {
         text: "Comparaisons",
         style: "h2",
         margin: [0, 30, 0, 10],
       },
+      comparativeData.activityCode !== "00"
+        ? {
+            text:
+              "Branche d'activité : " + divisions[comparativeData.activityCode],
+            margin: [0, 0, 0, 10],
+            font: "Raleway",
+          }
+        : "",
       {
         columns: [
           {
@@ -243,12 +272,128 @@ export const createIndicReport = (
                 margin: [0, 10, 0, 20],
                 alignment: "center",
               },
+              ///
+              {
+                table: {
+                  widths: [1, "*"],
+                  heights: [4, 4, 4, 4],
+                  body: [
+                    [
+                      {
+                        text: "",
+                        fillColor: "#b0b9f7",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Valeur pour la France",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        text: "",
+                        fillColor: "#d7dcfb",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Objectifs 2030 pour la France",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        text: "",
+                        fillColor: "#ffb642",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Valeur pour la branche",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                    [
+                      {
+                        text: "",
+                        fillColor: "#ffdc8d",
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                      {
+                        text: "Objectifs 2030 pour la branche",
+                        fontSize: 5,
+                        borderColor: [
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                          "#ffffff",
+                        ],
+                      },
+                    ],
+                  ],
+                  layout: {
+                    defaultBorder: false,
+                    hLineWidth: function (i, node) {
+                      return i === 0 || i === node.table.body.length ? 2 : 1;
+                    },
+                    vLineWidth: function (i, node) {
+                      return i === 0 || i === node.table.widths.length ? 2 : 1;
+                    },
+                    hLineColor: function (i, node) {
+                      return i === 0 || i === node.table.body.length
+                        ? "white"
+                        : "white";
+                    },
+                    vLineColor: function (i, node) {
+                      return i === 0 || i === node.table.widths.length
+                        ? "white"
+                        : "white";
+                    },
+                  },
+                },
+              },
             ],
           },
           {
             stack: [
               {
-                text: "Consommation de Capital Fixe ",
+                text: "Consommations de capital fixe ",
                 style: "h4",
               },
               {
@@ -261,7 +406,6 @@ export const createIndicReport = (
           },
         ],
       },
-      ,
     ],
     defaultStyle: {
       fontSize: 10,
@@ -294,7 +438,6 @@ export const createIndicReport = (
         margin: [0, 10, 0, 10],
         bold: true,
       },
-
       text: {
         alignment: "justify",
         lineHeight: 1.5,
@@ -318,16 +461,18 @@ export const createIndicReport = (
       tableLeft: {
         alignment: "left",
       },
+      legendText: {
+        fontSize: 7,
+        margin: [0, 10, 0, 0],
+      },
     },
   };
 
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        //pdfMake.createPdf(docDefinition).open();
         saveAs(blob, `${documentTitle}.pdf`);
       }
-
       resolve(blob);
     });
   });

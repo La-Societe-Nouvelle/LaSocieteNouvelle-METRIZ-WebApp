@@ -71,10 +71,7 @@ export const CreateIntensIndicatorPDF = (
   // ---------------------------------------------------------------
 
   const totalRevenue = revenue.amount;
-  const contributionPercentage = revenue.footprint.indicators[indic].value;
-  const contributionAmount = (contributionPercentage / 100) * totalRevenue;
-  const contributionPerEuro = contributionAmount / totalRevenue;
-
+console.log(production)
   // Document Property
 
   const margins = {
@@ -135,9 +132,9 @@ export const CreateIntensIndicatorPDF = (
           },
           {
             type: "rect",
-            x: 70,
+            x: 30,
             y: 105,
-            w: 200,
+            w: 130,
             h: 60,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -145,9 +142,29 @@ export const CreateIntensIndicatorPDF = (
           },
           {
             type: "rect",
-            x: 325,
+            x: 200,
             y: 105,
-            w: 200,
+            w: 140,
+            h: 60,
+            lineWidth: 2,
+            lineColor: "#f1f0f4",
+            r: 10,
+          },
+          {
+            type: "rect",
+            x: 200,
+            y: 105,
+            w: 140,
+            h: 60,
+            lineWidth: 2,
+            lineColor: "#f1f0f4",
+            r: 10,
+          },
+          {
+            type: "rect",
+            x: 200,
+            y: 105,
+            w: 140,
             h: 60,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -197,19 +214,15 @@ export const CreateIntensIndicatorPDF = (
           {
             margin: [0, 15, 0, 30],
             stack: [
-              {
-                text: "Pour 1€ de chiffre d'affaires",
-                alignment: "center",
-                background: "#FFFFFF",
-              },
+    
               {
                 margin: [0, 5, 0, 0],
-                text: contributionPerEuro.toFixed(2) + " €",
+                text:"53%",
                 alignment: "center",
                 style: "numbers",
               },
               {
-                text: " de ",
+                text: " d'intensité de ",
                 alignment: "center",
               },
               {
@@ -222,23 +235,19 @@ export const CreateIntensIndicatorPDF = (
           {
             margin: [0, 15, 0, 30],
             stack: [
-              {
-                text: "Pour 1€ de chiffre d'affaires",
-                alignment: "center",
-                background: "#FFFFFF",
-              },
+     
               {
                 margin: [0, 5, 0, 0],
-                text: contributionPerEuro.toFixed(2) + unit,
+                text: printValue(production.footprint.indicators[indic].value, precision) + " " + unit,
                 alignment: "center",
                 style: "numbers",
               },
               {
-                text: " de ",
+                text: "de COE émis",
                 alignment: "center",
               },
               {
-                text: label,
+                text: "liés à la production",
                 alignment: "center",
               },
             ],
@@ -247,24 +256,21 @@ export const CreateIntensIndicatorPDF = (
             margin: [0, 15, 0, 30],
             stack: [
               {
-                text: "Pour 1€ de chiffre d'affaires",
+                text: "Ce qui représente",
                 alignment: "center",
                 background: "#FFFFFF",
               },
               {
                 margin: [0, 5, 0, 0],
-                text: contributionPerEuro.toFixed(2) + " €",
+                text: "11 Millions",
                 alignment: "center",
                 style: "numbers",
               },
               {
-                text: " de ",
+                text: " de Lorem Ipsum ",
                 alignment: "center",
               },
-              {
-                text: label,
-                alignment: "center",
-              },
+
             ],
           },
         ],
