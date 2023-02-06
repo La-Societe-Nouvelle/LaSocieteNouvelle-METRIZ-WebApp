@@ -140,6 +140,7 @@ export const DSNDataReader = async (dataDSN) =>
         pcsEse: bloc["S21.G00.40.004"],
         complementPcsEse: bloc["S21.G00.40.005"],
         nature: bloc["S21.G00.40.007"],
+        dispositifPolitique: bloc["S21.G00.40.008"],
         numero: bloc["S21.G00.40.009"],
         uniteMesure: bloc["S21.G00.40.011"],
         quotiteCategorie: bloc["S21.G00.40.012"],
@@ -222,7 +223,7 @@ export const DSNDataReader = async (dataDSN) =>
 
     // Revenu autre ------------------------------------- //
 
-    else if (blocCode=="S21.G00.53")
+    else if (blocCode=="S21.G00.54")
     {
       let bloc = getBloc(rows,index,blocCode);
       let revenuAutre = {

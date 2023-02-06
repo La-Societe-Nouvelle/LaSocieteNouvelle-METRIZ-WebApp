@@ -25,9 +25,9 @@ function PieGraph(props) {
     datasets: [
       {
         data: [
-          intermediateConsumption.toFixed(1),
-          capitalConsumption.toFixed(1),
-          netValueAdded.toFixed(1),
+          intermediateConsumption.toFixed(0),
+          capitalConsumption.toFixed(0),
+          netValueAdded.toFixed(0),
         ],
         datalabels: {
           color: "#FFF",

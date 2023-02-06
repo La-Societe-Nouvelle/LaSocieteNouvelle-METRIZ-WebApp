@@ -49,7 +49,7 @@ export const writeStatementGEQ = (impactsData) => {
   const textStatement = [
     {
       text:
-        "Ecart interne de rémunérations F/H : " +
+        "Ecart interne de rémunérations Femmes/Hommes : " +
         printValue(impactsData.wageGap, 0) +
         " %" +
         (!impactsData.hasEmployees ? "*" : ""),

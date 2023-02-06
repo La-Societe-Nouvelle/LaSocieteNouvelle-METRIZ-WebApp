@@ -10,8 +10,9 @@ const ComparativeGraphs = (props) => {
   const id  = props.id;
   const unit  = metaIndics[props.indic].unit;
   const precision = metaIndics[props.indic].nbDecimals;
+  const year = props.year;
 
-  const labels = ["France", ["Exercice", "en cours"], "Branche"];
+  const labels = ["France", ["Exercice " + year], "Branche"];
 
   // Remove "Branche" label if no comparative division selected
   if(props.graphDataset[2] == null) {
@@ -49,7 +50,7 @@ const ComparativeGraphs = (props) => {
     datasets: [
       {
         label: "Valeur ",
-        data: props.graphDataset.map(data => data ? data.toFixed(precision) : null),
+        data: props.graphDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
@@ -137,7 +138,7 @@ const ComparativeGraphs = (props) => {
               bottom: 20
           },
             align : "start",
-            text: "En " + unit,
+            text: unit,
             color: "#191558",
             font : {
               size: 10,

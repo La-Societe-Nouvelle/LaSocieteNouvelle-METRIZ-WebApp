@@ -144,7 +144,7 @@ const ResultSection = (props) => {
   const graphViewOptions = [
     { value: "prd", label: "Production" },
     { value: "ic", label: "Consommations intermédiaires" },
-    { value: "cfc", label: "Consommation de capital fixe" },
+    { value: "cfc", label: "Consommations de capital fixe" },
     { value: "nva", label: "Valeur ajoutée nette" },
   ];
 
@@ -205,7 +205,7 @@ const ResultSection = (props) => {
                 if (session.validations.includes(key) && key != indic) {
                   return (
                     <Dropdown.Item
-                      className="small-text"
+                      className="small"
                       key={key}
                       onClick={() => setIndic(key)}
                     >
@@ -305,7 +305,7 @@ const ResultSection = (props) => {
         <h3>Comparaison par activité</h3>
 
         <Select
-          className="mb-3 small-text"
+          className="mb-3 small"
           defaultValue={{
             label: comparativeDivision + " - " + divisions[comparativeDivision],
             value: comparativeDivision,
@@ -342,6 +342,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -366,6 +367,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -390,6 +392,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
 
@@ -417,6 +420,7 @@ const ResultSection = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={session.year}
                 />
               </Col>
             </Row>
@@ -435,7 +439,7 @@ const ResultSection = (props) => {
           <h3>Courbes d'évolution</h3>
           <div style={{ width: "300px" }}>
             <Select
-              className="mb-3 small-text"
+              className="mb-3 small"
               defaultValue={{
                 label: trendGraphView.label,
                 value: trendGraphView.value,
@@ -467,9 +471,11 @@ const ResultSection = (props) => {
                     comparativeData.production.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={session.financialData.aggregates.production.footprint
-                    .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                  current={
+                    session.financialData.aggregates.production.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
               <div
@@ -494,9 +500,11 @@ const ResultSection = (props) => {
                     comparativeData.intermediateConsumption
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={session.financialData.aggregates.intermediateConsumption.footprint
-                    .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                  current={
+                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
               <div
@@ -521,9 +529,11 @@ const ResultSection = (props) => {
                     comparativeData.fixedCapitalConsumption
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={session.financialData.aggregates.capitalConsumption.footprint
-                    .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                  current={
+                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
               <div
@@ -549,9 +559,11 @@ const ResultSection = (props) => {
                     comparativeData.netValueAdded.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={session.financialData.aggregates.netValueAdded.footprint
-                    .getIndicator(indic)
-                    .value.toFixed(metaIndics[indic].nbDecimals)}
+                  current={
+                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                      indic
+                    ).value
+                  }
                 />
               </div>
             </Col>
@@ -574,7 +586,7 @@ const ResultSection = (props) => {
                 ].meta.info && (
                   <>
                     <h5>Objectif de la branche :</h5>
-                    <p className="small-text">
+                    <p className="small">
                       {
                         comparativeData.production.targetDivisionFootprint
                           .indicators[indic].meta.info
@@ -583,7 +595,7 @@ const ResultSection = (props) => {
                   </>
                 )}
                 <hr />
-                <p className="small-text">
+                <p className="small">
                   Source :&nbsp;
                   {comparativeData.production.trendsFootprint.indicators[indic]
                     .meta.source + " (Tendance)"}

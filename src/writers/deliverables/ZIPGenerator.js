@@ -152,7 +152,6 @@ const ZipGenerator = ({
         <i className="bi bi-download"></i>
         Télécharger
       </Button>
-      {console.log((generatedPDFs.length / (validations.length + 2)) * 100)}
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
         <Modal.Body>

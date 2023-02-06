@@ -109,7 +109,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   ),
                   nbDecimals
                 )}
-                <span className="unit"> {unitGrossImpact}</span>
+                <span > {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -142,7 +142,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                     ),
                     nbDecimals
                   )}
-                  <span className="unit"> {unitGrossImpact}</span>
+                  <span > {unitGrossImpact}</span>
                 </td>
               ) : null}
             </tr>
@@ -214,7 +214,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   ].getGrossImpact(intermediateConsumption.amount),
                   nbDecimals
                 )}
-                <span className="unit"> {unitGrossImpact}</span>
+                <span > {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -242,7 +242,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
-                    <span className="unit"> {unitGrossImpact}</span>
+                    <span > {unitGrossImpact}</span>
                   </td>
                 ) : null}
               </tr>
@@ -303,11 +303,12 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
-                    <span className="unit"> {unitGrossImpact}</span>
+                    <span > {unitGrossImpact}</span>
                   </td>
                 ) : null}
               </tr>
             ))}
+
           <tr className="border-top  fw-bold">
             <td>Valeur ajoutée nette</td>
             <td className="text-end">
@@ -336,7 +337,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   ),
                   nbDecimals
                 )}
-                <span className="unit"> {unitGrossImpact}</span>
+                <span > {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>

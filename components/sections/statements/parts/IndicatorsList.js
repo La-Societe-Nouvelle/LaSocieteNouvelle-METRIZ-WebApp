@@ -153,6 +153,7 @@ const IndicatorsList = (props) => {
 
   const validateIndicator = async (indic) => {
     setDisplayGraph(false);
+
     if (!validations.includes(indic)) {
       // Get footprint for all sectors
       let newComparativeData = await updateComparativeAreaData(indic);
@@ -165,9 +166,14 @@ const IndicatorsList = (props) => {
       }
 
       props.session.comparativeData = newComparativeData;
-      setComparativeData(newComparativeData);
 
+      setComparativeData(newComparativeData);
       SetValidations((validations) => [...validations, indic]);
+
+      // Update parent State
+
+      props.onValidation(indic);
+      
     }
     // add validation
     if (!props.session.validations.includes(indic)) {
@@ -232,7 +238,7 @@ const IndicatorsList = (props) => {
 
   const SuccessMessage = () => {
     return (
-      <p className="mt-4 small-text alert alert-success">
+      <p className="mt-4 small alert alert-success">
         ✓ La déclaration des impacts a été mise à jour.
       </p>
     );
@@ -291,6 +297,7 @@ const IndicatorsList = (props) => {
                   ]}
                   titleChart="Production"
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -314,6 +321,7 @@ const IndicatorsList = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -337,6 +345,7 @@ const IndicatorsList = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
@@ -362,6 +371,7 @@ const IndicatorsList = (props) => {
                     ].data.at(-1).value,
                   ]}
                   indic={indic}
+                  year={props.session.year}
                 />
               </Col>
             </Row>

@@ -682,7 +682,7 @@ const getEmployeesTrainingCompensations = (employees) => {
 const getInterdecileRange = async (employees) =>
 {
   employees = employees.filter(employee => employee.hourlyRate!=null).sort((a,b) => a.hourlyRate - b.hourlyRate);
-  let totalHours = getSumItems(employees.map(employee => employee.workingHours));
+  let totalHours = getSumItems(employees.map(employee => employee.workingHours), 0);
 
   if (employees.length < 2 || totalHours==0) return 1;
 

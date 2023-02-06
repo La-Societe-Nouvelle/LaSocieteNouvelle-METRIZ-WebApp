@@ -11,7 +11,6 @@ import metaIndics from "../../lib/indics";
 // Utils
 import { printValue } from "/src/utils/Utils";
 
-
 function exportIndicDataExpensesCSV(indic, session) {
   let csvContent = "data:text/csv;charset=utf-8,";
   csvContent += "corporated_id;corporate_name;amount;value;uncertainty";
@@ -60,12 +59,17 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   return csvContent;
 }
 
-function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, odds) {
-
+function generateFootprintPDF(
+  doc,
+  indic,
+  financialData,
+  legalUnit,
+  year,
+  title,
+  odds
+) {
   doc.setProperties({
-    title:
-      "rapport_empreinte_societale_" +
-      legalUnit.replaceAll(" ", ""),
+    title: "rapport_empreinte_societale_" + legalUnit.replaceAll(" ", ""),
   });
 
   let x = 10;
@@ -96,12 +100,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
 
   doc.setTextColor(0);
   doc.setFont("Helvetica", "normal");
-  doc.text(
-    "Année de fin d'exercice : " +
-      (year != null ? year : " - "),
-    x,
-    y
-  );
+  doc.text("Année de fin d'exercice : " + (year != null ? year : " - "), x, y);
   let today = new Date();
 
   y += 5;
@@ -235,8 +234,6 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
       { align: "right" }
     );
 
-
-
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(
@@ -300,7 +297,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
     doc.text(
       printValue(
         revenue.footprint.indicators[indic].getGrossImpact(revenue.amount),
-       0
+        0
       ),
       xValue + 24,
       y,
@@ -345,7 +342,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
         storedProduction.footprint.indicators[indic].getGrossImpact(
           storedProduction.amount
         ),
-       0
+        0
       ),
       xValue + 24,
       y,
@@ -449,7 +446,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
         intermediateConsumption.footprint.indicators[indic].getGrossImpact(
           intermediateConsumption.amount
         ),
-       0
+        0
       ),
       xValue + 24,
       y,
@@ -491,10 +488,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
           { align: "right" }
         );
         doc.text(
-          printValue(
-            indicator.getGrossImpact(aggregate.amount),
-            0
-          ),
+          printValue(indicator.getGrossImpact(aggregate.amount), 0),
           xValue + 24,
           y,
           { align: "right" }
@@ -580,10 +574,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
           { align: "right" }
         );
         doc.text(
-          printValue(
-            indicator.getGrossImpact(aggregate.amount),
-            0
-          ),
+          printValue(indicator.getGrossImpact(aggregate.amount), 0),
           xValue + 24,
           y,
           { align: "right" }
@@ -637,7 +628,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
         netValueAdded.footprint.indicators[indic].getGrossImpact(
           netValueAdded.amount
         ),
-       0
+        0
       ),
       xValue + 24,
       y,
@@ -708,9 +699,7 @@ function generateFootprintPDF(doc, indic, financialData, legalUnit, year,title, 
   return doc;
 }
 
-
 async function exportFootprintPDF(session) {
-
   const doc = new jsPDF("landscape", "mm", "a4", true);
 
   const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
@@ -724,7 +713,9 @@ async function exportFootprintPDF(session) {
   generateFootprintPDF(
     doc,
     envIndic,
-    session,
+    session.financialData,
+    session.legalUnit.corporateName,
+    session.year,
     "Empreinte environnementale",
     envOdds
   );
@@ -736,15 +727,15 @@ async function exportFootprintPDF(session) {
   generateFootprintPDF(
     doc,
     seIndic,
-    session,
+    session.financialData,
+    session.legalUnit.corporateName,
+    session.year,
     "Empreinte économique et sociale",
     seOdds
   );
 
   window.open(doc.output("bloburl"), "_blank");
 }
-
-
 
 export {
   exportIndicDataExpensesCSV,

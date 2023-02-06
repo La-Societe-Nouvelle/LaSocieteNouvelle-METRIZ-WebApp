@@ -11,31 +11,39 @@ import { DSNDataReader, DSNFileReader } from "/src/readers/DSNReader";
 
 import metaRubriques from "/lib/rubriquesDSN";
 
-const primesIncludedInPay = ["026", "027", "028", "029", "030"];
+const primesIncludedInPay = [
+  // ginore : Indemnités fin de contrat & assimilés
+  "026", // Prime exceptionnelle liée à l'activité avec période de rattachement spécifique
+  "027", // Prime liée à l'activité avec période de rattachement spécifique
+  "028", // Prime non liée à l'activité
+  "029", // Prime liée au rachat des jours de RTT avec période de rattachement spécifique
+  "030", // Prime rachat CET
+];
 const revenuAutresIncludedInPay = [
-  "02",
-  "03",
-  "04",
-  "05",
-  "06",
-  "10",
-  "11",
-  "12",
-  "14",
-  "15",
-  "16",
-  "17",
-  "18",
-  "19",
-  "25",
-  "26",
-  "27",
-  "31",
-  "33",
-  "90",
-  "91",
-  "92",
-  "93",
+  "02", // Avantage en nature : repas
+  "03", // Avantage en nature : logement
+  "04", // Avantage en nature : véhicule
+  "05", // Avantage en nature : NTIC
+  "06", // Avantage en nature : autres
+  // ignore : Frais professionnels remboursés &assimilés
+  "10", // Déduction forfaitaire spécifique
+  "11", // Participation y compris supplément
+  "12", // ntéressement y compris supplément
+  "14", // Abondement au plan d'épargne entreprise (PEE)
+  "15", // Abondement au plan d'épargne interentreprises (PEI)
+  "16", // Abondement au plan d'épargne pour la retraite collectif (PERCO)
+  "17", // Participation patronale au financement des titres-restaurant
+  "18", // Participation patronale aux frais de transports publics
+  "19", // Participation patronale aux frais de transports personnels
+  "25", // Droit d'auteur
+  "26", // Droit de doublage
+  "27", // Droit de rediffusion
+  "31", // Avantages de préretraite versés par l’employeur
+  "33", // Sommes provenant d'un CET et réaffectées à un PERCO ou à un régime de retraite supplémentaire
+  "90", // Participation au financement des services à la personne
+  "91", // Montant de la participation de l'employeur aux chèques vacances
+  "92", // Cotisation frais de santé
+  "93", // Cotisation prévoyance et retraite supplémentaire
 ];
 
 /* -------------------- IMPORT DSN FILE -------------------- */
@@ -55,9 +63,11 @@ export class ImportDSN extends React.Component {
 
     let alerts = [];
 
+    // filtre déclarations mensuelles
     const monthlyStatements = socialStatements.filter(
       (statement) => statement.nature == "01"
     );
+    // filtre déclarations mensuelles uniques
     let distinctStatements = monthlyStatements.filter(
       (value, index, self) =>
         index ===
@@ -76,6 +86,7 @@ export class ImportDSN extends React.Component {
       });
     }
 
+    // liste des établissements concernés par les DSN
     let etablissements = monthlyStatements
       .map((statement) => statement.nicEtablissement)
       .filter(
@@ -86,6 +97,7 @@ export class ImportDSN extends React.Component {
       let etablissementStatements = distinctStatements.filter(
         (statement) => statement.nicEtablissement == etablissement
       );
+      // verification mois
       let missingMonth =
         etablissementStatements.filter(
           (value, index, self) =>
@@ -99,6 +111,7 @@ export class ImportDSN extends React.Component {
             etablissement,
         });
       }
+      // Vérification fractions
       let missingFraction = checkFractions(etablissementStatements);
       if (missingFraction) {
         alerts.push({
@@ -110,6 +123,7 @@ export class ImportDSN extends React.Component {
       }
     });
 
+    // tri par mois et fraction
     socialStatements.sort((a, b) => compare(a, b));
 
     return (
@@ -125,7 +139,7 @@ export class ImportDSN extends React.Component {
                     <i className="bi bi-file-arrow-up-fill"></i>
                     Glisser votre fichier ici
                   </p>
-                  <p className="small-text">OU</p>
+                  <p className="small">OU</p>
                   <p className="btn btn-primary">Selectionner votre fichier</p>
                 </div>
               </div>
@@ -164,7 +178,7 @@ export class ImportDSN extends React.Component {
                   <td>Mois</td>
                   <td>Fraction</td>
                   <td>Ecart D9/D1</td>
-                  <td>Ecart F/H</td>
+                  <td>Ecart Femmes/Hommes</td>
                   <td></td>
                 </tr>
               </thead>
@@ -238,17 +252,20 @@ export class ImportDSN extends React.Component {
       let reader = new FileReader();
       reader.onload = async () => {
         try {
+          // DSN file -> array of rows (grouped by bloc)
           let dataDSN = await DSNFileReader(reader.result);
           try {
+            // rows -> json
             let socialStatement = await DSNDataReader(dataDSN);
             try {
-              let individualsData = await getIndividualsData([socialStatement]);
-              socialStatement.interdecileRange = await getInterdecileRange(
-                individualsData
-              );
-              socialStatement.genderWageGap = await getGenderWageGap(
-                individualsData
-              );
+              // check if data measurable
+              socialStatement.interdecileRange = await getInterdecileRange([
+                socialStatement,
+              ]);
+              socialStatement.genderWageGap = await getGenderWageGap([
+                socialStatement,
+              ]);
+              // add to list of statements
               socialStatement.id = getNewId(this.state.socialStatements);
               socialStatement.nicEtablissement =
                 socialStatement.entreprise.etablissement.nic;
@@ -301,18 +318,22 @@ export class ImportDSN extends React.Component {
   onSubmit = async () => {
     let impactsData = this.props.impactsData;
 
-    let individualsData = await getIndividualsData(this.state.socialStatements);
-
     impactsData.socialStatements = this.state.socialStatements;
-    impactsData.individualsData = individualsData;
 
     // update idr data
-    impactsData.interdecileRange = await getInterdecileRange(individualsData);
-    //await this.props.onUpdate("idr");
+    impactsData.interdecileRange = await getInterdecileRange(
+      impactsData.socialStatements
+    );
+    await this.props.onUpdate("idr");
 
-    // update idr data
-    impactsData.wageGap = await getGenderWageGap(individualsData);
+    // update geq data
+    impactsData.wageGap = await getGenderWageGap(impactsData.socialStatements);
     await this.props.onUpdate("geq");
+
+    // update knw data
+    impactsData.knwDetails.apprenticesRemunerations =
+      await getApprenticeshipRemunerations(impactsData.socialStatements);
+    await this.props.onUpdate("knw");
 
     this.props.onGoBack();
   };
@@ -320,46 +341,77 @@ export class ImportDSN extends React.Component {
 
 /* -------------------- FORMULAS -------------------- */
 
-//
+/** Individuals Data -> return array with each individual and data needed for assessment, from DSN files
+ *  Elements in json for each individual :
+ *    - id
+ *    - sex (1 for man & 2 for woman)
+ *    - pay
+ *    - hours (nb)
+ *    - hourlyRate
+ */
+
 const getIndividualsData = async (declarations) => {
+  // array of data
   let individualsData = [];
+
   declarations.forEach((declaration) => {
+    // list of individuals
     let individus = declaration.entreprise.etablissement.individus;
+
     individus.forEach((individu) => {
+      // get id
       let id = individu.identifiant || individu.identifiantTechnique;
+      // get sex
       let sex = individu.sexe
-        ? parseInt(individu.sexe)
-        : parseInt(individu.identifiant.charAt(0));
+        ? parseInt(individu.sexe) // use "sexe" variable
+        : parseInt(individu.identifiant.charAt(0)); // use first character of social security id
+
       let montantDeclaration = 0;
       let heuresDeclaration = 0;
 
+      // versements
       let versements = individu.versements;
       versements.forEach((versement) => {
-        // Rémunérations
+        // Rémunérations ------------------------------------ //
+
         let remunerations = versement.remunerations;
+
+        // get total amount
+        // -> type 001 : "Rémunération brute non plafonnée"
         remunerations
           .filter((remuneration) => remuneration.type == "001")
           .forEach((remuneration) => {
             montantDeclaration += parseFloat(remuneration.montant);
           });
+
+        // get nb hours
+        // -> type 002 : "Salaire brut soumis à contributions d'Assurance chômage"
         remunerations
           .filter((remuneration) => remuneration.type == "002")
           .forEach((remuneration) => {
+            // retrieve contract & measure unit
             let contrat = individu.contrats.filter(
               (contrat) => contrat.numero == remuneration.numeroContrat
             )[0];
             let uniteContrat = contrat.uniteMesure;
+            // browse activities
+            // -> type 01 : "Travail rémunéré"
             let activites = remuneration.activites;
             activites
               .filter((activite) => activite.type == "01")
               .forEach((activite) => {
                 heuresDeclaration += getQuotiteTravail(
-                  parseInt(activite.mesure),
-                  activite.uniteMesure,
-                  uniteContrat
+                  parseInt(activite.mesure), // quantity
+                  activite.uniteMesure, // unit (in activity bloc)
+                  uniteContrat // unit (in contract bloc)
                 );
               });
           });
+
+        // -> type 012 : "Heures d’équivalence"
+        // -> type 013 : "Heures d’habillage, déshabillage, pause"
+        // -> type 017 : "Heures supplémentaires ou complémentaires aléatoires"
+        // -> type 018 : "Heures supplémentaires structurelles"
         remunerations
           .filter((remuneration) =>
             ["012", "013", "017", "018"].includes(remuneration.type)
@@ -368,6 +420,7 @@ const getIndividualsData = async (declarations) => {
             montantDeclaration += parseFloat(remuneration.montant);
             heuresDeclaration += parseInt(remuneration.nombreHeures);
           });
+
         // Primes
         let primes = versement.primes;
         primes
@@ -375,7 +428,9 @@ const getIndividualsData = async (declarations) => {
           .forEach((prime) => {
             montantDeclaration += parseFloat(prime);
           });
+
         // Autres revenus
+        //  -
         let revenuAutres = versement.revenuAutres;
         revenuAutres
           .filter((revenuAutre) =>
@@ -386,28 +441,29 @@ const getIndividualsData = async (declarations) => {
           });
       });
 
+      // add data to individuals array
       let individual = individualsData.filter(
         (individual) => individual.id == id
       )[0];
       if (individual != undefined) {
-        individual.pay += montantDeclaration;
-        individual.hours += heuresDeclaration;
+        individual.workingHours += workingHours;
+        individual.wage += wage;
       } else {
         individualsData.push({
           id: id,
-          sex: sex,
-          pay: montantDeclaration,
-          hours: heuresDeclaration,
+          workingHours: workingHours,
+          wage: wage,
         });
       }
     });
   });
 
+  // add hourly rate
   individualsData.forEach(
     (individual) =>
       (individual.hourlyRate =
-        individual.hours > 0
-          ? roundValue(individual.pay / individual.hours, 2)
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
           : null)
   );
 
@@ -415,11 +471,15 @@ const getIndividualsData = async (declarations) => {
 };
 
 const getInterdecileRange = async (individualsData) => {
+  // sort individuals by hourly rate
   individualsData = individualsData
     .filter((individual) => individual.hourlyRate != null)
     .sort((a, b) => a.hourlyRate - b.hourlyRate);
+
+  // get nb total hours
   let totalHours = getSumItems(
-    individualsData.map((individual) => individual.hours)
+    individualsData.map((individual) => individual.workingHours),
+    2
   );
 
   if (individualsData.length < 2 || totalHours == 0) return 1;
@@ -430,19 +490,19 @@ const getInterdecileRange = async (individualsData) => {
 
   // D1
   let indexIndividualD1 = 0;
-  let hoursD1 = individualsData[indexIndividualD1].hours;
+  let hoursD1 = individualsData[indexIndividualD1].workingHours;
   while (hoursD1 < limitD1 && indexIndividualD1 < individualsData.length) {
     indexIndividualD1 += 1;
-    hoursD1 += individualsData[indexIndividualD1].hours;
+    hoursD1 += individualsData[indexIndividualD1].workingHours;
   }
   let hourlyRateD1 = individualsData[indexIndividualD1].hourlyRate;
 
   // D9
   let indexIndividualD9 = 0;
-  let hoursD9 = individualsData[indexIndividualD9].hours;
+  let hoursD9 = individualsData[indexIndividualD9].workingHours;
   while (hoursD9 < limitD9 && indexIndividualD9 < individualsData.length) {
     indexIndividualD9 += 1;
-    hoursD9 += individualsData[indexIndividualD9].hours;
+    hoursD9 += individualsData[indexIndividualD9].workingHours;
   }
   let hourlyRateD9 = individualsData[indexIndividualD9].hourlyRate;
 
@@ -451,27 +511,44 @@ const getInterdecileRange = async (individualsData) => {
   return interdecileRange;
 };
 
-const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
-  const unite = uniteActivite || uniteContrat || null;
-  switch (unite) {
-    case null:
-      return 0;
-    case "10":
-      return mesure;
-    case "12":
-      return mesure * 7;
-    case "20":
-      return mesure * 7;
-    case "21":
-      return mesure;
-    case "35":
-      return mesure;
-    default:
-      return 0;
-  }
-};
+const getGenderWageGap = async (declarations) => {
+  // retrieve sex, working hours & pay for each individual
+  let individualsData = [];
+  for (let declaration of declarations) {
+    let individus = declaration.entreprise.etablissement.individus;
+    for (let individu of individus) {
+      let id = individu.identifiant || individu.identifiantTechnique;
+      let sex = getIndividualSex(individu);
+      let workingHours = await getIndividualWorkingHours(individu);
+      let wage = await getIndividualWage(individu);
 
-const getGenderWageGap = async (individualsData) => {
+      let individual = individualsData.filter(
+        (individual) => individual.id == id
+      )[0];
+      if (individual != undefined) {
+        individual.workingHours += workingHours;
+        individual.wage += wage;
+      } else {
+        individualsData.push({
+          id: id,
+          sex: sex,
+          workingHours: workingHours,
+          wage: wage,
+        });
+      }
+    }
+  }
+
+  // build hourly rate
+  individualsData.forEach(
+    (individual) =>
+      (individual.hourlyRate =
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
+          : null)
+  );
+
+  // filter individuals without hourly rate or defined sex
   individualsData = individualsData.filter(
     (individual) =>
       individual.hourlyRate != null &&
@@ -484,13 +561,25 @@ const getGenderWageGap = async (individualsData) => {
   if (men.length == 0 || women.length == 0) return 0;
 
   // Men
-  let payMen = getSumItems(men.map((individual) => individual.pay));
-  let hoursMen = getSumItems(men.map((individual) => individual.hours));
+  let payMen = getSumItems(
+    men.map((individual) => individual.wage),
+    2
+  );
+  let hoursMen = getSumItems(
+    men.map((individual) => individual.workingHours),
+    2
+  );
   let hourlyRateMen = roundValue(payMen / hoursMen, 2);
 
   // Men
-  let payWomen = getSumItems(women.map((individual) => individual.pay));
-  let hoursWomen = getSumItems(women.map((individual) => individual.hours));
+  let payWomen = getSumItems(
+    women.map((individual) => individual.wage),
+    2
+  );
+  let hoursWomen = getSumItems(
+    women.map((individual) => individual.workingHours),
+    2
+  );
   let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
 
   // All
@@ -507,7 +596,44 @@ const getGenderWageGap = async (individualsData) => {
   return genderWageGap;
 };
 
-const getGenderWageGap_pctHourlyRateMen = async (individualsData) => {
+const getGenderWageGap_pctHourlyRateMen = async (declarations) => {
+  // retrieve sex, working hours & pay for each individual
+  let individualsData = [];
+  for (let declaration of declarations) {
+    let individus = declaration.entreprise.etablissement.individus;
+    for (let individu of individus) {
+      let id = individu.identifiant || individu.identifiantTechnique;
+      let sex = getIndividualSex(individu);
+      let workingHours = await getIndividualWorkingHours(individu);
+      let wage = await getIndividualWage(individu);
+
+      let individual = individualsData.filter(
+        (individual) => individual.id == id
+      )[0];
+      if (individual != undefined) {
+        individual.workingHours += workingHours;
+        individual.wage += wage;
+      } else {
+        individualsData.push({
+          id: id,
+          sex: sex,
+          workingHours: workingHours,
+          wage: wage,
+        });
+      }
+    }
+  }
+
+  // build hourly rate
+  individualsData.forEach(
+    (individual) =>
+      (individual.hourlyRate =
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
+          : null)
+  );
+
+  // filter individuals without hourly rate or defined sex
   individualsData = individualsData.filter(
     (individual) =>
       individual.hourlyRate != null &&
@@ -520,13 +646,25 @@ const getGenderWageGap_pctHourlyRateMen = async (individualsData) => {
   if (men.length == 0 || women.length == 0) return 0;
 
   // Men
-  let payMen = getSumItems(men.map((individual) => individual.pay));
-  let hoursMen = getSumItems(men.map((individual) => individual.hours));
+  let payMen = getSumItems(
+    men.map((individual) => individual.wage),
+    2
+  );
+  let hoursMen = getSumItems(
+    men.map((individual) => individual.workingHours),
+    2
+  );
   let hourlyRateMen = roundValue(payMen / hoursMen, 2);
 
   // Men
-  let payWomen = getSumItems(women.map((individual) => individual.pay));
-  let hoursWomen = getSumItems(women.map((individual) => individual.hours));
+  let payWomen = getSumItems(
+    women.map((individual) => individual.wage),
+    2
+  );
+  let hoursWomen = getSumItems(
+    women.map((individual) => individual.workingHours),
+    2
+  );
   let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
 
   // Interdecile range
@@ -536,6 +674,235 @@ const getGenderWageGap_pctHourlyRateMen = async (individualsData) => {
   );
   return genderWageGap;
 };
+
+// Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
+const getApprenticeshipRemunerations = async (declarations) => {
+  // retrieve sex, working hours & pay for each individual
+  let individualsData = [];
+  for (let declaration of declarations) {
+    let individus = declaration.entreprise.etablissement.individus;
+    for (let individu of individus) {
+      let id = individu.identifiant || individu.identifiantTechnique;
+      let workingHours = await getIndividualWorkingHours(individu);
+      let apprenticeshipHours = await getIndividualApprenticeshipHours(
+        individu
+      );
+      let wage = await getIndividualWage(individu);
+
+      let individual = individualsData.filter(
+        (individual) => individual.id == id
+      )[0];
+      if (individual != undefined) {
+        individual.workingHours += workingHours;
+        individual.apprenticeshipHours += apprenticeshipHours;
+        individual.wage += wage;
+      } else {
+        individualsData.push({
+          id: id,
+          workingHours: workingHours,
+          apprenticeshipHours: apprenticeshipHours,
+          wage: wage,
+        });
+      }
+    }
+  }
+
+  // build hourly rate
+  individualsData.forEach(
+    (individual) =>
+      (individual.hourlyRate =
+        individual.workingHours > 0
+          ? roundValue(individual.wage / individual.workingHours, 2)
+          : null)
+  );
+
+  // filter individuals without hourly rate or defined sex
+  individualsData = individualsData.filter(
+    (individual) => individual.hourlyRate != null
+  );
+
+  let apprenticesRemunerations = individualsData
+    .map(
+      ({ hourlyRate, apprenticeshipHours }) => hourlyRate * apprenticeshipHours
+    )
+    .reduce((a, b) => a + b, 0);
+
+  return roundValue(apprenticesRemunerations, 0);
+};
+
+/* -------------------- STATEMENTS GETTERS -------------------- */
+
+const getIndividualSex = (individu) => {
+  let sex = individu.sexe
+    ? parseInt(individu.sexe)
+    : parseInt(individu.identifiant.charAt(0));
+  return sex;
+};
+
+/** Heures de travail
+ *  Conditions - Heures associées à la recherche/formation
+ *    - Heures d'activités
+ *    - 012
+ *    - 013
+ *    - 017
+ *    - 018
+ */
+
+const getIndividualWage = (individu) => {
+  let montantDeclaration = 0;
+
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "001")
+      .forEach((remuneration) => {
+        montantDeclaration += parseFloat(remuneration.montant);
+      });
+    remunerations
+      .filter((remuneration) =>
+        ["012", "013", "017", "018"].includes(remuneration.type)
+      )
+      .forEach((remuneration) => {
+        montantDeclaration += parseFloat(remuneration.montant);
+      });
+    // Primes
+    let primes = versement.primes;
+    primes
+      .filter((prime) => primesIncludedInPay.includes(prime.type))
+      .forEach((prime) => {
+        montantDeclaration += parseFloat(prime.montant);
+      });
+    // Autres revenus
+    let revenuAutres = versement.revenuAutres;
+    revenuAutres
+      .filter((revenuAutre) =>
+        revenuAutresIncludedInPay.includes(revenuAutre.type)
+      )
+      .forEach((revenuAutre) => {
+        montantDeclaration += parseFloat(revenuAutre.montant);
+      });
+  });
+
+  return roundValue(montantDeclaration, 2);
+};
+
+/** Heures de travail
+ *  Conditions - Heures associées à la recherche/formation
+ *    - Heures d'activités
+ *    - 012
+ *    - 013
+ *    - 017
+ *    - 018
+ */
+
+const getIndividualWorkingHours = (individu) => {
+  let heuresDeclaration = 0;
+
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "002")
+      .forEach((remuneration) => {
+        let contrat = individu.contrats.filter(
+          (contrat) => contrat.numero == remuneration.numeroContrat
+        )[0];
+        let uniteContrat = contrat.uniteMesure;
+        let activites = remuneration.activites;
+        activites
+          .filter((activite) => activite.type == "01")
+          .forEach((activite) => {
+            heuresDeclaration += getQuotiteTravail(
+              parseInt(activite.mesure),
+              activite.uniteMesure,
+              uniteContrat
+            );
+          });
+      });
+    remunerations
+      .filter(
+        (remuneration) =>
+          ["012", "013", "017", "018"].includes(remuneration.type) // add to doc
+      )
+      .forEach((remuneration) => {
+        heuresDeclaration += parseInt(remuneration.nombreHeures);
+      });
+  });
+
+  return roundValue(heuresDeclaration, 2);
+};
+
+const getQuotiteTravail = (mesure, uniteActivite, uniteContrat) => {
+  const unite = uniteActivite || uniteContrat || null;
+  switch (unite) {
+    case null:
+      return 0;
+    case "10": // heure
+      return mesure;
+    case "12": // journée
+      return mesure * 7;
+    case "20": // forfait jour
+      return mesure * 7;
+    case "21": // forfait heure
+      return mesure;
+    case "35": // heures intermittents du spectacle
+      return mesure;
+    default:
+      return 0;
+  }
+};
+
+/** Conditions - Heures associées à la recherche/formation
+ *    - nature "29" : Stage
+ *    - dispositif politique "61" : Contrat de Professionnalisation
+ *    - dispositif politique "64" : Contrat d'apprentissage entreprises artisanales ou de moins de 11 salariés (loi du 3 janvier 1979)
+ *    - dispositif politique "65" : Contrat d’apprentissage entreprises non inscrites au répertoire des métiers d’au moins 11 salariés (loi de 1987)
+ *    - dispositif politique "66" : Convention industrielle de formation par la recherche en entreprise (CIFRE)
+ *    - dispositif politique "81" : Contrat d'apprentissage secteur public (Loi de 1992)
+ *    - dispositif politique "92" : Stage de la formation professionnelle
+ */
+
+const getIndividualApprenticeshipHours = (individu) => {
+  let trainingHours = 0;
+
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "002")
+      .forEach((remuneration) => {
+        let contrat = individu.contrats.filter(
+          (contrat) => contrat.numero == remuneration.numeroContrat
+        )[0];
+        if (
+          contrat.nature == "29" ||
+          ["61", "64", "65", "66", "81", "92"].includes(
+            contrat.dispositifPolitique
+          )
+        ) {
+          let uniteContrat = contrat.uniteMesure;
+          let activites = remuneration.activites;
+          activites
+            .filter((activite) => activite.type == "01")
+            .forEach((activite) => {
+              trainingHours += getQuotiteTravail(
+                parseInt(activite.mesure),
+                activite.uniteMesure,
+                uniteContrat
+              );
+            });
+        }
+      });
+  });
+
+  return roundValue(trainingHours, 2);
+};
+
+/* -------------------- OTHER FUNCTIONS -------------------- */
 
 const checkFractions = (socialStatements) => {
   let missingFraction = false;

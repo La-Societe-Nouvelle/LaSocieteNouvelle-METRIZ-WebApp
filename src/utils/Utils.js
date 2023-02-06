@@ -12,7 +12,8 @@ export function printValue(value,precision)
   if (value===null || value===undefined || value==="") {return " - "}
   else 
   {
-    let roundedValue = Math.round(value*Math.pow(10,precision))/Math.pow(10,precision).toFixed(precision);
+    let roundedValue = (Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)).toFixed(precision);
+
     if (roundedValue < 0) {
       return "("+(-roundedValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")+")";
     } else {
@@ -24,26 +25,29 @@ export function printValue(value,precision)
 export function printValueInput(value,precision) {
   if (value==null | value==="") {return ""}
   else                          {return (Math.round(value*Math.pow(10,precision))/Math.pow(10,precision))
-                                          .toFixed(precision)
                                           .toString()
                                           .replace(/\B(?=(\d{3})+(?!\d))/g, " ")}
 }
 
 /* ----- AMOUNT ----- */
 
-export function getSumItems(items)
+export function getSumItems(items,precision)
 {
-  return roundValue(items.reduce((a,b) => a+b,0),2)
+  if (precision!=undefined) {
+    return roundValue(items.reduce((a,b) => a+b,0), precision)
+  } else {
+    return items.reduce((a,b) => a+b,0)
+  }
 }
 
-export function getAmountItems(items)
+export function getAmountItems(items,precision)
 {
-  return getSumItems(items.map(item => item.amount))
+  return getSumItems(items.map(item => item.amount), precision)
 }
 
-export function getPrevAmountItems(items)
+export function getPrevAmountItems(items, precision)
 {
-  return getSumItems(items.map(item => item.prevAmount))
+  return getSumItems(items.map(item => item.prevAmount), precision)
 }
 
 /* ----- UNCERTAINTY ----- */
