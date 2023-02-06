@@ -12,7 +12,7 @@ pdfMake.fonts = {
   Raleway: {
     normal:
       "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-bold.ttf",
+    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Bold.ttf",
   },
   // download default Roboto font from cdnjs.com
   Roboto: {
