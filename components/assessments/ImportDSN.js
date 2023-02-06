@@ -257,14 +257,11 @@ export class ImportDSN extends React.Component {
           try {
             // rows -> json
             let socialStatement = await DSNDataReader(dataDSN);
+            let individualsData = await getIndividualsData([socialStatement]);
             try {
               // check if data measurable
-              socialStatement.interdecileRange = await getInterdecileRange([
-                socialStatement,
-              ]);
-              socialStatement.genderWageGap = await getGenderWageGap([
-                socialStatement,
-              ]);
+              socialStatement.interdecileRange = await getInterdecileRange(individualsData);
+              socialStatement.genderWageGap = await getGenderWageGap(individualsData);
               // add to list of statements
               socialStatement.id = getNewId(this.state.socialStatements);
               socialStatement.nicEtablissement =
@@ -320,145 +317,69 @@ export class ImportDSN extends React.Component {
 
     impactsData.socialStatements = this.state.socialStatements;
 
+    // indiividuals data
+    impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
+
     // update idr data
-    impactsData.interdecileRange = await getInterdecileRange(
-      impactsData.socialStatements
-    );
+    impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
     await this.props.onUpdate("idr");
 
     // update geq data
-    impactsData.wageGap = await getGenderWageGap(impactsData.socialStatements);
+    impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
     await this.props.onUpdate("geq");
 
     // update knw data
     impactsData.knwDetails.apprenticesRemunerations =
-      await getApprenticeshipRemunerations(impactsData.socialStatements);
+      await getApprenticeshipRemunerations(impactsData.individualsData);
     await this.props.onUpdate("knw");
 
     this.props.onGoBack();
   };
 }
 
-/* -------------------- FORMULAS -------------------- */
+/* -------------------- INDIVIDUALS DATA -------------------- */
 
 /** Individuals Data -> return array with each individual and data needed for assessment, from DSN files
  *  Elements in json for each individual :
  *    - id
  *    - sex (1 for man & 2 for woman)
- *    - pay
- *    - hours (nb)
+ *    - workingHourse
+ *    - wage
  *    - hourlyRate
+ *    - apprenticeshipHours
  */
 
-const getIndividualsData = async (declarations) => {
+const getIndividualsData = async (declarations) => 
+{
   // array of data
   let individualsData = [];
-
-  declarations.forEach((declaration) => {
-    // list of individuals
+  for (let declaration of declarations) {
     let individus = declaration.entreprise.etablissement.individus;
-
-    individus.forEach((individu) => {
-      // get id
+    for (let individu of individus) {
       let id = individu.identifiant || individu.identifiantTechnique;
-      // get sex
-      let sex = individu.sexe
-        ? parseInt(individu.sexe) // use "sexe" variable
-        : parseInt(individu.identifiant.charAt(0)); // use first character of social security id
+      let sex = getIndividualSex(individu);
+      let workingHours = await getIndividualWorkingHours(individu);
+      let wage = await getIndividualWage(individu);
+      let apprenticeshipHours = await getIndividualApprenticeshipHours(individu);
 
-      let montantDeclaration = 0;
-      let heuresDeclaration = 0;
-
-      // versements
-      let versements = individu.versements;
-      versements.forEach((versement) => {
-        // Rémunérations ------------------------------------ //
-
-        let remunerations = versement.remunerations;
-
-        // get total amount
-        // -> type 001 : "Rémunération brute non plafonnée"
-        remunerations
-          .filter((remuneration) => remuneration.type == "001")
-          .forEach((remuneration) => {
-            montantDeclaration += parseFloat(remuneration.montant);
-          });
-
-        // get nb hours
-        // -> type 002 : "Salaire brut soumis à contributions d'Assurance chômage"
-        remunerations
-          .filter((remuneration) => remuneration.type == "002")
-          .forEach((remuneration) => {
-            // retrieve contract & measure unit
-            let contrat = individu.contrats.filter(
-              (contrat) => contrat.numero == remuneration.numeroContrat
-            )[0];
-            let uniteContrat = contrat.uniteMesure;
-            // browse activities
-            // -> type 01 : "Travail rémunéré"
-            let activites = remuneration.activites;
-            activites
-              .filter((activite) => activite.type == "01")
-              .forEach((activite) => {
-                heuresDeclaration += getQuotiteTravail(
-                  parseInt(activite.mesure), // quantity
-                  activite.uniteMesure, // unit (in activity bloc)
-                  uniteContrat // unit (in contract bloc)
-                );
-              });
-          });
-
-        // -> type 012 : "Heures d’équivalence"
-        // -> type 013 : "Heures d’habillage, déshabillage, pause"
-        // -> type 017 : "Heures supplémentaires ou complémentaires aléatoires"
-        // -> type 018 : "Heures supplémentaires structurelles"
-        remunerations
-          .filter((remuneration) =>
-            ["012", "013", "017", "018"].includes(remuneration.type)
-          )
-          .forEach((remuneration) => {
-            montantDeclaration += parseFloat(remuneration.montant);
-            heuresDeclaration += parseInt(remuneration.nombreHeures);
-          });
-
-        // Primes
-        let primes = versement.primes;
-        primes
-          .filter((prime) => primesIncludedInPay.includes(prime.type))
-          .forEach((prime) => {
-            montantDeclaration += parseFloat(prime);
-          });
-
-        // Autres revenus
-        //  -
-        let revenuAutres = versement.revenuAutres;
-        revenuAutres
-          .filter((revenuAutre) =>
-            revenuAutresIncludedInPay.includes(revenuAutre.type)
-          )
-          .forEach((revenuAutre) => {
-            montantDeclaration += parseFloat(revenuAutre);
-          });
-      });
-
-      // add data to individuals array
-      let individual = individualsData.filter(
-        (individual) => individual.id == id
-      )[0];
+      let individual = individualsData.filter((individual) => individual.id == id)[0];
       if (individual != undefined) {
         individual.workingHours += workingHours;
         individual.wage += wage;
+        individual.apprenticeshipHours += apprenticeshipHours;
       } else {
         individualsData.push({
           id: id,
+          sex: sex,
           workingHours: workingHours,
           wage: wage,
+          apprenticeshipHours: apprenticeshipHours
         });
       }
-    });
-  });
+    }
+  }
 
-  // add hourly rate
+  // build hourly rate
   individualsData.forEach(
     (individual) =>
       (individual.hourlyRate =
@@ -470,19 +391,20 @@ const getIndividualsData = async (declarations) => {
   return individualsData;
 };
 
-const getInterdecileRange = async (individualsData) => {
+/* -------------------- FORMULAS -------------------- */
+
+const getInterdecileRange = async (individualsData) => 
+{
   // sort individuals by hourly rate
   individualsData = individualsData
-    .filter((individual) => individual.hourlyRate != null)
+    .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
+    .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
     .sort((a, b) => a.hourlyRate - b.hourlyRate);
 
   // get nb total hours
-  let totalHours = getSumItems(
-    individualsData.map((individual) => individual.workingHours),
-    2
-  );
+  let totalHours = getSumItems(individualsData.map((individual) => individual.workingHours), 2);
 
-  if (individualsData.length < 2 || totalHours == 0) return 1;
+  if (individualsData.length < 2 || totalHours <= 0) return 1;
 
   // Limits
   let limitD1 = Math.round(totalHours * 0.1);
@@ -511,49 +433,13 @@ const getInterdecileRange = async (individualsData) => {
   return interdecileRange;
 };
 
-const getGenderWageGap = async (declarations) => {
-  // retrieve sex, working hours & pay for each individual
-  let individualsData = [];
-  for (let declaration of declarations) {
-    let individus = declaration.entreprise.etablissement.individus;
-    for (let individu of individus) {
-      let id = individu.identifiant || individu.identifiantTechnique;
-      let sex = getIndividualSex(individu);
-      let workingHours = await getIndividualWorkingHours(individu);
-      let wage = await getIndividualWage(individu);
-
-      let individual = individualsData.filter(
-        (individual) => individual.id == id
-      )[0];
-      if (individual != undefined) {
-        individual.workingHours += workingHours;
-        individual.wage += wage;
-      } else {
-        individualsData.push({
-          id: id,
-          sex: sex,
-          workingHours: workingHours,
-          wage: wage,
-        });
-      }
-    }
-  }
-
-  // build hourly rate
-  individualsData.forEach(
-    (individual) =>
-      (individual.hourlyRate =
-        individual.workingHours > 0
-          ? roundValue(individual.wage / individual.workingHours, 2)
-          : null)
-  );
-
+const getGenderWageGap = async (individualsData) => 
+{
   // filter individuals without hourly rate or defined sex
-  individualsData = individualsData.filter(
-    (individual) =>
-      individual.hourlyRate != null &&
-      (individual.sex == 1 || individual.sex == 2)
-  );
+  individualsData = individualsData
+    .filter((individual) => individual.wage != null && !isNaN(individual.wage) && individual.wage > 0)
+    .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
+    .filer((individual) => individual.sex == 1 || individual.sex == 2);
 
   let men = individualsData.filter((individual) => individual.sex == 1);
   let women = individualsData.filter((individual) => individual.sex == 2);
@@ -588,7 +474,7 @@ const getGenderWageGap = async (declarations) => {
     2
   );
 
-  // Interdecile range
+  // Gander gap
   let genderWageGap = roundValue(
     Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll,
     2
@@ -596,49 +482,13 @@ const getGenderWageGap = async (declarations) => {
   return genderWageGap;
 };
 
-const getGenderWageGap_pctHourlyRateMen = async (declarations) => {
-  // retrieve sex, working hours & pay for each individual
-  let individualsData = [];
-  for (let declaration of declarations) {
-    let individus = declaration.entreprise.etablissement.individus;
-    for (let individu of individus) {
-      let id = individu.identifiant || individu.identifiantTechnique;
-      let sex = getIndividualSex(individu);
-      let workingHours = await getIndividualWorkingHours(individu);
-      let wage = await getIndividualWage(individu);
-
-      let individual = individualsData.filter(
-        (individual) => individual.id == id
-      )[0];
-      if (individual != undefined) {
-        individual.workingHours += workingHours;
-        individual.wage += wage;
-      } else {
-        individualsData.push({
-          id: id,
-          sex: sex,
-          workingHours: workingHours,
-          wage: wage,
-        });
-      }
-    }
-  }
-
-  // build hourly rate
-  individualsData.forEach(
-    (individual) =>
-      (individual.hourlyRate =
-        individual.workingHours > 0
-          ? roundValue(individual.wage / individual.workingHours, 2)
-          : null)
-  );
-
+const getGenderWageGap_pctHourlyRateMen = async (individualsData) => 
+{
   // filter individuals without hourly rate or defined sex
-  individualsData = individualsData.filter(
-    (individual) =>
-      individual.hourlyRate != null &&
-      (individual.sex == 1 || individual.sex == 2)
-  );
+  individualsData = individualsData
+    .filter((individual) => individual.wage != null && !isNaN(individual.wage) && individual.wage > 0)
+    .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
+    .filer((individual) => individual.sex == 1 || individual.sex == 2);
 
   let men = individualsData.filter((individual) => individual.sex == 1);
   let women = individualsData.filter((individual) => individual.sex == 2);
@@ -667,7 +517,7 @@ const getGenderWageGap_pctHourlyRateMen = async (declarations) => {
   );
   let hourlyRateWomen = roundValue(payWomen / hoursWomen, 2);
 
-  // Interdecile range
+  // Gender gap
   let genderWageGap = roundValue(
     Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateMen,
     2
@@ -676,50 +526,12 @@ const getGenderWageGap_pctHourlyRateMen = async (declarations) => {
 };
 
 // Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
-const getApprenticeshipRemunerations = async (declarations) => {
-  // retrieve sex, working hours & pay for each individual
-  let individualsData = [];
-  for (let declaration of declarations) {
-    let individus = declaration.entreprise.etablissement.individus;
-    for (let individu of individus) {
-      let id = individu.identifiant || individu.identifiantTechnique;
-      let workingHours = await getIndividualWorkingHours(individu);
-      let apprenticeshipHours = await getIndividualApprenticeshipHours(
-        individu
-      );
-      let wage = await getIndividualWage(individu);
-
-      let individual = individualsData.filter(
-        (individual) => individual.id == id
-      )[0];
-      if (individual != undefined) {
-        individual.workingHours += workingHours;
-        individual.apprenticeshipHours += apprenticeshipHours;
-        individual.wage += wage;
-      } else {
-        individualsData.push({
-          id: id,
-          workingHours: workingHours,
-          apprenticeshipHours: apprenticeshipHours,
-          wage: wage,
-        });
-      }
-    }
-  }
-
-  // build hourly rate
-  individualsData.forEach(
-    (individual) =>
-      (individual.hourlyRate =
-        individual.workingHours > 0
-          ? roundValue(individual.wage / individual.workingHours, 2)
-          : null)
-  );
-
+const getApprenticeshipRemunerations = async (individualsData) => 
+{
   // filter individuals without hourly rate or defined sex
-  individualsData = individualsData.filter(
-    (individual) => individual.hourlyRate != null
-  );
+  individualsData = individualsData
+    .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
+    .filter((individual) => individual.apprenticeshipHours != null && !isNaN(individual.apprenticeshipHours) && individual.apprenticeshipHours > 0);
 
   let apprenticesRemunerations = individualsData
     .map(
@@ -730,7 +542,7 @@ const getApprenticeshipRemunerations = async (declarations) => {
   return roundValue(apprenticesRemunerations, 0);
 };
 
-/* -------------------- STATEMENTS GETTERS -------------------- */
+/* -------------------- INDIVIDUALS DATA GETTERS -------------------- */
 
 const getIndividualSex = (individu) => {
   let sex = individu.sexe
