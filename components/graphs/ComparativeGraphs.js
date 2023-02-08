@@ -132,7 +132,6 @@ const ComparativeGraphs = (props) => {
           },
           title: {
             display: true,
-            text: "Valeur ajoutée nette",
             padding: {
               top: 10,
               bottom: 20
@@ -141,7 +140,7 @@ const ComparativeGraphs = (props) => {
             text: unit,
             color: "#191558",
             font : {
-              size: 10,
+              size: 11,
             }
           },
           tooltip: {
