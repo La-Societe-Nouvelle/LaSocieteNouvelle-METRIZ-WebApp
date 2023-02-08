@@ -37,10 +37,14 @@ $headings-font-weight : 800;
 $alert-padding-y : 0.75rem;
 $alert-padding-x : 1.25rem;
 
+// BUTTONS 
+$btn-font-size :  0.85rem;
+$btn-padding-y :  0.8rem;
+$btn-padding-x : 1.5rem;
+$btn-border-radius : 1.5rem;
+$btn-border-radius-sm : 1rem;
+$btn-link-disabled-color : "#FFF";
 
-
-
-  
 // INPUT
 $input-color : lighten(#191558, 10%);
 $input-bg : #ffffff;
