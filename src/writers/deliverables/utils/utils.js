@@ -48,7 +48,7 @@ export function getKeySuppliers(companies, indic, unit) {
         {
           text: company.corporateName + " ( SIREN " + company.corporateId + ")",
           fontSize: 8,
-          bold : true
+          bold: true,
         },
         {
           text: company.footprint.indicators[indic].value + " " + unit,
@@ -60,3 +60,36 @@ export function getKeySuppliers(companies, indic, unit) {
 
   return keySuppliers;
 }
+
+export const getPercentageForConsumptionRows = (totalAmount,intermediateConsumption) => {
+  let rows = [];
+
+
+  intermediateConsumption
+    .filter((consumption) => consumption.amount != 0)
+    .forEach((consumption) => {
+      let row = [];
+
+      let percentage = (consumption.amount / totalAmount) * 100;
+
+      row.push(
+        {
+          text: percentage.toFixed(0) + " %",
+          fillColor: "#191558",
+          color : "#FFFFFF",
+          fontSize: 7,
+          borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+          alignment:"right",
+          bold : true,
+        },
+        {
+          text : consumption.accountLib,
+          fontSize: 7,
+          borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+          bold : true,
+        }
+      );
+      rows.push(row);
+    });
+  return rows;
+};

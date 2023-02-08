@@ -166,3 +166,12 @@ export const getTargetSerieId = (indic) => {
 
 }
 
+export function getEvolution(value, target) {
+  
+  if (target) {
+    const evolution = ((target - value) / value) * 100;
+    return evolution.toFixed(0);
+  } else {
+    return "-";
+  }
+}

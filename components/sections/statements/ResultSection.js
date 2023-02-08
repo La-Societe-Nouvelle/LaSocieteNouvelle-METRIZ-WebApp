@@ -177,7 +177,6 @@ const ResultSection = (props) => {
           metaIndics[indic].libelle,
           metaIndics[indic].unit,
           session.financialData,
-          session.impactsData,
           session.comparativeData,
           true
         );
@@ -458,12 +457,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  id={"trend-prd-"+indic}
-                  title={
+                <p className="text-primary fw-bold text-center">
+                  {
                     comparativeData.production.trendsFootprint.indicators[indic]
                       .meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-prd-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -487,12 +488,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  id={"trend-ci-"+indic}
-                  title={
-                    comparativeData.intermediateConsumption.trendsFootprint.indicators[indic]
-                      .meta.label
+                <p className="text-primary fw-bold text-center">
+                  {
+                    comparativeData.intermediateConsumption.trendsFootprint
+                      .indicators[indic].meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-ci-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -517,12 +520,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  id={"trend-cfc-"+indic}
-                  title={
-                    comparativeData.fixedCapitalConsumption.trendsFootprint.indicators[indic]
-                      .meta.label
+                <p className="text-primary fw-bold text-center">
+                  {
+                    comparativeData.fixedCapitalConsumption.trendsFootprint
+                      .indicators[indic].meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-cfc-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -547,12 +552,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  id={"trend-nva-"+indic}
-                  title={
-                    comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-                      .meta.label
+                <p className="text-primary fw-bold text-center">
+                  {
+                    comparativeData.netValueAdded.trendsFootprint
+                      .indicators[indic].meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-nva-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
