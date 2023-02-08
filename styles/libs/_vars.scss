@@ -54,62 +54,12 @@ $table-border-color : #cac9de;
 $input-font-size : 0.9rem;
 $input-group-addon-bg : #f4f4fb;
 
-
+// TABLE
+$table-border-color : $bg-light;
+$table-border-width : 0;
 
  $hr-margin-y : 2rem;
  $hr-color : #dbdef1 ; 
 
 @import "~bootstrap/scss/bootstrap";
-
-
-
-
-// /* make the customizations */
-
-// $primary : #191558;
-// $secondary : #fa595f;
-// $light : #f0f0f8;
-// $gray-600 : #f3f3f3;
-// $info : $light;
-
-// $theme-colors: (
-//   "primary":    $primary,
-//   "secondary":  $secondary,
-//   "light":      $light
-// );
-
-// $body-color: #3c3b49;
-// $font-size-base: 0.9rem;
-// $link-color : lighten($primary, 5%);
-// $font-family-sans-serif: 'Roboto', sans-serif;
-
-
-// $h2-font-size:1.6rem;
-// $h3-font-size:1.4rem;
-// $h4-font-size:1.2rem;
-// $h5-font-size:1.1rem;
-// $h6-font-size:1rem;
-
-
-
-// /* Navbar */
-
-// $navbar-light-color :  #515050 ;
-// $navbar-light-hover-color : $secondary;
-// $nav-link-padding-y : 0.85rem;
-
-// $card-cap-bg : #fbfbff;
-// $card-border-width : 0;
-// $card-cap-padding-y : 1rem;
-
-// $border-radius-lg : 1rem;
-// $border-color : $light;
-// $accordion-button-active-bg : #fff;
-// $accordion-border-radius : 1rem;
-// $accordion-border-width : 0;
-// $accordion-border-color : $light;
-// $btn-border-radius : 1.5rem;
-// $btn-border-radius-sm : 2rem;
-// $badge-font-weight : 500;
-// $modal-content-bg : $light;
 
