@@ -13,9 +13,20 @@ section {
 
 // START SECTION 
 
-#start {
-  background: no-repeat url('../img/leaves_background.png');
-  padding: 0 3rem;
+.illu-box {
+  border-radius: 20px;
+  img {
+    height: 60px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  h3{
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+  }
+  p {
+    font-size: 14px;
+  }
 }
 
 #section-picto {

@@ -36,7 +36,7 @@ export class FinancialDatas extends React.Component {
 
     return (
       <>
-        <h3 className="subtitle ">Vérifiez les agrégats financiers</h3>
+        <h3 className=" ">Vérifiez les agrégats financiers</h3>
         <p className="form-text">
           Par mesure de précaution, vérifiez l’exactitude des agrégats
           financiers. Des erreurs de lecture peuvent intervenir en cas
@@ -87,15 +87,27 @@ export class FinancialDatas extends React.Component {
 
         <div className="table-data">{this.buildtable(selectedTable)}</div>
         <div className="text-end">
-          <button
+
+          {
+            this.props.session.progression > 1 ? 
+            <button
+            className="btn btn-primary me-2"
+            onClick={() => this.props.reset()}
+          >
+            <i className="bi bi-chevron-left"></i> Importer un nouveau FEC
+          </button>
+            :
+            <button
             className="btn btn-primary me-2"
             onClick={() => this.props.return()}
           >
             <i className="bi bi-chevron-left"></i> Retour aux comptes
             d'amortissements
           </button>
+          }
+      
           <button className={"btn btn-secondary"} onClick={this.props.submit}>
-            Valider l'import
+          { this.props.session.progression > 1 ?  "Reprendre mon analyse" : "Valider l'import" }
             <i className="bi bi-chevron-right"></i>
           </button>
         </div>

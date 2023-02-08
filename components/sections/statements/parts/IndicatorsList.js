@@ -9,10 +9,9 @@ import {
   useAccordionButton,
 } from "react-bootstrap";
 
-import { exportIndicPDF } from "../../../../src/writers/Export";
 import {
   StatementART,
-  StatementDIS,
+  StatementIDR,
   StatementECO,
   StatementGEQ,
   StatementGHG,
@@ -24,64 +23,109 @@ import {
   StatementWAS,
   StatementWAT,
 } from "../forms";
+
 import metaIndics from "/lib/indics";
+import divisions from "/lib/divisions";
 
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
+import { ImportDSN } from "../../../assessments/ImportDSN";
 
 import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
-import PieGraph from "../../../graphs/PieGraph";
-import retrieveAreaFootprint from "/src/services/responses/areaFootprint";
-import retrieveDivisionFootprint from "/src/services/responses/divisionFootprint";
-import retrieveTargetFootprint from "/src/services/responses/targetFootprint";
+
+import { getTargetSerieId } from "/src/utils/Utils";
+import { basicPDFReport } from "../../../../src/writers/deliverables/PDFGenerator";
+
+import getSerieData from "/src/services/responses/SerieData";
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 const IndicatorsList = (props) => {
+  const [prevIndics] = useState(props.session.indics);
+  const [notAvailableIndics, setnotAvailableIndics] = useState([]);
+
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
-  const [comparativeDivision, setComparativeDivision] = useState(
-    props.session.comparativeDivision
-  );
+  const [displayGraph, setDisplayGraph] = useState(true);
   const [indicToExport, setIndicToExport] = useState();
-  const [allSectorFootprint, setAllSectorFootprint] = useState(
-    props.session.comparativeAreaFootprints
-  );
-  const [divisionFootprint, setDivisionFootprint] = useState(
-    props.session.comparativeDivisionFootprints
-  );
 
-  const [targetSNBCbranch, setTargetSNBCbranch] = useState(
-    props.session.targetSNBCbranch
+  const [comparativeData, setComparativeData] = useState(
+    props.session.comparativeData
   );
-  const [targetSNBCarea, setTargetSNBCarea] = useState(
-    props.session.targetSNBCarea
+  const [comparativeDivision, setComparativeDivision] = useState(
+    props.session.comparativeData.activityCode
   );
-
   useEffect(async () => {
     if (validations.length > 0) {
       props.publish();
     }
-    // Update fooprints in session
-    if (props.session.comparativeAreaFootprints != allSectorFootprint) {
-      props.session.comparativeAreaFootprints = allSectorFootprint;
+  }, [validations]);
+
+  useEffect(() => {
+    // return indics not included in available list of indicators
+    const filteredIndics = Object.keys(metaIndics).filter(
+      (key) => !prevIndics.includes(key)
+    );
+    if (filteredIndics.length > 0) {
+      setnotAvailableIndics(filteredIndics);
     }
-    if (props.session.comparativeDivisionFootprints != divisionFootprint) {
-      props.session.comparativeDivisionFootprints = divisionFootprint;
+  }, []);
+
+  const updateComparativeAreaData = async (indic) => {
+    let idTarget = getTargetSerieId(indic);
+
+    let newComparativeData = await getMacroSerieData(
+      indic,
+      "00",
+      comparativeData,
+      "areaFootprint"
+    );
+
+    // Target Area Footprint
+    if (idTarget) {
+      newComparativeData = await getSerieData(
+        idTarget,
+        "00",
+        indic,
+        newComparativeData,
+        "targetAreaFootprint"
+      );
     }
-    if (props.session.comparativeDivision != comparativeDivision) {
-      props.session.comparativeDivision = comparativeDivision;
-    }
-    if (props.session.targetSNBCbranch != targetSNBCbranch) {
-      props.session.targetSNBCbranch = targetSNBCbranch;
-    }
-    if (props.session.targetSNBCarea != targetSNBCarea) {
-      props.session.targetSNBCarea = targetSNBCarea;
-    }
-  }, [validations, comparativeDivision]);
+
+    return newComparativeData;
+  };
+  const updateComparativeDivisionData = async (
+    indic,
+    newComparativeData,
+    comparativeDivision
+  ) => {
+    newComparativeData = await getMacroSerieData(
+      indic,
+      comparativeDivision,
+      newComparativeData,
+      "divisionFootprint"
+    );
+    newComparativeData = await getHistoricalSerieData(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "trendsFootprint"
+    );
+
+    newComparativeData = await getHistoricalSerieData(
+      comparativeDivision,
+      indic,
+      newComparativeData,
+      "targetDivisionFootprint"
+    );
+
+    return newComparativeData;
+  };
 
   // check if net value indicator will change with new value & cancel value if necessary
   const willNetValueAddedIndicator = async (indic) => {
@@ -108,86 +152,61 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
+    setDisplayGraph(false);
+
     if (!validations.includes(indic)) {
-      let indicsAreaFootprint = allSectorFootprint;
       // Get footprint for all sectors
-      const areaFootprint = await retrieveAreaFootprint(indic);
-
-      Object.assign(indicsAreaFootprint, areaFootprint);
-
-      setAllSectorFootprint(indicsAreaFootprint);
-
+      let newComparativeData = await updateComparativeAreaData(indic);
       if (comparativeDivision != "00") {
-        let indicsDivisionFootprint = divisionFootprint;
-        // Get footprint of selected division
-
-        divisionFootprint = await retrieveDivisionFootprint(
+        newComparativeData = await updateComparativeDivisionData(
           indic,
+          newComparativeData,
           comparativeDivision
         );
-
-        Object.assign(indicsDivisionFootprint, divisionFootprint);
-
-        setDivisionFootprint(indicsDivisionFootprint);
-
-        // Get Target SNCB for GHG indic
-
-        if (indic == "ghg") {
-          const target = await retrieveTargetFootprint(comparativeDivision);
-          setTargetSNBCbranch(target);
-
-          // TARGET SNCB 2030 FOR ALL SECTORS
-          const targetArea = await retrieveTargetFootprint("00");
-          setTargetSNBCarea(targetArea);
-        }
-      } else {
-        // Assign null value for all other indicators
-        let footprint = divisionFootprint;
-        Object.assign(footprint, {
-          [indic.toUpperCase()]: {
-            valueAddedDivisionFootprint: { value: null },
-            productionDivisionFootprint: { value: null },
-            consumptionDivisionFootprint: { value: null },
-            capitalConsumptionDivisionFootprint: { value: null },
-
-          },
-        });
-        setDivisionFootprint(footprint);
       }
+
+      props.session.comparativeData = newComparativeData;
+
+      setComparativeData(newComparativeData);
       SetValidations((validations) => [...validations, indic]);
+
+      // Update parent State
+
+      props.onValidation(indic);
+      
     }
     // add validation
     if (!props.session.validations.includes(indic)) {
+      props.session.validations.push(indic);
     }
-    props.session.validations.push(indic);
     // update footprint
     await props.session.updateIndicator(indic);
     setUpdatedIndic(indic);
+    setDisplayGraph(true);
   };
 
   // Update comparative division
   const updateDivision = async (division) => {
-    // Set TARGET 2030 for GHG indic
-    if (indicToExport == "ghg") {
-      const target = await retrieveTargetFootprint(division);
-      setTargetSNBCbranch(target);
+    setDisplayGraph(false);
 
-      // TARGET SNCB 2030 FOR ALL SECTORS
-      const targetArea = await retrieveTargetFootprint("00");
-      setTargetSNBCarea(targetArea);
+    props.session.comparativeData.activityCode = division;
+
+    let newComparativeData = comparativeData;
+
+    for await (const indic of validations) {
+      // update comparative data according to validated indicators
+      const updatedData = await updateComparativeDivisionData(
+        indic,
+        newComparativeData,
+        division
+      );
+      newComparativeData = updatedData;
     }
 
-    let indicsDivisionFootprint = divisionFootprint;
-
-    // Get footprint of selected division
-    divisionFootprint = await retrieveDivisionFootprint(
-      indicToExport,
-      division
-    );
-    Object.assign(indicsDivisionFootprint, divisionFootprint);
-
-    setDivisionFootprint(indicsDivisionFootprint);
+    props.session.comparativeData = newComparativeData;
+    setComparativeData(newComparativeData);
     setComparativeDivision(division);
+    setDisplayGraph(true);
   };
 
   // Export pdf on click
@@ -198,16 +217,19 @@ const IndicatorsList = (props) => {
       setIndicToExport(key);
       setPopUp("division");
     } else {
-      exportIndicPDF(
+      basicPDFReport(
+        props.session.year,
+        props.session.legalUnit.corporateName,
         key,
-        props.session,
-        comparativeDivision,
-        "#print-Production-" + key,
-        "#print-Consumption-" + key,
-        "#print-Value-" + key,
-        "#print-CapitalConsumption-" + key,
-        environmentalFootprint.includes(key) ? "#piechart-" + key : ""
+        metaIndics[key].libelle,
+        metaIndics[key].unit,
+        props.session.financialData,
+        props.session.impactsData,
+        props.session.comparativeData,
+        divisions[comparativeDivision],
+        true
       );
+
       setPopUp("");
     }
   };
@@ -216,7 +238,7 @@ const IndicatorsList = (props) => {
 
   const SuccessMessage = () => {
     return (
-      <p className="mt-4 small-text alert alert-success">
+      <p className="mt-4 small alert alert-success">
         ✓ La déclaration des impacts a été mise à jour.
       </p>
     );
@@ -241,188 +263,121 @@ const IndicatorsList = (props) => {
 
   //  INDICATORS CATEGORIES
   const valueCreation = ["eco", "art", "soc"];
-  const socialFootprint = ["dis", "geq", "knw"];
+  const socialFootprint = ["idr", "geq", "knw"];
   const environmentalFootprint = ["ghg", "nrg", "wat", "mat", "was", "haz"];
-
-  // Pie Graph component to print in PDF
-
-  const PieGraphRow = (props) => {
-    let indic = props.indic;
-    let intermediateConsumption = props.aggregates.intermediateConsumption;
-    let capitalConsumption = props.aggregates.capitalConsumption;
-    let netValueAdded = props.aggregates.netValueAdded;
-
-    return (
-      <Row>
-        <div className="piechart-container">
-          <PieGraph
-            id={"piechart-" + indic}
-            intermediateConsumption={intermediateConsumption.footprint.indicators[
-              indic
-            ].getGrossImpact(intermediateConsumption.amount)}
-            capitalConsumption={capitalConsumption.footprint.indicators[
-              indic
-            ].getGrossImpact(capitalConsumption.amount)}
-            netValueAdded={netValueAdded.footprint.indicators[
-              indic
-            ].getGrossImpact(netValueAdded.amount)}
-          />
-        </div>
-      </Row>
-    );
-  };
 
   return (
     <>
-      {/* Display all graphs by indicator to print them in PDF*/}
       {validations.length > 0 &&
-        comparativeDivision != "00" &&
-        validations.map(
-          (indic, key) =>
-            allSectorFootprint[indic.toUpperCase()] &&
-            divisionFootprint[indic.toUpperCase()] && (
-              <div className="hidden" key={key}>
-                <Row className="graphs">
-                  {/* Production Graph */}
+        displayGraph &&
+        validations.map((indic, key) => (
+          <div key={key} className="hidden">
+            <Row>
+              <Col sm={3} xl={3} lg={3} md={3}>
+                <ComparativeGraphs
+                  id={"production-" + indic}
+                  graphDataset={[
+                    comparativeData.production.areaFootprint.indicators[indic]
+                      .value,
+                    props.session.financialData.aggregates.production.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.production.divisionFootprint.indicators[
+                      indic
+                    ].value,
+                  ]}
+                  targetData={[
+                    comparativeData.production.targetAreaFootprint.indicators[
+                      indic
+                    ].value,
+                    null,
+                    comparativeData.production.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
+                  ]}
+                  titleChart="Production"
+                  indic={indic}
+                  year={props.session.year}
+                />
+              </Col>
+              <Col sm={3} xl={3} lg={3} md={3}>
+                <ComparativeGraphs
+                  id={"intermediateConsumption-" + indic}
+                  graphDataset={[
+                    comparativeData.intermediateConsumption.areaFootprint
+                      .indicators[indic].value,
+                    props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.intermediateConsumption.divisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  targetData={[
+                    comparativeData.intermediateConsumption.targetAreaFootprint
+                      .indicators[indic].value,
+                    null,
+                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
+                  ]}
+                  indic={indic}
+                  year={props.session.year}
+                />
+              </Col>
+              <Col sm={3} xl={3} lg={3} md={3}>
+                <ComparativeGraphs
+                  id={"capitalConsumption-" + indic}
+                  graphDataset={[
+                    comparativeData.fixedCapitalConsumption.areaFootprint
+                      .indicators[indic].value,
+                    props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.fixedCapitalConsumption.divisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  targetData={[
+                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                      .indicators[indic].value,
+                    null,
+                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
+                  ]}
+                  indic={indic}
+                  year={props.session.year}
+                />
+              </Col>
+              <Col sm={3} xl={3} lg={3} md={3}>
+                <ComparativeGraphs
+                  id={"netValueAdded-" + indic}
+                  graphDataset={[
+                    comparativeData.netValueAdded.areaFootprint.indicators[
+                      indic
+                    ].value,
+                    props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                      indic
+                    ).value,
+                    comparativeData.netValueAdded.divisionFootprint.indicators[
+                      indic
+                    ].value,
+                  ]}
+                  targetData={[
+                    comparativeData.netValueAdded.targetAreaFootprint
+                      .indicators[indic].value,
+                    null,
+                    comparativeData.netValueAdded.targetDivisionFootprint.indicators[
+                      indic
+                    ].data.at(-1).value,
+                  ]}
+                  indic={indic}
+                  year={props.session.year}
+                />
+              </Col>
+            </Row>
+          </div>
+        ))}
 
-                  <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-Production-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .productionAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .productionDivisionFootprint.value
-                      }
-                      titleChart="Production"
-                      indic={indic}
-                      targetBranchData={
-                        indic == "ghg"
-                          ? targetSNBCbranch.productionTarget.value
-                          : null
-                      }
-                      targetAreaData={
-                        indic == "ghg"
-                          ? targetSNBCarea.productionTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-                  {/* Intermediate Consumption Graph */}
-
-                  <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-Consumption-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .consumptionAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .consumptionDivisionFootprint.value
-                      }
-                      titleChart="Consommations intérmédiaires"
-                      indic={indic}
-                      targetBranchData={
-                        indic == "ghg"
-                          ? targetSNBCbranch.consumptionTarget.value
-                          : null
-                      }
-                      targetAreaData={
-                        indic == "ghg"
-                          ? targetSNBCarea.consumptionTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-                  {/* Net Value Added Graph */}
-
-                  <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-Value-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .valueAddedAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .valueAddedDivisionFootprint.value
-                      }
-                      titleChart="Valeur ajoutée nette"
-                      indic={indic}
-                      targetBranchData={
-                        indic == "ghg"
-                          ? targetSNBCbranch.valueAddedTarget.value
-                          : null
-                      }
-                      targetAreaData={
-                        indic == "ghg"
-                          ? targetSNBCarea.valueAddedTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-
-                       {/* Capital Consumtion Graph */}
-
-                       <Col sm={4} xl={4} lg={4} md={4}>
-                    <ComparativeGraphs
-                      id={"print-CapitalConsumption-" + indic}
-                      sectorData={
-                        allSectorFootprint[indic.toUpperCase()]
-                          .capitalConsumptionAreaFootprint.value
-                      }
-                      legalunitData={
-                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                      divisionData={
-                        divisionFootprint[indic.toUpperCase()]
-                          .capitalConsumptionDivisionFootprint.value
-                      }
-                      titleChart="Valeur ajoutée nette"
-                      indic={indic}
-                      targetBranchData={
-                        indic == "ghg"
-                          ? targetSNBCbranch.capitalConsumptionTarget.value
-                          : null
-                      }
-                      targetAreaData={
-                        indic == "ghg"
-                          ? targetSNBCarea.capitalConsumptionTarget.value
-                          : null
-                      }
-                    />
-                  </Col>
-                </Row>
-                {/* Distribution of gross impacts Graph for environnemental indicators*/}
-                {environmentalFootprint.includes(indic) && (
-                  <PieGraphRow
-                    indic={indic}
-                    aggregates={props.session.financialData.aggregates}
-                  />
-                )}
-              </div>
-            )
-        )}
       {popUp == "division" && (
         <ChangeDivision
           indic={indicToExport}
@@ -448,6 +403,7 @@ const IndicatorsList = (props) => {
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                     </ArrowToggle>
                   </div>
+
                   <div>
                     <button
                       className="btn btn-primary btn-sm"
@@ -521,6 +477,9 @@ const IndicatorsList = (props) => {
                   <div>
                     <ArrowToggle eventKey={key}>
                       {value.libelle}
+                      {notAvailableIndics.includes(key) && (
+                        <i className="ms-1 bi bi-exclamation-circle warning"></i>
+                      )}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                     </ArrowToggle>
                   </div>
@@ -544,28 +503,43 @@ const IndicatorsList = (props) => {
                   </div>
                 </div>
               </Card.Header>
+
               <Accordion.Collapse eventKey={key}>
                 <Card.Body>
                   {(() => {
                     switch (key) {
-                      case "dis":
+                      case "idr":
                         return (
                           <>
-                            <StatementDIS
+                            <StatementIDR
                               impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("dis")}
-                              onValidate={() => validateIndicator("dis")}
-                              toAssessment={() => triggerPopup("dis")}
+                              disableStatement={notAvailableIndics.includes(
+                                key
+                              )}
+                              onUpdate={willNetValueAddedIndicator.bind("idr")}
+                              onValidate={() => validateIndicator("idr")}
+                              toAssessment={() => triggerPopup("idr")}
+                              toImportDSN={() => triggerPopup("dsn")}
                             />
                             <ModalAssesment
-                              indic="dis"
+                              indic="idr"
                               impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("dis")}
-                              onValidate={() => validateIndicator("dis")}
+                              onUpdate={willNetValueAddedIndicator.bind("idr")}
+                              onValidate={() => validateIndicator("idr")}
                               onGoBack={handleClose}
                               popUp={popUp}
                               handleClose={handleClose}
                               title="Données Sociales"
+                            />
+                            <ModalAssesment
+                              indic="dsn"
+                              impactsData={props.impactsData}
+                              onUpdate={willNetValueAddedIndicator.bind("idr")}
+                              onValidate={() => validateIndicator("idr")}
+                              onGoBack={handleClose}
+                              popUp={popUp}
+                              handleClose={handleClose}
+                              title="Déclarations Sociales Nominatives"
                             />
                           </>
                         );
@@ -577,6 +551,7 @@ const IndicatorsList = (props) => {
                               onUpdate={willNetValueAddedIndicator.bind("geq")}
                               onValidate={() => validateIndicator("geq")}
                               toAssessment={() => triggerPopup("geq")}
+                              toImportDSN={() => triggerPopup("dsn")}
                             />
 
                             <ModalAssesment
@@ -588,6 +563,16 @@ const IndicatorsList = (props) => {
                               popUp={popUp}
                               handleClose={handleClose}
                               title="Données Sociales"
+                            />
+                            <ModalAssesment
+                              indic="dsn"
+                              impactsData={props.impactsData}
+                              onUpdate={willNetValueAddedIndicator.bind("geq")}
+                              onValidate={() => validateIndicator("geq")}
+                              onGoBack={handleClose}
+                              popUp={popUp}
+                              handleClose={handleClose}
+                              title="Déclarations Sociales Nominatives"
                             />
                           </>
                         );
@@ -791,7 +776,7 @@ function ModalAssesment(props) {
     <Modal
       show={props.popUp == props.indic}
       onHide={props.handleClose}
-      fullscreen
+      size="xl"
       centered
     >
       <Modal.Header closeButton>
@@ -800,7 +785,7 @@ function ModalAssesment(props) {
       <Modal.Body>
         {(() => {
           switch (props.indic) {
-            case "dis":
+            case "idr":
               return <AssessmentDIS {...props} />;
             case "geq":
               return <AssessmentDIS {...props} />;
@@ -810,6 +795,8 @@ function ModalAssesment(props) {
               return <AssessmentGHG {...props} />;
             case "nrg":
               return <AssessmentNRG {...props} />;
+            case "dsn":
+              return <ImportDSN {...props} />;
             default:
               return <div></div>;
           }

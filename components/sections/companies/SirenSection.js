@@ -2,7 +2,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 // Table
-import { CorporateIdTable } from "../../tables/CorporateIdTable";
+import { IdentifiedCompaniesTable } from "../../tables/IdentifiedCompaniesTable";
 
 // Reader & Writers
 import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
@@ -28,7 +28,7 @@ export class SirenSection extends React.Component {
       progression: 0,
       synchronised: 0,
       popup: false,
-      isDisabled: false,
+      isDisabled: true,
       errorFile: false,
       error: false,
     };
@@ -94,12 +94,10 @@ export class SirenSection extends React.Component {
     } = this.state;
 
     const financialData = this.props.session.financialData;
-    const setCompanyStep = this.props.setCompanyStep;
 
     const isNextStepAvailable = nextStepAvailable(companies);
 
     let buttonNextStep;
-
     if (
       this.state.companies.filter((company) => company.status == 200).length ==
       this.state.companies.length
@@ -107,7 +105,7 @@ export class SirenSection extends React.Component {
       buttonNextStep = (
         <div>
           <button
-            onClick={() => setCompanyStep(2)}
+            onClick={() => this.props.nextStep()}
             className={"btn btn-primary me-3"}
           >
             Secteurs d'activité <i className="bi bi-chevron-right"></i>
@@ -127,9 +125,8 @@ export class SirenSection extends React.Component {
         <button
           className={"btn btn-secondary"}
           id="validation-button"
-          onClick={() => setCompanyStep(2)}
-          disabled={!isNextStepAvailable}
-        >
+          onClick={() => this.props.nextStep()}
+          disabled={!isNextStepAvailable}>
           Valider les fournisseurs
           <i className="bi bi-chevron-right"></i>
         </button>
@@ -146,7 +143,7 @@ export class SirenSection extends React.Component {
             </h3>
           </div>
           <div className="step mt-3">
-            <h4>1. Téléchargez et complétez le tableaux de vos fournisseurs</h4>
+            <h4>1. Télécharger et compléter le tableaux de vos fournisseurs</h4>
             <p className="form-text">
               Exportez la liste des comptes fournisseurs auxiliaires afin de
               renseigner les numéros siren de vos fournisseurs.
@@ -159,7 +156,7 @@ export class SirenSection extends React.Component {
             </button>
           </div>
           <div className="step">
-            <h4>2. Importez le fichier excel complété</h4>
+            <h4>2. Importer le fichier excel complété</h4>
 
             <Dropzone
               onDrop={this.onDrop}
@@ -174,7 +171,7 @@ export class SirenSection extends React.Component {
                       <i className="bi bi-file-arrow-up-fill"></i>
                       Glisser votre fichier ici
                     </p>
-                    <p className="small-text">OU</p>
+                    <p className="small">OU</p>
                     <p className="btn btn-primary">
                       Selectionner votre fichier
                     </p>
@@ -185,10 +182,7 @@ export class SirenSection extends React.Component {
 
             {errorFile && (
               <div className="alert alert-danger">
-                <p>
-                  {" "}
-                  <i className="bi bi-x-octagon"></i> Fichier incorrect
-                </p>
+                <p> <i className="bi bi-x-octagon"></i> Fichier incorrect</p>
               </div>
             )}
             {popup && (
@@ -205,11 +199,10 @@ export class SirenSection extends React.Component {
             <div className="table-container">
               <div className="table-data table-company">
                 {error && <ErrorApi />}
-                {!error && !isNextStepAvailable && synchronised != 0 && (
+                { companies.some(company => company.status == "404") && (
                   <div className="alert alert-danger">
                     <p>
-                      <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas
-                       été synchronisés. Vérifiez le numéro de siren et
+                      <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas pu être synchroniser. Vérifiez le numéro de siren et
                       resynchronisez les données.
                     </p>
                     <button
@@ -217,7 +210,7 @@ export class SirenSection extends React.Component {
                       value="unsync"
                       className="btn btn-secondary"
                     >
-                      Comptes non synchronisées
+                      Comptes non synchronisés
                     </button>
                   </div>
                 )}
@@ -245,14 +238,14 @@ export class SirenSection extends React.Component {
                     )}
                   </div>
                 ) : 
-                <div className="alert alert-warning">
+                <div className="alert alert-info">
                 <p>
-                  <i className="bi bi-exclamation-triangle"></i> Les
+                  <i className="bi bi bi-exclamation-circle"></i> Les
                   empreintes de certains comptes doivent être synchronisées.
                 </p>
                 <button
                   onClick={() => this.synchroniseCompanies()}
-                  className="btn btn-warning"
+                  className="btn btn-secondary"
                   disabled={isDisabled}
                 >
                   <i className="bi bi-arrow-repeat"></i> Synchroniser les
@@ -303,7 +296,7 @@ export class SirenSection extends React.Component {
                   </div>
                 </div>
                 {companies.length && (
-                  <CorporateIdTable
+                  <IdentifiedCompaniesTable
                     nbItems={
                       nbItems == "all"
                         ? companiesShowed.length
@@ -326,7 +319,8 @@ export class SirenSection extends React.Component {
             />
           )}
 
-          <div className="text-end">{buttonNextStep}</div>
+          <div className="text-end">
+            {buttonNextStep}</div>
         </section>
       </Container>
     );

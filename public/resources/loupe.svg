@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="crayon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 707 812">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: none;
+      }
+
+      .cls-1, .cls-2, .cls-3, .cls-4 {
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-2, .cls-4 {
+        stroke-width: 75px;
+      }
+
+      .cls-1, .cls-4 {
+        stroke: #191558;
+      }
+
+      .cls-2 {
+        stroke: #232856;
+      }
+
+      .cls-5, .cls-3 {
+        fill: #fff;
+      }
+
+      .cls-6 {
+        fill: #d5e9ff;
+      }
+
+      .cls-7, .cls-4 {
+        fill: #191558;
+      }
+
+      .cls-3 {
+        stroke: #fff;
+        stroke-width: 15px;
+      }
+    </style>
+  </defs>
+  <circle class="cls-5" cx="145.5" cy="156.12" r="22.5"/>
+  <rect class="cls-2" x="518.21" y="424.14" width="30" height="375.35" rx="6.2" ry="6.2" transform="translate(-269.89 494.92) rotate(-40.65)"/>
+  <rect class="cls-1" x="518.21" y="424.14" width="30" height="375.35" rx="6.2" ry="6.2" transform="translate(-269.89 494.92) rotate(-40.65)"/>
+  <rect class="cls-4" x="472.65" y="371.08" width="30" height="375.35" rx="6.2" ry="6.2" transform="translate(-246.32 452.45) rotate(-40.65)"/>
+  <circle class="cls-7" cx="255.43" cy="270.14" r="255"/>
+  <circle class="cls-6" cx="255.43" cy="270.14" r="228.23"/>
+  <path class="cls-3" d="m163.98,104.29c.23-4.11,11.64-7.59,34.47-14.55,25.49-7.78,46.63-8.62,57.05-8.62,12.92,0,33.39,1.3,57.09,8.63,39.31,12.16,87.77,41,83.93,53.07-7.82,24.6-233.67-17.88-232.54-38.52Z"/>
+</svg>

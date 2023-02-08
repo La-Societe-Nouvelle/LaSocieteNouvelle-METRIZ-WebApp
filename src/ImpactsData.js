@@ -22,8 +22,10 @@ export class ImpactsData  {
 
     this.hasEmployees = props.hasEmployees !== undefined ? props.hasEmployees : null;
     this.employees = props.employees || [];
+    this.socialStatements = props.socialStatements || [];
+    this.individualsData = props.individualsData || [];
 
-    this.indexGini = props.indexGini !== undefined ? props.indexGini : null;
+    this.interdecileRange = props.interdecileRange !== undefined ? props.interdecileRange : null;
     this.wageGap =  props.wageGap !== undefined ? props.wageGap : null;
     this.researchAndTrainingContribution = props.researchAndTrainingContribution !== undefined ? props.researchAndTrainingContribution : null;
 
@@ -77,7 +79,6 @@ export class ImpactsData  {
     this.hasSocialPurpose = backUp.hasSocialPurpose;
     this.hasEmployees = backUp.hasEmployees;
     this.employees = backUp.employees || [];
-    this.indexGini = backUp.indexGini;
     this.wageGap = backUp.wageGap;
 
     this.researchAndTrainingContribution = backUp.researchAndTrainingContribution;
@@ -134,10 +135,10 @@ export class ImpactsData  {
   setHasEmployees(hasEmployees) {
     this.hasEmployees = hasEmployees;
     if (!hasEmployees) {
-      this.indexGini = 0;
+      this.interdecileRange = 1;
       this.wageGap = 0;
     } else {
-      this.indexGini = null;
+      this.interdecileRange = null;
       this.wageGap = null;
     }
   }

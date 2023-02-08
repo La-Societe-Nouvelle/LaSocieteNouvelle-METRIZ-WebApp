@@ -24,31 +24,31 @@ export class LegalUnit {
     // Accounting period
     this.year = props.year || "";
 
-    // Sector footprints
-    this.productionSectorFootprint = new SocialFootprint(
-      props.productionSectorFootprint
-    );
-    this.valueAddedSectorFootprint = new SocialFootprint(
-      props.valueAddedSectorFootprint
-    );
-    this.consumptionSectorFootprint = new SocialFootprint(
-      props.consumptionSectorFootprint
-    );
-    // Economic area footprints
-    this.productionAreaFootprint = new SocialFootprint(
-      props.productionAreaFootprint
-    );
-    this.valueAddedAreaFootprint = new SocialFootprint(
-      props.valueAddedAreaFootprint
-    );
+    // // Sector footprints
+    // this.productionSectorFootprint = new SocialFootprint(
+    //   props.productionSectorFootprint
+    // );
+    // this.valueAddedSectorFootprint = new SocialFootprint(
+    //   props.valueAddedSectorFootprint
+    // );
+    // this.consumptionSectorFootprint = new SocialFootprint(
+    //   props.consumptionSectorFootprint
+    // );
+    // // Economic area footprints
+    // this.productionAreaFootprint = new SocialFootprint(
+    //   props.productionAreaFootprint
+    // );
+    // this.valueAddedAreaFootprint = new SocialFootprint(
+    //   props.valueAddedAreaFootprint
+    // );
 
-    // status
-    this.status = props.status || ""; // OK:200 NOT FOUND: 404 ERROR: 500
-    this.dataFetched = props.dataFetched || false;
+    // // status
+    // this.status = props.status || ""; // OK:200 NOT FOUND: 404 ERROR: 500
+    // this.dataFetched = props.dataFetched || false;
 
-    // fetch default references
-    if (props.productionAreaFootprint == undefined)
-      this.initFootprintsReferences();
+    // // fetch default references
+    // if (props.productionAreaFootprint == undefined)
+    //   this.initFootprintsReferences();
 
     // ---------------------------------------------------------------------------------------------------- //
   }

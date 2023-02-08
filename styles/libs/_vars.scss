@@ -4,7 +4,7 @@ $primary: #191558;
 $secondary: #fa595f;
 $tertiary: #251f81;
 $light : #dbdef1;
-$bg-light : #fbfbff;
+$bg-light : #f0f0f8;
 $valid-color: #E2EFD9;
 $unvalid-color: #efdcd9;
 $success : #36c575;
@@ -13,15 +13,35 @@ $warning : #ffc107;
 $info:  #8994d1;
 
 // Font.
-$font-family : 'Raleway',Helvetica,sans-serif !default;
-$font-family-text : 'Roboto', sans-serif !default;
+$font-family-sans-serif: 'Roboto', sans-serif;
 $font-weight : 400 !default;
 $font-weight-bold : 700 !default;
 $letter-spacing : 0.3em !default;
 $text-color : #212529;
-$headings-color: $primary;
-$body-color : $text-color;
+$body-color : $text-color; 
+$body-bg : $bg-light;
+$link-decoration : none;
 
+// TITLES 
+$h1-font-size:2rem;
+$h2-font-size:1.6rem;
+$h3-font-size:1.2rem;
+$h4-font-size:1.1rem;
+$h5-font-size:0.8rem;
+$h6-font-size:0.8rem;
+$headings-font-family: 'Raleway', 'Roboto', sans-serif;
+$headings-color: $primary;
+$headings-font-weight : 800;
+
+// ALERTS 
+$alert-padding-y : 0.75rem;
+$alert-padding-x : 1.25rem;
+
+
+
+
+  
+// INPUT
 $input-color : lighten(#191558, 10%);
 $input-bg : #ffffff;
 $input-border-color : #cfcff7;
@@ -30,4 +50,62 @@ $table-border-color : #cac9de;
 $input-font-size : 0.9rem;
 $input-group-addon-bg : #f4f4fb;
 
+
+
+ $hr-margin-y : 2rem;
+ $hr-color : #dbdef1 ; 
+
 @import "~bootstrap/scss/bootstrap";
+
+
+
+
+// /* make the customizations */
+
+// $primary : #191558;
+// $secondary : #fa595f;
+// $light : #f0f0f8;
+// $gray-600 : #f3f3f3;
+// $info : $light;
+
+// $theme-colors: (
+//   "primary":    $primary,
+//   "secondary":  $secondary,
+//   "light":      $light
+// );
+
+// $body-color: #3c3b49;
+// $font-size-base: 0.9rem;
+// $link-color : lighten($primary, 5%);
+// $font-family-sans-serif: 'Roboto', sans-serif;
+
+
+// $h2-font-size:1.6rem;
+// $h3-font-size:1.4rem;
+// $h4-font-size:1.2rem;
+// $h5-font-size:1.1rem;
+// $h6-font-size:1rem;
+
+
+
+// /* Navbar */
+
+// $navbar-light-color :  #515050 ;
+// $navbar-light-hover-color : $secondary;
+// $nav-link-padding-y : 0.85rem;
+
+// $card-cap-bg : #fbfbff;
+// $card-border-width : 0;
+// $card-cap-padding-y : 1rem;
+
+// $border-radius-lg : 1rem;
+// $border-color : $light;
+// $accordion-button-active-bg : #fff;
+// $accordion-border-radius : 1rem;
+// $accordion-border-width : 0;
+// $accordion-border-color : $light;
+// $btn-border-radius : 1.5rem;
+// $btn-border-radius-sm : 2rem;
+// $badge-font-weight : 500;
+// $modal-content-bg : $light;
+

@@ -3,6 +3,11 @@
 // Generic formulas
 import { buildIndicatorAggregate, buildIndicatorMerge } from './footprintFormulas';
 
+/** Structure of file
+ *    - Assignment companies footprints to expenses or investments
+ *    - Build financial accounts footprints
+ */
+
 /* --------------------------------------------------------------------- */
 /* -------------------- ASSIGN COMPANIES FOOTPRINTS -------------------- */
 /* --------------------------------------------------------------------- */
@@ -24,7 +29,7 @@ const updateExternalExpensesIndicator = async (indic,financialData) =>
 {
   await Promise.all(financialData.expenses.map(async (expense) => 
   {
-    // fetch company
+    // retrieve company
     let company = financialData.getCompanyByAccount(expense.accountAux);
     // assign indicator
     expense.footprint.indicators[indic] = company.footprint.indicators[indic];
@@ -35,13 +40,13 @@ const updateExternalExpensesIndicator = async (indic,financialData) =>
 
 /* ----- Investments footprints ----- */
 
-// company footprint is assign to the investment
+// Affectation de l'empreinte du fournisseur (compte auxiliaire)
 
 const updateInvestmentsIndicator = async (indic,financialData) =>
 {
   await Promise.all(financialData.investments.map(async (investment) => 
   {
-    // fetch company
+    // retrieve company
     let company = financialData.getCompanyByAccount(investment.accountAux);
     // assign indicator
     investment.footprint.indicators[indic] = company.footprint.indicators[indic];
@@ -117,10 +122,10 @@ export const updateAccountsFootprints = async (indic,financialData) =>
 
 export const updateExternalExpensesAccountsIndicator = async (indic,financialData) =>
 {
-    await Promise.all(financialData.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum))
+    await Promise.all(financialData.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum)) // get external expenses accounts
                                                    .map(async ({accountNum,footprint}) => 
     {
-        // filter expenses
+        // retrieve expenses (linked to the account)
         let expenses = financialData.expenses.filter(expense => expense.account == accountNum);
         // control uncertainty
         expenses.filter(expense => expense.amount < 0)
@@ -403,7 +408,10 @@ const updateImmobilisationsIndicator = async (indic,financialData) =>
 
  /* ----- Depreciations footprints ----- */
 
-/** Empreinte déduite à partir de l'empreinte initiale et des dotations aux amortissements
+/** Empreinte obtenue à partir de l'empreinte initiale et des empreinte des dotations aux amortissements
+ *  L'empreinte des dotations est pondérée à hauteur du montant des dotations.
+ *  L'empreinte initiale du compte d'amortissement est pondrée à hauteur du montant "restant" (montant final du compte - montant des dotations)
+ *  En l'absence de dotations, l'empreinte finale correspond à l'empreinte initiale.
  */
 
 const updateDepreciationsIndicator = async (indic,financialData) =>

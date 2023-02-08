@@ -23,8 +23,6 @@ export class StatementGEQ extends React.Component {
     };
   }
 
-
-
   componentDidUpdate() {
     if (!this.props.impactsData.hasEmployees && this.state.wageGap == 0) {
       this.state.isDisabled = false;
@@ -53,7 +51,6 @@ export class StatementGEQ extends React.Component {
   render() {
     const { hasEmployees } = this.props.impactsData;
     const { wageGap, info, isDisabled } = this.state;
-
 
     return (
       <div className="statement">
@@ -85,7 +82,7 @@ export class StatementGEQ extends React.Component {
 
           <div className="form-group">
             <label>
-              Ecart de rémunérations F/H (en % du taux horaire brut moyen)
+              Ecart de rémunérations Femmes/Hommes (en % du taux horaire brut moyen)
             </label>
             <InputNumber
               value={roundValue(wageGap, 1)}
@@ -107,6 +104,14 @@ export class StatementGEQ extends React.Component {
           />
         </div>
         <div className="statement-validation">
+          <button
+            className="btn btn-primary btn-sm"
+            onClick={this.props.toImportDSN}
+            disabled={hasEmployees ? false : true}
+          >
+            <i className="bi bi-calculator"></i>
+            &nbsp;Import Fichiers DSN
+          </button>
           <button
             className="btn btn-primary btn-sm"
             onClick={this.props.toAssessment}
@@ -143,7 +148,7 @@ export class StatementGEQ extends React.Component {
       wageGap: valueOrDefault(this.props.impactsData.wageGap, ""),
     });
     this.props.onUpdate("geq");
-    this.props.onUpdate("dis");
+    this.props.onUpdate("idr");
   };
 
   updateWageGap = (input) => {
@@ -161,20 +166,3 @@ export class StatementGEQ extends React.Component {
   onValidate = () => this.props.onValidate();
 }
 
-export const writeStatementGEQ = (doc, x, y, impactsData) => {
-  doc.text(
-    "Ecart interne de rémunérations F/H : " +
-      printValue(impactsData.wageGap, 0) +
-      " %" +
-      (!impactsData.hasEmployees ? "*" : ""),
-    x,
-    y
-  );
-  if (!impactsData.hasEmployees) {
-    y += 6;
-    doc.setFont("Helvetica", "italic");
-    doc.text("*L'entreprise est déclarée non-employeur", x, y);
-    doc.setFont("Helvetica", "normal");
-  }
-  return y;
-};

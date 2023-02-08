@@ -94,9 +94,3 @@ export class StatementWAS extends React.Component {
 
   onValidate = () => this.props.onValidate()
 }
-
-export const writeStatementWAS = (doc,x,y,impactsData) =>
-{
-  doc.text("Production directe de déchets : "+printValue(impactsData.wasteProduction,0)+" kg +/- "+printValue(impactsData.wasteProductionUncertainty,0)+ " %",x,y);
-  return y;
-}

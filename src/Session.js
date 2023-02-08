@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-const currentVersion = "1.0.5";
+const currentVersion = "1.0.6";
 
 // Libraries
 import metaIndics from "../lib/indics.json";
@@ -23,6 +23,7 @@ import {
   updateFinalStatesFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
+import { ComparativeData } from "./ComparativeData";
 
 /* ---------- OBJECT SESSION ---------- */
 
@@ -32,7 +33,7 @@ export class Session {
     // ---------------------------------------------------------------------------------------------------- //
     // Version
     this.version = currentVersion;
-
+    
     // Session
     this.progression = props.progression || 0;
 
@@ -46,17 +47,11 @@ export class Session {
 
     // Validations
     this.validations = props.validations || [];
-    // Comparative Division
-    this.comparativeDivision = props.comparativeDivision || "00";
-    // Comparative Footprint  
-    this.comparativeAreaFootprints = props.comparativeAreaFootprints || {};
-
-    this.comparativeDivisionFootprints = props.comparativeDivisionFootprints || {};
-    this.targetSNBCbranch = props.targetSNBCbranch || {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null }, capitalConsumptionTarget: { value: null }};
-    this.targetSNBCarea = props.targetSNBCarea  || {valueAddedTarget: { value: null },productionTarget: { value: null },consumptionTarget: { value: null }, capitalConsumptionTarget: { value: null }};
-    // ---------------------------------------------------------------------------------------------------- //
-    
+    this.comparativeData =  new ComparativeData(props.comparativeData);
     this.updateFootprints();
+
+    // Indicators list
+    this.indics = props.indics || Object.keys(metaIndics)
 
   }
 

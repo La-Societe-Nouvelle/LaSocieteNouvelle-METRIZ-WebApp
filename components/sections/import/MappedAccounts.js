@@ -57,7 +57,7 @@ function MappedAccounts(props) {
 
   return (
     <div>
-      <h3 className="subtitle ">
+      <h3 className=" ">
         Associez les comptes d'amortissements et de dépréciations
       </h3>
       <Table size="lg" hover className="mt-3">

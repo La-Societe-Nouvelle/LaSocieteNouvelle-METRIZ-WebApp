@@ -161,24 +161,3 @@ export class StatementART extends React.Component {
   onValidate = () => this.props.onValidate();
 }
 
-export const writeStatementART = (doc, x, y, impactsData) => {
-  doc.text(
-    "Valeur ajoutée artisanale : " +
-      printValueInput(impactsData.craftedProduction, 0) +
-      " €" +
-      (impactsData.isValueAddedCrafted ? "*" : ""),
-    x,
-    y
-  );
-  if (impactsData.isValueAddedCrafted) {
-    y += 6;
-    doc.setFont("Helvetica", "italic");
-    doc.text(
-      "*Les activités de l'entreprise sont déclarées artisanales / faisant appel à un savoir-faire reconnu",
-      x,
-      y
-    );
-    doc.setFont("Helvetica", "normal");
-  }
-  return y;
-};
