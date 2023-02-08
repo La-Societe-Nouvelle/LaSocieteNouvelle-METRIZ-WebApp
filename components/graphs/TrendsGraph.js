@@ -245,7 +245,7 @@ function TrendsGraph(props) {
     setIsLoading(false);
   }, [props]);
 
-  return !isLoading && <Line data={data} options={options} />;
+  return !isLoading && <Line data={data} id={props.id} options={options} />;
 }
 
 export default TrendsGraph;

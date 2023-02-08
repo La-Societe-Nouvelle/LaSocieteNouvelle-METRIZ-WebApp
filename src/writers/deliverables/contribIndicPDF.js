@@ -1,7 +1,10 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { printValue } from "../../utils/Utils";
-import { getIndicDescription, sortExpensesByFootprintIndicator } from "./utils/utils";
+import {
+  getIndicDescription,
+  sortExpensesByFootprintIndicator,
+} from "./utils/utils";
 
 // --------------------------------------------------------------------------
 
@@ -37,17 +40,9 @@ export const CreateContribIndicatorPDF = (
 ) => {
   // ---------------------------------------------------------------
 
-const indicDescription = getIndicDescription(indic);
-console.log(indicDescription)
-  const {
-    production,
-    revenue,
-    storedProduction,
-    immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
-    netValueAdded,
-  } = financialData.aggregates;
+  const indicDescription = getIndicDescription(indic);
+
+  const { production, revenue } = financialData.aggregates;
 
   const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
     financialData.expenses,
@@ -59,8 +54,6 @@ console.log(indicDescription)
     indic,
     "asc"
   ).slice(0, 3);
-
-
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -140,6 +133,7 @@ console.log(indicDescription)
             color: "#FFFFFF",
             r: 10,
           },
+          // BOXES
           {
             type: "rect",
             x: 70,
@@ -257,7 +251,7 @@ console.log(indicDescription)
         ],
       },
       {
-        text: indicDescription
+        text: indicDescription,
       },
       // Box Vue de vos Soldes Intérmediaires de Gestion
       {
@@ -377,7 +371,7 @@ console.log(indicDescription)
                 alignment: "center",
               },
               {
-                text: "36%",
+                text: "??%",
                 alignment: "center",
                 style: "bigNumber",
                 margin: [0, 10, 0, 0],
@@ -388,7 +382,7 @@ console.log(indicDescription)
                 bold: true,
               },
               {
-                text: "36%",
+                text: "??%",
                 alignment: "center",
                 style: "branchNumber",
                 margin: [0, 10, 0, 0],
@@ -416,10 +410,10 @@ console.log(indicDescription)
               },
 
               mostImpactfulExpenses.map((expense) => ({
-                text:  expense.account + " - " + expense.accountLib,
+                text: expense.account + " - " + expense.accountLib,
                 margin: [10, 0, 0, 10],
               })),
-             
+
               {
                 text: "Les moins contributifs ",
                 fontSize: 10,
@@ -427,10 +421,10 @@ console.log(indicDescription)
                 margin: [10, 15, 0, 10],
               },
               leastImpactfulExpenses.map((expense) => ({
-                text:  expense.account + " - " + expense.accountLib,
+                text: expense.account + " - " + expense.accountLib,
                 margin: [10, 0, 0, 10],
               })),
-             
+
               // ACTIVITES FOURNISSEURS
               {
                 text: "Type d'activité des fournisseurs",
@@ -438,11 +432,9 @@ console.log(indicDescription)
                 margin: [0, 30, 0, 10],
               },
               mostImpactfulExpenses.map((expense) => ({
-                text:  expense.accountAux + " - " + expense.accountAuxLib,
+                text: expense.accountAux + " - " + expense.accountAuxLib,
                 margin: [10, 0, 0, 10],
               })),
-             
-            
             ],
           },
         ],

@@ -152,12 +152,12 @@ const ResultSection = (props) => {
     setTrendGraphView(option);
   };
 
-  const handlePDFGenerator = async () => {
+  const handlePDFGenerator = () => {
     const type = metaIndics[indic].type;
 
     switch (type) {
       case "proportion":
-        await CreateContribIndicatorPDF(
+        CreateContribIndicatorPDF(
           session.year,
           session.legalUnit.corporateName,
           indic,
@@ -170,7 +170,7 @@ const ResultSection = (props) => {
         );
         break;
       case "intensité":
-        await CreateIntensIndicatorPDF(
+        CreateIntensIndicatorPDF(
           session.year,
           session.legalUnit.corporateName,
           indic,
@@ -279,11 +279,12 @@ const ResultSection = (props) => {
 
           {metaIndics[indic].type == "intensité" && (
             <Col sm={3}>
-              <div className="border rounded mt-5">
+              <div className="border rounded mt-5 px-5 pb-4">
                 <h3 className="text-center">
                   Répartition des impacts bruts (en %)
                 </h3>
                 <PieGraph
+                  id={"part-" + indic}
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
                     indic
                   ].getGrossImpact(intermediateConsumption.amount)}
@@ -458,6 +459,7 @@ const ResultSection = (props) => {
                 }
               >
                 <TrendsGraph
+                  id={"trend-prd-"+indic}
                   title={
                     comparativeData.production.trendsFootprint.indicators[indic]
                       .meta.label
@@ -486,8 +488,9 @@ const ResultSection = (props) => {
                 }
               >
                 <TrendsGraph
+                  id={"trend-ci-"+indic}
                   title={
-                    comparativeData.production.trendsFootprint.indicators[indic]
+                    comparativeData.intermediateConsumption.trendsFootprint.indicators[indic]
                       .meta.label
                   }
                   unit={metaIndics[indic].unit}
@@ -515,8 +518,9 @@ const ResultSection = (props) => {
                 }
               >
                 <TrendsGraph
+                  id={"trend-cfc-"+indic}
                   title={
-                    comparativeData.production.trendsFootprint.indicators[indic]
+                    comparativeData.fixedCapitalConsumption.trendsFootprint.indicators[indic]
                       .meta.label
                   }
                   unit={metaIndics[indic].unit}
@@ -544,8 +548,9 @@ const ResultSection = (props) => {
                 }
               >
                 <TrendsGraph
+                  id={"trend-nva-"+indic}
                   title={
-                    comparativeData.production.trendsFootprint.indicators[indic]
+                    comparativeData.netValueAdded.trendsFootprint.indicators[indic]
                       .meta.label
                   }
                   unit={metaIndics[indic].unit}

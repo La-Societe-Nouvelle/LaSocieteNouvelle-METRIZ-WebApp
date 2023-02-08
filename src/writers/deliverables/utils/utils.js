@@ -38,3 +38,25 @@ export function getIndicDescription(indic) {
   }
   return description;
 }
+
+export function getKeySuppliers(companies, indic, unit) {
+  const keySuppliers = [];
+
+  companies.map((company) =>
+    keySuppliers.push({
+      stack: [
+        {
+          text: company.corporateName + " ( SIREN " + company.corporateId + ")",
+          fontSize: 8,
+          bold : true
+        },
+        {
+          text: company.footprint.indicators[indic].value + " " + unit,
+          fontSize: 7,
+        },
+      ],
+    })
+  );
+
+  return keySuppliers;
+}

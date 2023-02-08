@@ -29,7 +29,7 @@ function DoughnutChart({ value, title, id }) {
 
   const options = {
     maintainAspectRatio: true,
-    aspectRatio: 1,
+    devicePixelRatio: 2,
     cutoutPercentage: 80,
     hover: { mode: null },
     layout: {

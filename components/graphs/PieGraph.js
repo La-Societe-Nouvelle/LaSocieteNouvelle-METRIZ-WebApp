@@ -37,15 +37,17 @@ function PieGraph(props) {
           "rgba(25, 21, 88, 0.5)",
           "RGB(251, 122, 127)",
         ],
+        borderWidth: 1,
       },
     ],
   };
 
   const options = {
     devicePixelRatio: 2,
-
+    cutout:100,
     plugins: {
       legend: {
+        display : false,
         position: "bottom",
         align: "start",
         fullSize: false,
@@ -70,7 +72,7 @@ function PieGraph(props) {
 
   return (
     <Doughnut
-      id={props.id ? props.id : "PieChart"}
+      id={props.id}
       data={data}
       options={options}
     />

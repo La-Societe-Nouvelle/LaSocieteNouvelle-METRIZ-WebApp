@@ -366,3 +366,4 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
     });
   return rows;
 };
+
