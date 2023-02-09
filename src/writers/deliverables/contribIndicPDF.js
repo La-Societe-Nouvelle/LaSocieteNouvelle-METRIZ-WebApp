@@ -28,6 +28,7 @@ pdfMake.fonts = {
 };
 
 export const CreateContribIndicatorPDF = (
+  title,
   year,
   legalUnit,
   indic,
@@ -220,7 +221,7 @@ export const CreateContribIndicatorPDF = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: "Rapport - " + label, style: "header" },
+      { text: "Rapport - " + title, style: "header" }, 
       {
         columns: [
           {

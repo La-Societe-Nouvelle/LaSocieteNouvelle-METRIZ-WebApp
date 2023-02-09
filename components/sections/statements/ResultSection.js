@@ -158,6 +158,7 @@ const ResultSection = (props) => {
     switch (type) {
       case "proportion":
         CreateContribIndicatorPDF(
+          metaIndics[indic].libelle,
           session.year,
           session.legalUnit.corporateName,
           indic,
