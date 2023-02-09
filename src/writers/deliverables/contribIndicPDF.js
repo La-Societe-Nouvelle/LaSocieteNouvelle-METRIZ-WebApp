@@ -32,9 +32,7 @@ export const CreateContribIndicatorPDF = (
   legalUnit,
   indic,
   label,
-  unit,
   financialData,
-  impactsData,
   comparativeData,
   download
 ) => {
@@ -42,7 +40,8 @@ export const CreateContribIndicatorPDF = (
 
   const indicDescription = getIndicDescription(indic);
 
-  const { production, revenue } = financialData.aggregates;
+  const { production, revenue, intermediateConsumption } =
+    financialData.aggregates;
 
   const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
     financialData.expenses,
@@ -116,6 +115,7 @@ export const CreateContribIndicatorPDF = (
     background: function () {
       return {
         canvas: [
+          // Background
           {
             type: "rect",
             x: 0,
@@ -133,13 +133,13 @@ export const CreateContribIndicatorPDF = (
             color: "#FFFFFF",
             r: 10,
           },
-          // BOXES
+          // Boxes
           {
             type: "rect",
             x: 70,
             y: 105,
             w: 200,
-            h: 60,
+            h: 65,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -149,48 +149,62 @@ export const CreateContribIndicatorPDF = (
             x: 325,
             y: 105,
             w: 200,
-            h: 60,
+            h: 65,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Box Vue de vos Soldes Intermediaires de Gestion
+          // Box SIG
           {
             type: "rect",
             x: 30,
-            y: 242,
+            y: 245,
             w: 535,
-            h: 120,
+            h: 125,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
           },
+          //Comparaison avec la branche d'activité
           {
             type: "rect",
             x: 30,
             y: 392,
-            w: 220,
-            h: 280,
+            w: 210,
+            h: 150,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
           },
+          // Performance
           {
             type: "rect",
-            x: 275,
-            y: 392,
-            w: 290,
-            h: 220,
+            x: 30,
+            y: 561,
+            w: 210,
+            h: 160,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
           },
+          // Les comptes de charges les plus impactants
           {
             type: "rect",
-            x: 275,
-            y: 632,
-            w: 290,
-            h: 90,
+            x: 260,
+            y: 394,
+            w: 305,
+            h: 170,
+            lineWidth: 2,
+            lineColor: "#f1f0f4",
+            r: 10,
+          },
+          // Type d'activité des fournisseurs
+          {
+            type: "rect",
+            x: 260,
+            y: 582,
+            w: 305,
+            h: 100,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -220,6 +234,7 @@ export const CreateContribIndicatorPDF = (
               {
                 text: "de chiffre d'affaires",
                 alignment: "center",
+                margin: [0, 5, 0, 0],
               },
             ],
           },
@@ -228,22 +243,22 @@ export const CreateContribIndicatorPDF = (
             margin: [0, 15, 0, 30],
             stack: [
               {
-                text: "Pour 1€ de chiffre d'affaires",
+                text: "\tPour 1€ de chiffre d'affaires\t",
                 alignment: "center",
                 background: "#FFFFFF",
               },
               {
-                margin: [0, 5, 0, 0],
+                margin: [0, 5, 0, 5],
                 text: contributionPerEuro.toFixed(2) + " €",
                 alignment: "center",
                 style: "numbers",
               },
               {
-                text: " de ",
+                text: "contribuent",
                 alignment: "center",
               },
               {
-                text: label,
+                text: indic == "eco" ? "à l'" + label : "aux " + label,
                 alignment: "center",
               },
             ],
@@ -251,19 +266,20 @@ export const CreateContribIndicatorPDF = (
         ],
       },
       {
+        margin: [40, 0, 40, 0],
         text: indicDescription,
+        alignment: "center",
       },
       // Box Vue de vos Soldes Intérmediaires de Gestion
       {
-        text: "Vue de vos Soldes Intérmediaires de Gestion",
+        text: "\tVue de vos Soldes Intérmediaires de Gestion\t",
         style: "h2",
       },
       {
-        margin: [0, 0, 0, 10],
+        margin: [0, 10, 0, 10],
         columns: [
           {
-            width: 150,
-            margin: [10, 0, 10, 0],
+            width: "25%",
             stack: [
               {
                 text:
@@ -273,9 +289,13 @@ export const CreateContribIndicatorPDF = (
                 style: "bigNumber",
               },
               {
-                text: "de votre production pour la " + label,
+                text:
+                  indic == "eco"
+                    ? " de votre production sont consacrés à l'" + label
+                    : " de votre production sont consacrés aux " + label,
                 alignment: "center",
                 bold: true,
+                margin: [0, 5, 0, 0],
               },
             ],
           },
@@ -348,47 +368,61 @@ export const CreateContribIndicatorPDF = (
         ],
       },
       {
-        margin: [0, 30, 0, 0],
         columnGap: 40,
         columns: [
           {
-            width: 200,
+            width: "40%",
             stack: [
               {
-                text: "Comparaison avec la branche d'activité",
+                text: "\tComparaison avec la branche d'activité\t",
                 style: "h2",
-                margin: [0, 0, 0, 0],
               },
+
               {
                 image: productionChartImage,
                 width: 200,
                 alignment: "center",
               },
               {
-                text: "Performances de vos achats ",
+                text: "\tPerformances de vos achats\t",
                 style: "h3",
-                margin: [0, 20, 0, 0],
+                margin: [0, 30, 0, 10],
                 alignment: "center",
+                background: "#FFFFFF",
               },
               {
-                text: "??%",
+                text:
+                  printValue(
+                    intermediateConsumption.footprint.indicators[indic].value,
+                    1
+                  ) + " %",
                 alignment: "center",
                 style: "bigNumber",
-                margin: [0, 10, 0, 0],
               },
               {
-                text: "de vos achats contribuent aux Métiers d'Art et du Savoir Faire",
+                text:
+                  indic == "eco"
+                    ? " de vos achats sont consacrés à l'" + label
+                    : " de vos achats sont consacrés aux " + label,
                 alignment: "center",
                 bold: true,
               },
               {
-                text: "??%",
+                text:
+                  printValue(
+                    comparativeData.intermediateConsumption.divisionFootprint
+                      .indicators[indic].value,
+                    1
+                  ) + " %",
                 alignment: "center",
                 style: "branchNumber",
                 margin: [0, 10, 0, 0],
               },
               {
-                text: "des achats de la branche contribuent aux Métiers d'Art et du Savoir Faire",
+                text:
+                  indic == "eco"
+                    ? " des achats de la branches sont consacrés à l'" + label
+                    : " des achats de la branchessont consacrés aux " + label,
                 alignment: "center",
                 fontSize: 8,
               },
@@ -397,43 +431,39 @@ export const CreateContribIndicatorPDF = (
           {
             stack: [
               {
-                text: "Les comptes de charges les plus impactants",
+                text: "\tLes comptes de charges les plus impactants\t",
                 style: "h2",
-                margin: [0, 0, 0, 10],
               },
-
               {
                 text: "Les plus contributifs ",
                 fontSize: 10,
                 bold: true,
-                margin: [10, 0, 0, 10],
+                margin: [0, 10, 0, 10],
               },
 
               mostImpactfulExpenses.map((expense) => ({
                 text: expense.account + " - " + expense.accountLib,
-                margin: [10, 0, 0, 10],
               })),
 
               {
                 text: "Les moins contributifs ",
                 fontSize: 10,
                 bold: true,
-                margin: [10, 15, 0, 10],
+                margin: [0, 10, 0, 10],
               },
               leastImpactfulExpenses.map((expense) => ({
                 text: expense.account + " - " + expense.accountLib,
-                margin: [10, 0, 0, 10],
               })),
 
               // ACTIVITES FOURNISSEURS
               {
-                text: "Type d'activité des fournisseurs",
+                text: "\tType d'activité des fournisseurs\t",
                 style: "h2",
                 margin: [0, 30, 0, 10],
               },
               mostImpactfulExpenses.map((expense) => ({
                 text: expense.accountAux + " - " + expense.accountAuxLib,
-                margin: [10, 0, 0, 10],
+                margin: [0, 0, 0, 0],
               })),
             ],
           },

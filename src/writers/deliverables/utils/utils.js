@@ -18,7 +18,7 @@ export function getIndicDescription(indic) {
   switch (indic) {
     case "art":
       description =
-        "L'indicateur permet de rendre compte de la part de la valeur produite par des entreprises artisanales, créatives ou dont le savoir-faire est reconnu";
+        "L'indicateur permet de rendre compte de la part de la valeur produite par des entreprises artisanales, créatives ou dont le savoir-faire est reconnu.";
       break;
     case "eco":
       description =

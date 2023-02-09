@@ -161,10 +161,8 @@ const ResultSection = (props) => {
           session.year,
           session.legalUnit.corporateName,
           indic,
-          metaIndics[indic].libelle,
-          metaIndics[indic].unit,
+          metaIndics[indic].libelleGrandeur,
           session.financialData,
-          session.impactsData,
           session.comparativeData,
           true
         );
@@ -554,8 +552,9 @@ const ResultSection = (props) => {
               >
                 <p className="text-primary fw-bold text-center">
                   {
-                    comparativeData.netValueAdded.trendsFootprint
-                      .indicators[indic].meta.label
+                    comparativeData.netValueAdded.trendsFootprint.indicators[
+                      indic
+                    ].meta.label
                   }
                 </p>
                 <TrendsGraph
