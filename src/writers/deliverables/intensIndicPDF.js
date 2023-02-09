@@ -39,6 +39,7 @@ export const CreateIntensIndicatorPDF = (
   unit,
   financialData,
   comparativeData,
+  chartLabel,
   download
 ) => {
   // ---------------------------------------------------------------
@@ -105,8 +106,6 @@ export const CreateIntensIndicatorPDF = (
     height: 841.89,
   };
 
-  const innerPageSize = pageSize.width - 40;
-
   const documentTitle =
     "Plaquette_" +
     indic.toUpperCase() +
@@ -155,9 +154,9 @@ export const CreateIntensIndicatorPDF = (
           // BOXES
           {
             type: "rect",
-            x: 50,
+            x: 30,
             y: 90,
-            w: 110,
+            w: 125,
             h: 60,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -165,9 +164,9 @@ export const CreateIntensIndicatorPDF = (
           },
           {
             type: "rect",
-            x: 165,
+            x: 167,
             y: 90,
-            w: 135,
+            w: 125,
             h: 60,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -175,9 +174,9 @@ export const CreateIntensIndicatorPDF = (
           },
           {
             type: "rect",
-            x: 305,
+            x: 302,
             y: 90,
-            w: 110,
+            w: 125,
             h: 60,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -185,9 +184,9 @@ export const CreateIntensIndicatorPDF = (
           },
           {
             type: "rect",
-            x: 430,
+            x: 438,
             y: 90,
-            w: 120,
+            w: 125,
             h: 60,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -197,8 +196,8 @@ export const CreateIntensIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 220,
-            w: 320,
+            y: 224,
+            w: 330,
             h: 160,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -206,10 +205,10 @@ export const CreateIntensIndicatorPDF = (
           },
           {
             type: "rect",
-            x: 320,
+            x: 330,
             y: 260,
-            w: 240,
-            h: 110,
+            w: 230,
+            h: 120,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             color: "#FFFFFF",
@@ -239,6 +238,7 @@ export const CreateIntensIndicatorPDF = (
     content: [
       { text: "Rapport - " + label, style: "header" },
       {
+        columnGap: 30,
         columns: [
           {
             margin: [0, 20, 0, 0],
@@ -281,10 +281,12 @@ export const CreateIntensIndicatorPDF = (
                   precision
                 ),
                 style: "numbers",
+                margin: [0, 0, 0, 0],
               },
               {
                 text: "de " + unitGrossImpact,
                 bold: true,
+                margin: [0, 0, 0, 5],
               },
               {
                 text: "liés à la production",
@@ -312,25 +314,26 @@ export const CreateIntensIndicatorPDF = (
         ],
       },
       {
+        margin: [40, 30, 40, 0],
         text: indicDescription,
-        margin: [0, 30, 0, 0],
+        alignment: "center",
       },
       {
-        columnGap: 20,
         columns: [
           {
-            width: "*",
+            width: "60%",
             stack: [
               {
-                text: "Impacts de vos Soldes Intérmediaires de Gestion",
+                text: "\tImpacts de vos Soldes Intérmediaires de Gestion\t",
                 style: "h2",
                 alignment: "center",
               },
+
               {
                 margin: [0, 20, 0, 0],
                 columns: [
                   {
-                    width: 150,
+                    width: "60%",
                     stack: [
                       {
                         layout: "noBorders",
@@ -396,18 +399,16 @@ export const CreateIntensIndicatorPDF = (
                   {
                     width: 100,
                     image: chartImage,
-                    alignment: "left",
                   },
                 ],
               },
             ],
           },
           {
-            margin: [0, 40, 10, 0],
-            width: 200,
+            margin: [0, 30, 25, 0],
             stack: [
               {
-                text: "Comptes de charges qui représentent le plus de dépenses importées",
+                text: "\tComptes de charges qui représentent le plus de dépenses importées\t",
                 style: "h2",
                 fontSize: 10,
                 alignment: "center",
@@ -417,7 +418,10 @@ export const CreateIntensIndicatorPDF = (
                 table: {
                   heights: [10, 10, 10, 10],
                   body: [
-                 ...getPercentageForConsumptionRows(intermediateConsumption.amount,financialData.getIntermediateConsumptionsAggregates())
+                    ...getPercentageForConsumptionRows(
+                      intermediateConsumption.amount,
+                      financialData.getIntermediateConsumptionsAggregates()
+                    ),
                   ],
                   layout: {
                     defaultBorder: false,
@@ -449,7 +453,7 @@ export const CreateIntensIndicatorPDF = (
         text: "Les fournisseurs clés",
         style: "h2",
         alignment: "center",
-        margin: [0, 40, 0, 0],
+        margin: [0, 35, 0, 0],
         background: "#FFFFFF",
       },
       {
@@ -778,15 +782,9 @@ export const CreateIntensIndicatorPDF = (
           },
         ],
       },
+
       {
-        text: "Tendances de la branche",
-        color: "#fa595f",
-        bold: true,
-        alignment: "center",
-        margin: [0, 10, 0, 10],
-      },
-      {
-        columnGap: 30,
+        columnGap: 20,
         columns: [
           {
             width: "33%",
@@ -800,7 +798,7 @@ export const CreateIntensIndicatorPDF = (
               {
                 text: "de baisse d'intensité de la branche depuis 2010",
                 alignment: "center",
-                margin: [0, 5, 0, 10],
+                margin: [0, 2, 0, 10],
                 bold: true,
               },
               {
@@ -813,14 +811,26 @@ export const CreateIntensIndicatorPDF = (
               {
                 text: "objectif de baisse de la branche pour correspondre aux objectifs 2030",
                 alignment: "center",
-                margin: [0, 5, 0, 0],
+                margin: [0, 2, 0, 0],
               },
             ],
           },
+
           {
-            width: 250,
-            image: trendImage,
-            alignment: "center",
+            width: "*",
+            stack: [
+              {
+                text: chartLabel,
+                bold: true,
+                fontSize : 8,
+                margin: [0, 10, 0, 10],
+              },
+              {
+                width: 250,
+                image: trendImage,
+                alignment: "left",
+              },
+            ],
           },
         ],
       },
@@ -860,6 +870,7 @@ export const CreateIntensIndicatorPDF = (
       numbers: {
         fontSize: 18,
         bold: true,
+        margin: [0, 0, 0, 5],
       },
       bigNumber: {
         fontSize: 24,
