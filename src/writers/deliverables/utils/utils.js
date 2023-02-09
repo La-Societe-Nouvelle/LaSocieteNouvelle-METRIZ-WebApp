@@ -28,6 +28,10 @@ export function getIndicDescription(indic) {
       description =
         "L'indicateur permet de rendre compte de la part de la valeur produite dans un intérêt social défini.";
       break;
+      case "knw":
+        description =
+          "L'indicateur permet de rendre compte de la part de la valeur produite contribuant à la recherche, à la formation ou à l'enseignement."
+        break;
     case "ghg":
       description =
         "L'indicateur informe sur la quantité de gaz à effet de serre liée à la production de l'entreprise avec pour objectif d'identifier les entreprises les plus performantes.";
