@@ -281,7 +281,7 @@ const ResultSection = (props) => {
             <Col sm={3}>
               <div className="border rounded mt-5 px-5 pb-4">
                 <h3 className="text-center">
-                  Répartition des impacts bruts (en %)
+                  Répartition des impacts bruts
                 </h3>
                 <PieGraph
                   id={"part-" + indic}

@@ -29,9 +29,6 @@ function PieGraph(props) {
           capitalConsumption.toFixed(0),
           netValueAdded.toFixed(0),
         ],
-        datalabels: {
-          color: "#FFF",
-        },
         backgroundColor: [
           "rgb(25, 21, 88)",
           "rgba(25, 21, 88, 0.5)",
@@ -44,39 +41,47 @@ function PieGraph(props) {
 
   const options = {
     devicePixelRatio: 2,
-    cutout:100,
+    cutout: 100,
     plugins: {
       legend: {
-        display : false,
+        display: false,
         position: "bottom",
         align: "start",
         fullSize: false,
         labels: {
-          padding: 10 ,
+          padding: 10,
           font: {
             size: 13,
           },
-          boxWidth : 20,
-          boxHeight : 20,
-          useBorderRadius : true,
-          borderRadius: 10
+          boxWidth: 20,
+          boxHeight: 20,
+          useBorderRadius: true,
+          borderRadius: 10,
+        },
+      },
+      datalabels: {
+        color: "#FFF",
+        formatter: (value) => {
+          return value + "%";
         },
       },
       tooltip: {
-        backgroundColor: "#191558",
-        padding: 10,
-        cornerRadius: 2,
+        backgroundColor: "rgba(25,21,88,0.9)",
+        padding: 15,
+        cornerRadius: 3,
+        usePointStyle: true,
+
+        callbacks: {
+          label: function (context) {
+            let label = context.label;
+            return label;
+          },
+        },
       },
     },
   };
 
-  return (
-    <Doughnut
-      id={props.id}
-      data={data}
-      options={options}
-    />
-  );
+  return <Doughnut id={props.id} data={data} options={options} />;
 }
 
 export default PieGraph;
