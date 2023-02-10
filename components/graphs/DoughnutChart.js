@@ -21,16 +21,16 @@ function DoughnutChart({ value, title, id }) {
         },
         borderAlign: "inner",
         borderWidth: 0,
-        // backgroundColor: ["rgb(25, 21, 88)", "rgba(25, 21, 88,0.2)"],
-        backgroundColor: ["RGB(82, 98, 188)", "RGB(215,220,251,1)"],
+        backgroundColor: ["RGB(25, 21, 88)", "RGB(215,220,251,1)"],
       },
     ],
   };
 
   const options = {
     maintainAspectRatio: true,
+    responsive : false,
     devicePixelRatio: 2,
-    cutoutPercentage: 80,
+    cutout: 55,
     hover: { mode: null },
     layout: {
       autoPadding: false,
@@ -45,7 +45,6 @@ function DoughnutChart({ value, title, id }) {
         annotations: [
           {
             type: "label",
-   
             xValue: 2.5,
             yValue: 60,
             content: value + "%",
@@ -53,6 +52,7 @@ function DoughnutChart({ value, title, id }) {
             font: {
               size: 20,
               family: "Raleway",
+              weight : "bold"
             },
           },
         ],

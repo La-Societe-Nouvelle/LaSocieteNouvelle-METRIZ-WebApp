@@ -45,22 +45,14 @@ function PieGraph(props) {
     plugins: {
       legend: {
         display: false,
-        position: "bottom",
-        align: "start",
-        fullSize: false,
-        labels: {
-          padding: 10,
-          font: {
-            size: 13,
-          },
-          boxWidth: 20,
-          boxHeight: 20,
-          useBorderRadius: true,
-          borderRadius: 10,
-        },
       },
       datalabels: {
         color: "#FFF",
+        font: {
+          size: 18,
+          family: "Raleway",
+          weight: "bold",
+        },
         formatter: (value) => {
           return value + "%";
         },
@@ -70,7 +62,6 @@ function PieGraph(props) {
         padding: 15,
         cornerRadius: 3,
         usePointStyle: true,
-
         callbacks: {
           label: function (context) {
             let label = context.label;
