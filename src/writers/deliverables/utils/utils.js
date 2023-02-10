@@ -97,3 +97,9 @@ export const getPercentageForConsumptionRows = (totalAmount,intermediateConsumpt
     });
   return rows;
 };
+
+export function cutString(str, nbChar) {
+  console.log(str)
+  if (str.length <= nbChar) return str;
+  return str.substring(0, nbChar) + '...';
+}

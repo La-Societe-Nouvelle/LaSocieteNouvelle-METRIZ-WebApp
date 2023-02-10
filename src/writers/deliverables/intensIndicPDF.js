@@ -1,6 +1,10 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { getEvolution, printValue } from "../../utils/Utils";
+import {
+  getEvolution,
+  getShortCurrentDateString,
+  printValue,
+} from "../../utils/Utils";
 import metaIndics from "/lib/indics";
 
 import {
@@ -130,7 +134,23 @@ export const CreateIntensIndicatorPDF = (
         },
       ],
     },
+    footer: function (currentPage, pageCount) {
+      return {
+        columns: [
+          {
+            text: "Edité le " + getShortCurrentDateString(),
+            margin: [20, 25, 0, 0],
+          },
+          {
+            text: "Page " + currentPage.toString() + " sur " + pageCount,
+            alignment: "right",
+            margin: [0, 25, 20, 0],
+          },
+        ],
 
+        fontSize: 7,
+      };
+    },
     background: function () {
       return {
         canvas: [
@@ -196,9 +216,9 @@ export const CreateIntensIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 224,
-            w: 330,
-            h: 160,
+            y: 180,
+            w: 535,
+            h: 200,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -260,8 +280,20 @@ export const CreateIntensIndicatorPDF = (
             alignment: "center",
             stack: [
               {
-                text: "53%",
-                style: "numbers",
+                columnGap: 0,
+                columns: [
+                  {
+                    width: "auto",
+                    text: production.footprint.indicators[indic].value,
+                    style: "numbers",
+                    alignment: "right",
+                  },
+                  {
+                    text: unit,
+                    bold: true,
+                    margin: [0, 8, 0, 0],
+                  },
+                ],
               },
               {
                 text: " d'" + label,
@@ -314,93 +346,85 @@ export const CreateIntensIndicatorPDF = (
         ],
       },
       {
-        margin: [40, 30, 40, 0],
-        text: indicDescription,
+        text: "\tImpacts de vos Soldes Intermédiaires de Gestion\t",
+        style: "h2",
         alignment: "center",
+        margin: [0, 30, 0, 20],
+        background:"#FFFFFF"
       },
       {
         columns: [
           {
             width: "60%",
-            stack: [
+            columnGap : 50,
+            columns: [
               {
-                text: "\tImpacts de vos Soldes Intérmediaires de Gestion\t",
-                style: "h2",
-                alignment: "center",
-              },
-
-              {
-                margin: [0, 20, 0, 0],
-                columns: [
+                width: "30%",
+                stack: [
                   {
-                    width: "60%",
-                    stack: [
-                      {
-                        layout: "noBorders",
-                        table: {
-                          widths: [20, "*"],
-                          body: [
-                            [
-                              {
-                                text: "",
-                                fillColor: "#191558",
-                              },
-                              {
-                                text: "Consommations intermédiaires",
-                                fontSize: 7,
-                                bold: true,
-                              },
-                            ],
-                          ],
-                        },
-                      },
-                      {
-                        margin: [0, 5, 0, 0],
-                        layout: "noBorders",
-                        table: {
-                          widths: [20, "*"],
-                          body: [
-                            [
-                              {
-                                text: "",
-                                fillColor: "#8c8aab",
-                              },
-                              {
-                                text: "Consommations de capital fixe",
-                                fontSize: 7,
-                                bold: true,
-                              },
-                            ],
-                          ],
-                        },
-                      },
-                      {
-                        margin: [0, 5, 0, 0],
-                        layout: "noBorders",
-                        table: {
-                          widths: [20, "*"],
-                          body: [
-                            [
-                              {
-                                text: "",
-                                fillColor: "#fb7a7f",
-                              },
-                              {
-                                text: "Valeur ajoutée nette",
-                                fontSize: 7,
-                                bold: true,
-                              },
-                            ],
-                          ],
-                        },
-                      },
-                    ],
+                    layout: "noBorders",
+                    table: {
+                      widths: [10, "*"],
+                      body: [
+                        [
+                          {
+                            text: "",
+                            fillColor: "#191558",
+                          },
+                          {
+                            text: "Consommations intermédiaires",
+                            fontSize: 7,
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
                   },
                   {
-                    width: 100,
-                    image: chartImage,
+                    margin: [0, 5, 0, 0],
+                    layout: "noBorders",
+                    table: {
+                      widths: [10, "*"],
+                      body: [
+                        [
+                          {
+                            text: "",
+                            fillColor: "#8c8aab",
+                          },
+                          {
+                            text: "Consommations de capital fixe",
+                            fontSize: 7,
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
+                  },
+                  {
+                    margin: [0, 5, 0, 0],
+                    layout: "noBorders",
+                    table: {
+                      widths: [10, "*"],
+                      body: [
+                        [
+                          {
+                            text: "",
+                            fillColor: "#fb7a7f",
+                          },
+                          {
+                            text: "Valeur ajoutée nette",
+                            fontSize: 7,
+                            bold: true,
+                          },
+                        ],
+                      ],
+                    },
                   },
                 ],
+              },
+              {
+                width: 150,
+                image: chartImage,
               },
             ],
           },
@@ -408,7 +432,7 @@ export const CreateIntensIndicatorPDF = (
             margin: [0, 30, 25, 0],
             stack: [
               {
-                text: "\tComptes de charges qui représentent le plus de dépenses importées\t",
+                text: "\tdont les comptes de charges les plus impactants \t",
                 style: "h2",
                 fontSize: 10,
                 alignment: "center",
@@ -822,7 +846,7 @@ export const CreateIntensIndicatorPDF = (
               {
                 text: chartLabel,
                 bold: true,
-                fontSize : 8,
+                fontSize: 8,
                 margin: [0, 10, 0, 10],
               },
               {

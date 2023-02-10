@@ -109,7 +109,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   ),
                   nbDecimals
                 )}
-                <span > {unitGrossImpact}</span>
+                <span> {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -142,7 +142,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                     ),
                     nbDecimals
                   )}
-                  <span > {unitGrossImpact}</span>
+                  <span> {unitGrossImpact}</span>
                 </td>
               ) : null}
             </tr>
@@ -214,7 +214,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   ].getGrossImpact(intermediateConsumption.amount),
                   nbDecimals
                 )}
-                <span > {unitGrossImpact}</span>
+                <span> {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -242,7 +242,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
-                    <span > {unitGrossImpact}</span>
+                    <span> {unitGrossImpact}</span>
                   </td>
                 ) : null}
               </tr>
@@ -303,7 +303,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
-                    <span > {unitGrossImpact}</span>
+                    <span> {unitGrossImpact}</span>
                   </td>
                 ) : null}
               </tr>
@@ -337,7 +337,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
                   ),
                   nbDecimals
                 )}
-                <span > {unitGrossImpact}</span>
+                <span> {unitGrossImpact}</span>
               </td>
             ) : null}
           </tr>
@@ -354,63 +354,61 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
         </Button>
       </div>
       {metaIndics[indic].type == "proportion" && (
-        <>
+        <Row>
           <hr />
-          <div className="my-4 d-flex ">
-            <div className="pe-5">
-              <h5 className="mb-4">▪ Production</h5>
-              <div className="doughtnut-chart-container">
-                <DoughnutChart
-                  value={printValue(
-                    production.footprint.indicators[indic].value,
-                    nbDecimals
-                  )}
-                  title={"Production"}
-                  id={"prd-" + indic}
-                />
-              </div>
+          <Col>
+            <h5 className="mb-4 text-center">▪ Production</h5>
+            <div className="doughtnut-chart-container">
+              <DoughnutChart
+                value={printValue(
+                  production.footprint.indicators[indic].value,
+                  nbDecimals
+                )}
+                title={"Production"}
+                id={"prd-" + indic}
+              />
             </div>
-            <div className="px-5">
-              <h5 className="mb-4">▪ Consommations intermédiaires</h5>
-              <div className="doughtnut-chart-container">
-                <DoughnutChart
-                  value={printValue(
-                    intermediateConsumption.footprint.indicators[indic].value,
-                    nbDecimals
-                  )}
-                  title={"Consommations intermédiaires"}
-                  id={"ic-" + indic}
-                />
-              </div>
+          </Col>
+          <Col>
+            <h5 className="mb-4 text-center">▪ Consommations intermédiaires</h5>
+            <div className="doughtnut-chart-container">
+              <DoughnutChart
+                value={printValue(
+                  intermediateConsumption.footprint.indicators[indic].value,
+                  nbDecimals
+                )}
+                title={"Consommations intermédiaires"}
+                id={"ic-" + indic}
+              />
             </div>
-            <div className="px-5">
-              <h5 className="mb-4">▪ Consommation de capital fixe</h5>
-              <div className="doughtnut-chart-container">
-                <DoughnutChart
-                  value={printValue(
-                    capitalConsumption.footprint.indicators[indic].value,
-                    nbDecimals
-                  )}
-                  title={"Consommation de capital fixe"}
-                  id={"ccf-" + indic}
-                />
-              </div>
+          </Col>
+          <Col>
+            <h5 className="mb-4 text-center">▪ Consommations de capital fixe</h5>
+            <div className="doughtnut-chart-container">
+              <DoughnutChart
+                value={printValue(
+                  capitalConsumption.footprint.indicators[indic].value,
+                  nbDecimals
+                )}
+                title={"Consommation de capital fixe"}
+                id={"ccf-" + indic}
+              />
             </div>
-            <div className="ps-5">
-              <h5 className="mb-4">▪ Valeur ajoutée nette</h5>
-              <div className="doughtnut-chart-container">
-                <DoughnutChart
-                  value={printValue(
-                    netValueAdded.footprint.indicators[indic].getValue(),
-                    nbDecimals
-                  )}
-                  title={"Valeur ajoutée nette"}
-                  id={"nva-" + indic}
-                />
-              </div>
+          </Col>
+          <Col>
+            <h5 className="mb-4 text-center">▪ Valeur ajoutée nette</h5>
+            <div className="doughtnut-chart-container">
+              <DoughnutChart
+                value={printValue(
+                  netValueAdded.footprint.indicators[indic].getValue(),
+                  nbDecimals
+                )}
+                title={"Valeur ajoutée nette"}
+                id={"nva-" + indic}
+              />
             </div>
-          </div>
-        </>
+          </Col>
+        </Row>
       )}
     </>
   );

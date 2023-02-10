@@ -1,5 +1,6 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { getShortCurrentDateString } from "../../utils/Utils";
 import { getAnalyse, getStatementNote } from "../../utils/Writers";
 import { generateIndicTableBody } from "./utils/generateTableBody";
 import divisions from "/lib/divisions";
@@ -39,12 +40,7 @@ export const createIndicReport = (
 ) => {
   // ---------------------------------------------------------------
 
-  const currentDate = new Date();
-  const date = currentDate.toLocaleString("fr-FR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+ 
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -118,7 +114,7 @@ export const createIndicReport = (
       return {
         columns: [
           {
-            text: "Edité le " + date,
+            text: "Edité le " + getShortCurrentDateString(),
             margin: [20, 25, 0, 0],
           },
           {

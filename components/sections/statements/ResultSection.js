@@ -372,7 +372,7 @@ const ResultSection = (props) => {
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
-                <h5 className="mb-4">▪ Consommation de capital fixe</h5>
+                <h5 className="mb-4">▪ Consommations de capital fixe</h5>
                 <ComparativeGraphs
                   id={"capitalConsumption-" + indic}
                   graphDataset={[

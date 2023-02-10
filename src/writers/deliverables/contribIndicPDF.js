@@ -1,7 +1,8 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { printValue } from "../../utils/Utils";
+import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
+  cutString,
   getIndicDescription,
   sortExpensesByFootprintIndicator,
 } from "./utils/utils";
@@ -41,9 +42,8 @@ export const CreateContribIndicatorPDF = (
 
   const indicDescription = getIndicDescription(indic);
 
-  const { production, revenue, intermediateConsumption } =
+  const { production, revenue, intermediateConsumption,externalExpenses } =
     financialData.aggregates;
-
   const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
     financialData.expenses,
     indic,
@@ -112,7 +112,23 @@ export const CreateContribIndicatorPDF = (
         },
       ],
     },
+    footer: function (currentPage, pageCount) {
+      return {
+        columns: [
+          {
+            text: "Edité le " + getShortCurrentDateString(),
+            margin: [20, 25, 0, 0],
+          },
+          {
+            text: "Page " + currentPage.toString() + " sur " + pageCount,
+            alignment: "right",
+            margin: [0, 25, 20, 0],
+          },
+        ],
 
+        fontSize: 7,
+      };
+    },
     background: function () {
       return {
         canvas: [
@@ -183,7 +199,7 @@ export const CreateContribIndicatorPDF = (
             x: 30,
             y: 561,
             w: 210,
-            h: 160,
+            h: 150,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -271,9 +287,9 @@ export const CreateContribIndicatorPDF = (
         text: indicDescription,
         alignment: "center",
       },
-      // Box Vue de vos Soldes Intérmediaires de Gestion
+      // Box Vue de vos Soldes Intermédiaires de Gestion
       {
-        text: "\tVue de vos Soldes Intérmediaires de Gestion\t",
+        text: "\tVue de vos Soldes Intermédiaires de Gestion\t",
         style: "h2",
       },
       {
@@ -284,19 +300,19 @@ export const CreateContribIndicatorPDF = (
             stack: [
               {
                 text:
-                  printValue(production.footprint.indicators[indic].value, 0) +
-                  "%",
+                  printValue(production.footprint.indicators[indic].value, 1) +
+                  "%*",
                 alignment: "center",
                 style: "bigNumber",
+                fontSize: 26,
               },
               {
                 text:
                   indic == "eco"
-                    ? " de votre production sont consacrés à l'" + label
-                    : " de votre production sont consacrés aux " + label,
+                    ? " de votre production contribuent à l'" + label
+                    : " de votre production contribuent aux " + label,
                 alignment: "center",
                 bold: true,
-                margin: [0, 5, 0, 0],
               },
             ],
           },
@@ -305,7 +321,7 @@ export const CreateContribIndicatorPDF = (
               {
                 image: doughtnutICImage,
                 alignment: "center",
-                width: 60,
+                width: 120,
               },
               {
                 text: "Consommations",
@@ -327,10 +343,10 @@ export const CreateContribIndicatorPDF = (
               {
                 image: doughtnutCCFImage,
                 alignment: "center",
-                width: 60,
+                width: 120,
               },
               {
-                text: "Consommation",
+                text: "Consommations",
                 alignment: "center",
                 bold: true,
                 fontSize: 8,
@@ -348,7 +364,7 @@ export const CreateContribIndicatorPDF = (
             stack: [
               {
                 image: doughtnutNVAImage,
-                width: 60,
+                width: 120,
                 alignment: "center",
               },
               {
@@ -378,7 +394,11 @@ export const CreateContribIndicatorPDF = (
                 text: "\tComparaison avec la branche d'activité\t",
                 style: "h2",
               },
-
+              {
+                text: "Production",
+                fontSize : 9,
+                bold : true,
+              },
               {
                 image: productionChartImage,
                 width: 200,
@@ -387,24 +407,25 @@ export const CreateContribIndicatorPDF = (
               {
                 text: "\tPerformances de vos achats\t",
                 style: "h3",
-                margin: [0, 30, 0, 10],
+                margin: [0, 20, 0, 10],
                 alignment: "center",
                 background: "#FFFFFF",
               },
               {
                 text:
                   printValue(
-                    intermediateConsumption.footprint.indicators[indic].value,
+                    externalExpenses.footprint.indicators[indic].value,
                     1
                   ) + " %",
                 alignment: "center",
                 style: "bigNumber",
+                fontSize: 20,
               },
               {
                 text:
                   indic == "eco"
-                    ? " de vos achats sont consacrés à l'" + label
-                    : " de vos achats sont consacrés aux " + label,
+                    ? " de vos achats contribuent à l'" + label
+                    : " de vos achats contribuent aux " + label,
                 alignment: "center",
                 bold: true,
               },
@@ -417,19 +438,19 @@ export const CreateContribIndicatorPDF = (
                   ) + " %",
                 alignment: "center",
                 style: "branchNumber",
-                margin: [0, 10, 0, 0],
               },
               {
                 text:
                   indic == "eco"
-                    ? " des achats de la branches sont consacrés à l'" + label
-                    : " des achats de la branchessont consacrés aux " + label,
+                    ? " des achats de la branches contribuent à l'" + label
+                    : " des achats de la branches contribuent aux " + label,
                 alignment: "center",
                 fontSize: 8,
               },
             ],
           },
           {
+            width: "*",
             stack: [
               {
                 text: "\tLes comptes de charges les plus impactants\t",
@@ -443,7 +464,7 @@ export const CreateContribIndicatorPDF = (
               },
 
               mostImpactfulExpenses.map((expense) => ({
-                text: expense.account + " - " + expense.accountLib,
+                text: cutString( expense.account + " - " + expense.accountLib, 60) ,
               })),
 
               {
@@ -453,7 +474,7 @@ export const CreateContribIndicatorPDF = (
                 margin: [0, 10, 0, 10],
               },
               leastImpactfulExpenses.map((expense) => ({
-                text: expense.account + " - " + expense.accountLib,
+                text: cutString( expense.account + " - " + expense.accountLib, 60),
               })),
 
               // ACTIVITES FOURNISSEURS
@@ -468,9 +489,17 @@ export const CreateContribIndicatorPDF = (
               })),
             ],
           },
+     
         ],
+      
       },
-
+      {
+        text : "*Incertitude ",
+        fontSize : 7,
+        margin: [0, 50, 0, 0],
+        italics: true,
+        font : "Roboto"
+      },
       ,
     ],
     defaultStyle: {
@@ -510,14 +539,15 @@ export const CreateContribIndicatorPDF = (
         bold: true,
       },
       bigNumber: {
-        fontSize: 24,
         bold: true,
         color: "#fa595f",
+        margin: [0, 5, 0, 5],
       },
       branchNumber: {
         fontSize: 16,
         bold: true,
         color: "#ffb642",
+        margin: [0, 5, 0, 5],
       },
       text: {
         alignment: "justify",
