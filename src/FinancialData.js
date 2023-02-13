@@ -570,6 +570,7 @@ const buildPeriods = async (immobilisations,amortisations,amortisationExpenses) 
         // build next periods
         let nextPeriods = dates.slice(1).map((date,index,self) => {
             return({
+                id: index,
                 dateStart: index > 0 ? self[index-1] : dateStartYear,
                 dateEnd: date,
                 amount: null

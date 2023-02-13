@@ -114,7 +114,7 @@ export function ifCondition(condition,value) {
 
 export function getNewId(items) {return items.map(item => item.id).reduce((a,b) => {return Math.max(a,b)},0)+1}
 
-/* ----- ID ----- */
+/* ----- DATE ----- */
 
 export const getCurrentDateString = () => // dd-MM-yyyy hh:mm
 {
@@ -127,8 +127,6 @@ export const getCurrentDateString = () => // dd-MM-yyyy hh:mm
   return dateString
 }
 
-/* ----- DATE ----- */
-
 export const getDateFromString = (stringDate) =>
 {
   if (/^[0-9]{8}$/.test(stringDate)) {
@@ -137,6 +135,63 @@ export const getDateFromString = (stringDate) =>
     return null;
   }
 }
+
+export const getNextMonth = (month) =>
+{
+  let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)+1));
+  return date.getFullYear()+date.getMonth();
+}
+
+export const getLastDateOfMonth = (month) =>
+{
+  let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)+1),0);
+  return date.getFullYear()+date.getMonth()+date.getDay();
+}
+
+export const getNbDaysBetweenDates = (stringDateA,stringDateB) =>
+{
+  let dateA = getDateFromString(stringDateA);
+  let dateB = getDateFromString(stringDateB);
+  return Math.round(Math.abs(dateB - dateA) / (1000 * 60 * 60 * 24));
+}
+
+export const isInPeriod = (stringDateStart,stringDateEnd,stringDate) =>
+{
+  let isAfter = isAfter(stringDateStart,stringDate);
+  let isBefore = isBefore(stringDateEnd,stringDate);
+
+  if (isAfter==null || isBefore==null) {
+    return null;
+  } else {
+    return isAfter && isBefore;
+  }
+}
+
+export const isAfter = (stringDateRef,stringDate) =>
+{
+  let dateRef = getDateFromString(stringDateRef);
+  let date = getDateFromString(stringDate);
+
+  if (dateRef==null || date==null) {
+    return null;
+  } else {
+    return date.getDate()>=dateRef.getDate();
+  }
+}
+
+export const isBefore = (stringDateRef,stringDate) =>
+{
+  let dateRef = getDateFromString(stringDateRef);
+  let date = getDateFromString(stringDate);
+
+  if (dateRef==null || date==null) {
+    return null;
+  } else {
+    return date.getDate()<=dateRef.getDate();
+  }
+}
+
+/* ----- SERIES ID ----- */
 
 export const getTargetSerieId = (indic) => {
   let id;
