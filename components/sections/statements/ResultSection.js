@@ -37,6 +37,7 @@ import { createIndicReport } from "../../../src/writers/deliverables/PDFGenerato
 import { getAnalyse } from "../../../src/utils/Writers";
 import { CreateContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
 import { CreateIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
+import DeviationChart from "../../graphs/HorizontalBarChart";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -178,7 +179,7 @@ const ResultSection = (props) => {
           session.financialData,
           session.comparativeData,
           comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
-          .label,
+            .label,
           true
         );
         break;
@@ -280,9 +281,7 @@ const ResultSection = (props) => {
           {metaIndics[indic].type == "intensité" && (
             <Col sm={3}>
               <div className="border rounded mt-5 px-5 pb-4">
-                <h3 className="text-center">
-                  Répartition des impacts bruts
-                </h3>
+                <h3 className="text-center">Répartition des impacts bruts</h3>
                 <PieGraph
                   id={"part-" + indic}
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
@@ -427,12 +426,53 @@ const ResultSection = (props) => {
             </Row>
           </div>
         </div>
+                  <hr></hr>
+        <Row>
+          <Col lg={8}>
+            <ComparativeTable
+              financialData={session.financialData}
+              indic={indic}
+              comparativeData={comparativeData}
+            />
+          </Col>
+          <Col lg={4}>
+            <h5 className="mb-4">
+              ▪ Ecart par rapport à la moyenne de la branche
+            </h5>
 
-        <ComparativeTable
-          financialData={session.financialData}
-          indic={indic}
-          comparativeData={comparativeData}
-        />
+            <DeviationChart
+              id={"deviationChart-" + indic}
+              legalUnitData={[
+                session.financialData.aggregates.production.footprint.getIndicator(
+                  indic
+                ).value,
+                session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                  indic
+                ).value,
+                session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                  indic
+                ).value,
+                session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                  indic
+                ).value,
+              ]}
+              branchData={[
+                comparativeData.production.divisionFootprint.indicators[indic]
+                  .value,
+                comparativeData.intermediateConsumption.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.fixedCapitalConsumption.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.netValueAdded.divisionFootprint.indicators[
+                  indic
+                ].value,
+              ]}
+              indic={indic}
+              unit={metaIndics[indic].unit}
+              precision={metaIndics[indic].nbDecimal}
+            />
+          </Col>
+        </Row>
       </section>
       {/* ---------- Trend Line Chart ----------  */}
       {comparativeDivision != "00" && (

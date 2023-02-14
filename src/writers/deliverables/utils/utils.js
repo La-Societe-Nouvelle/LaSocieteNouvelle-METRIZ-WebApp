@@ -28,10 +28,10 @@ export function getIndicDescription(indic) {
       description =
         "L'indicateur permet de rendre compte de la part de la valeur produite dans un intérêt social défini.";
       break;
-      case "knw":
-        description =
-          "L'indicateur permet de rendre compte de la part de la valeur produite contribuant à la recherche, à la formation ou à l'enseignement."
-        break;
+    case "knw":
+      description =
+        "L'indicateur permet de rendre compte de la part de la valeur produite contribuant à la recherche, à la formation ou à l'enseignement.";
+      break;
     case "ghg":
       description =
         "L'indicateur informe sur la quantité de gaz à effet de serre liée à la production de l'entreprise avec pour objectif d'identifier les entreprises les plus performantes.";
@@ -50,7 +50,11 @@ export function getKeySuppliers(companies, indic, unit) {
     keySuppliers.push({
       stack: [
         {
-          text: company.corporateName + " ( SIREN " + company.corporateId + ")",
+          text:
+            cutString(company.corporateName, 30) +
+            " ( SIREN " +
+            company.corporateId +
+            ")",
           fontSize: 8,
           bold: true,
         },
@@ -65,32 +69,54 @@ export function getKeySuppliers(companies, indic, unit) {
   return keySuppliers;
 }
 
-export const getPercentageForConsumptionRows = (totalAmount,intermediateConsumption) => {
+export const getPercentageForConsumptionRows = (
+  totalAmount,
+  intermediateConsumption,
+  indic
+) => {
   let rows = [];
 
-
   intermediateConsumption
-    .filter((consumption) => consumption.amount != 0)
+    .filter(
+      (consumption) =>
+        consumption.footprint.indicators[indic].getGrossImpact(
+          consumption.amount
+        ) != 0
+    )
+    .sort((a, b) => {
+      let percentageA =
+        (a.footprint.indicators[indic].getGrossImpact(a.amount) / totalAmount) *
+        100;
+      let percentageB =
+        (b.footprint.indicators[indic].getGrossImpact(b.amount) / totalAmount) *
+        100;
+      return percentageB - percentageA;
+    })
+    .slice(0, 3)
     .forEach((consumption) => {
       let row = [];
-
-      let percentage = (consumption.amount / totalAmount) * 100;
+      let percentage =
+        (consumption.footprint.indicators[indic].getGrossImpact(
+          consumption.amount
+        ) /
+          totalAmount) *
+        100;
 
       row.push(
         {
           text: percentage.toFixed(0) + " %",
           fillColor: "#191558",
-          color : "#FFFFFF",
+          color: "#FFFFFF",
           fontSize: 7,
           borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-          alignment:"right",
-          bold : true,
+          alignment: "right",
+          bold: true,
         },
         {
-          text : consumption.accountLib,
+          text: consumption.accountLib,
           fontSize: 7,
           borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-          bold : true,
+          bold: true,
         }
       );
       rows.push(row);
@@ -99,7 +125,6 @@ export const getPercentageForConsumptionRows = (totalAmount,intermediateConsumpt
 };
 
 export function cutString(str, nbChar) {
-  console.log(str)
   if (str.length <= nbChar) return str;
-  return str.substring(0, nbChar) + '...';
+  return str.substring(0, nbChar) + "...";
 }

@@ -58,8 +58,10 @@ export const generateIndicTableBody = (
             text: [
               {
                 text:
-                  printValue(production.footprint.indicators[indic].value, precision) +
-                  " ",
+                  printValue(
+                    production.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
               },
               { text: unit, fontSize: "7" },
             ],
@@ -91,21 +93,24 @@ export const generateIndicTableBody = (
         columns: [
           {
             text: [
-              
               {
                 text:
-                  printValue(revenue.footprint.indicators[indic].value, precision) +
-                  " ",
+                  printValue(
+                    revenue.footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
               },
-              { text: unit, fontSize: "7" },
             ],
           },
         ],
+        borderColor: ["#000000", "#000000", "#000000", "#000000"],
         fillColor: "#fa595f",
-        fillOpacity : 0.3,
+        fillOpacity: 0.3,
         margin: [2, 2, 2, 2],
       },
       {
+        border: [true, true, true, true],
+        fillColor: "#fa595f",
         text:
           printValue(revenue.footprint.indicators[indic].uncertainty, 0) + " %",
         fontSize: "7",
@@ -146,11 +151,16 @@ export const generateIndicTableBody = (
             storedProduction.footprint.indicators[indic].uncertainty,
             0
           ) + " %",
-          fontSize: "7",
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getImmobilisedProductionRow(immobilisedProduction, indic, unit, precision),
+    ...getImmobilisedProductionRow(
+      immobilisedProduction,
+      indic,
+      unit,
+      precision
+    ),
     [
       {
         text: "Consommations intermédiaires",
@@ -192,7 +202,12 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getAggregateRow(intermediateConsumptionAggregates, indic, unit, precision),
+    ...getAggregateRow(
+      intermediateConsumptionAggregates,
+      indic,
+      unit,
+      precision
+    ),
     [
       {
         text: "Consommations de capital fixe",
@@ -233,7 +248,12 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getAggregateRow(fixedCapitalConsumptionsAggregates, indic, unit, precision),
+    ...getAggregateRow(
+      fixedCapitalConsumptionsAggregates,
+      indic,
+      unit,
+      precision
+    ),
     [
       {
         text: "Valeur ajoutée nette",
@@ -276,7 +296,12 @@ export const generateIndicTableBody = (
   return tableBody;
 };
 
-const getImmobilisedProductionRow = (immobilisedProduction, indic, unit, precision) => {
+const getImmobilisedProductionRow = (
+  immobilisedProduction,
+  indic,
+  unit,
+  precision
+) => {
   const immobilisedProductionRow = [];
   // Immobilised production
   if (immobilisedProduction > 0) {
@@ -314,7 +339,7 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit, precisi
             immobilisedProduction.footprint.indicators[indic].uncertainty,
             0
           ) + " %",
-          fontSize: "7",
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       }
     );
@@ -345,8 +370,10 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
               text: [
                 {
                   text:
-                    printValue(aggregate.footprint.indicators[indic].value, precision) +
-                    " ",
+                    printValue(
+                      aggregate.footprint.indicators[indic].value,
+                      precision
+                    ) + " ",
                 },
                 { text: unit, fontSize: "7" },
               ],
@@ -358,7 +385,7 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
           text:
             printValue(aggregate.footprint.indicators[indic].uncertainty, 0) +
             " %",
-            fontSize: "7",
+          fontSize: "7",
           margin: [2, 2, 2, 2],
         }
       );
@@ -366,4 +393,3 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
     });
   return rows;
 };
-

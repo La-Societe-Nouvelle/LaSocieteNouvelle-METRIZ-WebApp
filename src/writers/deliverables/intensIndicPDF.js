@@ -8,7 +8,6 @@ import {
 import metaIndics from "/lib/indics";
 
 import {
-  getIndicDescription,
   getKeySuppliers,
   getPercentageForConsumptionRows,
   sortExpensesByFootprintIndicator,
@@ -47,11 +46,19 @@ export const CreateIntensIndicatorPDF = (
   download
 ) => {
   // ---------------------------------------------------------------
+
+  const {
+    production,
+    revenue,
+    intermediateConsumption,
+    capitalConsumption,
+    netValueAdded,
+  } = financialData.aggregates;
+
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
 
-  const indicDescription = getIndicDescription(indic);
-
+  // UTILS
   const branchProductionEvolution = getEvolution(
     comparativeData.production.divisionFootprint.indicators[indic].value,
     comparativeData.production.trendsFootprint.indicators[indic].data.at(-1)
@@ -65,14 +72,6 @@ export const CreateIntensIndicatorPDF = (
     ].data.at(-1).value
   );
 
-  const {
-    production,
-    revenue,
-    intermediateConsumption,
-    capitalConsumption,
-    netValueAdded,
-  } = financialData.aggregates;
-
   const firstMostImpactfulCompanies = sortExpensesByFootprintIndicator(
     financialData.companies,
     indic,
@@ -85,10 +84,17 @@ export const CreateIntensIndicatorPDF = (
     "desc"
   ).slice(2, 4);
 
+  const intermediateConsumptionPart = getIntermediateConsumptionsPart(
+    financialData,
+    indic
+  );
   // Get chart canvas and encode it to import in document
 
   const canvasChart = document.getElementById("part-" + indic);
   const chartImage = canvasChart.toDataURL("image/png");
+
+  const deviationChart = document.getElementById("deviationChart-" + indic);
+  const deviationImage = deviationChart.toDataURL("image/png");
 
   const trendChart = document.getElementById("trend-prd-" + indic);
   const trendImage = trendChart.toDataURL("image/png");
@@ -218,29 +224,40 @@ export const CreateIntensIndicatorPDF = (
             x: 30,
             y: 180,
             w: 535,
-            h: 200,
+            h: 140,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
           },
-          {
-            type: "rect",
-            x: 330,
-            y: 260,
-            w: 230,
-            h: 120,
-            lineWidth: 2,
-            lineColor: "#f1f0f4",
-            color: "#FFFFFF",
-            r: 10,
-          },
+          createBoxIntermediateConsumption(intermediateConsumptionPart),
           // Box Fournisseurs clés
           {
             type: "rect",
             x: 30,
-            y: 410,
+            y: 340,
             w: 490,
             h: 70,
+            lineWidth: 2,
+            lineColor: "#f1f0f4",
+            r: 10,
+          },
+          // Chiffre + graphique
+          {
+            type: "rect",
+            x: 30,
+            y: 600,
+            w: 180,
+            h: 140,
+            lineWidth: 2,
+            lineColor: "#f1f0f4",
+            r: 10,
+          },
+          {
+            type: "rect",
+            x: 220,
+            y: 600,
+            w: 345,
+            h: 170,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -277,16 +294,14 @@ export const CreateIntensIndicatorPDF = (
           {
             margin: [0, 20, 0, 0],
             width: "25%",
-            alignment: "center",
             stack: [
               {
-                columnGap: 0,
-                columns: [
+                alignment: "center",
+                text: [
                   {
                     width: "auto",
                     text: production.footprint.indicators[indic].value,
                     style: "numbers",
-                    alignment: "right",
                   },
                   {
                     text: unit,
@@ -297,6 +312,7 @@ export const CreateIntensIndicatorPDF = (
               },
               {
                 text: " d'" + label,
+                alignment: "center",
               },
             ],
           },
@@ -350,21 +366,21 @@ export const CreateIntensIndicatorPDF = (
         style: "h2",
         alignment: "center",
         margin: [0, 30, 0, 20],
-        background:"#FFFFFF"
+        background: "#FFFFFF",
       },
       {
+        columnGap: 20,
         columns: [
           {
-            width: "60%",
-            columnGap : 50,
+            width: "65%",
             columns: [
               {
-                width: "30%",
                 stack: [
                   {
+                    margin: [0, 20, 0, 0],
                     layout: "noBorders",
                     table: {
-                      widths: [10, "*"],
+                      widths: [10, "auto"],
                       body: [
                         [
                           {
@@ -384,7 +400,7 @@ export const CreateIntensIndicatorPDF = (
                     margin: [0, 5, 0, 0],
                     layout: "noBorders",
                     table: {
-                      widths: [10, "*"],
+                      widths: [10, "auto"],
                       body: [
                         [
                           {
@@ -404,7 +420,7 @@ export const CreateIntensIndicatorPDF = (
                     margin: [0, 5, 0, 0],
                     layout: "noBorders",
                     table: {
-                      widths: [10, "*"],
+                      widths: [10, "auto"],
                       body: [
                         [
                           {
@@ -423,53 +439,17 @@ export const CreateIntensIndicatorPDF = (
                 ],
               },
               {
-                width: 150,
+                width: 100,
                 image: chartImage,
               },
             ],
           },
-          {
-            margin: [0, 30, 25, 0],
-            stack: [
-              {
-                text: "\tdont les comptes de charges les plus impactants \t",
-                style: "h2",
-                fontSize: 10,
-                alignment: "center",
-              },
-              ///
-              {
-                table: {
-                  heights: [10, 10, 10, 10],
-                  body: [
-                    ...getPercentageForConsumptionRows(
-                      intermediateConsumption.amount,
-                      financialData.getIntermediateConsumptionsAggregates()
-                    ),
-                  ],
-                  layout: {
-                    defaultBorder: false,
-                    hLineWidth: function (i, node) {
-                      return i === 0 || i === node.table.body.length ? 2 : 1;
-                    },
-                    vLineWidth: function (i, node) {
-                      return i === 0 || i === node.table.widths.length ? 2 : 1;
-                    },
-                    hLineColor: function (i, node) {
-                      return i === 0 || i === node.table.body.length
-                        ? "white"
-                        : "white";
-                    },
-                    vLineColor: function (i, node) {
-                      return i === 0 || i === node.table.widths.length
-                        ? "white"
-                        : "white";
-                    },
-                  },
-                },
-              },
-            ],
-          },
+          createChargesImpactContent(
+            intermediateConsumptionPart,
+            financialData.aggregates.intermediateConsumption,
+            financialData,
+            indic
+          ),
         ],
       },
       // KEY SUPPLIERS
@@ -477,7 +457,7 @@ export const CreateIntensIndicatorPDF = (
         text: "Les fournisseurs clés",
         style: "h2",
         alignment: "center",
-        margin: [0, 35, 0, 0],
+        margin: [0, 25, 0, 0],
         background: "#FFFFFF",
       },
       {
@@ -505,11 +485,13 @@ export const CreateIntensIndicatorPDF = (
       // TABLE SIG
       {
         margin: [0, 30, 0, 10],
+        columnGap: 20,
         columns: [
           {
-            width: "66%",
+            width: "*",
             style: "table",
             table: {
+              widths: [60, "auto", 40, "auto", "auto"],
               body: [
                 // HEADER
                 [
@@ -531,11 +513,19 @@ export const CreateIntensIndicatorPDF = (
                     border: [false, false, true, false],
                   },
                   {
-                    text: "Incertitude",
+                    text: "Incert.*",
                     border: [false, false, true, false],
+                    alignment: "center",
                   },
                 ],
                 // ROWS
+                [
+                  {},
+                  {},
+                  { text: unit, fontSize: "5" },
+                  { text: unitGrossImpact, fontSize: "5" },
+                  { text: "%", fontSize: "5", alignment: "center" },
+                ],
                 [
                   {
                     text: "Production",
@@ -544,20 +534,18 @@ export const CreateIntensIndicatorPDF = (
                   {
                     text: printValue(production.amount, 0) + " €",
                     margin: [2, 6, 2, 6],
-                    alignment: "left",
+                    alignment: "right",
                   },
                   {
                     columns: [
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                production.footprint.indicators[indic].value,
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              production.footprint.indicators[indic].value,
+                              precision
+                            ),
                           },
-                          { text: unit, fontSize: "5" },
                         ],
                       },
                     ],
@@ -569,15 +557,13 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                production.footprint.indicators[
-                                  indic
-                                ].getGrossImpact(production.amount),
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              production.footprint.indicators[
+                                indic
+                              ].getGrossImpact(production.amount),
+                              precision
+                            ),
                           },
-                          { text: unitGrossImpact, fontSize: "5" },
                         ],
                       },
                     ],
@@ -585,13 +571,12 @@ export const CreateIntensIndicatorPDF = (
                     margin: [2, 6, 2, 6],
                   },
                   {
-                    text:
-                      printValue(
-                        production.footprint.indicators[indic].uncertainty,
-                        0
-                      ) + " %",
+                    text: printValue(
+                      production.footprint.indicators[indic].uncertainty,
+                      0
+                    ),
                     fontSize: "5",
-                    alignment: "right",
+                    alignment: "center",
                     margin: [2, 6, 2, 6],
                   },
                 ],
@@ -611,15 +596,13 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                intermediateConsumption.footprint.indicators[
-                                  indic
-                                ].value,
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              intermediateConsumption.footprint.indicators[
+                                indic
+                              ].value,
+                              precision
+                            ),
                           },
-                          { text: unit, fontSize: "5" },
                         ],
                       },
                     ],
@@ -631,17 +614,13 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                intermediateConsumption.footprint.indicators[
-                                  indic
-                                ].getGrossImpact(
-                                  intermediateConsumption.amount
-                                ),
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              intermediateConsumption.footprint.indicators[
+                                indic
+                              ].getGrossImpact(intermediateConsumption.amount),
+                              precision
+                            ),
                           },
-                          { text: unitGrossImpact, fontSize: "5" },
                         ],
                       },
                     ],
@@ -649,14 +628,13 @@ export const CreateIntensIndicatorPDF = (
                     margin: [2, 6, 2, 6],
                   },
                   {
-                    text:
-                      printValue(
-                        intermediateConsumption.footprint.indicators[indic]
-                          .uncertainty,
-                        0
-                      ) + " %",
+                    text: printValue(
+                      intermediateConsumption.footprint.indicators[indic]
+                        .uncertainty,
+                      0
+                    ),
                     fontSize: "5",
-                    alignment: "right",
+                    alignment: "center",
                     margin: [2, 6, 2, 6],
                   },
                 ],
@@ -677,14 +655,12 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                capitalConsumption.footprint.indicators[indic]
-                                  .value,
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              capitalConsumption.footprint.indicators[indic]
+                                .value,
+                              precision
+                            ),
                           },
-                          { text: unit, fontSize: "5" },
                         ],
                       },
                     ],
@@ -694,15 +670,13 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                capitalConsumption.footprint.indicators[
-                                  indic
-                                ].getGrossImpact(capitalConsumption.amount),
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              capitalConsumption.footprint.indicators[
+                                indic
+                              ].getGrossImpact(capitalConsumption.amount),
+                              precision
+                            ),
                           },
-                          { text: unitGrossImpact, fontSize: "5" },
                         ],
                       },
                     ],
@@ -710,14 +684,13 @@ export const CreateIntensIndicatorPDF = (
                     margin: [2, 6, 2, 6],
                   },
                   {
-                    text:
-                      printValue(
-                        capitalConsumption.footprint.indicators[indic]
-                          .uncertainty,
-                        0
-                      ) + " %",
+                    text: printValue(
+                      capitalConsumption.footprint.indicators[indic]
+                        .uncertainty,
+                      0
+                    ),
                     fontSize: "5",
-                    alignment: "right",
+                    alignment: "center",
                     margin: [2, 6, 2, 6],
                   },
                 ],
@@ -736,13 +709,11 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                netValueAdded.footprint.indicators[indic].value,
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              netValueAdded.footprint.indicators[indic].value,
+                              precision
+                            ),
                           },
-                          { text: unit, fontSize: "5" },
                         ],
                       },
                     ],
@@ -754,15 +725,13 @@ export const CreateIntensIndicatorPDF = (
                       {
                         text: [
                           {
-                            text:
-                              printValue(
-                                netValueAdded.footprint.indicators[
-                                  indic
-                                ].getGrossImpact(netValueAdded.amount),
-                                precision
-                              ) + " ",
+                            text: printValue(
+                              netValueAdded.footprint.indicators[
+                                indic
+                              ].getGrossImpact(netValueAdded.amount),
+                              precision
+                            ),
                           },
-                          { text: unitGrossImpact, fontSize: "5" },
                         ],
                       },
                     ],
@@ -770,13 +739,12 @@ export const CreateIntensIndicatorPDF = (
                     margin: [2, 6, 2, 6],
                   },
                   {
-                    text:
-                      printValue(
-                        netValueAdded.footprint.indicators[indic].uncertainty,
-                        0
-                      ) + " %",
+                    text: printValue(
+                      netValueAdded.footprint.indicators[indic].uncertainty,
+                      0
+                    ),
                     fontSize: "5",
-                    alignment: "right",
+                    alignment: "center",
                     margin: [2, 6, 2, 6],
                   },
                 ],
@@ -799,60 +767,80 @@ export const CreateIntensIndicatorPDF = (
             },
           },
           {
-            text: "Ecart par rapport à la moyenne de la branche",
-            alignment: "center",
-            bold: true,
-            fontSize: "7",
+            width: "auto",
+            stack: [
+              {
+                text: "Ecart par rapport à la moyenne de la branche",
+                alignment: "center",
+                bold: true,
+                fontSize: "7",
+                margin: [0, 0, 0, 10],
+              },
+              {
+                width: 220,
+                height: 140,
+                image: deviationImage,
+              },
+            ],
           },
         ],
       },
 
       {
-        columnGap: 20,
+        columnGap: 40,
         columns: [
           {
             width: "33%",
+            margin: [0, 10, 0, 0],
             stack: [
               {
-                text: branchProductionEvolution + " % ",
+                text: branchProductionTarget + " % ",
                 alignment: "center",
                 style: "numbers",
                 color: "#ffb642",
               },
               {
-                text: "de baisse d'intensité de la branche depuis 2010",
+                text: "Objectif annuel de baisse d’intensité pour la branche",
                 alignment: "center",
                 margin: [0, 2, 0, 10],
                 bold: true,
               },
               {
-                text: branchProductionTarget + " % ",
+                text: branchProductionEvolution + " % ",
                 alignment: "center",
                 fontSize: "9",
                 style: "numbers",
                 color: "#ffb642",
               },
               {
-                text: "objectif de baisse de la branche pour correspondre aux objectifs 2030",
+                text:
+                  "Evolution de la baisse d’intensité entre " +
+                  year +
+                  " et la dernière valeur observée (Donnée estimée) ",
                 alignment: "center",
                 margin: [0, 2, 0, 0],
               },
+              {
+                text: "*Incertitude ",
+                fontSize: 7,
+                margin: [0, 50, 0, 0],
+                italics: true,
+                font: "Roboto",
+              },
             ],
           },
-
           {
-            width: "*",
+            width: "auto",
             stack: [
               {
                 text: chartLabel,
                 bold: true,
-                fontSize: 8,
+                fontSize: 7,
                 margin: [0, 10, 0, 10],
               },
               {
-                width: 250,
+                width: 260,
                 image: trendImage,
-                alignment: "left",
               },
             ],
           },
@@ -930,3 +918,109 @@ export const CreateIntensIndicatorPDF = (
     });
   });
 };
+
+function createChargesImpactContent(
+  intermediateConsumptionPart,
+  intermediateConsumption,
+  financialData,
+  indic
+) {
+  let content = {
+    stack: [
+      // Arrow
+      {
+        svg: '<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" overflow="hidden"><defs><clipPath id="clip0"><rect x="501" y="221" width="60" height="60"/></clipPath></defs><g clip-path="url(#clip0)" transform="translate(-501 -221)"><path d="M518.001 229.075 517.981 231.688C517.981 232.024 518.239 232.281 518.575 232.281 518.911 232.281 519.169 232.024 519.169 231.688L519.208 227.729C519.208 227.591 519.169 227.472 519.07 227.353 519.07 227.333 519.05 227.333 519.03 227.314 519.01 227.294 519.01 227.274 518.971 227.254 518.971 227.254 518.951 227.234 518.931 227.234 518.931 227.234 518.911 227.215 518.892 227.215 518.812 227.155 518.714 227.135 518.615 227.135L514.656 227.096C514.32 227.096 514.062 227.353 514.062 227.69 514.062 228.026 514.32 228.283 514.656 228.283L517.11 228.303C514.953 231.41 511.925 232.895 508.105 232.697 506.225 232.578 504.384 232.123 502.663 231.331 502.366 231.193 502.029 231.311 501.891 231.608 501.752 231.885 501.851 232.242 502.148 232.4 503.989 233.251 505.987 233.766 508.026 233.884 510.935 234.043 515.013 233.33 518.001 229.075Z" fill="#191558"/></g></svg>',
+        absolutePosition: { x: 360, y: 280 },
+      },
+      {
+        text: "\tdont les comptes de charges les plus impactants\t",
+        style: "h2",
+        fontSize: 9,
+        alignment: "center",
+      },
+      ///
+      {
+        table: {
+          body: [
+            ...getPercentageForConsumptionRows(
+              intermediateConsumption.footprint.indicators[
+                indic
+              ].getGrossImpact(intermediateConsumption.amount),
+              financialData.getIntermediateConsumptionsAggregates(),
+              indic
+            ),
+          ],
+          layout: {
+            hLineWidth: function (i) {
+              return i === 0 || i === 4 ? 2 : 1;
+            },
+            vLineWidth: function (i) {
+              return i === 0 || i === 4 ? 2 : 1;
+            },
+            hLineColor: function (i) {
+              return "white";
+            },
+            vLineColor: function (i) {
+              return "white";
+            },
+          },
+        },
+      },
+    ],
+  };
+  if (intermediateConsumptionPart > 50) {
+    return content;
+  }
+}
+
+function getIntermediateConsumptionsPart(financialData, indic) {
+  let total =
+    financialData.aggregates.intermediateConsumption.footprint.indicators[
+      indic
+    ].getGrossImpact(financialData.aggregates.intermediateConsumption.amount) +
+    financialData.aggregates.capitalConsumption.footprint.indicators[
+      indic
+    ].getGrossImpact(financialData.aggregates.capitalConsumption.amount) +
+    financialData.aggregates.netValueAdded.footprint.indicators[
+      indic
+    ].getGrossImpact(financialData.aggregates.netValueAdded.amount);
+
+  const intermediateConsumptionPart =
+    (financialData.aggregates.intermediateConsumption.footprint.indicators[
+      indic
+    ].getGrossImpact(financialData.aggregates.intermediateConsumption.amount) /
+      total) *
+    100;
+
+  return intermediateConsumptionPart;
+}
+
+function createBoxIntermediateConsumption(intermediateConsumptionPart) {
+  let rect;
+
+  if (intermediateConsumptionPart > 50) {
+    rect = {
+      type: "rect",
+      x: 370,
+      y: 235,
+      w: 190,
+      h: 75,
+      lineWidth: 2,
+      lineColor: "#f1f0f4",
+      color: "#FFFFFF",
+      r: 10,
+    };
+  } else {
+    rect = {
+      type: "rect",
+      x: 310,
+      y: 240,
+      w: 0,
+      h: 0,
+      lineColor: "#ffffff",
+      color: "#FFFFFF",
+    };
+  }
+
+  return rect;
+}
