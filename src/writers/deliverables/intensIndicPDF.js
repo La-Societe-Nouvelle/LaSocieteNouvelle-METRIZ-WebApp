@@ -8,9 +8,11 @@ import {
 import metaIndics from "/lib/indics";
 
 import {
+  currentAnnualReduction,
   getKeySuppliers,
   getPercentageForConsumptionRows,
   sortExpensesByFootprintIndicator,
+  targetAnnualReduction,
 } from "./utils/utils";
 
 // --------------------------------------------------------------------------
@@ -59,18 +61,18 @@ export const CreateIntensIndicatorPDF = (
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
 
   // UTILS
-  const branchProductionEvolution = getEvolution(
-    comparativeData.production.divisionFootprint.indicators[indic].value,
-    comparativeData.production.trendsFootprint.indicators[indic].data.at(-1)
-      .value
-  );
+  // const branchProductionEvolution = getEvolution(
+  //   comparativeData.production.divisionFootprint.indicators[indic].value,
+  //   comparativeData.production.trendsFootprint.indicators[indic].data.at(-1)
+  //     .value
+  // );
 
-  const branchProductionTarget = getEvolution(
-    comparativeData.production.trendsFootprint.indicators[indic].data[0].value,
-    comparativeData.production.targetDivisionFootprint.indicators[
-      indic
-    ].data.at(-1).value
-  );
+  const branchProductionTarget = targetAnnualReduction( comparativeData.production.targetDivisionFootprint.indicators[
+    indic
+  ].data)
+
+  const branchProductionEvolution = currentAnnualReduction(comparativeData.production.trendsFootprint.indicators[indic].data, year)
+  
 
   const firstMostImpactfulCompanies = sortExpensesByFootprintIndicator(
     financialData.companies,
@@ -235,7 +237,7 @@ export const CreateIntensIndicatorPDF = (
             type: "rect",
             x: 30,
             y: 340,
-            w: 490,
+            w: 535,
             h: 70,
             lineWidth: 2,
             lineColor: "#f1f0f4",
@@ -808,16 +810,15 @@ export const CreateIntensIndicatorPDF = (
               {
                 text: branchProductionEvolution + " % ",
                 alignment: "center",
-                fontSize: "9",
+                fontSize: "10",
                 style: "numbers",
                 color: "#ffb642",
               },
               {
                 text:
-                  "Evolution de la baisse d’intensité entre " +
-                  year +
-                  " et la dernière valeur observée (Donnée estimée) ",
+                  "Baisse actuelle observée pour l'année de l'exercice (Donnée estimée) " ,
                 alignment: "center",
+                fontSize: "8",
                 margin: [0, 2, 0, 0],
               },
               {

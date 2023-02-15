@@ -128,3 +128,27 @@ export function cutString(str, nbChar) {
   if (str.length <= nbChar) return str;
   return str.substring(0, nbChar) + "...";
 }
+
+
+export function targetAnnualReduction(data) {
+  let firstYearValue = data[0].value;
+  let lastYearValue = data[data.length - 1].value;
+  let yearsCount = data.length - 1;
+  let totalReduction = firstYearValue - lastYearValue;
+  let annualReduction = (totalReduction / firstYearValue) / yearsCount;
+  let percentageReduction = (annualReduction * 100).toFixed(0);
+  return percentageReduction;
+}
+
+export function currentAnnualReduction(data, year) {
+
+  const filteredData = data.filter(item => item.year <= year);
+
+  let firstYearValue = filteredData[0].value;
+  let lastYearValue = filteredData[filteredData.length - 1].value;
+  let yearsCount = filteredData.length - 1;
+  let totalReduction = firstYearValue - lastYearValue;
+  let annualReduction = (totalReduction / firstYearValue) / yearsCount;
+  let percentageReduction = (annualReduction * 100).toFixed(0);
+  return percentageReduction;
+}
