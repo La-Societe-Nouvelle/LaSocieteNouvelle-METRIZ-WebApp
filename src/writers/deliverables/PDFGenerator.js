@@ -195,8 +195,9 @@ export const createIndicReport = (
             return i === 0 || i === node.table.widths.length ? "#f0f0f8" : "";
           },
           hLineColor: function (i, node) {
-            return i === 0 ? "#191558" : "#f0f0f8";
+            return i === 0 ? "" : "#f0f0f8";
           },
+          
         },
       },
       { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },

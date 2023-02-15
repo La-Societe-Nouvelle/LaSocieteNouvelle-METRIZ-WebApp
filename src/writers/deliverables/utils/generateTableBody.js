@@ -98,19 +98,19 @@ export const generateIndicTableBody = (
                   printValue(
                     revenue.footprint.indicators[indic].value,
                     precision
-                  ) + " ",
+                  ) + " %",
               },
             ],
           },
         ],
-        borderColor: ["#000000", "#000000", "#000000", "#000000"],
         fillColor: "#fa595f",
-        fillOpacity: 0.3,
+        fillOpacity: 0.2,
         margin: [2, 2, 2, 2],
       },
       {
-        border: [true, true, true, true],
         fillColor: "#fa595f",
+        fillOpacity: 0.2,
+        margin: [2, 2, 2, 2],
         text:
           printValue(revenue.footprint.indicators[indic].uncertainty, 0) + " %",
         fontSize: "7",
