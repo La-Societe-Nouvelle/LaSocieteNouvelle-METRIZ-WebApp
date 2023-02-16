@@ -439,7 +439,7 @@ const getGenderWageGap = async (individualsData) =>
   individualsData = individualsData
     .filter((individual) => individual.wage != null && !isNaN(individual.wage) && individual.wage > 0)
     .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
-    .filer((individual) => individual.sex == 1 || individual.sex == 2);
+    .filter((individual) => individual.sex == 1 || individual.sex == 2);
 
   let men = individualsData.filter((individual) => individual.sex == 1);
   let women = individualsData.filter((individual) => individual.sex == 2);
