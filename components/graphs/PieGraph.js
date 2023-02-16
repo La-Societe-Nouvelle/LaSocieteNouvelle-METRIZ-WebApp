@@ -41,7 +41,6 @@ function PieGraph(props) {
 
   const options = {
     devicePixelRatio: 2,
-    cutout: 100,
     plugins: {
       legend: {
         display: false,

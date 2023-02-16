@@ -4,6 +4,8 @@ import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
   cutString,
   getIndicDescription,
+  getUncertaintyDescription,
+  loadFonts,
   sortExpensesByFootprintIndicator,
 } from "./utils/utils";
 
@@ -11,22 +13,8 @@ import {
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-pdfMake.fonts = {
-  Raleway: {
-    normal: "http://localhost:3000/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "http://localhost:3000/fonts/Raleway/Raleway-bold.ttf",
-  },
-  // download default Roboto font from cdnjs.com
-  Roboto: {
-    normal:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
-    bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
-    italics:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
-    bolditalics:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
-  },
-};
+//Call function to load fonts
+loadFonts();
 
 export const CreateContribIndicatorPDF = (
   title,
@@ -42,7 +30,7 @@ export const CreateContribIndicatorPDF = (
 
   const indicDescription = getIndicDescription(indic);
 
-  const { production, revenue, intermediateConsumption,externalExpenses } =
+  const { production, revenue, intermediateConsumption, externalExpenses } =
     financialData.aggregates;
   const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
     financialData.expenses,
@@ -54,6 +42,11 @@ export const CreateContribIndicatorPDF = (
     indic,
     "asc"
   ).slice(0, 3);
+
+  const uncertaintyText = getUncertaintyDescription(
+    "proportion",
+    production.footprint.indicators[indic].uncertainty
+  );
 
   // Get chart canvas and encode it to import in document
   const canvasProduction = document.getElementById("production-" + indic);
@@ -237,7 +230,7 @@ export const CreateContribIndicatorPDF = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: "Rapport - " + title, style: "header" }, 
+      { text: "Rapport - " + title, style: "header" },
       {
         columns: [
           {
@@ -396,8 +389,8 @@ export const CreateContribIndicatorPDF = (
               },
               {
                 text: "Production",
-                fontSize : 9,
-                bold : true,
+                fontSize: 9,
+                bold: true,
               },
               {
                 image: productionChartImage,
@@ -464,7 +457,10 @@ export const CreateContribIndicatorPDF = (
               },
 
               mostImpactfulExpenses.map((expense) => ({
-                text: cutString( expense.account + " - " + expense.accountLib, 60) ,
+                text: cutString(
+                  expense.account + " - " + expense.accountLib,
+                  60
+                ),
               })),
 
               {
@@ -474,7 +470,10 @@ export const CreateContribIndicatorPDF = (
                 margin: [0, 10, 0, 10],
               },
               leastImpactfulExpenses.map((expense) => ({
-                text: cutString( expense.account + " - " + expense.accountLib, 60),
+                text: cutString(
+                  expense.account + " - " + expense.accountLib,
+                  60
+                ),
               })),
 
               // ACTIVITES FOURNISSEURS
@@ -489,16 +488,14 @@ export const CreateContribIndicatorPDF = (
               })),
             ],
           },
-     
         ],
-      
       },
       {
-        text : "*Incertitude ",
-        fontSize : 7,
-        margin: [0, 50, 0, 0],
+        text: "* " + uncertaintyText,
+        fontSize: 6,
         italics: true,
-        font : "Roboto"
+        margin: [0, 50, 0, 0],
+        font: "Roboto",
       },
       ,
     ],
@@ -559,8 +556,7 @@ export const CreateContribIndicatorPDF = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        pdfMake.createPdf(docDefinition).open();
-        //saveAs(blob, `${documentTitle}.pdf`);
+        saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);

@@ -1,4 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
+
+import { PDFDocument } from "pdf-lib";
+
 import {
   Accordion,
   AccordionContext,
@@ -8,6 +11,10 @@ import {
   Row,
   useAccordionButton,
 } from "react-bootstrap";
+
+// Libs
+import metaIndics from "/lib/indics";
+import divisions from "/lib/divisions";
 
 import {
   StatementART,
@@ -24,9 +31,6 @@ import {
   StatementWAT,
 } from "../forms";
 
-import metaIndics from "/lib/indics";
-import divisions from "/lib/divisions";
-
 import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
@@ -35,14 +39,25 @@ import { ImportDSN } from "../../../assessments/ImportDSN";
 
 import ChangeDivision from "../../../popups/ChangeDivision";
 
+// Charts
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
+import DeviationChart from "../../../graphs/HorizontalBarChart";
+import DoughnutChart from "../../../graphs/DoughnutChart";
+import PieGraph from "../../../graphs/PieGraph";
 
-import { getTargetSerieId } from "/src/utils/Utils";
-import { createIndicReport } from "../../../../src/writers/deliverables/PDFGenerator";
-
+// Services
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
+
+import { getTargetSerieId } from "/src/utils/Utils";
+import { printValue } from "../../../../src/utils/Utils";
+
+// PDF Generation
+import { createIndicReport } from "../../../../src/writers/deliverables/PDFGenerator";
+import { CreateContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
+import { CreateIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
+import TrendsGraph from "../../../graphs/TrendsGraph";
 
 const IndicatorsList = (props) => {
   const [prevIndics] = useState(props.session.indics);
@@ -173,7 +188,6 @@ const IndicatorsList = (props) => {
       // Update parent State
 
       props.onValidation(indic);
-      
     }
     // add validation
     if (!props.session.validations.includes(indic)) {
@@ -217,17 +231,10 @@ const IndicatorsList = (props) => {
       setIndicToExport(key);
       setPopUp("division");
     } else {
-      createIndicReport(
-        props.session.year,
-        props.session.legalUnit.corporateName,
+      generateIndicatorReportPDF(
+        props.session,
         key,
-        metaIndics[key].libelle,
-        metaIndics[key].unit,
-        props.session.financialData,
-        props.session.impactsData,
-        props.session.comparativeData,
-        divisions[comparativeDivision],
-        true
+        divisions[comparativeDivision]
       );
 
       setPopUp("");
@@ -268,6 +275,8 @@ const IndicatorsList = (props) => {
 
   return (
     <>
+      {/* Charts generation */}
+
       {validations.length > 0 &&
         displayGraph &&
         validations.map((indic, key) => (
@@ -375,6 +384,146 @@ const IndicatorsList = (props) => {
                 />
               </Col>
             </Row>
+            {metaIndics[indic].type == "proportion" && (
+              <Row>
+                <Col>
+                  <div className="doughtnut-chart-container">
+                    <DoughnutChart
+                      value={printValue(
+                        props.session.financialData.aggregates.production
+                          .footprint.indicators[indic].value,
+                        metaIndics[indic].nbDecimals
+                      )}
+                      title={"Production"}
+                      id={"prd-" + indic}
+                    />
+                  </div>
+                </Col>
+                <Col>
+                  <div className="doughtnut-chart-container">
+                    <DoughnutChart
+                      value={printValue(
+                        props.session.financialData.aggregates
+                          .intermediateConsumption.footprint.indicators[indic]
+                          .value,
+                        metaIndics[indic].nbDecimals
+                      )}
+                      title={"Consommations intermédiaires"}
+                      id={"ic-" + indic}
+                    />
+                  </div>
+                </Col>
+                <Col>
+                  <div className="doughtnut-chart-container">
+                    <DoughnutChart
+                      value={printValue(
+                        props.session.financialData.aggregates
+                          .capitalConsumption.footprint.indicators[indic].value,
+                        metaIndics[indic].nbDecimals
+                      )}
+                      title={"Consommation de capital fixe"}
+                      id={"ccf-" + indic}
+                    />
+                  </div>
+                </Col>
+                <Col>
+                  <div className="doughtnut-chart-container">
+                    <DoughnutChart
+                      value={printValue(
+                        props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+                          indic
+                        ].getValue(),
+                        metaIndics[indic].nbDecimals
+                      )}
+                      title={"Valeur ajoutée nette"}
+                      id={"nva-" + indic}
+                    />
+                  </div>
+                </Col>
+              </Row>
+            )}
+
+            {metaIndics[indic].type == "intensité" && (
+              <Row>
+                <Col sm={2}>
+                    <PieGraph
+                      id={"part-" + indic}
+                      intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
+                        indic
+                      ].getGrossImpact(
+                        props.session.financialData.aggregates
+                          .intermediateConsumption.amount
+                      )}
+                      capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
+                        indic
+                      ].getGrossImpact(
+                        props.session.financialData.aggregates
+                          .capitalConsumption.amount
+                      )}
+                      netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+                        indic
+                      ].getGrossImpact(
+                        props.session.financialData.aggregates.netValueAdded
+                          .amount
+                      )}
+                    />
+                </Col>
+                <Col sm={3}>
+                  <DeviationChart
+                    id={"deviationChart-" + indic}
+                    legalUnitData={[
+                      props.session.financialData.aggregates.production.footprint.getIndicator(
+                        indic
+                      ).value,
+                      props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                        indic
+                      ).value,
+                      props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                        indic
+                      ).value,
+                      props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                        indic
+                      ).value,
+                    ]}
+                    branchData={[
+                      comparativeData.production.divisionFootprint.indicators[
+                        indic
+                      ].value,
+                      comparativeData.intermediateConsumption.divisionFootprint
+                        .indicators[indic].value,
+                      comparativeData.fixedCapitalConsumption.divisionFootprint
+                        .indicators[indic].value,
+                      comparativeData.netValueAdded.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    indic={indic}
+                    unit={metaIndics[indic].unit}
+                    precision={metaIndics[indic].nbDecimal}
+                  />
+                </Col>
+                <Col sm={6}>
+                  <TrendsGraph
+                    id={"trend-prd-" + indic}
+                    unit={metaIndics[indic].unit}
+                    code={comparativeDivision}
+                    trends={
+                      comparativeData.production.trendsFootprint.indicators[
+                        indic
+                      ]
+                    }
+                    target={
+                      comparativeData.production.targetDivisionFootprint
+                        .indicators[indic]
+                    }
+                    current={
+                      props.session.financialData.aggregates.production.footprint.getIndicator(
+                        indic
+                      ).value
+                    }
+                  />
+                </Col>
+              </Row>
+            )}
           </div>
         ))}
 
@@ -419,7 +568,7 @@ const IndicatorsList = (props) => {
                         handleDownloadPDF(key, comparativeDivision)
                       }
                     >
-                      <i className="bi bi-download"></i> Livrable
+                      <i className="bi bi-download"></i> Livrables
                     </button>
                   </div>
                 </div>
@@ -498,7 +647,7 @@ const IndicatorsList = (props) => {
                         handleDownloadPDF(key, comparativeDivision)
                       }
                     >
-                      <i className="bi bi-download"></i> Livrable
+                      <i className="bi bi-download"></i> Livrables
                     </button>
                   </div>
                 </div>
@@ -649,7 +798,7 @@ const IndicatorsList = (props) => {
                         handleDownloadPDF(key, comparativeDivision)
                       }
                     >
-                      <i className="bi bi-download"></i> Livrable
+                      <i className="bi bi-download"></i> Livrables
                     </button>
                   </div>
                 </div>
@@ -805,4 +954,104 @@ function ModalAssesment(props) {
     </Modal>
   );
 }
+
+async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
+  // Create an array of promises for generating PDF files
+  const pdfPromises = [];
+
+  const documentTitle =
+    "Rapport_" +
+    session.year +
+    "_" +
+    session.legalUnit.corporateName.replaceAll(" ", "") +
+    "-" +
+    indic.toUpperCase();
+
+  const type = metaIndics[indic].type;
+
+  switch (type) {
+    case "proportion":
+      pdfPromises.push(
+        CreateContribIndicatorPDF(
+          metaIndics[indic].libelle,
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].libelleGrandeur,
+          session.financialData,
+          session.comparativeData,
+          false
+        )
+      );
+      break;
+    case "intensité":
+      pdfPromises.push(
+        CreateIntensIndicatorPDF(
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].libelle,
+          metaIndics[indic].unit,
+          session.financialData,
+          session.comparativeData,
+          session.comparativeData.netValueAdded.trendsFootprint.indicators[
+            indic
+          ].meta.label,
+          false
+        )
+      );
+      break;
+    default:
+      break;
+  }
+
+  pdfPromises.push(
+    createIndicReport(
+      session.year,
+      session.legalUnit.corporateName,
+      indic,
+      metaIndics[indic].libelle,
+      metaIndics[indic].unit,
+      session.financialData,
+      session.impactsData,
+      session.comparativeData,
+      divisions[comparativeDivision],
+      false
+    )
+  );
+  Promise.all(pdfPromises).then(async (pdfs) => {
+    // Create a new empty PDF document to merge PDFs together
+    let mergedPdfDoc = await PDFDocument.create();
+
+    // Add each PDF to the final PDF document
+    for (const pdf of pdfs) {
+      const pdfBytes = await pdf.arrayBuffer();
+
+      const pdfDoc = await PDFDocument.load(pdfBytes);
+      const copiedPages = await mergedPdfDoc.copyPages(
+        pdfDoc,
+        pdfDoc.getPageIndices()
+      );
+      copiedPages.forEach((page) => mergedPdfDoc.addPage(page));
+    }
+
+    const mergedPdfData = new Blob([await mergedPdfDoc.save()], {
+      type: "application/pdf",
+    });
+
+    // Create a link to download the merged PDF
+    const downloadLink = document.createElement("a");
+    downloadLink.href = URL.createObjectURL(mergedPdfData);
+
+    downloadLink.download = documentTitle + ".pdf";
+    document.body.appendChild(downloadLink);
+
+    // Simulate a click on the link to start the download
+    downloadLink.click();
+
+    // Remove the link after the download
+    document.body.removeChild(downloadLink);
+  });
+}
+
 export default IndicatorsList;

@@ -8,6 +8,7 @@ import {
   getKeySuppliers,
   getPercentageForConsumptionRows,
   getUncertaintyDescription,
+  loadFonts,
   sortExpensesByFootprintIndicator,
   targetAnnualReduction,
 } from "./utils/utils";
@@ -16,22 +17,8 @@ import {
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-pdfMake.fonts = {
-  Raleway: {
-    normal: "http://localhost:3000/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "http://localhost:3000/fonts/Raleway/Raleway-bold.ttf",
-  },
-  // download default Roboto font from cdnjs.com
-  Roboto: {
-    normal:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
-    bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
-    italics:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
-    bolditalics:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
-  },
-};
+//Call function to load fonts
+loadFonts();
 
 export const CreateIntensIndicatorPDF = (
   year,
@@ -397,10 +384,10 @@ export const CreateIntensIndicatorPDF = (
         background: "#FFFFFF",
       },
       {
-        columnGap: 20,
+        columnGap : 45,
         columns: [
           {
-            width: "65%",
+            width: "60%",
             columns: [
               {
                 stack: [
@@ -937,8 +924,7 @@ export const CreateIntensIndicatorPDF = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-        pdfMake.createPdf(docDefinition).open();
-        //saveAs(blob, `${documentTitle}.pdf`);
+       saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);
@@ -957,7 +943,7 @@ function createChargesImpactContent(
       // Arrow
       {
         svg: '<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" overflow="hidden"><defs><clipPath id="clip0"><rect x="501" y="221" width="60" height="60"/></clipPath></defs><g clip-path="url(#clip0)" transform="translate(-501 -221)"><path d="M518.001 229.075 517.981 231.688C517.981 232.024 518.239 232.281 518.575 232.281 518.911 232.281 519.169 232.024 519.169 231.688L519.208 227.729C519.208 227.591 519.169 227.472 519.07 227.353 519.07 227.333 519.05 227.333 519.03 227.314 519.01 227.294 519.01 227.274 518.971 227.254 518.971 227.254 518.951 227.234 518.931 227.234 518.931 227.234 518.911 227.215 518.892 227.215 518.812 227.155 518.714 227.135 518.615 227.135L514.656 227.096C514.32 227.096 514.062 227.353 514.062 227.69 514.062 228.026 514.32 228.283 514.656 228.283L517.11 228.303C514.953 231.41 511.925 232.895 508.105 232.697 506.225 232.578 504.384 232.123 502.663 231.331 502.366 231.193 502.029 231.311 501.891 231.608 501.752 231.885 501.851 232.242 502.148 232.4 503.989 233.251 505.987 233.766 508.026 233.884 510.935 234.043 515.013 233.33 518.001 229.075Z" fill="#191558"/></g></svg>',
-        absolutePosition: { x: 360, y: 280 },
+        absolutePosition: { x: 330, y: 280 },
       },
       {
         text: "\tdont les comptes de charges les plus impactants\t",

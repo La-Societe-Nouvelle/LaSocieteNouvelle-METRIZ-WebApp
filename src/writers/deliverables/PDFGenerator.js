@@ -3,29 +3,15 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import { getShortCurrentDateString } from "../../utils/Utils";
 import { getAnalyse, getStatementNote } from "../../utils/Writers";
 import { generateIndicTableBody } from "./utils/generateTableBody";
+import { loadFonts } from "./utils/utils";
 import divisions from "/lib/divisions";
 
 // --------------------------------------------------------------------------
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-pdfMake.fonts = {
-  Raleway: {
-    normal:
-      "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
-    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Bold.ttf",
-  },
-  // download default Roboto font from cdnjs.com
-  Roboto: {
-    normal:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
-    bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
-    italics:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
-    bolditalics:
-      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
-  },
-};
+//Call function to load fonts
+loadFonts();
 
 export const createIndicReport = (
   year,
