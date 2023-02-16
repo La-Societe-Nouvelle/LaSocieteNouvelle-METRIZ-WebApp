@@ -6,6 +6,7 @@ import { createIndicReport } from "./PDFGenerator";
 import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
 import { generateFootprintPDF } from "../Export";
+import { PDFDocument } from "pdf-lib";
 
 const ZipGenerator = ({
   year,
@@ -41,7 +42,7 @@ const ZipGenerator = ({
     // Initialiser l'objet jsZip
     // Générer les PDFs et les ajouter au zip
     Promise.all(
-      validations.map((indic) =>
+      validations.map((indic, index)=>
         createIndicReport(
           year,
           legalUnit,
@@ -51,25 +52,44 @@ const ZipGenerator = ({
           financialData,
           impactsData,
           comparativeData,
-          false
-        )
+          false        )
       )
     )
-      .then((pdfs) => {
-        pdfs.forEach((pdf, index) => {
-          let title =
-            "Rapport_" +
-            year +
-            "_" +
-            legalUnit.replaceAll(" ", "") +
-            "-" +
-            validations[index].toUpperCase();
+      .then(async (pdfs) => {
+        // Créer un nouveau document PDF vide pour fusionner les PDF ensemble
+        let mergedPdfDoc = await PDFDocument.create();
 
-          zip.file(`${title}.pdf`, pdf, {
-            binary: true,
-          });
+        // Ajouter chaque PDF à l'intérieur du document PDF final
+        for (const pdf of pdfs) {
+          const pdfBytes = await pdf.arrayBuffer();
+
+          const pdfDoc = await PDFDocument.load(pdfBytes);
+          const copiedPages = await mergedPdfDoc.copyPages(
+            pdfDoc,
+            pdfDoc.getPageIndices()
+          );
+          copiedPages.forEach((page) => mergedPdfDoc.addPage(page));
+
           setGeneratedPDFs((prevPDFs) => [...prevPDFs, pdf]);
-        });
+        }
+        // Renvoyer le contenu du fichier zip contenant le PDF fusionné
+        const mergedPdfBytes = await mergedPdfDoc.save();
+        zip.file("Rapport_Final.pdf", mergedPdfBytes, { binary: true });
+
+        // pdfs.forEach((pdf, index) => {
+        //   let title =
+        //     "Rapport_" +
+        //     year +
+        //     "_" +
+        //     legalUnit.replaceAll(" ", "") +
+        //     "-" +
+        //     validations[index].toUpperCase();
+
+        //   zip.file(`${title}.pdf`, pdf, {
+        //     binary: true,
+        //   });
+        //   setGeneratedPDFs((prevPDFs) => [...prevPDFs, pdf]);
+        // });
 
         const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
         const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
@@ -155,22 +175,21 @@ const ZipGenerator = ({
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
         <Modal.Body>
-          {generatedPDFs.length == 0  ? (
+          {generatedPDFs.length == 0 ? (
             <>
               <div className="loader-container my-4">
                 <div className="dot-pulse m-auto"></div>
               </div>
             </>
-          ) :
-          <ProgressBar
-            animated
-            variant="secondary"
-            min={0}
-            max={100}
-            now={Math.round(generatedPDFs.length / totalFiles) * 100}
-          />  
-        }
-          
+          ) : (
+            <ProgressBar
+              animated
+              variant="secondary"
+              min={0}
+              max={100}
+              now={Math.round(generatedPDFs.length / totalFiles) * 100}
+            />
+          )}
         </Modal.Body>
       </Modal>
     </>
