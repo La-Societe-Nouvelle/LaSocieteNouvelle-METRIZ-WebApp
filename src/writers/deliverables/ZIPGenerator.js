@@ -7,6 +7,8 @@ import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
 import { generateFootprintPDF } from "../Export";
 import { PDFDocument } from "pdf-lib";
+import { CreateIntensIndicatorPDF } from "./intensIndicPDF";
+import { CreateContribIndicatorPDF } from "./contribIndicPDF";
 
 const ZipGenerator = ({
   year,
@@ -38,11 +40,23 @@ const ZipGenerator = ({
     setIsGenerating(true);
   }
 
-  function generatePDFs() {
+  async function generatePDFs() {
+    const documentTitle =
+      "Rapport_Empreinte_Societale" +
+      session.year +
+      "_" +
+      session.legalUnit.corporateName.replaceAll(" ", "");
+
     // Initialiser l'objet jsZip
     // Générer les PDFs et les ajouter au zip
-    Promise.all(
-      validations.map((indic, index)=>
+
+    const basicPDFpromises = [];
+    const reportPDFpromises = [];
+
+    validations.map((indic) => {
+      let type = metaIndics[indic].type;
+
+      basicPDFpromises.push(
         createIndicReport(
           year,
           legalUnit,
@@ -52,9 +66,49 @@ const ZipGenerator = ({
           financialData,
           impactsData,
           comparativeData,
-          false        )
-      )
-    )
+          false
+        )
+      );
+
+      switch (type) {
+        case "proportion":
+          reportPDFpromises.push(
+            CreateContribIndicatorPDF(
+              metaIndics[indic].libelle,
+              year,
+              legalUnit,
+              indic,
+              metaIndics[indic].libelleGrandeur,
+              financialData,
+              comparativeData,
+              false
+            )
+          );
+          break;
+        case "intensité":
+          reportPDFpromises.push(
+            CreateIntensIndicatorPDF(
+              year,
+              legalUnit,
+              indic,
+              metaIndics[indic].libelle,
+              metaIndics[indic].unit,
+              financialData,
+              comparativeData,
+              comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+                .meta.label,
+              false
+            )
+          );
+          break;
+        default:
+          break;
+      }
+    });
+
+    const mergedPromises = [...reportPDFpromises, ...basicPDFpromises];
+
+    Promise.all(mergedPromises)
       .then(async (pdfs) => {
         // Créer un nouveau document PDF vide pour fusionner les PDF ensemble
         let mergedPdfDoc = await PDFDocument.create();
@@ -74,22 +128,8 @@ const ZipGenerator = ({
         }
         // Renvoyer le contenu du fichier zip contenant le PDF fusionné
         const mergedPdfBytes = await mergedPdfDoc.save();
-        zip.file("Rapport_Final.pdf", mergedPdfBytes, { binary: true });
 
-        // pdfs.forEach((pdf, index) => {
-        //   let title =
-        //     "Rapport_" +
-        //     year +
-        //     "_" +
-        //     legalUnit.replaceAll(" ", "") +
-        //     "-" +
-        //     validations[index].toUpperCase();
-
-        //   zip.file(`${title}.pdf`, pdf, {
-        //     binary: true,
-        //   });
-        //   setGeneratedPDFs((prevPDFs) => [...prevPDFs, pdf]);
-        // });
+        zip.file(documentTitle + ".pdf", mergedPdfBytes, { binary: true });
 
         const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
         const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];

@@ -48,12 +48,15 @@ export const CreateIntensIndicatorPDF = (
 
   // Get Target for current year
 
+  console.log(
+    comparativeData.production.targetDivisionFootprint.indicators[indic]
+  );
+
   const nextYear = new Date().getFullYear() + 1;
   const nextYearTarget =
     comparativeData.production.targetDivisionFootprint.indicators[
       indic
-    ].data.find((data) => data.year == nextYear);
-
+    ].data.find((data) => data.year == nextYear) ?? null;
   const branchProductionTarget = targetAnnualReduction(
     comparativeData.production.targetDivisionFootprint.indicators[indic].data
   );
@@ -384,7 +387,7 @@ export const CreateIntensIndicatorPDF = (
         background: "#FFFFFF",
       },
       {
-        columnGap : 45,
+        columnGap: 45,
         columns: [
           {
             width: "60%",
@@ -924,7 +927,7 @@ export const CreateIntensIndicatorPDF = (
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
       if (download) {
-       saveAs(blob, `${documentTitle}.pdf`);
+        saveAs(blob, `${documentTitle}.pdf`);
       }
 
       resolve(blob);

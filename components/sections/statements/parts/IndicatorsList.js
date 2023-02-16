@@ -956,6 +956,7 @@ function ModalAssesment(props) {
 }
 
 async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
+  
   // Create an array of promises for generating PDF files
   const pdfPromises = [];
 
