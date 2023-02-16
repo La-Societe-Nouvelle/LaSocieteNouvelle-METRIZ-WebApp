@@ -127,6 +127,7 @@ export const createIndicReport = (
         fontSize: 7,
       };
     },
+    
     background: function () {
       return {
         canvas: [

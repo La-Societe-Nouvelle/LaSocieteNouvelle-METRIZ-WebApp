@@ -43,6 +43,24 @@ export function getIndicDescription(indic) {
   return description;
 }
 
+export function getUncertaintyDescription(typeIndic, uncertainty) {
+  let description;
+
+  if (typeIndic == "intensite") {
+    description =
+      "Incertitude : " +
+      uncertainty +
+      " %. L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+  } else {
+    description =
+      "Incertitude : " +
+      uncertainty +
+      "%. L’incertitude provient de l’utilisation de données statistiques, directement, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées (pour ces mêmes raisons). Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+  }
+
+  return description;
+}
+
 export function getKeySuppliers(companies, indic, unit) {
   const keySuppliers = [];
 
@@ -129,26 +147,24 @@ export function cutString(str, nbChar) {
   return str.substring(0, nbChar) + "...";
 }
 
-
 export function targetAnnualReduction(data) {
   let firstYearValue = data[0].value;
   let lastYearValue = data[data.length - 1].value;
   let yearsCount = data.length - 1;
   let totalReduction = firstYearValue - lastYearValue;
-  let annualReduction = (totalReduction / firstYearValue) / yearsCount;
+  let annualReduction = totalReduction / firstYearValue / yearsCount;
   let percentageReduction = (annualReduction * 100).toFixed(0);
   return percentageReduction;
 }
 
 export function currentAnnualReduction(data, year) {
-
-  const filteredData = data.filter(item => item.year <= year);
+  const filteredData = data.filter((item) => item.year <= year);
 
   let firstYearValue = filteredData[0].value;
   let lastYearValue = filteredData[filteredData.length - 1].value;
   let yearsCount = filteredData.length - 1;
   let totalReduction = firstYearValue - lastYearValue;
-  let annualReduction = (totalReduction / firstYearValue) / yearsCount;
+  let annualReduction = totalReduction / firstYearValue / yearsCount;
   let percentageReduction = (annualReduction * 100).toFixed(0);
   return percentageReduction;
 }

@@ -1,16 +1,13 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import {
-  getEvolution,
-  getShortCurrentDateString,
-  printValue,
-} from "../../utils/Utils";
+import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import metaIndics from "/lib/indics";
 
 import {
   currentAnnualReduction,
   getKeySuppliers,
   getPercentageForConsumptionRows,
+  getUncertaintyDescription,
   sortExpensesByFootprintIndicator,
   targetAnnualReduction,
 } from "./utils/utils";
@@ -61,18 +58,23 @@ export const CreateIntensIndicatorPDF = (
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
 
   // UTILS
-  // const branchProductionEvolution = getEvolution(
-  //   comparativeData.production.divisionFootprint.indicators[indic].value,
-  //   comparativeData.production.trendsFootprint.indicators[indic].data.at(-1)
-  //     .value
-  // );
 
-  const branchProductionTarget = targetAnnualReduction( comparativeData.production.targetDivisionFootprint.indicators[
-    indic
-  ].data)
+  // Get Target for current year
 
-  const branchProductionEvolution = currentAnnualReduction(comparativeData.production.trendsFootprint.indicators[indic].data, year)
-  
+  const nextYear = new Date().getFullYear() + 1;
+  const nextYearTarget =
+    comparativeData.production.targetDivisionFootprint.indicators[
+      indic
+    ].data.find((data) => data.year == nextYear);
+
+  const branchProductionTarget = targetAnnualReduction(
+    comparativeData.production.targetDivisionFootprint.indicators[indic].data
+  );
+
+  const branchProductionEvolution = currentAnnualReduction(
+    comparativeData.production.trendsFootprint.indicators[indic].data,
+    year
+  );
 
   const firstMostImpactfulCompanies = sortExpensesByFootprintIndicator(
     financialData.companies,
@@ -90,6 +92,12 @@ export const CreateIntensIndicatorPDF = (
     financialData,
     indic
   );
+
+  const uncertaintyText = getUncertaintyDescription(
+    "intesiste",
+    production.footprint.indicators[indic].uncertainty
+  );
+
   // Get chart canvas and encode it to import in document
 
   const canvasChart = document.getElementById("part-" + indic);
@@ -159,26 +167,29 @@ export const CreateIntensIndicatorPDF = (
         fontSize: 7,
       };
     },
-    background: function () {
-      return {
-        canvas: [
-          {
-            type: "rect",
-            x: 0,
-            y: 0,
-            w: 595.28,
-            h: 841.89,
-            color: "#f1f0f4",
-          },
-          {
-            type: "rect",
-            x: 20,
-            y: 35,
-            w: pageSize.width - 40,
-            h: pageSize.height - 65,
-            color: "#FFFFFF",
-            r: 10,
-          },
+    background: function (currentPage) {
+      let canvas = [
+        {
+          type: "rect",
+          x: 0,
+          y: 0,
+          w: 595.28,
+          h: 841.89,
+          color: "#f1f0f4",
+        },
+        {
+          type: "rect",
+          x: 20,
+          y: 35,
+          w: pageSize.width - 40,
+          h: pageSize.height - 65,
+          color: "#FFFFFF",
+          r: 10,
+        },
+      ];
+
+      if (currentPage == 1) {
+        canvas.push(
           // BOXES
           {
             type: "rect",
@@ -263,8 +274,12 @@ export const CreateIntensIndicatorPDF = (
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
-          },
-        ],
+          }
+        );
+      }
+
+      return {
+        canvas: canvas,
       };
     },
     info: {
@@ -290,6 +305,7 @@ export const CreateIntensIndicatorPDF = (
               },
               {
                 text: "de chiffre d'affaires",
+                fontSize: 9,
               },
             ],
           },
@@ -308,13 +324,14 @@ export const CreateIntensIndicatorPDF = (
                   {
                     text: unit,
                     bold: true,
-                    margin: [0, 8, 0, 0],
                   },
                 ],
               },
               {
-                text: " d'" + label,
+                margin: [0, 5, 0, 0],
+                text: "d'" + label,
                 alignment: "center",
+                fontSize: 9,
               },
             ],
           },
@@ -340,24 +357,33 @@ export const CreateIntensIndicatorPDF = (
               },
               {
                 text: "liés à la production",
+                fontSize: 9,
               },
             ],
           },
           {
-            margin: [0, 10, 0, 0],
+            margin: [0, 20, 0, 0],
             width: "25%",
             alignment: "center",
             stack: [
               {
-                text: "Ce qui représente",
-                background: "#FFFFFF",
+                alignment: "center",
+                text: [
+                  {
+                    width: "auto",
+                    text: nextYearTarget.value,
+                    style: "numbers",
+                  },
+                  {
+                    text: unit,
+                    bold: true,
+                  },
+                ],
               },
               {
-                text: "11 Millions",
-                style: "numbers",
-              },
-              {
-                text: " de Lorem Ipsum ",
+                margin: [0, 5, 0, 0],
+                text: "Objectif de la branche pour l'année prochaine",
+                fontSize: 9,
               },
             ],
           },
@@ -515,7 +541,7 @@ export const CreateIntensIndicatorPDF = (
                     border: [false, false, true, false],
                   },
                   {
-                    text: "Incert.*",
+                    text: "Incert.",
                     border: [false, false, true, false],
                     alignment: "center",
                   },
@@ -573,10 +599,11 @@ export const CreateIntensIndicatorPDF = (
                     margin: [2, 6, 2, 6],
                   },
                   {
-                    text: printValue(
-                      production.footprint.indicators[indic].uncertainty,
-                      0
-                    ),
+                    text:
+                      printValue(
+                        production.footprint.indicators[indic].uncertainty,
+                        0
+                      ) + " *",
                     fontSize: "5",
                     alignment: "center",
                     margin: [2, 6, 2, 6],
@@ -815,18 +842,10 @@ export const CreateIntensIndicatorPDF = (
                 color: "#ffb642",
               },
               {
-                text:
-                  "Baisse actuelle observée pour l'année de l'exercice (Donnée estimée) " ,
+                text: "Baisse actuelle observée pour l'année de l'exercice (Donnée estimée) ",
                 alignment: "center",
                 fontSize: "8",
                 margin: [0, 2, 0, 0],
-              },
-              {
-                text: "*Incertitude ",
-                fontSize: 7,
-                margin: [0, 50, 0, 0],
-                italics: true,
-                font: "Roboto",
               },
             ],
           },
@@ -846,6 +865,13 @@ export const CreateIntensIndicatorPDF = (
             ],
           },
         ],
+      },
+      {
+        text: "* " + uncertaintyText,
+        fontSize: 6,
+        italics: true,
+        margin: [0, 20, 0, 0],
+        font: "Roboto",
       },
     ],
     defaultStyle: {
