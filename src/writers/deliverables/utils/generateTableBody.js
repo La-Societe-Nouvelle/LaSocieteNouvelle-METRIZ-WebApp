@@ -79,7 +79,7 @@ export const generateIndicTableBody = (
     ],
     [
       {
-        text: "Chiffre d'affaire",
+        text: "Chiffre d'affaires",
         style: "tableLeft",
         margin: [15, 0, 0, 0],
       },
