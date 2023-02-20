@@ -3,7 +3,7 @@ import React from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
-import { Doughnut, Pie } from "react-chartjs-2";
+import { Doughnut, Pie } from "react-chartjs-2"; 
 
 function PieGraph(props) {
   let intermediateConsumption = parseFloat(props.intermediateConsumption);
@@ -40,7 +40,7 @@ function PieGraph(props) {
   };
 
   const options = {
-    devicePixelRatio: 2,
+    devicePixelRatio: 3,
     plugins: {
       legend: {
         display: false,

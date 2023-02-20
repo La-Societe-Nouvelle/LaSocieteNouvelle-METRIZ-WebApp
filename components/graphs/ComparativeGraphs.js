@@ -83,7 +83,7 @@ const ComparativeGraphs = (props) => {
       id={id}
       data={chartData}
       options={{
-        devicePixelRatio: 2,
+        devicePixelRatio: 3,
         scales: {
           y: {
             display: true,

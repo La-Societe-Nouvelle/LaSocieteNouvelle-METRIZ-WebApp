@@ -107,6 +107,7 @@ function TrendsGraph(props) {
     let minYear = trendsData[0].x.getFullYear();
 
     const options = {
+      devicePixelRatio: 3,
       pointRadius: 0,
       maintainAspectRatio: true,
       scales: {

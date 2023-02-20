@@ -29,13 +29,20 @@ function DoughnutChart({ value, title, id }) {
   const options = {
     maintainAspectRatio: true,
     responsive : false,
-    devicePixelRatio: 2,
+    devicePixelRatio: 3,
     cutout: 55,
     hover: { mode: null },
     layout: {
       autoPadding: false,
     },
-
+    scales: {
+      x: {
+        display: false,
+      },
+      y: {
+        display: false,
+      },
+    },
     plugins: {
       legend: {
         display: false,
@@ -45,8 +52,9 @@ function DoughnutChart({ value, title, id }) {
         annotations: [
           {
             type: "label",
-            xValue: 2.5,
-            yValue: 60,
+            xScaleID: 'x-axis-0', // Modifier cette ligne
+            x: '50%',
+            y: '50%',
             content: value + "%",
             color: "#191558",
             font: {

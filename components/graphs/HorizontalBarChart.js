@@ -12,8 +12,15 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
   ];
 
   const data = legalUnitData.map(
-    (value, key) => value.toFixed(precision) - branchData[key].toFixed(precision)
+    (value, key) =>
+      value.toFixed(precision) - branchData[key].toFixed(precision)
   );
+
+  const maxValue = Math.max(
+    Math.abs(Math.min(...data)),
+    Math.abs(Math.max(...data))
+  );
+  const minValue = -maxValue;
 
   // Data for chart
   const chartData = {
@@ -26,8 +33,8 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
         ),
         borderWidth: 0,
         type: "bar",
-        barPercentage: 0.8, // diminue la largeur des barres en pourcentage
-        categoryPercentage: 0.5, // augmente la largeur de chaque catégorie en pourcentage
+        barPercentage: 0.9, 
+        categoryPercentage: 0.4, 
       },
     ],
   };
@@ -36,7 +43,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
       id={id}
       data={chartData}
       options={{
-        devicePixelRatio: 2,
+        devicePixelRatio: 3,
         indexAxis: "y",
         scales: {
           y: {
@@ -45,18 +52,18 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             },
 
             grid: {
-              color: "#fff",
+              display:false,
             },
           },
           x: {
+            min: minValue, 
+            max: maxValue, 
             grid: {
               color: "#ececff",
             },
             ticks: {
               color: "#191558",
               font: {
-                size: 14,
-                weight: "bold",
                 family: "Raleway",
               },
               callback: function (value, index, values) {
@@ -74,14 +81,18 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             cornerRadius: 3,
             callbacks: {
               label: function (context) {
-
                 let label = context.formattedValue + " " + unit;
                 return label;
               },
             },
           },
           datalabels: {
-            display: false,
+            color: "#ffffff",
+            font: {
+              size: 10,
+              family: "Raleway",
+            },
+      
           },
         },
       }}
