@@ -978,7 +978,6 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
           session.year,
           session.legalUnit.corporateName,
           indic,
-          metaIndics[indic].libelleGrandeur,
           session.financialData,
           session.comparativeData,
           false

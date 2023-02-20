@@ -132,13 +132,14 @@ const ZipGenerator = ({
       ...reportPDFpromises,
       ...basicPDFpromises,
     ];
+    setGeneratedPDFs((prevPDFs) => [...prevPDFs, mergedPromises]);
 
     Promise.all(mergedPromises)
       .then(async (pdfs) => {
-        // Créer un nouveau document PDF vide pour fusionner les PDF ensemble
+        // Create a new empty PDF document to merge PDFs together
         let mergedPdfDoc = await PDFDocument.create();
 
-        // Ajouter chaque PDF à l'intérieur du document PDF final
+        // Add each PDF to the final PDF document
         for (const pdf of pdfs) {
           const pdfBytes = await pdf.arrayBuffer();
 
@@ -151,7 +152,6 @@ const ZipGenerator = ({
 
           setGeneratedPDFs((prevPDFs) => [...prevPDFs, pdf]);
         }
-        // Renvoyer le contenu du fichier zip contenant le PDF fusionné
         const mergedPdfBytes = await mergedPdfDoc.save();
 
         zip.file(documentTitle + ".pdf", mergedPdfBytes, { binary: true });
@@ -162,11 +162,9 @@ const ZipGenerator = ({
         const seOdds = ["5", "8", "9", "10", "12"];
         const envOdds = ["6", "7", "12", "13", "14", "15"];
 
-        // RAPPORT - EMPREINTE SOCIETALE
+        // Create Social FootPrint Report PDF
 
         const docEES = new jsPDF("landscape", "mm", "a4", true);
-
-        // RAPPORT - EMPREINTE ENVIRONNEMENTALE
 
         generateFootprintPDF(
           docEES,
@@ -180,8 +178,6 @@ const ZipGenerator = ({
 
         docEES.addPage();
 
-        // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
-
         generateFootprintPDF(
           docEES,
           seIndic,
@@ -192,6 +188,7 @@ const ZipGenerator = ({
           seOdds
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
+
         zip.file(
           "Rapport_Empreinte-Societale_SIG_" +
             legalUnit.replaceAll(" ", "") +
@@ -202,7 +199,7 @@ const ZipGenerator = ({
         // add .json file save
         const sessionFile = "session-metriz-" + legalUnit.replaceAll(" ", "-");
         const json = JSON.stringify(session);
-        // build download link & activate
+
         const blob = new Blob([json], { type: "application/json" });
 
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, sessionFile]);
@@ -240,6 +237,7 @@ const ZipGenerator = ({
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
         <Modal.Body>
+          {console.log(generatedPDFs)}
           {generatedPDFs.length == 0 ? (
             <>
               <div className="loader-container my-4">
