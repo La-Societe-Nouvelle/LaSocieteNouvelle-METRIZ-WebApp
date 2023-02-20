@@ -103,11 +103,6 @@ export const createIndicReport = (
             text: "Edité le " + getShortCurrentDateString(),
             margin: [20, 25, 0, 0],
           },
-          {
-            text: "Page " + currentPage.toString() + " sur " + pageCount,
-            alignment: "right",
-            margin: [0, 25, 20, 0],
-          },
         ],
 
         fontSize: 7,
@@ -145,7 +140,6 @@ export const createIndicReport = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      // TO DO : Create external function to create content to import
       { text: "Résultat - " + label, style: "header" },
       {
         text: "Empreintes de vos Soldes Intermédiaires de Gestion",
@@ -461,3 +455,5 @@ export const createIndicReport = (
     });
   });
 };
+
+

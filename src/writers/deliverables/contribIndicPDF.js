@@ -16,12 +16,11 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const CreateContribIndicatorPDF = (
+export const createContribIndicatorPDF = (
   title,
   year,
   legalUnit,
   indic,
-  label,
   financialData,
   comparativeData,
   download
@@ -30,8 +29,7 @@ export const CreateContribIndicatorPDF = (
 
   const indicDescription = getIndicDescription(indic);
 
-  const { production, revenue, intermediateConsumption, externalExpenses } =
-    financialData.aggregates;
+  const { production, revenue, externalExpenses } = financialData.aggregates;
   const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
     financialData.expenses,
     indic,
@@ -82,7 +80,7 @@ export const CreateContribIndicatorPDF = (
   };
 
   const documentTitle =
-    "Plaquette_" +
+    "Fiche_" +
     indic.toUpperCase() +
     "_" +
     year +
@@ -97,28 +95,23 @@ export const CreateContribIndicatorPDF = (
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0] },
+        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + year,
           alignment: "right",
           margin: [0, 15, 20, 0],
+          bold : true,
         },
       ],
     },
-    footer: function (currentPage, pageCount) {
+    footer: function () {
       return {
         columns: [
           {
             text: "Edité le " + getShortCurrentDateString(),
             margin: [20, 25, 0, 0],
           },
-          {
-            text: "Page " + currentPage.toString() + " sur " + pageCount,
-            alignment: "right",
-            margin: [0, 25, 20, 0],
-          },
         ],
-
         fontSize: 7,
       };
     },
@@ -223,7 +216,7 @@ export const CreateContribIndicatorPDF = (
       };
     },
     info: {
-      label: documentTitle,
+      title: documentTitle,
       author: legalUnit,
       subject: "Plaquette de résultat",
       creator: "Metriz - La Société Nouvelle",
@@ -250,7 +243,7 @@ export const CreateContribIndicatorPDF = (
           },
 
           {
-            margin: [0, 15, 0, 30],
+            margin: [40, 15, 40, 30],
             stack: [
               {
                 text: "\tPour 1€ de chiffre d'affaires\t",
@@ -264,11 +257,7 @@ export const CreateContribIndicatorPDF = (
                 style: "numbers",
               },
               {
-                text: "contribuent",
-                alignment: "center",
-              },
-              {
-                text: indic == "eco" ? "à l'" + label : "aux " + label,
+                text: "de " + title,
                 alignment: "center",
               },
             ],
@@ -300,10 +289,7 @@ export const CreateContribIndicatorPDF = (
                 fontSize: 26,
               },
               {
-                text:
-                  indic == "eco"
-                    ? " de votre production contribuent à l'" + label
-                    : " de votre production contribuent aux " + label,
+                text: "Taux de contribution de la production",
                 alignment: "center",
                 bold: true,
               },
@@ -415,12 +401,10 @@ export const CreateContribIndicatorPDF = (
                 fontSize: 20,
               },
               {
-                text:
-                  indic == "eco"
-                    ? " de vos achats contribuent à l'" + label
-                    : " de vos achats contribuent aux " + label,
+                text: "Taux de contribution de vos achats",
                 alignment: "center",
                 bold: true,
+                margin : [0,0,0,10]
               },
               {
                 text:
@@ -433,10 +417,7 @@ export const CreateContribIndicatorPDF = (
                 style: "branchNumber",
               },
               {
-                text:
-                  indic == "eco"
-                    ? " des achats de la branches contribuent à l'" + label
-                    : " des achats de la branches contribuent aux " + label,
+                text: "Taux de de contribution des achats de la branche",
                 alignment: "center",
                 fontSize: 8,
               },
@@ -506,7 +487,7 @@ export const CreateContribIndicatorPDF = (
     },
     styles: {
       header: {
-        fontSize: 16,
+        fontSize: 14,
         color: "#fa595f",
         bold: true,
         margin: [0, 5, 0, 10],

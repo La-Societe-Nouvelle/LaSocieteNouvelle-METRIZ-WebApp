@@ -35,9 +35,10 @@ import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData"
 
 import { createIndicReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
-import { CreateContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
-import { CreateIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
+import { createContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
+import { createIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
 import DeviationChart from "../../graphs/HorizontalBarChart";
+import { createIndiceIndicatorPDF } from "../../../src/writers/deliverables/indiceIndicPDF";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
@@ -158,19 +159,18 @@ const ResultSection = (props) => {
 
     switch (type) {
       case "proportion":
-        CreateContribIndicatorPDF(
+        createContribIndicatorPDF(
           metaIndics[indic].libelle,
           session.year,
           session.legalUnit.corporateName,
           indic,
-          metaIndics[indic].libelleGrandeur,
           session.financialData,
           session.comparativeData,
           true
         );
         break;
       case "intensité":
-        CreateIntensIndicatorPDF(
+        createIntensIndicatorPDF(
           session.year,
           session.legalUnit.corporateName,
           indic,
@@ -183,6 +183,21 @@ const ResultSection = (props) => {
           true
         );
         break;
+        case "indice":
+          createIndiceIndicatorPDF(
+            metaIndics[indic].libelle,
+            metaIndics[indic].libelleGrandeur,
+            session.year,
+            session.legalUnit.corporateName,
+            indic,
+            metaIndics[indic].unit,
+            session.financialData,
+            session.comparativeData,
+            comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
+            .label,
+            true
+          );
+          break;
       default:
         break;
     }
