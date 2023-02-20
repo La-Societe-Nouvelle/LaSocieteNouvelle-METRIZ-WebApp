@@ -36,6 +36,14 @@ export function getIndicDescription(indic) {
       description =
         "L'indicateur informe sur la quantité de gaz à effet de serre liée à la production de l'entreprise avec pour objectif d'identifier les entreprises les plus performantes.";
       break;
+    case "geq":
+      description =
+        "L’indicateur informe sur les écarts de salaires entre les femmes et les hommes au sein des entreprises ayant contribué à la production de la valeur.";
+      break;
+    case "idr":
+      description =
+        "L’indicateur vise à fournir un élément d’information sur l'écart des rémunérations au sein des entreprises ayant contribué à la production de la valeur, dans le but d'encourager celles qui ont un partage plus équitable de la valeur produite.";
+      break;
     default:
       description = null;
       break;
@@ -46,22 +54,34 @@ export function getIndicDescription(indic) {
 export function getUncertaintyDescription(typeIndic, uncertainty) {
   let description;
 
+  switch (typeIndic) {
+    case "contribution":
+      description =
+        "Incertitude : " +
+        uncertainty +
+        " %. L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+
+      break;
+    case "intensite":
+      description =
+        "L’incertitude provient de l’utilisation de données statistiques, directement, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées (pour ces mêmes raisons). Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+    case "indice":
+      description =
+        "Incertitude : " +
+        uncertainty +
+        " %. L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+    default:
+      break;
+  }
+
   if (typeIndic == "intensite") {
-    description =
-      "Incertitude : " +
-      uncertainty +
-      " %. L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
   } else {
-    description =
-      "Incertitude : " +
-      uncertainty +
-      "%. L’incertitude provient de l’utilisation de données statistiques, directement, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées (pour ces mêmes raisons). Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
   }
 
   return description;
 }
 
-export function getKeySuppliers(companies, indic, unit) {
+export function getKeySuppliers(companies, indic, unit, precision) {
   const keySuppliers = [];
 
   companies.map((company) =>
@@ -77,7 +97,10 @@ export function getKeySuppliers(companies, indic, unit) {
           bold: true,
         },
         {
-          text: company.footprint.indicators[indic].value + " " + unit,
+          text:
+            company.footprint.indicators[indic].value.toFixed(precision) +
+            " " +
+            unit,
           fontSize: 7,
         },
       ],
@@ -154,6 +177,11 @@ export function targetAnnualReduction(data) {
   let totalReduction = firstYearValue - lastYearValue;
   let annualReduction = totalReduction / firstYearValue / yearsCount;
   let percentageReduction = (annualReduction * 100).toFixed(0);
+
+  isNaN(percentageReduction)
+    ? (percentageReduction = undefined)
+    : (percentageReduction = "- " + percentageReduction);
+
   return percentageReduction;
 }
 
@@ -166,6 +194,15 @@ export function currentAnnualReduction(data, year) {
   let totalReduction = firstYearValue - lastYearValue;
   let annualReduction = totalReduction / firstYearValue / yearsCount;
   let percentageReduction = (annualReduction * 100).toFixed(0);
+
+  if (percentageReduction < 0) {
+    percentageReduction = percentageReduction * -1;
+    percentageReduction = "+ " + percentageReduction;
+  }
+  if (percentageReduction > 0) {
+    percentageReduction = " - " + percentageReduction;
+  }
+
   return percentageReduction;
 }
 
