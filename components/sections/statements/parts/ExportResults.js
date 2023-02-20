@@ -13,7 +13,7 @@ const ExportResults = (props) => {
     <>
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
-        <p className="mb-0">Rapport sur l'empreinte s   ociétale</p>
+        <p className="mb-0">Rapport sur l'empreinte sociétale</p>
         <div>
           <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
             <i className="bi bi-download"></i>

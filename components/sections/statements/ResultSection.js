@@ -237,7 +237,7 @@ const ResultSection = (props) => {
             </Button>
           )}
           <Button variant="secondary" onClick={handlePDFGenerator}>
-            Télécharger la fiche <i className="bi bi-download"></i>
+            Plaquette <i className="bi bi-download"></i>
           </Button>
           <Button
             variant="secondary"
@@ -256,7 +256,7 @@ const ResultSection = (props) => {
               )
             }
           >
-            Télécharger le rapport <i className="bi bi-download"></i>
+            Rapport <i className="bi bi-download"></i>
           </Button>
         </div>
       </div>
@@ -695,6 +695,9 @@ const ResultSection = (props) => {
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
+          <Button variant="secondary" onClick={handlePDFGenerator}>
+            Plaquette <i className="bi bi-download"></i>
+          </Button>
           <Button
             variant="secondary"
             onClick={() =>
@@ -711,7 +714,7 @@ const ResultSection = (props) => {
               )
             }
           >
-            Télécharger le rapport <i className="bi bi-download"></i>
+            Rapport <i className="bi bi-download"></i>
           </Button>
         </div>
       </section>
