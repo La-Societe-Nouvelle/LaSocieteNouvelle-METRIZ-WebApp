@@ -98,8 +98,9 @@ export const generateIndicTableBody = (
                   printValue(
                     revenue.footprint.indicators[indic].value,
                     precision
-                  ) + " %",
+                  ) + " ",
               },
+              { text: unit, fontSize: "7" },
             ],
           },
         ],

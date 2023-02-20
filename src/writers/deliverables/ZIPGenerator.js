@@ -7,8 +7,10 @@ import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
 import { generateFootprintPDF } from "../Export";
 import { PDFDocument } from "pdf-lib";
-import { CreateIntensIndicatorPDF } from "./intensIndicPDF";
-import { CreateContribIndicatorPDF } from "./contribIndicPDF";
+import { createIntensIndicatorPDF } from "./intensIndicPDF";
+import { createContribIndicatorPDF } from "./contribIndicPDF";
+import { createCoverPage } from "./coverPage";
+import { createIndiceIndicatorPDF } from "./indiceIndicPDF";
 
 const ZipGenerator = ({
   year,
@@ -42,14 +44,18 @@ const ZipGenerator = ({
 
   async function generatePDFs() {
     const documentTitle =
-      "Rapport_Empreinte_Societale" +
-      session.year +
+      "Empreinte-Societale_" +
+      session.legalUnit.corporateName.replaceAll(" ", "") +
       "_" +
-      session.legalUnit.corporateName.replaceAll(" ", "");
+      session.year;
 
     // Initialiser l'objet jsZip
     // Générer les PDFs et les ajouter au zip
 
+    const coverPage = createCoverPage(
+      session.year,
+      session.legalUnit.corporateName
+    );
     const basicPDFpromises = [];
     const reportPDFpromises = [];
 
@@ -73,12 +79,11 @@ const ZipGenerator = ({
       switch (type) {
         case "proportion":
           reportPDFpromises.push(
-            CreateContribIndicatorPDF(
+            createContribIndicatorPDF(
               metaIndics[indic].libelle,
               year,
               legalUnit,
               indic,
-              metaIndics[indic].libelleGrandeur,
               financialData,
               comparativeData,
               false
@@ -87,7 +92,7 @@ const ZipGenerator = ({
           break;
         case "intensité":
           reportPDFpromises.push(
-            CreateIntensIndicatorPDF(
+            createIntensIndicatorPDF(
               year,
               legalUnit,
               indic,
@@ -101,12 +106,32 @@ const ZipGenerator = ({
             )
           );
           break;
+        case "indice":
+          reportPDFpromises.push(
+            createIndiceIndicatorPDF(
+              metaIndics[indic].libelle,
+              metaIndics[indic].libelleGrandeur,
+              year,
+              legalUnit,
+              indic,
+              metaIndics[indic].unit,
+              financialData,
+              comparativeData,
+              comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+                .meta.label,
+              false
+            )
+          );
         default:
           break;
       }
     });
 
-    const mergedPromises = [...reportPDFpromises, ...basicPDFpromises];
+    const mergedPromises = [
+      coverPage,
+      ...reportPDFpromises,
+      ...basicPDFpromises,
+    ];
 
     Promise.all(mergedPromises)
       .then(async (pdfs) => {
@@ -137,7 +162,7 @@ const ZipGenerator = ({
         const seOdds = ["5", "8", "9", "10", "12"];
         const envOdds = ["6", "7", "12", "13", "14", "15"];
 
-        //   // RAPPORT - EMPREINTE SOCIETALE
+        // RAPPORT - EMPREINTE SOCIETALE
 
         const docEES = new jsPDF("landscape", "mm", "a4", true);
 
@@ -168,7 +193,7 @@ const ZipGenerator = ({
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
         zip.file(
-          "rapport_empreinte_societale_" +
+          "Rapport_Empreinte-Societale_SIG_" +
             legalUnit.replaceAll(" ", "") +
             ".pdf",
           docEES.output("blob")
@@ -192,7 +217,7 @@ const ZipGenerator = ({
             // Télécharger le zip
             saveAs(
               content,
-              "Rapports_Empreinte_sociétale_" + legalUnit + "_" + year + ".zip"
+              "Empreinte-Societale_" + legalUnit + "_" + year + ".zip"
             );
           })
           .finally(() => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button } from "react-bootstrap";
 import ZipGenerator from "../../../../src/writers/deliverables/ZIPGenerator";
 
@@ -13,12 +13,13 @@ const ExportResults = (props) => {
     <>
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
-        <p className="mb-0">Rapport sur l'empreinte sociétale</p>
+        <p className="mb-0">Rapport sur l'empreinte s   ociétale</p>
         <div>
           <Button variant="secondary" size="sm" onClick={handleDownloadPDF}>
             <i className="bi bi-download"></i>
             Télécharger
           </Button>
+
         </div>
       </div>
       <div className="dwn-group d-flex align-items-center justify-content-between">

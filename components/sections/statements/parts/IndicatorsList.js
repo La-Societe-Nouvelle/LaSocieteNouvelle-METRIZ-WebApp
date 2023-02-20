@@ -55,9 +55,10 @@ import { printValue } from "../../../../src/utils/Utils";
 
 // PDF Generation
 import { createIndicReport } from "../../../../src/writers/deliverables/PDFGenerator";
-import { CreateContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
-import { CreateIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
+import { createContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
+import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
 import TrendsGraph from "../../../graphs/TrendsGraph";
+import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 
 const IndicatorsList = (props) => {
   const [prevIndics] = useState(props.session.indics);
@@ -442,10 +443,9 @@ const IndicatorsList = (props) => {
                 </Col>
               </Row>
             )}
-
-            {metaIndics[indic].type == "intensité" && (
-              <Row>
-                <Col sm={2}>
+            {(metaIndics[indic].type == "intensité" || metaIndics[indic].type == "indice") && (
+                <Row>
+                  <Col sm={2}>
                     <PieGraph
                       id={"part-" + indic}
                       intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
@@ -467,63 +467,63 @@ const IndicatorsList = (props) => {
                           .amount
                       )}
                     />
-                </Col>
-                <Col sm={3}>
-                  <DeviationChart
-                    id={"deviationChart-" + indic}
-                    legalUnitData={[
-                      props.session.financialData.aggregates.production.footprint.getIndicator(
-                        indic
-                      ).value,
-                      props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                        indic
-                      ).value,
-                      props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                        indic
-                      ).value,
-                      props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                        indic
-                      ).value,
-                    ]}
-                    branchData={[
-                      comparativeData.production.divisionFootprint.indicators[
-                        indic
-                      ].value,
-                      comparativeData.intermediateConsumption.divisionFootprint
-                        .indicators[indic].value,
-                      comparativeData.fixedCapitalConsumption.divisionFootprint
-                        .indicators[indic].value,
-                      comparativeData.netValueAdded.divisionFootprint
-                        .indicators[indic].value,
-                    ]}
-                    indic={indic}
-                    unit={metaIndics[indic].unit}
-                    precision={metaIndics[indic].nbDecimal}
-                  />
-                </Col>
-                <Col sm={6}>
-                  <TrendsGraph
-                    id={"trend-prd-" + indic}
-                    unit={metaIndics[indic].unit}
-                    code={comparativeDivision}
-                    trends={
-                      comparativeData.production.trendsFootprint.indicators[
-                        indic
-                      ]
-                    }
-                    target={
-                      comparativeData.production.targetDivisionFootprint
-                        .indicators[indic]
-                    }
-                    current={
-                      props.session.financialData.aggregates.production.footprint.getIndicator(
-                        indic
-                      ).value
-                    }
-                  />
-                </Col>
-              </Row>
-            )}
+                  </Col>
+                  <Col sm={3}>
+                    <DeviationChart
+                      id={"deviationChart-" + indic}
+                      legalUnitData={[
+                        props.session.financialData.aggregates.production.footprint.getIndicator(
+                          indic
+                        ).value,
+                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                          indic
+                        ).value,
+                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                          indic
+                        ).value,
+                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                          indic
+                        ).value,
+                      ]}
+                      branchData={[
+                        comparativeData.production.divisionFootprint.indicators[
+                          indic
+                        ].value,
+                        comparativeData.intermediateConsumption
+                          .divisionFootprint.indicators[indic].value,
+                        comparativeData.fixedCapitalConsumption
+                          .divisionFootprint.indicators[indic].value,
+                        comparativeData.netValueAdded.divisionFootprint
+                          .indicators[indic].value,
+                      ]}
+                      indic={indic}
+                      unit={metaIndics[indic].unit}
+                      precision={metaIndics[indic].nbDecimal}
+                    />
+                  </Col>
+                  <Col sm={6}>
+                    <TrendsGraph
+                      id={"trend-prd-" + indic}
+                      unit={metaIndics[indic].unit}
+                      code={comparativeDivision}
+                      trends={
+                        comparativeData.production.trendsFootprint.indicators[
+                          indic
+                        ]
+                      }
+                      target={
+                        comparativeData.production.targetDivisionFootprint
+                          .indicators[indic]
+                      }
+                      current={
+                        props.session.financialData.aggregates.production.footprint.getIndicator(
+                          indic
+                        ).value
+                      }
+                    />
+                  </Col>
+                </Row>
+              )}
           </div>
         ))}
 
@@ -692,6 +692,7 @@ const IndicatorsList = (props) => {
                             />
                           </>
                         );
+
                       case "geq":
                         return (
                           <>
@@ -956,7 +957,6 @@ function ModalAssesment(props) {
 }
 
 async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
-  
   // Create an array of promises for generating PDF files
   const pdfPromises = [];
 
@@ -973,7 +973,7 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
   switch (type) {
     case "proportion":
       pdfPromises.push(
-        CreateContribIndicatorPDF(
+        createContribIndicatorPDF(
           metaIndics[indic].libelle,
           session.year,
           session.legalUnit.corporateName,
@@ -987,7 +987,7 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
       break;
     case "intensité":
       pdfPromises.push(
-        CreateIntensIndicatorPDF(
+        createIntensIndicatorPDF(
           session.year,
           session.legalUnit.corporateName,
           indic,
@@ -1001,6 +1001,24 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
           false
         )
       );
+      break;
+    case "indice":
+      pdfPromises.push(
+        createIndiceIndicatorPDF(
+          metaIndics[indic].libelle,
+          metaIndics[indic].libelleGrandeur,
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].unit,
+          session.financialData,
+          session.comparativeData,
+          session.comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+            .meta.label,
+          false
+        )
+      )
+      ;
       break;
     default:
       break;
