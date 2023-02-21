@@ -1,18 +1,16 @@
 /* ---------- Import ---------- */
-@import 'libs/vars';
-@import 'layout/header';
-@import 'layout/main';
-@import 'layout/menu';
-@import 'layout/footer';
-@import 'components/section';
-@import 'components/button';
-@import 'components/alert';
-@import 'components/form';
-@import 'components/tables';
+@import "libs/vars";
+@import "layout/header";
+@import "layout/main";
+@import "layout/menu";
+@import "layout/footer";
+@import "components/section";
+@import "components/button";
+@import "components/alert";
+@import "components/form";
+@import "components/tables";
 
-
-@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Roboto:wght@100;300;400;700&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;800&family=Roboto:wght@100;300;400;700&display=swap");
 
 /* ---------- GENERAL STYLE ---------- */
 
@@ -21,28 +19,26 @@ body {
 }
 
 .svg-inline--fa {
-	height: 15px;
-	vertical-align: middle;
+  height: 15px;
+  vertical-align: middle;
 }
 
 .beta {
-	font-size: 0.6em;
-	font-weight: 600;
-	color: $secondary;
+  font-size: 0.6em;
+  font-weight: 600;
+  color: $secondary;
 }
 
-
 .hidden {
- position: absolute;
- opacity: 0;
- pointer-events: none;
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 // Input
 
 input {
-
   &:disabled {
-    background-color: #EEEEEE;
+    background-color: #eeeeee;
   }
 
   &.hidden {
@@ -50,17 +46,11 @@ input {
   }
 }
 
-p.success {
-  color : $success;
-  margin : 0;
-}
-
 // Exposant
 
 sup {
   font-size: 9px;
 }
-
 
 /* ---------- GROUP ---------- */
 
@@ -73,21 +63,16 @@ sup {
   }
 }
 
-
-
 /* ---------- ASSESSMENT ---------- */
 
 .assessment {
-
-  .view-header {  // header in assessment
+  .view-header {
+    // header in assessment
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
   }
-
-
 }
-
 
 #import-companies-csv,
 #import-companies-xlsx,
@@ -100,21 +85,8 @@ sup {
   border: 0px;
 }
 
-
-
 /* ----- charts ----- */
 
-.piechart-container {
-  width: 400px;
-  padding-top: 1rem;
-  margin: 0 auto;
-}
-.chart-container {
-  padding: 2em 0;
-  position: relative;
-  width: 300px;
-  height: 320px;
-}
 
 @keyframes spinner {
   0% {
@@ -127,8 +99,8 @@ sup {
 .loading-spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid #f3f3f3; 
-  border-top: 3px solid ; 
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid;
   float: left;
   margin-right: 5px;
   border-radius: 50%;
@@ -143,20 +115,18 @@ sup {
   border-radius: 5px;
   color: white;
   margin-left: 5px;
-
-
 }
 
 /* ---------- Icones ---------- */
 
 i.success {
-  color : $success;
+  color: $success;
 }
 
 i.warning {
-  color : $warning;
+  color: $warning;
 }
 
 i.error {
-  color : $error;
+  color: $error;
 }
