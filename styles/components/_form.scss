@@ -67,12 +67,8 @@ table input {
 
 .statement {
   textarea {
-    width: 45%;
-    min-height: 100px;
-    &:focus,
-    &:focus-visible {
-      border-color: $tertiary;
-    }
+    width: 50%;
+    outline: none;
   }
 }
 .statement-form {

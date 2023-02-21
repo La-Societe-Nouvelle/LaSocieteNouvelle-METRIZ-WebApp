@@ -2,6 +2,7 @@
 
 // React
 import React from "react";
+import { Form } from "react-bootstrap";
 
 // Utils
 import {
@@ -30,7 +31,6 @@ export class StatementGHG extends React.Component {
   }
 
   componentDidUpdate() {
-
     if (
       this.state.greenhousesGazEmissions !=
       this.props.impactsData.greenhousesGazEmissions
@@ -48,11 +48,9 @@ export class StatementGHG extends React.Component {
           this.props.impactsData.greenhousesGazEmissionsUncertainty,
       });
     }
-
   }
 
   render() {
-
     const { netValueAdded } = this.props.impactsData;
     const {
       greenhousesGazEmissions,
@@ -65,7 +63,7 @@ export class StatementGHG extends React.Component {
       <div className="statement">
         <div className="statement-form">
           <div className="form-group">
-            <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label> 
+            <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
             <InputNumber
               value={roundValue(greenhousesGazEmissions, 0)}
               onUpdate={this.updateGreenhousesGazEmissions}
@@ -84,11 +82,11 @@ export class StatementGHG extends React.Component {
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
-          <textarea
-            type="text"
-            spellCheck="false"
-            value={info}
+          <Form.Control
+            as="textarea"
+            rows={4}
             onChange={this.updateInfo}
+            value={info}
             onBlur={this.saveInfo}
           />
         </div>
@@ -99,12 +97,12 @@ export class StatementGHG extends React.Component {
           >
             <i className="bi bi-calculator"></i> Outil d'évaluation
           </button>
-          <a 
+          <a
             className="btn btn-tertiary btn-sm"
             href="https://www.bilans-climat-simplifies.ademe.fr/"
             target="_blank"
           >
-           <i className="bi bi-box-arrow-up-right"></i> Outil de l'Ademe
+            <i className="bi bi-box-arrow-up-right"></i> Outil de l'Ademe
           </a>
           <button
             disabled={!isValid}
@@ -119,9 +117,8 @@ export class StatementGHG extends React.Component {
   }
 
   updateGreenhousesGazEmissions = (input) => {
+    this.props.impactsData.ghgTotal = true;
 
-   this.props.impactsData.ghgTotal = true;
- 
     this.props.impactsData.setGreenhousesGazEmissions(input);
     this.setState({
       greenhousesGazEmissionsUncertainty:
@@ -139,11 +136,7 @@ export class StatementGHG extends React.Component {
   saveInfo = () => (this.props.impactsData.comments.ghg = this.state.info);
 
   onValidate = () => {
-
-    this.setState({ isUpdated : true });
+    this.setState({ isUpdated: true });
     this.props.onValidate();
-  }
-
+  };
 }
-
-

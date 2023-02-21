@@ -5,11 +5,7 @@ import React from "react";
 import { Form } from "react-bootstrap";
 
 // Utils
-import {
-  printValueInput,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
 import { InputNumber } from "../../../input/InputNumber";
 
@@ -42,7 +38,6 @@ export class StatementART extends React.Component {
   }
 
   componentDidUpdate() {
-
     if (
       this.state.craftedProduction != this.props.impactsData.craftedProduction
     ) {
@@ -54,9 +49,12 @@ export class StatementART extends React.Component {
 
   render() {
     const { isValueAddedCrafted, netValueAdded } = this.props.impactsData;
-    const { craftedProduction } = this.state;
+    const { craftedProduction, info } = this.state;
 
-    let isValid = netValueAdded != null && (craftedProduction >= 0 && craftedProduction <= netValueAdded);
+    let isValid =
+      netValueAdded != null &&
+      craftedProduction >= 0 &&
+      craftedProduction <= netValueAdded;
 
     return (
       <div className="statement">
@@ -64,7 +62,6 @@ export class StatementART extends React.Component {
           <div className="form-group">
             <label>L'entreprise est-elle une entreprise artisanale ?</label>
             <Form>
-            
               <Form.Check
                 inline
                 type="radio"
@@ -91,13 +88,13 @@ export class StatementART extends React.Component {
                 label="Non"
                 value="false"
                 checked={isValueAddedCrafted === false}
-                onChange={this.onIsValueAddedCraftedChange} 
+                onChange={this.onIsValueAddedCraftedChange}
               />
             </Form>
           </div>
           <div className="form-group">
             <label>Part de la valeur ajoutée artisanale</label>
-           
+
             <InputNumber
               value={roundValue(craftedProduction, 0)}
               onUpdate={this.updateCraftedProduction.bind(this)}
@@ -109,7 +106,13 @@ export class StatementART extends React.Component {
         </div>
         <div className="form-group">
           <label>Informations complémentaires</label>
-          <textarea type="text" spellCheck="false" className="form-control" onChange={this.updateInfo}/>
+          <Form.Control
+            as="textarea"
+            rows={4}
+            onChange={this.updateInfo}
+            value={info}
+            onBlur={this.saveInfo}
+          />
         </div>
         <div className="statement-action">
           <button
@@ -160,4 +163,3 @@ export class StatementART extends React.Component {
 
   onValidate = () => this.props.onValidate();
 }
-

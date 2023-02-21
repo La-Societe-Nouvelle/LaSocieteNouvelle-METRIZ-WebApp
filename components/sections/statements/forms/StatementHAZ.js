@@ -2,10 +2,10 @@
 
 // React
 import React from "react";
+import { Form } from "react-bootstrap";
 
 // Utils
 import {
-  printValue,
   roundValue,
   valueOrDefault,
 } from "../../../../src/utils/Utils";
@@ -85,13 +85,14 @@ export class StatementHAZ extends React.Component {
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
-          <textarea
-            type="text"
-            spellCheck="false"
-            value={info}
+          <Form.Control
+            as="textarea"
+            rows={4}
             onChange={this.updateInfo}
+            value={info}
             onBlur={this.saveInfo}
           />
+     
         </div>
         <div className="statement-validation">
           <button

@@ -2,6 +2,7 @@
 
 // React
 import React from "react";
+import { Form } from "react-bootstrap";
 
 //Utils
 import {
@@ -82,13 +83,14 @@ export class StatementWAS extends React.Component {
 
         <div className="statement-comments">
           <label>Informations complémentaires</label>
-          <textarea
-            type="text"
-            spellCheck="false"
-            value={info}
+          <Form.Control
+            as="textarea"
+            rows={4}
             onChange={this.updateInfo}
+            value={info}
             onBlur={this.saveInfo}
           />
+
         </div>
         <div className="statement-validation">
           <button
