@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 
 import {
   Accordion,
@@ -45,6 +46,7 @@ import ComparativeGraphs from "../../../charts/ComparativeGraphs";
 import DeviationChart from "../../../charts/HorizontalBarChart";
 import SigPieChart from "../../../charts/SigPieChart";
 import GrossImpactChart from "../../../charts/GrossImpactChart";
+import TrendsGraph from "../../../charts/TrendsGraph";
 
 // Services
 import getSerieData from "/src/services/responses/SerieData";
@@ -58,11 +60,9 @@ import { printValue } from "../../../../src/utils/Utils";
 import { createIndicReport } from "../../../../src/writers/deliverables/indicReportPDF";
 import { createContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
-import TrendsGraph from "../../../charts/TrendsGraph";
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 
 const IndicatorsList = (props) => {
-
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
@@ -82,8 +82,6 @@ const IndicatorsList = (props) => {
       props.publish();
     }
   }, [validations]);
-
-  
 
   useEffect(() => {
     // return indics not included in available list of indicators
@@ -224,7 +222,6 @@ const IndicatorsList = (props) => {
 
   // Export pdf on click
   const handleDownloadPDF = async (key, comparativeDivision) => {
-    
     props.updateVisibleGraphs(true);
 
     // Display pop up to choose a comparative division
@@ -245,7 +242,6 @@ const IndicatorsList = (props) => {
       setPopUp("");
     }
     props.updateVisibleGraphs(false);
-  
   };
 
   // Resusable Components
@@ -1039,6 +1035,13 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
   Promise.all(pdfPromises).then(async (pdfs) => {
     // Create a new empty PDF document to merge PDFs together
     let mergedPdfDoc = await PDFDocument.create();
+    const fontBytes = await fetch(
+      "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf"
+    ).then((res) => res.arrayBuffer());
+
+    // Register the `fontkit` instance
+    mergedPdfDoc.registerFontkit(fontkit);
+
 
     // Add each PDF to the final PDF document
     for (const pdf of pdfs) {
@@ -1051,6 +1054,39 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
       );
       copiedPages.forEach((page) => mergedPdfDoc.addPage(page));
     }
+
+    // Get the number of pages in the merged PDF
+    const pageCount = mergedPdfDoc.getPageCount();
+
+    const ralewayFont = await mergedPdfDoc.embedFont(
+      fontBytes,
+      { subset: true, custom: true },
+      fontkit
+    );
+
+    // Loop through each page and add the page number
+    for (let i = 0; i < pageCount; i++) {
+      const page = mergedPdfDoc.getPage(i);
+
+      // Get the width and height of the page
+      const { width, height } = page.getSize();
+
+      // Add the page number as text in the bottom right corner
+      const pageNumberText = `Page ${i + 1} sur ${pageCount}`;
+      const fontSize = 7;
+      const textWidth = ralewayFont.widthOfTextAtSize(pageNumberText, fontSize);
+      const textHeight = ralewayFont.heightAtSize(fontSize);
+
+      page.drawText(pageNumberText, {
+        x: width - textWidth - 20,
+        y: textHeight + 12,
+        size: fontSize,
+        font: ralewayFont,
+        color: rgb(25 / 255, 21 / 255, 88 / 255),
+      });
+    }
+
+    // Save the merged PDF document with page numbers
 
     const mergedPdfData = new Blob([await mergedPdfDoc.save()], {
       type: "application/pdf",

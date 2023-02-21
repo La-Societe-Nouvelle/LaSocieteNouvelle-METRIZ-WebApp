@@ -6,7 +6,9 @@ import { createIndicReport } from "./indicReportPDF";
 import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
 import { generateFootprintPDF } from "../Export";
-import { PDFDocument } from "pdf-lib";
+import { PDFDocument, rgb } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
+
 import { createIntensIndicatorPDF } from "./intensIndicPDF";
 import { createContribIndicatorPDF } from "./contribIndicPDF";
 import { createCoverPage } from "./coverPage";
@@ -141,6 +143,12 @@ const ZipGenerator = ({
       .then(async (pdfs) => {
         // Create a new empty PDF document to merge PDFs together
         let mergedPdfDoc = await PDFDocument.create();
+        const fontBytes = await fetch(
+          "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf"
+        ).then((res) => res.arrayBuffer());
+
+        // Register the `fontkit` instance
+        mergedPdfDoc.registerFontkit(fontkit);
 
         // Add each PDF to the final PDF document
         for (const pdf of pdfs) {
@@ -155,6 +163,42 @@ const ZipGenerator = ({
 
           setGeneratedPDFs((prevPDFs) => [...prevPDFs, pdf]);
         }
+        // Get the number of pages in the merged PDF
+        const pageCount = mergedPdfDoc.getPageCount();
+
+        const ralewayFont = await mergedPdfDoc.embedFont(
+          fontBytes,
+          { subset: true, custom: true },
+          fontkit
+        );
+
+        // Loop through each page and add the page number
+        for (let i = 0; i < pageCount; i++) {
+          const page = mergedPdfDoc.getPage(i);
+         
+          if (i > 0) {
+            // Get the width and height of the page
+            const { width, height } = page.getSize();
+
+            // Add the page number as text in the bottom right corner
+            const pageNumberText = `Page ${i + 1} sur ${pageCount}`;
+            const fontSize = 7;
+            const textWidth = ralewayFont.widthOfTextAtSize(
+              pageNumberText,
+              fontSize
+            );
+            const textHeight = ralewayFont.heightAtSize(fontSize);
+
+            page.drawText(pageNumberText, {
+              x: width - textWidth - 20,
+              y: textHeight + 12,
+              size: fontSize,
+              font: ralewayFont,
+              color: rgb(25 / 255, 21 / 255, 88 / 255),
+            });
+          }
+        }
+
         const mergedPdfBytes = await mergedPdfDoc.save();
 
         zip.file(documentTitle + ".pdf", mergedPdfBytes, { binary: true });

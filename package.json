@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@pdf-lib/fontkit": "^1.1.1",
     "@vercel/analytics": "^0.1.5",
     "axios": "^0.27.2",
     "bootstrap": "^5.1.3",

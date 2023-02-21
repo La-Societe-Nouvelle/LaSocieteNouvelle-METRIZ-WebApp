@@ -105,10 +105,10 @@ export const createIndicReport = (
           {
             text: "Edité le " + getShortCurrentDateString(),
             margin: [20, 25, 0, 0],
+            font: "Raleway",
+            fontSize: 7,
           },
         ],
-
-        fontSize: 7,
       };
     },
 
