@@ -60,11 +60,11 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
         "Incertitude : " +
         uncertainty +
         " %. L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
-
       break;
     case "intensite":
       description =
         "L’incertitude provient de l’utilisation de données statistiques, directement, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées (pour ces mêmes raisons). Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+      break;
     case "indice":
       description =
         "Incertitude : " +

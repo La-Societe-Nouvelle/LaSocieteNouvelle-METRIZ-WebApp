@@ -36,6 +36,20 @@ export const createIndiceIndicatorPDF = (
   download
 ) => {
   // ---------------------------------------------------------------
+  // Variables
+  const precision = metaIndics[indic].nbDecimals;
+
+  const {
+    production,
+    revenue,
+    netValueAdded,
+    intermediateConsumption,
+    capitalConsumption,
+  } = financialData.aggregates;
+
+  const totalRevenue = revenue.amount;
+
+  // ---------------------------------------------------------------
   // utils
 
   const indicDescription = getIndicDescription(indic);
@@ -64,20 +78,6 @@ export const createIndiceIndicatorPDF = (
     "indice",
     production.footprint.indicators[indic].uncertainty
   );
-
-  // ---------------------------------------------------------------
-  // Variables
-  const precision = metaIndics[indic].nbDecimals;
-
-  const {
-    production,
-    revenue,
-    netValueAdded,
-    intermediateConsumption,
-    capitalConsumption,
-  } = financialData.aggregates;
-
-  const totalRevenue = revenue.amount;
 
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document

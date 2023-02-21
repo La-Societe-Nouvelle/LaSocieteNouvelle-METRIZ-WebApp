@@ -30,11 +30,12 @@ export const createContribIndicatorPDF = (
   download
 ) => {
   // ---------------------------------------------------------------
-  // utils
-
-  const indicDescription = getIndicDescription(indic);
 
   const { production, revenue, externalExpenses } = financialData.aggregates;
+
+  // ---------------------------------------------------------------
+  // utils
+  const indicDescription = getIndicDescription(indic);
 
   const mostImpactfulExpenses = sortExpensesByFootprint(
     financialData.expenses,
