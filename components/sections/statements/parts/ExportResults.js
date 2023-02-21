@@ -19,7 +19,6 @@ const ExportResults = (props) => {
             <i className="bi bi-download"></i>
             Télécharger
           </Button>
-
         </div>
       </div>
       <div className="dwn-group d-flex align-items-center justify-content-between">
@@ -36,6 +35,7 @@ const ExportResults = (props) => {
           impactsData={props.session.impactsData}
           comparativeData={props.session.comparativeData}
           session={props.session}
+          updateVisibleGraphs={props.updateVisibleGraphs}
         />
       </div>
     </>

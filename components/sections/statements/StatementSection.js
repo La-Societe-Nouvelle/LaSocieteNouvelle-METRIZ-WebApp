@@ -7,6 +7,7 @@ import IndicatorsList from "./parts/IndicatorsList";
 import ExportResults from "./parts/ExportResults";
 
 const StatementSection = (props) => {
+  const [visibleGraphs, setVisibleGraphs] = useState(false);
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
   const [isPublicationAvailable, setPublicationAvailable] = useState(false);
@@ -24,6 +25,12 @@ const StatementSection = (props) => {
       setValidationsState([...validationsState, newValidation]);
     }
   };
+
+  const updateVisibleGraphs = (newValue) => {
+    console.log(newValue)
+    setVisibleGraphs(newValue);
+  };
+
   return (
     <Container fluid className="indicator-section">
       {view == "statement" ? (
@@ -35,6 +42,8 @@ const StatementSection = (props) => {
               les éléments d'analyse.
             </p>
             <IndicatorsList
+              updateVisibleGraphs={updateVisibleGraphs}
+              visibleGraphs={visibleGraphs}
               onValidation={handleValidation}
               impactsData={props.session.impactsData}
               session={props.session}
@@ -48,6 +57,7 @@ const StatementSection = (props) => {
             </h2>
 
             <ExportResults
+              updateVisibleGraphs={updateVisibleGraphs}
               session={props.session}
               validations={validationsState}
             />

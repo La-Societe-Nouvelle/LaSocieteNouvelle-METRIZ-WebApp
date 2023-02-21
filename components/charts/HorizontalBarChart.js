@@ -19,7 +19,6 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
       return null;
     }
   });
-  console.log(data);
 
   const maxValue = Math.max(
     Math.abs(Math.min(...data)),

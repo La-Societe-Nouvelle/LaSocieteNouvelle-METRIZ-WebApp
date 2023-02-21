@@ -43,8 +43,8 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 import ComparativeGraphs from "../../../charts/ComparativeGraphs";
 import DeviationChart from "../../../charts/HorizontalBarChart";
-import SigPieChart from "../../../charts/SigPieChart"; 
-import GrossImpactChart  from "../../../charts/GrossImpactChart";
+import SigPieChart from "../../../charts/SigPieChart";
+import GrossImpactChart from "../../../charts/GrossImpactChart";
 
 // Services
 import getSerieData from "/src/services/responses/SerieData";
@@ -62,13 +62,13 @@ import TrendsGraph from "../../../charts/TrendsGraph";
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 
 const IndicatorsList = (props) => {
+
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
   const [validations, SetValidations] = useState(props.session.validations);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
-  const [displayGraph, setDisplayGraph] = useState(true);
   const [indicToExport, setIndicToExport] = useState();
 
   const [comparativeData, setComparativeData] = useState(
@@ -82,6 +82,8 @@ const IndicatorsList = (props) => {
       props.publish();
     }
   }, [validations]);
+
+  
 
   useEffect(() => {
     // return indics not included in available list of indicators
@@ -169,8 +171,6 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
-    setDisplayGraph(false);
-
     if (!validations.includes(indic)) {
       // Get footprint for all sectors
       let newComparativeData = await updateComparativeAreaData(indic);
@@ -203,8 +203,6 @@ const IndicatorsList = (props) => {
 
   // Update comparative division
   const updateDivision = async (division) => {
-    setDisplayGraph(false);
-
     props.session.comparativeData.activityCode = division;
 
     let newComparativeData = comparativeData;
@@ -222,18 +220,23 @@ const IndicatorsList = (props) => {
     props.session.comparativeData = newComparativeData;
     setComparativeData(newComparativeData);
     setComparativeDivision(division);
-    setDisplayGraph(true);
   };
 
   // Export pdf on click
   const handleDownloadPDF = async (key, comparativeDivision) => {
+    
+    props.updateVisibleGraphs(true);
+
     // Display pop up to choose a comparative division
     if (comparativeDivision == "00") {
       // Pass indic to export to download PDF directly from PopUp
       setIndicToExport(key);
       setPopUp("division");
     } else {
-      generateIndicatorReportPDF(
+      // Wait for visibleGraphs to be updated
+      await new Promise((resolve) => setTimeout(resolve, 0));
+
+      await generateIndicatorReportPDF(
         props.session,
         key,
         divisions[comparativeDivision]
@@ -241,6 +244,8 @@ const IndicatorsList = (props) => {
 
       setPopUp("");
     }
+    props.updateVisibleGraphs(false);
+  
   };
 
   // Resusable Components
@@ -279,8 +284,8 @@ const IndicatorsList = (props) => {
     <>
       {/* Charts generation */}
 
-      {validations.length > 0 &&
-        displayGraph &&
+      {props.visibleGraphs &&
+        validations.length > 0 &&
         validations.map((indic, key) => (
           <div key={key} className="hidden">
             <Row>
@@ -444,87 +449,88 @@ const IndicatorsList = (props) => {
                 </Col>
               </Row>
             )}
-            {(metaIndics[indic].type == "intensité" || metaIndics[indic].type == "indice") && (
-                <Row>
-                  <Col sm={2}>
-                    <GrossImpactChart 
-                      id={"part-" + indic}
-                      intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
+            {(metaIndics[indic].type == "intensité" ||
+              metaIndics[indic].type == "indice") && (
+              <Row>
+                <Col sm={2}>
+                  <GrossImpactChart
+                    id={"part-" + indic}
+                    intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
+                      indic
+                    ].getGrossImpact(
+                      props.session.financialData.aggregates
+                        .intermediateConsumption.amount
+                    )}
+                    capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
+                      indic
+                    ].getGrossImpact(
+                      props.session.financialData.aggregates.capitalConsumption
+                        .amount
+                    )}
+                    netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+                      indic
+                    ].getGrossImpact(
+                      props.session.financialData.aggregates.netValueAdded
+                        .amount
+                    )}
+                  />
+                </Col>
+                <Col sm={3}>
+                  <DeviationChart
+                    id={"deviationChart-" + indic}
+                    legalUnitData={[
+                      props.session.financialData.aggregates.production.footprint.getIndicator(
                         indic
-                      ].getGrossImpact(
-                        props.session.financialData.aggregates
-                          .intermediateConsumption.amount
-                      )}
-                      capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
+                      ).value,
+                      props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
                         indic
-                      ].getGrossImpact(
-                        props.session.financialData.aggregates
-                          .capitalConsumption.amount
-                      )}
-                      netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+                      ).value,
+                      props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
                         indic
-                      ].getGrossImpact(
-                        props.session.financialData.aggregates.netValueAdded
-                          .amount
-                      )}
-                    />
-                  </Col>
-                  <Col sm={3}>
-                    <DeviationChart
-                      id={"deviationChart-" + indic}
-                      legalUnitData={[
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
-                          indic
-                        ).value,
-                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                          indic
-                        ).value,
-                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                          indic
-                        ).value,
-                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                          indic
-                        ).value,
-                      ]}
-                      branchData={[
-                        comparativeData.production.divisionFootprint.indicators[
-                          indic
-                        ].value,
-                        comparativeData.intermediateConsumption
-                          .divisionFootprint.indicators[indic].value,
-                        comparativeData.fixedCapitalConsumption
-                          .divisionFootprint.indicators[indic].value,
-                        comparativeData.netValueAdded.divisionFootprint
-                          .indicators[indic].value,
-                      ]}
-                      indic={indic}
-                      unit={metaIndics[indic].unit}
-                      precision={metaIndics[indic].nbDecimal}
-                    />
-                  </Col>
-                  <Col sm={6}>
-                    <TrendsGraph
-                      id={"trend-prd-" + indic}
-                      unit={metaIndics[indic].unit}
-                      code={comparativeDivision}
-                      trends={
-                        comparativeData.production.trendsFootprint.indicators[
-                          indic
-                        ]
-                      }
-                      target={
-                        comparativeData.production.targetDivisionFootprint
-                          .indicators[indic]
-                      }
-                      current={
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                    />
-                  </Col>
-                </Row>
-              )}
+                      ).value,
+                      props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                        indic
+                      ).value,
+                    ]}
+                    branchData={[
+                      comparativeData.production.divisionFootprint.indicators[
+                        indic
+                      ].value,
+                      comparativeData.intermediateConsumption.divisionFootprint
+                        .indicators[indic].value,
+                      comparativeData.fixedCapitalConsumption.divisionFootprint
+                        .indicators[indic].value,
+                      comparativeData.netValueAdded.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    indic={indic}
+                    unit={metaIndics[indic].unit}
+                    precision={metaIndics[indic].nbDecimal}
+                  />
+                </Col>
+                <Col sm={6}>
+                  <TrendsGraph
+                    id={"trend-prd-" + indic}
+                    unit={metaIndics[indic].unit}
+                    code={comparativeDivision}
+                    trends={
+                      comparativeData.production.trendsFootprint.indicators[
+                        indic
+                      ]
+                    }
+                    target={
+                      comparativeData.production.targetDivisionFootprint
+                        .indicators[indic]
+                    }
+                    current={
+                      props.session.financialData.aggregates.production.footprint.getIndicator(
+                        indic
+                      ).value
+                    }
+                  />
+                </Col>
+              </Row>
+            )}
           </div>
         ))}
 
@@ -671,26 +677,6 @@ const IndicatorsList = (props) => {
                               toAssessment={() => triggerPopup("idr")}
                               toImportDSN={() => triggerPopup("dsn")}
                             />
-                            <ModalAssesment
-                              indic="idr"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("idr")}
-                              onValidate={() => validateIndicator("idr")}
-                              onGoBack={handleClose}
-                              popUp={popUp}
-                              handleClose={handleClose}
-                              title="Données Sociales"
-                            />
-                            <ModalAssesment
-                              indic="dsn"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("idr")}
-                              onValidate={() => validateIndicator("idr")}
-                              onGoBack={handleClose}
-                              popUp={popUp}
-                              handleClose={handleClose}
-                              title="Déclarations Sociales Nominatives"
-                            />
                           </>
                         );
 
@@ -704,27 +690,6 @@ const IndicatorsList = (props) => {
                               toAssessment={() => triggerPopup("geq")}
                               toImportDSN={() => triggerPopup("dsn")}
                             />
-
-                            <ModalAssesment
-                              indic="geq"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("geq")}
-                              onValidate={() => validateIndicator("geq")}
-                              onGoBack={handleClose}
-                              popUp={popUp}
-                              handleClose={handleClose}
-                              title="Données Sociales"
-                            />
-                            <ModalAssesment
-                              indic="dsn"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("geq")}
-                              onValidate={() => validateIndicator("geq")}
-                              onGoBack={handleClose}
-                              popUp={popUp}
-                              handleClose={handleClose}
-                              title="Déclarations Sociales Nominatives"
-                            />
                           </>
                         );
                       case "knw":
@@ -735,16 +700,6 @@ const IndicatorsList = (props) => {
                               onUpdate={willNetValueAddedIndicator.bind("knw")}
                               onValidate={() => validateIndicator("knw")}
                               toAssessment={() => triggerPopup("knw")}
-                            />
-                            <ModalAssesment
-                              indic="knw"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("knw")}
-                              onValidate={() => validateIndicator("knw")}
-                              popUp={popUp}
-                              onGoBack={handleClose}
-                              handleClose={handleClose}
-                              title="Outil de mesure"
                             />
                           </>
                         );
@@ -818,16 +773,6 @@ const IndicatorsList = (props) => {
                               onValidate={() => validateIndicator("ghg")}
                               toAssessment={() => triggerPopup("ghg")}
                             />
-                            <ModalAssesment
-                              indic="ghg"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("ghg")}
-                              onValidate={() => validateIndicator("ghg")}
-                              onGoBack={handleClose}
-                              popUp={popUp}
-                              handleClose={handleClose}
-                              title="Outil de mesure des émissions"
-                            />
                           </>
                         );
                       case "nrg":
@@ -838,16 +783,6 @@ const IndicatorsList = (props) => {
                               onUpdate={willNetValueAddedIndicator.bind("nrg")}
                               onValidate={() => validateIndicator("nrg")}
                               toAssessment={() => triggerPopup("nrg")}
-                            />
-                            <ModalAssesment
-                              indic="nrg"
-                              impactsData={props.impactsData}
-                              onUpdate={willNetValueAddedIndicator.bind("nrg")}
-                              onValidate={() => validateIndicator("nrg")}
-                              onGoBack={handleClose}
-                              popUp={popUp}
-                              handleClose={handleClose}
-                              title="Outil de mesure des énergies"
                             />
                           </>
                         );
@@ -895,6 +830,69 @@ const IndicatorsList = (props) => {
             </Card>
           ))}
       </Accordion>
+
+      {/* // MODAL  */}
+      <ModalAssesment
+        indic="knw"
+        impactsData={props.impactsData}
+        onUpdate={willNetValueAddedIndicator.bind("knw")}
+        onValidate={() => validateIndicator("knw")}
+        popUp={popUp}
+        onGoBack={handleClose}
+        handleClose={handleClose}
+        title="Outil de mesure"
+      />
+      <ModalAssesment
+        indic="idr"
+        impactsData={props.impactsData}
+        onUpdate={willNetValueAddedIndicator.bind("idr")}
+        onValidate={() => validateIndicator("idr")}
+        onGoBack={handleClose}
+        popUp={popUp}
+        handleClose={handleClose}
+        title="Données Sociales"
+      />
+      <ModalAssesment
+        indic="dsn"
+        impactsData={props.impactsData}
+        onUpdate={willNetValueAddedIndicator.bind("idr")}
+        onValidate={() => validateIndicator("idr")}
+        onGoBack={handleClose}
+        popUp={popUp}
+        handleClose={handleClose}
+        title="Déclarations Sociales Nominatives"
+      />
+      <ModalAssesment
+        indic="nrg"
+        impactsData={props.impactsData}
+        onUpdate={willNetValueAddedIndicator.bind("nrg")}
+        onValidate={() => validateIndicator("nrg")}
+        onGoBack={handleClose}
+        popUp={popUp}
+        handleClose={handleClose}
+        title="Outil de mesure des énergies"
+      />
+      <ModalAssesment
+        indic="ghg"
+        impactsData={props.impactsData}
+        onUpdate={willNetValueAddedIndicator.bind("ghg")}
+        onValidate={() => validateIndicator("ghg")}
+        onGoBack={handleClose}
+        popUp={popUp}
+        handleClose={handleClose}
+        title="Outil de mesure des émissions"
+      />
+
+      <ModalAssesment
+        indic="geq"
+        impactsData={props.impactsData}
+        onUpdate={willNetValueAddedIndicator.bind("geq")}
+        onValidate={() => validateIndicator("geq")}
+        onGoBack={handleClose}
+        popUp={popUp}
+        handleClose={handleClose}
+        title="Données Sociales"
+      />
     </>
   );
 };
@@ -1013,12 +1011,12 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          session.comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-            .meta.label,
+          session.comparativeData.netValueAdded.trendsFootprint.indicators[
+            indic
+          ].meta.label,
           false
         )
-      )
-      ;
+      );
       break;
     default:
       break;

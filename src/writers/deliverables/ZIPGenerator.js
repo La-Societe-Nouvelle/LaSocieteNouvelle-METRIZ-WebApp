@@ -20,6 +20,7 @@ const ZipGenerator = ({
   impactsData,
   comparativeData,
   session,
+  updateVisibleGraphs,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPDFs, setGeneratedPDFs] = useState([]);
@@ -31,9 +32,13 @@ const ZipGenerator = ({
     }
   }, [isGenerating]);
 
-  useEffect(() => {
+  useEffect(async () => {
     if (zip) {
-      generatePDFs();
+      updateVisibleGraphs(true);
+      // Wait for visibleGraphs to be updated
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      await generatePDFs();
+      updateVisibleGraphs(false);
     }
   }, [zip]);
 
@@ -59,7 +64,7 @@ const ZipGenerator = ({
     const basicPDFpromises = [];
     const reportPDFpromises = [];
 
-    validations.map((indic) => {
+    validations.forEach((indic) => {
       let type = metaIndics[indic].type;
 
       basicPDFpromises.push(
@@ -126,13 +131,11 @@ const ZipGenerator = ({
           break;
       }
     });
-
     const mergedPromises = [
       coverPage,
       ...reportPDFpromises,
       ...basicPDFpromises,
     ];
-    setGeneratedPDFs((prevPDFs) => [...prevPDFs, mergedPromises]);
 
     Promise.all(mergedPromises)
       .then(async (pdfs) => {
@@ -237,7 +240,6 @@ const ZipGenerator = ({
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
         <Modal.Body>
-          {console.log(generatedPDFs)}
           {generatedPDFs.length == 0 ? (
             <>
               <div className="loader-container my-4">
