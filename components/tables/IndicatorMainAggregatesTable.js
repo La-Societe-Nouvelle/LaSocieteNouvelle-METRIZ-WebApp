@@ -7,7 +7,7 @@ import { printValue } from "/src/utils/Utils";
 import metaIndics from "/lib/indics";
 
 // Chart
-import SigPieChart from "../graphs/SigPieChart";
+import SigPieChart from "../charts/SigPieChart";
 
 import { Button, Col, Row, Table } from "react-bootstrap";
 import { exportIndicXLSX } from "../../src/writers/ExportXLSX";

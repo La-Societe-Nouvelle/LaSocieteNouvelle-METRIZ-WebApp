@@ -41,10 +41,10 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 
 // Charts
 
-import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
-import DeviationChart from "../../../graphs/HorizontalBarChart";
-import SigPieChart from "../../../graphs/SigPieChart"; 
-import GrossImpactChart  from "../../../graphs/GrossImpactChart";
+import ComparativeGraphs from "../../../charts/ComparativeGraphs";
+import DeviationChart from "../../../charts/HorizontalBarChart";
+import SigPieChart from "../../../charts/SigPieChart"; 
+import GrossImpactChart  from "../../../charts/GrossImpactChart";
 
 // Services
 import getSerieData from "/src/services/responses/SerieData";
@@ -58,7 +58,7 @@ import { printValue } from "../../../../src/utils/Utils";
 import { createIndicReport } from "../../../../src/writers/deliverables/indicReportPDF";
 import { createContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
-import TrendsGraph from "../../../graphs/TrendsGraph";
+import TrendsGraph from "../../../charts/TrendsGraph";
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 
 const IndicatorsList = (props) => {

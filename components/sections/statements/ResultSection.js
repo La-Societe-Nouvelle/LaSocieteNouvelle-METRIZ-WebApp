@@ -20,10 +20,10 @@ import divisions from "/lib/divisions";
 import { ErrorApi } from "../../ErrorAPI";
 
 // Graphs
-import ComparativeGraphs from "../../graphs/ComparativeGraphs";
-import GrossImpactChart  from "../../graphs/GrossImpactChart";
-import TrendsGraph from "../../graphs/TrendsGraph";
-import DeviationChart from "../../graphs/HorizontalBarChart";
+import ComparativeGraphs from "../../charts/ComparativeGraphs";
+import GrossImpactChart  from "../../charts/GrossImpactChart";
+import TrendsGraph from "../../charts/TrendsGraph";
+import DeviationChart from "../../charts/HorizontalBarChart";
 
 
 // Tables
@@ -334,7 +334,7 @@ const ResultSection = (props) => {
         {error && <ErrorApi />}
         <div className="graph-container">
           <div className="mt-5">
-            <Row className="graphs">
+            <Row className="charts">
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Production</h5>
                 <ComparativeGraphs
