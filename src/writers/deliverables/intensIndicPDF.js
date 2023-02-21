@@ -72,7 +72,7 @@ export const createIntensIndicatorPDF = (
   );
 
   const uncertaintyText = getUncertaintyDescription(
-    "intesiste",
+    "intensite",
     production.footprint.indicators[indic].uncertainty
   );
 
