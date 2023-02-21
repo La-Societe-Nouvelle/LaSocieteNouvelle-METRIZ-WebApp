@@ -4,6 +4,8 @@ import { getShortCurrentDateString } from "../../utils/Utils";
 import { loadFonts } from "./utils/utils";
 
 // --------------------------------------------------------------------------
+//  Report Cover Page
+// --------------------------------------------------------------------------
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -11,8 +13,6 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
 export const createCoverPage = (year, legalUnit) => {
-  // ---------------------------------------------------------------
-
   // ---------------------------------------------------------------
   // Document Property
 
@@ -31,7 +31,6 @@ export const createCoverPage = (year, legalUnit) => {
   // PDF Content and Layout
   const docDefinition = {
     pageSize: pageSize,
-    // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
 
     footer: function () {
@@ -110,7 +109,6 @@ export const createCoverPage = (year, legalUnit) => {
 
   return new Promise((resolve) => {
     pdfMake.createPdf(docDefinition).getBlob((blob) => {
-      //  saveAs(blob, `doc.pdf`);
       resolve(blob);
     });
   });

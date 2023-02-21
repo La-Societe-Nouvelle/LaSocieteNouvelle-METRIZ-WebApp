@@ -3,9 +3,9 @@ import React from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
-import { Doughnut, Pie } from "react-chartjs-2"; 
+import { Doughnut } from "react-chartjs-2"; 
 
-function PieGraph(props) {
+function GrossImpactChart (props) {
   let intermediateConsumption = parseFloat(props.intermediateConsumption);
   let capitalConsumption = parseFloat(props.capitalConsumption);
   let netValueAdded = parseFloat(props.netValueAdded);
@@ -74,4 +74,4 @@ function PieGraph(props) {
   return <Doughnut id={props.id} data={data} options={options} />;
 }
 
-export default PieGraph;
+export default GrossImpactChart ;

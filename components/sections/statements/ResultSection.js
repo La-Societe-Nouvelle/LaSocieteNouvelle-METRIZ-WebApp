@@ -21,8 +21,10 @@ import { ErrorApi } from "../../ErrorAPI";
 
 // Graphs
 import ComparativeGraphs from "../../graphs/ComparativeGraphs";
-import PieGraph from "../../graphs/PieGraph";
+import GrossImpactChart  from "../../graphs/GrossImpactChart";
 import TrendsGraph from "../../graphs/TrendsGraph";
+import DeviationChart from "../../graphs/HorizontalBarChart";
+
 
 // Tables
 import { ComparativeTable } from "../../tables/ComparativeTable";
@@ -33,11 +35,11 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
-import { createIndicReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
+
+import { createIndicReport } from "../../../src/writers/deliverables/indicReportPDF";
 import { createContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
-import DeviationChart from "../../graphs/HorizontalBarChart";
 import { createIndiceIndicatorPDF } from "../../../src/writers/deliverables/indiceIndicPDF";
 
 const ResultSection = (props) => {
@@ -154,7 +156,7 @@ const ResultSection = (props) => {
     setTrendGraphView(option);
   };
 
-  const handlePDFGenerator = () => {
+  const handleindicReportPDF = () => {
     const type = metaIndics[indic].type;
 
     switch (type) {
@@ -236,7 +238,7 @@ const ResultSection = (props) => {
               {metaIndics[indic].libelle}
             </Button>
           )}
-          <Button variant="secondary" onClick={handlePDFGenerator}>
+          <Button variant="secondary" onClick={handleindicReportPDF}>
             Plaquette <i className="bi bi-download"></i>
           </Button>
           <Button
@@ -291,13 +293,13 @@ const ResultSection = (props) => {
               </Tab>
             </Tabs>
           </Col>
-          {/* ----------Gross Impact Pie Chart ----------  */}
+          {/* ----------Gross Impact Chart ----------  */}
 
           {metaIndics[indic].type == "intensité" && (
             <Col sm={3}>
               <div className="border rounded mt-5 px-5 pb-4">
                 <h3 className="text-center">Répartition des impacts bruts</h3>
-                <PieGraph
+                <GrossImpactChart 
                   id={"part-" + indic}
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
                     indic
@@ -695,7 +697,7 @@ const ResultSection = (props) => {
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
-          <Button variant="secondary" onClick={handlePDFGenerator}>
+          <Button variant="secondary" onClick={handleindicReportPDF}>
             Plaquette <i className="bi bi-download"></i>
           </Button>
           <Button

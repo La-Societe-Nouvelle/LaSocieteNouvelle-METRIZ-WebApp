@@ -6,9 +6,10 @@ import { printValue } from "/src/utils/Utils";
 // Libraries
 import metaIndics from "/lib/indics";
 
-//
+// Chart
+import SigPieChart from "../graphs/SigPieChart";
+
 import { Button, Col, Row, Table } from "react-bootstrap";
-import DoughnutChart from "../graphs/DoughnutChart";
 import { exportIndicXLSX } from "../../src/writers/ExportXLSX";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
@@ -359,7 +360,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           <Col>
             <h5 className="mb-4 text-center">▪ Production</h5>
             <div className="doughtnut-chart-container">
-              <DoughnutChart
+              <SigPieChart
                 value={printValue(
                   production.footprint.indicators[indic].value,
                   nbDecimals
@@ -372,7 +373,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           <Col>
             <h5 className="mb-4 text-center">▪ Consommations intermédiaires</h5>
             <div className="doughtnut-chart-container">
-              <DoughnutChart
+              <SigPieChart
                 value={printValue(
                   intermediateConsumption.footprint.indicators[indic].value,
                   nbDecimals
@@ -385,7 +386,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           <Col>
             <h5 className="mb-4 text-center">▪ Consommations de capital fixe</h5>
             <div className="doughtnut-chart-container">
-              <DoughnutChart
+              <SigPieChart
                 value={printValue(
                   capitalConsumption.footprint.indicators[indic].value,
                   nbDecimals
@@ -398,7 +399,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           <Col>
             <h5 className="mb-4 text-center">▪ Valeur ajoutée nette</h5>
             <div className="doughtnut-chart-container">
-              <DoughnutChart
+              <SigPieChart
                 value={printValue(
                   netValueAdded.footprint.indicators[indic].getValue(),
                   nbDecimals

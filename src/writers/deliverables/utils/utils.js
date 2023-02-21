@@ -1,4 +1,4 @@
-export function sortExpensesByFootprintIndicator(expenses, indicator, order) {
+export function sortExpensesByFootprint(expenses, indicator, order) {
   const sortedExpenses = expenses.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].value;
     const valueB = b.footprint.indicators[indicator].value;
@@ -55,7 +55,7 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
   let description;
 
   switch (typeIndic) {
-    case "contribution":
+    case "proportion":
       description =
         "Incertitude : " +
         uncertainty +

@@ -6,7 +6,7 @@ import ChartAnnotation from "chartjs-plugin-annotation";
 Chart.register(ChartDataLabels, ChartAnnotation);
 import { Doughnut } from "react-chartjs-2";
 
-function DoughnutChart({ value, title, id }) {
+function SigPieChart({ value, title, id }) {
   const chartData = [value, 100 - value];
 
   const filteredData = chartData.filter((d) => d !== 0);
@@ -76,4 +76,4 @@ function DoughnutChart({ value, title, id }) {
   return <Doughnut id={"dn-" + id} data={data} options={options} />;
 }
 
-export default DoughnutChart;
+export default SigPieChart;

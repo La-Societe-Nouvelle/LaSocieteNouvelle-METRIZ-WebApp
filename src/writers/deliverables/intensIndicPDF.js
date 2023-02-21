@@ -9,7 +9,7 @@ import {
   getPercentageForConsumptionRows,
   getUncertaintyDescription,
   loadFonts,
-  sortExpensesByFootprintIndicator,
+  sortExpensesByFootprint,
   targetAnnualReduction,
 } from "./utils/utils";
 
@@ -54,13 +54,13 @@ export const createIntensIndicatorPDF = (
     year
   );
 
-  const firstMostImpactfulCompanies = sortExpensesByFootprintIndicator(
+  const firstMostImpactfulCompanies = sortExpensesByFootprint(
     financialData.companies,
     indic,
     "desc"
   ).slice(0, 2);
 
-  const scdMostImpactfulCompanies = sortExpensesByFootprintIndicator(
+  const scdMostImpactfulCompanies = sortExpensesByFootprint(
     financialData.companies,
     indic,
     "desc"

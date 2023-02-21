@@ -1,20 +1,23 @@
+// PDF make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { getShortCurrentDateString, printValue } from "../../utils/Utils";
+// Libs
 import metaIndics from "/lib/indics";
-
+// Utils
+import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
   currentAnnualReduction,
   getIndicDescription,
   getKeySuppliers,
   getUncertaintyDescription,
   loadFonts,
-  sortExpensesByFootprintIndicator,
+  sortExpensesByFootprint,
   targetAnnualReduction,
 } from "./utils/utils";
 
 // --------------------------------------------------------------------------
-
+//  Intensity Indicator Report
+// --------------------------------------------------------------------------
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 //Call function to load fonts
@@ -33,20 +36,9 @@ export const createIndiceIndicatorPDF = (
   download
 ) => {
   // ---------------------------------------------------------------
-  const precision = metaIndics[indic].nbDecimals;
+  // utils
 
   const indicDescription = getIndicDescription(indic);
-
-  const {
-    production,
-    revenue,
-    netValueAdded,
-    intermediateConsumption,
-    capitalConsumption,
-  } = financialData.aggregates;
-
-  // UTILS
-
   const branchProductionTarget = targetAnnualReduction(
     comparativeData.production.targetDivisionFootprint.indicators[indic].data
   );
@@ -56,13 +48,13 @@ export const createIndiceIndicatorPDF = (
     year
   );
 
-  const firstMostImpactfulCompanies = sortExpensesByFootprintIndicator(
+  const firstMostImpactfulCompanies = sortExpensesByFootprint(
     financialData.companies,
     indic,
     "desc"
   ).slice(0, 2);
 
-  const scdMostImpactfulCompanies = sortExpensesByFootprintIndicator(
+  const scdMostImpactfulCompanies = sortExpensesByFootprint(
     financialData.companies,
     indic,
     "desc"
@@ -73,6 +65,21 @@ export const createIndiceIndicatorPDF = (
     production.footprint.indicators[indic].uncertainty
   );
 
+  // ---------------------------------------------------------------
+  // Variables
+  const precision = metaIndics[indic].nbDecimals;
+
+  const {
+    production,
+    revenue,
+    netValueAdded,
+    intermediateConsumption,
+    capitalConsumption,
+  } = financialData.aggregates;
+
+  const totalRevenue = revenue.amount;
+
+  // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
 
   const deviationChart = document.getElementById("deviationChart-" + indic);
@@ -80,10 +87,8 @@ export const createIndiceIndicatorPDF = (
 
   const trendChart = document.getElementById("trend-prd-" + indic);
   const trendImage = trendChart.toDataURL("image/png");
+
   // ---------------------------------------------------------------
-
-  const totalRevenue = revenue.amount;
-
   // Document Property
 
   const margins = {
@@ -109,7 +114,6 @@ export const createIndiceIndicatorPDF = (
   // PDF Content and Layout
   const docDefinition = {
     pageSize: pageSize,
-    // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
@@ -154,7 +158,7 @@ export const createIndiceIndicatorPDF = (
             color: "#FFFFFF",
             r: 10,
           },
-          // Boxes
+          // Key Figures
           {
             type: "rect",
             x: 70,
@@ -175,7 +179,7 @@ export const createIndiceIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Box SIG
+          // SIG
           {
             type: "rect",
             x: 30,
@@ -186,7 +190,7 @@ export const createIndiceIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Box Fournisseurs clés
+          // Key Suppliers
           {
             type: "rect",
             x: 30,
@@ -197,7 +201,7 @@ export const createIndiceIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Chiffre + graphique
+          // Key Figure + Chart
           {
             type: "rect",
             x: 30,
@@ -230,6 +234,8 @@ export const createIndiceIndicatorPDF = (
     },
     content: [
       { text: "Rapport - " + title, style: "header" },
+
+      //--------------------------------------------------
       {
         columns: [
           {
@@ -257,7 +263,9 @@ export const createIndiceIndicatorPDF = (
                   printValue(
                     netValueAdded.footprint.indicators[indic].value,
                     precision
-                  ) + " " + unit,
+                  ) +
+                  " " +
+                  unit,
                 alignment: "center",
                 style: "numbers",
               },
@@ -270,12 +278,14 @@ export const createIndiceIndicatorPDF = (
           },
         ],
       },
+      //--------------------------------------------------
       {
         margin: [40, 0, 40, 0],
         text: indicDescription,
         alignment: "center",
       },
-      // Box Vue de vos Soldes Intermédiaires de Gestion
+      //--------------------------------------------------
+      // Box "Soldes Intermédiaires de Gestion"
       {
         text: "\tVue de vos Soldes Intermédiaires de Gestion\t",
         style: "h2",
@@ -393,7 +403,8 @@ export const createIndiceIndicatorPDF = (
           },
         ],
       },
-      // KEY SUPPLIERS
+      //--------------------------------------------------
+      // Key Suppliers
       {
         text: "Les fournisseurs clés",
         style: "h2",
@@ -433,7 +444,8 @@ export const createIndiceIndicatorPDF = (
           },
         ],
       },
-      // TABLE SIG
+      //--------------------------------------------------
+      // SIG Table
       {
         margin: [0, 20, 0, 10],
         columns: [
@@ -442,7 +454,7 @@ export const createIndiceIndicatorPDF = (
             style: "table",
             table: {
               body: [
-                // HEADER
+                // header
                 [
                   {
                     text: "",
@@ -464,7 +476,7 @@ export const createIndiceIndicatorPDF = (
                     alignment: "center",
                   },
                 ],
-                // ROWS
+                // rows
                 [
                   {},
                   {},
@@ -641,6 +653,9 @@ export const createIndiceIndicatorPDF = (
               },
             },
           },
+          //--------------------------------------------------
+          //Deviation chart
+
           {
             width: "auto",
             stack: [
@@ -659,9 +674,11 @@ export const createIndiceIndicatorPDF = (
           },
         ],
       },
+      //--------------------------------------------------
       {
         columnGap: 40,
         columns: [
+          //Left Box
           {
             width: "33%",
             margin: [0, 7, 0, 0],
@@ -695,9 +712,9 @@ export const createIndiceIndicatorPDF = (
                 fontSize: "8",
                 margin: [0, 2, 0, 0],
               },
-         
             ],
           },
+          //Right Box
           {
             width: "auto",
             stack: [
@@ -713,10 +730,9 @@ export const createIndiceIndicatorPDF = (
               },
             ],
           },
- 
         ],
-        
       },
+      //--------------------------------------------------
       {
         text: "* " + uncertaintyText,
         fontSize: 6,
@@ -726,6 +742,8 @@ export const createIndiceIndicatorPDF = (
       },
       ,
     ],
+    //--------------------------------------------------
+    // Style
     defaultStyle: {
       fontSize: 10,
       color: "#191558",
@@ -747,30 +765,9 @@ export const createIndiceIndicatorPDF = (
         margin: [0, 20, 0, 10],
         background: "#FFFFFF",
       },
-      h3: {
-        fontSize: 12,
-        color: "#fa595f",
-        bold: true,
-        margin: [0, 0, 0, 10],
-      },
-      h4: {
-        fontSize: 10,
-        margin: [0, 10, 0, 10],
-        bold: true,
-      },
       numbers: {
         fontSize: 18,
         bold: true,
-      },
-      branchNumber: {
-        fontSize: 16,
-        bold: true,
-        color: "#ffb642",
-        margin: [0, 5, 0, 5],
-      },
-      text: {
-        alignment: "justify",
-        lineHeight: 1.5,
       },
       table: {
         fontSize: 7,

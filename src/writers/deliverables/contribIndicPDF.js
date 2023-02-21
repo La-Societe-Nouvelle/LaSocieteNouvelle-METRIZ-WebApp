@@ -1,14 +1,18 @@
+// PDF make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+// Utils
 import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
   cutString,
   getIndicDescription,
   getUncertaintyDescription,
   loadFonts,
-  sortExpensesByFootprintIndicator,
+  sortExpensesByFootprint,
 } from "./utils/utils";
 
+// --------------------------------------------------------------------------
+//  Contribution Indicator Report
 // --------------------------------------------------------------------------
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
@@ -26,16 +30,18 @@ export const createContribIndicatorPDF = (
   download
 ) => {
   // ---------------------------------------------------------------
+  // utils
 
   const indicDescription = getIndicDescription(indic);
 
   const { production, revenue, externalExpenses } = financialData.aggregates;
-  const mostImpactfulExpenses = sortExpensesByFootprintIndicator(
+
+  const mostImpactfulExpenses = sortExpensesByFootprint(
     financialData.expenses,
     indic,
     "desc"
   ).slice(0, 3);
-  const leastImpactfulExpenses = sortExpensesByFootprintIndicator(
+  const leastImpactfulExpenses = sortExpensesByFootprint(
     financialData.expenses,
     indic,
     "asc"
@@ -46,7 +52,9 @@ export const createContribIndicatorPDF = (
     production.footprint.indicators[indic].uncertainty
   );
 
-  // Get chart canvas and encode it to import in document
+  // ---------------------------------------------------------------
+  // Get charts canvas and encode it to import in document
+
   const canvasProduction = document.getElementById("production-" + indic);
   const productionChartImage = canvasProduction.toDataURL("image/png");
 
@@ -60,12 +68,14 @@ export const createContribIndicatorPDF = (
   const doughtnutNVAImage = doughtnutNVA.toDataURL("image/png");
 
   // ---------------------------------------------------------------
+  // key numbers
 
   const totalRevenue = revenue.amount;
   const contributionPercentage = revenue.footprint.indicators[indic].value;
   const contributionAmount = (contributionPercentage / 100) * totalRevenue;
   const contributionPerEuro = contributionAmount / totalRevenue;
 
+  // ---------------------------------------------------------------
   // Document Property
 
   const margins = {
@@ -80,18 +90,18 @@ export const createContribIndicatorPDF = (
   };
 
   const documentTitle =
-    "Fiche_" +
+    "Plaquette_" +
     indic.toUpperCase() +
     "_" +
-    year +
+    legalUnit.replaceAll(" ", "") +
     "-" +
-    legalUnit.replaceAll(" ", "");
+    year;
 
   // ---------------------------------------------------------------
   // PDF Content and Layout
+
   const docDefinition = {
     pageSize: pageSize,
-    // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
@@ -100,7 +110,7 @@ export const createContribIndicatorPDF = (
           text: "Exercice  " + year,
           alignment: "right",
           margin: [0, 15, 20, 0],
-          bold : true,
+          bold: true,
         },
       ],
     },
@@ -136,7 +146,7 @@ export const createContribIndicatorPDF = (
             color: "#FFFFFF",
             r: 10,
           },
-          // Boxes
+          // Key Figures
           {
             type: "rect",
             x: 70,
@@ -157,7 +167,7 @@ export const createContribIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Box SIG
+          // SIG
           {
             type: "rect",
             x: 30,
@@ -168,7 +178,7 @@ export const createContribIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          //Comparaison avec la branche d'activité
+          //Sector Comparaison Chart
           {
             type: "rect",
             x: 30,
@@ -179,7 +189,7 @@ export const createContribIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Performance
+          // Expenses Performances
           {
             type: "rect",
             x: 30,
@@ -190,7 +200,7 @@ export const createContribIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Les comptes de charges les plus impactants
+          // Most impacting expense accounts
           {
             type: "rect",
             x: 260,
@@ -201,7 +211,7 @@ export const createContribIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Type d'activité des fournisseurs
+          // Suppliers activity
           {
             type: "rect",
             x: 260,
@@ -224,6 +234,7 @@ export const createContribIndicatorPDF = (
     },
     content: [
       { text: "Rapport - " + title, style: "header" },
+      //--------------------------------------------------
       {
         columns: [
           {
@@ -264,12 +275,14 @@ export const createContribIndicatorPDF = (
           },
         ],
       },
+      //--------------------------------------------------
       {
         margin: [40, 0, 40, 0],
         text: indicDescription,
         alignment: "center",
       },
-      // Box Vue de vos Soldes Intermédiaires de Gestion
+      //--------------------------------------------------
+      // Box "Soldes Intermédiaires de Gestion"
       {
         text: "\tVue de vos Soldes Intermédiaires de Gestion\t",
         style: "h2",
@@ -363,9 +376,11 @@ export const createContribIndicatorPDF = (
           },
         ],
       },
+      //--------------------------------------------------
       {
         columnGap: 40,
         columns: [
+          // Left Box
           {
             width: "40%",
             stack: [
@@ -404,7 +419,7 @@ export const createContribIndicatorPDF = (
                 text: "Taux de contribution de vos achats",
                 alignment: "center",
                 bold: true,
-                margin : [0,0,0,10]
+                margin: [0, 0, 0, 10],
               },
               {
                 text:
@@ -423,6 +438,7 @@ export const createContribIndicatorPDF = (
               },
             ],
           },
+          // Right Box
           {
             width: "*",
             stack: [
@@ -471,6 +487,7 @@ export const createContribIndicatorPDF = (
           },
         ],
       },
+      //--------------------------------------------------
       {
         text: "* " + uncertaintyText,
         fontSize: 6,
@@ -480,6 +497,9 @@ export const createContribIndicatorPDF = (
       },
       ,
     ],
+    //--------------------------------------------------
+    //Style
+
     defaultStyle: {
       fontSize: 10,
       color: "#191558",
@@ -507,11 +527,6 @@ export const createContribIndicatorPDF = (
         bold: true,
         margin: [0, 0, 0, 10],
       },
-      h4: {
-        fontSize: 10,
-        margin: [0, 10, 0, 10],
-        bold: true,
-      },
       numbers: {
         fontSize: 18,
         bold: true,
@@ -526,10 +541,6 @@ export const createContribIndicatorPDF = (
         bold: true,
         color: "#ffb642",
         margin: [0, 5, 0, 5],
-      },
-      text: {
-        alignment: "justify",
-        lineHeight: 1.5,
       },
     },
   };

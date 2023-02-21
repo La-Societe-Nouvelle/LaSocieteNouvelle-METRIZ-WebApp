@@ -40,10 +40,11 @@ import { ImportDSN } from "../../../assessments/ImportDSN";
 import ChangeDivision from "../../../popups/ChangeDivision";
 
 // Charts
+
 import ComparativeGraphs from "../../../graphs/ComparativeGraphs";
 import DeviationChart from "../../../graphs/HorizontalBarChart";
-import DoughnutChart from "../../../graphs/DoughnutChart";
-import PieGraph from "../../../graphs/PieGraph";
+import SigPieChart from "../../../graphs/SigPieChart"; 
+import GrossImpactChart  from "../../../graphs/GrossImpactChart";
 
 // Services
 import getSerieData from "/src/services/responses/SerieData";
@@ -54,7 +55,7 @@ import { getTargetSerieId } from "/src/utils/Utils";
 import { printValue } from "../../../../src/utils/Utils";
 
 // PDF Generation
-import { createIndicReport } from "../../../../src/writers/deliverables/PDFGenerator";
+import { createIndicReport } from "../../../../src/writers/deliverables/indicReportPDF";
 import { createContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
 import TrendsGraph from "../../../graphs/TrendsGraph";
@@ -389,7 +390,7 @@ const IndicatorsList = (props) => {
               <Row>
                 <Col>
                   <div className="doughtnut-chart-container">
-                    <DoughnutChart
+                    <SigPieChart
                       value={printValue(
                         props.session.financialData.aggregates.production
                           .footprint.indicators[indic].value,
@@ -402,7 +403,7 @@ const IndicatorsList = (props) => {
                 </Col>
                 <Col>
                   <div className="doughtnut-chart-container">
-                    <DoughnutChart
+                    <SigPieChart
                       value={printValue(
                         props.session.financialData.aggregates
                           .intermediateConsumption.footprint.indicators[indic]
@@ -416,7 +417,7 @@ const IndicatorsList = (props) => {
                 </Col>
                 <Col>
                   <div className="doughtnut-chart-container">
-                    <DoughnutChart
+                    <SigPieChart
                       value={printValue(
                         props.session.financialData.aggregates
                           .capitalConsumption.footprint.indicators[indic].value,
@@ -429,7 +430,7 @@ const IndicatorsList = (props) => {
                 </Col>
                 <Col>
                   <div className="doughtnut-chart-container">
-                    <DoughnutChart
+                    <SigPieChart
                       value={printValue(
                         props.session.financialData.aggregates.netValueAdded.footprint.indicators[
                           indic
@@ -446,7 +447,7 @@ const IndicatorsList = (props) => {
             {(metaIndics[indic].type == "intensité" || metaIndics[indic].type == "indice") && (
                 <Row>
                   <Col sm={2}>
-                    <PieGraph
+                    <GrossImpactChart 
                       id={"part-" + indic}
                       intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
                         indic

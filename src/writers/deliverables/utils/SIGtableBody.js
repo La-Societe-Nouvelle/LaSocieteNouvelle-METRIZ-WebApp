@@ -1,7 +1,7 @@
 import { printValue } from "../../../utils/Utils";
 import metaIndics from "/lib/indics";
 
-export const generateIndicTableBody = (
+export const SIGtableBody = (
   aggregates,
   indic,
   unit,

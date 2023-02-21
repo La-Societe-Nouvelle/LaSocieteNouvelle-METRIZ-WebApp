@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import jsZip from "jszip";
 import { Button, Modal, ProgressBar } from "react-bootstrap";
-import { createIndicReport } from "./PDFGenerator";
+import { createIndicReport } from "./indicReportPDF";
 // Meta
 import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
