@@ -83,7 +83,7 @@ const ComparativeGraphs = (props) => {
       id={id}
       data={chartData}
       options={{
-        devicePixelRatio: 2,
+        devicePixelRatio: 3,
         scales: {
           y: {
             display: true,
@@ -140,7 +140,7 @@ const ComparativeGraphs = (props) => {
             text: unit,
             color: "#191558",
             font : {
-              size: 10,
+              size: 11,
             }
           },
           tooltip: {

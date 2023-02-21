@@ -21,8 +21,10 @@ import { ErrorApi } from "../../ErrorAPI";
 
 // Graphs
 import ComparativeGraphs from "../../graphs/ComparativeGraphs";
-import PieGraph from "../../graphs/PieGraph";
+import GrossImpactChart  from "../../graphs/GrossImpactChart";
 import TrendsGraph from "../../graphs/TrendsGraph";
+import DeviationChart from "../../graphs/HorizontalBarChart";
+
 
 // Tables
 import { ComparativeTable } from "../../tables/ComparativeTable";
@@ -32,23 +34,18 @@ import { IndicatorMainAggregatesTable } from "../../tables/IndicatorMainAggregat
 // Fetch API data
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
-import { basicPDFReport } from "../../../src/writers/deliverables/PDFGenerator";
+
 import { getAnalyse } from "../../../src/utils/Writers";
+
+import { createIndicReport } from "../../../src/writers/deliverables/indicReportPDF";
+import { createContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
+import { createIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
+import { createIndiceIndicatorPDF } from "../../../src/writers/deliverables/indiceIndicPDF";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
   const [error] = useState(false);
-
-  const [printGrossImpact] = useState([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat",
-  ]);
 
   const [divisionsOptions, setDivisionsOptions] = useState([]);
 
@@ -159,6 +156,54 @@ const ResultSection = (props) => {
     setTrendGraphView(option);
   };
 
+  const handleindicReportPDF = () => {
+    const type = metaIndics[indic].type;
+
+    switch (type) {
+      case "proportion":
+        createContribIndicatorPDF(
+          metaIndics[indic].libelle,
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          session.financialData,
+          session.comparativeData,
+          true
+        );
+        break;
+      case "intensité":
+        createIntensIndicatorPDF(
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].libelle,
+          metaIndics[indic].unit,
+          session.financialData,
+          session.comparativeData,
+          comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
+            .label,
+          true
+        );
+        break;
+        case "indice":
+          createIndiceIndicatorPDF(
+            metaIndics[indic].libelle,
+            metaIndics[indic].libelleGrandeur,
+            session.year,
+            session.legalUnit.corporateName,
+            indic,
+            metaIndics[indic].unit,
+            session.financialData,
+            session.comparativeData,
+            comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
+            .label,
+            true
+          );
+          break;
+      default:
+        break;
+    }
+  };
   return (
     <>
       {/* Head Section */}
@@ -193,11 +238,13 @@ const ResultSection = (props) => {
               {metaIndics[indic].libelle}
             </Button>
           )}
-
+          <Button variant="secondary" onClick={handleindicReportPDF}>
+            Plaquette <i className="bi bi-download"></i>
+          </Button>
           <Button
             variant="secondary"
             onClick={() =>
-              basicPDFReport(
+              createIndicReport(
                 session.year,
                 session.legalUnit.corporateName,
                 indic,
@@ -211,7 +258,7 @@ const ResultSection = (props) => {
               )
             }
           >
-            Télécharger le rapport <i className="bi bi-download"></i>
+            Rapport <i className="bi bi-download"></i>
           </Button>
         </div>
       </div>
@@ -225,7 +272,7 @@ const ResultSection = (props) => {
           <h3>{metaIndics[indic].libelle}</h3>
         </div>
         <Row>
-          <Col lg={printGrossImpact.includes(indic) ? "9" : "12"}>
+          <Col>
             <Tabs
               defaultActiveKey="mainAggregates"
               transition={false}
@@ -245,28 +292,15 @@ const ResultSection = (props) => {
                 <IndicatorExpensesTable session={session} indic={indic} />
               </Tab>
             </Tabs>
-            <div className="text-end">
-              <Button
-                variant="tertiary"
-                size="sm"
-                className="me-0"
-                onClick={() =>
-                  exportIndicXLSX(indic, session, comparativeDivision)
-                }
-              >
-                Télécharger les données <i className="bi bi-download"></i>
-              </Button>
-            </div>
           </Col>
-          {/* ----------Gross Impact Pie Chart ----------  */}
+          {/* ----------Gross Impact Chart ----------  */}
 
-          {printGrossImpact.includes(indic) && (
+          {metaIndics[indic].type == "intensité" && (
             <Col sm={3}>
-              <div className="border rounded mt-5">
-                <h3 className="text-center">
-                  Répartition des impacts bruts (en %)
-                </h3>
-                <PieGraph
+              <div className="border rounded mt-5 px-5 pb-4">
+                <h3 className="text-center">Répartition des impacts bruts</h3>
+                <GrossImpactChart 
+                  id={"part-" + indic}
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
                     indic
                   ].getGrossImpact(intermediateConsumption.amount)}
@@ -354,7 +388,7 @@ const ResultSection = (props) => {
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
-                <h5 className="mb-4">▪ Consommation de capital fixe</h5>
+                <h5 className="mb-4">▪ Consommations de capital fixe</h5>
                 <ComparativeGraphs
                   id={"capitalConsumption-" + indic}
                   graphDataset={[
@@ -409,12 +443,53 @@ const ResultSection = (props) => {
             </Row>
           </div>
         </div>
+                  <hr></hr>
+        <Row>
+          <Col lg={8}>
+            <ComparativeTable
+              financialData={session.financialData}
+              indic={indic}
+              comparativeData={comparativeData}
+            />
+          </Col>
+          <Col lg={4}>
+            <h5 className="mb-4">
+              ▪ Ecart par rapport à la moyenne de la branche
+            </h5>
 
-        <ComparativeTable
-          financialData={session.financialData}
-          indic={indic}
-          comparativeData={comparativeData}
-        />
+            <DeviationChart
+              id={"deviationChart-" + indic}
+              legalUnitData={[
+                session.financialData.aggregates.production.footprint.getIndicator(
+                  indic
+                ).value,
+                session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                  indic
+                ).value,
+                session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                  indic
+                ).value,
+                session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                  indic
+                ).value,
+              ]}
+              branchData={[
+                comparativeData.production.divisionFootprint.indicators[indic]
+                  .value,
+                comparativeData.intermediateConsumption.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.fixedCapitalConsumption.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.netValueAdded.divisionFootprint.indicators[
+                  indic
+                ].value,
+              ]}
+              indic={indic}
+              unit={metaIndics[indic].unit}
+              precision={metaIndics[indic].nbDecimal}
+            />
+          </Col>
+        </Row>
       </section>
       {/* ---------- Trend Line Chart ----------  */}
       {comparativeDivision != "00" && (
@@ -440,11 +515,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  title={
+                <p className="text-primary fw-bold text-center">
+                  {
                     comparativeData.production.trendsFootprint.indicators[indic]
                       .meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-prd-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -468,11 +546,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  title={
-                    comparativeData.production.trendsFootprint.indicators[indic]
-                      .meta.label
+                <p className="text-primary fw-bold text-center">
+                  {
+                    comparativeData.intermediateConsumption.trendsFootprint
+                      .indicators[indic].meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-ci-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -497,11 +578,14 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  title={
-                    comparativeData.production.trendsFootprint.indicators[indic]
-                      .meta.label
+                <p className="text-primary fw-bold text-center">
+                  {
+                    comparativeData.fixedCapitalConsumption.trendsFootprint
+                      .indicators[indic].meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-cfc-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -526,11 +610,15 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <TrendsGraph
-                  title={
-                    comparativeData.production.trendsFootprint.indicators[indic]
-                      .meta.label
+                <p className="text-primary fw-bold text-center">
+                  {
+                    comparativeData.netValueAdded.trendsFootprint.indicators[
+                      indic
+                    ].meta.label
                   }
+                </p>
+                <TrendsGraph
+                  id={"trend-nva-" + indic}
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
@@ -609,10 +697,13 @@ const ResultSection = (props) => {
           <Button variant="light" onClick={props.goBack}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
+          <Button variant="secondary" onClick={handleindicReportPDF}>
+            Plaquette <i className="bi bi-download"></i>
+          </Button>
           <Button
             variant="secondary"
             onClick={() =>
-              basicPDFReport(
+              createIndicReport(
                 session.year,
                 session.legalUnit.corporateName,
                 indic,
@@ -625,7 +716,7 @@ const ResultSection = (props) => {
               )
             }
           >
-            Télécharger le rapport <i className="bi bi-download"></i>
+            Rapport <i className="bi bi-download"></i>
           </Button>
         </div>
       </section>

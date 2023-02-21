@@ -107,6 +107,7 @@ function TrendsGraph(props) {
     let minYear = trendsData[0].x.getFullYear();
 
     const options = {
+      devicePixelRatio: 3,
       pointRadius: 0,
       maintainAspectRatio: true,
       scales: {
@@ -114,17 +115,7 @@ function TrendsGraph(props) {
           display: true,
           min: 0, 
           suggestedMax: suggestedMax,
-          title: {
-            display: true,
-            text: props.unit,
-            color: "#191558",
-            font: {
-              size: 12,
-              weight: "bold",
-              family : 'Roboto'
-
-            },
-          },
+  
           ticks: {
             color: "#191558",
             font: {
@@ -207,18 +198,17 @@ function TrendsGraph(props) {
         },
         title: {
           display: true,
-          text: props.title, 
-          color: "#251f81",
-          font: {
-            size: 15,
-            weight : 'bold',
-            family : 'Raleway' 
-          },
           padding: {
-                    top: 10,
-                    bottom: 30
-                }
-      },
+            top: 10,
+            bottom: 20
+        },
+          align : "start",
+          text: props.unit,
+          color: "#191558",
+          font : {
+            size: 12,
+          }
+        },
         tooltip: {
           backgroundColor: 'rgba(25,21,88,0.9)',
           padding: 15,
@@ -245,7 +235,7 @@ function TrendsGraph(props) {
     setIsLoading(false);
   }, [props]);
 
-  return !isLoading && <Line data={data} options={options} />;
+  return !isLoading && <Line data={data} id={props.id} options={options} />;
 }
 
 export default TrendsGraph;

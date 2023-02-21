@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import jsZip from "jszip";
 import { Button, Modal, ProgressBar } from "react-bootstrap";
-import { basicPDFReport } from "./PDFGenerator";
+import { createIndicReport } from "./indicReportPDF";
 // Meta
 import metaIndics from "/lib/indics";
 import jsPDF from "jspdf";
 import { generateFootprintPDF } from "../Export";
+import { PDFDocument } from "pdf-lib";
+import { createIntensIndicatorPDF } from "./intensIndicPDF";
+import { createContribIndicatorPDF } from "./contribIndicPDF";
+import { createCoverPage } from "./coverPage";
+import { createIndiceIndicatorPDF } from "./indiceIndicPDF";
 
 const ZipGenerator = ({
   year,
@@ -37,12 +42,28 @@ const ZipGenerator = ({
     setIsGenerating(true);
   }
 
-  function generatePDFs() {
+  async function generatePDFs() {
+    const documentTitle =
+      "Empreinte-Societale_" +
+      session.legalUnit.corporateName.replaceAll(" ", "") +
+      "_" +
+      session.year;
+
     // Initialiser l'objet jsZip
     // Générer les PDFs et les ajouter au zip
-    Promise.all(
-      validations.map((indic) =>
-        basicPDFReport(
+
+    const coverPage = createCoverPage(
+      session.year,
+      session.legalUnit.corporateName
+    );
+    const basicPDFpromises = [];
+    const reportPDFpromises = [];
+
+    validations.map((indic) => {
+      let type = metaIndics[indic].type;
+
+      basicPDFpromises.push(
+        createIndicReport(
           year,
           legalUnit,
           indic,
@@ -53,23 +74,87 @@ const ZipGenerator = ({
           comparativeData,
           false
         )
-      )
-    )
-      .then((pdfs) => {
-        pdfs.forEach((pdf, index) => {
-          let title =
-            "Rapport_" +
-            year +
-            "_" +
-            legalUnit.replaceAll(" ", "") +
-            "-" +
-            validations[index].toUpperCase();
+      );
 
-          zip.file(`${title}.pdf`, pdf, {
-            binary: true,
-          });
+      switch (type) {
+        case "proportion":
+          reportPDFpromises.push(
+            createContribIndicatorPDF(
+              metaIndics[indic].libelle,
+              year,
+              legalUnit,
+              indic,
+              financialData,
+              comparativeData,
+              false
+            )
+          );
+          break;
+        case "intensité":
+          reportPDFpromises.push(
+            createIntensIndicatorPDF(
+              year,
+              legalUnit,
+              indic,
+              metaIndics[indic].libelle,
+              metaIndics[indic].unit,
+              financialData,
+              comparativeData,
+              comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+                .meta.label,
+              false
+            )
+          );
+          break;
+        case "indice":
+          reportPDFpromises.push(
+            createIndiceIndicatorPDF(
+              metaIndics[indic].libelle,
+              metaIndics[indic].libelleGrandeur,
+              year,
+              legalUnit,
+              indic,
+              metaIndics[indic].unit,
+              financialData,
+              comparativeData,
+              comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+                .meta.label,
+              false
+            )
+          );
+        default:
+          break;
+      }
+    });
+
+    const mergedPromises = [
+      coverPage,
+      ...reportPDFpromises,
+      ...basicPDFpromises,
+    ];
+    setGeneratedPDFs((prevPDFs) => [...prevPDFs, mergedPromises]);
+
+    Promise.all(mergedPromises)
+      .then(async (pdfs) => {
+        // Create a new empty PDF document to merge PDFs together
+        let mergedPdfDoc = await PDFDocument.create();
+
+        // Add each PDF to the final PDF document
+        for (const pdf of pdfs) {
+          const pdfBytes = await pdf.arrayBuffer();
+
+          const pdfDoc = await PDFDocument.load(pdfBytes);
+          const copiedPages = await mergedPdfDoc.copyPages(
+            pdfDoc,
+            pdfDoc.getPageIndices()
+          );
+          copiedPages.forEach((page) => mergedPdfDoc.addPage(page));
+
           setGeneratedPDFs((prevPDFs) => [...prevPDFs, pdf]);
-        });
+        }
+        const mergedPdfBytes = await mergedPdfDoc.save();
+
+        zip.file(documentTitle + ".pdf", mergedPdfBytes, { binary: true });
 
         const envIndic = ["ghg", "nrg", "wat", "mat", "was", "haz"];
         const seIndic = ["eco", "art", "soc", "idr", "geq", "knw"];
@@ -77,11 +162,9 @@ const ZipGenerator = ({
         const seOdds = ["5", "8", "9", "10", "12"];
         const envOdds = ["6", "7", "12", "13", "14", "15"];
 
-        //   // RAPPORT - EMPREINTE SOCIETALE
+        // Create Social FootPrint Report PDF
 
         const docEES = new jsPDF("landscape", "mm", "a4", true);
-
-        // RAPPORT - EMPREINTE ENVIRONNEMENTALE
 
         generateFootprintPDF(
           docEES,
@@ -95,8 +178,6 @@ const ZipGenerator = ({
 
         docEES.addPage();
 
-        // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
-
         generateFootprintPDF(
           docEES,
           seIndic,
@@ -107,8 +188,9 @@ const ZipGenerator = ({
           seOdds
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
+
         zip.file(
-          "rapport_empreinte_societale_" +
+          "Rapport_Empreinte-Societale_SIG_" +
             legalUnit.replaceAll(" ", "") +
             ".pdf",
           docEES.output("blob")
@@ -117,7 +199,7 @@ const ZipGenerator = ({
         // add .json file save
         const sessionFile = "session-metriz-" + legalUnit.replaceAll(" ", "-");
         const json = JSON.stringify(session);
-        // build download link & activate
+
         const blob = new Blob([json], { type: "application/json" });
 
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, sessionFile]);
@@ -132,7 +214,7 @@ const ZipGenerator = ({
             // Télécharger le zip
             saveAs(
               content,
-              "Rapports_Empreinte_sociétale_" + legalUnit + "_" + year + ".zip"
+              "Empreinte-Societale_" + legalUnit + "_" + year + ".zip"
             );
           })
           .finally(() => {
@@ -155,22 +237,22 @@ const ZipGenerator = ({
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
         <Modal.Body>
-          {generatedPDFs.length == 0  ? (
+          {console.log(generatedPDFs)}
+          {generatedPDFs.length == 0 ? (
             <>
               <div className="loader-container my-4">
                 <div className="dot-pulse m-auto"></div>
               </div>
             </>
-          ) :
-          <ProgressBar
-            animated
-            variant="secondary"
-            min={0}
-            max={100}
-            now={Math.round(generatedPDFs.length / totalFiles) * 100}
-          />  
-        }
-          
+          ) : (
+            <ProgressBar
+              animated
+              variant="secondary"
+              min={0}
+              max={100}
+              now={Math.round(generatedPDFs.length / totalFiles) * 100}
+            />
+          )}
         </Modal.Body>
       </Modal>
     </>

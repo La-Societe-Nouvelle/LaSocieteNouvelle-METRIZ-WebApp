@@ -3,9 +3,9 @@ import React from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
-import { Pie } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2"; 
 
-function PieGraph(props) {
+function GrossImpactChart (props) {
   let intermediateConsumption = parseFloat(props.intermediateConsumption);
   let capitalConsumption = parseFloat(props.capitalConsumption);
   let netValueAdded = parseFloat(props.netValueAdded);
@@ -29,47 +29,49 @@ function PieGraph(props) {
           capitalConsumption.toFixed(0),
           netValueAdded.toFixed(0),
         ],
-        datalabels: {
-          color: "#FFF",
-       
-        },
         backgroundColor: [
+          "rgb(25, 21, 88)",
+          "rgba(25, 21, 88, 0.5)",
           "RGB(251, 122, 127)",
-          "RGB(219, 222, 241)",
-          "RGB(82, 98, 188)",
         ],
+        borderWidth: 1,
       },
     ],
   };
 
   const options = {
-    devicePixelRatio: 2,
-
+    devicePixelRatio: 3,
     plugins: {
-
       legend: {
-        position: "bottom",
-        align : "start",
-        fullSize	: false,
-        labels: {
-          font: {
-            size: 13,
-          },
+        display: false,
+      },
+      datalabels: {
+        color: "#FFF",
+        font: {
+          size: 18,
+          family: "Raleway",
+          weight: "bold",
+        },
+        formatter: (value) => {
+          return value + "%";
         },
       },
       tooltip: {
-        backgroundColor: '#191558',
-        padding : 10,
-        cornerRadius: 2
-      }
-      
+        backgroundColor: "rgba(25,21,88,0.9)",
+        padding: 15,
+        cornerRadius: 3,
+        usePointStyle: true,
+        callbacks: {
+          label: function (context) {
+            let label = context.label;
+            return label;
+          },
+        },
+      },
     },
-    
   };
 
-  return (
-    <Pie id={props.id ? props.id : "PieChart"} data={data} options={options} />
-  );
+  return <Doughnut id={props.id} data={data} options={options} />;
 }
 
-export default PieGraph;
+export default GrossImpactChart ;

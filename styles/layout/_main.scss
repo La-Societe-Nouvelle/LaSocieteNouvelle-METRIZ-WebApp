@@ -46,3 +46,10 @@
 .charts-container {
   position: relative;
 }
+
+.doughtnut-chart-container {
+  position: relative;
+  canvas {
+    margin: 0 auto;
+  }
+}
