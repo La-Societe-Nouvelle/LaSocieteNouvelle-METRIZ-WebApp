@@ -11,10 +11,15 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
     "Valeur ajoutée nette",
   ];
 
-  const data = legalUnitData.map(
-    (value, key) =>
-      value.toFixed(precision) - branchData[key].toFixed(precision)
-  );
+
+  const data = legalUnitData.map((value, key) => {
+    if (value) {
+      return value.toFixed(precision) - branchData[key].toFixed(precision);
+    } else {
+      return null;
+    }
+  });
+  console.log(data);
 
   const maxValue = Math.max(
     Math.abs(Math.min(...data)),
@@ -33,8 +38,9 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
         ),
         borderWidth: 0,
         type: "bar",
-        barPercentage: 0.9, 
-        categoryPercentage: 0.4, 
+        barPercentage: 0.9,
+        categoryPercentage: 0.4,
+        skipNull: true,
       },
     ],
   };
@@ -52,12 +58,12 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             },
 
             grid: {
-              display:false,
+              display: false,
             },
           },
           x: {
-            min: minValue, 
-            max: maxValue, 
+            min: minValue,
+            max: maxValue,
             grid: {
               color: "#ececff",
             },
@@ -92,7 +98,6 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
               size: 10,
               family: "Raleway",
             },
-      
           },
         },
       }}
