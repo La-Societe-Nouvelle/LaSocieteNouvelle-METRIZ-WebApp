@@ -536,29 +536,42 @@ export class FinancialData {
 
 /* -------------------------------------------------- PERIODS -------------------------------------------------- */
 
+/**
+ *  For each immobilisation - amortisation - amortisation expenses :
+ *      
+ */
+
 const buildPeriods = async (immobilisations,amortisations,amortisationExpenses) =>
 {
-    amortisations.forEach(amortisation =>
+    immobilisations
+        .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+        .forEach(async immobilisation =>
     {
-        let immobilisation = immobilisations.filter(immobilisation => immobilisation.account == amortisation.accountAux)[0];
+        let amortisation = amortisations.filter(amortisation => amortisation.accountAux == immobilisation.account)[0];
         let expenses = amortisationExpenses.filter(expense => expense.accountAux == amortisation.account);
 
-        let dateStartYear = immobilisation.entries[0].date; // A-NOUVEAUX ou initialisation compte immo
-        let dateEndYear = expenses.length > 0 
-            ? expenses.map(expense => expense.entries).reduce((a,b) => a.concat(b),[]).sort((a,b) => parseInt(a.date) < parseInt(b.date))[0].date 
-            : immobilisation.entries[immobilisation.entries.length-1].date; // to confirm (last date amortisation ?)
-
-        initImmobilisationsPeriods(immobilisation,dateStartYear,dateEndYear);
-        initAmortisationsExpensesPeriods(expenses,dateStartYear,dateEndYear);
-        initAmortisationsPeriods(amortisation,expenses,dateStartYear,dateEndYear);
-
-        let dates = amortisation.periods
-            .concat(immobilisation.periods)
-            .concat(expenses.map(expense => expense.periods).reduce((a,b) => a.concat(b),[]))
-            .map(period => [period.dateStart,period.dateEnd])   // get date start & date end
-            .reduce((a,b) => a.concat(b),[])
-            .filter((value, index, self) => index === self.findIndex(item => item === value) && value!="")   // remove duplicates and empty string
+        let dates = immobilisation.entries
+            .concat(amortisation.entries)
+            .concat(expenses.map(expense => expense.entries).reduce((a,b) => a.concat(b),[]))
+            .reduce((a,b) => a.concat(b),[]) // array with all entries
+            .map(entry => entry.date)
+            .filter((value, index, self) => index === self.findIndex(item => item === value) && value!="")   // remove duplicates dates and empty string
             .sort((a,b) => parseInt(a) > parseInt(b));   // sort by date (chronology)
+
+        let dateStart = dates[0];
+        let dateEnd = dates[dates.length-1];
+
+        expenses.forEach(async expense => await expense.initPeriods(dateStart,dateEnd));
+        await amortisation.initPeriods(expenses,dateStart,dateEnd);
+        await immobilisation.initPeriods(dateStart,dateEnd);
+        
+        // let dates = amortisation.periods
+        //     .concat(immobilisation.periods)
+        //     .concat(expenses.map(expense => expense.periods).reduce((a,b) => a.concat(b),[]))
+        //     .map(period => [period.dateStart,period.dateEnd])   // get date start & date end
+        //     .reduce((a,b) => a.concat(b),[])
+        //     .filter((value, index, self) => index === self.findIndex(item => item === value) && value!="")   // remove duplicates and empty string
+        //     .sort((a,b) => parseInt(a) > parseInt(b));   // sort by date (chronology)
         
         let datesExpenses = expenses
             .map(expense => expense.periods).reduce((a,b) => a.concat(b),[])
@@ -571,162 +584,21 @@ const buildPeriods = async (immobilisations,amortisations,amortisationExpenses) 
         let nextPeriods = dates.slice(1).map((date,index,self) => {
             return({
                 id: index,
-                dateStart: index > 0 ? self[index-1] : dateStartYear,
+                dateStart: index > 0 ? self[index-1] : dateStart,
                 dateEnd: date,
                 amount: null
             })
         })
 
-        updatePeriods(immobilisation,amortisation,expenses,nextPeriods,datesExpenses,dateStartYear,dateEndYear);
+        immobilisation.completePeriods(nextPeriods);
+        amortisation.completePeriods(nextPeriods);
+        expenses.forEach(async expense => expense.completePeriods(immobilisation,amortisation,nextPeriods,datesExpenses,dateStart));
+        
         console.log("results");
         console.log(immobilisation);
         console.log(amortisation);
         expenses.forEach(expense => console.log(expense));
     })
-}
-
-const initImmobilisationsPeriods = async (immobilisation,dateStartYear,dateEndYear) =>
-{
-    let currentAmount = immobilisation.prevAmount;
-    let dateStart = dateStartYear;
-
-    immobilisation.periods = [];
-
-    // entries
-    let entries = immobilisation.entries.filter(entry => !entry.isANouveaux).sort((a,b) => parseInt(a.date) > parseInt(b.date));
-    for (let entry of entries) {
-        // end current period
-        immobilisation.periods.push({
-            dateStart: dateStart,
-            dateEnd: entry.date,
-            amount: currentAmount
-        });
-        // update current values
-        currentAmount+= entry.amount;
-        dateStart = entry.date;
-    }
-    // add last period
-    if(dateStart!=dateEndYear) {
-        immobilisation.periods.push({
-            dateStart: dateStart,
-            dateEnd: dateEndYear,
-            amount: currentAmount
-        });
-    }
-}
-
-const initAmortisationsPeriods = async (amortisation,expenses,dateStartYear,dateEndYear) =>
-{
-    let currentAmount = amortisation.prevAmount;
-    let dateStart = dateStartYear;
-
-    amortisation.periods = [];
-
-    // entries
-    let entries = amortisation.entries
-        .filter(entry => !entry.isANouveaux)
-        .concat(expenses.map(expense => expense.adjustmentEntries).reduce((a,b) => a.concat(b),[]))
-        .sort((a,b) => parseInt(a.date) > parseInt(b.date));
-    for (let entry of entries) 
-    {
-        // end current period
-        amortisation.periods.push({
-            dateStart: dateStart,
-            dateEnd: entry.date,
-            amount: currentAmount
-        });
-        // update current values
-        currentAmount+= entry.amount;
-        dateStart = entry.date;
-    }
-    // add last period
-    amortisation.periods.push({
-        dateStart: dateStart,
-        dateEnd: dateEndYear,
-        amount: currentAmount
-    });
-
-    let index = 0;
-    while (index < amortisation.periods.length)
-    {
-        if (amortisation.periods[index].dateStart==amortisation.periods[index].dateEnd) {
-            amortisation.periods.splice(index,1);
-        } else if (index > 0 && amortisation.periods[index].amount==amortisation.periods[index-1].amount) {
-            amortisation.periods[index-1].dateEnd = amortisation.periods[index].dateEnd; // prolongation period
-            amortisation.periods.splice(index,1);
-        } else {
-            index+= 1;
-        }
-    }
-}
-
-const initAmortisationsExpensesPeriods = async (expenses,dateStartYear,dateEndYear) =>
-{
-    expenses.forEach(expense => 
-    {
-        let currentAmount = 0;
-        let currentMax = 0
-        let dateStart = dateStartYear;
-
-        expense.periods = [];
-        expense.adjustmentEntries = [];
-
-        // entries
-        let flows = getFlowsByDate(expense.entries);
-        for (let flow of flows) 
-        {
-            currentAmount+= flow.amount;
-
-            if (currentAmount > currentMax) 
-            {
-                let amountPeriod = currentAmount-currentMax;
-                currentMax = currentAmount;
-                // end current period
-                expense.periods.push({
-                    dateStart: dateStart,
-                    dateEnd: flow.date,
-                    amount: amountPeriod
-                });
-
-                // update current values
-                dateStart = flow.date;
-
-                if (flow.amount > amountPeriod) {
-                    expense.adjustmentEntries.push({
-                        date: flow.date,
-                        amount: -(flow.amount-amountPeriod)
-                    })
-                }
-            }
-            else {
-                expense.adjustmentEntries.push({
-                    date: flow.date,
-                    amount: -flow.amount
-                })
-            }
-        }
-
-        if (dateStart!=dateEndYear) {
-            // add last period
-            expense.periods.push({
-                dateStart: dateStart,
-                dateEnd: dateEndYear,
-                amount: currentAmount-currentMax
-            });
-        }
-    })
-}
-
-const getFlowsByDate = (entries) => 
-{
-    let flows = [];
-    entries.forEach((entry) => 
-    {
-        let flow = flows.filter(flow => flow.date==entry.date)[0];
-        if (flow == undefined) flows.push({date: entry.date, amount: entry.amount})
-        else flow.amount+= entry.amount;
-    })
-    return flows.sort((a,b) => parseInt(a.date) > parseInt(b.date));
 }
 
 const updatePeriods = (immobilisation,amortisation,expenses,nextPeriods,datesExpenses,dateStartYear,dateEndYear) =>

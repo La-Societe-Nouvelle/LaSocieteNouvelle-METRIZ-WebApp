@@ -8,11 +8,25 @@ import { Indicator } from '/src/footprintObjects/Indicator';
 
 // Librairies
 import metaIndics from '/lib/indics';
+import { SocialFootprint } from '../footprintObjects/SocialFootprint';
 
 /* ------------------------------------------------------------ */
 /* -------------------- FOOTPRINT FORMULAS -------------------- */
 /* ------------------------------------------------------------ */
 
+export async function buildAggregateFpt(elements,usePrev) 
+{
+    let footprint = new SocialFootprint();
+    let indics = Object.keys(metaIndics);
+    await Promise.all(
+        indics.map(async indic => {
+            let indicator = await buildIndicatorAggregate(indic,elements,usePrev);
+            footprint.indicators[indic] = indicator;
+            return;
+        })
+    )
+    return footprint;
+}
 
 export function buildIndicatorAggregate(indic,elements,usePrev) 
 {
@@ -55,6 +69,22 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
     }
 
     return indicator;
+}
+
+export async function megreFpt(footprintA,amountA,footprintB,amountB)
+{
+    let footprint = new SocialFootprint();
+    let indics = Object.keys(metaIndics);
+    await Promise.all(
+        indics.map(async indic => {
+            let indicatorA = footprintA.indicators[indic];
+            let indicatorB = footprintB.indicators[indic];
+            let indicator = await buildIndicatorMerge(indicatorA,amountA,indicatorB,amountB);
+            footprint.indicators[indic] = indicator;
+            return;
+        })
+    )
+    return footprint;
 }
 
 export function buildIndicatorMerge(indicatorA,amountA,

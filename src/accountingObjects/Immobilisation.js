@@ -126,4 +126,56 @@ export class Immobilisation {
         });
     }
   }
+
+  /* ---------- Periods ---------- */
+
+  initPeriods = async (dateStart,dateEnd) =>
+  {
+    let currentAmount = this.prevAmount;
+    let dateStart = dateStart;
+
+    this.periods = [];
+
+    // entries (except A-NOUVEAUX entry)
+    let entries = this.entries.filter(entry => !entry.isANouveaux).sort((a,b) => parseInt(a.date) > parseInt(b.date));
+    for (let entry of entries) 
+    {
+      // add period with current amount
+      this.periods.push({
+          dateStart: dateStart,
+          dateEnd: entry.date,
+          amount: currentAmount
+      });
+      // update current amount
+      currentAmount+= entry.amount;
+      dateStart = entry.date;
+    }
+
+    // add last period
+    if(dateStart!=dateEnd) 
+    {
+      this.periods.push({
+          dateStart: dateStart,
+          dateEnd: dateEnd,
+          amount: currentAmount
+      });
+    }
+  }
+
+  completePeriods = (nextPeriods) =>
+  {
+    // Immobilisation periods
+    let immobilisationPrevPeriods = [...this.periods];
+    this.periods = [];
+    nextPeriods.forEach(nextPeriod =>
+    {
+      // period matching with next period (next periods can't be over two prev periods)
+      let prevPeriod = immobilisationPrevPeriods.filter(period => (parseInt(period.dateStart) <= parseInt(nextPeriod.dateStart)) && (parseInt(period.dateEnd) >= parseInt(nextPeriod.dateEnd)))[0];
+      this.periods.push({
+        dateStart: nextPeriod.dateStart,
+        dateEnd: nextPeriod.dateEnd,
+        amount: prevPeriod.amount // same amount
+      })
+    })
+  }
 }
