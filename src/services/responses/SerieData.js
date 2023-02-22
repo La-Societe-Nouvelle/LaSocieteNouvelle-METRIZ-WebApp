@@ -1,15 +1,8 @@
 import axios from "axios";
-import {updateComparativeFootprint} from "../../ComparativeData";
+import { updateComparativeFootprint } from "../../ComparativeData";
 import SerieDataService from "../SerieDataService";
 
-const getSerieData = async (
-  id,
-  code,
-  indic,
-  comparativeData,
-  serie
-) => {
-
+const getSerieData = async (id, code, indic, comparativeData, serie) => {
   let netValueAddedSerie;
   let productionSerie;
   let intermediateConsumptionSerie;
@@ -64,10 +57,8 @@ const getSerieData = async (
       })
     )
     .catch(() => {
-      setError(true);
+      console.log(errors);
     });
-
-
 
   const newComparativeData = {
     fixedCapitalConsumption: fixedCapitalConsumptionSerie,
@@ -80,7 +71,7 @@ const getSerieData = async (
     indic,
     comparativeData,
     newComparativeData,
-    serie,
+    serie
   );
 
   return serieFootprint;
