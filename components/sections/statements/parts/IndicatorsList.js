@@ -169,8 +169,11 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
+
     if (!validations.includes(indic)) {
+
       // Get footprint for all sectors
+      // To do : Condition pour vérifier si on possède déjà les données comparatives
       let newComparativeData = await updateComparativeAreaData(indic);
       if (comparativeDivision != "00") {
         newComparativeData = await updateComparativeDivisionData(
@@ -196,7 +199,6 @@ const IndicatorsList = (props) => {
     // update footprint
     await props.session.updateIndicator(indic);
     setUpdatedIndic(indic);
-    setDisplayGraph(true);
   };
 
   // Update comparative division
