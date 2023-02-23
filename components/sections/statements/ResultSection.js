@@ -21,10 +21,9 @@ import { ErrorApi } from "../../ErrorAPI";
 
 // Graphs
 import ComparativeGraphs from "../../charts/ComparativeGraphs";
-import GrossImpactChart  from "../../charts/GrossImpactChart";
+import GrossImpactChart from "../../charts/GrossImpactChart";
 import TrendsGraph from "../../charts/TrendsGraph";
 import DeviationChart from "../../charts/HorizontalBarChart";
-
 
 // Tables
 import { ComparativeTable } from "../../tables/ComparativeTable";
@@ -185,21 +184,21 @@ const ResultSection = (props) => {
           true
         );
         break;
-        case "indice":
-          createIndiceIndicatorPDF(
-            metaIndics[indic].libelle,
-            metaIndics[indic].libelleGrandeur,
-            session.year,
-            session.legalUnit.corporateName,
-            indic,
-            metaIndics[indic].unit,
-            session.financialData,
-            session.comparativeData,
-            comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
+      case "indice":
+        createIndiceIndicatorPDF(
+          metaIndics[indic].libelle,
+          metaIndics[indic].libelleGrandeur,
+          session.year,
+          session.legalUnit.corporateName,
+          indic,
+          metaIndics[indic].unit,
+          session.financialData,
+          session.comparativeData,
+          comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
             .label,
-            true
-          );
-          break;
+          true
+        );
+        break;
       default:
         break;
     }
@@ -299,7 +298,7 @@ const ResultSection = (props) => {
             <Col sm={3}>
               <div className="border rounded mt-5 px-5 pb-4">
                 <h3 className="text-center">Répartition des impacts bruts</h3>
-                <GrossImpactChart 
+                <GrossImpactChart
                   id={"part-" + indic}
                   intermediateConsumption={intermediateConsumption.footprint.indicators[
                     indic
@@ -443,20 +442,16 @@ const ResultSection = (props) => {
             </Row>
           </div>
         </div>
-                  <hr></hr>
+        <hr></hr>
         <Row>
-          <Col lg={8}>
+          <Col lg={12}>
             <ComparativeTable
               financialData={session.financialData}
               indic={indic}
               comparativeData={comparativeData}
             />
           </Col>
-          <Col lg={4}>
-            <h5 className="mb-4">
-              ▪ Ecart par rapport à la moyenne de la branche
-            </h5>
-
+          <Col lg={4} className="hidden">
             <DeviationChart
               id={"deviationChart-" + indic}
               legalUnitData={[
