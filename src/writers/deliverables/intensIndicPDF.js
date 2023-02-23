@@ -851,7 +851,7 @@ export const createIntensIndicatorPDF = (
                 text: chartLabel,
                 bold: true,
                 fontSize: 7,
-                margin: [0, 10, 0, 10],
+                margin: [0, 15, 0, 10],
               },
               {
                 width: 260,
@@ -865,7 +865,7 @@ export const createIntensIndicatorPDF = (
         text: "* " + uncertaintyText,
         fontSize: 6,
         italics: true,
-        margin: [0, 20, 0, 0],
+        margin: [0, 25, 0, 0],
         font: "Roboto",
       },
     ],

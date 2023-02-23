@@ -6,11 +6,13 @@ import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
   cutString,
   getIndicDescription,
+  getIntensKeySuppliers,
   getUncertaintyDescription,
   loadFonts,
   sortCompaniesByFootprint,
   sortCompaniesByImpact,
 } from "./utils/utils";
+import metaIndics from "/lib/indics";
 
 // --------------------------------------------------------------------------
 //  Contribution Indicator Report
@@ -33,6 +35,9 @@ export const createContribIndicatorPDF = (
   // ---------------------------------------------------------------
 
   const { production, revenue, externalExpenses } = financialData.aggregates;
+  const unit = metaIndics[indic].unit;
+  const precision = metaIndics[indic].nbDecimals;
+  const unitGrossImpact = metaIndics[indic].unitAbsolute;
 
   // ---------------------------------------------------------------
   // utils
@@ -226,7 +231,7 @@ export const createContribIndicatorPDF = (
             x: 260,
             y: 582,
             w: 305,
-            h: 100,
+            h: 110,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -488,16 +493,23 @@ export const createContribIndicatorPDF = (
                 style: "h2",
                 margin: [0, 30, 0, 10],
               },
-              mostImpactfulCompanies
-                .filter((company) => !company.isDefaultAccount)
-                .map((company) => (
-                  {
-                    text: company.corporateId + " - " + company.corporateName,
-                  },
-                  {
-                    text: company.corporateId + " - " + company.corporateName,
-                  }
-                )),
+              ...getIntensKeySuppliers(
+                mostImpactfulCompanies,
+                indic,
+                unit,
+                unitGrossImpact,
+                precision
+              ),
+              // mostImpactfulCompanies
+              //   .filter((company) => !company.isDefaultAccount)
+              //   .map((company) => (
+              //     {
+              //       text: company.corporateId + " - " + company.corporateName,
+              //     },
+              //     {
+              //       text: company.corporateId + " - " + company.corporateName,
+              //     }
+              //   )),
             ],
           },
         ],

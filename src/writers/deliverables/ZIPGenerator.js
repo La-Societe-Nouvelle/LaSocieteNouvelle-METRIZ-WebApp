@@ -175,7 +175,7 @@ const ZipGenerator = ({
         // Loop through each page and add the page number
         for (let i = 0; i < pageCount; i++) {
           const page = mergedPdfDoc.getPage(i);
-         
+
           if (i > 0) {
             // Get the width and height of the page
             const { width, height } = page.getSize();

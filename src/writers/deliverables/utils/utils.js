@@ -138,7 +138,7 @@ export function getIntensKeySuppliers(
             bold: true,
           },
           {
-            margin: [0, 2, 0, 0],
+            margin: [0, 2, 0, 2],
             text:
               company.footprint.indicators[indic].value.toFixed(precision) +
               " " +
@@ -251,7 +251,6 @@ export function calculateAverageEvolutionRate(data) {
     if (parseInt(data[i + 1].year) === parseInt(data[i].year) + 1) {
       numberOfYears++;
       const evolutionRate = ((finalValue - initialValue) / initialValue) * 100;
-      console.log("consecutiv")
       evolutionRates.push(evolutionRate);
     } else {
       // Calculate annual evolution rate

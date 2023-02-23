@@ -41,7 +41,6 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
         type: "bar",
         barPercentage: 1,
         categoryPercentage: 0.5,
-
         minBarLength: 2,
       },
     ],
@@ -98,7 +97,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             color: "#ffffff",
             font: {
               size: 10,
-              family: "Raleway",
+              family: "Roboto",
             },
             formatter: (value) => {
               if (value !== 0) {
