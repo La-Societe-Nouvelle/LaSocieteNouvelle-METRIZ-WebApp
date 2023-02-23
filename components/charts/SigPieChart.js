@@ -19,6 +19,7 @@ function SigPieChart({ value, title, id }) {
         datalabels: {
           display: false,
         },
+
         borderAlign: "inner",
         borderWidth: 0,
         backgroundColor: ["RGB(25, 21, 88)", "RGB(215,220,251,1)"],
@@ -28,8 +29,8 @@ function SigPieChart({ value, title, id }) {
 
   const options = {
     maintainAspectRatio: true,
-    responsive : false,
-    devicePixelRatio: 3,
+    responsive: false,
+    devicePixelRatio: 2,
     cutout: 55,
     hover: { mode: null },
     layout: {
@@ -52,19 +53,18 @@ function SigPieChart({ value, title, id }) {
         annotations: [
           {
             type: "label",
-            xScaleID: 'x-axis-0', // Modifier cette ligne
-            x: '50%',
-            y: '50%',
+            xScaleID: "x-axis-0", // Modifier cette ligne
+            x: "50%",
+            y: "50%",
             content: value + "%",
             color: "#191558",
             font: {
               size: 20,
               family: "Raleway",
-              weight : "bold"
+              weight: "bold",
             },
           },
         ],
-
       },
 
       tooltip: {

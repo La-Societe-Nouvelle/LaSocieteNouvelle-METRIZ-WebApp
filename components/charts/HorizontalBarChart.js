@@ -1,6 +1,9 @@
 import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+Chart.register(ChartDataLabels);
+
 // Libraries
 
 const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
@@ -11,12 +14,13 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
     "Valeur ajoutée nette",
   ];
 
-
   const data = legalUnitData.map((value, key) => {
     if (value) {
-      return value.toFixed(precision) - branchData[key].toFixed(precision);
+      const difference = value - branchData[key];
+      const percentage = (difference / branchData[key]) * 100;
+      return Math.round(percentage);
     } else {
-      return null;
+      return 0;
     }
   });
 
@@ -32,14 +36,13 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
     datasets: [
       {
         data: data,
-        backgroundColor: data.map((value) =>
-          value > 0 ? "RGBA(250,89,95,0.5)" : "rgba(25, 21, 88, 0.5)"
-        ),
+        backgroundColor: ["rgb(140, 138, 171)"],
         borderWidth: 0,
         type: "bar",
-        barPercentage: 0.9,
-        categoryPercentage: 0.4,
-        skipNull: true,
+        barPercentage: 1,
+        categoryPercentage: 0.5,
+
+        minBarLength: 2,
       },
     ],
   };
@@ -48,7 +51,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
       id={id}
       data={chartData}
       options={{
-        devicePixelRatio: 3,
+        devicePixelRatio: 2,
         indexAxis: "y",
         scales: {
           y: {
@@ -61,13 +64,13 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             },
           },
           x: {
-            min: minValue,
-            max: maxValue,
+            min: minValue - 10,
+            max: maxValue + 10,
             grid: {
               color: "#ececff",
             },
             ticks: {
-              color: "#191558",
+              color: "#8c8aab",
               font: {
                 family: "Raleway",
               },
@@ -86,7 +89,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             cornerRadius: 3,
             callbacks: {
               label: function (context) {
-                let label = context.formattedValue + " " + unit;
+                let label = context.formattedValue + "%";
                 return label;
               },
             },
@@ -96,6 +99,11 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             font: {
               size: 10,
               family: "Raleway",
+            },
+            formatter: (value) => {
+              if (value !== 0) {
+                return value + "%";
+              }
             },
           },
         },

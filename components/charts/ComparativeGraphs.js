@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 // Libraries
@@ -62,6 +62,7 @@ const ComparativeGraphs = (props) => {
         type: "bar",
         barPercentage: 0.6,
         categoryPercentage: 0.6,
+        
       },
       {
         label: "Objectif ",
@@ -83,7 +84,7 @@ const ComparativeGraphs = (props) => {
       id={id}
       data={chartData}
       options={{
-        devicePixelRatio: 3,
+        devicePixelRatio: 2,
         scales: {
           y: {
             display: true,

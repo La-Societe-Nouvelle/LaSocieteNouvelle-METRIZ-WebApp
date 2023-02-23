@@ -3,14 +3,17 @@ import React from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
-import { Doughnut } from "react-chartjs-2"; 
+import { Doughnut } from "react-chartjs-2";
 
-function GrossImpactChart (props) {
-  let intermediateConsumption = parseFloat(props.intermediateConsumption);
-  let capitalConsumption = parseFloat(props.capitalConsumption);
-  let netValueAdded = parseFloat(props.netValueAdded);
+function GrossImpactChart(props) {
+  let intermediateConsumption = props.intermediateConsumption;
+  let capitalConsumption = props.capitalConsumption;
+  let netValueAdded = props.netValueAdded;
 
-  let total = intermediateConsumption + capitalConsumption + netValueAdded;
+  let total =
+    props.intermediateConsumption +
+    props.capitalConsumption +
+    props.netValueAdded;
 
   intermediateConsumption = (intermediateConsumption / total) * 100;
   capitalConsumption = (capitalConsumption / total) * 100;
@@ -25,10 +28,11 @@ function GrossImpactChart (props) {
     datasets: [
       {
         data: [
-          intermediateConsumption.toFixed(0),
-          capitalConsumption.toFixed(0),
-          netValueAdded.toFixed(0),
+          Math.round(intermediateConsumption),
+          Math.round(capitalConsumption),
+          Math.round(netValueAdded),
         ],
+        skipNull: true,
         backgroundColor: [
           "rgb(25, 21, 88)",
           "rgba(25, 21, 88, 0.5)",
@@ -40,7 +44,7 @@ function GrossImpactChart (props) {
   };
 
   const options = {
-    devicePixelRatio: 3,
+    devicePixelRatio: 2,
     plugins: {
       legend: {
         display: false,
@@ -53,7 +57,12 @@ function GrossImpactChart (props) {
           weight: "bold",
         },
         formatter: (value) => {
-          return value + "%";
+          if (value !== 0) {
+            return value + "%";
+          }
+          else {
+            return null;
+          }
         },
       },
       tooltip: {
@@ -74,4 +83,4 @@ function GrossImpactChart (props) {
   return <Doughnut id={props.id} data={data} options={options} />;
 }
 
-export default GrossImpactChart ;
+export default GrossImpactChart;

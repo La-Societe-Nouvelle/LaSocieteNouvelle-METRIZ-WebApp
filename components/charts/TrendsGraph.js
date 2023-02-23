@@ -37,7 +37,7 @@ function TrendsGraph(props) {
     const data = {
       datasets: [
         {
-          label: "Historique",
+          label: "Historique - Branche",
           data: trendsData,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -45,7 +45,7 @@ function TrendsGraph(props) {
           borderWidth: 4,
         },
         {
-          label: "Tendance",
+          label: "Tendance - Branche",
           data: trendsDataForecast,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -55,7 +55,7 @@ function TrendsGraph(props) {
         },
         {
           type: "bubble",
-          label: "Unité légale analysée",
+          label: "Situation",
           data: [{ x: "2021", y: props.current, r: 5 }],
           backgroundColor: "rgb(250,89,95)",
           borderColor: "rgb(250,89,95)",
@@ -67,7 +67,7 @@ function TrendsGraph(props) {
 
     if (targetData.length > 1) {
       data.datasets.push({
-        label: "Objectif",
+        label: "Objectif - Branche",
         data: targetData,
         skipNull: true,
         borderColor: "rgb(255, 238, 200)",
@@ -107,7 +107,7 @@ function TrendsGraph(props) {
     let minYear = trendsData[0].x.getFullYear();
 
     const options = {
-      devicePixelRatio: 3,
+      devicePixelRatio: 2,
       pointRadius: 0,
       maintainAspectRatio: true,
       scales: {
@@ -119,7 +119,7 @@ function TrendsGraph(props) {
           ticks: {
             color: "#191558",
             font: {
-              size: 11,
+              size: 10,
               family : 'Roboto'
             },
           },
@@ -132,7 +132,7 @@ function TrendsGraph(props) {
           ticks: {
             color: "#191558",
             font: {
-              size: 11,
+              size: 10,
             },
           },
           grid: {
@@ -150,14 +150,15 @@ function TrendsGraph(props) {
         legend: {
           display: true,
           position: "right",
-          font: {
-            size: 10,
-
-          },
+ 
           labels: {
             usePointStyle: true,
-            fullsize: true,
             color: "#191558",
+            padding: 20 ,
+            font: {
+              size: 12,
+              family : 'Roboto'
+            },
             generateLabels: function (chart) {
               const dataset = chart.data.datasets;
               return dataset
