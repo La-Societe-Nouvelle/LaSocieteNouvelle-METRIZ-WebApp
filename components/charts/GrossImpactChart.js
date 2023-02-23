@@ -45,6 +45,8 @@ function GrossImpactChart(props) {
 
   const options = {
     devicePixelRatio: 2,
+    maintainAspectRatio: true,
+    aspectRatio: 1, // specify aspect ratio
     plugins: {
       legend: {
         display: false,
@@ -59,8 +61,7 @@ function GrossImpactChart(props) {
         formatter: (value) => {
           if (value !== 0) {
             return value + "%";
-          }
-          else {
+          } else {
             return null;
           }
         },

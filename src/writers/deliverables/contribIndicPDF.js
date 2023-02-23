@@ -500,16 +500,6 @@ export const createContribIndicatorPDF = (
                 unitGrossImpact,
                 precision
               ),
-              // mostImpactfulCompanies
-              //   .filter((company) => !company.isDefaultAccount)
-              //   .map((company) => (
-              //     {
-              //       text: company.corporateId + " - " + company.corporateName,
-              //     },
-              //     {
-              //       text: company.corporateId + " - " + company.corporateName,
-              //     }
-              //   )),
             ],
           },
         ],

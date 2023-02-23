@@ -96,7 +96,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
           datalabels: {
             color: "#ffffff",
             font: {
-              size: 10,
+              size: 8,
               family: "Roboto",
             },
             formatter: (value) => {

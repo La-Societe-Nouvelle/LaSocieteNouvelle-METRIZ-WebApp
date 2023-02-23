@@ -27,7 +27,6 @@ const StatementSection = (props) => {
   };
 
   const updateVisibleGraphs = (newValue) => {
-    console.log(newValue)
     setVisibleGraphs(newValue);
   };
 

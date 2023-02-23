@@ -450,7 +450,7 @@ const IndicatorsList = (props) => {
             {(metaIndics[indic].type == "intensité" ||
               metaIndics[indic].type == "indice") && (
               <Row>
-                <Col sm={2}>
+                <Col sm={3}>
                   <GrossImpactChart
                     id={"part-" + indic}
                     intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
