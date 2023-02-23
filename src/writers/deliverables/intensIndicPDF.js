@@ -4,13 +4,13 @@ import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import metaIndics from "/lib/indics";
 
 import {
-  currentAnnualReduction,
-  getKeySuppliers,
   getPercentageForConsumptionRows,
   getUncertaintyDescription,
   loadFonts,
-  sortExpensesByFootprint,
+  sortCompaniesByImpact,
   targetAnnualReduction,
+  getIntensKeySuppliers,
+  calculateAverageEvolutionRate,
 } from "./utils/utils";
 
 // --------------------------------------------------------------------------
@@ -49,22 +49,27 @@ export const createIntensIndicatorPDF = (
     comparativeData.production.targetDivisionFootprint.indicators[indic].data
   );
 
-  const branchProductionEvolution = currentAnnualReduction(
-    comparativeData.production.trendsFootprint.indicators[indic].data,
-    year
-  );
 
-  const firstMostImpactfulCompanies = sortExpensesByFootprint(
+  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[indic].data.filter((item) => item.flag == "e" && item.year <= year);
+  lastEstimatedData = lastEstimatedData.slice(Math.max(lastEstimatedData.length - 2, 1));
+  
+    
+  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
+
+  
+  const firstMostImpactfulCompanies = sortCompaniesByImpact(
     financialData.companies,
     indic,
     "desc"
   ).slice(0, 2);
 
-  const scdMostImpactfulCompanies = sortExpensesByFootprint(
+  const scdMostImpactfulCompanies = sortCompaniesByImpact(
     financialData.companies,
     indic,
     "desc"
   ).slice(2, 4);
+
+
 
   const intermediateConsumptionPart = getIntermediateConsumptionsPart(
     financialData,
@@ -205,7 +210,7 @@ export const createIntensIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Box Vue de vos Soldes Intermediaires de Gestion
+          // Box Empreintes de vos Soldes Intermediaires de Gestion
           {
             type: "rect",
             x: 30,
@@ -264,7 +269,7 @@ export const createIntensIndicatorPDF = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: "Rapport - " + label, style: "header" },
+      { text:  label, style: "header" },
       {
         columnGap: 30,
         columns: [
@@ -364,7 +369,7 @@ export const createIntensIndicatorPDF = (
         ],
       },
       {
-        text: "\tImpacts de vos Soldes Intermédiaires de Gestion\t",
+        text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
         style: "h2",
         alignment: "center",
         margin: [0, 30, 0, 20],
@@ -456,7 +461,7 @@ export const createIntensIndicatorPDF = (
       },
       // KEY SUPPLIERS
       {
-        text: "Les fournisseurs clés",
+        text: "\tLes fournisseurs clés\t",
         style: "h2",
         alignment: "center",
         margin: [0, 25, 0, 0],
@@ -468,10 +473,11 @@ export const createIntensIndicatorPDF = (
           {
             columnGap: 20,
             columns: [
-              ...getKeySuppliers(
+              ...getIntensKeySuppliers(
                 firstMostImpactfulCompanies,
                 indic,
                 unit,
+                unitGrossImpact,
                 precision
               ),
             ],
@@ -484,10 +490,11 @@ export const createIntensIndicatorPDF = (
           {
             columnGap: 20,
             columns: [
-              ...getKeySuppliers(
+              ...getIntensKeySuppliers(
                 scdMostImpactfulCompanies,
                 indic,
                 unit,
+                unitGrossImpact,
                 precision
               ),
             ],
@@ -496,14 +503,12 @@ export const createIntensIndicatorPDF = (
       },
       // TABLE SIG
       {
-        margin: [0, 30, 0, 10],
-        columnGap: 20,
+        margin: [0, 25, 0, 10],
         columns: [
           {
             width: "*",
             style: "table",
             table: {
-              widths: [60, "auto", 40, "auto", "auto"],
               body: [
                 // HEADER
                 [
@@ -534,9 +539,13 @@ export const createIntensIndicatorPDF = (
                 [
                   {},
                   {},
-                  { text: unit, fontSize: "5", alignment: "right" },
-                  { text: unitGrossImpact, fontSize: "5", alignment: "right" },
-                  { text: "%", fontSize: "5", alignment: "center" },
+                  { text: "en " + unit, fontSize: "5", alignment: "center" },
+                  {
+                    text: "en " + unitGrossImpact,
+                    fontSize: "5",
+                    alignment: "center",
+                  },
+                  { text: "en " + "%", fontSize: "5", alignment: "center" },
                 ],
                 [
                   {
@@ -594,7 +603,7 @@ export const createIntensIndicatorPDF = (
                 ],
                 [
                   {
-                    text: "Consommations intermédiaires",
+                    text: "Conso. intermédiaires",
                     margin: [2, 6, 2, 6],
                   },
                   {
@@ -652,7 +661,7 @@ export const createIntensIndicatorPDF = (
                 ],
                 [
                   {
-                    text: "Consommations de capital fixe",
+                    text: "Conso. de capital fixe",
                     margin: [2, 6, 2, 6],
                   },
                   {
@@ -786,7 +795,7 @@ export const createIntensIndicatorPDF = (
                 alignment: "center",
                 bold: true,
                 fontSize: "7",
-                margin: [0, 0, 0, 20],
+                margin: [0, 0, 0, 14],
               },
               {
                 width: 245,
@@ -806,8 +815,8 @@ export const createIntensIndicatorPDF = (
             stack: [
               {
                 text: branchProductionTarget
-                ? branchProductionTarget + " %"
-                : "-",
+                  ? branchProductionTarget + " %"
+                  : "-",
                 alignment: "center",
                 style: "numbers",
                 color: "#ffb642",
@@ -828,7 +837,7 @@ export const createIntensIndicatorPDF = (
                 color: "#ffb642",
               },
               {
-                text: "Evolution observée pour l'année de l'exercice (Donnée estimée) ",
+                text: "Taux d'évolution moyen observé entre " + lastEstimatedData[0].year + " et " + lastEstimatedData[1].year ,
                 alignment: "center",
                 fontSize: "8",
                 margin: [0, 2, 0, 0],
@@ -867,7 +876,7 @@ export const createIntensIndicatorPDF = (
     },
     styles: {
       header: {
-        fontSize: 16,
+        fontSize: 14,
         color: "#fa595f",
         bold: true,
         margin: [0, 5, 0, 0],
@@ -1014,7 +1023,7 @@ function createBoxIntermediateConsumption(intermediateConsumptionPart) {
     rect = {
       type: "rect",
       x: 360,
-      y: 235,
+      y: 230,
       w: 200,
       h: 75,
       lineWidth: 2,

@@ -8,7 +8,8 @@ import {
   getIndicDescription,
   getUncertaintyDescription,
   loadFonts,
-  sortExpensesByFootprint,
+  sortCompaniesByFootprint,
+  sortCompaniesByImpact,
 } from "./utils/utils";
 
 // --------------------------------------------------------------------------
@@ -37,16 +38,23 @@ export const createContribIndicatorPDF = (
   // utils
   const indicDescription = getIndicDescription(indic);
 
-  const mostImpactfulExpenses = sortExpensesByFootprint(
+  const mostImpactfulExpenses = sortCompaniesByFootprint(
     financialData.expenses,
     indic,
     "desc"
   ).slice(0, 3);
-  const leastImpactfulExpenses = sortExpensesByFootprint(
+
+  const leastImpactfulExpenses = sortCompaniesByFootprint(
     financialData.expenses,
     indic,
     "asc"
   ).slice(0, 3);
+
+  const mostImpactfulCompanies = sortCompaniesByImpact(
+    financialData.companies,
+    indic,
+    "desc"
+  ).slice(0, 4);
 
   const uncertaintyText = getUncertaintyDescription(
     "proportion",
@@ -234,7 +242,7 @@ export const createContribIndicatorPDF = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: "Rapport - " + title, style: "header" },
+      { text: title, style: "header" },
       //--------------------------------------------------
       {
         columns: [
@@ -285,7 +293,7 @@ export const createContribIndicatorPDF = (
       //--------------------------------------------------
       // Box "Soldes Intermédiaires de Gestion"
       {
-        text: "\tVue de vos Soldes Intermédiaires de Gestion\t",
+        text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
         style: "h2",
       },
       {
@@ -433,7 +441,7 @@ export const createContribIndicatorPDF = (
                 style: "branchNumber",
               },
               {
-                text: "Taux de de contribution des achats de la branche",
+                text: "Moyenne de la branche",
                 alignment: "center",
                 fontSize: 8,
               },
@@ -476,14 +484,20 @@ export const createContribIndicatorPDF = (
 
               // ACTIVITES FOURNISSEURS
               {
-                text: "\tType d'activité des fournisseurs\t",
+                text: "\tFournisseurs clés\t",
                 style: "h2",
                 margin: [0, 30, 0, 10],
               },
-              mostImpactfulExpenses.map((expense) => ({
-                text: expense.accountAux + " - " + expense.accountAuxLib,
-                margin: [0, 0, 0, 0],
-              })),
+              mostImpactfulCompanies
+                .filter((company) => !company.isDefaultAccount)
+                .map((company) => (
+                  {
+                    text: company.corporateId + " - " + company.corporateName,
+                  },
+                  {
+                    text: company.corporateId + " - " + company.corporateName,
+                  }
+                )),
             ],
           },
         ],

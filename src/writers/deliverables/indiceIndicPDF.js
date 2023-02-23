@@ -6,12 +6,12 @@ import metaIndics from "/lib/indics";
 // Utils
 import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
-  currentAnnualReduction,
+  calculateAverageEvolutionRate,
   getIndicDescription,
   getKeySuppliers,
   getUncertaintyDescription,
   loadFonts,
-  sortExpensesByFootprint,
+  sortCompaniesByFootprint,
   targetAnnualReduction,
 } from "./utils/utils";
 
@@ -57,18 +57,21 @@ export const createIndiceIndicatorPDF = (
     comparativeData.production.targetDivisionFootprint.indicators[indic].data
   );
 
-  const branchProductionEvolution = currentAnnualReduction(
-    comparativeData.production.trendsFootprint.indicators[indic].data,
-    year
-  );
+  
+  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[indic].data.filter((item) => item.flag == "e" && item.year <= year);
+  lastEstimatedData = lastEstimatedData.slice(Math.max(lastEstimatedData.length - 2, 1));
+  
+    
+  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
 
-  const firstMostImpactfulCompanies = sortExpensesByFootprint(
+
+  const firstMostImpactfulCompanies = sortCompaniesByFootprint(
     financialData.companies,
     indic,
     "desc"
   ).slice(0, 2);
-
-  const scdMostImpactfulCompanies = sortExpensesByFootprint(
+  
+  const scdMostImpactfulCompanies = sortCompaniesByFootprint(
     financialData.companies,
     indic,
     "desc"
@@ -233,7 +236,7 @@ export const createIndiceIndicatorPDF = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: "Rapport - " + title, style: "header" },
+      { text: title, style: "header" },
 
       //--------------------------------------------------
       {
@@ -261,7 +264,7 @@ export const createIndiceIndicatorPDF = (
                 margin: [0, 5, 0, 5],
                 text:
                   printValue(
-                    netValueAdded.footprint.indicators[indic].value,
+                    production.footprint.indicators[indic].value,
                     precision
                   ) +
                   " " +
@@ -271,7 +274,10 @@ export const createIndiceIndicatorPDF = (
               },
               {
                 margin: [30, 0, 30, 0],
-                text: "d'" + libelleGrandeur,
+                text:
+                  indic == "idr"
+                    ? "Rapport interdécile "
+                    : "d'" + libelleGrandeur,
                 alignment: "center",
               },
             ],
@@ -287,7 +293,7 @@ export const createIndiceIndicatorPDF = (
       //--------------------------------------------------
       // Box "Soldes Intermédiaires de Gestion"
       {
-        text: "\tVue de vos Soldes Intermédiaires de Gestion\t",
+        text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
         style: "h2",
       },
       {
@@ -297,16 +303,24 @@ export const createIndiceIndicatorPDF = (
             width: "25%",
             stack: [
               {
-                text:
-                  printValue(production.footprint.indicators[indic].value, 1) +
-                  "%*",
                 alignment: "center",
                 bold: true,
                 fontSize: 24,
                 color: "#fa595f",
+                text: [
+                  {
+                    text: printValue(
+                      production.footprint.indicators[indic].value,
+                      precision
+                    ),
+                  },
+                  {
+                    text: indic == "idr" ? " " : "%",
+                  },
+                ],
               },
               {
-                text: "Taux associé",
+                text: "Indice associé",
                 alignment: "center",
                 bold: true,
                 fontSize: 8,
@@ -323,14 +337,20 @@ export const createIndiceIndicatorPDF = (
           {
             stack: [
               {
-                text:
-                  printValue(
-                    intermediateConsumption.footprint.indicators[indic].value,
-                    1
-                  ) + "%",
                 alignment: "center",
                 bold: true,
                 fontSize: 24,
+                text: [
+                  {
+                    text: printValue(
+                      intermediateConsumption.footprint.indicators[indic].value,
+                      precision
+                    ),
+                  },
+                  {
+                    text: indic == "idr" ? " " : "%",
+                  },
+                ],
               },
               {
                 text: "Consommations",
@@ -350,14 +370,20 @@ export const createIndiceIndicatorPDF = (
           {
             stack: [
               {
-                text:
-                  printValue(
-                    capitalConsumption.footprint.indicators[indic].value,
-                    1
-                  ) + "%",
                 alignment: "center",
                 bold: true,
                 fontSize: 24,
+                text: [
+                  {
+                    text: printValue(
+                      capitalConsumption.footprint.indicators[indic].value,
+                      precision
+                    ),
+                  },
+                  {
+                    text: indic == "idr" ? " " : "%",
+                  },
+                ],
               },
               {
                 text: "Consommations",
@@ -377,15 +403,22 @@ export const createIndiceIndicatorPDF = (
           {
             stack: [
               {
-                text:
-                  printValue(
-                    netValueAdded.footprint.indicators[indic].value,
-                    1
-                  ) + "%",
                 alignment: "center",
                 bold: true,
                 fontSize: 24,
+                text: [
+                  {
+                    text: printValue(
+                      netValueAdded.footprint.indicators[indic].value,
+                      precision
+                    ),
+                  },
+                  {
+                    text: indic == "idr" ? " " : "%",
+                  },
+                ],
               },
+
               {
                 text: "Valeur ajoutée",
                 alignment: "center",
@@ -406,7 +439,7 @@ export const createIndiceIndicatorPDF = (
       //--------------------------------------------------
       // Key Suppliers
       {
-        text: "Les fournisseurs clés",
+        text: "\tLes fournisseurs clés\t",
         style: "h2",
         alignment: "center",
         margin: [0, 25, 0, 0],
@@ -480,7 +513,7 @@ export const createIndiceIndicatorPDF = (
                 [
                   {},
                   {},
-                  { text: unit, fontSize: "5", alignment: "right" },
+                  { text: unit ? unit : "Rapport interdécile", fontSize: "5", alignment: "right" },
                   { text: "%", fontSize: "5", alignment: "center" },
                 ],
                 [
@@ -707,7 +740,7 @@ export const createIndiceIndicatorPDF = (
                 color: "#ffb642",
               },
               {
-                text: "Evolution observée pour l'année de l'exercice (Donnée estimée) ",
+                text: "Taux d'évolution moyen observé entre " + lastEstimatedData[0].year + " et " + lastEstimatedData[1].year ,
                 alignment: "center",
                 fontSize: "8",
                 margin: [0, 2, 0, 0],

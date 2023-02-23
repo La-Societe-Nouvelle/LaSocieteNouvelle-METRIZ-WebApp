@@ -1,4 +1,6 @@
-export function sortExpensesByFootprint(expenses, indicator, order) {
+import { printValue } from "../../../utils/Utils";
+
+export function sortCompaniesByFootprint(expenses, indicator, order) {
   const sortedExpenses = expenses.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].value;
     const valueB = b.footprint.indicators[indicator].value;
@@ -10,6 +12,20 @@ export function sortExpensesByFootprint(expenses, indicator, order) {
   });
 
   return sortedExpenses;
+}
+export function sortCompaniesByImpact(expensesAccounts, indicator, order) {
+  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
+    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
+    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
+
+    if (order === "asc") {
+      return valueA - valueB;
+    } else {
+      return valueB - valueA;
+    }
+  });
+
+  return sortedExpensesAccounts;
 }
 
 export function getIndicDescription(indic) {
@@ -53,16 +69,16 @@ export function getIndicDescription(indic) {
 
 export function getUncertaintyDescription(typeIndic, uncertainty) {
   let description;
-  if(typeIndic == 'intensite') {
-    description = "L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
-  }
-  else {
+  if (typeIndic == "intensite") {
     description =
-    "Incertitude : " +
-    uncertainty + "%. " +
-    "L’incertitude provient de l’utilisation de données statistiques, directement, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées (pour ces mêmes raisons). Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+      "L’incertitude provient des potentiels écarts dans l’évaluation de l’impact direct (mesure d’une grandeur physique) et de l’utilisation de données statistiques, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées. Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
+  } else {
+    description =
+      "Incertitude : " +
+      uncertainty +
+      "%. " +
+      "L’incertitude provient de l’utilisation de données statistiques, directement, en l’absence de données publiées pour un fournisseur, et/ou en amont, pour les empreintes publiées (pour ces mêmes raisons). Elle vise à se réduire avec la contribution de chaque acteur de la chaine de valeur et grâce aux retours statistiques obtenus.";
   }
-
 
   return description;
 }
@@ -70,28 +86,78 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
 export function getKeySuppliers(companies, indic, unit, precision) {
   const keySuppliers = [];
 
-  companies.map((company) =>
-    keySuppliers.push({
-      stack: [
-        {
-          text:
-            cutString(company.corporateName, 30) +
-            " ( SIREN " +
-            company.corporateId +
-            ")",
-          fontSize: 8,
-          bold: true,
-        },
-        {
-          text:
-            company.footprint.indicators[indic].value.toFixed(precision) +
-            " " +
-            unit,
-          fontSize: 7,
-        },
-      ],
-    })
-  );
+  companies
+    .filter((company) => !company.isDefaultAccount)
+    .map((company) =>
+      keySuppliers.push({
+        stack: [
+          {
+            text:
+              cutString(company.corporateName, 30) +
+              " ( SIREN " +
+              company.corporateId +
+              ")",
+            fontSize: 8,
+            bold: true,
+          },
+          {
+            text:
+              company.footprint.indicators[indic].value.toFixed(precision) +
+              " " +
+              unit,
+            fontSize: 7,
+          },
+        ],
+      })
+    );
+
+  return keySuppliers;
+}
+
+export function getIntensKeySuppliers(
+  companies,
+  indic,
+  unit,
+  unitGrossImpact,
+  precision
+) {
+  const keySuppliers = [];
+
+  companies
+    .filter((company) => !company.isDefaultAccount)
+    .map((company) =>
+      keySuppliers.push({
+        stack: [
+          {
+            text:
+              cutString(company.corporateName, 30) +
+              " ( SIREN " +
+              company.corporateId +
+              ")",
+            fontSize: 8,
+            bold: true,
+          },
+          {
+            margin: [0, 2, 0, 0],
+            text:
+              company.footprint.indicators[indic].value.toFixed(precision) +
+              " " +
+              unit +
+              " - " +
+              printValue(
+                company.footprint.indicators[indic].getGrossImpact(
+                  company.amount
+                ),
+                precision
+              ) +
+              " " +
+              unitGrossImpact,
+
+            fontSize: 7,
+          },
+        ],
+      })
+    );
 
   return keySuppliers;
 }
@@ -171,26 +237,38 @@ export function targetAnnualReduction(data) {
   return percentageReduction;
 }
 
-export function currentAnnualReduction(data, year) {
-  const filteredData = data.filter((item) => item.year <= year);
 
-  let firstYearValue = filteredData[0].value;
-  let lastYearValue = filteredData[filteredData.length - 1].value;
-  let yearsCount = filteredData.length - 1;
-  let totalReduction = firstYearValue - lastYearValue;
-  let annualReduction = totalReduction / firstYearValue / yearsCount;
-  let percentageReduction = (annualReduction * 100).toFixed(0);
+export function calculateAverageEvolutionRate(data) {
+  let evolutionRates = [];
+  let numberOfYears = 0;
 
-  if (percentageReduction < 0) {
-    percentageReduction = percentageReduction * -1;
-    percentageReduction = "+ " + percentageReduction;
+  for (let i = 0; i < data.length - 1; i++) {
+    const initialValue = data[i].value;
+    const finalValue = data[i + 1].value;
+
+
+    // Check if years are consecutive
+    if (parseInt(data[i + 1].year) === parseInt(data[i].year) + 1) {
+      numberOfYears++;
+      const evolutionRate = ((finalValue - initialValue) / initialValue) * 100;
+      console.log("consecutiv")
+      evolutionRates.push(evolutionRate);
+    } else {
+      // Calculate annual evolution rate
+      const numberOfAnnualEvolutionRates = parseInt(data[i + 1].year) - parseInt(data[i].year);
+      const annualEvolutionRate = Math.pow(finalValue / initialValue, 1 / numberOfAnnualEvolutionRates) - 1;
+      numberOfYears += numberOfAnnualEvolutionRates;
+      evolutionRates.push(annualEvolutionRate * 100);
+    }
   }
-  if (percentageReduction > 0) {
-    percentageReduction = " - " + percentageReduction;
-  }
 
-  return percentageReduction;
+  const sum = evolutionRates.reduce((a, b) => a + b, 0);
+  const averageEvolutionRate = sum / numberOfYears;
+
+  return averageEvolutionRate.toFixed(0);
 }
+
+
 
 export function loadFonts() {
   pdfMake.fonts = {
