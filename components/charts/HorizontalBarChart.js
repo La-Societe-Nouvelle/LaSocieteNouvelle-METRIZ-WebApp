@@ -39,7 +39,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
         backgroundColor: ["rgb(140, 138, 171)"],
         borderWidth: 0,
         type: "bar",
-        barPercentage: 1,
+        barPercentage: 0.9,
         categoryPercentage: 0.4,
         minBarLength: 2,
       },

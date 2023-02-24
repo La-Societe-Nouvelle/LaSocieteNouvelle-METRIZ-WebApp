@@ -207,7 +207,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 610,
+            y: 605,
             w: 180,
             h: 100,
             lineWidth: 2,
@@ -217,7 +217,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 220,
-            y: 610,
+            y: 605,
             w: 345,
             h: 160,
             lineWidth: 2,
@@ -490,21 +490,17 @@ export const createIndiceIndicatorPDF = (
                 [
                   {
                     text: "",
-                    border: [false, false, true, false],
                   },
                   {
                     text: "Montant",
-                    border: [false, false, true, false],
                   },
                   {
                     text: "Empreinte",
 
-                    border: [false, false, true, false],
                   },
 
                   {
                     text: "Incert.*",
-                    border: [false, false, true, false],
                     alignment: "center",
                   },
                 ],
@@ -518,11 +514,11 @@ export const createIndiceIndicatorPDF = (
                 [
                   {
                     text: "Production",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(production.amount, 0) + " €",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                     alignment: "right",
                   },
                   {
@@ -539,7 +535,7 @@ export const createIndiceIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
 
                   {
@@ -549,18 +545,18 @@ export const createIndiceIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
                 [
                   {
-                    text: "Consommations intermédiaires",
-                    margin: [2, 6, 2, 6],
+                    text: "Cons. intermédiaires",
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(intermediateConsumption.amount, 0) + " €",
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
 
                   {
@@ -579,7 +575,7 @@ export const createIndiceIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(
@@ -589,22 +585,22 @@ export const createIndiceIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
                 [
                   {
-                    text: "Consommations de capital fixe",
-                    margin: [2, 6, 2, 6],
+                    text: "Cons. de capital fixe",
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(capitalConsumption.amount, 0) + " €",
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                     columns: [
                       {
                         text: [
@@ -627,18 +623,18 @@ export const createIndiceIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
                 [
                   {
                     text: "Valeur ajoutée nette",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(netValueAdded.amount, 0) + " €",
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     columns: [
@@ -654,7 +650,7 @@ export const createIndiceIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
 
                   {
@@ -664,16 +660,17 @@ export const createIndiceIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
               ],
             },
             layout: {
               hLineWidth: function (i, node) {
-                return i === 0 || i === node.table.body.length ? 0 : 2;
+                return i === 0 || i === 1 || i === node.table.body.length
+                  ? 0
+                  : 2;
               },
-
               vLineWidth: function (i, node) {
                 return i === 0 || i === node.table.widths.length ? 0 : 2;
               },
@@ -696,7 +693,7 @@ export const createIndiceIndicatorPDF = (
                 alignment: "center",
                 bold: true,
                 fontSize: "7",
-                margin: [0, 0, 0, 20],
+                margin: [0, 0, 0, 13],
               },
               {
                 width: 245,
@@ -802,7 +799,7 @@ export const createIndiceIndicatorPDF = (
         bold: true,
       },
       table: {
-        fontSize: 7,
+        fontSize: 6,
         bold: true,
         alignment: "center",
         font: "Roboto",
