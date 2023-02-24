@@ -169,9 +169,7 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
-
     if (!validations.includes(indic)) {
-
       // Get footprint for all sectors
       // To do : Condition pour vérifier si on possède déjà les données comparatives
       let newComparativeData = await updateComparativeAreaData(indic);
@@ -282,8 +280,7 @@ const IndicatorsList = (props) => {
     <>
       {/* Charts generation */}
 
-      {
-        validations.length > 0 &&
+      {validations.length > 0 &&
         validations.map((indic, key) => (
           <div key={key} className="hidden charts-container">
             <Row>
@@ -449,85 +446,89 @@ const IndicatorsList = (props) => {
             )}
             {(metaIndics[indic].type == "intensité" ||
               metaIndics[indic].type == "indice") && (
-              <Row>
-                <Col sm={3}>
-                  <GrossImpactChart
-                    id={"part-" + indic}
-                    intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
-                      indic
-                    ].getGrossImpact(
-                      props.session.financialData.aggregates
-                        .intermediateConsumption.amount
-                    )}
-                    capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
-                      indic
-                    ].getGrossImpact(
-                      props.session.financialData.aggregates.capitalConsumption
-                        .amount
-                    )}
-                    netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
-                      indic
-                    ].getGrossImpact(
-                      props.session.financialData.aggregates.netValueAdded
-                        .amount
-                    )}
-                  />
-                </Col>
-                <Col sm={3}>
-                  <DeviationChart
-                    id={"deviationChart-" + indic}
-                    legalUnitData={[
-                      props.session.financialData.aggregates.production.footprint.getIndicator(
+              <>
+                <Row>
+                  <Col sm={3}>
+                    <GrossImpactChart
+                      id={"part-" + indic}
+                      intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
                         indic
-                      ).value,
-                      props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                      ].getGrossImpact(
+                        props.session.financialData.aggregates
+                          .intermediateConsumption.amount
+                      )}
+                      capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
                         indic
-                      ).value,
-                      props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                      ].getGrossImpact(
+                        props.session.financialData.aggregates
+                          .capitalConsumption.amount
+                      )}
+                      netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
                         indic
-                      ).value,
-                      props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                        indic
-                      ).value,
-                    ]}
-                    branchData={[
-                      comparativeData.production.divisionFootprint.indicators[
-                        indic
-                      ].value,
-                      comparativeData.intermediateConsumption.divisionFootprint
-                        .indicators[indic].value,
-                      comparativeData.fixedCapitalConsumption.divisionFootprint
-                        .indicators[indic].value,
-                      comparativeData.netValueAdded.divisionFootprint
-                        .indicators[indic].value,
-                    ]}
-                    indic={indic}
-                    unit={metaIndics[indic].unit}
-                    precision={metaIndics[indic].nbDecimal}
-                  />
-                </Col>
-                <Col sm={6}>
-                  <TrendsGraph
-                    id={"trend-prd-" + indic}
-                    unit={metaIndics[indic].unit}
-                    code={comparativeDivision}
-                    trends={
-                      comparativeData.production.trendsFootprint.indicators[
-                        indic
-                      ]
-                    }
-                    target={
-                      comparativeData.production.targetDivisionFootprint
-                        .indicators[indic]
-                    }
-                    current={
-                      props.session.financialData.aggregates.production.footprint.getIndicator(
-                        indic
-                      ).value
-                    }
-                  />
-                </Col>
-              </Row>
+                      ].getGrossImpact(
+                        props.session.financialData.aggregates.netValueAdded
+                          .amount
+                      )}
+                    />
+                  </Col>
+                  <Col sm={4}>
+                    <DeviationChart
+                      id={"deviationChart-" + indic}
+                      legalUnitData={[
+                        props.session.financialData.aggregates.production.footprint.getIndicator(
+                          indic
+                        ).value,
+                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                          indic
+                        ).value,
+                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                          indic
+                        ).value,
+                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                          indic
+                        ).value,
+                      ]}
+                      branchData={[
+                        comparativeData.production.divisionFootprint.indicators[
+                          indic
+                        ].value,
+                        comparativeData.intermediateConsumption
+                          .divisionFootprint.indicators[indic].value,
+                        comparativeData.fixedCapitalConsumption
+                          .divisionFootprint.indicators[indic].value,
+                        comparativeData.netValueAdded.divisionFootprint
+                          .indicators[indic].value,
+                      ]}
+                      indic={indic}
+                      unit={metaIndics[indic].unit}
+                      precision={metaIndics[indic].nbDecimal}
+                    />
+                  </Col>
+                </Row>
+                <Row>
+                  <Col sm={8}>
+                    <TrendsGraph
+                      id={"trend-prd-" + indic}
+                      unit={metaIndics[indic].unit}
+                      code={comparativeDivision}
+                      trends={
+                        comparativeData.production.trendsFootprint.indicators[
+                          indic
+                        ]
+                      }
+                      target={
+                        comparativeData.production.targetDivisionFootprint
+                          .indicators[indic]
+                      }
+                      current={
+                        props.session.financialData.aggregates.production.footprint.getIndicator(
+                          indic
+                        ).value
+                      }
+                    />
+                  </Col>
+                </Row>
+              </>
             )}
           </div>
         ))}
@@ -991,9 +992,6 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          session.comparativeData.netValueAdded.trendsFootprint.indicators[
-            indic
-          ].meta.label,
           false
         )
       );
@@ -1009,9 +1007,6 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          session.comparativeData.netValueAdded.trendsFootprint.indicators[
-            indic
-          ].meta.label,
           false
         )
       );
@@ -1043,7 +1038,6 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
 
     // Register the `fontkit` instance
     mergedPdfDoc.registerFontkit(fontkit);
-
 
     // Add each PDF to the final PDF document
     for (const pdf of pdfs) {

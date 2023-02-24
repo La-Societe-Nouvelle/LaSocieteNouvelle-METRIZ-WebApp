@@ -32,7 +32,6 @@ export const createIndiceIndicatorPDF = (
   unit,
   financialData,
   comparativeData,
-  chartLabel,
   download
 ) => {
   // ---------------------------------------------------------------
@@ -752,7 +751,7 @@ export const createIndiceIndicatorPDF = (
             width: "auto",
             stack: [
               {
-                text: chartLabel,
+                text: "Evolution de la performance de la branche",
                 bold: true,
                 fontSize: 7,
                 margin: [0, 7, 0, 7],
