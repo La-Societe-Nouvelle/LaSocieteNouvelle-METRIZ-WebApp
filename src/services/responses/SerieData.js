@@ -56,8 +56,8 @@ const getSerieData = async (id, code, indic, comparativeData, serie) => {
         }
       })
     )
-    .catch(() => {
-      console.log(errors);
+    .catch((error) => {
+      console.log(error);
     });
 
   const newComparativeData = {

@@ -93,10 +93,7 @@ export function getKeySuppliers(companies, indic, unit, precision) {
         stack: [
           {
             text:
-              cutString(company.corporateName, 30) +
-              " ( SIREN " +
-              company.corporateId +
-              ")",
+              cutString(company.corporateName, 40) ,
             fontSize: 8,
             bold: true,
           },
@@ -130,10 +127,7 @@ export function getIntensKeySuppliers(
         stack: [
           {
             text:
-              cutString(company.corporateName, 30) +
-              " ( SIREN " +
-              company.corporateId +
-              ")",
+              cutString(company.corporateName, 40),
             fontSize: 8,
             bold: true,
           },
@@ -162,42 +156,19 @@ export function getIntensKeySuppliers(
   return keySuppliers;
 }
 
-export const getPercentageForConsumptionRows = (
-  totalAmount,
-  intermediateConsumption,
-  indic
+export const getMostImpactfulExpenseAccountRows = (
+  mostImpactfulExpenseAccountsPart,
 ) => {
+  
   let rows = [];
-
-  intermediateConsumption
-    .filter(
-      (consumption) =>
-        consumption.footprint.indicators[indic].getGrossImpact(
-          consumption.amount
-        ) != 0
-    )
-    .sort((a, b) => {
-      let percentageA =
-        (a.footprint.indicators[indic].getGrossImpact(a.amount) / totalAmount) *
-        100;
-      let percentageB =
-        (b.footprint.indicators[indic].getGrossImpact(b.amount) / totalAmount) *
-        100;
-      return percentageB - percentageA;
-    })
-    .slice(0, 3)
-    .forEach((consumption) => {
+  
+  mostImpactfulExpenseAccountsPart
+    .forEach((item) => {
       let row = [];
-      let percentage =
-        (consumption.footprint.indicators[indic].getGrossImpact(
-          consumption.amount
-        ) /
-          totalAmount) *
-        100;
-
+   
       row.push(
         {
-          text: percentage.toFixed(0) + " %",
+          text:  item.impactPercentage + " %",
           fillColor: "#191558",
           color: "#FFFFFF",
           fontSize: 7,
@@ -206,7 +177,7 @@ export const getPercentageForConsumptionRows = (
           bold: true,
         },
         {
-          text: consumption.accountLib,
+          text: cutString(item.accountLib, 40),
           fontSize: 7,
           borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
           bold: true,

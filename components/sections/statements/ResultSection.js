@@ -179,8 +179,6 @@ const ResultSection = (props) => {
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
-            .label,
           true
         );
         break;
@@ -510,12 +508,9 @@ const ResultSection = (props) => {
                     : "border rounded p-4"
                 }
               >
-                <p className="text-primary fw-bold text-center">
-                  {
-                    comparativeData.production.trendsFootprint.indicators[indic]
-                      .meta.label
-                  }
-                </p>
+                <h5 className="text-center">
+                    Evolution de la performance de la branche
+                </h5>
                 <TrendsGraph
                   id={"trend-prd-" + indic}
                   unit={metaIndics[indic].unit}

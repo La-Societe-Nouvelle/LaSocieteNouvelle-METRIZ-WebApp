@@ -107,8 +107,6 @@ const ZipGenerator = ({
               metaIndics[indic].unit,
               financialData,
               comparativeData,
-              comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-                .meta.label,
               false
             )
           );

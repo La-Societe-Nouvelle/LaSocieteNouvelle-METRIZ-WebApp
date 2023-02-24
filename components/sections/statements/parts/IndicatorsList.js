@@ -282,10 +282,10 @@ const IndicatorsList = (props) => {
     <>
       {/* Charts generation */}
 
-      {props.visibleGraphs &&
+      {
         validations.length > 0 &&
         validations.map((indic, key) => (
-          <div key={key} className="hidden">
+          <div key={key} className="hidden charts-container">
             <Row>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs

@@ -4,7 +4,7 @@ import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import metaIndics from "/lib/indics";
 
 import {
-  getPercentageForConsumptionRows,
+  getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
   loadFonts,
   sortCompaniesByImpact,
@@ -28,7 +28,6 @@ export const createIntensIndicatorPDF = (
   unit,
   financialData,
   comparativeData,
-  chartLabel,
   download
 ) => {
   // ---------------------------------------------------------------
@@ -49,14 +48,32 @@ export const createIntensIndicatorPDF = (
     comparativeData.production.targetDivisionFootprint.indicators[indic].data
   );
 
+  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[
+    indic
+  ].data.filter((item) => item.flag == "e" && item.year <= year);
+  lastEstimatedData = lastEstimatedData.slice(
+    Math.max(lastEstimatedData.length - 2, 1)
+  );
 
-  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[indic].data.filter((item) => item.flag == "e" && item.year <= year);
-  lastEstimatedData = lastEstimatedData.slice(Math.max(lastEstimatedData.length - 2, 1));
-  
-    
-  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
+  let expensesAccounts = financialData.expenseAccounts.filter((expense) =>
+    /^6(0[^3]|[1-2])/.test(expense.accountNum)
+  );
 
-  
+  const mostImpactfulExpenses = sortCompaniesByImpact(
+    expensesAccounts,
+    indic,
+    "desc"
+  ).slice(0, 3);
+
+  const mostImpactfulExpenseAccountsPart = getMostImpactfulExpensesPart(
+    mostImpactfulExpenses,
+    production.footprint.indicators[indic].getGrossImpact(production.amount),
+    indic
+  );
+
+  const branchProductionEvolution =
+    calculateAverageEvolutionRate(lastEstimatedData);
+
   const firstMostImpactfulCompanies = sortCompaniesByImpact(
     financialData.companies,
     indic,
@@ -69,8 +86,7 @@ export const createIntensIndicatorPDF = (
     "desc"
   ).slice(2, 4);
 
-
-
+  // Part des consommations intermédiaires
   const intermediateConsumptionPart = getIntermediateConsumptionsPart(
     financialData,
     indic
@@ -269,7 +285,7 @@ export const createIntensIndicatorPDF = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text:  label, style: "header" },
+      { text: label, style: "header" },
       {
         columnGap: 30,
         columns: [
@@ -369,7 +385,7 @@ export const createIntensIndicatorPDF = (
         ],
       },
       {
-        text: "\tEmpreintes de vos Soldes Intermédiaires de Gestion\t",
+        text: "\tRépartition des impacts de la production\t",
         style: "h2",
         alignment: "center",
         margin: [0, 30, 0, 20],
@@ -453,8 +469,7 @@ export const createIntensIndicatorPDF = (
           },
           createChargesImpactContent(
             intermediateConsumptionPart,
-            financialData.aggregates.intermediateConsumption,
-            financialData,
+            mostImpactfulExpenseAccountsPart,
             indic
           ),
         ],
@@ -514,24 +529,18 @@ export const createIntensIndicatorPDF = (
                 [
                   {
                     text: "",
-                    border: [false, false, true, false],
                   },
                   {
                     text: "Montant",
-                    border: [false, false, true, false],
                   },
                   {
                     text: "Empreinte",
-
-                    border: [false, false, true, false],
                   },
                   {
                     text: "Impact",
-                    border: [false, false, true, false],
                   },
                   {
                     text: "Incert.*",
-                    border: [false, false, true, false],
                     alignment: "center",
                   },
                 ],
@@ -603,7 +612,7 @@ export const createIntensIndicatorPDF = (
                 ],
                 [
                   {
-                    text: "Conso. intermédiaires",
+                    text: "cons. intermédiaires",
                     margin: [2, 6, 2, 6],
                   },
                   {
@@ -661,7 +670,7 @@ export const createIntensIndicatorPDF = (
                 ],
                 [
                   {
-                    text: "Conso. de capital fixe",
+                    text: "cons. de capital fixe",
                     margin: [2, 6, 2, 6],
                   },
                   {
@@ -773,7 +782,9 @@ export const createIntensIndicatorPDF = (
             },
             layout: {
               hLineWidth: function (i, node) {
-                return i === 0 || i === node.table.body.length ? 0 : 2;
+                return i === 0 || i === 1 || i === node.table.body.length
+                  ? 0
+                  : 2;
               },
 
               vLineWidth: function (i, node) {
@@ -830,14 +841,21 @@ export const createIntensIndicatorPDF = (
                 bold: true,
               },
               {
-                text: branchProductionEvolution + " % ",
+                text:
+                  branchProductionEvolution > 0
+                    ? " + " + branchProductionEvolution + " % "
+                    : branchProductionEvolution + " % ",
                 alignment: "center",
                 fontSize: "10",
                 style: "numbers",
                 color: "#ffb642",
               },
               {
-                text: "Taux d'évolution moyen observé entre " + lastEstimatedData[0].year + " et " + lastEstimatedData[1].year ,
+                text:
+                  "Taux d'évolution moyen observé entre " +
+                  lastEstimatedData[0].year +
+                  " et " +
+                  lastEstimatedData[1].year,
                 alignment: "center",
                 fontSize: "8",
                 margin: [0, 2, 0, 0],
@@ -848,7 +866,7 @@ export const createIntensIndicatorPDF = (
             width: "auto",
             stack: [
               {
-                text: chartLabel,
+                text: "Evolution de la performance de la branche",
                 bold: true,
                 fontSize: 7,
                 margin: [0, 15, 0, 10],
@@ -942,9 +960,7 @@ export const createIntensIndicatorPDF = (
 
 function createChargesImpactContent(
   intermediateConsumptionPart,
-  intermediateConsumption,
-  financialData,
-  indic
+  mostImpactfulExpenseAccountsPart,
 ) {
   let content = {
     stack: [
@@ -962,15 +978,7 @@ function createChargesImpactContent(
       ///
       {
         table: {
-          body: [
-            ...getPercentageForConsumptionRows(
-              intermediateConsumption.footprint.indicators[
-                indic
-              ].getGrossImpact(intermediateConsumption.amount),
-              financialData.getIntermediateConsumptionsAggregates(),
-              indic
-            ),
-          ],
+          body: [...getMostImpactfulExpenseAccountRows(mostImpactfulExpenseAccountsPart)],
           layout: {
             hLineWidth: function (i) {
               return i === 0 || i === 4 ? 2 : 1;
@@ -1044,4 +1052,16 @@ function createBoxIntermediateConsumption(intermediateConsumptionPart) {
   }
 
   return rect;
+}
+function getMostImpactfulExpensesPart(expenses, total, indic) {
+  const expensesPart = expenses.map((expense) => {
+    let expenseImpact = expense.footprint.indicators[indic].getGrossImpact(
+      expense.amount
+    );
+    let impactPercentage = Math.round((expenseImpact / total) * 100);
+    let accountLib = expense.accountLib;
+
+    return { accountLib, impactPercentage }; 
+  });
+  return expensesPart;
 }

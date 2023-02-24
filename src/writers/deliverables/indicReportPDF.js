@@ -41,7 +41,7 @@ export const createIndicReport = (
     comparativeData,
     indic
   );
-
+ 
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
 
@@ -200,8 +200,8 @@ export const createIndicReport = (
       },
       // Analysis note
 
-      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
-      analysisNotes.map((note) => ({ text: note, style: "text", fontSize: 9 })),
+      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] }, 
+      analysisNotes.map((note) => ({ text: note.reduce((a, b) => a + " " + b), style: "text", fontSize: 9 })),
       // ---------------------------------------------------------------------------
       // Charts
       {
