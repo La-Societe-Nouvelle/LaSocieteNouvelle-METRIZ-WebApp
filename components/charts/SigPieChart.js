@@ -29,6 +29,8 @@ function SigPieChart({ value, title, id }) {
 
   const options = {
     devicePixelRatio: 2,
+    maintainAspectRatio: true,
+    responsive: false,
     cutout: 55,
     hover: { mode: null },
     layout: {

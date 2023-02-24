@@ -65,6 +65,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
           x: {
             min: minValue - 10,
             max: maxValue + 10,
+
             grid: {
               color: "#ececff",
             },
@@ -73,8 +74,11 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
               font: {
                 family: "Raleway",
               },
-              callback: function (value, index, values) {
-                return value === 0 ? value : "";
+              callback: (value, index) => {
+            
+                if (value === 0 || value === 40 || value === -40) {
+                  return value + "%";
+                }
               },
             },
           },
@@ -94,10 +98,15 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             },
           },
           datalabels: {
-            color: "#ffffff",
+            anchor: "start",
+            color: "#191558",
+            align: "top",
+            padding: {
+              bottom: 20,
+            },
             font: {
-              size: 8,
-              family: "Roboto",
+              size: 9,
+              family: "Raleway",
             },
             formatter: (value) => {
               if (value !== 0) {

@@ -127,7 +127,7 @@ const ComparativeGraphs = (props) => {
             },
             color: "#191558",
             font: {
-              size: 12,
+              size: 9,
               family: "Roboto",
             },
           },

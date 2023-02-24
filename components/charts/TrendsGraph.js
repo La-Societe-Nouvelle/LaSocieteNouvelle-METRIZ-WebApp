@@ -109,7 +109,6 @@ function TrendsGraph(props) {
     const options = {
       devicePixelRatio: 2,
       pointRadius: 0,
-      maintainAspectRatio: true,
       scales: {
         y: {
           display: true,
