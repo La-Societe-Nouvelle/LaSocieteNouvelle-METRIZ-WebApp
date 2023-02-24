@@ -559,11 +559,11 @@ export const createIntensIndicatorPDF = (
                 [
                   {
                     text: "Production",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(production.amount, 0) + " €",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                     alignment: "right",
                   },
                   {
@@ -580,7 +580,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     columns: [
@@ -598,7 +598,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(
@@ -607,18 +607,18 @@ export const createIntensIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
                 [
                   {
                     text: "cons. intermédiaires",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(intermediateConsumption.amount, 0) + " €",
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
 
                   {
@@ -637,7 +637,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     columns: [
@@ -655,7 +655,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(
@@ -665,22 +665,22 @@ export const createIntensIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
                 [
                   {
                     text: "cons. de capital fixe",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(capitalConsumption.amount, 0) + " €",
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                     columns: [
                       {
                         text: [
@@ -711,7 +711,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(
@@ -721,18 +721,18 @@ export const createIntensIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
                 [
                   {
                     text: "Valeur ajoutée nette",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(netValueAdded.amount, 0) + " €",
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     columns: [
@@ -748,7 +748,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     columns: [
@@ -766,7 +766,7 @@ export const createIntensIndicatorPDF = (
                       },
                     ],
                     alignment: "right",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                   {
                     text: printValue(
@@ -775,7 +775,7 @@ export const createIntensIndicatorPDF = (
                     ),
                     fontSize: "5",
                     alignment: "center",
-                    margin: [2, 6, 2, 6],
+                    margin: [2, 7, 2, 8],
                   },
                 ],
               ],
@@ -806,7 +806,7 @@ export const createIntensIndicatorPDF = (
                 alignment: "center",
                 bold: true,
                 fontSize: "7",
-                margin: [0, 0, 0, 14],
+                margin: [0, 0, 0, 13],
               },
               {
                 width: 245,

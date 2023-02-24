@@ -40,7 +40,7 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
         borderWidth: 0,
         type: "bar",
         barPercentage: 1,
-        categoryPercentage: 0.5,
+        categoryPercentage: 0.4,
         minBarLength: 2,
       },
     ],
@@ -72,7 +72,9 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             ticks: {
               color: "#8c8aab",
               font: {
+                size: 9,
                 family: "Raleway",
+                weight: "bold"
               },
               callback: (value, index) => {
             
@@ -98,15 +100,19 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
             },
           },
           datalabels: {
-            anchor: "start",
-            color: "#191558",
-            align: "top",
-            padding: {
-              bottom: 20,
-            },
+            anchor: function(context) {
+              return context.dataset.data[context.dataIndex] < 0 ? 'start' : 'end';
+            },    
+            offset: function(context) {
+              return context.dataset.data[context.dataIndex] < 0 ? -30 : 5;
+            },   
+            align: 'end',
+            color: "#8c8aab",
+       
             font: {
               size: 9,
               family: "Raleway",
+              weight:"bold"
             },
             formatter: (value) => {
               if (value !== 0) {
