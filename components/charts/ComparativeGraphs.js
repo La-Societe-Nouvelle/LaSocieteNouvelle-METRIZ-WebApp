@@ -62,7 +62,7 @@ const ComparativeGraphs = (props) => {
         type: "bar",
         barPercentage: 0.6,
         categoryPercentage: 0.6,
-        
+        minBarLength: 2,
       },
       {
         label: "Objectif ",
@@ -76,6 +76,7 @@ const ComparativeGraphs = (props) => {
         borderWidth: 0,
         barPercentage: 0.6,
         categoryPercentage: 0.6,
+        minBarLength: 2,
       },
     ],
   };

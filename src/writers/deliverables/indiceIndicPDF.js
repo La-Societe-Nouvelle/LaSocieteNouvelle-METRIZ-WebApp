@@ -1,8 +1,11 @@
 // PDF make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-// Libs
+
+// Lib
+import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
+
 // Utils
 import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
@@ -37,6 +40,7 @@ export const createIndiceIndicatorPDF = (
   // ---------------------------------------------------------------
   // Variables
   const precision = metaIndics[indic].nbDecimals;
+  const divisionName = divisions[comparativeData.activityCode];
 
   const {
     production,
@@ -56,20 +60,22 @@ export const createIndiceIndicatorPDF = (
     comparativeData.production.targetDivisionFootprint.indicators[indic].data
   );
 
-  
-  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[indic].data.filter((item) => item.flag == "e" && item.year <= year);
-  lastEstimatedData = lastEstimatedData.slice(Math.max(lastEstimatedData.length - 2, 1));
-  
-    
-  const branchProductionEvolution = calculateAverageEvolutionRate(lastEstimatedData);
+  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[
+    indic
+  ].data.filter((item) => item.flag == "e" && item.year <= year);
+  lastEstimatedData = lastEstimatedData.slice(
+    Math.max(lastEstimatedData.length - 2, 1)
+  );
 
+  const branchProductionEvolution =
+    calculateAverageEvolutionRate(lastEstimatedData);
 
   const firstMostImpactfulCompanies = sortCompaniesByFootprint(
     financialData.companies,
     indic,
     "desc"
   ).slice(0, 2);
-  
+
   const scdMostImpactfulCompanies = sortCompaniesByFootprint(
     financialData.companies,
     indic,
@@ -207,9 +213,9 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 605,
+            y: 625,
             w: 180,
-            h: 100,
+            h: 140,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -217,9 +223,9 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 220,
-            y: 605,
+            y: 625,
             w: 345,
-            h: 160,
+            h: 150,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -438,7 +444,7 @@ export const createIndiceIndicatorPDF = (
       //--------------------------------------------------
       // Key Suppliers
       {
-        text: "\tLes fournisseurs clés\t",
+        text: "\tFournisseurs clés\t",
         style: "h2",
         alignment: "center",
         margin: [0, 25, 0, 0],
@@ -479,7 +485,7 @@ export const createIndiceIndicatorPDF = (
       //--------------------------------------------------
       // SIG Table
       {
-        margin: [0, 20, 0, 10],
+        margin: [0, 20, 0, 0],
         columns: [
           {
             width: "*",
@@ -496,7 +502,6 @@ export const createIndiceIndicatorPDF = (
                   },
                   {
                     text: "Empreinte",
-
                   },
 
                   {
@@ -508,13 +513,18 @@ export const createIndiceIndicatorPDF = (
                 [
                   {},
                   {},
-                  { text: unit ? unit : "Rapport interdécile", fontSize: "5", alignment: "right" },
+                  {
+                    text: unit ? unit : "Rapport interdécile",
+                    fontSize: "5",
+                    alignment: "right",
+                  },
                   { text: "%", fontSize: "5", alignment: "center" },
                 ],
                 [
                   {
                     text: "Production",
                     margin: [2, 7, 2, 8],
+                    alignment: "left",
                   },
                   {
                     text: printValue(production.amount, 0) + " €",
@@ -552,6 +562,7 @@ export const createIndiceIndicatorPDF = (
                   {
                     text: "Cons. intermédiaires",
                     margin: [2, 7, 2, 8],
+                    alignment: "left",
                   },
                   {
                     text: printValue(intermediateConsumption.amount, 0) + " €",
@@ -591,6 +602,7 @@ export const createIndiceIndicatorPDF = (
                 [
                   {
                     text: "Cons. de capital fixe",
+                    alignment: "left",
                     margin: [2, 7, 2, 8],
                   },
                   {
@@ -629,6 +641,7 @@ export const createIndiceIndicatorPDF = (
                 [
                   {
                     text: "Valeur ajoutée nette",
+                    alignment: "left",
                     margin: [2, 7, 2, 8],
                   },
                   {
@@ -667,9 +680,7 @@ export const createIndiceIndicatorPDF = (
             },
             layout: {
               hLineWidth: function (i, node) {
-                return i === 0 || i === 1 || i === node.table.body.length
-                  ? 0
-                  : 2;
+                return i === 0 || i === 1 ? 0 : 2;
               },
               vLineWidth: function (i, node) {
                 return i === 0 || i === node.table.widths.length ? 0 : 2;
@@ -684,18 +695,45 @@ export const createIndiceIndicatorPDF = (
           },
           //--------------------------------------------------
           //Deviation chart
-
           {
-            width: "auto",
+            width: "*",
             stack: [
               {
-                text: "Ecart par rapport à la moyenne de la branche",
-                alignment: "center",
-                bold: true,
-                fontSize: "7",
-                margin: [0, 0, 0, 13],
+                table: {
+                  widths: ["100%"],
+                  body: [
+                    [
+                      {
+                        text: "Ecart par rapport à la moyenne de la branche",
+                        width: "100%",
+                        fontSize: "6",
+                        bold: true,
+                        alignment: "center",
+                        font: "Roboto",
+                        border: [false, false, false, true],
+                      },
+                    ],
+                  ],
+                },
+                layout: {
+                  hLineWidth: function (i, node) {
+                    return 2;
+                  },
+
+                  hLineColor: function (i, node) {
+                    return "#f0f0f8";
+                  },
+                  paddingTop: function (i, node) {
+                    return 0;
+                  },
+
+                  paddingBottom: function (i, node) {
+                    return 12;
+                  },
+                },
               },
               {
+                margin: [0, 1, 0, 0],
                 width: 245,
                 image: deviationImage,
               },
@@ -710,8 +748,13 @@ export const createIndiceIndicatorPDF = (
           //Left Box
           {
             width: "33%",
-            margin: [0, 7, 0, 0],
             stack: [
+              {
+                text: "\tObjectif de la branche\t",
+                style: "h2",
+                alignment: "center",
+                background: "#FFFFFF",
+              },
               {
                 text: branchProductionTarget
                   ? branchProductionTarget + " %"
@@ -722,36 +765,58 @@ export const createIndiceIndicatorPDF = (
               },
               {
                 text: branchProductionTarget
-                  ? "Objectif annuel de la branche"
-                  : "Aucun objectif défini pour la branche",
+                  ? "Objectif annuel"
+                  : "Aucun objectif défini",
                 alignment: "center",
                 margin: [0, 2, 0, 10],
                 bold: true,
               },
               {
-                text: branchProductionEvolution + " % ",
+                text:
+                  branchProductionEvolution > 0
+                    ? " + " + branchProductionEvolution + " % "
+                    : branchProductionEvolution + " % ",
                 alignment: "center",
                 fontSize: "10",
                 style: "numbers",
                 color: "#ffb642",
               },
               {
-                text: "Taux d'évolution moyen observé entre " + lastEstimatedData[0].year + " et " + lastEstimatedData[1].year ,
+                text:
+                  "Taux d'évolution moyen observé entre " +
+                  lastEstimatedData[0].year +
+                  " et " +
+                  lastEstimatedData[1].year,
                 alignment: "center",
                 fontSize: "8",
                 margin: [0, 2, 0, 0],
+              },
+              {
+                margin: [0, 15, 0, 0],
+                fontSize: 6,
+                text: [
+                  {
+                    text:
+                      "Branche de référence : " +
+                      comparativeData.activityCode +
+                      " - ",
+                  },
+                  {
+                    text: divisionName,
+                  },
+                ],
               },
             ],
           },
           //Right Box
           {
-            width: "auto",
+            width: "*",
             stack: [
               {
-                text: "Evolution de la performance de la branche",
-                bold: true,
-                fontSize: 7,
-                margin: [0, 7, 0, 7],
+                text: "\tEvolution de la performance de la branche\t",
+                style: "h2",
+                alignment: "center",
+                background: "#FFFFFF",
               },
               {
                 width: 250,
@@ -767,7 +832,7 @@ export const createIndiceIndicatorPDF = (
         fontSize: 6,
         italics: true,
         font: "Roboto",
-        margin: [0, 20, 0, 0],
+        margin: [0, 10, 0, 0],
       },
       ,
     ],

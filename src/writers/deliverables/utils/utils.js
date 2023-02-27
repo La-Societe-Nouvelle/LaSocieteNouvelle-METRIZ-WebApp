@@ -85,23 +85,24 @@ export function getUncertaintyDescription(typeIndic, uncertainty) {
 
 export function getKeySuppliers(companies, indic, unit, precision) {
   const keySuppliers = [];
-
   companies
     .filter((company) => !company.isDefaultAccount)
     .map((company) =>
       keySuppliers.push({
         stack: [
           {
-            text:
-              cutString(company.corporateName, 40) ,
+            text: cutString(company.corporateName, 40),
             fontSize: 8,
             bold: true,
           },
           {
             text:
-              company.footprint.indicators[indic].value.toFixed(precision) +
-              " " +
-              unit,
+              indic == "idr"
+                ? "Rapport interdécile : " +
+                  company.footprint.indicators[indic].value.toFixed(precision)
+                : company.footprint.indicators[indic].value.toFixed(precision) +
+                  " " +
+                  unit,
             fontSize: 7,
           },
         ],
@@ -120,14 +121,15 @@ export function getIntensKeySuppliers(
 ) {
   const keySuppliers = [];
 
+  const precisionImpact = unitGrossImpact == "€" ? 0 : precision;
+
   companies
     .filter((company) => !company.isDefaultAccount)
     .map((company) =>
       keySuppliers.push({
         stack: [
           {
-            text:
-              cutString(company.corporateName, 40),
+            text: cutString(company.corporateName, 40),
             fontSize: 8,
             bold: true,
           },
@@ -142,7 +144,7 @@ export function getIntensKeySuppliers(
                 company.footprint.indicators[indic].getGrossImpact(
                   company.amount
                 ),
-                precision
+                precisionImpact
               ) +
               " " +
               unitGrossImpact,
@@ -157,34 +159,32 @@ export function getIntensKeySuppliers(
 }
 
 export const getMostImpactfulExpenseAccountRows = (
-  mostImpactfulExpenseAccountsPart,
-) => {
-  
-  let rows = [];
-  
   mostImpactfulExpenseAccountsPart
-    .forEach((item) => {
-      let row = [];
-   
-      row.push(
-        {
-          text:  item.impactPercentage + " %",
-          fillColor: "#191558",
-          color: "#FFFFFF",
-          fontSize: 7,
-          borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-          alignment: "right",
-          bold: true,
-        },
-        {
-          text: cutString(item.accountLib, 40),
-          fontSize: 7,
-          borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
-          bold: true,
-        }
-      );
-      rows.push(row);
-    });
+) => {
+  let rows = [];
+
+  mostImpactfulExpenseAccountsPart.forEach((item) => {
+    let row = [];
+
+    row.push(
+      {
+        text: item.impactPercentage + " %",
+        fillColor: "#191558",
+        color: "#FFFFFF",
+        fontSize: 7,
+        borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+        alignment: "right",
+        bold: true,
+      },
+      {
+        text: cutString(item.accountLib, 40),
+        fontSize: 7,
+        borderColor: ["#ffffff", "#ffffff", "#ffffff", "#ffffff"],
+        bold: true,
+      }
+    );
+    rows.push(row);
+  });
   return rows;
 };
 
@@ -208,7 +208,6 @@ export function targetAnnualReduction(data) {
   return percentageReduction;
 }
 
-
 export function calculateAverageEvolutionRate(data) {
   let evolutionRates = [];
   let numberOfYears = 0;
@@ -217,7 +216,6 @@ export function calculateAverageEvolutionRate(data) {
     const initialValue = data[i].value;
     const finalValue = data[i + 1].value;
 
-
     // Check if years are consecutive
     if (parseInt(data[i + 1].year) === parseInt(data[i].year) + 1) {
       numberOfYears++;
@@ -225,8 +223,11 @@ export function calculateAverageEvolutionRate(data) {
       evolutionRates.push(evolutionRate);
     } else {
       // Calculate annual evolution rate
-      const numberOfAnnualEvolutionRates = parseInt(data[i + 1].year) - parseInt(data[i].year);
-      const annualEvolutionRate = Math.pow(finalValue / initialValue, 1 / numberOfAnnualEvolutionRates) - 1;
+      const numberOfAnnualEvolutionRates =
+        parseInt(data[i + 1].year) - parseInt(data[i].year);
+      const annualEvolutionRate =
+        Math.pow(finalValue / initialValue, 1 / numberOfAnnualEvolutionRates) -
+        1;
       numberOfYears += numberOfAnnualEvolutionRates;
       evolutionRates.push(annualEvolutionRate * 100);
     }
@@ -237,8 +238,6 @@ export function calculateAverageEvolutionRate(data) {
 
   return averageEvolutionRate.toFixed(0);
 }
-
-
 
 export function loadFonts() {
   pdfMake.fonts = {

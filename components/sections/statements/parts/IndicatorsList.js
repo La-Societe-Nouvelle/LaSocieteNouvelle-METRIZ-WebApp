@@ -169,27 +169,26 @@ const IndicatorsList = (props) => {
   };
 
   const validateIndicator = async (indic) => {
-    if (!validations.includes(indic)) {
-      // Get footprint for all sectors
-      // To do : Condition pour vérifier si on possède déjà les données comparatives
-      let newComparativeData = await updateComparativeAreaData(indic);
-      if (comparativeDivision != "00") {
-        newComparativeData = await updateComparativeDivisionData(
-          indic,
-          newComparativeData,
-          comparativeDivision
-        );
-      }
+    // Get footprint for all sectors
 
-      props.session.comparativeData = newComparativeData;
-
-      setComparativeData(newComparativeData);
-      SetValidations((validations) => [...validations, indic]);
-
-      // Update parent State
-
-      props.onValidation(indic);
+    let newComparativeData = await updateComparativeAreaData(indic);
+    if (comparativeDivision != "00") {
+      newComparativeData = await updateComparativeDivisionData(
+        indic,
+        newComparativeData,
+        comparativeDivision
+      );
     }
+
+    props.session.comparativeData = newComparativeData;
+
+    setComparativeData(newComparativeData);
+    SetValidations((validations) => [...validations, indic]);
+
+    // Update parent State
+
+    props.onValidation(indic);
+
     // add validation
     if (!props.session.validations.includes(indic)) {
       props.session.validations.push(indic);
@@ -222,7 +221,6 @@ const IndicatorsList = (props) => {
 
   // Export pdf on click
   const handleDownloadPDF = async (key, comparativeDivision) => {
-    
     props.updateVisibleGraphs(true);
 
     // Display pop up to choose a comparative division

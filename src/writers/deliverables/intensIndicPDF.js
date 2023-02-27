@@ -1,6 +1,8 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { getShortCurrentDateString, printValue } from "../../utils/Utils";
+
+// Lib
+import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
 import {
@@ -12,6 +14,7 @@ import {
   getIntensKeySuppliers,
   calculateAverageEvolutionRate,
 } from "./utils/utils";
+import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 
 // --------------------------------------------------------------------------
 
@@ -42,6 +45,7 @@ export const createIntensIndicatorPDF = (
 
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
+  const divisionName = divisions[comparativeData.activityCode];
 
   // UTILS
   const branchProductionTarget = targetAnnualReduction(
@@ -242,9 +246,9 @@ export const createIntensIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 340,
+            y: 338,
             w: 535,
-            h: 70,
+            h: 75,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -253,7 +257,7 @@ export const createIntensIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 590,
+            y: 600,
             w: 180,
             h: 140,
             lineWidth: 2,
@@ -263,9 +267,9 @@ export const createIntensIndicatorPDF = (
           {
             type: "rect",
             x: 220,
-            y: 590,
+            y: 600,
             w: 345,
-            h: 165,
+            h: 160,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -346,7 +350,7 @@ export const createIntensIndicatorPDF = (
                 margin: [0, 0, 0, 0],
               },
               {
-                text: "de " + unitGrossImpact,
+                text: unitGrossImpact,
                 bold: true,
                 margin: [0, 0, 0, 5],
               },
@@ -476,7 +480,7 @@ export const createIntensIndicatorPDF = (
       },
       // KEY SUPPLIERS
       {
-        text: "\tLes fournisseurs clés\t",
+        text: "\tFournisseurs clés\t",
         style: "h2",
         alignment: "center",
         margin: [0, 25, 0, 0],
@@ -518,11 +522,11 @@ export const createIntensIndicatorPDF = (
       },
       // TABLE SIG
       {
-        margin: [0, 25, 0, 10],
+        margin: [0, 20, 0, 0],
         columns: [
           {
-            width: "*",
-            style: "table",
+            width: "auto",
+            style: "table",        
             table: {
               body: [
                 // HEADER
@@ -560,6 +564,7 @@ export const createIntensIndicatorPDF = (
                   {
                     text: "Production",
                     margin: [2, 7, 2, 8],
+                    alignment: "left",
                   },
                   {
                     text: printValue(production.amount, 0) + " €",
@@ -612,8 +617,9 @@ export const createIntensIndicatorPDF = (
                 ],
                 [
                   {
-                    text: "cons. intermédiaires",
+                    text: "Cons. intermédiaires",
                     margin: [2, 7, 2, 8],
+                    alignment: "left",
                   },
                   {
                     text: printValue(intermediateConsumption.amount, 0) + " €",
@@ -670,8 +676,9 @@ export const createIntensIndicatorPDF = (
                 ],
                 [
                   {
-                    text: "cons. de capital fixe",
+                    text: "Cons. de capital fixe",
                     margin: [2, 7, 2, 8],
+                    alignment: "left",
                   },
                   {
                     text: printValue(capitalConsumption.amount, 0) + " €",
@@ -728,6 +735,7 @@ export const createIntensIndicatorPDF = (
                   {
                     text: "Valeur ajoutée nette",
                     margin: [2, 7, 2, 8],
+                    alignment: "left",
                   },
                   {
                     text: printValue(netValueAdded.amount, 0) + " €",
@@ -782,7 +790,7 @@ export const createIntensIndicatorPDF = (
             },
             layout: {
               hLineWidth: function (i, node) {
-                return i === 0 || i === 1 || i === node.table.body.length
+                return i === 0 || i === 1 
                   ? 0
                   : 2;
               },
@@ -799,16 +807,43 @@ export const createIntensIndicatorPDF = (
             },
           },
           {
-            width: "auto",
+            width: "*",
             stack: [
               {
-                text: "Ecart par rapport à la moyenne de la branche",
-                alignment: "center",
-                bold: true,
-                fontSize: "7",
-                margin: [0, 0, 0, 13],
+                table: {
+                  widths: ["100%"],
+                  body: [
+                    [
+                      {
+                        text: "Ecart par rapport à la moyenne de la branche",
+                        width: "100%",
+                        fontSize: "6",
+                        bold: true,
+                        alignment: "center",
+                        font: "Roboto",
+                        border: [false, false, false, true], 
+                      },
+                    ],
+                  ],
+                },
+                layout: {
+                  hLineWidth: function (i, node) {
+                    return   2;
+                  },
+    
+                  hLineColor: function (i, node) {
+                    return "#f0f0f8";
+                  },
+                  paddingTop: function(i, node) { return 0; },
+
+                  paddingBottom: function(i, node) { return 12; },
+  
+                },
+  
               },
+
               {
+                margin: [0, 1, 0, 0],
                 width: 245,
                 image: deviationImage,
               },
@@ -816,14 +851,18 @@ export const createIntensIndicatorPDF = (
           },
         ],
       },
-
       {
         columnGap: 40,
         columns: [
           {
             width: "33%",
-            margin: [0, 10, 0, 0],
             stack: [
+              {
+                text: "\tObjectif de la branche\t",
+                style: "h2",
+                alignment: "center",
+                background: "#FFFFFF",
+              },
               {
                 text: branchProductionTarget
                   ? branchProductionTarget + " %"
@@ -834,13 +873,13 @@ export const createIntensIndicatorPDF = (
               },
               {
                 text: branchProductionTarget
-                  ? "Objectif annuel de la branche"
-                  : "Aucun objectif défini pour la branche",
+                  ? "Objectif annuel"
+                  : "Aucun objectif défini",
                 alignment: "center",
-                margin: [0, 2, 0, 10],
                 bold: true,
               },
               {
+                margin: [0, 10, 0, 0],
                 text:
                   branchProductionEvolution > 0
                     ? " + " + branchProductionEvolution + " % "
@@ -858,18 +897,32 @@ export const createIntensIndicatorPDF = (
                   lastEstimatedData[1].year,
                 alignment: "center",
                 fontSize: "8",
-                margin: [0, 2, 0, 0],
+              },
+              {
+                margin: [0, 15, 0, 0],
+                fontSize: 6,
+                text: [
+                  {
+                    text:
+                      "Branche de référence : " +
+                      comparativeData.activityCode +
+                      " - ",
+                  },
+                  {
+                    text: divisionName,
+                  },
+                ],
               },
             ],
           },
           {
-            width: "auto",
+            width: "*",
             stack: [
               {
-                text: "Evolution de la performance de la branche",
-                bold: true,
-                fontSize: 7,
-                margin: [0, 15, 0, 10],
+                text: "\tEvolution de la performance de la branche\t",
+                style: "h2",
+                alignment: "center",
+                background: "#FFFFFF",
               },
               {
                 width: 260,
@@ -960,7 +1013,7 @@ export const createIntensIndicatorPDF = (
 
 function createChargesImpactContent(
   intermediateConsumptionPart,
-  mostImpactfulExpenseAccountsPart,
+  mostImpactfulExpenseAccountsPart
 ) {
   let content = {
     stack: [
@@ -978,7 +1031,11 @@ function createChargesImpactContent(
       ///
       {
         table: {
-          body: [...getMostImpactfulExpenseAccountRows(mostImpactfulExpenseAccountsPart)],
+          body: [
+            ...getMostImpactfulExpenseAccountRows(
+              mostImpactfulExpenseAccountsPart
+            ),
+          ],
           layout: {
             hLineWidth: function (i) {
               return i === 0 || i === 4 ? 2 : 1;
@@ -1061,7 +1118,7 @@ function getMostImpactfulExpensesPart(expenses, total, indic) {
     let impactPercentage = Math.round((expenseImpact / total) * 100);
     let accountLib = expense.accountLib;
 
-    return { accountLib, impactPercentage }; 
+    return { accountLib, impactPercentage };
   });
   return expensesPart;
 }

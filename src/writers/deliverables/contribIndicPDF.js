@@ -12,6 +12,9 @@ import {
   sortCompaniesByFootprint,
   sortCompaniesByImpact,
 } from "./utils/utils";
+
+// Lib
+import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
 // --------------------------------------------------------------------------
@@ -38,6 +41,7 @@ export const createContribIndicatorPDF = (
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
+  const divisionName = divisions[comparativeData.activityCode];
 
   // ---------------------------------------------------------------
   // utils
@@ -413,7 +417,7 @@ export const createContribIndicatorPDF = (
                 alignment: "center",
               },
               {
-                text: "\tPerformances de vos achats\t",
+                text: "\tEmpreinte de vos achats\t",
                 style: "h3",
                 margin: [0, 20, 0, 10],
                 alignment: "center",
@@ -449,6 +453,20 @@ export const createContribIndicatorPDF = (
                 text: "Moyenne de la branche",
                 alignment: "center",
                 fontSize: 8,
+                bold: true,
+              },
+              {
+                margin: [0, 5, 0, 0],
+                fontSize: 8,
+                alignment: "center",
+                text: [
+                  {
+                    text: comparativeData.activityCode + " - ",
+                  },
+                  {
+                    text: cutString(divisionName, 120),
+                  },
+                ],
               },
             ],
           },
@@ -457,7 +475,7 @@ export const createContribIndicatorPDF = (
             width: "*",
             stack: [
               {
-                text: "\tLes comptes de charges les plus impactants\t",
+                text: "\tComptes de charges les plus impactants\t",
                 style: "h2",
               },
               {
