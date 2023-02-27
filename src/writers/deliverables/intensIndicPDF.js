@@ -13,6 +13,7 @@ import {
   targetAnnualReduction,
   getIntensKeySuppliers,
   calculateAverageEvolutionRate,
+  cutString,
 } from "./utils/utils";
 import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 
@@ -525,7 +526,7 @@ export const createIntensIndicatorPDF = (
         margin: [0, 20, 0, 0],
         columns: [
           {
-            width: "auto",
+            width: "*",
             style: "table",        
             table: {
               body: [
