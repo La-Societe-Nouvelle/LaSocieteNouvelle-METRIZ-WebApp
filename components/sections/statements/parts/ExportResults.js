@@ -17,7 +17,6 @@ const ExportResults = (props) => {
   };
 
   const handleDownloadCompleteFile = async () => {
-    
     setIsGenerating(true);
     props.updateVisibleGraphs(true);
 
@@ -31,17 +30,14 @@ const ExportResults = (props) => {
       props.session.financialData,
       props.session.impactsData,
       props.session.comparativeData,
-      () => updateIsGenerating(false) 
+      () => updateIsGenerating(false)
     );
 
     props.updateVisibleGraphs(false);
-
   };
 
   return (
-    <>{
-      console.log(isGenerating)
-    }
+    <>
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
         <p className="mb-0">
@@ -54,11 +50,11 @@ const ExportResults = (props) => {
             Télécharger
           </Button>
         </div>
-      </div>{" "}
+      </div>
       <div className="dwn-group d-flex align-items-center justify-content-between">
         <p className="mb-0">
           <i className="bi bi-file-earmark-pdf-fill"></i> Rapport complet -
-          Empreinte Sociétale de l'entreprise{" "}
+          Empreinte Sociétale de l'entreprise
         </p>
         <div>
           <Button

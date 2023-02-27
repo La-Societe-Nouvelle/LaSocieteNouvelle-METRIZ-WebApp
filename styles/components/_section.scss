@@ -219,6 +219,7 @@ section {
  * Dot Pulse
  * ==============================================
  */
+
 .dot-pulse {
   position: relative;
   left: -9999px;
@@ -227,6 +228,8 @@ section {
   border-radius: 5px;
   background-color: $secondary;
   color: $secondary;
+  will-change: transform; /* Ajout de la propriété will-change */
+  transform: translateZ(0); /* Ajout de la propriété transform */
   box-shadow: 9999px 0 0 -5px $secondary;
   animation: dotPulse 1.5s infinite linear;
   animation-delay: 0.25s;
@@ -302,6 +305,7 @@ section {
   }
 }
 
+// Graphs Container
 .graph-container .loader-container {
   min-height: 300px;
   display: flex;
