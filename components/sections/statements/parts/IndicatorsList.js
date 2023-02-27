@@ -222,6 +222,7 @@ const IndicatorsList = (props) => {
 
   // Export pdf on click
   const handleDownloadPDF = async (key, comparativeDivision) => {
+    
     props.updateVisibleGraphs(true);
 
     // Display pop up to choose a comparative division

@@ -16,17 +16,12 @@ export async function generateCompleteFile(
   financialData,
   impactsData,
   comparativeData,
+  onDownloadComplete
 ) {
   const documentTitle =
-    "Empreinte-Societale_" +
-    legalUnit.replaceAll(" ", "") +
-    "_" +
-    year;
+    "Empreinte-Societale_" + legalUnit.replaceAll(" ", "") + "_" + year;
 
-  const coverPage = createCoverPage(
-    year,
-    legalUnit.corporateName
-  );
+  const coverPage = createCoverPage(year, legalUnit.corporateName);
   const basicPDFpromises = [];
   const reportPDFpromises = [];
 
@@ -115,7 +110,6 @@ export async function generateCompleteFile(
         pdfDoc.getPageIndices()
       );
       copiedPages.forEach((page) => mergedPdfDoc.addPage(page));
-
     }
     // Get the number of pages in the merged PDF
     const pageCount = mergedPdfDoc.getPageCount();
@@ -171,5 +165,10 @@ export async function generateCompleteFile(
 
     // Remove the link after the download
     document.body.removeChild(downloadLink);
+
+    // Appel de la fonction de rappel
+    if (typeof onDownloadComplete === "function") {
+      onDownloadComplete();
+    }
   });
 }

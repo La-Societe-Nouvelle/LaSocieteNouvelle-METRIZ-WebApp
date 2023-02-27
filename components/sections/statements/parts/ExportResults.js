@@ -12,10 +12,13 @@ const ExportResults = (props) => {
     await exportFootprintPDF(props.session);
   };
 
+  const updateIsGenerating = (value) => {
+    setIsGenerating(value);
+  };
+
   const handleDownloadCompleteFile = async () => {
     
     setIsGenerating(true);
-
     props.updateVisibleGraphs(true);
 
     // Wait for visibleGraphs to be updated
@@ -27,16 +30,18 @@ const ExportResults = (props) => {
       props.validations,
       props.session.financialData,
       props.session.impactsData,
-      props.session.comparativeData
+      props.session.comparativeData,
+      () => updateIsGenerating(false) 
     );
 
     props.updateVisibleGraphs(false);
 
-    setIsGenerating(false);
   };
 
   return (
-    <>
+    <>{
+      console.log(isGenerating)
+    }
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
         <p className="mb-0">
