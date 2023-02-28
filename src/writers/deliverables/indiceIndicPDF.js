@@ -191,7 +191,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 232,
+            y: 220,
             w: 535,
             h: 100,
             lineWidth: 2,
@@ -202,18 +202,18 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 352,
+            y: 340,
             w: 535,
             h: 75,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
           },
-          // Key Figure + Chart
+          // Target + Chart
           {
             type: "rect",
             x: 30,
-            y: 612,
+            y: 602,
             w: 180,
             h: 140,
             lineWidth: 2,
@@ -223,7 +223,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 220,
-            y: 612,
+            y: 602,
             w: 345,
             h: 150,
             lineWidth: 2,

@@ -58,7 +58,7 @@ export function getIndicDescription(indic) {
       break;
     case "idr":
       description =
-        "L’indicateur vise à fournir un élément d’information sur l'écart des rémunérations au sein des entreprises ayant contribué à la production de la valeur, dans le but d'encourager celles qui ont un partage plus équitable de la valeur produite.";
+        "L’indicateur informe sur l'écart des rémunérations au sein des entreprises ayant contribué à la production de la valeur, dans le but d'encourager celles qui ont un partage plus équitable de la valeur produite.";
       break;
     default:
       description = null;
