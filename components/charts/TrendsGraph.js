@@ -37,7 +37,7 @@ function TrendsGraph(props) {
     const data = {
       datasets: [
         {
-          label: "Historique",
+          label: "Historique - Branche",
           data: trendsData,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -45,7 +45,7 @@ function TrendsGraph(props) {
           borderWidth: 4,
         },
         {
-          label: "Tendance",
+          label: "Tendance - Branche",
           data: trendsDataForecast,
           borderColor: "rgb(255, 182, 66)",
           backgroundColor: "rgb(255, 182, 66)",
@@ -55,7 +55,7 @@ function TrendsGraph(props) {
         },
         {
           type: "bubble",
-          label: "Unité légale analysée",
+          label: "Situation",
           data: [{ x: "2021", y: props.current, r: 5 }],
           backgroundColor: "rgb(250,89,95)",
           borderColor: "rgb(250,89,95)",
@@ -67,7 +67,7 @@ function TrendsGraph(props) {
 
     if (targetData.length > 1) {
       data.datasets.push({
-        label: "Objectif",
+        label: "Objectif - Branche",
         data: targetData,
         skipNull: true,
         borderColor: "rgb(255, 238, 200)",
@@ -107,28 +107,18 @@ function TrendsGraph(props) {
     let minYear = trendsData[0].x.getFullYear();
 
     const options = {
+      devicePixelRatio: 2,
       pointRadius: 0,
-      maintainAspectRatio: true,
       scales: {
         y: {
           display: true,
           min: 0, 
           suggestedMax: suggestedMax,
-          title: {
-            display: true,
-            text: props.unit,
-            color: "#191558",
-            font: {
-              size: 12,
-              weight: "bold",
-              family : 'Roboto'
-
-            },
-          },
+  
           ticks: {
             color: "#191558",
             font: {
-              size: 11,
+              size: 10,
               family : 'Roboto'
             },
           },
@@ -141,7 +131,7 @@ function TrendsGraph(props) {
           ticks: {
             color: "#191558",
             font: {
-              size: 11,
+              size: 10,
             },
           },
           grid: {
@@ -159,14 +149,15 @@ function TrendsGraph(props) {
         legend: {
           display: true,
           position: "right",
-          font: {
-            size: 10,
-
-          },
+ 
           labels: {
             usePointStyle: true,
-            fullsize: true,
             color: "#191558",
+            padding: 20 ,
+            font: {
+              size: 12,
+              family : 'Roboto'
+            },
             generateLabels: function (chart) {
               const dataset = chart.data.datasets;
               return dataset
@@ -207,18 +198,17 @@ function TrendsGraph(props) {
         },
         title: {
           display: true,
-          text: props.title, 
-          color: "#251f81",
-          font: {
-            size: 15,
-            weight : 'bold',
-            family : 'Raleway' 
-          },
           padding: {
-                    top: 10,
-                    bottom: 30
-                }
-      },
+            top: 10,
+            bottom: 20
+        },
+          align : "start",
+          text: props.unit,
+          color: "#191558",
+          font : {
+            size: 12,
+          }
+        },
         tooltip: {
           backgroundColor: 'rgba(25,21,88,0.9)',
           padding: 15,
@@ -245,7 +235,7 @@ function TrendsGraph(props) {
     setIsLoading(false);
   }, [props]);
 
-  return !isLoading && <Line data={data} options={options} />;
+  return !isLoading && <Line data={data} id={props.id} options={options} />;
 }
 
 export default TrendsGraph;
