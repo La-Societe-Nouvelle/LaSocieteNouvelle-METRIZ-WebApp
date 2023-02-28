@@ -13,6 +13,7 @@ import { createIntensIndicatorPDF } from "./intensIndicPDF";
 import { createContribIndicatorPDF } from "./contribIndicPDF";
 import { createCoverPage } from "./coverPage";
 import { createIndiceIndicatorPDF } from "./indiceIndicPDF";
+import ChangeDivision from "../../../components/popups/ChangeDivision";
 
 const ZipGenerator = ({
   year,
@@ -20,13 +21,14 @@ const ZipGenerator = ({
   validations,
   financialData,
   impactsData,
-  comparativeData,
   session,
   updateVisibleGraphs,
+  handleDivision,
 }) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPDFs, setGeneratedPDFs] = useState([]);
   const [zip, setZip] = useState(null);
+  const [popUp, setPopUp] = useState();
 
   useEffect(() => {
     if (isGenerating) {
@@ -34,22 +36,39 @@ const ZipGenerator = ({
     }
   }, [isGenerating]);
 
+
   useEffect(async () => {
     if (zip) {
       updateVisibleGraphs(true);
-      // Wait for visibleGraphs to be updated
+      // Wait for visibleGraphs to be updated 
       await new Promise((resolve) => setTimeout(resolve, 0));
       await generatePDFs();
       updateVisibleGraphs(false);
     }
   }, [zip]);
 
+  // CLOSE POP-UP
+  const handleClose = () => {
+    setPopUp();
+  };
+
+  const handleDownloadZip = () => {
+    handleGeneratePDFs();
+  }
+
   function handleGeneratePDFs() {
-    setGeneratedPDFs([]);
-    setIsGenerating(true);
+    if (session.comparativeData.activityCode == "00") {
+      setPopUp("zip");
+    } else {
+      setPopUp();
+      setGeneratedPDFs([]);
+      setIsGenerating(true);
+    }
   }
 
   async function generatePDFs() {
+
+
     const documentTitle =
       "Empreinte-Societale_" +
       session.legalUnit.corporateName.replaceAll(" ", "") +
@@ -78,7 +97,7 @@ const ZipGenerator = ({
           metaIndics[indic].unit,
           financialData,
           impactsData,
-          comparativeData,
+          session.comparativeData,
           false
         )
       );
@@ -92,7 +111,7 @@ const ZipGenerator = ({
               legalUnit,
               indic,
               financialData,
-              comparativeData,
+              session.comparativeData,
               false
             )
           );
@@ -106,7 +125,7 @@ const ZipGenerator = ({
               metaIndics[indic].libelle,
               metaIndics[indic].unit,
               financialData,
-              comparativeData,
+              session.comparativeData,
               false
             )
           );
@@ -121,8 +140,8 @@ const ZipGenerator = ({
               indic,
               metaIndics[indic].unit,
               financialData,
-              comparativeData,
-              comparativeData.netValueAdded.trendsFootprint.indicators[indic]
+              session.comparativeData,
+              session.comparativeData.netValueAdded.trendsFootprint.indicators[indic]
                 .meta.label,
               false
             )
@@ -275,6 +294,17 @@ const ZipGenerator = ({
 
   return (
     <>
+      {popUp == "zip" && (
+        <ChangeDivision
+          indic={null}
+          session={session}
+          handleDivision={handleDivision}
+          onGoBack={handleClose}
+          handleClose={handleClose}
+          handleDownload={handleDownloadZip}
+        ></ChangeDivision>
+      )}
+
       <Button variant="secondary" size="sm" onClick={handleGeneratePDFs}>
         <i className="bi bi-download"></i>
         Télécharger

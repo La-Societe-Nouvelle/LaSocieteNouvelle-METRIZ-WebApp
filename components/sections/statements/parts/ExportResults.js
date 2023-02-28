@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { generateCompleteFile } from "../../../../src/writers/deliverables/generateCompleteFile";
 import ZipGenerator from "../../../../src/writers/deliverables/ZIPGenerator";
 
 import { exportFootprintPDF } from "../../../../src/writers/Export";
+import ChangeDivision from "../../../popups/ChangeDivision";
 
 const ExportResults = (props) => {
   const [isGenerating, setIsGenerating] = useState(false);
+  const [popUp, setPopUp] = useState(false);
+
 
   const handleDownloadPDF = async () => {
     await exportFootprintPDF(props.session);
@@ -16,24 +19,37 @@ const ExportResults = (props) => {
     setIsGenerating(value);
   };
 
+  // CLOSE POP-UP
+  const handleClose = () => {
+    setPopUp();
+  };
+
+ 
+
+
   const handleDownloadCompleteFile = async () => {
-    setIsGenerating(true);
-    props.updateVisibleGraphs(true);
+    if (props.session.comparativeData.activityCode == "00") {
+      setPopUp("pdf");
+    } else {
+      setPopUp();
+      setIsGenerating(true);
+      props.updateVisibleGraphs(true);
 
-    // Wait for visibleGraphs to be updated
-    await new Promise((resolve) => setTimeout(resolve, 0));
+      // Wait for visibleGraphs to be updated
+      await new Promise((resolve) => setTimeout(resolve, 0));
 
-    await generateCompleteFile(
-      props.session.year,
-      props.session.legalUnit.corporateName,
-      props.validations,
-      props.session.financialData,
-      props.session.impactsData,
-      props.session.comparativeData,
-      () => updateIsGenerating(false)
-    );
+      await generateCompleteFile(
+        props.session.year,
+        props.session.legalUnit.corporateName,
+        props.validations,
+        props.session.financialData,
+        props.session.impactsData,
+        props.session.comparativeData,
+        () => updateIsGenerating(false)
+      );
 
-    props.updateVisibleGraphs(false);
+      props.updateVisibleGraphs(false);
+    }
   };
 
   return (
@@ -83,6 +99,7 @@ const ExportResults = (props) => {
           comparativeData={props.session.comparativeData}
           session={props.session}
           updateVisibleGraphs={props.updateVisibleGraphs}
+          handleDivision={props.handleDivision}
         />
       </div>
       <Modal show={isGenerating}>
@@ -93,6 +110,19 @@ const ExportResults = (props) => {
           </div>
         </Modal.Body>
       </Modal>
+
+      {popUp == "pdf" && (
+        <ChangeDivision
+          indic={null}
+          session={props.session}
+          handleDivision={props.handleDivision}
+          onGoBack={handleClose}
+          handleClose={handleClose}
+          handleDownload={handleDownloadCompleteFile}
+        ></ChangeDivision>
+      )}
+
+
     </>
   );
 };

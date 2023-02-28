@@ -93,7 +93,16 @@ const IndicatorsList = (props) => {
     }
   }, []);
 
+  useEffect(async () => {
+    if(comparativeDivision !== props.session.comparativeData.activityCode) {
+
+      await updateDivision(props.session.comparativeData.activityCode)
+
+    }
+  }, [props.session.comparativeData.activityCode]);
+
   const updateComparativeAreaData = async (indic) => {
+
     let idTarget = getTargetSerieId(indic);
 
     let newComparativeData = await getMacroSerieData(
@@ -104,6 +113,7 @@ const IndicatorsList = (props) => {
     );
 
     // Target Area Footprint
+
     if (idTarget) {
       newComparativeData = await getSerieData(
         idTarget,
@@ -504,29 +514,32 @@ const IndicatorsList = (props) => {
                     />
                   </Col>
                 </Row>
-                <Row>
-                  <Col sm={8}>
-                    <TrendsGraph
-                      id={"trend-prd-" + indic}
-                      unit={metaIndics[indic].unit}
-                      code={comparativeDivision}
-                      trends={
-                        comparativeData.production.trendsFootprint.indicators[
-                          indic
-                        ]
-                      }
-                      target={
-                        comparativeData.production.targetDivisionFootprint
-                          .indicators[indic]
-                      }
-                      current={
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
-                          indic
-                        ).value
-                      }
-                    />
-                  </Col>
-                </Row>
+
+                {comparativeDivision !== "00" && (
+                  <Row>
+                    <Col sm={8}>
+                      <TrendsGraph
+                        id={"trend-prd-" + indic}
+                        unit={metaIndics[indic].unit}
+                        code={comparativeDivision}
+                        trends={
+                          comparativeData.production.trendsFootprint.indicators[
+                            indic
+                          ]
+                        }
+                        target={
+                          comparativeData.production.targetDivisionFootprint
+                            .indicators[indic]
+                        }
+                        current={
+                          props.session.financialData.aggregates.production.footprint.getIndicator(
+                            indic
+                          ).value
+                        }
+                      />
+                    </Col>
+                  </Row>
+                )}
               </>
             )}
           </div>

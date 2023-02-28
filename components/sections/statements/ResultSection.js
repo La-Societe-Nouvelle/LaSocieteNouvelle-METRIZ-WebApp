@@ -40,12 +40,13 @@ import { createIndicReport } from "../../../src/writers/deliverables/indicReport
 import { createContribIndicatorPDF } from "../../../src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "../../../src/writers/deliverables/intensIndicPDF";
 import { createIndiceIndicatorPDF } from "../../../src/writers/deliverables/indiceIndicPDF";
+import ChangeDivision from "../../popups/ChangeDivision";
 
 const ResultSection = (props) => {
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
   const [error] = useState(false);
-
+  const [popUp, setPopUp] = useState();
   const [divisionsOptions, setDivisionsOptions] = useState([]);
 
   useEffect(() => {
@@ -73,10 +74,13 @@ const ResultSection = (props) => {
     props.session.comparativeData
   );
 
+  // CLOSE POP-UP
+  const handleClose = () => setPopUp("");
+
   /* ---------- Update Comparative division ---------- */
 
   const changeComparativeDivision = async (event) => {
-    let division = event.value;
+    let division = event.value ? event.value : event;
 
     const newComparativeData = await updateComparativeData(
       indic,
@@ -90,8 +94,9 @@ const ResultSection = (props) => {
   /* ---------- Update comparative data according to comparative division ---------- */
 
   useEffect(async () => {
+    console.log(props.session.comparativeData.activityCode);
+
     if (comparativeDivision != props.session.comparativeData.activityCode) {
-      //props.session.comparativeData.activityCode = comparativeDivision;
 
       let newComparativeData = comparativeData;
 
@@ -114,6 +119,7 @@ const ResultSection = (props) => {
   }, [comparativeDivision]);
 
   const updateComparativeData = async (indic, code, newComparativeData) => {
+
     newComparativeData = await getMacroSerieData(
       indic,
       code,
@@ -134,6 +140,8 @@ const ResultSection = (props) => {
       newComparativeData,
       "targetDivisionFootprint"
     );
+
+
     return newComparativeData;
   };
 
@@ -156,49 +164,54 @@ const ResultSection = (props) => {
   };
 
   const handleindicReportPDF = () => {
+ 
     const type = metaIndics[indic].type;
-
-    switch (type) {
-      case "proportion":
-        createContribIndicatorPDF(
-          metaIndics[indic].libelle,
-          session.year,
-          session.legalUnit.corporateName,
-          indic,
-          session.financialData,
-          session.comparativeData,
-          true
-        );
-        break;
-      case "intensité":
-        createIntensIndicatorPDF(
-          session.year,
-          session.legalUnit.corporateName,
-          indic,
-          metaIndics[indic].libelle,
-          metaIndics[indic].unit,
-          session.financialData,
-          session.comparativeData,
-          true
-        );
-        break;
-      case "indice":
-        createIndiceIndicatorPDF(
-          metaIndics[indic].libelle,
-          metaIndics[indic].libelleGrandeur,
-          session.year,
-          session.legalUnit.corporateName,
-          indic,
-          metaIndics[indic].unit,
-          session.financialData,
-          session.comparativeData,
-          comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
-            .label,
-          true
-        );
-        break;
-      default:
-        break;
+    // Display pop up to choose a comparative division
+    if (comparativeDivision == "00") {
+      setPopUp("division");
+    } else {
+      switch (type) {
+        case "proportion":
+          createContribIndicatorPDF(
+            metaIndics[indic].libelle,
+            session.year,
+            session.legalUnit.corporateName,
+            indic,
+            session.financialData,
+            session.comparativeData,
+            true
+          );
+          break;
+        case "intensité":
+          createIntensIndicatorPDF(
+            session.year,
+            session.legalUnit.corporateName,
+            indic,
+            metaIndics[indic].libelle,
+            metaIndics[indic].unit,
+            session.financialData,
+            session.comparativeData,
+            true
+          );
+          break;
+        case "indice":
+          createIndiceIndicatorPDF(
+            metaIndics[indic].libelle,
+            metaIndics[indic].libelleGrandeur,
+            session.year,
+            session.legalUnit.corporateName,
+            indic,
+            metaIndics[indic].unit,
+            session.financialData,
+            session.comparativeData,
+            comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
+              .label,
+            true
+          );
+          break;
+        default:
+          break;
+      }
     }
   };
   return (
@@ -509,7 +522,7 @@ const ResultSection = (props) => {
                 }
               >
                 <h5 className="text-center">
-                    Evolution de la performance de la branche
+                  Evolution de la performance de la branche
                 </h5>
                 <TrendsGraph
                   id={"trend-prd-" + indic}
@@ -710,6 +723,16 @@ const ResultSection = (props) => {
           </Button>
         </div>
       </section>
+      {popUp == "division" && (
+        <ChangeDivision
+          indic={indic}
+          session={props.session}
+          handleDivision={changeComparativeDivision}
+          onGoBack={handleClose}
+          handleClose={handleClose}
+          handleDownload={handleindicReportPDF}
+        ></ChangeDivision>
+      )}
     </>
   );
 };

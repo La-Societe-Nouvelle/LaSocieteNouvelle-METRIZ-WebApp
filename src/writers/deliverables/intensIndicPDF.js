@@ -35,7 +35,6 @@ export const createIntensIndicatorPDF = (
   download
 ) => {
   // ---------------------------------------------------------------
-
   const {
     production,
     revenue,

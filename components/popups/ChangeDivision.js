@@ -41,7 +41,7 @@ const ChangeDivision = (props) => {
           onChange={changeComparativeDivision}
         />
 
-        <Button variant="secondary" size="sm" onClick={handleOnClick}>
+        <Button variant="secondary" size="sm"  onClick={handleOnClick}>
           Télécharger le rapport <i className="bi bi-download"></i>
         </Button>
       </Modal.Body>

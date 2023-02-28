@@ -15,6 +15,10 @@ const StatementSection = (props) => {
     props.session.validations
   );
 
+  const [comparativeDivision, setComparativeDivision] = useState(
+    props.session.comparativeData.activityCode
+  );
+
   const handleView = (indic) => {
     setIndic(indic);
     setView("result");
@@ -26,6 +30,11 @@ const StatementSection = (props) => {
     }
   };
 
+  const handleDivision = (code) => {
+
+    setComparativeDivision(code);
+    props.session.comparativeData.activityCode = code;
+  };
   const updateVisibleGraphs = (newValue) => {
     setVisibleGraphs(newValue);
   };
@@ -57,6 +66,7 @@ const StatementSection = (props) => {
 
             <ExportResults
               updateVisibleGraphs={updateVisibleGraphs}
+              handleDivision={handleDivision}
               session={props.session}
               validations={validationsState}
             />
