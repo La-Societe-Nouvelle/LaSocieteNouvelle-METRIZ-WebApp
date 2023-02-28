@@ -13,8 +13,7 @@ const ChangeDivision = (props) => {
   const changeComparativeDivision = async (event) => {
     let division = event.value;
     setComparativeDivision(division);
-    props.handleDivision(division);
-    props.handleClose;
+    await props.handleDivision(division);
   };
 
   const divisionsOptions = [];
@@ -29,8 +28,9 @@ const ChangeDivision = (props) => {
   return (
     <Modal show="true" onHide={props.handleClose} size="lg" centered>
       <Modal.Header closeButton>
-        <Modal.Title >
-          Sélectionnez un secteur d'activité pour ajouter des valeurs comparatives
+        <Modal.Title>
+          Sélectionnez un secteur d'activité pour ajouter des valeurs
+          comparatives
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
@@ -41,7 +41,7 @@ const ChangeDivision = (props) => {
           onChange={changeComparativeDivision}
         />
 
-        <Button variant="secondary" size="sm"  onClick={handleOnClick}>
+        <Button variant="secondary" size="sm" onClick={handleOnClick}>
           Télécharger le rapport <i className="bi bi-download"></i>
         </Button>
       </Modal.Body>

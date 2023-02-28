@@ -330,9 +330,9 @@ const ResultSection = (props) => {
 
       <section className="step">
         <h3>Comparaison par activité</h3>
-
         <Select
           className="mb-3 small"
+
           defaultValue={{
             label: comparativeDivision + " - " + divisions[comparativeDivision],
             value: comparativeDivision,

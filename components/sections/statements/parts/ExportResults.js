@@ -57,7 +57,7 @@ const ExportResults = (props) => {
       <h3>Télécharger les livrables</h3>
       <div className="dwn-group d-flex align-items-center justify-content-between">
         <p className="mb-0">
-          <i className="bi bi-file-earmark-pdf-fill"></i> Rapport - Empreinte
+          <i className="bi bi-file-earmark-pdf-fill"></i> Empreinte
           Sociétale des Soldes Intermédiaires de Gestion
         </p>
         <div>
