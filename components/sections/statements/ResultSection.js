@@ -94,7 +94,6 @@ const ResultSection = (props) => {
   /* ---------- Update comparative data according to comparative division ---------- */
 
   useEffect(async () => {
-    console.log(props.session.comparativeData.activityCode);
 
     if (comparativeDivision != props.session.comparativeData.activityCode) {
 
@@ -170,6 +169,7 @@ const ResultSection = (props) => {
     if (comparativeDivision == "00") {
       setPopUp("division");
     } else {
+      setPopUp();
       switch (type) {
         case "proportion":
           createContribIndicatorPDF(
