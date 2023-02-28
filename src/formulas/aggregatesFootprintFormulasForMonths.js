@@ -48,7 +48,7 @@ export const updateExternalExpensesAccountsFootprints_month = async (indic,finan
                                                    .map(async ({accountNum,data}) => 
     {
         // retrieve expenses (linked to the account)
-        let expenses = financialData.expenses.filter(expense => expense.account == accountNum)
+        let expenses = financialData.expenses.filter(expense => expense.accountNum == accountNum)
                                              .filter(expense => expense.date.startsWith(month));
         // control uncertainty
         expenses.filter(expense => expense.amount < 0)

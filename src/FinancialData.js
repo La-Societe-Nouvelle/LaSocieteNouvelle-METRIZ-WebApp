@@ -3,33 +3,23 @@
 // Accounting Objects
 import { Expense } from '/src/accountingObjects/Expense';
 import { Immobilisation } from '/src/accountingObjects/Immobilisation';
-import { Depreciation } from '/src/accountingObjects/Depreciation'
 import { Stock } from '/src/accountingObjects/Stock';
 import { Account, buildAggregateFromArray } from './accountingObjects/Account';
+import { AccountingItem } from './accountingObjects/AccountingItem';
+import { Aggregate } from './accountingObjects/Aggregate';
 
 // Other objects
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint'
 import { Company } from '/src/Company';
-import { getAmountItems, getDateFromString, getPrevAmountItems, getSumItems, roundValue } from './utils/Utils';
-import { Aggregate } from './accountingObjects/Aggregate';
+
+// Utils
+import { getAmountItems, getDateFromString, getDatesEndMonths, getNextDay, getPrevAmountItems, getPrevDay, getSumItems, roundValue } from './utils/Utils';
 
 // Scripts
 import { aggregatesBuilder } from './formulas/aggregatesBuilder';
 
 // Libraries
 import accountsMatching from '/lib/accountsMatching'
-
-// list aggregates
-const metaAggregates = ["revenue",
-                        "production",
-                        "storedProduction",
-                        "intermediateConsumption",
-                        "purchasesStocksVariations",
-                        "externalExpenses",
-                        "grossValueAdded",
-                        "depreciationExpenses",
-                        "capitalConsumption",
-                        "netValueAdded"];
 
 const oneDay = 24 * 60 * 60 * 1000;
 
@@ -44,118 +34,145 @@ export class FinancialData {
         if (data==undefined) data = {};
         
         // Print
-        // console.log(data);
+        console.log(data);
 
         // data loaded state
         this.isFinancialDataLoaded = data.isFinancialDataLoaded || false;   
         
         // Production ------------------------------ //
 
-        this.revenue = data.revenue || 0;                                                                                                                               // revenue (#71)
-        this.storedProduction = data.storedProduction || 0;                                                                                                             // stored production (#71)
-        this.immobilisedProduction = data.immobilisedProduction || 0;                                                                                                   // immobilised production (#72)
+        this.revenue = data.revenue || 0;                                                                                                                                           // revenue (#71)
+        this.sales = data.sales ? data.sales.map((props,index) => new AccountingItem({id: index, ...props})) : [];                                                                  // sales
+        this.storedProduction = data.storedProduction || 0;                                                                                                                         // stored production (#71)
+        this.immobilisedProduction = data.immobilisedProduction || 0;                                                                                                               // immobilised production (#72)
 
         // Expenses -------------------------------- //
 
-        this.expenses = data.expenses ? data.expenses.map((props,index) => new Expense({id: index, ...props})) : [];                                                    // external expenses (#60[^3], #61, #62)
-        this.stockVariations = data.stockVariations ? data.stockVariations.map((props,index) => new Expense({id: index, ...props})) : [];                               // stock variation (#603, #71)
-        this.depreciationExpenses = data.depreciationExpenses ? data.depreciationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                // depreciation expenses (#6811, #6871)
-        
-        this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({...props})) : this.expensesAccountsBuilder();
-        
+        this.expenses = data.expenses ? data.expenses.map((props,index) => new Expense({id: index, ...props})) : [];                                                                // external expenses (#60[^3], #61, #62)
+        this.stockVariations = data.stockVariations ? data.stockVariations.map((props,index) => new Expense({id: index, ...props})) : [];                                           // stock variation (#603, #71)
+        this.amortisationExpenses = data.amortisationExpenses ? data.amortisationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                            // amortisation expenses (#6811, #6871)
+        this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses ? data.adjustedAmortisationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];    // amortisation expenses (#6811, #6871)
+                
         // Stocks ---------------------------------- //
         
-        this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                            // stocks (#31 to #35, #37)
+        this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                                        // stocks (#31 to #35, #37)
         
         // Immobilisations ------------------------- //
 
-        this.investments = data.investments ? data.investments.map((props,index) => new Expense({id: index, ...props})) : [];                                           // investments (flows #2 <- #404)
-        this.immobilisationProductions = data.immobilisationProductions ? data.immobilisationProductions.map((props,index) => new Expense({id: index, ...props})) : []; // productions of immobilisations (flows #2 <- #72)
+        this.investments = data.investments ? data.investments.map((props,index) => new Expense({id: index, ...props})) : [];                                                       // investments (flows #2 <- #404)
+        this.immobilisationProductions = data.immobilisationProductions ? data.immobilisationProductions.map((props,index) => new Expense({id: index, ...props})) : [];             // productions of immobilisations (flows #2 <- #72)
         
-        this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                        // immobilisations (#20 to #27)
-        this.depreciations = data.depreciations ? data.depreciations.map((props,index) => new Depreciation({id: index, ...props})) : [];                                // depreciations (#28, #29 & #39)
+        this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                                    // immobilisations (#20 to #27)
+        this.amortisations = data.amortisations ? data.amortisations.map((props,index) => new Account({id: index, ...props})) : [];                                                 // amortisations (#28)
+        this.adjustedAmortisations = data.adjustedAmortisations ? data.adjustedAmortisations.map((props,index) => new Account({id: index, ...props})) : [];                         // amortisations (#28)
+
+        // Depreciations --------------------------- //
+
+        this.depreciations = data.depreciations ? data.depreciations.map((props,index) => new Account({id: index, ...props})) : [];                                                 // depreciations (#29 & #39)
 
         // Other figures --------------------------- //
 
         this.financialIncomes = data.financialIncomes || 0;
         this.exceptionalIncomes = data.exceptionalIncomes || 0;
-        this.otherOperatingIncomes = data.otherOperatingIncomes || 0;                                                                                                   //
-        this.taxes = data.taxes || 0;                                                                                                                                   // #63
-        this.personnelExpenses = data.personnelExpenses || 0;                                                                                                           // #64
-        this.otherExpenses = data.otherExpenses || 0;                                                                                                                   // #65
-        this.financialExpenses = data.financialExpenses || 0;                                                                                                           // #66
-        this.exceptionalExpenses = data.exceptionalExpenses || 0;                                                                                                       // #67 hors #6871
-        this.provisions = data.provisions || 0;                                                                                                                         // #68 hors #6811
-        this.taxOnProfits = data.taxOnProfits || 0;                                                                                                                     // #69
+        this.otherOperatingIncomes = data.otherOperatingIncomes || 0;                                                                                                               //
+        this.taxes = data.taxes || 0;                                                                                                                                               // #63
+        this.personnelExpenses = data.personnelExpenses || 0;                                                                                                                       // #64
+        this.otherExpenses = data.otherExpenses || 0;                                                                                                                               // #65
+        this.financialExpenses = data.financialExpenses || 0;                                                                                                                       // #66
+        this.exceptionalExpenses = data.exceptionalExpenses || 0;                                                                                                                   // #67 hors #6871
+        this.provisions = data.provisions || 0;                                                                                                                                     // #68 hors #6811
+        this.taxOnProfits = data.taxOnProfits || 0;                                                                                                                                 // #69
 
-        // Companies
+        // Expenses accounts ----------------------- //
+
+        this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({...props})) : this.expensesAccountsBuilder(data.accounts);
+
+        // Companies ------------------------------- //
+
         this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
+        this.defaultAccountsAux = data.defaultAccountsAux ? data.defaultAccountsAux : [];
 
-        // Aggregates
+        // Aggregates ------------------------------ //
+
         this.aggregates = {};
         data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : aggregatesBuilder(this);
         
     // ---------------------------------------------------------------------------------------------------- //
-        buildPeriods(this.immobilisations,this.depreciations,this.depreciationExpenses);
+
+        buildImmobilisationsPhases(this.immobilisations, this.amortisations, this.amortisationExpenses);
+        console.log(this);
     }
 
     /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
 
-    expensesAccountsBuilder = () =>
+    expensesAccountsBuilder = (metaAccounts) =>
     {
-        return this.expenses.concat(this.depreciationExpenses)
-                            .concat(this.stockVariations.filter(variation => /^6/.test(variation.account)))
-                            .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                            .map(expense => new Account({accountNum: expense.account, accountLib: expense.accountLib, amount: this.getAmountExpenseByAccount(expense.account)}));
+        // external expenses
+        let externalExpenseAccounts = this.expenses
+            .map(expense => expense.accountNum)
+            .filter((value, index, self) => index === self.findIndex(item => item == value))
+            .map(accountNum => new Account({accountNum, accountLib: metaAccounts[accountNum], amount: this.getAmountExternalExpenseByAccount(accountNum)}));
+        // purchases stock variations
+        let stockVariationAccounts = this.stocks
+            .filter(stock => !stock.isProductionStock)
+            .map(stock => "60"+stock.accountNum)
+            .filter((value, index, self) => index === self.findIndex(item => item == value))
+            .map(accountNum => new Account({accountNum, accountLib: metaAccounts[accountNum], amount: this.getAmountStockVariationByAccountAux(accountNum)}));
+        // amortisation expenses
+        let amortisationExpenseAccounts = this.amortisations
+            .map(amortisation => "6811"+(parseInt(amortisation.accountNum.charAt(2))+1)+amortisation.accountNum.slice(3))
+            .filter((value, index, self) => index === self.findIndex(item => item == value))
+            .map(accountNum => new Account({accountNum, accountLib: metaAccounts[accountNum], amount: this.getAmountAmortisationExpenseByAccountAux(accountNum)}));
+
+        return [...externalExpenseAccounts,...stockVariationAccounts,...amortisationExpenseAccounts];
     }
 
-    getAmountExpenseByAccount = (accountNum) => getAmountItems(this.expenses.concat(this.depreciationExpenses)
-                                                                            .concat(this.stockVariations)
-                                                                            .filter(expense => expense.account == accountNum))
+    getAmountExternalExpenseByAccount = (accountNum) => getAmountItems(this.expenses.filter(expense => expense.accountNum == accountNum))
+    getAmountStockVariationByAccountAux = (accountNum) => getAmountItems(this.stockVariations.filter(variation => variation.accountAux == accountNum))
+    getAmountAmortisationExpenseByAccountAux = (accountNum) => getAmountItems(this.amortisationExpenses.filter(expense => expense.accountAux == accountNum))
 
     /* ---------------------------------------- COMPANIES INITIALIZER ---------------------------------------- */
 
+    // call when load financial data (import)
     companiesInitializer = () =>
     {
         this.companies = this.expenses.concat(this.investments)
-                                      .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib, isDefaultAccount: expense.isDefaultAccountAux})})
-                                      .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                                      .map(({account,accountLib,isDefaultAccount},id) => new Company({id, account, isDefaultAccount, corporateName: accountLib, amount: this.getAmountExpenseByAccountAux(account)}));
+            .map(expense => {return({
+                accountNum: expense.accountAux, 
+                corporateName: expense.accountAuxLib, 
+                isDefaultAccount: this.defaultAccountsAux.includes(expense.accountAux)
+            })})
+            .filter((value, index, self) => index === self.findIndex(item => item.accountNum === value.accountNum))
+            .map(({accountNum,corporateName,isDefaultAccount},id) => new Company({id, accountNum, isDefaultAccount, corporateName, amount: this.getAmountExpenseByAccountAux(accountNum)}));
     }
 
-    getAmountExpenseByAccountAux = (accountNum) => getAmountItems(this.expenses.concat(this.investments)
-                                                                               .filter(expense => expense.accountAux == accountNum))
+    getAmountExpenseByAccountAux = (accountNum) => getAmountItems(this.expenses.concat(this.investments).filter(expense => expense.accountAux == accountNum))
 
     /* ---------------------------------------- INITIAL STATES INITIALIZER ---------------------------------------- */
 
     initialStatesInitializer = () =>
     {
-        // Immobilisations
-        this.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
-                            .filter(immobilisation => (this.depreciations.filter(depreciation => depreciation.accountAux==immobilisation.account).length > 0))
-                            .forEach(immobilisation => {immobilisation.initialState = (this.investments.filter(investment => investment.account == immobilisation.account).length > 0) ? "currentFootprint" : "defaultData";});
+        // Immobilisations -> default data for all amortisable immobilisation
+        this.immobilisations
+            .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+            .filter(immobilisation => (this.amortisations.filter(amortisation => amortisation.accountAux==immobilisation.accountNum).length > 0))
+            .forEach(immobilisation => {
+                immobilisation.initialState = "defaultData";
+                accountsMatching.branche.forEach(matching => {
+                    let regex = new RegExp(matching.accountRegex);
+                    if (regex.test(immobilisation.accountNum)) {
+                        immobilisation.prevFootprintActivityCode = matching.branche; // set default branch
+                    }
+                })
+            });
         
-        // Stocks (purchases)
+        // Stocks (purchases) -> current footprint if at least one expense related to the stock account
         this.stocks.filter(stock => !stock.isProductionStock)
-                   .forEach(stock => {stock.initialState = (this.expenses.filter(expense => expense.account.startsWith("60"+stock.account.charAt(1))).length > 0) ? "currentFootprint" : "defaultData";});
+            .forEach(stock => {stock.initialState = (this.expenses.filter(expense => expense.accountNum.startsWith(stock.accountAux)).length > 0) ? "currentFootprint" : "defaultData";});
         
-        // Stocks (production)
+        // Stocks (production) -> current footprint for all
         this.stocks.filter(stock => stock.isProductionStock)
-                   .forEach(stock => stock.initialState = "currentFootprint");
-
-        // match accounts
-        this.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
-                            .filter(immobilisation => immobilisation.initialState == "defaultData")
-                            .forEach(immobilisation => 
-        {
-            accountsMatching.branche.forEach(matching => 
-            {
-                let regex = new RegExp(matching.accountRegex);
-                if (regex.test(immobilisation.account)) {
-                    immobilisation.prevFootprintActivityCode = matching.branche;
-                }
-            })
-        });
+            .forEach(stock => stock.initialState = "currentFootprint");
     }
 
     /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
@@ -163,40 +180,29 @@ export class FinancialData {
     async loadInitialStates(data) 
     {        
         // Print
-        // console.log(data);
+        console.log(data);
 
         // Available accounts
-        let prevAccountsData = data.financialData.stocks.concat(data.financialData.immobilisations).concat(data.financialData.depreciations);
+        let prevAccountsData = data.financialData.stocks.concat(data.financialData.immobilisations).concat(data.financialData.amortisations);
 
-        // Stocks accounts
-        this.stocks.concat(this.immobilisations).concat(this.depreciations)
-                   .forEach((stock) => 
+        // Asset accounts
+        this.stocks.concat(this.immobilisations).concat(this.amortisations)
+            .forEach((account) => 
         {
-            let prevAccount = prevAccountsData.filter(item => item.account == stock.account)[0];
-            if (prevAccount!=undefined)
-            {
-                stock.prevFootprint = new SocialFootprint(prevAccount.footprint);
-                stock.initialState = "prevFootprint";
-            }
-            else if (stock.prevAmount > 0)
-            {
-                console.log("New account with previous amount not null");
-            }
-            else
-            {
-                stock.prevFootprint = new SocialFootprint();
-                stock.initialState = "none";
-            }
-        })
-
-        // Expense accounts
-        this.expenseAccounts.forEach(account =>
-        {
-            let prevProps = data.financialData.expenseAccounts.filter(prevAccount => prevAccount.accountNum = account.accountNum)[0];
-            if (prevProps!=undefined)
-            {
-                account.prevFootprint = new SocialFootprint(prevProps.footprint);
+            let prevAccount = prevAccountsData.filter(item => item.accountNum == account.accountNum)[0];
+            // prev account found
+            if (prevAccount!=undefined) {
+                account.prevFootprint = new SocialFootprint(prevAccount.footprint);
                 account.initialState = "prevFootprint";
+            } 
+            // prev account not found & prev amount > 0
+            else if (account.prevAmount > 0) {
+                console.log("New account with previous amount not null");
+            } 
+            // else no prev data
+            else {
+                account.prevFootprint = new SocialFootprint();
+                account.initialState = "none";
             }
         })
     }
@@ -207,9 +213,9 @@ export class FinancialData {
 
     // Principaux agrégats
     getProduction = () => this.getRevenue() + this.getStoredProduction() + this.getImmobilisedProduction()
-    getAmountIntermediateConsumption = () => this.getAmountExternalExpenses() - this.getVariationPurchasesStocks()
-    getGrossValueAdded = () => this.getProduction() - this.getAmountIntermediateConsumption()
-    getNetValueAdded = () => this.getGrossValueAdded() - this.getAmountDepreciationExpenses()
+    getAmountIntermediateConsumptions = () => this.getAmountExternalExpenses() + this.getVariationPurchasesStocks() // SI-SF i.e. delta < 0 -> storage (not consumption)
+    getAmountFixedCapitalConsumptions = () => this.getAmountAmortisationExpenses()
+    getNetValueAdded = () => this.getProduction() - this.getAmountIntermediateConsumptions() - this.getAmountFixedCapitalConsumptions()
 
     // PRODUCTION ---------------------------------------------- //
 
@@ -219,45 +225,43 @@ export class FinancialData {
 
     // EXPENSES ------------------------------------------------ //
 
-    // External penses
-    getAmountExternalExpenses = () => getSumItems(this.expenses.map(expense => expense.amount), 2)
-    
-    // Depreciation expenses
-    getAmountDepreciationExpenses = () => getSumItems(this.depreciationExpenses.map(expense => expense.amount), 2)
+    getAmountExternalExpenses = () => getAmountItems(this.expenses, 2)
+    getAmountAmortisationExpenses = () => getAmountItems(this.amortisationExpenses, 2)
+    // getAmountDepreciationExpenses = () => getAmountItems(this.depreciationExpenses, 2)
 
     // STOCKS -------------------------------------------------- //
     
     // Purchases stocks
-    getVariationPurchasesStocks = () => this.getFinalAmountPurchasesStocks() - this.getInitialAmountPurchasesStocks()
+    getVariationPurchasesStocks = () => getAmountItems(this.stockVariations, 2)
     getInitialAmountPurchasesStocks = () => getPrevAmountItems(this.stocks.filter(stock => !stock.isProductionStock), 2)
     getFinalAmountPurchasesStocks = () => getAmountItems(this.stocks.filter(stock => !stock.isProductionStock), 2)
     
     // Net amount
-    getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.account)), 2)
-    getFinalNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.amount - this.getFinalValueLossStock(stock.account)), 2)
+    getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.accountNum)), 2)
+    getFinalNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.amount - this.getFinalValueLossStock(stock.accountNum)), 2)
 
     // Value loss
-    getInitialValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount)[0] || 0;
-    getFinalValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.amount)[0] || 0;
+    getInitialValueLossStock = (accountNum) => getPrevAmountItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum), 2);
+    getFinalValueLossStock = (accountNum) => getAmountItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum), 2);
 
 
     // IMMOBILISATIONS ----------------------------------------- //
         
     // Value loss
-    getInitialValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount), 2)
-    getFinalValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux==accountNum).map(depreciation => depreciation.amount), 2)
+    getInitialValueLossImmobilisation = (accountNum) => getPrevAmountItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum), 2)
+    getFinalValueLossImmobilisation = (accountNum) => getAmountItems(this.depreciations.filter(depreciation => depreciation.accountAux==accountNum), 2)
 
     // OTHER KEY FIGURES --------------------------------------- //
 
     // Operating section
 
-    getAmountOperatingIncomes = () => this.getProduction()+this.getAmountOtherOperatingIncomes();
+    getAmountOperatingIncomes = () => this.getProduction() + this.getAmountOtherOperatingIncomes();
     getAmountOtherOperatingIncomes = () => this.otherOperatingIncomes;
 
     getAmountTaxes = () => this.taxes;
     getAmountPersonnelExpenses = () => this.personnelExpenses;
     getAmountOtherExpenses = () => this.otherExpenses;
-    getAmountOperatingExpenses = () => this.getAmountIntermediateConsumption()+this.getAmountTaxes()+this.getAmountPersonnelExpenses()+this.getAmountDepreciationExpenses()+this.getAmountProvisions()+this.getAmountOtherExpenses()
+    getAmountOperatingExpenses = () => this.getAmountFixedCapitalConsumptions()+this.getAmountTaxes()+this.getAmountPersonnelExpenses()+this.getAmountAmortisationExpenses()+this.getAmountProvisions()+this.getAmountOtherExpenses()
 
     getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountOperatingExpenses();
 
@@ -283,48 +287,37 @@ export class FinancialData {
 
     /* ---------- Stocks ---------- */
 
-    getStock = (id) => this.stocks.filter(stock => stock.id==id)[0]
-    getStockByAccount = (account) => this.stocks.filter(stock => stock.account==account)[0]
-    updateStock = (nextProps) => this.getStock(nextProps.id).update(nextProps)    
+    getStockByAccount = (accountNum) => this.stocks.filter(stock => stock.accountNum==accountNum)[0]
+    updateStock = (nextProps) => this.getStockByAccount(nextProps.accountNum).update(nextProps)    
       
     /* ---------- Expenses ---------- */
 
     getExpense = (id) => this.expenses.filter(expense => expense.id==id)[0]
-
-    /* ---------- Depreciations ---------- */
     
-    getDepreciationExpense = (id) => this.depreciationExpenses.filter(expense => expense.getId()==id)[0]
-    getDepreciationExpenseByAccountAux = (accountNum) => this.depreciationExpenses.filter(expense => expense.accountAux==accountNum)[0]    
+    getAmortisationExpense = (id) => this.amortisationExpenses.filter(expense => expense.getId()==id)[0]
+    getAmortisationExpenseByAccountAux = (accountNum) => this.amortisationExpenses.filter(expense => expense.accountAux==accountNum)[0]    
 
     /* ---------- Immobilisations ---------- */
 
-    getImmobilisation = (id) => this.immobilisations.filter(immobilisation => immobilisation.id==id)[0]
-    getImmobilisationByAccount = (accountNum) => this.immobilisations.filter(immobilisation => immobilisation.account==accountNum)[0]
-    updateImmobilisation = (nextProps) => this.getImmobilisation(nextProps.id).update(nextProps)
+    getImmobilisationByAccount = (accountNum) => this.immobilisations.filter(immobilisation => immobilisation.accountNum==accountNum)[0]
+    updateImmobilisation = (nextProps) => this.getImmobilisationByAccount(nextProps.accountNum).update(nextProps)    
 
     /* ---------- Depreciations ---------- */
     
-    getDepreciation = (id) => this.depreciations.filter(depreciation => depreciation.id==id)[0]
-    getDepreciationByAccount = (accountNum) => this.depreciations.filter(depreciation => depreciation.account==accountNum)[0]
+    getDepreciationByAccount = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountNum==accountNum)[0]
         
     /* ---------- Companies ---------- */
 
     getCompany = (id) => this.companies.filter(company => company.id==id)[0]
-    getCompanyByAccount = (accountNum) => this.companies.filter(company => company.account == accountNum)[0]
+    getCompanyByAccount = (accountNum) => this.companies.filter(company => company.accountNum == accountNum)[0]
     getCompanyByName = (name) => this.companies.filter(company => company.corporateName==name)[0]
 
-    updateCorporateId = (account,corporateName,corporateId) => 
+    updateCorporateId = (accountNum,corporateName,corporateId) => 
     {
-        let company ;
-
-        if(account){
-           company = this.getCompanyByAccount(account);
+        let company  = accountNum ? this.getCompanyByAccount(accountNum) : this.getCompanyByName(corporateName);
+        if (company!=undefined) {
+            company.update({corporateId});
         }
-        else {          
-            company = this.getCompanyByName(corporateName);
-        }
-
-        if (company!=undefined) company.update({id: company.id,corporateId});
     }
 
     /* ---------------------------------------- Détails - Soldes Intermédiaires de Gestion ---------------------------------------- */
@@ -475,7 +468,7 @@ export class FinancialData {
 
         // Dotations aux amortissements, dépréciations et provisions
         //items = this.expenseAccounts.filter(account => /^681/.test(account.accountNum));
-        aggregate = {accountLib: "Dotations aux amortissements, dépréciations et provisions", amount: this.getAmountDepreciationExpenses()+this.getAmountProvisions(), isToBeChecked: false};
+        aggregate = {accountLib: "Dotations aux amortissements, dépréciations et provisions", amount: this.getAmountAmortisationExpenses()+this.getAmountProvisions(), isToBeChecked: false};
         aggregate.isToBeChecked = true;
         aggregates.push(aggregate); 
 
@@ -541,28 +534,50 @@ export class FinancialData {
  *      
  */
 
-const buildPeriods = async (immobilisations,amortisations,amortisationExpenses) =>
+const buildImmobilisationsPhases = async (immobilisations,amortisations,financialYear) =>
 {
     immobilisations
         .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
         .forEach(async immobilisation =>
     {
-        let amortisation = amortisations.filter(amortisation => amortisation.accountAux == immobilisation.account)[0];
-        let expenses = amortisationExpenses.filter(expense => expense.accountAux == amortisation.account);
+        let amortisation = amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
 
-        let dates = immobilisation.entries
-            .concat(amortisation.entries)
-            .concat(expenses.map(expense => expense.entries).reduce((a,b) => a.concat(b),[]))
-            .reduce((a,b) => a.concat(b),[]) // array with all entries
+        // get all dates ending an immobilisation account phase (i.e. before any change)
+        let datesEndImmobilisationPhases = immobilisation.entries
+            .filter(entry => !entry.isANouveaux)
             .map(entry => entry.date)
+            .map(date => getPrevDay(date))
+            .filter(date => parseInt(date)>=parseInt(financialYear.dateStart));
+
+        // get all dates ending an amortisation account phase (i.e. at any change)
+        let datesEndAmortisationPhases = amortisation.entries
+            .filter(entry => !entry.isANouveaux)
+            .map(entry => entry.date);
+
+        // end of months
+        let datesEndMonths = getDatesEndMonths(financialYear.dateStart,financialYear.dateEnd);
+
+        // concat phases & sort dates
+        let datesEndPhases = datesEndMonths
+            .concat([financialYear.dateEnd])
+            .concat(datesEndImmobilisationPhases)
+            .concat(datesEndAmortisationPhases)
             .filter((value, index, self) => index === self.findIndex(item => item === value) && value!="")   // remove duplicates dates and empty string
             .sort((a,b) => parseInt(a) > parseInt(b));   // sort by date (chronology)
 
-        let dateStart = dates[0];
-        let dateEnd = dates[dates.length-1];
+        // build phases
+        let phases = datesEndPhases.map((value,index,self) => {
+            return({
+                dateStart: index>0 ? getNextDay(self[index-1]) : financialYear.dateStart, 
+                dateEnd: value
+            })
+        })
 
-        expenses.forEach(async expense => await expense.initPeriods(dateStart,dateEnd));
-        await amortisation.initPeriods(expenses,dateStart,dateEnd);
+        immobilisation.buildPeriods(phases);
+        amortisation.buildPeriods(phases);
+
+        amortisationExpenses.forEach(async expense => await expense.initPeriods(dateStart,dateEnd));
+        await amortisation.initPeriods(amortisationExpenses,dateStart,dateEnd);
         await immobilisation.initPeriods(dateStart,dateEnd);
         
         // let dates = amortisation.periods
@@ -573,7 +588,7 @@ const buildPeriods = async (immobilisations,amortisations,amortisationExpenses) 
         //     .filter((value, index, self) => index === self.findIndex(item => item === value) && value!="")   // remove duplicates and empty string
         //     .sort((a,b) => parseInt(a) > parseInt(b));   // sort by date (chronology)
         
-        let datesExpenses = expenses
+        let datesExpenses = amortisationExpenses
             .map(expense => expense.periods).reduce((a,b) => a.concat(b),[])
             .map(period => [period.dateStart,period.dateEnd])
             .reduce((a,b) => a.concat(b),[])
@@ -592,12 +607,85 @@ const buildPeriods = async (immobilisations,amortisations,amortisationExpenses) 
 
         immobilisation.completePeriods(nextPeriods);
         amortisation.completePeriods(nextPeriods);
-        expenses.forEach(async expense => expense.completePeriods(immobilisation,amortisation,nextPeriods,datesExpenses,dateStart));
+        amortisationExpenses.forEach(async expense => expense.completePeriods(immobilisation,amortisation,nextPeriods,datesExpenses,dateStart));
         
         console.log("results");
         console.log(immobilisation);
         console.log(amortisation);
-        expenses.forEach(expense => console.log(expense));
+        amortisationExpenses.forEach(expense => console.log(expense));
+    })
+}
+
+const buildAjustedPeriods = async (immobilisations,amortisations,amortisationExpenses,financialPeriod) =>
+{
+    let adjustedAmortisations = [];
+    let adjustedAmortisationExpenses = [];
+
+    immobilisations
+        .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+        .forEach(async immobilisation =>
+    {
+        let amortisation = amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
+        let expenses = amortisationExpenses.filter(expense => expense.accountAux == amortisation.accountNum);
+
+        let adjustedAmortisationPeriods = [];
+
+        let currentAmortisationAmount = amortisation.prevAmount;
+        let currentExpensesAmount = 0;
+        let currentMax = 0;
+        let dateStart = financialPeriod.dateStart;
+
+        for (let amortisationPeriod of amortisation.periods)
+        {
+            let immobilisationPeriod = immobilisation.periods.filter(period => period.index==amortisationPeriod.index)[0];
+
+            let expensesPeriod = expenses.filter(expense => expense.date==amortisationPeriod.dateEnd);
+            currentExpensesAmount = currentExpensesAmount+getAmountItems(expensesPeriod);
+
+            let entriesPeriod = amortisation.entries.filter(entry => entry.date==amortisationPeriod.dateEnd);
+            currentAmortisationAmount = currentAmortisationAmount + getAmountItems(entriesPeriod) - getAmountItems(expensesPeriod);
+
+            adjustedAmortisationPeriods.push({
+                dateStart: amortisationPeriod.dateStart,
+                dateEnd: amortisationPeriod.dateEnd,
+                amount: currentAmortisationAmount,
+                nbDays: Math.round(Math.abs((getDateFromString(amortisationPeriod.dateStart) - getDateFromString(amortisationPeriod.dateEnd)) / oneDay), 0),
+                amountToDepreciate: immobilisationPeriod.amount-currentAmortisationAmount
+            })
+
+            if (currentExpensesAmount > currentMax) 
+            {
+                let amountExpenses = currentExpensesAmount-currentMax;
+                let totalAmountToDepreciate = getSumItems(concernedPeriods.map(period => period.nbDays*period.amountToDepreciate));
+
+                let adjustedAmortisationExpense = new Expense({
+                    label: "Dotation ajustée",
+                    accountNum: /^280/.test(amortisation.accountNum) ? "6811"+immobilisation.accountNum : "6812"+immobilisation.accountNum,
+                    accountLib: "Amortissement "+immobilisation.label,
+                    accountAux: amortisation.accountNum,
+                    amount: roundValue(amountExpenses,2),
+                });
+                adjustedAmortisationExpenses.push(adjustedAmortisationExpense);
+
+                let concernedPeriods = adjustedAmortisationPeriods.periods.filter(period => (parseInt(period.dateStart)>=parseInt(dateStart)) && (parseInt(period.dateEnd)<=parseInt(amortisationPeriod.dateEnd)));
+                concernedPeriods.forEach(period => {
+                    period.amount = totalAmountToDepreciate>0 ? roundValue(Math.round( amountExpenses*(period.amountToDepreciate/totalAmountToDepreciate)), 2) : 0;
+                })
+                
+                currentAmortisationAmount = currentAmortisationAmount+amountExpenses;
+                currentMax = currentExpensesAmount;
+                dateStart = getNextDay(amortisationPeriod.dateEnd);
+            }
+        }
+
+        let adjustedAmortisation = new Depreciation(amortisation);
+        adjustedAmortisation.periods = adjustedAmortisationPeriods;
+        adjustedAmortisations.push(adjustedAmortisation);
+    })
+
+    return({
+        adjustedAmortisations,
+        adjustedAmortisationExpenses
     })
 }
 

@@ -63,19 +63,19 @@ export class IndicatorCompaniesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-          {companies.map(({corporateId,corporateName,account,footprint}) => 
+          {companies.map(({corporateId,corporateName,accountNum,footprint}) => 
             {
               const indicator = footprint.indicators[indic];
               return(
                 <tr key={corporateId}>
                   <td className="short center">{corporateId}</td>
                   <td className="auto">{corporateName}</td>
-                  <td className="short right">{printValue(expensesByCompanies[account],0)}</td>
+                  <td className="short right">{printValue(expensesByCompanies[accountNum],0)}</td>
                   <td className="column_unit">&nbsp;€</td>
                   <td className="column_value">{printValue(indicator.getValue(),nbDecimals)}</td>
                   <td className="column_unit">&nbsp;{unit}</td>
                   <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(indicator.getUncertainty(),0)}&nbsp;%</td>
-                  {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(expensesByCompanies[account]),nbDecimals)}</td> : null}
+                  {impactAbsolu ? <td className="column_value">{printValue(indicator.getValueAbsolute(expensesByCompanies[accountNum]),nbDecimals)}</td> : null}
                   {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}
                 </tr>)})}
           </tbody>
@@ -110,7 +110,7 @@ const getExpensesByCompanies = (companies,expenses) =>
     let expensesByCompanies = {};
     companies.forEach(company =>
       {
-        expensesByCompanies[company.account] = expenses.filter(expense => expense.accountAux == company.account)
+        expensesByCompanies[company.accountNum] = expenses.filter(expense => expense.accountAux == company.accountNum)
                                                        .map(expense => expense.amount)
                                                        .reduce((a,b) => a+b,0);
       })

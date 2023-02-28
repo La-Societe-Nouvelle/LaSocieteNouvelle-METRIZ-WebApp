@@ -1,6 +1,7 @@
 // La Société Nouvelle
 
 // Imports
+import { getAmountItems } from "../utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 const oneDay = 24 * 60 * 60 * 1000;
@@ -8,7 +9,7 @@ const oneDay = 24 * 60 * 60 * 1000;
 export class Expense {
 
   constructor({id,
-               account,
+               accountNum,
                accountLib,
                accountAux,
                accountAuxLib,
@@ -20,7 +21,7 @@ export class Expense {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
     
-    this.account = account;
+    this.accountNum = accountNum;
     this.accountLib = accountLib;
     this.accountAux = accountAux;
     this.accountAuxLib = accountAuxLib;
@@ -34,6 +35,59 @@ export class Expense {
   }
 
   /* ---------- Periods ---------- */
+
+  getAdjustedEntries = async (periods,entries,dateStart,dateEnd) =>
+  {
+    const adjustmentEntries = [];
+
+    let currentAmount = 0;
+    let currentMax = 0
+
+    for (let period of periods) 
+    {
+      let entriesAtDate = entries.filter(entry => entry.date==period.dateStart);
+      if (entriesAtDate.length>0) {
+        let expensesOnPeriod = getAmountItems(entriesAtDate);
+        //
+
+        adjustmentEntries.push({
+
+        })
+      }
+      currentAmount+= flow.amount;
+
+      if (currentAmount > currentMax) 
+      {
+        let amountPeriod = currentAmount-currentMax;
+        currentMax = currentAmount;
+
+        // update current values
+        dateStart = flow.date;
+
+        if (flow.amount > amountPeriod) {
+          this.adjustmentEntries.push({
+            date: flow.date,
+            amount: -(flow.amount-amountPeriod)
+          })
+      }
+      }
+      else {
+        this.adjustmentEntries.push({
+          date: flow.date,
+          amount: -flow.amount
+        })
+      }
+    }
+
+    if (dateStart!=dateEnd) {
+      // add last period
+      this.periods.push({
+        dateStart: dateStart,
+        dateEnd: dateEnd,
+        amount: currentAmount-currentMax
+      });
+    }
+  }
 
   initPeriods = async (dateStart,dateEnd) =>
   {

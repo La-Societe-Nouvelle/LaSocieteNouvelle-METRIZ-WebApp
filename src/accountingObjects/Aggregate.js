@@ -9,8 +9,7 @@ export class Aggregate {
                amount,
                footprint,
                prevAmount,
-               prevFootprint,
-               initialState}) 
+               prevFootprint}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.label = label;
@@ -20,7 +19,6 @@ export class Aggregate {
 
     this.prevAmount = prevAmount || 0;
     this.prevFootprint = new SocialFootprint(prevFootprint);
-    this.initialState = initialState || "none";
   // ---------------------------------------------------------------------------------------------------- //
   }
 

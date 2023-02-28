@@ -16,13 +16,13 @@ const limit = 0.1;
 export async function getSignificativeCompanies(companies,expenses,investments,minFpt,maxFpt)
 {
   if (minFpt==null || maxFpt==null) {
-    return companies.filter(company => company.state != "siren").map(company => company.account);
+    return companies.filter(company => company.state != "siren").map(company => company.accountNum);
   }
 
   // significative companies for expenses
   let expensesByCompanies = getExpensesByCompanies(expenses); // key: account / value: amount
-  let identifiedCompanies = companies.filter(company => company.state == "siren" && Object.keys(expensesByCompanies).includes(company.account));
-  let unidentifiedCompanies = companies.filter(company => company.state != "siren" && Object.keys(expensesByCompanies).includes(company.account));
+  let identifiedCompanies = companies.filter(company => company.state == "siren" && Object.keys(expensesByCompanies).includes(company.accountNum));
+  let unidentifiedCompanies = companies.filter(company => company.state != "siren" && Object.keys(expensesByCompanies).includes(company.accountNum));
 
   let significativeCompaniesForExpenses = [];
   for (let indic of Object.keys(metaIndics)) {
@@ -31,7 +31,7 @@ export async function getSignificativeCompanies(companies,expenses,investments,m
   }
 
   // significative companies for investments
-  let significativeCompaniesForInvestments = companies.filter(company => investments.filter(investment => investment.accountAux == company.account).length > 0 && company.state!="siren").map(company => company.account);
+  let significativeCompaniesForInvestments = companies.filter(company => investments.filter(investment => investment.accountAux == company.accountNum).length > 0 && company.state!="siren").map(company => company.accountNum);
 
   // Merge
   let significativeCompanies = significativeCompaniesForExpenses.concat(significativeCompaniesForInvestments).filter((value, index, self) => index === self.findIndex(item => item === value));
@@ -41,7 +41,7 @@ export async function getSignificativeCompanies(companies,expenses,investments,m
 const getSignificativeCompaniesByIndic = async (indic,identifiedCompanies,unidentifiedCompanies,expensesByCompanies,minFpt,maxFpt,limit) =>
 {
   // sort unidentified companies by expenses (absolute value)
-  unidentifiedCompanies = unidentifiedCompanies.sort((a,b) => Math.abs(expensesByCompanies[a.account]) - Math.abs(expensesByCompanies[b.account]));
+  unidentifiedCompanies = unidentifiedCompanies.sort((a,b) => Math.abs(expensesByCompanies[a.accountNum]) - Math.abs(expensesByCompanies[b.accountNum]));
 
   let significativeGap = false;
   let index = 0;
@@ -52,19 +52,19 @@ const getSignificativeCompaniesByIndic = async (indic,identifiedCompanies,uniden
   while (!significativeGap && index < unidentifiedCompanies.length)
   {
     // get limit amount
-    let limitAmount = Math.abs(expensesByCompanies[unidentifiedCompanies[index].account]);
+    let limitAmount = Math.abs(expensesByCompanies[unidentifiedCompanies[index].accountNum]);
     
     // build impact for upper limit companies (mininum footprint case) -> use activity footprint if defined otherwise use min footprint
-    let upperLimitCompanies = unidentifiedCompanies.filter(company => Math.abs(expensesByCompanies[company.account]) > limitAmount);
+    let upperLimitCompanies = unidentifiedCompanies.filter(company => Math.abs(expensesByCompanies[company.accountNum]) > limitAmount);
     let impactUpperLimitCompanies = getSumItems(upperLimitCompanies.map(company => company.footprintActivityCode=="00" || company.status!=200
-    ? minFpt.indicators[indic].value*expensesByCompanies[company.account]
-    : company.footprint.indicators[indic].value*expensesByCompanies[company.account]));
+    ? minFpt.indicators[indic].value*expensesByCompanies[company.accountNum]
+    : company.footprint.indicators[indic].value*expensesByCompanies[company.accountNum]));
     
     // build impact for under limit companies (maximum footprint case) -> use activity footprint if defined otherwise use max footprint
-    let underLimitCompanies = unidentifiedCompanies.filter(company => Math.abs(expensesByCompanies[company.account]) <= limitAmount);
+    let underLimitCompanies = unidentifiedCompanies.filter(company => Math.abs(expensesByCompanies[company.accountNum]) <= limitAmount);
     let impactUnderLimitCompanies = getSumItems(underLimitCompanies.map(company => company.footprintActivityCode=="00" || company.status!=200
-      ? maxFpt.indicators[indic].value*expensesByCompanies[company.account]
-      : company.footprint.indicators[indic].value*expensesByCompanies[company.account]));
+      ? maxFpt.indicators[indic].value*expensesByCompanies[company.accountNum]
+      : company.footprint.indicators[indic].value*expensesByCompanies[company.accountNum]));
 
     // check if impact of under limit companies represent more than [limit] % of tracked expenses and upper limit companies impacts
     if (Math.abs(impactUnderLimitCompanies) >= Math.abs(impactIdentifiedCompaniesExpenses + impactUpperLimitCompanies)*limit) significativeGap = true;
@@ -73,7 +73,7 @@ const getSignificativeCompaniesByIndic = async (indic,identifiedCompanies,uniden
   }
 
   // Retrieve list of companies
-  let significativeCompanies = unidentifiedCompanies.slice(index).map(company => company.account);
+  let significativeCompanies = unidentifiedCompanies.slice(index).map(company => company.accountNum);
   return significativeCompanies;
 }
 

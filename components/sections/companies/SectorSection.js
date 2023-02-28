@@ -69,12 +69,12 @@ export class SectorSection extends React.Component
         });
       case "significative":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => this.state.significativeCompanies.includes(company.account)),
+          companiesShowed: this.state.unidentifiedCompanies.filter((company) => this.state.significativeCompanies.includes(company.accountNum)),
           view: view,
         });
       case "significativeWithoutActivity":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => this.state.significativeCompanies.includes(company.account) && company.footprintActivityCode == "00"),
+          companiesShowed: this.state.unidentifiedCompanies.filter((company) => this.state.significativeCompanies.includes(company.accountNum) && company.footprintActivityCode == "00"),
           view: view,
         });
       case "defaultActivity":
@@ -107,7 +107,7 @@ export class SectorSection extends React.Component
     const financialData = this.props.financialData;
 
     const isNextStepAvailable = !(unidentifiedCompanies.filter((company) => company.status != 200).length > 0);
-    const lengthSignificativeCompaniesWithoutActivity = unidentifiedCompanies.filter((company) => company.footprintActivityCode == "00" && significativeCompanies.includes(company.account)).length;
+    const lengthSignificativeCompaniesWithoutActivity = unidentifiedCompanies.filter((company) => company.footprintActivityCode == "00" && significativeCompanies.includes(company.accountNum)).length;
     const isSignificativeCompaniesWithoutActivity = lengthSignificativeCompaniesWithoutActivity > 0;
     
     return (

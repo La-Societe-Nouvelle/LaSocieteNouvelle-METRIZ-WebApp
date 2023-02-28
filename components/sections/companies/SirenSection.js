@@ -397,9 +397,9 @@ export class SirenSection extends React.Component {
       let XLSXData = await XLSXFileReader(reader.result);
 
       await Promise.all(
-        XLSXData.map(async ({ account, denomination, siren }) =>
+        XLSXData.map(async ({ account, accountNum, denomination, siren }) =>
           this.props.session.financialData.updateCorporateId(
-            account,
+            accountNum || account,
             denomination,
             siren
           )
@@ -418,10 +418,10 @@ export class SirenSection extends React.Component {
   // Export CSV File
   exportXLSXFile = async () => {
     let jsonContent = await this.props.session.financialData.companies
-      .filter((company) => company.account.charAt(0) != "_")
+      .filter((company) => company.accountNum.charAt(0) != "_")
       .map((company) => {
         return {
-          account: company.account,
+          accountNum: company.accountNum,
           denomination: company.corporateName,
           siren: company.corporateId,
         };

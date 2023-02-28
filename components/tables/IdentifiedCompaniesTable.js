@@ -190,7 +190,7 @@ class RowTableCompanies extends React.Component {
   }
 
   render() {
-    const { corporateName, account, amount, status, isDefaultAccount } = this.props;
+    const { corporateName, accountNum, amount, status, isDefaultAccount } = this.props;
     const { corporateId } = this.state;
     let icon;
     if (corporateId && status != 200) {
@@ -230,7 +230,7 @@ class RowTableCompanies extends React.Component {
             />
         </td>
         <td>{corporateName}</td>
-        <td>{account}</td>
+        <td>{accountNum}</td>
         <td className="text-end">{printValue(amount, 0)} &euro;</td>
       </tr>
     );

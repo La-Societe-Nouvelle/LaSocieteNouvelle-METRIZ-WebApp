@@ -1,5 +1,5 @@
 // Imports
-import { buildIndicatorAggregate } from "../formulas/footprintFormulas";
+import { buildAggregateIndicator } from "../formulas/footprintFormulas";
 import { getAmountItems, getPrevAmountItems } from "../utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
@@ -9,22 +9,29 @@ export class Account {
 
   constructor({accountNum,
                accountLib,
+               accountAux,
                amount,
                footprint,
+               initialState,
                prevAmount,
                prevFootprint,
-               initialState}) 
+               entries}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
-    this.accountNum = accountNum;
-    this.accountLib = accountLib;
+    this.id = accountNum;                                           // id
 
-    this.amount = amount || 0;
-    this.footprint = new SocialFootprint(footprint);
+    this.accountNum = accountNum;                                   // account number
+    this.accountLib = accountLib;                                   // account label
+    this.accountAux = accountAux;                                   // 
 
-    this.prevAmount = prevAmount || 0;
-    this.prevFootprint = new SocialFootprint(prevFootprint);
-    this.initialState = initialState || "none";
+    this.amount = amount || 0;                                      // amount at the end
+    this.footprint = new SocialFootprint(footprint);                //
+    
+    this.initialState = initialState || "currentFootprint";         // 
+    this.prevAmount = prevAmount || 0;                              // amount
+    this.prevFootprint = new SocialFootprint(prevFootprint);        //
+
+    this.entries = entries || [];
   // ---------------------------------------------------------------------------------------------------- //
   }
 
@@ -37,12 +44,12 @@ export const buildAggregateFromArray = ({accountNum,
   let amount = getAmountItems(items);
 
   let footprint = new SocialFootprint();
-  indics.forEach(indic => footprint.indicators[indic] = buildIndicatorAggregate(indic,items));
+  indics.forEach(indic => footprint.indicators[indic] = buildAggregateIndicator(indic,items));
 
   let prevAmount = getPrevAmountItems(items);
 
   let prevFootprint = new SocialFootprint();
-  indics.forEach(indic => prevFootprint.indicators[indic] = buildIndicatorAggregate(indic,items,{usePrev: true}));
+  indics.forEach(indic => prevFootprint.indicators[indic] = buildAggregateIndicator(indic,items,{usePrev: true}));
 
   return new Account({accountNum,accountLib,amount,footprint,prevAmount,prevFootprint});
 }

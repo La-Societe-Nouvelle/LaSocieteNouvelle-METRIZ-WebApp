@@ -4,13 +4,13 @@
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 // Utils
-import { getCurrentDateString } from "../utils/Utils";
+import { getAmountItems, getCurrentDateString } from "../utils/Utils";
 import api from "../api";
 
 export class Immobilisation {
   constructor({
     id,
-    account,
+    accountNum,
     accountLib,
     isDepreciableImmobilisation,
     amount,
@@ -28,7 +28,7 @@ export class Immobilisation {
     // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
 
-    this.account = account;
+    this.accountNum = accountNum;
     this.accountLib = accountLib;
 
     this.isDepreciableImmobilisation = isDepreciableImmobilisation || false;
@@ -129,86 +129,24 @@ export class Immobilisation {
 
   /* ---------- Periods ---------- */
 
-  initPeriods = async (dateStart,dateEnd) =>
+  buildPeriods = async (periods) =>
   {
-    let currentAmount = this.prevAmount;
-    let dateStart = dateStart;
-
     this.periods = [];
 
-    // entries (except A-NOUVEAUX entry)
-    let entries = this.entries.filter(entry => !entry.isANouveaux).sort((a,b) => parseInt(a.date) > parseInt(b.date));
-    for (let entry of entries) 
-    {
+    let currentAmount = this.prevAmount;
+
+    for (let period of periods) 
+    {      
+      // update current amount
+      let entriesAtDate = this.entries.filter(entry => !entry.isANouveaux).filter(entry => entry.date==period.dateStart); // variations at beginning of period
+      let variationOnPeriod = getAmountItems(entriesAtDate, 2);
+      currentAmount = currentAmount+variationOnPeriod;
+
       // add period with current amount
       this.periods.push({
-          dateStart: dateStart,
-          dateEnd: entry.date,
-          amount: currentAmount
-      });
-      // update current amount
-      currentAmount+= entry.amount;
-      dateStart = entry.date;
-    }
-
-    // add last period
-    if(dateStart!=dateEnd) 
-    {
-      this.periods.push({
-          dateStart: dateStart,
-          dateEnd: dateEnd,
-          amount: currentAmount
-      });
-    }
-  }
-
-  completePeriods = (nextPeriods) =>
-  {
-    // Immobilisation periods
-    let immobilisationPrevPeriods = [...this.periods];
-    this.periods = [];
-    nextPeriods.forEach(nextPeriod =>
-    {
-      // period matching with next period (next periods can't be over two prev periods)
-      let prevPeriod = immobilisationPrevPeriods.filter(period => (parseInt(period.dateStart) <= parseInt(nextPeriod.dateStart)) && (parseInt(period.dateEnd) >= parseInt(nextPeriod.dateEnd)))[0];
-      this.periods.push({
-        dateStart: nextPeriod.dateStart,
-        dateEnd: nextPeriod.dateEnd,
-        amount: prevPeriod.amount // same amount
-      })
-    })
-  }
-
-  initPeriodsWithoutImmobilisedProduction = async (immobilisationProductions,dateStart,dateEnd) =>
-  {
-    let currentAmount = this.prevAmount;
-    let dateStart = dateStart;
-
-    this.periods = [];
-
-    // entries (except A-NOUVEAUX entry)
-    let entries = this.entries.filter(entry => !entry.isANouveaux).sort((a,b) => parseInt(a.date) > parseInt(b.date));
-    for (let entry of entries) 
-    {
-      let immobilisationProductionsAtDate = immobilisationProductions.filter(immobilisationProduction => immobilisationProduction.date==entry.date);
-      // add period with current amount
-      this.periods.push({
-          dateStart: dateStart,
-          dateEnd: entry.date,
-          amount: currentAmount
-      });
-      // update current amount
-      currentAmount+= entry.amount;
-      dateStart = entry.date;
-    }
-
-    // add last period
-    if(dateStart!=dateEnd) 
-    {
-      this.periods.push({
-          dateStart: dateStart,
-          dateEnd: dateEnd,
-          amount: currentAmount
+        dateStart: period.dateStart,
+        dateEnd: period.dateEnd,
+        amount: currentAmount
       });
     }
   }

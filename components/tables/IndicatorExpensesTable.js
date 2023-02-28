@@ -55,12 +55,12 @@ export class IndicatorExpensesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {expensesByAccount.map(({account,amount,accountLib}) => 
+            {expensesByAccount.map(({accountNum,amount,accountLib}) => 
             {
-              const indicator = session.getExpensesAccountIndicator(account,indic);
+              const indicator = session.getExpensesAccountIndicator(accountNum,indic);
               return(
-                <tr key={account}>
-                  <td >{account}</td>
+                <tr key={accountNum}>
+                  <td >{accountNum}</td>
                   <td >{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
                   <td  className="text-end">{printValue(amount,0)} &euro;</td>
                   <td  className="text-end">{printValue(indicator.getValue(),nbDecimals)} <span > {unit}</span></td>
@@ -85,7 +85,7 @@ export class IndicatorExpensesTable extends React.Component {
   {
     switch(columSorted) 
     {
-      case "account": expenses.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "account": expenses.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
       case "amount": expenses.sort((a,b) => b.amount - a.amount); break;
     }
     if (this.state.reverseSort) expenses.reverse();
@@ -96,10 +96,10 @@ export class IndicatorExpensesTable extends React.Component {
 export const getExpensesGroupByAccount = (expenses) =>  
 {
     let expensesByAccount = {};
-    expenses.forEach(({account,accountLib,amount}) => 
+    expenses.forEach(({accountNum,accountLib,amount}) => 
     {
-        if (expensesByAccount[account] == undefined) expensesByAccount[account] = {account, amount, accountLib};
-        else expensesByAccount[account].amount+= amount;
+        if (expensesByAccount[accountNum] == undefined) expensesByAccount[accountNum] = {accountNum, amount, accountLib};
+        else expensesByAccount[accountNum].amount+= amount;
     })
-    return Object.entries(expensesByAccount).map(([account,{amount,accountLib}]) => ({account, amount, accountLib}));
+    return Object.entries(expensesByAccount).map(([accountNum,{amount,accountLib}]) => ({accountNum, amount, accountLib}));
 }

@@ -73,7 +73,7 @@ export const IndicatorIncomeStatementTable = ({indic,session}) =>
           <td>CHARGES EXTERNES</td></tr>
         <tr>
           <td>&emsp;Variation de stocks</td>
-          <td className="column_value">{printValue(-financialData.getVariationPurchasesStocks(),0)}</td>
+          <td className="column_value">{printValue(financialData.getVariationPurchasesStocks(),0)}</td>
           <td className="column_unit">&nbsp;€</td>
           <td className="column_value">{printValue(session.getPurchasesStocksVariationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
@@ -114,12 +114,12 @@ export const IndicatorIncomeStatementTable = ({indic,session}) =>
           <td>DOTATIONS D'EXPLOITATION</td></tr>
         <tr>
           <td>&emsp;Dotations aux amortissements sur immobilisations</td>
-          <td className="column_value">{printValue(financialData.getAmountDepreciationExpenses(),0)}</td>
+          <td className="column_value">{printValue(financialData.getAmountAmortisationExpenses(),0)}</td>
           <td className="column_unit">&nbsp;€</td>
           <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValue(),nbDecimals)}</td>
           <td className="column_unit">&nbsp;{unit}</td>
           <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(session.getDepreciationsFootprint().getIndicator(indic).getUncertainty(),0)}&nbsp;%</td>
-          {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountDepreciationExpenses()),nbDecimals)}</td> : null}
+          {impactAbsolu ? <td className="column_value">{printValue(session.getDepreciationsFootprint().getIndicator(indic).getValueAbsolute(financialData.getAmountAmortisationExpenses()),nbDecimals)}</td> : null}
           {impactAbsolu ? <td className="column_unit">&nbsp;{unitAbsolute}</td> : null}</tr>
         <tr>
           <td>&emsp;Autres dotations aux amortissements, aux dépréciations et aux provisions</td>
@@ -127,7 +127,7 @@ export const IndicatorIncomeStatementTable = ({indic,session}) =>
           <td className="column_unit">&nbsp;€</td></tr>
         <tr>
           <td></td>
-          <td className="column_value important with-top-line">{printValue(financialData.getAmountDepreciationExpenses()+financialData.getAmountProvisions(),0)}</td>
+          <td className="column_value important with-top-line">{printValue(financialData.getAmountProvisions(),0)}</td>
           <td className="column_unit important">&nbsp;€</td></tr>
 
         <tr className="with-top-margin">

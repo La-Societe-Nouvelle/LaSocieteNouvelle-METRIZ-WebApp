@@ -14,13 +14,13 @@ import { SocialFootprint } from '../footprintObjects/SocialFootprint';
 /* -------------------- FOOTPRINT FORMULAS -------------------- */
 /* ------------------------------------------------------------ */
 
-export async function buildAggregateFpt(elements,usePrev) 
+export async function buildAggregateFootprint(elements,usePrev) 
 {
     let footprint = new SocialFootprint();
     let indics = Object.keys(metaIndics);
     await Promise.all(
         indics.map(async indic => {
-            let indicator = await buildIndicatorAggregate(indic,elements,usePrev);
+            let indicator = await buildAggregateIndicator(indic,elements,usePrev);
             footprint.indicators[indic] = indicator;
             return;
         })
@@ -28,7 +28,7 @@ export async function buildAggregateFpt(elements,usePrev)
     return footprint;
 }
 
-export function buildIndicatorAggregate(indic,elements,usePrev) 
+export function buildAggregateIndicator(indic,elements,usePrev) 
 {
     let indicator = new Indicator({indic});
     
@@ -71,7 +71,48 @@ export function buildIndicatorAggregate(indic,elements,usePrev)
     return indicator;
 }
 
-export async function megreFpt(footprintA,amountA,footprintB,amountB)
+export async function buildVariationFootprint(element) 
+{
+    let footprint = new SocialFootprint();
+    let indics = Object.keys(metaIndics);
+    await Promise.all(
+        indics.map(async indic => {
+            let indicator = await buildVariationIndicator(indic,element);
+            footprint.indicators[indic] = indicator;
+            return;
+        })
+    )
+    return footprint;
+}
+
+export function buildVariationIndicator(indic,element)
+{
+    let indicator = new Indicator({indic: indicatorA.getIndic()});
+
+    let precision = metaIndics[indicator.indic].nbDecimals;
+
+    let amountVariation = element.amount - element.prevAmount;
+    let impactVariation = element.footprint.indicators[indic].getValue()*element.amount - element.prevFootprint.indicators[indic].getValue()*element.prevAmount;
+    let impactMaxVariation = element.footprint.indicators[indic].getValueMax()*element.amount - element.prevFootprint.indicators[indic].getValueMin()*element.prevAmount;
+    let impactMinVariation = element.footprint.indicators[indic].getValueMin()*element.amount - element.prevFootprint.indicators[indic].getValueMax()*element.prevAmount;
+
+    if (amountVariation!=0 && impactVariation!=0) {
+        indicator.setValue(roundValue(impactVariation/amountVariation, precision));
+        let uncertainty = Math.abs(impactVariation) > 0 ? roundValue( Math.max( Math.abs(impactMaxVariation-impactVariation) , Math.abs(impactVariation-impactMinVariation) )/Math.abs(impactVariation) * 100 , 0) : 0;
+        indicator.setUncertainty(uncertainty);
+    } else if (element.amount!=0) {
+        indicator.setValue(roundValue(impactVariation/0.01, precision));
+        let uncertainty = Math.abs(impactVariation) > 0 ? roundValue( Math.max( Math.abs(impactMaxVariation-impactVariation) , Math.abs(impactVariation-impactMinVariation) )/Math.abs(impactVariation) * 100 , 0) : 0;
+        indicator.setUncertainty(uncertainty);
+    } else {
+        indicator.setValue(null);
+        indicator.setUncertainty(null);
+    }
+
+    return indicator;
+}
+
+export async function mergeFootprints(footprintA,amountA,footprintB,amountB)
 {
     let footprint = new SocialFootprint();
     let indics = Object.keys(metaIndics);
@@ -124,5 +165,48 @@ export function buildIndicatorMerge(indicatorA,amountA,
         indicator.setUncertainty(indicatorB.getUncertainty());
     }
      
+    return indicator;
+}
+
+export function mergeIndicators(indic,items) 
+{
+    let indicator = new Indicator({indic});
+    
+    let precision = metaIndics[indic].nbDecimals;
+
+    let totalAmount = 0.0;
+    let grossImpact = 0.0;
+    let grossImpactMax = 0.0;
+    let grossImpactMin = 0.0;
+
+    let missingData = false;
+    
+    items.forEach((item) => 
+    {
+        let itemAmount = item.amount;
+        let itemIndicator = item.indicator;
+
+        if (itemAmount!=null && itemAmount!=0 && itemIndicator.getValue()!=null) 
+        {
+            grossImpact+= itemIndicator.getValue()*itemAmount;
+            grossImpactMax+= Math.max(itemIndicator.getValueMax()*itemAmount,itemIndicator.getValueMin()*itemAmount);
+            grossImpactMin+= Math.min(itemIndicator.getValueMax()*itemAmount,itemIndicator.getValueMin()*itemAmount);
+            totalAmount+= itemAmount;
+        } 
+        else if (itemAmount==null || (itemAmount!=0 && itemIndicator.getValue()==null)) {missingData = true}
+    })
+
+    if (!missingData && totalAmount != 0) { 
+        indicator.setValue(roundValue(grossImpact/totalAmount, precision));
+        let uncertainty = Math.abs(grossImpact) > 0 ? roundValue(Math.max( Math.abs(grossImpactMax-grossImpact) , Math.abs(grossImpact-grossImpactMin) ) / Math.abs(grossImpact) * 100, 0) : 0;
+        indicator.setUncertainty(uncertainty);
+    } else if (items.length == 0) {
+        indicator.setValue(0); 
+        indicator.setUncertainty(0);
+    } else {
+        indicator.setValue(null); 
+        indicator.setUncertainty(null);
+    }
+
     return indicator;
 }

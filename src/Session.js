@@ -18,17 +18,20 @@ import { buildIndicatorAggregate } from "./formulas/footprintFormulas";
 import {
   updateAggregatesFootprints,
   updateProductionItemsFootprints,
-  updateOutputFlowsFootprints,
   updateAccountsFootprints,
   updateFinalStatesFootprints,
+  updateExternalExpensesFpt,
+  updateInvestmentsFpt,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
 import { ComparativeData } from "./ComparativeData";
 
 /* ---------- OBJECT SESSION ---------- */
 
-export class Session {
-  constructor(props) {
+export class Session 
+{
+  constructor(props) 
+  {
     if (props == undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
     // Version
@@ -39,6 +42,7 @@ export class Session {
 
     // Year
     this.year = props.year || "";
+    this.financialYears = props.financialYears || {};
 
     // Data
     this.legalUnit = new LegalUnit(props.legalUnit);
@@ -48,11 +52,11 @@ export class Session {
     // Validations
     this.validations = props.validations || [];
     this.comparativeData =  new ComparativeData(props.comparativeData);
+
     this.updateFootprints();
 
     // Indicators list
     this.indics = props.indics || Object.keys(metaIndics)
-
   }
 
   /* -------------------- PROGRESSION -------------------- */
@@ -101,22 +105,31 @@ export class Session {
   // Main footprints are stored in variables to avoid processing multiple times when render the results
   // ... and allows to have all the values directly in the json back up file
 
+  // Updating output flows footprints
+  //  -> re assign companies fpt to expenses & investments 
+
+  updateOutputFlowFootprints = async () => 
+  {
+    // External expenses
+    await updateExternalExpensesFpt(financialData);
+
+    // Investments
+    await updateInvestmentsFpt(financialData);
+  }
+
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
-  async updateFootprints() {
-    await Promise.all(
-      Object.keys(metaIndics).map((indic) => this.updateIndicator(indic))
-    );
+  updateFootprints = async () => 
+  {
+    await Promise.all(Object.keys(metaIndics).map((indic) => this.updateIndicator(indic)));
     return;
   }
 
  
   // Update indicator
-  async updateIndicator(indic) {
+  async updateIndicator(indic) 
+  {
     // Net Value Added
     this.updateNetValueAddedFootprint(indic);
-
-    // Output flows : expenses / investments
-    await updateOutputFlowsFootprints(indic, this.financialData);
 
     // Accounts
     await updateAccountsFootprints(indic, this.financialData);
@@ -159,17 +172,9 @@ export class Session {
     return buildIndicatorAggregate(
       indic,
       this.financialData.expenses.filter((expense) =>
-        expense.account.startsWith(accountPurchases)
+        expense.accountNum.startsWith(accountPurchases)
       )
     );
   }
 
-  getDepreciationsAccountIndicator(account, indic) {
-    return buildIndicatorAggregate(
-      indic,
-      this.financialData.depreciationExpenses.filter((expense) =>
-        expense.account.startsWith(account)
-      )
-    );
-  }
 }

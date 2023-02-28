@@ -48,15 +48,15 @@ export class ImmobilisationsTable extends React.Component {
           </thead>
           <tbody>
             {immobilisations.map(
-              ({ account, accountLib, amount, prevAmount }) => {
+              ({ accountNum, accountLib, amount, prevAmount }) => {
                 let augmentation = investments
-                  .filter((investment) => investment.account == account)
+                  .filter((investment) => investment.accountNum == accountNum)
                   .map((investment) => investment.amount)
                   .reduce((a, b) => a + b, 0);
                 let dimininution = prevAmount + augmentation - amount;
                 return (
-                  <tr key={account}>
-                    <td>{account}</td>
+                  <tr key={accountNum}>
+                    <td>{accountNum}</td>
                     <td>
                       {accountLib.charAt(0).toUpperCase() +
                         accountLib.slice(1).toLowerCase()}
@@ -128,7 +128,7 @@ export class ImmobilisationsTable extends React.Component {
         items.sort((a, b) => a.accountLib.localeCompare(b.accountLib));
         break;
       case "account":
-        items.sort((a, b) => a.account.localeCompare(b.account));
+        items.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
         break;
       //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
       //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;

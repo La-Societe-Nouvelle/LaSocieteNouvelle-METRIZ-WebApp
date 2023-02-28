@@ -10,7 +10,7 @@ import api from '../api';
 export class Stock {
 
   constructor({id,
-               account,
+               accountNum,
                accountLib,
                accountAux,
                isProductionStock,
@@ -28,20 +28,24 @@ export class Stock {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
 
-    this.account = account;
+    this.accountNum = accountNum;
     this.accountLib = accountLib;
     this.accountAux = accountAux;
 
     this.isProductionStock = isProductionStock;
 
     // Footprint
+
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint)
 
     // Previous footprint
-    this.prevAmount = prevAmount || 0;
+
     this.initialState = initialState || "none";
+
+    this.prevAmount = prevAmount || 0;
     this.prevFootprint = new SocialFootprint(prevFootprint);
+
     this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
     this.prevFootprintActivityCode = prevFootprintActivityCode || "00";
 

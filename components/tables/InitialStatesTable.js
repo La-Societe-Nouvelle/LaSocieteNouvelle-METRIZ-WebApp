@@ -55,7 +55,7 @@ export class InitialStatesTable extends React.Component {
           <tbody>
             {accounts.slice(page*nbItems,(page+1)*nbItems)
                      .map((account) => 
-              <Row key={account.account} 
+              <Row key={account.accountNum} 
                    {...account}
                    onInitialStateUpdate={this.updateAccount.bind(this)}
                    syncData={this.synchroniseAccount.bind(this)}/>)}
@@ -109,7 +109,7 @@ export class InitialStatesTable extends React.Component {
     switch(columSorted) 
     {
       case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
-      case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "account": items.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
       case "amount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
     }
     if (this.state.reverseSort) items.reverse();
@@ -125,9 +125,9 @@ export class InitialStatesTable extends React.Component {
   updateAccount = (nextProps) =>
   {
     // Immobilisation
-    if (/^2/.test(nextProps.account)) this.props.financialData.updateImmobilisation(nextProps);
+    if (/^2/.test(nextProps.accountNum)) this.props.financialData.updateImmobilisation(nextProps);
     // Stock
-    else if (/^3/.test(nextProps.account)) this.props.financialData.updateStock(nextProps);
+    else if (/^3/.test(nextProps.accountNum)) this.props.financialData.updateStock(nextProps);
     
     this.props.onUpdate();
   }
@@ -138,12 +138,12 @@ export class InitialStatesTable extends React.Component {
 
 const buildHasInputs = (account,financialData) =>
 {
-  if (/^3/.test(account.account)) {
-    account.hasInputs = financialData.expenses.filter(expense => expense.account == account.accountAux).length > 0;
-    account.hasOutputs = financialData.stockVariations.filter(stockVariation => stockVariation.accountAux == account.account).length > 0;
-  } else if (/^2/.test(account.account)) {
-    account.hasInputs = financialData.investments.filter(investment => investment.account == account.account).length > 0;
-    account.hasOutputs = financialData.depreciations.filter(depreciation => depreciation.accountAux == account.account).length > 0;
+  if (/^3/.test(account.accountNum)) {
+    account.hasInputs = financialData.expenses.filter(expense => expense.accountNum == account.accountAux).length > 0;
+    account.hasOutputs = financialData.stockVariations.filter(stockVariation => stockVariation.accountAux == account.accountNum).length > 0;
+  } else if (/^2/.test(account.accountNum)) {
+    account.hasInputs = financialData.investments.filter(investment => investment.accountNum == account.accountNum).length > 0;
+    account.hasOutputs = financialData.depreciations.filter(depreciation => depreciation.accountAux == account.accountNum).length > 0;
   }
 }
 
@@ -151,7 +151,7 @@ const buildHasInputs = (account,financialData) =>
 
 const Row = (props) => 
 {
-  switch(props.account.charAt(0))
+  switch(props.accountNum.charAt(0))
   {
     case "2": return <RowTableImmobilisations {...props}/>
     case "3": return <RowTableStocks {...props}/>
@@ -162,12 +162,12 @@ const Row = (props) =>
 
 function RowTableImmobilisations(props) 
 {
-  const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
+  const {id,accountNum,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
   const activityCode = /^[0-9]{2}/.test(prevFootprintActivityCode) ? prevFootprintActivityCode.substring(0,2) : prevFootprintActivityCode;
 
 
-  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, account: account, prevFootprintActivityCode: event.value})
-  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, account: account, initialState: event.value})
+  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id, accountNum, prevFootprintActivityCode: event.value})
+  const onOriginStateChange = (event) => props.onInitialStateUpdate({id, accountNum, initialState: event.value})
 
 
     const branchesOptions = [];
@@ -224,7 +224,7 @@ function RowTableImmobilisations(props)
   if (isDepreciableImmobilisation && hasOutputs) {
     return (
       <tr>
-        <td >{account}</td>
+        <td >{accountNum}</td>
         <td>
           {accountLib.charAt(0).toUpperCase() +
             accountLib.slice(1).toLowerCase()}
@@ -272,7 +272,7 @@ function RowTableImmobilisations(props)
   } 
   else if (isDepreciableImmobilisation) {
     return (<tr>
-              <td>{account}</td>
+              <td>{accountNum}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
               <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
@@ -280,7 +280,7 @@ function RowTableImmobilisations(props)
             </tr>)
   } else {
     return (<tr>
-              <td >{account}</td>
+              <td >{accountNum}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non prise en compte (non amortissable)</td>
               <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
@@ -293,11 +293,11 @@ function RowTableImmobilisations(props)
 
 function RowTableStocks(props)
 {
-  const {id,prevAmount,account,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs} = props;
+  const {id,prevAmount,accountNum,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs} = props;
   const activityCode = prevFootprintActivityCode.substring(0,2);
 
-  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, account: account, prevFootprintActivityCode: event.value})
-  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, account: account, initialState: event.value})
+  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id, accountNum, prevFootprintActivityCode: event.value})
+  const onOriginStateChange = (event) => props.onInitialStateUpdate({id, accountNum, initialState: event.value})
 
   const initialStateOptions = [];
   const defaultValueInitialState = {};
@@ -350,7 +350,7 @@ function RowTableStocks(props)
 
   return (
     <tr>
-      <td >{account}</td>
+      <td >{accountNum}</td>
       <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
       {!isProductionStock &&
         <td colSpan={initialState=="defaultData" ? 1 : 2}>

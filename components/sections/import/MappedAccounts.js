@@ -4,18 +4,11 @@ import { Table } from "react-bootstrap";
 function MappedAccounts(props) {
   const accounts = Object.entries(props.meta.accounts);
 
-  const depAccounts = accounts.filter(
-    (account) =>
-      /^28/.test(account) || /^29/.test(account) || /^39/.test(account)
-  );
-  const assetAccounts = accounts.filter(
-    (account) => /^2(0|1)/.test(account) || /^3[0-8]/.test(account)
-  );
+  const accountsToMap = accounts.filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
+  const assetAccounts = accounts.filter((account) => /^2(0|1)/.test(account) || /^3[0-8]/.test(account));
 
   const [isDisabled, setIsDisabled] = useState(true);
-  const [mappedAccounts, setMappedAccounts] = useState(
-    props.meta.mappingAccounts
-  );
+  const [mappedAccounts, setMappedAccounts] = useState(props.meta.mappingAccounts);
 
   // disabled if one account is not mapped i.e. enabled if all accounts are mapped
   useEffect(() => {
@@ -26,11 +19,11 @@ function MappedAccounts(props) {
     }
   }, [isDisabled, mappedAccounts]);
 
-  function handleOnchange(depAccountNum, nextAccountAuxNum) {
+  function handleOnchange(accountToMapNum, nextAccountAuxNum) {
     // remove association if a dep/amort. account is already associated with account aux
     Object.entries(mappedAccounts).map(([key, { accountAux }]) => {
       if (
-        key.substring(0, 2) == depAccountNum.substring(0, 2) &&
+        key.substring(0, 2) == accountToMapNum.substring(0, 2) &&
         accountAux == nextAccountAuxNum
       ) {
         Object.assign(mappedAccounts, {
@@ -41,7 +34,7 @@ function MappedAccounts(props) {
 
     // add association
     Object.assign(mappedAccounts, {
-      [depAccountNum]: { accountAux: nextAccountAuxNum, directMatching: true },
+      [accountToMapNum]: { accountAux: nextAccountAuxNum, directMatching: true },
     });
 
     props.meta.mappingAccounts = mappedAccounts; // ?
@@ -70,12 +63,12 @@ function MappedAccounts(props) {
           </tr>
         </thead>
         <tbody>
-          {depAccounts.map(([depAccountNum, depAccountLib], index) => (
+          {accountsToMap.map(([accountToMapNum, accountToMapLib], index) => (
             <tr key={index}>
-              <td>{depAccountNum}</td>
-              <td>{depAccountLib}</td>
+              <td>{accountToMapNum}</td>
+              <td>{accountToMapLib}</td>
               <td style={{width:'40px'}}>
-                {!mappedAccounts[depAccountNum].directMatching && (
+                {!mappedAccounts[accountToMapNum].directMatching && (
                   <IconWarning />
                 )}
               </td>
@@ -83,15 +76,15 @@ function MappedAccounts(props) {
                 <select
                   className="form-select"
                   onChange={(e) =>
-                    handleOnchange(depAccountNum, e.target.value)
+                    handleOnchange(accountToMapNum, e.target.value)
                   }
-                  value={mappedAccounts[depAccountNum].accountAux || ""}
+                  value={mappedAccounts[accountToMapNum].accountAux || ""}
                 >
                   <option value="">Sélectionner un compte...</option>
                   {assetAccounts
                     .filter(
                       ([assetAccountNum, _]) =>
-                        assetAccountNum[0] == depAccountNum[0]
+                        assetAccountNum[0] == accountToMapNum[0]
                     )
                     .map(([assetAccountNum, assetAccountLib], index) => (
                       <option key={index} value={assetAccountNum}>

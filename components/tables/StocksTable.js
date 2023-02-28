@@ -40,16 +40,16 @@ export class StocksTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-          {stocks.map(({account,accountLib,amount,prevAmount}) => {
-            let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
+          {stocks.map(({accountNum,accountLib,amount,prevAmount}) => {
+            let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==accountNum)
                                          .map(depreciation => depreciation.amount)
                                          .reduce((a,b) => a + b,0);
-            let prevValueLoss = depreciations.filter(depreciation => depreciation.accountAux==account)
+            let prevValueLoss = depreciations.filter(depreciation => depreciation.accountAux==accountNum)
                                              .map(depreciation => depreciation.prevAmount)
                                              .reduce((a,b) => a + b,0);
             return(
-              <tr key={account}>
-                <td >{account}</td>
+              <tr key={accountNum}>
+                <td >{accountNum}</td>
                 <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
                 <td className="text-end">{printValue(amount-valueLoss,0)}  &euro;</td>
                 <td className="text-end">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
@@ -84,7 +84,7 @@ export class StocksTable extends React.Component {
     switch(columSorted) 
     {
       case "label": items.sort((a,b) => a.accountLib.localeCompare(b.accountLib)); break;
-      case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "account": items.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
       //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
       //case "amount": items.sort((a,b) => b.amount - a.amount); break;
       //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;

@@ -211,11 +211,11 @@ async function buildExpensesContent(indic,session)
   // Consommations intermédiaires
 
   expensesByAccount
-    .forEach(({ account, accountLib, amount }) => 
+    .forEach(({ accountNum, accountLib, amount }) => 
     {
-      let indicator = session.getExpensesAccountIndicator(account,indic);
+      let indicator = session.getExpensesAccountIndicator(accountNum,indic);
       aoaContent.push([
-        account,
+        accountNum,
         accountLib,
         roundValue(amount, 0),
         roundValue(indicator.getValue(), nbDecimals),

@@ -49,7 +49,7 @@ const columnsFEC = ["JournalCode",
 
 /* -------------------- PARSER -------------------- */
 
-const parseAmount = (stringAmount) => roundValue(parseFloat(stringAmount.replace(',','.')),2)
+const parseAmount = (stringAmount) => roundValue(parseFloat(stringAmount.replace(',','.')), 2)
 
 /* -------------------- BALANCE CHECKER -------------------- */
 
@@ -77,17 +77,23 @@ export async function FECFileReader(content)
 
   let dataFEC = {
     books: [],
-    meta: {books: {},accounts: {}, accountsAux: {}, firstDate: null, lastDate: null}
+    meta: {
+      books: {},                  // key : accountNum / values : { label, type }
+      accounts: {},               // key : accountNum / value : accountLib
+      accountsAux: {},            // key : accountNum / value : accountLib
+      firstDate: null, 
+      lastDate: null
+    }
   };
 
   // Separator ------------------------------------------------------------------------------------------ //
+
   let separator;
   try {
 
    separator = getSeparator(content.slice(0,content.indexOf('\n'))); // throw exception
     
   } catch (error) {
-    
     throw error;
   }
 
@@ -107,17 +113,16 @@ export async function FECFileReader(content)
 
   // Rows ----------------------------------------------------------------------------------------------- //
   
-  // Segmentations des lignes
+  // Segmentation des lignes
   const rows = content.slice(content.indexOf('\n')+1).split('\n');
 
   // Lecture des lignes
   await rows.forEach(async (rowString,index) => 
   {
-    // Segmentations des colonnes (String -> JSON)
+    // Segmentation des colonnes (String -> JSON)
     let row = rowString.replace('\r','').split(separator);
 
     let rowArray = row.slice(0,18);
-
 
     if (rowArray.length == 18)
     {
@@ -128,15 +133,21 @@ export async function FECFileReader(content)
       let rowData = await readFECFileRow(indexColumns,rowArray);
 
       // Construction du journal (si absent) et mise à jour des métadonnées relatives aux journaux
-      if (!(rowData.JournalCode in dataFEC.meta.books)) 
-      {
+      if (!(rowData.JournalCode in dataFEC.meta.books)) {
         dataFEC.books[rowData.JournalCode] = [];
-        dataFEC.meta.books[rowData.JournalCode] = {label: rowData.JournalLib, type: getDefaultBookType(rowData.JournalCode,rowData.JournalLib)}
+        dataFEC.meta.books[rowData.JournalCode] = {
+          label: rowData.JournalLib, 
+          type: getDefaultBookType(rowData.JournalCode,rowData.JournalLib)
+        }
       }
 
       // Mise à jour des métadonnées relatives aux libellés de comptes
-      if (!Object.keys(dataFEC.meta.accounts).includes(rowData.CompteNum)) dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
-      if (rowData.CompAuxNum != undefined && dataFEC.meta.accountsAux[rowData.CompAuxNum] == undefined) dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
+      if (!Object.keys(dataFEC.meta.accounts).includes(rowData.CompteNum)) {
+        dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
+      }
+      if (rowData.CompAuxNum!=undefined && !Object.keys(dataFEC.meta.accountsAux).includes(rowData.CompAuxNum)) {
+        dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
+      }
 
       // Date
       if (dataFEC.meta.firstDate==null || parseInt(rowData.EcritureDate) < parseInt(dataFEC.meta.firstDate)) dataFEC.meta.firstDate = rowData.EcritureDate;
@@ -152,9 +163,9 @@ export async function FECFileReader(content)
 
   // Mapping accounts ----------------------------------------------------------------------------------- //
 
-  let mappingAccounts = await buildMappingAccounts(dataFEC.meta.accounts);
-  dataFEC.meta.accountsMapped = mappingAccounts.accountsMapped;
-  dataFEC.meta.mappingAccounts = mappingAccounts.mapping;
+  let mappingAccounts = await buildMappingAssetAccounts(dataFEC.meta.accounts);
+
+  dataFEC.meta.mappingAccounts = mappingAccounts;         // key : account / value : { accountAux, directMatching }
 
   // Return --------------------------------------------------------------------------------------------- //
   return dataFEC;
@@ -174,9 +185,9 @@ async function readFECFileRow(indexColumns,rowArray)
   let rowData = {}
   Object.entries(indexColumns).forEach(([column,index]) => 
   {
-    rowData[column] = rowArray[index].replace(/^\"/,"")      // remove quote at the beginning
-                                     .replace(/\"$/,"")      // remove quote at the end
-                                     .replace(/^\s+|\s+$/,"");     // remove spaces before and after string
+    rowData[column] = rowArray[index].replace(/^\"/,"")             // remove quote at the beginning
+                                     .replace(/\"$/,"")             // remove quote at the end
+                                     .replace(/^\s+|\s+$/,"");      // remove spaces before and after string
   });
   return rowData;
 }
@@ -200,46 +211,61 @@ function getDefaultBookType(bookCode,bookLib)
 /* ------------------------- ACCOUNTS MAPPING SCRIPTS ------------------------- */
 
 // check mapping
-async function buildMappingAccounts(accounts)
+async function buildMappingAssetAccounts(accounts)
 {
-  // accountsMapped : true if not all accounts have direct matching
-  // mapping: "depAccount": {accountAux:"immobilisationAccount", directMatching: (true|false)}
-  let res = {accountsMapped: false, mapping: {}};
+  // mappingAccounts : "account": { accountAux:"immobilisationAccount", directMatching: (true|false) }
+  let mappingAccounts = {}
 
-  let depreciationAccounts = Object.keys(accounts).filter(account => /^(2[8-9]|39)/.test(account)); // depreciation accounts
+  let accountsToMap = Object.keys(accounts).filter(account => /^(2[8-9]|39)/.test(account)); // amortisation & depreciation accounts
   let assetAccounts = Object.keys(accounts).filter(account => /^(2[0-1]|3[0-8])/.test(account)); // immobilisation & stock accounts
 
   // try simple mapping
-  depreciationAccounts.forEach(depAccount =>
+  accountsToMap.forEach(accountToMap =>
   {
     // get asset account matching default pattern
-    let accountAux = assetAccounts.filter(assetAccount => assetAccount.startsWith(depAccount[0]+depAccount.substring(2)));
+    let accountAux = assetAccounts.filter(assetAccount => assetAccount.startsWith(accountToMap[0]+accountToMap.substring(2)));
 
-    // build res.mapping
-    if (accountAux.length==1) res.mapping[depAccount] = {accountAux: accountAux[0], directMatching: true}
-    else res.mapping[depAccount] = {accountAux: "", directMatching: false};
+    // build mappingAccounts
+    if (accountAux.length==1) { // if single match
+      mappingAccounts[accountToMap] = {
+        accountAux: accountAux[0],
+        directMatching: true
+      };
+    } else {
+      mappingAccounts[accountToMap] = {
+        accountAux: "",
+        directMatching: false
+      };
+    }
   })
 
-  if (Object.values(res.mapping).filter(item => !item.directMatching).length == 0) res.accountsMapped = true
-  else
+  // if not all accounts mapped
+  if (Object.values(mappingAccounts).filter(item => !item.directMatching).length > 0)
   {
     // build distances between accounts for all possible associations
     let distances = [];
-    depreciationAccounts.forEach(depreciationAccount => 
+    accountsToMap.forEach(accountToMap => 
     {
-      assetAccounts.filter(assetAccount => assetAccount[0]==depreciationAccount[0]) // asset account from the same accouting class
+      assetAccounts.filter(assetAccount => assetAccount[0]==accountToMap[0]) // asset account from the same accouting class
                    .forEach(assetAccount =>
       {
-        let expectedAssetAccount = depreciationAccount[0]+depreciationAccount.substring(2); // ref account num
+        let expectedAssetAccount = accountToMap[0]+accountToMap.substring(2); // ref account num
         let distanceNum = distance(expectedAssetAccount,assetAccount);
-        let distanceLib = distance(accounts[depreciationAccount],accounts[assetAccount]);
+        let distanceLib = distance(accounts[accountToMap],accounts[assetAccount]);
         let prefixLength = getPrefixLength(expectedAssetAccount,assetAccount);
-        distances.push({account: depreciationAccount, accountAux: assetAccount, distanceNum, distanceLib, prefixLength, expectedAccount: expectedAssetAccount});
+
+        distances.push({
+          accountNum: accountToMap,
+          accountAux: assetAccount,
+          distanceNum, distanceLib,
+          prefixLength, 
+          expectedAccount: expectedAssetAccount
+        });
       })
     });
 
     // Map with prefix length
-    distances.forEach(distance => distance.stashed = false);
+    distances.forEach(distance => distance.stashed = false); // init values stahed
     let mappingWithPrefixLength = await mapAccountsWithPrefixLength(distances); // return JSON with mappings
     
     // Map with accountNum distance
@@ -250,37 +276,45 @@ async function buildMappingAccounts(accounts)
     distances.forEach(distance => distance.stashed = false);
     let mappingWithLibDistances = await mapAccountsWithLibDistances(distances);
 
-    // Merge mapping (can have duplicates)
+    // Merge accountAux matching (duplicates possible)
     let mappings = [];
-    depreciationAccounts.forEach(depreciationAccount =>
+    accountsToMap.forEach(accountToMap =>
     {
       let assetAccounts = [
-        res.mapping[depreciationAccount].accountAux,
-        mappingWithPrefixLength[depreciationAccount],
-        mappingWithNumDistances[depreciationAccount],
-        mappingWithLibDistances[depreciationAccount]
+        mappingAccounts[accountToMap].accountAux,
+        mappingWithPrefixLength[accountToMap],
+        mappingWithNumDistances[accountToMap],
+        mappingWithLibDistances[accountToMap]
       ];
       assetAccounts.filter(assetAccount => assetAccount) // remove empty string or undefined
-                   .forEach(assetAccount => mappings.push({account: depreciationAccount, accountAux: assetAccount}));
+                   .forEach(assetAccount => mappings.push({accountNum: accountToMap, accountAux: assetAccount}));
     });
 
     // build res
-    depreciationAccounts.forEach(depreciationAccount =>
+    accountsToMap.forEach(accountToMap =>
     {
-      let assetAccounts = mappings.filter(mapping => mapping.account == depreciationAccount)  // get all solutions for depreciation account
+      let assetAccounts = mappings.filter(mapping => mapping.account == accountToMap)  // get all solutions for depreciation account
                                   .map(mapping => mapping.accountAux)
                                   .filter((value, index, self) => index === self.findIndex(item => item === value)); // remove duplicates
 
-      // if only one asste account match and if that asset account is not used for another depreciation account
-      if (assetAccounts.length == 1 && mappings.filter(mapping => mapping.account!=depreciationAccount && mapping.accountAux==assetAccounts[0]).length == 0)
+      // if only one asset account match and if that asset account not match for another amortisation/depreciation account
+      if (assetAccounts.length == 1 
+        && mappings.filter(mapping => mapping.account!=accountToMap && mapping.accountAux==assetAccounts[0]).length == 0)
       {
-        res.mapping[depreciationAccount] = {accountAux: assetAccounts[0], directMatching: res.mapping[depreciationAccount].directMatching}; // rewrite res.mapping but keep directMatching
+        mappingAccounts[accountToMap] = {
+          accountAux: assetAccounts[0],
+          directMatching: mappingAccounts[accountToMap].directMatching // retrieve if direct matching initially
+        };
+      } else {
+        mappingAccounts[accountToMap] = {
+          accountAux: "", 
+          directMatching: false
+        };
       }
-      else res.mapping[depreciationAccount] = {accountAux: "", directMatching: false};
     })    
   }
 
-  return res;
+  return mappingAccounts;
 }
 
 const getPrefixLength = (stringA,stringB) =>
@@ -432,18 +466,19 @@ export async function FECDataReader(FECData)
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
   data.mappingAccounts = FECData.meta.mappingAccounts;
-  data.ignoreDepreciationEntries = [];
+  data.defaultAccountsAux = [];
+
+  // Reader data ---------------------------------------------------------------------------------------- //
+  data.ignoreAmortisationEntries = [];
   data.ignoreStockVariationsEntries = [];
   data.errors =[];
 
   // Production / Incomes ------------------------------------------------------------------------------- //
   data.revenue = 0;                       // 70
+  data.sales = [];                         // 70
   data.storedProduction = 0;              // 71
   data.immobilisedProduction = 0;         // 72
   data.otherOperatingIncomes = 0;         // 74, 75, 781, 791
-
-  // Production / Incomes ------------------------------------------------------------------------------- //
-  data.sales = [];                         // 70
 
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = [];                       // stock 31, 32, 33, 34, 35, 37
@@ -451,15 +486,16 @@ export async function FECDataReader(FECData)
 
   // Expenses ------------------------------------------------------------------------------------------- //
   data.expenses = [];                     // 60, 61, 62 (hors 603)
-  data.depreciationExpenses = [];         // 6811 and 6871
+  data.amortisationExpenses = [];         // 6811 and 6871
   
   // Immobilisations ------------------------------------------------------------------------------------ //
   data.immobilisations = [];              // #20 to #27
   data.investments = [];                  // flow #2 <- #404
   data.immobilisationProductions = [];    // flow #2 <- #72
-
+  
   // Amortissements et Dépréciations -------------------------------------------------------------------- //
-  data.depreciations = [];                // #28, #29 and #39
+  data.amortisations = [];                // #28
+  data.depreciations = [];                // #29 and #39 (unused)
 
   // others key figures --------------------------------------------------------------------------------- //
   data.financialIncomes = 0;              // #76, #786, #796
@@ -473,11 +509,14 @@ export async function FECDataReader(FECData)
   data.taxOnProfits = 0;                  // #69
 
   // Other used data ------------------------------------------------------------------------------------//
-  data.KNWData = {apprenticeshipTax: 0, vocationalTrainingTax: 0}
+  data.KNWData = {
+    apprenticeshipTax: 0, 
+    vocationalTrainingTax: 0
+  };
 
   // ----------------------------------------------------------------------------------------------------//
 
-  /* ---------- A NOUVEAUX ---------- */
+  /* ------------------------- A NOUVEAUX ------------------------- */
 
   // Get book code for "A Nouveaux"
   let codeANouveaux = Object.entries(FECData.meta.books)
@@ -495,15 +534,17 @@ export async function FECDataReader(FECData)
       try
       {
         await readANouveauxEntry(data,journal,ligne);
+        // init #2 & #3 accounts
       }
       catch (error) {data.errors.push(error)};
+
       return;
     })
 
     // -------------------------------------------------- //
   }
 
-  /* ---------- OTHER BOOKS ---------- */
+  /* ------------------------- OTHER BOOKS ------------------------- */
 
   // Read books (except "A Nouveaux")
   Object.entries(FECData.meta.books)
@@ -528,7 +569,7 @@ export async function FECDataReader(FECData)
         if (/^7/.test(ligne.CompteNum)) await readProductionEntry(data,journal,ligne);
       
         // Lecture d'informations supplémentaires
-        if (/^63/.test(ligne.CompteNum)) readAddtionalDataEntry(data,journal,ligne);
+        if (/^63/.test(ligne.CompteNum)) await readAddtionalDataEntry(data,journal,ligne);
 
         // -------------------------------------------------- //
       }
@@ -537,7 +578,7 @@ export async function FECDataReader(FECData)
     })
   });
 
-  /* ---------- RETURN ---------- */
+  /* ------------------------- RETURN ------------------------- */
   data.isFinancialDataLoaded = true;
   return data;
 }
@@ -571,7 +612,7 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     // immobilisation data
     let immobilisationData = 
     {
-      account: ligneCourante.CompteNum,
+      accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
       isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
       prevAmount: parseAmount(ligneCourante.Debit),
@@ -587,14 +628,37 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     data.immobilisations.push(immobilisationData);
   }
 
-  // Comptes d'amortissements et de dépréciations ----------------------------------------------------- //
+  // Comptes d'amortissements ------------------------------------------------------------------------- //
 
-  if (/^2[8-9]/.test(ligneCourante.CompteNum))
+  if (/^28/.test(ligneCourante.CompteNum))
   {
-    // depreciation data
+    // amortisation data
+    let amortisationData = 
+    {
+      accountNum: ligneCourante.CompteNum,
+      accountLib: ligneCourante.CompteLib,
+      accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
+      prevAmount: parseAmount(ligneCourante.Credit),
+      amount: parseAmount(ligneCourante.Credit),
+      entries: [{
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate,
+        isANouveaux: true
+      }]
+    }
+    // push data
+    data.amortisations.push(amortisationData);
+  }
+
+  // Comptes de dépréciations ------------------------------------------------------------------------- //
+
+  if (/^29/.test(ligneCourante.CompteNum))
+  {
+    // depreication data
     let depreciationData = 
     {
-      account: ligneCourante.CompteNum,
+      accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
       accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
@@ -633,9 +697,9 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     // stock data
     let stockData = 
     {
-      account: ligneCourante.CompteNum,
+      accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
-      accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replaceAll("0$",""),
+      accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1).replace(/(0*)$/g,""), // external expenses accounts linked to stock account
       isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
       amount: parseAmount(ligneCourante.Debit),
       prevAmount: parseAmount(ligneCourante.Debit),
@@ -657,7 +721,7 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     // depreciation data
     let depreciationData = 
     {
-      account: ligneCourante.CompteNum,
+      accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
       accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
       prevAmount: parseAmount(ligneCourante.Credit),
@@ -708,7 +772,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
     // si compte existant -> variation de la valeur de l'immobilisation
     if (immobilisation!=undefined) 
     {
-      immobilisation.amount+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+      immobilisation.amount = immobilisation.amount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
       immobilisation.entries.push({
         entryNum: ligneCourante.EcritureNum,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
@@ -722,7 +786,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       // immobilisation data
       let immobilisationData = 
       {
-        account: ligneCourante.CompteNum,
+        accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
         prevAmount: 0.0,
@@ -749,7 +813,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       {
         entryNum: ligneCourante.EcritureNum,
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
-        account: ligneCourante.CompteNum,
+        accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         accountAux: ligneFournisseur.CompAuxNum || "_"+ligneCourante.CompteNum,
         accountAuxLib : ligneFournisseur.CompAuxLib || "ACQUISTIONS "+ligneCourante.CompteLib,
@@ -759,9 +823,34 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       }
       // push data
       data.investments.push(investmentData);
+      if (!ligneFournisseur.CompAuxNum) data.defaultAccountsAux.push(investmentData.accountAux);
     }
 
-    // Immobilised Production ------------------------------------------- //
+    // Immobilisation en cours (avances / acomptes) --------------------- //
+
+    // lecture du compte auxiliaire
+    let ligneImmobilisationEnCours = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum
+                                                          && /^23(7|8)/.test(ligne.CompteNum)
+                                                          && ligne.CompteNum!=ligneCourante.CompteNum)[0];
+    if (ligneImmobilisationEnCours!=undefined)
+    {      
+      // investment data
+      let immobilisationEnCoursData = 
+      {
+        entryNum: ligneCourante.EcritureNum,
+        label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
+        accountNum: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        accountAux: ligneImmobilisationEnCours.CompteNum,
+        accountAuxLib : ligneImmobilisationEnCours.CompteLib,
+        amount: parseAmount(ligneImmobilisationEnCours.Credit) - parseAmount(ligneImmobilisationEnCours.Debit),
+        date: ligneCourante.EcritureDate
+      }
+      // push data
+      // data.investments.push(immobilisationEnCoursData);
+    }
+
+    // Production immobilisée ------------------------------------------- //
     
     // lecture du compte auxiliaire (cas production immobilisée)
     let ligneProduction = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum 
@@ -773,29 +862,93 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       {
         entryNum: ligneCourante.EcritureNum,
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
-        account: ligneCourante.CompteNum,
+        accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         accountAux: ligneProduction.CompteNum,
         accountAuxLib : ligneProduction.CompteLib,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        amount: parseAmount(ligneProduction.Credit) - parseAmount(ligneCourante.Debit),
         date: ligneCourante.EcritureDate
       }
       // push data
       data.immobilisationProductions.push(immobilisationProductionData);
     }
+
+    // Immobilisation en cours (production immobilisée) ----------------- //
+
+    // lecture du compte auxiliaire
+    let ligneProductionEnCours = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum
+                                                         && /^23(1|2)/.test(ligne.CompteNum)
+                                                         && ligne.CompteNum!=ligneCourante.CompteNum)[0];
+    if (ligneImmobilisationEnCours!=undefined)
+    {      
+      // investment data
+      let immobilisationProductionData = 
+      {
+        entryNum: ligneCourante.EcritureNum,
+        label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
+        accountNum: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        accountAux: ligneProductionEnCours.CompteNum,
+        accountAuxLib : ligneProductionEnCours.CompteLib,
+        amount: parseAmount(ligneProductionEnCours.Credit) - parseAmount(ligneProductionEnCours.Debit),
+        date: ligneCourante.EcritureDate
+      }
+      // push data
+      // data.immobilisationProductions.push(immobilisationProductionData);
+    }
   }
 
-  // Amortissement & Dépréciation --------------------------------------------------------------------- //
+  // Amortissement ------------------------------------------------------------------------------------ //
 
-  if (/^2[8-9]/.test(ligneCourante.CompteNum))
+  if (/^28/.test(ligneCourante.CompteNum))
+  {
+    // Retrieve amortisation item
+    let amortisation = data.amortisations.filter(amortisation => amortisation.account == ligneCourante.CompteNum)[0];
+    
+    // si compte existant -> enregistrement de la variation
+    if (amortisation!=undefined) 
+    {
+      amortisation.amount = amortisation.amount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+      amortisation.entries.push({
+        entryNum: ligneCourante.EcritureNum,
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+        date: ligneCourante.EcritureDate
+      })
+    }
+
+    // si compte inexistant -> ajout compte
+    else
+    {
+      // amortisation data
+      let amortisationData = 
+      {
+        accountNum: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
+        prevAmount: 0.0,
+        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+        entries: [{
+          entryNum: ligneCourante.EcritureNum,
+          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+          date: ligneCourante.EcritureDate
+        }]
+      }
+      // push data
+      data.amortisations.push(amortisationData);
+    }
+  }
+
+  // Dépréciation ------------------------------------------------------------------------------------- //
+
+  if (/^29/.test(ligneCourante.CompteNum))
   {
     // Retrieve depreciation item
     let depreciation = data.depreciations.filter(depreciation => depreciation.account == ligneCourante.CompteNum)[0];
     
-    // si compte existant -> variation de la valeur de l'immobilisation
+    // si compte existant -> enregistrement de la variation
     if (depreciation!=undefined) 
     {
-      depreciation.amount+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+      depreciation.amount = depreciation.amount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
       depreciation.entries.push({
         entryNum: ligneCourante.EcritureNum,
         amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
@@ -809,7 +962,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       // depreciation data
       let depreciationData = 
       {
-        account: ligneCourante.CompteNum,
+        accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
         prevAmount: 0.0,
@@ -851,10 +1004,10 @@ const readStockEntry = async (data,journal,ligneCourante) =>
     // Retrieve stock item
     let stock = data.stocks.filter(stock => stock.account == ligneCourante.CompteNum)[0];
 
-    // si compte existant -> variation de la valeur du stock
+    // si compte existant -> enregistrement de la variation
     if (stock!=undefined) 
     {
-      stock.amount+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+      stock.amount = stock.amount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
       stock.entries.push({
         entryNum: ligneCourante.EcritureNum,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
@@ -868,9 +1021,9 @@ const readStockEntry = async (data,journal,ligneCourante) =>
       // stock data
       let stockData = 
       {
-        account: ligneCourante.CompteNum,
+        accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replaceAll("0$",""),
+        accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replace(/(0*)$/g,""),
         isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
         prevAmount: 0,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
@@ -892,10 +1045,10 @@ const readStockEntry = async (data,journal,ligneCourante) =>
     // Retrieve depreciation item
     let depreciation = data.depreciations.filter(depreciation => depreciation.account == ligneCourante.CompteNum)[0];
     
-    // si compte existant -> variation de la valeur de l'immobilisation
+    // si compte existant -> enregistrement de la variation
     if (depreciation!=undefined) 
     {
-      depreciation.amount+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+      depreciation.amount = depreciation.amount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
       depreciation.entries.push({
         entryNum: ligneCourante.EcritureNum,
         amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
@@ -909,7 +1062,7 @@ const readStockEntry = async (data,journal,ligneCourante) =>
       // depreciation data
       let depreciationData = 
       {
-        account: ligneCourante.CompteNum,
+        accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
         accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
         prevAmount: 0.0,
@@ -960,7 +1113,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
     let expenseData = 
     {
       label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
-      account: ligneCourante.CompteNum,
+      accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
       accountAux: ligneFournisseur.CompAuxNum || "_"+ligneCourante.CompteNum,
       accountAuxLib: ligneFournisseur.CompAuxLib || "DEPENSES "+ligneCourante.CompteLib,
@@ -970,6 +1123,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
     }
     // push data
     data.expenses.push(expenseData);
+    if (!ligneFournisseur.CompAuxNum) data.defaultAccountsAux.push(expenseData.accountAux);
   }
 
   // Stocks variation (603) --------------------------------------------------------------------------- //
@@ -986,102 +1140,50 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
 
     if (entryStockVariationsData.isStockVariationsTracked)
     {
-      for (let stockVariationData of entryStockVariationsData.entryData)
-      {
-        // retrieve stock variation item
-        let stockVariation = data.stockVariations.filter(stockVariation => stockVariation.account == stockVariationData.account
-                                                                        && stockVariation.accountAux == stockVariationData.accountAux)[0];
-
-        if (stockVariation!=undefined) 
-        {
-          stockVariation.amount+= stockVariationData.amount;
-          stockVariation.entries.push({
-            entryNum: ligneCourante.EcritureNum,
-            amount: stockVariationData.amount,
-            date: ligneCourante.EcritureDate
-          })
-        }
-
-        else
-        { 
-          // push data
-          stockVariationData.entries = [{
-            entryNum: ligneCourante.EcritureNum,
-            amount: stockVariationData.amount,
-            date: ligneCourante.EcritureDate
-          }]
-          data.stockVariations.push(stockVariationData);
-        } 
-      }
+      data.stockVariations.push(entryStockVariationsData);
     }
     else throw entryStockVariationsData.message;
   }
 
   // Dotations aux amortissements sur immobilisations (6811 & 6871) ----------------------------------- //
   
-  if (/^68(1|7)1/.test(ligneCourante.CompteNum) && !data.ignoreDepreciationEntries.includes(ligneCourante.EcritureNum))
+  if (/^68(1|7)1/.test(ligneCourante.CompteNum) && !data.ignoreAmortisationEntries.includes(ligneCourante.EcritureNum))
   {
     // get entry
     let entry = journal.filter(ligne => ligne.EcritureNum == ligneCourante.EcritureNum);
 
     // ignore entry for futher references
-    data.ignoreDepreciationEntries.push(ligneCourante.EcritureNum);
+    data.ignoreAmortisationEntries.push(ligneCourante.EcritureNum);
 
-    let entryDepreciationExpensesData = readDepreciationExpensesFromEntry(entry);
+    let entryAmortisationExpensesData = readAmortisationExpensesFromEntry(entry);
 
-    if (entryDepreciationExpensesData.isExpensesTracked)
+    if (entryAmortisationExpensesData.isExpensesTracked)
     {
-      for (let depreciationExpenseData of entryDepreciationExpensesData.entryData)
-      {
-        // retrieve depreciation expense item
-        let depreciationExpense = data.depreciationExpenses.filter(expense => expense.account == depreciationExpenseData.account
-                                                                           && expense.accountAux == depreciationExpenseData.accountAux)[0];
-
-        if (depreciationExpense!=undefined) 
-        {
-          depreciationExpense.amount+= depreciationExpenseData.amount;
-          depreciationExpense.entries.push({
-            entryNum: ligneCourante.EcritureNum,
-            amount: depreciationExpenseData.amount,
-            date: ligneCourante.EcritureDate
-          })
-        }
-
-        else
-        {
-          // push data
-          depreciationExpenseData.entries = [{
-            entryNum: ligneCourante.EcritureNum,
-            amount: depreciationExpenseData.amount,
-            date: ligneCourante.EcritureDate
-          }]
-          data.depreciationExpenses.push(depreciationExpenseData);
-        } 
-      }
+      data.amortisationExpenses.push(entryAmortisationExpensesData);
     }
-    else throw entryDepreciationExpensesData.message;
+    else throw entryAmortisationExpensesData.message;
   }
 
   // Other expenses ----------------------------------------------------------------------------------- //
 
-  if (/^63/.test(ligneCourante.CompteNum))      data.taxes+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-  if (/^64/.test(ligneCourante.CompteNum))      data.personnelExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-  if (/^65/.test(ligneCourante.CompteNum))      data.otherExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-  if (/^681[^1]/.test(ligneCourante.CompteNum)) data.provisions+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^63/.test(ligneCourante.CompteNum))      data.taxes = data.taxes + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^64/.test(ligneCourante.CompteNum))      data.personnelExpenses = data.personnelExpenses + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^65/.test(ligneCourante.CompteNum))      data.otherExpenses = data.otherExpenses + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^681[^1]/.test(ligneCourante.CompteNum)) data.provisions = data.provisions + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   
   // Financial expenses ------------------------------------------------------------------------------- //
 
-  if (/^66/.test(ligneCourante.CompteNum))      data.financialExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-  if (/^686/.test(ligneCourante.CompteNum))     data.financialExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^66/.test(ligneCourante.CompteNum))      data.financialExpenses = roundValue(data.financialExpenses + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit), 2);
+  if (/^686/.test(ligneCourante.CompteNum))     data.financialExpenses = roundValue(data.financialExpenses + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit), 2);
 
   // Exceptional expenses ----------------------------------------------------------------------------- //
   
-  if (/^67/.test(ligneCourante.CompteNum))      data.exceptionalExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-  if (/^687[^1]/.test(ligneCourante.CompteNum)) data.exceptionalExpenses+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^67/.test(ligneCourante.CompteNum))      data.exceptionalExpenses = data.exceptionalExpenses + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^687[^1]/.test(ligneCourante.CompteNum)) data.exceptionalExpenses = data.exceptionalExpenses + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
   
   // Tax on profits ----------------------------------------------------------------------------------- //
 
-  if (/^69/.test(ligneCourante.CompteNum))      data.taxOnProfits+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^69/.test(ligneCourante.CompteNum))      data.taxOnProfits = data.taxOnProfits + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
 }
 
@@ -1105,38 +1207,41 @@ const readProductionEntry = async (data,journal,ligneCourante) =>
 
   // Revenue ------------------------------------------------------------------------------------------ //
 
-  if (/^70/.test(ligneCourante.CompteNum))      data.revenue+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-  if (/^70/.test(ligneCourante.CompteNum)) {
+  if (/^70/.test(ligneCourante.CompteNum))      data.revenue = data.revenue + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^70/.test(ligneCourante.CompteNum)) 
+  {
     data.sales.push({
-      entryNum: ligneCourante.EcritureNum,
+      accountNum: ligneCourante.CompteNum,
+      accountLib: ligneCourante.CompteLib,
       amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+      entryNum: ligneCourante.EcritureNum,
       date: ligneCourante.EcritureDate
     })
   }
   
   // Stored/Unstored Production ----------------------------------------------------------------------- //
 
-  if (/^71/.test(ligneCourante.CompteNum))      data.storedProduction+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^71/.test(ligneCourante.CompteNum))      data.storedProduction = data.storedProduction + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
   
   // Immobilised Production --------------------------------------------------------------------------- //
 
-  if (/^72/.test(ligneCourante.CompteNum))      data.immobilisedProduction+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^72/.test(ligneCourante.CompteNum))      data.immobilisedProduction = data.immobilisedProduction + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
   
   // Other operating incomes -------------------------------------------------------------------------- //
 
-  if (/^74/.test(ligneCourante.CompteNum))      data.otherOperatingIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-  if (/^75/.test(ligneCourante.CompteNum))      data.otherOperatingIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-  if (/^7(8|9)1/.test(ligneCourante.CompteNum)) data.otherOperatingIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^74/.test(ligneCourante.CompteNum))      data.otherOperatingIncomes = data.otherOperatingIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^75/.test(ligneCourante.CompteNum))      data.otherOperatingIncomes = data.otherOperatingIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^7(8|9)1/.test(ligneCourante.CompteNum)) data.otherOperatingIncomes = data.otherOperatingIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
 
   // Financial incomes -------------------------------------------------------------------------------- //
 
-  if (/^76/.test(ligneCourante.CompteNum))      data.financialIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-  if (/^7(8|9)6/.test(ligneCourante.CompteNum)) data.financialIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^76/.test(ligneCourante.CompteNum))      data.financialIncomes = data.financialIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^7(8|9)6/.test(ligneCourante.CompteNum)) data.financialIncomes = data.financialIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
 
   // Exceptional incomes ------------------------------------------------------------------------------ //
 
-  if (/^77/.test(ligneCourante.CompteNum))      data.exceptionalIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-  if (/^7(8|9)7/.test(ligneCourante.CompteNum)) data.exceptionalIncomes+= parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^77/.test(ligneCourante.CompteNum))      data.exceptionalIncomes = data.exceptionalIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+  if (/^7(8|9)7/.test(ligneCourante.CompteNum)) data.exceptionalIncomes = data.exceptionalIncomes + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
 
 }
 
@@ -1155,10 +1260,10 @@ const readAddtionalDataEntry = async (data,journal,ligneCourante) =>
   // Data for KNW ------------------------------------------------------------------------------------- //
 
   // ...taxe d'apprentissage
-  if (/^6312/.test(ligneCourante.CompteNum)) data.KNWData.apprenticeshipTax+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^6312/.test(ligneCourante.CompteNum)) data.KNWData.apprenticeshipTax = data.KNWData.apprenticeshipTax + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
   // ...participation formation professionnelle
-  if (/^63(1|3)3/.test(ligneCourante.CompteNum)) data.KNWData.vocationalTrainingTax+= parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+  if (/^63(1|3)3/.test(ligneCourante.CompteNum)) data.KNWData.vocationalTrainingTax = data.KNWData.vocationalTrainingTax + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
 
 }
 
@@ -1280,12 +1385,13 @@ const readStockVariations = (rows) =>
       let stockVariationData = 
       {
         label: rowStockVariation.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-        account: rowStockVariation.CompteNum,
+        accountNum: rowStockVariation.CompteNum,
         accountLib: rowStockVariation.CompteLib,
         accountAux: rowStock.CompteNum,
         accountAuxLib: rowStock.CompteLib,
         isProductionStock: false,
         amount: parseAmount(rowStockVariation.Debit) - parseAmount(rowStockVariation.Credit),
+        date: rowStockVariation.EcritureDate
       }
       // push data
       res.entryData.push(stockVariationData);
@@ -1313,7 +1419,7 @@ const readStockVariations = (rows) =>
       let stockVariationData = 
       {
         label: rowStockVariation.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-        account: rowStockVariation.CompteNum,
+        accountNum: rowStockVariation.CompteNum,
         accountLib: rowStockVariation.CompteLib,
         accountAux: rowStock.CompteNum,
         accountAuxLib: rowStock.CompteLib,
@@ -1341,11 +1447,11 @@ const readStockVariations = (rows) =>
  *  - message (String) : -
  */
 
-const readDepreciationExpensesFromEntry = (entry) =>
+const readAmortisationExpensesFromEntry = (entry) =>
 {  
   // ---------- Entry ---------- //
   
-  let res = readDepreciationExpenses(entry);
+  let res = readAmortisationExpenses(entry);
   if (res.isExpensesTracked) return res;
 
   // ---------- Sub-entries ---------- //
@@ -1354,17 +1460,17 @@ const readDepreciationExpensesFromEntry = (entry) =>
 
   // group by asset type
   subEntries = getSubEntriesByAssetType(entry);
-  res = readDepreciationExpensesFromSubEntries(subEntries);
+  res = readAmortisationExpensesFromSubEntries(subEntries);
   if (res.isExpensesTracked) return res;
 
   // group by label
   subEntries = getSubEntriesByLabel(entry);
-  res = readDepreciationExpensesFromSubEntries(subEntries);
+  res = readAmortisationExpensesFromSubEntries(subEntries);
   if (res.isExpensesTracked) return res;
 
   // group by balanced group
   subEntries = getSubEntriesByBalancedGroup(entry);
-  res = readDepreciationExpensesFromSubEntries(subEntries);
+  res = readAmortisationExpensesFromSubEntries(subEntries);
   if (res.isExpensesTracked) return res;
 
   // ---------- Error ---------- //
@@ -1373,31 +1479,31 @@ const readDepreciationExpensesFromEntry = (entry) =>
   res.isExpensesTracked = false;
   
   // lignes relatives aux comptes de dotations
-  let rowsDepreciationExpenses = entry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
-  let depreciationExpenseAccounts = rowsDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
+  let rowsAmortisationExpenses = entry.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
+  let amortisationExpenseAccounts = rowsAmortisationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
   
   // lignes relatives aux comtpes d'amortissements
   let rowsDepreciations = entry.filter(ligne => /^28/.test(ligne.CompteNum));
   let depreciationAccounts = rowsDepreciations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum));
 
-  let balanced = checkBalanceTwoLists(rowsDepreciations,rowsDepreciationExpenses);
+  let balanced = checkBalanceTwoLists(rowsDepreciations,rowsAmortisationExpenses);
 
   // Message
   res.message = "L'écriture "+entry[0].EcritureNum+" du journal "+entry[0].JournalLib+" entraîne une exception (lecture dotation(s) aux amortissements) : "
     + depreciationAccounts.length+" compte(s) d'amortissements ("+(depreciationAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
-    + depreciationExpenseAccounts.length+" compte(s) de dotations ("+(depreciationExpenseAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
+    + amortisationExpenseAccounts.length+" compte(s) de dotations ("+(amortisationExpenseAccounts.map(row => row.CompteNum).reduce((a,b) => a+", "+b,"").substring(2))+"), "
     + (balanced ? "montant des dotations égal à la variation des amortissements au sein de l'écriture " : "montant des dotations différent de la variation des amortissements au sein de l'écriture.");
   
   return res;
 }
 
-const readDepreciationExpensesFromSubEntries = (subEntries) =>
+const readAmortisationExpensesFromSubEntries = (subEntries) =>
 {
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
   for (let subEntry of subEntries)
   {
-    let resSubEntry = readDepreciationExpenses(subEntry);
+    let resSubEntry = readAmortisationExpenses(subEntry);
 
     if (resSubEntry.isExpensesTracked) res.entryData.push(...resSubEntry.entryData);
     else
@@ -1413,20 +1519,20 @@ const readDepreciationExpensesFromSubEntries = (subEntries) =>
   return res;
 }
 
-const readDepreciationExpenses = (rows) =>
+const readAmortisationExpenses = (rows) =>
 {
   // response
   let res = {entryData: [], isExpensesTracked: false, message: ""};
 
   // lignes relatives aux comptes de dotations
-  let rowsDepreciationExpenses = rows.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
+  let rowsAmortisationExpenses = rows.filter(ligne => /^68(1|7)1/.test(ligne.CompteNum));
 
   // lignes relatives aux comtpes d'amortissements
-  let rowsDepreciations = rows.filter(ligne => /^28/.test(ligne.CompteNum));
+  let rowsAmortisations = rows.filter(ligne => /^28/.test(ligne.CompteNum));
 
   // Empty entry -------------------------------------------------------------------------------------- //
 
-  if (rowsDepreciationExpenses.length == 0)
+  if (rowsAmortisationExpenses.length == 0)
   {
     res.isExpensesTracked = true;
     res.message = "Aucune dotation aux amortissements sur immobilisations.";
@@ -1435,67 +1541,67 @@ const readDepreciationExpenses = (rows) =>
 
   // Single depreciation account ---------------------------------------------------------------------- //
 
-  let sameDepreciationAccountUsed = rowsDepreciations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+  let sameDepreciationAccountUsed = rowsAmortisations.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
   if (sameDepreciationAccountUsed)
   {
     res.isExpensesTracked = true;
     res.message = "OK";
 
     // ligne relative au compte d'amortissements
-    let rowDepreciation = rowsDepreciations[0];
+    let rowDepreciation = rowsAmortisations[0];
 
     // build data
-    rowsDepreciationExpenses.forEach((rowDepreciationExpense) =>
+    rowsAmortisationExpenses.forEach((rowAmortisationExpense) =>
     {
-      // depreciation expense data
-      let depreciationExpenseData = 
+      // amortisation expense data
+      let amortisationExpenseData = 
       {
-        label: rowDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-        account: rowDepreciationExpense.CompteNum,
-        accountLib: rowDepreciationExpense.CompteLib,
+        label: rowAmortisationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+        accountNum: rowAmortisationExpense.CompteNum,
+        accountLib: rowAmortisationExpense.CompteLib,
         accountAux: rowDepreciation.CompteNum,
-        amount: parseAmount(rowDepreciationExpense.Debit) - parseAmount(rowDepreciationExpense.Credit),
+        amount: parseAmount(rowAmortisationExpense.Debit) - parseAmount(rowAmortisationExpense.Credit),
       }
       // push data
-      res.entryData.push(depreciationExpenseData);
+      res.entryData.push(amortisationExpenseData);
     })
 
     // return
     return res;
   }
 
-  // Single depreciation expense account & amount balanced with depreciation accounts ----------------- //
+  // Single amortisation expense account & amount balanced with amortisation accounts ----------------- //
 
-  let sameDepreciationExpenseAccountUsed = rowsDepreciationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
-  if (sameDepreciationExpenseAccountUsed && checkBalanceTwoLists(rowsDepreciationExpenses,rowsDepreciations))
+  let sameAmortisationExpenseAccountUsed = rowsAmortisationExpenses.filter((value, index, self) => index === self.findIndex(item => item.CompteNum === value.CompteNum)).length == 1;
+  if (sameAmortisationExpenseAccountUsed && checkBalanceTwoLists(rowsAmortisationExpenses,rowsAmortisations))
   {
     res.isExpensesTracked = true;
     res.message = "OK";
 
     // ligne relative au compte de dotations
-    let rowDepreciationExpense = rowsDepreciationExpenses[0];
+    let rowAmortisationExpense = rowsAmortisationExpenses[0];
 
     // build data
-    rowsDepreciations.forEach((rowDepreciation) =>
+    rowsAmortisations.forEach((rowAmortisation) =>
     {
-      // depreciation expense data
-      let depreciationExpenseData = 
+      // amortisation expense data
+      let amortisationExpenseData = 
       {
-        label: rowDepreciationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
-        account: rowDepreciationExpense.CompteNum,
-        accountLib: rowDepreciationExpense.CompteLib,
-        accountAux: rowDepreciation.CompteNum,
-        amount: parseAmount(rowDepreciation.Credit) - parseAmount(rowDepreciation.Debit),
+        label: rowAmortisationExpense.CompteLib.replace(/^\"/,"").replace(/\"$/,""),
+        accountNum: rowAmortisationExpense.CompteNum,
+        accountLib: rowAmortisationExpense.CompteLib,
+        accountAux: rowAmortisation.CompteNum,
+        amount: parseAmount(rowAmortisation.Credit) - parseAmount(rowAmortisation.Debit),
       }
       // push data
-      res.entryData.push(depreciationExpenseData);
+      res.entryData.push(amortisationExpenseData);
     })
 
     return res;
   }
 
   res.isExpensesTracked = false;
-  res.message = sameDepreciationExpenseAccountUsed ? "Un seul compte de dotations mais le montant des dotations ne correspond pas à la variation des amortissements" : "Plusieurs comptes de dotations et d'amortissements.";
+  res.message = sameAmortisationExpenseAccountUsed ? "Un seul compte de dotations mais le montant des dotations ne correspond pas à la variation des amortissements" : "Plusieurs comptes de dotations et d'amortissements.";
   return res;
 }
 

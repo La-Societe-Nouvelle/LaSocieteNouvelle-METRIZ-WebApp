@@ -136,6 +136,18 @@ export const getDateFromString = (stringDate) =>
   }
 }
 
+export const getPrevDay = (date) =>
+{
+  let prevDate = new Date(parseInt(date.substring(0,4)), parseInt(date.substring(4,6), parseInt(date.substring(6,8))-1));
+  return prevDate.getFullYear()+prevDate.getMonth()+prevDate.getDay();
+}
+
+export const getNextDay = (date) =>
+{
+  let prevDate = new Date(parseInt(date.substring(0,4)), parseInt(date.substring(4,6), parseInt(date.substring(6,8))+1));
+  return prevDate.getFullYear()+prevDate.getMonth()+prevDate.getDay();
+}
+
 export const getNextMonth = (month) =>
 {
   let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)+1));
@@ -146,6 +158,19 @@ export const getLastDateOfMonth = (month) =>
 {
   let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)+1),0);
   return date.getFullYear()+date.getMonth()+date.getDay();
+}
+
+export const getDatesEndMonths = (dateStart,dateEnd) =>
+{
+  let datesEndMonths = [];
+  let month = dateStart.substring(0,6);
+  let dateEndMonth = getLastDateOfMonth(month);
+  while (parseInt(dateEndMonth) <= parseInt(dateEnd)) {
+    datesEndMonths.push(dateEndMonth);
+    month = getNextMonth(month);
+    dateEndMonth = getLastDateOfMonth(month);
+  }
+  return dateEndMonth;
 }
 
 export const getNbDaysBetweenDates = (stringDateA,stringDateB) =>

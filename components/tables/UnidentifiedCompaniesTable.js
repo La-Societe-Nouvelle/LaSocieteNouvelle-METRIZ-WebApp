@@ -90,7 +90,7 @@ export class UnidentifiedCompaniesTable extends React.Component {
                 key={"company_" + company.id}
                 {...company}
                 isSignificative={significativeCompanies.includes(
-                  company.account
+                  company.accountNum
                 )}
                 updateCompany={this.updateCompany.bind(this)}
               />
@@ -247,7 +247,7 @@ class RowTableCompanies extends React.Component {
   }
 
   render() {
-    const { corporateName, account, amount, status, dataFetched } = this.props;
+    const { corporateName, accountNum, amount, status, dataFetched } = this.props;
     const { areaCode, activityCode, dataUpdated } = this.state;
     let isSignificative = this.props.isSignificative;
     let icon;
@@ -278,7 +278,7 @@ class RowTableCompanies extends React.Component {
           {corporateName}
 
         </td>
-        <td>{account}</td>
+        <td>{accountNum}</td>
         <td>
           <Select
             defaultValue={{

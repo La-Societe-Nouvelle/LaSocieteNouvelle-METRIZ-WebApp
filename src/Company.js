@@ -6,7 +6,7 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 export class Company {
   constructor({
     id,
-    account,
+    accountNum,
     isDefaultAccount,
     corporateId,
     corporateName,
@@ -28,7 +28,7 @@ export class Company {
     this.id = id;
 
     // Company
-    this.account = account || ""; // numéro compte auxiliaire
+    this.accountNum = accountNum || ""; // numéro compte auxiliaire
     this.isDefaultAccount = isDefaultAccount; // account aux defined in FEC
 
     this.corporateId = corporateId || null; // siren
