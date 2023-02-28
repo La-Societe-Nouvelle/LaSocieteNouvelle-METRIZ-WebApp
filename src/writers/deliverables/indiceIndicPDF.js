@@ -170,7 +170,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 70,
-            y: 105,
+            y: 90,
             w: 200,
             h: 65,
             lineWidth: 2,
@@ -180,7 +180,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 325,
-            y: 105,
+            y: 90,
             w: 200,
             h: 65,
             lineWidth: 2,
@@ -191,7 +191,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 245,
+            y: 232,
             w: 535,
             h: 100,
             lineWidth: 2,
@@ -202,9 +202,9 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 370,
+            y: 352,
             w: 535,
-            h: 70,
+            h: 75,
             lineWidth: 2,
             lineColor: "#f1f0f4",
             r: 10,
@@ -213,7 +213,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 30,
-            y: 625,
+            y: 612,
             w: 180,
             h: 140,
             lineWidth: 2,
@@ -223,7 +223,7 @@ export const createIndiceIndicatorPDF = (
           {
             type: "rect",
             x: 220,
-            y: 625,
+            y: 612,
             w: 345,
             h: 150,
             lineWidth: 2,
@@ -245,9 +245,9 @@ export const createIndiceIndicatorPDF = (
 
       //--------------------------------------------------
       {
+        margin: [0, 20, 0, 25],
         columns: [
           {
-            margin: [0, 30, 0, 30],
             stack: [
               {
                 text: printValue(totalRevenue, 0) + "€",
@@ -263,7 +263,6 @@ export const createIndiceIndicatorPDF = (
           },
 
           {
-            margin: [0, 30, 0, 30],
             stack: [
               {
                 margin: [0, 5, 0, 5],
@@ -278,7 +277,6 @@ export const createIndiceIndicatorPDF = (
                 style: "numbers",
               },
               {
-                margin: [30, 0, 30, 0],
                 text:
                   indic == "idr"
                     ? "Rapport interdécile "
@@ -291,7 +289,6 @@ export const createIndiceIndicatorPDF = (
       },
       //--------------------------------------------------
       {
-        margin: [40, 0, 40, 0],
         text: indicDescription,
         alignment: "center",
       },
@@ -485,7 +482,7 @@ export const createIndiceIndicatorPDF = (
       //--------------------------------------------------
       // SIG Table
       {
-        margin: [0, 20, 0, 0],
+        margin: [0, 25, 0, 0],
         columns: [
           {
             width: "*",
@@ -832,7 +829,7 @@ export const createIndiceIndicatorPDF = (
         fontSize: 6,
         italics: true,
         font: "Roboto",
-        margin: [0, 10, 0, 0],
+        margin: [0, 20, 0, 0],
       },
       ,
     ],
