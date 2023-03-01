@@ -162,7 +162,7 @@ const Row = (props) =>
 
 function RowTableImmobilisations(props) 
 {
-  const {id,accountNum,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
+  const {id,accountNum,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isAmortisable} = props;
   const activityCode = /^[0-9]{2}/.test(prevFootprintActivityCode) ? prevFootprintActivityCode.substring(0,2) : prevFootprintActivityCode;
 
 
@@ -221,7 +221,7 @@ function RowTableImmobilisations(props)
     return initialStateOptions;
   }
 
-  if (isDepreciableImmobilisation && hasOutputs) {
+  if (isAmortisable && hasOutputs) {
     return (
       <tr>
         <td >{accountNum}</td>
@@ -270,7 +270,7 @@ function RowTableImmobilisations(props)
       </tr>
     );
   } 
-  else if (isDepreciableImmobilisation) {
+  else if (isAmortisable) {
     return (<tr>
               <td>{accountNum}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>

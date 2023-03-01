@@ -14,7 +14,7 @@ import { getAmountItems, getPrevAmountItems, getSumItems, roundValue } from '../
 export const immobilisationsPhasesBuilder = (financialData, financialYear) => 
 {
     financialData.immobilisations
-        .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+        .filter(immobilisation => immobilisation.isAmortisable)
         .forEach(async immobilisation => 
         {
             let amortisation = financialData.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
@@ -83,7 +83,7 @@ export const adjustedAmortisationDataBuilder = (financialData, financialYear) =>
     financialData.adjustedAmortisationExpenses = [];
 
     financialData.immobilisations
-        .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+        .filter(immobilisation => immobilisation.isAmortisable)
         .forEach(async immobilisation => 
         {
             let amortisation = financialData.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];

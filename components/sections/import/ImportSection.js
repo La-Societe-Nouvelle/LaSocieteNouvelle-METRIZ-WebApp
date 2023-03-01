@@ -172,9 +172,12 @@ function ImportSection(props) {
 
       // load financial data
       props.session.financialData = new FinancialData(nextFinancialData);
+      props.session.financialData.amortisableImmobilisationSetter();
+      props.session.financialData.expensesAccountsBuilder(nextFinancialData.accounts);
       props.session.financialData.companiesInitializer();
       props.session.financialData.initialStatesInitializer();
       props.session.financialData.immobilisationsPhasesBuilder(props.session.financialPeriod);
+      console.log("Here");
       props.session.financialData.adjustedAmortisationDataBuilder(props.session.financialPeriod);
 
       // load impacts data

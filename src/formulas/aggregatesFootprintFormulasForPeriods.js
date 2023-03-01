@@ -20,7 +20,7 @@ export const updateImmobilisationPeriodsFpt = async (indic,financialData,financi
 {
   let periods = financialData.immobilisationPeriods;
   financialData.immobilisations
-    .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+    .filter(immobilisation => immobilisation.isAmortisable)
     .map(async immobilisation => 
     {
       let investments = financialData.investments.filter(investment => investment.accountNum==immobilisation.accountNum);

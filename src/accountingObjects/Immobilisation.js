@@ -12,7 +12,7 @@ export class Immobilisation {
     id,
     accountNum,
     accountLib,
-    isDepreciableImmobilisation,
+    isAmortisable,
     amount,
     footprint,
     prevAmount,
@@ -31,7 +31,7 @@ export class Immobilisation {
     this.accountNum = accountNum;
     this.accountLib = accountLib;
 
-    this.isDepreciableImmobilisation = isDepreciableImmobilisation || false;
+    this.isAmortisable = isAmortisable || false;
 
     // Footprint
     this.amount = amount || 0;

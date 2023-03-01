@@ -100,6 +100,16 @@ export class FinancialData {
     // ---------------------------------------------------------------------------------------------------- //
     }
 
+    /* ---------------------------------------- AMORTISABLE IMMOBILISATION SETTER ---------------------------------------- */
+
+    amortisableImmobilisationSetter = () =>
+    {
+        this.immobilisations.forEach(immobilisation => {
+            let amortisation = this.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
+            immobilisation.isAmortisable = amortisation!=undefined;
+        })
+    }
+
     /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
 
     expensesAccountsBuilder = (metaAccounts) =>
@@ -148,23 +158,16 @@ export class FinancialData {
     /* ---------------------------------------- IMMOBILISATIONS PHASES BUILDER ---------------------------------------- */
 
     immobilisationsPhasesBuilder = (financialPeriod) => 
-    {
-        console.log("immobilisations phases builder")
-        console.log(financialPeriod)
-        
+    {        
         // end of months
         let datesEndMonths = getDatesEndMonths(financialPeriod.dateStart, financialPeriod.dateEnd);
-        console.log(datesEndMonths);
 
         this.immobilisations
-            .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+            .filter(immobilisation => immobilisation.isAmortisable)
             .forEach(async immobilisation => {
                 let amortisation = this.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
-                console.log(immobilisation);
-                console.log(amortisation);
 
                 // get all dates ending an immobilisation account phase (i.e. before any change)
-                console.log(immobilisation.entries);
                 let datesEndImmobilisationPhases = immobilisation.entries
                     .filter(entry => !entry.isANouveaux)
                     .map(entry => entry.date)
@@ -172,14 +175,9 @@ export class FinancialData {
                     .filter(date => parseInt(date) >= parseInt(financialPeriod.dateStart));
 
                 // get all dates ending an amortisation account phase (i.e. at any change)
-                console.log(amortisation.entries);
                 let datesEndAmortisationPhases = amortisation.entries
                     .filter(entry => !entry.isANouveaux)
                     .map(entry => entry.date);
-
-                console.log([financialPeriod.dateEnd]);
-                console.log(datesEndImmobilisationPhases);
-                console.log(datesEndAmortisationPhases);
 
                 // concat phases & sort dates
                 let datesEndPhases = datesEndMonths
@@ -232,7 +230,7 @@ export class FinancialData {
 
         for (let phase of phases) {
             // update current amount
-            let entriesAtDate = immobilisation.entries.filter(entry => !entry.isANouveaux).filter(entry => entry.date == phase.dateEnd); // variations at end of period
+            let entriesAtDate = amortisation.entries.filter(entry => !entry.isANouveaux).filter(entry => entry.date == phase.dateEnd); // variations at end of period
             let variationOnPhase = getAmountItems(entriesAtDate, 2);
             currentAmount = roundValue(currentAmount + variationOnPhase, 2);
 
@@ -253,13 +251,13 @@ export class FinancialData {
         this.adjustedAmortisationExpenses = [];
 
         this.immobilisations
-            .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+            .filter(immobilisation => immobilisation.isAmortisable)
             .forEach(async immobilisation => {
                 let amortisation = this.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
                 let amortisationExpenses = this.amortisationExpenses.filter(expense => expense.accountAux == amortisation.accountNum);
 
-                let adjustedData = await this.buildAdjustedAmortisations(immobilisation, amortisation, amortisationExpenses, financialPeriod, phases);
-                let adjustedAmortisation = new Account({ id: index, ...amortisation, phases: adjustedData.adjustedAmortisationPhases });
+                let adjustedData = await this.buildAdjustedAmortisations(immobilisation, amortisation, amortisationExpenses, financialPeriod, immobilisation.phases);
+                let adjustedAmortisation = new Account({...amortisation, phases: adjustedData.adjustedAmortisationPhases });
                 let adjustedExpenses = adjustedData.adjustedAmortisationExpenses.map((props, index) => new Expense({ id: index, ...props }));
 
                 this.adjustedAmortisations.push(adjustedAmortisation);
@@ -267,7 +265,7 @@ export class FinancialData {
             })
     }
 
-    buildAdjustedAmortisations = async (immobilisation, amortisation, amortisationExpenses, financialYear, phases) => 
+    buildAdjustedAmortisations = async (immobilisation, amortisation, amortisationExpenses, financialPeriod, phases) => 
     {
         let adjustedAmortisationPhases = [];
         let adjustedAmortisationExpenses = [];
@@ -345,7 +343,7 @@ export class FinancialData {
     {
         // Immobilisations -> default data for all amortisable immobilisation
         this.immobilisations
-            .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+            .filter(immobilisation => immobilisation.isAmortisable)
             .filter(immobilisation => (this.amortisations.filter(amortisation => amortisation.accountAux==immobilisation.accountNum).length > 0))
             .forEach(immobilisation => {
                 immobilisation.initialState = "defaultData";

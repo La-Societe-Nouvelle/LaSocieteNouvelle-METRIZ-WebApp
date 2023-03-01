@@ -614,7 +614,7 @@ async function readANouveauxEntry(data,journal,ligneCourante)
     {
       accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
-      isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
+      isAmortisable: /^2(0|1)/.test(ligneCourante.CompteNum),
       prevAmount: parseAmount(ligneCourante.Debit),
       amount: parseAmount(ligneCourante.Debit),
       entries: [{
@@ -788,7 +788,7 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
       {
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        isDepreciableImmobilisation: /^2(0|1)/.test(ligneCourante.CompteNum),
+        isAmortisable: /^2(0|1)/.test(ligneCourante.CompteNum),
         prevAmount: 0.0,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         entries: [{
