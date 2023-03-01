@@ -14,7 +14,8 @@ export class Amortisation {
                prevAmount,
                prevFootprint,
                initialState,
-               entries}) 
+               entries,
+               phases}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = id;                                                   // id
@@ -31,6 +32,7 @@ export class Amortisation {
     this.prevFootprint = new SocialFootprint(prevFootprint);        //
 
     this.entries = entries || [];
+    this.phases = phases || [];
   // ---------------------------------------------------------------------------------------------------- //
   }
 

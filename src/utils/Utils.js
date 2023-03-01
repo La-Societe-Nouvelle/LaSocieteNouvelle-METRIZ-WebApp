@@ -127,37 +127,42 @@ export const getCurrentDateString = () => // dd-MM-yyyy hh:mm
   return dateString
 }
 
-export const getDateFromString = (stringDate) =>
+export const parseDate = (stringDate) =>
 {
   if (/^[0-9]{8}$/.test(stringDate)) {
-    return new Date(parseInt(stringDate.substring(0,4)), parseInt(stringDate.substring(4,6)), parseInt(stringDate.substring(6,8)));
+    return new Date(parseInt(stringDate.substring(0,4)), parseInt(stringDate.substring(4,6))-1, parseInt(stringDate.substring(6,8)));
+  } else if (/^[0-9]{6}$/.test(stringDate)) {
+    return new Date(parseInt(stringDate.substring(0,4)), parseInt(stringDate.substring(4,6))-1, 1);
   } else {
     return null;
   }
 }
 
-export const getPrevDay = (date) =>
+export const getPrevDate = (stringDate) =>
 {
-  let prevDate = new Date(parseInt(date.substring(0,4)), parseInt(date.substring(4,6), parseInt(date.substring(6,8))-1));
-  return prevDate.getFullYear()+prevDate.getMonth()+prevDate.getDay();
+  let date = parseDate(stringDate);
+  let prevDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()-1);
+  return formatDate(prevDate);
 }
 
-export const getNextDay = (date) =>
+export const getNextDate = (stringDate) =>
 {
-  let prevDate = new Date(parseInt(date.substring(0,4)), parseInt(date.substring(4,6), parseInt(date.substring(6,8))+1));
-  return prevDate.getFullYear()+prevDate.getMonth()+prevDate.getDay();
+  let date = parseDate(stringDate);
+  let nextDate = new Date(date.getFullYear(), date.getMonth(), date.getDate()+1);
+  return formatDate(nextDate);
 }
 
 export const getNextMonth = (month) =>
 {
-  let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)+1));
-  return date.getFullYear()+date.getMonth();
+  let currentMonth = parseDate(month);
+  let nextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth()+1, 1);
+  return formatMonth(nextMonth);
 }
 
 export const getLastDateOfMonth = (month) =>
 {
-  let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)+1),0);
-  return date.getFullYear()+date.getMonth()+date.getDay();
+  let date = new Date(parseInt(month.substring(0,4)), parseInt(month.substring(4,6)), 0);
+  return formatDate(date);
 }
 
 export const getDatesEndMonths = (dateStart,dateEnd) =>
@@ -170,13 +175,13 @@ export const getDatesEndMonths = (dateStart,dateEnd) =>
     month = getNextMonth(month);
     dateEndMonth = getLastDateOfMonth(month);
   }
-  return dateEndMonth;
+  return datesEndMonths;
 }
 
 export const getNbDaysBetweenDates = (stringDateA,stringDateB) =>
 {
-  let dateA = getDateFromString(stringDateA);
-  let dateB = getDateFromString(stringDateB);
+  let dateA = parseDate(stringDateA);
+  let dateB = parseDate(stringDateB);
   return Math.round(Math.abs(dateB - dateA) / (1000 * 60 * 60 * 24));
 }
 
@@ -194,8 +199,8 @@ export const isInPeriod = (stringDateStart,stringDateEnd,stringDate) =>
 
 export const isAfter = (stringDateRef,stringDate) =>
 {
-  let dateRef = getDateFromString(stringDateRef);
-  let date = getDateFromString(stringDate);
+  let dateRef = parseDate(stringDateRef);
+  let date = parseDate(stringDate);
 
   if (dateRef==null || date==null) {
     return null;
@@ -206,8 +211,8 @@ export const isAfter = (stringDateRef,stringDate) =>
 
 export const isBefore = (stringDateRef,stringDate) =>
 {
-  let dateRef = getDateFromString(stringDateRef);
-  let date = getDateFromString(stringDate);
+  let dateRef = parseDate(stringDateRef);
+  let date = parseDate(stringDate);
 
   if (dateRef==null || date==null) {
     return null;
@@ -215,6 +220,9 @@ export const isBefore = (stringDateRef,stringDate) =>
     return date.getDate()<=dateRef.getDate();
   }
 }
+
+const formatDate = (date) => "" + date.getFullYear() + (date.getMonth()+1>=10 ? "" : "0") + (date.getMonth()+1) + date.getDate()
+const formatMonth = (date) => "" + date.getFullYear() + (date.getMonth()+1>=10 ? "" : "0") + (date.getMonth()+1)
 
 /* ----- SERIES ID ----- */
 

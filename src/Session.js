@@ -42,7 +42,7 @@ export class Session
 
     // Year
     this.year = props.year || "";
-    this.financialYears = props.financialYears || {};
+    this.financialPeriod = props.financialPeriod || {};
 
     // Data
     this.legalUnit = new LegalUnit(props.legalUnit);

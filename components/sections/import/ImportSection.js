@@ -131,6 +131,7 @@ function ImportSection(props) {
       {
         try {
           let FECData = await FECFileReader(reader.result); // read file (file -> JSON)
+          console.log(FECData);
           setImportedData(FECData);
           setView(1);
         } catch (error) {
@@ -147,7 +148,8 @@ function ImportSection(props) {
     } // show error (file)
   }
 
-  async function loadFECData(importedData) {
+  async function loadFECData(importedData) 
+  {
     let nextFinancialData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
 
     if (nextFinancialData.errors.length > 0) {
@@ -163,11 +165,17 @@ function ImportSection(props) {
       props.session.year = /^[0-9]{8}/.test(importedData.meta.lastDate)
         ? importedData.meta.lastDate.substring(0, 4)
         : "";
+      props.session.financialPeriod = {
+        dateStart: importedData.meta.firstDate,
+        dateEnd: importedData.meta.lastDate
+      }
 
       // load financial data
       props.session.financialData = new FinancialData(nextFinancialData);
       props.session.financialData.companiesInitializer();
       props.session.financialData.initialStatesInitializer();
+      props.session.financialData.immobilisationsPhasesBuilder(props.session.financialPeriod);
+      props.session.financialData.adjustedAmortisationDataBuilder(props.session.financialPeriod);
 
       // load impacts data
       props.session.impactsData.netValueAdded =

@@ -15,7 +15,8 @@ export class Account {
                initialState,
                prevAmount,
                prevFootprint,
-               entries}) 
+               entries,
+               phases}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = accountNum;                                           // id
@@ -32,6 +33,7 @@ export class Account {
     this.prevFootprint = new SocialFootprint(prevFootprint);        //
 
     this.entries = entries || [];
+    this.phases = phases || [];
   // ---------------------------------------------------------------------------------------------------- //
   }
 

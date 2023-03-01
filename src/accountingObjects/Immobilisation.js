@@ -126,28 +126,4 @@ export class Immobilisation {
         });
     }
   }
-
-  /* ---------- Periods ---------- */
-
-  buildPeriods = async (periods) =>
-  {
-    this.periods = [];
-
-    let currentAmount = this.prevAmount;
-
-    for (let period of periods) 
-    {      
-      // update current amount
-      let entriesAtDate = this.entries.filter(entry => !entry.isANouveaux).filter(entry => entry.date==period.dateStart); // variations at beginning of period
-      let variationOnPeriod = getAmountItems(entriesAtDate, 2);
-      currentAmount = currentAmount+variationOnPeriod;
-
-      // add period with current amount
-      this.periods.push({
-        dateStart: period.dateStart,
-        dateEnd: period.dateEnd,
-        amount: currentAmount
-      });
-    }
-  }
 }

@@ -2,7 +2,7 @@
 
 // Generic formulas
 import { Aggregate } from '../accountingObjects/Aggregate';
-import { getAmountItems, getPrevDay } from '../utils/Utils';
+import { getAmountItems, getPrevDate } from '../utils/Utils';
 import { buildAggregateFootprint, buildAggregateIndicator } from './footprintFormulas';
 
 /** Structure of file

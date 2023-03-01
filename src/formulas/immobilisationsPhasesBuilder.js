@@ -2,7 +2,6 @@
 
 // Objects
 import { Account } from '../accountingObjects/Account';
-import { Aggregate } from '../accountingObjects/Aggregate';
 import { Expense } from '../accountingObjects/Expense';
 
 // Utils
@@ -19,7 +18,6 @@ export const immobilisationsPhasesBuilder = (financialData, financialYear) =>
         .forEach(async immobilisation => 
         {
             let amortisation = financialData.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
-            let amortisationExpenses = financialData.amortisationExpenses.filter(expense => expense.accountAux == amortisation.accountNum);
 
             // get all dates ending an immobilisation account phase (i.e. before any change)
             let datesEndImmobilisationPhases = immobilisation.entries
@@ -55,49 +53,7 @@ export const immobilisationsPhasesBuilder = (financialData, financialYear) =>
 
             await buildImmobilisationPhasess(immobilisation,phases);
             await buildImmobilisationPhasess(amortisation,phases);
-
-
-
-            amortisation.buildPeriods(phases);
-
-            amortisationExpenses.forEach(async expense => await expense.initPeriods(dateStart, dateEnd));
-            await amortisation.initPeriods(amortisationExpenses, dateStart, dateEnd);
-            await immobilisation.initPeriods(dateStart, dateEnd);
-
-            // let dates = amortisation.periods
-            //     .concat(immobilisation.periods)
-            //     .concat(expenses.map(expense => expense.periods).reduce((a,b) => a.concat(b),[]))
-            //     .map(period => [period.dateStart,period.dateEnd])   // get date start & date end
-            //     .reduce((a,b) => a.concat(b),[])
-            //     .filter((value, index, self) => index === self.findIndex(item => item === value) && value!="")   // remove duplicates and empty string
-            //     .sort((a,b) => parseInt(a) > parseInt(b));   // sort by date (chronology)
-
-            let datesExpenses = amortisationExpenses
-                .map(expense => expense.periods).reduce((a, b) => a.concat(b), [])
-                .map(period => [period.dateStart, period.dateEnd])
-                .reduce((a, b) => a.concat(b), [])
-                .filter((value, index, self) => index === self.findIndex(item => item === value))
-                .sort((a, b) => parseInt(a) > parseInt(b));
-
-            // build next periods
-            let nextPeriods = dates.slice(1).map((date, index, self) => {
-                return ({
-                    id: index,
-                    dateStart: index > 0 ? self[index - 1] : dateStart,
-                    dateEnd: date,
-                    amount: null
-                })
-            })
-
-            immobilisation.completePeriods(nextPeriods);
-            amortisation.completePeriods(nextPeriods);
-            amortisationExpenses.forEach(async expense => expense.completePeriods(immobilisation, amortisation, nextPeriods, datesExpenses, dateStart));
-
-            console.log("results");
-            console.log(immobilisation);
-            console.log(amortisation);
-            amortisationExpenses.forEach(expense => console.log(expense));
-        })
+        });
 }
 
 const buildImmobilisationPhasess = async (immobilisation, phases) => 
@@ -121,39 +77,37 @@ const buildImmobilisationPhasess = async (immobilisation, phases) =>
     }
 }
 
-const buildAmortisationPhases = async (amortisation,phases) => 
+export const adjustedAmortisationDataBuilder = (financialData, financialYear) =>
 {
-    amortisation.phases = [];
+    financialData.adjustedAmortisations = [];
+    financialData.adjustedAmortisationExpenses = [];
 
-    let currentAmount = this.prevAmount;
+    financialData.immobilisations
+        .filter(immobilisation => immobilisation.isDepreciableImmobilisation)
+        .forEach(async immobilisation => 
+        {
+            let amortisation = financialData.amortisations.filter(amortisation => amortisation.accountAux == immobilisation.accountNum)[0];
+            let amortisationExpenses = financialData.amortisationExpenses.filter(expense => expense.accountAux == amortisation.accountNum);
 
-    for (let phase of phases) {
-        // update current amount
-        let entriesAtDate = this.entries.filter(entry => !entry.isANouveaux).filter(entry => entry.date == phase.dateEnd); // variations at end of period
-        let variationOnPhase = getAmountItems(entriesAtDate, 2);
-        currentAmount = roundValue(currentAmount + variationOnPhase, 2);
-
-        // add period with current amount
-        this.periods.push({
-            dateStart: phase.dateStart,
-            dateEnd: phase.dateEnd,
-            amount: currentAmount
-        });
-    }
+            let adjustedData = await buildAdjustedAmortisations(immobilisation,amortisation,amortisationExpenses,financialYear,phases);
+            let adjustedAmortisation = new Account({id: index, ...amortisation, phases: adjustedData.adjustedAmortisationPhases});
+            let adjustedExpenses = adjustedData.adjustedAmortisationExpenses.map((props,index) => new Expense({id: index, ...props}));
+            
+            financialData.adjustedAmortisations.push(adjustedAmortisation);
+            financialData.adjustedAmortisationExpenses.push(adjustedExpenses);
+        })
 }
 
-const buildAdjustedAmortisations = (immobilisation,amortisation,amortisationExpenses,financialYear,phases) => 
+const buildAdjustedAmortisations = async (immobilisation,amortisation,amortisationExpenses,financialYear,phases) => 
 {
     let adjustedAmortisationPhases = [];    
     let adjustedAmortisationExpenses = [];
 
     let currentAmountAmortisation = amortisation.prevAmount;
-    let prevAmountAmortisation = amortisation.prevAmount;
     let currentAmountExpenses = 0;
-    let currentAmountExpensesMax = 0;
-    let dateLastExpense = financialYear.dateStart;
+    let maxAmountExpenses = 0;
     let tempPhases = [];
-    let totalToDepreciate = 0;
+    let totalToAmortisate = 0;
 
     for (let phase of phases) 
     {
@@ -165,39 +119,56 @@ const buildAdjustedAmortisations = (immobilisation,amortisation,amortisationExpe
             id: phase.id,
             dateStart: phase.dateStart,
             dateEnd: phase.dateEnd,
-            amountToDepreciate: (immobilisationAmount - currentAmountAmortisation)*nbDaysPhase
+            amountToAmortise: (immobilisationAmount - currentAmountAmortisation)*nbDaysPhase,
+            prevAmount: currentAmountAmortisation
         })
-        totalToDepreciate = totalToDepreciate + (immobilisationAmount - currentAmountAmortisation)*nbDaysPhase;
+        totalToAmortisate = totalToAmortisate + (immobilisationAmount - currentAmountAmortisation)*nbDaysPhase;
         
         // get expenses at end of phase
         let expensesAtDate = amortisationExpenses.filter(expense => expense.date == phase.dateEnd);
-        currentAmountExpenses = roundValue(currentAmountExpenses + getAmountItems(expensesAtDate), 2);
+        let amountExpensesAtDate = getAmountItems(expensesAtDate);
+        currentAmountExpenses = roundValue(currentAmountExpenses + amountExpensesAtDate, 2);
         
         // get amortisation entries at end of phase
         let entriesAtDate = amortisation.entries.filter(entry => entry.date == phase.dateEnd);
-        let amortisationVariation = getAmountItems(entriesAtDate) - getAmountItems(expensesAtDate);
-        currentAmountAmortisation = currentAmountAmortisation + amortisationVariation;
+        let variationAmortisation = getAmountItems(entriesAtDate);
+        currentAmountAmortisation = currentAmountAmortisation + variationAmortisation - amountExpensesAtDate; // amount without amortisation expenses
         
-        if (currentAmountExpenses > currentAmountExpensesMax) 
+        if (currentAmountExpenses > maxAmountExpenses) 
         {
-            let amountAdjustedExpense = roundValue(currentAmountExpensesMax-currentAmountExpenses, 2);
+            let totalAmountAdjustedExpense = roundValue(maxAmountExpenses-currentAmountExpenses, 2);
             let cumulAdjustment = 0;
 
             for (let tempPhase of tempPhases) 
             {
-                let amountExpense = roundValue((tempPhase.amountToDepreciate / totalToDepreciate)*amountAdjustedExpense, 2);
-                let adjustedAmortisationExpense = new Expense({
-                    amount: amountExpense
+                let amountAdjustedExpense = roundValue((tempPhase.amountToAmortise / totalToAmortisate)*totalAmountAdjustedExpense, 2);
+
+                adjustedAmortisationExpenses.push({
+                    accountNum: "6811"+(parseInt(amortisation.accountNum.charAt(2))+1)+amortisation.accountNum.slice(3),
+                    accountLib: "Dotations - "+amortisation.accountLib,
+                    accountAux: amortisation.accountNum,
+                    accountAuxLib: amortisation.accountLib,
+                    amount: amountAdjustedExpense,
+                    date: tempPhase.dateEnd
                 })
+
                 adjustedAmortisationPhases.push({
                     id: tempPhase.id,
                     dateStart: tempPhase.dateStart,
                     dateEnd: tempPhase.dateEnd,
-                    amount: roundValue(cumulAdjustment + amountExpense, 2)
+                    amount: roundValue(tempPhase.prevAmount + cumulAdjustment + amountAdjustedExpense, 2)
                 })
                 cumulAdjustment = cumulAdjustment;
             }
+
+            tempPhases = [];
+            totalToAmortisate = 0;
+            currentAmountAmortisation = currentAmountAmortisation + totalAmountAdjustedExpense;
         }
     }
 
+    return({
+        adjustedAmortisationPhases,
+        adjustedAmortisationExpenses
+    })
 }
