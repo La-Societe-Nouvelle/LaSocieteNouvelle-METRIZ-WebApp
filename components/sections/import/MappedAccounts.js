@@ -2,46 +2,36 @@ import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
 function MappedAccounts(props) {
-  const accounts = Object.entries(props.meta.accounts);
+  const [accounts, setAccounts] = useState(props.meta.accounts);
 
-  const accountsToMap = accounts.filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
-  const assetAccounts = accounts.filter((account) => /^2(0|1)/.test(account) || /^3[0-8]/.test(account));
+  const accountsToMap = Object.keys(accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
+  const assetAccounts = Object.keys(accounts).filter((accountNum) => /^2(0|1)/.test(accountNum) || /^3[0-8]/.test(accountNum));
 
   const [isDisabled, setIsDisabled] = useState(true);
-  const [mappedAccounts, setMappedAccounts] = useState(props.meta.mappingAccounts);
 
   // disabled if one account is not mapped i.e. enabled if all accounts are mapped
   useEffect(() => {
-    if (Object.values(mappedAccounts).some((it) => !it.accountAux)) {
+    if (accountsToMap.some((accountNum) => !accounts[accountNum].assetAccountNum)) {
       setIsDisabled(true);
     } else {
       setIsDisabled(false);
     }
-  }, [isDisabled, mappedAccounts]);
+  }, [isDisabled]);
 
-  function handleOnchange(accountToMapNum, nextAccountAuxNum) {
+  function handleOnchange(accountToMapNum, nextAssetAccountNum) {
     // remove association if a dep/amort. account is already associated with account aux
-    Object.entries(mappedAccounts).map(([key, { accountAux }]) => {
-      if (
-        key.substring(0, 2) == accountToMapNum.substring(0, 2) &&
-        accountAux == nextAccountAuxNum
-      ) {
-        Object.assign(mappedAccounts, {
-          [key]: { accountAux: "", directMatching: false },
-        });
-      }
-    });
-
+    Object.entries(accounts)
+      .filter(([_,{assetAccountNum}]) => assetAccountNum==nextAssetAccountNum)
+      .forEach(([_,{assetAccountNum}]) => assetAccountNum = "");
+        
     // add association
-    Object.assign(mappedAccounts, {
-      [accountToMapNum]: { accountAux: nextAccountAuxNum, directMatching: true },
-    });
+    accounts[accountToMapNum].assetAccountNum = nextAssetAccountNum;
 
-    props.meta.mappingAccounts = mappedAccounts; // ?
-    setMappedAccounts({ ...mappedAccounts });
+    props.meta.accounts = accounts; // ?
+    setAccounts(accounts);
 
     // check if all accounts are associated
-    if (Object.values(mappedAccounts).some((it) => !it.accountAux)) {
+    if (accountsToMap.some((account) => !accounts[account].assetAccountNum)) {
       setIsDisabled(true);
     } else {
       setIsDisabled(false);
@@ -63,12 +53,12 @@ function MappedAccounts(props) {
           </tr>
         </thead>
         <tbody>
-          {accountsToMap.map(([accountToMapNum, accountToMapLib], index) => (
+          {accountsToMap.map((accountToMapNum, index) => (
             <tr key={index}>
               <td>{accountToMapNum}</td>
-              <td>{accountToMapLib}</td>
+              <td>{accounts[accountToMapNum].accountLib}</td>
               <td style={{width:'40px'}}>
-                {!mappedAccounts[accountToMapNum].directMatching && (
+                {!accounts[accountToMapNum].directMatching && (
                   <IconWarning />
                 )}
               </td>
@@ -78,7 +68,7 @@ function MappedAccounts(props) {
                   onChange={(e) =>
                     handleOnchange(accountToMapNum, e.target.value)
                   }
-                  value={mappedAccounts[accountToMapNum].accountAux || ""}
+                  value={accounts[accountToMapNum].assetAccountNum || ""}
                 >
                   <option value="">Sélectionner un compte...</option>
                   {assetAccounts
@@ -86,9 +76,9 @@ function MappedAccounts(props) {
                       ([assetAccountNum, _]) =>
                         assetAccountNum[0] == accountToMapNum[0]
                     )
-                    .map(([assetAccountNum, assetAccountLib], index) => (
+                    .map((assetAccountNum, index) => (
                       <option key={index} value={assetAccountNum}>
-                        {assetAccountNum} - {assetAccountLib}
+                        {assetAccountNum} - {accounts[assetAccountNum].accountLib}
                       </option>
                     ))}
                 </select>

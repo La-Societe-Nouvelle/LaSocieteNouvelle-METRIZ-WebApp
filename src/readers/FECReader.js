@@ -143,10 +143,16 @@ export async function FECFileReader(content)
 
       // Mise à jour des métadonnées relatives aux libellés de comptes
       if (!Object.keys(dataFEC.meta.accounts).includes(rowData.CompteNum)) {
-        dataFEC.meta.accounts[rowData.CompteNum] = rowData.CompteLib;
+        dataFEC.meta.accounts[rowData.CompteNum] = {
+          accountNum: rowData.CompteNum,
+          accountLib: rowData.CompteLib
+        }
       }
       if (rowData.CompAuxNum!=undefined && !Object.keys(dataFEC.meta.accountsAux).includes(rowData.CompAuxNum)) {
-        dataFEC.meta.accountsAux[rowData.CompAuxNum] = rowData.CompAuxLib;
+        dataFEC.meta.accountsAux[rowData.CompAuxNum] = {
+          accountNum: rowData.CompAuxNum,
+          accountLib: rowData.CompAuxLib
+        }
       }
 
       // Date
@@ -163,9 +169,8 @@ export async function FECFileReader(content)
 
   // Mapping accounts ----------------------------------------------------------------------------------- //
 
-  let mappingAccounts = await buildMappingAssetAccounts(dataFEC.meta.accounts);
-
-  dataFEC.meta.mappingAccounts = mappingAccounts;         // key : account / value : { accountAux, directMatching }
+  dataFEC.meta.accounts = await buildMappingAssetAccounts(dataFEC.meta.accounts);
+  console.log(dataFEC.meta.accounts);
 
   // Return --------------------------------------------------------------------------------------------- //
   return dataFEC;
@@ -214,107 +219,100 @@ function getDefaultBookType(bookCode,bookLib)
 async function buildMappingAssetAccounts(accounts)
 {
   // mappingAccounts : "account": { accountAux:"immobilisationAccount", directMatching: (true|false) }
-  let mappingAccounts = {}
+  //let mappingAccounts = {}
 
-  let accountsToMap = Object.keys(accounts).filter(account => /^(2[8-9]|39)/.test(account)); // amortisation & depreciation accounts
-  let assetAccounts = Object.keys(accounts).filter(account => /^(2[0-1]|3[0-8])/.test(account)); // immobilisation & stock accounts
+  let accountsToMap = Object.keys(accounts).filter((accountNum) => /^(2[8-9]|39)/.test(accountNum)); // amortisation & depreciation accounts
+  let assetAccounts = Object.keys(accounts).filter((accountNum) => /^(2[0-1]|3[0-8])/.test(accountNum)); // immobilisation & stock accounts
 
   // try simple mapping
-  accountsToMap.forEach(accountToMap =>
+  accountsToMap.forEach(async (accountToMap) =>
   {
     // get asset account matching default pattern
-    let accountAux = assetAccounts.filter(assetAccount => assetAccount.startsWith(accountToMap[0]+accountToMap.substring(2)));
+    let assetAccount = assetAccounts.filter(assetAccount => assetAccount.startsWith(accountToMap[0]+accountToMap.substring(2)));
 
     // build mappingAccounts
-    if (accountAux.length==1) { // if single match
-      mappingAccounts[accountToMap] = {
-        accountAux: accountAux[0],
-        directMatching: true
-      };
+    if (assetAccount.length==1) { // if single match
+      accounts[accountToMap].assetAccountNum = assetAccount[0];
+      accounts[accountToMap].directMatching = true;
     } else {
-      mappingAccounts[accountToMap] = {
-        accountAux: "",
-        directMatching: false
-      };
+      accounts[accountToMap].assetAccountNum = "";
+      accounts[accountToMap].directMatching = false;
     }
-  })
+  });
+  console.log(accounts);
 
   // if not all accounts mapped
-  if (Object.values(mappingAccounts).filter(item => !item.directMatching).length > 0)
+  if (accountsToMap.filter((accountToMap) => !accounts[accountToMap].directMatching).length > 0)
   {
     // build distances between accounts for all possible associations
     let distances = [];
     accountsToMap.forEach(accountToMap => 
     {
       assetAccounts.filter(assetAccount => assetAccount[0]==accountToMap[0]) // asset account from the same accouting class
-                   .forEach(assetAccount =>
+                   .forEach(assetAccountNum =>
       {
-        let expectedAssetAccount = accountToMap[0]+accountToMap.substring(2); // ref account num
-        let distanceNum = distance(expectedAssetAccount,assetAccount);
-        let distanceLib = distance(accounts[accountToMap],accounts[assetAccount]);
-        let prefixLength = getPrefixLength(expectedAssetAccount,assetAccount);
+        let expectedAssetAccountNum = accountToMap[0]+accountToMap.substring(2); // ref account num
+        let distanceWithNum = distance(expectedAssetAccountNum,assetAccountNum);
+        let distanceWithLib = distance(accounts[accountToMap].accountLib,accounts[assetAccountNum].accountLib);
+        let prefixLength = getPrefixLength(expectedAssetAccountNum,assetAccountNum);
 
         distances.push({
           accountNum: accountToMap,
-          accountAux: assetAccount,
-          distanceNum, distanceLib,
+          assetAccountNum,
+          distanceWithNum, 
+          distanceWithLib,
           prefixLength, 
-          expectedAccount: expectedAssetAccount
+          expectedAssetAccountNum
         });
       })
     });
 
     // Map with prefix length
     distances.forEach(distance => distance.stashed = false); // init values stahed
-    let mappingWithPrefixLength = await mapAccountsWithPrefixLength(distances); // return JSON with mappings
+    let assetAccountWithPrefixLength = await mapAccountsWithPrefixLength(distances); // return JSON with mappings
     
     // Map with accountNum distance
     distances.forEach(distance => distance.stashed = false);
-    let mappingWithNumDistances = await mapAccountsWithNumDistances(distances);
+    let assetAccountWithNumDistances = await mapAccountsWithNumDistances(distances);
     
     // Map with accountLib distance
     distances.forEach(distance => distance.stashed = false);
-    let mappingWithLibDistances = await mapAccountsWithLibDistances(distances);
+    let assetAccountWithLibDistances = await mapAccountsWithLibDistances(distances);
 
     // Merge accountAux matching (duplicates possible)
     let mappings = [];
     accountsToMap.forEach(accountToMap =>
     {
       let assetAccounts = [
-        mappingAccounts[accountToMap].accountAux,
-        mappingWithPrefixLength[accountToMap],
-        mappingWithNumDistances[accountToMap],
-        mappingWithLibDistances[accountToMap]
+        accounts[accountToMap].assetAccountNum,
+        assetAccountWithPrefixLength[accountToMap],
+        assetAccountWithNumDistances[accountToMap],
+        assetAccountWithLibDistances[accountToMap]
       ];
-      assetAccounts.filter(assetAccount => assetAccount) // remove empty string or undefined
-                   .forEach(assetAccount => mappings.push({accountNum: accountToMap, accountAux: assetAccount}));
+      assetAccounts.filter(assetAccountNum => assetAccountNum) // remove empty string or undefined
+                   .forEach(assetAccountNum => mappings.push({accountNum: accountToMap, assetAccountNum: assetAccountNum}));
     });
 
     // build res
     accountsToMap.forEach(accountToMap =>
     {
-      let assetAccounts = mappings.filter(mapping => mapping.account == accountToMap)  // get all solutions for depreciation account
-                                  .map(mapping => mapping.accountAux)
-                                  .filter((value, index, self) => index === self.findIndex(item => item === value)); // remove duplicates
+      let assetAccounts = mappings
+        .filter(mapping => mapping.accountNum == accountToMap)  // get all solutions for depreciation account
+        .map(mapping => mapping.assetAccountNum)
+        .filter((value, index, self) => index === self.findIndex(item => item === value)); // remove duplicates
 
       // if only one asset account match and if that asset account not match for another amortisation/depreciation account
       if (assetAccounts.length == 1 
-        && mappings.filter(mapping => mapping.account!=accountToMap && mapping.accountAux==assetAccounts[0]).length == 0)
+        && mappings.filter(mapping => mapping.accountNum!=accountToMap && mapping.assetAccountNum==assetAccounts[0]).length == 0)
       {
-        mappingAccounts[accountToMap] = {
-          accountAux: assetAccounts[0],
-          directMatching: mappingAccounts[accountToMap].directMatching // retrieve if direct matching initially
-        };
+        accounts[accountToMap].assetAccountNum = assetAccounts[0];
       } else {
-        mappingAccounts[accountToMap] = {
-          accountAux: "", 
-          directMatching: false
-        };
+        accounts[accountToMap].assetAccountNum = "";
       }
     })    
   }
 
-  return mappingAccounts;
+  return accounts;
 }
 
 const getPrefixLength = (stringA,stringB) =>
@@ -458,6 +456,8 @@ const mapAccountsWithLibDistances = async (distances) =>
 export async function FECDataReader(FECData)
 // ...extract data to use in session (JSON -> Session)
 { 
+  console.log(FECData.meta.mappingAccounts);
+  console.log(FECData.meta.accounts);
   // Output data ---------------------------------------------------------------------------------------- //
   
   let data = {};
@@ -465,7 +465,6 @@ export async function FECDataReader(FECData)
   // Meta ----------------------------------------------------------------------------------------------- //
   data.accounts = FECData.meta.accounts;
   data.accountsAux = FECData.meta.accountsAux;
-  data.mappingAccounts = FECData.meta.mappingAccounts;
   data.defaultAccountsAux = [];
 
   // Reader data ---------------------------------------------------------------------------------------- //
@@ -481,7 +480,15 @@ export async function FECDataReader(FECData)
   data.otherOperatingIncomes = 0;         // 74, 75, 781, 791
 
   // Stocks --------------------------------------------------------------------------------------------- //
-  data.stocks = [];                       // stock 31, 32, 33, 34, 35, 37
+  data.stocks = {};                       // stock 31, 32, 33, 34, 35, 37
+  Object.entries(FECData.meta.accounts)
+    .filter(([accountNum,_]) => /^3[1-7]/.test(accountNum))
+    .forEach(([accountNum,accountLib]) => data.stocks[accountNum] = { 
+      accountNum: accountNum,
+      accountLib: accountLib,
+      entries: [],
+      depreciationEntries: []
+    });
   data.stockVariations = [];              // stock flows 603 <-> 31-32-37 & 71 <-> 33-34-35
 
   // Expenses ------------------------------------------------------------------------------------------- //
@@ -489,13 +496,23 @@ export async function FECDataReader(FECData)
   data.amortisationExpenses = [];         // 6811 and 6871
   
   // Immobilisations ------------------------------------------------------------------------------------ //
-  data.immobilisations = [];              // #20 to #27
+  data.immobilisations = {};              // #20 to #27 / #28 / #29
+  Object.entries(FECData.meta.accounts)
+    .filter(([accountNum,_]) => /^2[0-7]/.test(accountNum))
+    .forEach(([accountNum,accountData]) => data.immobilisations[accountNum] = { 
+      accountNum: accountNum,
+      accountLib: accountData.accountLib,
+      entries: [],
+      amortisationEntries: [],
+      depreciationEntries: []
+    });
+  console.log(data.immobilisations);
   data.investments = [];                  // flow #2 <- #404
   data.immobilisationProductions = [];    // flow #2 <- #72
   
   // Amortissements et Dépréciations -------------------------------------------------------------------- //
-  data.amortisations = [];                // #28
-  data.depreciations = [];                // #29 and #39 (unused)
+  //data.amortisations = [];                // #28
+  //data.depreciations = [];                // #29 and #39 (unused)
 
   // others key figures --------------------------------------------------------------------------------- //
   data.financialIncomes = 0;              // #76, #786, #796
@@ -609,69 +626,40 @@ async function readANouveauxEntry(data,journal,ligneCourante)
 
   if (/^2[0-7]/.test(ligneCourante.CompteNum))
   {
-    // immobilisation data
-    let immobilisationData = 
-    {
-      accountNum: ligneCourante.CompteNum,
-      accountLib: ligneCourante.CompteLib,
-      isAmortisable: /^2(0|1)/.test(ligneCourante.CompteNum),
-      prevAmount: parseAmount(ligneCourante.Debit),
-      amount: parseAmount(ligneCourante.Debit),
-      entries: [{
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Debit),
-        date: ligneCourante.EcritureDate,
-        isANouveaux: true
-      }]
-    }
-    // push data
-    data.immobilisations.push(immobilisationData);
+    // Retrieve immobilisation item
+    let immobilisation = data.immobilisations[ligneCourante.CompteNum];
+    if (immobilisation==undefined) throw "Erreur de lecture pour le compte d'immobilisation "+ligneCourante.CompteNum+".";
+
+    // update data
+    immobilisation.initialAmount = parseAmount(ligneCourante.Debit);
   }
 
   // Comptes d'amortissements ------------------------------------------------------------------------- //
 
   if (/^28/.test(ligneCourante.CompteNum))
   {
-    // amortisation data
-    let amortisationData = 
-    {
-      accountNum: ligneCourante.CompteNum,
-      accountLib: ligneCourante.CompteLib,
-      accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
-      prevAmount: parseAmount(ligneCourante.Credit),
-      amount: parseAmount(ligneCourante.Credit),
-      entries: [{
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Credit),
-        date: ligneCourante.EcritureDate,
-        isANouveaux: true
-      }]
-    }
-    // push data
-    data.amortisations.push(amortisationData);
+    // Retrieve immobilisation item
+    let accountData = data.accounts[ligneCourante.CompteNum];
+    if (accountData==undefined) throw "Erreur de correspondance pour le compte d'amortissement "+ligneCourante.CompteNum+".";
+    let immobilisation = data.immobilisations[accountData.assetAccountNum];
+    if (immobilisation==undefined) throw "Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".";
+
+    // update date
+    immobilisation.initialAmortisationAmount = parseAmount(ligneCourante.Credit);
   }
 
   // Comptes de dépréciations ------------------------------------------------------------------------- //
 
   if (/^29/.test(ligneCourante.CompteNum))
   {
-    // depreication data
-    let depreciationData = 
-    {
-      accountNum: ligneCourante.CompteNum,
-      accountLib: ligneCourante.CompteLib,
-      accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
-      prevAmount: parseAmount(ligneCourante.Credit),
-      amount: parseAmount(ligneCourante.Credit),
-      entries: [{
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Credit),
-        date: ligneCourante.EcritureDate,
-        isANouveaux: true
-      }]
-    }
-    // push data
-    data.depreciations.push(depreciationData);
+    // Retrieve immobilisation item
+    let accountData = data.accounts[ligneCourante.CompteNum];
+    if (accountData==undefined) throw "Erreur de correspondance pour le compte de dépréciation "+ligneCourante.CompteNum+".";
+    let immobilisation = data.immobilisations[accountData.assetAccountNum];
+    if (immobilisation==undefined) throw "Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".";
+
+    // update date
+    immobilisation.initialDepreciationAmount = parseAmount(ligneCourante.Credit);
   }
 
   /* --- STOCKS --- */
@@ -694,47 +682,26 @@ async function readANouveauxEntry(data,journal,ligneCourante)
 
   if (/^3([1-5]|7)/.test(ligneCourante.CompteNum))
   {
-    // stock data
-    let stockData = 
-    {
-      accountNum: ligneCourante.CompteNum,
-      accountLib: ligneCourante.CompteLib,
-      accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1).replace(/(0*)$/g,""), // external expenses accounts linked to stock account
-      isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
-      amount: parseAmount(ligneCourante.Debit),
-      prevAmount: parseAmount(ligneCourante.Debit),
-      entries: [{
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Debit),
-        date: ligneCourante.EcritureDate,
-        isANouveaux: true
-      }]
-    }
-    // push data
-    data.stocks.push(stockData);
+    // Retrieve stock item
+    let stock = data.stocks[ligneCourante.CompteNum];
+    if (stock==undefined) throw "Erreur de lecture pour le compte de stock "+ligneCourante.CompteNum+".";
+
+    // update data
+    stock.initialAmount = parseAmount(ligneCourante.Debit);
   }
 
   // Comptes de dépréciations ------------------------------------------------------------------------- //
 
   if (/^39/.test(ligneCourante.CompteNum))
   {
-    // depreciation data
-    let depreciationData = 
-    {
-      accountNum: ligneCourante.CompteNum,
-      accountLib: ligneCourante.CompteLib,
-      accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
-      prevAmount: parseAmount(ligneCourante.Credit),
-      amount: parseAmount(ligneCourante.Credit),
-      entries: [{
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Credit),
-        date: ligneCourante.EcritureDate,
-        isANouveaux: true
-      }]
-    }
-    // push data
-    data.depreciations.push(depreciationData);
+    // Retrieve stock item
+    let accountData = data.accounts[ligneCourante.CompteNum];
+    if (accountData==undefined) throw "Erreur de correspondance pour le compte de dépréciation "+ligneCourante.CompteNum+".";
+    let stock = data.stocks[accountData.assetAccountNum];
+    if (stock==undefined) throw "Erreur de lecture pour le compte de stock "+accountData.assetAccountNum+".";
+
+    // update date
+    stock.initialDepreciationAmount = parseAmount(ligneCourante.Credit);
   }
 }
 
@@ -767,39 +734,16 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
     // Immobilisation --------------------------------------------------- //
     
     // Retrieve immobilisation item
-    let immobilisation = data.immobilisations.filter(immobilisation => immobilisation.account == ligneCourante.CompteNum)[0];
+    let immobilisation = data.immobilisations[ligneCourante.CompteNum];
+    if (immobilisation==undefined) throw "Erreur de lecture pour le compte d'immobilisation "+ligneCourante.CompteNum+".";
 
-    // si compte existant -> variation de la valeur de l'immobilisation
-    if (immobilisation!=undefined) 
-    {
-      immobilisation.amount = immobilisation.amount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-      immobilisation.entries.push({
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-        date: ligneCourante.EcritureDate
-      })
-    }
-    
-    // si compte inexistant -> ajout compte
-    else 
-    {
-      // immobilisation data
-      let immobilisationData = 
-      {
-        accountNum: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        isAmortisable: /^2(0|1)/.test(ligneCourante.CompteNum),
-        prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-        entries: [{
-          entryNum: ligneCourante.EcritureNum,
-          amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-          date: ligneCourante.EcritureDate
-        }]
-      }
-      // push data
-      data.immobilisations.push(immobilisationData);
-    }
+    // update data
+    immobilisation.lastAmount = immobilisation.lastAmount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+    immobilisation.entries.push({
+      entryNum: ligneCourante.EcritureNum,
+      amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+      date: ligneCourante.EcritureDate
+    })
 
     // Acquisition ------------------------------------------------------ //
     
@@ -815,15 +759,15 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: ligneFournisseur.CompAuxNum || "_"+ligneCourante.CompteNum,
-        accountAuxLib : ligneFournisseur.CompAuxLib || "ACQUISTIONS "+ligneCourante.CompteLib,
-        isDefaultAccountAux: ligneFournisseur.CompAuxNum ? false : true,
+        providerNum: ligneFournisseur.CompAuxNum || "_"+ligneCourante.CompteNum,
+        providerLib: ligneFournisseur.CompAuxLib || "ACQUISTIONS "+ligneCourante.CompteLib,
+        isDefaultProvider: ligneFournisseur.CompAuxNum ? false : true,
         amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate
       }
       // push data
       data.investments.push(investmentData);
-      if (!ligneFournisseur.CompAuxNum) data.defaultAccountsAux.push(investmentData.accountAux);
+      if (!ligneFournisseur.CompAuxNum) data.defaultProviders.push(investmentData.providerNum);
     }
 
     // Immobilisation en cours (avances / acomptes) --------------------- //
@@ -841,8 +785,8 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: ligneImmobilisationEnCours.CompteNum,
-        accountAuxLib : ligneImmobilisationEnCours.CompteLib,
+        accountAux: ligneImmobilisationEnCours.CompteNum, // param name
+        accountAuxLib : ligneImmobilisationEnCours.CompteLib, // param name
         amount: parseAmount(ligneImmobilisationEnCours.Credit) - parseAmount(ligneImmobilisationEnCours.Debit),
         date: ligneCourante.EcritureDate
       }
@@ -864,8 +808,8 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
         label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        accountAux: ligneProduction.CompteNum,
-        accountAuxLib : ligneProduction.CompteLib,
+        productionAccountNum: ligneProduction.CompteNum,
+        productionAccountLib: ligneProduction.CompteLib,
         amount: parseAmount(ligneProduction.Credit) - parseAmount(ligneCourante.Debit),
         date: ligneCourante.EcritureDate
       }
@@ -902,80 +846,38 @@ const readImmobilisationEntry = async (data,journal,ligneCourante) =>
 
   if (/^28/.test(ligneCourante.CompteNum))
   {
-    // Retrieve amortisation item
-    let amortisation = data.amortisations.filter(amortisation => amortisation.account == ligneCourante.CompteNum)[0];
+    // Retrieve immobilisation item
+    let accountData = data.accounts[ligneCourante.CompteNum];
+    if (accountData==undefined) throw "Erreur de correspondance pour le compte d'amortissement "+ligneCourante.CompteNum+".";
+    let immobilisation = data.immobilisations[accountData.assetAccountNum];
+    if (immobilisation==undefined) throw "Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".";
     
-    // si compte existant -> enregistrement de la variation
-    if (amortisation!=undefined) 
-    {
-      amortisation.amount = amortisation.amount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-      amortisation.entries.push({
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-        date: ligneCourante.EcritureDate
-      })
-    }
-
-    // si compte inexistant -> ajout compte
-    else
-    {
-      // amortisation data
-      let amortisationData = 
-      {
-        accountNum: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
-        prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-        entries: [{
-          entryNum: ligneCourante.EcritureNum,
-          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-          date: ligneCourante.EcritureDate
-        }]
-      }
-      // push data
-      data.amortisations.push(amortisationData);
-    }
+    // update data
+    immobilisation.lastAmortisationAmount = immobilisation.lastAmortisationAmount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    immobilisation.amortisationEntries.push({
+      entryNum: ligneCourante.EcritureNum,
+      amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+      date: ligneCourante.EcritureDate
+    })
   }
 
   // Dépréciation ------------------------------------------------------------------------------------- //
 
   if (/^29/.test(ligneCourante.CompteNum))
   {
-    // Retrieve depreciation item
-    let depreciation = data.depreciations.filter(depreciation => depreciation.account == ligneCourante.CompteNum)[0];
+    // Retrieve immobilisation item
+    let accountData = data.accounts[ligneCourante.CompteNum];
+    if (accountData==undefined) throw "Erreur de correspondance pour le compte de dépréciation "+ligneCourante.CompteNum+".";
+    let immobilisation = data.immobilisations[accountData.assetAccountNum];
+    if (immobilisation==undefined) throw "Erreur de lecture pour le compte d'immobilisation "+accountData.assetAccountNum+".";
     
-    // si compte existant -> enregistrement de la variation
-    if (depreciation!=undefined) 
-    {
-      depreciation.amount = depreciation.amount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-      depreciation.entries.push({
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-        date: ligneCourante.EcritureDate
-      })
-    }
-
-    // si compte inexistant -> ajout compte
-    else
-    {
-      // depreciation data
-      let depreciationData = 
-      {
-        accountNum: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
-        prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-        entries: [{
-          entryNum: ligneCourante.EcritureNum,
-          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-          date: ligneCourante.EcritureDate
-        }]
-      }
-      // push data
-      data.depreciations.push(depreciationData);
-    }
+    // update data
+    immobilisation.lastDepreciationAmount = immobilisation.lastDepreciationAmount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    immobilisation.depreciationEntries.push({
+      entryNum: ligneCourante.EcritureNum,
+      amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+      date: ligneCourante.EcritureDate
+    })
   }
 }
 
@@ -1002,82 +904,36 @@ const readStockEntry = async (data,journal,ligneCourante) =>
   if (/^3([1-5]|7)/.test(ligneCourante.CompteNum))
   {    
     // Retrieve stock item
-    let stock = data.stocks.filter(stock => stock.account == ligneCourante.CompteNum)[0];
+    let stock = data.stocks[ligneCourante.CompteNum];
+    if (stock==undefined) throw "Erreur de lecture pour le compte de stock "+ligneCourante.CompteNum+".";
 
-    // si compte existant -> enregistrement de la variation
-    if (stock!=undefined) 
-    {
-      stock.amount = stock.amount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
-      stock.entries.push({
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-        date: ligneCourante.EcritureDate
-      })
-    }
-
-    // si compte inexistant -> ajout compte
-    else
-    {
-      // stock data
-      let stockData = 
-      {
-        accountNum: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        accountAux: /^3[3-5]/.test(ligneCourante.CompteNum) ? null : "60"+ligneCourante.CompteNum.slice(1,-1).replace(/(0*)$/g,""),
-        isProductionStock: /^3[3-5]/.test(ligneCourante.CompteNum),
-        prevAmount: 0,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-        entries: [{
-          entryNum: ligneCourante.EcritureNum,
-          amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-          date: ligneCourante.EcritureDate
-        }]
-      }
-      // push data
-      data.stocks.push(stockData);
-    }
+    // update data
+    stock.lastAmount = stock.lastAmount + parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit);
+    stock.entries.push({
+      entryNum: ligneCourante.EcritureNum,
+      amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+      date: ligneCourante.EcritureDate
+    })
   }
 
   // Dépréciation ------------------------------------------------------------------------------------- //
 
   if (/^39/.test(ligneCourante.CompteNum))
   {
-    // Retrieve depreciation item
-    let depreciation = data.depreciations.filter(depreciation => depreciation.account == ligneCourante.CompteNum)[0];
+    // Retrieve stock item
+    let accountData = data.accounts[ligneCourante.CompteNum];
+    if (accountData==undefined) throw "Erreur de correspondance pour le compte de dépréciation "+ligneCourante.CompteNum+".";
+    let stock = data.stocks[accountData.assetAccountNum];
+    if (stock==undefined) throw "Erreur de lecture pour le compte de stock "+accountData.assetAccountNum+".";
     
-    // si compte existant -> enregistrement de la variation
-    if (depreciation!=undefined) 
-    {
-      depreciation.amount = depreciation.amount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
-      depreciation.entries.push({
-        entryNum: ligneCourante.EcritureNum,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-        date: ligneCourante.EcritureDate
-      })
-    }
-
-    // si compte inexistant -> ajout compte
-    else
-    {
-      // depreciation data
-      let depreciationData = 
-      {
-        accountNum: ligneCourante.CompteNum,
-        accountLib: ligneCourante.CompteLib,
-        accountAux: data.mappingAccounts[ligneCourante.CompteNum].accountAux,
-        prevAmount: 0.0,
-        amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-        entries: [{
-          entryNum: ligneCourante.EcritureNum,
-          amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-          date: ligneCourante.EcritureDate
-        }]
-      }
-      // push data
-      data.depreciations.push(depreciationData);
-    }
+    // update data
+    stock.lastDepreciationAmount = stock.lastDepreciationAmount + parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit);
+    stock.depreciationEntries.push({
+      entryNum: ligneCourante.EcritureNum,
+      amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
+      date: ligneCourante.EcritureDate
+    })
   }
-
 }
 
 /* ---------- COMPTES DE CHARGES ---------- */
@@ -1115,9 +971,9 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       label: ligneCourante.EcritureLib.replace(/^\"/,"").replace(/\"$/,""),
       accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
-      accountAux: ligneFournisseur.CompAuxNum || "_"+ligneCourante.CompteNum,
-      accountAuxLib: ligneFournisseur.CompAuxLib || "DEPENSES "+ligneCourante.CompteLib,
-      isDefaultAccountAux: ligneFournisseur.CompAuxNum ? false : true,
+      providerAccountNum: ligneFournisseur.CompAuxNum || "_"+ligneCourante.CompteNum,
+      providerAccountLib: ligneFournisseur.CompAuxLib || "DEPENSES "+ligneCourante.CompteLib,
+      isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
       amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
       date: ligneCourante.EcritureDate
     }
@@ -1214,7 +1070,6 @@ const readProductionEntry = async (data,journal,ligneCourante) =>
       accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
       amount: parseAmount(ligneCourante.Credit) - parseAmount(ligneCourante.Debit),
-      entryNum: ligneCourante.EcritureNum,
       date: ligneCourante.EcritureDate
     })
   }

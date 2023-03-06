@@ -55,14 +55,14 @@ export class FinancialData {
                 
         // Stocks ---------------------------------- //
         
-        this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                                        // stocks (#31 to #35, #37)
+        this.stocks = data.stocks ? Object.values(data.stocks).map((props,index) => new Stock({id: index, ...props})) : [];                                                                        // stocks (#31 to #35, #37)
         
         // Immobilisations ------------------------- //
 
         this.investments = data.investments ? data.investments.map((props,index) => new Expense({id: index, ...props})) : [];                                                       // investments (flows #2 <- #404)
         this.immobilisationProductions = data.immobilisationProductions ? data.immobilisationProductions.map((props,index) => new Expense({id: index, ...props})) : [];             // productions of immobilisations (flows #2 <- #72)
         
-        this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                                    // immobilisations (#20 to #27)
+        this.immobilisations = data.immobilisations ? Object.values(data.immobilisations).map((props,index) => new Immobilisation({id: index, ...props})) : [];                                    // immobilisations (#20 to #27)
         this.amortisations = data.amortisations ? data.amortisations.map((props,index) => new Account({id: index, ...props})) : [];                                                 // amortisations (#28)
         this.adjustedAmortisations = data.adjustedAmortisations ? data.adjustedAmortisations.map((props,index) => new Account({id: index, ...props})) : [];                         // amortisations (#28)
 

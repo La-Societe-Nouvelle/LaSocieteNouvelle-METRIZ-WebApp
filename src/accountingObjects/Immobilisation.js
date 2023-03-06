@@ -7,39 +7,68 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { getAmountItems, getCurrentDateString } from "../utils/Utils";
 import api from "../api";
 
-export class Immobilisation {
+export class Immobilisation 
+{
   constructor({
     id,
-    accountNum,
-    accountLib,
-    isAmortisable,
-    amount,
-    footprint,
+    // Immobilisation
+    accountNum, accountLib, isAmortisable, entries, phases,
+    // Amortisation
+    amortisationAccountNum, amortisationAccountLib, amortisationEntries, amortisationPhases,
+    // Initial state
+    initialState, initialAmount, initialAmortisationAmount, initialFootprint, initialFootprintParams,
+    // Last state
+    lastAmount, lastAmortisationAmount, lastFootprint, lastAmortisationFootprint,
     prevAmount,
     prevFootprint,
     prevFootprintAreaCode,
     prevFootprintActivityCode,
-    initialState,
     status,
     dataFetched,
     lastUpdateFromRemote,
-    entries
+    periods
   }) {
     // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
 
+    // Immobilisation
+
     this.accountNum = accountNum;
     this.accountLib = accountLib;
-
+    
     this.isAmortisable = isAmortisable || false;
 
-    // Footprint
-    this.amount = amount || 0;
-    this.footprint = new SocialFootprint(footprint);
+    this.entries = entries || [];
 
-    // Previous footprint
-    this.prevAmount = prevAmount || 0;
+    this.phases = phases || [];
+
+    // amortisation
+
+    this.amortisationAccountNum = amortisationAccountNum;
+    this.amortisationAccountLib = amortisationAccountLib;
+
+    this.amortisationEntries = amortisationEntries || [];
+    this.amortisationPhases = amortisationPhases || [];
+
+    // Initial state
     this.initialState = initialState || "none";
+    this.initialAmount = initialAmount || 0;
+    this.initialFootprint = new SocialFootprint(initialFootprint);
+    this.initialAmortisationAmount = initialAmortisationAmount || 0;
+    this.initialFootprintParams = initialFootprintParams || {};
+
+    // Last state
+    this.lastAmount = lastAmount;
+    this.lastAmortisationAmount = lastAmortisationAmount;
+    this.lastFootprint = new SocialFootprint(lastFootprint);
+    this.lastAmortisationFootprint = new SocialFootprint(lastAmortisationFootprint);
+
+    // Periods
+    this.phases = phases ? phases.map(phase => new ImmobilisationPhase(phase)) : [];
+
+    // Old
+
+    this.prevAmount = prevAmount || 0;
     this.prevFootprint = new SocialFootprint(prevFootprint);
     this.prevFootprintAreaCode = prevFootprintAreaCode || "FRA";
     this.prevFootprintActivityCode = prevFootprintActivityCode || "TOTAL";
@@ -50,7 +79,6 @@ export class Immobilisation {
     this.lastUpdateFromRemote = lastUpdateFromRemote || null;
 
     // entries
-    this.entries = entries || [];
     // ---------------------------------------------------------------------------------------------------- //
   }
 
@@ -127,3 +155,15 @@ export class Immobilisation {
     }
   }
 }
+
+export class ImmobilisationPhase
+{
+  constructor(props) {
+    this.dateStart = props.dateStart;
+    this.dateEnd = props.dateEnd;
+    this.amount = props.amount;
+    this.footprint = new SocialFootprint(props.footprint);
+    this.amortisationAmount = props.amortisationAmount;
+    this.amoritisationFootprint = new SocialFootprint(props.amoritisationFootprint);
+  }
+} 
