@@ -350,7 +350,6 @@ export function mergeAggregates(obj1, obj2) {
   const mergedObj = {};
 
   for (let [id, obj] of Object.entries(obj1)) {
-    // Si l'ID existe déjà dans mergedObj, fusionner les périodes de données
     if (mergedObj[id]) {
       Object.assign(mergedObj[id].periodsData, obj.periodsData);
     }
@@ -360,7 +359,6 @@ export function mergeAggregates(obj1, obj2) {
   }
 
   for (let [id, obj] of Object.entries(obj2)) {
-    // Si l'ID existe déjà dans mergedObj, fusionner les périodes de données
     if (mergedObj[id]) {
       Object.assign(mergedObj[id].periodsData, obj.periodsData);
     }

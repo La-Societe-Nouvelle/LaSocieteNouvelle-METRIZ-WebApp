@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from "react-select";
 
 // Utils
@@ -178,11 +178,16 @@ const Row = (props) =>
 
 function RowTableImmobilisations(props) 
 {
+  
   const immobilisation = props.account;
   const {accountNum,accountLib,initialStateSet,initialFootprintParams,isAmortisable} = immobilisation;
 
   const [initialStateType, setInitialStateType] = useState(immobilisation.initialStateType);
   const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "TOTAL");
+
+  useEffect(() => {
+    setInitialStateType(immobilisation.initialStateType);
+  }, [props]);
 
   const onActivityCodeChange = (event) => {
     immobilisation.initialFootprintParams.code = event.value;
@@ -224,7 +229,7 @@ function RowTableImmobilisations(props)
         </td>
         <td colSpan={initialStateType == "defaultData" ? 1 : 2}>
           <Select
-              defaultValue={initialStateTypeOptions[initialStateType]}
+              value={initialStateTypeOptions[initialStateType]}
               placeholder={"Choisissez..."}
               className={
                 initialStateType == "prevFootprint" ||
@@ -288,6 +293,11 @@ function RowTableStocks(props)
   const [initialStateType, setInitialStateType] = useState(stock.initialStateType);
   const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "00");
 
+  useEffect(() => {
+    setInitialStateType(stock.initialStateType);
+  }, [props]);
+
+
   const onActivityCodeChange = (event) => {
     stock.initialFootprintParams.code = event.value;
     stock.initialStateSet = false;
@@ -325,7 +335,7 @@ function RowTableStocks(props)
       {!isProductionStock &&
         <td colSpan={initialStateType=="defaultData" ? 1 : 2}>
           <Select
-            defaultValue={initialStateTypeOptions[initialStateType]}
+            value={initialStateTypeOptions[initialStateType]}
             placeholder={"Choisissez..."}
             className={
               initialStateType == "prevFootprint" ||
