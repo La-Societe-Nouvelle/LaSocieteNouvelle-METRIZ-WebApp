@@ -136,7 +136,6 @@ export class SirenSection extends React.Component
       );
     }
 
-    console.log(providers);
     return (
       <Container fluid id="siren-section">
         <section className="step">

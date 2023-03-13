@@ -64,6 +64,9 @@ export class Stock {
     this.lastUpdateFromRemote = lastUpdateFromRemote || null; 
 
   // ---------------------------------------------------------------------------------------------------- //
+
+    this.defaultStockVariationAccountNum = this.isProductionStock ? "60"+this.accountNum : undefined;
+    this.defaultStockVariationAccountLib = this.isProductionStock ?  "Variation stock "+this.accountLib : undefined;
   }
 
   /* ------------------------- Update props ------------------------- */

@@ -70,6 +70,9 @@ export class Immobilisation
     this.lastUpdateFromRemote = lastUpdateFromRemote || null;
 
     // ---------------------------------------------------------------------------------------------------- //
+
+    this.defaultAmortisationExpenseAccountNum = this.isAmortisable ? "6811" + (parseInt(this.amortisationAccountNum.charAt(2)) + 1) + this.amortisationAccountNum.slice(3) : undefined;
+    this.defaultAmortisationExpenseAccountLib = this.isAmortisable ?  "Dotations - " + this.amortisationAccountLib : undefined;
   }
 
   /* ------------------------- Update props ------------------------- */
@@ -280,17 +283,14 @@ export class Immobilisation
     {
       let adjustedAmortisationExpenses = [];
   
-      let defaultAmortisationExpenseAccountNum = "6811" + (parseInt(this.amortisationAccountNum.charAt(2)) + 1) + this.amortisationAccountNum.slice(3);
-      let defaultAmortisationExpenseAccountLib = "Dotations - " + this.amortisationAccountLib;
-
       Object.values(this.states)
         .filter(state => state.amortisationExpenseAmount > 0)
         .forEach((state,index) => 
       {
         let adjustedAmortisationExpense = new AmortisationExpense({
-          id: defaultAmortisationExpenseAccountNum+"_"+(index+1),
-          accountNum: defaultAmortisationExpenseAccountNum,
-          accountLib: defaultAmortisationExpenseAccountLib,
+          id: this.defaultAmortisationExpenseAccountNum+"_"+(index+1),
+          accountNum: this.defaultAmortisationExpenseAccountNum,
+          accountLib: this.defaultAmortisationExpenseAccountLib,
           amortisationAccountNum: this.amortisationAccountNum,
           amortisationAccountLib: this.amortisationAccountLib,
           amount: state.amortisationExpenseAmount,

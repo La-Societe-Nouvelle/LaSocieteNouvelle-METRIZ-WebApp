@@ -151,7 +151,7 @@ const IndicatorsList = (props) =>
       SetValidations(validations.filter((item) => item != indic));
 
       // update footprint
-      await props.session.updateIndicator(indic,period.periodKey);
+      await props.session.updateIndicator(indic,period);
     }
   };
 
@@ -185,7 +185,7 @@ const IndicatorsList = (props) =>
       props.session.validations.push(indic);
     }
     // update footprint
-    await props.session.updateIndicator(indic,period.periodKey);
+    await props.session.updateIndicator(indic,period);
     setUpdatedIndic(indic);
     setDisplayGraph(true);
   };
@@ -360,7 +360,7 @@ const IndicatorsList = (props) =>
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
                     ].value,
-                    props.session.financialData.mainAggregates.netValueAdded.period[period.periodKey].footprint.getIndicator(
+                    props.session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.netValueAdded.divisionFootprint.indicators[

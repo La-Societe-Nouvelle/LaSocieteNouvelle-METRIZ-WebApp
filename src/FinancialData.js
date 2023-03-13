@@ -234,17 +234,17 @@ export class FinancialData {
         this.stockVariationAccounts = this.stocks
             .filter(stock => !stock.isProductionStock)
             .map(stock => new Account({
-                accountNum: "60"+stock.accountNum, 
-                accountLib: "Variation stock "+stock.accountLib
+                accountNum: stock.defaultStockVariationAccountNum, 
+                accountLib: stock.defaultStockVariationAccountLib,
             }));
         this.stockVariationAccounts.forEach(account => account.buildPeriods(this.stockVariations.filter(variation => variation.stockAccountNum==account.accountNum),periods));
 
         // amortisation expenses
-        console.log(this.adjustedAmortisationExpenses);
-        this.amortisationExpensesAccounts = this.adjustedAmortisationExpenses
-            .map(expense => new Account({
-                accountNum: expense.accountNum, 
-                accountLib: expense.accountLib, 
+        this.amortisationExpensesAccounts = this.immobilisations
+            .filter(immobilisation => immobilisation.isAmortisable)
+            .map(immobilisation => new Account({
+                accountNum: immobilisation.defaultAmortisationExpenseAccountNum, 
+                accountLib: immobilisation.defaultAmortisationExpenseAccountLib, 
             }));
         this.amortisationExpensesAccounts.forEach(account => account.buildPeriods(this.adjustedAmortisationExpenses.filter(expense => expense.accountNum==account.accountNum),periods));
     }

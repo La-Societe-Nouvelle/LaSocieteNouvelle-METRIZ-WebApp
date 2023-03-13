@@ -16,12 +16,12 @@ import { Indicator } from "/src/footprintObjects/Indicator";
 // Formulas
 import { buildIndicatorAggregate } from "./formulas/footprintFormulas";
 import {
-  updateAggregatesFootprints,
+  updateMainAggregatesFootprints,
   updateProductionItemsFootprints,
-  updateAccountsFootprints,
-  updateFinalStatesFootprints,
   updateExternalExpensesFpt,
   updateInvestmentsFpt,
+  updateIntermediateConsumptionsFootprints,
+  updateFixedCapitalConsumptionsFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
 import { ComparativeData } from "./ComparativeData";
@@ -119,30 +119,30 @@ export class Session
   }
 
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
-  updateFootprints = async () => 
+  updateFootprints = async (period) => 
   {
-    await Promise.all(Object.keys(metaIndics).map((indic) => this.updateIndicator(indic)));
+    await Promise.all(Object.keys(metaIndics).map((indic) => this.updateIndicator(indic,period)));
     return;
   }
 
  
   // Update indicator
-  async updateIndicator(indic,periodKey) 
+  async updateIndicator(indic,period) 
   {
     // Net Value Added
-    this.updateNetValueAddedFootprint(indic,periodKey);
+    this.updateNetValueAddedFootprint(indic,period.periodKey);
 
-    // Accounts
-    await updateAccountsFootprints(indic, this.financialData);
+    // Intermediate Consumptions
+    await updateIntermediateConsumptionsFootprints(this.financialData, period);
 
-    // Aggregates
-    await updateAggregatesFootprints(indic, this.financialData);
+    // Intermediate Consumptions
+    await updateFixedCapitalConsumptionsFootprints(this.financialData, period);
+
+    // Main Aggregates
+    await updateMainAggregatesFootprints(indic, this.financialData, period);
 
     // Production items
-    await updateProductionItemsFootprints(indic, this.financialData);
-
-    // Immobilisations & Stocks
-    //await updateFinalStatesFootprints(indic, this.financialData);
+    await updateProductionItemsFootprints(indic, this.financialData, period);
 
     return;
   }
