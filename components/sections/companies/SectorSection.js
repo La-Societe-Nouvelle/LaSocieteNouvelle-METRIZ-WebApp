@@ -45,7 +45,7 @@ export class SectorSection extends React.Component
     let minFpt = await fetchMinFootprint();
     let maxFpt = await fetchMaxFootprint();
     let significativeCompanies = await getSignificativeCompanies(
-      this.props.session.financialData.companies,
+      this.props.session.financialData.providers,
       this.props.session.financialData.expenses,
       this.props.session.financialData.investments,
       minFpt,maxFpt
@@ -105,6 +105,7 @@ export class SectorSection extends React.Component
     if (companiesShowed.length == 0 && view!="") this.handleChange("");
 
     const financialData = this.props.financialData;
+    const financialPeriod = this.props.financialPeriod;
 
     const isNextStepAvailable = !(unidentifiedCompanies.filter((provider) => provider.status != 200).length > 0);
     const lengthSignificativeCompaniesWithoutActivity = unidentifiedCompanies.filter((provider) => provider.footprintActivityCode == "00" && significativeCompanies.includes(provider.accountNum)).length;
@@ -180,9 +181,10 @@ export class SectorSection extends React.Component
                 <UnidentifiedCompaniesTable
                   nbItems={nbItems == "all" ? unidentifiedCompanies.length : parseInt(nbItems)}
                   onUpdate={this.updateFootprints.bind(this)}
-                  companies={companiesShowed}
-                  significativeCompanies={significativeCompanies}
+                  providers={companiesShowed}
+                  significativeProviders={significativeCompanies}
                   financialData={financialData}
+                  financialPeriod={financialPeriod}
                 />
 
               </div>
@@ -223,18 +225,18 @@ export class SectorSection extends React.Component
 
   updateFootprints = async () => 
   {
-    this.props.session.updateFootprints();
+    //this.props.session.updateFootprints();
 
     // check if companies is a significative companies
     let {minFpt,maxFpt} = this.state;
-    let significativeCompanies = await getSignificativeCompanies(
+    let significativeProviders = await getSignificativeProviders(
       this.props.session.financialData.companies,
       this.props.session.financialData.expenses,
       this.props.session.financialData.investments,
       minFpt,maxFpt
     );
 
-    this.setState({ companies: this.props.companies, significativeCompanies: significativeCompanies });
+    this.setState({ providers: this.props.providers, significativeProviders: significativeProviders });
   };
 
   /* ---------- FETCHING DATA ---------- */
@@ -259,7 +261,7 @@ export class SectorSection extends React.Component
 
     // check if companies is a significative companies
     let {minFpt,maxFpt} = this.state;
-    let significativeCompanies = await getSignificativeCompanies(
+    let significativeCompanies = await getSignificativeProviders(
       this.props.session.financialData.companies,
       this.props.session.financialData.expenses,
       this.props.session.financialData.investments,

@@ -6,7 +6,9 @@ import ResultSection from "./ResultSection";
 import IndicatorsList from "./parts/IndicatorsList";
 import ExportResults from "./parts/ExportResults";
 
-const StatementSection = (props) => {
+const StatementSection = (props) => 
+{
+  const [period, setPeriod] = useState(props.session.financialPeriod)
   const [view, setView] = useState("statement");
   const [indic, setIndic] = useState();
   const [isPublicationAvailable, setPublicationAvailable] = useState(false);
@@ -40,6 +42,7 @@ const StatementSection = (props) => {
               session={props.session}
               viewResult={handleView}
               publish={() => setPublicationAvailable(true)}
+              period={period}
             />
           </section>
           <section className="step">

@@ -150,14 +150,14 @@ export class Session
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
   updateNetValueAddedFootprint = (indic,periodKey) => {
-    this.financialData.mainAggregates.netValueAdded.footprint.indicators[indic] =
+    this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].footprint.indicators[indic] =
       this.validations.indexOf(indic) >= 0
         ? this.getNetValueAddedIndicator(indic,periodKey)
         : new Indicator({ indic });
   };
 
   getNetValueAddedIndicator = (indic,periodKey) => {
-    const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[periodKey];
+    const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].amount;
     const impactsData = this.impactsData;
 
     impactsData.setNetValueAdded(netValueAdded);

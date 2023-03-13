@@ -67,7 +67,8 @@ export class Provider
   }
 
   // init footrpint id
-  getDefaultFootprintId() {
+  getDefaultFootprintId() 
+  {
     if (!this.corporateId) {
       return null;
     }
@@ -129,11 +130,14 @@ export class Provider
 
   /* ---------- Remote ---------- */
 
-  async updateFromRemote() {
+  async updateFromRemote() 
+  {
+    let footprintId = this.getDefaultFootprintId();
     // Case - Fetch footprint with id --------------------------------------------------------------------- //
-    if (this.state == "siren" && /[0-9]{9}/.test(this.footprintId)) {
+    if (this.state == "siren" && footprintId && /[0-9]{9}/.test(footprintId)) 
+    {
       // request
-      await api.get("legalunitfootprint/" + this.footprintId).then((res) => {
+      await api.get("legalunitfootprint/" + footprintId).then((res) => {
         let status = res.data.header.code;
 
         if (status == 200) {

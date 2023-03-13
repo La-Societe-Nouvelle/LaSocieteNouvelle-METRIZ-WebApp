@@ -44,7 +44,10 @@ import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
-const IndicatorsList = (props) => {
+const IndicatorsList = (props) => 
+{
+  const period = props.period;
+
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
@@ -128,15 +131,16 @@ const IndicatorsList = (props) => {
   };
 
   // check if net value indicator will change with new value & cancel value if necessary
-  const willNetValueAddedIndicator = async (indic) => {
+  const willNetValueAddedIndicator = async (indic) => 
+  {
     setUpdatedIndic();
 
     // get new value
-    let nextIndicator = props.session.getNetValueAddedIndicator(indic);
+    let nextIndicator = props.session.getNetValueAddedIndicator(indic,period.periodKey);
 
     if (
       nextIndicator !==
-      props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+      props.session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators[
         indic
       ]
     ) {
@@ -147,11 +151,12 @@ const IndicatorsList = (props) => {
       SetValidations(validations.filter((item) => item != indic));
 
       // update footprint
-      await props.session.updateIndicator(indic);
+      await props.session.updateIndicator(indic,period.periodKey);
     }
   };
 
-  const validateIndicator = async (indic) => {
+  const validateIndicator = async (indic) => 
+  {
     setDisplayGraph(false);
 
     if (!validations.includes(indic)) {
@@ -180,7 +185,7 @@ const IndicatorsList = (props) => {
       props.session.validations.push(indic);
     }
     // update footprint
-    await props.session.updateIndicator(indic);
+    await props.session.updateIndicator(indic,period.periodKey);
     setUpdatedIndic(indic);
     setDisplayGraph(true);
   };
@@ -279,7 +284,7 @@ const IndicatorsList = (props) => {
                   graphDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
-                    props.session.financialData.aggregates.production.footprint.getIndicator(
+                    props.session.financialData.mainAggregates.production.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.production.divisionFootprint.indicators[
@@ -306,7 +311,7 @@ const IndicatorsList = (props) => {
                   graphDataset={[
                     comparativeData.intermediateConsumption.areaFootprint
                       .indicators[indic].value,
-                    props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.intermediateConsumption.divisionFootprint
@@ -330,7 +335,7 @@ const IndicatorsList = (props) => {
                   graphDataset={[
                     comparativeData.fixedCapitalConsumption.areaFootprint
                       .indicators[indic].value,
-                    props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                    props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.fixedCapitalConsumption.divisionFootprint
@@ -355,7 +360,7 @@ const IndicatorsList = (props) => {
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
                     ].value,
-                    props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    props.session.financialData.mainAggregates.netValueAdded.period[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.netValueAdded.divisionFootprint.indicators[

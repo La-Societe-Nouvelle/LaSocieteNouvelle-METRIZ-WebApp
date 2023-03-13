@@ -136,6 +136,7 @@ export class SirenSection extends React.Component
       );
     }
 
+    console.log(providers);
     return (
       <Container fluid id="siren-section">
         <section className="step">
@@ -387,6 +388,7 @@ export class SirenSection extends React.Component
           if (provider) {
             provider.corporateName = corporateName;
             provider.corporateId = corporateId;
+            provider.state = "siren";
             provider.dataFetched = false; // check if changes or use update()
           }
         })
@@ -406,13 +408,15 @@ export class SirenSection extends React.Component
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
       await Promise.all(
-        XLSXData.map(async ({ accountNum, accountLib, denomination, siren }) => {
+        XLSXData.map(async ({ accountNum, accountLib, denomination, siren, account }) => {
+          if (account && !accountNum) accountNum = account;
           let provider = accountNum ? 
               this.props.session.financialData.providers.filter(provider => provider.providerNum == accountNum)[0]    // based on num
             : this.props.session.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
           if (provider) {
             provider.corporateId = siren;
             provider.corporateName = denomination;
+            provider.state = "siren";
             provider.dataFetched = false; // check if changes or use update()
           }
         })
@@ -495,7 +499,7 @@ export class SirenSection extends React.Component
 
     this.enableButton();
     // update session
-    this.props.session.updateFootprints();
+    //this.props.session.updateFootprints();
   };
 
   /* ----- POP-UP ----- */
