@@ -432,11 +432,12 @@ export class SirenSection extends React.Component
 
   // Export CSV File
   exportXLSXFile = async () => {
+    console.log(this.props.session.financialData.providers)
     let jsonContent = await this.props.session.financialData.providers
-      .filter((provider) => provider.accountNum.charAt(0) != "_")
+      .filter((provider) => provider.providerNum.charAt(0) != "_")
       .map((provider) => {
         return {
-          accountNum: provider.accountNum,
+          accountNum: provider.providerNum,
           denomination: provider.corporateName,
           siren: provider.corporateId,
         };

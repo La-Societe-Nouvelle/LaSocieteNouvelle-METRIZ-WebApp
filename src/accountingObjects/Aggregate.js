@@ -42,9 +42,9 @@ export const buildAggregateFromItems = ({label,items,periods}) =>
   return aggregate;
 }
 
-export const buildAggregateFromAccounts = ({label,accounts,periods}) => 
+export const buildAggregateFromAccounts = ({id,label,accounts,periods}) => 
 {
-  let aggregate = new Aggregate({label});
+  let aggregate = new Aggregate({id,label});
   periods.forEach(period => {
     aggregate.periodsData[period.periodKey] = {
       amount: getAmountItems(accounts.map(account => account.periodsData[period.periodKey]), 2),
