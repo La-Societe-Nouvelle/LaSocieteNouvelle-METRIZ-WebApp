@@ -9,32 +9,29 @@ export class Account {
 
   constructor({accountNum,
                accountLib,
-               accountAux,
-               amount,
-               footprint,
-               initialState,
-               prevAmount,
-               prevFootprint,
-               entries,
-               phases}) 
+               periodsData}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = accountNum;                                           // id
 
     this.accountNum = accountNum;                                   // account number
     this.accountLib = accountLib;                                   // account label
-    this.accountAux = accountAux;                                   // 
-
-    this.amount = amount || 0;                                      // amount at the end
-    this.footprint = new SocialFootprint(footprint);                //
     
-    this.initialState = initialState || "currentFootprint";         // 
-    this.prevAmount = prevAmount || 0;                              // amount
-    this.prevFootprint = new SocialFootprint(prevFootprint);        //
-
-    this.entries = entries || [];
-    this.phases = phases || [];
+    this.periodsData = periodsData || {};
   // ---------------------------------------------------------------------------------------------------- //
+  }
+
+  buildPeriods = (items,periods) => 
+  {
+    this.periodsData = {};
+    periods.forEach(period => 
+    {
+      this.periodsData[period.periodKey] = {
+        periodKey: period.periodKey,
+        amount: getAmountItems(items.filter(item => period.regex.test(item.date)), 2),
+        footprint: new SocialFootprint()
+      }
+    })
   }
 
 }

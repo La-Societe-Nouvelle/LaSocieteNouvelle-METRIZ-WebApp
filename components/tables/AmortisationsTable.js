@@ -8,6 +8,8 @@ import { Table } from "react-bootstrap";
 import {
   getAmountItems,
   getPrevAmountItems,
+  getPrevDate,
+  getSumItems,
   printValue,
 } from "../../src/utils/Utils";
 
@@ -23,8 +25,10 @@ export class AmortisationsTable extends React.Component {
   }
 
   render() {
-    const { immobilisations, amortisations, amortisationExpenses } =
+    const { immobilisations, amortisationExpenses } =
       this.props.financialData;
+    const period = this.props.period;
+    const prevStateDateEnd = getPrevDate(period.dateStart);
     const { columnSorted } = this.state;
 
     this.sortItems(immobilisations, columnSorted);
@@ -51,26 +55,18 @@ export class AmortisationsTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {immobilisations.map(({ accountNum, accountLib }) => {
-              let amortisation = amortisations.filter(
-                (amortisation) => amortisation.accountAux == accountNum
-              )[0];
-              if (amortisation != undefined) {
-                let expenses = amortisationExpenses.filter(
-                  (expense) => expense.accountAux == amortisation.accountNum
-                );
-                let augmentation = getAmountItems(expenses);
-                let dimininution =
-                  amortisation.prevAmount + augmentation - amortisation.amount;
+            {immobilisations.map((immobilisation) => {
+              if (immobilisation.amortisationAccountNum) {
+                let augmentation = getAmountItems(immobilisation.amortisationEntries.filter((entry) => period.regex.test(entry.date) && entry.amount > 0), 0);
+                let dimininution = getAmountItems(immobilisation.amortisationEntries.filter((entry) => period.regex.test(entry.date) && entry.amount < 0), 0);
                 return (
-                  <tr key={accountNum}>
-                    <td>{accountNum}</td>
+                  <tr key={immobilisation.accountNum}>
+                    <td>{immobilisation.accountNum}</td>
                     <td>
-                      {accountLib.charAt(0).toUpperCase() +
-                        accountLib.slice(1).toLowerCase()}
+                      {immobilisation.accountLib.charAt(0).toUpperCase() + immobilisation.accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end">
-                      {printValue(amortisation.prevAmount, 0)} &euro;
+                      {printValue(immobilisation.states[prevStateDateEnd].amortisationAmount, 0)} &euro;
                     </td>
                     <td className="text-end">
                       {printValue(augmentation, 0)} &euro;
@@ -79,17 +75,17 @@ export class AmortisationsTable extends React.Component {
                       {printValue(dimininution, 0)} &euro;
                     </td>
                     <td className="text-end">
-                      {printValue(amortisation.amount, 0)} &euro;
+                      {printValue(immobilisation.states[period.dateEnd].amortisationAmount, 0)} &euro;
                     </td>
                   </tr>
                 );
               } else {
                 return (
-                  <tr key={accountNum}>
-                    <td>{accountNum}</td>
+                  <tr key={immobilisation.accountNum}>
+                    <td>{immobilisation.accountNum}</td>
                     <td>
-                      {accountLib.charAt(0).toUpperCase() +
-                        accountLib.slice(1).toLowerCase()}
+                      {immobilisation.accountLib.charAt(0).toUpperCase() +
+                        immobilisation.accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end"></td>
                     <td className="text-end"></td>
@@ -106,22 +102,21 @@ export class AmortisationsTable extends React.Component {
               <tr>
                 <td colSpan="2">TOTAL</td>
                 <td className="text-end">
-                  {printValue(getPrevAmountItems(amortisations), 0)} &euro;
+                  {printValue(getSumItems(immobilisations.map(immobilisation => immobilisation.states[prevStateDateEnd].amortisationAmount))
+                  , 0)}{" "}&euro;
                 </td>
                 <td className="text-end">
                   {printValue(getAmountItems(amortisationExpenses), 0)} &euro;
                 </td>
                 <td className="text-end">
                   {printValue(
-                    getPrevAmountItems(amortisations) +
-                      getAmountItems(amortisationExpenses) -
-                      getAmountItems(amortisations),
-                    0
-                  )}{" "}
-                  &euro;
+                     getSumItems(immobilisations.map(immobilisation => immobilisation.states[prevStateDateEnd].amortisationAmount)) 
+                    + getAmountItems(amortisationExpenses) 
+                    - getSumItems(immobilisations.map(immobilisation => immobilisation.states[period.dateEnd].amortisationAmount)) 
+                  , 0)}{" "} &euro;
                 </td>
                 <td className="text-end">
-                  {printValue(getAmountItems(amortisations), 0)} &euro;
+                  {printValue(getSumItems(immobilisations.map(immobilisation => immobilisation.states[period.dateEnd].amortisationAmount)), 0)} &euro;
                 </td>
               </tr>
             </tfoot>

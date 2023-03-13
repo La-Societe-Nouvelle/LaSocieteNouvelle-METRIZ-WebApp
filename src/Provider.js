@@ -1,50 +1,47 @@
 import api from "./api";
-import { getCurrentDateString, valueOrDefault } from "./utils/Utils";
+import { getAmountItems, getCurrentDateString, valueOrDefault } from "./utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 
 
-export class Company {
-  constructor({
-    id,
-    accountNum,
-    isDefaultAccount,
-    corporateId,
-    corporateName,
-    legalUnitName,
-    legalUnitAreaCode,
-    legalUnitActivityCode,
-    state,
-    footprint,
-    footprintId,
-    footprintAreaCode,
-    footprintActivityCode,
-    status,
-    dataFetched,
-    lastUpdateFromRemote,
-    amount,
+export class Provider 
+{
+  constructor({id,
+               providerNum,
+               providerLib,
+               isDefaultProviderAccount,
+               corporateId,
+               corporateName,
+               legalUnitData,
+               state,
+               footprint,
+               footprintId,
+               footprintParams,
+               status,
+               dataFetched,
+               lastUpdateFromRemote,
+               amount,
   }) {
     // ---------------------------------------------------------------------------------------------------- //
+
     // Id
     this.id = id;
 
     // Company
-    this.accountNum = accountNum || ""; // numéro compte auxiliaire
-    this.isDefaultAccount = isDefaultAccount; // account aux defined in FEC
+    this.providerNum = providerNum || "";                           // numéro compte auxiliaire
+    this.providerLib = providerLib || "";                           // libellé compte auxiliaire
+    this.isDefaultProviderAccount = isDefaultProviderAccount;       // account aux defined in FEC
 
-    this.corporateId = corporateId || null; // siren
-    this.corporateName = corporateName || ""; // libellé du compte auxiliaire
+    this.corporateId = corporateId || null;                         // siren
+    this.corporateName = corporateName || "";                       // dénomination unité légale
 
     // Legal data
-    this.legalUnitName = legalUnitName || ""; // denomination legale
-    this.legalUnitAreaCode = legalUnitAreaCode || ""; // code géographique (unité légale)
-    this.legalUnitActivityCode = legalUnitActivityCode || ""; // code d'activité (unité légale)
+    this.legalUnitData = legalUnitData || {};                       // data unité legale
 
     // Footprint
     this.state = state || "default"; // "" | "siren" | "default"
     this.footprint = new SocialFootprint(footprint);
     this.footprintId = footprintId || this.getDefaultFootprintId();
-    this.footprintAreaCode = footprintAreaCode || "FRA"; // code géographique (valeurs par défaut)
-    this.footprintActivityCode = footprintActivityCode || "00"; // code d'activité (valeurs par défaut)
+    this.footprintParams = footprintParams || {};                   // paramètres (empreinte par défaut)
 
     // Updates
     this.status = status || null; // 200 (ok), 404 (not found), 500 (server error)
@@ -53,7 +50,20 @@ export class Company {
 
     // Amount (expenses & investments)
     this.amount = amount || 0;
+
     // ---------------------------------------------------------------------------------------------------- //
+  }
+
+  buildPeriods = (expenses, periods) => 
+  {
+    this.periodsData = {};
+    periods.forEach(period => 
+    {
+      this.periodsData[period.periodKey] = {
+        periodKey: period.periodKey,
+        amount: getAmountItems(expenses.filter(expense => period.regex.test(expense.date)), 2)
+      }
+    })
   }
 
   // init footrpint id
@@ -83,12 +93,12 @@ export class Company {
 
   /* ---------- Update ---------- */
 
-  async update(nextProps) {
+  async update(nextProps) 
+  {
     // update corporate id ------------------------------ //
-    if (
-      nextProps.corporateId != undefined &&
-      nextProps.corporateId != this.corporateId
-    ) {
+    if (nextProps.corporateId != undefined &&
+        nextProps.corporateId != this.corporateId) 
+    {
       this.corporateId = nextProps.corporateId;
       this.footprintId = this.getDefaultFootprintId();
       // legal data

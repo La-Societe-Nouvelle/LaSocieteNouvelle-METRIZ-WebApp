@@ -5,7 +5,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 // Utils
-import { printValue } from "../../src/utils/Utils";
+import { getAmountItems, getPrevDate, getSumItems, printValue } from "../../src/utils/Utils";
 
 /* ---------- TABLE STOCKS ---------- */
 
@@ -23,6 +23,8 @@ export class StocksTable extends React.Component {
   render() 
   {
     const {stocks,depreciations,aggregates} = this.props.financialData;
+    const period = this.props.period;
+    const prevStateDateEnd = getPrevDate(period.dateStart);
     const {columnSorted} = this.state;
 
     this.sortItems(stocks,columnSorted);
@@ -40,20 +42,14 @@ export class StocksTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-          {stocks.map(({accountNum,accountLib,amount,prevAmount}) => {
-            let valueLoss = depreciations.filter(depreciation => depreciation.accountAux==accountNum)
-                                         .map(depreciation => depreciation.amount)
-                                         .reduce((a,b) => a + b,0);
-            let prevValueLoss = depreciations.filter(depreciation => depreciation.accountAux==accountNum)
-                                             .map(depreciation => depreciation.prevAmount)
-                                             .reduce((a,b) => a + b,0);
+          {stocks.map((stock) => {
             return(
-              <tr key={accountNum}>
-                <td >{accountNum}</td>
-                <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                <td className="text-end">{printValue(amount-valueLoss,0)}  &euro;</td>
-                <td className="text-end">{printValue(prevAmount-prevValueLoss,0)}  &euro;</td>
-                <td className="text-end">{printValue((amount-valueLoss)-(prevAmount-prevValueLoss),0)}  &euro;</td>
+              <tr key={stock.accountNum}>
+                <td >{stock.accountNum}</td>
+                <td>{stock.accountLib.charAt(0).toUpperCase() + stock.accountLib.slice(1).toLowerCase()}</td>
+                <td className="text-end">{printValue(stock.states[period.dateEnd].amount,0)}  &euro;</td>
+                <td className="text-end">{printValue(stock.states[prevStateDateEnd].amount,0)}  &euro;</td>
+                <td className="text-end">{printValue(stock.states[period.dateEnd].amount - stock.states[prevStateDateEnd].amount,0)}  &euro;</td>
               </tr>)})}
  
           </tbody>
@@ -61,9 +57,9 @@ export class StocksTable extends React.Component {
           {stocks.length > 0 &&
             <tr className="border-top">
               <td colSpan="2"> Total</td>
-              <td className="text-end">{printValue(aggregates.netAmountStocks.amount,0)}  &euro;</td>
-              <td className="text-end">{printValue(aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
-              <td className="text-end">{printValue(aggregates.netAmountStocks.amount - aggregates.netAmountStocks.prevAmount,0)}  &euro;</td>
+              <td className="text-end">{printValue(getAmountItems(stocks.map(stock => stock.states[period.dateEnd])), 0)}  &euro;</td>
+              <td className="text-end">{printValue(getAmountItems(stocks.map(stock => stock.states[prevStateDateEnd])), 0)}  &euro;</td>
+              <td className="text-end">{printValue(getSumItems(stocks.map(stock => stock.states[period.dateEnd].amount - stock.states[prevStateDateEnd].amount)),0)}  &euro;</td>
           </tr>}
           </tfoot>
         </Table>
@@ -94,3 +90,6 @@ export class StocksTable extends React.Component {
   }
 
 }
+
+const getGrossAmountStock = (stock,date) => stock.states[date].amount
+const getNetAmountStock = (stock,date) => stock.states[date].amount - stock.states[date].depreciationAmount

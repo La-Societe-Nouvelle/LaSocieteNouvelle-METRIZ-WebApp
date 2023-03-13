@@ -16,6 +16,8 @@ import { FinancialData } from "/src/FinancialData";
 // Mail Report Error
 import { sendReportToSupport } from "../../../pages/api/mail-api";
 import { FECImport } from "./FECImport";
+import { buildAggregates } from "../../../src/formulas/aggregatesBuilder";
+import { buildRegexFinancialPeriod, getListMonthsFinancialPeriod } from "../../../src/Session";
 
 function ImportSection(props) {
   //STATE
@@ -150,15 +152,16 @@ function ImportSection(props) {
 
   async function loadFECData(importedData) 
   {
-    let nextFinancialData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
+    console.log(importedData);
+    let FECData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
 
-    if (nextFinancialData.errors.length > 0) {
+    if (FECData.errors.length > 0) {
       // show error(s) (content)
-      nextFinancialData.errors.forEach((error) => console.log(error));
+      FECData.errors.forEach((error) => console.log(error));
       setView(0);
       setErrorFile(true);
       setErrorMessage("Erreur(s) relevée(s) : ");
-      setErrors(nextFinancialData.errors);
+      setErrors(FECData.errors);
       setImportedData(null);
     } else {
       // load year
@@ -167,32 +170,38 @@ function ImportSection(props) {
         : "";
       props.session.financialPeriod = {
         dateStart: importedData.meta.firstDate,
-        dateEnd: importedData.meta.lastDate
+        dateEnd: importedData.meta.lastDate,
+        regex: buildRegexFinancialPeriod(importedData.meta.firstDate,importedData.meta.lastDate),
+        periodKey: "FY"+importedData.meta.lastDate.substring(0,4)
       }
 
+      let periods = getListMonthsFinancialPeriod(importedData.meta.firstDate,importedData.meta.lastDate)
+        .map(month => {
+          return({
+            regex: new RegExp("^"+month),
+            periodKey: month
+          })
+        })
+        .concat(props.session.financialPeriod);
+
       // load financial data
-      props.session.financialData = new FinancialData(nextFinancialData);
-      props.session.financialData.amortisableImmobilisationSetter();
-      props.session.financialData.expensesAccountsBuilder(nextFinancialData.accounts);
-      props.session.financialData.companiesInitializer();
-      props.session.financialData.initialStatesInitializer();
-      props.session.financialData.immobilisationsPhasesBuilder(props.session.financialPeriod);
+      await props.session.financialData.loadFECData(FECData);
+      console.log(props.session.financialData);
       console.log("Here");
-      props.session.financialData.adjustedAmortisationDataBuilder(props.session.financialPeriod);
 
       // load impacts data
       props.session.impactsData.netValueAdded =
-        props.session.financialData.getNetValueAdded();
+        props.session.financialData.mainAggregates.netValueAdded.periodsData[props.session.financialPeriod.periodKey];
       props.session.impactsData.knwDetails.apprenticeshipTax =
-        nextFinancialData.KNWData.apprenticeshipTax;
+        FECData.KNWData.apprenticeshipTax;
       props.session.impactsData.knwDetails.vocationalTrainingTax =
-        nextFinancialData.KNWData.vocationalTrainingTax;
+        FECData.KNWData.vocationalTrainingTax;
 
       // update footprints
-      props.session.updateFootprints();
+      //props.session.updateFootprints();
 
       // update validations
-      props.session.checkValidations();
+      //props.session.checkValidations();
 
       // update progression
       props.session.progression = 1;

@@ -18,15 +18,59 @@ function MappedAccounts(props) {
     }
   }, [isDisabled]);
 
-  function handleOnchange(accountToMapNum, nextAssetAccountNum) {
-    // remove association if a dep/amort. account is already associated with account aux
-    Object.entries(accounts)
-      .filter(([_,{assetAccountNum}]) => assetAccountNum==nextAssetAccountNum)
-      .forEach(([_,{assetAccountNum}]) => assetAccountNum = "");
-        
-    // add association
-    accounts[accountToMapNum].assetAccountNum = nextAssetAccountNum;
+  function handleOnchange(accountToMapNum, nextAssetAccountNum) 
+  {    
+    if (accountToMapNum.charAt(1)=="8") 
+    {
+      // remove current association with prev asset account
+      let prevAssetAccountNum = accounts[accountToMapNum].assetAccountNum;
+      if (prevAssetAccountNum) {
+        accounts[prevAssetAccountNum].amortisationAccountNum = undefined;
+        accounts[prevAssetAccountNum].amortisationAccountLib = undefined;
+      }
+      
+      // remove current association with next asset account (in amortisation account data)
+      let prevAmortisationAccountNum = accounts[nextAssetAccountNum].amortisationAccountNum; // current association
+      if (prevAmortisationAccountNum) {
+        accounts[prevAmortisationAccountNum].assetAccountNum = undefined;
+        accounts[prevAmortisationAccountNum].assetAccountLib = undefined;
+      }
 
+      // update asset account data
+      accounts[nextAssetAccountNum].amortisationAccountNum = accountToMapNum;
+      accounts[nextAssetAccountNum].amortisationAccountLib = accounts[accountToMapNum].accountLib;
+      
+      // update amortisation account data
+      accounts[accountToMapNum].assetAccountNum = nextAssetAccountNum;
+      accounts[accountToMapNum].assetAccountLib = accounts[nextAssetAccountNum].accountLib;
+    }
+
+    if (accountToMapNum.charAt(1)=="9") 
+    {
+      // remove current association with asset account
+      let prevAssetAccountNum = accounts[accountToMapNum].assetAccountNum;
+      if (prevAssetAccountNum) {
+        accounts[prevAssetAccountNum].depreciationAccountNum = undefined;
+        accounts[prevAssetAccountNum].depreciationAccountLib = undefined;
+      }
+
+      // remove current association with next asset account (in depreciation account data)
+      let prevDepreciationAccountNum = accounts[nextAssetAccountNum].depreciationAccountNum; // current association
+      if (prevDepreciationAccountNum) {
+        accounts[prevDepreciationAccountNum].assetAccountNum = undefined;
+        accounts[prevDepreciationAccountNum].assetAccountLib = undefined;
+      }
+
+      // update asset account data
+      accounts[nextAssetAccountNum].depreciationAccountNum = accountToMapNum;
+      accounts[nextAssetAccountNum].depreciationAccountLib = accounts[accountToMapNum].accountLib;
+      
+      // update depreciation account data
+      accounts[accountToMapNum].assetAccountNum = nextAssetAccountNum;
+      accounts[accountToMapNum].assetAccountLib = accounts[nextAssetAccountNum].accountLib;
+    }
+
+    console.log(props.meta.accounts);
     props.meta.accounts = accounts; // ?
     setAccounts(accounts);
 

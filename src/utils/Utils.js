@@ -50,6 +50,11 @@ export function getPrevAmountItems(items, precision)
   return getSumItems(items.map(item => item.prevAmount), precision)
 }
 
+export function getAmountItemsForPeriod(items, periodKey,precision)
+{
+  return getAmountItems(items.map(item => item.periodsData[periodKey]), precision)
+}
+
 /* ----- UNCERTAINTY ----- */
 
 export function getUncertainty(value,valueMin,valueMax)

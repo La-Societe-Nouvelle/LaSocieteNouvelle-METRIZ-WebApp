@@ -25,6 +25,8 @@ export class DepreciationsTable extends React.Component {
   render() {
     const { immobilisations, depreciations, depreciationExpenses } =
       this.props.financialData;
+    const period = this.props.period;
+    const prevStateDateEnd = getPrevDate(period.dateStart);
     const { columnSorted } = this.state;
 
     this.sortItems(immobilisations, columnSorted);
@@ -51,17 +53,11 @@ export class DepreciationsTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {immobilisations.map(({ accountNum, accountLib }) => {
-              let depreciation = depreciations.filter(
-                (depreciation) => depreciation.accountAux == accountNum
-              )[0];
-              if (depreciation != undefined) {
-                let expenses = depreciationExpenses.filter(
-                  (expense) => expense.accountAux == depreciation.accountNum
-                );
+            {immobilisations.map((immobilisation) => {
+              if (immobilisation.depreciationAccountNum) {
+                let expenses = depreciationExpenses.filter((expense) => expense.depreciationAccountNum == immobilisation.depreciationAccountNum);
                 let augmentation = getAmountItems(expenses);
-                let dimininution =
-                  depreciation.prevAmount + augmentation - depreciation.amount;
+                let dimininution = depreciation.prevAmount + augmentation - depreciation.amount;
                 return (
                   <tr key={accountNum}>
                     <td>{accountNum}</td>

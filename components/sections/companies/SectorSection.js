@@ -59,27 +59,27 @@ export class SectorSection extends React.Component
     {
       case "aux":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => !company.isDefaultAccount),
+          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => !provider.isDefaultAccount),
           view: view,
         });
       case "expenses":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => company.isDefaultAccount),
+          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => provider.isDefaultAccount),
           view: view,
         });
       case "significative":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => this.state.significativeCompanies.includes(company.accountNum)),
+          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => this.state.significativeCompanies.includes(provider.accountNum)),
           view: view,
         });
       case "significativeWithoutActivity":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => this.state.significativeCompanies.includes(company.accountNum) && company.footprintActivityCode == "00"),
+          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => this.state.significativeCompanies.includes(provider.accountNum) && provider.footprintActivityCode == "00"),
           view: view,
         });
       case "defaultActivity":
         return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((company) => company.footprintActivityCode == "00"),
+          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => provider.footprintActivityCode == "00"),
           view: view,
         });
       default:
@@ -106,8 +106,8 @@ export class SectorSection extends React.Component
 
     const financialData = this.props.financialData;
 
-    const isNextStepAvailable = !(unidentifiedCompanies.filter((company) => company.status != 200).length > 0);
-    const lengthSignificativeCompaniesWithoutActivity = unidentifiedCompanies.filter((company) => company.footprintActivityCode == "00" && significativeCompanies.includes(company.accountNum)).length;
+    const isNextStepAvailable = !(unidentifiedCompanies.filter((provider) => provider.status != 200).length > 0);
+    const lengthSignificativeCompaniesWithoutActivity = unidentifiedCompanies.filter((provider) => provider.footprintActivityCode == "00" && significativeCompanies.includes(provider.accountNum)).length;
     const isSignificativeCompaniesWithoutActivity = lengthSignificativeCompaniesWithoutActivity > 0;
     
     return (
@@ -246,9 +246,9 @@ export class SectorSection extends React.Component
     this.setState({ fetching: true, progression: 0 });
     let i = 0;
     let n = companiesToSynchronise.length;
-    for (let company of companiesToSynchronise) {
+    for (let provider of companiesToSynchronise) {
       try {
-        await company.updateFromRemote();
+        await provider.updateFromRemote();
       } catch (error) {
         this.setState({ error: true });
         break;

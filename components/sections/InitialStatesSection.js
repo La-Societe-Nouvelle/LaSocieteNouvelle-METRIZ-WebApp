@@ -16,7 +16,8 @@ import { ErrorApi } from "../ErrorAPI";
 /* -------------------- INITIAL STATES SECTION -------------------- */
 /* ---------------------------------------------------------------- */
 
-export class InitialStatesSection extends React.Component {
+export class InitialStatesSection extends React.Component 
+{
   constructor(props) {
     super(props);
     this.onDrop = (files) => {
@@ -138,6 +139,7 @@ export class InitialStatesSection extends React.Component {
                 <div className="table-data mt-2">
                   <InitialStatesTable
                     financialData={financialData}
+                    financialPeriod={this.props.session.financialPeriod}
                     accountsShowed={accountsShowed}
                     onUpdate={this.updateFootprints.bind(this)}
                   />
@@ -227,19 +229,20 @@ export class InitialStatesSection extends React.Component {
   /* ---------- ACTIONS ---------- */
 
   // Synchronisation
-  async synchroniseAll() {
+  async synchroniseAll() 
+  {
     // init progression
     this.setState({ fetching: true, syncProgression: 0 });
     // accounts
     const accountsToSync = this.props.session.financialData.immobilisations
       .concat(this.props.session.financialData.stocks)
-      .filter((account) => account.initialState == "defaultData");
+      .filter((account) => account.initialStateType == "defaultData");
 
     let i = 0;
     let n = accountsToSync.length;
     for (let account of accountsToSync) {
       try {
-        await account.updatePrevFootprintFromRemote();
+        await account.updateInitialStateFootprintFromRemote();
       } catch (error) {
         this.setState({ error: true });
         break;
@@ -251,7 +254,7 @@ export class InitialStatesSection extends React.Component {
       });
     }
 
-    await this.props.session.updateFootprints();
+    //await this.props.session.updateFootprints();
     this.setState({
       fetching: false,
       syncProgression: 0,
@@ -271,7 +274,7 @@ export class InitialStatesSection extends React.Component {
   /* ----- UPDATES ----- */
 
   updateFootprints = () => {
-    this.props.session.updateFootprints();
+    //this.props.session.updateFootprints();
     this.setState({ financialData: this.props.session.financialData });
   };
 
@@ -341,14 +344,11 @@ export class InitialStatesSection extends React.Component {
 
 /* -------------------------------------------------- NEXT SECTION -------------------------------------------------- */
 
+// condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
 const nextStepAvailable = ({ financialData }) =>
-  // condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
-  {
-    let accounts = financialData.immobilisations.concat(financialData.stocks);
-    return !(
-      accounts.filter(
-        (account) =>
-          account.initialState == "defaultData" && !account.dataFetched
-      ).length > 0
-    );
-  };
+{
+  let accounts = financialData.immobilisations.concat(financialData.stocks);
+  console.log(accounts);
+  console.log(!(accounts.some((account) => account.initialStateType == "defaultData" && !account.initialStateSet)))
+  return !(accounts.some((account) => (account.initialStateType == "defaultData" && !account.initialStateSet) || (account.isAmortisable && account.initialStateType == "none")));
+};

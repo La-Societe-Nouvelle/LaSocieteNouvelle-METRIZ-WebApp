@@ -18,7 +18,7 @@ export class UnidentifiedCompaniesTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      companies: props.companies,
+      providers: props.providers,
       significativeCompanies: props.significativeCompanies,
       columnSorted: "amount",
       reverseSort: false,
@@ -44,12 +44,12 @@ export class UnidentifiedCompaniesTable extends React.Component {
   }
 
   render() {
-    const { companies, significativeCompanies, columnSorted, page, nbItems } =
+    const { providers, significativeCompanies, columnSorted, page, nbItems } =
       this.state;
 
     // sort companies
-    this.sortCompanies(companies, columnSorted);
-    let showedCompanies = companies.slice(page * nbItems, (page + 1) * nbItems);
+    this.sortCompanies(providers, columnSorted);
+    let showedCompanies = providers.slice(page * nbItems, (page + 1) * nbItems);
 
     return (
       <div className="table-main">
@@ -98,7 +98,7 @@ export class UnidentifiedCompaniesTable extends React.Component {
           </tbody>
         </Table>
 
-        {companies.length > nbItems && (
+        {providers.length > nbItems && (
           <div className="table-navigation">
             <button
               className={page == 0 ? "hidden" : "btn btn-primary"}
@@ -108,12 +108,12 @@ export class UnidentifiedCompaniesTable extends React.Component {
             </button>
             <div>
               <p>
-                {page + 1}/{parseInt(companies.length / nbItems + 1)}
+                {page + 1}/{parseInt(providers.length / nbItems + 1)}
               </p>
             </div>
             <button
               className={
-                (page + 1) * nbItems < companies.length
+                (page + 1) * nbItems < providers.length
                   ? "btn btn-primary"
                   : "hidden"
               }
@@ -184,15 +184,15 @@ export class UnidentifiedCompaniesTable extends React.Component {
   }
 
   updateCompany = (nextProps) => {
-    let company = this.props.financialData.getCompany(nextProps.id);
-    company.update(nextProps);
+    let provider = this.props.financialData.getCompany(nextProps.id);
+    provider.update(nextProps);
     this.props.onUpdate();
     this.setState({ companies: this.props.companies });
   };
 
   updateCompanyFromRemote = async (companyId) => {
-    let company = this.props.financialData.getCompany(companyId);
-    await company.updateFromRemote();
+    let provider = this.props.financialData.getCompany(companyId);
+    await provider.updateFromRemote();
     this.props.onUpdate();
     this.setState({ companies: this.props.companies });
   };

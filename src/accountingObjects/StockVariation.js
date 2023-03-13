@@ -3,17 +3,15 @@
 // Imports
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-export class Expense {
+export class StockVariation {
 
   constructor({id,
                accountNum,
                accountLib,
-               providerNum,
-               providerLib,
-               isDefaultProvider,
+               stockAccountNum,
+               stockAccountLib,
                amount,
-               footprint,
-               date}) 
+               footprint}) 
   {
   // ---------------------------------------------------------------------------------------------------- //
     this.id = id;
@@ -21,14 +19,11 @@ export class Expense {
     this.accountNum = accountNum;
     this.accountLib = accountLib;
 
-    this.providerNum = providerNum;
-    this.providerLib = providerLib;
-    this.isDefaultProvider = isDefaultProvider;
+    this.stockAccountNum = stockAccountNum;
+    this.stockAccountLib = stockAccountLib;
 
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint);
-
-    this.date = date;
   // ---------------------------------------------------------------------------------------------------- //
   }
 

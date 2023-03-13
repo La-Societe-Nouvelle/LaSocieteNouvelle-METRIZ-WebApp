@@ -1,121 +1,130 @@
 // La Société Nouvelle
 
-// Objects
-import { Aggregate } from '../accountingObjects/Aggregate';
+import { getAmountItemsForPeriod } from "../utils/Utils";
 
-// Utils
-import { getAmountItems, getPrevAmountItems, getSumItems, roundValue } from '../utils/Utils';
+/* ---------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- AGGREGATES BUILDER ---------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------- */
 
-/* ------------------------------------------------------------ */
-/* -------------------- AGGREGATES BUILDER -------------------- */
-/* ------------------------------------------------------------ */
+/* ---------------------------------------- Aggrégats - Soldes Intermédiaires de Gestion ---------------------------------------- */
 
-export const aggregatesBuilder = (financialData) =>
+/** Aggrégats - Consommations intermédiaires :
+ *      607,6097                                Achats de marchandises
+ *      6037                                    Variation des stocks de marchandises
+ *      601,6091,602,6092                       Achats de matières premières et autres approvisionnements
+ *      6031,6032                               Variations de stocks de matières premières et autres approvisionnements
+ *      604,6094,605,6095,606,6096,608,6098     Autres achats
+ *      61,62                                   Autres charges externes
+ * 
+ *  Aggrégats - Consommations de capital fixe :
+ *      68111                                   Dotations aux amortissements sur immobilisations incorporelles
+ *      68112                                   Dotations aux amortissements sur immobilisations corporelles
+ *      6871                                    Dotations aux amortissements exceptionnels des immobilisations
+ */
+
+export const buildIntermediateConsumptionsAggregates = (financialData, periodKey) =>
 {
-  let aggregates = financialData.aggregates;
+    let aggregates = [];
+    let accounts = [];
 
-  // MAIN AGGREGATES ----------------------------------------- //
+    // Achats stockés - Matières premières
+    accounts = financialData.externalExpenseAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Matières premières",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  aggregates.production = new Aggregate({
-      label: "Production",
-      amount: roundValue(financialData.getProduction(), 2)
-  });
+    // Achats stockés - Autres approvisionnements
+    accounts = financialData.externalExpenseAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Autres approvisionnements",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
+    
+    // Achats de marchandises
+    accounts = financialData.externalExpenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Marchandises",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  aggregates.intermediateConsumption = new Aggregate({
-      label: "Consommations intermédiaires",
-      amount: roundValue(financialData.getAmountIntermediateConsumptions(), 2)
-  })
+    // Variation des stocks
+    accounts = financialData.stockVariationAccounts.filter(account => /^603/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Variation des stocks",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  aggregates.capitalConsumption = new Aggregate({
-      label: "Consommations de capital fixe",
-      amount: roundValue(financialData.getAmountFixedCapitalConsumptions(), 2)
-  })
+    // Autres achats
+    accounts = financialData.externalExpenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Autres achats",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  aggregates.netValueAdded = new Aggregate({
-      label: "Valeur ajoutée nette",
-      amount: roundValue(financialData.getNetValueAdded(), 2)
-  })
+    // Autres charges externes
+    accounts = financialData.externalExpenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Autres charges externes",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };  
 
-  // PRODUCTION ---------------------------------------------- //
+    return aggregates;
+}
+    
 
-  aggregates.revenue = new Aggregate({
-      label: "Chiffre d'affaires",
-      amount: roundValue(financialData.revenue, 2)
-  });
-  aggregates.storedProduction = new Aggregate({
-      label: "Production stockée",
-      amount: roundValue(financialData.storedProduction, 2)
-  });
-  aggregates.immobilisedProduction = new Aggregate({
-      label: "Production immobilisée",
-      amount: roundValue(financialData.immobilisedProduction, 2)
-  });
+export const buildFixedCapitalConsumptionsAggregates = (financialData, periodKey) =>
+{
+    let aggregates = [];
+    let accounts = []
 
-  // EXPENSES ------------------------------------------------ //
+    // Dotations aux amortissements sur immobilisations incorporelles
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^68111/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Dotations aux amortissements sur immobilisations incorporelles",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  aggregates.externalExpenses = new Aggregate({
-      label: "Charges externes",
-      amount: roundValue(financialData.getAmountExternalExpenses(), 2)
-  });
-  aggregates.amortisationExpenses = new Aggregate({
-      label: "Dotations aux amortissements sur immobilisations",
-      amount: roundValue(financialData.getAmountAmortisationExpenses(), 2)
-  });
-  aggregates.storedPurchases = new Aggregate({
-      label: "Variation de stock d'achats et de marchandises",
-      amount: roundValue(financialData.getVariationPurchasesStocks(), 2)
-  });
+    // Dotations aux amortissements sur immobilisations corporelles
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^68112/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Dotations aux amortissements sur immobilisations corporelles",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  // STOCKS -------------------------------------------------- //
+    // Dotations aux amortissements sur immobilisations incorporelles
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^6811[^(1|2)]/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Dotations aux amortissements sur immobilisations",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };
 
-  // Purchases
-  aggregates.purchaseStocks = new Aggregate({
-      label: "Stocks d'achats et de marchandises",
-      amount: getAmountItems(financialData.stocks.filter(stock => !stock.isProductionStock), 2),
-      prevAmount: getPrevAmountItems(financialData.stocks.filter(stock => !stock.isProductionStock), 2)
-  });
+    // Dotations aux amortissements exceptionnels des immobilisations
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
+    if (accounts.length > 0) {
+        aggregates.push({
+            label: "Dotations aux amortissements exceptionnels des immobilisations",
+            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+        });
+    };       
 
-  // Production
-  aggregates.productionStocks = new Aggregate({
-      label: "Stocks de production",
-      amount: getAmountItems(financialData.stocks.filter(stock => stock.isProductionStock), 2),
-      prevAmount: getPrevAmountItems(financialData.stocks.filter(stock => stock.isProductionStock), 2)
-  });
-
-  // Stocks
-  aggregates.stocksVariation = new Aggregate({
-      label: "Variation des stocks",
-      amount: getSumItems(financialData.stocks.map(stock => stock.amount - stock.prevAmount), 2)
-  });
-  aggregates.stocks = new Aggregate({
-      label: "Stocks",
-      amount: getAmountItems(financialData.stocks, 2),
-      prevAmount: getPrevAmountItems(financialData.stocks, 2)
-  });
-  aggregates.grossAmountStocks = new Aggregate({
-      label: "Stocks",
-      amount: getAmountItems(financialData.stocks, 2),
-      prevAmount: getPrevAmountItems(financialData.stocks, 2)
-  });
-  aggregates.netAmountStocks = new Aggregate({
-      label: "Stocks",
-      amount: financialData.getFinalNetAmountStocks(),
-      prevAmount: financialData.getInitialNetAmountStocks()
-  });
-
-  // IMMOBILISATIONS ----------------------------------------- //
-  
-  // Immobilisation
-  aggregates.grossAmountImmobilisation = new Aggregate({
-      label: "Immobilisations",
-      amount: getAmountItems(financialData.immobilisations, 2),
-      prevAmount: getPrevAmountItems(financialData.immobilisations, 2)
-  });
-  aggregates.netAmountImmobilisation = new Aggregate({
-      label: "Immobilisations",
-      amount: getSumItems(financialData.immobilisations.map(immobilisation => immobilisation.amount - financialData.getFinalValueLossImmobilisation(immobilisation.accountNum)), 2),
-      prevAmount: getSumItems(financialData.immobilisations.map(immobilisation => immobilisation.prevAmount - financialData.getInitialValueLossImmobilisation(immobilisation.accountNum)), 2)
-  });
-
-  // --------------------------------------------------------- //
+    return aggregates;
 }

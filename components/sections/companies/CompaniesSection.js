@@ -12,12 +12,12 @@ import { SirenSection } from "./SirenSection";
 /* -------------------- COMPANIES SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class CompaniesSection extends React.Component 
+export class ProvidersSection extends React.Component 
 {
   constructor(props) {
     super(props);
     this.state = {
-      companies: props.session.financialData.companies,
+      providers: props.session.financialData.providers,
       companyStep: 1,
     };
 
@@ -34,7 +34,7 @@ export class CompaniesSection extends React.Component
 
     // if current state is for identified companies
     if (this.state.companyStep==1) {
-      const unidentifiedCompanies = this.state.companies.filter((company) => company.state == "default");
+      const unidentifiedCompanies = this.state.providers.filter((provider) => provider.state == "default");
       if (unidentifiedCompanies.length > 0) {
         this.setState({companyStep: 2});
       } else {
@@ -62,7 +62,7 @@ export class CompaniesSection extends React.Component
     } = this.state;
     
     const financialData = this.props.session.financialData;
-    const unidentifiedCompanies = this.state.companies.filter((company) => company.state == "default");
+    const unidentifiedCompanies = this.state.providers.filter((provider) => provider.state == "default");
 
     // Synchro with corporate ID 
 

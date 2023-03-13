@@ -62,6 +62,7 @@ function exportIndicDataDepreciationsCSV(indic, session) {
 function generateFootprintPDF(
   doc,
   indic,
+  periodKey,
   financialData,
   legalUnit,
   year,
@@ -355,7 +356,7 @@ function generateFootprintPDF(
   height += 12;
 
   // // Immobilised production
-  if (financialData.getImmobilisedProduction() > 0) {
+  if (immobilisedProduction.periodsData[periodKey] > 0) {
     xValue = x + 64;
     y += 4;
     height += 4;

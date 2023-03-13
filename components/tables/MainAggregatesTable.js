@@ -2,24 +2,25 @@
 
 // Utils
 import { Table } from 'react-bootstrap';
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../../src/formulas/aggregatesBuilder';
 import { printValue } from '../../src/utils/Utils';
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 
-export const MainAggregatesTable = ({financialData}) =>
+export const MainAggregatesTable = ({financialData,period}) =>
 {
-  const externalExpensesAggregates = financialData.getExternalExpensesAggregates();
+  const periodKey = period.periodKey;
+  const intermediateConsumptionsAggregates = buildIntermediateConsumptionsAggregates(financialData, periodKey);
+  const fixedCapitalConsumptionsAggregates = buildFixedCapitalConsumptionsAggregates(financialData, periodKey);
 
-  const depreciationExpensesAggregates = financialData.getBasicDepreciationExpensesAggregates();
+  const {revenue,
+         storedProduction,
+         immobilisedProduction} = financialData;
 
   const {production,
-         revenue,
-         storedProduction,
-         immobilisedProduction,
-         intermediateConsumption,
-         storedPurchases,
-         capitalConsumption,
-         netValueAdded} = financialData.aggregates;
+         intermediateConsumptions,
+         fixedCapitalConsumptions,
+         netValueAdded} = financialData.mainAggregates;
   
   return(
     <>
@@ -34,54 +35,50 @@ export const MainAggregatesTable = ({financialData}) =>
         <tbody> 
           <tr className="fw-bold border-top">
             <td>Production sur l'exercice courant</td>
-            <td className="text-end">{printValue(production.amount,0)} &euro;</td>
+            <td className="text-end">{printValue(production.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
           <tr>
             <td>&emsp;Chiffre d'Affaires</td> 
-            <td className="text-end">{printValue(revenue.amount,0)} &euro;</td>
+            <td className="text-end">{printValue(revenue.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
           <tr>
             <td>&emsp;Production stockée</td>
-            <td className="text-end">{printValue(storedProduction.amount,0)} &euro;</td>
+            <td className="text-end">{printValue(storedProduction.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
           <tr>
             <td>&emsp;Production immobilisée</td>
-            <td className="text-end">{printValue(immobilisedProduction.amount,0)} &euro;</td>
+            <td className="text-end">{printValue(immobilisedProduction.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>          
           
           <tr className="fw-bold border-top">
             <td>Consommations intermédiaires</td>
-            <td className={"important text-end"}>{printValue(intermediateConsumption.amount,0)} &euro;</td>
+            <td className={"important text-end"}>{printValue(intermediateConsumptions.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
-          <tr>
-            <td>&emsp;Variation de stocks</td>
-            <td className="text-end">{printValue(-storedPurchases.amount,0)} &euro;</td>
-            </tr>
-        {externalExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
+        {intermediateConsumptionsAggregates.filter(aggregate => aggregate.amount != 0).map(({label,amount},index) => 
           <tr key={index}>
-            <td>&emsp;{accountLib}</td>
+            <td>&emsp;{label}</td>
             <td className="text-end">{printValue(amount,0)} &euro;</td>
             
           </tr>)}
 
           <tr className="fw-bold border-top">
             <td>Consommations de capital fixe</td>
-            <td className={"important text-end"}>{printValue(capitalConsumption.amount,0)} &euro;</td>
+            <td className={"important text-end"}>{printValue(fixedCapitalConsumptions.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
-        {depreciationExpensesAggregates.filter(aggregate => aggregate.amount != 0).map(({accountLib,amount},index) => 
+        {fixedCapitalConsumptionsAggregates.filter(aggregate => aggregate.amount != 0).map(({label,amount},index) => 
           <tr key={index}>
-            <td>&emsp;{accountLib}</td>
+            <td>&emsp;{label}</td>
             <td className="text-end">{printValue(amount,0)} &euro;</td>
             
           </tr>)}
 
           <tr className="fw-bold border-top">
             <td>Valeur ajoutée nette</td>
-            <td className={"important text-end"}>{printValue(netValueAdded.amount,0)}  &euro;</td>
+            <td className={"important text-end"}>{printValue(netValueAdded.periodsData[periodKey].amount,0)}  &euro;</td>
             </tr>
           <tr>
             <td>&emsp;dont charges de personnel</td>
-            <td className={"detail text-end"}>{printValue(financialData.getAmountPersonnelExpenses(),0)}  &euro;</td>
+            <td className={"detail text-end"}>{printValue(financialData.otherFinancialData.personnelExpenses.periodsData[periodKey].amount,0)}  &euro;</td>
             </tr>
 
         </tbody>

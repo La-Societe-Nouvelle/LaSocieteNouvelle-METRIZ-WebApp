@@ -16,23 +16,27 @@ import { StocksTable } from "../../tables/StocksTable";
 /* -------------------- FINANCIAL SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class FinancialDatas extends React.Component {
-  constructor(props) {
-    super(props);
+export class FinancialDatas extends React.Component 
+{
 
+  constructor(props) 
+  {
+    super(props);
     this.state = {
       selectedTable: "incomeStatement",
+      period: props.session.financialPeriod,
       errorFile: false,
       errorMessage: "",
       errors: [],
     };
   }
+
   componentDidMount() {
     window.scrollTo(0, 0);
   }
 
   render() {
-    const { selectedTable } = this.state;
+    const { selectedTable, period } = this.state;
 
     return (
       <>
@@ -85,7 +89,7 @@ export class FinancialDatas extends React.Component {
           </button>
         </div>
 
-        <div className="table-data">{this.buildtable(selectedTable)}</div>
+        <div className="table-data">{this.buildtable(selectedTable,period)}</div>
         <div className="text-end">
 
           {
@@ -117,18 +121,21 @@ export class FinancialDatas extends React.Component {
 
   /* ---------- TABLE ---------- */
 
-  buildtable = (selectedTable) => {
+  buildtable = (selectedTable,period) => 
+  {
     switch (selectedTable) {
       case "mainAggregates":
         return (
           <MainAggregatesTable
             financialData={this.props.session.financialData}
+            period={period}
           />
         ); // Soldes intermediaires de gestion
       case "incomeStatement":
         return (
           <IncomeStatementTable
             financialData={this.props.session.financialData}
+            period={period}
           />
         ); // Compte de résultat
       case "immobilisations":
@@ -136,22 +143,25 @@ export class FinancialDatas extends React.Component {
           <>
             <ImmobilisationsTable
               financialData={this.props.session.financialData}
+              period={period}
             />
             <hr></hr>
             <AmortisationsTable
               financialData={this.props.session.financialData}
+              period={period}
             />
-            <hr></hr>
+            {/* <hr></hr>
             <DepreciationsTable
               financialData={this.props.session.financialData}
-            />
+              period={period}
+            /> */}
           </>
         ); // Table des immobilisations
       case "stocks":
-        return <StocksTable financialData={this.props.session.financialData} />; // Table des stocks
+        return <StocksTable financialData={this.props.session.financialData} period={period}/>; // Table des stocks
       case "expenses":
         return (
-          <ExpensesTable financialData={this.props.session.financialData} />
+          <ExpensesTable financialData={this.props.session.financialData} period={period}/>
         ); // Dépenses par compte de charges externes
     }
   };

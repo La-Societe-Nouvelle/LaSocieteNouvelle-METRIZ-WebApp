@@ -14,22 +14,22 @@ export class IdentifiedCompaniesTable extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      companies: props.companies,
+      providers: props.providers,
       columnSorted: "amount",
       reverseSort: false,
       page: 0,
     };
   }
   componentDidUpdate(prevProps) {
-    if (prevProps.companies !== this.props.companies) {
-      this.setState({ companies: this.props.companies });
+    if (prevProps.providers !== this.props.providers) {
+      this.setState({ providers: this.props.providers });
     }
   }
 
   render() {
     const { nbItems } = this.props;
-    const { companies, columnSorted, page } = this.state;
-    this.sortCompanies(companies, columnSorted);
+    const { providers, columnSorted, page } = this.state;
+    this.sortCompanies(providers, columnSorted);
     return (
       <div className="table-main" id="table">
         <Table>
@@ -59,18 +59,18 @@ export class IdentifiedCompaniesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {companies
+            {providers
               .slice(page * nbItems, (page + 1) * nbItems)
-              .map((company) => (
+              .map((provider) => (
                 <RowTableCompanies
-                  key={"company_" + company.id}
-                  {...company}
+                  key={"provider_" + provider.id}
+                  {...provider}
                   updateCompany={this.updateCompany.bind(this)}
                 />
               ))}
           </tbody>
         </Table>
-        {companies.length == 0 && (
+        {providers.length == 0 && (
           <p
             className="small
         "
@@ -78,7 +78,7 @@ export class IdentifiedCompaniesTable extends React.Component {
             Aucun résultat
           </p>
         )}
-        {companies.length > nbItems && (
+        {providers.length > nbItems && (
           <div className="table-navigation">
             <button
               className={page == 0 ? "hidden" : "btn btn-primary"}
@@ -88,12 +88,12 @@ export class IdentifiedCompaniesTable extends React.Component {
             </button>
             <div>
               <p>
-                {page + 1}/{parseInt(companies.length / nbItems + 1)}
+                {page + 1}/{parseInt(providers.length / nbItems + 1)}
               </p>
             </div>
             <button
               className={
-                (page + 1) * nbItems < companies.length ? "btn btn-primary" : "hidden"
+                (page + 1) * nbItems < providers.length ? "btn btn-primary" : "hidden"
               }
               onClick={this.nextPage}
             >
@@ -151,7 +151,7 @@ export class IdentifiedCompaniesTable extends React.Component {
       this.setState({ page: this.state.page + 1 });
   };
 
-  /* ---------- OPERATIONS ON COMPANY ---------- */
+  /* ---------- OPERATIONS ON PROVIDER ---------- */
 
   updateCompany = (nextProps) => {
     let company = this.props.financialData.getCompany(nextProps.id);

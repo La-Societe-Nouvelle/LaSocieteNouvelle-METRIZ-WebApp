@@ -19,8 +19,8 @@ export class SirenSection extends React.Component {
     super(props);
 
     this.state = {
-      companies: props.session.financialData.companies,
-      companiesShowed: props.session.financialData.companies,
+      providers: props.session.financialData.providers,
+      providersShowed: props.session.financialData.providers,
       view: "all",
       nbItems: 20,
       fetching: false,
@@ -51,28 +51,28 @@ export class SirenSection extends React.Component {
     switch (view) {
       case "undefined":
         return this.setState({
-          companiesShowed: this.state.companies.filter(
-            (company) => company.state != "siren"
+          companiesShowed: this.state.providers.filter(
+            (provider) => provider.state != "siren"
           ),
           view: view,
         });
       case "unsync":
         return this.setState({
-          companiesShowed: this.state.companies.filter(
-            (company) => company.status != 200
+          companiesShowed: this.state.providers.filter(
+            (provider) => provider.status != 200
           ),
           view: view,
         });
       case "error":
         return this.setState({
-          companiesShowed: this.state.companies.filter(
-            (company) => company.status == 404
+          companiesShowed: this.state.providers.filter(
+            (provider) => provider.status == 404
           ),
           view: view,
         });
       default:
         return this.setState({
-          companiesShowed: this.state.companies,
+          companiesShowed: this.state.providers,
           view: view,
         });
     }
@@ -80,13 +80,13 @@ export class SirenSection extends React.Component {
 
   render() {
     const {
-      companies,
+      providers: providers,
       view,
       nbItems,
       fetching,
       progression,
       synchronised,
-      companiesShowed,
+      providersShowed: companiesShowed,
       popup,
       isDisabled,
       errorFile,
@@ -95,12 +95,12 @@ export class SirenSection extends React.Component {
 
     const financialData = this.props.session.financialData;
 
-    const isNextStepAvailable = nextStepAvailable(companies);
+    const isNextStepAvailable = nextStepAvailable(providers);
 
     let buttonNextStep;
     if (
-      this.state.companies.filter((company) => company.status == 200).length ==
-      this.state.companies.length
+      this.state.providers.filter((provider) => provider.status == 200).length ==
+      this.state.providers.length
     ) {
       buttonNextStep = (
         <div>
@@ -199,7 +199,7 @@ export class SirenSection extends React.Component {
             <div className="table-container">
               <div className="table-data table-company">
                 {error && <ErrorApi />}
-                { companies.some(company => company.status == "404") && (
+                { providers.some(provider => provider.status == "404") && (
                   <div className="alert alert-danger">
                     <p>
                       <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas pu être synchroniser. Vérifiez le numéro de siren et
@@ -220,7 +220,7 @@ export class SirenSection extends React.Component {
                       <i className="bi bi-check2 me-2"></i> Tous les comptes ayant un
                       n° de Siren ont bien été synchronisés.
                     </p>
-                    {companies.filter((company) => company.state == "default")
+                    {providers.filter((provider) => provider.state == "default")
                       .length > 0 && (
                       <button
                         onClick={this.handleChange}
@@ -229,11 +229,11 @@ export class SirenSection extends React.Component {
                       >
                         Comptes sans numéro de siren (
                         {
-                          companies.filter(
-                            (company) => company.state == "default"
+                          providers.filter(
+                            (provider) => provider.state == "default"
                           ).length
                         }
-                        /{companies.length})
+                        /{providers.length})
                       </button>
                     )}
                   </div>
@@ -244,7 +244,7 @@ export class SirenSection extends React.Component {
                   empreintes de certains comptes doivent être synchronisées.
                 </p>
                 <button
-                  onClick={() => this.synchroniseCompanies()}
+                  onClick={() => this.synchroniseProviders()}
                   className="btn btn-secondary"
                   disabled={isDisabled}
                 >
@@ -295,7 +295,7 @@ export class SirenSection extends React.Component {
                     </select>
                   </div>
                 </div>
-                {companies.length && (
+                {providers.length && (
                   <IdentifiedCompaniesTable
                     nbItems={
                       nbItems == "all"
@@ -341,7 +341,7 @@ export class SirenSection extends React.Component {
     let companies = this.props.session.financialData.companies;
 
     let nonSyncWithSiren = companies.filter(
-      (company) => company.state == "siren" && company.status != 200
+      (provider) => provider.state == "siren" && provider.status != 200
     );
 
     let disable;
@@ -368,18 +368,24 @@ export class SirenSection extends React.Component {
   };
 
   // Import CSV File
-  importCSVFile = (file) => {
+  importCSVFile = (file) => 
+  {
     let reader = new FileReader();
-    reader.onload = async () => {
+
+    reader.onload = async () => 
+    {
       let CSVData = await CSVFileReader(reader.result);
 
       let companiesIds = await processCSVCompaniesData(CSVData);
       await Promise.all(
-        Object.entries(companiesIds).map(async ([corporateName, corporateId]) =>
+        Object.entries(companiesIds).map(async ([corporateName, providerNum]) => {
+          let provider  = providerNum ? this.props.session.financialData.getCompanyByAccount(providerNum) : this.props.session.financialData.getCompanyByName(corporateName);
+          provider.corporateName = corporateName;
           this.props.session.financialData.updateCorporateId(
             corporateName,
             corporateId
           )
+        }
         )
       );
       this.setState({
@@ -418,12 +424,12 @@ export class SirenSection extends React.Component {
   // Export CSV File
   exportXLSXFile = async () => {
     let jsonContent = await this.props.session.financialData.companies
-      .filter((company) => company.accountNum.charAt(0) != "_")
-      .map((company) => {
+      .filter((provider) => provider.accountNum.charAt(0) != "_")
+      .map((provider) => {
         return {
-          accountNum: company.accountNum,
-          denomination: company.corporateName,
-          siren: company.corporateId,
+          accountNum: provider.accountNum,
+          denomination: provider.corporateName,
+          siren: provider.corporateId,
         };
       });
     let fileProps = { wsclos: [{ wch: 50 }, { wch: 20 }] };
@@ -445,9 +451,9 @@ export class SirenSection extends React.Component {
 
   /* ---------- FETCHING DATA ---------- */
 
-  synchroniseCompanies = async () => {
-    let companiesToSynchronise = this.state.companies.filter(
-      (company) => company.state == "siren" && company.status != 200
+  synchroniseProviders = async () => {
+    let companiesToSynchronise = this.state.providers.filter(
+      (provider) => provider.state == "siren" && provider.status != 200
     );
 
     // synchronise data
@@ -473,9 +479,9 @@ export class SirenSection extends React.Component {
       fetching: false,
       progression: 0,
       view: "all",
-      companiesShowed: this.state.companies,
-      synchronised: this.state.companies.filter(
-        (company) => company.status == 200
+      companiesShowed: this.state.providers,
+      synchronised: this.state.providers.filter(
+        (provider) => provider.status == 200
       ).length,
     });
 
@@ -493,12 +499,12 @@ export class SirenSection extends React.Component {
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const nextStepAvailable = (companies) => {
-  let nbSirenSynchronised = companies.filter(
-    (company) => company.state == "siren" && company.status == 200
+const nextStepAvailable = (providers) => {
+  let nbSirenSynchronised = providers.filter(
+    (provider) => provider.state == "siren" && provider.status == 200
   ).length;
 
-  let nbSiren = companies.filter((company) => company.state == "siren").length;
+  let nbSiren = providers.filter((provider) => provider.state == "siren").length;
   if (nbSirenSynchronised == nbSiren && nbSiren != 0) {
     return true;
   } else {

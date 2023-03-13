@@ -16,7 +16,7 @@ import { ComparativeData } from "../ComparativeData";
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import { Company } from "../Company";
+import { Provider } from "../Provider";
 
 
 const prevIndics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
@@ -224,24 +224,24 @@ async function updateComparativeData(
 }
 
 const updateCompaniesData = async (session) => {
-  let companies = session.financialData.companies
+  let providers = session.financialData.providers
     ? session.financialData.companies.map(
-        (props, index) => new Company({ id: index, ...props })
+        (props, index) => new Provider({ id: index, ...props })
       )
     : [];
 
-  let companiesToSynchronise = companies.filter(
-    (company) => company.state == "siren"
+  let companiesToSynchronise = providers.filter(
+    (provider) => provider.state == "siren"
   );
 
-  for (let company of companiesToSynchronise) {
+  for (let provider of companiesToSynchronise) {
     try {
-      await company.updateFromRemote();
+      await provider.updateFromRemote();
     } catch (error) {
       console.log(error);
       break;
     }
   }
 
-  return companies;
+  return providers;
 };
