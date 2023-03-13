@@ -16,14 +16,14 @@ import { ErrorApi } from "../ErrorAPI";
 /* -------------------- INITIAL STATES SECTION -------------------- */
 /* ---------------------------------------------------------------- */
 
-export class InitialStatesSection extends React.Component 
-{
+export class InitialStatesSection extends React.Component {
   constructor(props) {
     super(props);
     this.onDrop = (files) => {
       this.setState({ files });
       this.importFile();
-    };
+    };  
+
 
     this.state = {
       financialData: props.session.financialData,
@@ -33,7 +33,6 @@ export class InitialStatesSection extends React.Component
       titlePopup: "",
       message: "",
       files: [],
-      view: "importData",
       error: false,
     };
   }
@@ -57,7 +56,7 @@ export class InitialStatesSection extends React.Component
     const accountsShowed = financialData.immobilisations.concat(
       financialData.stocks
     );
-
+  
     const isNextStepAvailable = nextStepAvailable(this.state) && message == "";
     return (
       <Container fluid>
@@ -67,151 +66,126 @@ export class InitialStatesSection extends React.Component
             <p>
               Les états initiaux correspondent aux{" "}
               <b>
-                empreintes des comptes de stocks et d’immobilisations en début
-                d’exercice
+                empreintes des comptes de stocks et d'immobilisations en début
+                d'exercice
               </b>
-              . Ces empreintes peuvent être reprises de l’exercice précédent
-              (onglet 1) ou estimées sur la base de l’exercice courant ou
-              initialisées à partir de valeurs par défaut (onglet 2)
+              . Ces empreintes peuvent être reprises de l'exercice précédent ou
+              estimées sur la base de l'exercice courant ou initialisées à
+              partir de valeurs par défaut.
             </p>
           </div>
+          <div className="step p-4">
+            <h3 className="mb-3"> Reprise sur l'exercice précédent</h3>
+            <p className="small">
+              En cas d'analyse réalisée pour l'exercice précédent,{" "}
+              <b>importez le fichier</b> de l'analyse de l'exercice précédent.
+              L'ajout de la sauvegarde permet d'assurer une continuité vis-à-vis
+              de l'exercice en cours. La sauvegarde contient les valeurs des
+              indicateurs associés aux comptes de stocks, d'immobilisations et
+              d'amortissements en fin d'exercice.
+            </p>
 
-          <div className="table-menu">
-            <button
-              value="importData"
-              className={this.state.view == "importData" ? "active" : ""}
-              onClick={this.changeView}
-            >
-              Importer la sauvegarde de l'année dernière
-            </button>
-
-            <button
-              className={this.state.view == "defaultData" ? "active" : ""}
-              onClick={this.changeView}
-              value="defaultData"
-            >
-              Initialiser avec des valeurs par défaut
-            </button>
-          </div>
-          {this.state.view == "defaultData" ? (
-            <section className="step">
-              <div className="small">
+            <label>Importer votre fichier de sauvegarde (.json)</label>
+            <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false}>
+              {({ getRootProps, getInputProps }) => (
+                <div className="dropzone-section">
+                  <div {...getRootProps()} className="dropzone">
+                    <input {...getInputProps()} />
+                    <p>
+                      <i className="bi bi-file-arrow-up-fill"></i> Glisser votre
+                      fichier ici
+                    </p>
+                    <p className="small">OU</p>
+                    <p className="btn btn-primary">
+                      Selectionner votre fichier
+                    </p>
+                  </div>
+                </div>
+              )}
+            </Dropzone>
+            {files.length > 0 && message == "" && (
+              <div className="alert alert-success">
                 <p>
-                  En cas d'analyse réalisée pour l'exercice précédent, importez
-                  le fichier de sauvegarde via le premier onglet.
-                </p>
-                <p>
-                  <i className="bi bi-info-circle"></i>{" "}
-                  <b>Valeur par défaut :</b> Les valeurs par défaut
-                  correspondent aux données disponibles pour la branche
-                  économique la plus proche.
-                </p>
-                <p>
-                  <i className="bi  bi-info-circle"></i>{" "}
-                  <b>Estimée sur exercice courant : </b>Nous initialisons
-                  l'empreinte du compte en début d'exercice. à partir des
-                  opérations réalisées sur l'exercice courant.
+                  Votre fichier <b>{files[0].name}</b> a bien été importé
                 </p>
               </div>
+            )}
+            {showMessage && (
+              <div className="alert alert-danger">
+                <p>{titlePopup}</p>
+                <p>{message}</p>
+              </div>
+            )}
+          </div>
+          <div className="step p-4 my-3">
+            <h3 className="mb-3"> Initialiser les états initiaux </h3>
 
-              {error && <ErrorApi />}
-              {!isNextStepAvailable ? (
-                <div className="alert alert-info">
-                  <p>
-                    <i className="bi bi-exclamation-circle"></i> Les
-                    empreintes de certains comptes doivent être synchronisées.
-                  </p>
-                  <button
-                    onClick={() => this.synchroniseAll()}
-                    className="btn btn-secondary"
-                  >
-                    <i className="bi bi-arrow-repeat"></i> Synchroniser les
-                    données
-                  </button>
-                </div>
-              ) :  <div className={"alert alert-success"}>
+            <div className="small">
               <p>
-                <i className="bi bi-check2"></i> Les données ont bien été synchronisées.
+                <i className="bi bi-info-circle"></i> <b>Valeur par défaut :</b>{" "}
+                Les valeurs par défaut correspondent aux données disponibles
+                pour la branche économique la plus proche.
               </p>
-            </div>}
-              {financialData.immobilisations.concat(financialData.stocks)
-                .length > 0 && (
-                <div className="table-data mt-2">
-                  <InitialStatesTable
-                    financialData={financialData}
-                    financialPeriod={this.props.session.financialPeriod}
-                    accountsShowed={accountsShowed}
-                    onUpdate={this.updateFootprints.bind(this)}
-                  />
-                </div>
-              )}
+              <p>
+                <i className="bi  bi-info-circle"></i>{" "}
+                <b>Estimée sur exercice courant : </b>Nous initialisons
+                l'empreinte du compte en début d'exercice. à partir des
+                opérations réalisées sur l'exercice courant.
+              </p>
+            </div>
 
-              {fetching && (
-                <div className="popup">
-                  <ProgressBar
-                    message="Récupération des données par défaut..."
-                    progression={syncProgression}
-                  />
-                </div>
-              )}
-            </section>
-          ) : (
-            <section className="step">
-              <p className="small mb-2">
-                L'ajout de la sauvegarde de l'analyse sur l'exercice précédent
-                permet d'assurer une continuité vis-à-vis de l'exercice en
-                cours. La sauvegarde contient les valeurs des indicateurs
-                associés aux comptes de stocks, d'immobilisations et
-                d'amortissements en fin d'exercice.
-              </p>
-              <label>Importer votre fichier de sauvegarde (.json)</label>
-              <Dropzone onDrop={this.onDrop} maxFiles={1} multiple={false}>
-                {({ getRootProps, getInputProps }) => (
-                  <div className="dropzone-section">
-                    <div {...getRootProps()} className="dropzone">
-                      <input {...getInputProps()} />
-                      <p>
-                        <i className="bi bi-file-arrow-up-fill"></i> Glisser
-                        votre fichier ici
-                      </p>
-                      <p className="small">OU</p>
-                      <p className="btn btn-primary">
-                        Selectionner votre fichier
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </Dropzone>
-              {files.length > 0 && message == "" && (
-                <div className="alert alert-success">
-                  <h4>Votre fichier a bien été importé</h4>
-                  <ul>
-                    {files.map((file) => (
-                      <li key={file.name}>
-                        {" "}
-                        <i className="bi bi-file-earmark-excel-fill"></i>{" "}
-                        {file.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {showMessage && (
-                <div className="alert alert-danger">
-                  <p>{titlePopup}</p>
-                  <p>{message}</p>
-                </div>
-              )}
-            </section>
-          )}
+            {error && <ErrorApi />}
+            {!isNextStepAvailable ? (
+              <div className="alert alert-info">
+                <p>
+                  <i className="bi bi-exclamation-circle"></i> Les empreintes de
+                  certains comptes doivent être synchronisées.
+                </p>
+                <button
+                  onClick={() => this.synchroniseAll()}
+                  className="btn btn-secondary"
+                >
+                  <i className="bi bi-arrow-repeat"></i> Synchroniser les
+                  données
+                </button>
+              </div>
+            ) : (
+              <div className={"alert alert-success"}>
+                <p>
+                  <i className="bi bi-check2"></i> Les données ont bien été
+                  synchronisées.
+                </p>
+              </div>
+            )}
+            {financialData.immobilisations.concat(financialData.stocks).length >
+              0 && (
+              <div className="table-data mt-2">
+                <InitialStatesTable
+                  financialData={financialData}
+                  financialPeriod={this.props.session.financialPeriod}
+                  accountsShowed={accountsShowed}
+                  onUpdate={this.updateFootprints.bind(this)}
+                />
+              </div>
+            )}
+
+            {fetching && (
+              <div className="popup">
+                <ProgressBar
+                  message="Récupération des données par défaut..."
+                  progression={syncProgression}
+                />
+              </div>
+            )}
+          </div>
 
           <div className="text-end">
             <button
-                className={"btn btn-primary me-2"}
-                onClick={this.props.return}
-              >
+              className={"btn btn-primary me-2"}
+              onClick={this.props.return}
+            >
               <i className="bi bi-chevron-left"></i>Etape précédente
-              </button>
+            </button>
             <button
               className={"btn btn-secondary"}
               id="validation-button"
@@ -229,8 +203,7 @@ export class InitialStatesSection extends React.Component
   /* ---------- ACTIONS ---------- */
 
   // Synchronisation
-  async synchroniseAll() 
-  {
+  async synchroniseAll() {
     // init progression
     this.setState({ fetching: true, syncProgression: 0 });
     // accounts
@@ -261,15 +234,6 @@ export class InitialStatesSection extends React.Component
       financialData: this.props.session.financialData,
     });
   }
-  /* ---------- SELECTED VIEW ---------- */
-
-  changeView = (event) =>
-    this.setState({
-      view: event.target.value,
-      files: [],
-      showMessage: false,
-      message: "",
-    });
 
   /* ----- UPDATES ----- */
 
@@ -288,17 +252,21 @@ export class InitialStatesSection extends React.Component
       try {
         // text -> JSON
         const prevSession = JSON.parse(reader.result);
-
         // update to current version
         updateVersion(prevSession);
 
+        const prevYear = prevSession.financialPeriod.periodKey.slice(2);
+        const currYear = this.props.session.financialPeriod.periodKey.slice(2);
+
         if (
           //prevSession.legalUnit.siren == this.props.session.legalUnit.siren &&
-          parseInt(prevSession.year) ==
-          parseInt(this.props.session.year) - 1
+          parseInt(prevYear) ==
+          parseInt(currYear) - 1
         ) {
+   
           // JSON -> session
-          this.props.session.financialData.loadInitialStates(prevSession);
+          this.props.session.financialData.mergeData(prevSession.financialData);
+          this.props.session.financialData.loadInitialStates(prevSession.financialData);
 
           // Update component
           this.setState({
@@ -345,10 +313,18 @@ export class InitialStatesSection extends React.Component
 /* -------------------------------------------------- NEXT SECTION -------------------------------------------------- */
 
 // condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
-const nextStepAvailable = ({ financialData }) =>
-{
+const nextStepAvailable = ({ financialData }) => {
   let accounts = financialData.immobilisations.concat(financialData.stocks);
   console.log(accounts);
-  console.log(!(accounts.some((account) => account.initialStateType == "defaultData" && !account.initialStateSet)))
-  return !(accounts.some((account) => (account.initialStateType == "defaultData" && !account.initialStateSet) || (account.isAmortisable && account.initialStateType == "none")));
+  console.log(
+    !accounts.some(
+      (account) =>
+        account.initialStateType == "defaultData" && !account.initialStateSet
+    )
+  );
+  return !accounts.some(
+    (account) =>
+      (account.initialStateType == "defaultData" && !account.initialStateSet) ||
+      (account.isAmortisable && account.initialStateType == "none")
+  );
 };
