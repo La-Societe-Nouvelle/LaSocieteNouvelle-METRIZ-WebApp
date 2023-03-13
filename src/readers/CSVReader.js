@@ -56,7 +56,10 @@ async function processCSVCompaniesData(CSVCompaniesData)
   let data = {};
   
   await CSVCompaniesData.forEach((CSVCompanieData) => {
-    data[CSVCompanieData.corporateName] = CSVCompanieData.corporateId;
+    data[CSVCompanieData.providerNum] = {
+      corporateName: CSVCompanieData.corporateName,
+      corporateId: CSVCompanieData.corporateId,
+    }
   })
 
   return data;

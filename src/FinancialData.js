@@ -333,9 +333,10 @@ export class FinancialData {
                 corporateName: expense.providerLib, 
                 isDefaultProviderAccount: expense.isDefaultProviderAccount
             })})
-            .filter((value, index, self) => index === self.findIndex(item => item.accountNum === value.accountNum))
+            .filter((value, index, self) => index === self.findIndex(item => item.providerNum === value.providerNum))
             .map((providerData,id) => new Provider({id, ...providerData}));
-        this.providers.forEach(provider => provider.buildPeriods(this.expenses.concat(this.investments).filter(expense => expense.providerNum==provider.providerNum),periods))
+        this.providers.forEach(provider => provider.buildPeriods(this.expenses.concat(this.investments).filter(expense => expense.providerNum == provider.providerNum),periods));
+        console.log(this.providers);
     }
 
     /* ---------------------------------------- INITIAL STATES INITIALIZER ---------------------------------------- */

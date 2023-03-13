@@ -23,7 +23,7 @@ export class Stock {
 
     this.id = id;
     this.isProductionStock = /^3(3|4|5)/.test(accountNum);
-    this.expensesAccountsPrefix = !this.isProductionStock ? "60"+accountNum.slice(1).replace(/(0*)$/g,"") : null;
+    this.expensesAccountsPrefix = !this.isProductionStock ? "60"+accountNum.slice(1).replace(/(0*)$/g,"") : null; // 3145 -> 60145.. 
     
     // Stock -------------------------------------------- //
     

@@ -8,10 +8,12 @@ import { InputText } from "/components/input/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 import { Table } from "react-bootstrap";
 
-/* ---------- COMPANIES TABLE ---------- */
+/* ---------- PROVIDERS TABLE ---------- */
 
-export class IdentifiedCompaniesTable extends React.Component {
-  constructor(props) {
+export class IdentifiedProvidersTable extends React.Component 
+{
+  constructor(props) 
+  {
     super(props);
     this.state = {
       providers: props.providers,
@@ -20,16 +22,18 @@ export class IdentifiedCompaniesTable extends React.Component {
       page: 0,
     };
   }
+
   componentDidUpdate(prevProps) {
     if (prevProps.providers !== this.props.providers) {
       this.setState({ providers: this.props.providers });
     }
   }
 
-  render() {
-    const { nbItems } = this.props;
+  render() 
+  {
+    const { nbItems, financialPeriod } = this.props;
     const { providers, columnSorted, page } = this.state;
-    this.sortCompanies(providers, columnSorted);
+    this.sortProviders(providers, financialPeriod, columnSorted);
     return (
       <div className="table-main" id="table">
         <Table>
@@ -62,10 +66,11 @@ export class IdentifiedCompaniesTable extends React.Component {
             {providers
               .slice(page * nbItems, (page + 1) * nbItems)
               .map((provider) => (
-                <RowTableCompanies
+                <RowTableProviders
                   key={"provider_" + provider.id}
                   {...provider}
-                  updateCompany={this.updateCompany.bind(this)}
+                  financialPeriod={financialPeriod}
+                  updateProvider={this.updateProvider.bind(this)}
                 />
               ))}
           </tbody>
@@ -116,26 +121,26 @@ export class IdentifiedCompaniesTable extends React.Component {
     }
   }
 
-  sortCompanies(companies, columSorted) {
+  sortProviders(providers, period, columSorted) {
     
     switch (columSorted) {
       case "identifiant":
-        companies.sort((a, b) =>
+        providers.sort((a, b) =>
           valueOrDefault(a.corporateId, "").localeCompare(
             valueOrDefault(b.corporateId, "")
           )
         );
         break;
       case "denomination":
-        companies.sort((a, b) =>
+        providers.sort((a, b) =>
           a.getCorporateName().localeCompare(b.getCorporateName())
         );
         break;
       case "amount":
-        companies.sort((a, b) => b.amount - a.amount);
+        providers.sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount);
         break;
     }
-    if (this.state.reverseSort) companies.reverse();
+    if (this.state.reverseSort) providers.reverse();
   }
 
   /* ---------- NAVIGATION ---------- */
@@ -146,31 +151,32 @@ export class IdentifiedCompaniesTable extends React.Component {
   nextPage = () => {
     if (
       (this.state.page + 1) * this.props.nbItems <
-      this.props.financialData.companies.length
+      this.props.financialData.providers.length
     )
       this.setState({ page: this.state.page + 1 });
   };
 
   /* ---------- OPERATIONS ON PROVIDER ---------- */
 
-  updateCompany = (nextProps) => {
-    let company = this.props.financialData.getCompany(nextProps.id);
-    company.update(nextProps);
+  updateProvider = (nextProps) => {
+    let provider = this.props.financialData.getCompany(nextProps.id);
+    provider.update(nextProps);
     this.props.checkSync(nextProps);
-    this.setState({ companies: this.props.companies });
+    this.setState({ providers: this.props.providers });
   };
 
-  updateCompanyFromRemote = async (companyId) => {
-    let company = this.props.financialData.getCompany(companyId);
-    await company.updateFromRemote();
+  updateProviderFromRemote = async (providerNum) => {
+    let provider = this.props.financialData.getCompany(providerNum);
+    await provider.updateFromRemote();
     this.props.onUpdate();
-    this.setState({ companies: this.props.companies });
+    this.setState({ providers: this.props.providers });
   };
 }
 
-/* ----- COMPANY ROW ----- */
+/* ----- PROVIDER ROW ----- */
 
-class RowTableCompanies extends React.Component {
+class RowTableProviders extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
@@ -190,7 +196,7 @@ class RowTableCompanies extends React.Component {
   }
 
   render() {
-    const { corporateName, accountNum, amount, status, isDefaultAccount } = this.props;
+    const { corporateName, accountNum, periodsData, status, isDefaultAccount, financialPeriod } = this.props;
     const { corporateId } = this.state;
     let icon;
     if (corporateId && status != 200) {
@@ -231,14 +237,14 @@ class RowTableCompanies extends React.Component {
         </td>
         <td>{corporateName}</td>
         <td>{accountNum}</td>
-        <td className="text-end">{printValue(amount, 0)} &euro;</td>
+        <td className="text-end">{printValue(periodsData[financialPeriod.periodKey].amount, 0)} &euro;</td>
       </tr>
     );
   }
 
   updateCorporateId = (nextCorporateId) => {
     this.setState({ dataUpdated: true });
-    this.props.updateCompany({
+    this.props.updateProvider({
       id: this.props.id,
       corporateId: nextCorporateId,
     });

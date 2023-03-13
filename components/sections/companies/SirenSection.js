@@ -2,7 +2,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 // Table
-import { IdentifiedCompaniesTable } from "../../tables/IdentifiedCompaniesTable";
+import { IdentifiedProvidersTable } from "../../tables/IdentifiedCompaniesTable";
 
 // Reader & Writers
 import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
@@ -14,10 +14,12 @@ import { ProgressBar } from "../../popups/ProgressBar";
 import { MessagePopup } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
-export class SirenSection extends React.Component {
-  constructor(props) {
-    super(props);
 
+export class SirenSection extends React.Component 
+{
+  constructor(props) 
+  {
+    super(props);
     this.state = {
       providers: props.session.financialData.providers,
       providersShowed: props.session.financialData.providers,
@@ -45,34 +47,34 @@ export class SirenSection extends React.Component {
     };
   }
 
-  handleChange = (event) => {
+  handleChange = (event) => 
+  {
     let view = event.target.value;
-
     switch (view) {
       case "undefined":
         return this.setState({
-          companiesShowed: this.state.providers.filter(
+          providersShowed: this.state.providers.filter(
             (provider) => provider.state != "siren"
           ),
           view: view,
         });
       case "unsync":
         return this.setState({
-          companiesShowed: this.state.providers.filter(
+          providersShowed: this.state.providers.filter(
             (provider) => provider.status != 200
           ),
           view: view,
         });
       case "error":
         return this.setState({
-          companiesShowed: this.state.providers.filter(
+          providersShowed: this.state.providers.filter(
             (provider) => provider.status == 404
           ),
           view: view,
         });
       default:
         return this.setState({
-          companiesShowed: this.state.providers,
+          providersShowed: this.state.providers,
           view: view,
         });
     }
@@ -80,13 +82,13 @@ export class SirenSection extends React.Component {
 
   render() {
     const {
-      providers: providers,
+      providers,
       view,
       nbItems,
       fetching,
       progression,
       synchronised,
-      providersShowed: companiesShowed,
+      providersShowed,
       popup,
       isDisabled,
       errorFile,
@@ -94,6 +96,7 @@ export class SirenSection extends React.Component {
     } = this.state;
 
     const financialData = this.props.session.financialData;
+    const financialPeriod = this.props.financialPeriod;
 
     const isNextStepAvailable = nextStepAvailable(providers);
 
@@ -296,15 +299,16 @@ export class SirenSection extends React.Component {
                   </div>
                 </div>
                 {providers.length && (
-                  <IdentifiedCompaniesTable
+                  <IdentifiedProvidersTable
                     nbItems={
                       nbItems == "all"
-                        ? companiesShowed.length
+                        ? providersShowed.length
                         : parseInt(nbItems)
                     }
                     onUpdate={this.updateFootprints.bind(this)}
-                    companies={companiesShowed}
+                    providers={providersShowed}
                     financialData={financialData}
+                    financialPeriod={financialPeriod}
                     checkSync={this.enableButton.bind(this)}
                   />
                 )}
@@ -334,13 +338,13 @@ export class SirenSection extends React.Component {
 
   updateFootprints = () => {
     this.props.session.updateFootprints();
-    this.setState({ companies: this.props.session.financialData.companies });
+    this.setState({ providers: this.props.session.financialData.providers });
   };
 
   enableButton = () => {
-    let companies = this.props.session.financialData.companies;
+    let providers = this.props.session.financialData.providers;
 
-    let nonSyncWithSiren = companies.filter(
+    let nonSyncWithSiren = providers.filter(
       (provider) => provider.state == "siren" && provider.status != 200
     );
 
@@ -378,18 +382,17 @@ export class SirenSection extends React.Component {
 
       let companiesIds = await processCSVCompaniesData(CSVData);
       await Promise.all(
-        Object.entries(companiesIds).map(async ([corporateName, providerNum]) => {
+        Object.entries(companiesIds).map(async ([providerNum, corporateName, corporateId]) => {
           let provider  = providerNum ? this.props.session.financialData.getCompanyByAccount(providerNum) : this.props.session.financialData.getCompanyByName(corporateName);
-          provider.corporateName = corporateName;
-          this.props.session.financialData.updateCorporateId(
-            corporateName,
-            corporateId
-          )
-        }
-        )
+          if (provider) {
+            provider.corporateName = corporateName;
+            provider.corporateId = corporateId;
+            provider.dataFetched = false; // check if changes or use update()
+          }
+        })
       );
       this.setState({
-        companies: this.props.session.financialData.companies,
+        providers: this.props.session.financialData.providers,
       });
     };
 
@@ -397,22 +400,25 @@ export class SirenSection extends React.Component {
   };
 
   // Import XLSX File
-  importXLSXFile = (file) => {
+  importXLSXFile = (file) => 
+  {
     let reader = new FileReader();
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
-
       await Promise.all(
-        XLSXData.map(async ({ account, accountNum, denomination, siren }) =>
-          this.props.session.financialData.updateCorporateId(
-            accountNum || account,
-            denomination,
-            siren
-          )
-        )
+        XLSXData.map(async ({ accountNum, accountLib, denomination, siren }) => {
+          let provider = accountNum ? 
+              this.props.session.financialData.providers.filter(provider => provider.providerNum == accountNum)[0]    // based on num
+            : this.props.session.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
+          if (provider) {
+            provider.corporateId = siren;
+            provider.corporateName = denomination;
+            provider.dataFetched = false; // check if changes or use update()
+          }
+        })
       );
       this.setState({
-        companies: this.props.session.financialData.companies,
+        providers: this.props.session.financialData.providers,
       });
     };
 
@@ -423,7 +429,7 @@ export class SirenSection extends React.Component {
 
   // Export CSV File
   exportXLSXFile = async () => {
-    let jsonContent = await this.props.session.financialData.companies
+    let jsonContent = await this.props.session.financialData.providers
       .filter((provider) => provider.accountNum.charAt(0) != "_")
       .map((provider) => {
         return {
@@ -452,7 +458,7 @@ export class SirenSection extends React.Component {
   /* ---------- FETCHING DATA ---------- */
 
   synchroniseProviders = async () => {
-    let companiesToSynchronise = this.state.providers.filter(
+    let providersToSynchronise = this.state.providers.filter(
       (provider) => provider.state == "siren" && provider.status != 200
     );
 
@@ -460,11 +466,11 @@ export class SirenSection extends React.Component {
     this.setState({ fetching: true, progression: 0 });
 
     let i = 0;
-    let n = companiesToSynchronise.length;
+    let n = providersToSynchronise.length;
 
-    for (let company of companiesToSynchronise) {
+    for (let provider of providersToSynchronise) {
       try {
-        await company.updateFromRemote();
+        await provider.updateFromRemote();
       } catch (error) {
         this.setState({ error: true });
         break;
@@ -479,7 +485,7 @@ export class SirenSection extends React.Component {
       fetching: false,
       progression: 0,
       view: "all",
-      companiesShowed: this.state.providers,
+      providersShowed: this.state.providers,
       synchronised: this.state.providers.filter(
         (provider) => provider.status == 200
       ).length,

@@ -62,7 +62,8 @@ export class ProvidersSection extends React.Component
     } = this.state;
     
     const financialData = this.props.session.financialData;
-    const unidentifiedCompanies = this.state.providers.filter((provider) => provider.state == "default");
+    const financialPeriod = this.props.session.financialPeriod;
+    const unidentifiedCompanies = this.state.providers.filter((provider) => provider.isDefaultProviderAccount); // ?
 
     // Synchro with corporate ID 
 
@@ -70,6 +71,7 @@ export class ProvidersSection extends React.Component
       return (
         <SirenSection {...this.props}
           financialData={financialData} 
+          financialPeriod={financialPeriod}
           nextStep={this.nextStep}/>
       )
     }
@@ -78,6 +80,7 @@ export class ProvidersSection extends React.Component
       return (
         <SectorSection {...this.props}
           financialData={financialData} 
+          financialPeriod={financialPeriod}
           unidentifiedCompanies={unidentifiedCompanies} 
           prevStep={this.prevStep} 
           nextStep={this.nextStep}/>
