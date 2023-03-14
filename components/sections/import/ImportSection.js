@@ -17,7 +17,7 @@ import {
   buildRegexFinancialPeriod,
   getListMonthsFinancialPeriod,
 } from "../../../src/Session";
-import { StockExpensesMapping } from "./StockExpensesMapping";
+import { StockPurchasesMapping } from "./StockPurchasesMapping";
 
 function ImportSection(props) {
   //STATE
@@ -114,7 +114,7 @@ function ImportSection(props) {
           />
         )}
         {view == 3 && (
-          <StockExpensesMapping
+          <StockPurchasesMapping
             return={() => setView(2)}
             onClick={() => loadFECData(importedData)}
             meta={importedData.meta}
