@@ -123,7 +123,7 @@ function ImportSection(props) {
         {view == 4 && (
           <FinancialDatas
             {...props}
-            return={() => setView(2)}
+            return={() => setView(3)}
             reset={() => setView(0)}
           />
         )}
@@ -144,7 +144,6 @@ function ImportSection(props) {
       {
         try {
           let FECData = await FECFileReader(reader.result); // read file (file -> JSON)
-          console.log(FECData);
           setImportedData(FECData);
           setView(1);
         } catch (error) {
@@ -162,10 +161,10 @@ function ImportSection(props) {
   }
 
   async function loadFECData(importedData) {
-    console.log(importedData);
+  
 
     let FECData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
-
+    console.log(FECData)
     if (FECData.errors.length > 0) {
       // show error(s) (content)
       FECData.errors.forEach((error) => console.log(error));
