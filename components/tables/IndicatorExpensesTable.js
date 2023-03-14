@@ -30,11 +30,11 @@ export class IndicatorExpensesTable extends React.Component {
 
   render() 
   {
-    const {session,indic} = this.props;
+    const {session,indic,period} = this.props;
     const {columnSorted} = this.state;
 
-    const expensesByAccount = getExpensesGroupByAccount(session.financialData.expenses);
-    this.sortExpenses(expensesByAccount,columnSorted);
+    const externalExpensesAccounts = session.financialData.externalExpenseAccounts;
+    this.sortAccounts(externalExpensesAccounts,period,columnSorted);
 
     const nbDecimals = metaIndics[indic].nbDecimals;
     const unit = metaIndics[indic].unit;
@@ -55,17 +55,15 @@ export class IndicatorExpensesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {expensesByAccount.map(({accountNum,amount,accountLib}) => 
-            {
-              const indicator = session.getExpensesAccountIndicator(accountNum,indic);
+          {externalExpensesAccounts.map(({accountNum,accountLib,periodsData}) => {
               return(
                 <tr key={accountNum}>
-                  <td >{accountNum}</td>
-                  <td >{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td  className="text-end">{printValue(amount,0)} &euro;</td>
-                  <td  className="text-end">{printValue(indicator.getValue(),nbDecimals)} <span > {unit}</span></td>
-                  <td  className="text-end"><u>+</u>{printValue(indicator.getUncertainty(),0)}%</td>
-                  {impactAbsolu ? <td  className="text-end">{printValue(indicator.getValueAbsolute(amount),nbDecimals)}<span > {unitAbsolute}</span></td> : null}
+                  <td> {accountNum}</td>
+                  <td> {accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
+                  <td  className="text-end">{printValue(periodsData[period.periodKey],0)} &euro;</td>
+                  <td  className="text-end">{printValue(periodsData[period.periodKey].footprint.indicators[indic].getValue(),nbDecimals)} <span > {unit}</span></td>
+                  <td  className="text-end"><u>+</u>{printValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),0)}%</td>
+                  {impactAbsolu ? <td  className="text-end">{printValue(periodsData[period.periodKey].footprint.indicators[indic].getValueAbsolute(periodsData[period.periodKey].amount),nbDecimals)}<span > {unitAbsolute}</span></td> : null}
                 </tr>)})}
           </tbody>
         </Table>
@@ -81,14 +79,14 @@ export class IndicatorExpensesTable extends React.Component {
     else                                        {this.setState({reverseSort: !this.state.reverseSort})}
   }
 
-  sortExpenses(expenses,columSorted) 
+  sortAccounts(accounts,period,columSorted) 
   {
     switch(columSorted) 
     {
-      case "account": expenses.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
-      case "amount": expenses.sort((a,b) => b.amount - a.amount); break;
+      case "account": accounts.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
+      case "amount": accounts.sort((a,b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount); break;
     }
-    if (this.state.reverseSort) expenses.reverse();
+    if (this.state.reverseSort) accounts.reverse();
   }
 
 }

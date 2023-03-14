@@ -1,6 +1,7 @@
 // La Société Nouvelle
 
 import { getAmountItemsForPeriod } from "../utils/Utils";
+import { buildAggregatePeriodFootprint } from "./footprintFormulas";
 
 /* ---------------------------------------------------------------------------------------------------- */
 /* ---------------------------------------- AGGREGATES BUILDER ---------------------------------------- */
@@ -22,7 +23,7 @@ import { getAmountItemsForPeriod } from "../utils/Utils";
  *      6871                                    Dotations aux amortissements exceptionnels des immobilisations
  */
 
-export const buildIntermediateConsumptionsAggregates = (financialData, periodKey) =>
+export const buildIntermediateConsumptionsAggregates = async (financialData, periodKey) =>
 {
     let aggregates = [];
     let accounts = [];
@@ -33,6 +34,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Matières premières",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -42,6 +44,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Autres approvisionnements",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
     
@@ -51,6 +54,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Marchandises",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -60,6 +64,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Variation des stocks",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -69,6 +74,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Autres achats",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -78,6 +84,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Autres charges externes",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };  
 
@@ -85,7 +92,7 @@ export const buildIntermediateConsumptionsAggregates = (financialData, periodKey
 }
     
 
-export const buildFixedCapitalConsumptionsAggregates = (financialData, periodKey) =>
+export const buildFixedCapitalConsumptionsAggregates = async (financialData, periodKey) =>
 {
     let aggregates = [];
     let accounts = []
@@ -96,6 +103,7 @@ export const buildFixedCapitalConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Dotations aux amortissements sur immobilisations incorporelles",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -105,6 +113,7 @@ export const buildFixedCapitalConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Dotations aux amortissements sur immobilisations corporelles",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -114,6 +123,7 @@ export const buildFixedCapitalConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Dotations aux amortissements sur immobilisations",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };
 
@@ -123,6 +133,7 @@ export const buildFixedCapitalConsumptionsAggregates = (financialData, periodKey
         aggregates.push({
             label: "Dotations aux amortissements exceptionnels des immobilisations",
             amount: getAmountItemsForPeriod(accounts, periodKey, 2),
+            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
         });
     };       
 

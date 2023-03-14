@@ -2,9 +2,9 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterHAZ = (session) => {
+export const analysisTextWriterHAZ = (session,period) => {
   const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -27,16 +27,16 @@ export const analysisTextWriterHAZ = (session) => {
 
   currentParagraph.push(
     "L'intensité d'utilisation de produits dangereux de la production est de " +
-      printValue(aggregates.production.footprint.indicators.haz.value, 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.haz.value, 0) +
       " g/€."
   );
   if (
-    aggregates.production.footprint.indicators.haz.value !=
-    aggregates.revenue.footprint.indicators.haz.value
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.haz.value !=
+    revenue.periodsData[period.periodKey].footprint.indicators.haz.value
   ) {
     currentParagraph.push(
       "La valeur est de " +
-        printValue(aggregates.revenue.footprint.indicators.haz.value, 0) +
+        printValue(revenue.periodsData[period.periodKey].footprint.indicators.haz.value, 0) +
         " g/€ pour le chiffre d'affaires, en prenant compte des stocks de production."
     );
   } else {
@@ -61,15 +61,15 @@ export const analysisTextWriterHAZ = (session) => {
         printValue(impactsData.hazardousSubstancesConsumption, 0) +
         " kg," +
         " soit une intensité de " +
-        printValue(aggregates.netValueAdded.footprint.indicators.haz.value, 0) +
+        printValue(mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.haz.value, 0) +
         " g/€ pour la valeur ajoutée."
     );
     currentParagraph.push(
       "L'utilisation directe de produits dangereux compte pour " +
         printValue(
           (impactsData.hazardousSubstancesConsumption /
-            aggregates.production.footprint.indicators.haz.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.haz.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -88,15 +88,15 @@ export const analysisTextWriterHAZ = (session) => {
   currentParagraph.push(
     "Les consommations intermédiaires sont à l'orgine d'une consommation de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.haz.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.haz.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " kg de produits dangereux," +
       " ce qui correspond à une intensité de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.haz.value,
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.haz.value,
         0
       ) +
       " g/€."
@@ -104,11 +104,11 @@ export const analysisTextWriterHAZ = (session) => {
   currentParagraph.push(
     "La consommation indirecte représente " +
       printValue(
-        (aggregates.intermediateConsumption.footprint.indicators.was.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.was.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
@@ -129,8 +129,8 @@ export const analysisTextWriterHAZ = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations implique une consommation de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.haz.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.haz.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +

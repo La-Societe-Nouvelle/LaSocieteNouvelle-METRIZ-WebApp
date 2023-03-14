@@ -73,6 +73,7 @@ const StatementSection = (props) =>
         <ResultSection
           session={props.session}
           indic={indic}
+          period={period}
           goBack={() => setView("statement")}
         />
       )}

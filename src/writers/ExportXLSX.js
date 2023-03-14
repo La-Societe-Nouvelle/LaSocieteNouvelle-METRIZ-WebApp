@@ -64,14 +64,17 @@ async function buildMainAggregatesContent(indic,session)
   const nbDecimals = metaIndics[indic].nbDecimals;
 
   const {
-    production,
     revenue,
     storedProduction,
-    immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
+    immobilisedProduction
+  } = session.financialData;
+  
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
     netValueAdded,
-  } = session.financialData.aggregates;
+  } = session.financialData.mainAggregates;
 
   // header
 
@@ -123,9 +126,9 @@ async function buildMainAggregatesContent(indic,session)
 
   aoaContent.push([
     "Consommations intermédiaires",
-    roundValue(intermediateConsumption.amount, 0),
-    roundValue(intermediateConsumption.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(intermediateConsumptions.amount, 0),
+    roundValue(intermediateConsumptions.footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(intermediateConsumptions.footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   const intermediateConsumptionsAggregates =
@@ -147,9 +150,9 @@ async function buildMainAggregatesContent(indic,session)
 
   aoaContent.push([
     "Consommations de capital fixe",
-    roundValue(capitalConsumption.amount, 0),
-    roundValue(capitalConsumption.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(capitalConsumption.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(fixedCapitalConsumptions.amount, 0),
+    roundValue(fixedCapitalConsumptions.footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(fixedCapitalConsumptions.footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   const fixedCapitalConsumptionsAggregates =

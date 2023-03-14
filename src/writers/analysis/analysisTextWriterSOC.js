@@ -2,9 +2,9 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterSOC = (session) => {
+export const analysisTextWriterSOC = (session,period) => {
   const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -24,7 +24,7 @@ export const analysisTextWriterSOC = (session) => {
 
   currentParagraph.push(
     "Le taux de contribution de la valeur produite est de " +
-      printValue(aggregates.production.footprint.indicators.soc.value, 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.soc.value, 0) +
       " %."
   );
 
@@ -39,9 +39,9 @@ export const analysisTextWriterSOC = (session) => {
     currentParagraph.push(
       "La valeur ajoutée est donc entièrement contributrice aux acteurs d'intérêt social et représente " +
         printValue(
-          (aggregates.netValueAdded.amount /
-            aggregates.production.footprint.indicators.soc.getGrossImpact(
-              aggregates.production.amount
+          (mainAggregates.netValueAdded.periodsData[period.periodKey].amount /
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -63,25 +63,25 @@ export const analysisTextWriterSOC = (session) => {
   // résultat
   currentParagraph.push(
     printValue(
-      aggregates.intermediateConsumption.footprint.indicators.soc.value,
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.soc.value,
       0
     ) +
       " % du volume des consommations intermédiaires contribue aux acteurs d'intérêt social," +
       " soit un montant de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.soc.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
+          mainAggregates.intermediateConsumption.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " €" +
       " et " +
       printValue(
-        (aggregates.intermediateConsumption.footprint.indicators.soc.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.soc.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.footprint.indicators.soc.getGrossImpact(
+            mainAggregates.production.amount
           )) *
           100,
         0
@@ -102,14 +102,14 @@ export const analysisTextWriterSOC = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations contribue à hauteur de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.soc.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " €, soit " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.soc.value,
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.soc.value,
         0
       ) +
       " % du volume des dotations aux amortissements."

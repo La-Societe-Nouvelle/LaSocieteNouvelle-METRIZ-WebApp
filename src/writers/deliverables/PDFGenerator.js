@@ -72,7 +72,8 @@ export const basicPDFReport = (
     impactsData,
     financialData,
     comparativeData,
-    indic
+    indic,
+    period
   );
 
   // ---------------------------------------------------------------
@@ -174,7 +175,7 @@ export const basicPDFReport = (
         table: {
           widths: ["*", "auto", "auto", "auto"],
           body: generateIndicTableBody(
-            financialData.aggregates,
+            financialData.mainAggregates,
             indic,
             unit,
             financialData.getIntermediateConsumptionsAggregates(),

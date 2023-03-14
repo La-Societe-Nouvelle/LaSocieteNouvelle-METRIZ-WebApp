@@ -22,12 +22,14 @@ import { Table } from 'react-bootstrap';
 /* -------------------- PUBLISH STATEMENT SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class PublishStatementSection extends React.Component {
-
-    constructor(props) {
+export class PublishStatementSection extends React.Component 
+{
+    constructor(props) 
+    {
         super(props);
+
         const socialFootprint = {};
-        Object.entries(props.session.financialData.aggregates.revenue.footprint.indicators).filter(([_, indicator]) => indicator.value != null)
+        Object.entries(props.session.financialData.mainAggregates.revenue.periodsData[props.period.periodKey].footprint.indicators).filter(([_, indicator]) => indicator.value != null)
             .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
 
         this.state =
@@ -39,7 +41,7 @@ export class PublishStatementSection extends React.Component {
             year: props.session.year || "",
 
             // Statements 
-            revenueFootprint: props.session.financialData.aggregates.revenue.footprint,
+            revenueFootprint: props.session.financialData.mainAggregates.revenue.periodsData[props.period.periodKey].footprint,
             validations: props.session.validations,
             comments: props.session.impactsData.comments || {},
 

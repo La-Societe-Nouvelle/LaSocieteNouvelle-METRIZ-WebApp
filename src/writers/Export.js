@@ -199,14 +199,17 @@ function generateFootprintPDF(
   // FINANCIAL DATA
 
   const {
-    production,
     revenue,
     storedProduction,
     immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
+  } = financialData;
+
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
     netValueAdded,
-  } = financialData.aggregates;
+  } = financialData.mainAggregates;
 
   let xAmount = 60;
   let xValue = x + 64;
@@ -414,7 +417,7 @@ function generateFootprintPDF(
 
   doc.setFontSize(6);
 
-  doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(intermediateConsumptions.amount, 0) + " €", xAmount, y, {
     align: "right",
   });
 
@@ -424,7 +427,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "bold");
     doc.text(
       printValue(
-        intermediateConsumption.footprint.indicators[indic].getValue(),
+        intermediateConsumptions.footprint.indicators[indic].getValue(),
         1
       ),
       xValue,
@@ -435,7 +438,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        intermediateConsumption.footprint.indicators[indic].getUncertainty(),
+        intermediateConsumptions.footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -444,8 +447,8 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        intermediateConsumption.footprint.indicators[indic].getGrossImpact(
-          intermediateConsumption.amount
+        intermediateConsumptions.footprint.indicators[indic].getGrossImpact(
+          intermediateConsumptions.amount
         ),
         0
       ),
@@ -509,7 +512,7 @@ function generateFootprintPDF(
     y
   );
   doc.setFontSize(6);
-  doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(fixedCapitalConsumptions.amount, 0) + " €", xAmount, y, {
     align: "right",
   });
   xValue = x + 64;
@@ -517,7 +520,7 @@ function generateFootprintPDF(
   indic.forEach((indic) => {
     doc.setFont("Helvetica", "bold");
     doc.text(
-      printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1),
+      printValue(fixedCapitalConsumptions.footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
@@ -525,7 +528,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        capitalConsumption.footprint.indicators[indic].getUncertainty(),
+        fixedCapitalConsumptions.footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -534,8 +537,8 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        capitalConsumption.footprint.indicators[indic].getGrossImpact(
-          capitalConsumption.amount
+        fixedCapitalConsumptions.footprint.indicators[indic].getGrossImpact(
+          fixedCapitalConsumptions.amount
         ),
         0
       ),

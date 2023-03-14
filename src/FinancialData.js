@@ -118,7 +118,7 @@ export class FinancialData {
       // Aggregates ------------------------------ //
 
       this.mainAggregates = {};
-      Object.entries(data.aggregates).forEach(
+      Object.entries(data.mainAggregates).forEach(
         ([aggregateId, aggregateProps]) =>
           (this.mainAggregates[aggregateId] = new Aggregate(aggregateProps))
       );

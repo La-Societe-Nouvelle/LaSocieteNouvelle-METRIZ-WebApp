@@ -2,9 +2,9 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterWAT = (session) => {
+export const analysisTextWriterWAT = (session,period) => {
   const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -24,16 +24,16 @@ export const analysisTextWriterWAT = (session) => {
 
   currentParagraph.push(
     "L'intensité de consommation d'eau de la valeur produite est de " +
-      printValue(aggregates.production.footprint.indicators.wat.value, 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.wat.value, 0) +
       " L/€."
   );
   if (
-    aggregates.production.footprint.indicators.wat.value !=
-    aggregates.revenue.footprint.indicators.wat.value
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.wat.value !=
+    revenue.periodsData[period.periodKey].footprint.indicators.wat.value
   ) {
     currentParagraph.push(
       "La valeur est de " +
-        printValue(aggregates.revenue.footprint.indicators.wat.value, 0) +
+        printValue(revenue.periodsData[period.periodKey].footprint.indicators.wat.value, 0) +
         " L/€ pour le chiffre d'affaires, en prenant compte des stocks de production."
     );
   } else {
@@ -56,15 +56,15 @@ export const analysisTextWriterWAT = (session) => {
         printValue(impactsData.waterConsumption, 0) +
         " m3," +
         " soit une intensité de " +
-        printValue(aggregates.netValueAdded.footprint.indicators.wat.value, 0) +
+        printValue(mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.wat.value, 0) +
         " L/€ pour la valeur ajoutée."
     );
     currentParagraph.push(
       "La consommation directe d'eau représente " +
         printValue(
           (impactsData.waterConsumption /
-            aggregates.production.footprint.indicators.wat.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.wat.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -83,15 +83,15 @@ export const analysisTextWriterWAT = (session) => {
   currentParagraph.push(
     "Les consommations intermédiaires sont à l'orgine d'une consommation indirecte de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.wat.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.wat.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " m3 d'eau," +
       " ce qui correspond à une intensité de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.wat.value,
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.wat.value,
         0
       ) +
       " L/€."
@@ -99,11 +99,11 @@ export const analysisTextWriterWAT = (session) => {
   currentParagraph.push(
     "La consommation indirecte d'eau des consommations intermédiaires représente " +
       printValue(
-        (aggregates.intermediateConsumption.footprint.indicators.wat.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.wat.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.wat.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.wat.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
@@ -124,8 +124,8 @@ export const analysisTextWriterWAT = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations représente une consommation indirecte de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.wat.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.wat.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +

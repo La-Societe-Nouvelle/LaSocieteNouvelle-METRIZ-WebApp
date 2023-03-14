@@ -1,9 +1,9 @@
 // La Société Nouvelle
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterECO = (session) => {
+export const analysisTextWriterECO = (session,period) => {
   const { impactsData, comparativeData, financialData } = session;
-  const { aggregates, expenseAccounts } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction, externalExpenseAccounts } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -34,7 +34,7 @@ export const analysisTextWriterECO = (session) => {
       "Le volume des activités localisées en France s'élève à " +
         impactsData.domesticProduction +
         "€, soit " +
-        aggregates.netValueAdded.footprint.indicators.eco.value +
+        mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.eco.value +
         "% de la valeur ajoutée."
     );
   }
@@ -48,11 +48,11 @@ export const analysisTextWriterECO = (session) => {
   // résultat
   currentParagraph.push(
     "Les consommations intermédiaires proviennent à " +
-      aggregates.intermediateConsumption.footprint.indicators.eco.value +
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value +
       "% d'activités françaises, soit un volume de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.eco.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
@@ -68,11 +68,11 @@ export const analysisTextWriterECO = (session) => {
       .value != null
   ) {
     if (
-      aggregates.intermediateConsumption.footprint.indicators.eco.value >
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value >
         comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
           .value *
           0.9 &&
-      aggregates.intermediateConsumption.footprint.indicators.eco.value <
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value <
         comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
           .value *
           1.1
@@ -82,7 +82,7 @@ export const analysisTextWriterECO = (session) => {
       );
     }
     if (
-      aggregates.intermediateConsumption.footprint.indicators.eco.value >
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value >
       comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
         .value
     ) {
@@ -97,19 +97,19 @@ export const analysisTextWriterECO = (session) => {
   }
 
   // comptes les plus impactants
-  let bestAccount = expenseAccounts.sort(
+  let bestAccount = externalExpenseAccounts.sort(
     (a, b) =>
-      b.footprint.indicators.eco.getGrossImpact(b.amount) -
-      a.footprint.indicators.eco.getGrossImpact(a.amount)
+      b.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(b.periodsData[period.periodKey].amount) -
+      a.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(a.periodsData[period.periodKey].amount)
   )[0];
   currentParagraph.push(
     'Le compte de charges "' +
       bestAccount.accountLib.charAt(0) +
       bestAccount.accountLib.substring(1).toLowerCase() +
       "\" représente la plus grosse contribution indirecte de l'entreprise, avec un taux de contribution de " +
-      bestAccount.footprint.indicators.eco.value +
+      bestAccount.periodsData[period.periodKey].footprint.indicators.eco.value +
       " % pour un volume de " +
-      printValue(bestAccount.amount, 0) +
+      printValue(bestAccount.periodsData[period.periodKey].amount, 0) +
       " €."
   );
 
@@ -120,13 +120,13 @@ export const analysisTextWriterECO = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations apporte une contribution indirecte de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.eco.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " €, " +
-      aggregates.capitalConsumption.footprint.indicators.eco.value +
+      mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value +
       " % du montant des dotations aux amortissements."
   );
 
@@ -138,16 +138,16 @@ export const analysisTextWriterECO = (session) => {
 
   currentParagraph.push(
     "In fine, le taux de contribution de la production sur l'exercice est de " +
-      aggregates.production.footprint.indicators.eco.value +
+      mainAggregates.production.periodsData[period.periodKey].footprint.indicators.eco.value +
       " %."
   );
   if (
-    aggregates.production.footprint.indicators.eco.value !=
-    aggregates.revenue.footprint.indicators.eco.value
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.eco.value !=
+    revenue.periodsData[period.periodKey].footprint.indicators.eco.value
   ) {
     currentParagraph.push(
       "La valeur est de " +
-        aggregates.revenue.footprint.indicators.eco.value +
+        revenue.periodsData[period.periodKey].footprint.indicators.eco.value +
         "% pour le chiffre d'affaires, en prenant compte des stocks de production."
     );
   } else {

@@ -2,9 +2,9 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterIDR = (session) => {
+export const analysisTextWriterIDR = (session,period) => {
   const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -24,7 +24,7 @@ export const analysisTextWriterIDR = (session) => {
 
   currentParagraph.push(
     "Le rapport interdécile associé à la valeur produite est de " +
-      printValue(aggregates.production.footprint.indicators.idr.value, 1) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.idr.value, 1) +
       "."
   );
 
@@ -60,7 +60,7 @@ export const analysisTextWriterIDR = (session) => {
   currentParagraph.push(
     "Le rapport interdécile associé aux consommations intermédiaires est de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.idr.value,
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.idr.value,
         1
       ) +
       "."
@@ -79,7 +79,7 @@ export const analysisTextWriterIDR = (session) => {
   currentParagraph.push(
     "La rapport interdécile associé à l'amortissement des immobilisations est de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.idr.value,
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.idr.value,
         1
       ) +
       "."

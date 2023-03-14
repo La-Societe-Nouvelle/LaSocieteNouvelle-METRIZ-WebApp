@@ -2,9 +2,9 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterART = (session) => {
+export const analysisTextWriterART = (session,period) => {
   const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -24,14 +24,14 @@ export const analysisTextWriterART = (session) => {
 
   currentParagraph.push(
     "Le taux de contribution aux métiers d'art et aux savoir-faire de la production sur l'exercice est de " +
-      printValue(aggregates.production.footprint.indicators.art.getValue(), 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.art.getValue(), 0) +
       "%."
   );
   currentParagraph.push(
     "Il correspond à un volume de " +
       printValue(
-        aggregates.production.footprint.indicators.art.getGrossImpact(
-          aggregates.production.amount
+        mainAggregates.production.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+          mainAggregates.production.periodsData[period.periodKey].amount
         ),
         0
       ) +
@@ -52,8 +52,8 @@ export const analysisTextWriterART = (session) => {
       "La valeur ajoutée est donc entièrement contributrice aux métiers d'art et aux savoir-faire et représente " +
         printValue(
           (impactsData.craftedProduction /
-            aggregates.production.footprint.indicators.art.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -70,7 +70,7 @@ export const analysisTextWriterART = (session) => {
   } else {
     currentParagraph.push(
       printValue(
-        (impactsData.craftedProduction / aggregates.netValueAdded.amount) * 100,
+        (impactsData.craftedProduction / mainAggregates.netValueAdded.periodsData[period.periodKey].amount) * 100,
         0
       ) +
         " % de la valeur ajoutée nette de l'entreprise est considérée comme artisanale."
@@ -79,8 +79,8 @@ export const analysisTextWriterART = (session) => {
       "Elle représente " +
         printValue(
           (impactsData.craftedProduction /
-            aggregates.production.footprint.indicators.art.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -99,11 +99,11 @@ export const analysisTextWriterART = (session) => {
   currentParagraph.push(
     "La contribution indirecte via les consommations intermédiaires compte pour " +
       printValue(
-        (aggregates.intermediateConsumption.footprint.indicators.art.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.art.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
@@ -113,14 +113,14 @@ export const analysisTextWriterART = (session) => {
   currentParagraph.push(
     "Elle représente " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.art.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       "€, soit " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.art.getValue(),
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.art.getValue(),
         0
       ) +
       "% du montant total des consommations intermédiaires."
@@ -139,23 +139,23 @@ export const analysisTextWriterART = (session) => {
   currentParagraph.push(
     "Enfin la contribution indirecte via l'amortissement des immobilisations est de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.art.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       "€, soit " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.art.getValue(),
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.art.getValue(),
         0
       ) +
       "% du volume des dotations aux amortissements et " +
       printValue(
-        (aggregates.capitalConsumption.footprint.indicators.art.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        (mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.art.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.art.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0

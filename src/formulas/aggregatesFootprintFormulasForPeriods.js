@@ -126,7 +126,7 @@ export const updateImmobilisationPeriodsFpt = async (indic,financialData,financi
 
 const getProductionFptBetweenDates = async (indic,financialData,dateStart,dateEnd) =>
 {
-  let netValueAdded = financialData.aggregates.netValueAdded;
+  let netValueAdded = financialData.mainAggregates.netValueAdded;
   let intermediateConsumptions = await buildIntermediateConsumptionsPeriodAggregate(indic,financialData,dateStart,dateEnd);
   let fixedCapitalConsumptions = await buildFixedCapitalConsumptionsPeriodAggregate(indic,financialData,dateStart,dateEnd);
 

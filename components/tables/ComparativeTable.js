@@ -8,13 +8,14 @@ import metaIndics from "/lib/indics";
 import { Table } from "react-bootstrap";
 import { useEffect } from "react";
 
-export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
+export const ComparativeTable = ({ financialData, indic, comparativeData, period }) => 
+{
   const {
     production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
     netValueAdded,
-    intermediateConsumption,
-    capitalConsumption,
-  } = financialData.aggregates;
+  } = financialData.mainAggregates;
 
 
   const unit = metaIndics[indic].unit;
@@ -66,7 +67,6 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
       <thead>
         <tr>
           <td>Agrégat</td>
-
           <td
             colSpan={displayTargetColumn ? 2 : 0}
             className="border-left text-center"
@@ -121,7 +121,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
           )}
           <td className="border-left text-end">
             {printValue(
-              production.footprint.getIndicator(indic).value,
+              production.periodsData[period.periodKey].footprint.getIndicator(indic).value,
               precision
             )}
             <span > {unit}</span>
@@ -178,7 +178,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
           )}
           <td className="border-left text-end">
             {printValue(
-              intermediateConsumption.footprint.getIndicator(indic).value,
+              intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(indic).value,
               precision
             )}
             <span > {unit}</span>
@@ -235,7 +235,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
           )}
           <td className="border-left text-end">
             {printValue(
-              capitalConsumption.footprint.getIndicator(indic).value,
+              fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(indic).value,
               precision
             )}
             <span > {unit}</span>
@@ -291,7 +291,7 @@ export const ComparativeTable = ({ financialData, indic, comparativeData }) => {
           )}
           <td className="border-left text-end">
             {printValue(
-              netValueAdded.footprint.getIndicator(indic).value,
+              netValueAdded.periodsData[period.periodKey].footprint.getIndicator(indic).value,
               precision
             )}
             <span > {unit}</span>

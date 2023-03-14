@@ -2,9 +2,9 @@
 
 import { compareToReference, printValue } from "../../utils/Utils";
 
-export const analysisTextWriterGHG = (session) => {
+export const analysisTextWriterGHG = (session,period) => {
   const { impactsData, comparativeData, financialData } = session;
-  const { aggregates, expenseAccounts } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction, expenseAccounts } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -24,24 +24,24 @@ export const analysisTextWriterGHG = (session) => {
 
   currentParagraph.push(
     "L'intensité carbone de la valeur produite sur l'exercice est de " +
-      printValue(aggregates.production.footprint.indicators.ghg.value, 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.value, 0) +
       " gCO2e/€."
   );
   if (
-    aggregates.production.footprint.indicators.ghg.value !=
-    aggregates.revenue.footprint.indicators.ghg.value
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.value !=
+    revenue.periodsData[period.periodKey].footprint.indicators.ghg.value
   ) {
     currentParagraph.push(
       "La valeur est de " +
-        printValue(aggregates.revenue.footprint.indicators.ghg.value, 0) +
+        printValue(revenue.periodsData[period.periodKey].footprint.indicators.ghg.value, 0) +
         " gCO2e/€ pour le chiffre d'affaires, en prenant compte des stocks de production."
     );
   }
   currentParagraph.push(
     "En valeur brute, les émissions liées à la production s'élèvent à " +
       printValue(
-        aggregates.production.footprint.indicators.ghg.getGrossImpact(
-          aggregates.production.amount
+        mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+          mainAggregates.production.periodsData[period.periodKey].amount
         ),
         0
       ) +
@@ -66,8 +66,8 @@ export const analysisTextWriterGHG = (session) => {
         " kgCO2e, soit " +
         printValue(
           (impactsData.greenhousesGazEmissions /
-            aggregates.production.footprint.indicators.ghg.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -80,7 +80,7 @@ export const analysisTextWriterGHG = (session) => {
       null
     ) {
       let comparison = compareToReference(
-        aggregates.netValueAdded.footprint.indicators.ghg.value,
+        mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.value,
         comparativeData.netValueAdded.divisionFootprint.indicators.ghg.value,
         10
       );
@@ -88,7 +88,7 @@ export const analysisTextWriterGHG = (session) => {
         currentParagraph.push(
           "L'intensité d'émissions de la valeur ajoutée est donc de " +
             printValue(
-              aggregates.netValueAdded.footprint.indicators.ghg.value,
+              mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.value,
               0
             ) +
             " gCO2e/€, soit un niveau équivalent à la branche d'activités."
@@ -97,7 +97,7 @@ export const analysisTextWriterGHG = (session) => {
         currentParagraph.push(
           "L'intensité d'émissions de la valeur ajoutée est donc de " +
             printValue(
-              aggregates.netValueAdded.footprint.indicators.ghg.value,
+              mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.value,
               0
             ) +
             " gCO2e/€, soit un niveau inférieur à la branche d'activités."
@@ -106,7 +106,7 @@ export const analysisTextWriterGHG = (session) => {
         currentParagraph.push(
           "L'intensité d'émissions de la valeur ajoutée est donc de " +
             printValue(
-              aggregates.netValueAdded.footprint.indicators.ghg.value,
+              mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.value,
               0
             ) +
             " gCO2e/€, soit un niveau supérieur à la branche d'activités."
@@ -116,7 +116,7 @@ export const analysisTextWriterGHG = (session) => {
       currentParagraph.push(
         "L'intensité d'émissions de la valeur ajoutée est donc de " +
           printValue(
-            aggregates.netValueAdded.footprint.indicators.ghg.value,
+            mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.value,
             0
           ) +
           " gCO2e/€"
@@ -134,40 +134,40 @@ export const analysisTextWriterGHG = (session) => {
   currentParagraph.push(
     "Les émissions indirectes des consommations intermédiaires s'élèvent à " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.ghg.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " kgCO2e, soit une intensité de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.ghg.value,
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.value,
         0
       ) +
       " gCO2e/€."
   );
   if (
-    aggregates.intermediateConsumption.footprint.indicators.ghg.getGrossImpact(
-      aggregates.intermediateConsumption.amount
+    mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
     ) >
-      aggregates.netValueAdded.footprint.indicators.ghg.getGrossImpact(
-        aggregates.netValueAdded.amount
+      mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+        mainAggregates.netValueAdded.periodsData[period.periodKey].amount
       ) &&
-    aggregates.intermediateConsumption.footprint.indicators.ghg.getGrossImpact(
-      aggregates.intermediateConsumption.amount
+    mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
     ) >
-      aggregates.capitalConsumption.footprint.indicators.ghg.getGrossImpact(
-        aggregates.capitalConsumption.amount
+      mainAggregates.capitalConsumption.footprint.indicators.ghg.getGrossImpact(
+        mainAggregates.capitalConsumption.amount
       )
   ) {
     currentParagraph.push(
       "Elles représentent les émissions les plus importantes sur le périmètre de la production (" +
         printValue(
-          (aggregates.intermediateConsumption.footprint.indicators.ghg.getGrossImpact(
-            aggregates.intermediateConsumption.amount
+          (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+            mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
           ) /
-            aggregates.production.footprint.indicators.ghg.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -185,7 +185,7 @@ export const analysisTextWriterGHG = (session) => {
       .value != null
   ) {
     let comparison = compareToReference(
-      aggregates.intermediateConsumption.footprint.indicators.ghg.value,
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.value,
       comparativeData.intermediateConsumption.divisionFootprint.indicators.ghg
         .value,
       10
@@ -209,8 +209,8 @@ export const analysisTextWriterGHG = (session) => {
   currentParagraph = [];
   let worstAccount = expenseAccounts.sort(
     (a, b) =>
-      b.footprint.indicators.ghg.getGrossImpact(b.amount) -
-      a.footprint.indicators.ghg.getGrossImpact(a.amount)
+      b.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(b.periodsData[period.periodKey].amount) -
+      a.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(a.periodsData[period.periodKey].amount)
   )[0];
   currentParagraph.push(
     'Le compte de charges "' +
@@ -218,19 +218,19 @@ export const analysisTextWriterGHG = (session) => {
       worstAccount.accountLib.substring(1).toLowerCase() +
       '" est le plus émetteur (' +
       printValue(
-        (worstAccount.footprint.indicators.ghg.getGrossImpact(
-          worstAccount.amount
+        (worstAccount.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+          worstAccount.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.ghg.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
       ) +
       " % des émissions totales) avec une intensité de " +
-      printValue(worstAccount.footprint.indicators.ghg.value, 0) +
+      printValue(worstAccount.periodsData[period.periodKey].footprint.indicators.ghg.value, 0) +
       " gCO2e/€ et un montant de " +
-      printValue(worstAccount.amount, 0) +
+      printValue(worstAccount.periodsData[period.periodKey].amount, 0) +
       " €."
   );
 
@@ -243,14 +243,14 @@ export const analysisTextWriterGHG = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations est à l'origine de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.ghg.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " kgCO2e émis, de part une intensité carbone de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.ghg.value,
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.value,
         0
       ) +
       " gCO2e/€."

@@ -2,9 +2,9 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterMAT = (session) => {
+export const analysisTextWriterMAT = (session,period) => {
   const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
 
   // array of paragraphs
   let analysis = [];
@@ -27,16 +27,16 @@ export const analysisTextWriterMAT = (session) => {
 
   currentParagraph.push(
     "L'intensité d'extraction de matières premières de la valeur produite est de " +
-      printValue(aggregates.production.footprint.indicators.mat.value, 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.mat.value, 0) +
       " g/€."
   );
   if (
-    aggregates.production.footprint.indicators.mat.value !=
-    aggregates.revenue.footprint.indicators.mat.value
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.mat.value !=
+    revenue.periodsData[period.periodKey].footprint.indicators.mat.value
   ) {
     currentParagraph.push(
       "La valeur est de " +
-        printValue(aggregates.revenue.footprint.indicators.mat.value, 0) +
+        printValue(revenue.periodsData[period.periodKey].footprint.indicators.mat.value, 0) +
         " g/€ pour le chiffre d'affaires, en prenant compte des stocks de production."
     );
   } else {
@@ -63,15 +63,15 @@ export const analysisTextWriterMAT = (session) => {
       "La quantité de matière extraite est de " +
         printValue(impactsData.materialsExtraction, 0) +
         " kg, soit une intensité de " +
-        printValue(aggregates.netValueAdded.footprint.indicators.mat.value, 0) +
+        printValue(mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.mat.value, 0) +
         " g/€ pour la valeur ajoutée."
     );
     currentParagraph.push(
       "La quantité extraite par l'entreprise représente " +
         printValue(
           (impactsData.materialsExtraction /
-            aggregates.production.footprint.indicators.mat.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.mat.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -90,15 +90,15 @@ export const analysisTextWriterMAT = (session) => {
   currentParagraph.push(
     "Les consommations intermédiaires sont à l'orgine d'une extraction de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.mat.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.mat.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " kg de matières premières," +
       " ce qui correspond à une intensité de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.mat.value,
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.mat.value,
         0
       ) +
       " g/€."
@@ -106,11 +106,11 @@ export const analysisTextWriterMAT = (session) => {
   currentParagraph.push(
     "L'extraction indirecte liée aux consommations intermédiaires représente " +
       printValue(
-        (aggregates.intermediateConsumption.footprint.indicators.mat.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.mat.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.mat.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.mat.getGrossImpact(
+            mainAggregates.productions.periodsData[period.periodKey].amount
           )) *
           100,
         0
@@ -131,8 +131,8 @@ export const analysisTextWriterMAT = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations est à l'origine d'une extraction de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.mat.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.mat.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +

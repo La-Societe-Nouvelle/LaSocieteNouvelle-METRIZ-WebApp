@@ -36,38 +36,28 @@ import { exportIndicXLSX } from "../../../src/writers/ExportXLSX";
 import { basicPDFReport } from "../../../src/writers/deliverables/PDFGenerator";
 import { getAnalyse } from "../../../src/utils/Writers";
 
-const ResultSection = (props) => {
+const indicsWithGrossImpacts = [
+  "ghg",
+  "haz",
+  "mat",
+  "nrg",
+  "was",
+  "wat",
+];
+
+const divisionsOptions = Object.entries(divisions)
+  .sort((a,b) => parseInt(a)-parseInt(b))
+  .map(([value, label]) => {return({ value: value, label: value + " - " + label })});
+
+const ResultSection = (props) => 
+{
+  const [period, setPeriod] = useState(props.period);
   const [indic, setIndic] = useState(props.indic);
   const [session] = useState(props.session);
   const [error] = useState(false);
 
-  const [printGrossImpact] = useState([
-    "ghg",
-    "haz",
-    "mat",
-    "nrg",
-    "was",
-    "wat",
-  ]);
-
-  const [divisionsOptions, setDivisionsOptions] = useState([]);
-
-  useEffect(() => {
-    let options = [];
-    //Divisions select options
-    Object.entries(divisions)
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .map(([value, label]) => {
-        if (value != "00") {
-          options.push({ value: value, label: value + " - " + label });
-        }
-      });
-
-    setDivisionsOptions(options);
-  }, []);
-
-  const { intermediateConsumption, capitalConsumption, netValueAdded } =
-    props.session.financialData.aggregates;
+  const { production, intermediateConsumptions, fixedCapitalConsumptions, netValueAdded } =
+   props.session.financialData.mainAggregates;
 
   /* ----------  COMPARATIVE DATA ---------- */
   const [comparativeDivision, setComparativeDivision] = useState(
@@ -81,13 +71,11 @@ const ResultSection = (props) => {
 
   const changeComparativeDivision = async (event) => {
     let division = event.value;
-
     const newComparativeData = await updateComparativeData(
       indic,
       division,
       comparativeData
     );
-
     setComparativeData(newComparativeData);
     setComparativeDivision(division);
   };
@@ -225,7 +213,7 @@ const ResultSection = (props) => {
           <h3>{metaIndics[indic].libelle}</h3>
         </div>
         <Row>
-          <Col lg={printGrossImpact.includes(indic) ? "9" : "12"}>
+          <Col lg={indicsWithGrossImpacts.includes(indic) ? "9" : "12"}>
             <Tabs
               defaultActiveKey="mainAggregates"
               transition={false}
@@ -236,13 +224,13 @@ const ResultSection = (props) => {
                 eventKey="mainAggregates"
                 title=" Soldes intermédiaires de gestion"
               >
-                <IndicatorMainAggregatesTable session={session} indic={indic} />
+                <IndicatorMainAggregatesTable session={session} indic={indic} period={period} />
               </Tab>
               <Tab
                 eventKey="expensesAccounts"
                 title=" Détails - Comptes de charges"
               >
-                <IndicatorExpensesTable session={session} indic={indic} />
+                <IndicatorExpensesTable session={session} indic={indic} period={period} />
               </Tab>
             </Tabs>
             <div className="text-end">
@@ -260,22 +248,22 @@ const ResultSection = (props) => {
           </Col>
           {/* ----------Gross Impact Pie Chart ----------  */}
 
-          {printGrossImpact.includes(indic) && (
+          {indicsWithGrossImpacts.includes(indic) && (
             <Col sm={3}>
               <div className="border rounded mt-5">
                 <h3 className="text-center">
                   Répartition des impacts bruts (en %)
                 </h3>
                 <PieGraph
-                  intermediateConsumption={intermediateConsumption.footprint.indicators[
+                  intermediateConsumption={intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
                     indic
-                  ].getGrossImpact(intermediateConsumption.amount)}
-                  capitalConsumption={capitalConsumption.footprint.indicators[
+                  ].getGrossImpact(intermediateConsumptions.periodsData[period.periodKey].amount)}
+                  capitalConsumption={fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[
                     indic
-                  ].getGrossImpact(capitalConsumption.amount)}
-                  netValueAdded={netValueAdded.footprint.indicators[
+                  ].getGrossImpact(fixedCapitalConsumptions.periodsData[period.periodKey].amount)}
+                  netValueAdded={netValueAdded.periodsData[period.periodKey].footprint.indicators[
                     indic
-                  ].getGrossImpact(netValueAdded.amount)}
+                  ].getGrossImpact(netValueAdded.periodsData[period.periodKey].amount)}
                 />
               </div>
             </Col>
@@ -308,7 +296,7 @@ const ResultSection = (props) => {
                   graphDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
-                    session.financialData.aggregates.production.footprint.getIndicator(
+                    production.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.production.divisionFootprint.indicators[
@@ -335,7 +323,7 @@ const ResultSection = (props) => {
                   graphDataset={[
                     comparativeData.intermediateConsumption.areaFootprint
                       .indicators[indic].value,
-                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.intermediateConsumption.divisionFootprint
@@ -354,13 +342,13 @@ const ResultSection = (props) => {
                 />
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
-                <h5 className="mb-4">▪ Consommation de capital fixe</h5>
+                <h5 className="mb-4">▪ Consommations de capital fixe</h5>
                 <ComparativeGraphs
                   id={"capitalConsumption-" + indic}
                   graphDataset={[
                     comparativeData.fixedCapitalConsumption.areaFootprint
                       .indicators[indic].value,
-                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                    fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.fixedCapitalConsumption.divisionFootprint
@@ -387,7 +375,7 @@ const ResultSection = (props) => {
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
                     ].value,
-                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    netValueAdded.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
                     comparativeData.netValueAdded.divisionFootprint.indicators[
@@ -414,6 +402,7 @@ const ResultSection = (props) => {
           financialData={session.financialData}
           indic={indic}
           comparativeData={comparativeData}
+          period={period}
         />
       </section>
       {/* ---------- Trend Line Chart ----------  */}
@@ -455,7 +444,7 @@ const ResultSection = (props) => {
                       .indicators[indic]
                   }
                   current={
-                    session.financialData.aggregates.production.footprint.getIndicator(
+                    production.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value
                   }
@@ -484,7 +473,7 @@ const ResultSection = (props) => {
                       .targetDivisionFootprint.indicators[indic]
                   }
                   current={
-                    session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                    intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value
                   }
@@ -513,7 +502,7 @@ const ResultSection = (props) => {
                       .targetDivisionFootprint.indicators[indic]
                   }
                   current={
-                    session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                    fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value
                   }
@@ -543,7 +532,7 @@ const ResultSection = (props) => {
                       .indicators[indic]
                   }
                   current={
-                    session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                    netValueAdded.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value
                   }
@@ -599,7 +588,7 @@ const ResultSection = (props) => {
       <section className="step">
         <h3>Note d'analyse</h3>
         <div id="analyse">
-          <Analyse indic={indic} session={session} />
+          <Analyse indic={indic} session={session} period={period}/>
         </div>
       </section>
       {/* ---------- Footer section ----------  */}
@@ -635,12 +624,13 @@ const ResultSection = (props) => {
 
 /* ----- STATEMENTS / ASSESSMENTS COMPONENTS ----- */
 
-const Analyse = ({ indic, session }) => {
+const Analyse = ({ indic, session, period }) => {
   let analyse = getAnalyse(
     session.impactsData,
     session.financialData,
     session.comparativeData,
-    indic
+    indic,
+    period
   );
 
   return (

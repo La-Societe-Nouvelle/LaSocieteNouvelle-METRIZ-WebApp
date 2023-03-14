@@ -21,7 +21,7 @@ export class ImmobilisationsTable extends React.Component
   }
 
   render() {
-    const { immobilisations, investments, aggregates } = this.props.financialData;
+    const { immobilisations, investments } = this.props.financialData;
     const { columnSorted } = this.state;
     const period = this.props.period;
     const prevStateDateEnd = getPrevDate(period.dateStart);
