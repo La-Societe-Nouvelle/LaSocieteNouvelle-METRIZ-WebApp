@@ -4,20 +4,20 @@ import { Col, Container, Row } from "react-bootstrap";
 
 // Views
 import ImportForm from "./ImportForm";
-import MappedAccounts from "./MappedAccounts";
+import DepreciationAssetsMapping from "./DepreciationAssetsMapping";
 
 import { FinancialDatas } from "./FinancialDatas";
 // Readers
 import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
 
-// Objects
-import { FinancialData } from "/src/FinancialData";
-
 // Mail Report Error
 import { sendReportToSupport } from "../../../pages/api/mail-api";
 import { FECImport } from "./FECImport";
-import { buildAggregates } from "../../../src/formulas/aggregatesBuilder";
-import { buildRegexFinancialPeriod, getListMonthsFinancialPeriod } from "../../../src/Session";
+import {
+  buildRegexFinancialPeriod,
+  getListMonthsFinancialPeriod,
+} from "../../../src/Session";
+import { StockPurchasesMapping } from "./StockPurchasesMapping";
 
 function ImportSection(props) {
   //STATE
@@ -26,7 +26,7 @@ function ImportSection(props) {
   );
   const [file, setFile] = useState([]);
   const [importedData, setImportedData] = useState(null);
-  const [view, setView] = useState(  props.session.progression > 1  ? 3 : 0);
+  const [view, setView] = useState(props.session.progression > 1 ? 3 : 0);
   const [errorFile, setErrorFile] = useState(false);
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -85,13 +85,11 @@ function ImportSection(props) {
                       className="btn btn-secondary mb-2"
                       onClick={() => sendErrorReport(errors)}
                     >
-                     Envoyer un rapport d'erreur
+                      Envoyer un rapport d'erreur
                     </button>
 
                     {errorMail && (
-                      <p className="small alert alert-info mb-2">
-                        {errorMail}
-                      </p>
+                      <p className="small alert alert-info mb-2">{errorMail}</p>
                     )}
                   </>
                 )}
@@ -109,13 +107,26 @@ function ImportSection(props) {
         )}
 
         {view == 2 && (
-          <MappedAccounts
+          <DepreciationAssetsMapping
             return={() => setView(1)}
+            onClick={() => setView(3)}
+            meta={importedData.meta}
+          />
+        )}
+        {view == 3 && (
+          <StockPurchasesMapping
+            return={() => setView(2)}
             onClick={() => loadFECData(importedData)}
             meta={importedData.meta}
           />
         )}
-        {view == 3 && <FinancialDatas {...props} return={() => setView(2)} reset={() => setView(0)} />}
+        {view == 4 && (
+          <FinancialDatas
+            {...props}
+            return={() => setView(2)}
+            reset={() => setView(0)}
+          />
+        )}
       </section>
     </Container>
   );
@@ -150,9 +161,9 @@ function ImportSection(props) {
     } // show error (file)
   }
 
-  async function loadFECData(importedData) 
-  {
+  async function loadFECData(importedData) {
     console.log(importedData);
+
     let FECData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
 
     if (FECData.errors.length > 0) {
@@ -171,27 +182,33 @@ function ImportSection(props) {
       props.session.financialPeriod = {
         dateStart: importedData.meta.firstDate,
         dateEnd: importedData.meta.lastDate,
-        regex: buildRegexFinancialPeriod(importedData.meta.firstDate,importedData.meta.lastDate),
-        periodKey: "FY"+importedData.meta.lastDate.substring(0,4)
-      }
+        regex: buildRegexFinancialPeriod(
+          importedData.meta.firstDate,
+          importedData.meta.lastDate
+        ),
+        periodKey: "FY" + importedData.meta.lastDate.substring(0, 4),
+      };
 
-      let periods = getListMonthsFinancialPeriod(importedData.meta.firstDate,importedData.meta.lastDate)
-        .map(month => {
-          return({
-            regex: new RegExp("^"+month),
-            periodKey: month
-          })
+      let periods = getListMonthsFinancialPeriod(
+        importedData.meta.firstDate,
+        importedData.meta.lastDate
+      )
+        .map((month) => {
+          return {
+            regex: new RegExp("^" + month),
+            periodKey: month,
+          };
         })
         .concat(props.session.financialPeriod);
 
       // load financial data
       await props.session.financialData.loadFECData(FECData);
-      console.log(props.session.financialData);
-      console.log("Here");
 
       // load impacts data
       props.session.impactsData.netValueAdded =
-        props.session.financialData.mainAggregates.netValueAdded.periodsData[props.session.financialPeriod.periodKey];
+        props.session.financialData.mainAggregates.netValueAdded.periodsData[
+          props.session.financialPeriod.periodKey
+        ];
       props.session.impactsData.knwDetails.apprenticeshipTax =
         FECData.KNWData.apprenticeshipTax;
       props.session.impactsData.knwDetails.vocationalTrainingTax =
@@ -206,7 +223,7 @@ function ImportSection(props) {
       // update progression
       props.session.progression = 1;
 
-      setView(3);
+      setView(4);
     }
   }
 
