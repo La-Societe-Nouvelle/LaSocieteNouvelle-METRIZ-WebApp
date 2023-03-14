@@ -31,11 +31,10 @@ export class ProvidersSection extends React.Component
 
   nextStep = () => 
   {
-
     // if current state is for identified companies
     if (this.state.companyStep==1) {
-      const unidentifiedCompanies = this.state.providers.filter((provider) => provider.state == "default");
-      if (unidentifiedCompanies.length > 0) {
+      const someProvidersUnidentified = this.props.session.financialData.providers.some((provider) => provider.useDefaultFootprint);
+      if (someProvidersUnidentified) {
         this.setState({companyStep: 2});
       } else {
         this.props.submit();
@@ -63,7 +62,7 @@ export class ProvidersSection extends React.Component
     
     const financialData = this.props.session.financialData;
     const financialPeriod = this.props.session.financialPeriod;
-    const unidentifiedCompanies = this.state.providers.filter((provider) => provider.isDefaultProviderAccount); // ?
+    const unidentifiedProviders = financialData.providers.filter((provider) => provider.useDefaultFootprint); // ?
 
     // Synchro with corporate ID 
 
@@ -81,7 +80,7 @@ export class ProvidersSection extends React.Component
         <SectorSection {...this.props}
           financialData={financialData} 
           financialPeriod={financialPeriod}
-          unidentifiedCompanies={unidentifiedCompanies} 
+          unidentifiedProviders={unidentifiedProviders} 
           prevStep={this.prevStep} 
           nextStep={this.nextStep}/>
       )

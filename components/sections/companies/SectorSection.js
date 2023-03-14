@@ -27,16 +27,17 @@ export class SectorSection extends React.Component
   constructor(props) {
     super(props);
     this.state = {
-      unidentifiedCompanies: props.unidentifiedCompanies, // companies without siren
-      companiesShowed: props.unidentifiedCompanies,       // view
-      significativeCompanies: [],             // significative companies
-      view: "all",                            // filter view
-      nbItems: 20,                            // nb items
-      fetching: false,                        // -> to show popup
-      progression: 0,                         // progession -> popup
+      unidentifiedProviders: props.unidentifiedProviders,         // companies without siren
+      unidentifiedProvidersShowed: props.unidentifiedProviders,   // view
+      significativeProviders: [],                                 // significative companies
+      view: "all",                                                // filter view
+      nbItems: 20,                                                // nb items
+      fetching: false,                                            // -> to show popup
+      progression: 0,                                             // progession -> popup
       error: false,
       minFpt: null,
-      maxFpt: null
+      maxFpt: null,
+      isNextStepAvailable: nextStepAvailable(props.unidentifiedProviders),
     };
   }
 
@@ -48,68 +49,35 @@ export class SectorSection extends React.Component
       this.props.session.financialData.providers,
       this.props.session.financialData.expenses,
       this.props.session.financialData.investments,
-      minFpt,maxFpt
+      minFpt,maxFpt,
+      this.props.financialPeriod
     );
     this.setState({significativeCompanies,minFpt,maxFpt})
   }
 
-  handleChange = (view) => 
+  render() 
   {
-    switch (view) 
-    {
-      case "aux":
-        return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => !provider.isDefaultAccount),
-          view: view,
-        });
-      case "expenses":
-        return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => provider.isDefaultAccount),
-          view: view,
-        });
-      case "significative":
-        return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => this.state.significativeCompanies.includes(provider.accountNum)),
-          view: view,
-        });
-      case "significativeWithoutActivity":
-        return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => this.state.significativeCompanies.includes(provider.accountNum) && provider.footprintActivityCode == "00"),
-          view: view,
-        });
-      case "defaultActivity":
-        return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies.filter((provider) => provider.footprintActivityCode == "00"),
-          view: view,
-        });
-      default:
-        return this.setState({
-          companiesShowed: this.state.unidentifiedCompanies,
-          view: view,
-        });
-    }
-  };
-
-  render() {
     const {
-      unidentifiedCompanies,
-      significativeCompanies,
-      companiesShowed,
+      unidentifiedProviders,
+      significativeProviders,
+      unidentifiedProvidersShowed,
       view,
       nbItems,
       fetching,
       progression,
       error,
+      isNextStepAvailable,
     } = this.state;
-
-    if (companiesShowed.length == 0 && view!="") this.handleChange("");
-
+    
     const financialData = this.props.financialData;
-    const financialPeriod = this.props.financialPeriod;
+    const period = this.props.financialPeriod;
+    
+    const showedProviders = this.getShowedProviders(view);
+    console.log(showedProviders.length);
+    if (showedProviders.length == 0 && view!="") this.setState({view: ""}); // reset filter
 
-    const isNextStepAvailable = !(unidentifiedCompanies.filter((provider) => provider.status != 200).length > 0);
-    const lengthSignificativeCompaniesWithoutActivity = unidentifiedCompanies.filter((provider) => provider.footprintActivityCode == "00" && significativeCompanies.includes(provider.accountNum)).length;
-    const isSignificativeCompaniesWithoutActivity = lengthSignificativeCompaniesWithoutActivity > 0;
+    const nbSignificativeProvidersWithoutActivity = unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00" && significativeProviders.includes(provider.providerNum)).length;
+    const someSignificativeProvidersWithoutActivity = nbSignificativeProvidersWithoutActivity > 0;
     
     return (
       <Container fluid id="sector-section">
@@ -134,19 +102,19 @@ export class SectorSection extends React.Component
                   <div className="alert alert-info">
                   <p><i className="bi bi bi-exclamation-circle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
                   <button className={"btn btn-secondary"}
-                    onClick={() => this.synchroniseCompanies()}>
+                    onClick={() => this.synchroniseProviders()}>
                     <i className="bi bi-arrow-repeat"></i> Synchroniser les données
                   </button>
                 </div>}
                 {/* ---------- Show message significative accounts have default activity ---------- */}
-                {isSignificativeCompaniesWithoutActivity &&
+                {someSignificativeProvidersWithoutActivity &&
                   <div className="alert alert-warning"> 
                     <p><i className="bi bi-exclamation-triangle"></i> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.</p>
                     <button
                       className={"btn btn-warning"}
                       value="significative"
-                      onClick={() => this.handleChange("significativeWithoutActivity")}>
-                      Afficher les comptes significatifs sans secteur ({lengthSignificativeCompaniesWithoutActivity} compte{lengthSignificativeCompaniesWithoutActivity > 1 ? "s" : ""})
+                      onClick={() => this.setState({view: "significativeWithoutActivity"})}>
+                      Afficher les comptes significatifs sans secteur ({nbSignificativeProvidersWithoutActivity} compte{nbSignificativeProvidersWithoutActivity > 1 ? "s" : ""})
                     </button>
                   </div>}
                 
@@ -156,13 +124,13 @@ export class SectorSection extends React.Component
                     <select
                       className="form-select"
                       value={view}
-                      onChange={(event) => this.handleChange(event.target.value)}>
+                      onChange={(event) => this.setState({view: event.target.value})}>
                       <option key="1" value="">Tous les comptes (sans siren)</option>
                       <option key="2" value="aux">Comptes fournisseurs uniquement</option>
                       <option key="3" value="expenses">Autres comptes tiers</option>
                       <option key="4" value="significative">Comptes significatifs</option>
                       <option key="5" value="defaultActivity">Comptes tiers non rattachés à un secteur d'activité</option>
-                      {isSignificativeCompaniesWithoutActivity && <option key="6" value="significativeWithoutActivity">Comptes significatifs non rattachés à un secteur d'activité</option>}
+                      {someSignificativeProvidersWithoutActivity && <option key="6" value="significativeWithoutActivity">Comptes significatifs non rattachés à un secteur d'activité</option>}
                     </select>
                   </div>
                   <div className="form-group">
@@ -179,12 +147,13 @@ export class SectorSection extends React.Component
 
                 {/* ---------- Table ---------- */}
                 <UnidentifiedCompaniesTable
-                  nbItems={nbItems == "all" ? unidentifiedCompanies.length : parseInt(nbItems)}
+                  nbItems={nbItems == "all" ? unidentifiedProviders.length : parseInt(nbItems)}
                   onUpdate={this.updateFootprints.bind(this)}
-                  providers={companiesShowed}
-                  significativeProviders={significativeCompanies}
+                  providers={showedProviders}
+                  significativeProviders={significativeProviders}
                   financialData={financialData}
-                  financialPeriod={financialPeriod}
+                  financialPeriod={period}
+                  refreshSection={this.refreshSection}
                 />
 
               </div>
@@ -221,6 +190,25 @@ export class SectorSection extends React.Component
 
   changeNbItems = (event) => this.setState({ nbItems: event.target.value });
 
+  getShowedProviders = (view) => 
+  {
+    switch (view) 
+    {
+      case "aux": // provider account
+        return this.props.unidentifiedProviders.filter((provider) => !provider.isDefaultProviderAccount);
+      case "expenses": // default provider account
+        return this.props.unidentifiedProviders.filter((provider) => provider.isDefaultProviderAccount);
+      case "significative": // significative provider
+        return this.props.unidentifiedProviders.filter((provider) => this.state.significativeProviders.includes(provider.providerNum));
+      case "significativeWithoutActivity":  // significative provider & no activity code set
+        return this.props.unidentifiedProviders.filter((provider) => this.state.significativeProviders.includes(provider.providerNum) && provider.defaultFootprintParams.code == "00");
+      case "defaultActivity": // no activity code set
+        return this.props.unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00");
+      default: // default
+        return this.props.unidentifiedProviders;
+    }
+  };
+
   /* ---------- UPDATES ---------- */
 
   updateFootprints = async () => 
@@ -229,11 +217,12 @@ export class SectorSection extends React.Component
 
     // check if companies is a significative companies
     let {minFpt,maxFpt} = this.state;
-    let significativeProviders = await getSignificativeProviders(
-      this.props.session.financialData.companies,
+    let significativeProviders = await getSignificativeCompanies(
+      this.props.session.financialData.providers,
       this.props.session.financialData.expenses,
       this.props.session.financialData.investments,
-      minFpt,maxFpt
+      minFpt,maxFpt,
+      this.props.financialPeriod
     );
 
     this.setState({ providers: this.props.providers, significativeProviders: significativeProviders });
@@ -241,17 +230,19 @@ export class SectorSection extends React.Component
 
   /* ---------- FETCHING DATA ---------- */
 
-  synchroniseCompanies = async () => 
+  synchroniseProviders = async () => 
   {
-    let companiesToSynchronise = this.state.unidentifiedCompanies;
+    let providersToSynchronise = this.props.unidentifiedProviders; // only showed ?
+    console.log(providersToSynchronise);
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
     let i = 0;
-    let n = companiesToSynchronise.length;
-    for (let provider of companiesToSynchronise) {
+    let n = providersToSynchronise.length;
+    for (let provider of providersToSynchronise) {
       try {
         await provider.updateFromRemote();
       } catch (error) {
+        console.log(error);
         this.setState({ error: true });
         break;
       }
@@ -259,25 +250,36 @@ export class SectorSection extends React.Component
       this.setState({ progression: Math.round((i / n) * 100) });
     }
 
-    // check if companies is a significative companies
+    // check if providers is a significative companies
     let {minFpt,maxFpt} = this.state;
-    let significativeCompanies = await getSignificativeProviders(
-      this.props.session.financialData.companies,
+    let significativeProviders = await getSignificativeCompanies(
+      this.props.session.financialData.providers,
       this.props.session.financialData.expenses,
       this.props.session.financialData.investments,
-      minFpt,maxFpt
+      minFpt,maxFpt,
+      this.props.financialPeriod
     );
 
     // update state
+    const isNextStepAvailable = nextStepAvailable(this.props.unidentifiedProviders);
     this.setState({
       fetching: false,
       progression: 0,
-      significativeCompanies: significativeCompanies,
+      significativeCompanies: significativeProviders,
+      isNextStepAvailable
     });
-    this.handleChange(this.state.view);
+    this.setState({view: this.state.view});
 
     // update session
-    this.props.session.updateFootprints();
+    //this.props.session.updateFootprints();
+  }
+
+  refreshSection = () => 
+  {
+    const isNextStepAvailable = nextStepAvailable(this.props.unidentifiedProviders);
+    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+      this.setState({ isNextStepAvailable });
+    }
   }
 }
 
@@ -324,3 +326,12 @@ const fetchMaxFootprint = async () =>
 
   return footprint;
 }
+
+
+/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
+
+const nextStepAvailable = (providers) => 
+{
+  let stepAvailable = !providers.some((provider) => provider.footprintStatus != 200);
+  return stepAvailable;
+};

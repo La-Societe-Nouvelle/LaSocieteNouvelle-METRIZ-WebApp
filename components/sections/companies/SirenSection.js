@@ -51,11 +51,12 @@ export class SirenSection extends React.Component
 
   componentDidUpdate = () =>
   {
-    console.log("props section did update");
+    // next step available
     const isNextStepAvailable = nextStepAvailable(this.props.session.financialData.providers);
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
+    // providers fpt to sync
     const isSyncButtonEnable = checkSyncButtonEnable(this.props.session.financialData.providers);
     if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
       this.setState({ isSyncButtonEnable });
@@ -68,28 +69,22 @@ export class SirenSection extends React.Component
     switch (view) {
       case "undefined":
         return this.setState({
-          providersShowed: this.state.providers.filter(
-            (provider) => provider.state != "siren"
-          ),
+          providersShowed: this.state.providers.filter((provider) => provider.useDefaultFootprint),
           view: view,
         });
       case "unsync":
         return this.setState({
-          providersShowed: this.state.providers.filter(
-            (provider) => provider.status != 200
-          ),
+          providersShowed: this.state.providers.filter((provider) => provider.footprintStatus != 200),
           view: view,
         });
       case "error":
         return this.setState({
-          providersShowed: this.state.providers.filter(
-            (provider) => provider.status == 404
-          ),
+          providersShowed: this.state.providers.filter((provider) => provider.footprintStatus == 404),
           view: view,
         });
       default:
         return this.setState({
-          providersShowed: this.state.providers,
+          providersShowed: this.props.session.financialData.providers,
           view: view,
         });
     }
@@ -102,10 +97,8 @@ export class SirenSection extends React.Component
       nbItems,
       fetching,
       progression,
-      synchronised,
       providersShowed,
       popup,
-      isDisabled,
       isSyncButtonEnable,
       isNextStepAvailable,
       errorFile,
@@ -115,10 +108,11 @@ export class SirenSection extends React.Component
     const financialData = this.props.session.financialData;
     const financialPeriod = this.props.financialPeriod;
 
+    console.log(financialData.providers.filter((provider) => provider.footprintStatus == 200).length == financialData.providers.length)
     let buttonNextStep;
     if (
-      this.state.providers.filter((provider) => provider.footprintStatus == 200).length ==
-      this.state.providers.length
+      financialData.providers.filter((provider) => provider.footprintStatus == 200).length ==
+      financialData.providers.length
     ) {
       buttonNextStep = (
         <div>
@@ -340,7 +334,8 @@ export class SirenSection extends React.Component
           )}
 
           <div className="text-end">
-            {buttonNextStep}</div>
+            {buttonNextStep}
+          </div>
         </section>
       </Container>
     );
@@ -536,6 +531,7 @@ export class SirenSection extends React.Component
   closePopup = () => this.setState({ popup: false });
   openPopup = () => this.setState({ popup: true });
 }
+
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
 const nextStepAvailable = (providers) => 

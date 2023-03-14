@@ -144,9 +144,9 @@ export class Provider
     // update default footprint params ------------------ //
     // update params, remove footprint & update dataFetched
     else if (nextProps.defaultFootprintParams != undefined ||
-             nextProps.defaultFootprintParams != this.defaultFootprintParams) 
+             nextProps.defaultFootprintParams !== this.defaultFootprintParams) 
     {
-      this.defaultFootprintParams = nextProps.defaultFootprintParams;
+      this.defaultFootprintParams = {...this.defaultFootprintParams, ...nextProps.defaultFootprintParams}; // update only params in next props
       this.dataFetched = false;
       this.footprintStatus = 0;
       this.footprint = new SocialFootprint();
@@ -183,6 +183,7 @@ export class Provider
         throw err;
       });
     }
+
     // Case - Fetch id not ok ----------------------------------------------------------------------------- //
     else if (!this.useDefaultFootprint) 
     {
@@ -192,10 +193,12 @@ export class Provider
       this.footprint = new SocialFootprint();
       this.dataFetched = false;
     }
+
     // Case - Fetch default data -------------------------------------------------------------------------- //
     else if (this.useDefaultFootprint) 
     {
-      let defaultFptParams = Object.entries(this.initialFootprintParams).map(([key,value]) => key+"="+value).join("&");
+      console.log("default fetcher")
+      let defaultFptParams = Object.entries(this.defaultFootprintParams).map(([key,value]) => key+"="+value).join("&");
       await api.get("defaultfootprint?"+defaultFptParams).then((res) => 
       {
         let status = res.data.header.code;

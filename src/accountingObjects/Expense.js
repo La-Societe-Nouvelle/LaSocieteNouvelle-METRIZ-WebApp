@@ -10,7 +10,7 @@ export class Expense {
                accountLib,
                providerNum,
                providerLib,
-               isDefaultProvider,
+               isDefaultProviderAccount,
                amount,
                footprint,
                date}) 
@@ -23,7 +23,7 @@ export class Expense {
 
     this.providerNum = providerNum;
     this.providerLib = providerLib;
-    this.isDefaultProvider = isDefaultProvider;
+    this.isDefaultProviderAccount = isDefaultProviderAccount;
 
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint);
