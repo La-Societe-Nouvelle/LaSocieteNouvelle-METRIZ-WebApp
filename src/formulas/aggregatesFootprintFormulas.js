@@ -17,14 +17,20 @@ import { buildAggregateIndicator, buildAggregatePeriodIndicator, buildDifference
 /* ----- Empreintes des charges externes ----- */
 // Affectation de l'empreinte du fournisseur (compte auxiliaire)
 
-export const updateExternalExpensesFpt = async (financialData) =>
+export const updateExternalExpensesFpt = async (financialData,period) =>
 {
   await Promise.all(financialData.expenses.map(async (expense) => 
   {
     // retrieve company
-    let company = financialData.getCompanyByAccount(expense.accountAux);
-    // assign fpt
-    expense.footprint = company.footprint;
+    let provider = financialData.providers.filter(provider => provider.providerNum==expense.providerNum)[0];
+    if (provider) 
+    {
+      // assign footprint
+      expense.footprint = provider.footprint;
+    } 
+    else {
+      console.log("Fournisseur "+expense.providerNum+" introuvable.");
+    }
     return;
   }));
   return;
@@ -38,9 +44,15 @@ export const updateInvestmentsFpt = async (financialData) =>
   await Promise.all(financialData.investments.map(async (investment) => 
   {
     // retrieve company
-    let company = financialData.getCompanyByAccount(investment.accountAux);
-    // assign fpt
-    investment.footprint = company.footprint;
+    let provider = financialData.providers.filter(provider => provider.providerNum==investment.providerNum)[0];
+    if (provider) 
+    {
+      // assign footprint
+      investment.footprint = provider.footprint;
+    } 
+    else {
+      console.log("Fournisseur "+investment.providerNum+" introuvable.");
+    }
     return;
   }));
   return;

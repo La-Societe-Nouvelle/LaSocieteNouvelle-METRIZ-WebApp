@@ -180,8 +180,14 @@ class Metriz extends React.Component {
   /* ----- PROGESSION ---- */
 
 
-  validStep = (step) => 
+  validStep = async (step) => 
   {
+    // 
+    if (step==3) {
+      console.log("update output footprints");
+      await this.state.session.updateOutputFlowFootprints();
+    }
+
     // Increase progression
     this.state.session.progression = Math.max(step + 1, this.state.session.progression);
 

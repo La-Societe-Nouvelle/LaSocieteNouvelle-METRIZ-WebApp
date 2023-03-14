@@ -112,10 +112,10 @@ export class Session
   updateOutputFlowFootprints = async () => 
   {
     // External expenses
-    await updateExternalExpensesFpt(financialData);
+    await updateExternalExpensesFpt(this.financialData,this.financialPeriod);
 
     // Investments
-    await updateInvestmentsFpt(financialData);
+    await updateInvestmentsFpt(this.financialData,this.financialPeriod);
   }
 
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
