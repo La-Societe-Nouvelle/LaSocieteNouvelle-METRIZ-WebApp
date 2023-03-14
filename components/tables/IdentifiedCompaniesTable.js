@@ -23,8 +23,15 @@ export class IdentifiedProvidersTable extends React.Component
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.providers !== this.props.providers) {
+  componentDidUpdate(prevProps) 
+  {
+    console.log("props table did update");
+    console.log(this.props.providers[0].useDefaultFootprint); 
+    if (JSON.stringify(prevProps.providers) !== JSON.stringify(this.props.providers) ) {
+      console.log("test 2")
+      this.setState({ providers: this.props.providers });
+    }
+    if (prevProps.providers != this.props.providers) {
       this.setState({ providers: this.props.providers });
     }
   }
@@ -68,9 +75,9 @@ export class IdentifiedProvidersTable extends React.Component
               .map((provider) => (
                 <RowTableProviders
                   key={"provider_" + provider.id}
-                  {...provider}
+                  provider={provider}
                   financialPeriod={financialPeriod}
-                  updateProvider={this.updateProvider.bind(this)}
+                  refreshTable={this.refreshTable}
                 />
               ))}
           </tbody>
@@ -111,6 +118,8 @@ export class IdentifiedProvidersTable extends React.Component
     );
   }
 
+  refreshTable = () => this.props.refreshSection()
+
   /* ---------- SORTING ---------- */
 
   changeColumnSorted(columnSorted) {
@@ -133,7 +142,7 @@ export class IdentifiedProvidersTable extends React.Component
         break;
       case "denomination":
         providers.sort((a, b) =>
-          a.getCorporateName().localeCompare(b.getCorporateName())
+          a.providerLib.localeCompare(b.providerLib)
         );
         break;
       case "amount":
@@ -158,13 +167,6 @@ export class IdentifiedProvidersTable extends React.Component
 
   /* ---------- OPERATIONS ON PROVIDER ---------- */
 
-  updateProvider = (nextProps) => {
-    let provider = this.props.financialData.getCompany(nextProps.id);
-    provider.update(nextProps);
-    this.props.checkSync(nextProps);
-    this.setState({ providers: this.props.providers });
-  };
-
   updateProviderFromRemote = async (providerNum) => {
     let provider = this.props.financialData.getCompany(providerNum);
     await provider.updateFromRemote();
@@ -180,45 +182,47 @@ class RowTableProviders extends React.Component
   constructor(props) {
     super(props);
     this.state = {
-      corporateId: props.corporateId || "",
-      dataUpdated: props.dataUpdated,
+      corporateId: props.provider.corporateId,
       toggleIcon: false,
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props != prevProps) {
+  componentDidUpdate() 
+  {
+    if (this.props.provider.corporateId !== this.state.corporateId) {
       this.setState({
-        corporateId: this.props.corporateId || "",
-        dataUpdated: false,
+        corporateId: this.props.provider.corporateId
       });
     }
+    
   }
 
-  render() {
-    const { corporateName, accountNum, periodsData, status, isDefaultAccount, financialPeriod } = this.props;
+  render() 
+  {
+    const { provider, financialPeriod } = this.props;
+    const { providerLib, providerNum, periodsData, footprintStatus, isDefaultProviderAccount } = provider;
     const { corporateId } = this.state;
+
     let icon;
-    if (corporateId && status != 200) {
+    if (corporateId && !footprintStatus) {
       icon = (
         <i className="bi bi-arrow-repeat text-success" title="Données prêtes à être synchronisées"></i>
 
       );
     }
-
-    if (status == 200) {
+    if (corporateId && footprintStatus == 200) {
       icon = (
         <i className="bi bi-check2 text-success" title="Données synchronisées"></i>
 
       );
     }
-    if (status == 404) {
+    if (corporateId && footprintStatus == 404) {
       icon = (
         <i className="bi bi-x-lg text-danger"  title="Erreur lors de la synchronisation"></i>
 
       );
     }
-    if (!corporateId && !isDefaultAccount) {
+    if (!corporateId && !isDefaultProviderAccount) {
       icon = (
         <i className="bi bi-exclamation-circle text-info"  title="Donnée manquante"></i>
       );
@@ -232,21 +236,19 @@ class RowTableProviders extends React.Component
         <td className="siren-input">
           <InputText
               value={corporateId}
-              onUpdate={this.updateCorporateId.bind(this)}
+              onUpdate={this.updateCorporateId}
             />
         </td>
-        <td>{corporateName}</td>
-        <td>{accountNum}</td>
+        <td>{providerLib}</td>
+        <td>{providerNum}</td>
         <td className="text-end">{printValue(periodsData[financialPeriod.periodKey].amount, 0)} &euro;</td>
       </tr>
     );
   }
 
-  updateCorporateId = (nextCorporateId) => {
-    this.setState({ dataUpdated: true });
-    this.props.updateProvider({
-      id: this.props.id,
-      corporateId: nextCorporateId,
-    });
+  updateCorporateId = (nextCorporateId) => 
+  {
+    this.props.provider.update({corporateId: nextCorporateId});
+    this.props.refreshTable();
   };
 }

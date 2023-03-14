@@ -6,50 +6,47 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 export class Provider 
 {
   constructor({id,
+               isDefaultProviderAccount,
                providerNum,
                providerLib,
-               isDefaultProviderAccount,
                corporateId,
-               corporateName,
                legalUnitData,
-               state,
+               useDefaultFootprint,
                footprint,
-               footprintId,
                footprintParams,
-               status,
                dataFetched,
-               lastUpdateFromRemote,
-               amount,
+               footprintStatus,
+               periodsData,
   }) {
     // ---------------------------------------------------------------------------------------------------- //
 
     // Id
     this.id = id;
-
-    // Company
-    this.providerNum = providerNum || "";                           // numéro compte auxiliaire
-    this.providerLib = providerLib || "";                           // libellé compte auxiliaire
     this.isDefaultProviderAccount = isDefaultProviderAccount;       // account aux defined in FEC
 
-    this.corporateId = corporateId || null;                         // siren
-    this.corporateName = corporateName || "";                       // dénomination unité légale
+    // Provider account
+    this.providerNum = providerNum || "";                           // numéro compte auxiliaire
+    this.providerLib = providerLib || "";                           // libellé compte auxiliaire
 
-    // Legal data
+    // Legal unit data
+    this.corporateId = corporateId || null;                         // siren
     this.legalUnitData = legalUnitData || {};                       // data unité legale
 
     // Footprint
-    this.state = state || "default"; // "" | "siren" | "default"
     this.footprint = new SocialFootprint(footprint);
-    this.footprintId = footprintId || this.getDefaultFootprintId();
-    this.footprintParams = footprintParams || {};                   // paramètres (empreinte par défaut)
-
+    this.useDefaultFootprint = useDefaultFootprint || true;         // true by default
+    this.defaultFootprintParams = footprintParams || {              // paramètres (empreinte par défaut)
+      area: "FRA",
+      code: "00",
+      aggregate: "PRD"
+    };            
+    
     // Updates
-    this.status = status || null; // 200 (ok), 404 (not found), 500 (server error)
-    this.dataFetched = dataFetched; // response received
-    this.lastUpdateFromRemote = lastUpdateFromRemote || null; // date of last update
+    this.dataFetched = dataFetched || false;                        // response received
+    this.footprintStatus = footprintStatus || 0;                    // status response api
 
-    // Amount (expenses & investments)
-    this.amount = amount || 0;
+    // periods data for amount (expenses & investments) ..no footprint
+    this.periodsData = periodsData || {};
 
     // ---------------------------------------------------------------------------------------------------- //
   }
@@ -66,14 +63,14 @@ export class Provider
     })
   }
 
-  // init footrpint id
+  // get footrpint id (siren)
   getDefaultFootprintId() 
   {
     if (!this.corporateId) {
       return null;
     }
     // SIREN
-    if (/[0-9]{9}/.test(this.corporateId)) {
+    else if (/[0-9]{9}/.test(this.corporateId)) {
       return this.corporateId;
     }
     // SIRET
@@ -97,34 +94,62 @@ export class Provider
   async update(nextProps) 
   {
     // update corporate id ------------------------------ //
-    if (nextProps.corporateId != undefined &&
+    if (nextProps.corporateId &&
         nextProps.corporateId != this.corporateId) 
     {
-      this.corporateId = nextProps.corporateId;
-      this.footprintId = this.getDefaultFootprintId();
       // legal data
-      this.legalUnitName = "";
-      this.legalUnitAreaCode = "";
-      this.legalUnitActivityCode = "";
-      // status
-      this.state = this.footprintId ? "siren" : "default";
+      this.corporateId = nextProps.corporateId;
+      this.legalUnitData = {};
+      // footprint
+      this.useDefaultFootprint = false;
+      this.defaultFootprintParams = {};
       this.dataFetched = false;
-      this.status = null;
+      this.footprintStatus = 0;
+      this.footprint = new SocialFootprint();
     }
 
-    // update default footprint ------------------------- //
-    else if (
-      nextProps.footprintAreaCode != undefined ||
-      nextProps.footprintActivityCode != undefined
-    ) {
-      if (nextProps.footprintAreaCode != undefined)
-        this.footprintAreaCode = nextProps.footprintAreaCode;
-      if (nextProps.footprintActivityCode != undefined)
-        this.footprintActivityCode = nextProps.footprintActivityCode;
-      // status
-      this.state = "default";
+    // remove corporate id ------------------------------ //
+    // update params, remove footprint & update dataFetched
+    else if ((nextProps.corporateId == "" || nextProps.corporateId == null) &&
+              nextProps.corporateId != this.corporateId) 
+    {
+      this.corporateId = null;
+      this.useDefaultFootprint = true;
+      this.defaultFootprintParams = {
+        area: "FRA",
+        code: "00",
+        aggregate: "PRD"
+      };
       this.dataFetched = false;
-      this.status = null;
+      this.footprintStatus = 0;
+      this.footprint = new SocialFootprint();
+      }
+
+    // update default footprint ------------------------- //
+    // update params, remove footprint & update dataFetched
+    else if (nextProps.useDefaultFootprint &&
+             nextProps.useDefaultFootprint != this.useDefaultFootprint) 
+    {
+      this.useDefaultFootprint = true;
+      this.defaultFootprintParams = {
+        area: "FRA",
+        code: "00",
+        aggregate: "PRD"
+      };
+      this.dataFetched = false;
+      this.footprintStatus = 0;
+      this.footprint = new SocialFootprint();
+    }
+
+    // update default footprint params ------------------ //
+    // update params, remove footprint & update dataFetched
+    else if (nextProps.defaultFootprintParams != undefined ||
+             nextProps.defaultFootprintParams != this.defaultFootprintParams) 
+    {
+      this.defaultFootprintParams = nextProps.defaultFootprintParams;
+      this.dataFetched = false;
+      this.footprintStatus = 0;
+      this.footprint = new SocialFootprint();
     }
   }
 
@@ -134,103 +159,61 @@ export class Provider
   {
     let footprintId = this.getDefaultFootprintId();
     // Case - Fetch footprint with id --------------------------------------------------------------------- //
-    if (this.state == "siren" && footprintId && /[0-9]{9}/.test(footprintId)) 
+    if (!this.useDefaultFootprint && footprintId && /[0-9]{9}/.test(footprintId)) 
     {
       // request
-      await api.get("legalunitfootprint/" + footprintId).then((res) => {
+      await api.get("legalunitfootprint/" + footprintId).then((res) => 
+      {
         let status = res.data.header.code;
-
+        this.footprintStatus = status;
         if (status == 200) {
-          let data = res.data.legalUnit;
           // legal data --------------------------------------- //
-          this.legalUnitName = data.denominationunitelegale;
-          this.legalUnitAreaCode = "FRA";
-          this.legalUnitActivityCode = data.activiteprincipaleunitelegale;
+          this.legalUnitData = res.data.legalUnit;
           // footprint ---------------------------------------- //
           this.footprint.updateAll(res.data.footprint);
-          // state -------------------------------------------- //
-          this.lastUpdateFromRemote = getCurrentDateString();
           this.dataFetched = true;
         } else {
           // legal data --------------------------------------- //
-          this.legalUnitName = "";
-          this.legalUnitAreaCode = "";
-          this.legalUnitActivityCode = "";
+          this.legalUnitData = {};
           // footprint ---------------------------------------- //
           this.footprint = new SocialFootprint();
-          // state -------------------------------------------- //
-          this.lastUpdateFromRemote = "";
           this.dataFetched = false;
         }
-        this.status = status;
       }).catch((err)=>{
         throw err;
       });
     }
     // Case - Fetch id not ok ----------------------------------------------------------------------------- //
-    else if (this.state == "siren") {
+    else if (!this.useDefaultFootprint) 
+    {
       // legal data --------------------------------------- //
-      this.legalUnitName = "";
-      this.legalUnitAreaCode = "";
-      this.legalUnitActivityCode = "";
+      this.legalUnitData = {};
       // footprint ---------------------------------------- //
       this.footprint = new SocialFootprint();
-      // state -------------------------------------------- //
-      this.lastUpdateFromRemote = "";
       this.dataFetched = false;
-      this.status = 404;
     }
     // Case - Fetch default data -------------------------------------------------------------------------- //
-    else if (this.state == "default") {
-
-      await api
-        .get("defaultfootprint/?code="+this.footprintActivityCode+"&aggregate=PRD&area="+this.footprintAreaCode)
-        .then((res) => {
-          let status = res.data.header.code;
-          if (status == 200) {
-            let data = res.data;
-
-            // footprint ---------------------------------------- //
-            this.footprint.updateAll(data.footprint);
-            // state -------------------------------------------- //
-            this.lastUpdateFromRemote = getCurrentDateString();
-            this.dataFetched = true;
-          } else {
-            this.footprint = new SocialFootprint();
-            // state -------------------------------------------- //
-            this.lastUpdateFromRemote = "";
-            this.dataFetched = false;
-          }
-          this.status = status;
-        }).catch((err)=>{
-          throw err;
-        });
+    else if (this.useDefaultFootprint) 
+    {
+      let defaultFptParams = Object.entries(this.initialFootprintParams).map(([key,value]) => key+"="+value).join("&");
+      await api.get("defaultfootprint?"+defaultFptParams).then((res) => 
+      {
+        let status = res.data.header.code;
+        this.footprintStatus = status;
+        if (status == 200) {
+          // footprint ---------------------------------------- //
+          this.footprint.updateAll(res.data.footprint);
+          this.dataFetched = true;
+        } else {
+          this.footprint = new SocialFootprint();
+          this.dataFetched = false;
+        }
+      }).catch((err)=>{
+        throw err;
+      });
     }
     // ---------------------------------------------------------------------------------------------------- //
     return;
   }
 
-  /* ---------- Getters ---------- */
-
-  getId() {
-    return this.id;
-  }
-
-  getCorporateId() {
-    return this.corporateId;
-  }
-  getCorporateName() {
-    return this.corporateName;
-  }
-
-  getAreaCode() {
-    return this.footprintAreaCode;
-  }
-  getActivityCode() {
-    return this.footprintActivityCode;
-  }
-
-  getFootprint() {
-    return this.footprint;
-  }
 }

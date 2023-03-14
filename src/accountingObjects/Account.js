@@ -17,7 +17,16 @@ export class Account {
     this.accountNum = accountNum;                                   // account number
     this.accountLib = accountLib;                                   // account label
     
-    this.periodsData = periodsData || {};
+    this.periodsData = {};
+    if (periodsData) {
+      Object.values(periodsData).forEach(({periodKey,amount,footprint}) => {
+        this.periodsData[periodKey] = {
+          periodKey,
+          amount,
+          footprint: new SocialFootprint(footprint)
+        }
+      })
+    }
   // ---------------------------------------------------------------------------------------------------- //
   }
 

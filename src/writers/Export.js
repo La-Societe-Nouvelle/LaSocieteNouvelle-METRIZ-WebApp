@@ -18,11 +18,11 @@ function exportIndicDataExpensesCSV(indic, session) {
   let expenses = session.financialData.expenses;
   expenses.forEach((expense) => {
     csvContent += "\r\n";
-    let indicator = expense.getFootprint().getIndicator(indic);
+    let indicator = expense.footprint.getIndicator(indic);
     let row =
-      expense.getCorporateId() +
+      expense.corporateId +
       ";" +
-      expense.getCorporateName() +
+      expense.legalUnitData.denomination +
       ";" +
       expense.getAmount() +
       ";" +
@@ -42,11 +42,11 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   let depreciations = session.financialData.getDepreciations();
   depreciations.forEach((depreciation) => {
     csvContent += "\r\n";
-    let indicator = depreciation.getFootprint().getIndicator(indic);
+    let indicator = depreciation.footprint.getIndicator(indic);
     let row =
-      depreciation.getCorporateId() +
+      depreciation.corporateId +
       ";" +
-      depreciation.getCorporateName() +
+      depreciation.legalUnitData.denomination +
       ";" +
       depreciation.getAmount() +
       ";" +

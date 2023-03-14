@@ -97,7 +97,7 @@ export class IndicatorCompaniesTable extends React.Component {
     switch(columSorted) 
     {
       case "identifiant": companies.sort((a,b) => valueOrDefault(a.corporateId,"").localeCompare(valueOrDefault(b.corporateId,""))); break;
-      case "denomination": companies.sort((a,b) => a.getCorporateName().localeCompare(b.getCorporateName())); break;
+      case "denomination": companies.sort((a,b) => a.providerLib.localeCompare(b.providerLib)); break;
       case "amount": companies.sort((a,b) => b.amount - a.amount); break;
     }
     if (this.state.reverseSort) companies.reverse();

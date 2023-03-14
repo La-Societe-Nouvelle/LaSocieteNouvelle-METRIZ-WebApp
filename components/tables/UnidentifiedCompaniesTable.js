@@ -158,7 +158,7 @@ export class UnidentifiedCompaniesTable extends React.Component
         break;
       case "denomination":
         providers.sort((a, b) =>
-          a.getCorporateName().localeCompare(b.getCorporateName())
+          a.providerLib.localeCompare(b.providerLib)
         );
         break;
       case "amount":

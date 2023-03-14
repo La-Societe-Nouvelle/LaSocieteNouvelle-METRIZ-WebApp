@@ -31,6 +31,8 @@ export class SirenSection extends React.Component
       synchronised: 0,
       popup: false,
       isDisabled: true,
+      isSyncButtonEnable: false,
+      isNextStepAvailable: nextStepAvailable(props.session.financialData.providers),
       errorFile: false,
       error: false,
     };
@@ -45,6 +47,19 @@ export class SirenSection extends React.Component
         this.setState({ errorFile: true });
       }
     };
+  }
+
+  componentDidUpdate = () =>
+  {
+    console.log("props section did update");
+    const isNextStepAvailable = nextStepAvailable(this.props.session.financialData.providers);
+    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+      this.setState({ isNextStepAvailable });
+    }
+    const isSyncButtonEnable = checkSyncButtonEnable(this.props.session.financialData.providers);
+    if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
+      this.setState({ isSyncButtonEnable });
+    }
   }
 
   handleChange = (event) => 
@@ -91,6 +106,8 @@ export class SirenSection extends React.Component
       providersShowed,
       popup,
       isDisabled,
+      isSyncButtonEnable,
+      isNextStepAvailable,
       errorFile,
       error,
     } = this.state;
@@ -98,11 +115,9 @@ export class SirenSection extends React.Component
     const financialData = this.props.session.financialData;
     const financialPeriod = this.props.financialPeriod;
 
-    const isNextStepAvailable = nextStepAvailable(providers);
-
     let buttonNextStep;
     if (
-      this.state.providers.filter((provider) => provider.status == 200).length ==
+      this.state.providers.filter((provider) => provider.footprintStatus == 200).length ==
       this.state.providers.length
     ) {
       buttonNextStep = (
@@ -136,6 +151,7 @@ export class SirenSection extends React.Component
       );
     }
 
+    console.log("section render");
     return (
       <Container fluid id="siren-section">
         <section className="step">
@@ -202,7 +218,7 @@ export class SirenSection extends React.Component
             <div className="table-container">
               <div className="table-data table-company">
                 {error && <ErrorApi />}
-                { providers.some(provider => provider.status == "404") && (
+                {providers.some(provider => provider.footprintStatus == 404) && (
                   <div className="alert alert-danger">
                     <p>
                       <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas pu être synchroniser. Vérifiez le numéro de siren et
@@ -223,8 +239,7 @@ export class SirenSection extends React.Component
                       <i className="bi bi-check2 me-2"></i> Tous les comptes ayant un
                       n° de Siren ont bien été synchronisés.
                     </p>
-                    {providers.filter((provider) => provider.state == "default")
-                      .length > 0 && (
+                    {providers.some((provider) => provider.useDefaultFootprint) && (
                       <button
                         onClick={this.handleChange}
                         value="undefined"
@@ -233,7 +248,7 @@ export class SirenSection extends React.Component
                         Comptes sans numéro de siren (
                         {
                           providers.filter(
-                            (provider) => provider.state == "default"
+                            (provider) => provider.useDefaultFootprint
                           ).length
                         }
                         /{providers.length})
@@ -249,7 +264,7 @@ export class SirenSection extends React.Component
                 <button
                   onClick={() => this.synchroniseProviders()}
                   className="btn btn-secondary"
-                  disabled={isDisabled}
+                  disabled={!isSyncButtonEnable}
                 >
                   <i className="bi bi-arrow-repeat"></i> Synchroniser les
                   données
@@ -310,6 +325,7 @@ export class SirenSection extends React.Component
                     financialData={financialData}
                     financialPeriod={financialPeriod}
                     checkSync={this.enableButton.bind(this)}
+                    refreshSection={this.refreshSection}
                   />
                 )}
               </div>
@@ -355,6 +371,18 @@ export class SirenSection extends React.Component
     this.setState({ isDisabled: disable });
   };
 
+  refreshSection = () => 
+  {
+    const isNextStepAvailable = nextStepAvailable(this.props.session.financialData.providers);
+    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+      this.setState({ isNextStepAvailable });
+    }
+    const isSyncButtonEnable = checkSyncButtonEnable(this.props.session.financialData.providers);
+    if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
+      this.setState({ isSyncButtonEnable });
+    }
+  }
+
   /* ---------- FILE IMPORT ---------- */
 
   importFile = (file) => {
@@ -385,10 +413,10 @@ export class SirenSection extends React.Component
         Object.entries(companiesIds).map(async ([providerNum, corporateName, corporateId]) => {
           let provider  = providerNum ? this.props.session.financialData.getCompanyByAccount(providerNum) : this.props.session.financialData.getCompanyByName(corporateName);
           if (provider) {
-            provider.corporateName = corporateName;
             provider.corporateId = corporateId;
-            provider.state = "siren";
-            provider.dataFetched = false; // check if changes or use update()
+            provider.legalUnitData.denomination = denomination;
+            provider.useDefaultFootprint = false;
+            provider.footprintStatus = 0; // check if changes or use update()
           }
         })
       );
@@ -401,7 +429,7 @@ export class SirenSection extends React.Component
   };
 
   // Import XLSX File
-  importXLSXFile = (file) => 
+  importXLSXFile = async (file) => 
   {
     let reader = new FileReader();
     reader.onload = async () => {
@@ -414,10 +442,11 @@ export class SirenSection extends React.Component
             : this.props.session.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
           if (provider) {
             provider.corporateId = siren;
-            provider.corporateName = denomination;
-            provider.state = "siren";
-            provider.dataFetched = false; // check if changes or use update()
+            provider.legalUnitData.denomination = denomination;
+            provider.useDefaultFootprint = false;
+            provider.footprintStatus = 0; // check if changes or use update()
           }
+          return;
         })
       );
       this.setState({
@@ -432,7 +461,6 @@ export class SirenSection extends React.Component
 
   // Export CSV File
   exportXLSXFile = async () => {
-    console.log(this.props.session.financialData.providers)
     let jsonContent = await this.props.session.financialData.providers
       .filter((provider) => provider.providerNum.charAt(0) != "_")
       .map((provider) => {
@@ -461,9 +489,11 @@ export class SirenSection extends React.Component
 
   /* ---------- FETCHING DATA ---------- */
 
-  synchroniseProviders = async () => {
+  // fetch data for showed providers
+  synchroniseProviders = async () => 
+  {
     let providersToSynchronise = this.state.providers.filter(
-      (provider) => provider.state == "siren" && provider.status != 200
+      (provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200
     );
 
     // synchronise data
@@ -491,13 +521,12 @@ export class SirenSection extends React.Component
       view: "all",
       providersShowed: this.state.providers,
       synchronised: this.state.providers.filter(
-        (provider) => provider.status == 200
+        (provider) => provider.footprintStatus == 200
       ).length,
     });
 
     document.getElementById("step-3").scrollIntoView();
 
-    this.enableButton();
     // update session
     //this.props.session.updateFootprints();
   };
@@ -509,15 +538,23 @@ export class SirenSection extends React.Component
 }
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const nextStepAvailable = (providers) => {
+const nextStepAvailable = (providers) => 
+{
   let nbSirenSynchronised = providers.filter(
-    (provider) => provider.state == "siren" && provider.status == 200
+    (provider) => !provider.useDefaultFootprint && provider.footprintStatus == 200
   ).length;
 
-  let nbSiren = providers.filter((provider) => provider.state == "siren").length;
+  let nbSiren = providers.filter((provider) => !provider.useDefaultFootprint).length;
   if (nbSirenSynchronised == nbSiren && nbSiren != 0) {
     return true;
   } else {
     return false;
   }
+};
+
+// provider not using default footprint & footprint status not OK
+const checkSyncButtonEnable = (providers) => 
+{
+  let enable = providers.some((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
+  return enable;
 };

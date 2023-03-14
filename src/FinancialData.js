@@ -431,7 +431,7 @@ export class FinancialData {
       .map((expense) => {
         return {
           providerNum: expense.providerNum,
-          corporateName: expense.providerLib,
+          providerLib: expense.providerLib,
           isDefaultProviderAccount: expense.isDefaultProviderAccount,
         };
       })
