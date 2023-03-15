@@ -6,7 +6,7 @@ import { printValue } from "/src/utils/Utils";
 // Libraries
 import metaIndics from "/lib/indics";
 import { Table } from "react-bootstrap";
-import { useEffect } from "react";
+import { getEvolution } from "../../src/utils/Utils";
 
 export const ComparativeTable = ({ financialData, indic, comparativeData, period }) => 
 {
@@ -330,14 +330,6 @@ export const ComparativeTable = ({ financialData, indic, comparativeData, period
   );
 };
 
-function getEvolution(value, target) {
-  if (target) {
-    const evolution = ((target - value) / value) * 100;
-    return evolution.toFixed(0);
-  } else {
-    return "-";
-  }
-}
 
 function getValue(value, unit, precision) {
   if (value !== null) {

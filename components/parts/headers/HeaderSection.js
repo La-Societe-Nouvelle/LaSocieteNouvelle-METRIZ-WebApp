@@ -32,7 +32,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
             </a>
           </li>
         </ul>
-        <Button className="download me-4" variant="primary" onClick={saveSession}>
+        <Button className="btn-sm me-4 my-2 p-2" variant="secondary" onClick={saveSession}>
         <i className="bi bi-arrow-down"></i>
           Sauvegarder ma session
         </Button>

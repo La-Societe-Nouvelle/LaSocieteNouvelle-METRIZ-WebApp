@@ -95,11 +95,11 @@ export class StatementGEQ extends React.Component {
         </div>
         <div className="statement-comments">
           <label>Informations complémentaires</label>
-          <textarea
-            type="text"
-            spellCheck="false"
-            value={info}
+          <Form.Control
+            as="textarea"
+            rows={4}
             onChange={this.updateInfo}
+            value={info}
             onBlur={this.saveInfo}
           />
         </div>

@@ -2,6 +2,7 @@
 
 // React
 import React from "react";
+import { Form } from "react-bootstrap";
 
 //Utils
 import {
@@ -17,7 +18,10 @@ export class StatementWAT extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      waterConsumption: valueOrDefault(props.impactsData.waterConsumption, undefined),
+      waterConsumption: valueOrDefault(
+        props.impactsData.waterConsumption,
+        undefined
+      ),
       waterConsumptionUncertainty: valueOrDefault(
         props.impactsData.waterConsumptionUncertainty,
         undefined
@@ -74,12 +78,11 @@ export class StatementWAT extends React.Component {
 
         <div className="statement-comments">
           <label>Informations complémentaires</label>
-          <textarea
-            className="form-control"
-            type="text"
-            spellCheck="false"
-            value={info}
+          <Form.Control
+            as="textarea"
+            rows={4}
             onChange={this.updateInfo}
+            value={info}
             onBlur={this.saveInfo}
           />
         </div>

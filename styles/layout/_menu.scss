@@ -1,7 +1,6 @@
-
 /* Menu */
 
-header{
+header {
   ul.nav {
     padding: 0;
     list-style: none;
@@ -17,95 +16,84 @@ header{
 .top-bar {
   background-color: #343a40;
   display: flex;
-    justify-content: space-between;
-    align-items: center;
-  .btn-download {
-    background-color: #07f;
-    padding : 0.7em;
-    margin : 0.5em 1em;
-    
-  }
-  .nav a{
-    color : #fff;
-    font-size : 0.8em;
+  justify-content: space-between;
+  align-items: center;
+
+  .nav a {
+    color: #fff;
+    font-size: 0.8em;
   }
 }
 
-#progression{
-        flex-grow: 1;
-        
-        .stepper-item{
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
+#progression {
+  flex-grow: 1;
 
-        }
-        .stepper-item::before {
-            position: absolute;
-            content: "";
-            border-bottom: 15px solid #9aa2d0;
-            width: 100%;
-            top: 12px;
-            left: -50%;
-            z-index: 2;
-          }
-          
-          .stepper-item::after {
-            position: absolute;
-            content: "";
-            border-bottom: 15px solid #9aa2d0;
-            width: 100%;
-            top: 12px;
-            left: 50%;
-            z-index: 2;
-          }
-          .step-counter {
-            position: relative;
-            z-index: 5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border:none;
-            background: #9aa2d0;
-            font-size: 1.5rem;
-            color : #fff;
-            font-weight: 800;
-          }
+  .stepper-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+  }
+  .stepper-item::before {
+    position: absolute;
+    content: "";
+    border-bottom: 15px solid #9aa2d0;
+    width: 100%;
+    top: 12px;
+    left: -50%;
+    z-index: 2;
+  }
 
-          .current{
-            background-color: $tertiary;
-         
-        }
-        .current + .step-name{
-            font-weight: 800;
-        }
-          .stepper-item.completed .step-counter {
-            background-color: $tertiary;
-          }
-          
-          .stepper-item.completed::after {
-            position: absolute;
-            content: "";
-            border-bottom: 15px solid $tertiary;
-            width: 100%;
-            top: 12px;
-            left: 50%;
-            z-index: 3;
-          }
-          
-          .stepper-item:first-child::before {
-            content: none;
-          }
-          .stepper-item:last-child::after {
-            width: 65%;
-          }
-   
+  .stepper-item::after {
+    position: absolute;
+    content: "";
+    border-bottom: 15px solid #9aa2d0;
+    width: 100%;
+    top: 12px;
+    left: 50%;
+    z-index: 2;
+  }
+  .step-counter {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #9aa2d0;
+    font-size: 1.5rem;
+    color: #fff;
+    font-weight: 800;
+  }
 
-    
-    }
+  .current {
+    background-color: $tertiary;
+  }
+  .current + .step-name {
+    font-weight: 800;
+  }
+  .stepper-item.completed .step-counter {
+    background-color: $tertiary;
+  }
 
+  .stepper-item.completed::after {
+    position: absolute;
+    content: "";
+    border-bottom: 15px solid $tertiary;
+    width: 100%;
+    top: 12px;
+    left: 50%;
+    z-index: 3;
+  }
+
+  .stepper-item:first-child::before {
+    content: none;
+  }
+  .stepper-item:last-child::after {
+    width: 65%;
+  }
+}

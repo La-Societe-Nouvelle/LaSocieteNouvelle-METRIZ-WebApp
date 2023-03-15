@@ -48,7 +48,7 @@ export class StartSection extends React.Component
                     d'activité et, si vous le souhaitez, <b>valoriser votre empreinte</b> en la publiant au sein de notre base de
                     données ouverte.
                   </p>
-                  <div className="mt-5 btn-group">
+                  <div className="mt-5">
                     <Button
                       variant="secondary"
                       className="me-2"

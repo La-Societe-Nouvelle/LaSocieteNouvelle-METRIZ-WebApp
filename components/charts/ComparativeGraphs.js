@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
 // Libraries
@@ -62,6 +62,7 @@ const ComparativeGraphs = (props) => {
         type: "bar",
         barPercentage: 0.6,
         categoryPercentage: 0.6,
+        minBarLength: 2,
       },
       {
         label: "Objectif ",
@@ -75,6 +76,7 @@ const ComparativeGraphs = (props) => {
         borderWidth: 0,
         barPercentage: 0.6,
         categoryPercentage: 0.6,
+        minBarLength: 2,
       },
     ],
   };
@@ -126,7 +128,7 @@ const ComparativeGraphs = (props) => {
             },
             color: "#191558",
             font: {
-              size: 12,
+              size: 9,
               family: "Roboto",
             },
           },
@@ -140,7 +142,7 @@ const ComparativeGraphs = (props) => {
             text: unit,
             color: "#191558",
             font : {
-              size: 10,
+              size: 11,
             }
           },
           tooltip: {

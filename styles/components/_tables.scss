@@ -1,24 +1,5 @@
 /* ---------- TABLE ---------- */
 
-.table > :not(:first-child) {
-  border : none;
-}
-
-.pagination {
-
-  display: flex;
-  justify-content: flex-start;
-  flex-grow: 1;
-  gap: 20px;
-  margin-top: 1rem;
-
-  .form-input,
-  label {
-    font-size: 0.85rem;
-    width: auto;
-  }
-}
-
 .toChecked {
   border-right: 2px solid $warning;
 }
@@ -27,19 +8,16 @@ p.toChecked {
   font-size: 0.8rem;
   margin: 1rem 0;
 }
-table {
-  border: 1px solid $light;
-  font-size: 0.85em;
 
-  td {
-    border : none;
-  }
+table {
+  font-size: 0.85em;
+  border-radius: 1rem;
+  border : 2px solid $bg-light;
 
   tr.fw-bold td {
-   padding: 0.5rem 0.25rem;
-   background-color:darken($bg-light, 1%);
+    padding: 0.5rem 0.25rem;
+    background-color: darken($bg-light, 1%);
   }
-  
 
   .siren {
     width: 250px;
@@ -61,7 +39,6 @@ table {
     width: 100px;
   }
   .success {
- 
     .form-input,
     .form-input:active,
     .form-input:focus,
@@ -76,24 +53,8 @@ table {
     border-color: $warning;
   }
 
-  p.warning {
-    color: $warning;
-    .form-input,
-    .form-input:active,
-    .form-input:focus {
-      border-color: $warning;
-    }
-  }
-  select.warning {
-    background-color: #fffdf6;
-    border-color: $warning;
-  }
-  .error {
-    color: $error;
-  }
-
   // --- Cell --- //
- 
+
   td {
     // index
     &.sub {
@@ -106,15 +67,15 @@ table {
       font-size: 15px;
     }
   }
-  
+
   // --- Head --- //
 
   thead {
-    background-color: lighten($primary, 10%);
-    color : #fff;
+    background-color: $primary;
+    color: #fff;
     font-weight: 700;
-    font-size: 1.1em;
-    border: 1px solid lighten($primary, 10%);
+    font-size: 1em;
+    border : 2px solid $primary;
 
   }
   .subth {
@@ -203,20 +164,20 @@ table {
     font-size: 0.9rem;
     background-color: $bg-light;
     font-weight: 600;
-    border : none;
+    border: none;
     padding: 1rem;
     color: $primary;
-    border-top:  1px solid $light;
+    border-top: 1px solid $light;
     border-bottom: 2px solid $light;
     cursor: pointer;
   }
   button:first-child {
-    border-left : 1px solid $light;
-    border-radius : 5px 0 0 5px;
+    border-left: 1px solid $light;
+    border-radius: 5px 0 0 5px;
   }
   button:last-child {
     border-right: 1px solid $light;
-    border-radius : 0px 5px 5px 0;
+    border-radius: 0px 5px 5px 0;
   }
   button.active,
   button:hover,
@@ -227,18 +188,7 @@ table {
   }
 }
 
-.table-btn {
-  text-align: right;
-  .btn {
-    font-weight: normal;
-    font-size: 0.9em;
-    svg {
-      height: 15px;
-    }
-  }
-}
 .table-data {
-
   .fa-circle-info {
     color: $secondary;
   }
@@ -260,21 +210,6 @@ table {
 
 // TABLE Assesment
 
-.column_icon .btn {
-  padding: 0;
-  background-color: transparent;
-  svg {
-    height: 20px;
-  }
-}
-
-.a-nouveaux-input {
-  margin: 1em 0;
-  width: 100%;
-  background: $bg-light;
-  padding: 1em;
-}
-
 // Custom columns size
 .division-column {
   width: 450px;
@@ -284,32 +219,29 @@ table {
   width: 250px;
 }
 
-
 .comparative-table {
   .border-left {
-    border-left: 2px solid lighten( $light, 5%);
-}
- 
+    border-left: 2px solid lighten($light, 5%);
+  }
 }
 
-  // --- Immobilisations Table --- //
+// --- Immobilisations Table --- //
 
 .immobilisationsTable {
-
   caption-side: top;
 
   caption {
     background-color: lighten($primary, 10%);
-    color : #fff;
+    color: #fff;
     font-weight: 700;
-    font-size: 1.1em;  
+    font-size: 1.1em;
     padding: 0.5rem 0.5rem;
     border: 1px solid #dbdef1;
   }
-  
+
   thead {
     background-color: $light;
-    color : $text-color;
+    color: $text-color;
     font-weight: normal;
   }
-} 
+}

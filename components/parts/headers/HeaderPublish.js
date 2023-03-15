@@ -33,8 +33,8 @@ export function HeaderPublish({ setStep, downloadSession }) {
           </li>
         </ul>
         <Button
-          className="download me-4"
-          variant="primary"
+          className="btn-sm me-4 my-2 p-2"
+          variant="secondary"
           onClick={saveSession}
         >
           <i className="bi bi-arrow-down"></i>
@@ -43,17 +43,19 @@ export function HeaderPublish({ setStep, downloadSession }) {
       </div>
       <Container fluid id="menu">
         <Row>
-          <div className="logo">
-            <img
-              src="/logo_la-societe-nouvelle_s.svg"
-              alt="logo"
-              onClick={refresh}
-            />
-          </div>
-          <div className="action">
-            <button className="btn btn-secondary" onClick={() => setStep(4)}>
-              <i className="bi bi-chevron-left"></i> Retour à la déclaration des impacts
-            </button>
+          <div className="d-flex justify-content-between align-items-center">
+                <img
+                  src="/logo_la-societe-nouvelle_s.svg"
+                  alt="logo"
+                  onClick={refresh}
+                />
+              <div className="action">
+                <button className="btn btn-secondary" onClick={() => setStep(4)}>
+                  <i className="bi bi-chevron-left"></i> Retour à la déclaration des
+                  impacts
+                </button>
+              </div>
+
           </div>
           <nav id="progression" className="d-flex">
             <div className={"stepper-item completed"}>

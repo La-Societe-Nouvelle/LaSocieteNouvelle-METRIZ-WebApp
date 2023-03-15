@@ -285,6 +285,15 @@ const formatMonth = (date) =>
   (date.getMonth() + 1);
 
 /* ----- SERIES ID ----- */
+export const getShortCurrentDateString = () => {
+  const currentDate = new Date();
+  const dateString = currentDate.toLocaleString("fr-FR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  return dateString;
+};
 
 export const getTargetSerieId = (indic) => {
   let id;
@@ -371,3 +380,11 @@ export function mergeAggregates(obj1, obj2) {
 }
 
 
+export function getEvolution(value, target) {
+  if (target) {
+    const evolution = ((target - value) / value) * 100;
+    return evolution.toFixed(0);
+  } else {
+    return "-";
+  }
+}

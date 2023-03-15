@@ -337,7 +337,7 @@ async function buildMappingAssetAccounts(accounts)
 const getPrefixLength = (stringA,stringB) =>
 {
   let prefixLength = 0;
-  while (stringA[prefixLength]==stringB[prefixLength]) prefixLength++;
+  while (stringA[prefixLength]==stringB[prefixLength] && prefixLength<stringA.length && prefixLength<stringB.length) prefixLength++;
   return prefixLength;
 }
 

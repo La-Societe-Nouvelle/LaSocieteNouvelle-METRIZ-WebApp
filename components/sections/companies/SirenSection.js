@@ -200,8 +200,8 @@ export class SirenSection extends React.Component
               </div>}
 
 
-                <div className="pagination">
-                  <div className="form-group">
+                <div className="d-flex mb-3">
+                  <div className="form-group me-2">
                     <select
                       onChange={this.changeView}
                       value={view}

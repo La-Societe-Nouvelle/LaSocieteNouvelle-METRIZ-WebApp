@@ -53,7 +53,7 @@
   },
   "ghg": {
     "isBeta": false,
-    "libelle": "Intensité d'Émissions de Gaz à effet de serre",
+    "libelle": "Intensité d'émission de gaz à effet de serre",
     "libelleDeclaredValue": "",
     "libelleGrandeur": "Émissions de Gaz à effet de serre",
     "libelleMenu": "Gaz à effet de serre",

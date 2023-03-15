@@ -1,26 +1,12 @@
 /* Header */
 
-	header {
-		
-		p{
-			font-size: 0.95em;
-		}
-		.logo {
-				img {
-					display: block;
-					height: 5em;
-					margin: 0 auto;
-					&:hover{
-						cursor: pointer;
-					}
-				}
-			
-		} 
-	}
-	.header{
-		padding: 1em 0;
-	}
+header {
 
-	.navbar-light .navbar-nav .nav-link {
-		color : $primary;
-	}
+    img {
+      height: 5em;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+
