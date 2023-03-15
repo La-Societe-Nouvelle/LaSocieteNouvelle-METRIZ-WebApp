@@ -2,7 +2,8 @@ import { printValue } from "../../../utils/Utils";
 import metaIndics from "/lib/indics";
 
 export const generateIndicTableBody = (
-  aggregates,
+  mainAggregates,
+  productionAggregates,
   indic,
   unit,
   intermediateConsumptionAggregates,
@@ -10,14 +11,16 @@ export const generateIndicTableBody = (
 ) => {
   // FINANCIAL DATA
   const {
-    production,
     revenue,
     storedProduction,
     immobilisedProduction,
+  } = productionAggregates;
+  const {
+    production,
     intermediateConsumption,
     capitalConsumption,
     netValueAdded,
-  } = aggregates;
+  } = mainAggregates;
 
   const precision = metaIndics[indic].nbDecimals;
 

@@ -67,7 +67,7 @@ async function buildMainAggregatesContent(indic,session)
     revenue,
     storedProduction,
     immobilisedProduction
-  } = session.financialData;
+  } = session.financialData.productionAggregates;
   
   const {
     production,

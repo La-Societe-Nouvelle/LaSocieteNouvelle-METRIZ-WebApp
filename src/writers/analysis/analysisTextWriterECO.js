@@ -3,7 +3,8 @@ import { printValue } from "../../utils/Utils";
 
 export const analysisTextWriterECO = (session,period) => {
   const { impactsData, comparativeData, financialData } = session;
-  const { mainAggregates, revenue, storedProduction, immobilisedProduction, externalExpenseAccounts } = financialData;
+  const { mainAggregates, productionAggregates } = financialData;
+  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
   // array of paragraphs
   let analysis = [];
@@ -97,7 +98,7 @@ export const analysisTextWriterECO = (session,period) => {
   }
 
   // comptes les plus impactants
-  let bestAccount = externalExpenseAccounts.sort(
+  let bestAccount = externalExpensesAccounts.sort(
     (a, b) =>
       b.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(b.periodsData[period.periodKey].amount) -
       a.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(a.periodsData[period.periodKey].amount)

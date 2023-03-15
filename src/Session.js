@@ -40,7 +40,7 @@ export class Session
     this.progression = props.progression || 0;
 
     // Year
-    this.year = props.year || "";
+    this.year = props.year || ""; // obsolete
     this.availablePeriods = props.availablePeriods || [];
     this.financialPeriod = props.financialPeriod || {};
 

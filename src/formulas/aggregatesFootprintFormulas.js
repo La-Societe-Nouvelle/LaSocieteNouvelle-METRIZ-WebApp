@@ -82,7 +82,7 @@ export const updateIntermediateConsumptionsFootprints = async (financialData,per
 
 const updateExternalExpensesAccountsFpt = async (financialData,period) =>
 {
-  await Promise.all(financialData.externalExpenseAccounts
+  await Promise.all(financialData.externalExpensesAccounts
     .map(async (account) => 
   {
     // retrieve expenses (linked to the account)
@@ -158,7 +158,7 @@ const updatePurchasesStocksStatesFpt = async (financialData,period) =>
 
 const updatePurchasesStocksVariationsAccountsFpt = async (financialData,period) =>
 {
-  await Promise.all(financialData.stockVariationAccounts
+  await Promise.all(financialData.stockVariationsAccounts
     .map(async (account) => 
   {
     let stock = financialData.stocks.filter(stock => stock.defaultStockVariationAccountNum==account.accountNum)[0];
@@ -328,7 +328,7 @@ export const updateMainAggregatesFootprints = async (indic,financialData,period)
 
   // Intermediate consumptions
   intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
-    await buildAggregatePeriodIndicator(indic,financialData.externalExpenseAccounts.concat(financialData.stockVariationAccounts),period.periodKey);
+    await buildAggregatePeriodIndicator(indic,financialData.externalExpensesAccounts.concat(financialData.stockVariationsAccounts),period.periodKey);
   
   // Fixed capital consumtpions
   fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
@@ -421,8 +421,8 @@ const updateSoldProductionFpt = async (indic,financialData,period) =>
 
   let productionFootprint = financialData.mainAggregates.production.periodsData[period.periodKey].footprint;
   
-  let revenueAmount = financialData.revenue.periodsData[period.periodKey].amount;
-  financialData.revenue.periodsData[period.periodKey].footprint.indicators[indic]
+  let revenueAmount = financialData.productionAggregates.revenue.periodsData[period.periodKey].amount;
+  financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint.indicators[indic]
     = await mergeIndicators(indic,[
       {amount: initialProductionStockAmount, footprint: initialProductionStockFootprint},
       {amount: roundValue(revenueAmount-initialProductionStockAmount,2), footprint: productionFootprint}

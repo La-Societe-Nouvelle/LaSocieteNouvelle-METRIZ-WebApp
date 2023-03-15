@@ -29,7 +29,7 @@ export class PublishStatementSection extends React.Component
         super(props);
 
         const socialFootprint = {};
-        Object.entries(props.session.financialData.mainAggregates.revenue.periodsData[props.period.periodKey].footprint.indicators).filter(([_, indicator]) => indicator.value != null)
+        Object.entries(props.session.financialData.productionAggregates.revenue.periodsData[props.period.periodKey].footprint.indicators).filter(([_, indicator]) => indicator.value != null)
             .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
 
         this.state =
@@ -41,7 +41,7 @@ export class PublishStatementSection extends React.Component
             year: props.session.year || "",
 
             // Statements 
-            revenueFootprint: props.session.financialData.mainAggregates.revenue.periodsData[props.period.periodKey].footprint,
+            revenueFootprint: props.session.financialData.productionAggregates.revenue.periodsData[props.period.periodKey].footprint,
             validations: props.session.validations,
             comments: props.session.impactsData.comments || {},
 

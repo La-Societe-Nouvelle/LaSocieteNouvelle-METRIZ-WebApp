@@ -33,7 +33,7 @@ export class IndicatorExpensesTable extends React.Component {
     const {session,indic,period} = this.props;
     const {columnSorted} = this.state;
 
-    const externalExpensesAccounts = session.financialData.externalExpenseAccounts;
+    const externalExpensesAccounts = session.financialData.externalExpensesAccounts;
     this.sortAccounts(externalExpensesAccounts,period,columnSorted);
 
     const nbDecimals = metaIndics[indic].nbDecimals;

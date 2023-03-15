@@ -41,7 +41,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session, period }) =>
     revenue,
     storedProduction,
     immobilisedProduction
-  } = financialData;
+  } = financialData.productionAggregates;
 
   const {
     production,

@@ -202,7 +202,7 @@ function generateFootprintPDF(
     revenue,
     storedProduction,
     immobilisedProduction,
-  } = financialData;
+  } = financialData.productionAggregates;
 
   const {
     production,

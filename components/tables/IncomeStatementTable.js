@@ -109,9 +109,9 @@ const getFinancialItems = (financialData, periodKey) =>
   // Resultat d'exploitation -------------------------- //
 
   // incomes
-  financialItems.revenue = financialData.revenue.periodsData[periodKey].amount;
-  financialItems.storedProduction = financialData.storedProduction.periodsData[periodKey].amount;
-  financialItems.immobilisedProduction = financialData.immobilisedProduction.periodsData[periodKey].amount;
+  financialItems.revenue = financialData.productionAggregates.revenue.periodsData[periodKey].amount;
+  financialItems.storedProduction = financialData.productionAggregates.storedProduction.periodsData[periodKey].amount;
+  financialItems.immobilisedProduction = financialData.productionAggregates.immobilisedProduction.periodsData[periodKey].amount;
   financialItems.otherOperatingIncomes = financialData.otherFinancialData.otherOperatingIncomes.periodsData[periodKey].amount;
 
   // total incomes
@@ -182,7 +182,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
   let accounts = [];
 
   // Achats de marchandises
-  accounts = financialData.externalExpenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+  accounts = financialData.externalExpensesAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
       label: "Achats de marchandises",
@@ -192,7 +192,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
   }
 
   // Variation des stocks de marchandises
-  accounts = financialData.stockVariationAccounts.filter(account => /^6037/.test(account.accountNum));
+  accounts = financialData.stockVariationsAccounts.filter(account => /^6037/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
       label: "Variation des stocks de marchandises",
@@ -202,7 +202,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
   }
 
   // Achats de matières premières et autres approvisionnements 
-  accounts = financialData.externalExpenseAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
+  accounts = financialData.externalExpensesAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
         label: "Achats de matières premières et autres approvisionnements",
@@ -212,7 +212,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
   }
 
   // Variation des stocks de matières premières et autres approvisionnements 
-  accounts = financialData.stockVariationAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
+  accounts = financialData.stockVariationsAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
         label: "Variation des stocks de matières premières et autres approvisionnements",
@@ -222,7 +222,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
   }
 
   // Autres achats
-  accounts = financialData.externalExpenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+  accounts = financialData.externalExpensesAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
         label: "Autres achats",
@@ -232,7 +232,7 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
   }
 
   // Autres charges externes
-  accounts = financialData.externalExpenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+  accounts = financialData.externalExpensesAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
   if (accounts.length>0) {
     aggregates.push({
         label: "Autres charges externes",

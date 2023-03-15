@@ -4,7 +4,8 @@ import { compareToReference, printValue } from "../../utils/Utils";
 
 export const analysisTextWriterGHG = (session,period) => {
   const { impactsData, comparativeData, financialData } = session;
-  const { mainAggregates, revenue, storedProduction, immobilisedProduction, expenseAccounts } = financialData;
+  const { mainAggregates, productionAggregates } = financialData;
+  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
   // array of paragraphs
   let analysis = [];

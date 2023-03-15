@@ -65,9 +65,11 @@ export class FinancialData
 
       // Production items ------------------------ //
 
-      this.revenue = new Aggregate(data.revenue);                                                                                   // revenue (#71)
-      this.storedProduction = new Aggregate(data.storedProduction);                                                                 // stored production (#71)
-      this.immobilisedProduction = new Aggregate(data.immobilisedProduction);                                                       // immobilised production (#72)
+      this.productionAggregates = {
+        revenue: new Aggregate(data.revenue),                                                                                       // revenue (#71)
+        storedProduction: new Aggregate(data.storedProduction),                                                                     // stored production (#71)
+        immobilisedProduction: new Aggregate(data.immobilisedProduction),                                                           // immobilised production (#72)
+      }
 
       // External expenses ----------------------- //
 
@@ -88,8 +90,8 @@ export class FinancialData
 
       // Expenses accounts ----------------------- //
 
-      this.externalExpenseAccounts = data.externalExpenseAccounts.map((props) => new Account({ ...props }));
-      this.stockVariationAccounts = data.stockVariationAccounts.map((props) => new Account({ ...props }));
+      this.externalExpensesAccounts = data.externalExpensesAccounts.map((props) => new Account({ ...props }));
+      this.stockVariationsAccounts = data.stockVariationsAccounts.map((props) => new Account({ ...props }));
       this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map((props) => new Account({ ...props }));
 
       // Providers ------------------------------- //
@@ -187,21 +189,21 @@ export class FinancialData
 
   buildProductionItems = async (FECData, periods) => {
     // revenue (#70)
-    this.revenue = buildAggregateFromItems({
+    this.productionAggregates.revenue = buildAggregateFromItems({
       id: "revenue",
       label: "Production vendue",
       items: FECData.revenue,
       periods,
     });
     // stored production (#71)
-    this.storedProduction = buildAggregateFromItems({
+    this.productionAggregates.storedProduction = buildAggregateFromItems({
       id: "storedProduction",
       label: "Production stockée",
       items: FECData.storedProduction,
       periods,
     });
     // immobilised production (#72)
-    this.immobilisedProduction = buildAggregateFromItems({
+    this.productionAggregates.immobilisedProduction = buildAggregateFromItems({
       id: "immobilisedProduction",
       label: "Production immobilisée",
       items: FECData.immobilisedProduction,
@@ -211,7 +213,7 @@ export class FinancialData
 
   buildExpensesAccounts = async (periods) => {
     // external expenses
-    this.externalExpenseAccounts = this.expenses
+    this.externalExpensesAccounts = this.expenses
       .map((expense) => expense.accountNum)
       .filter(
         (value, index, self) =>
@@ -224,7 +226,7 @@ export class FinancialData
             accountLib: this.metaAccounts[accountNum].accountLib,
           })
       );
-    this.externalExpenseAccounts.forEach((account) =>
+    this.externalExpensesAccounts.forEach((account) =>
       account.buildPeriods(
         this.expenses.filter(
           (expense) => expense.accountNum == account.accountNum
@@ -234,7 +236,7 @@ export class FinancialData
     );
 
     // purchases stock variations
-    this.stockVariationAccounts = this.stocks
+    this.stockVariationsAccounts = this.stocks
       .filter((stock) => !stock.isProductionStock)
       .map(
         (stock) =>
@@ -243,7 +245,7 @@ export class FinancialData
             accountLib: "Variation stock " + stock.accountLib,
           })
       );
-    this.stockVariationAccounts.forEach((account) =>
+    this.stockVariationsAccounts.forEach((account) =>
       account.buildPeriods(
         this.stockVariations.filter(
           (variation) => variation.stockAccountNum == account.accountNum
@@ -285,9 +287,9 @@ export class FinancialData
         (production.periodsData[periodKey] = {
           periodKey,
           amount: roundValue(
-            this.revenue.periodsData[periodKey].amount +
-              this.storedProduction.periodsData[periodKey].amount +
-              this.immobilisedProduction.periodsData[periodKey].amount,
+            this.productionAggregates.revenue.periodsData[periodKey].amount +
+              this.productionAggregates.storedProduction.periodsData[periodKey].amount +
+              this.productionAggregates.immobilisedProduction.periodsData[periodKey].amount,
             2
           ),
           footprint: new SocialFootprint(),
@@ -299,8 +301,8 @@ export class FinancialData
     let intermediateConsumptions = buildAggregateFromAccounts({
       id: "intermediateConsumptions",
       label: "Consommations intermédiaires",
-      accounts: this.externalExpenseAccounts.concat(
-        this.stockVariationAccounts
+      accounts: this.externalExpensesAccounts.concat(
+        this.stockVariationsAccounts
       ),
       periods,
     });
@@ -380,9 +382,8 @@ export class FinancialData
       .map((providerData, id) => new Provider({ id, ...providerData }));
     this.providers.forEach((provider) =>
       provider.buildPeriods(
-        this.expenses
-          .concat(this.investments)
-          .filter((expense) => expense.providerNum == provider.providerNum),
+        this.expenses.filter((expense) => expense.providerNum == provider.providerNum),
+        this.investments.filter((expense) => expense.providerNum == provider.providerNum),
         periods
       )
     );
@@ -436,9 +437,9 @@ export class FinancialData
 
   // WIP (temp name)
   mergeData = async (previousData) => {
-    this.externalExpenseAccounts = mergeExpenses(
-      this.externalExpenseAccounts,
-      previousData.externalExpenseAccounts
+    this.externalExpensesAccounts = mergeExpenses(
+      this.externalExpensesAccounts,
+      previousData.externalExpensesAccounts
     );
     this.amortisationExpensesAccounts = mergeExpenses(
       this.amortisationExpensesAccounts,

@@ -15,7 +15,7 @@ export const MainAggregatesTable = ({financialData,period}) =>
 
   const {revenue,
          storedProduction,
-         immobilisedProduction} = financialData;
+         immobilisedProduction} = financialData.productionAggregates;
 
   const {production,
          intermediateConsumptions,

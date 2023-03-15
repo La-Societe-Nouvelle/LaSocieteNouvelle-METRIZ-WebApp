@@ -51,14 +51,16 @@ export class Provider
     // ---------------------------------------------------------------------------------------------------- //
   }
 
-  buildPeriods = (expenses, periods) => 
+  buildPeriods = (expenses, investments, periods) => 
   {
     this.periodsData = {};
     periods.forEach(period => 
     {
       this.periodsData[period.periodKey] = {
         periodKey: period.periodKey,
-        amount: getAmountItems(expenses.filter(expense => period.regex.test(expense.date)), 2)
+        amount: getAmountItems(expenses.concat(investments).filter(expense => period.regex.test(expense.date)), 2),
+        amountExpenses: getAmountItems(expenses.filter(expense => period.regex.test(expense.date)), 2),
+        amountInvestments: getAmountItems(investments.filter(expense => period.regex.test(expense.date)), 2)
       }
     })
   }

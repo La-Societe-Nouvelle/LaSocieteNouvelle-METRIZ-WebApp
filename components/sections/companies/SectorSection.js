@@ -45,8 +45,6 @@ export class SectorSection extends React.Component
     let maxFpt = await fetchMaxFootprint();
     let significativeProviders = await getSignificativeCompanies(
       this.props.financialData.providers,
-      this.props.financialData.expenses,
-      this.props.financialData.investments,
       minFpt,maxFpt,
       this.props.financialPeriod
     );
@@ -71,7 +69,7 @@ export class SectorSection extends React.Component
     const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint);
     const showedProviders = getShowedProviders(view,unidentifiedProviders,significativeProviders);
         
-    if (showedProviders.length == 0 && view!="") this.setState({view: ""}); // reset filter
+    //if (showedProviders.length == 0 && view!="") this.setState({view: ""}); // reset filter
 
     const nbSignificativeProvidersWithoutActivity = unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00" && significativeProviders.includes(provider.providerNum)).length;
     const someSignificativeProvidersWithoutActivity = nbSignificativeProvidersWithoutActivity > 0;
@@ -223,8 +221,6 @@ export class SectorSection extends React.Component
     let {minFpt,maxFpt} = this.state;
     let significativeProviders = await getSignificativeCompanies(
       this.props.financialData.providers,
-      this.props.financialData.expenses,
-      this.props.financialData.investments,
       minFpt,maxFpt,
       this.props.financialPeriod
     );
@@ -234,7 +230,7 @@ export class SectorSection extends React.Component
     this.setState({
       fetching: false,
       progression: 0,
-      significativeCompanies: significativeProviders,
+      significativeProviders: significativeProviders,
       isNextStepAvailable
     });
   }

@@ -27,11 +27,11 @@ export class ExpensesTable extends React.Component {
 
   render() 
   {
-    const {externalExpenseAccounts} = this.props.financialData;
+    const {externalExpensesAccounts} = this.props.financialData;
     const periodKey = this.props.period.periodKey;
     const {columnSorted,reverseSort} = this.state;
 
-    sortExpenses(externalExpenseAccounts,periodKey,columnSorted,reverseSort);
+    sortExpenses(externalExpensesAccounts,periodKey,columnSorted,reverseSort);
 
     return (
       <>
@@ -44,7 +44,7 @@ export class ExpensesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {externalExpenseAccounts.map((account) => 
+            {externalExpensesAccounts.map((account) => 
               <tr key={account.accountNum}>
                 <td >{account.accountNum}</td>
                 <td >{account.accountLib.charAt(0).toUpperCase() + account.accountLib.slice(1).toLowerCase()}</td>

@@ -113,7 +113,7 @@ export class Immobilisation
 
     // states
     Object.values(prevImmobilisation.states)
-      .forEach(state => this.states[state.date] = new StockState(state));
+      .forEach(state => this.states[state.date] = new ImmobilisationState(state));
   }
 
   /* ------------------------- Fetch Default Data ------------------------- */

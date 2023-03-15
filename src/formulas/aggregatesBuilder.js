@@ -29,7 +29,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     let accounts = [];
 
     // Achats stockés - Matières premières
-    accounts = financialData.externalExpenseAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Matières premières",
@@ -39,7 +39,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Achats stockés - Autres approvisionnements
-    accounts = financialData.externalExpenseAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Autres approvisionnements",
@@ -49,7 +49,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
     
     // Achats de marchandises
-    accounts = financialData.externalExpenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Marchandises",
@@ -59,7 +59,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Variation des stocks
-    accounts = financialData.stockVariationAccounts.filter(account => /^603/.test(account.accountNum));
+    accounts = financialData.stockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Variation des stocks",
@@ -69,7 +69,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Autres achats
-    accounts = financialData.externalExpenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Autres achats",
@@ -79,7 +79,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Autres charges externes
-    accounts = financialData.externalExpenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Autres charges externes",

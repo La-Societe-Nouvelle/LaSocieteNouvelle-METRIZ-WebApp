@@ -176,6 +176,7 @@ export const basicPDFReport = (
           widths: ["*", "auto", "auto", "auto"],
           body: generateIndicTableBody(
             financialData.mainAggregates,
+            financialData.productionAggregates,
             indic,
             unit,
             financialData.getIntermediateConsumptionsAggregates(),

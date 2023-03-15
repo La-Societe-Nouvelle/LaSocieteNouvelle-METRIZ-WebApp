@@ -464,7 +464,7 @@ export class SirenSection extends React.Component
       fetching: false,
       progression: 0,
       view: "all",
-      synchronised: this.state.providers.filter(
+      synchronised: this.props.financialData.providers.filter(
         (provider) => provider.footprintStatus == 200
       ).length,
     });

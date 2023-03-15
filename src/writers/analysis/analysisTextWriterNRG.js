@@ -4,7 +4,8 @@ import { printValue } from "../../utils/Utils";
 
 export const analysisTextWriterNRG = (session,period) => {
   const { impactsData, financialData } = session;
-  const { mainAggregates, revenue, storedProduction, immobilisedProduction } = financialData;
+  const { mainAggregates, productionAggregates } = financialData;
+  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
   // array of paragraphs
   let analysis = [];
