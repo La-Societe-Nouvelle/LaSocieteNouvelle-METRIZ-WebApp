@@ -5,11 +5,13 @@ export const StockPurchasesMapping = (props) =>
 {
   const [accounts, setAccounts] = useState(() => {
     const initializedAccounts = { ...props.meta.accounts };
-    // Initialize the purchasesAccounts property for each stocks account to an empty array
+    // Initialize the purchasesAccounts property for each stocks account if not already defined
     Object.keys(initializedAccounts)
       .filter((accountNum) => /^3(1|2|7)/.test(accountNum))
       .forEach((accountNum) => {
-        initializedAccounts[accountNum].purchasesAccounts = [];
+        if (!initializedAccounts[accountNum].purchasesAccounts) {
+          initializedAccounts[accountNum].purchasesAccounts = [];
+        }
       });
     return initializedAccounts;
   });
@@ -32,27 +34,24 @@ export const StockPurchasesMapping = (props) =>
           accountNum.charAt(1) === purchaseAccountNum.charAt(2)
       );
 
-      // Retrieve the complete information of the matching accounts
-      const purchasesAccountsInfo = matchingAccounts.map(
-        (purchaseAccountNum) => accounts[purchaseAccountNum]
-      );
-
       // Update the purchasesAccounts property of the accounts object
-      updatedAccounts[accountNum].purchasesAccounts = purchasesAccountsInfo;
+      updatedAccounts[accountNum].purchasesAccounts = matchingAccounts;
     });
     setAccounts(updatedAccounts); // Update the state with the new value of accounts
   }, []);
+
 
   function handleDeletePurchaseAccount(stockAccountNum, purchaseAccountNum) {
     const updatedAccounts = { ...accounts };
     const purchasesAccounts = updatedAccounts[
       stockAccountNum
     ].purchasesAccounts.filter(
-      (account) => account.accountNum !== purchaseAccountNum ///Remove the corresponding purchase account
+      (accountNum) => accountNum !== purchaseAccountNum ///Remove the corresponding purchase account
     );
     updatedAccounts[stockAccountNum].purchasesAccounts = purchasesAccounts; // Update the purchasesAccounts for the corresponding stock account
     setAccounts(updatedAccounts);
   }
+
   const handleAddPurchaseAccount = (stockAccountNum, purchaseAccountNum) => {
     const updatedAccounts = {
       ...accounts,
@@ -60,10 +59,7 @@ export const StockPurchasesMapping = (props) =>
         ...accounts[stockAccountNum],
         purchasesAccounts: [
           ...accounts[stockAccountNum].purchasesAccounts,
-          {
-            accountNum: purchaseAccountNum,
-            accountLib: accounts[purchaseAccountNum].accountLib,
-          },
+          purchaseAccountNum,
         ],
       },
     };
@@ -75,18 +71,18 @@ export const StockPurchasesMapping = (props) =>
     const allPurchaseAccounts = Object.keys(accounts).filter((accountNum) =>
       /^60[^3]/.test(accountNum)
     );
-
+  
     const usedPurchaseAccounts = accounts[
       stockAccountNum
-    ].purchasesAccounts.map((account) => account.accountNum);
-
+    ].purchasesAccounts;
+  
     const availablePurchaseAccounts = allPurchaseAccounts
       .filter((accountNum) => !usedPurchaseAccounts.includes(accountNum))
       .map((accountNum) => ({
         accountNum: accountNum,
         accountLib: accounts[accountNum].accountLib,
       }));
-
+  
     return availablePurchaseAccounts;
   }
 
@@ -135,15 +131,13 @@ export const StockPurchasesMapping = (props) =>
                               onClick={() =>
                                 handleDeletePurchaseAccount(
                                   accountNum,
-                                  purchasesAccount.accountNum
-                                )
+                                  purchasesAccount                                )
                               }
                             >
                               <i className="bi bi-trash3-fill"></i>
                             </Button>
                             <span>
-                              {purchasesAccount.accountNum} -{" "}
-                              {purchasesAccount.accountLib}
+                            {purchasesAccount} - {accounts[purchasesAccount].accountLib} 
                             </span>
                           </li>
                         )

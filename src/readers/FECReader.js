@@ -476,7 +476,6 @@ export async function FECDataReader(FECData)
 // ...extract data to use in session (JSON -> Session)
 { 
   // Output data ---------------------------------------------------------------------------------------- //
-  
   let data = {};
 
   // Meta ----------------------------------------------------------------------------------------------- //
@@ -497,8 +496,10 @@ export async function FECDataReader(FECData)
   data.immobilisedProduction = [];        // 72
   data.otherOperatingIncomes = [];        // 74, 75, 781, 791
 
+  console.log(FECData.meta.accounts)
+
   // Stocks --------------------------------------------------------------------------------------------- //
-  data.stocks = {};                       // stock 31, 32, 33, 34, 35, 37
+  data.stocks = {};      
   Object.entries(FECData.meta.accounts)
     .filter(([accountNum,_]) => /^3[1-7]/.test(accountNum))
     .forEach(([accountNum,accountData]) => data.stocks[accountNum] = { 
@@ -512,6 +513,7 @@ export async function FECDataReader(FECData)
       depreciationAccountNum: FECData.meta.accounts[accountNum].depreciationAccountNum,
       depreciationAccountNum: FECData.meta.accounts[accountNum].depreciationAccountLib,
       depreciationEntries: [],
+      purchasesAccounts : FECData.meta.accounts[accountNum].purchasesAccounts,
       // initial state
       initialState: {
         amount: 0,

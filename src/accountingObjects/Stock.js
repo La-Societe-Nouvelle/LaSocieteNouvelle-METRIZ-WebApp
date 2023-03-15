@@ -13,13 +13,13 @@ export class Stock {
                depreciationAccountNum, depreciationAccountLib, depreciationEntries,       // Depreciation data
                initialStateType, initialState, initialStateSet, initialFootprintParams,   // Initial state
                lastState,
+               purchasesAccounts,
                states,
                status,
                dataFetched,
                lastUpdateFromRemote})
   {
   // ---------------------------------------------------------------------------------------------------- //
-
     this.isProductionStock = /^3(3|4|5)/.test(accountNum);
     this.expensesAccountsPrefix = !this.isProductionStock ? "60"+accountNum.slice(1).replace(/(0*)$/g,"") : null; // 3145 -> 60145.. 
     
@@ -43,6 +43,8 @@ export class Stock {
     this.initialFootprintParams = initialFootprintParams || {};
     this.initialStateSet = initialStateSet && initialState;
 
+    // Associated Purchases Accounts 
+    this.purchasesAccounts = purchasesAccounts || [];
     // intermediate
     this.states = {};
     if (states) {

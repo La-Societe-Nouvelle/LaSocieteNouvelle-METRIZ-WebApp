@@ -105,8 +105,7 @@ export class FinancialDatas extends React.Component
             className="btn btn-primary me-2"
             onClick={() => this.props.return()}
           >
-            <i className="bi bi-chevron-left"></i> Retour aux comptes
-            d'amortissements
+            <i className="bi bi-chevron-left"></i> Retour
           </button>
           }
       
