@@ -9,28 +9,21 @@ import {
   Aggregate,
   buildAggregateFromAccounts,
   buildAggregateFromItems,
+  mergeAggregatePeriodsData,
 } from "./accountingObjects/Aggregate";
 
 // Other objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 // Utils
-import {
-  getAmountItems,
-  roundValue,
-  mergeAggregates,
-  mergeExpenses,
-} from "./utils/Utils";
+import { getAmountItems, mergePeriodsData, roundValue } from "./utils/Utils";
 
 // Libraries
 import accountsMatching from "/lib/accountsMatching";
 import { StockVariation } from "./accountingObjects/StockVariation";
 import { AmortisationExpense } from "./accountingObjects/AmortisationExpense";
-import { buildRegexFinancialPeriod } from "./Session";
 import { immobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
 import { Provider } from "./Provider";
-
-const oneDay = 24 * 60 * 60 * 1000;
 
 export const otherFinancialDataItems = [
   "otherOperatingIncomes", // #74, #75, #781, #791
@@ -47,16 +40,12 @@ export const otherFinancialDataItems = [
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */
 
-export class FinancialData 
-{
-  constructor(data) 
-  {
+export class FinancialData {
+  constructor(data) {
     // if no data (new session)
     if (data == undefined) {
       this.isFinancialDataLoaded = false;
-    } 
-    
-    else {
+    } else {
       // ---------------------------------------------------------------------------------------------------- //
 
       // data loaded state
@@ -65,43 +54,69 @@ export class FinancialData
 
       // Production items ------------------------ //
 
-      this.revenue = new Aggregate(data.revenue);                                                                                   // revenue (#71)
-      this.storedProduction = new Aggregate(data.storedProduction);                                                                 // stored production (#71)
-      this.immobilisedProduction = new Aggregate(data.immobilisedProduction);                                                       // immobilised production (#72)
+      this.revenue = new Aggregate(data.revenue); // revenue (#71)
+      this.storedProduction = new Aggregate(data.storedProduction); // stored production (#71)
+      this.immobilisedProduction = new Aggregate(data.immobilisedProduction); // immobilised production (#72)
 
       // External expenses ----------------------- //
 
-      this.expenses = data.expenses.map((props) => new Expense({...props}));                                                        // external expenses (#60[^3], #61, #62)
+      this.expenses = data.expenses.map((props) => new Expense({ ...props })); // external expenses (#60[^3], #61, #62)
 
       // Stocks ---------------------------------- //
 
-      this.stocks = Object.values(data.stocks).map((props) => new Stock({...props}));                                               // stocks (#31 to #35, #37) / Depreciation (#29)
-      this.stockVariations = data.stockVariations.map((props) => new StockVariation({...props}));                                   // stock variation (#603, #71)
+      this.stocks = Object.values(data.stocks).map(
+        (props) => new Stock({ ...props })
+      ); // stocks (#31 to #35, #37) / Depreciation (#29)
+      this.stockVariations = data.stockVariations.map(
+        (props) => new StockVariation({ ...props })
+      ); // stock variation (#603, #71)
 
       // Immobilisations ------------------------- //
 
-      this.immobilisations = Object.values(data.immobilisations).map((props) => new Immobilisation({...props}));                    // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
-      this.amortisationExpenses = data.amortisationExpenses.map((props) => new AmortisationExpense({...props}));                    // amortisation expenses (#6811, #6871)
-      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map((props) => new AmortisationExpense({...props}));    // amortisation expenses (#6811, #6871)
-      this.investments = data.investments.map((props) => new Expense({...props }));                                                 // investments (flows #2 <- #404)
-      this.immobilisedProductions = data.immobilisedProductions.map((props) => new immobilisedProduction({...props}));              // productions of immobilisations (flows #2 <- #72)
+      this.immobilisations = Object.values(data.immobilisations).map(
+        (props) => new Immobilisation({ ...props })
+      ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+      this.amortisationExpenses = data.amortisationExpenses.map(
+        (props) => new AmortisationExpense({ ...props })
+      ); // amortisation expenses (#6811, #6871)
+      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map(
+        (props) => new AmortisationExpense({ ...props })
+      ); // amortisation expenses (#6811, #6871)
+      this.investments = data.investments.map(
+        (props) => new Expense({ ...props })
+      ); // investments (flows #2 <- #404)
+      this.immobilisedProductions = data.immobilisedProductions.map(
+        (props) => new immobilisedProduction({ ...props })
+      ); // productions of immobilisations (flows #2 <- #72)
 
       // Expenses accounts ----------------------- //
 
-      this.externalExpenseAccounts = data.externalExpenseAccounts.map((props) => new Account({ ...props }));
-      this.stockVariationAccounts = data.stockVariationAccounts.map((props) => new Account({ ...props }));
-      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map((props) => new Account({ ...props }));
+      this.externalExpenseAccounts = data.externalExpenseAccounts.map(
+        (props) => new Account({ ...props })
+      );
+      this.stockVariationAccounts = data.stockVariationAccounts.map(
+        (props) => new Account({ ...props })
+      );
+      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map(
+        (props) => new Account({ ...props })
+      );
 
       // Providers ------------------------------- //
 
-      this.providers = data.providers.map((props) => new Provider({...props}));
+      this.providers = data.providers.map(
+        (props) => new Provider({ ...props })
+      );
 
       // Aggregates ------------------------------ //
 
       this.mainAggregates = {
         production: new Aggregate(data.mainAggregates.production),
-        intermediateConsumptions: new Aggregate(data.mainAggregates.intermediateConsumptions),
-        fixedCapitalConsumptions: new Aggregate(data.mainAggregates.fixedCapitalConsumptions),
+        intermediateConsumptions: new Aggregate(
+          data.mainAggregates.intermediateConsumptions
+        ),
+        fixedCapitalConsumptions: new Aggregate(
+          data.mainAggregates.fixedCapitalConsumptions
+        ),
         netValueAdded: new Aggregate(data.mainAggregates.netValueAdded),
       };
 
@@ -117,8 +132,7 @@ export class FinancialData
   /* ---------------------------------------- BUILD FINANCIAL DATA FROM FEC DATA ---------------------------------------- */
   /* -------------------------------------------------------------------------------------------------------------------- */
 
-  loadFECData = async (FECData,financialPeriod,periods) => 
-  {
+  loadFECData = async (FECData, financialPeriod, periods) => {
     // ---------------------------------------------------------------------------------------------------- //
 
     // Meta ------------------------------------ //
@@ -131,12 +145,16 @@ export class FinancialData
 
     // External expenses ----------------------- //
 
-    this.expenses = FECData.expenses.map((props) => new Expense({...props})); // external expenses (#60[^3], #61, #62)
+    this.expenses = FECData.expenses.map((props) => new Expense({ ...props })); // external expenses (#60[^3], #61, #62)
 
     // Stocks ---------------------------------- //
 
-    this.stocks = Object.values(FECData.stocks).map((props) => new Stock({...props})); // stocks (#31 to #35, #37) / Depreciation (#29)
-    this.stockVariations = FECData.stockVariations.map((props) => new StockVariation({...props })); // stock variation (#603, #71)
+    this.stocks = Object.values(FECData.stocks).map(
+      (props) => new Stock({ ...props })
+    ); // stocks (#31 to #35, #37) / Depreciation (#29)
+    this.stockVariations = FECData.stockVariations.map(
+      (props) => new StockVariation({ ...props })
+    ); // stock variation (#603, #71)
 
     for (let stock of this.stocks) {
       await stock.buildStates(financialPeriod);
@@ -144,19 +162,36 @@ export class FinancialData
 
     // Immobilisations ------------------------- //
 
-    this.immobilisations = Object.values(FECData.immobilisations).map((props) => new Immobilisation({...props}));         // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
-    this.amortisationExpenses = FECData.amortisationExpenses.map((props) => new AmortisationExpense({...props}));         // amortisation expenses (#6811, #6871)
-    this.investments = FECData.investments.map((props) => new Expense({...props}));                                       // investments (flows #2 <- #404)
-    this.immobilisedProductions = FECData.immobilisedProductions.map((props) => new immobilisedProduction({...props}));   // productions of immobilisations (flows #2 <- #72)
+    this.immobilisations = Object.values(FECData.immobilisations).map(
+      (props) => new Immobilisation({ ...props })
+    ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+    this.amortisationExpenses = FECData.amortisationExpenses.map(
+      (props) => new AmortisationExpense({ ...props })
+    ); // amortisation expenses (#6811, #6871)
+    this.investments = FECData.investments.map(
+      (props) => new Expense({ ...props })
+    ); // investments (flows #2 <- #404)
+    this.immobilisedProductions = FECData.immobilisedProductions.map(
+      (props) => new immobilisedProduction({ ...props })
+    ); // productions of immobilisations (flows #2 <- #72)
 
     this.adjustedAmortisationExpenses = [];
-    for (let immobilisation of this.immobilisations) 
-    {
-      let immobilisationAmortisationExpenses = this.amortisationExpenses.filter((expense) => expense.amortisationAccountNum == immobilisation.amortisationAccountNum);
-      await immobilisation.buildStates(financialPeriod,immobilisationAmortisationExpenses);
+    for (let immobilisation of this.immobilisations) {
+      let immobilisationAmortisationExpenses = this.amortisationExpenses.filter(
+        (expense) =>
+          expense.amortisationAccountNum ==
+          immobilisation.amortisationAccountNum
+      );
+      await immobilisation.buildStates(
+        financialPeriod,
+        immobilisationAmortisationExpenses
+      );
       await immobilisation.divideAdjustedAmortisationExpenses();
-      let immobilisationAdjustedAmortisationExpenses = await immobilisation.getAdjustedAmortisationExpenses();
-      this.adjustedAmortisationExpenses.push(...immobilisationAdjustedAmortisationExpenses);
+      let immobilisationAdjustedAmortisationExpenses =
+        await immobilisation.getAdjustedAmortisationExpenses();
+      this.adjustedAmortisationExpenses.push(
+        ...immobilisationAdjustedAmortisationExpenses
+      );
     }
 
     // Expenses accounts ----------------------- //
@@ -432,36 +467,103 @@ export class FinancialData
       .forEach((stock) => (stock.initialStateType = "currentFootprint"));
   };
 
-  /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
+  /* ------------------------- Load BackUp Data ------------------------- */
 
-  // WIP (temp name)
-  mergeData = async (previousData) => {
-    this.externalExpenseAccounts = mergeExpenses(
-      this.externalExpenseAccounts,
-      previousData.externalExpenseAccounts
+  loadFinancialDataFromBackUp = (prevFinancialData) => {
+    // Merge with previous exepenses
+    this.adjustedAmortisationExpenses =
+      this.adjustedAmortisationExpenses.concat(
+        prevFinancialData.adjustedAmortisationExpenses
+      );
+    this.amortisationExpenses = this.amortisationExpenses.concat(
+      prevFinancialData.amortisationExpenses
     );
-    this.amortisationExpensesAccounts = mergeExpenses(
+
+    // Add previous periods in expenses accounts
+
+    this.amortisationExpensesAccounts = mergePeriodsAccounts(
       this.amortisationExpensesAccounts,
-      previousData.amortisationExpensesAccounts
+      prevFinancialData.amortisationExpensesAccounts
     );
-    this.mainAggregates = mergeAggregates(this.mainAggregates, previousData.mainAggregates);
+    // Merge with previous exepenses
 
-  };  
+    this.expenses = this.expenses.concat(prevFinancialData.expenses);
+    // Add previous periods in expenses accounts
 
-  // WIP 
+    this.externalExpenseAccounts = mergePeriodsAccounts(
+      this.externalExpenseAccounts,
+      prevFinancialData.externalExpenseAccounts
+    );
+
+    // immo
+    
+    
+
+    prevFinancialData.immobilisations.map(
+      (props) => console.log(props))
+    ;
+    // stocks
+
+    //immobilisedProduction
+
+    this.immobilisedProduction = mergePeriodsData(
+      this.immobilisedProduction,
+      prevFinancialData.immobilisedProduction
+    );
+
+    // Merge with previous investments
+
+    this.investments = this.investments.concat(prevFinancialData.investments);
+
+   
+    this.mainAggregates = mergeAggregatePeriodsData(
+      this.mainAggregates,
+      prevFinancialData.mainAggregates
+    );
+
+    this.metaAccounts = mergeAccounts(this.metaAccounts, prevFinancialData.metaAccounts);
+
+    this.otherFinancialData = mergeAggregatePeriodsData(this.otherFinancialData, prevFinancialData.otherFinancialData);
+    
+    this.providers = mergeProviders(this.providers, prevFinancialData.providers);
+
+    this.revenue = mergePeriodsData(
+      this.revenue,
+      prevFinancialData.revenue
+    );
+
+    this.stockVariationAccounts = mergePeriodsAccounts(
+      this.stockVariationAccounts,
+      prevFinancialData.stockVariationAccounts
+    );
+
+    this.storedProduction = mergePeriodsData(
+      this.storedProduction,
+      prevFinancialData.storedProduction
+    );
+
+    this.stockVariations = mergeAccounts(this.stockVariations, prevFinancialData.stockVariations);
+
+  }
+  ;
+
+  /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
   async loadInitialStates(data) {
-
     // Available accounts
     let prevAccountsData = data.stocks.concat(data.immobilisations);
     let currentAccountsData = this.stocks.concat(this.immobilisations);
-  
+
     // Assets accounts
     currentAccountsData.forEach((account) => {
-      let prevAccount = prevAccountsData.find(prevItem => prevItem.accountNum === account.accountNum);
+      let prevAccount = prevAccountsData.find(
+        (prevItem) => prevItem.accountNum === account.accountNum
+      );
       if (prevAccount) {
         const entries = prevAccount.entries.concat(account.entries);
-        const depreciationEntries = prevAccount.depreciationEntries.concat(account.depreciationEntries);
-        const states = {...prevAccount.states, ...account.states};
+        const depreciationEntries = prevAccount.depreciationEntries.concat(
+          account.depreciationEntries
+        );
+        const states = { ...prevAccount.states, ...account.states };
         account.initialStateType = "prevFootprint";
         account.initialState = prevAccount.initialState;
         // update objets
@@ -469,16 +571,100 @@ export class FinancialData
         account.depreciationEntries = depreciationEntries;
         account.states = states;
         prevAccountsData.splice(prevAccountsData.indexOf(prevAccount), 1);
-      }
-      else {
+      } else {
         // TO DO init initial state
       }
-    })  
+    });
   }
-  
 
   /* ---------------------------------------- GETTERS ---------------------------------------- */
 
   getProvider = (providerNum) =>
     this.providers.filter((provider) => provider.providerNum == providerNum)[0];
 }
+/* ---------------------------------------- UTILS  ---------------------------------------- */
+
+export const mergePeriodsAccounts = (
+  currentExpensesAccounts,
+  previousExpensesAccounts
+) => {
+  const uniqueAccounts = new Set(); // Create a new Set to store unique account num
+  const mergedExpensesAccounts = [];
+
+  // Merged expenses accounts
+  const exepensesAccounts = currentExpensesAccounts.concat(
+    previousExpensesAccounts
+  );
+
+  exepensesAccounts.forEach((account) => {
+    // Check if the accountNum has not been added to the Set yet
+    if (!uniqueAccounts.has(account.accountNum)) {
+      uniqueAccounts.add(account.accountNum);
+      mergedExpensesAccounts.push(account);
+    } else {
+      // If the accountNum has already been added to the Set, merge the periodsData
+      const index = mergedExpensesAccounts.findIndex(
+        (item) => item.accountNum === account.accountNum
+      );
+      Object.assign(
+        mergedExpensesAccounts[index].periodsData,
+        account.periodsData
+      );
+    }
+  });
+  return mergedExpensesAccounts;
+};
+export const mergeProviders = (
+  currentProviders,
+  previousProviders
+) => {
+  const uniqueProviders = new Set(); 
+  const mergedProviders = [];
+
+  // Merged expenses accounts
+  const providers = currentProviders.concat(
+    previousProviders
+  );
+
+  providers.forEach((provider) => {
+    // Check if the accountNum has not been added to the Set yet
+    if (!uniqueProviders.has(provider.providerNum)) {
+      uniqueProviders.add(provider.providerNum);
+      mergedProviders.push(provider);
+    } else {
+      // If the accountNum has already been added to the Set, merge the periodsData
+      const index = mergedProviders.findIndex(
+        (item) => item.providerNum === provider.providerNum
+      );
+      Object.assign(
+        mergedProviders[index].periodsData,
+        provider.periodsData
+      );
+      mergedProviders[index].footprintStatus = 203;
+    }
+  });
+
+  return mergedProviders;
+};
+
+export const mergeAccounts = (current, previous) => {
+  // Create a new object to hold the merged metadata, starting with the previous metadata.
+  const mergedAccounts = Object.assign({}, previous);
+
+  for (const accNum in current) {
+    // If the current account number is not in the merged metadata, add it.
+    if (!(accNum in mergedAccounts)) {
+      mergedAccounts[accNum] = current[accNum];
+    } else {
+      // Merge the current and previous metadata for that account number.
+      const mergeddata = Object.assign(
+        {},
+        previous[accNum],
+        current[accNum]
+      );
+      mergedAccounts[accNum] = mergeddata;
+    }
+  }
+
+  return mergedAccounts;
+};
