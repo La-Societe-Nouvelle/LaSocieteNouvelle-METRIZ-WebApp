@@ -197,7 +197,6 @@ export class Provider
     // Case - Fetch default data -------------------------------------------------------------------------- //
     else if (this.useDefaultFootprint) 
     {
-      console.log("default fetcher")
       let defaultFptParams = Object.entries(this.defaultFootprintParams).map(([key,value]) => key+"="+value).join("&");
       await api.get("defaultfootprint?"+defaultFptParams).then((res) => 
       {

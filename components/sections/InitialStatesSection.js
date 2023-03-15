@@ -203,20 +203,24 @@ export class InitialStatesSection extends React.Component {
   /* ---------- ACTIONS ---------- */
 
   // Synchronisation
-  async synchroniseAll() {
-    // init progression
-    this.setState({ fetching: true, syncProgression: 0 });
+  async synchroniseAll() 
+  {
     // accounts
     const accountsToSync = this.props.session.financialData.immobilisations
       .concat(this.props.session.financialData.stocks)
-      .filter((account) => account.initialStateType == "defaultData");
+      .filter((asset) => asset.initialStateType == "defaultData");
+    
+    // init progression
+    this.setState({ fetching: true, syncProgression: 0 });
 
     let i = 0;
     let n = accountsToSync.length;
-    for (let account of accountsToSync) {
+    for (let account of accountsToSync) 
+    {
       try {
         await account.updateInitialStateFootprintFromRemote();
-      } catch (error) {
+      } 
+      catch (error) {
         this.setState({ error: true });
         break;
       }
@@ -313,15 +317,9 @@ export class InitialStatesSection extends React.Component {
 /* -------------------------------------------------- NEXT SECTION -------------------------------------------------- */
 
 // condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
-const nextStepAvailable = ({ financialData }) => {
+const nextStepAvailable = ({ financialData }) => 
+{
   let accounts = financialData.immobilisations.concat(financialData.stocks);
-  console.log(accounts);
-  console.log(
-    !accounts.some(
-      (account) =>
-        account.initialStateType == "defaultData" && !account.initialStateSet
-    )
-  );
   return !accounts.some(
     (account) =>
       (account.initialStateType == "defaultData" && !account.initialStateSet) ||

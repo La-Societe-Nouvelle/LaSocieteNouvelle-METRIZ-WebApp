@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
-function DepreciationAssetsMapping(props) {
-
+function DepreciationAssetsMapping(props) 
+{
   const [accounts, setAccounts] = useState(props.meta.accounts);
 
   const accountsToMap = Object.keys(accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
@@ -17,8 +17,6 @@ function DepreciationAssetsMapping(props) {
       setIsDisabled(false);
     }
   }, [isDisabled]);
-
- 
 
   function handleOnchange(accountToMapNum, nextAssetAccountNum) 
   {    
@@ -83,6 +81,13 @@ function DepreciationAssetsMapping(props) {
     }
   }
 
+  const onSubmit = () =>
+  {
+    console.log("Associations des comptes d'amortissement et de dépréciation avec les comptes de stock et d'immobilisation : ");
+    console.log(Object.values(accounts).filter(({accountNum}) => /^2(0|1)/.test(accountNum) || /^3[0-8]/.test(accountNum)));
+    props.onClick();
+  }
+
   return (
     <div>
       <h3 >
@@ -142,7 +147,7 @@ function DepreciationAssetsMapping(props) {
         <button
           className="btn btn-secondary"
           disabled={isDisabled}
-          onClick={() => props.onClick()}
+          onClick={onSubmit}
         >
           Valider
           <i className="bi bi-chevron-right"></i>

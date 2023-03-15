@@ -19,7 +19,8 @@ import {
 } from "../../../src/Session";
 import { StockPurchasesMapping } from "./StockPurchasesMapping";
 
-function ImportSection(props) {
+function ImportSection(props) 
+{
   //STATE
   const [corporateName, setCorporateName] = useState(
     props.session.legalUnit.corporateName || ""
@@ -135,23 +136,29 @@ function ImportSection(props) {
 
   // Import FEC File
 
-  function importFECFile(file) {
+  function importFECFile(file) 
+  {
     let currentFile = file[0];
     let reader = new FileReader();
 
     reader.onload = async () =>
-      // Action after file loaded
+    // Action after file loaded
+    {
+      try 
       {
-        try {
-          let FECData = await FECFileReader(reader.result); // read file (file -> JSON)
-          console.log(FECData);
-          setImportedData(FECData);
-          setView(1);
-        } catch (error) {
-          setErrorFile(true);
-          setErrorMessage(error);
-        } // show error(s) (file structure)
-      };
+        let FECData = await FECFileReader(reader.result); // read file (file -> JSON)
+        console.log("--------------------------------------------------");
+        console.log("Lecture du FEC")
+        console.log(FECData.meta);
+        console.log(FECData.books);
+        setImportedData(FECData);
+        setView(1);
+      } 
+      catch (error) {
+        setErrorFile(true);
+        setErrorMessage(error);
+      } // show error(s) (file structure)
+    };
 
     try {
       reader.readAsText(currentFile, "iso-8859-1"); // Read file
@@ -161,9 +168,8 @@ function ImportSection(props) {
     } // show error (file)
   }
 
-  async function loadFECData(importedData) {
-    console.log(importedData);
-
+  async function loadFECData(importedData) 
+  {
     let FECData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
 
     if (FECData.errors.length > 0) {
@@ -174,51 +180,21 @@ function ImportSection(props) {
       setErrorMessage("Erreur(s) relevée(s) : ");
       setErrors(FECData.errors);
       setImportedData(null);
-    } else {
-      // load year
-      props.session.year = /^[0-9]{8}/.test(importedData.meta.lastDate)
-        ? importedData.meta.lastDate.substring(0, 4)
-        : "";
-      props.session.financialPeriod = {
-        dateStart: importedData.meta.firstDate,
-        dateEnd: importedData.meta.lastDate,
-        regex: buildRegexFinancialPeriod(
-          importedData.meta.firstDate,
-          importedData.meta.lastDate
-        ),
-        periodKey: "FY" + importedData.meta.lastDate.substring(0, 4),
-      };
-
-      let periods = getListMonthsFinancialPeriod(
-        importedData.meta.firstDate,
-        importedData.meta.lastDate
-      )
-        .map((month) => {
-          return {
-            regex: new RegExp("^" + month),
-            periodKey: month,
-          };
-        })
-        .concat(props.session.financialPeriod);
-
+    } 
+    else 
+    {
       // load financial data
-      await props.session.financialData.loadFECData(FECData);
+      let financialPeriod = getFinancialPeriodFECData(FECData);
+      let monthPeriods = getMonthPeriodsFECData(FECData);
+      let periods = [financialPeriod,...monthPeriods];
 
-      // load impacts data
-      props.session.impactsData.netValueAdded =
-        props.session.financialData.mainAggregates.netValueAdded.periodsData[
-          props.session.financialPeriod.periodKey
-        ];
-      props.session.impactsData.knwDetails.apprenticeshipTax =
-        FECData.KNWData.apprenticeshipTax;
-      props.session.impactsData.knwDetails.vocationalTrainingTax =
-        FECData.KNWData.vocationalTrainingTax;
+      props.session.addPeriods(periods);
+      props.session.financialPeriod = financialPeriod;
+      await props.session.financialData.loadFECData(FECData,financialPeriod,periods);
 
-      // update footprints
-      //props.session.updateFootprints();
-
-      // update validations
-      //props.session.checkValidations();
+      // load impacts data -> to update
+      props.session.impactsData[financialPeriod.periodKey].knwDetails.apprenticeshipTax = FECData.KNWData.apprenticeshipTax;
+      props.session.impactsData[financialPeriod.periodKey].knwDetails.vocationalTrainingTax = FECData.KNWData.vocationalTrainingTax;
 
       // update progression
       props.session.progression = 1;
@@ -241,3 +217,30 @@ function ImportSection(props) {
 }
 
 export default ImportSection;
+
+const getFinancialPeriodFECData = (FECData) =>
+{
+  // periods to build
+  let financialPeriod = {
+    dateStart: FECData.firstDate,
+    dateEnd: FECData.lastDate,
+    periodKey: "FY" + FECData.lastDate.substring(0, 4),
+    regex: buildRegexFinancialPeriod(FECData.firstDate, FECData.lastDate),
+  };
+  
+  return financialPeriod;
+}
+
+const getMonthPeriodsFECData = (FECData) =>
+{
+  // let periods = getListMonthsFinancialPeriod(importedData.meta.firstDate, importedData.meta.lastDate)
+  //     .map(month => {
+  //         return ({
+  //             regex: new RegExp("^" + month),
+  //             periodKey: month
+  //         })
+  //     })
+  //     .concat(props.session.financialPeriod);
+
+  return [];
+}

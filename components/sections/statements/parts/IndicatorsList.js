@@ -51,7 +51,7 @@ const IndicatorsList = (props) =>
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
-  const [validations, SetValidations] = useState(props.session.validations);
+  const [validations, SetValidations] = useState(props.session.validations[period.periodKey]);
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
   const [displayGraph, setDisplayGraph] = useState(true);
@@ -145,13 +145,13 @@ const IndicatorsList = (props) =>
       ]
     ) {
       // remove validation
-      props.session.validations = props.session.validations.filter(
+      props.session.validations[period.periodKey] = props.session.validations[period.periodKey].filter(
         (item) => item != indic
       );
       SetValidations(validations.filter((item) => item != indic));
 
       // update footprint
-      await props.session.updateIndicator(indic,period);
+      await props.session.updateFootprints(period);
     }
   };
 
@@ -181,11 +181,11 @@ const IndicatorsList = (props) =>
       
     }
     // add validation
-    if (!props.session.validations.includes(indic)) {
-      props.session.validations.push(indic);
+    if (!props.session.validations[period.periodKey].includes(indic)) {
+      props.session.validations[period.periodKey].push(indic);
     }
     // update footprint
-    await props.session.updateIndicator(indic,period);
+    await props.session.updateFootprints(period);
     setUpdatedIndic(indic);
     setDisplayGraph(true);
   };
@@ -436,7 +436,7 @@ const IndicatorsList = (props) =>
                       case "eco":
                         return (
                           <StatementECO
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("eco")}
                             onValidate={() => validateIndicator("eco")}
                           />
@@ -444,7 +444,7 @@ const IndicatorsList = (props) =>
                       case "art":
                         return (
                           <StatementART
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("art")}
                             onValidate={() => validateIndicator("art")}
                           />
@@ -452,7 +452,7 @@ const IndicatorsList = (props) =>
                       case "soc":
                         return (
                           <StatementSOC
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("soc")}
                             onValidate={() => validateIndicator("soc")}
                           />
@@ -517,7 +517,7 @@ const IndicatorsList = (props) =>
                         return (
                           <>
                             <StatementIDR
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               disableStatement={notAvailableIndics.includes(
                                 key
                               )}
@@ -528,7 +528,7 @@ const IndicatorsList = (props) =>
                             />
                             <ModalAssesment
                               indic="idr"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("idr")}
                               onValidate={() => validateIndicator("idr")}
                               onGoBack={handleClose}
@@ -538,7 +538,7 @@ const IndicatorsList = (props) =>
                             />
                             <ModalAssesment
                               indic="dsn"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("idr")}
                               onValidate={() => validateIndicator("idr")}
                               onGoBack={handleClose}
@@ -552,7 +552,7 @@ const IndicatorsList = (props) =>
                         return (
                           <>
                             <StatementGEQ
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("geq")}
                               onValidate={() => validateIndicator("geq")}
                               toAssessment={() => triggerPopup("geq")}
@@ -561,7 +561,7 @@ const IndicatorsList = (props) =>
 
                             <ModalAssesment
                               indic="geq"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("geq")}
                               onValidate={() => validateIndicator("geq")}
                               onGoBack={handleClose}
@@ -571,7 +571,7 @@ const IndicatorsList = (props) =>
                             />
                             <ModalAssesment
                               indic="dsn"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("geq")}
                               onValidate={() => validateIndicator("geq")}
                               onGoBack={handleClose}
@@ -585,14 +585,14 @@ const IndicatorsList = (props) =>
                         return (
                           <>
                             <StatementKNW
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("knw")}
                               onValidate={() => validateIndicator("knw")}
                               toAssessment={() => triggerPopup("knw")}
                             />
                             <ModalAssesment
                               indic="knw"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("knw")}
                               onValidate={() => validateIndicator("knw")}
                               popUp={popUp}
@@ -630,11 +630,11 @@ const IndicatorsList = (props) =>
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
-                        props.impactsData.greenhousesGazEmissions != 0 &&
+                        props.impactsData[period.periodKey].greenhousesGazEmissions != 0 &&
                         validations.includes("nrg") &&
                         !validations.includes("ghg") && <IconWarning />}
                       {key == "nrg" &&
-                        props.impactsData.energyConsumption != 0 &&
+                        props.impactsData[period.periodKey].energyConsumption != 0 &&
                         validations.includes("ghg") &&
                         !validations.includes("nrg") && <IconWarning />}
                     </ArrowToggle>
@@ -667,14 +667,14 @@ const IndicatorsList = (props) =>
                         return (
                           <>
                             <StatementGHG
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("ghg")}
                               onValidate={() => validateIndicator("ghg")}
                               toAssessment={() => triggerPopup("ghg")}
                             />
                             <ModalAssesment
                               indic="ghg"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("ghg")}
                               onValidate={() => validateIndicator("ghg")}
                               onGoBack={handleClose}
@@ -688,14 +688,14 @@ const IndicatorsList = (props) =>
                         return (
                           <>
                             <StatementNRG
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("nrg")}
                               onValidate={() => validateIndicator("nrg")}
                               toAssessment={() => triggerPopup("nrg")}
                             />
                             <ModalAssesment
                               indic="nrg"
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("nrg")}
                               onValidate={() => validateIndicator("nrg")}
                               onGoBack={handleClose}
@@ -709,7 +709,7 @@ const IndicatorsList = (props) =>
                         return (
                           <>
                             <StatementWAT
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("wat")}
                               onValidate={() => validateIndicator("wat")}
                             />
@@ -718,7 +718,7 @@ const IndicatorsList = (props) =>
                       case "mat":
                         return (
                           <StatementMAT
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("mat")}
                             onValidate={() => validateIndicator("mat")}
                           />
@@ -726,7 +726,7 @@ const IndicatorsList = (props) =>
                       case "was":
                         return (
                           <StatementWAS
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("was")}
                             onValidate={() => validateIndicator("was")}
                           />
@@ -734,7 +734,7 @@ const IndicatorsList = (props) =>
                       case "haz":
                         return (
                           <StatementHAZ
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("haz")}
                             onValidate={() => validateIndicator("haz")}
                           />

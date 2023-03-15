@@ -5,17 +5,14 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 export class StockVariation {
 
-  constructor({id,
-               accountNum,
+  constructor({accountNum,
                accountLib,
                stockAccountNum,
                stockAccountLib,
                amount,
                footprint}) 
   {
-  // ---------------------------------------------------------------------------------------------------- //
-    this.id = id;
-    
+  // ---------------------------------------------------------------------------------------------------- //    
     this.accountNum = accountNum;
     this.accountLib = accountLib;
 

@@ -21,8 +21,6 @@ export class SirenSection extends React.Component
   {
     super(props);
     this.state = {
-      providers: props.session.financialData.providers,
-      providersShowed: props.session.financialData.providers,
       view: "all",
       nbItems: 20,
       fetching: false,
@@ -30,18 +28,17 @@ export class SirenSection extends React.Component
       progression: 0,
       synchronised: 0,
       popup: false,
-      isDisabled: true,
       isSyncButtonEnable: false,
-      isNextStepAvailable: nextStepAvailable(props.session.financialData.providers),
+      isNextStepAvailable: checkNextStepAvailable(props.financialData.providers),
       errorFile: false,
       error: false,
     };
 
-    this.onDrop = (files) => {
+    this.onDrop = (files) => 
+    {
       if (files.length) {
         this.importFile(files[0]);
         this.openPopup();
-        this.setState({ isDisabled: false });
         this.setState({ errorFile: false });
       } else {
         this.setState({ errorFile: true });
@@ -52,52 +49,23 @@ export class SirenSection extends React.Component
   componentDidUpdate = () =>
   {
     // next step available
-    const isNextStepAvailable = nextStepAvailable(this.props.session.financialData.providers);
+    const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
     // providers fpt to sync
-    const isSyncButtonEnable = checkSyncButtonEnable(this.props.session.financialData.providers);
+    const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
     if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
       this.setState({ isSyncButtonEnable });
     }
   }
 
-  handleChange = (event) => 
-  {
-    let view = event.target.value;
-    switch (view) {
-      case "undefined":
-        return this.setState({
-          providersShowed: this.state.providers.filter((provider) => provider.useDefaultFootprint),
-          view: view,
-        });
-      case "unsync":
-        return this.setState({
-          providersShowed: this.state.providers.filter((provider) => provider.footprintStatus != 200),
-          view: view,
-        });
-      case "error":
-        return this.setState({
-          providersShowed: this.state.providers.filter((provider) => provider.footprintStatus == 404),
-          view: view,
-        });
-      default:
-        return this.setState({
-          providersShowed: this.props.session.financialData.providers,
-          view: view,
-        });
-    }
-  };
-
   render() {
     const {
-      providers,
       view,
       nbItems,
       fetching,
       progression,
-      providersShowed,
       popup,
       isSyncButtonEnable,
       isNextStepAvailable,
@@ -105,47 +73,13 @@ export class SirenSection extends React.Component
       error,
     } = this.state;
 
-    const financialData = this.props.session.financialData;
+    const financialData = this.props.financialData;
     const financialPeriod = this.props.financialPeriod;
 
-    console.log(financialData.providers.filter((provider) => provider.footprintStatus == 200).length == financialData.providers.length)
-    let buttonNextStep;
-    if (
-      financialData.providers.filter((provider) => provider.footprintStatus == 200).length ==
-      financialData.providers.length
-    ) {
-      buttonNextStep = (
-        <div>
-          <button
-            onClick={() => this.props.nextStep()}
-            className={"btn btn-primary me-3"}
-          >
-            Secteurs d'activité <i className="bi bi-chevron-right"></i>
-          </button>
-          <button
-            className={"btn btn-secondary"}
-            id="validation-button"
-            onClick={this.props.submit}
-          >
-            Mesurer mon impact
-            <i className="bi bi-chevron-right"></i>
-          </button>
-        </div>
-      );
-    } else {
-      buttonNextStep = (
-        <button
-          className={"btn btn-secondary"}
-          id="validation-button"
-          onClick={() => this.props.nextStep()}
-          disabled={!isNextStepAvailable}>
-          Valider les fournisseurs
-          <i className="bi bi-chevron-right"></i>
-        </button>
-      );
-    }
+    const providers = financialData.providers;
+    const showedProviders = getShowedProviders(view,providers);
+    const allProvidersIdentified = (providers.filter((provider) => provider.footprintStatus == 200).length == providers.length);
 
-    console.log("section render");
     return (
       <Container fluid id="siren-section">
         <section className="step">
@@ -219,7 +153,7 @@ export class SirenSection extends React.Component
                       resynchronisez les données.
                     </p>
                     <button
-                      onClick={this.handleChange}
+                      onClick={this.changeView}
                       value="unsync"
                       className="btn btn-secondary"
                     >
@@ -235,7 +169,7 @@ export class SirenSection extends React.Component
                     </p>
                     {providers.some((provider) => provider.useDefaultFootprint) && (
                       <button
-                        onClick={this.handleChange}
+                        onClick={this.changeView}
                         value="undefined"
                         className={"btn btn-tertiary"}
                       >
@@ -269,7 +203,7 @@ export class SirenSection extends React.Component
                 <div className="pagination">
                   <div className="form-group">
                     <select
-                      onChange={this.handleChange}
+                      onChange={this.changeView}
                       value={view}
                       className="form-select"
                     >
@@ -311,14 +245,12 @@ export class SirenSection extends React.Component
                   <IdentifiedProvidersTable
                     nbItems={
                       nbItems == "all"
-                        ? providersShowed.length
+                        ? showedProviders.length
                         : parseInt(nbItems)
                     }
-                    onUpdate={this.updateFootprints.bind(this)}
-                    providers={providersShowed}
+                    providers={showedProviders}
                     financialData={financialData}
                     financialPeriod={financialPeriod}
-                    checkSync={this.enableButton.bind(this)}
                     refreshSection={this.refreshSection}
                   />
                 )}
@@ -334,7 +266,34 @@ export class SirenSection extends React.Component
           )}
 
           <div className="text-end">
-            {buttonNextStep}
+            {allProvidersIdentified && (
+              <div>
+                <button
+                  className={"btn btn-primary me-3"}
+                  onClick={() => this.props.nextStep()}
+                >
+                  Secteurs d'activité <i className="bi bi-chevron-right"></i>
+                </button>
+                <button
+                  className={"btn btn-secondary"}
+                  id="validation-button"
+                  onClick={this.props.submit}
+                >
+                  Mesurer mon impact
+                  <i className="bi bi-chevron-right"></i>
+                </button>
+              </div>
+            )}
+            {!allProvidersIdentified && (
+              <button
+                className={"btn btn-secondary"}
+                id="validation-button"
+                onClick={() => this.props.nextStep()}
+                disabled={!isNextStepAvailable}>
+                Valider les fournisseurs
+                <i className="bi bi-chevron-right"></i>
+              </button>
+            )}
           </div>
         </section>
       </Container>
@@ -344,35 +303,17 @@ export class SirenSection extends React.Component
   /* ---------- VIEW ---------- */
 
   changeNbItems = (event) => this.setState({ nbItems: event.target.value });
+  changeView = (event) => this.setState({ view: event.target.value });
 
   /* ---------- UPDATES ---------- */
 
-  updateFootprints = () => {
-    this.props.session.updateFootprints();
-    this.setState({ providers: this.props.session.financialData.providers });
-  };
-
-  enableButton = () => {
-    let providers = this.props.session.financialData.providers;
-
-    let nonSyncWithSiren = providers.filter(
-      (provider) => provider.state == "siren" && provider.status != 200
-    );
-
-    let disable;
-
-    nonSyncWithSiren.length > 0 ? (disable = false) : (disable = true);
-
-    this.setState({ isDisabled: disable });
-  };
-
   refreshSection = () => 
   {
-    const isNextStepAvailable = nextStepAvailable(this.props.session.financialData.providers);
+    const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
-    const isSyncButtonEnable = checkSyncButtonEnable(this.props.session.financialData.providers);
+    const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
     if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
       this.setState({ isSyncButtonEnable });
     }
@@ -406,7 +347,7 @@ export class SirenSection extends React.Component
       let companiesIds = await processCSVCompaniesData(CSVData);
       await Promise.all(
         Object.entries(companiesIds).map(async ([providerNum, corporateName, corporateId]) => {
-          let provider  = providerNum ? this.props.session.financialData.getCompanyByAccount(providerNum) : this.props.session.financialData.getCompanyByName(corporateName);
+          let provider  = providerNum ? this.props.financialData.getCompanyByAccount(providerNum) : this.props.financialData.getCompanyByName(corporateName);
           if (provider) {
             provider.corporateId = corporateId;
             provider.legalUnitData.denomination = denomination;
@@ -416,7 +357,7 @@ export class SirenSection extends React.Component
         })
       );
       this.setState({
-        providers: this.props.session.financialData.providers,
+        providers: this.props.financialData.providers,
       });
     };
 
@@ -433,8 +374,8 @@ export class SirenSection extends React.Component
         XLSXData.map(async ({ accountNum, accountLib, denomination, siren, account }) => {
           if (account && !accountNum) accountNum = account;
           let provider = accountNum ? 
-              this.props.session.financialData.providers.filter(provider => provider.providerNum == accountNum)[0]    // based on num
-            : this.props.session.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
+              this.props.financialData.providers.filter(provider => provider.providerNum == accountNum)[0]    // based on num
+            : this.props.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
           if (provider) {
             provider.corporateId = siren;
             provider.legalUnitData.denomination = denomination;
@@ -445,7 +386,7 @@ export class SirenSection extends React.Component
         })
       );
       this.setState({
-        providers: this.props.session.financialData.providers,
+        providers: this.props.financialData.providers,
       });
     };
 
@@ -456,7 +397,7 @@ export class SirenSection extends React.Component
 
   // Export CSV File
   exportXLSXFile = async () => {
-    let jsonContent = await this.props.session.financialData.providers
+    let jsonContent = await this.props.financialData.providers
       .filter((provider) => provider.providerNum.charAt(0) != "_")
       .map((provider) => {
         return {
@@ -487,9 +428,8 @@ export class SirenSection extends React.Component
   // fetch data for showed providers
   synchroniseProviders = async () => 
   {
-    let providersToSynchronise = this.state.providers.filter(
-      (provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200
-    );
+    // providers with fpt unfetched
+    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
 
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
@@ -497,10 +437,21 @@ export class SirenSection extends React.Component
     let i = 0;
     let n = providersToSynchronise.length;
 
-    for (let provider of providersToSynchronise) {
-      try {
+    for (let provider of providersToSynchronise) 
+    {
+      try 
+      {
+        // fetch footprint
         await provider.updateFromRemote();
-      } catch (error) {
+        // assign to expenses & investments
+        this.props.financialData.expenses
+          .concat(this.props.financialData.investments)
+          .filter(expense => expense.providerNum==provider.providerNum)
+          .forEach(expense => {
+            expense.footprint = provider.footprint;
+          });
+      } 
+      catch (error) {
         this.setState({ error: true });
         break;
       }
@@ -509,21 +460,16 @@ export class SirenSection extends React.Component
     }
 
     // update state
-
     this.setState({
       fetching: false,
       progression: 0,
       view: "all",
-      providersShowed: this.state.providers,
       synchronised: this.state.providers.filter(
         (provider) => provider.footprintStatus == 200
       ).length,
     });
 
     document.getElementById("step-3").scrollIntoView();
-
-    // update session
-    //this.props.session.updateFootprints();
   };
 
   /* ----- POP-UP ----- */
@@ -534,7 +480,7 @@ export class SirenSection extends React.Component
 
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const nextStepAvailable = (providers) => 
+const checkNextStepAvailable = (providers) => 
 {
   let nbSirenSynchronised = providers.filter(
     (provider) => !provider.useDefaultFootprint && provider.footprintStatus == 200
@@ -553,4 +499,14 @@ const checkSyncButtonEnable = (providers) =>
 {
   let enable = providers.some((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
   return enable;
+};
+
+const getShowedProviders = (view,providers) => 
+{
+  switch (view) {
+    case "undefined": return providers.filter((provider) => provider.useDefaultFootprint);
+    case "unsync":    return providers.filter((provider) => provider.footprintStatus != 200);
+    case "error":     return providers.filter((provider) => provider.footprintStatus == 404);
+    default:          return providers;
+  }
 };

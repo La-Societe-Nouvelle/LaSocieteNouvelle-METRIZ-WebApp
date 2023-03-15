@@ -25,10 +25,7 @@ export class IdentifiedProvidersTable extends React.Component
 
   componentDidUpdate(prevProps) 
   {
-    console.log("props table did update");
-    console.log(this.props.providers[0].useDefaultFootprint); 
     if (JSON.stringify(prevProps.providers) !== JSON.stringify(this.props.providers) ) {
-      console.log("test 2")
       this.setState({ providers: this.props.providers });
     }
     if (prevProps.providers != this.props.providers) {
@@ -41,6 +38,7 @@ export class IdentifiedProvidersTable extends React.Component
     const { nbItems, financialPeriod } = this.props;
     const { providers, columnSorted, page } = this.state;
     this.sortProviders(providers, financialPeriod, columnSorted);
+
     return (
       <div className="table-main" id="table">
         <Table>

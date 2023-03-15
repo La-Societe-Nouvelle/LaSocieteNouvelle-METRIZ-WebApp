@@ -170,7 +170,6 @@ export async function FECFileReader(content)
   // Mapping accounts ----------------------------------------------------------------------------------- //
 
   dataFEC.meta.accounts = await buildMappingAssetAccounts(dataFEC.meta.accounts);
-  console.log(dataFEC.meta.accounts);
 
   // Return --------------------------------------------------------------------------------------------- //
   return dataFEC;
@@ -552,7 +551,6 @@ export async function FECDataReader(FECData)
         depreciationAmount: 0,
       }
     });
-  console.log(data.immobilisations);
   
   data.investments = [];                  // flow #2 <- #404
   data.immobilisedProductions = [];    // flow #2 <- #72

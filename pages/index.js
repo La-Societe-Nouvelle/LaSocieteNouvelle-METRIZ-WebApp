@@ -25,6 +25,7 @@ import { getPrevAmountItems } from '/src/utils/Utils';
 import { updateVersion } from '/src/version/updateVersion';
 import { Footer } from '../components/parts/Footer';
 import { Mobile} from '../components/Mobile'
+import { getAmountItems } from '../src/utils/Utils';
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -167,9 +168,9 @@ class Metriz extends React.Component {
 
     switch (step) {
       case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} isLoading={this.state.loading} />)
-      case 1: return (<ImportSection {...sectionProps} />)
-      case 2: return (<InitialStatesSection {...sectionProps} return={() => this.setStep(1)}/>)
-      case 3: return (<ProvidersSection {...sectionProps} />)
+      case 1: return (<ImportSection {...sectionProps} submit={this.validImportedData} />)
+      case 2: return (<InitialStatesSection {...sectionProps} submit={this.validInitialStates} return={() => this.setStep(1)}/>)
+      case 3: return (<ProvidersSection {...sectionProps} submit={this.validProviders} />)
       case 4: return (<StatementSection {...sectionProps} publish={() => this.setStep(5)} />)
       case 5: return (<PublishStatementSection {...sectionProps} return={() => this.setStep(4)} />)
 
@@ -179,15 +180,42 @@ class Metriz extends React.Component {
 
   /* ----- PROGESSION ---- */
 
+  validImportedData = async () => 
+  {
+    console.log("--------------------------------------------------");
+    console.log("Ecritures comptables importées");
+    console.log(this.state.session.financialData);
+
+    // first year..
+    // if (getAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks).map(asset => asset.InitialState)) == 0) {
+    //   this.state.session.progression++;
+    // }
+
+    this.setStep(2);
+  }
+
+  validInitialStates = async () => 
+  {
+    console.log("--------------------------------------------------");
+    console.log("Empreintes des stocks et immobilisations initialisées");
+    console.log("Immobilisations :");
+    console.log(this.state.session.financialData.immobilisations.map(immobilisation => immobilisation.InitialState));
+    console.log("Stocks :")
+    console.log(this.state.session.financialData.stocks.map(stock => stock.InitialState));
+
+    this.setStep(3);
+  }
+
+  validProviders = async () => 
+  {
+    console.log("--------------------------------------------------");
+    console.log("Empreintes des fournisseurs récupérées");
+
+    this.setStep(4);
+  }
 
   validStep = async (step) => 
   {
-    // 
-    if (step==3) {
-      console.log("update output footprints");
-      await this.state.session.updateOutputFlowFootprints();
-    }
-
     // Increase progression
     this.state.session.progression = Math.max(step + 1, this.state.session.progression);
 
@@ -198,6 +226,10 @@ class Metriz extends React.Component {
 
     // update current step
     this.setStep(this.state.session.progression);
+  }
+
+  updateProgression = (step) => {
+    this.state.session.progression = Math.max(step + 1, this.state.session.progression);
   }
 
 }

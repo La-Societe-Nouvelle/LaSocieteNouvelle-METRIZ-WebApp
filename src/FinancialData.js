@@ -47,81 +47,63 @@ export const otherFinancialDataItems = [
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */
 
-export class FinancialData {
-  constructor(data) {
+export class FinancialData 
+{
+  constructor(data) 
+  {
     // if no data (new session)
     if (data == undefined) {
       this.isFinancialDataLoaded = false;
-    } else {
+    } 
+    
+    else {
       // ---------------------------------------------------------------------------------------------------- //
+
       // data loaded state
       this.metaAccounts = data.accounts;
-      this.isFinancialDataLoaded = data.isFinancialDataLoaded; // (true)                                                                             // to follow step
+      this.isFinancialDataLoaded = data.isFinancialDataLoaded; // to follow progression
 
       // Production items ------------------------ //
 
-      this.revenue = new Aggregate(data.revenue); // revenue (#71)
-      this.storedProduction = new Aggregate(data.storedProduction); // stored production (#71)
-      this.immobilisedProduction = new Aggregate(data.immobilisedProduction); // immobilised production (#72)
+      this.revenue = new Aggregate(data.revenue);                                                                                   // revenue (#71)
+      this.storedProduction = new Aggregate(data.storedProduction);                                                                 // stored production (#71)
+      this.immobilisedProduction = new Aggregate(data.immobilisedProduction);                                                       // immobilised production (#72)
 
       // External expenses ----------------------- //
 
-      this.expenses = data.expenses.map(
-        (props, index) => new Expense({ id: index, ...props })
-      ); // external expenses (#60[^3], #61, #62)
+      this.expenses = data.expenses.map((props) => new Expense({...props}));                                                        // external expenses (#60[^3], #61, #62)
 
       // Stocks ---------------------------------- //
 
-      this.stocks = Object.values(data.stocks).map(
-        (props, index) => new Stock({ id: index, ...props })
-      ); // stocks (#31 to #35, #37) / Depreciation (#29)
-      this.stockVariations = data.stockVariations.map(
-        (props, index) => new StockVariation({ id: index, ...props })
-      ); // stock variation (#603, #71)
+      this.stocks = Object.values(data.stocks).map((props) => new Stock({...props}));                                               // stocks (#31 to #35, #37) / Depreciation (#29)
+      this.stockVariations = data.stockVariations.map((props) => new StockVariation({...props}));                                   // stock variation (#603, #71)
 
       // Immobilisations ------------------------- //
 
-      this.immobilisations = Object.values(data.immobilisations).map(
-        (props, index) => new Immobilisation({ id: index, ...props })
-      ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
-      this.amortisationExpenses = data.amortisationExpenses.map(
-        (props, index) => new AmortisationExpense({ id: index, ...props })
-      ); // amortisation expenses (#6811, #6871)
-      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map(
-        (props, index) => new AmortisationExpense({ id: index, ...props })
-      ); // amortisation expenses (#6811, #6871)
-      this.investments = data.investments.map(
-        (props, index) => new Expense({ id: index, ...props })
-      ); // investments (flows #2 <- #404)
-      this.immobilisedProductions = data.immobilisedProductions.map(
-        (props, index) => new immobilisedProduction({ id: index, ...props })
-      ); // productions of immobilisations (flows #2 <- #72)
+      this.immobilisations = Object.values(data.immobilisations).map((props) => new Immobilisation({...props}));                    // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+      this.amortisationExpenses = data.amortisationExpenses.map((props) => new AmortisationExpense({...props}));                    // amortisation expenses (#6811, #6871)
+      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map((props) => new AmortisationExpense({...props}));    // amortisation expenses (#6811, #6871)
+      this.investments = data.investments.map((props) => new Expense({...props }));                                                 // investments (flows #2 <- #404)
+      this.immobilisedProductions = data.immobilisedProductions.map((props) => new immobilisedProduction({...props}));              // productions of immobilisations (flows #2 <- #72)
 
       // Expenses accounts ----------------------- //
 
-      this.externalExpenseAccounts = data.externalExpenseAccounts.map(
-        (props) => new Account({ ...props })
-      );
-      this.stockVariationAccounts = data.stockVariationAccounts.map(
-        (props) => new Account({ ...props })
-      );
-      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map(
-        (props) => new Account({ ...props })
-      );
+      this.externalExpenseAccounts = data.externalExpenseAccounts.map((props) => new Account({ ...props }));
+      this.stockVariationAccounts = data.stockVariationAccounts.map((props) => new Account({ ...props }));
+      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map((props) => new Account({ ...props }));
 
       // Providers ------------------------------- //
 
-      this.providers = data.providers.map(
-        (props, id) => new Provider({ id: id, ...props })
-      );
+      this.providers = data.providers.map((props) => new Provider({...props}));
 
       // Aggregates ------------------------------ //
 
-      this.mainAggregates = {};
-      Object.entries(data.mainAggregates).forEach(
-        ([aggregateId, aggregateProps]) =>
-          (this.mainAggregates[aggregateId] = new Aggregate(aggregateProps))
-      );
+      this.mainAggregates = {
+        production: new Aggregate(data.mainAggregates.production),
+        intermediateConsumptions: new Aggregate(data.mainAggregates.intermediateConsumptions),
+        fixedCapitalConsumptions: new Aggregate(data.mainAggregates.fixedCapitalConsumptions),
+        netValueAdded: new Aggregate(data.mainAggregates.netValueAdded),
+      };
 
       // Other figures --------------------------- //
 
@@ -135,28 +117,8 @@ export class FinancialData {
   /* ---------------------------------------- BUILD FINANCIAL DATA FROM FEC DATA ---------------------------------------- */
   /* -------------------------------------------------------------------------------------------------------------------- */
 
-  loadFECData = async (FECData) => {
-    console.log(FECData);
-    // ---------------------------------------------------------------------------------------------------- //
-
-    // periods to build
-    let financialPeriod = {
-      dateStart: FECData.firstDate,
-      dateEnd: FECData.lastDate,
-      periodKey: "FY" + FECData.lastDate.substring(0, 4),
-      regex: buildRegexFinancialPeriod(FECData.firstDate, FECData.lastDate),
-    };
-    let periods = [financialPeriod];
-
-    // let periods = getListMonthsFinancialPeriod(importedData.meta.firstDate, importedData.meta.lastDate)
-    //     .map(month => {
-    //         return ({
-    //             regex: new RegExp("^" + month),
-    //             periodKey: month
-    //         })
-    //     })
-    //     .concat(props.session.financialPeriod);
-
+  loadFECData = async (FECData,financialPeriod,periods) => 
+  {
     // ---------------------------------------------------------------------------------------------------- //
 
     // Meta ------------------------------------ //
@@ -169,18 +131,12 @@ export class FinancialData {
 
     // External expenses ----------------------- //
 
-    this.expenses = FECData.expenses.map(
-      (props, index) => new Expense({ id: index, ...props })
-    ); // external expenses (#60[^3], #61, #62)
+    this.expenses = FECData.expenses.map((props) => new Expense({...props})); // external expenses (#60[^3], #61, #62)
 
     // Stocks ---------------------------------- //
 
-    this.stocks = Object.values(FECData.stocks).map(
-      (props, index) => new Stock({ id: index, ...props })
-    ); // stocks (#31 to #35, #37) / Depreciation (#29)
-    this.stockVariations = FECData.stockVariations.map(
-      (props, index) => new StockVariation({ id: index, ...props })
-    ); // stock variation (#603, #71)
+    this.stocks = Object.values(FECData.stocks).map((props) => new Stock({...props})); // stocks (#31 to #35, #37) / Depreciation (#29)
+    this.stockVariations = FECData.stockVariations.map((props) => new StockVariation({...props })); // stock variation (#603, #71)
 
     for (let stock of this.stocks) {
       await stock.buildStates(financialPeriod);
@@ -188,36 +144,19 @@ export class FinancialData {
 
     // Immobilisations ------------------------- //
 
-    this.immobilisations = Object.values(FECData.immobilisations).map(
-      (props, index) => new Immobilisation({ id: index, ...props })
-    ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
-    this.amortisationExpenses = FECData.amortisationExpenses.map(
-      (props, index) => new AmortisationExpense({ id: index, ...props })
-    ); // amortisation expenses (#6811, #6871)
-    this.investments = FECData.investments.map(
-      (props, index) => new Expense({ id: index, ...props })
-    ); // investments (flows #2 <- #404)
-    this.immobilisedProductions = FECData.immobilisedProductions.map(
-      (props, index) => new immobilisedProduction({ id: index, ...props })
-    ); // productions of immobilisations (flows #2 <- #72)
+    this.immobilisations = Object.values(FECData.immobilisations).map((props) => new Immobilisation({...props}));         // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+    this.amortisationExpenses = FECData.amortisationExpenses.map((props) => new AmortisationExpense({...props}));         // amortisation expenses (#6811, #6871)
+    this.investments = FECData.investments.map((props) => new Expense({...props}));                                       // investments (flows #2 <- #404)
+    this.immobilisedProductions = FECData.immobilisedProductions.map((props) => new immobilisedProduction({...props}));   // productions of immobilisations (flows #2 <- #72)
 
     this.adjustedAmortisationExpenses = [];
-    for (let immobilisation of this.immobilisations) {
-      let immobilisationAmortisationExpenses = this.amortisationExpenses.filter(
-        (expense) =>
-          expense.amortisationAccountNum ==
-          immobilisation.amortisationAccountNum
-      );
-      await immobilisation.buildStates(
-        financialPeriod,
-        immobilisationAmortisationExpenses
-      );
+    for (let immobilisation of this.immobilisations) 
+    {
+      let immobilisationAmortisationExpenses = this.amortisationExpenses.filter((expense) => expense.amortisationAccountNum == immobilisation.amortisationAccountNum);
+      await immobilisation.buildStates(financialPeriod,immobilisationAmortisationExpenses);
       await immobilisation.divideAdjustedAmortisationExpenses();
-      let immobilisationAdjustedAmortisationExpenses =
-        await immobilisation.getAdjustedAmortisationExpenses();
-      this.adjustedAmortisationExpenses.push(
-        ...immobilisationAdjustedAmortisationExpenses
-      );
+      let immobilisationAdjustedAmortisationExpenses = await immobilisation.getAdjustedAmortisationExpenses();
+      this.adjustedAmortisationExpenses.push(...immobilisationAdjustedAmortisationExpenses);
     }
 
     // Expenses accounts ----------------------- //
@@ -314,7 +253,6 @@ export class FinancialData {
     );
 
     // amortisation expenses
-    console.log(this.adjustedAmortisationExpenses);
     this.amortisationExpensesAccounts = this.adjustedAmortisationExpenses.map(
       (expense) =>
         new Account({
@@ -396,7 +334,6 @@ export class FinancialData {
         })
     );
     this.mainAggregates.netValueAdded = netValueAdded;
-    console.log(this.mainAggregates);
 
     // --------------------------------------------------------- //
   };
@@ -449,7 +386,6 @@ export class FinancialData {
         periods
       )
     );
-    console.log(this.providers);
   };
 
   /* ---------------------------------------- INITIAL STATES INITIALIZER ---------------------------------------- */
@@ -537,9 +473,7 @@ export class FinancialData {
       else {
         // TO DO init initial state
       }
-    })
-  
-    console.log(currentAccountsData)
+    })  
   }
   
 

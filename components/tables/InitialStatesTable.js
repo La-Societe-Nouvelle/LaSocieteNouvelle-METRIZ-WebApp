@@ -243,7 +243,6 @@ function RowTableImmobilisations(props)
 
             />
         </td>
-        {console.log(initialStateType)}
         {initialStateType == "defaultData" && (
         <td className={initialStateSet === true ? " success" : ""}>
           <Select

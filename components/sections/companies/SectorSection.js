@@ -27,8 +27,6 @@ export class SectorSection extends React.Component
   constructor(props) {
     super(props);
     this.state = {
-      unidentifiedProviders: props.unidentifiedProviders,         // companies without siren
-      unidentifiedProvidersShowed: props.unidentifiedProviders,   // view
       significativeProviders: [],                                 // significative companies
       view: "all",                                                // filter view
       nbItems: 20,                                                // nb items
@@ -37,7 +35,7 @@ export class SectorSection extends React.Component
       error: false,
       minFpt: null,
       maxFpt: null,
-      isNextStepAvailable: nextStepAvailable(props.unidentifiedProviders),
+      isNextStepAvailable: nextStepAvailable(props.financialData.providers),
     };
   }
 
@@ -45,35 +43,34 @@ export class SectorSection extends React.Component
   {
     let minFpt = await fetchMinFootprint();
     let maxFpt = await fetchMaxFootprint();
-    let significativeCompanies = await getSignificativeCompanies(
-      this.props.session.financialData.providers,
-      this.props.session.financialData.expenses,
-      this.props.session.financialData.investments,
+    let significativeProviders = await getSignificativeCompanies(
+      this.props.financialData.providers,
+      this.props.financialData.expenses,
+      this.props.financialData.investments,
       minFpt,maxFpt,
       this.props.financialPeriod
     );
-    this.setState({significativeCompanies,minFpt,maxFpt})
+    this.setState({significativeProviders,minFpt,maxFpt})
   }
 
   render() 
   {
     const {
-      unidentifiedProviders,
-      significativeProviders,
-      unidentifiedProvidersShowed,
       view,
       nbItems,
       fetching,
       progression,
       error,
       isNextStepAvailable,
+      significativeProviders
     } = this.state;
-    
+
     const financialData = this.props.financialData;
     const period = this.props.financialPeriod;
-    
-    const showedProviders = this.getShowedProviders(view);
-    console.log(showedProviders.length);
+
+    const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint);
+    const showedProviders = getShowedProviders(view,unidentifiedProviders,significativeProviders);
+        
     if (showedProviders.length == 0 && view!="") this.setState({view: ""}); // reset filter
 
     const nbSignificativeProvidersWithoutActivity = unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00" && significativeProviders.includes(provider.providerNum)).length;
@@ -148,10 +145,8 @@ export class SectorSection extends React.Component
                 {/* ---------- Table ---------- */}
                 <UnidentifiedCompaniesTable
                   nbItems={nbItems == "all" ? unidentifiedProviders.length : parseInt(nbItems)}
-                  onUpdate={this.updateFootprints.bind(this)}
                   providers={showedProviders}
                   significativeProviders={significativeProviders}
-                  financialData={financialData}
                   financialPeriod={period}
                   refreshSection={this.refreshSection}
                 />
@@ -190,58 +185,32 @@ export class SectorSection extends React.Component
 
   changeNbItems = (event) => this.setState({ nbItems: event.target.value });
 
-  getShowedProviders = (view) => 
-  {
-    switch (view) 
-    {
-      case "aux": // provider account
-        return this.props.unidentifiedProviders.filter((provider) => !provider.isDefaultProviderAccount);
-      case "expenses": // default provider account
-        return this.props.unidentifiedProviders.filter((provider) => provider.isDefaultProviderAccount);
-      case "significative": // significative provider
-        return this.props.unidentifiedProviders.filter((provider) => this.state.significativeProviders.includes(provider.providerNum));
-      case "significativeWithoutActivity":  // significative provider & no activity code set
-        return this.props.unidentifiedProviders.filter((provider) => this.state.significativeProviders.includes(provider.providerNum) && provider.defaultFootprintParams.code == "00");
-      case "defaultActivity": // no activity code set
-        return this.props.unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00");
-      default: // default
-        return this.props.unidentifiedProviders;
-    }
-  };
-
-  /* ---------- UPDATES ---------- */
-
-  updateFootprints = async () => 
-  {
-    //this.props.session.updateFootprints();
-
-    // check if companies is a significative companies
-    let {minFpt,maxFpt} = this.state;
-    let significativeProviders = await getSignificativeCompanies(
-      this.props.session.financialData.providers,
-      this.props.session.financialData.expenses,
-      this.props.session.financialData.investments,
-      minFpt,maxFpt,
-      this.props.financialPeriod
-    );
-
-    this.setState({ providers: this.props.providers, significativeProviders: significativeProviders });
-  };
-
   /* ---------- FETCHING DATA ---------- */
 
   synchroniseProviders = async () => 
   {
-    let providersToSynchronise = this.props.unidentifiedProviders; // only showed ?
-    console.log(providersToSynchronise);
+    let providersToSynchronise = this.props.financialData.providers
+      .filter((provider) => provider.useDefaultFootprint && provider.footprintStatus != 200); // only showed ?
+
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
+
     let i = 0;
     let n = providersToSynchronise.length;
-    for (let provider of providersToSynchronise) {
-      try {
+
+    for (let provider of providersToSynchronise) 
+    {
+      try 
+      {
+        // fetch footprint
         await provider.updateFromRemote();
-      } catch (error) {
+        // assign to expenses & investments
+        this.props.financialData.expenses
+          .concat(this.props.financialData.investments)
+          .filter(expense => expense.providerNum==provider.providerNum)
+          .forEach(expense => expense.footprint = provider.footprint);
+      } 
+      catch (error) {
         console.log(error);
         this.setState({ error: true });
         break;
@@ -253,30 +222,26 @@ export class SectorSection extends React.Component
     // check if providers is a significative companies
     let {minFpt,maxFpt} = this.state;
     let significativeProviders = await getSignificativeCompanies(
-      this.props.session.financialData.providers,
-      this.props.session.financialData.expenses,
-      this.props.session.financialData.investments,
+      this.props.financialData.providers,
+      this.props.financialData.expenses,
+      this.props.financialData.investments,
       minFpt,maxFpt,
       this.props.financialPeriod
     );
 
     // update state
-    const isNextStepAvailable = nextStepAvailable(this.props.unidentifiedProviders);
+    const isNextStepAvailable = nextStepAvailable(this.props.financialData.providers);
     this.setState({
       fetching: false,
       progression: 0,
       significativeCompanies: significativeProviders,
       isNextStepAvailable
     });
-    this.setState({view: this.state.view});
-
-    // update session
-    //this.props.session.updateFootprints();
   }
 
   refreshSection = () => 
   {
-    const isNextStepAvailable = nextStepAvailable(this.props.unidentifiedProviders);
+    const isNextStepAvailable = nextStepAvailable(this.props.financialData.providers);
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
@@ -334,4 +299,23 @@ const nextStepAvailable = (providers) =>
 {
   let stepAvailable = !providers.some((provider) => provider.footprintStatus != 200);
   return stepAvailable;
-};
+}
+
+const getShowedProviders = (view,providers,significativeProviders) => 
+{
+  switch (view) 
+  {
+    case "aux": // provider account
+      return providers.filter((provider) => !provider.isDefaultProviderAccount);
+    case "expenses": // default provider account
+      return providers.filter((provider) => provider.isDefaultProviderAccount);
+    case "significative": // significative provider
+      return providers.filter((provider) => significativeProviders.includes(provider.providerNum));
+    case "significativeWithoutActivity":  // significative provider & no activity code set
+      return providers.filter((provider) => significativeProviders.includes(provider.providerNum) && provider.defaultFootprintParams.code == "00");
+    case "defaultActivity": // no activity code set
+      return providers.filter((provider) => provider.defaultFootprintParams.code == "00");
+    default: // default
+      return providers;
+  }
+}

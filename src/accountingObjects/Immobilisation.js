@@ -10,8 +10,7 @@ import { AmortisationExpense } from "./AmortisationExpense";
 
 export class Immobilisation 
 {
-  constructor({id,
-               accountNum, accountLib, entries,                                           // Immobilisation data
+  constructor({accountNum, accountLib, entries,                                           // Immobilisation data
                amortisationAccountNum, amortisationAccountLib, amortisationEntries,       // Amortisation data
                depreciationAccountNum, depreciationAccountLib, depreciationEntries,       // Depreciation data
                initialStateType, initialState, initialStateSet, initialFootprintParams,   // Initial state
@@ -23,7 +22,6 @@ export class Immobilisation
   {
     // ---------------------------------------------------------------------------------------------------- //
 
-    this.id = id;
     this.isAmortisable = amortisationAccountNum!=undefined;
 
     // Immobilisation ----------------------------------- //

@@ -10,7 +10,8 @@ import { Loader } from "../popups/Loader";
 /* -------------------- START SECTION -------------------- */
 /* ------------------------------------------------------- */
 
-export class StartSection extends React.Component {
+export class StartSection extends React.Component 
+{
   constructor(props) {
     super(props);
   }

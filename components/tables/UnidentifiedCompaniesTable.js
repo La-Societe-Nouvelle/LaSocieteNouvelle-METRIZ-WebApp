@@ -39,7 +39,6 @@ export class UnidentifiedCompaniesTable extends React.Component
 
   componentDidUpdate(prevProps) 
   {
-    console.log(this.props.providers.length);
     if (prevProps.providers !== this.props.providers) {
       this.setState({ providers: this.props.providers });
     }
@@ -100,7 +99,6 @@ export class UnidentifiedCompaniesTable extends React.Component
               isSignificative={significativeProviders.includes(
                 provider.providerNum
               )}
-              updateProvider={this.updateProvider.bind(this)}
               period={period}
               refreshTable={this.refreshTable}
             />
@@ -179,32 +177,10 @@ export class UnidentifiedCompaniesTable extends React.Component
   nextPage = () => {
     if (
       (this.state.page + 1) * this.props.nbItems <
-      this.props.financialData.providers.length
+      this.props.providers.length
     ) {
       this.setState({ page: this.state.page + 1 });
     }
-  };
-
-  /* ---------- OPERATIONS ON COMPANY ---------- */
-
-  async fetchDataProvider(provider) {
-    await provider.fetchData();
-    this.props.financialData.updateCompany(provider);
-    this.forceUpdate();
-  }
-
-  updateProvider = (nextProps) => {
-    let provider = this.props.financialData.getCompany(nextProps.id);
-    provider.update(nextProps);
-    this.props.onUpdate();
-    this.setState({ companies: this.props.companies });
-  };
-
-  updateCompanyFromRemote = async (companyId) => {
-    let provider = this.props.financialData.getCompany(companyId);
-    await provider.updateFromRemote();
-    this.props.onUpdate();
-    this.setState({ companies: this.props.companies });
   };
 
   refreshTable = () => this.props.refreshSection();
@@ -300,12 +276,14 @@ class RowTableProviders extends React.Component
   onAreaCodeChange = (event) => {
     this.props.provider.update({defaultFootprintParams: {area: event.value}});
     this.setState({areaCode: event.value});
+    // fetch data auto ? -> updating expenses / significative providers
     this.props.refreshTable();
   };
 
   onActivityCodeChange = (event) => {
     this.props.provider.update({defaultFootprintParams: {code: event.value}});
     this.setState({activityCode: event.value});
+    // fetch data auto ? -> updating expenses / significative providers
     this.props.refreshTable();
   };
 }

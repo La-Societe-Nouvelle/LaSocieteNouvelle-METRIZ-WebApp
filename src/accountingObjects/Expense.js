@@ -5,8 +5,7 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 export class Expense {
 
-  constructor({id,
-               accountNum,
+  constructor({accountNum,
                accountLib,
                providerNum,
                providerLib,
@@ -15,9 +14,7 @@ export class Expense {
                footprint,
                date}) 
   {
-  // ---------------------------------------------------------------------------------------------------- //
-    this.id = id;
-    
+  // ---------------------------------------------------------------------------------------------------- //    
     this.accountNum = accountNum;
     this.accountLib = accountLib;
 

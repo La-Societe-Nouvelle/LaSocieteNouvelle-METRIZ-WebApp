@@ -60,7 +60,7 @@ export class IndicatorExpensesTable extends React.Component {
                 <tr key={accountNum}>
                   <td> {accountNum}</td>
                   <td> {accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                  <td  className="text-end">{printValue(periodsData[period.periodKey],0)} &euro;</td>
+                  <td  className="text-end">{printValue(periodsData[period.periodKey].amount,0)} &euro;</td>
                   <td  className="text-end">{printValue(periodsData[period.periodKey].footprint.indicators[indic].getValue(),nbDecimals)} <span > {unit}</span></td>
                   <td  className="text-end"><u>+</u>{printValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),0)}%</td>
                   {impactAbsolu ? <td  className="text-end">{printValue(periodsData[period.periodKey].footprint.indicators[indic].getValueAbsolute(periodsData[period.periodKey].amount),nbDecimals)}<span > {unitAbsolute}</span></td> : null}

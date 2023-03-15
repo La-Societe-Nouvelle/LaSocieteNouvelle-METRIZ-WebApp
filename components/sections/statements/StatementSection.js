@@ -13,7 +13,7 @@ const StatementSection = (props) =>
   const [indic, setIndic] = useState();
   const [isPublicationAvailable, setPublicationAvailable] = useState(false);
   const [validationsState, setValidationsState] = useState(
-    props.session.validations
+    props.session.validations[period.periodKey]
   );
 
   const handleView = (indic) => {

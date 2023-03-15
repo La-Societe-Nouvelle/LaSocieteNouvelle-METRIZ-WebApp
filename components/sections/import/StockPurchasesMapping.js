@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 
-export const StockPurchasesMapping = (props) => {
+export const StockPurchasesMapping = (props) => 
+{
   const [accounts, setAccounts] = useState(() => {
     const initializedAccounts = { ...props.meta.accounts };
     // Initialize the purchasesAccounts property for each stocks account to an empty array
@@ -12,6 +13,7 @@ export const StockPurchasesMapping = (props) => {
       });
     return initializedAccounts;
   });
+
   const stocksAccounts = Object.keys(accounts).filter((accountNum) =>
     /^3(1|2|7)/.test(accountNum)
   );
@@ -94,9 +96,16 @@ export const StockPurchasesMapping = (props) => {
       return accounts[accountNum].purchasesAccounts.length > 0;
     });
   };
+
+  const onSubmit = () =>
+  {
+    console.log("Associations des comptes d'achats avec les comptes de stocks : ");
+    console.log(Object.keys(accounts).filter(({accountNum}) => /^3(1|2|7)/.test(accountNum)));
+    props.onClick();
+  }
+
   return (
     <div>
-      {console.log(accounts)}
       <h3>Associez les comptes de stocks et les comptes de charges</h3>
       <Form>
         <Table size="lg" hover className="mt-3">
@@ -116,7 +125,6 @@ export const StockPurchasesMapping = (props) => {
                   <td>{accounts[accountNum].accountLib}</td>
                   <td>
                     <ul className="list-unstyled">
-                      {console.log(accounts[accountNum])}
                       {accounts[accountNum].purchasesAccounts.map(
                         (purchasesAccount, subIndex) => (
                           <li key={subIndex} className="py-2">
@@ -179,7 +187,7 @@ export const StockPurchasesMapping = (props) => {
         </button>
         <button
           className="btn btn-secondary"
-          onClick={() => props.onClick()}
+          onClick={onSubmit}
           disabled={!allStocksAccountsHavePurchaseAccounts()}
         >
           Valider mes données

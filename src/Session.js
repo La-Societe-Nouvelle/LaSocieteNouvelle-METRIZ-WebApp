@@ -14,12 +14,9 @@ import { ImpactsData } from "/src/ImpactsData.js";
 import { Indicator } from "/src/footprintObjects/Indicator";
 
 // Formulas
-import { buildIndicatorAggregate } from "./formulas/footprintFormulas";
 import {
   updateMainAggregatesFootprints,
   updateProductionItemsFootprints,
-  updateExternalExpensesFpt,
-  updateInvestmentsFpt,
   updateIntermediateConsumptionsFootprints,
   updateFixedCapitalConsumptionsFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
@@ -35,6 +32,7 @@ export class Session
   {
     if (props == undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
+
     // Version
     this.version = currentVersion;
     
@@ -43,26 +41,44 @@ export class Session
 
     // Year
     this.year = props.year || "";
+    this.availablePeriods = props.availablePeriods || [];
     this.financialPeriod = props.financialPeriod || {};
 
     // Data
     this.legalUnit = new LegalUnit(props.legalUnit);
     this.financialData = new FinancialData(props.financialData);
-    this.impactsData = new ImpactsData(props.impactsData);
+    this.impactsData = {};
+    this.availablePeriods.forEach(period => {
+      this.impactsData[period.periodKey] = new ImpactsData(props.impactsData[period.periodKey]);
+    })
 
     // Validations
-    this.validations = props.validations || [];
-    this.comparativeData =  new ComparativeData(props.comparativeData);
+    this.validations = {};
+    this.availablePeriods.forEach(period => {
+      this.validations[period.periodKey] = props.validations[period.periodKey] || [];
+    })
 
-    //this.updateFootprints();
+    // comparative data
+    this.comparativeData =  new ComparativeData(props.comparativeData);
 
     // Indicators list
     this.indics = props.indics || Object.keys(metaIndics)
   }
 
+  addPeriods = (periods) =>
+  {
+    let newPeriods = periods.filter(period => !this.availablePeriods.includes(period));
+    this.availablePeriods.push(...newPeriods);
+    newPeriods.forEach(period => {
+      this.impactsData[period.periodKey] = new ImpactsData();
+      this.validations[period.periodKey] = [];
+    })
+  }
+
   /* -------------------- PROGRESSION -------------------- */
 
-  getStepMax = () => {
+  getStepMax = () => 
+  {
     // if no siren
     if (!/[0-9]{9}/.test(this.legalUnit.siren)) return 1;
     // if no financial data
@@ -71,34 +87,16 @@ export class Session
     else if (
       this.financialData.immobilisations
         .concat(this.financialData.stocks)
-        .filter(
-          (account) =>
-            account.initialState == "defaultData" && !account.dataFetched
-        ).length > 0
+        .some((asset) => asset.initialStateType == "defaultData" && !asset.dataFetched)
     )
       return 3;
     // if data for comppanies not fetched
     else if (
-      this.financialData.providers.filter((provider) => provider.status != 200)
-        .length > 0
+      this.financialData.providers.some((provider) => provider.footprintStatus != 200)
     )
       return 4;
     // else
     else return 5;
-  };
-
-  /* -------------------- VALIDATIONS -------------------- */
-
-  checkValidations = async (periodKey) => {
-    Object.keys(metaIndics).forEach((indic) => {
-      let nextIndicator = this.getNetValueAddedIndicator(indic,periodKey);
-      if (
-        nextIndicator !==
-        this.financialData.mainAggregates.netValueAdded.footprint.indicators[indic]
-      ) {
-        this.validations = this.validations.filter((item) => item != indic);
-      }
-    });
   };
 
   /* ---------------------------------------- FOOTPRINTS PROCESS ---------------------------------------- */
@@ -106,31 +104,11 @@ export class Session
   // Main footprints are stored in variables to avoid processing multiple times when render the results
   // ... and allows to have all the values directly in the json back up file
 
-  // Updating output flows footprints
-  //  -> re assign companies fpt to expenses & investments 
-
-  updateOutputFlowFootprints = async () => 
-  {
-    // External expenses
-    await updateExternalExpensesFpt(this.financialData,this.financialPeriod);
-
-    // Investments
-    await updateInvestmentsFpt(this.financialData,this.financialPeriod);
-  }
-
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
   updateFootprints = async (period) => 
   {
-    await Promise.all(Object.keys(metaIndics).map((indic) => this.updateIndicator(indic,period)));
-    return;
-  }
-
- 
-  // Update indicator
-  async updateIndicator(indic,period) 
-  {
     // Net Value Added
-    this.updateNetValueAddedFootprint(indic,period.periodKey);
+    await this.updateNetValueAddedFootprint(period);
 
     // Intermediate Consumptions
     await updateIntermediateConsumptionsFootprints(this.financialData, period);
@@ -139,26 +117,35 @@ export class Session
     await updateFixedCapitalConsumptionsFootprints(this.financialData, period);
 
     // Main Aggregates
-    await updateMainAggregatesFootprints(indic, this.financialData, period);
+    await this.updateMainAggregatesFootprints(period);
 
     // Production items
-    await updateProductionItemsFootprints(indic, this.financialData, period);
+    await this.updateProductionItemsFootprints(period);
+
+    console.log(this.financialData.mainAggregates);
 
     return;
   }
 
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
-  updateNetValueAddedFootprint = (indic,periodKey) => {
+  updateNetValueAddedFootprint = async (period) => 
+  {
+    await Promise.all(Object.keys(metaIndics).map((indic) => this.updateNetValueAddedIndicator(indic,period.periodKey)));
+  }
+
+  updateNetValueAddedIndicator = (indic,periodKey) => 
+  {
     this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].footprint.indicators[indic] =
-      this.validations.indexOf(indic) >= 0
+      this.validations[periodKey].indexOf(indic) >= 0
         ? this.getNetValueAddedIndicator(indic,periodKey)
         : new Indicator({ indic });
   };
 
-  getNetValueAddedIndicator = (indic,periodKey) => {
+  getNetValueAddedIndicator = (indic,periodKey) => 
+  {
     const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].amount;
-    const impactsData = this.impactsData;
+    const impactsData = this.impactsData[periodKey];
 
     impactsData.setNetValueAdded(netValueAdded);
 
@@ -167,15 +154,14 @@ export class Session
     } else return new Indicator({ indic: indic });
   };
 
-  /* -------------------- ACCOUNTS FOOTPRINTS -------------------- */
+  updateMainAggregatesFootprints = async (period) => 
+  {
+    await Promise.all(Object.keys(metaIndics).map(async (indic) => await updateMainAggregatesFootprints(indic,this.financialData,period)));
+  }
 
-  getExpensesAccountIndicator(accountPurchases, indic) {
-    return buildIndicatorAggregate(
-      indic,
-      this.financialData.expenses.filter((expense) =>
-        expense.accountNum.startsWith(accountPurchases)
-      )
-    );
+  updateProductionItemsFootprints = async (period) => 
+  {
+    await Promise.all(Object.keys(metaIndics).map(async (indic) => await updateProductionItemsFootprints(indic,this.financialData,period)));
   }
 
 }

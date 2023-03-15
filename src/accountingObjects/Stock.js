@@ -9,8 +9,7 @@ import api from '../api';
 
 export class Stock {
 
-  constructor({id,
-               accountNum, accountLib, entries,                                           // Stock data
+  constructor({accountNum, accountLib, entries,                                           // Stock data
                depreciationAccountNum, depreciationAccountLib, depreciationEntries,       // Depreciation data
                initialStateType, initialState, initialStateSet, initialFootprintParams,   // Initial state
                lastState,
@@ -21,7 +20,6 @@ export class Stock {
   {
   // ---------------------------------------------------------------------------------------------------- //
 
-    this.id = id;
     this.isProductionStock = /^3(3|4|5)/.test(accountNum);
     this.expensesAccountsPrefix = !this.isProductionStock ? "60"+accountNum.slice(1).replace(/(0*)$/g,"") : null; // 3145 -> 60145.. 
     
