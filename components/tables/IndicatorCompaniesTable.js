@@ -35,7 +35,7 @@ export class IndicatorCompaniesTable extends React.Component {
 
     const companies = session.financialData.companies.filter(company => company.dataFetched)
                                                      .filter(company => company.footprint.indicators[indic].flag=="p");
-    const expensesByCompanies = getExpensesByCompanies(companies,session.financialData.expenses);
+    const expensesByCompanies = getExpensesByCompanies(companies,session.financialData.externalExpenses);
 
     this.sortCompanies(companies,columnSorted);
 

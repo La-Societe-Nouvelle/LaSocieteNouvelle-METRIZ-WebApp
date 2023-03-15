@@ -191,7 +191,7 @@ async function buildExpensesContent(indic,session)
     expenseAccounts
   } = session.financialData;
 
-  const expensesByAccount = getExpensesGroupByAccount(session.financialData.expenses);
+  const expensesByAccount = getExpensesGroupByAccount(session.financialData.externalExpenses);
   expensesByAccount.sort((a,b) => b.amount - a.amount);
 
   // header

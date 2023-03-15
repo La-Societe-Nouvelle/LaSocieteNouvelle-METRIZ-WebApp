@@ -73,7 +73,7 @@ export class FinancialData
 
       // External expenses ----------------------- //
 
-      this.expenses = data.expenses.map((props) => new Expense({...props}));                                                        // external expenses (#60[^3], #61, #62)
+      this.externalExpenses = data.externalExpenses.map((props) => new Expense({...props}));                                        // external expenses (#60[^3], #61, #62)
 
       // Stocks ---------------------------------- //
 
@@ -133,7 +133,7 @@ export class FinancialData
 
     // External expenses ----------------------- //
 
-    this.expenses = FECData.expenses.map((props) => new Expense({...props})); // external expenses (#60[^3], #61, #62)
+    this.externalExpenses = FECData.externalExpenses.map((props) => new Expense({...props})); // external expenses (#60[^3], #61, #62)
 
     // Stocks ---------------------------------- //
 
@@ -213,7 +213,7 @@ export class FinancialData
 
   buildExpensesAccounts = async (periods) => {
     // external expenses
-    this.externalExpensesAccounts = this.expenses
+    this.externalExpensesAccounts = this.externalExpenses
       .map((expense) => expense.accountNum)
       .filter(
         (value, index, self) =>
@@ -228,7 +228,7 @@ export class FinancialData
       );
     this.externalExpensesAccounts.forEach((account) =>
       account.buildPeriods(
-        this.expenses.filter(
+        this.externalExpenses.filter(
           (expense) => expense.accountNum == account.accountNum
         ),
         periods
@@ -365,7 +365,7 @@ export class FinancialData
 
   // call when load financial data (import)
   buildProviders = async (periods) => {
-    this.providers = this.expenses
+    this.providers = this.externalExpenses
       .concat(this.investments)
       .map((expense) => {
         return {
@@ -382,7 +382,7 @@ export class FinancialData
       .map((providerData, id) => new Provider({ id, ...providerData }));
     this.providers.forEach((provider) =>
       provider.buildPeriods(
-        this.expenses.filter((expense) => expense.providerNum == provider.providerNum),
+        this.externalExpenses.filter((expense) => expense.providerNum == provider.providerNum),
         this.investments.filter((expense) => expense.providerNum == provider.providerNum),
         periods
       )
@@ -412,8 +412,8 @@ export class FinancialData
     this.stocks
       .filter((stock) => !stock.isProductionStock)
       .forEach((stock) => {
-        stock.initialStateType = this.expenses.some((expense) =>
-          expense.accountNum.startsWith(stock.expensesAccountsPrefix)
+        stock.initialStateType = this.externalExpenses.some((expense) =>
+          stock.purchasesAccounts.includes(expense.accountNum)
         )
           ? "currentFootprint"
           : "defaultData";

@@ -157,7 +157,7 @@ export class InitialStatesTable extends React.Component {
 const buildHasInputs = (account,financialData) =>
 {
   if (/^3/.test(account.accountNum)) {
-    account.hasInputs = financialData.expenses.some(expense => expense.accountNum.startsWith(account.expensesAccountsPrefix));
+    account.hasInputs = financialData.externalExpenses.some(expense => account.purchasesAccounts.includes(expense.accountNum));
   } else if (/^2/.test(account.accountNum)) {
     account.hasInputs = financialData.investments.some(investment => investment.accountNum == account.accountNum);
   }

@@ -203,7 +203,7 @@ export class SectorSection extends React.Component
         // fetch footprint
         await provider.updateFromRemote();
         // assign to expenses & investments
-        this.props.financialData.expenses
+        this.props.financialData.externalExpenses
           .concat(this.props.financialData.investments)
           .filter(expense => expense.providerNum==provider.providerNum)
           .forEach(expense => expense.footprint = provider.footprint);

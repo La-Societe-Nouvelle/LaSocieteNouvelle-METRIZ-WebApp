@@ -19,7 +19,7 @@ import { buildAggregateIndicator, buildAggregatePeriodIndicator, buildDifference
 
 export const updateExternalExpensesFpt = async (financialData) =>
 {
-  await Promise.all(financialData.expenses.map(async (expense) => 
+  await Promise.all(financialData.externalExpenses.map(async (expense) => 
   {
     // retrieve company
     let provider = financialData.providers.filter(provider => provider.providerNum==expense.providerNum)[0];
@@ -86,7 +86,7 @@ const updateExternalExpensesAccountsFpt = async (financialData,period) =>
     .map(async (account) => 
   {
     // retrieve expenses (linked to the account)
-    let expenses = financialData.expenses
+    let expenses = financialData.externalExpenses
       .filter(expense => expense.accountNum==account.accountNum)
       .filter(expense => period.regex.test(expense.date))
       .filter(expense => expense.amount>0); // temp solution to avoid uncertainty issue
@@ -108,8 +108,8 @@ export const updateInitialStateStocksFpt = async (financialData,period) =>
     .map(async (stock) => 
   {
     // purchases
-    let purchases = financialData.expenses
-      .filter(expense => expense.accountNum.startsWith(stock.expensesAccountsPrefix))
+    let purchases = financialData.externalExpenses
+      .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))
       .filter(expense => period.regex.test(expense.date));
     let purchasesFootprint = await buildAggregateFootprint(purchases);
     
@@ -140,8 +140,8 @@ const updatePurchasesStocksStatesFpt = async (financialData,period) =>
     let oldStock = Math.max(-getSumItems(unstorages, 2),0);
     let newStock = roundValue(finalState.amount-oldStock,2);
 
-    let purchases = financialData.expenses
-    .filter(expense => expense.accountNum.startsWith(stock.expensesAccountsPrefix))
+    let purchases = financialData.externalExpenses
+    .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))
     .filter(expense => period.regex.test(expense.date));
     let purchasesFootprint = await buildAggregateFootprint(purchases);
     

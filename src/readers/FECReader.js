@@ -524,7 +524,7 @@ export async function FECDataReader(FECData)
   data.stockVariations = [];              // stock flows 603 <-> 31-32-37 & 71 <-> 33-34-35
 
   // Expenses ------------------------------------------------------------------------------------------- //
-  data.expenses = [];                     // 60, 61, 62 (hors 603)
+  data.externalExpenses = [];             // 60, 61, 62 (hors 603)
   data.amortisationExpenses = [];         // 6811 and 6871
   
   // Immobilisations ------------------------------------------------------------------------------------ //
@@ -1025,7 +1025,7 @@ const readExpenseEntry = async (data,journal,ligneCourante) =>
       date: ligneCourante.EcritureDate
     }
     // push data
-    data.expenses.push(expenseData);
+    data.externalExpenses.push(expenseData);
     if (!ligneFournisseur.CompAuxNum) data.defaultProviders.push(expenseData.providerNum);
   }
 

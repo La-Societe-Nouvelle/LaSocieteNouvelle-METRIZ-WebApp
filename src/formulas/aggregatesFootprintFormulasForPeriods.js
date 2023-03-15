@@ -137,7 +137,7 @@ const getProductionFptBetweenDates = async (indic,financialData,dateStart,dateEn
 const buildIntermediateConsumptionsPeriodAggregate = async (indic,financialData,dateStart,dateEnd) =>
 {
   let aggregate = new Aggregate();
-  let externalExpenses = financialData.expenses
+  let externalExpenses = financialData.externalExpenses
     .filter(expense => parseInt(expense.date)>=parseInt(dateStart) && parseInt(expense.date)<=parseInt(dateEnd));
   let stockVariations = financialData.stockVariations // error !!! -> use entries ? OK
     .filter(variation => variation.isPurchasesStockVariation)

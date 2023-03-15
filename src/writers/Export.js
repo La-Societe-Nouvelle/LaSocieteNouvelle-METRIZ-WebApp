@@ -15,7 +15,7 @@ function exportIndicDataExpensesCSV(indic, session) {
   let csvContent = "data:text/csv;charset=utf-8,";
   csvContent += "corporated_id;corporate_name;amount;value;uncertainty";
 
-  let expenses = session.financialData.expenses;
+  let expenses = session.financialData.externalExpenses;
   expenses.forEach((expense) => {
     csvContent += "\r\n";
     let indicator = expense.footprint.getIndicator(indic);
