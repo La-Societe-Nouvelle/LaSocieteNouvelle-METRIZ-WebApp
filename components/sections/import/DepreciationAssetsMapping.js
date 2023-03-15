@@ -7,6 +7,8 @@ function DepreciationAssetsMapping(props)
 
   const accountsToMap = Object.keys(accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
   const assetAccounts = Object.keys(accounts).filter((accountNum) => /^2(0|1)/.test(accountNum) || /^3[0-8]/.test(accountNum));
+
+  const [lastMapping, setLastMapping] = useState("");
    
   const [isDisabled, setIsDisabled] = useState(true);
   // disabled if one account is not mapped i.e. enabled if all accounts are mapped
@@ -79,6 +81,8 @@ function DepreciationAssetsMapping(props)
     } else {
       setIsDisabled(false);
     }
+
+    setLastMapping(accountToMapNum+"-"+nextAssetAccountNum);
   }
 
   const onSubmit = () =>
@@ -88,6 +92,7 @@ function DepreciationAssetsMapping(props)
     props.onClick();
   }
 
+  console.log(lastMapping);
   return (
     <div>
       <h3 >

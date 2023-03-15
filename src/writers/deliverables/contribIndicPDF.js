@@ -33,11 +33,13 @@ export const createContribIndicatorPDF = (
   indic,
   financialData,
   comparativeData,
-  download
+  download,
+  period
 ) => {
   // ---------------------------------------------------------------
 
-  const { production, revenue, externalExpenses } = financialData.aggregates;
+  const { production } = financialData.mainAggregates;
+  const { revenue } = financialData.productionAggregates;
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
@@ -48,26 +50,28 @@ export const createContribIndicatorPDF = (
   const indicDescription = getIndicDescription(indic);
 
   const mostImpactfulExpenses = sortCompaniesByFootprint(
-    financialData.expenses,
+    financialData.externalExpenses,
+    period,
     indic,
     "desc"
   ).slice(0, 3);
 
   const leastImpactfulExpenses = sortCompaniesByFootprint(
-    financialData.expenses,
+    financialData.externalExpenses,
+    period,
     indic,
     "asc"
   ).slice(0, 3);
 
   const mostImpactfulCompanies = sortCompaniesByImpact(
-    financialData.companies,
+    financialData.providers,
     indic,
     "desc"
   ).slice(0, 4);
 
   const uncertaintyText = getUncertaintyDescription(
     "proportion",
-    production.footprint.indicators[indic].uncertainty
+    production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty
   );
 
   // ---------------------------------------------------------------
@@ -88,8 +92,8 @@ export const createContribIndicatorPDF = (
   // ---------------------------------------------------------------
   // key numbers
 
-  const totalRevenue = revenue.amount;
-  const contributionPercentage = revenue.footprint.indicators[indic].value;
+  const totalRevenue = revenue.periodsData[period.periodKey].amount;
+  const contributionPercentage = revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
   const contributionAmount = (contributionPercentage / 100) * totalRevenue;
   const contributionPerEuro = contributionAmount / totalRevenue;
 
@@ -313,7 +317,7 @@ export const createContribIndicatorPDF = (
             stack: [
               {
                 text:
-                  printValue(production.footprint.indicators[indic].value, 1) +
+                  printValue(production.periodsData[period.periodKey].footprint.indicators[indic].value, 1) +
                   "%*",
                 alignment: "center",
                 style: "bigNumber",
@@ -442,7 +446,7 @@ export const createContribIndicatorPDF = (
               {
                 text:
                   printValue(
-                    comparativeData.intermediateConsumption.divisionFootprint
+                    comparativeData.intermediateConsumptions.divisionFootprint
                       .indicators[indic].value,
                     1
                   ) + " %",

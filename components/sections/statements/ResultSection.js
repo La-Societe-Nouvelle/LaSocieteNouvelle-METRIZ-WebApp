@@ -205,7 +205,8 @@ const ResultSection = (props) =>
             session.comparativeData,
             comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
               .label,
-            true
+            true,
+            period
           );
           break;
         default:
@@ -310,10 +311,10 @@ const ResultSection = (props) =>
                 <h3 className="text-center">Répartition des impacts bruts</h3>
                 <GrossImpactChart
                   id={"part-" + indic}
-                  intermediateConsumption={intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
+                  intermediateConsumptions={intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
                     indic
                   ].getGrossImpact(intermediateConsumptions.periodsData[period.periodKey].amount)}
-                  capitalConsumption={fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[
+                  fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[
                     indic
                   ].getGrossImpact(fixedCapitalConsumptions.periodsData[period.periodKey].amount)}
                   netValueAdded={netValueAdded.periodsData[period.periodKey].footprint.indicators[
@@ -374,21 +375,21 @@ const ResultSection = (props) =>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommations intermédiaires</h5>
                 <ComparativeGraphs
-                  id={"intermediateConsumption-" + indic}
+                  id={"intermediateConsumptions-" + indic}
                   graphDataset={[
-                    comparativeData.intermediateConsumption.areaFootprint
+                    comparativeData.intermediateConsumptions.areaFootprint
                       .indicators[indic].value,
                     intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.intermediateConsumption.divisionFootprint
+                    comparativeData.intermediateConsumptions.divisionFootprint
                       .indicators[indic].value,
                   ]}
                   targetData={[
-                    comparativeData.intermediateConsumption.targetAreaFootprint
+                    comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+                    comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
                   ]}
@@ -399,21 +400,21 @@ const ResultSection = (props) =>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommations de capital fixe</h5>
                 <ComparativeGraphs
-                  id={"capitalConsumption-" + indic}
+                  id={"fixedCapitalConsumptions-" + indic}
                   graphDataset={[
-                    comparativeData.fixedCapitalConsumption.areaFootprint
+                    comparativeData.fixedCapitalConsumptions.areaFootprint
                       .indicators[indic].value,
                     fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.fixedCapitalConsumption.divisionFootprint
+                    comparativeData.fixedCapitalConsumptions.divisionFootprint
                       .indicators[indic].value,
                   ]}
                   targetData={[
-                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                    comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+                    comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
                   ]}
@@ -459,6 +460,7 @@ const ResultSection = (props) =>
               financialData={session.financialData}
               indic={indic}
               comparativeData={comparativeData}
+              period={period}
             />
           </Col>
           <Col lg={4} className="hidden">
@@ -481,9 +483,9 @@ const ResultSection = (props) =>
               branchData={[
                 comparativeData.production.divisionFootprint.indicators[indic]
                   .value,
-                comparativeData.intermediateConsumption.divisionFootprint
+                comparativeData.intermediateConsumptions.divisionFootprint
                   .indicators[indic].value,
-                comparativeData.fixedCapitalConsumption.divisionFootprint
+                comparativeData.fixedCapitalConsumptions.divisionFootprint
                   .indicators[indic].value,
                 comparativeData.netValueAdded.divisionFootprint.indicators[
                   indic
@@ -550,7 +552,7 @@ const ResultSection = (props) =>
               >
                 <p className="text-primary fw-bold text-center">
                   {
-                    comparativeData.intermediateConsumption.trendsFootprint
+                    comparativeData.intermediateConsumptions.trendsFootprint
                       .indicators[indic].meta.label
                   }
                 </p>
@@ -559,11 +561,11 @@ const ResultSection = (props) =>
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
-                    comparativeData.intermediateConsumption.trendsFootprint
+                    comparativeData.intermediateConsumptions.trendsFootprint
                       .indicators[indic]
                   }
                   target={
-                    comparativeData.intermediateConsumption
+                    comparativeData.intermediateConsumptions
                       .targetDivisionFootprint.indicators[indic]
                   }
                   current={
@@ -582,7 +584,7 @@ const ResultSection = (props) =>
               >
                 <p className="text-primary fw-bold text-center">
                   {
-                    comparativeData.fixedCapitalConsumption.trendsFootprint
+                    comparativeData.fixedCapitalConsumptions.trendsFootprint
                       .indicators[indic].meta.label
                   }
                 </p>
@@ -591,11 +593,11 @@ const ResultSection = (props) =>
                   unit={metaIndics[indic].unit}
                   code={comparativeDivision}
                   trends={
-                    comparativeData.fixedCapitalConsumption.trendsFootprint
+                    comparativeData.fixedCapitalConsumptions.trendsFootprint
                       .indicators[indic]
                   }
                   target={
-                    comparativeData.fixedCapitalConsumption
+                    comparativeData.fixedCapitalConsumptions
                       .targetDivisionFootprint.indicators[indic]
                   }
                   current={

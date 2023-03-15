@@ -68,11 +68,11 @@ export class AssessmentNRG extends React.Component
     this.state = 
     {
       // total consumption & uncertainty
-      energyConsumption: props.impactsData.energyConsumption,
-      energyConsumptionUncertainty: props.impactsData.energyConsumptionUncertainty,
+      energyConsumption: props.impactsData[props.period.periodKey].energyConsumption,
+      energyConsumptionUncertainty: props.impactsData[props.period.periodKey].energyConsumptionUncertainty,
 
       // details (by products)
-      nrgDetails: props.impactsData.nrgDetails,
+      nrgDetails: props.impactsData[props.period.periodKey].nrgDetails,
       
       // adding new product
       typeNewProduct: "",
@@ -776,7 +776,7 @@ export class AssessmentNRG extends React.Component
   // update props
   onSubmit = async () => 
   {
-    let { impactsData } = this.props;
+    let impactsData = this.props.impactsData[this.props.period.periodKey];
 
     // update nrg data
     impactsData.nrgDetails = this.state.nrgDetails;

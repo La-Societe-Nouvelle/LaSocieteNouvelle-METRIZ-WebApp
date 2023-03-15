@@ -98,7 +98,8 @@ const ZipGenerator = ({
           financialData,
           impactsData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
 
@@ -112,7 +113,8 @@ const ZipGenerator = ({
               indic,
               financialData,
               session.comparativeData,
-              false
+              false,
+              period
             )
           );
           break;
@@ -126,7 +128,8 @@ const ZipGenerator = ({
               metaIndics[indic].unit,
               financialData,
               session.comparativeData,
-              false
+              false,
+              period
             )
           );
           break;
@@ -143,7 +146,8 @@ const ZipGenerator = ({
               session.comparativeData,
               session.comparativeData.netValueAdded.trendsFootprint.indicators[indic]
                 .meta.label,
-              false
+              false,
+              period
             )
           );
         default:
@@ -237,7 +241,8 @@ const ZipGenerator = ({
           legalUnit,
           year,
           "Empreinte environnementale",
-          envOdds
+          envOdds,
+          period
         );
 
         docEES.addPage();
@@ -249,7 +254,8 @@ const ZipGenerator = ({
           legalUnit,
           year,
           "Empreinte économique et sociale",
-          seOdds
+          seOdds,
+          period
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
 

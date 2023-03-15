@@ -317,6 +317,8 @@ export class SirenSection extends React.Component
     if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
       this.setState({ isSyncButtonEnable });
     }
+    // temp
+    this.forceUpdate();
   }
 
   /* ---------- FILE IMPORT ---------- */

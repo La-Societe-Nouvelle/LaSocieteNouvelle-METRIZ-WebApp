@@ -171,6 +171,8 @@ function ImportSection(props)
   async function loadFECData(importedData) 
   {
     let FECData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
+    console.log("--------------------------------------------------");
+    console.log("Lecture des écritures comptables")
     console.log(FECData)
     if (FECData.errors.length > 0) {
       // show error(s) (content)

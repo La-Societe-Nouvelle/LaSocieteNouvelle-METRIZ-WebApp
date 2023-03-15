@@ -496,8 +496,6 @@ export async function FECDataReader(FECData)
   data.immobilisedProduction = [];        // 72
   data.otherOperatingIncomes = [];        // 74, 75, 781, 791
 
-  console.log(FECData.meta.accounts)
-
   // Stocks --------------------------------------------------------------------------------------------- //
   data.stocks = {};      
   Object.entries(FECData.meta.accounts)

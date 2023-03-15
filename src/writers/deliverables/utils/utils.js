@@ -1,9 +1,9 @@
 import { printValue } from "../../../utils/Utils";
 
-export function sortCompaniesByFootprint(expenses, indicator, order) {
+export function sortCompaniesByFootprint(expenses, period, indicator, order) {
   const sortedExpenses = expenses.sort((a, b) => {
-    const valueA = a.footprint.indicators[indicator].value;
-    const valueB = b.footprint.indicators[indicator].value;
+    const valueA = a.periodsData[period.periodKey].footprint.indicators[indicator].value;
+    const valueB = b.periodsData[period.periodKey].footprint.indicators[indicator].value;
     if (order === "asc") {
       return valueA - valueB;
     } else {

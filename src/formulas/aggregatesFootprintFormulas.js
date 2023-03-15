@@ -390,7 +390,7 @@ const updateStoredProductionFpt = async (indic,financialData,period) =>
   let finalProductionStockAmount = getAmountItems(productionStocks.map(stock => stock.states[period.dateEnd]));
   let finalProductionStockFootprint = await buildAggregateFootprint(productionStocks.map(stock => stock.states[period.dateEnd]));
 
-  financialData.storedProduction.periodsData[period.periodKey].footprint.indicators[indic]
+  financialData.productionAggregates.storedProduction.periodsData[period.periodKey].footprint.indicators[indic]
     = await buildDifferenceIndicator(indic,
       {amount: finalProductionStockAmount, footprint: finalProductionStockFootprint},     // final production
       {amount: initialProductionStockAmount, footprint: initialProductionStockFootprint}  // initial production
@@ -403,7 +403,7 @@ const updateStoredProductionFpt = async (indic,financialData,period) =>
 
 const updateImmobilisedProductionFpt = async (indic,financialData,period) =>
 {
-  financialData.immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic]
+  financialData.productionAggregates.immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic]
     = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
   return;
 }

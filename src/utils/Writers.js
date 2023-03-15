@@ -64,36 +64,37 @@ export const getAnalyse = (
   indic,
   period
 ) => {
-  const session = {
-    impactsData: impactsData,
+  const props = {
+    impactsData: impactsData[period.periodKey],
     financialData: financialData,
     comparativeData: comparativeData,
+    period: period
   };
 
   switch (indic) {
     case "art":
-      return analysisTextWriterART(session,period);
+      return analysisTextWriterART(props);
     case "idr":
-      return analysisTextWriterIDR(session,period);
+      return analysisTextWriterIDR(props);
     case "eco":
-      return analysisTextWriterECO(session,period);
+      return analysisTextWriterECO(props);
     case "geq":
-      return analysisTextWriterGEQ(session,period);
+      return analysisTextWriterGEQ(props);
     case "ghg":
-      return analysisTextWriterGHG(session,period);
+      return analysisTextWriterGHG(props);
     case "haz":
-      return analysisTextWriterHAZ(session,period);
+      return analysisTextWriterHAZ(props);
     case "knw":
-      return analysisTextWriterKNW(session,period);
+      return analysisTextWriterKNW(props);
     case "mat":
-      return analysisTextWriterMAT(session,period);
+      return analysisTextWriterMAT(props);
     case "nrg":
-      return analysisTextWriterNRG(session,period);
+      return analysisTextWriterNRG(props);
     case "soc":
-      return analysisTextWriterSOC(session,period);
+      return analysisTextWriterSOC(props);
     case "was":
-      return analysisTextWriterWAS(session,period);
+      return analysisTextWriterWAS(props);
     case "wat":
-      return analysisTextWriterWAT(session,period);
+      return analysisTextWriterWAT(props);
   }
 };

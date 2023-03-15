@@ -1,8 +1,8 @@
 // La Société Nouvelle
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterECO = (session,period) => {
-  const { impactsData, comparativeData, financialData } = session;
+export const analysisTextWriterECO = (props) => {
+  const { impactsData, comparativeData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
   const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
@@ -65,16 +65,16 @@ export const analysisTextWriterECO = (session,period) => {
   // comparaison branche
 
   if (
-    comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
+    comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
       .value != null
   ) {
     if (
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value >
-        comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
+        comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
           .value *
           0.9 &&
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value <
-        comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
+        comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
           .value *
           1.1
     ) {
@@ -84,7 +84,7 @@ export const analysisTextWriterECO = (session,period) => {
     }
     if (
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value >
-      comparativeData.intermediateConsumption.divisionFootprint.indicators.eco
+      comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
         .value
     ) {
       currentParagraph.push(

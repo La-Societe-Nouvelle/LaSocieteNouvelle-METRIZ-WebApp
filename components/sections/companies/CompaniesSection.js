@@ -33,6 +33,7 @@ export class ProvidersSection extends React.Component
     // if current state is for identified providers
     if (this.state.step==1) {
       const someProvidersUnidentified = this.props.session.financialData.providers.some((provider) => provider.useDefaultFootprint);
+      console.log(someProvidersUnidentified);
       if (someProvidersUnidentified) {
         this.setState({step: 2});
       } else {

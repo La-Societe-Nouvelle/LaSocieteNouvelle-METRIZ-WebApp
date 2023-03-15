@@ -1,25 +1,32 @@
-// PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-// Utils
-
-import { getShortCurrentDateString } from "../../utils/Utils";
 import { getAnalyse, getStatementNote } from "../../utils/Writers";
-import { SIGtableBody } from "./utils/SIGtableBody";
-import { loadFonts } from "./utils/utils";
-
-// Lib
+import { generateIndicTableBody } from "./utils/generateTableBody";
 import divisions from "/lib/divisions";
 
 // --------------------------------------------------------------------------
-//  Indice Indicator Report
-// --------------------------------------------------------------------------
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-//Call function to load fonts
-loadFonts();
+pdfMake.fonts = {
+  Raleway: {
+    normal:
+      "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf",
+    bold: "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Bold.ttf",
+  },
+  // download default Roboto font from cdnjs.com
+  Roboto: {
+    normal:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
+    bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
+    italics:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
+    bolditalics:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
+  },
+};
 
-export const createIndicReport = (
+export const basicPDFReport = (
   year,
   legalUnit,
   indic,
@@ -31,21 +38,15 @@ export const createIndicReport = (
   download
 ) => {
   // ---------------------------------------------------------------
-  // Utils : Text Generation
 
-  const statementNotes = getStatementNote(impactsData, indic);
+  const currentDate = new Date();
+  const date = currentDate.toLocaleString("fr-FR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 
-  const analysisNotes = getAnalyse(
-    impactsData,
-    financialData,
-    comparativeData,
-    indic,
-    period
-  );
- 
-  // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
-
   const canvasProduction = document.getElementById("production-" + indic);
   const canvasValueAdded = document.getElementById("netValueAdded-" + indic);
   const canvasIntermediateConsumptions = document.getElementById(
@@ -61,6 +62,19 @@ export const createIndicReport = (
   const canvasValueAddedImage = canvasValueAdded.toDataURL("image/png");
   const canvasFixedCapitalConsumptionsImage =
     canvasFixedCapitalConsumptions.toDataURL("image/png");
+
+  // ---------------------------------------------------------------
+  // Text Generation
+
+  const statementNotes = getStatementNote(impactsData, indic);
+
+  const analysisNotes = getAnalyse(
+    impactsData,
+    financialData,
+    comparativeData,
+    indic,
+    period
+  );
 
   // ---------------------------------------------------------------
   // Document Property
@@ -88,6 +102,7 @@ export const createIndicReport = (
   // PDF Content and Layout
   const docDefinition = {
     pageSize: pageSize,
+    // [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
@@ -100,23 +115,26 @@ export const createIndicReport = (
         },
       ],
     },
-    footer: function () {
+    footer: function (currentPage, pageCount) {
       return {
         columns: [
           {
-            text: "Edité le " + getShortCurrentDateString(),
+            text: "Edité le " + date,
             margin: [20, 25, 0, 0],
-            font: "Raleway",
-            fontSize: 7,
+          },
+          {
+            text: "Page " + currentPage.toString() + " sur " + pageCount,
+            alignment: "right",
+            margin: [0, 25, 20, 0],
           },
         ],
+
+        fontSize: 7,
       };
     },
-
     background: function () {
       return {
         canvas: [
-          // Background
           {
             type: "rect",
             x: 0,
@@ -145,19 +163,18 @@ export const createIndicReport = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
+      // TO DO : Create external function to create content to import
       { text: "Résultat - " + label, style: "header" },
-      //--------------------------------------------------
       {
         text: "Empreintes de vos Soldes Intermédiaires de Gestion",
         style: "h2",
         margin: [0, 10, 0, 20],
       },
-      // SIG Table
       {
         style: "table",
         table: {
           widths: ["*", "auto", "auto", "auto"],
-          body: SIGtableBody(
+          body: generateIndicTableBody(
             financialData.mainAggregates,
             financialData.productionAggregates,
             indic,
@@ -184,28 +201,23 @@ export const createIndicReport = (
             return i === 0 || i === node.table.widths.length ? "#f0f0f8" : "";
           },
           hLineColor: function (i, node) {
-            return i === 0 ? "" : "#f0f0f8";
+            return i === 0 ? "#191558" : "#f0f0f8";
           },
         },
       },
-      //--------------------------------------------------
       { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
       statementNotes.map((note) => note),
       { text: impactsData.comments[indic], margin: [0, 10, 0, 10] },
 
-      // ---------------------------------------------------------------------------
-      //  PAGE 2
+      // -- PAGE 2-------------------------------------------------------------------------
       {
         text: "Analyse - " + label,
         style: "header",
         pageBreak: "before",
       },
-      // Analysis note
 
-      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] }, 
-      analysisNotes.map((note) => ({ text: note.reduce((a, b) => a + " " + b), style: "text", fontSize: 9 })),
-      // ---------------------------------------------------------------------------
-      // Charts
+      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
+      analysisNotes.map((note) => ({ text: note, style: "text", fontSize: 9 })),
       {
         text: "Comparaisons",
         style: "h2",
@@ -397,8 +409,6 @@ export const createIndicReport = (
         ],
       },
     ],
-    // ---------------------------------------------------------------------------
-    // Style
     defaultStyle: {
       fontSize: 10,
       color: "#191558",

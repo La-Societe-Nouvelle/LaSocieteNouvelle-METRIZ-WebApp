@@ -84,13 +84,13 @@ export class AssessmentGHG extends React.Component {
     super(props);
     this.state = {
       // total ghg emissions & uncertainty
-      greenhousesGazEmissions: props.impactsData.greenhousesGazEmissions,
+      greenhousesGazEmissions: props.impactsData[props.period.periodKey].greenhousesGazEmissions,
       greenhousesGazEmissionsUncertainty:
-        props.impactsData.greenhousesGazEmissionsUncertainty,
+        props.impactsData[props.period.periodKey].greenhousesGazEmissionsUncertainty,
 
       // details
-      ghgDetails: props.impactsData.ghgDetails,
-      nrgTotal: props.impactsData.nrgTotal,
+      ghgDetails: props.impactsData[props.period.periodKey].ghgDetails,
+      nrgTotal: props.impactsData[props.period.periodKey].nrgTotal,
       // adding new factor
       newFactorAssessmentItem: "",
       // alert message
@@ -1225,7 +1225,7 @@ export class AssessmentGHG extends React.Component {
 
   // update props
   onSubmit = async () => {
-    let impactsData = this.props.impactsData;
+    let impactsData = this.props.impactsData[this.props.period.periodKey];
 
     // update ghg data
     impactsData.ghgDetails = this.state.ghgDetails;

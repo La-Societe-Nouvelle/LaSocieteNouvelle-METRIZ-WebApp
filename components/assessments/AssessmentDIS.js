@@ -34,15 +34,16 @@ import { XLSXSocialDataBuilder } from "../../src/readers/SocialDataContentReader
  *    inputs
  */
 
-export class AssessmentDIS extends React.Component {
+export class AssessmentDIS extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
       // gini index
-      indexGini: props.impactsData.indexGini,
+      indexGini: props.impactsData[props.period.periodKey].indexGini,
       // details
-      hasEmployees: props.impactsData.hasEmployees,
-      employees: props.impactsData.employees,
+      hasEmployees: props.impactsData[props.period.periodKey].hasEmployees,
+      employees: props.impactsData[props.period.periodKey].employees,
       // display
       columnSorted: "id",
       reverseSort: false,
@@ -51,8 +52,8 @@ export class AssessmentDIS extends React.Component {
 
   componentDidUpdate(prevProps) 
   {
-    if (prevProps.impactsData.employees != this.state.employees) {
-      this.props.impactsData.employees = this.state.employees;
+    if (prevProps.impactsData[this.props.period.periodKey].employees != this.state.employees) {
+      this.props.impactsData[this.props.period.periodKey].employees = this.state.employees;
     }
   }
 
@@ -191,7 +192,7 @@ export class AssessmentDIS extends React.Component {
   // Submit
   onSubmit = async () => 
   {
-    let impactsData = this.props.impactsData;
+    let impactsData = this.props.impactsData[period.periodKey];
 
     // update dis data
     //impactsData.indexGini = getIndexGini(impactsData.employees);
@@ -316,7 +317,7 @@ export class AssessmentDIS extends React.Component {
   // Update -> needed ?
   updateSocialData = (nextProps) => 
   {
-    let employee = this.props.impactsData.employees.filter((employee) => employee.id == nextProps.id)[0];
+    let employee = this.props.impactsData[this.props.period.periodKey].employees.filter((employee) => employee.id == nextProps.id)[0];
     if (employee == undefined) {
       this.addEmployee();
     } else {

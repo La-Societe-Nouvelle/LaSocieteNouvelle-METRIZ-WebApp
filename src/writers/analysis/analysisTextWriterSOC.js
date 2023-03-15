@@ -2,8 +2,8 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterSOC = (session,period) => {
-  const { impactsData, financialData } = session;
+export const analysisTextWriterSOC = (props) => {
+  const { impactsData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
   const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
@@ -71,7 +71,7 @@ export const analysisTextWriterSOC = (session,period) => {
       " soit un montant de " +
       printValue(
         mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
-          mainAggregates.intermediateConsumption.periodsData[period.periodKey].amount
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +

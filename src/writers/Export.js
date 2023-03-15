@@ -222,7 +222,7 @@ function generateFootprintPDF(
   doc.text("Production", x + 2, y);
   doc.setFontSize(6);
 
-  doc.text(printValue(production.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(production.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
     align: "right",
   });
 
@@ -232,7 +232,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "bold");
 
     doc.text(
-      printValue(production.footprint.indicators[indic].getValue(), 1),
+      printValue(production.periodsData[period.periodKey].footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
@@ -241,7 +241,7 @@ function generateFootprintPDF(
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(
-      printValue(production.footprint.indicators[indic].getUncertainty(), 0) +
+      printValue(production.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0) +
         "%",
       xValue + 12,
       y,
@@ -249,8 +249,8 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        production.footprint.indicators[indic].getGrossImpact(
-          production.amount
+        production.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+          production.periodsData[period.periodKey].amount
         ),
         0
       ),
@@ -268,13 +268,13 @@ function generateFootprintPDF(
   doc.setFontSize(7);
   doc.text("dont Chiffre d'affaires", x + 2, y);
   doc.setFontSize(6);
-  doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(revenue.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
     align: "right",
   });
 
   indic.forEach((indic) => {
     if (
-      printValue(revenue.footprint.indicators[indic].getValue(), 1) != " - "
+      printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getValue(), 1) != " - "
     ) {
       doc.setFont("Helvetica", "bold");
       doc.setFillColor(255, 138, 142);
@@ -283,7 +283,7 @@ function generateFootprintPDF(
 
     doc.setFontSize(6);
     doc.text(
-      printValue(revenue.footprint.indicators[indic].getValue(), 1),
+      printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
@@ -293,14 +293,14 @@ function generateFootprintPDF(
 
     doc.setFontSize(5);
     doc.text(
-      printValue(revenue.footprint.indicators[indic].getUncertainty(), 0) + "%",
+      printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0) + "%",
       xValue + 12,
       y,
       { align: "right" }
     );
     doc.text(
       printValue(
-        revenue.footprint.indicators[indic].getGrossImpact(revenue.amount),
+        revenue.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(revenue.periodsData[period.periodKey].amount),
         0
       ),
       xValue + 24,
@@ -319,14 +319,14 @@ function generateFootprintPDF(
   doc.text("dont Production stockée", x + 2, y);
 
   doc.setFontSize(6);
-  doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(storedProduction.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
     align: "right",
   });
 
   indic.forEach((indic) => {
     doc.setFontSize(6);
     doc.text(
-      printValue(storedProduction.footprint.indicators[indic].getValue(), 1),
+      printValue(storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
@@ -334,7 +334,7 @@ function generateFootprintPDF(
     doc.setFontSize(5);
     doc.text(
       printValue(
-        storedProduction.footprint.indicators[indic].getUncertainty(),
+        storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -343,8 +343,8 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        storedProduction.footprint.indicators[indic].getGrossImpact(
-          storedProduction.amount
+        storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+          storedProduction.periodsData[period.periodKey].amount
         ),
         0
       ),
@@ -368,14 +368,14 @@ function generateFootprintPDF(
     doc.text("dont Production immobilisée", x + 2, y);
     doc.setFontSize(6);
 
-    doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, {
+    doc.text(printValue(immobilisedProduction.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
       align: "right",
     });
 
     indic.forEach((indic) => {
       doc.text(
         printValue(
-          immobilisedProduction.footprint.indicators[indic].getValue(),
+          immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getValue(),
           1
         ),
         xValue,
@@ -384,7 +384,7 @@ function generateFootprintPDF(
       );
       doc.text(
         printValue(
-          immobilisedProduction.footprint.indicators[indic].getUncertainty(),
+          immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),
           0
         ) + "%",
         xValue + 12,
@@ -393,8 +393,8 @@ function generateFootprintPDF(
       );
       doc.text(
         printValue(
-          immobilisedProduction.footprint.indicators[indic].getGrossImpact(
-            immobilisedProduction.amount
+          immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+            immobilisedProduction.periodsData[period.periodKey].amount
           ),
           0
         ),
@@ -417,7 +417,7 @@ function generateFootprintPDF(
 
   doc.setFontSize(6);
 
-  doc.text(printValue(intermediateConsumptions.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
     align: "right",
   });
 
@@ -427,7 +427,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "bold");
     doc.text(
       printValue(
-        intermediateConsumptions.footprint.indicators[indic].getValue(),
+        intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getValue(),
         1
       ),
       xValue,
@@ -438,7 +438,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        intermediateConsumptions.footprint.indicators[indic].getUncertainty(),
+        intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -447,8 +447,8 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        intermediateConsumptions.footprint.indicators[indic].getGrossImpact(
-          intermediateConsumptions.amount
+        intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+          intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ),
@@ -512,7 +512,7 @@ function generateFootprintPDF(
     y
   );
   doc.setFontSize(6);
-  doc.text(printValue(fixedCapitalConsumptions.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
     align: "right",
   });
   xValue = x + 64;
@@ -520,7 +520,7 @@ function generateFootprintPDF(
   indic.forEach((indic) => {
     doc.setFont("Helvetica", "bold");
     doc.text(
-      printValue(fixedCapitalConsumptions.footprint.indicators[indic].getValue(), 1),
+      printValue(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
@@ -528,7 +528,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        fixedCapitalConsumptions.footprint.indicators[indic].getUncertainty(),
+        fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -537,8 +537,8 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        fixedCapitalConsumptions.footprint.indicators[indic].getGrossImpact(
-          fixedCapitalConsumptions.amount
+        fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+          fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ),
@@ -601,7 +601,7 @@ function generateFootprintPDF(
   doc.text("Valeur ajoutée nette", x + 2, y);
 
   doc.setFontSize(6);
-  doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, {
+  doc.text(printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
     align: "right",
   });
 
@@ -610,7 +610,7 @@ function generateFootprintPDF(
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
     doc.text(
-      printValue(netValueAdded.footprint.indicators[indic].getValue(), 1),
+      printValue(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getValue(), 1),
       xValue,
       y,
       { align: "right" }
@@ -619,7 +619,7 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        netValueAdded.footprint.indicators[indic].getUncertainty(),
+        netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -629,8 +629,8 @@ function generateFootprintPDF(
 
     doc.text(
       printValue(
-        netValueAdded.footprint.indicators[indic].getGrossImpact(
-          netValueAdded.amount
+        netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+          netValueAdded.periodsData[period.periodKey].amount
         ),
         0
       ),

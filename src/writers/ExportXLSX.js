@@ -95,39 +95,39 @@ async function buildMainAggregatesContent(indic,session)
 
   aoaContent.push([
     "Production",
-    roundValue(production.amount, 0),
-    roundValue(production.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(production.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(production.periodsData[period.periodKey].amount, 0),
+    roundValue(production.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(production.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   aoaContent.push([
     "   Production vendue",
-    roundValue(revenue.amount, 0),
-    roundValue(revenue.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(revenue.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(revenue.periodsData[period.periodKey].amount, 0),
+    roundValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   aoaContent.push([
     "   Production stockée",
-    roundValue(storedProduction.amount, 0),
-    roundValue(storedProduction.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(storedProduction.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(storedProduction.periodsData[period.periodKey].amount, 0),
+    roundValue(storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   aoaContent.push([
     "   Production immobilisée",
-    roundValue(immobilisedProduction.amount, 0),
-    roundValue(immobilisedProduction.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(immobilisedProduction.periodsData[period.periodKey].amount, 0),
+    roundValue(immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   // Consommations intermédiaires
 
   aoaContent.push([
     "Consommations intermédiaires",
-    roundValue(intermediateConsumptions.amount, 0),
-    roundValue(intermediateConsumptions.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(intermediateConsumptions.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0),
+    roundValue(intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   const intermediateConsumptionsAggregates =
@@ -149,9 +149,9 @@ async function buildMainAggregatesContent(indic,session)
 
   aoaContent.push([
     "Consommations de capital fixe",
-    roundValue(fixedCapitalConsumptions.amount, 0),
-    roundValue(fixedCapitalConsumptions.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(fixedCapitalConsumptions.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0),
+    roundValue(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   const fixedCapitalConsumptionsAggregates =
@@ -172,9 +172,9 @@ async function buildMainAggregatesContent(indic,session)
   // Net Value Added
   aoaContent.push([
     "Valeur ajoutée nette",
-    roundValue(netValueAdded.amount, 0),
-    roundValue(netValueAdded.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(netValueAdded.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(netValueAdded.periodsData[period.periodKey].amount, 0),
+    roundValue(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   return aoaContent;

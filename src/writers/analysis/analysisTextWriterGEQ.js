@@ -2,8 +2,8 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterGEQ = (session,period) => {
-  const { impactsData, financialData } = session;
+export const analysisTextWriterGEQ = (props) => {
+  const { impactsData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
   const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 

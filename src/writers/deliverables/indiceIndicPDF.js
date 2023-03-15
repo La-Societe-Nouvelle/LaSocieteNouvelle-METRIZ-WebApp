@@ -35,7 +35,8 @@ export const createIndiceIndicatorPDF = (
   unit,
   financialData,
   comparativeData,
-  download
+  download,
+  period
 ) => {
   // ---------------------------------------------------------------
   // Variables
@@ -43,14 +44,17 @@ export const createIndiceIndicatorPDF = (
   const divisionName = divisions[comparativeData.activityCode];
 
   const {
-    production,
     revenue,
-    netValueAdded,
-    intermediateConsumption,
-    capitalConsumption,
-  } = financialData.aggregates;
+  } = financialData.productionAggregates;
 
-  const totalRevenue = revenue.amount;
+  const {
+    production,
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+  } = financialData.mainAggregates;
+
+  const totalRevenue = revenue.periodsData[period.periodKey].amount;
 
   // ---------------------------------------------------------------
   // utils
@@ -71,20 +75,22 @@ export const createIndiceIndicatorPDF = (
     calculateAverageEvolutionRate(lastEstimatedData);
 
   const firstMostImpactfulCompanies = sortCompaniesByFootprint(
-    financialData.companies,
+    financialData.providers,
+    period,
     indic,
     "desc"
   ).slice(0, 2);
 
   const scdMostImpactfulCompanies = sortCompaniesByFootprint(
-    financialData.companies,
+    financialData.providers,
+    period,
     indic,
     "desc"
   ).slice(2, 4);
 
   const uncertaintyText = getUncertaintyDescription(
     "indice",
-    production.footprint.indicators[indic].uncertainty
+    production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty
   );
 
   // ---------------------------------------------------------------
@@ -268,7 +274,7 @@ export const createIndiceIndicatorPDF = (
                 margin: [0, 5, 0, 5],
                 text:
                   printValue(
-                    production.footprint.indicators[indic].value,
+                    revenue.periodsData[period.periodKey].footprint.indicators[indic].value,
                     precision
                   ) +
                   " " +
@@ -312,7 +318,7 @@ export const createIndiceIndicatorPDF = (
                 text: [
                   {
                     text: printValue(
-                      production.footprint.indicators[indic].value,
+                      production.periodsData[period.periodKey].footprint.indicators[indic].value,
                       precision
                     ),
                   },
@@ -345,7 +351,7 @@ export const createIndiceIndicatorPDF = (
                 text: [
                   {
                     text: printValue(
-                      intermediateConsumption.footprint.indicators[indic].value,
+                      intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
                       precision
                     ),
                   },
@@ -378,7 +384,7 @@ export const createIndiceIndicatorPDF = (
                 text: [
                   {
                     text: printValue(
-                      capitalConsumption.footprint.indicators[indic].value,
+                      fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
                       precision
                     ),
                   },
@@ -411,7 +417,7 @@ export const createIndiceIndicatorPDF = (
                 text: [
                   {
                     text: printValue(
-                      netValueAdded.footprint.indicators[indic].value,
+                      netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
                       precision
                     ),
                   },
@@ -524,7 +530,7 @@ export const createIndiceIndicatorPDF = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(production.amount, 0) + " €",
+                    text: printValue(production.periodsData[period.periodKey].amount, 0) + " €",
                     margin: [2, 7, 2, 8],
                     alignment: "right",
                   },
@@ -534,7 +540,7 @@ export const createIndiceIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              production.footprint.indicators[indic].value,
+                              production.periodsData[period.periodKey].footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -547,7 +553,7 @@ export const createIndiceIndicatorPDF = (
 
                   {
                     text: printValue(
-                      production.footprint.indicators[indic].uncertainty,
+                      production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",
@@ -562,7 +568,7 @@ export const createIndiceIndicatorPDF = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(intermediateConsumption.amount, 0) + " €",
+                    text: printValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -573,7 +579,7 @@ export const createIndiceIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              intermediateConsumption.footprint.indicators[
+                              intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
                                 indic
                               ].value,
                               precision
@@ -587,7 +593,7 @@ export const createIndiceIndicatorPDF = (
                   },
                   {
                     text: printValue(
-                      intermediateConsumption.footprint.indicators[indic]
+                      intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                         .uncertainty,
                       0
                     ),
@@ -603,7 +609,7 @@ export const createIndiceIndicatorPDF = (
                     margin: [2, 7, 2, 8],
                   },
                   {
-                    text: printValue(capitalConsumption.amount, 0) + " €",
+                    text: printValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -615,7 +621,7 @@ export const createIndiceIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              capitalConsumption.footprint.indicators[indic]
+                              fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                                 .value,
                               precision
                             ),
@@ -626,7 +632,7 @@ export const createIndiceIndicatorPDF = (
                   },
                   {
                     text: printValue(
-                      capitalConsumption.footprint.indicators[indic]
+                      fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                         .uncertainty,
                       0
                     ),
@@ -642,7 +648,7 @@ export const createIndiceIndicatorPDF = (
                     margin: [2, 7, 2, 8],
                   },
                   {
-                    text: printValue(netValueAdded.amount, 0) + " €",
+                    text: printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -652,7 +658,7 @@ export const createIndiceIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              netValueAdded.footprint.indicators[indic].value,
+                              netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -665,7 +671,7 @@ export const createIndiceIndicatorPDF = (
 
                   {
                     text: printValue(
-                      netValueAdded.footprint.indicators[indic].uncertainty,
+                      netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",

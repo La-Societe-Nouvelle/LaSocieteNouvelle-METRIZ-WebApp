@@ -10,7 +10,7 @@ export class ComparativeData {
 
     //Get Comparative footprint for each aggreagate
 
-    this.fixedCapitalConsumption = props.fixedCapitalConsumption || {
+    this.fixedCapitalConsumptions = props.fixedCapitalConsumptions || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
@@ -18,7 +18,7 @@ export class ComparativeData {
       trendsFootprint: new HistoricalFootprint(),
     };  
 
-    this.intermediateConsumption = props.intermediateConsumption || {
+    this.intermediateConsumptions = props.intermediateConsumptions || {
       areaFootprint: new ComparativeFootprint(),
       targetAreaFootprint: new ComparativeFootprint(),
       divisionFootprint: new ComparativeFootprint(),
@@ -51,23 +51,23 @@ export async function updateHistoricalFootprint(
   newComparativeData,
   serie
 ) {
-  let newFixedCapitalConsumption;
+  let newFixedCapitalConsumptions;
   
-  newFixedCapitalConsumption = Object.assign(
+  newFixedCapitalConsumptions = Object.assign(
     {},
-    prevComparativeData.fixedCapitalConsumption[serie].indicators,
+    prevComparativeData.fixedCapitalConsumptions[serie].indicators,
     {
-      ...prevComparativeData.fixedCapitalConsumption[serie].indicators,
-      [indic]: newComparativeData.fixedCapitalConsumption,
+      ...prevComparativeData.fixedCapitalConsumptions[serie].indicators,
+      [indic]: newComparativeData.fixedCapitalConsumptions,
     }
   );
 
-  const newIntermediateConsumption = Object.assign(
+  const newIntermediateConsumptions = Object.assign(
     {},
-    prevComparativeData.intermediateConsumption[serie].indicators,
+    prevComparativeData.intermediateConsumptions[serie].indicators,
     {
-      ...prevComparativeData.intermediateConsumption[serie].indicators,
-      [indic]: newComparativeData.intermediateConsumption,
+      ...prevComparativeData.intermediateConsumptions[serie].indicators,
+      [indic]: newComparativeData.intermediateConsumptions,
     }
   );
 
@@ -90,16 +90,16 @@ export async function updateHistoricalFootprint(
   );
 
   const updatedHistoricalFootprint = Object.assign({}, prevComparativeData, {
-    fixedCapitalConsumption: {
-      ...prevComparativeData.fixedCapitalConsumption,
+    fixedCapitalConsumptions: {
+      ...prevComparativeData.fixedCapitalConsumptions,
       [serie]: {
-        indicators: newFixedCapitalConsumption,
+        indicators: newFixedCapitalConsumptions,
       },
     },
-    intermediateConsumption: {
-      ...prevComparativeData.intermediateConsumption,
+    intermediateConsumptions: {
+      ...prevComparativeData.intermediateConsumptions,
       [serie]: {
-        indicators: newIntermediateConsumption,
+        indicators: newIntermediateConsumptions,
       },
     },
     netValueAdded: {
@@ -125,35 +125,35 @@ export async function updateComparativeFootprint(
   newComparativeData,
   serie
 ) {
-  let newFixedCapitalConsumption;
+  let newFixedCapitalConsumptions;
 
-    newFixedCapitalConsumption = Object.assign(
+    newFixedCapitalConsumptions = Object.assign(
       {},
-      prevComparativeData.fixedCapitalConsumption[serie].indicators,
+      prevComparativeData.fixedCapitalConsumptions[serie].indicators,
       {
-        ...prevComparativeData.fixedCapitalConsumption[serie].indicators,
+        ...prevComparativeData.fixedCapitalConsumptions[serie].indicators,
         [indic]: {
-          value: newComparativeData.fixedCapitalConsumption
-            ? newComparativeData.fixedCapitalConsumption.value
+          value: newComparativeData.fixedCapitalConsumptions
+            ? newComparativeData.fixedCapitalConsumptions.value
             : null,
-          flag: newComparativeData.fixedCapitalConsumption
-            ? newComparativeData.fixedCapitalConsumption.flag
+          flag: newComparativeData.fixedCapitalConsumptions
+            ? newComparativeData.fixedCapitalConsumptions.flag
             : null,
         },
       }
     );
 
-  const newIntermediateConsumption = Object.assign(
+  const newIntermediateConsumptions = Object.assign(
     {},
-    prevComparativeData.intermediateConsumption[serie].indicators,
+    prevComparativeData.intermediateConsumptions[serie].indicators,
     {
-      ...prevComparativeData.intermediateConsumption[serie].indicators,
+      ...prevComparativeData.intermediateConsumptions[serie].indicators,
       [indic]: {
         value: newComparativeData.intermediateConsumption
-          ? newComparativeData.intermediateConsumption.value
+          ? newComparativeData.intermediateConsumptions.value
           : null,
         flag: newComparativeData.intermediateConsumption
-          ? newComparativeData.intermediateConsumption.flag
+          ? newComparativeData.intermediateConsumptions.flag
           : null,
       },
     }
@@ -192,16 +192,16 @@ export async function updateComparativeFootprint(
   );
 
   const updatedAggregatesFootprint = Object.assign({}, prevComparativeData, {
-    fixedCapitalConsumption: {
-      ...prevComparativeData.fixedCapitalConsumption,
+    fixedCapitalConsumptions: {
+      ...prevComparativeData.fixedCapitalConsumptions,
       [serie]: {
-        indicators: newFixedCapitalConsumption,
+        indicators: newFixedCapitalConsumptions,
       },
     },
-    intermediateConsumption: {
-      ...prevComparativeData.intermediateConsumption,
+    intermediateConsumptions: {
+      ...prevComparativeData.intermediateConsumptions,
       [serie]: {
-        indicators: newIntermediateConsumption,
+        indicators: newIntermediateConsumptions,
       },
     },
     netValueAdded: {

@@ -2,8 +2,8 @@
 
 import { compareToReference, printValue } from "../../utils/Utils";
 
-export const analysisTextWriterGHG = (session,period) => {
-  const { impactsData, comparativeData, financialData } = session;
+export const analysisTextWriterGHG = (props) => {
+  const { impactsData, comparativeData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
   const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
@@ -157,8 +157,8 @@ export const analysisTextWriterGHG = (session,period) => {
     mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
     ) >
-      mainAggregates.capitalConsumption.footprint.indicators.ghg.getGrossImpact(
-        mainAggregates.capitalConsumption.amount
+      mainAggregates.fixedCapitalConsumptions.footprint.indicators.ghg.getGrossImpact(
+        mainAggregates.fixedCapitalConsumptions.amount
       )
   ) {
     currentParagraph.push(
@@ -182,12 +182,12 @@ export const analysisTextWriterGHG = (session,period) => {
   // comparaison branche
 
   if (
-    comparativeData.intermediateConsumption.divisionFootprint.indicators.ghg
+    comparativeData.intermediateConsumptions.divisionFootprint.indicators.ghg
       .value != null
   ) {
     let comparison = compareToReference(
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.value,
-      comparativeData.intermediateConsumption.divisionFootprint.indicators.ghg
+      comparativeData.intermediateConsumptions.divisionFootprint.indicators.ghg
         .value,
       10
     );

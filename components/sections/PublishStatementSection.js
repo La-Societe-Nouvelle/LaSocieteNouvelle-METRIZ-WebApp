@@ -42,8 +42,8 @@ export class PublishStatementSection extends React.Component
 
             // Statements 
             revenueFootprint: props.session.financialData.productionAggregates.revenue.periodsData[props.period.periodKey].footprint,
-            validations: props.session.validations,
-            comments: props.session.impactsData.comments || {},
+            validations: props.session.validations[props.period.periodKey],
+            comments: props.session.impactsData[props.period.periodKey].comments || {},
 
             // declarant 
             declarant: "",

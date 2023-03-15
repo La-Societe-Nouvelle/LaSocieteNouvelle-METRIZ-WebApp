@@ -55,9 +55,9 @@ export class FinancialData {
       // Production items ------------------------ //
 
       this.productionAggregates = {
-        revenue: new Aggregate(data.revenue),                                                                                       // revenue (#71)
-        storedProduction: new Aggregate(data.storedProduction),                                                                     // stored production (#71)
-        immobilisedProduction: new Aggregate(data.immobilisedProduction),                                                           // immobilised production (#72)
+        revenue: new Aggregate(data.productionAggregates.revenue),                                                                  // revenue (#71)
+        storedProduction: new Aggregate(data.productionAggregates.storedProduction),                                                // stored production (#71)
+        immobilisedProduction: new Aggregate(data.productionAggregates.immobilisedProduction),                                      // immobilised production (#72)
       }
 
       // External expenses ----------------------- //
@@ -137,7 +137,7 @@ export class FinancialData {
 
     // Production items ------------------------ //
 
-    await this.buildProductionItems(FECData, periods);
+    await this.buildProductionAggregates(FECData, periods);
 
     // External expenses ----------------------- //
 
@@ -216,7 +216,9 @@ export class FinancialData {
 
   /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
 
-  buildProductionItems = async (FECData, periods) => {
+  buildProductionAggregates = async (FECData, periods) => 
+  {
+    this.productionAggregates = {};
     // revenue (#70)
     this.productionAggregates.revenue = buildAggregateFromItems({
       id: "revenue",
@@ -501,9 +503,9 @@ export class FinancialData {
 
     //immobilisedProduction
 
-    this.immobilisedProduction = mergePeriodsData(
-      this.immobilisedProduction,
-      prevFinancialData.immobilisedProduction
+    this.productionAggregates.immobilisedProduction = mergePeriodsData(
+      this.productionAggregates.immobilisedProduction,
+      prevFinancialData.productionAggregates.immobilisedProduction
     );
 
     // Merge with previous investments
@@ -522,19 +524,21 @@ export class FinancialData {
     
     this.providers = mergeProviders(this.providers, prevFinancialData.providers);
 
-    this.revenue = mergePeriodsData(
-      this.revenue,
-      prevFinancialData.revenue
+    // Production aggregates
+
+    this.productionAggregates.revenue = mergePeriodsData(
+      this.productionAggregates.revenue,
+      prevFinancialData.productionAggregates.revenue
     );
 
-    this.stockVariationAccounts = mergePeriodsAccounts(
-      this.stockVariationAccounts,
-      prevFinancialData.stockVariationAccounts
+    this.productionAggregates.stockVariationAccounts = mergePeriodsAccounts(
+      this.productionAggregates.stockVariationAccounts,
+      prevFinancialData.productionAggregates.stockVariationAccounts
     );
 
-    this.storedProduction = mergePeriodsData(
-      this.storedProduction,
-      prevFinancialData.storedProduction
+    this.productionAggregates.storedProduction = mergePeriodsData(
+      this.productionAggregates.storedProduction,
+      prevFinancialData.productionAggregates.storedProduction
     );
 
     this.stockVariations = mergeAccounts(this.stockVariations, prevFinancialData.stockVariations);

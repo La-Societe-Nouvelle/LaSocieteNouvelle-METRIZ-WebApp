@@ -241,6 +241,8 @@ export class SectorSection extends React.Component
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
+    // temp
+    this.forceUpdate();
   }
 }
 

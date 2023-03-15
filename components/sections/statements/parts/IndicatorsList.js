@@ -324,21 +324,21 @@ const IndicatorsList = (props) => {
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"intermediateConsumption-" + indic}
+                  id={"intermediateConsumptions-" + indic}
                   graphDataset={[
-                    comparativeData.intermediateConsumption.areaFootprint
+                    comparativeData.intermediateConsumptions.areaFootprint
                       .indicators[indic].value,
                     props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.intermediateConsumption.divisionFootprint
+                    comparativeData.intermediateConsumptions.divisionFootprint
                       .indicators[indic].value,
                   ]}
                   targetData={[
-                    comparativeData.intermediateConsumption.targetAreaFootprint
+                    comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+                    comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
                   ]}
@@ -348,21 +348,21 @@ const IndicatorsList = (props) => {
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"capitalConsumption-" + indic}
+                  id={"fixedCapitalConsumptions-" + indic}
                   graphDataset={[
-                    comparativeData.fixedCapitalConsumption.areaFootprint
+                    comparativeData.fixedCapitalConsumptions.areaFootprint
                       .indicators[indic].value,
                     props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                       indic
                     ).value,
-                    comparativeData.fixedCapitalConsumption.divisionFootprint
+                    comparativeData.fixedCapitalConsumptions.divisionFootprint
                       .indicators[indic].value,
                   ]}
                   targetData={[
-                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                    comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
                     null,
-                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+                    comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
                   ]}
@@ -403,7 +403,7 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates.production
+                        props.session.financialData.mainAggregates.production.periodsData[period.periodKey]
                           .footprint.indicators[indic].value,
                         metaIndics[indic].nbDecimals
                       )}
@@ -416,8 +416,8 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates
-                          .intermediateConsumption.footprint.indicators[indic]
+                        props.session.financialData.mainAggregates
+                          .intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                           .value,
                         metaIndics[indic].nbDecimals
                       )}
@@ -430,8 +430,8 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates
-                          .capitalConsumption.footprint.indicators[indic].value,
+                        props.session.financialData.mainAggregates
+                          .fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
                         metaIndics[indic].nbDecimals
                       )}
                       title={"Consommation de capital fixe"}
@@ -443,7 +443,7 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+                        props.session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators[
                           indic
                         ].getValue(),
                         metaIndics[indic].nbDecimals
@@ -462,22 +462,22 @@ const IndicatorsList = (props) => {
                   <Col sm={3}>
                     <GrossImpactChart
                       id={"part-" + indic}
-                      intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
+                      intermediateConsumptions={props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
                         indic
                       ].getGrossImpact(
-                        props.session.financialData.aggregates
-                          .intermediateConsumption.amount
+                        props.session.financialData.mainAggregates
+                          .intermediateConsumptions.periodsData[period.periodKey].amount
                       )}
-                      capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
+                      fixedCapitalConsumptions={props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[
                         indic
                       ].getGrossImpact(
-                        props.session.financialData.aggregates
-                          .capitalConsumption.amount
+                        props.session.financialData.mainAggregates
+                          .fixedCapitalConsumptions.periodsData[period.periodKey].amount
                       )}
-                      netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
+                      netValueAdded={props.session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators[
                         indic
                       ].getGrossImpact(
-                        props.session.financialData.aggregates.netValueAdded
+                        props.session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey]
                           .amount
                       )}
                     />
@@ -486,16 +486,16 @@ const IndicatorsList = (props) => {
                     <DeviationChart
                       id={"deviationChart-" + indic}
                       legalUnitData={[
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
+                        props.session.financialData.mainAggregates.production.periodsData[period.periodKey].footprint.getIndicator(
                           indic
                         ).value,
-                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
+                        props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                           indic
                         ).value,
-                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
+                        props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.getIndicator(
                           indic
                         ).value,
-                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
+                        props.session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.getIndicator(
                           indic
                         ).value,
                       ]}
@@ -503,9 +503,9 @@ const IndicatorsList = (props) => {
                         comparativeData.production.divisionFootprint.indicators[
                           indic
                         ].value,
-                        comparativeData.intermediateConsumption
+                        comparativeData.intermediateConsumptions
                           .divisionFootprint.indicators[indic].value,
-                        comparativeData.fixedCapitalConsumption
+                        comparativeData.fixedCapitalConsumptions
                           .divisionFootprint.indicators[indic].value,
                         comparativeData.netValueAdded.divisionFootprint
                           .indicators[indic].value,
@@ -534,7 +534,7 @@ const IndicatorsList = (props) => {
                             .indicators[indic]
                         }
                         current={
-                          props.session.financialData.aggregates.production.footprint.getIndicator(
+                          props.session.financialData.mainAaggregates.production.periodsData[period.periodKey].footprint.getIndicator(
                             indic
                           ).value
                         }
@@ -847,7 +847,7 @@ const IndicatorsList = (props) => {
       {/* // MODAL  */}
       <ModalAssesment
         indic="knw"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("knw")}
         onValidate={() => validateIndicator("knw")}
         popUp={popUp}
@@ -857,7 +857,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="idr"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("idr")}
         onValidate={() => validateIndicator("idr")}
         onGoBack={handleClose}
@@ -867,7 +867,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="dsn"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("idr")}
         onValidate={() => validateIndicator("idr")}
         onGoBack={handleClose}
@@ -877,7 +877,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="nrg"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("nrg")}
         onValidate={() => validateIndicator("nrg")}
         onGoBack={handleClose}
@@ -887,7 +887,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="ghg"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("ghg")}
         onValidate={() => validateIndicator("ghg")}
         onGoBack={handleClose}
@@ -898,7 +898,7 @@ const IndicatorsList = (props) => {
 
       <ModalAssesment
         indic="geq"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("geq")}
         onValidate={() => validateIndicator("geq")}
         onGoBack={handleClose}

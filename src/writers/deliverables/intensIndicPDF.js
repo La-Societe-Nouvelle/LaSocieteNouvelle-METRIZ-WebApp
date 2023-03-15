@@ -36,12 +36,14 @@ export const createIntensIndicatorPDF = (
 ) => {
   // ---------------------------------------------------------------
   const {
+    revenue
+  } = financialData.productionAggregates;
+  const {
     production,
-    revenue,
-    intermediateConsumption,
-    capitalConsumption,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
     netValueAdded,
-  } = financialData.aggregates;
+  } = financialData.mainAggregates;
 
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
@@ -71,7 +73,7 @@ export const createIntensIndicatorPDF = (
 
   const mostImpactfulExpenseAccountsPart = getMostImpactfulExpensesPart(
     mostImpactfulExpenses,
-    production.footprint.indicators[indic].getGrossImpact(production.amount),
+    production.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(production.periodsData[period.periodKey].amount),
     indic
   );
 
@@ -91,14 +93,14 @@ export const createIntensIndicatorPDF = (
   ).slice(2, 4);
 
   // Part des consommations intermédiaires
-  const intermediateConsumptionPart = getIntermediateConsumptionsPart(
+  const intermediateConsumptionsPart = getIntermediateConsumptionsPart(
     financialData,
     indic
   );
 
   const uncertaintyText = getUncertaintyDescription(
     "intensite",
-    production.footprint.indicators[indic].uncertainty
+    production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty
   );
 
   // Get chart canvas and encode it to import in document
@@ -114,7 +116,7 @@ export const createIntensIndicatorPDF = (
 
   // ---------------------------------------------------------------
 
-  const totalRevenue = revenue.amount;
+  const totalRevenue = revenue.periodsData[period.periodKey].amount;
 
   // Document Property
 
@@ -241,7 +243,7 @@ export const createIntensIndicatorPDF = (
             lineColor: "#f1f0f4",
             r: 10,
           },
-          createBoxIntermediateConsumption(intermediateConsumptionPart),
+          createBoxIntermediateConsumptions(intermediateConsumptionsPart),
           // Box Fournisseurs clés
           {
             type: "rect",
@@ -317,7 +319,7 @@ export const createIntensIndicatorPDF = (
                 text: [
                   {
                     width: "auto",
-                    text: production.footprint.indicators[indic].value + " ",
+                    text: production.periodsData[period.periodKey].footprint.indicators[indic].value + " ",
                     style: "numbers",
                   },
                   {
@@ -341,8 +343,8 @@ export const createIntensIndicatorPDF = (
             stack: [
               {
                 text: printValue(
-                  production.footprint.indicators[indic].getGrossImpact(
-                    production.amount
+                  production.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
+                    production.periodsData[period.periodKey].amount
                   ),
                   precision
                 ),
@@ -472,7 +474,7 @@ export const createIntensIndicatorPDF = (
             ],
           },
           createChargesImpactContent(
-            intermediateConsumptionPart,
+            intermediateConsumptionsPart,
             mostImpactfulExpenseAccountsPart,
             indic
           ),
@@ -567,7 +569,7 @@ export const createIntensIndicatorPDF = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(production.amount, 0) + " €",
+                    text: printValue(production.periodsData[period.periodKey].amount, 0) + " €",
                     margin: [2, 7, 2, 8],
                     alignment: "right",
                   },
@@ -577,7 +579,7 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              production.footprint.indicators[indic].value,
+                              production.periodsData[period.periodKey].footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -593,9 +595,9 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              production.footprint.indicators[
+                              production.periodsData[period.periodKey].footprint.indicators[
                                 indic
-                              ].getGrossImpact(production.amount),
+                              ].getGrossImpact(production.periodsData[period.periodKey].amount),
                               precision
                             ),
                           },
@@ -607,7 +609,7 @@ export const createIntensIndicatorPDF = (
                   },
                   {
                     text: printValue(
-                      production.footprint.indicators[indic].uncertainty,
+                      production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",
@@ -622,7 +624,7 @@ export const createIntensIndicatorPDF = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(intermediateConsumption.amount, 0) + " €",
+                    text: printValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -633,7 +635,7 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              intermediateConsumption.footprint.indicators[
+                              intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
                                 indic
                               ].value,
                               precision
@@ -651,9 +653,9 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              intermediateConsumption.footprint.indicators[
+                              intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
                                 indic
-                              ].getGrossImpact(intermediateConsumption.amount),
+                              ].getGrossImpact(intermediateConsumptions.periodsData[period.periodKey].amount),
                               precision
                             ),
                           },
@@ -665,7 +667,7 @@ export const createIntensIndicatorPDF = (
                   },
                   {
                     text: printValue(
-                      intermediateConsumption.footprint.indicators[indic]
+                      intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                         .uncertainty,
                       0
                     ),
@@ -681,7 +683,7 @@ export const createIntensIndicatorPDF = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(capitalConsumption.amount, 0) + " €",
+                    text: printValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -693,7 +695,7 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              capitalConsumption.footprint.indicators[indic]
+                              fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                                 .value,
                               precision
                             ),
@@ -708,9 +710,9 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              capitalConsumption.footprint.indicators[
+                              fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[
                                 indic
-                              ].getGrossImpact(capitalConsumption.amount),
+                              ].getGrossImpact(fixedCapitalConsumptions.periodsData[period.periodKey].amount),
                               precision
                             ),
                           },
@@ -722,7 +724,7 @@ export const createIntensIndicatorPDF = (
                   },
                   {
                     text: printValue(
-                      capitalConsumption.footprint.indicators[indic]
+                      fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
                         .uncertainty,
                       0
                     ),
@@ -738,7 +740,7 @@ export const createIntensIndicatorPDF = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(netValueAdded.amount, 0) + " €",
+                    text: printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -748,7 +750,7 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              netValueAdded.footprint.indicators[indic].value,
+                              netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -764,9 +766,9 @@ export const createIntensIndicatorPDF = (
                         text: [
                           {
                             text: printValue(
-                              netValueAdded.footprint.indicators[
+                              netValueAdded.periodsData[period.periodKey].footprint.indicators[
                                 indic
-                              ].getGrossImpact(netValueAdded.amount),
+                              ].getGrossImpact(netValueAdded.periodsData[period.periodKey].amount),
                               precision
                             ),
                           },
@@ -778,7 +780,7 @@ export const createIntensIndicatorPDF = (
                   },
                   {
                     text: printValue(
-                      netValueAdded.footprint.indicators[indic].uncertainty,
+                      netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",
@@ -1012,7 +1014,7 @@ export const createIntensIndicatorPDF = (
 };
 
 function createChargesImpactContent(
-  intermediateConsumptionPart,
+  intermediateConsumptionsPart,
   mostImpactfulExpenseAccountsPart
 ) {
   let content = {
@@ -1054,37 +1056,37 @@ function createChargesImpactContent(
       },
     ],
   };
-  if (intermediateConsumptionPart > 40) {
+  if (intermediateConsumptionsPart > 40) {
     return content;
   }
 }
 
 function getIntermediateConsumptionsPart(financialData, indic) {
   let total =
-    financialData.aggregates.intermediateConsumption.footprint.indicators[
+    financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
       indic
-    ].getGrossImpact(financialData.aggregates.intermediateConsumption.amount) +
-    financialData.aggregates.capitalConsumption.footprint.indicators[
+    ].getGrossImpact(financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount) +
+    financialData.mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[
       indic
-    ].getGrossImpact(financialData.aggregates.capitalConsumption.amount) +
-    financialData.aggregates.netValueAdded.footprint.indicators[
+    ].getGrossImpact(financialData.mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount) +
+    financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators[
       indic
-    ].getGrossImpact(financialData.aggregates.netValueAdded.amount);
+    ].getGrossImpact(financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].amount);
 
-  const intermediateConsumptionPart =
-    (financialData.aggregates.intermediateConsumption.footprint.indicators[
+  const intermediateConsumptionsPart =
+    (financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
       indic
-    ].getGrossImpact(financialData.aggregates.intermediateConsumption.amount) /
+    ].getGrossImpact(financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount) /
       total) *
     100;
 
-  return intermediateConsumptionPart;
+  return intermediateConsumptionsPart;
 }
 
-function createBoxIntermediateConsumption(intermediateConsumptionPart) {
+function createBoxIntermediateConsumptions(intermediateConsumptionsPart) {
   let rect;
 
-  if (intermediateConsumptionPart > 40) {
+  if (intermediateConsumptionsPart > 40) {
     rect = {
       type: "rect",
       x: 360,

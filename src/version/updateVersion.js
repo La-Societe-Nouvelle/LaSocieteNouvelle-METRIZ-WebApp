@@ -124,7 +124,7 @@ const updater_1_0_4 = async (sessionData) => {
     amount: getAmountItems(investments),
     footprint: investmentsFootprint,
   };
-  sessionData.financialData.aggregates.grossFixedCapitalFormation =
+  sessionData.financialData.mainAggregates.grossFixedCapitalFormation =
     dataGrossFixedCapitalFormationAggregate;
 };
 

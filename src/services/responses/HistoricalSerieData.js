@@ -7,8 +7,8 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
 
     let netValueAddedHistorical = {data : [{year: null, value: null, flag: null}], meta : {}};
     let productionHistorical = {data : [{year: null, value: null, flag: null}], meta : {}};;
-    let intermediateConsumptionHistorical = {data : [{year: null, value: null, flag: null}], meta : {}};;
-    let fixedCapitalConsumptionHistorical = {data : [{year: null, value: null, flag: null}], meta : {}};;
+    let intermediateConsumptionsHistorical = {data : [{year: null, value: null, flag: null}], meta : {}};;
+    let fixedCapitalConsumptionsHistorical = {data : [{year: null, value: null, flag: null}], meta : {}};;
     let id;
 
     if(serie == 'trendsFootprint') {
@@ -21,16 +21,16 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
     }
     const getValueAdded = SerieDataService.getSerieData(id, code, "NVA");
     const getProduction = SerieDataService.getSerieData(id, code, "PRD");
-    const getConsumption = SerieDataService.getSerieData(id, code, "IC");
-    const getCapitalConsumption = SerieDataService.getSerieData(id, code, "CFC");
+    const getIntermediateConsumptions = SerieDataService.getSerieData(id, code, "IC");
+    const getFixedCapitalConsumptions = SerieDataService.getSerieData(id, code, "CFC");
     await axios
-      .all([getValueAdded, getProduction, getConsumption, getCapitalConsumption])
+      .all([getValueAdded, getProduction, getIntermediateConsumptions, getFixedCapitalConsumptions])
       .then(
         axios.spread((...responses) => {
           const netValueAdded = responses[0];
           const production = responses[1];
-          const consumption = responses[2];
-          const fixedCapitalConsumption = responses[3];
+          const intermediateConsumptions = responses[2];
+          const fixedCapitalConsumptions = responses[3];
 
           if (netValueAdded.data.header.code == 200) {
             netValueAddedHistorical.data = netValueAdded.data.data;
@@ -44,16 +44,16 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
           }
      
 
-          if (consumption.data.header.code == 200) {
-            intermediateConsumptionHistorical.data = consumption.data.data;
-            intermediateConsumptionHistorical.meta =  consumption.data.meta;
+          if (intermediateConsumptions.data.header.code == 200) {
+            intermediateConsumptionsHistorical.data = intermediateConsumptions.data.data;
+            intermediateConsumptionsHistorical.meta =  intermediateConsumptions.data.meta;
 
           }
      
 
-          if (fixedCapitalConsumption.data.header.code == 200) {
-            fixedCapitalConsumptionHistorical.data = fixedCapitalConsumption.data.data;
-            fixedCapitalConsumptionHistorical.meta =  fixedCapitalConsumption.data.meta;
+          if (fixedCapitalConsumptions.data.header.code == 200) {
+            fixedCapitalConsumptionsHistorical.data = fixedCapitalConsumptions.data.data;
+            fixedCapitalConsumptionsHistorical.meta =  fixedCapitalConsumptions.data.meta;
           }
     
         })
@@ -62,7 +62,11 @@ const getHistoricalSerieData = async (code,indic,comparativeData, serie) => {
         console.log(error)
       });
 
-      const newComparativeData = {  fixedCapitalConsumption : fixedCapitalConsumptionHistorical,intermediateConsumption : intermediateConsumptionHistorical, production : productionHistorical, netValueAdded : netValueAddedHistorical}  
+      const newComparativeData = {  
+        fixedCapitalConsumptions : fixedCapitalConsumptionsHistorical,
+        intermediateConsumptions : intermediateConsumptionsHistorical,
+        production : productionHistorical,
+        netValueAdded : netValueAddedHistorical}  
       const historicalFootprint = await updateHistoricalFootprint(indic,comparativeData, newComparativeData, serie)
 
 

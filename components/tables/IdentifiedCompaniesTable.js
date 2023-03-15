@@ -246,7 +246,9 @@ class RowTableProviders extends React.Component
 
   updateCorporateId = (nextCorporateId) => 
   {
-    this.props.provider.update({corporateId: nextCorporateId});
-    this.props.refreshTable();
+    if (nextCorporateId!=this.props.provider.corporateId) {
+      this.props.provider.update({corporateId: nextCorporateId});
+      this.props.refreshTable();
+    }
   };
 }

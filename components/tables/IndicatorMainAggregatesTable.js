@@ -5,7 +5,6 @@ import { printValue } from "/src/utils/Utils";
 
 // Libraries
 import metaIndics from "/lib/indics";
-import { Table } from "react-bootstrap";
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "../../src/formulas/aggregatesBuilder";
 import { useEffect, useState } from "react";
 
@@ -290,7 +289,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session, period }) =>
               <td className="text-end">
                 {printValue(
                   fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(
-                    capitalConsumption.amount
+                    fixedCapitalConsumptions.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}{" "}
@@ -379,7 +378,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session, period }) =>
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  production.footprint.indicators[indic].value,
+                  production.periodsData[period.periodKey].footprint.indicators[indic].value,
                   nbDecimals
                 )}
                 title={"Production"}
@@ -392,7 +391,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session, period }) =>
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  intermediateConsumption.footprint.indicators[indic].value,
+                  intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
                   nbDecimals
                 )}
                 title={"Consommations intermédiaires"}
@@ -405,7 +404,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session, period }) =>
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  capitalConsumption.footprint.indicators[indic].value,
+                  fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
                   nbDecimals
                 )}
                 title={"Consommation de capital fixe"}
@@ -418,7 +417,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session, period }) =>
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  netValueAdded.footprint.indicators[indic].getValue(),
+                  netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getValue(),
                   nbDecimals
                 )}
                 title={"Valeur ajoutée nette"}
