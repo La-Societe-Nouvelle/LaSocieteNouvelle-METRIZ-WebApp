@@ -11,6 +11,7 @@ import { ProgressBar } from "../popups/ProgressBar";
 import { updateVersion } from "../../src/version/updateVersion";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../ErrorAPI";
+import { getPrevDate } from "../../src/utils/Utils";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -22,8 +23,7 @@ export class InitialStatesSection extends React.Component {
     this.onDrop = (files) => {
       this.setState({ files });
       this.importFile();
-    };  
-
+    };
 
     this.state = {
       financialData: props.session.financialData,
@@ -56,7 +56,7 @@ export class InitialStatesSection extends React.Component {
     const accountsShowed = financialData.immobilisations.concat(
       financialData.stocks
     );
-  
+
     const isNextStepAvailable = nextStepAvailable(this.state) && message == "";
     return (
       <Container fluid>
@@ -203,24 +203,21 @@ export class InitialStatesSection extends React.Component {
   /* ---------- ACTIONS ---------- */
 
   // Synchronisation
-  async synchroniseAll() 
-  {
+  async synchroniseAll() {
     // accounts
     const accountsToSync = this.props.session.financialData.immobilisations
       .concat(this.props.session.financialData.stocks)
       .filter((asset) => asset.initialStateType == "defaultData");
-    
+
     // init progression
     this.setState({ fetching: true, syncProgression: 0 });
 
     let i = 0;
     let n = accountsToSync.length;
-    for (let account of accountsToSync) 
-    {
+    for (let account of accountsToSync) {
       try {
         await account.updateInitialStateFootprintFromRemote();
-      } 
-      catch (error) {
+      } catch (error) {
         this.setState({ error: true });
         break;
       }
@@ -256,44 +253,76 @@ export class InitialStatesSection extends React.Component {
       try {
         // text -> JSON
         const prevSession = JSON.parse(reader.result);
+        const currSession = this.props.session;
+
         // update to current version
         updateVersion(prevSession);
 
         const prevYear = prevSession.financialPeriod.periodKey.slice(2);
-        const currYear = this.props.session.financialPeriod.periodKey.slice(2);
+        const currYear = currSession.financialPeriod.periodKey.slice(2);
+     
+        const isObjectInAvailablePeriods = prevSession.availablePeriods.find(
+          (obj) => {
+            return currSession.availablePeriods.some((period) => {
+              return period.periodKey === obj.periodKey;
+            });
+          }
+        );
 
-        if (
-          //prevSession.legalUnit.siren == this.props.session.legalUnit.siren &&
-          parseInt(prevYear) ==
-          parseInt(currYear) - 1
-        ) {
-   
-          // JSON -> session
-          this.props.session.financialData.mergeData(prevSession.financialData);
-          this.props.session.financialData.loadInitialStates(prevSession.financialData);
+        // if (isObjectInAvailablePeriods) {
+        //   // TO DO : Change alert message into pop up alert
+        //   this.setState({
+        //     titlePopup: "Erreur - Fichier",
+        //     message:
+        //       "Des données sont déjà disponibles pour l'année correspondante à la sauvegarde importée.",
+        //     showMessage: true,
+        //   });
+        //   return;
+        // }
 
-          // Update component
-          this.setState({
-            financialData: this.props.session.financialData,
-            message: "",
-            showMessage: false,
-          });
-        } else if (
-          prevSession.legalUnit.siren != this.props.session.legalUnit.siren
-        ) {
+        if (prevSession.legalUnit.siren != currSession.legalUnit.siren) {
           this.setState({
             titlePopup: "Erreur - Fichier",
             message: "Les numéros de siren ne correspondent pas.",
             showMessage: true,
           });
-        } else {
+          return;
+        }
+       
+        if (
+          parseInt(prevYear) != parseInt(currYear) - 1 ||
+          prevSession.financialPeriod.dateEnd !=
+            getPrevDate(currSession.financialPeriod.dateStart)
+        ) {
           this.setState({
             titlePopup: "Erreur - Fichier",
             message: "La sauvegarde ne correspond pas à l'année précédente.",
             showMessage: true,
           });
+          return;
         }
+
+      
+        // Update session with prev values 
+        currSession.loadSessionFromBackup(prevSession);
+
+        // Update financialData with prev values
+        currSession.financialData.loadFinancialDataFromBackUp(prevSession.financialData);
+
+        console.log(prevSession.financialData.immobilisations);
+          console.log(currSession)
+
+        // JSON -> session
+ 
+
+        // Update component
+        this.setState({
+          financialData: this.props.session.financialData,
+          message: "",
+          showMessage: false,
+        });
       } catch (error) {
+        console.log(error)
         this.setState({
           titlePopup: "Erreur - Fichier",
           message: "Fichier non lisible.",
@@ -317,8 +346,7 @@ export class InitialStatesSection extends React.Component {
 /* -------------------------------------------------- NEXT SECTION -------------------------------------------------- */
 
 // condition : data fetched for all accounts using default data for initial state (or no account with data unfetched if using default data as initial state)
-const nextStepAvailable = ({ financialData }) => 
-{
+const nextStepAvailable = ({ financialData }) => {
   let accounts = financialData.immobilisations.concat(financialData.stocks);
   return !accounts.some(
     (account) =>
