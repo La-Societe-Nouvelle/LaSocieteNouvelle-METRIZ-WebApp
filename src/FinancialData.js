@@ -547,7 +547,12 @@ export class FinancialData {
     // Stock variations 
     this.stockVariationsAccounts = mergePeriodsAccounts(this.stockVariationsAccounts,prevFinancialData.stockVariationsAccounts);
 
-    this.stockVariations = mergeAccounts(this.stockVariations,prevFinancialData.stockVariations);
+    for (let stockVariations of this.stockVariations) {
+      let prevStockVariations = prevFinancialData.stockVariations.find(prev => prev.accountNum === stockVariations.accountNum);
+      if(!prevFinancialData) {
+        this.stockVariations.push(prevStockVariations)
+      }
+    }
   };
 
   /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
