@@ -530,7 +530,11 @@ export class FinancialData {
 
     this.otherFinancialData = mergeAggregatePeriodsData(this.otherFinancialData,prevFinancialData.otherFinancialData);
 
-    this.providers = mergeProviders(this.providers,prevFinancialData.providers); // Merge providers informations, add if not exists and add FootprintStatus 203 (potentially not up to date with datbase)
+    // Providers
+    for (let provider of this.providers) {
+      let prevProvider = prevFinancialData.providers.find(prev => prev.providerNum === provider.providerNum);
+      await provider.loadPrevProvider(prevProvider);
+    }
 
     // Production aggregates
 
@@ -646,33 +650,7 @@ export const mergePeriodsAccounts = (
 //   return mergedProviders;
 // };
 
-export const mergeProviders = (currentProviders, previousProviders) => {
-  const uniqueProviders = new Set();
-  const mergedProviders = [];
 
-  // Add all previousProviders to mergedProviders
-  previousProviders.forEach((provider) => {
-    mergedProviders.push({ ...provider, footprintStatus: 203 });
-    uniqueProviders.add(provider.providerNum);
-  });
-
-  // Merge currentProviders with previousProviders
-  currentProviders.forEach((provider) => {
-    // Check if the providerNum has not been added to the Set yet
-    if (!uniqueProviders.has(provider.providerNum)) {
-      uniqueProviders.add(provider.providerNum);
-      mergedProviders.push(provider);
-    } else {
-      // If the providerNum has already been added to the Set, merge the periodsData
-      const index = mergedProviders.findIndex(
-        (item) => item.providerNum === provider.providerNum
-      );
-      Object.assign(mergedProviders[index].periodsData, provider.periodsData);
-    }
-  });
-
-  return mergedProviders;
-};
 
 
 export const mergeAccounts = (current, previous) => {

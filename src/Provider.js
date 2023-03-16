@@ -2,21 +2,20 @@ import api from "./api";
 import { getAmountItems, getCurrentDateString, valueOrDefault } from "./utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 
-
-export class Provider 
-{
-  constructor({id,
-               isDefaultProviderAccount,
-               providerNum,
-               providerLib,
-               corporateId,
-               legalUnitData,
-               useDefaultFootprint,
-               footprint,
-               footprintParams,
-               dataFetched,
-               footprintStatus,
-               periodsData,
+export class Provider {
+  constructor({
+    id,
+    isDefaultProviderAccount,
+    providerNum,
+    providerLib,
+    corporateId,
+    legalUnitData,
+    useDefaultFootprint,
+    footprint,
+    footprintParams,
+    dataFetched,
+    footprintStatus,
+    periodsData,
   }) {
     // ---------------------------------------------------------------------------------------------------- //
 
@@ -39,8 +38,8 @@ export class Provider
       area: "FRA",
       code: "00",
       aggregate: "PRD"
-    };            
-    
+    };
+
     // Updates
     this.dataFetched = dataFetched || false;                        // response received
     this.footprintStatus = footprintStatus || 0;                    // status response api
@@ -125,7 +124,7 @@ export class Provider
       this.dataFetched = false;
       this.footprintStatus = 0;
       this.footprint = new SocialFootprint();
-      }
+    }
 
     // update default footprint ------------------------- //
     // update params, remove footprint & update dataFetched
@@ -166,24 +165,24 @@ export class Provider
       // request
       await api.get("legalunitfootprint/" + footprintId).then((res) => 
       {
-        let status = res.data.header.code;
-        this.footprintStatus = status;
-        if (status == 200) {
-          // legal data --------------------------------------- //
-          this.legalUnitData = res.data.legalUnit;
-          // footprint ---------------------------------------- //
-          this.footprint.updateAll(res.data.footprint);
-          this.dataFetched = true;
-        } else {
-          // legal data --------------------------------------- //
-          this.legalUnitData = {};
-          // footprint ---------------------------------------- //
-          this.footprint = new SocialFootprint();
-          this.dataFetched = false;
-        }
+          let status = res.data.header.code;
+          this.footprintStatus = status;
+          if (status == 200) {
+            // legal data --------------------------------------- //
+            this.legalUnitData = res.data.legalUnit;
+            // footprint ---------------------------------------- //
+            this.footprint.updateAll(res.data.footprint);
+            this.dataFetched = true;
+          } else {
+            // legal data --------------------------------------- //
+            this.legalUnitData = {};
+            // footprint ---------------------------------------- //
+            this.footprint = new SocialFootprint();
+            this.dataFetched = false;
+          }
       }).catch((err)=>{
-        throw err;
-      });
+          throw err;
+        });
     }
 
     // Case - Fetch id not ok ----------------------------------------------------------------------------- //
@@ -202,22 +201,33 @@ export class Provider
       let defaultFptParams = Object.entries(this.defaultFootprintParams).map(([key,value]) => key+"="+value).join("&");
       await api.get("defaultfootprint?"+defaultFptParams).then((res) => 
       {
-        let status = res.data.header.code;
-        this.footprintStatus = status;
-        if (status == 200) {
-          // footprint ---------------------------------------- //
-          this.footprint.updateAll(res.data.footprint);
-          this.dataFetched = true;
-        } else {
-          this.footprint = new SocialFootprint();
-          this.dataFetched = false;
-        }
+          let status = res.data.header.code;
+          this.footprintStatus = status;
+          if (status == 200) {
+            // footprint ---------------------------------------- //
+            this.footprint.updateAll(res.data.footprint);
+            this.dataFetched = true;
+          } else {
+            this.footprint = new SocialFootprint();
+            this.dataFetched = false;
+          }
       }).catch((err)=>{
-        throw err;
-      });
+          throw err;
+        });
     }
     // ---------------------------------------------------------------------------------------------------- //
     return;
   }
 
+  async loadPrevProvider(prevProvider) {
+    this.corporateId = prevProvider.corporateId;
+    this.footprintStatus = 203;
+    this.footprint = prevProvider.footprint;
+    this.isDefaultProviderAccount = prevProvider.isDefaultProviderAccount;
+    this.legalUnitData = prevProvider.legalUnitData;
+    this.periodsData = Object.assign(
+      this.periodsData,
+      prevProvider.periodsData
+    );
+  }
 }
