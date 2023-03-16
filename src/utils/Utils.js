@@ -333,52 +333,10 @@ export const getTargetSerieId = (indic) => {
   return id;
 };
 
-export const mergeExpenses = (arr1, arr2) => {
-  const uniqueIds = new Set(); // Create a new Set to store unique IDs 
-  const mergedArray = []; 
-
-  // Merge arrays
-  const merged = arr1.concat(arr2);
-
-  merged.forEach((obj) => {
-    // Check if the ID has not been added to the Set yet
-    if (!uniqueIds.has(obj.id)) {
-      uniqueIds.add(obj.id);
-      mergedArray.push(obj);
-    } else {
-      // If the ID has already been added to the Set, merge the periodsData
-      const index = mergedArray.findIndex((item) => item.id === obj.id);
-      Object.assign(mergedArray[index].periodsData, obj.periodsData);
-    }
-  });
-  return mergedArray; 
-  
-};
-
-export function mergeAggregates(obj1, obj2) {
-  const mergedObj = {};
-
-  for (let [id, obj] of Object.entries(obj1)) {
-    if (mergedObj[id]) {
-      Object.assign(mergedObj[id].periodsData, obj.periodsData);
-    }
-    else {
-      mergedObj[id] = obj;
-    }
-  }
-
-  for (let [id, obj] of Object.entries(obj2)) {
-    if (mergedObj[id]) {
-      Object.assign(mergedObj[id].periodsData, obj.periodsData);
-    }
-    else {
-      mergedObj[id] = obj;
-    }
-  }
-
-  return mergedObj;
+export function mergePeriodsData(current, previous) {
+  const periodsData = { ...previous.periodsData, ...current.periodsData };
+  return { ...current, periodsData };
 }
-
 
 export function getEvolution(value, target) {
   if (target) {

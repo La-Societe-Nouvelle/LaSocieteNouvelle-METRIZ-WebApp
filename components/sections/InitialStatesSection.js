@@ -269,16 +269,16 @@ export class InitialStatesSection extends React.Component {
           }
         );
 
-        // if (isObjectInAvailablePeriods) {
-        //   // TO DO : Change alert message into pop up alert
-        //   this.setState({
-        //     titlePopup: "Erreur - Fichier",
-        //     message:
-        //       "Des données sont déjà disponibles pour l'année correspondante à la sauvegarde importée.",
-        //     showMessage: true,
-        //   });
-        //   return;
-        // }
+        if (isObjectInAvailablePeriods) {
+          // TO DO : Change alert message into pop up alert
+          this.setState({
+            titlePopup: "Erreur - Fichier",
+            message:
+              "Des données sont déjà disponibles pour l'année correspondante à la sauvegarde importée.",
+            showMessage: true,
+          });
+          return;
+        }
 
         if (prevSession.legalUnit.siren != currSession.legalUnit.siren) {
           this.setState({
@@ -288,7 +288,7 @@ export class InitialStatesSection extends React.Component {
           });
           return;
         }
-       
+      
         if (
           parseInt(prevYear) != parseInt(currYear) - 1 ||
           prevSession.financialPeriod.dateEnd !=
@@ -308,13 +308,7 @@ export class InitialStatesSection extends React.Component {
 
         // Update financialData with prev values
         currSession.financialData.loadFinancialDataFromBackUp(prevSession.financialData);
-
-        console.log(prevSession.financialData.immobilisations);
-          console.log(currSession)
-
-        // JSON -> session
  
-
         // Update component
         this.setState({
           financialData: this.props.session.financialData,
