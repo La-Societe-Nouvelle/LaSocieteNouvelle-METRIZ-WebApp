@@ -613,38 +613,67 @@ export const mergePeriodsAccounts = (
   });
   return mergedExpensesAccounts;
 };
-export const mergeProviders = (
-  currentProviders,
-  previousProviders
-) => {
-  const uniqueProviders = new Set(); 
+//   currentProviders,
+//   previousProviders
+// ) => {
+//   const uniqueProviders = new Set(); 
+//   const mergedProviders = [];
+
+//   // Merged expenses accounts
+//   const providers = currentProviders.concat(
+//     previousProviders
+//   );
+
+//   providers.forEach((provider) => {
+//     // Check if the accountNum has not been added to the Set yet
+//     if (!uniqueProviders.has(provider.providerNum)) {
+//       uniqueProviders.add(provider.providerNum);
+//       mergedProviders.push(provider);
+//     } else {
+//       // If the accountNum has already been added to the Set, merge the periodsData
+//       const index = mergedProviders.findIndex(
+//         (item) => item.providerNum === provider.providerNum
+//       );
+//       Object.assign(
+//         mergedProviders[index].periodsData,
+//         provider.periodsData
+//       );
+//       mergedProviders[index].footprintStatus = 203;
+ 
+//     }
+//   });
+
+//   return mergedProviders;
+// };
+
+export const mergeProviders = (currentProviders, previousProviders) => {
+  const uniqueProviders = new Set();
   const mergedProviders = [];
 
-  // Merged expenses accounts
-  const providers = currentProviders.concat(
-    previousProviders
-  );
+  // Add all previousProviders to mergedProviders
+  previousProviders.forEach((provider) => {
+    mergedProviders.push({ ...provider, footprintStatus: 203 });
+    uniqueProviders.add(provider.providerNum);
+  });
 
-  providers.forEach((provider) => {
-    // Check if the accountNum has not been added to the Set yet
+  // Merge currentProviders with previousProviders
+  currentProviders.forEach((provider) => {
+    // Check if the providerNum has not been added to the Set yet
     if (!uniqueProviders.has(provider.providerNum)) {
       uniqueProviders.add(provider.providerNum);
       mergedProviders.push(provider);
     } else {
-      // If the accountNum has already been added to the Set, merge the periodsData
+      // If the providerNum has already been added to the Set, merge the periodsData
       const index = mergedProviders.findIndex(
         (item) => item.providerNum === provider.providerNum
       );
-      Object.assign(
-        mergedProviders[index].periodsData,
-        provider.periodsData
-      );
-      mergedProviders[index].footprintStatus = 203;
+      Object.assign(mergedProviders[index].periodsData, provider.periodsData);
     }
   });
 
   return mergedProviders;
 };
+
 
 export const mergeAccounts = (current, previous) => {
   // Create a new object to hold the merged metadata, starting with the previous metadata.
