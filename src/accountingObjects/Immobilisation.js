@@ -94,26 +94,32 @@ export class Immobilisation
 
   /* ------------------------- Load BackUp Data ------------------------- */
 
-  async loadInitialStateFromBackUp(prevImmobilisation) 
+  loadInitialStateFromBackUp = async (prevImmobilisation)  =>
   {
-    // immobilisation enries
-    this.entries.push(prevImmobilisation.entries);
 
-    // amortisation entries
-    this.amortisationEntries.push(prevImmobilisation.amortisationEntries);
+    // TO THINK : concat instead of push but need to check if arrays are empty before concat
+    // // immobilisation enries
+    this.entries.push(...prevImmobilisation.entries);
 
-    // depreciation entries
-    this.depreciationEntries.push(prevImmobilisation.depreciationEntries);
+    // // amortisation entries
+    this.amortisationEntries.push(...prevImmobilisation.amortisationEntries);
 
-    // initial state
+    // // depreciation entries
+    this.depreciationEntries.push(...prevImmobilisation.depreciationEntries);
+
+    // // initial state
     this.initialStateType = prevImmobilisation.initialStateType;
-    this.initialState = new ImmobilisationState(prevImmobilisation.initialState);
-    this.initialFootprintParams = prevImmobilisation.initialFootprintParams || {};
+    this.initialState = new ImmobilisationState(
+      prevImmobilisation.initialState
+    );
+    this.initialFootprintParams =
+      prevImmobilisation.initialFootprintParams || {};
     this.initialStateSet = prevImmobilisation.initialStateSet;
 
-    // states
-    Object.values(prevImmobilisation.states)
-      .forEach(state => this.states[state.date] = new ImmobilisationState(state));
+    // // states
+    Object.values(prevImmobilisation.states).forEach(
+      (state) => (this.states[state.date] = new ImmobilisationState(state))
+    );
   }
 
   /* ------------------------- Fetch Default Data ------------------------- */

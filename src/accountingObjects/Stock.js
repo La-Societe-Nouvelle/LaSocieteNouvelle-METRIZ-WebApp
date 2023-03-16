@@ -92,13 +92,13 @@ export class Stock {
 
   /* ------------------------- Load BackUp Data ------------------------- */
 
-  async loadInitialStateFromBackUp(prevStock) 
+   loadInitialStateFromBackUp = async (prevStock) =>
   {
-    // immobilisation enries
-    this.entries.push(prevStock.entries);
+    // stock enries
+    this.entries.push(...prevStock.entries);
 
     // depreciation entries
-    this.depreciationEntries.push(prevStock.depreciationEntries);
+    this.depreciationEntries.push(...prevStock.depreciationEntries);
 
     // initial state
     this.initialStateType = prevStock.initialStateType;
@@ -106,6 +106,8 @@ export class Stock {
     this.initialFootprintParams = prevStock.initialFootprintParams || {};
     this.initialStateSet = prevStock.initialStateSet;
 
+    // purchasesAccounts
+    this.purchasesAccounts = this.purchasesAccounts.concat(prevStock.purchasesAccounts.filter(account => !this.purchasesAccounts.includes(account)));
     // states
     Object.values(prevStock.states)
       .forEach(state => this.states[state.date] = new StockState(state));
