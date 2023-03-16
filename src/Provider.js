@@ -222,12 +222,13 @@ export class Provider {
   async loadPrevProvider(prevProvider) {
     this.corporateId = prevProvider.corporateId;
     this.footprintStatus = 203;
-    this.footprint = prevProvider.footprint;
+    this.footprint =  new SocialFootprint(prevProvider.footprint) ;
     this.isDefaultProviderAccount = prevProvider.isDefaultProviderAccount;
     this.legalUnitData = prevProvider.legalUnitData;
     this.periodsData = Object.assign(
       this.periodsData,
       prevProvider.periodsData
     );
+    this.useDefaultFootprint = prevProvider.useDefaultFootprint;
   }
 }

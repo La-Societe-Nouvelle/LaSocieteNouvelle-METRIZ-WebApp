@@ -28,7 +28,7 @@ export class SirenSection extends React.Component
       progression: 0,
       synchronised: 0,
       popup: false,
-      isSyncButtonEnable: false,
+      isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
       isNextStepAvailable: checkNextStepAvailable(props.financialData.providers),
       errorFile: false,
       error: false,
@@ -48,6 +48,7 @@ export class SirenSection extends React.Component
 
   componentDidUpdate = () =>
   {
+    
     // next step available
     const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
@@ -431,8 +432,7 @@ export class SirenSection extends React.Component
   synchroniseProviders = async () => 
   {
     // providers with fpt unfetched
-    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
-
+    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200 || provider.footprintS);
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
 
@@ -443,6 +443,7 @@ export class SirenSection extends React.Component
     {
       try 
       {
+        console.log(provider)
         // fetch footprint
         await provider.updateFromRemote();
         // assign to expenses & investments
@@ -454,6 +455,7 @@ export class SirenSection extends React.Component
           });
       } 
       catch (error) {
+        console.log(error)
         this.setState({ error: true });
         break;
       }
@@ -499,7 +501,7 @@ const checkNextStepAvailable = (providers) =>
 // provider not using default footprint & footprint status not OK
 const checkSyncButtonEnable = (providers) => 
 {
-  let enable = providers.some((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
+  let enable = providers.some((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200 || provider.footprintStatus == 203);
   return enable;
 };
 
