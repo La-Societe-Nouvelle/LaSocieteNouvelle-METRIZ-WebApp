@@ -125,6 +125,7 @@ export async function updateComparativeFootprint(
   newComparativeData,
   serie
 ) {
+
   let newFixedCapitalConsumptions;
 
     newFixedCapitalConsumptions = Object.assign(
@@ -149,16 +150,17 @@ export async function updateComparativeFootprint(
     {
       ...prevComparativeData.intermediateConsumptions[serie].indicators,
       [indic]: {
-        value: newComparativeData.intermediateConsumption
+        value: newComparativeData.intermediateConsumptions
           ? newComparativeData.intermediateConsumptions.value
           : null,
-        flag: newComparativeData.intermediateConsumption
+        flag: newComparativeData.intermediateConsumptions
           ? newComparativeData.intermediateConsumptions.flag
           : null,
       },
     }
   );
 
+ 
   const newProduction = Object.assign(
     {},
     prevComparativeData.production[serie].indicators,
@@ -191,6 +193,7 @@ export async function updateComparativeFootprint(
     }
   );
 
+ 
   const updatedAggregatesFootprint = Object.assign({}, prevComparativeData, {
     fixedCapitalConsumptions: {
       ...prevComparativeData.fixedCapitalConsumptions,
@@ -217,6 +220,5 @@ export async function updateComparativeFootprint(
       },
     },
   });
-
   return updatedAggregatesFootprint;
 }

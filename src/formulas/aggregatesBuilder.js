@@ -60,6 +60,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
 
     // Variation des stocks
     accounts = financialData.stockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
+    console.log(accounts);
     if (accounts.length > 0) {
         aggregates.push({
             label: "Variation des stocks",
