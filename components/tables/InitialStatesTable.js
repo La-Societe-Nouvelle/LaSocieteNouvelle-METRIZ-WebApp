@@ -44,6 +44,7 @@ export class InitialStatesTable extends React.Component {
 
   render()
   {
+
     const {immobilisations,stocks} = this.props.financialData;
     const prevStateDateEnd = getPrevDate(this.props.financialPeriod.dateStart);
 
@@ -178,15 +179,19 @@ const Row = (props) =>
 
 function RowTableImmobilisations(props) 
 {
-  
   const immobilisation = props.account;
-  const {accountNum,accountLib,initialStateSet,initialFootprintParams,isAmortisable} = immobilisation;
+  const {accountNum,accountLib,initialFootprintParams,isAmortisable} = immobilisation;
 
   const [initialStateType, setInitialStateType] = useState(immobilisation.initialStateType);
+  const [initialStateSet, setInitialStateSet] = useState(immobilisation.initialStateSet);
+
   const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "TOTAL");
 
   useEffect(() => {
+  
+    setInitialStateSet(immobilisation.initialStateSet);
     setInitialStateType(immobilisation.initialStateType);
+   
   }, [props]);
 
   const onActivityCodeChange = (event) => {
@@ -287,12 +292,14 @@ function RowTableImmobilisations(props)
 function RowTableStocks(props)
 {
   const stock = props.account;
-  const {accountNum,accountLib,initialStateSet,isProductionStock,initialFootprintParams,hasInputs} = stock;
+  const {accountNum,accountLib,isProductionStock,initialFootprintParams,hasInputs} = stock;
 
   const [initialStateType, setInitialStateType] = useState(stock.initialStateType);
+  const [initialStateSet, setInitialStateSet] = useState(stock.initialStateSet);
   const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "00");
 
   useEffect(() => {
+    setInitialStateSet(stock.initialStateSet);
     setInitialStateType(stock.initialStateType);
   }, [props]);
 
