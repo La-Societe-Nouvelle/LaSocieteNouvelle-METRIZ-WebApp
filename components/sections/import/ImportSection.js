@@ -124,7 +124,7 @@ function ImportSection(props)
         {view == 4 && (
           <FinancialDatas
             {...props}
-            return={() => setView(3)}
+            return={() => setView(1)}
             reset={() => setView(0)}
           />
         )}
