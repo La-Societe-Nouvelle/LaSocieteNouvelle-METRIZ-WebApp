@@ -1,7 +1,8 @@
 import { printValue } from "../../../utils/Utils";
 
-export function sortCompaniesByFootprint(expenses, period, indicator, order) {
-  const sortedExpenses = expenses.sort((a, b) => {
+
+export function sortAccountsByFootprint(accounts, period, indicator, order) {
+  const sortedAccounts = accounts.sort((a, b) => {
     const valueA = a.periodsData[period.periodKey].footprint.indicators[indicator].value;
     const valueB = b.periodsData[period.periodKey].footprint.indicators[indicator].value;
     if (order === "asc") {
@@ -11,8 +12,9 @@ export function sortCompaniesByFootprint(expenses, period, indicator, order) {
     }
   });
 
-  return sortedExpenses;
+  return sortedAccounts;
 }
+
 export function sortCompaniesByImpact(expensesAccounts, indicator, order) {
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
@@ -91,7 +93,7 @@ export function getKeySuppliers(companies, indic, unit, precision) {
       keySuppliers.push({
         stack: [
           {
-            text: cutString(company.corporateName, 40),
+            text: cutString(company.providerLib, 40),
             fontSize: 8,
             bold: true,
           },
@@ -112,37 +114,38 @@ export function getKeySuppliers(companies, indic, unit, precision) {
   return keySuppliers;
 }
 
-export function getIntensKeySuppliers(
-  companies,
+export function getIntensKeyProviders(
+  providers,
   indic,
   unit,
   unitGrossImpact,
-  precision
+  precision,
+  period
 ) {
   const keySuppliers = [];
 
   const precisionImpact = unitGrossImpact == "€" ? 0 : precision;
-
-  companies
-    .filter((company) => !company.isDefaultAccount)
-    .map((company) =>
+  console.log(providers)
+  providers
+    .filter((provider) => !provider.isDefaultAccount)
+    .map((provider) =>
       keySuppliers.push({
         stack: [
           {
-            text: cutString(company.corporateName, 40),
+            text: cutString(provider.providerLib, 40),
             fontSize: 8,
             bold: true,
           },
           {
             margin: [0, 2, 0, 2],
             text:
-              company.footprint.indicators[indic].value.toFixed(precision) +
+              provider.footprint.indicators[indic].value.toFixed(precision) +
               " " +
               unit +
               " - " +
               printValue(
-                company.footprint.indicators[indic].getGrossImpact(
-                  company.amount
+                provider.footprint.indicators[indic].getGrossImpact(
+                  provider.periodsData[period.periodKey].amount
                 ),
                 precisionImpact
               ) +
@@ -189,6 +192,7 @@ export const getMostImpactfulExpenseAccountRows = (
 };
 
 export function cutString(str, nbChar) {
+
   if (str.length <= nbChar) return str;
   return str.substring(0, nbChar) + "...";
 }

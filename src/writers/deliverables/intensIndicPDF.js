@@ -11,7 +11,7 @@ import {
   loadFonts,
   sortCompaniesByImpact,
   targetAnnualReduction,
-  getIntensKeySuppliers,
+  getIntensKeyProviders,
   calculateAverageEvolutionRate,
   cutString,
 } from "./utils/utils";
@@ -494,7 +494,7 @@ export const createIntensIndicatorPDF = (
           {
             columnGap: 20,
             columns: [
-              ...getIntensKeySuppliers(
+              ...getIntensKeyProviders(
                 firstMostImpactfulCompanies,
                 indic,
                 unit,
@@ -511,7 +511,7 @@ export const createIntensIndicatorPDF = (
           {
             columnGap: 20,
             columns: [
-              ...getIntensKeySuppliers(
+              ...getIntensKeyProviders(
                 scdMostImpactfulCompanies,
                 indic,
                 unit,

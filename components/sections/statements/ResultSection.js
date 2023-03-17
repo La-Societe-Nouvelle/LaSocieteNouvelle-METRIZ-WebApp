@@ -112,7 +112,6 @@ const ResultSection = (props) => {
 
         newComparativeData = updatedData;
       }
-      console.log(newComparativeData)
       // Update session with comparative data for all validated indicators
 
       props.session.comparativeData = newComparativeData;
@@ -174,17 +173,17 @@ const ResultSection = (props) => {
         case "proportion":
           createContribIndicatorPDF(
             metaIndics[indic].libelle,
-            session.year,
             session.legalUnit.corporateName,
             indic,
             session.financialData,
             session.comparativeData,
-            true
+            true,
+            period
           );
           break;
         case "intensité":
           createIntensIndicatorPDF(
-            session.year,
+            
             session.legalUnit.corporateName,
             indic,
             metaIndics[indic].libelle,
@@ -198,7 +197,6 @@ const ResultSection = (props) => {
           createIndiceIndicatorPDF(
             metaIndics[indic].libelle,
             metaIndics[indic].libelleGrandeur,
-            session.year,
             session.legalUnit.corporateName,
             indic,
             metaIndics[indic].unit,
@@ -252,11 +250,10 @@ const ResultSection = (props) => {
           <Button variant="secondary" onClick={handleindicReportPDF}>
             Plaquette <i className="bi bi-download"></i>
           </Button>
-          <Button
+          <Button 
             variant="secondary"
             onClick={() =>
               createIndicReport(
-                session.year,
                 session.legalUnit.corporateName,
                 indic,
                 metaIndics[indic].libelle,
@@ -264,8 +261,8 @@ const ResultSection = (props) => {
                 session.financialData,
                 session.impactsData,
                 session.comparativeData,
-                divisions[comparativeDivision],
-                true
+                true,
+                period
               )
             }
           >
@@ -381,6 +378,7 @@ const ResultSection = (props) => {
                     comparativeData.production.targetAreaFootprint.indicators[
                       indic
                     ].value,
+                    prevPeriod &&
                     production.periodsData[
                       prevPeriod.periodKey
                     ].footprint.getIndicator(indic).value ,
@@ -407,6 +405,7 @@ const ResultSection = (props) => {
                   targetData={[
                     comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
+                      prevPeriod &&
                     intermediateConsumptions.periodsData[
                       prevPeriod.periodKey
                     ].footprint.getIndicator(indic).value ,
@@ -434,6 +433,7 @@ const ResultSection = (props) => {
                   targetData={[
                     comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
+                      prevPeriod &&
                     fixedCapitalConsumptions.periodsData[
                       prevPeriod.periodKey
                     ].footprint.getIndicator(indic).value,
@@ -464,6 +464,7 @@ const ResultSection = (props) => {
                   targetData={[
                     comparativeData.netValueAdded.targetAreaFootprint
                       .indicators[indic].value,
+                      prevPeriod &&
                       netValueAdded.periodsData[
                         prevPeriod.periodKey
                       ].footprint.getIndicator(indic).value ,
@@ -568,10 +569,10 @@ const ResultSection = (props) => {
                       period.periodKey
                     ].footprint.getIndicator(indic).value
                   }
-                  prev={
+                  prev={ prevPeriod &&
                     production.periodsData[
                       prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value || null
+                    ].footprint.getIndicator(indic).value
                   }
                 />
               </div>
@@ -740,7 +741,6 @@ const ResultSection = (props) => {
             variant="secondary"
             onClick={() =>
               createIndicReport(
-                session.year,
                 session.legalUnit.corporateName,
                 indic,
                 metaIndics[indic].libelle,
@@ -748,7 +748,8 @@ const ResultSection = (props) => {
                 session.financialData,
                 session.impactsData,
                 session.comparativeData,
-                true
+                true,
+                period
               )
             }
           >

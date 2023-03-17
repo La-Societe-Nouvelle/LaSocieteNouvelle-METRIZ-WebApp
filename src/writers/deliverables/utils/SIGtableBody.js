@@ -7,7 +7,8 @@ export const SIGtableBody = (
   indic,
   unit,
   intermediateConsumptionsAggregates,
-  fixedCapitalConsumptionsAggregates
+  fixedCapitalConsumptionsAggregates,
+  period
 ) => {
   // FINANCIAL DATA
   const {
@@ -354,13 +355,15 @@ const getImmobilisedProductionRow = (
 
 const getAggregateRow = (aggregates, indic, unit, precision) => {
   let rows = [];
+
   aggregates
     .filter((aggregate) => aggregate.amount != 0)
     .forEach((aggregate) => {
+
       let row = [];
       row.push(
         {
-          text: aggregate.accountLib,
+          text: aggregate.label,
           style: "tableLeft",
           margin: [15, 0, 0, 0],
         },
