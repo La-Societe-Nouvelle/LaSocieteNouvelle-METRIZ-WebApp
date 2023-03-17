@@ -204,6 +204,7 @@ class Metriz extends React.Component {
     console.log(this.state.session.financialData.stocks.map(stock => stock.InitialState));
 
     this.setStep(3);
+
   }
 
   validProviders = async () => 
@@ -212,6 +213,7 @@ class Metriz extends React.Component {
     console.log("Empreintes des fournisseurs récupérées");
 
     this.setStep(4);
+    this.updateProgression(3)
   }
 
   validStep = async (step) => 
@@ -230,6 +232,7 @@ class Metriz extends React.Component {
 
   updateProgression = (step) => {
     this.state.session.progression = Math.max(step + 1, this.state.session.progression);
+    console.log(this.state.session)
   }
 
 }

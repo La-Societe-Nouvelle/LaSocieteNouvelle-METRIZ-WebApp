@@ -28,8 +28,9 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
           if (production.data.header.code == 200) {
             productionFootprint = production.data.data.at(-1);
           }
-  
+     
           if (intermediateConsumptions.data.header.code == 200) {
+          
             intermediateConsumptionsFootprint = intermediateConsumptions.data.data.at(-1);
           }
 
@@ -42,7 +43,8 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
         console.log(errors);
       });
   
-
+      console.log(fixedCapitalConsumptionsFootprint)
+      console.log(intermediateConsumptionsFootprint);
 
       const newComparativeData = {
         fixedCapitalConsumptions : fixedCapitalConsumptionsFootprint,

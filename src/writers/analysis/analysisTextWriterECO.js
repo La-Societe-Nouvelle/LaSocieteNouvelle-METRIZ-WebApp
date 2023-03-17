@@ -98,7 +98,7 @@ export const analysisTextWriterECO = (props) => {
   }
 
   // comptes les plus impactants
-  let bestAccount = externalExpensesAccounts.sort(
+  let bestAccount = financialData.externalExpensesAccounts.sort(
     (a, b) =>
       b.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(b.periodsData[period.periodKey].amount) -
       a.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(a.periodsData[period.periodKey].amount)

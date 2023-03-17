@@ -533,6 +533,7 @@ export class FinancialData {
     // Providers
     for (let provider of this.providers) {
       let prevProvider = prevFinancialData.providers.find(prev => prev.providerNum === provider.providerNum);
+      // to do : logique inverse et create new provider if not exists
       await provider.loadPrevProvider(prevProvider);
     }
 

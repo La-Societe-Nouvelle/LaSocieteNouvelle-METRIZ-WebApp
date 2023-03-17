@@ -14,7 +14,7 @@ import {
   getKeySuppliers,
   getUncertaintyDescription,
   loadFonts,
-  sortCompaniesByFootprint,
+  sortAccountsByFootprint,
   targetAnnualReduction,
 } from "./utils/utils";
 
@@ -74,14 +74,14 @@ export const createIndiceIndicatorPDF = (
   const branchProductionEvolution =
     calculateAverageEvolutionRate(lastEstimatedData);
 
-  const firstMostImpactfulCompanies = sortCompaniesByFootprint(
+  const firstMostImpactfulCompanies = sortAccountsByFootprint(
     financialData.providers,
     period,
     indic,
     "desc"
   ).slice(0, 2);
 
-  const scdMostImpactfulCompanies = sortCompaniesByFootprint(
+  const scdMostImpactfulCompanies = sortAccountsByFootprint(
     financialData.providers,
     period,
     indic,

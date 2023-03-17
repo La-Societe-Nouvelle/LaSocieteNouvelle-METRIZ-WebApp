@@ -10,12 +10,10 @@ const ComparativeGraphs = (props) => {
   const id  = props.id;
   const unit  = metaIndics[props.indic].unit;
   const precision = metaIndics[props.indic].nbDecimals;
-  const year = props.year;
-
-  const labels = ["France", ["Exercice " + year], "Branche"];
+  const labels = ["France", "Exercice", "Branche"];
 
   // Remove "Branche" label if no comparative division selected
-  if(props.graphDataset[2] == null) {
+  if( props.graphDataset[2] == null) {
     labels.pop()
   }
   let suggestedMax;
@@ -70,7 +68,7 @@ const ComparativeGraphs = (props) => {
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
-          "RGBA(215,220,251,1)",
+          "RGBA(250,89,95,0.5)",
           "rgb(255 220 141)",
         ],
         borderWidth: 0,

@@ -6,10 +6,10 @@ import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
   cutString,
   getIndicDescription,
-  getIntensKeySuppliers,
+  getIntensKeyProviders,
   getUncertaintyDescription,
   loadFonts,
-  sortCompaniesByFootprint,
+  sortAccountsByFootprint,
   sortCompaniesByImpact,
 } from "./utils/utils";
 
@@ -28,7 +28,6 @@ loadFonts();
 
 export const createContribIndicatorPDF = (
   title,
-  year,
   legalUnit,
   indic,
   financialData,
@@ -38,36 +37,45 @@ export const createContribIndicatorPDF = (
 ) => {
   // ---------------------------------------------------------------
 
-  const { production } = financialData.mainAggregates;
+  const { production, intermediateConsumptions } = financialData.mainAggregates;
   const { revenue } = financialData.productionAggregates;
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
   const divisionName = divisions[comparativeData.activityCode];
+  const currentPeriod = period.periodKey.slice(2);
 
   // ---------------------------------------------------------------
   // utils
   const indicDescription = getIndicDescription(indic);
+  const externalExpensesAccounts = financialData.externalExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey)); 
+  
 
-  const mostImpactfulExpenses = sortCompaniesByFootprint(
-    financialData.externalExpenses,
+  const providers = financialData.providers.filter(provider => {
+    return Object.keys(provider.periodsData).some(key => key === period.periodKey);
+  });
+
+  const mostImpactfulExpenses = sortAccountsByFootprint(
+    externalExpensesAccounts,
     period,
     indic,
     "desc"
   ).slice(0, 3);
 
-  const leastImpactfulExpenses = sortCompaniesByFootprint(
-    financialData.externalExpenses,
+  console.log(mostImpactfulExpenses)
+  const leastImpactfulExpenses = sortAccountsByFootprint(
+    externalExpensesAccounts,
     period,
     indic,
     "asc"
   ).slice(0, 3);
 
-  const mostImpactfulCompanies = sortCompaniesByImpact(
-    financialData.providers,
+  const mostImpactfulProviders = sortCompaniesByImpact(
+    providers,
     indic,
     "desc"
   ).slice(0, 4);
+
 
   const uncertaintyText = getUncertaintyDescription(
     "proportion",
@@ -93,9 +101,11 @@ export const createContribIndicatorPDF = (
   // key numbers
 
   const totalRevenue = revenue.periodsData[period.periodKey].amount;
+
   const contributionPercentage = revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
   const contributionAmount = (contributionPercentage / 100) * totalRevenue;
   const contributionPerEuro = contributionAmount / totalRevenue;
+ 
 
   // ---------------------------------------------------------------
   // Document Property
@@ -117,7 +127,7 @@ export const createContribIndicatorPDF = (
     "_" +
     legalUnit.replaceAll(" ", "") +
     "-" +
-    year;
+    currentPeriod;
 
   // ---------------------------------------------------------------
   // PDF Content and Layout
@@ -129,7 +139,7 @@ export const createContribIndicatorPDF = (
       columns: [
         { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
-          text: "Exercice  " + year,
+          text: "Exercice  " + currentPeriod,
           alignment: "right",
           margin: [0, 15, 20, 0],
           bold: true,
@@ -429,8 +439,9 @@ export const createContribIndicatorPDF = (
               },
               {
                 text:
+                // PREV : Empreinte des charges externes
                   printValue(
-                    externalExpenses.footprint.indicators[indic].value,
+                    intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
                     1
                   ) + " %",
                 alignment: "center",
@@ -491,7 +502,7 @@ export const createContribIndicatorPDF = (
 
               mostImpactfulExpenses.map((expense) => ({
                 text: cutString(
-                  expense.account + " - " + expense.accountLib,
+                  expense.accountNum + " - " + expense.accountLib,
                   60
                 ),
               })),
@@ -504,7 +515,7 @@ export const createContribIndicatorPDF = (
               },
               leastImpactfulExpenses.map((expense) => ({
                 text: cutString(
-                  expense.account + " - " + expense.accountLib,
+                  expense.accountNum + " - " + expense.accountLib,
                   60
                 ),
               })),
@@ -515,12 +526,13 @@ export const createContribIndicatorPDF = (
                 style: "h2",
                 margin: [0, 30, 0, 10],
               },
-              ...getIntensKeySuppliers(
-                mostImpactfulCompanies,
+              ...getIntensKeyProviders(
+                mostImpactfulProviders,
                 indic,
                 unit,
                 unitGrossImpact,
-                precision
+                precision,
+                period
               ),
             ],
           },

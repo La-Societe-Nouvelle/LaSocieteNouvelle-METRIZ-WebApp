@@ -53,12 +53,22 @@ function TrendsGraph(props) {
           borderDash: [5, 8],
           order: 3,
         },
+        // TO DO get Year
         {
           type: "bubble",
           label: "Situation",
-          data: [{ x: "2021", y: props.current, r: 5 }],
+          data: [{ x: "2022", y: props.current, r: 5 }],
           backgroundColor: "rgb(250,89,95)",
           borderColor: "rgb(250,89,95)",
+          borderWidth: 4,
+          order: 1,
+        },
+        {
+          type: "bubble",
+          label: "Situation",
+          data: [{ x: "2021", y: props.prev - 10, r: 5 }],
+          backgroundColor: "rgba(250,89,95,0.5)",
+          borderColor: "rgba(250,89,95,0.5)",
           borderWidth: 4,
           order: 1,
         },
