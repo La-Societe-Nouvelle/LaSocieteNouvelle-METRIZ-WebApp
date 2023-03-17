@@ -13,7 +13,6 @@ import {
   targetAnnualReduction,
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
-  cutString,
 } from "./utils/utils";
 import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 
@@ -25,16 +24,19 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
 export const createIntensIndicatorPDF = (
-  year,
   legalUnit,
   indic,
   label,
   unit,
   financialData,
   comparativeData,
-  download
+  download,
+  period
 ) => {
   // ---------------------------------------------------------------
+
+  const currentPeriod = period.periodKey.slice(2);
+
   const {
     revenue
   } = financialData.productionAggregates;
@@ -56,13 +58,15 @@ export const createIntensIndicatorPDF = (
 
   let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[
     indic
-  ].data.filter((item) => item.flag == "e" && item.year <= year);
+  ].data.filter((item) => item.flag == "e" && item.year <= currentPeriod);
+
+
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)
   );
 
-  let expensesAccounts = financialData.expenseAccounts.filter((expense) =>
-    /^6(0[^3]|[1-2])/.test(expense.accountNum)
+  let expensesAccounts = financialData.externalExpenses.filter((expense) =>
+    /^6(0[^3]|[1-2])/.test(expense.accountNum) && expense.date.slice(0,4) == period.periodKey.slice(2)
   );
 
   const mostImpactfulExpenses = sortCompaniesByImpact(
@@ -80,14 +84,18 @@ export const createIntensIndicatorPDF = (
   const branchProductionEvolution =
     calculateAverageEvolutionRate(lastEstimatedData);
 
+    const providers = financialData.providers.filter(provider => {
+      return Object.keys(provider.periodsData).some(key => key === period.periodKey);
+    });
+
   const firstMostImpactfulCompanies = sortCompaniesByImpact(
-    financialData.companies,
+    providers,
     indic,
     "desc"
   ).slice(0, 2);
 
   const scdMostImpactfulCompanies = sortCompaniesByImpact(
-    financialData.companies,
+    providers,
     indic,
     "desc"
   ).slice(2, 4);
@@ -95,7 +103,8 @@ export const createIntensIndicatorPDF = (
   // Part des consommations intermédiaires
   const intermediateConsumptionsPart = getIntermediateConsumptionsPart(
     financialData,
-    indic
+    indic,
+    period
   );
 
   const uncertaintyText = getUncertaintyDescription(
@@ -135,7 +144,7 @@ export const createIntensIndicatorPDF = (
     "Fiche_" +
     indic.toUpperCase() +
     "_" +
-    year +
+    currentPeriod +
     "-" +
     legalUnit.replaceAll(" ", "");
 
@@ -149,7 +158,7 @@ export const createIntensIndicatorPDF = (
       columns: [
         { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
-          text: "Exercice  " + year,
+          text: "Exercice  " + currentPeriod,
           alignment: "right",
           margin: [0, 15, 20, 0],
           bold: true,
@@ -499,7 +508,8 @@ export const createIntensIndicatorPDF = (
                 indic,
                 unit,
                 unitGrossImpact,
-                precision
+                precision,
+                period
               ),
             ],
           },
@@ -516,7 +526,8 @@ export const createIntensIndicatorPDF = (
                 indic,
                 unit,
                 unitGrossImpact,
-                precision
+                precision,
+                period
               ),
             ],
           },
@@ -894,9 +905,9 @@ export const createIntensIndicatorPDF = (
               {
                 text:
                   "Taux d'évolution moyen observé entre " +
-                  lastEstimatedData[0].year +
+                  lastEstimatedData[0].currentPeriod +
                   " et " +
-                  lastEstimatedData[1].year,
+                  lastEstimatedData[1].currentPeriod,
                 alignment: "center",
                 fontSize: "8",
               },
@@ -1061,7 +1072,7 @@ function createChargesImpactContent(
   }
 }
 
-function getIntermediateConsumptionsPart(financialData, indic) {
+function getIntermediateConsumptionsPart(financialData, indic,period) {
   let total =
     financialData.mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
       indic

@@ -16,6 +16,7 @@ export function sortAccountsByFootprint(accounts, period, indicator, order) {
 }
 
 export function sortCompaniesByImpact(expensesAccounts, indicator, order) {
+
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
     const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
@@ -125,7 +126,6 @@ export function getIntensKeyProviders(
   const keySuppliers = [];
 
   const precisionImpact = unitGrossImpact == "€" ? 0 : precision;
-  console.log(providers)
   providers
     .filter((provider) => !provider.isDefaultAccount)
     .map((provider) =>

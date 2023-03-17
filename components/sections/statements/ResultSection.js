@@ -183,14 +183,14 @@ const ResultSection = (props) => {
           break;
         case "intensité":
           createIntensIndicatorPDF(
-            
             session.legalUnit.corporateName,
             indic,
             metaIndics[indic].libelle,
             metaIndics[indic].unit,
             session.financialData,
             session.comparativeData,
-            true
+            true,
+            period
           );
           break;
         case "indice":
