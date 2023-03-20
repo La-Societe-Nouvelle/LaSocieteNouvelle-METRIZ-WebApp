@@ -114,7 +114,7 @@ export class SectorSection extends React.Component
                   </div>}
                 
                 {/* ---------- Head ---------- */}
-                <div className="pagination">
+                <div className="pagination mb-3">
                   <div className="form-group">
                     <select
                       className="form-select"

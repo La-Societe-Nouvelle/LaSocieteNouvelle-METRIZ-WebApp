@@ -102,7 +102,9 @@ const ResultSection = (props) => {
     if (comparativeDivision != props.session.comparativeData.activityCode) {
       let newComparativeData = comparativeData;
 
-      for await (const indic of props.session.validations[props.session.financialPeriod.periodKey]) {
+      for await (const indic of props.session.validations[
+        props.session.financialPeriod.periodKey
+      ]) {
         // update comparative data for each  indicators
         const updatedData = await updateComparativeData(
           indic,
@@ -250,7 +252,7 @@ const ResultSection = (props) => {
           <Button variant="secondary" onClick={handleindicReportPDF}>
             Plaquette <i className="bi bi-download"></i>
           </Button>
-          <Button 
+          <Button
             variant="secondary"
             onClick={() =>
               createIndicReport(
@@ -379,9 +381,9 @@ const ResultSection = (props) => {
                       indic
                     ].value,
                     prevPeriod &&
-                    production.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value ,
+                      production.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.production.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -405,10 +407,10 @@ const ResultSection = (props) => {
                   targetData={[
                     comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
-                      prevPeriod &&
-                    intermediateConsumptions.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value ,
+                    prevPeriod &&
+                      intermediateConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -433,10 +435,10 @@ const ResultSection = (props) => {
                   targetData={[
                     comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
-                      prevPeriod &&
-                    fixedCapitalConsumptions.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value,
+                    prevPeriod &&
+                      fixedCapitalConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -464,10 +466,10 @@ const ResultSection = (props) => {
                   targetData={[
                     comparativeData.netValueAdded.targetAreaFootprint
                       .indicators[indic].value,
-                      prevPeriod &&
+                    prevPeriod &&
                       netValueAdded.periodsData[
                         prevPeriod.periodKey
-                      ].footprint.getIndicator(indic).value ,
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.netValueAdded.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -497,7 +499,6 @@ const ResultSection = (props) => {
                 session.financialData.mainAggregates.production.periodsData[
                   period.periodKey
                 ].footprint.getIndicator(indic).value,
-                
                 session.financialData.mainAggregates.intermediateConsumptions.periodsData[
                   period.periodKey
                 ].footprint.getIndicator(indic).value,
@@ -520,8 +521,6 @@ const ResultSection = (props) => {
                 ].value,
               ]}
               indic={indic}
-              unit={metaIndics[indic].unit}
-              precision={metaIndics[indic].nbDecimal}
             />
           </Col>
         </Row>
@@ -569,11 +568,14 @@ const ResultSection = (props) => {
                       period.periodKey
                     ].footprint.getIndicator(indic).value
                   }
-                  prev={ prevPeriod &&
+                  prev={
+                    prevPeriod &&
                     production.periodsData[
                       prevPeriod.periodKey
                     ].footprint.getIndicator(indic).value
                   }
+                  period={period}
+                  prevPeriod={prevPeriod}
                 />
               </div>
               <div
@@ -606,6 +608,14 @@ const ResultSection = (props) => {
                       period.periodKey
                     ].footprint.getIndicator(indic).value
                   }
+                  prev={
+                    prevPeriod &&
+                    intermediateConsumptions.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.getIndicator(indic).value
+                  }
+                  period={period}
+                  prevPeriod={prevPeriod}
                 />
               </div>
               <div
@@ -638,6 +648,14 @@ const ResultSection = (props) => {
                       period.periodKey
                     ].footprint.getIndicator(indic).value
                   }
+                  prev={
+                    prevPeriod &&
+                    fixedCapitalConsumptions.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.getIndicator(indic).value
+                  }
+                  period={period}
+                  prevPeriod={prevPeriod}
                 />
               </div>
               <div
@@ -672,6 +690,14 @@ const ResultSection = (props) => {
                       period.periodKey
                     ].footprint.getIndicator(indic).value
                   }
+                  prev={
+                    prevPeriod &&
+                    netValueAdded.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.getIndicator(indic).value
+                  }
+                  period={period}
+                  prevPeriod={prevPeriod}
                 />
               </div>
             </Col>
