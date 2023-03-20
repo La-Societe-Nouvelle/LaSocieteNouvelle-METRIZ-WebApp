@@ -107,7 +107,9 @@ export class Stock {
     this.initialStateSet = prevStock.initialStateSet;
 
     // purchasesAccounts
-    this.purchasesAccounts = this.purchasesAccounts.concat(prevStock.purchasesAccounts.filter(account => !this.purchasesAccounts.includes(account)));
+    if(prevStock.purchasesAccounts.length > 0) {
+      this.purchasesAccounts = this.purchasesAccounts.concat(prevStock.purchasesAccounts.filter(account => !this.purchasesAccounts.includes(account)));
+    }
     // states
     Object.values(prevStock.states)
       .forEach(state => this.states[state.date] = new StockState(state));
