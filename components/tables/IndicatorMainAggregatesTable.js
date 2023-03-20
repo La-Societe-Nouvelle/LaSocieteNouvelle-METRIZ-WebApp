@@ -810,7 +810,7 @@ export const IndicatorMainAggregatesTable = ({
           variant="tertiary"
           size="sm"
           className="me-0 mb-2"
-          onClick={() => exportIndicXLSX(indic, session)}
+          onClick={() => exportIndicXLSX(indic, session, period)}
         >
           Télécharger les données <i className="bi bi-download"></i>
         </Button>

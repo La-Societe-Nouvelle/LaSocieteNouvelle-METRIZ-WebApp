@@ -40,7 +40,14 @@ export class Session {
     // Year
     this.year = props.year || ""; // obsolete
     this.availablePeriods = props.availablePeriods || [];
+    this.availablePeriods.forEach(period => {
+      period.regex = buildRegexFinancialPeriod(period.dateStart, period.dateEnd)
+    })
+
     this.financialPeriod = props.financialPeriod || {};
+    this.financialPeriod.regex = props.financialPeriod
+      ? buildRegexFinancialPeriod(props.financialPeriod.dateStart, props.financialData.dateEnd)
+      : {};
 
     // Data
     this.legalUnit = new LegalUnit(props.legalUnit);
