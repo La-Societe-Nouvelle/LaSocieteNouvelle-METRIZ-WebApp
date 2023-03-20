@@ -15,6 +15,7 @@ import {
   getUncertaintyDescription,
   loadFonts,
   sortAccountsByFootprint,
+  sortProvidersByImpact,
   targetAnnualReduction,
 } from "./utils/utils";
 
@@ -39,6 +40,8 @@ export const createIndiceIndicatorPDF = (
 ) => {
   // ---------------------------------------------------------------
   // Variables
+
+  const currentPeriod = period.periodKey.slice(2);
   const precision = metaIndics[indic].nbDecimals;
   const divisionName = divisions[comparativeData.activityCode];
 
@@ -65,7 +68,7 @@ export const createIndiceIndicatorPDF = (
 
   let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[
     indic
-  ].data.filter((item) => item.flag == "e" && item.year <= year);
+  ].data.filter((item) => item.flag == "e" && item.year <= currentPeriod);
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)
   );
@@ -73,20 +76,24 @@ export const createIndiceIndicatorPDF = (
   const branchProductionEvolution =
     calculateAverageEvolutionRate(lastEstimatedData);
 
-  const firstMostImpactfulCompanies = sortAccountsByFootprint(
-    financialData.providers,
-    period,
+
+    const providers = financialData.providers.filter(provider => {
+      return Object.keys(provider.periodsData).some(key => key === period.periodKey);
+    });
+
+
+  const firstMostImpactfulCompanies = sortProvidersByImpact(
+   providers,
     indic,
     "desc"
   ).slice(0, 2);
 
-  const scdMostImpactfulCompanies = sortAccountsByFootprint(
-    financialData.providers,
-    period,
+  const scdMostImpactfulCompanies = sortProvidersByImpact(
+    providers,
     indic,
     "desc"
   ).slice(2, 4);
-
+ 
   const uncertaintyText = getUncertaintyDescription(
     "indice",
     production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty
@@ -119,7 +126,7 @@ export const createIndiceIndicatorPDF = (
     "Fiche_" +
     indic.toUpperCase() +
     "_" +
-    year +
+    currentPeriod +
     "-" +
     legalUnit.replaceAll(" ", "");
 
@@ -132,7 +139,7 @@ export const createIndiceIndicatorPDF = (
       columns: [
         { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
-          text: "Exercice  " + year,
+          text: "Exercice  " + currentPeriod,
           alignment: "right",
           margin: [0, 15, 20, 0],
           bold: true,

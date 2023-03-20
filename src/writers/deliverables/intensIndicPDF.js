@@ -9,7 +9,7 @@ import {
   getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
   loadFonts,
-  sortCompaniesByImpact,
+  sortProvidersByImpact,
   targetAnnualReduction,
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
@@ -69,7 +69,7 @@ export const createIntensIndicatorPDF = (
     /^6(0[^3]|[1-2])/.test(expense.accountNum) && expense.date.slice(0,4) == period.periodKey.slice(2)
   );
 
-  const mostImpactfulExpenses = sortCompaniesByImpact(
+  const mostImpactfulExpenses = sortProvidersByImpact(
     expensesAccounts,
     indic,
     "desc"
@@ -88,13 +88,13 @@ export const createIntensIndicatorPDF = (
       return Object.keys(provider.periodsData).some(key => key === period.periodKey);
     });
 
-  const firstMostImpactfulCompanies = sortCompaniesByImpact(
+  const firstMostImpactfulCompanies = sortProvidersByImpact(
     providers,
     indic,
     "desc"
   ).slice(0, 2);
 
-  const scdMostImpactfulCompanies = sortCompaniesByImpact(
+  const scdMostImpactfulCompanies = sortProvidersByImpact(
     providers,
     indic,
     "desc"

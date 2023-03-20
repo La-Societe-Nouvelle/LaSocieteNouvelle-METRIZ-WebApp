@@ -2,6 +2,7 @@ import { printValue } from "../../../utils/Utils";
 
 
 export function sortAccountsByFootprint(accounts, period, indicator, order) {
+
   const sortedAccounts = accounts.sort((a, b) => {
     const valueA = a.periodsData[period.periodKey].footprint.indicators[indicator].value;
     const valueB = b.periodsData[period.periodKey].footprint.indicators[indicator].value;
@@ -15,7 +16,9 @@ export function sortAccountsByFootprint(accounts, period, indicator, order) {
   return sortedAccounts;
 }
 
-export function sortCompaniesByImpact(expensesAccounts, indicator, order) {
+
+
+export function sortProvidersByImpact(expensesAccounts, indicator, order) {
 
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);

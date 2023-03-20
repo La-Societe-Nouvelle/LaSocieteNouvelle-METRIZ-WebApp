@@ -10,7 +10,7 @@ import {
   getUncertaintyDescription,
   loadFonts,
   sortAccountsByFootprint,
-  sortCompaniesByImpact,
+  sortProvidersByImpact,
 } from "./utils/utils";
 
 // Lib
@@ -62,7 +62,7 @@ export const createContribIndicatorPDF = (
     "desc"
   ).slice(0, 3);
 
-  console.log(mostImpactfulExpenses)
+
   const leastImpactfulExpenses = sortAccountsByFootprint(
     externalExpensesAccounts,
     period,
@@ -70,7 +70,7 @@ export const createContribIndicatorPDF = (
     "asc"
   ).slice(0, 3);
 
-  const mostImpactfulProviders = sortCompaniesByImpact(
+  const mostImpactfulProviders = sortProvidersByImpact(
     providers,
     indic,
     "desc"
