@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx';
 import { getExpensesGroupByAccount } from '../../components/tables/IndicatorExpensesTable';
 import { getFixedCapitalConsumptionsAggregatesGroups, getIntermediateConsumptionsAggregatesGroups } from '../../components/tables/IndicatorMainAggregatesTable';
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../formulas/aggregatesBuilder';
 import {  roundValue } from '../utils/Utils';
 
 import metaIndics from "/lib/indics";
@@ -8,11 +9,13 @@ import metaIndics from "/lib/indics";
 async function exportIndicXLSX(
   indic,
   session,
+  period
 ) {
   // Build file
   let file = await IndicXLSXFileWriter(
     indic,
-    session
+    session,
+    period
   );
 
   let blob = new Blob([file], { type: "application/octet-stream" });
@@ -24,14 +27,14 @@ async function exportIndicXLSX(
 
 /* ---------- CONTENT BUILDER ---------- */
 
-async function IndicXLSXFileWriter(indic,session)
+async function IndicXLSXFileWriter(indic,session,period)
 {
   const workbook = XLSX.utils.book_new();
 
   //workbook.Props = fileProps;
 
   // build main aggregates tab
-  let mainAggregatesContent = await buildMainAggregatesContent(indic,session);
+  let mainAggregatesContent = await buildMainAggregatesContent(indic,session,period);
   const mainAggregatesWorksheet = XLSX.utils.aoa_to_sheet(mainAggregatesContent);
   mainAggregatesWorksheet['!cols'] = [{ wch: 75 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
   workbook.SheetNames.push("Soldes");
@@ -56,7 +59,7 @@ async function IndicXLSXFileWriter(indic,session)
 
 /* ---------- CONTENT BUILDERS ---------- */ 
 
-async function buildMainAggregatesContent(indic,session)
+async function buildMainAggregatesContent(indic,session,period)
 {
   let aoaContent = [];
 
@@ -131,7 +134,10 @@ async function buildMainAggregatesContent(indic,session)
   ])
 
   const intermediateConsumptionsAggregates =
-    getIntermediateConsumptionsAggregatesGroups(session.financialData);
+  await buildIntermediateConsumptionsAggregates(
+    session.financialData,
+    period.periodKey
+  );
 
   intermediateConsumptionsAggregates
     .filter((aggregate) => aggregate.amount != 0)
@@ -155,7 +161,11 @@ async function buildMainAggregatesContent(indic,session)
   ])
 
   const fixedCapitalConsumptionsAggregates =
-    getFixedCapitalConsumptionsAggregatesGroups(session.financialData);
+  await buildFixedCapitalConsumptionsAggregates(
+    session.financialData,
+    period.periodKey
+  );
+
 
   fixedCapitalConsumptionsAggregates
     .filter((aggregate) => aggregate.amount != 0)
@@ -211,17 +221,17 @@ async function buildExpensesContent(indic,session)
   ])
 
   // Consommations intermédiaires
-
+  console.log(expensesByAccount)
   expensesByAccount
     .forEach(({ accountNum, accountLib, amount }) => 
     {
-      let indicator = session.getExpensesAccountIndicator(accountNum,indic);
+      let indicator = session.getExpensesAccountIndicator(accountNum,indic); // TO FIX
       aoaContent.push([
         accountNum,
         accountLib,
         roundValue(amount, 0),
         roundValue(indicator.getValue(), nbDecimals),
-        roundValue(indicator.getUncertainty(), 0)
+        roundValue(indicator.getUncertainty(),   0)
       ]);
     });
 
