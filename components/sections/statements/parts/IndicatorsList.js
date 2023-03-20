@@ -54,7 +54,7 @@ import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 import { getTargetSerieId } from "/src/utils/Utils";
-import { printValue } from "../../../../src/utils/Utils";
+import { getPrevDate, printValue } from "../../../../src/utils/Utils";
 
 // PDF Generation
 import { createIndicReport } from "../../../../src/writers/deliverables/indicReportPDF";
@@ -78,6 +78,15 @@ const IndicatorsList = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeData.activityCode
   );
+
+    // Prev Period
+
+    const prevDateEnd = getPrevDate(period.dateStart);
+    const prevPeriod = props.session.availablePeriods.find(
+      (period) => period.dateEnd == prevDateEnd
+    );
+    console.log(prevPeriod)
+  
   useEffect(async () => {
     if (validations.length > 0) {
       props.publish();
@@ -96,9 +105,7 @@ const IndicatorsList = (props) => {
 
   useEffect(async () => {
     if(comparativeDivision !== props.session.comparativeData.activityCode) {
-
       await updateDivision(props.session.comparativeData.activityCode)
-
     }
   }, [props.session.comparativeData.activityCode]);
 
@@ -312,7 +319,10 @@ const IndicatorsList = (props) => {
                     comparativeData.production.targetAreaFootprint.indicators[
                       indic
                     ].value,
-                    null,
+                    prevPeriod &&
+                    props.session.financialData.mainAggregates.production.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.getIndicator(indic).value,
                     comparativeData.production.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -337,7 +347,10 @@ const IndicatorsList = (props) => {
                   targetData={[
                     comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
-                    null,
+                      prevPeriod &&
+                      props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -361,7 +374,10 @@ const IndicatorsList = (props) => {
                   targetData={[
                     comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
-                    null,
+                      prevPeriod &&
+                      props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -387,7 +403,10 @@ const IndicatorsList = (props) => {
                   targetData={[
                     comparativeData.netValueAdded.targetAreaFootprint
                       .indicators[indic].value,
-                    null,
+                      prevPeriod &&
+                      props.session.financialData.mainAggregates.netValueAdded.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.netValueAdded.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -538,6 +557,14 @@ const IndicatorsList = (props) => {
                             indic
                           ).value
                         }
+                        prev={
+                          prevPeriod &&
+                          props.session.financialData.mainAggregates.production.periodsData[
+                            prevPeriod.periodKey
+                          ].footprint.getIndicator(indic).value
+                        }
+                        period={period}
+                        prevPeriod={prevPeriod}
                       />
                     </Col>
                   </Row>
