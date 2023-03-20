@@ -16,7 +16,7 @@ import { createIndiceIndicatorPDF } from "./indiceIndicPDF";
 import ChangeDivision from "../../../components/popups/ChangeDivision";
 
 const ZipGenerator = ({
-  year,
+  period,
   legalUnit,
   validations,
   financialData,
@@ -67,19 +67,20 @@ const ZipGenerator = ({
   }
 
   async function generatePDFs() {
-
+    
+    const year = period.periodKey.slice(2);
 
     const documentTitle =
       "Empreinte-Societale_" +
       session.legalUnit.corporateName.replaceAll(" ", "") +
       "_" +
-      session.year;
+      year;
 
     // Initialiser l'objet jsZip
     // Générer les PDFs et les ajouter au zip
 
     const coverPage = createCoverPage(
-      session.year,
+      year,
       session.legalUnit.corporateName
     );
     const basicPDFpromises = [];
@@ -90,7 +91,6 @@ const ZipGenerator = ({
 
       basicPDFpromises.push(
         createIndicReport(
-          year,
           legalUnit,
           indic,
           metaIndics[indic].libelle,
@@ -108,7 +108,6 @@ const ZipGenerator = ({
           reportPDFpromises.push(
             createContribIndicatorPDF(
               metaIndics[indic].libelle,
-              year,
               legalUnit,
               indic,
               financialData,
@@ -121,7 +120,6 @@ const ZipGenerator = ({
         case "intensité":
           reportPDFpromises.push(
             createIntensIndicatorPDF(
-              year,
               legalUnit,
               indic,
               metaIndics[indic].libelle,
@@ -138,7 +136,6 @@ const ZipGenerator = ({
             createIndiceIndicatorPDF(
               metaIndics[indic].libelle,
               metaIndics[indic].libelleGrandeur,
-              year,
               legalUnit,
               indic,
               metaIndics[indic].unit,
@@ -237,12 +234,12 @@ const ZipGenerator = ({
         generateFootprintPDF(
           docEES,
           envIndic,
+          period,
           financialData,
           legalUnit,
           year,
           "Empreinte environnementale",
           envOdds,
-          period
         );
 
         docEES.addPage();
@@ -250,12 +247,12 @@ const ZipGenerator = ({
         generateFootprintPDF(
           docEES,
           seIndic,
+          period,
           financialData,
           legalUnit,
           year,
           "Empreinte économique et sociale",
           seOdds,
-          period
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
 

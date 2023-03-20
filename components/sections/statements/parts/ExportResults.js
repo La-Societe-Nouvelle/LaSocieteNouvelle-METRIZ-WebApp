@@ -88,7 +88,7 @@ const ExportResults = (props) => {
           </p>
         </div>
         <ZipGenerator
-          year={props.session.year}
+          period={period}
           legalUnit={props.session.legalUnit.corporateName}
           validations={props.validations}
           financialData={props.session.financialData}
