@@ -102,21 +102,29 @@ export const IndicatorMainAggregatesTable = ({
   return (
     <>
       <Table id="mainAggregates" size="sm" responsive>
-        <thead>
-          <tr>
-            <td>Agrégat</td>
-            <td className="text-end">Montant</td>
-            <td className="text-end">Empreinte</td>
-            <td className="text-end">Incertitude</td>
-            {printGrossImpact ? <td className="text-end">Impact</td> : null}
-            {prevPeriod && (
-              <>
-                <td className="text-end">Empreinte N-1</td>
-                <td className="text-end">Incertitude N-1</td>
-              </>
-            )}
-          </tr>
-        </thead>
+      <thead>
+    <tr>
+      <th>Agrégat</th>
+      <th colspan="3" class="text-center">Année N</th>
+      {prevPeriod && (
+        <th colspan={printGrossImpact ? "4" : "3"} class="text-center">N-1</th>
+      )}
+    </tr>
+    <tr>
+      <td></td>
+      <td class="text-end">Montant</td>
+      <td class="text-end">Empreinte</td>
+      <td class="text-end">Incertitude</td>
+      {printGrossImpact ? <td class="text-end">Impact</td> : null}
+      {prevPeriod && (
+        <>
+          <td class="text-end">Empreinte</td>
+          <td class="text-end">Incertitude</td>
+          {printGrossImpact ? <td class="text-end">Impact</td> : null}
+        </>
+      )}
+    </tr>
+  </thead>
         <tbody>
           <tr className="fw-bold">
             <td>Production</td>
