@@ -6,7 +6,7 @@ export const analysisTextWriterGHG = (props) => {
   const { impactsData, comparativeData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
   const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
-
+  console.log(props)
   // array of paragraphs
   let analysis = [];
   let currentParagraph = [];
@@ -157,8 +157,8 @@ export const analysisTextWriterGHG = (props) => {
     mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
     ) >
-      mainAggregates.fixedCapitalConsumptions.footprint.indicators.ghg.getGrossImpact(
-        mainAggregates.fixedCapitalConsumptions.amount
+      mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
       )
   ) {
     currentParagraph.push(
