@@ -9,7 +9,7 @@ import ChangeDivision from "../../../popups/ChangeDivision";
 const ExportResults = (props) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [popUp, setPopUp] = useState(false);
-
+  const [period] = useState(props.session.financialPeriod);
 
   const handleDownloadPDF = async () => {
     await exportFootprintPDF(props.session);
@@ -24,9 +24,6 @@ const ExportResults = (props) => {
     setPopUp();
   };
 
- 
-
-
   const handleDownloadCompleteFile = async () => {
     if (props.session.comparativeData.activityCode == "00") {
       setPopUp("pdf");
@@ -39,13 +36,13 @@ const ExportResults = (props) => {
       await new Promise((resolve) => setTimeout(resolve, 0));
 
       await generateCompleteFile(
-        props.session.year,
         props.session.legalUnit.corporateName,
-        props.validations,
+        props.session.validations[period.periodKey],
         props.session.financialData,
         props.session.impactsData,
         props.session.comparativeData,
-        () => updateIsGenerating(false)
+        () => updateIsGenerating(false),
+        period,
       );
 
       props.updateVisibleGraphs(false);

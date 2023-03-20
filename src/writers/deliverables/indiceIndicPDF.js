@@ -29,7 +29,6 @@ loadFonts();
 export const createIndiceIndicatorPDF = (
   title,
   libelleGrandeur,
-  year,
   legalUnit,
   indic,
   unit,

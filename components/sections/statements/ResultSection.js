@@ -204,8 +204,6 @@ const ResultSection = (props) => {
             metaIndics[indic].unit,
             session.financialData,
             session.comparativeData,
-            comparativeData.netValueAdded.trendsFootprint.indicators[indic].meta
-              .label,
             true,
             period
           );

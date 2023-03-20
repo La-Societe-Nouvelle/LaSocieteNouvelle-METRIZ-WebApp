@@ -115,6 +115,7 @@ export const ComparativeTable = ({
             <td className="text-end">Objectif 2030</td>
             <td className="border-left text-end">Valeur</td>
             <td className="border-left text-end">Valeur</td>
+            <td className="border-left text-end">Valeur</td>
             <td className="text-end">Objectif 2030</td>
             <td className="text-end">Evolution</td>
           </tr>

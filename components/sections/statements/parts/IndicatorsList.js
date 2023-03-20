@@ -63,7 +63,7 @@ import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/i
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 
 const IndicatorsList = (props) => {
-  const period = props.period;
+  const [period] =  useState(props.period);
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
@@ -254,7 +254,8 @@ const IndicatorsList = (props) => {
       await generateIndicatorReportPDF(
         props.session,
         key,
-        divisions[comparativeDivision]
+        divisions[comparativeDivision],
+        period
       );
 
       setPopUp("");
@@ -995,13 +996,15 @@ function ModalAssesment(props) {
   );
 }
 
-async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
+async function generateIndicatorReportPDF(session, indic, comparativeDivision,period) {
   // Create an array of promises for generating PDF files
   const pdfPromises = [];
+  console.log(period); 
+  const year = period.periodKey.slice(2);
 
   const documentTitle =
     "Rapport_" +
-    session.year +
+    year +
     "_" +
     session.legalUnit.corporateName.replaceAll(" ", "") +
     "-" +
@@ -1014,26 +1017,26 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
       pdfPromises.push(
         createContribIndicatorPDF(
           metaIndics[indic].libelle,
-          session.year,
           session.legalUnit.corporateName,
           indic,
           session.financialData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
       break;
     case "intensité":
       pdfPromises.push(
         createIntensIndicatorPDF(
-          session.year,
           session.legalUnit.corporateName,
           indic,
           metaIndics[indic].libelle,
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
       break;
@@ -1042,23 +1045,22 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
         createIndiceIndicatorPDF(
           metaIndics[indic].libelle,
           metaIndics[indic].libelleGrandeur,
-          session.year,
           session.legalUnit.corporateName,
           indic,
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
       break;
     default:
       break;
   }
-
+ 
   pdfPromises.push(
     createIndicReport(
-      session.year,
       session.legalUnit.corporateName,
       indic,
       metaIndics[indic].libelle,
@@ -1066,8 +1068,8 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
       session.financialData,
       session.impactsData,
       session.comparativeData,
-      divisions[comparativeDivision],
-      false
+      false,
+      period
     )
   );
   Promise.all(pdfPromises).then(async (pdfs) => {
