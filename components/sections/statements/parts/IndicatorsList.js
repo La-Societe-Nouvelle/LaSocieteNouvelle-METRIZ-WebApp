@@ -64,7 +64,7 @@ import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/i
 
 const IndicatorsList = (props) => {
   const period = props.period;
-  const [prevIndics] = useState(props.session.indics);
+  const [prevIndics] = useState(props.session.indics[period.periodKey]);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
   const [validations, SetValidations] = useState(props.session.validations[period.periodKey]);

@@ -10,61 +10,63 @@ import { SocialFootprint } from "../footprintObjects/SocialFootprint";
 import { buildRegexFinancialPeriod } from "../Session";
 import { getAmountItems, getPrevDate } from "../utils/Utils";
 
-const updateVersion = (data) =>
+export const updater_2_0_0 = async (sessionData) =>
 {
-  let nextSession = {};
+  let prevSession = {...sessionData};
   
   // version
-  nextSession.version = "2.0.0"; // Session.version ?
+  sessionData.version = "2.0.0"; // Session.version ?
 
   // Progression
-  nextSession.progression = data.progression;
+  sessionData.progression = prevSession.progression;
   
   // Periods
-  let prevFinancialPeriod = getFinancialPeriod(data.year);
-  nextSession.availablePeriods = [prevFinancialPeriod];
-  nextSession.financialPeriod = prevFinancialPeriod;
+  let prevFinancialPeriod = getFinancialPeriod(prevSession.year);
+  console.log(prevFinancialPeriod);
+  sessionData.availablePeriods = [prevFinancialPeriod];
+  sessionData.financialPeriod = prevFinancialPeriod;
 
   // Legal unit data
-  nextSession.legalUnit = data.legalUnit;
+  sessionData.legalUnit = prevSession.legalUnit;
 
   // Financial data
-  nextSession.financialData = getNextFinancialDataObjectBuilder(data.financialData,prevFinancialPeriod);
+  sessionData.financialData = await getNextFinancialDataObjectBuilder(prevSession.financialData,prevFinancialPeriod);
 
   // Impacts data
-  nextSession.impactsData = {
-    [prevFinancialPeriod.periodKey]: data.impactsData,
+  sessionData.impactsData = {
+    [prevFinancialPeriod.periodKey]: prevSession.impactsData,
   };
 
   // Validations
-  nextSession.validations = {
-    [prevFinancialPeriod.periodKey]: data.validations,
+  sessionData.validations = {
+    [prevFinancialPeriod.periodKey]: prevSession.validations,
   };
 
   // Comparative data
-  nextSession.comparativeData = data.comparativeData;
+  sessionData.comparativeData = prevSession.comparativeData;
 
   // Indicators list
-  nextSession.indics = {
-    [prevFinancialPeriod.periodKey]: data.indics,
+  sessionData.indics = {
+    [prevFinancialPeriod.periodKey]: prevSession.indics,
   };
 
-  return nextSession;
+  prevSession = sessionData;
+  console.log(prevSession);
 }
 
 const getFinancialPeriod = (prevYear) =>
 {
-  let year = data.year || "2021"; // default 01/01/2021
+  let year = prevYear || "2021"; // default 01/01/2021
   let prevFinancialPeriod = {
     dateStart: year+"0101",
     dateEnd: year+"1231",
-    periodKey: "FY"+data,
+    periodKey: "FY"+year,
     regex: buildRegexFinancialPeriod(year+"0101",year+"1231"),
   };
   return prevFinancialPeriod;
 }
 
-const getNextFinancialDataObjectBuilder = (prevFinancialDataObject,prevFinancialPeriod) =>
+const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFinancialPeriod) =>
 {
   let nextFinancialData = {};
 
@@ -125,24 +127,30 @@ const getNextFinancialDataObjectBuilder = (prevFinancialDataObject,prevFinancial
 
   // Stocks ---------------------------------- //
 
-  nextFinancialData.stocks = prevFinancialDataObject.stocks.map(prevStock => buildStock(prevFinancialDataObject,prevStock));
+  nextFinancialData.stocks = prevFinancialDataObject.stocks.map(prevStock => buildStock(prevFinancialDataObject,prevStock,prevFinancialPeriod));
+  console.log("stocks OK");
   nextFinancialData.stockVariations = prevFinancialDataObject.stockVariations.map(prevStockVariation => buildStockVariation(prevStockVariation,prevFinancialPeriod));
+  console.log("stock variations OK");
 
   // Immobilisations ------------------------- //
 
   nextFinancialData.immobilisations = prevFinancialDataObject.immobilisations.map(prevImmobilisation => {
     let prevAmortisation = prevFinancialDataObject.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^28/.test(account))[0];
     let prevDepreciation = prevFinancialDataObject.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^29/.test(account))[0];
-    let prevDepreciationExpenses = prevFinancialDataObject.depreciationExpenses.filter(expense => expense.accountAux==prevAmortisation.account);
-    let newtImmobilisation = buildImmobilisation(prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod);
-    return newtImmobilisation;
+    let prevDepreciationExpenses = prevAmortisation ? prevFinancialDataObject.depreciationExpenses.filter(expense => expense.accountAux==prevAmortisation.account) : [];
+    let nextImmobilisation = buildImmobilisation(prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod);
+    return nextImmobilisation;
   });
+  console.log("immobilisations OK");
 
   // depreciationExpenses => only amortisation expenses ?
   nextFinancialData.amortisationExpenses = prevFinancialDataObject.depreciationExpenses.map(prevAmortisationExpense => buildAmortisationExpense(prevAmortisationExpense,prevFinancialPeriod));
-  nextFinancialData.adjustedAmortisationExpenses = nextFinancialData.immobilisations.map(nextImmobilisation => buildAdjustedAmortisationExpense(nextImmobilisation,prevFinancialPeriod));
+  nextFinancialData.adjustedAmortisationExpenses = nextFinancialData.immobilisations
+    .filter(nextImmobilisation => nextImmobilisation.isAmortisable)
+    .map(nextImmobilisation => buildAdjustedAmortisationExpense(nextImmobilisation,prevFinancialPeriod));
   nextFinancialData.investments = prevFinancialDataObject.investments.map(prevInvestment => buildInvestment(prevInvestment,prevFinancialPeriod));
   nextFinancialData.immobilisedProductions = prevFinancialDataObject.immobilisationProductions.map(prevImmobilisedProduction => buildImmobilisedProduction(prevImmobilisedProduction,prevFinancialPeriod));
+  console.log("immobilisation variations OK");
 
   // Expenses accounts ----------------------- //
 
@@ -155,6 +163,7 @@ const getNextFinancialDataObjectBuilder = (prevFinancialDataObject,prevFinancial
   nextFinancialData.amortisationExpensesAccounts = prevFinancialDataObject.expenseAccounts
     .filter(account => /^68/.test(account.account))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
+  console.log("expenses accounts OK");
 
   // Providers ------------------------------- //
 
@@ -163,50 +172,50 @@ const getNextFinancialDataObjectBuilder = (prevFinancialDataObject,prevFinancial
   // Aggregates ------------------------------ //
 
   nextFinancialData.mainAggregates = {
-    production: new Aggregate({
+    production: {
       id:"production", 
       label:"Production",
       periodsData: {
         [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregate.production.amount,
+            amount: prevFinancialDataObject.aggregates.production.amount,
             footprint: prevFinancialDataObject.aggregates.production.footprint,
             periodKey: prevFinancialPeriod.periodKey
         }
       }
-    }),
-    intermediateConsumptions: new Aggregate({
+    },
+    intermediateConsumptions: {
       id:"intermediateConsumptions", 
       label:"Consommations intermédiaires",
       periodsData: {
         [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregate.intermediateConsumption.amount,
+            amount: prevFinancialDataObject.aggregates.intermediateConsumption.amount,
             footprint: prevFinancialDataObject.aggregates.intermediateConsumption.footprint,
             periodKey: prevFinancialPeriod.periodKey
         }
       }
-    }),
-    fixedCapitalConsumptions: new Aggregate({
+    },
+    fixedCapitalConsumptions: {
       id:"intermediateConsumptions", 
       label:"Consommations de capital fixe",
       periodsData: {
         [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregate.capitalConsumption.amount,
+            amount: prevFinancialDataObject.aggregates.capitalConsumption.amount,
             footprint: prevFinancialDataObject.aggregates.capitalConsumption.footprint,
             periodKey: prevFinancialPeriod.periodKey
         }
       }
-    }),
-    netValueAdded: new Aggregate({
+    },
+    netValueAdded: {
       id:"netValueAdded", 
       label:"Valeur ajoutée nette",
       periodsData: {
         [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregate.netValueAdded.amount,
+            amount: prevFinancialDataObject.aggregates.netValueAdded.amount,
             footprint: prevFinancialDataObject.aggregates.netValueAdded.footprint,
             periodKey: prevFinancialPeriod.periodKey
         }
       }
-    })
+    }
   };
 
   // Other figures --------------------------- //
@@ -237,12 +246,12 @@ const buildExpense = (prevExpense,prevFinancialPeriod) =>
     isDefaultProviderAccount: prevExpense.isDefaultAccountAux,
     amount: prevExpense.amount,
     footprint: prevExpense.footprint,
-    date: prevFinancialPeriod.dataEnd, // untracked before
+    date: prevFinancialPeriod.dateEnd, // untracked before
   };
   return nextExpense;
 }
 
-const buildStock = (prevFinancialDataObject,prevStock) => 
+const buildStock = (prevFinancialDataObject,prevStock,prevFinancialPeriod) => 
 {
   let prefix = !prevStock.isProductionStock ? "60"+prevStock.account.slice(1).replace(/(0*)$/g,"") : null;
   let prevDepreciation = prevFinancialDataObject.depreciations.find(({accountAux}) => accountAux==prevStock.account);
@@ -251,7 +260,7 @@ const buildStock = (prevFinancialDataObject,prevStock) =>
   {
     isProductionStock: prevStock.isProductionStock,
     expensesAccountsPrefix: !prevStock.isProductionStock ? prefix : null,
-    purchasesAccounts: !prevStock.isProductionStock ? Object.keys(nextFinancialData.metaAccounts).filter(accountNum => accountNum.startsWith(prefix)) : "",
+    purchasesAccounts: !prevStock.isProductionStock ? prevFinancialDataObject.expenseAccounts.map(account => account.accountNum).filter(accountNum => accountNum.startsWith(prefix)) : "",
     accountNum: prevStock.account,
     accountLib: prevStock.accountLib,
     entries: [],    
@@ -260,10 +269,10 @@ const buildStock = (prevFinancialDataObject,prevStock) =>
     depreciationEntries: [],
     initialStateType: prevStock.initialState,
     initialState: prevStock.initialState ? {
-      date: getPrevDate(prevFinancialPeriod.dataStart),
+      date: getPrevDate(prevFinancialPeriod.dateStart),
       prevStateDate: undefined,
-      amount: prevAmount,
-      footprint: prevFootprint,
+      amount: prevStock.prevAmount,
+      footprint: prevStock.prevFootprint,
     } : {},
     initialFootprintParams: prevStock.initialState=="defaultData" ? {
         area: prevStock.prevFootprintAreaCode,
@@ -272,22 +281,22 @@ const buildStock = (prevFinancialDataObject,prevStock) =>
       } : {},
     initialStateSet: prevStock.status==200,
     states: {
-      [getPrevDate(prevFinancialPeriod.dataStart)] : {
-        date: getPrevDate(prevFinancialPeriod.dataStart),
+      [getPrevDate(prevFinancialPeriod.dateStart)] : {
+        date: getPrevDate(prevFinancialPeriod.dateStart),
         prevStateDate: undefined,
-        amount: prevAmount,
-        footprint: prevFootprint,
+        amount: prevStock.prevAmount,
+        footprint: prevStock.prevFootprint,
       },
-      [prevFinancialPeriod.dataEnd]: {
-        date: prevFinancialPeriod.dataEnd,
-        prevStateDate: getPrevDate(prevFinancialPeriod.dataStart),
+      [prevFinancialPeriod.dateEnd]: {
+        date: prevFinancialPeriod.dateEnd,
+        prevStateDate: getPrevDate(prevFinancialPeriod.dateStart),
         amount: prevStock.amount,
         footprint: prevStock.footprint
       }
     },
     lastState: {
-      date: prevFinancialPeriod.dataEnd,
-      prevStateDate: getPrevDate(prevFinancialPeriod.dataStart),
+      date: prevFinancialPeriod.dateEnd,
+      prevStateDate: getPrevDate(prevFinancialPeriod.dateStart),
       amount: prevStock.amount,
       footprint: prevStock.footprint
     },
@@ -309,14 +318,15 @@ const buildStockVariation = (prevStockVariation,prevFinancialPeriod) =>
     stockAccountLib: prevStockVariation.accountAuxLib,
     amount: prevStockVariation.amount,
     footprint: prevStockVariation.footprint,
-    date: prevFinancialPeriod.dataEnd, // untracked before
+    date: prevFinancialPeriod.dateEnd, // untracked before
   }
+  return nextStockVariation;
 }
 
 const buildImmobilisation = (prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod) => 
 {
   let nextImmobilisation = {
-    isAmortisable: prevImmobilisation.isDepreciableImmobilisation,
+    isAmortisable: prevAmortisation!=undefined,
     accountNum: prevImmobilisation.account,
     accountLib: prevImmobilisation.accountLib,
     entries: [],
@@ -328,19 +338,39 @@ const buildImmobilisation = (prevImmobilisation,prevAmortisation,prevDepreciatio
     depreciationEntries: [], // untracked before
     initialStateType: prevImmobilisation.initialState || "none",
     initialState: prevImmobilisation.isDepreciableImmobilisation ? {
-      date: getPrevDate(prevFinancialPeriod.dataStart),
+      date: getPrevDate(prevFinancialPeriod.dateStart),
       prevStateDate: null,
       amount: prevImmobilisation.prevAmount,
       footprint: new SocialFootprint(prevImmobilisation.prevFootprint),
-      amortisationAmount: prevAmortisation.amortisationAmount,
-      amortisationFootprint: new SocialFootprint(prevAmortisation.prevFootprint),
-      amortisationExpenseAmount: getAmountItems(prevDepreciationExpenses) // check if right
+      amortisationAmount: prevAmortisation ? prevAmortisation.prevAmount : undefined,
+      amortisationFootprint: prevAmortisation ? new SocialFootprint(prevAmortisation.prevFootprint) : undefined,
+      amortisationExpenseAmount: prevDepreciation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
     } : null,
     initialFootprintParams: prevImmobilisation.initialState=="defaultData" ? {
       area: prevImmobilisation.prevFootprintAreaCode, 
       code: prevImmobilisation.prevFootprintActivityCode, 
       aggregate: "TRESS"} : {},
     initialStateSet: prevImmobilisation.status == 200,
+    states: {
+      [getPrevDate(prevFinancialPeriod.dateStart)]: {
+        date: getPrevDate(prevFinancialPeriod.dateStart),
+        prevStateDate: null,
+        amount: prevImmobilisation.prevAmount,
+        footprint: new SocialFootprint(prevImmobilisation.prevFootprint),
+        amortisationAmount: prevAmortisation ? prevAmortisation.prevAmount : undefined,
+        amortisationFootprint: prevAmortisation ? new SocialFootprint(prevAmortisation.prevFootprint) : undefined,
+        amortisationExpenseAmount: prevDepreciation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
+      },
+      [prevFinancialPeriod.dateEnd]: {
+        date: prevFinancialPeriod.dateEnd,
+        prevStateDate: getPrevDate(prevFinancialPeriod.dateStart),
+        amount: prevImmobilisation.amount,
+        footprint: new SocialFootprint(prevImmobilisation.footprint),
+        amortisationAmount: prevAmortisation ? prevAmortisation.amount : undefined,
+        amortisationFootprint: prevAmortisation ? new SocialFootprint(prevAmortisation.prevFootprint) : undefined,
+        amortisationExpenseAmount: prevDepreciation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
+      }
+    }
   }
   return nextImmobilisation;
 }
@@ -354,19 +384,20 @@ const buildAmortisationExpense = (prevAmortisationExpense, prevFinancialPeriod) 
     amortisationAccountLib: prevAmortisationExpense.accountAuxLib,
     amount: prevAmortisationExpense.amount,
     footprint: prevAmortisationExpense.footprint,
-    date: prevFinancialPeriod.dataEnd
+    date: prevFinancialPeriod.dateEnd
   };
   return nextAmortisationExpense;
 }
 
 const buildAdjustedAmortisationExpense = (nextImmobilisation,prevFinancialPeriod) =>
 {
+  console.log(nextImmobilisation);
   let nextAdjustedAmortisationExpense = {
     accountNum: "6811" + (parseInt(nextImmobilisation.amortisationAccountNum.charAt(2)) + 1) + nextImmobilisation.amortisationAccountNum.slice(3),
     accountLib: "Dotations - " + nextImmobilisation.amortisationAccountLib,
     amortisationAccountNum: nextImmobilisation.amortisationAccountNum,
     amortisationAccountLib: nextImmobilisation.amortisationAccountLib,
-    amount: nextImmobilisation.states[prevFinancialPeriod.dataEnd].amortisationExpenseAmount,
+    amount: nextImmobilisation.states[prevFinancialPeriod.dateEnd].amortisationExpenseAmount,
     date: prevFinancialPeriod.dateEnd
   };
   return nextAdjustedAmortisationExpense;
@@ -396,7 +427,7 @@ const buildImmobilisedProduction = (prevImmobilisedProduction,prevFinancialPerio
     immobilisationAccountLib: prevImmobilisedProduction.accountLib,
     amount: prevImmobilisedProduction.amount,
     footprint: prevImmobilisedProduction.footprint,
-    date: prevFinancialPeriod.dataEnd
+    date: prevFinancialPeriod.dateEnd
   };
   return immobilisedProduction;
 }
