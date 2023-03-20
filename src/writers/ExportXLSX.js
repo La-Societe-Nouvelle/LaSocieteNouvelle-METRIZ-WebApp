@@ -1,6 +1,5 @@
 import * as XLSX from 'xlsx';
 import { getExpensesGroupByAccount } from '../../components/tables/IndicatorExpensesTable';
-import { getFixedCapitalConsumptionsAggregatesGroups, getIntermediateConsumptionsAggregatesGroups } from '../../components/tables/IndicatorMainAggregatesTable';
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../formulas/aggregatesBuilder';
 import {  roundValue } from '../utils/Utils';
 
