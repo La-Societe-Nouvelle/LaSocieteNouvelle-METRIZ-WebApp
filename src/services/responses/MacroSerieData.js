@@ -43,8 +43,6 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
         console.log(errors);
       });
   
-      console.log(fixedCapitalConsumptionsFootprint)
-      console.log(intermediateConsumptionsFootprint);
 
       const newComparativeData = {
         fixedCapitalConsumptions : fixedCapitalConsumptionsFootprint,

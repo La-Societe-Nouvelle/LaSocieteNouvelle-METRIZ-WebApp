@@ -534,7 +534,7 @@ const IndicatorsList = (props) => {
                             .indicators[indic]
                         }
                         current={
-                          props.session.financialData.mainAaggregates.production.periodsData[period.periodKey].footprint.getIndicator(
+                          props.session.financialData.mainAggregates.production.periodsData[period.periodKey].footprint.getIndicator(
                             indic
                           ).value
                         }
