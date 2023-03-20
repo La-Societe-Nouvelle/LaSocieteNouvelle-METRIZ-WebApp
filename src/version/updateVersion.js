@@ -17,9 +17,7 @@ import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import { Provider } from "../Provider";
-
-
-const prevIndics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
+import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -27,26 +25,36 @@ const prevIndics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg",
 
 export const updateVersion = async (sessionData) => {
   switch (sessionData.version) {
+    case "2.0.0":
+      break;
+    case "1.0.6":
+      await updater_2_0_0(sessionData);
+      break;
     case "1.0.5":
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.4":
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.3":
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.2":
       updater_1_0_2(sessionData);
-      updater_1_0_5(sessionData);
       await updater_1_0_4(sessionData);
+      await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.1":
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.0":
       updater_1_0_0(sessionData);
@@ -54,10 +62,12 @@ export const updateVersion = async (sessionData) => {
       updater_1_0_2(sessionData);
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     default:
       break;
   }
+  console.log(sessionData);
 };
 
 const updater_1_0_5 = async (sessionData) => {
