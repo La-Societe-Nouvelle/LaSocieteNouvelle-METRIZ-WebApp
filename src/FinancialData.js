@@ -486,72 +486,127 @@ export class FinancialData {
 
   /* ------------------------- Load BackUp Data ------------------------- */
 
-  loadFinancialDataFromBackUp = async(prevFinancialData) => {
-
+  loadFinancialDataFromBackUp = async (prevFinancialData) => {
     // Merge with previous exepenses
-    this.adjustedAmortisationExpenses = this.adjustedAmortisationExpenses.concat(prevFinancialData.adjustedAmortisationExpenses);
-    this.amortisationExpenses = this.amortisationExpenses.concat(prevFinancialData.amortisationExpenses);
+    this.adjustedAmortisationExpenses =
+      this.adjustedAmortisationExpenses.concat(
+        prevFinancialData.adjustedAmortisationExpenses
+      );
+    this.amortisationExpenses = this.amortisationExpenses.concat(
+      prevFinancialData.amortisationExpenses
+    );
 
     // Add previous periods in expenses accounts
-    this.amortisationExpensesAccounts = mergePeriodsAccounts(this.amortisationExpensesAccounts,prevFinancialData.amortisationExpensesAccounts);
-    
+    this.amortisationExpensesAccounts = mergePeriodsAccounts(
+      this.amortisationExpensesAccounts,
+      prevFinancialData.amortisationExpensesAccounts
+    );
+
     // Merge with previous external expenses
-    this.externalExpenses = this.externalExpenses.concat(prevFinancialData.externalExpenses);
-   
+    this.externalExpenses = this.externalExpenses.concat(
+      prevFinancialData.externalExpenses
+    );
+
     // Add previous periods in expenses accounts
-    this.externalExpensesAccounts = mergePeriodsAccounts(this.externalExpensesAccounts,prevFinancialData.externalExpensesAccounts);
+    this.externalExpensesAccounts = mergePeriodsAccounts(
+      this.externalExpensesAccounts,
+      prevFinancialData.externalExpensesAccounts
+    );
 
-    // Add previous initial state for immobilisations 
+    // Add previous initial state for immobilisations
 
-    for (let immobilisation of this.immobilisations) {
+    for (let prevImmobilisation of prevFinancialData.immobilisations) {
+      const existingImmo = this.immobilisations.find(
+        (immobilisation) =>
+          immobilisation.accountNum === prevImmobilisation.accountNum
+      );
 
-      let prevImmobilisation = prevFinancialData.immobilisations.find(prevImmobilisation => prevImmobilisation.accountNum == immobilisation.accountNum);
-     //TO DO : create new immo 
-      await immobilisation.loadInitialStateFromBackUp(prevImmobilisation)
+      if (existingImmo) {
+        await existingImmo.loadInitialStateFromBackUp(prevImmobilisation);
+      } else {
+        const newImmo = new Immobilisation(prevImmobilisation);
+        this.immobilisations.push(newImmo);
+      }
     }
- 
-    // Add previous initial state for stocks 
 
-    for (let stock of this.stocks) {
+    // Add previous initial state for stocks
 
-      let prevStock = prevFinancialData.stocks.find(prevStock => prevStock.accountNum == stock.accountNum);
-      //TO DO : create new immo 
-      await stock.loadInitialStateFromBackUp(prevStock)
+    for (let prevStock of prevFinancialData.stocks) {
+      const existingStock = this.stocks.find(
+        (stock) => stock.accountNum === prevStock.accountNum
+      );
+
+      if (existingStock) {
+        await existingStock.loadInitialStateFromBackUp(prevStock);
+      } else {
+        const newStock = new Stock(prevStock);
+        this.stocks.push(newStock);
+      }
     }
 
     // Merge with previous investments
     this.investments = this.investments.concat(prevFinancialData.investments);
 
     // Add previous periods in mainAggregates
-    this.mainAggregates = mergeAggregatePeriodsData(this.mainAggregates,prevFinancialData.mainAggregates);
+    this.mainAggregates = mergeAggregatePeriodsData(
+      this.mainAggregates,
+      prevFinancialData.mainAggregates
+    );
 
     // Merge with previous metaAccounts
-    this.metaAccounts = mergeAccounts(this.metaAccounts,prevFinancialData.metaAccounts);
+    this.metaAccounts = mergeAccounts(
+      this.metaAccounts,
+      prevFinancialData.metaAccounts
+    );
 
-    this.otherFinancialData = mergeAggregatePeriodsData(this.otherFinancialData,prevFinancialData.otherFinancialData);
+    this.otherFinancialData = mergeAggregatePeriodsData(
+      this.otherFinancialData,
+      prevFinancialData.otherFinancialData
+    );
 
     // Providers
     for (let provider of this.providers) {
-      let prevProvider = prevFinancialData.providers.find(prev => prev.providerNum === provider.providerNum);
-      // to do : logique inverse et create new provider if not exists
-      await provider.loadPrevProvider(prevProvider);
+      let prevProvider = prevFinancialData.providers.find(
+        (prev) => prev.providerNum === provider.providerNum
+      );
+      if (prevProvider) {
+        await provider.loadPrevProvider(prevProvider);
+      } else {
+        //Create new provider
+        let newProvider = new Provider(prevProvider);
+        this.providers.push(newProvider);
+      }
     }
 
     // Production aggregates
 
-    this.productionAggregates.revenue = mergePeriodsData(this.productionAggregates.revenue,prevFinancialData.productionAggregates.revenue);
+    this.productionAggregates.revenue = mergePeriodsData(
+      this.productionAggregates.revenue,
+      prevFinancialData.productionAggregates.revenue
+    );
 
-    this.productionAggregates.immobilisedProduction = mergePeriodsData(this.productionAggregates.immobilisedProduction,prevFinancialData.productionAggregates.immobilisedProduction);
+    this.productionAggregates.immobilisedProduction = mergePeriodsData(
+      this.productionAggregates.immobilisedProduction,
+      prevFinancialData.productionAggregates.immobilisedProduction
+    );
 
-    this.productionAggregates.storedProduction = mergePeriodsData(this.productionAggregates.storedProduction,prevFinancialData.productionAggregates.storedProduction);
+    this.productionAggregates.storedProduction = mergePeriodsData(
+      this.productionAggregates.storedProduction,
+      prevFinancialData.productionAggregates.storedProduction
+    );
 
-    // Stock variations 
-    this.stockVariationsAccounts = mergePeriodsAccounts(this.stockVariationsAccounts,prevFinancialData.stockVariationsAccounts);
+    // Stock variations
+    this.stockVariationsAccounts = mergePeriodsAccounts(
+      this.stockVariationsAccounts,
+      prevFinancialData.stockVariationsAccounts
+    );
 
     for (let stockVariations of this.stockVariations) {
-      let prevStockVariations = prevFinancialData.stockVariations.find(prev => prev.accountNum === stockVariations.accountNum);
-      if(!prevFinancialData) {
-        this.stockVariations.push(prevStockVariations)
+      let prevStockVariations = prevFinancialData.stockVariations.find(
+        (prev) => prev.accountNum === stockVariations.accountNum
+      );
+      if (!prevStockVariations) {
+        this.stockVariations.push(prevStockVariations);
       }
     }
   };
@@ -623,41 +678,6 @@ export const mergePeriodsAccounts = (
   });
   return mergedExpensesAccounts;
 };
-//   currentProviders,
-//   previousProviders
-// ) => {
-//   const uniqueProviders = new Set(); 
-//   const mergedProviders = [];
-
-//   // Merged expenses accounts
-//   const providers = currentProviders.concat(
-//     previousProviders
-//   );
-
-//   providers.forEach((provider) => {
-//     // Check if the accountNum has not been added to the Set yet
-//     if (!uniqueProviders.has(provider.providerNum)) {
-//       uniqueProviders.add(provider.providerNum);
-//       mergedProviders.push(provider);
-//     } else {
-//       // If the accountNum has already been added to the Set, merge the periodsData
-//       const index = mergedProviders.findIndex(
-//         (item) => item.providerNum === provider.providerNum
-//       );
-//       Object.assign(
-//         mergedProviders[index].periodsData,
-//         provider.periodsData
-//       );
-//       mergedProviders[index].footprintStatus = 203;
- 
-//     }
-//   });
-
-//   return mergedProviders;
-// };
-
-
-
 
 export const mergeAccounts = (current, previous) => {
   // Create a new object to hold the merged metadata, starting with the previous metadata.
@@ -669,11 +689,7 @@ export const mergeAccounts = (current, previous) => {
       mergedAccounts[accNum] = current[accNum];
     } else {
       // Merge the current and previous metadata for that account number.
-      const mergeddata = Object.assign(
-        {},
-        previous[accNum],
-        current[accNum]
-      );
+      const mergeddata = Object.assign({}, previous[accNum], current[accNum]);
       mergedAccounts[accNum] = mergeddata;
     }
   }
