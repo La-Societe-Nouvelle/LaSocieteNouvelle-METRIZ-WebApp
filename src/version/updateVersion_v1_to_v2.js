@@ -7,17 +7,67 @@
 import { Immobilisation, ImmobilisationState } from "../accountingObjects/Immobilisation";
 import { FinancialData } from "../FinancialData";
 import { SocialFootprint } from "../footprintObjects/SocialFootprint";
+import { buildRegexFinancialPeriod } from "../Session";
 import { getAmountItems, getPrevDate } from "../utils/Utils";
 
 const updateVersion = (data) =>
 {
-  let prevFinancialDataObject = new PrevFinancialDataObject(data.financialData);
-  let nextFinancialData = new FinancialData();
+  let nextSession = {};
+  
+  // version
+  nextSession.version = "2.0.0"; // Session.version ?
 
+  // Progression
+  nextSession.progression = data.progression;
+  
+  // Periods
+  let prevFinancialPeriod = getFinancialPeriod(data.year);
+  nextSession.availablePeriods = [prevFinancialPeriod];
+  nextSession.financialPeriod = prevFinancialPeriod;
+
+  // Legal unit data
+  nextSession.legalUnit = data.legalUnit;
+
+  // Financial data
+  nextSession.financialData = getNextFinancialDataObjectBuilder(data.financialData,prevFinancialPeriod);
+
+  // Impacts data
+  nextSession.impactsData = {
+    [prevFinancialPeriod.periodKey]: data.impactsData,
+  };
+
+  // Validations
+  nextSession.validations = {
+    [prevFinancialPeriod.periodKey]: data.validations,
+  };
+
+  // Comparative data
+  nextSession.comparativeData = data.comparativeData;
+
+  // Indicators list
+  nextSession.indics = {
+    [prevFinancialPeriod.periodKey]: data.indics,
+  };
+
+  return nextSession;
 }
 
-const nextFinancialDataObjectBuilder = (nextFinancialData,prevFinancialDataObject,prevFinancialPeriod) =>
+const getFinancialPeriod = (prevYear) =>
 {
+  let year = data.year || "2021"; // default 01/01/2021
+  let prevFinancialPeriod = {
+    dateStart: year+"0101",
+    dateEnd: year+"1231",
+    periodKey: "FY"+data,
+    regex: buildRegexFinancialPeriod(year+"0101",year+"1231"),
+  };
+  return prevFinancialPeriod;
+}
+
+const getNextFinancialDataObjectBuilder = (prevFinancialDataObject,prevFinancialPeriod) =>
+{
+  let nextFinancialData = {};
+
   // metaAccounts
   nextFinancialData.metaAccounts = {};
   prevFinancialDataObject.expenseAccounts
@@ -96,9 +146,15 @@ const nextFinancialDataObjectBuilder = (nextFinancialData,prevFinancialDataObjec
 
   // Expenses accounts ----------------------- //
 
-  nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.account));
-  nextFinancialData.stockVariationsAccounts = prevFinancialDataObject.expenseAccounts.filter(account => /^603/.test(account.account));
-  nextFinancialData.amortisationExpensesAccounts = prevFinancialDataObject.expenseAccounts.filter(account => /^68/.test(account.account));
+  nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts
+    .filter(account => /^6(0[^3]|1|2)/.test(account.account))
+    .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
+  nextFinancialData.stockVariationsAccounts = prevFinancialDataObject.expenseAccounts
+    .filter(account => /^603/.test(account.account))
+    .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
+  nextFinancialData.amortisationExpensesAccounts = prevFinancialDataObject.expenseAccounts
+    .filter(account => /^68/.test(account.account))
+    .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
 
   // Providers ------------------------------- //
 
@@ -167,19 +223,20 @@ const nextFinancialDataObjectBuilder = (nextFinancialData,prevFinancialDataObjec
     provisions: prevFinancialDataObject.provisions,
     taxOnProfits: prevFinancialDataObject.taxOnProfits
   };
-  
+
+  return nextFinancialData;
 }
 
 const buildExpense = (prevExpense,prevFinancialPeriod) => 
 {
   let nextExpense = {
-    accountNum: expense.account,
-    accountLib: expense.accountLib,
-    providerNum: expense.accountAux,
-    providerLib: expense.accountAuxLib,
-    isDefaultProviderAccount: expense.isDefaultAccountAux,
-    amount: expense.amount,
-    footprint: expense.footprint,
+    accountNum: prevExpense.account,
+    accountLib: prevExpense.accountLib,
+    providerNum: prevExpense.accountAux,
+    providerLib: prevExpense.accountAuxLib,
+    isDefaultProviderAccount: prevExpense.isDefaultAccountAux,
+    amount: prevExpense.amount,
+    footprint: prevExpense.footprint,
     date: prevFinancialPeriod.dataEnd, // untracked before
   };
   return nextExpense;
@@ -342,6 +399,22 @@ const buildImmobilisedProduction = (prevImmobilisedProduction,prevFinancialPerio
     date: prevFinancialPeriod.dataEnd
   };
   return immobilisedProduction;
+}
+
+const buildExpensesAccount = (prevAccount,prevFinancialPeriod) =>
+{
+  let nextExpensesAccount = {
+    accountNum: prevAccount.accountNum,
+    accountLib: prevAccount.accountLib,
+    periodsData: {
+      [prevFinancialPeriod.periodKey]: {
+        periodKey: prevFinancialPeriod.periodKey,
+        amount: prevAccount.amount,
+        footprint: prevAccount.footprint
+      }
+    }
+  };
+  return nextExpensesAccount;
 }
 
 const buildProvider = (prevProvider) =>
