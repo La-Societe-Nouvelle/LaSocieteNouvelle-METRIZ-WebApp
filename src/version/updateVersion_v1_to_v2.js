@@ -1,0 +1,431 @@
+
+
+/**
+ *    -> data = json of prev backup
+ */
+
+import { Immobilisation, ImmobilisationState } from "../accountingObjects/Immobilisation";
+import { FinancialData } from "../FinancialData";
+import { SocialFootprint } from "../footprintObjects/SocialFootprint";
+import { getAmountItems, getPrevDate } from "../utils/Utils";
+
+const updateVersion = (data) =>
+{
+  let prevFinancialDataObject = new PrevFinancialDataObject(data.financialData);
+  let nextFinancialData = new FinancialData();
+
+}
+
+const nextFinancialDataObjectBuilder = (nextFinancialData,prevFinancialDataObject,prevFinancialPeriod) =>
+{
+  // metaAccounts
+  nextFinancialData.metaAccounts = {};
+  prevFinancialDataObject.expenseAccounts
+    .concat(prevFinancialDataObject.stocks)
+    .concat(prevFinancialDataObject.immobilisations)
+    .concat(prevFinancialDataObject.depreciations)
+    .forEach(account => {
+      nextFinancialData.metaAccounts[account.account] = account[account.accountLib];  // check no duplicate & all accounts
+    })
+
+  // isFinancialDataLoaded [unchange]
+  nextFinancialData.isFinancialDataLoaded = prevFinancialDataObject.isFinancialDataLoaded;
+
+  // Production items ------------------------ //
+
+  nextFinancialData.productionAggregates = {
+    revenue: {
+      id:"revenue", 
+      label:"Production vendue",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.revenue,
+            footprint: prevFinancialDataObject.aggregates.revenue.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    }, 
+    storedProduction: {
+      id:"storedProduction", 
+      label:"Production stockée",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.storedProduction,
+            footprint: prevFinancialDataObject.aggregates.storedProduction.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    },
+    immobilisedProduction: {
+      id:"immobilisedProduction", 
+      label:"Production immobilisée",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.immobilisedProduction,
+            footprint: prevFinancialDataObject.aggregates.immobilisedProduction.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    },
+  };
+
+  // External expenses ----------------------- //
+
+  nextFinancialData.externalExpenses = prevFinancialDataObject.expenses.map(prevExpense => buildExpense(prevExpense,prevFinancialPeriod));
+
+  // Stocks ---------------------------------- //
+
+  nextFinancialData.stocks = prevFinancialDataObject.stocks.map(prevStock => buildStock(prevFinancialDataObject,prevStock));
+  nextFinancialData.stockVariations = prevFinancialDataObject.stockVariations.map(prevStockVariation => buildStockVariation(prevStockVariation,prevFinancialPeriod));
+
+  // Immobilisations ------------------------- //
+
+  nextFinancialData.immobilisations = prevFinancialDataObject.immobilisations.map(prevImmobilisation => {
+    let prevAmortisation = prevFinancialDataObject.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^28/.test(account))[0];
+    let prevDepreciation = prevFinancialDataObject.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^29/.test(account))[0];
+    let prevDepreciationExpenses = prevFinancialDataObject.depreciationExpenses.filter(expense => expense.accountAux==prevAmortisation.account);
+    let newtImmobilisation = buildImmobilisation(prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod);
+    return newtImmobilisation;
+  });
+
+  // depreciationExpenses => only amortisation expenses ?
+  nextFinancialData.amortisationExpenses = prevFinancialDataObject.depreciationExpenses.map(prevAmortisationExpense => buildAmortisationExpense(prevAmortisationExpense,prevFinancialPeriod));
+  nextFinancialData.adjustedAmortisationExpenses = nextFinancialData.immobilisations.map(nextImmobilisation => buildAdjustedAmortisationExpense(nextImmobilisation,prevFinancialPeriod));
+  nextFinancialData.investments = prevFinancialDataObject.investments.map(prevInvestment => buildInvestment(prevInvestment,prevFinancialPeriod));
+  nextFinancialData.immobilisedProductions = prevFinancialDataObject.immobilisationProductions.map(prevImmobilisedProduction => buildImmobilisedProduction(prevImmobilisedProduction,prevFinancialPeriod));
+
+  // Expenses accounts ----------------------- //
+
+  nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.account));
+  nextFinancialData.stockVariationsAccounts = prevFinancialDataObject.expenseAccounts.filter(account => /^603/.test(account.account));
+  nextFinancialData.amortisationExpensesAccounts = prevFinancialDataObject.expenseAccounts.filter(account => /^68/.test(account.account));
+
+  // Providers ------------------------------- //
+
+  nextFinancialData.providers = prevFinancialDataObject.companies.map(prevProvider => buildProvider(prevProvider));
+
+  // Aggregates ------------------------------ //
+
+  nextFinancialData.mainAggregates = {
+    production: new Aggregate({
+      id:"production", 
+      label:"Production",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.aggregate.production.amount,
+            footprint: prevFinancialDataObject.aggregates.production.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    }),
+    intermediateConsumptions: new Aggregate({
+      id:"intermediateConsumptions", 
+      label:"Consommations intermédiaires",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.aggregate.intermediateConsumption.amount,
+            footprint: prevFinancialDataObject.aggregates.intermediateConsumption.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    }),
+    fixedCapitalConsumptions: new Aggregate({
+      id:"intermediateConsumptions", 
+      label:"Consommations de capital fixe",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.aggregate.capitalConsumption.amount,
+            footprint: prevFinancialDataObject.aggregates.capitalConsumption.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    }),
+    netValueAdded: new Aggregate({
+      id:"netValueAdded", 
+      label:"Valeur ajoutée nette",
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+            amount: prevFinancialDataObject.aggregate.netValueAdded.amount,
+            footprint: prevFinancialDataObject.aggregates.netValueAdded.footprint,
+            periodKey: prevFinancialPeriod.periodKey
+        }
+      }
+    })
+  };
+
+  // Other figures --------------------------- //
+
+  nextFinancialData.otherFinancialData = {
+    otherOperatingIncomes: prevFinancialDataObject.otherOperatingIncomes,
+    financialIncomes: prevFinancialDataObject.financialIncomes,
+    exceptionalIncomes: prevFinancialDataObject.exceptionalIncomes,
+    taxes: prevFinancialDataObject.taxes,
+    personnelExpenses: prevFinancialDataObject.personnelExpenses,
+    otherExpenses: prevFinancialDataObject.otherExpenses,
+    financialExpenses: prevFinancialDataObject.financialExpenses,
+    exceptionalExpenses: prevFinancialDataObject.exceptionalExpenses,
+    provisions: prevFinancialDataObject.provisions,
+    taxOnProfits: prevFinancialDataObject.taxOnProfits
+  };
+  
+}
+
+const buildExpense = (prevExpense,prevFinancialPeriod) => 
+{
+  let nextExpense = {
+    accountNum: expense.account,
+    accountLib: expense.accountLib,
+    providerNum: expense.accountAux,
+    providerLib: expense.accountAuxLib,
+    isDefaultProviderAccount: expense.isDefaultAccountAux,
+    amount: expense.amount,
+    footprint: expense.footprint,
+    date: prevFinancialPeriod.dataEnd, // untracked before
+  };
+  return nextExpense;
+}
+
+const buildStock = (prevFinancialDataObject,prevStock) => 
+{
+  let prefix = !prevStock.isProductionStock ? "60"+prevStock.account.slice(1).replace(/(0*)$/g,"") : null;
+  let prevDepreciation = prevFinancialDataObject.depreciations.find(({accountAux}) => accountAux==prevStock.account);
+
+  let nextStock = 
+  {
+    isProductionStock: prevStock.isProductionStock,
+    expensesAccountsPrefix: !prevStock.isProductionStock ? prefix : null,
+    purchasesAccounts: !prevStock.isProductionStock ? Object.keys(nextFinancialData.metaAccounts).filter(accountNum => accountNum.startsWith(prefix)) : "",
+    accountNum: prevStock.account,
+    accountLib: prevStock.accountLib,
+    entries: [],    
+    depreciationAccountNum: prevDepreciation ? prevDepreciation.account : undefined,
+    depreciationAccountLib: prevDepreciation ? prevDepreciation.accountLib : undefined,
+    depreciationEntries: [],
+    initialStateType: prevStock.initialState,
+    initialState: prevStock.initialState ? {
+      date: getPrevDate(prevFinancialPeriod.dataStart),
+      prevStateDate: undefined,
+      amount: prevAmount,
+      footprint: prevFootprint,
+    } : {},
+    initialFootprintParams: prevStock.initialState=="defaultData" ? {
+        area: prevStock.prevFootprintAreaCode,
+        code: prevStock.prevFootprintActivityCode,
+        aggregate: "TRESS"
+      } : {},
+    initialStateSet: prevStock.status==200,
+    states: {
+      [getPrevDate(prevFinancialPeriod.dataStart)] : {
+        date: getPrevDate(prevFinancialPeriod.dataStart),
+        prevStateDate: undefined,
+        amount: prevAmount,
+        footprint: prevFootprint,
+      },
+      [prevFinancialPeriod.dataEnd]: {
+        date: prevFinancialPeriod.dataEnd,
+        prevStateDate: getPrevDate(prevFinancialPeriod.dataStart),
+        amount: prevStock.amount,
+        footprint: prevStock.footprint
+      }
+    },
+    lastState: {
+      date: prevFinancialPeriod.dataEnd,
+      prevStateDate: getPrevDate(prevFinancialPeriod.dataStart),
+      amount: prevStock.amount,
+      footprint: prevStock.footprint
+    },
+    status: prevStock.status,
+    dataFetched: prevStock.dataFetched,
+    lastUpdateFromRemote: prevStock.lastUpdateFromRemote, 
+    defaultStockVariationAccountNum: prevStock.isProductionStock ? "60"+prevStock.account : undefined,
+    defaultStockVariationAccountLib: prevStock.isProductionStock ?  "Variation stock "+prevStock.accountLib : undefined,
+  };
+  return nextStock;
+}
+
+const buildStockVariation = (prevStockVariation,prevFinancialPeriod) =>
+{
+  let nextStockVariation = {
+    accountNum: prevStockVariation.account,
+    accountLib: prevStockVariation.accountLib,
+    stockAccountNum: prevStockVariation.accountAux,
+    stockAccountLib: prevStockVariation.accountAuxLib,
+    amount: prevStockVariation.amount,
+    footprint: prevStockVariation.footprint,
+    date: prevFinancialPeriod.dataEnd, // untracked before
+  }
+}
+
+const buildImmobilisation = (prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod) => 
+{
+  let nextImmobilisation = {
+    isAmortisable: prevImmobilisation.isDepreciableImmobilisation,
+    accountNum: prevImmobilisation.account,
+    accountLib: prevImmobilisation.accountLib,
+    entries: [],
+    amortisationAccountNum: prevAmortisation ? prevAmortisation.account : undefined,
+    amortisationAccountLib: prevAmortisation ? prevAmortisation.accountLib : undefined,
+    amortisationEntries: [], // untracked before
+    depreciationAccountNum: prevDepreciation ? prevDepreciation.account : undefined,
+    depreciationAccountLib: prevDepreciation ? prevDepreciation.accountLib : undefined,
+    depreciationEntries: [], // untracked before
+    initialStateType: prevImmobilisation.initialState || "none",
+    initialState: prevImmobilisation.isDepreciableImmobilisation ? {
+      date: getPrevDate(prevFinancialPeriod.dataStart),
+      prevStateDate: null,
+      amount: prevImmobilisation.prevAmount,
+      footprint: new SocialFootprint(prevImmobilisation.prevFootprint),
+      amortisationAmount: prevAmortisation.amortisationAmount,
+      amortisationFootprint: new SocialFootprint(prevAmortisation.prevFootprint),
+      amortisationExpenseAmount: getAmountItems(prevDepreciationExpenses) // check if right
+    } : null,
+    initialFootprintParams: prevImmobilisation.initialState=="defaultData" ? {
+      area: prevImmobilisation.prevFootprintAreaCode, 
+      code: prevImmobilisation.prevFootprintActivityCode, 
+      aggregate: "TRESS"} : {},
+    initialStateSet: prevImmobilisation.status == 200,
+  }
+  return nextImmobilisation;
+}
+
+const buildAmortisationExpense = (prevAmortisationExpense, prevFinancialPeriod) =>
+{
+  let nextAmortisationExpense = {    
+    accountNum: prevAmortisationExpense.account,
+    accountLib: prevAmortisationExpense.accountLib,
+    amortisationAccountNum: prevAmortisationExpense.accountAux,
+    amortisationAccountLib: prevAmortisationExpense.accountAuxLib,
+    amount: prevAmortisationExpense.amount,
+    footprint: prevAmortisationExpense.footprint,
+    date: prevFinancialPeriod.dataEnd
+  };
+  return nextAmortisationExpense;
+}
+
+const buildAdjustedAmortisationExpense = (nextImmobilisation,prevFinancialPeriod) =>
+{
+  let nextAdjustedAmortisationExpense = {
+    accountNum: "6811" + (parseInt(nextImmobilisation.amortisationAccountNum.charAt(2)) + 1) + nextImmobilisation.amortisationAccountNum.slice(3),
+    accountLib: "Dotations - " + nextImmobilisation.amortisationAccountLib,
+    amortisationAccountNum: nextImmobilisation.amortisationAccountNum,
+    amortisationAccountLib: nextImmobilisation.amortisationAccountLib,
+    amount: nextImmobilisation.states[prevFinancialPeriod.dataEnd].amortisationExpenseAmount,
+    date: prevFinancialPeriod.dateEnd
+  };
+  return nextAdjustedAmortisationExpense;
+}
+
+const buildInvestment = (prevInvestment) => 
+{
+  let nextInvestment = {
+    accountNum: prevInvestment.account,
+    accountLib: prevInvestment.accountLib,
+    providerNum: prevInvestment.accountAux,
+    providerLib: prevInvestment.accountAuxLib,
+    isDefaultProviderAccount: prevInvestment.isDefaultAccountAux,
+    amount: prevInvestment.amount,
+    footprint: prevInvestment.footprint,
+    date: prevInvestment.date,
+  };
+  return nextInvestment;
+}
+
+const buildImmobilisedProduction = (prevImmobilisedProduction,prevFinancialPeriod) =>
+{
+  let immobilisedProduction = {
+    accountNum: prevImmobilisedProduction.accountAux,
+    accountLib: prevImmobilisedProduction.accountAuxLib,
+    immobilisationAccountNum: prevImmobilisedProduction.account,
+    immobilisationAccountLib: prevImmobilisedProduction.accountLib,
+    amount: prevImmobilisedProduction.amount,
+    footprint: prevImmobilisedProduction.footprint,
+    date: prevFinancialPeriod.dataEnd
+  };
+  return immobilisedProduction;
+}
+
+const buildProvider = (prevProvider) =>
+{
+  let nextProvider = {
+    isDefaultProviderAccount: prevProvider.isDefaultAccount,
+    providerNum: prevProvider.account,
+    providerLib: prevProvider.corporateName,
+    corporateId: prevProvider.corporateId,
+    legalUnitData: {
+      codePays: prevProvider.legalUnitAreaCode,
+      activitePrincipale: prevProvider.legalUnitActivityCode 
+    },
+    footprint: prevProvider.footprint,
+    useDefaultFootprint: prevProvider.state=="default",
+    defaultFootprintParams: prevProvider.state=="default" ? {
+      area: prevProvider.footprintAreaCode,
+      code: prevProvider.footprintActivityCode,
+      aggregate: "PRD"
+    } : {},
+    dataFetched: prevProvider.dataFetched,
+    footprintStatus: prevProvider.status,
+    periodsData: {}
+  };
+  return nextProvider;
+}
+
+class PrevFinancialDataObject 
+{
+  constructor(data) 
+  {
+  // ---------------------------------------------------------------------------------------------------- //
+      
+      if (data==undefined) data = {};
+      
+      // data loaded state
+      this.isFinancialDataLoaded = data.isFinancialDataLoaded || false;   
+      
+      // Production ------------------------------ //
+
+      this.revenue = data.revenue || 0;                                                                                                                               // revenue (#71)
+      this.storedProduction = data.storedProduction || 0;                                                                                                             // stored production (#71)
+      this.immobilisedProduction = data.immobilisedProduction || 0;                                                                                                   // immobilised production (#72)
+
+      // Expenses -------------------------------- //
+
+      this.expenses = data.expenses ? data.expenses.map((props,index) => new Expense({id: index, ...props})) : [];                                                    // external expenses (#60[^3], #61, #62)
+      this.stockVariations = data.stockVariations ? data.stockVariations.map((props,index) => new Expense({id: index, ...props})) : [];                               // stock variation (#603, #71)
+      this.depreciationExpenses = data.depreciationExpenses ? data.depreciationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                // depreciation expenses (#6811, #6871)
+      
+      this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({...props})) : this.expensesAccountsBuilder();
+      
+      // Stocks ---------------------------------- //
+      
+      this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                            // stocks (#31 to #35, #37)
+      
+      // Immobilisations ------------------------- //
+
+      this.investments = data.investments ? data.investments.map((props,index) => new Expense({id: index, ...props})) : [];                                           // investments (flows #2 <- #404)
+      this.immobilisationProductions = data.immobilisationProductions ? data.immobilisationProductions.map((props,index) => new Expense({id: index, ...props})) : []; // productions of immobilisations (flows #2 <- #72)
+      
+      this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                        // immobilisations (#20 to #27)
+      this.depreciations = data.depreciations ? data.depreciations.map((props,index) => new Depreciation({id: index, ...props})) : [];                                // depreciations (#28, #29 & #39)
+
+      // Other figures --------------------------- //
+
+      this.financialIncomes = data.financialIncomes || 0;
+      this.exceptionalIncomes = data.exceptionalIncomes || 0;
+      this.otherOperatingIncomes = data.otherOperatingIncomes || 0;                                                                                                   //
+      this.taxes = data.taxes || 0;                                                                                                                                   // #63
+      this.personnelExpenses = data.personnelExpenses || 0;                                                                                                           // #64
+      this.otherExpenses = data.otherExpenses || 0;                                                                                                                   // #65
+      this.financialExpenses = data.financialExpenses || 0;                                                                                                           // #66
+      this.exceptionalExpenses = data.exceptionalExpenses || 0;                                                                                                       // #67 hors #6871
+      this.provisions = data.provisions || 0;                                                                                                                         // #68 hors #6811
+      this.taxOnProfits = data.taxOnProfits || 0;                                                                                                                     // #69
+
+      // Companies
+      this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
+
+      // Aggregates
+      this.aggregates = {};
+      data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : aggregatesBuilder(this);
+      
+  // ---------------------------------------------------------------------------------------------------- //
+  }
+}

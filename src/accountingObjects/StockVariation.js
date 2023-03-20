@@ -10,7 +10,8 @@ export class StockVariation {
                stockAccountNum,
                stockAccountLib,
                amount,
-               footprint}) 
+               footprint,
+               date}) 
   {
   // ---------------------------------------------------------------------------------------------------- //    
     this.accountNum = accountNum;
@@ -21,6 +22,8 @@ export class StockVariation {
 
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint);
+
+    this.date = date;
   // ---------------------------------------------------------------------------------------------------- //
   }
 
