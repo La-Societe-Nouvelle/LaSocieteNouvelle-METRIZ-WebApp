@@ -238,16 +238,6 @@ class Metriz extends React.Component {
   validInitialStates = async () => {
     console.log("--------------------------------------------------");
     console.log("Empreintes des stocks et immobilisations initialisées");
-    console.log("Immobilisations :");
-    console.log(
-      this.state.session.financialData.immobilisations.map(
-        (immobilisation) => immobilisation.InitialState
-      )
-    );
-    console.log("Stocks :");
-    console.log(
-      this.state.session.financialData.stocks.map((stock) => stock.InitialState)
-    );
 
     this.setStep(3);
     this.updateProgression(2);

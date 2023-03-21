@@ -224,29 +224,30 @@ async function buildMappingAssetAccounts(accounts)
   let assetAccounts = Object.keys(accounts).filter((accountNum) => /^(2[0-1]|3[0-8])/.test(accountNum)); // immobilisation & stock accounts
 
   // try simple mapping
-  accountsToMap.forEach(async (accountToMap) =>
+  accountsToMap.forEach(async (accountToMapNum) =>
   {
     // get asset account matching default pattern
-    let assetAccount = assetAccounts.filter(assetAccount => assetAccount.startsWith(accountToMap[0]+accountToMap.substring(2)));
-
+    let assetAccount = assetAccounts.filter(assetAccount => assetAccount.startsWith(accountToMapNum[0]+accountToMapNum.substring(2)));
     // build mappingAccounts
-    if (assetAccount.length==1) { // if single match
+    if (assetAccount.length==1) // if single match
+    {
       let assetAccountNum = assetAccount[0];
-      accounts[accountToMap].assetAccountNum = assetAccountNum;
-      accounts[accountToMap].assetAccountLib = accounts[assetAccountNum].accountLib;
-      accounts[accountToMap].directMatching = true;
-      if (accountToMap.charAt(1)=="8") {
-        accounts[assetAccountNum].amortisationAccountNum = accountToMap;
-        accounts[assetAccountNum].amortisationAccountLib = accounts[accountToMap].accountLib;
-      } else if (accountToMap.charAt(1)=="9") {
-        accounts[assetAccountNum].depreciationAccountNum = accountToMap;
-        accounts[assetAccountNum].depreciationAccountLib = accounts[accountToMap].accountLib;
+      accounts[accountToMapNum].directMatching = true;
+      accounts[accountToMapNum].assetAccountNum = assetAccountNum;
+      accounts[accountToMapNum].assetAccountLib = accounts[assetAccountNum].accountLib;
+      // asset
+      if (accountToMapNum.charAt(1)=="8") {
+        accounts[assetAccountNum].amortisationAccountNum = accountToMapNum;
+        accounts[assetAccountNum].amortisationAccountLib = accounts[accountToMapNum].accountLib;
+      } else if (accountToMapNum.charAt(1)=="9") {
+        accounts[assetAccountNum].depreciationAccountNum = accountToMapNum;
+        accounts[assetAccountNum].depreciationAccountLib = accounts[accountToMapNum].accountLib;
       }
 
     } else {
-      accounts[accountToMap].assetAccountNum = undefined;
-      accounts[accountToMap].assetAccountLib = undefined;
-      accounts[accountToMap].directMatching = false;
+      accounts[accountToMapNum].directMatching = false;
+      accounts[accountToMapNum].assetAccountNum = undefined;
+      accounts[accountToMapNum].assetAccountLib = undefined;
     }
   });
 
@@ -260,7 +261,7 @@ async function buildMappingAssetAccounts(accounts)
       assetAccounts.filter(assetAccount => assetAccount[0]==accountToMap[0]) // asset account from the same accouting class
                    .forEach(assetAccountNum =>
       {
-        let expectedAssetAccountNum = accountToMap[0]+accountToMap.substring(2); // ref account num
+        let expectedAssetAccountNum = accountToMap[0]+accountToMap.substring(2)+"0"; // ref account num
         let distanceWithNum = distance(expectedAssetAccountNum,assetAccountNum);
         let distanceWithLib = distance(accounts[accountToMap].accountLib,accounts[assetAccountNum].accountLib);
         let prefixLength = getPrefixLength(expectedAssetAccountNum,assetAccountNum);
@@ -270,7 +271,7 @@ async function buildMappingAssetAccounts(accounts)
           assetAccountNum,
           distanceWithNum, 
           distanceWithLib,
-          prefixLength, 
+          prefixLength: prefixLength, 
           expectedAssetAccountNum
         });
       })
@@ -279,7 +280,7 @@ async function buildMappingAssetAccounts(accounts)
     // Map with prefix length
     distances.forEach(distance => distance.stashed = false); // init values stahed
     let assetAccountWithPrefixLength = await mapAccountsWithPrefixLength(distances); // return JSON with mappings
-    
+
     // Map with accountNum distance
     distances.forEach(distance => distance.stashed = false);
     let assetAccountWithNumDistances = await mapAccountsWithNumDistances(distances);
@@ -290,7 +291,7 @@ async function buildMappingAssetAccounts(accounts)
 
     // Merge accountAux matching (duplicates possible)
     let mappings = [];
-    accountsToMap.forEach(accountToMap =>
+    for (let accountToMap of accountsToMap)
     {
       let assetAccounts = [
         accounts[accountToMap].assetAccountNum,
@@ -300,33 +301,34 @@ async function buildMappingAssetAccounts(accounts)
       ];
       assetAccounts.filter(assetAccountNum => assetAccountNum) // remove empty string or undefined
                    .forEach(assetAccountNum => mappings.push({accountNum: accountToMap, assetAccountNum: assetAccountNum}));
-    });
+    };
 
     // build res
-    accountsToMap.forEach(accountToMap =>
+    accountsToMap.forEach(accountToMapNum =>
     {
       let assetAccounts = mappings
-        .filter(mapping => mapping.accountNum == accountToMap)  // get all solutions for depreciation account
+        .filter(mapping => mapping.accountNum == accountToMapNum)  // get all solutions for depreciation account
         .map(mapping => mapping.assetAccountNum)
         .filter((value, index, self) => index === self.findIndex(item => item === value)); // remove duplicates
 
       // if only one asset account match and if that asset account not match for another amortisation/depreciation account
       if (assetAccounts.length == 1 
-        && mappings.filter(mapping => mapping.accountNum!=accountToMap && mapping.assetAccountNum==assetAccounts[0]).length == 0)
+        && mappings.filter(mapping => mapping.accountNum!=accountToMapNum && mapping.assetAccountNum==assetAccounts[0]).length == 0)
       {
         let assetAccountNum = assetAccounts[0];
-        accounts[accountToMap].assetAccountNum = assetAccountNum;
-        accounts[accountToMap].assetAccountLib = accounts[assetAccountNum].accountLib;
-        if (accountToMap.charAt(1)=="8") {
-          accounts[assetAccountNum].amortisationAccountNum = accountToMap;
-          accounts[assetAccountNum].amortisationAccountLib = accounts[accountToMap].accountLib;
-        } else if (accountToMap.charAt(1)=="9") {
-          accounts[assetAccountNum].depreciationAccountNum = accountToMap;
-          accounts[assetAccountNum].depreciationAccountLib = accounts[accountToMap].accountLib;
+        accounts[accountToMapNum].assetAccountNum = assetAccountNum;
+        accounts[accountToMapNum].assetAccountLib = accounts[assetAccountNum].accountLib;
+        // asset account data
+        if (accountToMapNum.charAt(1)=="8") {
+          accounts[assetAccountNum].amortisationAccountNum = accountToMapNum;
+          accounts[assetAccountNum].amortisationAccountLib = accounts[accountToMapNum].accountLib;
+        } else if (accountToMapNum.charAt(1)=="9") {
+          accounts[assetAccountNum].depreciationAccountNum = accountToMapNum;
+          accounts[assetAccountNum].depreciationAccountLib = accounts[accountToMapNum].accountLib;
         }
       } else {
-        accounts[accountToMap].assetAccountNum = undefined;
-        accounts[accountToMap].assetAccountLib = undefined;
+        accounts[accountToMapNum].assetAccountNum = undefined;
+        accounts[accountToMapNum].assetAccountLib = undefined;
       }
     })    
   }
@@ -358,17 +360,17 @@ const mapAccountsWithPrefixLength = async (distances) =>
   // mapping if distincts account & accountAux with min distance
   for (let distanceToMap of distancesToMap)
   {
-    if (distancesToMap.concat(stashedDistances).filter(distance => distance.account==distanceToMap.account).length==1
-     && distancesToMap.concat(stashedDistances).filter(distance => distance.account[1]==distanceToMap.account[1]).filter(distance => distance.accountAux==distanceToMap.accountAux).length==1)
+    if (distancesToMap.concat(stashedDistances).filter(distance => distance.accountNum==distanceToMap.accountNum).length==1 // only one amortisation/depreciation account
+     && distancesToMap.concat(stashedDistances).filter(distance => distance.assetAccountNum==distanceToMap.assetAccountNum).length==1 // only one asset account
+     && distancesToMap.concat(stashedDistances).filter(distance => distance.accountNum==distanceToMap.accountNum && distance.assetAccountNum==distanceToMap.assetAccountNum).length==1) // linked together
     {
-      mapping[distanceToMap.account] = distanceToMap.accountAux;
+      mapping[distanceToMap.accountNum] = distanceToMap.assetAccountNum;
     }
-    else distances.filter(distance => distance.account==distanceToMap.account || distance.accountAux==distanceToMap.accountAux).forEach(distance => distance.stashed = true);
+    else distances.filter(distance => distance.accountNum==distanceToMap.accountNum || distance.assetAccountNum==distanceToMap.assetAccountNum).forEach(distance => distance.stashed = true);
   }
 
-
   // filter remaining distances
-  let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.account) && !Object.values(mapping).includes(distance.accountAux));
+  let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.accountNum) && !Object.values(mapping).includes(distance.assetAccountNum));
 
   // if remaining distance to map (accounts stashed excluded)
   if (remainingDistances.filter(distance => !distance.stashed).length > 0)
@@ -390,8 +392,8 @@ const mapAccountsWithNumDistances = async (distances) =>
   if (distances.length==0) return mapping;
 
   // filter distances to map (accounts stashed included)
-  let minDistanceNum = Math.min(...distances.filter(item => !item.stashed).map(item => item.distanceNum)); // min distanceNum of distances not stashed
-  let distancesWithMinDistance = distances.filter(distance => distance.distanceNum==minDistanceNum && !distance.stashed);
+  let minDistanceNum = Math.min(...distances.filter(item => !item.stashed).map(item => item.distanceWithNum)); // min distanceNum of distances not stashed
+  let distancesWithMinDistance = distances.filter(distance => distance.distanceWithNum==minDistanceNum && !distance.stashed);
   let maxPrefixLength = Math.max(...distancesWithMinDistance.map(distance => distance.prefixLength)); // max prefixLength of distances with min distanceNum and not stashed
   let distancesToMap = distancesWithMinDistance.filter(distance => distance.prefixLength==maxPrefixLength);
 
@@ -401,17 +403,17 @@ const mapAccountsWithNumDistances = async (distances) =>
   // mapping if distincts account & accountAux with min distance
   for (let distanceToMap of distancesToMap)
   {
-    if (distancesToMap.concat(stashedDistances).filter(distance => distance.account==distanceToMap.account).length==1
-     && distancesToMap.concat(stashedDistances).filter(distance => distance.account[1]==distanceToMap.account[1]).filter(distance => distance.accountAux==distanceToMap.accountAux).length==1)
+    if (distancesToMap.concat(stashedDistances).filter(distance => distance.accountNum==distanceToMap.accountNum).length==1
+     && distancesToMap.concat(stashedDistances).filter(distance => distance.assetAccountNum==distanceToMap.assetAccountNum).length==1
+     && distancesToMap.concat(stashedDistances).filter(distance => distance.accountNum==distanceToMap.accountNum && distance.assetAccountNum==distanceToMap.assetAccountNum).length==1)
     {
-      mapping[distanceToMap.account] = distanceToMap.accountAux;
+      mapping[distanceToMap.accountNum] = distanceToMap.assetAccountNum;
     }
-    else distances.filter(distance => distance.account==distanceToMap.account || distance.accountAux==distanceToMap.accountAux).forEach(distance => distance.stashed = true);
+    else distances.filter(distance => distance.accountNum==distanceToMap.accountNum || distance.assetAccountNum==distanceToMap.assetAccountNum).forEach(distance => distance.stashed = true);
   }
 
-
   // filter remaining distances
-  let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.account) && !Object.values(mapping).includes(distance.accountAux));
+  let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.accountNum) && !Object.values(mapping).includes(distance.assetAccountNum));
 
   // if remaining distance to map (accounts stashed excluded)
   if (remainingDistances.filter(distance => !distance.stashed).length > 0)
@@ -433,8 +435,8 @@ const mapAccountsWithLibDistances = async (distances) =>
   if (distances.length==0) return mapping;
 
   // filter distances to map (accounts stashed included)
-  let minDistanceLib = Math.min(...distances.filter(item => !item.stashed).map(item => item.distanceLib)); // min distanceLib of distances not stashed
-  let distancesWithMinDistance = distances.filter(distance => distance.distanceLib==minDistanceLib && !distance.stashed);
+  let minDistanceLib = Math.min(...distances.filter(item => !item.stashed).map(item => item.distanceWithLib)); // min distanceLib of distances not stashed
+  let distancesWithMinDistance = distances.filter(distance => distance.distanceWithLib==minDistanceLib && !distance.stashed);
   let maxPrefixLength = Math.max(...distancesWithMinDistance.map(distance => distance.prefixLength)); // max prefixLength of distances with min distanceLib and not stashed
   let distancesToMap = distancesWithMinDistance.filter(distance => distance.prefixLength==maxPrefixLength);
 
@@ -444,17 +446,18 @@ const mapAccountsWithLibDistances = async (distances) =>
   // mapping if distincts account & accountAux with min distance
   for (let distanceToMap of distancesToMap)
   {
-    if (distancesToMap.concat(stashedDistances).filter(distance => distance.account==distanceToMap.account).length==1
-     && distancesToMap.concat(stashedDistances).filter(distance => distance.account[1]==distanceToMap.account[1]).filter(distance => distance.accountAux==distanceToMap.accountAux).length==1)
+    if (distancesToMap.concat(stashedDistances).filter(distance => distance.accountNum==distanceToMap.accountNum).length==1
+     && distancesToMap.concat(stashedDistances).filter(distance => distance.assetAccountNum==distanceToMap.assetAccountNum).length==1
+     && distancesToMap.concat(stashedDistances).filter(distance => distance.accountNum==distanceToMap.accountNum && distance.assetAccountNum==distanceToMap.assetAccountNum).length==1)
     {
-      mapping[distanceToMap.account] = distanceToMap.accountAux;
+      mapping[distanceToMap.accountNum] = distanceToMap.assetAccountNum;
     }
-    else distances.filter(distance => distance.account==distanceToMap.account || distance.accountAux==distanceToMap.accountAux).forEach(distance => distance.stashed = true);
+    else distances.filter(distance => distance.accountNum==distanceToMap.accountNum || distance.assetAccountNum==distanceToMap.assetAccountNum).forEach(distance => distance.stashed = true);
   }
 
 
   // filter remaining distances
-  let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.account) && !Object.values(mapping).includes(distance.accountAux));
+  let remainingDistances = distances.filter(distance => !Object.keys(mapping).includes(distance.accountNum) && !Object.values(mapping).includes(distance.assetAccountNum));
 
   // if remaining distance to map (accounts stashed excluded)
   if (remainingDistances.filter(distance => !distance.stashed).length > 0)
@@ -501,8 +504,6 @@ export async function FECDataReader(FECData)
   Object.entries(FECData.meta.accounts)
     .filter(([accountNum,_]) => /^3[1-7]/.test(accountNum))
     .forEach(([accountNum,accountData]) => data.stocks[accountNum] = { 
-      // type
-      isProductionStock: FECData.meta.accounts[accountNum].isProductionStock,
       // stock data
       accountNum: accountNum,
       accountLib: accountData.accountLib,
@@ -530,8 +531,6 @@ export async function FECDataReader(FECData)
   Object.entries(FECData.meta.accounts)
     .filter(([accountNum,_]) => /^2[0-7]/.test(accountNum))
     .forEach(([accountNum,accountData]) => data.immobilisations[accountNum] = { 
-      // type
-      isAmortisable: FECData.meta.accounts[accountNum].isAmortisable,
       // immobilisation data
       accountNum: accountNum,
       accountLib: accountData.accountLib,

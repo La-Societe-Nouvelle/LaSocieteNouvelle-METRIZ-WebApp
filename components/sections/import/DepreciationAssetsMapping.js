@@ -92,7 +92,6 @@ function DepreciationAssetsMapping(props)
     props.onClick();
   }
 
-  console.log(lastMapping);
   return (
     <div>
       <h3 >
