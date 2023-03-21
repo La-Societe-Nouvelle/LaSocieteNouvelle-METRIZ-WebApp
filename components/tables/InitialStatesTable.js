@@ -190,7 +190,7 @@ function RowTableImmobilisations(props)
           defaultValueInitialState ={value:"prevFootprint", label: "Reprise sur exercice précédent"}
         break;
         case "currentFootprint":
-          defaultValueInitialState = {value:"currentFootprint", label: "Estimée sur exerice courant"}
+          defaultValueInitialState = {value:"currentFootprint", label: "Estimée sur exercice courant"}
         break;
       default:
         defaultValueInitialState = {value:"defaultData", label:"Valeurs par défaut"};
@@ -213,7 +213,7 @@ function RowTableImmobilisations(props)
     }
     
     if(hasInputs) {
-      initialStateOptions.push({value:"currentFootprint", label: "Estimée sur exerice courant"})
+      initialStateOptions.push({value:"currentFootprint", label: "Estimée sur exercice courant"})
     }
 
     initialStateOptions.push({value:"defaultData", label:"Valeurs par défaut"})
