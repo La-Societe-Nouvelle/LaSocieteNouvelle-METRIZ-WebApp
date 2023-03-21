@@ -303,10 +303,9 @@ const updateAmortisationExpensesFpt = async (financialData,period) =>
 const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
 {
 
-  let currentAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey));
+  let filteredAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey));
 
-  
-  await Promise.all(currentAmortisationExpensesAccounts
+  await Promise.all(filteredAmortisationExpensesAccounts
     .map(async (account) => 
   {
     let amortisationExpenses = financialData.adjustedAmortisationExpenses

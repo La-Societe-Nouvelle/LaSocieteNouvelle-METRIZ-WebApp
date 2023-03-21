@@ -27,9 +27,10 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
 {
     let aggregates = [];
     let accounts = [];
+    let filteredExternalExpensesAccounts = financialData.externalExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
 
     // Achats stockés - Matières premières
-    accounts = financialData.externalExpensesAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
+    accounts = filteredExternalExpensesAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Matières premières",
@@ -39,7 +40,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Achats stockés - Autres approvisionnements
-    accounts = financialData.externalExpensesAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
+    accounts = filteredExternalExpensesAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Autres approvisionnements",
@@ -49,7 +50,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
     
     // Achats de marchandises
-    accounts = financialData.externalExpensesAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+    accounts = filteredExternalExpensesAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Marchandises",
@@ -59,8 +60,11 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Variation des stocks
-    accounts = financialData.stockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
-    console.log(accounts);
+    let filteredStockVariationsAccounts = financialData.stockVariationsAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
+
+    accounts = filteredStockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
+    console.log( financialData.stockVariationsAccounts.length)
+    console.log(filteredStockVariationsAccounts.length);
     if (accounts.length > 0) {
         aggregates.push({
             label: "Variation des stocks",
@@ -70,7 +74,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Autres achats
-    accounts = financialData.externalExpensesAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+    accounts = filteredExternalExpensesAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Autres achats",
@@ -80,7 +84,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     };
 
     // Autres charges externes
-    accounts = financialData.externalExpensesAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+    accounts = filteredExternalExpensesAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Autres charges externes",
@@ -97,9 +101,10 @@ export const buildFixedCapitalConsumptionsAggregates = async (financialData, per
 {
     let aggregates = [];
     let accounts = []
+    let filteredAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
 
     // Dotations aux amortissements sur immobilisations incorporelles
-    accounts = financialData.amortisationExpensesAccounts.filter(account => /^68111/.test(account.accountNum));
+    accounts = filteredAmortisationExpensesAccounts.filter(account => /^68111/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Dotations aux amortissements sur immobilisations incorporelles",
@@ -109,7 +114,7 @@ export const buildFixedCapitalConsumptionsAggregates = async (financialData, per
     };
 
     // Dotations aux amortissements sur immobilisations corporelles
-    accounts = financialData.amortisationExpensesAccounts.filter(account => /^68112/.test(account.accountNum));
+    accounts = filteredAmortisationExpensesAccounts.filter(account => /^68112/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Dotations aux amortissements sur immobilisations corporelles",
@@ -119,7 +124,7 @@ export const buildFixedCapitalConsumptionsAggregates = async (financialData, per
     };
 
     // Dotations aux amortissements sur immobilisations incorporelles
-    accounts = financialData.amortisationExpensesAccounts.filter(account => /^6811[^(1|2)]/.test(account.accountNum));
+    accounts = filteredAmortisationExpensesAccounts.filter(account => /^6811[^(1|2)]/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Dotations aux amortissements sur immobilisations",
@@ -129,7 +134,7 @@ export const buildFixedCapitalConsumptionsAggregates = async (financialData, per
     };
 
     // Dotations aux amortissements exceptionnels des immobilisations
-    accounts = financialData.amortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
+    accounts = filteredAmortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
     if (accounts.length > 0) {
         aggregates.push({
             label: "Dotations aux amortissements exceptionnels des immobilisations",
