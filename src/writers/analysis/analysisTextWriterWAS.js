@@ -30,7 +30,7 @@ export const analysisTextWriterWAS = (props) => {
   );
   if (
     mainAggregates.production.periodsData[period.periodKey].footprint.indicators.was.value !=
-    revenue.footprint.indicators.was.value
+    revenue.periodsData[period.periodKey].footprint.indicators.was.value
   ) {
     currentParagraph.push(
       "La valeur est de " +

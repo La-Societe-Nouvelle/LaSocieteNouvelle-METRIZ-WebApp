@@ -114,26 +114,26 @@ export const IndicatorMainAggregatesTable = ({
         <thead>
           <tr>
             <th>Agrégat</th>
-            <th colSpan="3" class="text-center">
+            <th colSpan="3" className="text-center">
               Année N
             </th>
             {prevPeriod && (
-              <th colSpan={printGrossImpact ? "4" : "3"} class="text-center">
+              <th colSpan={printGrossImpact ? "4" : "3"} className="text-center">
                 N-1
               </th>
             )}
           </tr>
           <tr>
             <td></td>
-            <td class="text-end">Montant</td>
-            <td class="text-end">Empreinte</td>
-            <td class="text-end">Incertitude</td>
-            {printGrossImpact ? <td class="text-end">Impact</td> : null}
+            <td className="text-end">Montant</td>
+            <td className="text-end">Empreinte</td>
+            <td className="text-end">Incertitude</td>
+            {printGrossImpact ? <td className="text-end">Impact</td> : null}
             {prevPeriod && (
               <>
-                <td class="text-end">Empreinte</td>
-                <td class="text-end">Incertitude</td>
-                {printGrossImpact ? <td class="text-end">Impact</td> : null}
+                <td className="text-end">Empreinte</td>
+                <td className="text-end">Incertitude</td>
+                {printGrossImpact ? <td className="text-end">Impact</td> : null}
               </>
             )}
           </tr>

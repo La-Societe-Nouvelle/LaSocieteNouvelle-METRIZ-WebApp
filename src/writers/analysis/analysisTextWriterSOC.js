@@ -58,9 +58,9 @@ export const analysisTextWriterSOC = (props) => {
   analysis.push(currentParagraph);
 
   // Consommations intermédiaires ------------------------------------------------------------------ //
-
+  console.log(mainAggregates.production)
   currentParagraph = [];
-
+ 
   // résultat
   currentParagraph.push(
     printValue(
@@ -81,8 +81,8 @@ export const analysisTextWriterSOC = (props) => {
         (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
           mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          mainAggregates.production.footprint.indicators.soc.getGrossImpact(
-            mainAggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.soc.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
