@@ -111,7 +111,7 @@ export const analysisTextWriterMAT = (props) => {
           mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
           mainAggregates.production.periodsData[period.periodKey].footprint.indicators.mat.getGrossImpact(
-            mainAggregates.productions.periodsData[period.periodKey].amount
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
