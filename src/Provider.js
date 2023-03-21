@@ -12,7 +12,7 @@ export class Provider {
     legalUnitData,
     useDefaultFootprint,
     footprint,
-    footprintParams,
+    defaultFootprintParams,
     dataFetched,
     footprintStatus,
     periodsData,
@@ -33,8 +33,8 @@ export class Provider {
 
     // Footprint
     this.footprint = new SocialFootprint(footprint);
-    this.useDefaultFootprint = useDefaultFootprint || true;         // true by default
-    this.defaultFootprintParams = footprintParams || {              // paramètres (empreinte par défaut)
+    this.useDefaultFootprint = useDefaultFootprint!=undefined ? useDefaultFootprint : true;         // true by default
+    this.defaultFootprintParams = defaultFootprintParams || {       // paramètres (empreinte par défaut)
       area: "FRA",
       code: "00",
       aggregate: "PRD"
@@ -230,5 +230,6 @@ export class Provider {
       prevProvider.periodsData
     );
     this.useDefaultFootprint = prevProvider.useDefaultFootprint;
+    this.defaultFootprintParams = prevProvider.defaultFootprintParams;
   }
 }

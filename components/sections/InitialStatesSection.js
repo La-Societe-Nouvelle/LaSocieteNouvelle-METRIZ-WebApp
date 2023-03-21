@@ -254,11 +254,13 @@ export class InitialStatesSection extends React.Component {
       try {
         // text -> JSON
         const prevSessionData = JSON.parse(reader.result);
-        const prevSession = new Session(prevSessionData);
+        
+        // update to current version
+        await updateVersion(prevSessionData);
+
         const currSession = this.props.session;
 
-        // update to current version
-       await updateVersion(prevSession);
+        const prevSession = new Session(prevSessionData);
 
         const prevYear = prevSession.financialPeriod.periodKey.slice(2);
         const currYear = currSession.financialPeriod.periodKey.slice(2);

@@ -434,7 +434,7 @@ export class SirenSection extends React.Component
   synchroniseProviders = async () => 
   {
     // providers with fpt unfetched
-    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200 || provider.footprintS);
+    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
 

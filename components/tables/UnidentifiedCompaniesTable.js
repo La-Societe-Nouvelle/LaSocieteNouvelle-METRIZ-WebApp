@@ -247,7 +247,7 @@ class RowTableProviders extends React.Component
         <td>{providerNum}</td>
         <td>
           <Select
-            defaultValue={{
+            value={{
               label: areaCode + " - " + areas[areaCode],
               value: areaCode,
             }}
@@ -259,7 +259,7 @@ class RowTableProviders extends React.Component
         </td>
         <td>
           <Select
-            defaultValue={{
+            value={{
               label: activityCode + " - " + divisions[activityCode],
               value: activityCode}}
             placeholder={"Choisissez un secteur d'activité"}
