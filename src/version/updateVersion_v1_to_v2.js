@@ -69,7 +69,7 @@ const getFinancialPeriod = (prevYear) =>
 const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFinancialPeriod) =>
 {
   let nextFinancialData = {};
-
+  console.log(prevFinancialDataObject)
   // metaAccounts
   nextFinancialData.metaAccounts = {};
   prevFinancialDataObject.expenseAccounts
@@ -153,15 +153,16 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
   console.log("immobilisation variations OK");
 
   // Expenses accounts ----------------------- //
+  console.log( prevFinancialDataObject.expenseAccounts);
 
   nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts
-    .filter(account => /^6(0[^3]|1|2)/.test(account.account))
+    .filter(account => /^6(0[^3]|1|2)/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
   nextFinancialData.stockVariationsAccounts = prevFinancialDataObject.expenseAccounts
-    .filter(account => /^603/.test(account.account))
+    .filter(account => /^603/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
   nextFinancialData.amortisationExpensesAccounts = prevFinancialDataObject.expenseAccounts
-    .filter(account => /^68/.test(account.account))
+    .filter(account => /^68/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
   console.log("expenses accounts OK");
 
@@ -232,7 +233,7 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
     provisions: prevFinancialDataObject.provisions,
     taxOnProfits: prevFinancialDataObject.taxOnProfits
   };
-
+  console.log(nextFinancialData)
   return nextFinancialData;
 }
 
