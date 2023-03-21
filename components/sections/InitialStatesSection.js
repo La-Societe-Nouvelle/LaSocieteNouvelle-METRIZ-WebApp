@@ -12,6 +12,7 @@ import { updateVersion } from "../../src/version/updateVersion";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../ErrorAPI";
 import { getPrevDate } from "../../src/utils/Utils";
+import { Session } from "../../src/Session";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -252,7 +253,8 @@ export class InitialStatesSection extends React.Component {
     reader.onload = async () => {
       try {
         // text -> JSON
-        const prevSession = JSON.parse(reader.result);
+        const prevSessionData = JSON.parse(reader.result);
+        const prevSession = new Session(prevSessionData);
         const currSession = this.props.session;
 
         // update to current version
@@ -302,8 +304,7 @@ export class InitialStatesSection extends React.Component {
           return;
         }
 
-      
-        // Update session with prev values 
+        // Update session with prev values
         currSession.loadSessionFromBackup(prevSession);
 
         // Update financialData with prev values

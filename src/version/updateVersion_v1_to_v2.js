@@ -168,7 +168,7 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
 
   // Providers ------------------------------- //
 
-  nextFinancialData.providers = prevFinancialDataObject.companies.map(prevProvider => buildProvider(prevProvider));
+  nextFinancialData.providers = prevFinancialDataObject.companies.map(prevProvider => buildProvider(prevProvider,prevFinancialDataObject.expenses,prevFinancialDataObject.investments,prevFinancialPeriod));
 
   // Aggregates ------------------------------ //
 
@@ -449,7 +449,7 @@ const buildExpensesAccount = (prevAccount,prevFinancialPeriod) =>
   return nextExpensesAccount;
 }
 
-const buildProvider = (prevProvider) =>
+const buildProvider = (prevProvider,prevExternalExpenses,prevInvestments,prevFinancialPeriod) =>
 {
   let nextProvider = {
     isDefaultProviderAccount: prevProvider.isDefaultAccount,
@@ -469,7 +469,14 @@ const buildProvider = (prevProvider) =>
     } : {},
     dataFetched: prevProvider.dataFetched,
     footprintStatus: prevProvider.status,
-    periodsData: {}
+    periodsData: {
+      [prevFinancialPeriod.periodKey]: {
+        periodKey: prevFinancialPeriod.periodKey,
+        amount: getAmountItems(prevExternalExpenses.concat(prevInvestments).filter((expense) => expense.accountAux == prevProvider.account)),
+        amountExpenses: getAmountItems(prevExternalExpenses.filter((expense) => expense.accountAux == prevProvider.account)),
+        amountInvestments: getAmountItems(prevInvestments.filter((investment) => investment.accountAux == prevProvider.account))
+      }
+    }
   };
   return nextProvider;
 }
