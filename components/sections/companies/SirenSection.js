@@ -350,7 +350,9 @@ export class SirenSection extends React.Component
       let companiesIds = await processCSVCompaniesData(CSVData);
       await Promise.all(
         Object.entries(companiesIds).map(async ([providerNum, corporateName, corporateId]) => {
-          let provider  = providerNum ? this.props.financialData.getCompanyByAccount(providerNum) : this.props.financialData.getCompanyByName(corporateName);
+          let provider  = providerNum ? 
+              this.props.financialData.providers.find(provider => provider.providerNum==providerNum) 
+            : this.props.financialData.providers.find(provider => provider.providerLib==corporateName);
           if (provider) {
             provider.corporateId = corporateId;
             provider.legalUnitData.denomination = denomination;
