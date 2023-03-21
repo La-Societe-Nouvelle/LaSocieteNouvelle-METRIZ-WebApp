@@ -209,8 +209,9 @@ export const updateInitialStateImmobilisationsFpt = async (financialData,period)
     .filter(immobilisation => immobilisation.initialStateType=="defaultData")
     .map(async (immobilisation) => 
   {
-    let prevStateDateEnd = getPrevDate(period.dateStart);
-    immobilisation.states[prevStateDateEnd].footprint = immobilisation.initialState.footprint;
+    let initialStateDate = immobilisation.initialState.date;
+    immobilisation.states[initialStateDate].footprint = immobilisation.initialState.footprint;
+    immobilisation.states[initialStateDate].amortisationFootprint = immobilisation.initialState.amortisationFootprint;
     return;
   }));
   return;
@@ -224,14 +225,12 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
   let immobilisations = financialData.immobilisations.filter(immobilisation => immobilisation.isAmortisable);
   await Promise.all(immobilisations.map(async (immobilisation) =>
   {
-    let prevStateDateEnd = getPrevDate(period.dateStart);
-    let initialState = immobilisation.states[prevStateDateEnd];
-
     let states = Object.values(immobilisation.states)
       .filter(state => period.regex.test(state.date)); // sort
 
     for (let state of states) 
     {
+      let prevState = immobilisation.states[state.prevStateDate];
       let newImmobilisations = [];
 
       // investissements
@@ -252,18 +251,18 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
       // immobilisation footprint
       state.footprint = await mergeFootprints([
         ...newImmobilisations,                                                                                // investments
-        {amount: roundValue(state.amount-newImmobilisationsAmount, 2), footprint: initialState.footprint}]);  // remains
+        {amount: roundValue(state.amount-newImmobilisationsAmount, 2), footprint: prevState.footprint}]);  // remains
 
       // amortisation expense footprint
       let amortisationExpenseFootprint = await buildDifferenceFootprint(
-        {amount: initialState.amount, footprint: initialState.footprint},                        // immobilisation
-        {amount: initialState.amortisationAmount, footprint: initialState.amortisationFootprint} // amortisation
+        {amount: prevState.amount, footprint: prevState.footprint},                        // immobilisation
+        {amount: prevState.amortisationAmount, footprint: prevState.amortisationFootprint} // amortisation
       )
 
       // amortisation footprint
       state.amortisationFootprint = await mergeFootprints([
-        {amount: state.amortisationExpenseAmount, footprint: amortisationExpenseFootprint},                                               // amortisation expense
-        {amount: roundValue(state.amortisationAmount-state.amortisationExpenseAmount, 2), footprint: initialState.amortisationFootprint}  // amortisation
+        {amount: state.amortisationExpenseAmount, footprint: amortisationExpenseFootprint},                                            // amortisation expense
+        {amount: roundValue(state.amortisationAmount-state.amortisationExpenseAmount, 2), footprint: prevState.amortisationFootprint}  // amortisation
       ])
     }
     return;
@@ -303,9 +302,8 @@ const updateAmortisationExpensesFpt = async (financialData,period) =>
 const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
 {
 
-  let filteredAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey));
-
-  await Promise.all(filteredAmortisationExpensesAccounts
+  let amortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey));
+  await Promise.all(amortisationExpensesAccounts
     .map(async (account) => 
   {
     let amortisationExpenses = financialData.adjustedAmortisationExpenses
@@ -334,7 +332,6 @@ export const updateMainAggregatesFootprints = async (indic,financialData,period)
     await buildAggregatePeriodIndicator(indic,financialData.externalExpensesAccounts.concat(financialData.stockVariationsAccounts),period.periodKey);
   
   // Fixed capital consumtpions
-
   fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
     await buildAggregatePeriodIndicator(indic,financialData.amortisationExpensesAccounts,period.periodKey);
   

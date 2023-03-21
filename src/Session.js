@@ -22,7 +22,7 @@ import {
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
 import { ComparativeData } from "./ComparativeData";
-import { getDatesEndMonths } from "./utils/Utils";
+import { getDatesEndMonths, getLastDateOfMonth, getPrevDate } from "./utils/Utils";
 
 /* ---------- OBJECT SESSION ---------- */
 
@@ -219,10 +219,22 @@ export class Session {
   };
 }
 
-export const buildRegexFinancialPeriod = (dateStart, dateEnd) => {
+export const buildRegexFinancialPeriod = (dateStart, dateEnd) => 
+{ // REVIEW
   let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
   let months = datesEndMonths.map((date) => date.substring(0, 6));
-  let regexString = "^(" + months.join("|") + ")";
+
+  let datesLastMonth = [];
+  if (dateEnd!=getLastDateOfMonth(dateEnd)) {
+    let lastMonth = dateEnd.substring(0,6);
+    let prevDate = dateEnd;
+    while (prevDate.startsWith(lastMonth)) {
+      datesLastMonth.push(prevDate);
+      prevDate = getPrevDate(prevDate);
+    }
+  };
+
+  let regexString = "^(" + months.concat(datesLastMonth).join("|") + ")";
   return new RegExp(regexString);
 };
 
