@@ -105,9 +105,9 @@ export const IndicatorMainAggregatesTable = ({
       <thead>
     <tr>
       <th>Agrégat</th>
-      <th colspan="3" class="text-center">Année N</th>
+      <th colSpan="3" class="text-center">Année N</th>
       {prevPeriod && (
-        <th colspan={printGrossImpact ? "4" : "3"} class="text-center">N-1</th>
+        <th colSpan={printGrossImpact ? "4" : "3"} class="text-center">N-1</th>
       )}
     </tr>
     <tr>

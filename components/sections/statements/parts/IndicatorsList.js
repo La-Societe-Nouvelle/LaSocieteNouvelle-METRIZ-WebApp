@@ -85,7 +85,6 @@ const IndicatorsList = (props) => {
     const prevPeriod = props.session.availablePeriods.find(
       (period) => period.dateEnd == prevDateEnd
     );
-    console.log(prevPeriod)
   
   useEffect(async () => {
     if (validations.length > 0) {
@@ -96,7 +95,7 @@ const IndicatorsList = (props) => {
   useEffect(() => {
     // return indics not included in available list of indicators
     const filteredIndics = Object.keys(metaIndics).filter(
-      (key) => !prevIndics.includes(key)
+      (key) => !prevIndics[period.periodKey].includes(key)
     );
     if (filteredIndics.length > 0) {
       setnotAvailableIndics(filteredIndics);
@@ -297,9 +296,8 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-      {/* Charts generation */}
 
-      {validations.length > 0 &&
+      {validations.length > 0 && prevPeriod &&
         validations.map((indic, key) => (
           <div key={key} className="hidden charts-container">
             <Row>

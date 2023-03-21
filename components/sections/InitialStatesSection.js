@@ -256,7 +256,7 @@ export class InitialStatesSection extends React.Component {
         const currSession = this.props.session;
 
         // update to current version
-        updateVersion(prevSession);
+       await updateVersion(prevSession);
 
         const prevYear = prevSession.financialPeriod.periodKey.slice(2);
         const currYear = currSession.financialPeriod.periodKey.slice(2);

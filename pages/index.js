@@ -134,8 +134,8 @@ class Metriz extends React.Component {
     // build JSON
     const session = this.state.session;
     const fileName = session.legalUnit.siren
-      ? "svg_ese_" + session.legalUnit.siren
-      : "svg_ese_" + session.legalUnit.corporateName; // To update
+      ? "session-metriz-" + session.legalUnit.siren + "-" + session.financialPeriod.periodKey.slice(2)
+      : "session-metriz-" + session.legalUnit.corporateName  + "-" + session.financialPeriod.periodKey.slice(2); // To update
     const json = JSON.stringify(session);
 
     // build download link & activate

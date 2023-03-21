@@ -70,7 +70,6 @@ export class Session {
     this.availablePeriods.forEach((period) => {
       this.validations[period.periodKey] = props.validations[period.periodKey];
     });
-    console.log(this.validations);
 
     // comparative data
     this.comparativeData = new ComparativeData(props.comparativeData);
@@ -157,8 +156,6 @@ export class Session {
 
     // Production items
     await this.updateProductionItemsFootprints(period);
-
-    console.log(this.financialData.mainAggregates);
 
     return;
   };
