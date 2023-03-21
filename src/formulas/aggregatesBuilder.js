@@ -63,8 +63,7 @@ export const buildIntermediateConsumptionsAggregates = async (financialData, per
     let filteredStockVariationsAccounts = financialData.stockVariationsAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
 
     accounts = filteredStockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
-    console.log( financialData.stockVariationsAccounts.length)
-    console.log(filteredStockVariationsAccounts.length);
+
     if (accounts.length > 0) {
         aggregates.push({
             label: "Variation des stocks",

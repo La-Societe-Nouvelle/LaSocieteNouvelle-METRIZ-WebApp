@@ -140,10 +140,10 @@ async function buildMainAggregatesContent(indic,session,period)
 
   intermediateConsumptionsAggregates
     .filter((aggregate) => aggregate.amount != 0)
-    .forEach(({ accountLib, amount, footprint }) => 
+    .forEach(({ label, amount, footprint }) => 
     (
       aoaContent.push([
-        "   "+accountLib,
+        "   "+label,
         roundValue(amount, 0),
         roundValue(footprint.indicators[indic].getValue(), nbDecimals),
         roundValue(footprint.indicators[indic].getUncertainty(), 0)
@@ -168,10 +168,10 @@ async function buildMainAggregatesContent(indic,session,period)
 
   fixedCapitalConsumptionsAggregates
     .filter((aggregate) => aggregate.amount != 0)
-    .forEach(({ accountLib, amount, footprint }) => 
+    .forEach(({ label, amount, footprint }) => 
     (
       aoaContent.push([
-        "   "+accountLib,
+        "   "+label,
         roundValue(amount, 0),
         roundValue(footprint.indicators[indic].getValue(), nbDecimals),
         roundValue(footprint.indicators[indic].getUncertainty(), 0)
@@ -193,15 +193,12 @@ async function buildExpensesContent(indic,session)
 {
   let aoaContent = [];
 
-  const nbDecimals = metaIndics[indic].nbDecimals;
+  //const nbDecimals = metaIndics[indic].nbDecimals;
+  const currentPeriod = session.financialPeriod.periodKey;
+  const externalExpenses = session.financialData.externalExpenses.filter(account => account.date.startsWith(currentPeriod.slice(2)));
+  //const expensesByAccount = getExpensesGroupByAccount(session.financialData.externalExpenses);
 
-  const {
-    expenseAccounts
-  } = session.financialData;
-
-  const expensesByAccount = getExpensesGroupByAccount(session.financialData.externalExpenses);
-  expensesByAccount.sort((a,b) => b.amount - a.amount);
-
+  externalExpenses.sort((a,b) => b.amount - a.amount);
   // header
 
   aoaContent.push([
@@ -219,18 +216,18 @@ async function buildExpensesContent(indic,session)
     "Incertitude (en %)"
   ])
 
-  // Consommations intermédiaires
-  console.log(expensesByAccount)
-  expensesByAccount
-    .forEach(({ accountNum, accountLib, amount }) => 
+
+  externalExpenses
+    .forEach(({ accountNum, accountLib, amount, footprint }) => 
     {
-      let indicator = session.getExpensesAccountIndicator(accountNum,indic); // TO FIX
+     // let indicator = session.getExpensesAccountIndicator(accountNum,indic); // TO FIX
+
       aoaContent.push([
         accountNum,
         accountLib,
         roundValue(amount, 0),
-        roundValue(indicator.getValue(), nbDecimals),
-        roundValue(indicator.getUncertainty(),   0)
+        footprint.indicators[indic].value,
+        footprint.indicators[indic].uncertainty
       ]);
     });
 
