@@ -65,8 +65,8 @@ export class Stock {
 
   // ---------------------------------------------------------------------------------------------------- //
 
-    this.defaultStockVariationAccountNum = this.isProductionStock ? "60"+this.accountNum : undefined;
-    this.defaultStockVariationAccountLib = this.isProductionStock ?  "Variation stock "+this.accountLib : undefined;
+    this.defaultStockVariationAccountNum = !this.isProductionStock ? "60"+this.accountNum : undefined;
+    this.defaultStockVariationAccountLib = !this.isProductionStock ?  "Variation stock "+this.accountLib : undefined;
   }
 
   /* ------------------------- Update props ------------------------- */
