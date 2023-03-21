@@ -143,7 +143,8 @@ const getFinancialItems = (financialData, periodKey) =>
   // Résultat exceptionnel ---------------------------- //
 
   financialItems.exceptionalIncomes = financialData.otherFinancialData.exceptionalIncomes.periodsData[periodKey].amount;
-  financialItems.exceptionalExpenses = financialData.otherFinancialData.exceptionalExpenses.periodsData[periodKey].amount;
+  let exceptionalAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
+  financialItems.exceptionalExpenses = getAmountItemsForPeriod(exceptionalAmortisationExpensesAccounts, periodKey, 2) + financialData.otherFinancialData.exceptionalExpenses.periodsData[periodKey].amount;
   financialItems.exceptionalResult = 
       financialItems.exceptionalIncomes 
     - financialItems.exceptionalExpenses;

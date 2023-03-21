@@ -282,6 +282,10 @@ export class FinancialData {
     // purchases stock variations
     this.stockVariationsAccounts = this.stocks
       .filter((stock) => !stock.isProductionStock)
+      .filter(
+        (value, index, self) =>
+          index === self.findIndex((item) => item.accountNum == value.accountNum)
+      )
       .map(
         (stock) =>
           new Account({
@@ -299,7 +303,12 @@ export class FinancialData {
     );
 
     // amortisation expenses
-    this.amortisationExpensesAccounts = this.adjustedAmortisationExpenses.map(
+    this.amortisationExpensesAccounts = this.adjustedAmortisationExpenses
+      .filter(
+        (value, index, self) =>
+          index === self.findIndex((item) => item.accountNum == value.accountNum)
+      )
+      .map(
       (expense) =>
         new Account({
           accountNum: expense.accountNum,
