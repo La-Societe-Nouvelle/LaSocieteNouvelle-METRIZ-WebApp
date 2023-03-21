@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-const currentVersion = "1.0.6";
+const currentVersion = "2.0.0";
 
 // Libraries
 import metaIndics from "../lib/indics.json";
@@ -40,13 +40,19 @@ export class Session {
     // Year
     this.year = props.year || ""; // obsolete
     this.availablePeriods = props.availablePeriods || [];
-    this.availablePeriods.forEach(period => {
-      period.regex = buildRegexFinancialPeriod(period.dateStart, period.dateEnd)
-    })
+    this.availablePeriods.forEach((period) => {
+      period.regex = buildRegexFinancialPeriod(
+        period.dateStart,
+        period.dateEnd
+      );
+    });
 
     this.financialPeriod = props.financialPeriod || {};
     this.financialPeriod.regex = props.financialPeriod
-      ? buildRegexFinancialPeriod(props.financialPeriod.dateStart, props.financialData.dateEnd)
+      ? buildRegexFinancialPeriod(
+          props.financialPeriod.dateStart,
+          props.financialData.dateEnd
+        )
       : {};
 
     // Data
@@ -62,15 +68,19 @@ export class Session {
     // Validations
     this.validations = {};
     this.availablePeriods.forEach((period) => {
-      this.validations[period.periodKey] =
-        props.validations[period.periodKey] || [];
+      this.validations[period.periodKey] = props.validations[period.periodKey];
     });
+    console.log(this.validations);
 
     // comparative data
     this.comparativeData = new ComparativeData(props.comparativeData);
 
     // Indicators list
-    this.indics = props.indics || Object.keys(metaIndics);
+    this.indics = {};
+    this.availablePeriods.forEach((period) => {
+      this.indics[period.periodKey] = props.indics[period.periodKey] || [];
+    });
+  
   }
 
   addPeriods = (periods) => {
@@ -81,6 +91,7 @@ export class Session {
     newPeriods.forEach((period) => {
       this.impactsData[period.periodKey] = new ImpactsData();
       this.validations[period.periodKey] = [];
+      this.indics[period.periodKey] = Object.keys(metaIndics);
     });
   };
 
