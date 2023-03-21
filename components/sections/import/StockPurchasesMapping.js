@@ -96,7 +96,7 @@ export const StockPurchasesMapping = (props) =>
   const onSubmit = () =>
   {
     console.log("Associations des comptes d'achats avec les comptes de stocks : ");
-    console.log(Object.keys(accounts).filter(({accountNum}) => /^3(1|2|7)/.test(accountNum)));
+    console.log(Object.values(accounts).filter(({accountNum}) => /^3(1|2|7)/.test(accountNum)));
     props.onClick();
   }
 

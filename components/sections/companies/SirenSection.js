@@ -443,7 +443,6 @@ export class SirenSection extends React.Component
     {
       try 
       {
-        console.log(provider)
         // fetch footprint
         await provider.updateFromRemote();
         // assign to expenses & investments

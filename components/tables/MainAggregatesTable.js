@@ -1,6 +1,7 @@
 // La Société Nouvelle
 
 // Utils
+import { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../../src/formulas/aggregatesBuilder';
 import { printValue } from '../../src/utils/Utils';
@@ -11,8 +12,34 @@ export const MainAggregatesTable = ({financialData,period}) =>
 {
   console.log(financialData)
   const periodKey = period.periodKey;
-  const intermediateConsumptionsAggregates = buildIntermediateConsumptionsAggregates(financialData, periodKey);
-  const fixedCapitalConsumptionsAggregates = buildFixedCapitalConsumptionsAggregates(financialData, periodKey);
+
+  const [
+    intermediateConsumptionsAggregates,
+    setIntermediateConsumptionsAggregates,
+  ] = useState([]);
+  const [
+    fixedCapitalConsumptionsAggregates,
+    setFixedCapitalConsumptionsAggregates,
+  ] = useState([]);
+
+  useEffect(async () => {
+    // Current Aggregates
+    const intermediateConsumptionsAggregates =
+      await buildIntermediateConsumptionsAggregates(
+        financialData,
+        period.periodKey
+      );
+    setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
+    const fixedCapitalConsumptionsAggregates =
+      await buildFixedCapitalConsumptionsAggregates(
+        financialData,
+        period.periodKey
+      );
+    setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
+  }, []);
+
+  //const intermediateConsumptionsAggregates = buildIntermediateConsumptionsAggregates(financialData, periodKey);
+  //const fixedCapitalConsumptionsAggregates = buildFixedCapitalConsumptionsAggregates(financialData, periodKey);
 
   const {revenue,
          storedProduction,
