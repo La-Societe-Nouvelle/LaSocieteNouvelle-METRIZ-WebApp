@@ -10,7 +10,7 @@ import {
   getUncertaintyDescription,
   loadFonts,
   sortAccountsByFootprint,
-  sortProvidersByImpact,
+  sortProvidersByContrib,
 } from "./utils/utils";
 
 // Lib
@@ -70,11 +70,13 @@ export const createContribIndicatorPDF = (
     "asc"
   ).slice(0, 3);
 
-  const mostImpactfulProviders = sortProvidersByImpact(
+  const mostImpactfulProviders = sortProvidersByContrib(
+    period.periodKey,
     providers,
     indic,
     "desc"
   ).slice(0, 4);
+
 
 
   const uncertaintyText = getUncertaintyDescription(
@@ -105,7 +107,6 @@ export const createContribIndicatorPDF = (
   const contributionPercentage = revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
   const contributionAmount = (contributionPercentage / 100) * totalRevenue;
   const contributionPerEuro = contributionAmount / totalRevenue;
- 
 
   // ---------------------------------------------------------------
   // Document Property

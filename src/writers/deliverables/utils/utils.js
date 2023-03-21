@@ -34,6 +34,27 @@ export function sortProvidersByImpact(expensesAccounts, indicator, order) {
   return sortedExpensesAccounts;
 }
 
+export function sortProvidersByContrib(periodKey,expensesAccounts, indicator, order) {
+  
+  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
+    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.periodsData[periodKey].amount);
+    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.periodsData[periodKey].amount);
+  
+    if (order === "asc") {
+      return valueA - valueB;
+    } else {
+      return valueB - valueA;
+    }
+  }).slice(0, 4).sort((a, b) => {
+    let sortedAccountA = 100 - a.footprint.indicators[indicator].value;
+    let sortedAccountB = 100 - b.footprint.indicators[indicator].value;
+    return sortedAccountB - sortedAccountA;
+  });
+  
+
+  return sortedExpensesAccounts;
+}
+
 export function getIndicDescription(indic) {
   let description;
 
