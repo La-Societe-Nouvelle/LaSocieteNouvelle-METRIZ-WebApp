@@ -22,6 +22,7 @@ import { SocialFootprint } from '../footprintObjects/SocialFootprint';
 
 export async function buildAggregateFootprint(elements,usePrev) 
 {
+
     let footprint = new SocialFootprint();
     let indics = Object.keys(metaIndics);
     await Promise.all(
@@ -191,6 +192,7 @@ export function mergeIndicators(indic,items)
 
 export async function buildAggregatePeriodFootprint(accounts,periodKey) 
 {
+  
     let footprint = new SocialFootprint();
     let indics = Object.keys(metaIndics);
     await Promise.all(
@@ -205,6 +207,9 @@ export async function buildAggregatePeriodFootprint(accounts,periodKey)
 
 export function buildAggregatePeriodIndicator(indic,accounts,periodKey) 
 {
+
+    let currentAccounts =  accounts.filter(account => account.periodsData.hasOwnProperty(periodKey));
+   
     let indicator = new Indicator({indic});
     
     let precision = metaIndics[indic].nbDecimals;
@@ -215,8 +220,8 @@ export function buildAggregatePeriodIndicator(indic,accounts,periodKey)
     let grossImpactMin = 0.0;
 
     let missingData = false;
-    
-    accounts.forEach((account) => 
+
+    currentAccounts.forEach((account) => 
     {
         let amount = account.periodsData[periodKey].amount;
         let indicatorElement = account.periodsData[periodKey].footprint.indicators[indic];

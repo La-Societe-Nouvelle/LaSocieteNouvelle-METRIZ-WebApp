@@ -302,13 +302,17 @@ const updateAmortisationExpensesFpt = async (financialData,period) =>
 
 const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
 {
-  await Promise.all(financialData.amortisationExpensesAccounts
+
+  let currentAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey));
+
+  
+  await Promise.all(currentAmortisationExpensesAccounts
     .map(async (account) => 
   {
     let amortisationExpenses = financialData.adjustedAmortisationExpenses
       .filter(expense => expense.accountNum==account.accountNum)
       .filter(expense => period.regex.test(expense.date));
-
+      
     account.periodsData[period.periodKey].footprint = await buildAggregateFootprint(amortisationExpenses);
     return;
   }));
@@ -331,6 +335,7 @@ export const updateMainAggregatesFootprints = async (indic,financialData,period)
     await buildAggregatePeriodIndicator(indic,financialData.externalExpensesAccounts.concat(financialData.stockVariationsAccounts),period.periodKey);
   
   // Fixed capital consumtpions
+
   fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
     await buildAggregatePeriodIndicator(indic,financialData.amortisationExpensesAccounts,period.periodKey);
   

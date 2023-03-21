@@ -61,7 +61,7 @@ export const buildAggregateFromAccounts = ({
 
 export const mergeAggregatePeriodsData = (current, previous) => {
   // Create a new object and copy the properties from both current and previous objects
-  const mergedAggregates = Object.assign({}, previous, current);
+  let mergedAggregates = Object.assign({}, previous, current);
   // Loop through each aggregate property in the object and merge the periodsData
   for (const aggregate in mergedAggregates) {
     mergedAggregates[aggregate].periodsData = Object.assign(
