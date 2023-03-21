@@ -51,7 +51,7 @@ export class Session {
     this.financialPeriod.regex = props.financialPeriod
       ? buildRegexFinancialPeriod(
           props.financialPeriod.dateStart,
-          props.financialData.dateEnd
+          props.financialPeriod.dateEnd
         )
       : {};
 

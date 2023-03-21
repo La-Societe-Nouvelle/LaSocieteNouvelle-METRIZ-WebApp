@@ -53,7 +53,7 @@ export class ImportDSN extends React.Component {
     super(props);
     this.state = {
       files: [],
-      socialStatements: props.impactsData[props.period.periodKey].socialStatements || [],
+      socialStatements: props.impactsData.socialStatements || [],
       errorFile: false,
     };
   }
@@ -313,7 +313,7 @@ export class ImportDSN extends React.Component {
 
   // Submit
   onSubmit = async () => {
-    let impactsData = this.props.impactsData[this.props.period.periodKey];
+    let impactsData = this.props.impactsData;
 
     impactsData.socialStatements = this.state.socialStatements;
 
