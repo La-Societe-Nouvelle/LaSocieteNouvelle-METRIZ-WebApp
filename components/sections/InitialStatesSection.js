@@ -311,9 +311,9 @@ export class InitialStatesSection extends React.Component {
           .filter(immobilisation => immobilisation.initialState.amount > 0)
           .forEach(immobilisation => {
             let prevImmobilisation = prevSession.financialData.immobilisations.find(prevImmobilisation => prevImmobilisation.accountNum==immobilisation.accountNum);
-            let prevStateDateEnd = immobilisation.initialState.prevStateDate;
-            if (!prevImmobilisation) checkANouveaux = false;
-            else if (!prevImmobilisation.states[prevStateDateEnd]) checkANouveaux = false;
+            let prevStateDateEnd = immobilisation.initialState.date;
+            if (!prevImmobilisation) {checkANouveaux = false;}
+            else if (!prevImmobilisation.states[prevStateDateEnd]) {checkANouveaux = false;}
             else if (prevImmobilisation.states[prevStateDateEnd].amount!=immobilisation.initialState.amount
               || (immobilisation.amortisationAccountNum && prevImmobilisation.states[prevStateDateEnd].amortisationAmount!=immobilisation.initialState.amortisationAmount)
               || (immobilisation.depreciationAccountNum && prevImmobilisation.states[prevStateDateEnd].depreciationAmount!=immobilisation.initialState.depreciationAmount)) {
@@ -324,9 +324,9 @@ export class InitialStatesSection extends React.Component {
           .filter(stock => stock.initialState.amount > 0)
           .forEach(stock => {
             let prevStock = prevSession.financialData.stocks.find(prevStock => prevStock.accountNum==stock.accountNum);
-            let prevStateDateEnd = stock.initialState.prevStateDate;
-            if (!prevStock) checkANouveaux = false;
-            else if (!prevStock.states[prevStateDateEnd]) checkANouveaux = false;
+            let prevStateDateEnd = stock.initialState.date;
+            if (!prevStock) {checkANouveaux = false;}
+            else if (!prevStock.states[prevStateDateEnd]) {checkANouveaux = false;}
             else if (prevStock.states[prevStateDateEnd].amount!=stock.initialState.amount
               || (stock.depreciationAccountNum && prevStock.states[prevStateDateEnd].depreciationAmount!=stock.initialState.depreciationAmount)) {
                 checkANouveaux = false;
