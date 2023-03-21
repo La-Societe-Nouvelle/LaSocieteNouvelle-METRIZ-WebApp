@@ -28,8 +28,9 @@ export class PublishStatementSection extends React.Component
     {
         super(props);
 
+        const period = props.session.financialPeriod;
         const socialFootprint = {};
-        Object.entries(props.session.financialData.productionAggregates.revenue.periodsData[props.period.periodKey].footprint.indicators).filter(([_, indicator]) => indicator.value != null)
+        Object.entries(props.session.financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint.indicators).filter(([_, indicator]) => indicator.value != null)
             .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
 
         this.state =
@@ -38,12 +39,12 @@ export class PublishStatementSection extends React.Component
             // Legal entity data 
             siren: props.session.legalUnit.siren || "",
             denomination: props.session.legalUnit.corporateName || "",
-            year: props.session.year || "",
+            year: period.dateEnd.substring(0,4),
 
             // Statements 
-            revenueFootprint: props.session.financialData.productionAggregates.revenue.periodsData[props.period.periodKey].footprint,
-            validations: props.session.validations[props.period.periodKey],
-            comments: props.session.impactsData[props.period.periodKey].comments || {},
+            revenueFootprint: props.session.financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint,
+            validations: props.session.validations[period.periodKey],
+            comments: props.session.impactsData[period.periodKey].comments || {},
 
             // declarant 
             declarant: "",

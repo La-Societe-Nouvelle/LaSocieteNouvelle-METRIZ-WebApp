@@ -221,7 +221,7 @@ export class Provider {
 
   async loadPrevProvider(prevProvider) {
     this.corporateId = prevProvider.corporateId;
-    this.footprintStatus = 203;
+    this.footprintStatus = prevProvider.footprintStatus==200 ? 203 : prevProvider.footprintStatus;
     this.footprint =  new SocialFootprint(prevProvider.footprint) ;
     this.isDefaultProviderAccount = prevProvider.isDefaultProviderAccount;
     this.legalUnitData = prevProvider.legalUnitData;

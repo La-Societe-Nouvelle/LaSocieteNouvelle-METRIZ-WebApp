@@ -21,7 +21,7 @@ export class AssessmentKNW extends React.Component {
     super(props);
     this.state = {
       // details
-      knwDetails: props.impactsData[props.period.periodKey].knwDetails,
+      knwDetails: props.impactsData.knwDetails,
     };
   }
 
@@ -183,7 +183,7 @@ export class AssessmentKNW extends React.Component {
     });
 
   updateResearchAndTrainingContribution = async (nextProps) => {
-    let impactsData = this.props.impactsData[this.props.period.periodKey];
+    let impactsData = this.props.impactsData;
     // update knw details
     impactsData.knwDetails = { ...impactsData.knwDetails, ...nextProps };
     // update result

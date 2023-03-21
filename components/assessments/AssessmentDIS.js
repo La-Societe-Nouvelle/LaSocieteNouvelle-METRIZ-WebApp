@@ -40,10 +40,10 @@ export class AssessmentDIS extends React.Component
     super(props);
     this.state = {
       // gini index
-      indexGini: props.impactsData[props.period.periodKey].indexGini,
+      indexGini: props.impactsData.indexGini,
       // details
-      hasEmployees: props.impactsData[props.period.periodKey].hasEmployees,
-      employees: props.impactsData[props.period.periodKey].employees,
+      hasEmployees: props.impactsData.hasEmployees,
+      employees: props.impactsData.employees,
       // display
       columnSorted: "id",
       reverseSort: false,
@@ -52,8 +52,8 @@ export class AssessmentDIS extends React.Component
 
   componentDidUpdate(prevProps) 
   {
-    if (prevProps.impactsData[this.props.period.periodKey].employees != this.state.employees) {
-      this.props.impactsData[this.props.period.periodKey].employees = this.state.employees;
+    if (prevProps.impactsData.employees != this.state.employees) {
+      this.props.impactsData.employees = this.state.employees;
     }
   }
 
@@ -192,7 +192,7 @@ export class AssessmentDIS extends React.Component
   // Submit
   onSubmit = async () => 
   {
-    let impactsData = this.props.impactsData[period.periodKey];
+    let impactsData = this.props.impactsData;
 
     // update dis data
     //impactsData.indexGini = getIndexGini(impactsData.employees);
@@ -317,7 +317,7 @@ export class AssessmentDIS extends React.Component
   // Update -> needed ?
   updateSocialData = (nextProps) => 
   {
-    let employee = this.props.impactsData[this.props.period.periodKey].employees.filter((employee) => employee.id == nextProps.id)[0];
+    let employee = this.props.impactsData.employees.filter((employee) => employee.id == nextProps.id)[0];
     if (employee == undefined) {
       this.addEmployee();
     } else {
