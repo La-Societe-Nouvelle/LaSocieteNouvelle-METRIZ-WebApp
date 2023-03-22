@@ -1,6 +1,7 @@
 // PDF make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { buildAggregatePeriodIndicator } from "../../formulas/footprintFormulas";
 // Utils
 import { getShortCurrentDateString, printValue } from "../../utils/Utils";
 import {
@@ -48,11 +49,26 @@ export const createContribIndicatorPDF = (
   // ---------------------------------------------------------------
   // utils
   const indicDescription = getIndicDescription(indic);
-  const externalExpensesAccounts = financialData.externalExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey)); 
-  
+  const externalExpensesAccounts =
+    financialData.externalExpensesAccounts.filter((account) =>
+      account.periodsData.hasOwnProperty(period.periodKey)
+    );
 
-  const providers = financialData.providers.filter(provider => {
-    return Object.keys(provider.periodsData).some(key => key === period.periodKey);
+  let filteredExternalExpensesAccounts =
+    financialData.externalExpensesAccounts.filter((account) =>
+      /^60[^(8|9)]/.test(account.accountNum)
+    );
+  // Calcul du taux de contribution des achats
+  const contribExternalAccounts = buildAggregatePeriodIndicator(
+    indic,
+    filteredExternalExpensesAccounts,
+    period.periodKey
+  );
+
+  const providers = financialData.providers.filter((provider) => {
+    return Object.keys(provider.periodsData).some(
+      (key) => key === period.periodKey
+    );
   });
 
   const mostImpactfulExpenses = sortAccountsByFootprint(
@@ -61,7 +77,6 @@ export const createContribIndicatorPDF = (
     indic,
     "desc"
   ).slice(0, 3);
-
 
   const leastImpactfulExpenses = sortAccountsByFootprint(
     externalExpensesAccounts,
@@ -77,11 +92,10 @@ export const createContribIndicatorPDF = (
     "desc"
   ).slice(0, 4);
 
-
-
   const uncertaintyText = getUncertaintyDescription(
     "proportion",
-    production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty
+    production.periodsData[period.periodKey].footprint.indicators[indic]
+      .uncertainty
   );
 
   // ---------------------------------------------------------------
@@ -104,7 +118,8 @@ export const createContribIndicatorPDF = (
 
   const totalRevenue = revenue.periodsData[period.periodKey].amount;
 
-  const contributionPercentage = revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
+  const contributionPercentage =
+    revenue.periodsData[period.periodKey].footprint.indicators[indic].value;
   const contributionAmount = (contributionPercentage / 100) * totalRevenue;
   const contributionPerEuro = contributionAmount / totalRevenue;
 
@@ -328,8 +343,11 @@ export const createContribIndicatorPDF = (
             stack: [
               {
                 text:
-                  printValue(production.periodsData[period.periodKey].footprint.indicators[indic].value, 1) +
-                  "%*",
+                  printValue(
+                    production.periodsData[period.periodKey].footprint
+                      .indicators[indic].value,
+                    1
+                  ) + "%*",
                 alignment: "center",
                 style: "bigNumber",
                 fontSize: 26,
@@ -439,12 +457,7 @@ export const createContribIndicatorPDF = (
                 background: "#FFFFFF",
               },
               {
-                text:
-                // PREV : Empreinte des charges externes
-                  printValue(
-                    intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
-                    1
-                  ) + " %",
+                text: printValue(contribExternalAccounts.value, 1) + " %",
                 alignment: "center",
                 style: "bigNumber",
                 fontSize: 20,
