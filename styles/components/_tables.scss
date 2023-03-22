@@ -12,7 +12,7 @@ p.toChecked {
 table {
   font-size: 0.85em;
   border-radius: 1rem;
-  border : 2px solid $bg-light;
+  border: 2px solid $bg-light;
 
   tr.fw-bold td {
     padding: 0.5rem 0.25rem;
@@ -75,7 +75,8 @@ table {
     color: #fff;
     font-weight: 700;
     font-size: 1em;
-    tr:nth-child(2){
+    tr:nth-child(2),
+    tr:nth-child(3) {
       background-color: lighten($primary, 5%);
     }
   }
@@ -93,7 +94,9 @@ table {
   tbody {
     td {
       vertical-align: middle;
+
     }
+
     // select
     select {
       width: 100%;
@@ -158,6 +161,9 @@ table {
   }
 }
 
+// MAIN AGGREGATE TABLE
+
+
 .table-menu {
   margin: 2em 0 0.5rem 0;
   text-align: center;
@@ -220,7 +226,7 @@ table {
   width: 250px;
 }
 
-.comparative-table {
+.comparative-table, #mainAggregates {
   .border-left {
     border-left: 2px solid lighten($light, 5%);
   }
