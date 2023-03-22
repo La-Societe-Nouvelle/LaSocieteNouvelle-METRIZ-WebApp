@@ -72,7 +72,6 @@ const ResultSection = (props) => {
   const [comparativeData, setComparativeData] = useState(
     props.session.comparativeData
   );
-
   // Prev Period
 
   const prevDateEnd = getPrevDate(props.session.financialPeriod.dateStart);
@@ -364,24 +363,25 @@ const ResultSection = (props) => {
                 <h5 className="mb-4">▪ Production</h5>
                 <ComparativeGraphs
                   id={"production-" + indic}
-                  graphDataset={[
+                  firstDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
-                    production.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
-                    comparativeData.production.divisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}
-                  targetData={[
-                    comparativeData.production.targetAreaFootprint.indicators[
-                      indic
-                    ].value,
                     prevPeriod &&
                       production.periodsData[
                         prevPeriod.periodKey
                       ].footprint.getIndicator(indic).value,
+                    comparativeData.production.divisionFootprint.indicators[
+                      indic
+                    ].value,
+                  ]}
+                  secondDataset={[
+                    comparativeData.production.targetAreaFootprint.indicators[
+                      indic
+                    ].value,
+                    production.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
+
                     comparativeData.production.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -393,22 +393,23 @@ const ResultSection = (props) => {
                 <h5 className="mb-4">▪ Consommations intermédiaires</h5>
                 <ComparativeGraphs
                   id={"intermediateConsumptions-" + indic}
-                  graphDataset={[
+                  firstDataset={[
                     comparativeData.intermediateConsumptions.areaFootprint
-                      .indicators[indic].value,
-                    intermediateConsumptions.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
-                    comparativeData.intermediateConsumptions.divisionFootprint
-                      .indicators[indic].value,
-                  ]}
-                  targetData={[
-                    comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
                     prevPeriod &&
                       intermediateConsumptions.periodsData[
                         prevPeriod.periodKey
                       ].footprint.getIndicator(indic).value,
+                    comparativeData.intermediateConsumptions.divisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  secondDataset={[
+                    comparativeData.intermediateConsumptions.targetAreaFootprint
+                      .indicators[indic].value,
+                    intermediateConsumptions.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
+
                     comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -421,22 +422,23 @@ const ResultSection = (props) => {
                 <h5 className="mb-4">▪ Consommations de capital fixe</h5>
                 <ComparativeGraphs
                   id={"fixedCapitalConsumptions-" + indic}
-                  graphDataset={[
+                  firstDataset={[
                     comparativeData.fixedCapitalConsumptions.areaFootprint
-                      .indicators[indic].value,
-                    fixedCapitalConsumptions.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
-                    comparativeData.fixedCapitalConsumptions.divisionFootprint
-                      .indicators[indic].value,
-                  ]}
-                  targetData={[
-                    comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
                     prevPeriod &&
                       fixedCapitalConsumptions.periodsData[
                         prevPeriod.periodKey
                       ].footprint.getIndicator(indic).value,
+                    comparativeData.fixedCapitalConsumptions.divisionFootprint
+                      .indicators[indic].value,
+                  ]}
+                  secondDataset={[
+                    comparativeData.fixedCapitalConsumptions.targetAreaFootprint
+                      .indicators[indic].value,
+                    fixedCapitalConsumptions.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
+
                     comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -450,24 +452,24 @@ const ResultSection = (props) => {
                 <h5 className="mb-4">▪ Valeur ajoutée nette</h5>
                 <ComparativeGraphs
                   id={"netValueAdded-" + indic}
-                  graphDataset={[
+                  firstDataset={[
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
                     ].value,
-                    netValueAdded.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
-                    comparativeData.netValueAdded.divisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}
-                  targetData={[
-                    comparativeData.netValueAdded.targetAreaFootprint
-                      .indicators[indic].value,
                     prevPeriod &&
                       netValueAdded.periodsData[
                         prevPeriod.periodKey
                       ].footprint.getIndicator(indic).value,
+                    comparativeData.netValueAdded.divisionFootprint.indicators[
+                      indic
+                    ].value,
+                  ]}
+                  secondDataset={[
+                    comparativeData.netValueAdded.targetAreaFootprint
+                      .indicators[indic].value,
+                    netValueAdded.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
                     comparativeData.netValueAdded.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,

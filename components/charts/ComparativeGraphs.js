@@ -10,15 +10,15 @@ const ComparativeGraphs = (props) => {
   const id  = props.id;
   const unit  = metaIndics[props.indic].unit;
   const precision = metaIndics[props.indic].nbDecimals;
-  const labels = ["France", "Exercice", "Branche"];
+  const labels = ["France", "Exercice", "Branche" ];
 
   // Remove "Branche" label if no comparative division selected
-  if( props.graphDataset[2] == null) {
+  if( props.firstDataset[2] == null) {
     labels.pop()
   }
   let suggestedMax;
   if (unit == "%") {
-    let max = Math.max(... props.graphDataset.map((o) => o));
+    let max = Math.max(... props.firstDataset.map((o) => o));
 
     if(max < 10) {
       suggestedMax = 10;
@@ -48,11 +48,11 @@ const ComparativeGraphs = (props) => {
     datasets: [
       {
         label: "Valeur ",
-        data: props.graphDataset.map(data => data ? data : null),
+        data: props.firstDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
-          "RGBA(250,89,95,1)",
+          "RGBA(250,89,95,0.5)",
           "rgb(255, 182, 66)",
          
         ],
@@ -64,11 +64,11 @@ const ComparativeGraphs = (props) => {
       },
       {
         label: "Objectif ",
-        data: props.targetData.map(data => data ? data : null),
+        data: props.secondDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
-          "RGBA(250,89,95,0.5)",
+          "RGBA(250,89,95,1)",
           "rgb(255 220 141)",
         ],
         borderWidth: 0,
