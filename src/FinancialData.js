@@ -574,15 +574,14 @@ export class FinancialData {
     );
 
     // Providers
-    for (let provider of this.providers) {
-      let prevProvider = prevFinancialData.providers.find(
-        (prev) => prev.providerNum === provider.providerNum
+    for (let prevProvider of prevFinancialData.providers) {
+      let provider = this.providers.find(
+        (provider) => provider.providerNum === prevProvider.providerNum
       );
-      if (prevProvider) {
+      if (provider) {
         await provider.loadPrevProvider(prevProvider);
       } else {
-        //Create new provider
-        let newProvider = new Provider(prevProvider);
+        const newProvider = new Provider({ ...prevProvider });
         this.providers.push(newProvider);
       }
     }
