@@ -43,8 +43,13 @@ export const updater_2_0_0 = async (sessionData) =>
   };
 
   // Comparative data
-  sessionData.comparativeData = prevSession.comparativeData;
-
+  sessionData.comparativeData = {
+    activityCode : prevSession.comparativeData.activityCode,
+    fixedCapitalConsumptions : prevSession.comparativeData.fixedCapitalConsumption,
+    intermediateConsumptions : prevSession.comparativeData.intermediateConsumption,
+    netValueAdded :  prevSession.comparativeData.netValueAdded,
+    production :  prevSession.comparativeData.production,
+  };
   // Indicators list
   sessionData.indics = {
     [prevFinancialPeriod.periodKey]: prevSession.indics,
