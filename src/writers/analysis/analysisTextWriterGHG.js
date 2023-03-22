@@ -6,7 +6,6 @@ export const analysisTextWriterGHG = (props) => {
   const { impactsData, comparativeData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
   const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
-  console.log(props)
   // array of paragraphs
   let analysis = [];
   let currentParagraph = [];
