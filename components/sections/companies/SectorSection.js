@@ -66,7 +66,8 @@ export class SectorSection extends React.Component
     const financialData = this.props.financialData;
     const period = this.props.financialPeriod;
 
-    const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint);
+    const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint && provider.periodsData.hasOwnProperty(period.periodKey));
+
     const showedProviders = getShowedProviders(view,unidentifiedProviders,significativeProviders);
         
     //if (showedProviders.length == 0 && view!="") this.setState({view: ""}); // reset filter

@@ -77,7 +77,9 @@ export class SirenSection extends React.Component
     const financialData = this.props.financialData;
     const financialPeriod = this.props.financialPeriod;
 
-    const providers = financialData.providers;
+    const providers = financialData.providers.filter(provider => provider.periodsData.hasOwnProperty(financialPeriod.periodKey));
+
+    //const providers = financialData.providers ;
     const showedProviders = getShowedProviders(view,providers);
     const allProvidersIdentified = (providers.filter((provider) => provider.footprintStatus == 200).length == providers.length);
 

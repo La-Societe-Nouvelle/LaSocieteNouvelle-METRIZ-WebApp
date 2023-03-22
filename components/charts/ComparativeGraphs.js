@@ -158,14 +158,7 @@ const ComparativeGraphs = (props) => {
             padding : 10,
             cornerRadius: 2,
             callbacks: {
-              title: function (tooltipItems, data) {
-                console.log(tooltipItems)
-              
-                //Return value for title
-                return ;
-              },
               label: function (context) {
-                console.log(context) 
                 let label = context.dataset.label[context.dataIndex] + " :  " + context.parsed.y + " " + unit;
                 return label;
               },
