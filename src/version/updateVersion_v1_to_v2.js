@@ -10,6 +10,19 @@ import { SocialFootprint } from "../footprintObjects/SocialFootprint";
 import { buildRegexFinancialPeriod } from "../Session";
 import { getAmountItems, getPrevDate } from "../utils/Utils";
 
+export const otherFinancialDataItems = [
+  "otherOperatingIncomes", // #74, #75, #781, #791
+  "financialIncomes", // #76, #786, #796
+  "exceptionalIncomes", // #77, #787, #797
+  "taxes", // #63
+  "personnelExpenses", // #64
+  "otherExpenses", // #65
+  "financialExpenses", // #66 & #686
+  "exceptionalExpenses", // #67 & #687 except #6871
+  "provisions", // #681 except #6811
+  "taxOnProfits", // #69
+];
+
 export const updater_2_0_0 = async (sessionData) =>
 {
   let prevSession = {...sessionData};
@@ -163,13 +176,28 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
   nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts
     .filter(account => /^6(0[^3]|1|2)/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
-  nextFinancialData.stockVariationsAccounts = prevFinancialDataObject.expenseAccounts
+  nextFinancialData.stockVariationsAccounts = nextFinancialData.stockVariations
     .filter(account => /^603/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
-  nextFinancialData.amortisationExpensesAccounts = prevFinancialDataObject.expenseAccounts
-    .filter(account => /^68/.test(account.accountNum))
-    .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
+  // nextFinancialData.amortisationExpensesAccounts = nextFinancialData.adjustedAmortisationExpenses
+  //   .filter(account => /^68/.test(account.accountNum))
+  //   .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
   console.log("expenses accounts OK");
+
+  nextFinancialData.amortisationExpensesAccounts = nextFinancialData.adjustedAmortisationExpenses
+    .filter((value, index, self) => index === self.findIndex((item) => item.accountNum == value.accountNum))
+    .map((expense) => {return({
+          accountNum: expense.accountNum,
+          accountLib: expense.accountLib,
+          periodsData: {
+            [prevFinancialPeriod.periodKey]: {
+              periodKey: prevFinancialPeriod.periodKey,
+              amount: getAmountItems(nextFinancialData.adjustedAmortisationExpenses.filter(item => item.accountNum == expense.accountNum && prevFinancialPeriod.regex.test(item.date)), 2),
+              footprint: new SocialFootprint(),
+            }
+          }
+        })
+      });
 
   // Providers ------------------------------- //
 
@@ -226,19 +254,20 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
 
   // Other figures --------------------------- //
 
-  nextFinancialData.otherFinancialData = {
-    otherOperatingIncomes: prevFinancialDataObject.otherOperatingIncomes,
-    financialIncomes: prevFinancialDataObject.financialIncomes,
-    exceptionalIncomes: prevFinancialDataObject.exceptionalIncomes,
-    taxes: prevFinancialDataObject.taxes,
-    personnelExpenses: prevFinancialDataObject.personnelExpenses,
-    otherExpenses: prevFinancialDataObject.otherExpenses,
-    financialExpenses: prevFinancialDataObject.financialExpenses,
-    exceptionalExpenses: prevFinancialDataObject.exceptionalExpenses,
-    provisions: prevFinancialDataObject.provisions,
-    taxOnProfits: prevFinancialDataObject.taxOnProfits
-  };
-  console.log(nextFinancialData)
+  nextFinancialData.otherFinancialData = {};
+  otherFinancialDataItems.forEach((itemLib) => {
+    let financialDataItem = {
+      id: itemLib,
+      label: itemLib,
+      periodsData: {
+        [prevFinancialPeriod.periodKey]: {
+          amount: prevFinancialDataObject[itemLib],
+        }
+      },
+    };
+    nextFinancialData.otherFinancialData[itemLib] = financialDataItem;
+  });
+
   return nextFinancialData;
 }
 
@@ -397,13 +426,12 @@ const buildAmortisationExpense = (prevAmortisationExpense, prevFinancialPeriod) 
 
 const buildAdjustedAmortisationExpense = (nextImmobilisation,prevFinancialPeriod) =>
 {
-  console.log(nextImmobilisation);
   let nextAdjustedAmortisationExpense = {
     accountNum: "6811" + (parseInt(nextImmobilisation.amortisationAccountNum.charAt(2)) + 1) + nextImmobilisation.amortisationAccountNum.slice(3),
     accountLib: "Dotations - " + nextImmobilisation.amortisationAccountLib,
     amortisationAccountNum: nextImmobilisation.amortisationAccountNum,
     amortisationAccountLib: nextImmobilisation.amortisationAccountLib,
-    amount: nextImmobilisation.states[prevFinancialPeriod.dateEnd].amortisationExpenseAmount,
+    amount: nextImmobilisation.states[prevFinancialPeriod.dateEnd].amortisationAmount,
     date: prevFinancialPeriod.dateEnd
   };
   return nextAdjustedAmortisationExpense;

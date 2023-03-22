@@ -306,6 +306,8 @@ const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
   await Promise.all(amortisationExpensesAccounts
     .map(async (account) => 
   {
+    console.log(account.accountNum);
+    console.log(financialData.adjustedAmortisationExpenses);
     let amortisationExpenses = financialData.adjustedAmortisationExpenses
       .filter(expense => expense.accountNum==account.accountNum)
       .filter(expense => period.regex.test(expense.date));
@@ -371,6 +373,10 @@ const updateProductionStocksStatesFpt = async (indic,financialData,period) =>
   let stocks = financialData.stocks.filter(stock => stock.isProductionStock);
   await Promise.all(stocks.map(async (stock) =>
   {
+    if (stock.initialStateType=="currentFootprint") {
+      stock.initialState.footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
+      stock.states[stock.initialState.date].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
+    }
     stock.states[period.dateEnd].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
     return;
   }));

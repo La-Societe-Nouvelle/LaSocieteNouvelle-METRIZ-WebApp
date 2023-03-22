@@ -30,6 +30,7 @@ export class ProvidersSection extends React.Component
 
   nextStep = () => 
   {
+    console.log(this.state.step);
     // if current state is for identified providers
     if (this.state.step==1) {
       const someProvidersUnidentified = this.props.session.financialData.providers.some((provider) => provider.useDefaultFootprint);
@@ -43,6 +44,7 @@ export class ProvidersSection extends React.Component
 
     // if current state is for unidentified providers
     else if (this.state.step==2) {
+      console.log("submit");
       this.props.submit()
     }
   }

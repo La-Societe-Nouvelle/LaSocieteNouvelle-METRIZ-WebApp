@@ -105,7 +105,7 @@ export const IncomeStatementTable = ({ financialData, period }) =>
 const getFinancialItems = (financialData, periodKey) => 
 {
   let financialItems = {};
-
+  console.log(financialData.otherFinancialData);
   // Resultat d'exploitation -------------------------- //
 
   // incomes
