@@ -299,8 +299,7 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-      {validations.length > 0 &&
-        prevPeriod &&
+      {validations.length > 0  &&
         validations.map((indic, key) => (
           <div key={key} className="hidden charts-container">
             <Row>
