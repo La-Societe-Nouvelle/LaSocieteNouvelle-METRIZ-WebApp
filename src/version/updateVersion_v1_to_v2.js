@@ -87,7 +87,6 @@ const getFinancialPeriod = (prevYear) =>
 const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFinancialPeriod) =>
 {
   let nextFinancialData = {};
-  console.log(prevFinancialDataObject)
   // metaAccounts
   nextFinancialData.metaAccounts = {};
   prevFinancialDataObject.expenseAccounts
@@ -146,9 +145,7 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
   // Stocks ---------------------------------- //
 
   nextFinancialData.stocks = prevFinancialDataObject.stocks.map(prevStock => buildStock(prevFinancialDataObject,prevStock,prevFinancialPeriod));
-  console.log("stocks OK");
   nextFinancialData.stockVariations = prevFinancialDataObject.stockVariations.map(prevStockVariation => buildStockVariation(prevStockVariation,prevFinancialPeriod));
-  console.log("stock variations OK");
 
   // Immobilisations ------------------------- //
 
@@ -159,7 +156,6 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
     let nextImmobilisation = buildImmobilisation(prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod);
     return nextImmobilisation;
   });
-  console.log("immobilisations OK");
 
   // depreciationExpenses => only amortisation expenses ?
   nextFinancialData.amortisationExpenses = prevFinancialDataObject.depreciationExpenses.map(prevAmortisationExpense => buildAmortisationExpense(prevAmortisationExpense,prevFinancialPeriod));
@@ -168,21 +164,28 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
     .map(nextImmobilisation => buildAdjustedAmortisationExpense(nextImmobilisation,prevFinancialPeriod));
   nextFinancialData.investments = prevFinancialDataObject.investments.map(prevInvestment => buildInvestment(prevInvestment,prevFinancialPeriod));
   nextFinancialData.immobilisedProductions = prevFinancialDataObject.immobilisationProductions.map(prevImmobilisedProduction => buildImmobilisedProduction(prevImmobilisedProduction,prevFinancialPeriod));
-  console.log("immobilisation variations OK");
 
   // Expenses accounts ----------------------- //
-  console.log( prevFinancialDataObject.expenseAccounts);
 
   nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts
     .filter(account => /^6(0[^3]|1|2)/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
-  nextFinancialData.stockVariationsAccounts = nextFinancialData.stockVariations
-    .filter(account => /^603/.test(account.accountNum))
-    .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
-  // nextFinancialData.amortisationExpensesAccounts = nextFinancialData.adjustedAmortisationExpenses
-  //   .filter(account => /^68/.test(account.accountNum))
-  //   .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
-  console.log("expenses accounts OK");
+
+  nextFinancialData.stockVariationsAccounts = nextFinancialData.stocks
+    .filter(stock => !stock.isProductionStock)
+    .filter((value, index, self) => index === self.findIndex((item) => item.accountNum == value.accountNum))
+    .map((stock) => {return({
+          accountNum: "60" + stock.accountNum,
+          accountLib: "Variation stock " + stock.accountLib,
+          periodsData: {
+            [prevFinancialPeriod.periodKey]: {
+              periodKey: prevFinancialPeriod.periodKey,
+              amount: getAmountItems(nextFinancialData.stockVariations.filter(item => item.stockAccountNum == stock.accountNum && prevFinancialPeriod.regex.test(item.date)), 2),
+              footprint: new SocialFootprint(),
+            }
+          }
+        })
+      });
 
   nextFinancialData.amortisationExpensesAccounts = nextFinancialData.adjustedAmortisationExpenses
     .filter((value, index, self) => index === self.findIndex((item) => item.accountNum == value.accountNum))
@@ -347,8 +350,8 @@ const buildStock = (prevFinancialDataObject,prevStock,prevFinancialPeriod) =>
 const buildStockVariation = (prevStockVariation,prevFinancialPeriod) =>
 {
   let nextStockVariation = {
-    accountNum: prevStockVariation.account,
-    accountLib: prevStockVariation.accountLib,
+    accountNum: "60"+prevStockVariation.accountAux,
+    accountLib: "Variation stock "+prevStockVariation.accountAuxLib,
     stockAccountNum: prevStockVariation.accountAux,
     stockAccountLib: prevStockVariation.accountAuxLib,
     amount: prevStockVariation.amount,
@@ -379,7 +382,7 @@ const buildImmobilisation = (prevImmobilisation,prevAmortisation,prevDepreciatio
       footprint: new SocialFootprint(prevImmobilisation.prevFootprint),
       amortisationAmount: prevAmortisation ? prevAmortisation.prevAmount : undefined,
       amortisationFootprint: prevAmortisation ? new SocialFootprint(prevAmortisation.prevFootprint) : undefined,
-      amortisationExpenseAmount: prevDepreciation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
+      amortisationExpenseAmount: undefined // check if right
     } : null,
     initialFootprintParams: prevImmobilisation.initialState=="defaultData" ? {
       area: prevImmobilisation.prevFootprintAreaCode, 
@@ -394,7 +397,7 @@ const buildImmobilisation = (prevImmobilisation,prevAmortisation,prevDepreciatio
         footprint: new SocialFootprint(prevImmobilisation.prevFootprint),
         amortisationAmount: prevAmortisation ? prevAmortisation.prevAmount : undefined,
         amortisationFootprint: prevAmortisation ? new SocialFootprint(prevAmortisation.prevFootprint) : undefined,
-        amortisationExpenseAmount: prevDepreciation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
+        amortisationExpenseAmount: undefined // check if right
       },
       [prevFinancialPeriod.dateEnd]: {
         date: prevFinancialPeriod.dateEnd,
@@ -403,7 +406,7 @@ const buildImmobilisation = (prevImmobilisation,prevAmortisation,prevDepreciatio
         footprint: new SocialFootprint(prevImmobilisation.footprint),
         amortisationAmount: prevAmortisation ? prevAmortisation.amount : undefined,
         amortisationFootprint: prevAmortisation ? new SocialFootprint(prevAmortisation.prevFootprint) : undefined,
-        amortisationExpenseAmount: prevDepreciation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
+        amortisationExpenseAmount: prevAmortisation ? getAmountItems(prevDepreciationExpenses) : undefined // check if right
       }
     }
   }
@@ -431,7 +434,7 @@ const buildAdjustedAmortisationExpense = (nextImmobilisation,prevFinancialPeriod
     accountLib: "Dotations - " + nextImmobilisation.amortisationAccountLib,
     amortisationAccountNum: nextImmobilisation.amortisationAccountNum,
     amortisationAccountLib: nextImmobilisation.amortisationAccountLib,
-    amount: nextImmobilisation.states[prevFinancialPeriod.dateEnd].amortisationAmount,
+    amount: nextImmobilisation.states[prevFinancialPeriod.dateEnd].amortisationExpenseAmount,
     date: prevFinancialPeriod.dateEnd
   };
   return nextAdjustedAmortisationExpense;

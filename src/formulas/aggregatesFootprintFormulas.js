@@ -137,12 +137,12 @@ const updatePurchasesStocksStatesFpt = async (financialData,period) =>
       .filter(variation => period.regex.test(variation.date))
       .filter(variation => variation.amount < 0); // all unstorages
     
-    let oldStock = Math.max(-getSumItems(unstorages, 2),0);
+    let oldStock = Math.max(-getAmountItems(unstorages, 2),0);
     let newStock = roundValue(finalState.amount-oldStock,2);
 
     let purchases = financialData.externalExpenses
-    .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))
-    .filter(expense => period.regex.test(expense.date));
+      .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))
+      .filter(expense => period.regex.test(expense.date));
     let purchasesFootprint = await buildAggregateFootprint(purchases);
     
     finalState.footprint = await mergeFootprints([
@@ -275,7 +275,7 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
 
 const updateAmortisationExpensesFpt = async (financialData,period) =>
 {
-  let amortisationExpenses = financialData.adjustedAmortisationExpenses.filter(expense => period.regex.test(expense.date));
+  let amortisationExpenses = financialData.adjustedAmortisationExpenses.filter(expense => period.regex.test(expense.date) && expense.amount>0);
   await Promise.all(amortisationExpenses.map(async (expense) =>
   {
     let immobilisation = financialData.immobilisations.filter(immobilisation => immobilisation.amortisationAccountNum==expense.amortisationAccountNum)[0];
@@ -287,7 +287,7 @@ const updateAmortisationExpensesFpt = async (financialData,period) =>
       expense.footprint = await buildDifferenceFootprint(
         {amount: prevState.amount, footprint: prevState.footprint},                        // immobilisation
         {amount: prevState.amortisationAmount, footprint: prevState.amortisationFootprint} // amortisation
-      )
+      );
     } else {
       console.log("immobilisation not found for amortisation account : "+expense.amortisationAccountNum)
     }
@@ -306,9 +306,8 @@ const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
   await Promise.all(amortisationExpensesAccounts
     .map(async (account) => 
   {
-    console.log(account.accountNum);
-    console.log(financialData.adjustedAmortisationExpenses);
     let amortisationExpenses = financialData.adjustedAmortisationExpenses
+      .filter(expense => expense.amount>0)
       .filter(expense => expense.accountNum==account.accountNum)
       .filter(expense => period.regex.test(expense.date));
       
@@ -334,8 +333,9 @@ export const updateMainAggregatesFootprints = async (indic,financialData,period)
     await buildAggregatePeriodIndicator(indic,financialData.externalExpensesAccounts.concat(financialData.stockVariationsAccounts),period.periodKey);
   
   // Fixed capital consumtpions
+  let amortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount>0);
   fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
-    await buildAggregatePeriodIndicator(indic,financialData.amortisationExpensesAccounts,period.periodKey);
+    await buildAggregatePeriodIndicator(indic,amortisationExpensesAccounts,period.periodKey);
   
   // Production
   production.periodsData[period.periodKey].footprint.indicators[indic] = 
