@@ -13,6 +13,7 @@ import { Container } from "react-bootstrap";
 import { ErrorApi } from "../ErrorAPI";
 import { getPrevDate } from "../../src/utils/Utils";
 import { Session } from "../../src/Session";
+import { MessagePopup, MessagePopupErrors, MessagePopupSuccess } from "../popups/MessagePopup";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -30,10 +31,11 @@ export class InitialStatesSection extends React.Component {
       financialData: props.session.financialData,
       fetching: false,
       syncProgression: 0,
-      showMessage: false,
       titlePopup: "",
       message: "",
       files: [],
+      popupSuccess:false,
+      popupError:false,
       error: false,
     };
   }
@@ -47,11 +49,11 @@ export class InitialStatesSection extends React.Component {
       financialData,
       fetching,
       syncProgression,
-      showMessage,
       titlePopup,
-      files,
       message,
       error,
+      popupError,
+      popupSuccess
     } = this.state;
 
     const accountsShowed = financialData.immobilisations.concat(
@@ -103,20 +105,23 @@ export class InitialStatesSection extends React.Component {
                   </div>
                 </div>
               )}
-            </Dropzone>
-            {files.length > 0 && message == "" && (
-              <div className="alert alert-success">
-                <p>
-                  Votre fichier <b>{files[0].name}</b> a bien été importé
-                </p>
-              </div>
+            </Dropzone>    
+            {popupSuccess && (
+                <MessagePopupSuccess
+                message={message}
+                title={titlePopup} 
+                closePopup={() =>this.setState({ popupSuccess: false })}
+              />
             )}
-            {showMessage && (
-              <div className="alert alert-danger">
-                <p>{titlePopup}</p>
-                <p>{message}</p>
-              </div>
+           {popupError && (
+              <MessagePopupErrors
+                message={message}
+                title={titlePopup} 
+                closePopup={() =>this.setState({ popupError: false })}
+              />
             )}
+        
+    
           </div>
           <div className="step p-4 my-3">
             <h3 className="mb-3"> Initialiser les états initiaux </h3>
@@ -272,23 +277,22 @@ export class InitialStatesSection extends React.Component {
             });
           }
         );
-
         if (isObjectInAvailablePeriods) {
-          // TO DO : Change alert message into pop up alert
+
           this.setState({
             titlePopup: "Erreur - Fichier",
             message:
-              "Des données sont déjà disponibles pour l'année correspondante à la sauvegarde importée.",
-            showMessage: true,
+              "Des données sont déjà disponibles pour l'année correspondante à la sauvegarde importée. Veuillez vérifier le fichier et réessayer",
+            popupError: true 
           });
           return;
         }
 
         if (prevSession.legalUnit.siren != currSession.legalUnit.siren) {
           this.setState({
-            titlePopup: "Erreur - Fichier",
-            message: "Les numéros de siren ne correspondent pas.",
-            showMessage: true,
+            titlePopup: "Erreur de Fichier",
+            message: "Les numéros de siren ne correspondent pas. Veuillez vérifier le fichier et réessayer",
+            popupError: true 
           });
           return;
         }
@@ -299,9 +303,10 @@ export class InitialStatesSection extends React.Component {
             getPrevDate(currSession.financialPeriod.dateStart)
         ) {
           this.setState({
-            titlePopup: "Erreur - Fichier",
-            message: "La sauvegarde ne correspond pas à l'année précédente.",
-            showMessage: true,
+            titlePopup: "Erreur de Fichier",
+            message: "La sauvegarde ne correspond pas à l'année précédente. Veuillez vérifier le fichier et réessayer.",
+            popupError: true 
+
           });
           return;
         }
@@ -333,12 +338,11 @@ export class InitialStatesSection extends React.Component {
             }
         });
         if (!checkANouveaux) {
-          // TO DO : Change alert message into pop up alert
           this.setState({
             titlePopup: "Erreur - Correspondances des données",
             message:
-              "Des données importées ne correspondent pas aux données du journal des A-Nouveaux.",
-            showMessage: true,
+              "Des données importées ne correspondent pas aux données du journal des A-Nouveaux. Veuillez vérifier le fichier et réessayer.",
+            popupError: true 
           });
           return;
         }
@@ -352,15 +356,18 @@ export class InitialStatesSection extends React.Component {
         // Update component
         this.setState({
           financialData: this.props.session.financialData,
-          message: "",
-          showMessage: false,
+          popupSuccess: true,
+          titlePopup: "Importation réussie",
+          message:
+            "Les données de l'exercice précédent ont été ajoutées avec succès. Les valeurs des indicateurs de stocks, immobilisations et amortissements en fin d'exercice ont été prises en compte pour l'exercice en cours.",
         });
+        
       } catch (error) {
         console.log(error)
         this.setState({
           titlePopup: "Erreur - Fichier",
-          message: "Fichier non lisible.",
-          showMessage: true,
+          message: "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
+          popupError: true 
         });
       }
     };
@@ -370,8 +377,8 @@ export class InitialStatesSection extends React.Component {
     } catch (error) {
       this.setState({
         titlePopup: "Erreur - Fichier",
-        message: "Fihcier non lisible.",
-        showMessage: true,
+        message: "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
+        popupError: true 
       });
     }
   };
