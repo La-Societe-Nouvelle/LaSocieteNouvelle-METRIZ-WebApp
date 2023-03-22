@@ -91,11 +91,15 @@ export const ComparativeTable = ({
             className="border-left text-center"
           >
             France
+            <span className="tw-normal small d-block"> {unit}</span>
           </td>
-
-          <td className="border-left text-center">Exercice en cours</td>
+          <td className="border-left text-center">Exercice en cours
+          <span className="tw-normal small d-block"> {unit}</span>
+          </td>
           {prevPeriod && (
-            <td className="border-left text-center">Exercice précédent</td>
+            <td className="border-left text-center">Exercice précédent
+                      <span className="tw-normal small d-block"> {unit}</span>
+            </td>
           )}
           {displayDivisionColumn && (
             <td
@@ -103,23 +107,36 @@ export const ComparativeTable = ({
               className="border-left text-center"
             >
               Branche
+              <span className="tw-normal small d-block"> {unit}</span>
             </td>
           )}
         </tr>
       </thead>
       <tbody>
-        {displayTargetColumn && (
-          <tr className="subth">
-            <td scope="row"></td>
-            <td className="border-left text-end">Valeur</td>
-            <td className="text-end">Objectif 2030</td>
-            <td className="border-left text-end">Valeur</td>
-            {prevPeriod && <td className="border-left text-end">Valeur</td>}
-            <td className="border-left text-end">Valeur</td>
-            <td className="text-end">Objectif 2030</td>
-            <td className="text-end">Evolution</td>
-          </tr>
-        )}
+        <tr className="subth">
+          <td scope="row"></td>
+          <td className="border-left text-end">Empreinte
+          </td>
+          {displayTargetColumn && <td className="text-end">Objectif 2030
+          </td>}
+          <td className="border-left text-end">Empreinte</td>
+          {prevPeriod && <td className="border-left text-end">Empreinte
+          </td>}
+          {displayDivisionColumn && (
+            <>
+              <td className="border-left text-end">Empreinte
+              </td>
+              {displayTargetColumn && (
+                <>
+                  <td className="text-end">Objectif 2030
+                  </td>
+                  <td className="text-end">Evolution (%)</td>
+                </>
+              )}
+            </>
+          )}
+        </tr>
+
 
         <tr>
           <td>Production</td>
@@ -147,7 +164,7 @@ export const ComparativeTable = ({
               ).value,
               precision
             )}
-            <span> {unit}</span>
+            
           </td>
           {prevPeriod && (
             <td className="border-left text-end">
@@ -157,7 +174,7 @@ export const ComparativeTable = ({
                 ].footprint.getIndicator(indic).value,
                 precision
               )}
-              <span> {unit}</span>
+              
             </td>
           )}
           {displayDivisionColumn && (
@@ -183,7 +200,7 @@ export const ComparativeTable = ({
               </td>
               <td className="text-end">
                 {productionEvolutionBranch}
-                {productionEvolutionBranch != "-" && "%"}
+                {productionEvolutionBranch != "-" }
               </td>
             </>
           )}
@@ -216,7 +233,7 @@ export const ComparativeTable = ({
               ].footprint.getIndicator(indic).value,
               precision
             )}
-            <span> {unit}</span>
+            
           </td>
           {prevPeriod && (
             <td className="border-left text-end">
@@ -226,7 +243,7 @@ export const ComparativeTable = ({
                 ].footprint.getIndicator(indic).value,
                 precision
               )}
-              <span> {unit}</span>
+              
             </td>
           )}
           {displayDivisionColumn && (
@@ -252,7 +269,7 @@ export const ComparativeTable = ({
               </td>
               <td className="text-end">
                 {consumptionEvolutionBranch}
-                {consumptionEvolutionBranch != "-" && "%"}
+                {consumptionEvolutionBranch != "-" }
               </td>
             </>
           )}
@@ -285,7 +302,7 @@ export const ComparativeTable = ({
               ].footprint.getIndicator(indic).value,
               precision
             )}
-            <span> {unit}</span>
+            
           </td>
           {prevPeriod && (
             <td className="border-left text-end">
@@ -295,7 +312,7 @@ export const ComparativeTable = ({
                 ].footprint.getIndicator(indic).value,
                 precision
               )}
-              <span> {unit}</span>
+              
             </td>
           )}
           {displayDivisionColumn && (
@@ -321,7 +338,7 @@ export const ComparativeTable = ({
               </td>
               <td className="text-end">
                 {fixedCapitalConsumptionsEvolutionBranch}
-                {fixedCapitalConsumptionsEvolutionBranch != "-" && "%"}
+                {fixedCapitalConsumptionsEvolutionBranch != "-" }
               </td>
             </>
           )}
@@ -354,7 +371,7 @@ export const ComparativeTable = ({
               ].footprint.getIndicator(indic).value,
               precision
             )}
-            <span> {unit}</span>
+            
           </td>
           {prevPeriod && (
             <td className="border-left text-end">
@@ -364,7 +381,7 @@ export const ComparativeTable = ({
                 ].footprint.getIndicator(indic).value,
                 precision
               )}
-              <span> {unit}</span>
+              
             </td>
           )}
           {displayDivisionColumn && (
@@ -391,7 +408,7 @@ export const ComparativeTable = ({
               </td>
               <td className="text-end">
                 {valueAddedEvolutionBranch}
-                {valueAddedEvolutionBranch != "-" && "%"}{" "}
+                {valueAddedEvolutionBranch != "-" }{" "}
               </td>
             </>
           )}
@@ -406,7 +423,7 @@ function getValue(value, unit, precision) {
     return (
       <>
         {printValue(value, precision)}
-        <span> {unit}</span>
+        
       </>
     );
   } else {

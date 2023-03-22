@@ -47,7 +47,11 @@ const ComparativeGraphs = (props) => {
     labels: labels,
     datasets: [
       {
-        label: "Valeur ",
+        label: [
+          "Valeur",
+          "Année N-1",
+          "Valeur",
+        ],
         data: props.firstDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
@@ -63,7 +67,11 @@ const ComparativeGraphs = (props) => {
         minBarLength: 2,
       },
       {
-        label: "Objectif ",
+        label: [
+          "Objectif",
+          "Année N",
+          "Objectif",
+        ],
         data: props.secondDataset.map(data => data ? data : null),
         skipNull: true,
         backgroundColor: [
@@ -83,6 +91,7 @@ const ComparativeGraphs = (props) => {
       id={id}
       data={chartData}
       options={{
+
         devicePixelRatio: 2,
         scales: {
           y: {
@@ -144,9 +153,23 @@ const ComparativeGraphs = (props) => {
             }
           },
           tooltip: {
+
             backgroundColor: '#191558',
             padding : 10,
-            cornerRadius: 2
+            cornerRadius: 2,
+            callbacks: {
+              title: function (tooltipItems, data) {
+                console.log(tooltipItems)
+              
+                //Return value for title
+                return ;
+              },
+              label: function (context) {
+                console.log(context) 
+                let label = context.dataset.label[context.dataIndex] + " :  " + context.parsed.y + " " + unit;
+                return label;
+              },
+            },
           }
         },
      

@@ -226,9 +226,14 @@ table {
   width: 250px;
 }
 
-.comparative-table, #mainAggregates {
+#mainAggregates {
   .border-left {
-    border-left: 2px solid lighten($light, 5%);
+    border-left: 2px solid darken($light, 1%);
+  }
+}
+.comparative-table  {
+  .border-left {
+    border-left: 2px solid lighten($light, 2%);
   }
 }
 
