@@ -72,7 +72,7 @@ export class IdentifiedProvidersTable extends React.Component
               .slice(page * nbItems, (page + 1) * nbItems)
               .map((provider) => (
                 <RowTableProviders
-                  key={"provider_" + provider.id}
+                  key={"provider_" + provider.providerNum}
                   provider={provider}
                   financialPeriod={financialPeriod}
                   refreshTable={this.refreshTable}

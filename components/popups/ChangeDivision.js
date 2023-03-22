@@ -21,6 +21,7 @@ const ChangeDivision = (props) => {
   //Divisions select options
   Object.entries(divisions)
     .sort((a, b) => parseInt(a) - parseInt(b))
+    .filter(([value,_]) => value!="00")
     .map(([value, label]) =>
       divisionsOptions.push({ value: value, label: value + " - " + label })
     );

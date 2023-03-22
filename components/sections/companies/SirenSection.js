@@ -280,7 +280,7 @@ export class SirenSection extends React.Component
                 <button
                   className={"btn btn-secondary"}
                   id="validation-button"
-                  onClick={this.props.submit}
+                  onClick={() => this.props.nextStep()}
                 >
                   Mesurer mon impact
                   <i className="bi bi-chevron-right"></i>

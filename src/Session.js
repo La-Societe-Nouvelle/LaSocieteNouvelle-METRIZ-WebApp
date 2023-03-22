@@ -157,6 +157,7 @@ export class Session {
     // Production items
     await this.updateProductionItemsFootprints(period);
 
+    console.log(this.financialData);
     return;
   };
 
