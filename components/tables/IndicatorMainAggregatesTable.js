@@ -114,7 +114,7 @@ export const IndicatorMainAggregatesTable = ({
         <thead>
           <tr>
             <th>Agrégat</th>
-            <th  colSpan={printGrossImpact ? "4" : "3"} className="text-center">
+            <th colSpan={printGrossImpact ? "4" : "3"} className="text-center">
               Année N
             </th>
             {prevPeriod && (
@@ -127,13 +127,13 @@ export const IndicatorMainAggregatesTable = ({
             <td></td>
             <td className="text-end">Montant </td>
             <td className="text-end">Empreinte</td>
-            <td className="text-end">Incertitude</td>
-            {printGrossImpact ? <td className="text-end">Impact</td> : null}
+            <td className="text-end pe-3">Incertitude</td>
+            {printGrossImpact && <td className="text-end">Impact</td>}
             {prevPeriod && (
               <>
                 <td className="text-end border-left ">Empreinte</td>
-                <td className="text-end ">Incertitude</td>
-                {printGrossImpact ? <td className="text-end">Impact</td> : null}
+                <td className="text-end  pe-3">Incertitude</td>
+                {printGrossImpact && <td className="text-end  pe-3">Impact</td>}
               </>
             )}
           </tr>
@@ -141,13 +141,13 @@ export const IndicatorMainAggregatesTable = ({
             <td></td>
             <td className="text-end">&euro; </td>
             <td className="text-end">{unit}</td>
-            <td className="text-end">%</td>
+            <td className="text-end  pe-3">%</td>
             {printGrossImpact && <td className="text-end"> {unitGrossImpact}</td> }
             {prevPeriod && (
               <>
                 <td className="text-end border-left">{unit}</td>
-                <td className="text-end">%</td>
-                {printGrossImpact && <td className="text-end"> {unitGrossImpact}</td>}
+                <td className="text-end  pe-3">%</td>
+                {printGrossImpact && <td className="text-end  pe-3"> {unitGrossImpact}</td>}
               </>
             )}
           </tr>
@@ -166,7 +166,7 @@ export const IndicatorMainAggregatesTable = ({
                 nbDecimals
               )}
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
                 production.periodsData[period.periodKey].footprint.indicators[
@@ -175,7 +175,7 @@ export const IndicatorMainAggregatesTable = ({
                 0
               )}
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end">
                 {printValue(
                   production.periodsData[period.periodKey].footprint.indicators[
@@ -186,7 +186,7 @@ export const IndicatorMainAggregatesTable = ({
                   nbDecimals
                 )}
               </td>
-            ) : null}
+            ) }
 
             {prevPeriod && (
               <> 
@@ -199,7 +199,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
 
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(
                     production.periodsData[
@@ -240,7 +240,7 @@ export const IndicatorMainAggregatesTable = ({
               )}{" "}
               <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
                 revenue.periodsData[period.periodKey].footprint.indicators[
@@ -274,7 +274,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
 
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(
                     revenue.periodsData[
@@ -284,7 +284,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       revenue.periodsData[
@@ -296,7 +296,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                ) : null}
+                ) }
               </>
             )}
           </tr>
@@ -319,7 +319,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}{" "}
                 <span className="unit"></span>
               </td>
-              <td className="text-end">
+              <td className="text-end  pe-3">
                 <u>+</u>
                 {printValue(
                   storedProduction.periodsData[
@@ -329,7 +329,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}
                 
               </td>
-              {printGrossImpact ? (
+              {printGrossImpact && (
                 <td className="text-end">
                   {printValue(
                     storedProduction.periodsData[
@@ -341,7 +341,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   
                 </td>
-              ) : null}
+              ) }
 
               {prevPeriod && (
                 <>
@@ -354,7 +354,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}{" "}
   
                   </td>
-                  <td className="text-end">
+                  <td className="text-end  pe-3">
                     <u>+</u>
                     {printValue(
                       storedProduction.periodsData[
@@ -364,7 +364,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                  {printGrossImpact ? (
+                  {printGrossImpact && (
                     <td className="text-end">
                       {printValue(
                         storedProduction.periodsData[
@@ -376,7 +376,7 @@ export const IndicatorMainAggregatesTable = ({
                       )}
                       
                     </td>
-                  ) : null}
+                  ) }
                 </>
               )}
             </tr>
@@ -401,7 +401,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}{" "}
                 <span className="unit"></span>
               </td>
-              <td className="text-end">
+              <td className="text-end  pe-3">
                 <u>+</u>
                 {printValue(
                   immobilisedProduction.periodsData[
@@ -411,7 +411,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}
                 
               </td>
-              {printGrossImpact ? (
+              {printGrossImpact && (
                 <td className="text-end">
                   (
                   {printValue(
@@ -424,7 +424,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   )<span className="unit"> </span>
                 </td>
-              ) : null}
+              ) }
 
               {prevPeriod && (
                 <>
@@ -437,7 +437,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}{" "}
   
                   </td>
-                  <td className="text-end">
+                  <td className="text-end  pe-3">
                     <u>+</u>
                     {printValue(
                       immobilisedProduction.periodsData[
@@ -447,7 +447,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                  {printGrossImpact ? (
+                  {printGrossImpact && (
                     <td className="text-end">
                       (
                       {printValue(
@@ -462,7 +462,7 @@ export const IndicatorMainAggregatesTable = ({
                       )}
                       )<span className="unit"> </span>
                     </td>
-                  ) : null}
+                  ) }
                 </>
               )}
             </tr>
@@ -485,7 +485,7 @@ export const IndicatorMainAggregatesTable = ({
               )}{" "}
               <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
                 intermediateConsumptions.periodsData[
@@ -495,7 +495,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end">
                 {printValue(
                   intermediateConsumptions.periodsData[
@@ -508,7 +508,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}
                 
               </td>
-            ) : null}
+            ) }
 
             {prevPeriod && (
               <>
@@ -521,7 +521,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
 
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(
                     intermediateConsumptions.periodsData[
@@ -531,7 +531,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       intermediateConsumptions.periodsData[
@@ -545,7 +545,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                ) : null}
+                ) }
               </>
             )}
           </tr>
@@ -563,11 +563,11 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
 
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       footprint.indicators[indic].getGrossImpact(amount),
@@ -575,7 +575,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                ) : null}
+                ) }
                 {prevPeriod &&
                   prevIntermediateConsumptionsAggregates.length > 0 && (
                     <>
@@ -588,7 +588,7 @@ export const IndicatorMainAggregatesTable = ({
                         )}{" "}
       
                       </td>
-                      <td className="text-end">
+                      <td className="text-end  pe-3">
                         <u>+</u>
                         {printValue(
                           prevIntermediateConsumptionsAggregates[
@@ -598,7 +598,7 @@ export const IndicatorMainAggregatesTable = ({
                         )}
                         
                       </td>
-                      {printGrossImpact ? (
+                      {printGrossImpact && (
                         <td className="text-end">
                           {printValue(
                             prevIntermediateConsumptionsAggregates[
@@ -610,7 +610,7 @@ export const IndicatorMainAggregatesTable = ({
                           )}
                           
                         </td>
-                      ) : null}
+                      ) }
                     </>
                   )}
               </tr>
@@ -634,7 +634,7 @@ export const IndicatorMainAggregatesTable = ({
               )}{" "}
               <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
                 fixedCapitalConsumptions.periodsData[
@@ -644,7 +644,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end">
                 {printValue(
                   fixedCapitalConsumptions.periodsData[
@@ -657,7 +657,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}{" "}
                
               </td>
-            ) : null}
+            ) }
             {prevPeriod && (
               <>
                 <td className="text-end border-left">
@@ -669,7 +669,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
 
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(
                     fixedCapitalConsumptions.periodsData[
@@ -679,7 +679,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       fixedCapitalConsumptions.periodsData[
@@ -693,7 +693,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}{" "}
                    
                   </td>
-                ) : null}
+                )}
               </>
             )}
           </tr>
@@ -711,11 +711,11 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
                   <span className="unit">  </span>
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       footprint.indicators[indic].getGrossImpact(amount),
@@ -723,7 +723,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                ) : null}
+                ) }
                 {prevPeriod &&
                   prevFixedCapitalConsumptionsAggregates.length > 0 && (
                     <>
@@ -736,7 +736,7 @@ export const IndicatorMainAggregatesTable = ({
                         )}{" "}
                         <span className="unit">  </span>
                       </td>
-                      <td className="text-end">
+                      <td className="text-end  pe-3">
                         <u>+</u>
                         {printValue(
                           prevFixedCapitalConsumptionsAggregates[
@@ -746,7 +746,7 @@ export const IndicatorMainAggregatesTable = ({
                         )}
                         
                       </td>
-                      {printGrossImpact ? (
+                      {printGrossImpact && (
                         <td className="text-end">
                           {printValue(
                             prevFixedCapitalConsumptionsAggregates[
@@ -758,7 +758,7 @@ export const IndicatorMainAggregatesTable = ({
                           )}
                           
                         </td>
-                      ) : null}
+                      ) }
                     </>
                   )}
               </tr>
@@ -782,7 +782,7 @@ export const IndicatorMainAggregatesTable = ({
               )}{" "}
               <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
                 netValueAdded.periodsData[
@@ -792,7 +792,7 @@ export const IndicatorMainAggregatesTable = ({
               )}
               
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end" title="Impact direct de l'entreprise">
                 {printValue(
                   netValueAdded.periodsData[
@@ -804,7 +804,7 @@ export const IndicatorMainAggregatesTable = ({
                 )}
                 
               </td>
-            ) : null}
+            ) }
             {prevPeriod && (
               <>
                 <td className="text-end border-left">
@@ -816,7 +816,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}{" "}
 
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
                   {printValue(
                     netValueAdded.periodsData[
@@ -826,7 +826,7 @@ export const IndicatorMainAggregatesTable = ({
                   )}
                   
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td
                     className="text-end"
                     title="Impact direct de l'entreprise"
@@ -841,7 +841,7 @@ export const IndicatorMainAggregatesTable = ({
                     )}
                     
                   </td>
-                ) : null}
+                )}
               </>
             )}
           </tr>
