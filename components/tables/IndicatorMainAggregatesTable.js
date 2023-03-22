@@ -114,7 +114,7 @@ export const IndicatorMainAggregatesTable = ({
         <thead>
           <tr>
             <th>Agrégat</th>
-            <th colSpan="3" className="text-center">
+            <th  colSpan={printGrossImpact ? "4" : "3"} className="text-center">
               Année N
             </th>
             {prevPeriod && (

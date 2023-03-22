@@ -75,8 +75,9 @@ table {
     color: #fff;
     font-weight: 700;
     font-size: 1em;
-    border : 2px solid $primary;
-
+    tr:nth-child(2){
+      background-color: lighten($primary, 5%);
+    }
   }
   .subth {
     background-color: darken($bg-light, 1%);
