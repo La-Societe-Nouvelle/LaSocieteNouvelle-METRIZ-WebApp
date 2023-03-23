@@ -190,7 +190,7 @@ const updatePurchasesStocksVariationsFpt = async (financialData,period) =>
 const updatePurchasesStocksVariationsAccountsFpt = async (financialData,period) =>
 {
   await Promise.all(financialData.stockVariationsAccounts
-    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount>0) // account defined for period with amount not null
+    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount!=0) // account defined for period with amount not null
     .map(async (account) => 
   {
     let stock = financialData.stocks.find(stock => stock.defaultStockVariationAccountNum==account.accountNum);
@@ -257,7 +257,7 @@ export const updateInitialStateImmobilisationsFpt = async (financialData,period)
     let investments = financialData.investments
       .filter(investment => investment.accountNum==immobilisation.accountNum)
       .filter(investment => period.regex.test(investment.date))
-      .filter(investment => investment.amount > 0);
+      .filter(investment => investment.amount>0);
     let investmentsFootprint = await buildAggregateFootprint(investments);
     
     if (investments.length==0) {
@@ -385,8 +385,7 @@ const updateAmortisationExpensesFpt = async (financialData,period) =>
 
 const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
 {
-
-  let amortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.amount>0);
+  let amortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0);
   await Promise.all(amortisationExpensesAccounts
     .map(async (account) => 
   {
@@ -420,7 +419,7 @@ export const updateMainAggregatesFootprints = async (indic,financialData,period)
   
   // Fixed capital consumtpions
   let fixedCapitalConsumptionsAccounts = financialData.amortisationExpensesAccounts
-    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
+    .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
   fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
     await buildAggregatePeriodIndicator(indic,fixedCapitalConsumptionsAccounts,period.periodKey);
   

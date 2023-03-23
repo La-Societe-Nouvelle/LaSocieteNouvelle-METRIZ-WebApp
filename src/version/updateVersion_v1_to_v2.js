@@ -440,7 +440,7 @@ const buildAdjustedAmortisationExpense = (nextImmobilisation,prevFinancialPeriod
   return nextAdjustedAmortisationExpense;
 }
 
-const buildInvestment = (prevInvestment) => 
+const buildInvestment = (prevInvestment,prevFinancialPeriod) => 
 {
   let nextInvestment = {
     accountNum: prevInvestment.account,
@@ -450,7 +450,7 @@ const buildInvestment = (prevInvestment) =>
     isDefaultProviderAccount: prevInvestment.isDefaultAccountAux,
     amount: prevInvestment.amount,
     footprint: prevInvestment.footprint,
-    date: prevInvestment.date,
+    date: prevFinancialPeriod.dateStart,
   };
   return nextInvestment;
 }
