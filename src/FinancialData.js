@@ -609,14 +609,10 @@ export class FinancialData {
       prevFinancialData.stockVariationsAccounts
     );
 
-    for (let stockVariations of this.stockVariations) {
-      let prevStockVariations = prevFinancialData.stockVariations.find(
-        (prev) => prev.accountNum === stockVariations.accountNum
-      );
-      if (!prevStockVariations) {
-        this.stockVariations.push(prevStockVariations);
-      }
-    }
+    this.stockVariations = this.stockVariations.concat(
+      prevFinancialData.stockVariations
+    );
+
   };
 
   /* ---------------------------------------- GETTERS ---------------------------------------- */
