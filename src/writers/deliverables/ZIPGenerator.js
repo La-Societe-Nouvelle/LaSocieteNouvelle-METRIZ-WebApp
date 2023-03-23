@@ -141,8 +141,6 @@ const ZipGenerator = ({
               metaIndics[indic].unit,
               financialData,
               session.comparativeData,
-              session.comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-                .meta.label,
               false,
               period
             )
