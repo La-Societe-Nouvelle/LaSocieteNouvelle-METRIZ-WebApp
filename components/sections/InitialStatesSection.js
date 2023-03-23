@@ -60,7 +60,7 @@ export class InitialStatesSection extends React.Component {
       financialData.stocks
     );
 
-    const isNextStepAvailable = nextStepAvailable(this.state) && message == "";
+    const isNextStepAvailable = nextStepAvailable(this.state);
     return (
       <Container fluid>
         <section className="step">
@@ -348,10 +348,11 @@ export class InitialStatesSection extends React.Component {
         }
 
         // Update session with prev values
-        currSession.loadSessionFromBackup(prevSession);
-
+        await currSession.loadSessionFromBackup(prevSession);
+        
         // Update financialData with prev values
-        currSession.financialData.loadFinancialDataFromBackUp(prevSession.financialData);
+        await currSession.financialData.loadFinancialDataFromBackUp(prevSession.financialData);
+        await currSession.updateFootprints(prevSession.financialPeriod);
  
         // Update component
         this.setState({

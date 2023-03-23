@@ -48,7 +48,7 @@ export class Immobilisation
     this.initialStateType = initialStateType || "none";
     this.initialState = initialState ? new ImmobilisationState(initialState) : null;
     this.initialFootprintParams = initialFootprintParams || {};
-    this.initialStateSet = initialStateSet && initialState;
+    this.initialStateSet = initialStateSet || false;
 
     // intermediate
     this.states = {};
