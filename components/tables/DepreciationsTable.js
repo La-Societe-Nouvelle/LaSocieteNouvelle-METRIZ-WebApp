@@ -25,14 +25,9 @@ export class DepreciationsTable extends React.Component {
   render() {
     const { immobilisations, depreciations, depreciationExpenses } =
       this.props.financialData;
+    const period = this.props.period;
+    const prevStateDateEnd = getPrevDate(period.dateStart);
     const { columnSorted } = this.state;
-
-    const assetDepreciations = depreciations.filter((depreciation) =>
-      /^29/.test(depreciation.account)
-    );
-    const assetDepreciationExpenses = depreciationExpenses.filter((expense) =>
-      /^29/.test(expense.accountAux)
-    );
 
     this.sortItems(immobilisations, columnSorted);
 
@@ -58,20 +53,14 @@ export class DepreciationsTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {immobilisations.map(({ account, accountLib }) => {
-              let depreciation = assetDepreciations.filter(
-                (depreciation) => depreciation.accountAux == account
-              )[0];
-              if (depreciation != undefined) {
-                let expenses = assetDepreciationExpenses.filter(
-                  (expense) => expense.accountAux == depreciation.account
-                );
+            {immobilisations.map((immobilisation) => {
+              if (immobilisation.depreciationAccountNum) {
+                let expenses = depreciationExpenses.filter((expense) => expense.depreciationAccountNum == immobilisation.depreciationAccountNum);
                 let augmentation = getAmountItems(expenses);
-                let dimininution =
-                  depreciation.prevAmount + augmentation - depreciation.amount;
+                let dimininution = depreciation.prevAmount + augmentation - depreciation.amount;
                 return (
-                  <tr key={account}>
-                    <td>{account}</td>
+                  <tr key={accountNum}>
+                    <td>{accountNum}</td>
                     <td>
                       {accountLib.charAt(0).toUpperCase() +
                         accountLib.slice(1).toLowerCase()}
@@ -92,8 +81,8 @@ export class DepreciationsTable extends React.Component {
                 );
               } else {
                 return (
-                  <tr key={account}>
-                    <td>{account}</td>
+                  <tr key={accountNum}>
+                    <td>{accountNum}</td>
                     <td>
                       {accountLib.charAt(0).toUpperCase() +
                         accountLib.slice(1).toLowerCase()}
@@ -113,23 +102,23 @@ export class DepreciationsTable extends React.Component {
               <tr>
                 <td colSpan="2">TOTAL</td>
                 <td className="text-end">
-                  {printValue(getPrevAmountItems(assetDepreciations), 0)} &euro;
+                  {printValue(getPrevAmountItems(depreciations), 0)} &euro;
                 </td>
                 <td className="text-end">
-                  {printValue(getAmountItems(assetDepreciationExpenses), 0)}{" "}
+                  {printValue(getAmountItems(depreciationExpenses), 0)}{" "}
                   &euro;
                 </td>
                 <td className="text-end">
                   {printValue(
-                    getPrevAmountItems(assetDepreciations) +
-                      getAmountItems(assetDepreciationExpenses) -
-                      getAmountItems(assetDepreciations),
+                    getPrevAmountItems(depreciations) +
+                      getAmountItems(depreciationExpenses) -
+                      getAmountItems(depreciations),
                     0
                   )}{" "}
                   &euro;
                 </td>
                 <td className="text-end">
-                  {printValue(getAmountItems(assetDepreciations), 0)} &euro;
+                  {printValue(getAmountItems(depreciations), 0)} &euro;
                 </td>
               </tr>
             </tfoot>
@@ -155,7 +144,7 @@ export class DepreciationsTable extends React.Component {
         items.sort((a, b) => a.accountLib.localeCompare(b.accountLib));
         break;
       case "account":
-        items.sort((a, b) => a.account.localeCompare(b.account));
+        items.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
         break;
       //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
       //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;

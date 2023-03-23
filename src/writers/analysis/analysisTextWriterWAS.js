@@ -2,9 +2,10 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterWAS = (session) => {
-  const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+export const analysisTextWriterWAS = (props) => {
+  const { impactsData, financialData, period } = props;
+  const { mainAggregates, productionAggregates } = financialData;
+  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
   // array of paragraphs
   let analysis = [];
@@ -24,16 +25,16 @@ export const analysisTextWriterWAS = (session) => {
 
   currentParagraph.push(
     "L'intensité de production de déchets de la valeur produite est de " +
-      printValue(aggregates.production.footprint.indicators.was.value, 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.was.value, 0) +
       " g/€."
   );
   if (
-    aggregates.production.footprint.indicators.was.value !=
-    aggregates.revenue.footprint.indicators.was.value
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.was.value !=
+    revenue.periodsData[period.periodKey].footprint.indicators.was.value
   ) {
     currentParagraph.push(
       "La valeur est de " +
-        printValue(aggregates.revenue.footprint.indicators.was.value, 0) +
+        printValue(revenue.periodsData[period.periodKey].footprint.indicators.was.value, 0) +
         " g/€ pour le chiffre d'affaires, en prenant compte des stocks de production."
     );
   } else {
@@ -58,15 +59,15 @@ export const analysisTextWriterWAS = (session) => {
         printValue(impactsData.wasteProduction, 0) +
         " kg," +
         " soit une intensité de " +
-        printValue(aggregates.netValueAdded.footprint.indicators.was.value, 0) +
+        printValue(mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.was.value, 0) +
         " g/€ pour la valeur ajoutée."
     );
     currentParagraph.push(
       "Ils représentent " +
         printValue(
           (impactsData.wasteProduction /
-            aggregates.production.footprint.indicators.was.getGrossImpact(
-              aggregates.production.amount
+            mainAggregates.production.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+              mainAggregates.production.periodsData[period.periodKey].amount
             )) *
             100,
           0
@@ -85,15 +86,15 @@ export const analysisTextWriterWAS = (session) => {
   currentParagraph.push(
     "Les consommations intermédiaires sont à l'orgine de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.was.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +
       " kg de déchets," +
       " ce qui correspond à une intensité de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.was.value,
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.was.value,
         0
       ) +
       " g/€."
@@ -101,11 +102,11 @@ export const analysisTextWriterWAS = (session) => {
   currentParagraph.push(
     "Les déchets produits indirectement représentent " +
       printValue(
-        (aggregates.intermediateConsumption.footprint.indicators.was.getGrossImpact(
-          aggregates.intermediateConsumption.amount
+        (mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
         ) /
-          aggregates.production.footprint.indicators.was.getGrossImpact(
-            aggregates.production.amount
+          mainAggregates.production.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+            mainAggregates.production.periodsData[period.periodKey].amount
           )) *
           100,
         0
@@ -126,8 +127,8 @@ export const analysisTextWriterWAS = (session) => {
   currentParagraph.push(
     "L'amortissement des immobilisations induit une production indirecte de déchets de l'ordre de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.was.getGrossImpact(
-          aggregates.capitalConsumption.amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.was.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ) +

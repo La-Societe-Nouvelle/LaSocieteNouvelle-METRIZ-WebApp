@@ -7,6 +7,7 @@ import { jsPDF } from "jspdf";
 
 // Libs
 import metaIndics from "../../lib/indics";
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "../formulas/aggregatesBuilder";
 
 // Utils
 import { printValue } from "/src/utils/Utils";
@@ -15,14 +16,14 @@ function exportIndicDataExpensesCSV(indic, session) {
   let csvContent = "data:text/csv;charset=utf-8,";
   csvContent += "corporated_id;corporate_name;amount;value;uncertainty";
 
-  let expenses = session.financialData.expenses;
+  let expenses = session.financialData.externalExpenses;
   expenses.forEach((expense) => {
     csvContent += "\r\n";
-    let indicator = expense.getFootprint().getIndicator(indic);
+    let indicator = expense.footprint.getIndicator(indic);
     let row =
-      expense.getCorporateId() +
+      expense.corporateId +
       ";" +
-      expense.getCorporateName() +
+      expense.legalUnitData.denomination +
       ";" +
       expense.getAmount() +
       ";" +
@@ -42,11 +43,11 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   let depreciations = session.financialData.getDepreciations();
   depreciations.forEach((depreciation) => {
     csvContent += "\r\n";
-    let indicator = depreciation.getFootprint().getIndicator(indic);
+    let indicator = depreciation.footprint.getIndicator(indic);
     let row =
-      depreciation.getCorporateId() +
+      depreciation.corporateId +
       ";" +
-      depreciation.getCorporateName() +
+      depreciation.legalUnitData.denomination +
       ";" +
       depreciation.getAmount() +
       ";" +
@@ -59,18 +60,40 @@ function exportIndicDataDepreciationsCSV(indic, session) {
   return csvContent;
 }
 
-function generateFootprintPDF(
+async function generateFootprintPDF(
   doc,
   indic,
+  period,
   financialData,
   legalUnit,
   year,
   title,
   odds
 ) {
+
+
   doc.setProperties({
     title: "rapport_empreinte_societale_" + legalUnit.replaceAll(" ", ""),
   });
+
+    // FINANCIAL DATA
+
+    const { revenue, storedProduction, immobilisedProduction } =
+    financialData.productionAggregates;
+
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    netValueAdded,
+  } = financialData.mainAggregates;
+  // get Intermediate Aggregates
+  
+  const intermediateConsumptionsAggregates =
+    await buildIntermediateConsumptionsAggregates(financialData, period.periodKey);
+  const fixedCapitalConsumptionsAggregates =
+   await buildFixedCapitalConsumptionsAggregates(financialData, period.periodKey);
+
 
   let x = 10;
   let y = 20;
@@ -130,8 +153,8 @@ function generateFootprintPDF(
 
   let xRect = x + 17;
   doc.setDrawColor(25, 21, 88);
-
-  // LIBELLE
+    console.log(indic)
+  // LIBELLE  
   indic.forEach((indic) => {
     doc.rect((xRect += 35), y, 37, 8);
     let img = new Image();
@@ -195,17 +218,7 @@ function generateFootprintPDF(
     xUnit += 37;
   });
 
-  // FINANCIAL DATA
 
-  const {
-    production,
-    revenue,
-    storedProduction,
-    immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
-    netValueAdded,
-  } = financialData.aggregates;
 
   let xAmount = 60;
   let xValue = x + 64;
@@ -218,17 +231,26 @@ function generateFootprintPDF(
   doc.text("Production", x + 2, y);
   doc.setFontSize(6);
 
-  doc.text(printValue(production.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
+  doc.text(
+    printValue(production.periodsData[period.periodKey].amount, 0) + " €",
+    xAmount,
+    y,
+    {
+      align: "right",
+    }
+  );
 
   indic.forEach((indic) => {
-    let nbDecimals = metaIndics[indic].nbDecimals;
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
 
     doc.text(
-      printValue(production.footprint.indicators[indic].getValue(), 1),
+      printValue(
+        production.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getValue(),
+        1
+      ),
       xValue,
       y,
       { align: "right" }
@@ -237,17 +259,21 @@ function generateFootprintPDF(
     doc.setFontSize(5);
     doc.setFont("Helvetica", "normal");
     doc.text(
-      printValue(production.footprint.indicators[indic].getUncertainty(), 0) +
-        "%",
+      printValue(
+        production.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getUncertainty(),
+        0
+      ) + "%",
       xValue + 12,
       y,
       { align: "right" }
     );
     doc.text(
       printValue(
-        production.footprint.indicators[indic].getGrossImpact(
-          production.amount
-        ),
+        production.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getGrossImpact(production.periodsData[period.periodKey].amount),
         0
       ),
       xValue + 24,
@@ -264,13 +290,23 @@ function generateFootprintPDF(
   doc.setFontSize(7);
   doc.text("dont Chiffre d'affaires", x + 2, y);
   doc.setFontSize(6);
-  doc.text(printValue(revenue.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
+  doc.text(
+    printValue(revenue.periodsData[period.periodKey].amount, 0) + " €",
+    xAmount,
+    y,
+    {
+      align: "right",
+    }
+  );
 
   indic.forEach((indic) => {
     if (
-      printValue(revenue.footprint.indicators[indic].getValue(), 1) != " - "
+      printValue(
+        revenue.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getValue(),
+        1
+      ) != " - "
     ) {
       doc.setFont("Helvetica", "bold");
       doc.setFillColor(255, 138, 142);
@@ -279,7 +315,12 @@ function generateFootprintPDF(
 
     doc.setFontSize(6);
     doc.text(
-      printValue(revenue.footprint.indicators[indic].getValue(), 1),
+      printValue(
+        revenue.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getValue(),
+        1
+      ),
       xValue,
       y,
       { align: "right" }
@@ -289,14 +330,21 @@ function generateFootprintPDF(
 
     doc.setFontSize(5);
     doc.text(
-      printValue(revenue.footprint.indicators[indic].getUncertainty(), 0) + "%",
+      printValue(
+        revenue.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getUncertainty(),
+        0
+      ) + "%",
       xValue + 12,
       y,
       { align: "right" }
     );
     doc.text(
       printValue(
-        revenue.footprint.indicators[indic].getGrossImpact(revenue.amount),
+        revenue.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getGrossImpact(revenue.periodsData[period.periodKey].amount),
         0
       ),
       xValue + 24,
@@ -315,14 +363,24 @@ function generateFootprintPDF(
   doc.text("dont Production stockée", x + 2, y);
 
   doc.setFontSize(6);
-  doc.text(printValue(storedProduction.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
+  doc.text(
+    printValue(storedProduction.periodsData[period.periodKey].amount, 0) + " €",
+    xAmount,
+    y,
+    {
+      align: "right",
+    }
+  );
 
   indic.forEach((indic) => {
     doc.setFontSize(6);
     doc.text(
-      printValue(storedProduction.footprint.indicators[indic].getValue(), 1),
+      printValue(
+        storedProduction.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getValue(),
+        1
+      ),
       xValue,
       y,
       { align: "right" }
@@ -330,7 +388,9 @@ function generateFootprintPDF(
     doc.setFontSize(5);
     doc.text(
       printValue(
-        storedProduction.footprint.indicators[indic].getUncertainty(),
+        storedProduction.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -339,9 +399,9 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        storedProduction.footprint.indicators[indic].getGrossImpact(
-          storedProduction.amount
-        ),
+        storedProduction.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getGrossImpact(storedProduction.periodsData[period.periodKey].amount),
         0
       ),
       xValue + 24,
@@ -355,7 +415,7 @@ function generateFootprintPDF(
   height += 12;
 
   // // Immobilised production
-  if (financialData.getImmobilisedProduction() > 0) {
+  if (immobilisedProduction.periodsData[period.periodKey] > 0) {
     xValue = x + 64;
     y += 4;
     height += 4;
@@ -364,14 +424,24 @@ function generateFootprintPDF(
     doc.text("dont Production immobilisée", x + 2, y);
     doc.setFontSize(6);
 
-    doc.text(printValue(immobilisedProduction.amount, 0) + " €", xAmount, y, {
-      align: "right",
-    });
+    doc.text(
+      printValue(
+        immobilisedProduction.periodsData[period.periodKey].amount,
+        0
+      ) + " €",
+      xAmount,
+      y,
+      {
+        align: "right",
+      }
+    );
 
     indic.forEach((indic) => {
       doc.text(
         printValue(
-          immobilisedProduction.footprint.indicators[indic].getValue(),
+          immobilisedProduction.periodsData[
+            period.periodKey
+          ].footprint.indicators[indic].getValue(),
           1
         ),
         xValue,
@@ -380,7 +450,9 @@ function generateFootprintPDF(
       );
       doc.text(
         printValue(
-          immobilisedProduction.footprint.indicators[indic].getUncertainty(),
+          immobilisedProduction.periodsData[
+            period.periodKey
+          ].footprint.indicators[indic].getUncertainty(),
           0
         ) + "%",
         xValue + 12,
@@ -389,8 +461,10 @@ function generateFootprintPDF(
       );
       doc.text(
         printValue(
-          immobilisedProduction.footprint.indicators[indic].getGrossImpact(
-            immobilisedProduction.amount
+          immobilisedProduction.periodsData[
+            period.periodKey
+          ].footprint.indicators[indic].getGrossImpact(
+            immobilisedProduction.periodsData[period.periodKey].amount
           ),
           0
         ),
@@ -413,9 +487,17 @@ function generateFootprintPDF(
 
   doc.setFontSize(6);
 
-  doc.text(printValue(intermediateConsumption.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
+  doc.text(
+    printValue(
+      intermediateConsumptions.periodsData[period.periodKey].amount,
+      0
+    ) + " €",
+    xAmount,
+    y,
+    {
+      align: "right",
+    }
+  );
 
   xValue = x + 64;
   indic.forEach((indic) => {
@@ -423,7 +505,9 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "bold");
     doc.text(
       printValue(
-        intermediateConsumption.footprint.indicators[indic].getValue(),
+        intermediateConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators[indic].getValue(),
         1
       ),
       xValue,
@@ -434,7 +518,9 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        intermediateConsumption.footprint.indicators[indic].getUncertainty(),
+        intermediateConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -443,8 +529,10 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        intermediateConsumption.footprint.indicators[indic].getGrossImpact(
-          intermediateConsumption.amount
+        intermediateConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators[indic].getGrossImpact(
+          intermediateConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ),
@@ -458,14 +546,12 @@ function generateFootprintPDF(
 
   y += 2.5;
 
-  financialData
-    .getIntermediateConsumptionsAggregates()
-    .filter((aggregate) => aggregate.amount != 0)
+    intermediateConsumptionsAggregates
     .forEach((aggregate) => {
       height += 4;
       y += 4;
       doc.setFontSize(7);
-      doc.text(aggregate.accountLib, x + 2, y);
+      doc.text(aggregate.label, x + 2, y);
 
       doc.setFontSize(6);
       doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
@@ -508,15 +594,28 @@ function generateFootprintPDF(
     y
   );
   doc.setFontSize(6);
-  doc.text(printValue(capitalConsumption.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
+  doc.text(
+    printValue(
+      fixedCapitalConsumptions.periodsData[period.periodKey].amount,
+      0
+    ) + " €",
+    xAmount,
+    y,
+    {
+      align: "right",
+    }
+  );
   xValue = x + 64;
 
   indic.forEach((indic) => {
     doc.setFont("Helvetica", "bold");
     doc.text(
-      printValue(capitalConsumption.footprint.indicators[indic].getValue(), 1),
+      printValue(
+        fixedCapitalConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators[indic].getValue(),
+        1
+      ),
       xValue,
       y,
       { align: "right" }
@@ -524,7 +623,9 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        capitalConsumption.footprint.indicators[indic].getUncertainty(),
+        fixedCapitalConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators[indic].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -533,8 +634,10 @@ function generateFootprintPDF(
     );
     doc.text(
       printValue(
-        capitalConsumption.footprint.indicators[indic].getGrossImpact(
-          capitalConsumption.amount
+        fixedCapitalConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators[indic].getGrossImpact(
+          fixedCapitalConsumptions.periodsData[period.periodKey].amount
         ),
         0
       ),
@@ -548,14 +651,12 @@ function generateFootprintPDF(
 
   y += 6;
 
-  financialData
-    .getFixedCapitalConsumptionsAggregates()
-    .filter((aggregate) => aggregate.amount != 0)
+    fixedCapitalConsumptionsAggregates
     .forEach((aggregate) => {
       height += 6;
       xValue = x + 64;
       doc.setFontSize(6);
-      doc.text(doc.splitTextToSize(aggregate.accountLib, 35), x + 2, y);
+      doc.text(doc.splitTextToSize(aggregate.label, 35), x + 2, y);
       doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
         align: "right",
       });
@@ -597,16 +698,26 @@ function generateFootprintPDF(
   doc.text("Valeur ajoutée nette", x + 2, y);
 
   doc.setFontSize(6);
-  doc.text(printValue(netValueAdded.amount, 0) + " €", xAmount, y, {
-    align: "right",
-  });
+  doc.text(
+    printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €",
+    xAmount,
+    y,
+    {
+      align: "right",
+    }
+  );
 
   xValue = x + 64;
   indic.forEach((indic) => {
     doc.setFontSize(6);
     doc.setFont("Helvetica", "bold");
     doc.text(
-      printValue(netValueAdded.footprint.indicators[indic].getValue(), 1),
+      printValue(
+        netValueAdded.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getValue(),
+        1
+      ),
       xValue,
       y,
       { align: "right" }
@@ -615,7 +726,9 @@ function generateFootprintPDF(
     doc.setFont("Helvetica", "normal");
     doc.text(
       printValue(
-        netValueAdded.footprint.indicators[indic].getUncertainty(),
+        netValueAdded.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getUncertainty(),
         0
       ) + "%",
       xValue + 12,
@@ -625,9 +738,9 @@ function generateFootprintPDF(
 
     doc.text(
       printValue(
-        netValueAdded.footprint.indicators[indic].getGrossImpact(
-          netValueAdded.amount
-        ),
+        netValueAdded.periodsData[period.periodKey].footprint.indicators[
+          indic
+        ].getGrossImpact(netValueAdded.periodsData[period.periodKey].amount),
         0
       ),
       xValue + 24,
@@ -710,9 +823,10 @@ async function exportFootprintPDF(session) {
 
   // RAPPORT - EMPREINTE ENVIRONNEMENTALE
 
-  generateFootprintPDF(
+  await generateFootprintPDF(
     doc,
     envIndic,
+    session.financialPeriod,
     session.financialData,
     session.legalUnit.corporateName,
     session.year,
@@ -724,9 +838,10 @@ async function exportFootprintPDF(session) {
 
   // RAPPORT - EMPREINTE ÉCONOMIQUE ET SOCIALE
 
-  generateFootprintPDF(
+  await generateFootprintPDF(
     doc,
     seIndic,
+    session.financialPeriod,
     session.financialData,
     session.legalUnit.corporateName,
     session.year,

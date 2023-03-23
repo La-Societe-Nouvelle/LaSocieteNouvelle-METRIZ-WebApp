@@ -27,11 +27,11 @@ export class ExpensesTable extends React.Component {
 
   render() 
   {
-    const {expenseAccounts} = this.props.financialData;
+    const {externalExpensesAccounts} = this.props.financialData;
+    const periodKey = this.props.period.periodKey;
     const {columnSorted,reverseSort} = this.state;
 
-    const externalExpensesAccounts = expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum));
-    sortExpenses(externalExpensesAccounts,columnSorted,reverseSort);
+    sortExpenses(externalExpensesAccounts,periodKey,columnSorted,reverseSort);
 
     return (
       <>
@@ -44,11 +44,11 @@ export class ExpensesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {externalExpensesAccounts.map(({accountNum,amount,accountLib}) => 
-              <tr key={accountNum}>
-                <td >{accountNum}</td>
-                <td >{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
-                <td className="text-end">{printValue(amount,0)} &euro;</td>
+            {externalExpensesAccounts.map((account) => 
+              <tr key={account.accountNum}>
+                <td >{account.accountNum}</td>
+                <td >{account.accountLib.charAt(0).toUpperCase() + account.accountLib.slice(1).toLowerCase()}</td>
+                <td className="text-end">{printValue(account.periodsData[periodKey].amount,0)} &euro;</td>
               </tr>)}
           </tbody>
         </Table>
@@ -66,12 +66,12 @@ export class ExpensesTable extends React.Component {
 
 }
 
-const sortExpenses = (accounts,columSorted,reverseSort) =>
+const sortExpenses = (accounts,periodKey,columSorted,reverseSort) =>
 {
   switch(columSorted) 
   {
     case "account": accounts.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
-    case "amount": accounts.sort((a,b) => b.amount - a.amount); break;
+    case "amount": accounts.sort((a,b) => b.periodsData[periodKey].amount - a.periodsData[periodKey].amount); break;
   }
   if (reverseSort) accounts.reverse();
 }

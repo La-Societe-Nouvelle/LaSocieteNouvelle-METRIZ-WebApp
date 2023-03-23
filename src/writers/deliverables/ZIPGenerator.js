@@ -16,7 +16,7 @@ import { createIndiceIndicatorPDF } from "./indiceIndicPDF";
 import ChangeDivision from "../../../components/popups/ChangeDivision";
 
 const ZipGenerator = ({
-  year,
+  period,
   legalUnit,
   validations,
   financialData,
@@ -67,19 +67,20 @@ const ZipGenerator = ({
   }
 
   async function generatePDFs() {
-
+    
+    const year = period.periodKey.slice(2);
 
     const documentTitle =
       "Empreinte-Societale_" +
       session.legalUnit.corporateName.replaceAll(" ", "") +
       "_" +
-      session.year;
+      year;
 
     // Initialiser l'objet jsZip
     // Générer les PDFs et les ajouter au zip
 
     const coverPage = createCoverPage(
-      session.year,
+      year,
       session.legalUnit.corporateName
     );
     const basicPDFpromises = [];
@@ -90,7 +91,6 @@ const ZipGenerator = ({
 
       basicPDFpromises.push(
         createIndicReport(
-          year,
           legalUnit,
           indic,
           metaIndics[indic].libelle,
@@ -98,7 +98,8 @@ const ZipGenerator = ({
           financialData,
           impactsData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
 
@@ -107,26 +108,26 @@ const ZipGenerator = ({
           reportPDFpromises.push(
             createContribIndicatorPDF(
               metaIndics[indic].libelle,
-              year,
               legalUnit,
               indic,
               financialData,
               session.comparativeData,
-              false
+              false,
+              period
             )
           );
           break;
         case "intensité":
           reportPDFpromises.push(
             createIntensIndicatorPDF(
-              year,
               legalUnit,
               indic,
               metaIndics[indic].libelle,
               metaIndics[indic].unit,
               financialData,
               session.comparativeData,
-              false
+              false,
+              period
             )
           );
           break;
@@ -135,15 +136,13 @@ const ZipGenerator = ({
             createIndiceIndicatorPDF(
               metaIndics[indic].libelle,
               metaIndics[indic].libelleGrandeur,
-              year,
               legalUnit,
               indic,
               metaIndics[indic].unit,
               financialData,
               session.comparativeData,
-              session.comparativeData.netValueAdded.trendsFootprint.indicators[indic]
-                .meta.label,
-              false
+              false,
+              period
             )
           );
         default:
@@ -233,11 +232,12 @@ const ZipGenerator = ({
         generateFootprintPDF(
           docEES,
           envIndic,
+          period,
           financialData,
           legalUnit,
           year,
           "Empreinte environnementale",
-          envOdds
+          envOdds,
         );
 
         docEES.addPage();
@@ -245,11 +245,12 @@ const ZipGenerator = ({
         generateFootprintPDF(
           docEES,
           seIndic,
+          period,
           financialData,
           legalUnit,
           year,
           "Empreinte économique et sociale",
-          seOdds
+          seOdds,
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
 

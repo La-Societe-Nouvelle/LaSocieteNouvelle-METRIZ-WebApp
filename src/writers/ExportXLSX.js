@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { getExpensesGroupByAccount } from '../../components/tables/IndicatorExpensesTable';
-import { getFixedCapitalConsumptionsAggregatesGroups, getIntermediateConsumptionsAggregatesGroups } from '../../components/tables/IndicatorMainAggregatesTable';
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../formulas/aggregatesBuilder';
 import {  roundValue } from '../utils/Utils';
 
 import metaIndics from "/lib/indics";
@@ -8,11 +8,13 @@ import metaIndics from "/lib/indics";
 async function exportIndicXLSX(
   indic,
   session,
+  period
 ) {
   // Build file
   let file = await IndicXLSXFileWriter(
     indic,
-    session
+    session,
+    period
   );
 
   let blob = new Blob([file], { type: "application/octet-stream" });
@@ -24,14 +26,14 @@ async function exportIndicXLSX(
 
 /* ---------- CONTENT BUILDER ---------- */
 
-async function IndicXLSXFileWriter(indic,session)
+async function IndicXLSXFileWriter(indic,session,period)
 {
   const workbook = XLSX.utils.book_new();
 
   //workbook.Props = fileProps;
 
   // build main aggregates tab
-  let mainAggregatesContent = await buildMainAggregatesContent(indic,session);
+  let mainAggregatesContent = await buildMainAggregatesContent(indic,session,period);
   const mainAggregatesWorksheet = XLSX.utils.aoa_to_sheet(mainAggregatesContent);
   mainAggregatesWorksheet['!cols'] = [{ wch: 75 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
   workbook.SheetNames.push("Soldes");
@@ -56,21 +58,24 @@ async function IndicXLSXFileWriter(indic,session)
 
 /* ---------- CONTENT BUILDERS ---------- */ 
 
-async function buildMainAggregatesContent(indic,session)
+async function buildMainAggregatesContent(indic,session,period)
 {
   let aoaContent = [];
 
   const nbDecimals = metaIndics[indic].nbDecimals;
 
   const {
-    production,
     revenue,
     storedProduction,
-    immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
+    immobilisedProduction
+  } = session.financialData.productionAggregates;
+  
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
     netValueAdded,
-  } = session.financialData.aggregates;
+  } = session.financialData.mainAggregates;
 
   // header
 
@@ -92,50 +97,53 @@ async function buildMainAggregatesContent(indic,session)
 
   aoaContent.push([
     "Production",
-    roundValue(production.amount, 0),
-    roundValue(production.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(production.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(production.periodsData[period.periodKey].amount, 0),
+    roundValue(production.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(production.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   aoaContent.push([
     "   Production vendue",
-    roundValue(revenue.amount, 0),
-    roundValue(revenue.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(revenue.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(revenue.periodsData[period.periodKey].amount, 0),
+    roundValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   aoaContent.push([
     "   Production stockée",
-    roundValue(storedProduction.amount, 0),
-    roundValue(storedProduction.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(storedProduction.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(storedProduction.periodsData[period.periodKey].amount, 0),
+    roundValue(storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(storedProduction.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   aoaContent.push([
     "   Production immobilisée",
-    roundValue(immobilisedProduction.amount, 0),
-    roundValue(immobilisedProduction.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(immobilisedProduction.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(immobilisedProduction.periodsData[period.periodKey].amount, 0),
+    roundValue(immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   // Consommations intermédiaires
 
   aoaContent.push([
     "Consommations intermédiaires",
-    roundValue(intermediateConsumption.amount, 0),
-    roundValue(intermediateConsumption.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(intermediateConsumption.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0),
+    roundValue(intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   const intermediateConsumptionsAggregates =
-    getIntermediateConsumptionsAggregatesGroups(session.financialData);
+  await buildIntermediateConsumptionsAggregates(
+    session.financialData,
+    period.periodKey
+  );
 
   intermediateConsumptionsAggregates
     .filter((aggregate) => aggregate.amount != 0)
-    .forEach(({ accountLib, amount, footprint }) => 
+    .forEach(({ label, amount, footprint }) => 
     (
       aoaContent.push([
-        "   "+accountLib,
+        "   "+label,
         roundValue(amount, 0),
         roundValue(footprint.indicators[indic].getValue(), nbDecimals),
         roundValue(footprint.indicators[indic].getUncertainty(), 0)
@@ -146,20 +154,24 @@ async function buildMainAggregatesContent(indic,session)
 
   aoaContent.push([
     "Consommations de capital fixe",
-    roundValue(capitalConsumption.amount, 0),
-    roundValue(capitalConsumption.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(capitalConsumption.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0),
+    roundValue(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   const fixedCapitalConsumptionsAggregates =
-    getFixedCapitalConsumptionsAggregatesGroups(session.financialData);
+  await buildFixedCapitalConsumptionsAggregates(
+    session.financialData,
+    period.periodKey
+  );
+
 
   fixedCapitalConsumptionsAggregates
     .filter((aggregate) => aggregate.amount != 0)
-    .forEach(({ accountLib, amount, footprint }) => 
+    .forEach(({ label, amount, footprint }) => 
     (
       aoaContent.push([
-        "   "+accountLib,
+        "   "+label,
         roundValue(amount, 0),
         roundValue(footprint.indicators[indic].getValue(), nbDecimals),
         roundValue(footprint.indicators[indic].getUncertainty(), 0)
@@ -169,9 +181,9 @@ async function buildMainAggregatesContent(indic,session)
   // Net Value Added
   aoaContent.push([
     "Valeur ajoutée nette",
-    roundValue(netValueAdded.amount, 0),
-    roundValue(netValueAdded.footprint.indicators[indic].getValue(), nbDecimals),
-    roundValue(netValueAdded.footprint.indicators[indic].getUncertainty(), 0)
+    roundValue(netValueAdded.periodsData[period.periodKey].amount, 0),
+    roundValue(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+    roundValue(netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
   ])
 
   return aoaContent;
@@ -181,15 +193,12 @@ async function buildExpensesContent(indic,session)
 {
   let aoaContent = [];
 
-  const nbDecimals = metaIndics[indic].nbDecimals;
+  //const nbDecimals = metaIndics[indic].nbDecimals;
+  const currentPeriod = session.financialPeriod.periodKey;
+  const externalExpenses = session.financialData.externalExpenses.filter(account => account.date.startsWith(currentPeriod.slice(2)));
+  //const expensesByAccount = getExpensesGroupByAccount(session.financialData.externalExpenses);
 
-  const {
-    expenseAccounts
-  } = session.financialData;
-
-  const expensesByAccount = getExpensesGroupByAccount(session.financialData.expenses);
-  expensesByAccount.sort((a,b) => b.amount - a.amount);
-
+  externalExpenses.sort((a,b) => b.amount - a.amount);
   // header
 
   aoaContent.push([
@@ -207,18 +216,18 @@ async function buildExpensesContent(indic,session)
     "Incertitude (en %)"
   ])
 
-  // Consommations intermédiaires
 
-  expensesByAccount
-    .forEach(({ account, accountLib, amount }) => 
+  externalExpenses
+    .forEach(({ accountNum, accountLib, amount, footprint }) => 
     {
-      let indicator = session.getExpensesAccountIndicator(account,indic);
+     // let indicator = session.getExpensesAccountIndicator(accountNum,indic); // TO FIX
+
       aoaContent.push([
-        account,
+        accountNum,
         accountLib,
         roundValue(amount, 0),
-        roundValue(indicator.getValue(), nbDecimals),
-        roundValue(indicator.getUncertainty(), 0)
+        footprint.indicators[indic].value,
+        footprint.indicators[indic].uncertainty
       ]);
     });
 

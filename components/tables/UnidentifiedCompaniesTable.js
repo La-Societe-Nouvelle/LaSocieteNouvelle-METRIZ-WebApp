@@ -14,12 +14,22 @@ import Select from "react-select";
 
 /* ---------- COMPANIES TABLE ---------- */
 
-export class UnidentifiedCompaniesTable extends React.Component {
-  constructor(props) {
+const divisionsOptions = Object.entries(divisions)
+  .sort((a,b) => parseInt(a)-parseInt(b))
+  .map(([value, label]) => {return({ value: value, label: value + " - " + label })});
+
+const areasOptions = Object.entries(areas)
+  .sort()
+  .map(([value, label]) => {return({value: value, label: value + " - " + label })});
+
+export class UnidentifiedCompaniesTable extends React.Component 
+{
+  constructor(props) 
+  {
     super(props);
     this.state = {
-      companies: props.companies,
-      significativeCompanies: props.significativeCompanies,
+      providers: props.providers,
+      significativeProviders: props.significativeProviders,
       columnSorted: "amount",
       reverseSort: false,
       page: 0,
@@ -27,29 +37,26 @@ export class UnidentifiedCompaniesTable extends React.Component {
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.companies !== this.props.companies) {
-      this.setState({ companies: this.props.companies });
+  componentDidUpdate(prevProps) 
+  {
+    if (prevProps.providers !== this.props.providers) {
+      this.setState({ providers: this.props.providers });
     }
     if (prevProps.nbItems !== this.props.nbItems) {
-      this.setState({ nbItems: this.props.nbItems });
+      this.setState({ nbItems: this.props.nbItems, page: 0 });
     }
-    if (
-      prevProps.significativeCompanies !== this.props.significativeCompanies
-    ) {
-      this.setState({
-        significativeCompanies: this.props.significativeCompanies,
-      });
+    if (prevProps.significativeProviders !== this.props.significativeProviders) {
+      this.setState({significativeProviders: this.props.significativeProviders });
     }
   }
 
   render() {
-    const { companies, significativeCompanies, columnSorted, page, nbItems } =
-      this.state;
+    const { providers, significativeProviders, columnSorted, page, nbItems } = this.state;
+    const period = this.props.financialPeriod;
 
-    // sort companies
-    this.sortCompanies(companies, columnSorted);
-    let showedCompanies = companies.slice(page * nbItems, (page + 1) * nbItems);
+    // sort providers
+    this.sortProviders(providers, columnSorted);
+    const showedProviders = providers.slice(page * nbItems, (page + 1) * nbItems);
 
     return (
       <div className="table-main">
@@ -85,20 +92,21 @@ export class UnidentifiedCompaniesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {showedCompanies.map((company) => (
-              <RowTableCompanies
-                key={"company_" + company.id}
-                {...company}
-                isSignificative={significativeCompanies.includes(
-                  company.account
-                )}
-                updateCompany={this.updateCompany.bind(this)}
-              />
-            ))}
+          {showedProviders.map((provider) => (
+            <RowTableProviders
+              key={"company_" + provider.providerNum}
+              provider={provider}
+              isSignificative={significativeProviders.includes(
+                provider.providerNum
+              )}
+              period={period}
+              refreshTable={this.refreshTable}
+            />
+          ))}
           </tbody>
         </Table>
 
-        {companies.length > nbItems && (
+        {providers.length > nbItems && (
           <div className="table-navigation">
             <button
               className={page == 0 ? "hidden" : "btn btn-primary"}
@@ -108,12 +116,12 @@ export class UnidentifiedCompaniesTable extends React.Component {
             </button>
             <div>
               <p>
-                {page + 1}/{parseInt(companies.length / nbItems + 1)}
+                {page + 1}/{parseInt(providers.length / nbItems + 1)}
               </p>
             </div>
             <button
               className={
-                (page + 1) * nbItems < companies.length
+                (page + 1) * nbItems < providers.length
                   ? "btn btn-primary"
                   : "hidden"
               }
@@ -137,25 +145,25 @@ export class UnidentifiedCompaniesTable extends React.Component {
     }
   }
 
-  sortCompanies(companies, columSorted) {
+  sortProviders(providers, period, columSorted) {
     switch (columSorted) {
       case "identifiant":
-        companies.sort((a, b) =>
+        providers.sort((a, b) =>
           valueOrDefault(a.corporateId, "").localeCompare(
             valueOrDefault(b.corporateId, "")
           )
         );
         break;
       case "denomination":
-        companies.sort((a, b) =>
-          a.getCorporateName().localeCompare(b.getCorporateName())
+        providers.sort((a, b) =>
+          a.providerLib.localeCompare(b.providerLib)
         );
         break;
       case "amount":
-        companies.sort((a, b) => b.amount - a.amount);
+        providers.sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount);
         break;
     }
-    if (this.state.reverseSort) companies.reverse();
+    if (this.state.reverseSort) providers.reverse();
   }
 
   /* ---------- NAVIGATION ---------- */
@@ -169,90 +177,49 @@ export class UnidentifiedCompaniesTable extends React.Component {
   nextPage = () => {
     if (
       (this.state.page + 1) * this.props.nbItems <
-      this.props.financialData.companies.length
+      this.props.providers.length
     ) {
       this.setState({ page: this.state.page + 1 });
     }
   };
 
-  /* ---------- OPERATIONS ON COMPANY ---------- */
-
-  async fetchDataCompany(company) {
-    await company.fetchData();
-    this.props.financialData.updateCompany(company);
-    this.forceUpdate();
-  }
-
-  updateCompany = (nextProps) => {
-    let company = this.props.financialData.getCompany(nextProps.id);
-    company.update(nextProps);
-    this.props.onUpdate();
-    this.setState({ companies: this.props.companies });
-  };
-
-  updateCompanyFromRemote = async (companyId) => {
-    let company = this.props.financialData.getCompany(companyId);
-    await company.updateFromRemote();
-    this.props.onUpdate();
-    this.setState({ companies: this.props.companies });
-  };
+  refreshTable = () => this.props.refreshSection();
 }
 
 /* ----- COMPANY ROW ----- */
 
-class RowTableCompanies extends React.Component {
-  constructor(props) {
+class RowTableProviders extends React.Component 
+{
+  constructor(props) 
+  {
     super(props);
     this.state = {
-      corporateId: props.corporateId || "",
-      areaCode: props.state != "" ? props.footprintAreaCode : "FRA",
-      activityCode: props.state != "" ? props.footprintActivityCode : "00",
-      dataUpdated: props.dataUpdated,
+      activityCode: props.provider.defaultFootprintParams.code,
+      areaCode: props.provider.defaultFootprintParams.area,
       toggleIcon: false,
-      divisionsOptions: [],
-      areasOptions: [],
     };
-
-    //Divisions select options
-    Object.entries(divisions)
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .map(([value, label]) =>
-        this.state.divisionsOptions.push({
-          value: value,
-          label: value + " - " + label,
-        })
-      );
-
-    // area select options
-    Object.entries(areas)
-      .sort()
-      .map(([value, label]) =>
-        this.state.areasOptions.push({
-          value: value,
-          label: value + " - " + label,
-        })
-      );
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props != prevProps) {
-      this.setState({
-        corporateId: this.props.corporateId || "",
-        areaCode: this.props.state != "" ? this.props.footprintAreaCode : "FRA",
-        activityCode:
-          this.props.state != "" ? this.props.footprintActivityCode : "00",
-        dataUpdated: false,
-      });
+  componentDidUpdate()
+  {
+    if (this.props.provider.defaultFootprintParams.code != this.state.activityCode) {
+      this.setState({activityCode: this.props.provider.defaultFootprintParams.code});
+    }
+    if (this.props.provider.defaultFootprintParams.area != this.state.areaCode) {
+      this.setState({areaCode: this.props.provider.defaultFootprintParams.area});
     }
   }
 
-  render() {
-    const { corporateName, account, amount, status, dataFetched } = this.props;
-    const { areaCode, activityCode, dataUpdated } = this.state;
+  render() 
+  {
+    const { providerNum, providerLib, periodsData, footprintStatus } = this.props.provider;
+    const period = this.props.period;
+    const { areaCode, activityCode } = this.state;
+
     let isSignificative = this.props.isSignificative;
     let icon;
 
- if (status == 200) {
+    if (footprintStatus == 200) {
       icon = (
         <i
           className="bi bi-check2 text-success"
@@ -275,60 +242,48 @@ class RowTableCompanies extends React.Component {
           )}
         </td>
         <td >
-          {corporateName}
-
+          {providerLib}
         </td>
-        <td>{account}</td>
+        <td>{providerNum}</td>
         <td>
           <Select
-            defaultValue={{
+            value={{
               label: areaCode + " - " + areas[areaCode],
               value: areaCode,
             }}
             placeholder={"Choisissez un espace économique"}
-            className={!dataUpdated && status == 200 ? "success" : ""}
-            options={this.state.areasOptions}
+            className={footprintStatus == 200 ? "success" : ""}
+            options={areasOptions}
             onChange={this.onAreaCodeChange}
           />
         </td>
         <td>
           <Select
-            defaultValue={{
+            value={{
               label: activityCode + " - " + divisions[activityCode],
-              value: activityCode,
-            }}
+              value: activityCode}}
             placeholder={"Choisissez un secteur d'activité"}
-            className={!dataUpdated && status == 200 ? "success" : ""}
-            options={this.state.divisionsOptions}
+            className={footprintStatus == 200 ? "success" : ""}
+            options={divisionsOptions}
             onChange={this.onActivityCodeChange}
           />
         </td>
-        <td className="text-end">{printValue(amount, 0)} &euro;</td>
+        <td className="text-end">{printValue(periodsData[period.periodKey].amount, 0)} &euro;</td>
       </tr>
     );
   }
 
-  updateCorporateId = (nextCorporateId) => {
-    this.setState({ dataUpdated: true });
-    this.props.updateCompany({
-      id: this.props.id,
-      corporateId: nextCorporateId,
-    });
-  };
-
   onAreaCodeChange = (event) => {
-    this.setState({ areaCode: event.value, dataUpdated: true });
-    this.props.updateCompany({
-      id: this.props.id,
-      footprintAreaCode: event.value,
-    });
+    this.props.provider.update({defaultFootprintParams: {area: event.value}});
+    this.setState({areaCode: event.value});
+    // fetch data auto ? -> updating expenses / significative providers
+    this.props.refreshTable();
   };
 
   onActivityCodeChange = (event) => {
-    this.setState({ activityCode: event.value, dataUpdated: true });
-    this.props.updateCompany({
-      id: this.props.id,
-      footprintActivityCode: event.value,
-    });
+    this.props.provider.update({defaultFootprintParams: {code: event.value}});
+    this.setState({activityCode: event.value});
+    // fetch data auto ? -> updating expenses / significative providers
+    this.props.refreshTable();
   };
 }

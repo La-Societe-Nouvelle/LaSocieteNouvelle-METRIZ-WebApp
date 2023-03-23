@@ -5,6 +5,11 @@ import { printValue } from "/src/utils/Utils";
 
 // Libraries
 import metaIndics from "/lib/indics";
+import {
+  buildFixedCapitalConsumptionsAggregates,
+  buildIntermediateConsumptionsAggregates,
+} from "../../src/formulas/aggregatesBuilder";
+import { useEffect, useState } from "react";
 
 // Chart
 import SigPieChart from "../charts/SigPieChart";
@@ -14,9 +19,13 @@ import { exportIndicXLSX } from "../../src/writers/ExportXLSX";
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
-export const IndicatorMainAggregatesTable = ({ indic, session }) => {
+export const IndicatorMainAggregatesTable = ({
+  indic,
+  session,
+  period,
+  prevPeriod,
+}) => {
   const financialData = session.financialData;
-
   const nbDecimals = metaIndics[indic].nbDecimals;
   const unit = metaIndics[indic].unit;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
@@ -24,323 +33,817 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
     indic
   );
 
-  const intermediateConsumptionsAggregates =
-    getIntermediateConsumptionsAggregatesGroups(financialData);
-  const fixedCapitalConsumptionsAggregates =
-    getFixedCapitalConsumptionsAggregatesGroups(financialData);
+  const [
+    intermediateConsumptionsAggregates,
+    setIntermediateConsumptionsAggregates,
+  ] = useState([]);
+  const [
+    fixedCapitalConsumptionsAggregates,
+    setFixedCapitalConsumptionsAggregates,
+  ] = useState([]);
+
+  const [
+    prevIntermediateConsumptionsAggregates,
+    setPrevIntermediateConsumptionsAggregates,
+  ] = useState([]);
+  const [
+    prevFixedCapitalConsumptionsAggregates,
+    setPrevFixedCapitalConsumptionsAggregates,
+  ] = useState([]);
+
+  useEffect(async () => {
+    // Current Aggregates
+    const intermediateConsumptionsAggregates =
+      await buildIntermediateConsumptionsAggregates(
+        financialData,
+        period.periodKey
+      );
+    setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
+
+    const fixedCapitalConsumptionsAggregates =
+      await buildFixedCapitalConsumptionsAggregates(
+        financialData,
+        period.periodKey
+      );
+    setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
+
+    // Previous Aggretates
+    if (prevPeriod) {
+      const prevIntermediateConsumptionsAggregates =
+        await buildIntermediateConsumptionsAggregates(
+          financialData,
+          prevPeriod.periodKey
+        );
+      const filteredPrevIntermediateConsumptionsAggregates =
+        prevIntermediateConsumptionsAggregates.filter(
+          (aggregate) => aggregate.amount != 0
+        );
+      setPrevIntermediateConsumptionsAggregates(
+        filteredPrevIntermediateConsumptionsAggregates
+      );
+
+      const prevFixedCapitalConsumptionsAggregates =
+        await buildFixedCapitalConsumptionsAggregates(
+          financialData,
+          prevPeriod.periodKey
+        );
+      const filteredPrevFixedCapitalConsumptionsAggregates =
+        prevFixedCapitalConsumptionsAggregates.filter(
+          (aggregate) => aggregate.amount != 0
+        );
+
+      setPrevFixedCapitalConsumptionsAggregates(
+        filteredPrevFixedCapitalConsumptionsAggregates
+      );
+    }
+  }, []);
+
+  const { revenue, storedProduction, immobilisedProduction } =
+    financialData.productionAggregates;
 
   const {
     production,
-    revenue,
-    storedProduction,
-    immobilisedProduction,
-    intermediateConsumption,
-    capitalConsumption,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
     netValueAdded,
-  } = financialData.aggregates;
+  } = financialData.mainAggregates;
 
   return (
     <>
       <Table id="mainAggregates" size="sm" responsive>
         <thead>
           <tr>
-            <td>Agrégat</td>
-            <td className="text-end">Montant</td>
+            <th>Agrégat</th>
+            <th colSpan={printGrossImpact ? "4" : "3"} className="text-center">
+              Année N
+            </th>
+            {prevPeriod && (
+              <th colSpan={printGrossImpact ? "4" : "3"} className="text-center border-left">
+                N-1
+              </th>
+            )}
+          </tr>
+          <tr>
+            <td></td>
+            <td className="text-end">Montant </td>
             <td className="text-end">Empreinte</td>
-            <td className="text-end">Incertitude</td>
-            {printGrossImpact ? <td className="text-end">Impact</td> : null}
+            <td className="text-end pe-3">Incertitude</td>
+            {printGrossImpact && <td className="text-end">Impact</td>}
+            {prevPeriod && (
+              <>
+                <td className="text-end border-left ">Empreinte</td>
+                <td className="text-end  pe-3">Incertitude</td>
+                {printGrossImpact && <td className="text-end  pe-3">Impact</td>}
+              </>
+            )}
+          </tr>
+          <tr className="small fw-normal">
+            <td></td>
+            <td className="text-end">&euro; </td>
+            <td className="text-end">{unit}</td>
+            <td className="text-end  pe-3">%</td>
+            {printGrossImpact && <td className="text-end"> {unitGrossImpact}</td> }
+            {prevPeriod && (
+              <>
+                <td className="text-end border-left">{unit}</td>
+                <td className="text-end  pe-3">%</td>
+                {printGrossImpact && <td className="text-end  pe-3"> {unitGrossImpact}</td>}
+              </>
+            )}
           </tr>
         </thead>
         <tbody>
           <tr className="fw-bold">
             <td>Production</td>
             <td className="text-end">
-              {printValue(production.amount, 0)} &euro;
+              {printValue(production.periodsData[period.periodKey].amount, 0)}
             </td>
             <td className="text-end">
               {printValue(
-                production.footprint.indicators[indic].getValue(),
+                production.periodsData[period.periodKey].footprint.indicators[
+                  indic
+                ].getValue(),
                 nbDecimals
-              )}{" "}
-              <span className="unit">{unit}</span>
+              )}
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                production.footprint.indicators[indic].getUncertainty(),
+                production.periodsData[period.periodKey].footprint.indicators[
+                  indic
+                ].getUncertainty(),
                 0
               )}
-              %
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end">
                 {printValue(
-                  production.footprint.indicators[indic].getGrossImpact(
-                    production.amount
+                  production.periodsData[period.periodKey].footprint.indicators[
+                    indic
+                  ].getGrossImpact(
+                    production.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}
-                <span className="unit"> {unitGrossImpact}</span>
               </td>
-            ) : null}
+            ) }
+
+            {prevPeriod && (
+              <> 
+                <td className="text-end border-left">
+                  {printValue(
+                    production.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getValue(),
+                    nbDecimals
+                  )}{" "}
+
+                </td>
+                <td className="text-end  pe-3">
+                  <u>+</u>
+                  {printValue(
+                    production.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getUncertainty(),
+                    0
+                  )}
+                  
+                </td>
+                {printGrossImpact ? (
+                  <td className="text-end">
+                    {printValue(
+                      production.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        production.periodsData[prevPeriod.periodKey].amount
+                      ),
+                      nbDecimals
+                    )}
+                   
+                  </td>
+                ) : null}
+              </>
+            )}
           </tr>
           <tr>
             <td>&emsp;Production vendue</td>
-            <td className="text-end">{printValue(revenue.amount, 0)} &euro;</td>
             <td className="text-end">
-              {printValue(
-                revenue.footprint.indicators[indic].getValue(),
-                nbDecimals
-              )}{" "}
-              <span className="unit">{unit}</span>
+              {printValue(revenue.periodsData[period.periodKey].amount, 0)}{" "}
+              
             </td>
             <td className="text-end">
+              {printValue(
+                revenue.periodsData[period.periodKey].footprint.indicators[
+                  indic
+                ].getValue(),
+                nbDecimals
+              )}{" "}
+              <span className="unit"></span>
+            </td>
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                revenue.footprint.indicators[indic].getUncertainty(),
+                revenue.periodsData[period.periodKey].footprint.indicators[
+                  indic
+                ].getUncertainty(),
                 0
               )}
-              %
+              
             </td>
             {printGrossImpact ? (
               <td className="text-end">
                 {printValue(
-                  revenue.footprint.indicators[indic].getGrossImpact(
-                    revenue.amount
+                  revenue.periodsData[period.periodKey].footprint.indicators[
+                    indic
+                  ].getGrossImpact(
+                    revenue.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}
-                <span> {unitGrossImpact}</span>
+                
               </td>
             ) : null}
+            {prevPeriod && (
+              <>
+                <td className="text-end border-left">
+                  {printValue(
+                    revenue.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getValue(),
+                    nbDecimals
+                  )}{" "}
+
+                </td>
+                <td className="text-end  pe-3">
+                  <u>+</u>
+                  {printValue(
+                    revenue.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getUncertainty(),
+                    0
+                  )}
+                  
+                </td>
+                {printGrossImpact && (
+                  <td className="text-end">
+                    {printValue(
+                      revenue.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        revenue.periodsData[prevPeriod.periodKey].amount
+                      ),
+                      nbDecimals
+                    )}
+                    
+                  </td>
+                ) }
+              </>
+            )}
           </tr>
           {storedProduction != 0 && (
             <tr>
               <td>&emsp;Production stockée</td>
               <td className="text-end">
-                {printValue(storedProduction.amount, 0)} &euro;
+                {printValue(
+                  storedProduction.periodsData[period.periodKey].amount,
+                  0
+                )}{" "}
+                
               </td>
               <td className="text-end">
                 {printValue(
-                  storedProduction.footprint.indicators[indic].getValue(),
+                  storedProduction.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getValue(),
                   nbDecimals
                 )}{" "}
-                <span className="unit">{unit}</span>
+                <span className="unit"></span>
               </td>
-              <td className="text-end">
+              <td className="text-end  pe-3">
                 <u>+</u>
                 {printValue(
-                  storedProduction.footprint.indicators[indic].getUncertainty(),
+                  storedProduction.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getUncertainty(),
                   0
                 )}
-                %
+                
               </td>
-              {printGrossImpact ? (
+              {printGrossImpact && (
                 <td className="text-end">
                   {printValue(
-                    storedProduction.footprint.indicators[indic].getGrossImpact(
-                      storedProduction.amount
+                    storedProduction.periodsData[
+                      period.periodKey
+                    ].footprint.indicators[indic].getGrossImpact(
+                      storedProduction.periodsData[period.periodKey].amount
                     ),
                     nbDecimals
                   )}
-                  <span> {unitGrossImpact}</span>
+                  
                 </td>
-              ) : null}
+              ) }
+
+              {prevPeriod && (
+                <>
+                  <td className="text-end border-left">
+                    {printValue(
+                      storedProduction.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getValue(),
+                      nbDecimals
+                    )}{" "}
+  
+                  </td>
+                  <td className="text-end  pe-3">
+                    <u>+</u>
+                    {printValue(
+                      storedProduction.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getUncertainty(),
+                      0
+                    )}
+                    
+                  </td>
+                  {printGrossImpact && (
+                    <td className="text-end">
+                      {printValue(
+                        storedProduction.periodsData[
+                          prevPeriod.periodKey
+                        ].footprint.indicators[indic].getGrossImpact(
+                          storedProduction.periodsData[period.periodKey].amount
+                        ),
+                        nbDecimals
+                      )}
+                      
+                    </td>
+                  ) }
+                </>
+              )}
             </tr>
           )}
-          {immobilisedProduction.amount > 0 && (
+          {immobilisedProduction.periodsData[period.periodKey].amount > 0 && (
             <tr>
               <td>&emsp;Production immobilisée</td>
               <td className="text-end">
-                ({printValue(immobilisedProduction.amount, 0)}) &euro;
-              </td>
-              <td className="text-end">
+                (
                 {printValue(
-                  immobilisedProduction.footprint.indicators[indic].getValue(),
-                  nbDecimals
-                )}{" "}
-                <span className="unit">{unit}</span>
-              </td>
-              <td className="text-end">
-                <u>+</u>
-                {printValue(
-                  immobilisedProduction.footprint.indicators[
-                    indic
-                  ].getUncertainty(),
+                  immobilisedProduction.periodsData[period.periodKey].amount,
                   0
                 )}
-                %
+                ) 
               </td>
-              {printGrossImpact ? (
+              <td className="text-end">
+                {printValue(
+                  immobilisedProduction.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getValue(),
+                  nbDecimals
+                )}{" "}
+                <span className="unit"></span>
+              </td>
+              <td className="text-end  pe-3">
+                <u>+</u>
+                {printValue(
+                  immobilisedProduction.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getUncertainty(),
+                  0
+                )}
+                
+              </td>
+              {printGrossImpact && (
                 <td className="text-end">
                   (
                   {printValue(
-                    immobilisedProduction.footprint.indicators[
-                      indic
-                    ].getGrossImpact(immobilisedProduction.amount),
+                    immobilisedProduction.periodsData[
+                      period.periodKey
+                    ].footprint.indicators[indic].getGrossImpact(
+                      immobilisedProduction.periodsData[period.periodKey].amount
+                    ),
                     nbDecimals
                   )}
-                  )<span className="unit"> {unitGrossImpact}</span>
+                  )<span className="unit"> </span>
                 </td>
-              ) : null}
+              ) }
+
+              {prevPeriod && (
+                <>
+                  <td className="text-end border-left">
+                    {printValue(
+                      immobilisedProduction.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getValue(),
+                      nbDecimals
+                    )}{" "}
+  
+                  </td>
+                  <td className="text-end  pe-3">
+                    <u>+</u>
+                    {printValue(
+                      immobilisedProduction.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getUncertainty(),
+                      0
+                    )}
+                    
+                  </td>
+                  {printGrossImpact && (
+                    <td className="text-end">
+                      (
+                      {printValue(
+                        immobilisedProduction.periodsData[
+                          prevPeriod.periodKey
+                        ].footprint.indicators[indic].getGrossImpact(
+                          immobilisedProduction.periodsData[
+                            prevPeriod.periodKey
+                          ].amount
+                        ),
+                        nbDecimals
+                      )}
+                      )<span className="unit"> </span>
+                    </td>
+                  ) }
+                </>
+              )}
             </tr>
           )}
           <tr className="border-top  fw-bold">
             <td>Consommations intermédiaires</td>
             <td className="text-end">
-              {printValue(intermediateConsumption.amount, 0)} &euro;
+              {printValue(
+                intermediateConsumptions.periodsData[period.periodKey].amount,
+                0
+              )}{" "}
+              
             </td>
             <td className="text-end">
               {printValue(
-                intermediateConsumption.footprint.indicators[indic].getValue(),
+                intermediateConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getValue(),
                 nbDecimals
               )}{" "}
-              <span className="unit">{unit}</span>
+              <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                intermediateConsumption.footprint.indicators[
-                  indic
-                ].getUncertainty(),
+                intermediateConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              %
+              
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end">
                 {printValue(
-                  intermediateConsumption.footprint.indicators[
-                    indic
-                  ].getGrossImpact(intermediateConsumption.amount),
+                  intermediateConsumptions.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getGrossImpact(
+                    intermediateConsumptions.periodsData[period.periodKey]
+                      .amount
+                  ),
                   nbDecimals
                 )}
-                <span> {unitGrossImpact}</span>
+                
               </td>
-            ) : null}
+            ) }
+
+            {prevPeriod && (
+              <>
+                <td className="text-end border-left">
+                  {printValue(
+                    intermediateConsumptions.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getValue(),
+                    nbDecimals
+                  )}{" "}
+
+                </td>
+                <td className="text-end  pe-3">
+                  <u>+</u>
+                  {printValue(
+                    intermediateConsumptions.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getUncertainty(),
+                    0
+                  )}
+                  
+                </td>
+                {printGrossImpact && (
+                  <td className="text-end">
+                    {printValue(
+                      intermediateConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        intermediateConsumptions.periodsData[
+                          prevPeriod.periodKey
+                        ].amount
+                      ),
+                      nbDecimals
+                    )}
+                    
+                  </td>
+                ) }
+              </>
+            )}
           </tr>
 
           {intermediateConsumptionsAggregates
             .filter((aggregate) => aggregate.amount != 0)
-            .map(({ accountLib, amount, footprint }, index) => (
+            .map(({ label, amount, footprint }, index) => (
               <tr key={index}>
-                <td>&emsp;{accountLib}</td>
-                <td className="text-end">{printValue(amount, 0)} &euro;</td>
+                <td>&emsp;{label}</td>
+                <td className="text-end">{printValue(amount, 0)} </td>
                 <td className="text-end">
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
-                  <span className="unit">{unit}</span>
+
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
-                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}%
+                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
-                    <span> {unitGrossImpact}</span>
+                    
                   </td>
-                ) : null}
+                ) }
+                {prevPeriod &&
+                  prevIntermediateConsumptionsAggregates.length > 0 && (
+                    <>
+                      <td className="text-end border-left">
+                        {printValue(
+                          prevIntermediateConsumptionsAggregates[
+                            index
+                          ].footprint.indicators[indic].getValue(),
+                          nbDecimals
+                        )}{" "}
+      
+                      </td>
+                      <td className="text-end  pe-3">
+                        <u>+</u>
+                        {printValue(
+                          prevIntermediateConsumptionsAggregates[
+                            index
+                          ].footprint.indicators[indic].getUncertainty(),
+                          0
+                        )}
+                        
+                      </td>
+                      {printGrossImpact && (
+                        <td className="text-end">
+                          {printValue(
+                            prevIntermediateConsumptionsAggregates[
+                              index
+                            ].footprint.indicators[indic].getGrossImpact(
+                              amount
+                            ),
+                            nbDecimals
+                          )}
+                          
+                        </td>
+                      ) }
+                    </>
+                  )}
               </tr>
             ))}
 
           <tr className="border-top  fw-bold">
-            <td> Consommations de capital fixe</td>
+            <td>Consommations de capital fixe</td>
             <td className="text-end">
-              {printValue(capitalConsumption.amount, 0)} &euro;
+              {printValue(
+                fixedCapitalConsumptions.periodsData[period.periodKey].amount,
+                0
+              )}{" "}
+              
             </td>
             <td className="text-end">
               {printValue(
-                capitalConsumption.footprint.indicators[indic].getValue(),
+                fixedCapitalConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getValue(),
                 nbDecimals
               )}{" "}
-              <span className="unit">{unit}</span>
+              <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                capitalConsumption.footprint.indicators[indic].getUncertainty(),
+                fixedCapitalConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              %
+              
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end">
                 {printValue(
-                  capitalConsumption.footprint.indicators[indic].getGrossImpact(
-                    capitalConsumption.amount
+                  fixedCapitalConsumptions.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getGrossImpact(
+                    fixedCapitalConsumptions.periodsData[period.periodKey]
+                      .amount
                   ),
                   nbDecimals
                 )}{" "}
-                <span className="unit"> {unitGrossImpact}</span>
+               
               </td>
-            ) : null}
+            ) }
+            {prevPeriod && (
+              <>
+                <td className="text-end border-left">
+                  {printValue(
+                    fixedCapitalConsumptions.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getValue(),
+                    nbDecimals
+                  )}{" "}
+
+                </td>
+                <td className="text-end  pe-3">
+                  <u>+</u>
+                  {printValue(
+                    fixedCapitalConsumptions.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getUncertainty(),
+                    0
+                  )}
+                  
+                </td>
+                {printGrossImpact && (
+                  <td className="text-end">
+                    {printValue(
+                      fixedCapitalConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        fixedCapitalConsumptions.periodsData[
+                          prevPeriod.periodKey
+                        ].amount
+                      ),
+                      nbDecimals
+                    )}{" "}
+                   
+                  </td>
+                )}
+              </>
+            )}
           </tr>
+
           {fixedCapitalConsumptionsAggregates
             .filter((aggregate) => aggregate.amount != 0)
-            .map(({ accountLib, amount, footprint }, index) => (
+            .map(({ label, amount, footprint }, index) => (
               <tr key={index}>
-                <td>&emsp;{accountLib}</td>
-                <td className="text-end">{printValue(amount, 0)} &euro;</td>
+                <td>&emsp;{label}</td>
+                <td className="text-end">{printValue(amount, 0)} </td>
                 <td className="text-end">
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
-                  <span className="unit"> {unit} </span>
+                  <span className="unit">  </span>
                 </td>
-                <td className="text-end">
+                <td className="text-end  pe-3">
                   <u>+</u>
-                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}%
+                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
-                {printGrossImpact ? (
+                {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
                       footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
-                    <span> {unitGrossImpact}</span>
+                    
                   </td>
-                ) : null}
+                ) }
+                {prevPeriod &&
+                  prevFixedCapitalConsumptionsAggregates.length > 0 && (
+                    <>
+                      <td className="text-end border-left">
+                        {printValue(
+                          prevFixedCapitalConsumptionsAggregates[
+                            index
+                          ].footprint.indicators[indic].getValue(),
+                          nbDecimals
+                        )}{" "}
+                        <span className="unit">  </span>
+                      </td>
+                      <td className="text-end  pe-3">
+                        <u>+</u>
+                        {printValue(
+                          prevFixedCapitalConsumptionsAggregates[
+                            index
+                          ].footprint.indicators[indic].getUncertainty(),
+                          0
+                        )}
+                        
+                      </td>
+                      {printGrossImpact && (
+                        <td className="text-end">
+                          {printValue(
+                            prevFixedCapitalConsumptionsAggregates[
+                              index
+                            ].footprint.indicators[indic].getGrossImpact(
+                              amount
+                            ),
+                            nbDecimals
+                          )}
+                          
+                        </td>
+                      ) }
+                    </>
+                  )}
               </tr>
             ))}
 
           <tr className="border-top  fw-bold">
             <td>Valeur ajoutée nette</td>
             <td className="text-end">
-              {printValue(netValueAdded.amount, 0)} &euro;
+              {printValue(
+                netValueAdded.periodsData[period.periodKey].amount,
+                0
+              )}{" "}
+              
             </td>
             <td className="text-end">
               {printValue(
-                netValueAdded.footprint.indicators[indic].getValue(),
+                netValueAdded.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getValue(),
                 nbDecimals
               )}{" "}
-              <span className="unit">{unit}</span>
+              <span className="unit"></span>
             </td>
-            <td className="text-end">
+            <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                netValueAdded.footprint.indicators[indic].getUncertainty(),
+                netValueAdded.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getUncertainty(),
                 0
               )}
-              %
+              
             </td>
-            {printGrossImpact ? (
+            {printGrossImpact && (
               <td className="text-end" title="Impact direct de l'entreprise">
                 {printValue(
-                  netValueAdded.footprint.indicators[indic].getGrossImpact(
-                    netValueAdded.amount
+                  netValueAdded.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getGrossImpact(
+                    netValueAdded.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}
-                <span> {unitGrossImpact}</span>
+                
               </td>
-            ) : null}
+            ) }
+            {prevPeriod && (
+              <>
+                <td className="text-end border-left">
+                  {printValue(
+                    netValueAdded.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getValue(),
+                    nbDecimals
+                  )}{" "}
+
+                </td>
+                <td className="text-end  pe-3">
+                  <u>+</u>
+                  {printValue(
+                    netValueAdded.periodsData[
+                      prevPeriod.periodKey
+                    ].footprint.indicators[indic].getUncertainty(),
+                    0
+                  )}
+                  
+                </td>
+                {printGrossImpact && (
+                  <td
+                    className="text-end"
+                    title="Impact direct de l'entreprise"
+                  >
+                    {printValue(
+                      netValueAdded.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        netValueAdded.periodsData[prevPeriod.periodKey].amount
+                      ),
+                      nbDecimals
+                    )}
+                    
+                  </td>
+                )}
+              </>
+            )}
           </tr>
         </tbody>
       </Table>
@@ -349,7 +852,7 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
           variant="tertiary"
           size="sm"
           className="me-0 mb-2"
-          onClick={() => exportIndicXLSX(indic, session)}
+          onClick={() => exportIndicXLSX(indic, session, period)}
         >
           Télécharger les données <i className="bi bi-download"></i>
         </Button>
@@ -362,7 +865,9 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  production.footprint.indicators[indic].value,
+                  production.periodsData[period.periodKey].footprint.indicators[
+                    indic
+                  ].value,
                   nbDecimals
                 )}
                 title={"Production"}
@@ -375,7 +880,8 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  intermediateConsumption.footprint.indicators[indic].value,
+                  intermediateConsumptions.periodsData[period.periodKey]
+                    .footprint.indicators[indic].value,
                   nbDecimals
                 )}
                 title={"Consommations intermédiaires"}
@@ -384,11 +890,14 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             </div>
           </Col>
           <Col>
-            <h5 className="mb-4 text-center">▪ Consommations de capital fixe</h5>
+            <h5 className="mb-4 text-center">
+              ▪ Consommations de capital fixe
+            </h5>
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  capitalConsumption.footprint.indicators[indic].value,
+                  fixedCapitalConsumptions.periodsData[period.periodKey]
+                    .footprint.indicators[indic].value,
                   nbDecimals
                 )}
                 title={"Consommation de capital fixe"}
@@ -401,7 +910,9 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
             <div className="doughtnut-chart-container">
               <SigPieChart
                 value={printValue(
-                  netValueAdded.footprint.indicators[indic].getValue(),
+                  netValueAdded.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getValue(),
                   nbDecimals
                 )}
                 title={"Valeur ajoutée nette"}
@@ -413,18 +924,4 @@ export const IndicatorMainAggregatesTable = ({ indic, session }) => {
       )}
     </>
   );
-};
-
-/* ----- GROUP FUNCTIONS ----- */
-
-// External expenses
-export const getIntermediateConsumptionsAggregatesGroups = (financialData) => {
-  let expensesGroups = financialData.getIntermediateConsumptionsAggregates();
-  return expensesGroups;
-};
-
-// Depreciation expenses
-export const getFixedCapitalConsumptionsAggregatesGroups = (financialData) => {
-  let expensesGroups = financialData.getFixedCapitalConsumptionsAggregates();
-  return expensesGroups;
 };

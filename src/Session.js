@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-const currentVersion = "1.0.6";
+const currentVersion = "2.0.0";
 
 // Libraries
 import metaIndics from "../lib/indics.json";
@@ -14,16 +14,15 @@ import { ImpactsData } from "/src/ImpactsData.js";
 import { Indicator } from "/src/footprintObjects/Indicator";
 
 // Formulas
-import { buildIndicatorAggregate } from "./formulas/footprintFormulas";
 import {
-  updateAggregatesFootprints,
+  updateMainAggregatesFootprints,
   updateProductionItemsFootprints,
-  updateOutputFlowsFootprints,
-  updateAccountsFootprints,
-  updateFinalStatesFootprints,
+  updateIntermediateConsumptionsFootprints,
+  updateFixedCapitalConsumptionsFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
 import { ComparativeData } from "./ComparativeData";
+import { getDatesEndMonths, getLastDateOfMonth, getPrevDate } from "./utils/Utils";
 
 /* ---------- OBJECT SESSION ---------- */
 
@@ -31,29 +30,82 @@ export class Session {
   constructor(props) {
     if (props == undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
+
     // Version
     this.version = currentVersion;
-    
+
     // Session
     this.progression = props.progression || 0;
 
     // Year
-    this.year = props.year || "";
+    this.year = props.year || ""; // obsolete
+    this.availablePeriods = props.availablePeriods || [];
+    this.availablePeriods.forEach((period) => {
+      period.regex = buildRegexFinancialPeriod(
+        period.dateStart,
+        period.dateEnd
+      );
+    });
+
+    this.financialPeriod = props.financialPeriod || {};
+    this.financialPeriod.regex = props.financialPeriod
+      ? buildRegexFinancialPeriod(
+          props.financialPeriod.dateStart,
+          props.financialPeriod.dateEnd
+        )
+      : {};
 
     // Data
     this.legalUnit = new LegalUnit(props.legalUnit);
     this.financialData = new FinancialData(props.financialData);
-    this.impactsData = new ImpactsData(props.impactsData);
+    this.impactsData = {};
+    this.availablePeriods.forEach((period) => {
+      this.impactsData[period.periodKey] = new ImpactsData(
+        props.impactsData[period.periodKey]
+      );
+    });
 
     // Validations
-    this.validations = props.validations || [];
-    this.comparativeData =  new ComparativeData(props.comparativeData);
-    this.updateFootprints();
+    this.validations = {};
+    this.availablePeriods.forEach((period) => {
+      this.validations[period.periodKey] = props.validations[period.periodKey];
+    });
+
+    // comparative data
+    this.comparativeData = new ComparativeData(props.comparativeData);
 
     // Indicators list
-    this.indics = props.indics || Object.keys(metaIndics)
-
+    this.indics = {};
+    this.availablePeriods.forEach((period) => {
+      this.indics[period.periodKey] = props.indics[period.periodKey] || [];
+    });
+  
   }
+
+  addPeriods = (periods) => {
+    let newPeriods = periods.filter(
+      (period) => !this.availablePeriods.includes(period)
+    );
+    this.availablePeriods.push(...newPeriods);
+    newPeriods.forEach((period) => {
+      this.impactsData[period.periodKey] = new ImpactsData();
+      this.validations[period.periodKey] = [];
+      this.indics[period.periodKey] = Object.keys(metaIndics);
+    });
+  };
+
+  loadSessionFromBackup = (prevSession) => {
+    // add previous periods
+    this.addPeriods(prevSession.availablePeriods);
+
+    // add previous validated indicators
+    this.validations[prevSession.financialPeriod.periodKey] =
+      prevSession.validations[prevSession.financialPeriod.periodKey];
+
+    // add previsous impact data
+    this.impactsData[prevSession.financialPeriod.periodKey] =
+      prevSession.impactsData[prevSession.financialPeriod.periodKey];
+  };
 
   /* -------------------- PROGRESSION -------------------- */
 
@@ -66,34 +118,21 @@ export class Session {
     else if (
       this.financialData.immobilisations
         .concat(this.financialData.stocks)
-        .filter(
-          (account) =>
-            account.initialState == "defaultData" && !account.dataFetched
-        ).length > 0
+        .some(
+          (asset) =>
+            asset.initialStateType == "defaultData" && !asset.dataFetched
+        )
     )
       return 3;
     // if data for comppanies not fetched
     else if (
-      this.financialData.companies.filter((company) => company.status != 200)
-        .length > 0
+      this.financialData.providers.some(
+        (provider) => provider.footprintStatus != 200
+      )
     )
       return 4;
     // else
     else return 5;
-  };
-
-  /* -------------------- VALIDATIONS -------------------- */
-
-  checkValidations = async () => {
-    Object.keys(metaIndics).forEach((indic) => {
-      let nextIndicator = this.getNetValueAddedIndicator(indic);
-      if (
-        nextIndicator !==
-        this.financialData.aggregates.netValueAdded.footprint.indicators[indic]
-      ) {
-        this.validations = this.validations.filter((item) => item != indic);
-      }
-    });
   };
 
   /* ---------------------------------------- FOOTPRINTS PROCESS ---------------------------------------- */
@@ -102,49 +141,50 @@ export class Session {
   // ... and allows to have all the values directly in the json back up file
 
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
-  async updateFootprints() {
-    await Promise.all(
-      Object.keys(metaIndics).map((indic) => this.updateIndicator(indic))
-    );
-    return;
-  }
-
- 
-  // Update indicator
-  async updateIndicator(indic) {
+  updateFootprints = async (period) => {
     // Net Value Added
-    this.updateNetValueAddedFootprint(indic);
+    await this.updateNetValueAddedFootprint(period);
 
-    // Output flows : expenses / investments
-    await updateOutputFlowsFootprints(indic, this.financialData);
+    // Intermediate Consumptions
+    await updateIntermediateConsumptionsFootprints(this.financialData, period);
 
-    // Accounts
-    await updateAccountsFootprints(indic, this.financialData);
+    // Intermediate Consumptions
+    await updateFixedCapitalConsumptionsFootprints(this.financialData, period);
 
-    // Aggregates
-    await updateAggregatesFootprints(indic, this.financialData);
+    // Main Aggregates
+    await this.updateMainAggregatesFootprints(period);
 
     // Production items
-    await updateProductionItemsFootprints(indic, this.financialData);
+    await this.updateProductionItemsFootprints(period);
 
-    // Immobilisations & Stocks
-    await updateFinalStatesFootprints(indic, this.financialData);
-
+    console.log(this.financialData);
     return;
-  }
+  };
 
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
-  updateNetValueAddedFootprint = (indic) => {
-    this.financialData.aggregates.netValueAdded.footprint.indicators[indic] =
-      this.validations.indexOf(indic) >= 0
-        ? this.getNetValueAddedIndicator(indic)
+  updateNetValueAddedFootprint = async (period) => {
+    await Promise.all(
+      Object.keys(metaIndics).map((indic) =>
+        this.updateNetValueAddedIndicator(indic, period.periodKey)
+      )
+    );
+  };
+
+  updateNetValueAddedIndicator = (indic, periodKey) => {
+    this.financialData.mainAggregates.netValueAdded.periodsData[
+      periodKey
+    ].footprint.indicators[indic] =
+      this.validations[periodKey].indexOf(indic) >= 0
+        ? this.getNetValueAddedIndicator(indic, periodKey)
         : new Indicator({ indic });
   };
 
-  getNetValueAddedIndicator = (indic) => {
-    const netValueAdded = this.financialData.getNetValueAdded();
-    const impactsData = this.impactsData;
+  getNetValueAddedIndicator = (indic, periodKey) => {
+    const netValueAdded =
+      this.financialData.mainAggregates.netValueAdded.periodsData[periodKey]
+        .amount;
+    const impactsData = this.impactsData[periodKey];
 
     impactsData.setNetValueAdded(netValueAdded);
 
@@ -153,23 +193,54 @@ export class Session {
     } else return new Indicator({ indic: indic });
   };
 
-  /* -------------------- ACCOUNTS FOOTPRINTS -------------------- */
-
-  getExpensesAccountIndicator(accountPurchases, indic) {
-    return buildIndicatorAggregate(
-      indic,
-      this.financialData.expenses.filter((expense) =>
-        expense.account.startsWith(accountPurchases)
+  updateMainAggregatesFootprints = async (period) => {
+    await Promise.all(
+      Object.keys(metaIndics).map(
+        async (indic) =>
+          await updateMainAggregatesFootprints(
+            indic,
+            this.financialData,
+            period
+          )
       )
     );
-  }
+  };
 
-  getDepreciationsAccountIndicator(account, indic) {
-    return buildIndicatorAggregate(
-      indic,
-      this.financialData.depreciationExpenses.filter((expense) =>
-        expense.account.startsWith(account)
+  updateProductionItemsFootprints = async (period) => {
+    await Promise.all(
+      Object.keys(metaIndics).map(
+        async (indic) =>
+          await updateProductionItemsFootprints(
+            indic,
+            this.financialData,
+            period
+          )
       )
     );
-  }
+  };
 }
+
+export const buildRegexFinancialPeriod = (dateStart, dateEnd) => 
+{ // REVIEW
+  let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
+  let months = datesEndMonths.map((date) => date.substring(0, 6));
+
+  let datesLastMonth = [];
+  if (dateEnd!=getLastDateOfMonth(dateEnd)) {
+    let lastMonth = dateEnd.substring(0,6);
+    let prevDate = dateEnd;
+    while (prevDate.startsWith(lastMonth)) {
+      datesLastMonth.push(prevDate);
+      prevDate = getPrevDate(prevDate);
+    }
+  };
+
+  let regexString = "^(" + months.concat(datesLastMonth).join("|") + ")";
+  return new RegExp(regexString);
+};
+
+export const getListMonthsFinancialPeriod = (dateStart, dateEnd) => {
+  let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
+  let months = datesEndMonths.map((date) => date.substring(0, 6));
+  return months;
+};

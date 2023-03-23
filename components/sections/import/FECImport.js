@@ -7,7 +7,8 @@ import { Table } from "react-bootstrap";
 
 /* ---------- FEC IMPORT  ---------- */
 
-export class FECImport extends React.Component {
+export class FECImport extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
@@ -85,7 +86,7 @@ export class FECImport extends React.Component {
             </button>
             <button
               className="btn btn-secondary"
-              onClick={() => this.props.onClick()}
+              onClick={this.onSubmit}
             >
               Etape suivante
               <i className="bi bi-chevron-right"></i>
@@ -98,7 +99,8 @@ export class FECImport extends React.Component {
 
   /* ----- EDIT ----- */
 
-  changeJournalANouveaux = (event) => {
+  changeJournalANouveaux = (event) => 
+  {
     let meta = this.state.meta;
     let selectedCode = event.target.value;
     let prevSelectedCode = Object.entries(meta.books)
@@ -113,4 +115,11 @@ export class FECImport extends React.Component {
     );
     this.setState({ meta: meta, noBook: selectedCode == prevSelectedCode });
   };
+
+  onSubmit = () =>
+  {
+    console.log("Sélection du journal des A-Nouveaux : ");
+    console.log(this.state.meta.books);
+    this.props.onClick();
+  }
 }

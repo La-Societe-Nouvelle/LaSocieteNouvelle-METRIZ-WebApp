@@ -10,27 +10,29 @@ import { createIndicReport } from "./indicReportPDF";
 import { createIntensIndicatorPDF } from "./intensIndicPDF";
 
 export async function generateCompleteFile(
-  year,
   legalUnit,
   validations,
   financialData,
   impactsData,
   comparativeData,
-  onDownloadComplete
+  onDownloadComplete,
+  period
 ) {
+  const year = period.periodKey.slice(2);
+
   const documentTitle =
     "Empreinte-Societale_" + legalUnit.replaceAll(" ", "") + "_" + year;
-
-  const coverPage = createCoverPage(year, legalUnit.corporateName);
+    
+  const coverPage = createCoverPage(year, legalUnit);
   const basicPDFpromises = [];
   const reportPDFpromises = [];
+
 
   validations.forEach((indic) => {
     let type = metaIndics[indic].type;
 
     basicPDFpromises.push(
       createIndicReport(
-        year,
         legalUnit,
         indic,
         metaIndics[indic].libelle,
@@ -38,7 +40,8 @@ export async function generateCompleteFile(
         financialData,
         impactsData,
         comparativeData,
-        false
+        false,
+        period
       )
     );
 
@@ -47,26 +50,26 @@ export async function generateCompleteFile(
         reportPDFpromises.push(
           createContribIndicatorPDF(
             metaIndics[indic].libelle,
-            year,
             legalUnit,
             indic,
             financialData,
             comparativeData,
-            false
+            false,
+            period
           )
         );
         break;
       case "intensité":
         reportPDFpromises.push(
           createIntensIndicatorPDF(
-            year,
             legalUnit,
             indic,
             metaIndics[indic].libelle,
             metaIndics[indic].unit,
             financialData,
             comparativeData,
-            false
+            false,
+            period
           )
         );
         break;
@@ -75,13 +78,13 @@ export async function generateCompleteFile(
           createIndiceIndicatorPDF(
             metaIndics[indic].libelle,
             metaIndics[indic].libelleGrandeur,
-            year,
             legalUnit,
             indic,
             metaIndics[indic].unit,
             financialData,
             comparativeData,
-            false
+            false,
+            period
           )
         );
       default:

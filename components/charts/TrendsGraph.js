@@ -4,37 +4,47 @@ import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Line } from "react-chartjs-2";
-import 'chartjs-adapter-moment';
+import "chartjs-adapter-moment";
 
 function TrendsGraph(props) {
-
-  const [data, setData] = useState({ datasets: [] });
+  const [chartData, setChartData] = useState({ datasets: [] });
   const [options, setOptions] = useState({});
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    
-    const trendsData = props.trends.data.map((data) =>
-      data.flag == 'e'
-      ? { x: new Date(data.year), y: data.value }
-      : { x: new Date(data.year), y: null }
+    const { trends, target, period, current, prevPeriod, prev, unit } = props;
+
+    const trendsDataForecast = [];
+
+    for (const data of trends.data) {
+      if (data.flag === "f") {
+        trendsDataForecast.push({ x: new Date(data.year), y: data.value });
+      } else {
+        trendsDataForecast.push({ x: new Date(data.year), y: null });
+      }
+    }
+
+    const firstForecastData = trendsDataForecast.find(
+      (element) => element.y != null
     );
+    let firstForecastYear = firstForecastData.x.getFullYear();
 
-    let lastNonNull = trendsData.findLast((element) => element.y != null);
-    let lastYear = lastNonNull.x.getFullYear();
+    const trendsData = [];
+    for (const data of trends.data) {
+      if (data.flag === "e" || data.year == firstForecastYear) {
+        trendsData.push({ x: new Date(data.year), y: data.value });
+      } else {
+        trendsData.push({ x: new Date(data.year), y: null });
+      }
+    }
 
-    const trendsDataForecast = props.trends.data.map((data) =>
-      data.flag == 'f' || data.year == lastYear
-      ? { x: new Date(data.year), y: data.value }
-      : { x: new Date(data.year), y: null }
-    );
-
-    const targetData = props.target.data.map((data) => ({
+    const targetData = target.data.map((data) => ({
       x: data.year,
       y: data.value,
     }));
 
-    const data = {
+    // Ajouter une entrée pour 2020 dans trendsDataForecast
+    const chartData = {
       datasets: [
         {
           label: "Historique - Branche",
@@ -54,9 +64,9 @@ function TrendsGraph(props) {
           order: 3,
         },
         {
-          type: "bubble",
           label: "Situation",
-          data: [{ x: "2021", y: props.current, r: 5 }],
+          type: "bubble",
+          data: [{ x: period.periodKey.slice(2), y: current, r: 5 }],
           backgroundColor: "rgb(250,89,95)",
           borderColor: "rgb(250,89,95)",
           borderWidth: 4,
@@ -64,9 +74,29 @@ function TrendsGraph(props) {
         },
       ],
     };
+    if (prevPeriod) {
+      chartData.datasets.push(
+        {
+          type: "bubble",
+          data: [{ x: prevPeriod.periodKey.slice(2), y: prev, r: 5 }],
+          backgroundColor: "rgb(250,89,95)",
+          borderColor: "rgb(250,89,95)",
+          borderWidth: 4,
+        },
+        {
+          data: [
+            { x: prevPeriod.periodKey.slice(2), y: prev, r: 5 },
+            { x: period.periodKey.slice(2), y: current, r: 5 },
+          ],
+          type: "line",
+          borderColor: "rgb(250,89,95)",
+          fill: false,
+        }
+      );
+    }
 
     if (targetData.length > 1) {
-      data.datasets.push({
+      chartData.datasets.push({
         label: "Objectif - Branche",
         data: targetData,
         skipNull: true,
@@ -76,25 +106,24 @@ function TrendsGraph(props) {
         order: 4,
       });
     }
-    
-    
-    let suggestedMax;
-    if (props.unit == "%") {
-      let max = Math.max(...props.trends.data.map((o) => o.value));
 
-      if(max < 10) {
+    let suggestedMax;
+    if (unit == "%") {
+      let max = Math.max(...trends.data.map((o) => o.value));
+
+      if (max < 10) {
         suggestedMax = 10;
       }
-     
+
       switch (true) {
         case max < 10:
-           suggestedMax = 10;
+          suggestedMax = 10;
           break;
         case max > 10 && max < 25:
-           suggestedMax = 25;
+          suggestedMax = 25;
           break;
         case max > 25 && max < 50:
-           suggestedMax = 50;
+          suggestedMax = 50;
           break;
         default:
           suggestedMax = 100;
@@ -112,14 +141,14 @@ function TrendsGraph(props) {
       scales: {
         y: {
           display: true,
-          min: 0, 
+          min: 0,
           suggestedMax: suggestedMax,
-  
+
           ticks: {
             color: "#191558",
             font: {
               size: 10,
-              family : 'Roboto'
+              family: "Roboto",
             },
           },
           grid: {
@@ -137,26 +166,26 @@ function TrendsGraph(props) {
           grid: {
             color: "#ececff",
           },
-          type: 'time',
+          type: "time",
           time: {
-               time: {
-                    unit: 'year'
-                }
-          }
+            time: {
+              unit: "year",
+            },
+          },
         },
       },
       plugins: {
         legend: {
           display: true,
           position: "right",
- 
+
           labels: {
             usePointStyle: true,
             color: "#191558",
-            padding: 20 ,
+            padding: 20,
             font: {
               size: 12,
-              family : 'Roboto'
+              family: "Roboto",
             },
             generateLabels: function (chart) {
               const dataset = chart.data.datasets;
@@ -170,11 +199,14 @@ function TrendsGraph(props) {
                   order: data.order,
                   pointStyle: "line",
                   strokeStyle: data.borderColor,
-                  text: data.label,
+                  text:
+                    data.label === undefined || data.label === ""
+                      ? null
+                      : data.label,
                 }))
+                .filter((label) => label.text !== null)
                 .sort((a, b) => a.order - b.order);
             },
-
           },
 
           onClick(click, legendItem, legend) {
@@ -194,35 +226,34 @@ function TrendsGraph(props) {
           labels: {
             display: false,
           },
-          
         },
         title: {
           display: true,
           padding: {
             top: 10,
-            bottom: 20
-        },
-          align : "start",
-          text: props.unit,
+            bottom: 20,
+          },
+          align: "start",
+          text: unit,
           color: "#191558",
-          font : {
+          font: {
             size: 12,
-          }
+          },
         },
         tooltip: {
-          backgroundColor: 'rgba(25,21,88,0.9)',
+          backgroundColor: "rgba(25,21,88,0.9)",
           padding: 15,
           cornerRadius: 3,
           usePointStyle: true,
           callbacks: {
-            title: function(tooltipItems, data) {
-              let date = new Date(tooltipItems[0].label); 
+            title: function (tooltipItems, data) {
+              let date = new Date(tooltipItems[0].label);
               let year = date.getFullYear();
               //Return value for title
               return year;
-          },
+            },
             label: function (context) {
-              let label = " " + context.parsed.y + " " + props.unit;
+              let label = " " + context.parsed.y + " " + unit;
               return label;
             },
           },
@@ -230,12 +261,14 @@ function TrendsGraph(props) {
       },
     };
 
-    setData(data);
+    setChartData(chartData);
     setOptions(options);
     setIsLoading(false);
-  }, [props]);
+  }, [props.id]);
 
-  return !isLoading && <Line data={data} id={props.id} options={options} />;
+  return (
+    !isLoading && <Line data={chartData} id={props.id} options={options} />
+  );
 }
 
 export default TrendsGraph;

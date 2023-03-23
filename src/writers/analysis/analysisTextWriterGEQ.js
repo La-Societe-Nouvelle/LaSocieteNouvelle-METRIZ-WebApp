@@ -2,9 +2,10 @@
 
 import { printValue } from "../../utils/Utils";
 
-export const analysisTextWriterGEQ = (session) => {
-  const { impactsData, financialData } = session;
-  const { aggregates } = financialData;
+export const analysisTextWriterGEQ = (props) => {
+  const { impactsData, financialData, period } = props;
+  const { mainAggregates, productionAggregates } = financialData;
+  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
 
   // array of paragraphs
   let analysis = [];
@@ -24,7 +25,7 @@ export const analysisTextWriterGEQ = (session) => {
 
   currentParagraph.push(
     "L'écart de rémunération associé à la valeur produite est de " +
-      printValue(aggregates.production.footprint.indicators.geq.getValue(), 0) +
+      printValue(mainAggregates.production.periodsData[period.periodKey].footprint.indicators.geq.getValue(), 0) +
       " %."
   );
 
@@ -60,7 +61,7 @@ export const analysisTextWriterGEQ = (session) => {
   currentParagraph.push(
     "L'écart de rémunération Femmes/Hommes moyen associé des consommations intermédiaires est de " +
       printValue(
-        aggregates.intermediateConsumption.footprint.indicators.geq.getValue(),
+        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.geq.getValue(),
         0
       ) +
       " %."
@@ -79,7 +80,7 @@ export const analysisTextWriterGEQ = (session) => {
   currentParagraph.push(
     "L'écart de rémunération Femmes/Hommes moyen associé à l'amortissement des immobilisations est de " +
       printValue(
-        aggregates.capitalConsumption.footprint.indicators.geq.getValue(),
+        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.geq.getValue(),
         0
       ) +
       " %."

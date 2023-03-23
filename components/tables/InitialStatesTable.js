@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Select from "react-select";
 
 // Utils
@@ -11,9 +11,24 @@ import { printValue } from '/src/utils/Utils';
 import divisions from '/lib/divisions'; 
 import branches from '/lib/branches'; 
 import { Table } from 'react-bootstrap';
+import { getPrevDate } from '../../src/utils/Utils';
 
 /* ---------- INITIAL STATES TABLE ---------- */
 
+const branchesOptions = Object.entries(branches)
+  .sort((a, b) => a[0].localeCompare(b[0]))
+  .map(([value, label]) => {return({ value: value, label: value + " - " + label })});
+
+const divisionsOptions = Object.entries(divisions)
+  .sort((a,b) => parseInt(a)-parseInt(b))
+  .map(([value, label]) => {return({ value: value, label: value + " - " + label })});
+
+const initialStateTypeOptions = {
+  "none": {value: "none", label:"---"},
+  "prevFootprint": {value:"prevFootprint", label: "Reprise sur exercice précédent"},
+  "currentFootprint": {value:"currentFootprint", label: "Estimée sur exerice courant"},
+  "defaultData": {value:"defaultData", label:"Valeurs par défaut"}
+}
 export class InitialStatesTable extends React.Component {
   
   constructor(props) {
@@ -29,15 +44,18 @@ export class InitialStatesTable extends React.Component {
 
   render()
   {
+
     const {immobilisations,stocks} = this.props.financialData;
+    const prevStateDateEnd = getPrevDate(this.props.financialPeriod.dateStart);
+
     const {columnSorted,nbItems,page} = this.state;
 
     const accounts = immobilisations.concat(stocks);  // merge array
-    accounts.forEach(account => buildHasInputs(account,this.props.financialData));
-    this.sortItems(accounts,columnSorted);
+    accounts.forEach(account => buildHasInputs(account,this.props.financialData)); // to know if fpt can be based on current financial period
 
-    this.sortItems(immobilisations,columnSorted);
-    this.sortItems(stocks,columnSorted);
+    this.sortItems(accounts,columnSorted);
+    //this.sortItems(immobilisations,columnSorted);
+    //this.sortItems(stocks,columnSorted);
 
     const nbAccounts = accounts.length;
     
@@ -53,12 +71,13 @@ export class InitialStatesTable extends React.Component {
               </tr>
           </thead>
           <tbody>
-            {accounts.slice(page*nbItems,(page+1)*nbItems)
-                     .map((account) => 
-              <Row key={account.account} 
-                   {...account}
-                   onInitialStateUpdate={this.updateAccount.bind(this)}
-                   syncData={this.synchroniseAccount.bind(this)}/>)}
+          {accounts.slice(page*nbItems,(page+1)*nbItems)
+                    .map((account) => 
+            <Row key={account.accountNum} 
+                 account={account}
+                 prevStateDateEnd={prevStateDateEnd}
+                 onInitialStateUpdate={this.updateAccount.bind(this)}
+                 syncData={this.synchroniseAccount.bind(this)}/>)}
           </tbody>
         </Table>
 
@@ -109,7 +128,7 @@ export class InitialStatesTable extends React.Component {
     switch(columSorted) 
     {
       case "label": items.sort((a,b) => a.label.localeCompare(b.label)); break;
-      case "account": items.sort((a,b) => a.account.localeCompare(b.account)); break;
+      case "account": items.sort((a,b) => a.accountNum.localeCompare(b.accountNum)); break;
       case "amount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
     }
     if (this.state.reverseSort) items.reverse();
@@ -125,9 +144,9 @@ export class InitialStatesTable extends React.Component {
   updateAccount = (nextProps) =>
   {
     // Immobilisation
-    if (/^2/.test(nextProps.account)) this.props.financialData.updateImmobilisation(nextProps);
+    if (/^2/.test(nextProps.accountNum)) this.props.financialData.updateImmobilisation(nextProps);
     // Stock
-    else if (/^3/.test(nextProps.account)) this.props.financialData.updateStock(nextProps);
+    else if (/^3/.test(nextProps.accountNum)) this.props.financialData.updateStock(nextProps);
     
     this.props.onUpdate();
   }
@@ -138,12 +157,10 @@ export class InitialStatesTable extends React.Component {
 
 const buildHasInputs = (account,financialData) =>
 {
-  if (/^3/.test(account.account)) {
-    account.hasInputs = financialData.expenses.filter(expense => expense.account == account.accountAux).length > 0;
-    account.hasOutputs = financialData.stockVariations.filter(stockVariation => stockVariation.accountAux == account.account).length > 0;
-  } else if (/^2/.test(account.account)) {
-    account.hasInputs = financialData.investments.filter(investment => investment.account == account.account).length > 0;
-    account.hasOutputs = financialData.depreciations.filter(depreciation => depreciation.accountAux == account.account).length > 0;
+  if (/^3/.test(account.accountNum)) {
+    account.hasInputs = financialData.externalExpenses.some(expense => account.purchasesAccounts.includes(expense.accountNum));
+  } else if (/^2/.test(account.accountNum)) {
+    account.hasInputs = financialData.investments.some(investment => investment.accountNum == account.accountNum);
   }
 }
 
@@ -151,7 +168,7 @@ const buildHasInputs = (account,financialData) =>
 
 const Row = (props) => 
 {
-  switch(props.account.charAt(0))
+  switch(props.account.accountNum.charAt(0))
   {
     case "2": return <RowTableImmobilisations {...props}/>
     case "3": return <RowTableStocks {...props}/>
@@ -162,128 +179,109 @@ const Row = (props) =>
 
 function RowTableImmobilisations(props) 
 {
-  const {id,account,accountLib,prevAmount,initialState,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs,isDepreciableImmobilisation} = props;
-  const activityCode = /^[0-9]{2}/.test(prevFootprintActivityCode) ? prevFootprintActivityCode.substring(0,2) : prevFootprintActivityCode;
+  const immobilisation = props.account;
+  const {accountNum,accountLib,initialFootprintParams,isAmortisable} = immobilisation;
 
+  const [initialStateType, setInitialStateType] = useState(immobilisation.initialStateType);
+  const [initialStateSet, setInitialStateSet] = useState(immobilisation.initialStateSet);
 
-  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, account: account, prevFootprintActivityCode: event.value})
-  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, account: account, initialState: event.value})
+  const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "TOTAL");
 
+  useEffect(() => {
+  
+    setInitialStateSet(immobilisation.initialStateSet);
+    setInitialStateType(immobilisation.initialStateType);
+   
+  }, [props]);
 
-    const branchesOptions = [];
-    const initialStateOptions = [];
-    const defaultValueInitialState = {};
-
-  Object.entries(branches)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([value, label]) => (
-      branchesOptions.push({ value: value, label: value + " - " + label })
-    ))
-
-  const getDefaultValue = (initialState) => {
-    
-    switch (initialState) {
-      case "none":
-        defaultValueInitialState = {value:"none", label: "---"};
-        break;
-        case "prevFootprint":
-          defaultValueInitialState ={value:"prevFootprint", label: "Reprise sur exercice précédent"}
-        break;
-        case "currentFootprint":
-          defaultValueInitialState = {value:"currentFootprint", label: "Estimée sur exercice courant"}
-        break;
-      default:
-        defaultValueInitialState = {value:"defaultData", label:"Valeurs par défaut"};
-        break;
-    }
-
-    return defaultValueInitialState;
-  }
-  const getInitialStateOption = (initialState ,hasInputs) => {
-
-    switch (initialState) {
-      case "none":
-        initialStateOptions.push({value:"none", label: "---"})
-        break;
-        case "prevFootprint":
-          initialStateOptions.push({value:"prevFootprint", label: "Reprise sur exercice précédent"})
-        break;
-      default:
-        break;
-    }
-    
-    if(hasInputs) {
-      initialStateOptions.push({value:"currentFootprint", label: "Estimée sur exercice courant"})
-    }
-
-    initialStateOptions.push({value:"defaultData", label:"Valeurs par défaut"})
-
-    return initialStateOptions;
+  const onActivityCodeChange = (event) => {
+    immobilisation.initialFootprintParams.code = event.value;
+    immobilisation.initialStateSet = false;
+    setActivityCode(immobilisation.initialFootprintParams.code);
   }
 
-  if (isDepreciableImmobilisation && hasOutputs) {
+  const onInitialStateTypeChange = (event) => {
+    immobilisation.initialStateType = event.value;
+    immobilisation.initialStateSet = false;
+    if (immobilisation.initialStateType=="defaultData") {
+      immobilisation.initialFootprintParams = {
+        code: "TOTAL",
+        area: "FRA",
+        aggregate: "TRESS"
+      }
+    } else {
+      immobilisation.initialFootprintParams = {}
+    }
+    setInitialStateType(immobilisation.initialStateType);
+  }
+
+  const getInitialStateOptions = () => 
+  {
+    switch (initialStateType) {
+      case "none": return ([initialStateTypeOptions["none"], initialStateTypeOptions["defaultData"]]);                    // options -> none, defaultData
+      case "defaultData": return ([initialStateTypeOptions["defaultData"]]);                                              // options -> defaultData
+      case "prevFootprint": return ([initialStateTypeOptions["prevFootprint"], initialStateTypeOptions["defaultData"]]);  // options -> prevFootprint, defaultData
+    }
+  }
+
+  if (isAmortisable) {
     return (
       <tr>
-        <td >{account}</td>
+        <td >{accountNum}</td>
         <td>
           {accountLib.charAt(0).toUpperCase() +
-            accountLib.slice(1).toLowerCase()}
+           accountLib.slice(1).toLowerCase()}
         </td>
-        <td colSpan={initialState == "defaultData" ? 1 : 2}>
+        <td colSpan={initialStateType == "defaultData" ? 1 : 2}>
+          <Select
+              value={initialStateTypeOptions[initialStateType]}
+              placeholder={"Choisissez..."}
+              className={
+                initialStateType == "prevFootprint" ||
+                initialStateType == "currentFootprint" ||
+                initialStateSet
+                  ? "success"
+                  : ""
+              }
+              options={getInitialStateOptions()}
+              onChange={onInitialStateTypeChange}
 
-        <Select
-            defaultValue={getDefaultValue(initialState)}
-            placeholder={"Choisissez..."}
-            className={
-              initialState == "prevFootprint" ||
-              initialState == "currentFootprint" ||
-              dataFetched
-                ? "success"
-                : ""
-            }
-            options={getInitialStateOption(initialState, hasInputs)}
-            onChange={onOriginStateChange}
-
-          />
-          
+            />
         </td>
-        {initialState == "defaultData" && (
-          <td className={dataFetched === true ? " success" : ""}>
-
-        <Select
-            defaultValue={{
-              label: activityCode + " - " + branches[activityCode],
-              value: activityCode,
-            }}
-            placeholder={"Choisissez une branche"}
-            className={dataFetched ? " success" : ""}
-            options={branchesOptions}
-            onChange={onActivityCodeChange}
-          
-          />
-
-        
-          </td>
+        {initialStateType == "defaultData" && (
+        <td className={initialStateSet === true ? " success" : ""}>
+          <Select
+              defaultValue={{
+                label: activityCode + " - " + branches[activityCode],
+                value: activityCode,
+              }}
+              placeholder={"Choisissez une branche"}
+              className={initialStateSet ? " success" : ""}
+              options={branchesOptions}
+              onChange={onActivityCodeChange}
+            
+            />
+        </td>
         )}
-        <td className="text-end">{printValue(prevAmount, 0)} &euro;</td>
+        <td className="text-end">{printValue(immobilisation.states[props.prevStateDateEnd].amount, 0)} &euro;</td>
   
       </tr>
     );
   } 
-  else if (isDepreciableImmobilisation) {
+  else if (isAmortisable) {
     return (<tr>
-              <td>{account}</td>
+              <td>{accountNum}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non amortie sur l'exercice</td>
-              <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
+              <td className="text-end">{printValue(immobilisation.states[props.prevStateDateEnd].amount,0)} &euro;</td>
         
             </tr>)
   } else {
     return (<tr>
-              <td >{account}</td>
+              <td >{accountNum}</td>
               <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
               <td colSpan="2">&nbsp;&nbsp;Immobilisation non prise en compte (non amortissable)</td>
-              <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
+              <td className="text-end">{printValue(immobilisation.states[props.prevStateDateEnd].amount,0)} &euro;</td>
         
             </tr>)
   }
@@ -293,99 +291,85 @@ function RowTableImmobilisations(props)
 
 function RowTableStocks(props)
 {
-  const {id,prevAmount,account,accountLib,accountAux,initialState,isProductionStock,prevFootprintActivityCode,dataFetched,hasInputs,hasOutputs} = props;
-  const activityCode = prevFootprintActivityCode.substring(0,2);
+  const stock = props.account;
+  const {accountNum,accountLib,isProductionStock,initialFootprintParams,hasInputs} = stock;
 
-  const onActivityCodeChange = (event) => props.onInitialStateUpdate({id: id, account: account, prevFootprintActivityCode: event.value})
-  const onOriginStateChange = (event) => props.onInitialStateUpdate({id: id, account: account, initialState: event.value})
+  const [initialStateType, setInitialStateType] = useState(stock.initialStateType);
+  const [initialStateSet, setInitialStateSet] = useState(stock.initialStateSet);
+  const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "00");
 
-  const initialStateOptions = [];
-  const defaultValueInitialState = {};
-  const divisionsOptions = [];
+  useEffect(() => {
+    setInitialStateSet(stock.initialStateSet);
+    setInitialStateType(stock.initialStateType);
+  }, [props]);
 
-  const getDefaultValue = (initialState) => {
-    
-    switch (initialState) {
-      case "none":
-        defaultValueInitialState = {value:"none", label: "---"};
-        break;
-        case "prevFootprint":
-          defaultValueInitialState ={value:"prevFootprint", label: "Reprise sur exercice précédent"}
-        break;
-        case "currentFootprint":
-          defaultValueInitialState = {value:"currentFootprint", label: "Estimée sur exerice courant"}
-        break;
-      default:
-        defaultValueInitialState = {value:"defaultData", label:"Valeurs par défaut"};
-        break;
-    }
 
-    return defaultValueInitialState;
+  const onActivityCodeChange = (event) => {
+    stock.initialFootprintParams.code = event.value;
+    stock.initialStateSet = false;
+    setActivityCode(stock.initialFootprintParams.code);
   }
-  const getInitialStateOption = (initialState ,hasInputs) => {
 
-    switch (initialState) {
-      case "none":
-        initialStateOptions.push({value:"none", label: "---"})
-        break;
-        case "prevFootprint":
-          initialStateOptions.push({value:"prevFootprint", label: "Reprise sur exercice précédent"})
-        break;
-      default:
-        break;
+  const onInitialStateTypeChange = (event) => {
+    stock.initialStateType = event.value;
+    stock.initialStateSet = false;
+    if (stock.initialStateType=="defaultData") {
+      stock.initialFootprintParams = {
+        area: "FRA",
+        code: "00",
+        aggregate: "TRESS"
+      }
+    } else {
+      stock.initialFootprintParams = {}
     }
-    
-    if(hasInputs) {
-      initialStateOptions.push({value:"currentFootprint", label: "Estimée sur exerice courant"})
-    }
+    setInitialStateType(stock.initialStateType);
+  }
 
-    initialStateOptions.push({value:"defaultData", label:"Valeurs par défaut"})
-
+  const getInitialStateOptions = () => {
+    let initialStateOptions = [];
+    if (initialStateType=="none") initialStateOptions.push(initialStateTypeOptions["none"]);
+    if (initialStateType=="prevFootprint") initialStateOptions.push(initialStateTypeOptions["prevFootprint"]);
+    if (stock.hasInputs) initialStateOptions.push(initialStateTypeOptions["currentFootprint"]);
+    initialStateOptions.push(initialStateTypeOptions["defaultData"]);
     return initialStateOptions;
   }
 
-  Object.entries(divisions).sort((a,b) => parseInt(a)-parseInt(b)).map(([value, label]) => (
-    divisionsOptions.push({ value: value, label: value + " - " + label })
-  ))
-
   return (
     <tr>
-      <td >{account}</td>
+      <td >{accountNum}</td>
       <td>{accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}</td>
       {!isProductionStock &&
-        <td colSpan={initialState=="defaultData" ? 1 : 2}>
-            <Select
-            defaultValue={getDefaultValue(initialState)}
+        <td colSpan={initialStateType=="defaultData" ? 1 : 2}>
+          <Select
+            value={initialStateTypeOptions[initialStateType]}
             placeholder={"Choisissez..."}
             className={
-              initialState == "prevFootprint" ||
-              initialState == "currentFootprint" ||
-              dataFetched
+              initialStateType == "prevFootprint" ||
+              initialStateType == "currentFootprint" ||
+              initialStateSet
                 ? "success"
                 : ""
             }
-            options={getInitialStateOption(initialState, hasInputs)}
-            onChange={onOriginStateChange}
+            options={getInitialStateOptions()}
+            onChange={onInitialStateTypeChange}
 
           />
-
-          </td>}
+        </td>}
         {isProductionStock &&
           <td colSpan="2">
               <Select
               placeholder={"Choisissez..."}
               defaultValue={{label:"Estimée sur exercice courant", value:"none"}}
               className={
-                initialState == "currentFootprint" 
+                initialStateType == "currentFootprint" 
                   ? "success"
                   : ""
               }
               options={[{label:"Estimée sur exercice courant", value:"none"}]}
-
             />
           </td>}
-      {initialState=="defaultData" &&
-          <td className={dataFetched === true ? "success" : ""}>
+      {initialStateType=="defaultData" &&
+          <td className={initialStateSet === true ? "success" : ""}>
 
       <Select
             defaultValue={{
@@ -393,15 +377,13 @@ function RowTableStocks(props)
               value: activityCode,
             }}
             placeholder={"Choisissez une division"}
-            className={dataFetched ? "success" : ""}
+            className={initialStateSet ? "success" : ""}
             options={divisionsOptions}
             onChange={onActivityCodeChange}
           
-          />
-
-          
+          />          
           </td>}
-      <td className="text-end">{printValue(prevAmount,0)} &euro;</td>
+      <td className="text-end">{printValue(stock.states[props.prevStateDateEnd].amount,0)} &euro;</td>
 
     </tr>
   )

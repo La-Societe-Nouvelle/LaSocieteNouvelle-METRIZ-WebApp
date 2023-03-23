@@ -1,532 +1,672 @@
 // La Société Nouvelle
 
 // Accounting Objects
-import { Expense } from '/src/accountingObjects/Expense';
-import { Immobilisation } from '/src/accountingObjects/Immobilisation';
-import { Depreciation } from '/src/accountingObjects/Depreciation'
-import { Stock } from '/src/accountingObjects/Stock';
-import { Account, buildAggregateFromArray } from './accountingObjects/Account';
+import { Expense } from "/src/accountingObjects/Expense";
+import { Immobilisation } from "/src/accountingObjects/Immobilisation";
+import { Stock } from "/src/accountingObjects/Stock";
+import { Account } from "./accountingObjects/Account";
+import {
+  Aggregate,
+  buildAggregateFromAccounts,
+  buildAggregateFromItems,
+  mergeAggregatePeriodsData,
+} from "./accountingObjects/Aggregate";
 
 // Other objects
-import { SocialFootprint } from '/src/footprintObjects/SocialFootprint'
-import { Company } from '/src/Company';
-import { getAmountItems, getPrevAmountItems, getSumItems } from './utils/Utils';
-import { Aggregate } from './accountingObjects/Aggregate';
+import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-// Scripts
-import { aggregatesBuilder } from './formulas/aggregatesBuilder';
+// Utils
+import { getAmountItems, mergePeriodsData, roundValue } from "./utils/Utils";
 
 // Libraries
-import accountsMatching from '/lib/accountsMatching'
+import accountsMatching from "/lib/accountsMatching";
+import { StockVariation } from "./accountingObjects/StockVariation";
+import { AmortisationExpense } from "./accountingObjects/AmortisationExpense";
+import { immobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
+import { Provider } from "./Provider";
 
-// list aggregates
-const metaAggregates = ["revenue",
-                        "production",
-                        "storedProduction",
-                        "intermediateConsumption",
-                        "purchasesStocksVariations",
-                        "externalExpenses",
-                        "grossValueAdded",
-                        "depreciationExpenses",
-                        "capitalConsumption",
-                        "netValueAdded"];
+export const otherFinancialDataItems = [
+  "otherOperatingIncomes", // #74, #75, #781, #791
+  "financialIncomes", // #76, #786, #796
+  "exceptionalIncomes", // #77, #787, #797
+  "taxes", // #63
+  "personnelExpenses", // #64
+  "otherExpenses", // #65
+  "financialExpenses", // #66 & #686
+  "exceptionalExpenses", // #67 & #687 except #6871
+  "provisions", // #681 except #6811
+  "taxOnProfits", // #69
+];
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */
 
 export class FinancialData {
+  constructor(data) {
+    // if no data (new session)
+    if (data == undefined) {
+      this.isFinancialDataLoaded = false;
+    } else {
+      // ---------------------------------------------------------------------------------------------------- //
 
-    constructor(data) 
-    {
+      // data loaded state
+      this.metaAccounts = data.accounts;
+      this.isFinancialDataLoaded = data.isFinancialDataLoaded; // to follow progression
+
+      // Production items ------------------------ //
+
+      this.productionAggregates = {
+        revenue: new Aggregate(data.productionAggregates.revenue), // revenue (#71)
+        storedProduction: new Aggregate(
+          data.productionAggregates.storedProduction
+        ), // stored production (#71)
+        immobilisedProduction: new Aggregate(
+          data.productionAggregates.immobilisedProduction
+        ), // immobilised production (#72)
+      };
+
+      // External expenses ----------------------- //
+
+      this.externalExpenses = data.externalExpenses.map(
+        (props) => new Expense({ ...props })
+      ); // external expenses (#60[^3], #61, #62)
+
+      // Stocks ---------------------------------- //
+
+      this.stocks = Object.values(data.stocks).map(
+        (props) => new Stock({ ...props })
+      ); // stocks (#31 to #35, #37) / Depreciation (#29)
+      this.stockVariations = data.stockVariations.map(
+        (props) => new StockVariation({ ...props })
+      ); // stock variation (#603, #71)
+
+      // Immobilisations ------------------------- //
+
+      this.immobilisations = Object.values(data.immobilisations).map(
+        (props) => new Immobilisation({ ...props })
+      ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+      this.amortisationExpenses = data.amortisationExpenses.map(
+        (props) => new AmortisationExpense({ ...props })
+      ); // amortisation expenses (#6811, #6871)
+      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map(
+        (props) => new AmortisationExpense({ ...props })
+      ); // amortisation expenses (#6811, #6871)
+      this.investments = data.investments.map(
+        (props) => new Expense({ ...props })
+      ); // investments (flows #2 <- #404)
+      this.immobilisedProductions = data.immobilisedProductions.map(
+        (props) => new immobilisedProduction({ ...props })
+      ); // productions of immobilisations (flows #2 <- #72)
+
+      // Expenses accounts ----------------------- //
+
+      this.externalExpensesAccounts = data.externalExpensesAccounts.map(
+        (props) => new Account({ ...props })
+      );
+      this.stockVariationsAccounts = data.stockVariationsAccounts.map(
+        (props) => new Account({ ...props })
+      );
+      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map(
+        (props) => new Account({ ...props })
+      );
+
+      // Providers ------------------------------- //
+
+      this.providers = data.providers.map(
+        (props) => new Provider({ ...props })
+      );
+
+      // Aggregates ------------------------------ //
+
+      this.mainAggregates = {
+        production: new Aggregate(data.mainAggregates.production),
+        intermediateConsumptions: new Aggregate(
+          data.mainAggregates.intermediateConsumptions
+        ),
+        fixedCapitalConsumptions: new Aggregate(
+          data.mainAggregates.fixedCapitalConsumptions
+        ),
+        netValueAdded: new Aggregate(data.mainAggregates.netValueAdded),
+      };
+
+      // Other figures --------------------------- //
+
+      this.otherFinancialData = data.otherFinancialData || {};
+
+      // ---------------------------------------------------------------------------------------------------- //
+    }
+  }
+
+  /* -------------------------------------------------------------------------------------------------------------------- */
+  /* ---------------------------------------- BUILD FINANCIAL DATA FROM FEC DATA ---------------------------------------- */
+  /* -------------------------------------------------------------------------------------------------------------------- */
+
+  loadFECData = async (FECData, financialPeriod, periods) => {
     // ---------------------------------------------------------------------------------------------------- //
-        
-        if (data==undefined) data = {};
-        
-        // Print
-        // console.log(data);
 
-        // data loaded state
-        this.isFinancialDataLoaded = data.isFinancialDataLoaded || false;   
-        
-        // Production ------------------------------ //
+    // Meta ------------------------------------ //
 
-        this.revenue = data.revenue || 0;                                                                                                                               // revenue (#71)
-        this.storedProduction = data.storedProduction || 0;                                                                                                             // stored production (#71)
-        this.immobilisedProduction = data.immobilisedProduction || 0;                                                                                                   // immobilised production (#72)
+    this.metaAccounts = FECData.accounts || {};
 
-        // Expenses -------------------------------- //
+    // Production items ------------------------ //
 
-        this.expenses = data.expenses ? data.expenses.map((props,index) => new Expense({id: index, ...props})) : [];                                                    // external expenses (#60[^3], #61, #62)
-        this.stockVariations = data.stockVariations ? data.stockVariations.map((props,index) => new Expense({id: index, ...props})) : [];                               // stock variation (#603, #71)
-        this.depreciationExpenses = data.depreciationExpenses ? data.depreciationExpenses.map((props,index) => new Expense({id: index, ...props})) : [];                // depreciation expenses (#6811, #6871)
-        
-        this.expenseAccounts = data.expenseAccounts ? data.expenseAccounts.map((props) => new Account({...props})) : this.expensesAccountsBuilder();
-        
-        // Stocks ---------------------------------- //
-        
-        this.stocks = data.stocks ? data.stocks.map((props,index) => new Stock({id: index, ...props})) : [];                                                            // stocks (#31 to #35, #37)
-        
-        // Immobilisations ------------------------- //
+    await this.buildProductionAggregates(FECData, periods);
 
-        this.investments = data.investments ? data.investments.map((props,index) => new Expense({id: index, ...props})) : [];                                           // investments (flows #2 <- #404)
-        this.immobilisationProductions = data.immobilisationProductions ? data.immobilisationProductions.map((props,index) => new Expense({id: index, ...props})) : []; // productions of immobilisations (flows #2 <- #72)
-        
-        this.immobilisations = data.immobilisations ? data.immobilisations.map((props,index) => new Immobilisation({id: index, ...props})) : [];                        // immobilisations (#20 to #27)
-        this.depreciations = data.depreciations ? data.depreciations.map((props,index) => new Depreciation({id: index, ...props})) : [];                                // depreciations (#28, #29 & #39)
+    // External expenses ----------------------- //
 
-        // Other figures --------------------------- //
+    this.externalExpenses = FECData.externalExpenses.map(
+      (props) => new Expense({ ...props })
+    ); // external expenses (#60[^3], #61, #62)
 
-        this.financialIncomes = data.financialIncomes || 0;
-        this.exceptionalIncomes = data.exceptionalIncomes || 0;
-        this.otherOperatingIncomes = data.otherOperatingIncomes || 0;                                                                                                   //
-        this.taxes = data.taxes || 0;                                                                                                                                   // #63
-        this.personnelExpenses = data.personnelExpenses || 0;                                                                                                           // #64
-        this.otherExpenses = data.otherExpenses || 0;                                                                                                                   // #65
-        this.financialExpenses = data.financialExpenses || 0;                                                                                                           // #66
-        this.exceptionalExpenses = data.exceptionalExpenses || 0;                                                                                                       // #67 hors #6871
-        this.provisions = data.provisions || 0;                                                                                                                         // #68 hors #6811
-        this.taxOnProfits = data.taxOnProfits || 0;                                                                                                                     // #69
+    // Stocks ---------------------------------- //
 
-        // Companies
-        this.companies = data.companies ? data.companies.map((props,id) => new Company({id: id, ...props})) : [];
+    this.stocks = Object.values(FECData.stocks).map(
+      (props) => new Stock({ ...props })
+    ); // stocks (#31 to #35, #37) / Depreciation (#29)
+    this.stockVariations = FECData.stockVariations.map(
+      (props) => new StockVariation({ ...props })
+    ); // stock variation (#603, #71)
 
-        // Aggregates
-        this.aggregates = {};
-        data.aggregates ? Object.entries(data.aggregates).forEach(([aggregateId,aggregateProps]) => this.aggregates[aggregateId] = new Aggregate(aggregateProps)) : aggregatesBuilder(this);
-        
+    for (let stock of this.stocks) {
+      await stock.buildStates(financialPeriod);
+    }
+
+    // Immobilisations ------------------------- //
+
+    this.immobilisations = Object.values(FECData.immobilisations).map(
+      (props) => new Immobilisation({ ...props })
+    ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+    this.amortisationExpenses = FECData.amortisationExpenses.map(
+      (props) => new AmortisationExpense({ ...props })
+    ); // amortisation expenses (#6811, #6871)
+    this.investments = FECData.investments.map(
+      (props) => new Expense({ ...props })
+    ); // investments (flows #2 <- #404)
+    this.immobilisedProductions = FECData.immobilisedProductions.map(
+      (props) => new immobilisedProduction({ ...props })
+    ); // productions of immobilisations (flows #2 <- #72)
+
+    this.adjustedAmortisationExpenses = [];
+    for (let immobilisation of this.immobilisations) {
+      let immobilisationAmortisationExpenses = this.amortisationExpenses.filter(
+        (expense) =>
+          expense.amortisationAccountNum ==
+          immobilisation.amortisationAccountNum
+      );
+      await immobilisation.buildStates(
+        financialPeriod,
+        immobilisationAmortisationExpenses
+      );
+      await immobilisation.divideAdjustedAmortisationExpenses();
+      let immobilisationAdjustedAmortisationExpenses =
+        await immobilisation.getAdjustedAmortisationExpenses();
+      this.adjustedAmortisationExpenses.push(
+        ...immobilisationAdjustedAmortisationExpenses
+      );
+    }
+
+    // Expenses accounts ----------------------- //
+
+    await this.buildExpensesAccounts(periods);
+
+    // Providers ------------------------------- //
+
+    await this.buildProviders(periods);
+
+    // Other figures --------------------------- //
+
+    await this.buildOtherFinancialData(FECData, periods);
+
+    // Main Aggregates ------------------------- //
+
+    await this.buildMainAggregates(periods);
+
+    // Initial states -------------------------- //
+
+    await this.initInitialStates();
+
     // ---------------------------------------------------------------------------------------------------- //
-    }
+    this.isFinancialDataLoaded = true;
+  };
 
-    /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
+  /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
 
-    expensesAccountsBuilder = () =>
-    {
-        return this.expenses.concat(this.depreciationExpenses)
-                            .concat(this.stockVariations.filter(variation => /^6/.test(variation.account)))
-                            .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                            .map(expense => new Account({accountNum: expense.account, accountLib: expense.accountLib, amount: this.getAmountExpenseByAccount(expense.account)}));
-    }
+  buildProductionAggregates = async (FECData, periods) => {
+    this.productionAggregates = {};
+    // revenue (#70)
+    this.productionAggregates.revenue = buildAggregateFromItems({
+      id: "revenue",
+      label: "Production vendue",
+      items: FECData.revenue,
+      periods,
+    });
+    // stored production (#71)
+    this.productionAggregates.storedProduction = buildAggregateFromItems({
+      id: "storedProduction",
+      label: "Production stockée",
+      items: FECData.storedProduction,
+      periods,
+    });
+    // immobilised production (#72)
+    this.productionAggregates.immobilisedProduction = buildAggregateFromItems({
+      id: "immobilisedProduction",
+      label: "Production immobilisée",
+      items: FECData.immobilisedProduction,
+      periods,
+    });
+  };
 
-    getAmountExpenseByAccount = (accountNum) => getAmountItems(this.expenses.concat(this.depreciationExpenses)
-                                                                            .concat(this.stockVariations)
-                                                                            .filter(expense => expense.account == accountNum))
+  buildExpensesAccounts = async (periods) => {
+    // external expenses
+    this.externalExpensesAccounts = this.externalExpenses
+      .map((expense) => expense.accountNum)
+      .filter(
+        (value, index, self) =>
+          index === self.findIndex((item) => item == value)
+      )
+      .map(
+        (accountNum) =>
+          new Account({
+            accountNum,
+            accountLib: this.metaAccounts[accountNum].accountLib,
+          })
+      );
+    this.externalExpensesAccounts.forEach((account) =>
+      account.buildPeriods(
+        this.externalExpenses.filter(
+          (expense) => expense.accountNum == account.accountNum
+        ),
+        periods
+      )
+    );
 
-    /* ---------------------------------------- COMPANIES INITIALIZER ---------------------------------------- */
+    // purchases stock variations
+    this.stockVariationsAccounts = this.stocks
+      .filter((stock) => !stock.isProductionStock)
+      .filter(
+        (value, index, self) =>
+          index === self.findIndex((item) => item.accountNum == value.accountNum)
+      )
+      .map(
+        (stock) =>
+          new Account({
+            accountNum: "60" + stock.accountNum,
+            accountLib: "Variation stock " + stock.accountLib,
+          })
+      );
+    this.stockVariationsAccounts.forEach((account) =>
+      account.buildPeriods(
+        this.stockVariations.filter(
+          (variation) => variation.stockAccountNum == account.accountNum
+        ),
+        periods
+      )
+    );
 
-    companiesInitializer = () =>
-    {
-        this.companies = this.expenses.concat(this.investments)
-                                      .map(expense => {return({account: expense.accountAux, accountLib: expense.accountAuxLib, isDefaultAccount: expense.isDefaultAccountAux})})
-                                      .filter((value, index, self) => index === self.findIndex(item => item.account === value.account))
-                                      .map(({account,accountLib,isDefaultAccount},id) => new Company({id, account, isDefaultAccount, corporateName: accountLib, amount: this.getAmountExpenseByAccountAux(account)}));
-    }
-
-    getAmountExpenseByAccountAux = (accountNum) => getAmountItems(this.expenses.concat(this.investments)
-                                                                               .filter(expense => expense.accountAux == accountNum))
-
-    /* ---------------------------------------- INITIAL STATES INITIALIZER ---------------------------------------- */
-
-    initialStatesInitializer = () =>
-    {
-        // Immobilisations
-        this.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
-                            .filter(immobilisation => (this.depreciations.filter(depreciation => depreciation.accountAux==immobilisation.account).length > 0))
-                            .forEach(immobilisation => {immobilisation.initialState = (this.investments.filter(investment => investment.account == immobilisation.account).length > 0) ? "currentFootprint" : "defaultData";});
-        
-        // Stocks (purchases)
-        this.stocks.filter(stock => !stock.isProductionStock)
-                   .forEach(stock => {stock.initialState = (this.expenses.filter(expense => expense.account.startsWith("60"+stock.account.charAt(1))).length > 0) ? "currentFootprint" : "defaultData";});
-        
-        // Stocks (production)
-        this.stocks.filter(stock => stock.isProductionStock)
-                   .forEach(stock => stock.initialState = "currentFootprint");
-
-        // match accounts
-        this.immobilisations.filter(immobilisation => immobilisation.isDepreciableImmobilisation)
-                            .filter(immobilisation => immobilisation.initialState == "defaultData")
-                            .forEach(immobilisation => 
-        {
-            accountsMatching.branche.forEach(matching => 
-            {
-                let regex = new RegExp(matching.accountRegex);
-                if (regex.test(immobilisation.account)) {
-                    immobilisation.prevFootprintActivityCode = matching.branche;
-                }
-            })
-        });
-    }
-
-    /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
-
-    async loadInitialStates(data) 
-    {        
-        // Print
-        // console.log(data);
-
-        // Available accounts
-        let prevAccountsData = data.financialData.stocks.concat(data.financialData.immobilisations).concat(data.financialData.depreciations);
-
-        // Stocks accounts
-        this.stocks.concat(this.immobilisations).concat(this.depreciations)
-                   .forEach((stock) => 
-        {
-            let prevAccount = prevAccountsData.filter(item => item.account == stock.account)[0];
-            if (prevAccount!=undefined)
-            {
-                stock.prevFootprint = new SocialFootprint(prevAccount.footprint);
-                stock.initialState = "prevFootprint";
-            }
-            else if (stock.prevAmount > 0)
-            {
-                console.log("New account with previous amount not null");
-            }
-            else
-            {
-                stock.prevFootprint = new SocialFootprint();
-                stock.initialState = "none";
-            }
+    // amortisation expenses
+    this.amortisationExpensesAccounts = this.adjustedAmortisationExpenses
+      .filter(
+        (value, index, self) =>
+          index === self.findIndex((item) => item.accountNum == value.accountNum)
+      )
+      .map(
+      (expense) =>
+        new Account({
+          accountNum: expense.accountNum,
+          accountLib: expense.accountLib,
         })
+    );
+    this.amortisationExpensesAccounts.forEach((account) =>
+      account.buildPeriods(
+        this.adjustedAmortisationExpenses.filter(
+          (expense) => expense.accountNum == account.accountNum
+        ),
+        periods
+      )
+    );
+  };
 
-        // Expense accounts
-        this.expenseAccounts.forEach(account =>
-        {
-            let prevProps = data.financialData.expenseAccounts.filter(prevAccount => prevAccount.accountNum = account.accountNum)[0];
-            if (prevProps!=undefined)
-            {
-                account.prevFootprint = new SocialFootprint(prevProps.footprint);
-                account.initialState = "prevFootprint";
-            }
-        })
-    }
-    
-    /* ---------------------------------------- AMOUNTS GETTERS ---------------------------------------- */
-    
+  buildMainAggregates = async (periods) => {
+    this.mainAggregates = {};
+
     // MAIN AGGREGATES ----------------------------------------- //
 
-    // Principaux agrégats
-    getProduction = () => this.getRevenue() + this.getStoredProduction() + this.getImmobilisedProduction()
-    getAmountIntermediateConsumption = () => this.getAmountExternalExpenses() - this.getVariationPurchasesStocks()
-    getGrossValueAdded = () => this.getProduction() - this.getAmountIntermediateConsumption()
-    getNetValueAdded = () => this.getGrossValueAdded() - this.getAmountDepreciationExpenses()
+    // Production
+    let production = new Aggregate({
+      id: "production",
+      label: "Production",
+    });
+    periods.forEach(
+      ({ periodKey }) =>
+        (production.periodsData[periodKey] = {
+          periodKey,
+          amount: roundValue(
+            this.productionAggregates.revenue.periodsData[periodKey].amount +
+              this.productionAggregates.storedProduction.periodsData[periodKey]
+                .amount +
+              this.productionAggregates.immobilisedProduction.periodsData[
+                periodKey
+              ].amount,
+            2
+          ),
+          footprint: new SocialFootprint(),
+        })
+    );
+    this.mainAggregates.production = production;
 
-    // PRODUCTION ---------------------------------------------- //
+    // Intermediate consumptions
+    let intermediateConsumptions = buildAggregateFromAccounts({
+      id: "intermediateConsumptions",
+      label: "Consommations intermédiaires",
+      accounts: this.externalExpensesAccounts.concat(
+        this.stockVariationsAccounts
+      ),
+      periods,
+    });
+    this.mainAggregates.intermediateConsumptions = intermediateConsumptions;
 
-    getRevenue = () => this.revenue
-    getStoredProduction = () => this.storedProduction
-    getImmobilisedProduction = () => this.immobilisedProduction
+    // Fixed capital consumptions
+    let fixedCapitalConsumptions = buildAggregateFromAccounts({
+      id: "fixedCapitalConsumptions",
+      label: "Consommations de capital fixe",
+      accounts: this.amortisationExpensesAccounts,
+      periods,
+    });
+    this.mainAggregates.fixedCapitalConsumptions = fixedCapitalConsumptions;
 
-    // EXPENSES ------------------------------------------------ //
+    // Net value added
+    let netValueAdded = new Aggregate({
+      id: "netValueAdded",
+      label: "Valeur ajoutée nette",
+    });
+    periods.forEach(
+      ({ periodKey }) =>
+        (netValueAdded.periodsData[periodKey] = {
+          periodKey,
+          amount: roundValue(
+            production.periodsData[periodKey].amount -
+              intermediateConsumptions.periodsData[periodKey].amount -
+              fixedCapitalConsumptions.periodsData[periodKey].amount,
+            2
+          ),
+          footprint: new SocialFootprint(),
+        })
+    );
+    this.mainAggregates.netValueAdded = netValueAdded;
 
-    // External penses
-    getAmountExternalExpenses = () => getSumItems(this.expenses.map(expense => expense.amount), 2)
-    
-    // Depreciation expenses
-    getAmountDepreciationExpenses = () => getSumItems(this.depreciationExpenses.map(expense => expense.amount), 2)
+    // --------------------------------------------------------- //
+  };
 
-    // STOCKS -------------------------------------------------- //
-    
-    // Purchases stocks
-    getVariationPurchasesStocks = () => this.getFinalAmountPurchasesStocks() - this.getInitialAmountPurchasesStocks()
-    getInitialAmountPurchasesStocks = () => getPrevAmountItems(this.stocks.filter(stock => !stock.isProductionStock), 2)
-    getFinalAmountPurchasesStocks = () => getAmountItems(this.stocks.filter(stock => !stock.isProductionStock), 2)
-    
-    // Net amount
-    getInitialNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.prevAmount - this.getInitialValueLossStock(stock.account)), 2)
-    getFinalNetAmountStocks = () => getSumItems(this.stocks.map(stock => stock.amount - this.getFinalValueLossStock(stock.account)), 2)
+  buildOtherFinancialData = async (FECData, periods) => {
+    this.otherFinancialData = {};
 
-    // Value loss
-    getInitialValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount)[0] || 0;
-    getFinalValueLossStock = (accountNum) => this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.amount)[0] || 0;
+    otherFinancialDataItems.forEach((itemLib) => {
+      let financialDataItem = {
+        id: itemLib,
+        label: itemLib,
+        periodsData: {},
+      };
+      periods.forEach((period) => {
+        financialDataItem.periodsData[period.periodKey] = {
+          periodKey: period.periodKey,
+          amount: getAmountItems(
+            FECData[itemLib].filter((entry) => period.regex.test(entry.date))
+          ),
+        };
+      });
+      this.otherFinancialData[itemLib] = financialDataItem;
+    });
+  };
 
+  /* ---------------------------------------- PROVIDERS INITIALIZER ---------------------------------------- */
 
-    // IMMOBILISATIONS ----------------------------------------- //
-        
-    // Value loss
-    getInitialValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux == accountNum).map(depreciation => depreciation.prevAmount), 2)
-    getFinalValueLossImmobilisation = (accountNum) => getSumItems(this.depreciations.filter(depreciation => depreciation.accountAux==accountNum).map(depreciation => depreciation.amount), 2)
+  // call when load financial data (import)
+  buildProviders = async (periods) => {
+    this.providers = this.externalExpenses
+      .concat(this.investments)
+      .map((expense) => {
+        return {
+          providerNum: expense.providerNum,
+          providerLib: expense.providerLib,
+          isDefaultProviderAccount: expense.isDefaultProviderAccount,
+        };
+      })
+      .filter(
+        (value, index, self) =>
+          index ===
+          self.findIndex((item) => item.providerNum === value.providerNum)
+      )
+      .map((providerData, id) => new Provider({ id, ...providerData }));
+    this.providers.forEach((provider) =>
+      provider.buildPeriods(
+        this.externalExpenses.filter(
+          (expense) => expense.providerNum == provider.providerNum
+        ),
+        this.investments.filter(
+          (expense) => expense.providerNum == provider.providerNum
+        ),
+        periods
+      )
+    );
+  };
 
-    // OTHER KEY FIGURES --------------------------------------- //
+  /* ---------------------------------------- INITIAL STATES INITIALIZER ---------------------------------------- */
 
-    // Operating section
+  initInitialStates = async () => {
+    // Immobilisations -> default data for all amortisable immobilisation
+    this.immobilisations
+      .filter((immobilisation) => immobilisation.isAmortisable)
+      .forEach((immobilisation) => {
+        immobilisation.initialStateType = "defaultData";
+        let matchingActivity = accountsMatching.branche.filter(
+          ({ accountRegex }) =>
+            new RegExp(accountRegex).test(immobilisation.accountNum)
+        )[0];
+        immobilisation.initialFootprintParams = {
+          area: "FRA",
+          code: matchingActivity ? matchingActivity.branche : "TOTAL",
+          aggregate: "TRESS",
+        };
+      });
 
-    getAmountOperatingIncomes = () => this.getProduction()+this.getAmountOtherOperatingIncomes();
-    getAmountOtherOperatingIncomes = () => this.otherOperatingIncomes;
+    // Stocks (purchases) -> current footprint if at least one expense related to the stock account
+    this.stocks
+      .filter((stock) => !stock.isProductionStock)
+      .forEach((stock) => {
+        stock.initialStateType = this.externalExpenses.some((expense) =>
+          stock.purchasesAccounts.includes(expense.accountNum)
+        )
+          ? "currentFootprint"
+          : "defaultData";
+        stock.initialFootprintParams =
+          stock.initialStateType == "defaultData"
+            ? {
+                area: "FRA",
+                code: "00",
+                aggregate: "TRESS",
+              }
+            : {};
+      });
 
-    getAmountTaxes = () => this.taxes;
-    getAmountPersonnelExpenses = () => this.personnelExpenses;
-    getAmountOtherExpenses = () => this.otherExpenses;
-    getAmountOperatingExpenses = () => this.getAmountIntermediateConsumption()+this.getAmountTaxes()+this.getAmountPersonnelExpenses()+this.getAmountDepreciationExpenses()+this.getAmountProvisions()+this.getAmountOtherExpenses()
+    // Stocks (production) -> current footprint for all
+    this.stocks
+      .filter((stock) => stock.isProductionStock)
+      .forEach((stock) => (stock.initialStateType = "currentFootprint"));
+  };
 
-    getOperatingResult = () => this.getAmountOperatingIncomes() - this.getAmountOperatingExpenses();
+  /* ------------------------- Load BackUp Data ------------------------- */
 
-    // Financial section
-    
-    getAmountFinancialIncomes = () => this.financialIncomes;
-    getAmountFinancialExpenses = () => this.financialExpenses;
-    getFinancialResult = () => this.getAmountFinancialIncomes() - this.getAmountFinancialExpenses();
-    
-    // Exceptionnal section
-    
-    getAmountExceptionalIncomes = () => this.exceptionalIncomes;
-    getAmountExceptionalExpenses = () => this.exceptionalExpenses;
-    getExceptionalResult = () => this.getAmountExceptionalIncomes() - this.getAmountExceptionalExpenses();
-    
-    // Profit
+  loadFinancialDataFromBackUp = async (prevFinancialData) => {
+    // Merge with previous exepenses
+    this.adjustedAmortisationExpenses =
+      this.adjustedAmortisationExpenses.concat(
+        prevFinancialData.adjustedAmortisationExpenses
+      );
+    this.amortisationExpenses = this.amortisationExpenses.concat(
+      prevFinancialData.amortisationExpenses
+    );
 
-    getAmountProvisions = () => this.provisions;
-    getAmountTaxOnProfits = () => this.taxOnProfits;
-    getProfit = () => this.getOperatingResult()+this.getFinancialResult()+this.getExceptionalResult()-this.getAmountTaxOnProfits();
+    // Add previous periods in expenses accounts
+    this.amortisationExpensesAccounts = mergePeriodsAccounts(
+      this.amortisationExpensesAccounts,
+      prevFinancialData.amortisationExpensesAccounts
+    );
 
-    /* ---------------------------------------- INTERACTIONS ---------------------------------------- */
+    // Merge with previous external expenses
+    this.externalExpenses = this.externalExpenses.concat(
+      prevFinancialData.externalExpenses
+    );
 
-    /* ---------- Stocks ---------- */
+    // Add previous periods in expenses accounts
+    this.externalExpensesAccounts = mergePeriodsAccounts(
+      this.externalExpensesAccounts,
+      prevFinancialData.externalExpensesAccounts
+    );
 
-    getStock = (id) => this.stocks.filter(stock => stock.id==id)[0]
-    getStockByAccount = (account) => this.stocks.filter(stock => stock.account==account)[0]
-    updateStock = (nextProps) => this.getStock(nextProps.id).update(nextProps)    
-      
-    /* ---------- Expenses ---------- */
+    // Add previous initial state for immobilisations
 
-    getExpense = (id) => this.expenses.filter(expense => expense.id==id)[0]
+    for (let prevImmobilisation of prevFinancialData.immobilisations) {
+      const existingImmo = this.immobilisations.find(
+        (immobilisation) =>
+          immobilisation.accountNum === prevImmobilisation.accountNum
+      );
 
-    /* ---------- Depreciations ---------- */
-    
-    getDepreciationExpense = (id) => this.depreciationExpenses.filter(expense => expense.getId()==id)[0]
-    getDepreciationExpenseByAccountAux = (accountNum) => this.depreciationExpenses.filter(expense => expense.accountAux==accountNum)[0]    
-
-    /* ---------- Immobilisations ---------- */
-
-    getImmobilisation = (id) => this.immobilisations.filter(immobilisation => immobilisation.id==id)[0]
-    getImmobilisationByAccount = (accountNum) => this.immobilisations.filter(immobilisation => immobilisation.account==accountNum)[0]
-    updateImmobilisation = (nextProps) => this.getImmobilisation(nextProps.id).update(nextProps)
-
-    /* ---------- Depreciations ---------- */
-    
-    getDepreciation = (id) => this.depreciations.filter(depreciation => depreciation.id==id)[0]
-    getDepreciationByAccount = (accountNum) => this.depreciations.filter(depreciation => depreciation.account==accountNum)[0]
-        
-    /* ---------- Companies ---------- */
-
-    getCompany = (id) => this.companies.filter(company => company.id==id)[0]
-    getCompanyByAccount = (accountNum) => this.companies.filter(company => company.account == accountNum)[0]
-    getCompanyByName = (name) => this.companies.filter(company => company.corporateName==name)[0]
-
-    updateCorporateId = (account,corporateName,corporateId) => 
-    {
-        let company ;
-
-        if(account){
-           company = this.getCompanyByAccount(account);
-        }
-        else {          
-            company = this.getCompanyByName(corporateName);
-        }
-
-        if (company!=undefined) company.update({id: company.id,corporateId});
+      if (existingImmo) {
+        await existingImmo.loadInitialStateFromBackUp(prevImmobilisation);
+      } else {
+        const newImmo = new Immobilisation(prevImmobilisation);
+        this.immobilisations.push(newImmo);
+      }
     }
 
-    /* ---------------------------------------- Détails - Soldes Intermédiaires de Gestion ---------------------------------------- */
+    // Add previous initial state for stocks
 
-    /** Aggrégats - Consommations intermédiaires :
-     *      607,6097                                Achats de marchandises
-     *      6037                                    Variation des stocks de marchandises
-     *      601,6091,602,6092                       Achats de matières premières et autres approvisionnements
-     *      6031,6032                               Variations de stocks de matières premières et autres approvisionnements
-     *      604,6094,605,6095,606,6096,608,6098     Autres achats
-     *      61,62                                   Autres charges externes
-     * 
-     *  Aggrégats - Consommations de capital fixe :
-     *      68111                                   Dotations aux amortissements sur immobilisations incorporelles
-     *      68112                                   Dotations aux amortissements sur immobilisations corporelles
-     *      6871                                    Dotations aux amortissements exceptionnels des immobilisations
-     */
+    for (let prevStock of prevFinancialData.stocks) {
+      const existingStock = this.stocks.find(
+        (stock) => stock.accountNum === prevStock.accountNum
+      );
 
-     getIntermediateConsumptionsAggregates = () =>
-     {
-        let aggregates = [];
-        let aggregate = {};
-        let items = [];
-
-        // Achats stockés - Matières premières
-        items = this.expenseAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Matières premières",items});
-        aggregates.push(aggregate);
-
-        // Achats stockés - Autres approvisionnements
-        items = this.expenseAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Autres approvisionnements",items});
-        aggregates.push(aggregate);
-        
-        // Achats de marchandises
-        items = this.expenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Marchandises",items});
-        aggregates.push(aggregate);
-
-        // Variation des stocks
-        items = this.expenseAccounts.filter(account => /^603/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks",items});
-        aggregates.push(aggregate);
-
-        // Autres achats
-        items = this.expenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Autres achats",items});
-        aggregates.push(aggregate);
-
-        // Autres charges externes
-        items = this.expenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Autres charges externes",items});
-        aggregates.push(aggregate);      
- 
-         return aggregates;
-     }
-
-     getFixedCapitalConsumptionsAggregates = () =>
-     {
-        let aggregates = [];
-        let aggregate = {};
-        let items = []
-
-        // Dotations aux amortissements sur immobilisations incorporelles
-        items = this.expenseAccounts.filter(account => /^68111/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations incorporelles",items});
-        aggregates.push(aggregate);
-
-        // Dotations aux amortissements sur immobilisations corporelles
-        items = this.expenseAccounts.filter(account => /^68112/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations corporelles",items});
-        aggregates.push(aggregate);
- 
-        // Dotations aux amortissements exceptionnels des immobilisations
-        items = this.expenseAccounts.filter(account => /^6871/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements exceptionnels des immobilisations",items});
-        aggregates.push(aggregate);           
- 
-         return aggregates;
-     }
-
-    /* ---------------------------------------- Details - Charges d'exploitation ---------------------------------------- */
-
-    /** Aggrégats - Charges d'exploitation
-     *      607                                     Achats de marchandises
-     *      6037                                    Variation des stocks de marchandises
-     *      601,6091,602,6092                       Achats de matières premières et autres approvisionnements
-     *      6031,6032                               Variation des stocks de matières premières et autres approvisionnements 
-     *      604,6094,605,6095,606,6096,608,6098     Autres achats
-     *      61,62                                   Autres charges externes
-     *      63                                      Impôts, taxes et versements assimilés
-     *      64                                      Charges sociales
-     *      681                                     Dotations aux amortissements, dépréciations et provisions
-     *      65                                      Autres charges d'exploitation
-     */
-
-    getOperatingExpensesAggregates = () =>
-    {
-        let aggregates = [];
-        let aggregate = {};
-        let items = [];
- 
-        // Achats de marchandises
-        items = this.expenseAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Achats de marchandises",items});
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate);
-
-        // Variation des stocks de marchandises
-        items = this.expenseAccounts.filter(account => /^6037/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de marchandises",items});
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate);
-
-        // Achats de matières premières et autres approvisionnements 
-        items = this.expenseAccounts.filter(account => /^60([1|2]|9[1|2])/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Achats de matières premières et autres approvisionnements",items});
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate);
-
-        // Variation des stocks de matières premières et autres approvisionnements 
-        items = this.expenseAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Variation des stocks de matières premières et autres approvisionnements",items});
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate);
-
-        // Autres achats
-        items = this.expenseAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Autres achats",items});
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate);
-
-        // Autres charges externes
-        items = this.expenseAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
-        aggregate = buildAggregateFromArray({accountLib: "Autres charges externes",items});
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate);
-        
-        // Impôts, taxes et versements assimilés
-        //items = this.expenseAccounts.filter(account => /^63/.test(account.accountNum));
-        aggregate = {accountLib: "Impôts, taxes et versements assimilés", amount: this.getAmountTaxes(), isToBeChecked: false};
-        aggregates.push(aggregate); 
-
-        // Charges sociales
-        //items = this.expenseAccounts.filter(account => /^64/.test(account.accountNum));
-        aggregate = {accountLib: "Charges sociales", amount: this.getAmountPersonnelExpenses(), isToBeChecked: false};
-        aggregates.push(aggregate);
-
-        // Dotations aux amortissements, dépréciations et provisions
-        //items = this.expenseAccounts.filter(account => /^681/.test(account.accountNum));
-        aggregate = {accountLib: "Dotations aux amortissements, dépréciations et provisions", amount: this.getAmountDepreciationExpenses()+this.getAmountProvisions(), isToBeChecked: false};
-        aggregate.isToBeChecked = true;
-        aggregates.push(aggregate); 
-
-        // Autres charges d'exploitation
-        //items = this.expenseAccounts.filter(account => /^65/.test(account.accountNum));
-        aggregate = {accountLib: "Autres charges d'exploitation", amount: this.getAmountOtherExpenses(), isToBeChecked: false};
-        aggregates.push(aggregate); 
-
-        return aggregates;
+      if (existingStock) {
+        await existingStock.loadInitialStateFromBackUp(prevStock);
+      } else {
+        const newStock = new Stock(prevStock);
+        this.stocks.push(newStock);
+      }
     }
 
-    /* ---------------------------------------- Details [OBSOLETE] ---------------------------------------- */
+    // Merge with previous investments
+    this.investments = this.investments.concat(prevFinancialData.investments);
 
-    getExternalExpensesAggregates = () =>
-    {
-        // Achats
-        let purchases = this.expenseAccounts.filter(account => /^60(?!4|94|61|961)/.test(account.accountNum));
-        let purchasesAggregate = buildAggregateFromArray({accountLib: "Achats",items: purchases});
+    // Add previous periods in mainAggregates
+    this.mainAggregates = mergeAggregatePeriodsData(
+      this.mainAggregates,
+      prevFinancialData.mainAggregates
+    );
 
-        // Achats non stockables
-        let nonStorablePurchases = this.expenseAccounts.filter(account => /^60(61|961)/.test(account.accountNum));
-        let nonStorablePurchasesAggregate = buildAggregateFromArray({accountLib: "Fournitures non-stockables",items: nonStorablePurchases});
-        
-        // Services extérieurs
-        let externalServices = this.expenseAccounts.filter(account => /^6(1|04|94)/.test(account.accountNum));
-        let externalServicesAggregate = buildAggregateFromArray({accountLib: "Services extérieurs",items: externalServices});
-        
-        // Autres services extérieurs
-        let otherExternalServices = this.expenseAccounts.filter(account => /^62/.test(account.accountNum));
-        let otherExternalServicesAggregate = buildAggregateFromArray({accountLib: "Autres services extérieurs",items: otherExternalServices});        
+    // Merge with previous metaAccounts
+    this.metaAccounts = mergeAccounts(
+      this.metaAccounts,
+      prevFinancialData.metaAccounts
+    );
 
-        return ([purchasesAggregate,
-                 nonStorablePurchasesAggregate,
-                 externalServicesAggregate,
-                 otherExternalServicesAggregate]);
+    this.otherFinancialData = mergeAggregatePeriodsData(
+      this.otherFinancialData,
+      prevFinancialData.otherFinancialData
+    );
+
+    // Providers
+    for (let prevProvider of prevFinancialData.providers) {
+      let provider = this.providers.find(
+        (provider) => provider.providerNum === prevProvider.providerNum
+      );
+      if (provider) {
+        await provider.loadPrevProvider(prevProvider);
+      } else {
+        const newProvider = new Provider({ ...prevProvider });
+        this.providers.push(newProvider);
+      }
     }
 
-    getBasicDepreciationExpensesAggregates = () =>
-    {
-        // Dotations sur immobilisations incorporelles
-        let intangibleAssetsDepreciationsExpenses = this.expenseAccounts.filter(account => /^68111/.test(account.accountNum));
-        let intangibleAssetsDepreciationsExpensesAggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations incorporelles",items: intangibleAssetsDepreciationsExpenses});
+    // Production aggregates
 
-        // Dotations sur immoblisations corporelles
-        let tangibleAssetsDepreciationsExpenses = this.expenseAccounts.filter(account => /^68112/.test(account.accountNum));
-        let tangibleAssetsDepreciationsExpensesAggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements sur immobilisations corporelles",items: tangibleAssetsDepreciationsExpenses});
-        
-        // Dotations exceptionnelles
-        let exceptionalDepreciationsExpenses = this.expenseAccounts.filter(account => /^6871/.test(account.accountNum));
-        let exceptionalDepreciationsExpensesAggregate = buildAggregateFromArray({accountLib: "Dotations aux amortissements exceptionnels sur immobilisations",items: exceptionalDepreciationsExpenses});
+    this.productionAggregates.revenue = mergePeriodsData(
+      this.productionAggregates.revenue,
+      prevFinancialData.productionAggregates.revenue
+    );
 
-        return ([intangibleAssetsDepreciationsExpensesAggregate,
-                 tangibleAssetsDepreciationsExpensesAggregate,
-                 exceptionalDepreciationsExpensesAggregate]);
-    }
+    this.productionAggregates.immobilisedProduction = mergePeriodsData(
+      this.productionAggregates.immobilisedProduction,
+      prevFinancialData.productionAggregates.immobilisedProduction
+    );
 
+    this.productionAggregates.storedProduction = mergePeriodsData(
+      this.productionAggregates.storedProduction,
+      prevFinancialData.productionAggregates.storedProduction
+    );
+
+    // Stock variations
+    this.stockVariationsAccounts = mergePeriodsAccounts(
+      this.stockVariationsAccounts,
+      prevFinancialData.stockVariationsAccounts
+    );
+
+    this.stockVariations = this.stockVariations.concat(
+      prevFinancialData.stockVariations
+    );
+
+  };
+
+  /* ---------------------------------------- GETTERS ---------------------------------------- */
+
+  getProvider = (providerNum) =>
+    this.providers.filter((provider) => provider.providerNum == providerNum)[0];
 }
+/* ---------------------------------------- UTILS  ---------------------------------------- */
+
+export const mergePeriodsAccounts = (
+  currentExpensesAccounts,
+  previousExpensesAccounts
+) => {
+  const uniqueAccounts = new Set(); // Create a new Set to store unique account num
+  const mergedExpensesAccounts = [];
+
+  // Merged expenses accounts
+  const exepensesAccounts = currentExpensesAccounts.concat(
+    previousExpensesAccounts
+  );
+
+  exepensesAccounts.forEach((account) => {
+    // Check if the accountNum has not been added to the Set yet
+    if (!uniqueAccounts.has(account.accountNum)) {
+      uniqueAccounts.add(account.accountNum);
+      mergedExpensesAccounts.push(account);
+    } else {
+      // If the accountNum has already been added to the Set, merge the periodsData
+      const index = mergedExpensesAccounts.findIndex(
+        (item) => item.accountNum === account.accountNum
+      );
+      Object.assign(
+        mergedExpensesAccounts[index].periodsData,
+        account.periodsData
+      );
+    }
+  });
+  return mergedExpensesAccounts;
+};
+
+export const mergeAccounts = (current, previous) => {
+  // Create a new object to hold the merged metadata, starting with the previous metadata.
+  const mergedAccounts = Object.assign({}, previous);
+
+  for (const accNum in current) {
+    // If the current account number is not in the merged metadata, add it.
+    if (!(accNum in mergedAccounts)) {
+      mergedAccounts[accNum] = current[accNum];
+    } else {
+      // Merge the current and previous metadata for that account number.
+      const mergeddata = Object.assign({}, previous[accNum], current[accNum]);
+      mergedAccounts[accNum] = mergeddata;
+    }
+  }
+
+  return mergedAccounts;
+};

@@ -16,10 +16,8 @@ import { ComparativeData } from "../ComparativeData";
 import getSerieData from "/src/services/responses/SerieData";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import { Company } from "../Company";
-
-
-const prevIndics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
+import { Provider } from "../Provider";
+import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -27,26 +25,36 @@ const prevIndics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg",
 
 export const updateVersion = async (sessionData) => {
   switch (sessionData.version) {
+    case "2.0.0":
+      break;
+    case "1.0.6":
+      await updater_2_0_0(sessionData);
+      break;
     case "1.0.5":
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.4":
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.3":
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.2":
       updater_1_0_2(sessionData);
-      updater_1_0_5(sessionData);
       await updater_1_0_4(sessionData);
+      await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.1":
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     case "1.0.0":
       updater_1_0_0(sessionData);
@@ -54,10 +62,12 @@ export const updateVersion = async (sessionData) => {
       updater_1_0_2(sessionData);
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
+      await updater_2_0_0(sessionData);
       break;
     default:
       break;
   }
+  console.log(sessionData);
 };
 
 const updater_1_0_5 = async (sessionData) => {
@@ -124,7 +134,7 @@ const updater_1_0_4 = async (sessionData) => {
     amount: getAmountItems(investments),
     footprint: investmentsFootprint,
   };
-  sessionData.financialData.aggregates.grossFixedCapitalFormation =
+  sessionData.financialData.mainAggregates.grossFixedCapitalFormation =
     dataGrossFixedCapitalFormationAggregate;
 };
 
@@ -224,24 +234,24 @@ async function updateComparativeData(
 }
 
 const updateCompaniesData = async (session) => {
-  let companies = session.financialData.companies
+  let providers = session.financialData.providers
     ? session.financialData.companies.map(
-        (props, index) => new Company({ id: index, ...props })
+        (props, index) => new Provider({ id: index, ...props })
       )
     : [];
 
-  let companiesToSynchronise = companies.filter(
-    (company) => company.state == "siren"
+  let companiesToSynchronise = providers.filter(
+    (provider) => provider.state == "siren"
   );
 
-  for (let company of companiesToSynchronise) {
+  for (let provider of companiesToSynchronise) {
     try {
-      await company.updateFromRemote();
+      await provider.updateFromRemote();
     } catch (error) {
       console.log(error);
       break;
     }
   }
 
-  return companies;
+  return providers;
 };

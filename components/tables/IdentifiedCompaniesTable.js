@@ -8,28 +8,37 @@ import { InputText } from "/components/input/InputText";
 import { printValue, valueOrDefault } from "/src/utils/Utils";
 import { Table } from "react-bootstrap";
 
-/* ---------- COMPANIES TABLE ---------- */
+/* ---------- PROVIDERS TABLE ---------- */
 
-export class IdentifiedCompaniesTable extends React.Component {
-  constructor(props) {
+export class IdentifiedProvidersTable extends React.Component 
+{
+  constructor(props) 
+  {
     super(props);
     this.state = {
-      companies: props.companies,
+      providers: props.providers,
       columnSorted: "amount",
       reverseSort: false,
       page: 0,
     };
   }
-  componentDidUpdate(prevProps) {
-    if (prevProps.companies !== this.props.companies) {
-      this.setState({ companies: this.props.companies });
+
+  componentDidUpdate(prevProps) 
+  {
+    if (JSON.stringify(prevProps.providers) !== JSON.stringify(this.props.providers) ) {
+      this.setState({ providers: this.props.providers });
+    }
+    if (prevProps.providers != this.props.providers) {
+      this.setState({ providers: this.props.providers });
     }
   }
 
-  render() {
-    const { nbItems } = this.props;
-    const { companies, columnSorted, page } = this.state;
-    this.sortCompanies(companies, columnSorted);
+  render() 
+  {
+    const { nbItems, financialPeriod } = this.props;
+    const { providers, columnSorted, page } = this.state;
+    this.sortProviders(providers, financialPeriod, columnSorted);
+
     return (
       <div className="table-main" id="table">
         <Table>
@@ -59,18 +68,19 @@ export class IdentifiedCompaniesTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {companies
+            {providers
               .slice(page * nbItems, (page + 1) * nbItems)
-              .map((company) => (
-                <RowTableCompanies
-                  key={"company_" + company.id}
-                  {...company}
-                  updateCompany={this.updateCompany.bind(this)}
+              .map((provider) => (
+                <RowTableProviders
+                  key={"provider_" + provider.providerNum}
+                  provider={provider}
+                  financialPeriod={financialPeriod}
+                  refreshTable={this.refreshTable}
                 />
               ))}
           </tbody>
         </Table>
-        {companies.length == 0 && (
+        {providers.length == 0 && (
           <p
             className="small
         "
@@ -78,7 +88,7 @@ export class IdentifiedCompaniesTable extends React.Component {
             Aucun résultat
           </p>
         )}
-        {companies.length > nbItems && (
+        {providers.length > nbItems && (
           <div className="table-navigation">
             <button
               className={page == 0 ? "hidden" : "btn btn-primary"}
@@ -88,12 +98,12 @@ export class IdentifiedCompaniesTable extends React.Component {
             </button>
             <div>
               <p>
-                {page + 1}/{parseInt(companies.length / nbItems + 1)}
+                {page + 1}/{parseInt(providers.length / nbItems + 1)}
               </p>
             </div>
             <button
               className={
-                (page + 1) * nbItems < companies.length ? "btn btn-primary" : "hidden"
+                (page + 1) * nbItems < providers.length ? "btn btn-primary" : "hidden"
               }
               onClick={this.nextPage}
             >
@@ -106,6 +116,8 @@ export class IdentifiedCompaniesTable extends React.Component {
     );
   }
 
+  refreshTable = () => this.props.refreshSection()
+
   /* ---------- SORTING ---------- */
 
   changeColumnSorted(columnSorted) {
@@ -116,26 +128,26 @@ export class IdentifiedCompaniesTable extends React.Component {
     }
   }
 
-  sortCompanies(companies, columSorted) {
+  sortProviders(providers, period, columSorted) {
     
     switch (columSorted) {
       case "identifiant":
-        companies.sort((a, b) =>
+        providers.sort((a, b) =>
           valueOrDefault(a.corporateId, "").localeCompare(
             valueOrDefault(b.corporateId, "")
           )
         );
         break;
       case "denomination":
-        companies.sort((a, b) =>
-          a.getCorporateName().localeCompare(b.getCorporateName())
+        providers.sort((a, b) =>
+          a.providerLib.localeCompare(b.providerLib)
         );
         break;
       case "amount":
-        companies.sort((a, b) => b.amount - a.amount);
+        providers.sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount);
         break;
     }
-    if (this.state.reverseSort) companies.reverse();
+    if (this.state.reverseSort) providers.reverse();
   }
 
   /* ---------- NAVIGATION ---------- */
@@ -146,73 +158,69 @@ export class IdentifiedCompaniesTable extends React.Component {
   nextPage = () => {
     if (
       (this.state.page + 1) * this.props.nbItems <
-      this.props.financialData.companies.length
+      this.props.financialData.providers.length
     )
       this.setState({ page: this.state.page + 1 });
   };
 
-  /* ---------- OPERATIONS ON COMPANY ---------- */
+  /* ---------- OPERATIONS ON PROVIDER ---------- */
 
-  updateCompany = (nextProps) => {
-    let company = this.props.financialData.getCompany(nextProps.id);
-    company.update(nextProps);
-    this.props.checkSync(nextProps);
-    this.setState({ companies: this.props.companies });
-  };
-
-  updateCompanyFromRemote = async (companyId) => {
-    let company = this.props.financialData.getCompany(companyId);
-    await company.updateFromRemote();
+  updateProviderFromRemote = async (providerNum) => {
+    let provider = this.props.financialData.getCompany(providerNum);
+    await provider.updateFromRemote();
     this.props.onUpdate();
-    this.setState({ companies: this.props.companies });
+    this.setState({ providers: this.props.providers });
   };
 }
 
-/* ----- COMPANY ROW ----- */
+/* ----- PROVIDER ROW ----- */
 
-class RowTableCompanies extends React.Component {
+class RowTableProviders extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
-      corporateId: props.corporateId || "",
-      dataUpdated: props.dataUpdated,
+      corporateId: props.provider.corporateId,
       toggleIcon: false,
     };
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props != prevProps) {
+  componentDidUpdate() 
+  {
+    if (this.props.provider.corporateId !== this.state.corporateId) {
       this.setState({
-        corporateId: this.props.corporateId || "",
-        dataUpdated: false,
+        corporateId: this.props.provider.corporateId
       });
     }
+    
   }
 
-  render() {
-    const { corporateName, account, amount, status, isDefaultAccount } = this.props;
+  render() 
+  {
+    const { provider, financialPeriod } = this.props;
+    const { providerLib, providerNum, periodsData, footprintStatus, isDefaultProviderAccount } = provider;
     const { corporateId } = this.state;
+
     let icon;
-    if (corporateId && status != 200) {
+    if (corporateId && !footprintStatus) {
       icon = (
         <i className="bi bi-arrow-repeat text-success" title="Données prêtes à être synchronisées"></i>
 
       );
     }
-
-    if (status == 200) {
+    if (corporateId && footprintStatus == 200) {
       icon = (
         <i className="bi bi-check2 text-success" title="Données synchronisées"></i>
 
       );
     }
-    if (status == 404) {
+    if (corporateId && footprintStatus == 404) {
       icon = (
         <i className="bi bi-x-lg text-danger"  title="Erreur lors de la synchronisation"></i>
 
       );
     }
-    if (!corporateId && !isDefaultAccount) {
+    if (!corporateId && !isDefaultProviderAccount) {
       icon = (
         <i className="bi bi-exclamation-circle text-info"  title="Donnée manquante"></i>
       );
@@ -226,21 +234,21 @@ class RowTableCompanies extends React.Component {
         <td className="siren-input">
           <InputText
               value={corporateId}
-              onUpdate={this.updateCorporateId.bind(this)}
+              onUpdate={this.updateCorporateId}
             />
         </td>
-        <td>{corporateName}</td>
-        <td>{account}</td>
-        <td className="text-end">{printValue(amount, 0)} &euro;</td>
+        <td>{providerLib}</td>
+        <td>{providerNum}</td>
+        <td className="text-end">{printValue(periodsData[financialPeriod.periodKey].amount, 0)} &euro;</td>
       </tr>
     );
   }
 
-  updateCorporateId = (nextCorporateId) => {
-    this.setState({ dataUpdated: true });
-    this.props.updateCompany({
-      id: this.props.id,
-      corporateId: nextCorporateId,
-    });
+  updateCorporateId = (nextCorporateId) => 
+  {
+    if (nextCorporateId!=this.props.provider.corporateId) {
+      this.props.provider.update({corporateId: nextCorporateId});
+      this.props.refreshTable();
+    }
   };
 }

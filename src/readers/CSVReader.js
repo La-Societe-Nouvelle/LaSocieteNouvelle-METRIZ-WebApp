@@ -42,78 +42,6 @@ async function readCSVFileRow(columns,row) {
   return rowData;
 }
 
-/* ---------- EXPENSES FILE ---------- */ 
-
-/*
-  Header format :
-    -> label : label
-    -> amount : amount
-    -> account : account (id)
-    -> accountLib : account label [not used yet]
-    -> corporateId : id of the company
-    -> corporateName : name of the company
-*/
-
-async function processCSVExpensesData(CSVExpensesData)
-// ...extract data to use in session
-{
-  let data = {};
-  data.expenses = [];
-  data.accounts = {};
-  //data.companies = [];
-  
-  await CSVExpensesData.forEach((CSVExpenseData) => {
-    if (CSVExpenseData.account==undefined) { CSVExpenseData.account = ""};
-    if (data.accounts[CSVExpenseData.account]==undefined) { data.accounts[CSVExpenseData.account] = CSVExpenseData.accountLib }
-    let expenseData = {
-      label: CSVExpenseData.label,
-      account: CSVExpenseData.account,
-      corporateId: CSVExpenseData.corporateId,
-      corporateName: CSVExpenseData.corporateName,
-      amount: parseFloat(CSVExpenseData.amount),
-    }
-    data.expenses.push(expenseData);
-  })
-
-  return data;
-}
-
-/* ---------- DEPRECIATIONS FILE ---------- */ 
-
-/*
-  Header format :
-    -> label : label
-    -> amount : amount
-    -> account : account (id)
-    -> accountLib : account label [not used yet]
-    -> corporateId : id of the company
-    -> corporateName : name of the company
-*/
-
-async function processCSVDepreciationsData(CSVData)
-// ...extract data to use in session
-{
-  let data = {};
-  data.depreciations = [];
-  data.accounts = {};
-  //data.companies = [];
-  
-  await CSVData.forEach((ecriture) => {
-    if (ecriture.account==undefined) { ecriture.account = ""};
-    if (data.accounts[ecriture.account]==undefined) { data.accounts[ecriture.account] = ecriture.accountLib }
-    let depreciationData = {
-      label: ecriture.label,
-      account: ecriture.account,
-      corporateId: ecriture.corporateId,
-      corporateName: ecriture.corporateName,
-      amount: parseFloat(ecriture.amount),
-    }
-    data.depreciations.push(depreciationData);
-  })
-
-  return data;
-}
-
 /* ---------- COMPANIES FILE ---------- */ 
 
 /*
@@ -128,10 +56,13 @@ async function processCSVCompaniesData(CSVCompaniesData)
   let data = {};
   
   await CSVCompaniesData.forEach((CSVCompanieData) => {
-    data[CSVCompanieData.corporateName] = CSVCompanieData.corporateId;
+    data[CSVCompanieData.providerNum] = {
+      corporateName: CSVCompanieData.corporateName,
+      corporateId: CSVCompanieData.corporateId,
+    }
   })
 
   return data;
 }
 
-export {CSVFileReader, processCSVExpensesData, processCSVCompaniesData};
+export {CSVFileReader, processCSVCompaniesData};

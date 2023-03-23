@@ -34,7 +34,8 @@ import { XLSXSocialDataBuilder } from "../../src/readers/SocialDataContentReader
  *    inputs
  */
 
-export class AssessmentDIS extends React.Component {
+export class AssessmentDIS extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {

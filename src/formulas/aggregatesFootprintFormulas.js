@@ -1,430 +1,533 @@
 // La Société Nouvelle
 
 // Generic formulas
-import { buildIndicatorAggregate, buildIndicatorMerge } from './footprintFormulas';
+import { SocialFootprint } from '../footprintObjects/SocialFootprint';
+import { getAmountItems, getPrevDate, getSumItems, roundValue, sortChronologicallyDates } from '../utils/Utils';
+import { getImmobilisedProductionFootprint } from './aggregatesFootprintFormulasForPeriods';
+import { buildAggregateIndicator, buildAggregatePeriodIndicator, buildDifferenceFootprint, mergeFootprints, buildDifferenceIndicator, mergeIndicators, buildAggregateFootprint } from './footprintFormulas';
 
 /** Structure of file
- *    - Assignment companies footprints to expenses or investments
+ *    - Intermediate consumptions & purchase stocks footprints
  *    - Build financial accounts footprints
  */
 
-/* --------------------------------------------------------------------- */
-/* -------------------- ASSIGN COMPANIES FOOTPRINTS -------------------- */
-/* --------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- INTERMEDIATE CONSUMPTIONS & PURCHASES STOCKS FOOTPRINTS ---------------------------------------- */
+/* ----------------------------------------------------------------------------------------------------------------------------------------- */
 
-export const updateOutputFlowsFootprints = async (indic,financialData) =>
+export const updateIntermediateConsumptionsFootprints = async (financialData,period) =>
 {
-    // External expenses
-    updateExternalExpensesIndicator(indic,financialData);
+  // External expenses accounts
+  await updateExternalExpensesAccountsFpt(financialData,period);
+  
+  // initial states purhcases stocks
+  await updateInitialStateStocksFpt(financialData,period);
 
-    // Investments
-    updateInvestmentsIndicator(indic,financialData);
-}
+  // Purchases stocks
+  await updatePurchasesStocksStatesFpt(financialData,period);
 
-/* ----- Empreintes des charges externes ----- */
-
-// Affectation de l'empreinte du fournisseur (compte auxiliaire)
-
-const updateExternalExpensesIndicator = async (indic,financialData) =>
-{
-  await Promise.all(financialData.expenses.map(async (expense) => 
-  {
-    // retrieve company
-    let company = financialData.getCompanyByAccount(expense.accountAux);
-    // assign indicator
-    expense.footprint.indicators[indic] = company.footprint.indicators[indic];
-    return;
-  }));
-  return;
-}
-
-/* ----- Investments footprints ----- */
-
-// Affectation de l'empreinte du fournisseur (compte auxiliaire)
-
-const updateInvestmentsIndicator = async (indic,financialData) =>
-{
-  await Promise.all(financialData.investments.map(async (investment) => 
-  {
-    // retrieve company
-    let company = financialData.getCompanyByAccount(investment.accountAux);
-    // assign indicator
-    investment.footprint.indicators[indic] = company.footprint.indicators[indic];
-    return;
-  }));
-  return;
-}
-
-/* -------------------------------------------------------------------------------- */
-/* -------------------- FINANCIAL ACCOUNTS INDICATORS FORMULAS -------------------- */
-/* -------------------------------------------------------------------------------- */
-
-export const updateAccountsFootprints = async (indic,financialData) =>
-{
-    // External expenses --------------------------------------------------------- //
-
-    // External expenses accounts
-    await updateExternalExpensesAccountsIndicator(indic,financialData);
-
-    // Purchase stocks ----------------------------------------------------------- //
-    
-    // Purchase stocks
-    await updatePurchasesStocksIndicator(indic,financialData);
-
-    // ...previous footprints based on current financial year
-    financialData.stocks.filter(stock => !stock.isProductionStock)
-                        .filter(stock => stock.initialState == "currentFootprint")
-                        .map(async (stock) => stock.prevFootprint.indicators[indic] = stock.footprint.indicators[indic]);      
-
-    // Purchase stocks variations ------------------------------------------------ //
-
-    // Stocks variations footprints
-    await updatePurchasesStocksVariationsIndicator(indic,financialData);
-
-    // Stocks variations accounts footprints
-    await updatePurchasesStocksVariationsAccountsIndicator(indic,financialData);
-
-    // Immobilisation ------------------------------------------------------------ //
-
-    // ...previous immobilisation footprints based on current financial year
-    await financialData.immobilisations.filter(immobilisation => immobilisation.initialState == "currentFootprint")
-                                       .map(async (immobilisation) => 
-    {
-        let investmentsRelatedToImmobilisation = financialData.investments.filter(investment => investment.account == immobilisation.account);
-        immobilisation.prevFootprint.indicators[indic] = await buildIndicatorAggregate(indic,investmentsRelatedToImmobilisation);
-        return;
-    });
-
-    // ...previous depreciation footprints based on current financial year
-    await financialData.depreciations.filter(depreciation => /^28/.test(depreciation.account))
-                                     .filter(depreciation => depreciation.initialState == "currentFootprint")
-                                     .map(async (depreciation) => 
-    {
-        let immobilisation = financialData.getImmobilisationByAccount(depreciation.accountAux);
-        depreciation.prevFootprint.indicators[indic] = immobilisation.prevFootprint.indicators[indic];
-        return;
-    });
-
-    // Depreciation expenses ----------------------------------------------------- //
-    
-    // Depreciation expenses
-    await updateDepreciationExpensesIndicator(indic,financialData);
-
-    // Depreciation expenses accounts
-    await updateDepreciationExpensesAccountsIndicator(indic,financialData);
-
-    return;
+  // Stocks variations accounts footprints
+  await updatePurchasesStocksVariationsAccountsFpt(financialData,period);
 }
 
 /* ---------- Empreintes des comptes de charges externes ---------- */
+// Agrégation des dépenses rattachées au compte de charge
 
-// Agrégation des dépenses rattachées au compte
-
-export const updateExternalExpensesAccountsIndicator = async (indic,financialData) =>
+const updateExternalExpensesAccountsFpt = async (financialData,period) =>
 {
-    await Promise.all(financialData.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum)) // get external expenses accounts
-                                                   .map(async ({accountNum,footprint}) => 
-    {
-        // retrieve expenses (linked to the account)
-        let expenses = financialData.expenses.filter(expense => expense.account == accountNum);
-        // control uncertainty
-        expenses.filter(expense => expense.amount < 0)
-                .filter(expense => expenses.filter(item => item.amount > 0 && item.company == expense.company).length > 0)
-                .forEach(expense => expense.footprint.indicators[indic].uncertainty = 0);
-        // build indicator
-        footprint.indicators[indic] = await buildIndicatorAggregate(indic,expenses);
-        return;
-    }));
+  await Promise.all(financialData.externalExpensesAccounts
+    .map(async (account) => 
+  {
+    // retrieve expenses
+    let expenses = financialData.externalExpenses
+      .filter(expense => expense.accountNum==account.accountNum)  // expenses linked to expense account
+      .filter(expense => period.regex.test(expense.date))         // expenses within period
+      .filter(expense => expense.amount > 0);                     // temp solution to avoid uncertainty issue
+    // build footprint
+    account.periodsData[period.periodKey].footprint = await buildAggregateFootprint(expenses);
     return;
+  }));
+  return;
+}
+
+/* ----- Empreintes initials des comptes de stocks ----- */
+// Agrégation des dépenses rattachées au compte de charge
+// to update using external expenses accounts for period
+
+export const updateInitialStateStocksFpt = async (financialData,period) =>
+{
+  // => initial state fpt based on current financial period
+  await Promise.all(financialData.stocks
+    .filter(stock => !stock.isProductionStock)                                // purchases stocks
+    .filter(stock => stock.initialState.date==getPrevDate(period.dateStart))  // initial state date is before period (no prev session imported)
+    .filter(stock => stock.initialStateType=="currentFootprint")              // initial fpt based on current financial period (other types : default data)
+    .map(async (stock) => 
+  {
+    // purchases
+    let purchases = financialData.externalExpenses
+      .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))  // expenses linked to stock account
+      .filter(expense => period.regex.test(expense.date))                       // expenses within period
+      .filter(expense => expense.amount > 0);                                   // temp solution to avoid uncertainty issue
+    let purchasesFootprint = await buildAggregateFootprint(purchases);
+    
+    if (purchases.length==0) {
+      console.log("[ERROR] pas d'achats relatifs au compte de stock "+stock.accountNum+" ("+stock.purchasesAccounts.join(",")+") sur la période "+period.periodKey);
+    }
+
+    stock.initialState.footprint = purchasesFootprint;
+    stock.states[stock.initialState.date].footprint = purchasesFootprint;
+    return;
+  }));
+
+  // => initial state fpt based on default data
+  await Promise.all(financialData.stocks
+    .filter(stock => !stock.isProductionStock)                                        // purchases stocks
+    .filter(stock => stock.initialState.date==getPrevDate(period.dateStart))          // initial state date is before period (no prev session imported)
+    .filter(stock => stock.initialStateType=="defaultData" && stock.initialStateSet)  // initial fpt based on current financial period (other types : default data)
+    .map(async (stock) => 
+  {
+    stock.states[stock.initialState.date].footprint = stock.initialState.footprint;
+    return;
+  }));
+
+  // check
+  financialData.stocks
+    .filter(stock => !stock.isProductionStock)
+    .filter(stock => stock.initialState.date==getPrevDate(period.dateStart))
+    .filter(stock => stock.initialStateType!="currentFootprint")
+    .forEach(stock => {
+      if (stock.initialStateType=="defaultData" && !stock.initialStateSet) {
+        console.log("[ERROR] état initial manquant pour le compte de stock "+stock.accountNum+" (valeur par défaut)");
+      } else if (stock.initialStateType!="defaultData") {
+        console.log("[ERROR] état initial non défini pour le compte de stock "+stock.accountNum+" ("+stock.initialStateType+")");
+      }
+    });
+  financialData.stocks
+  .filter(stock => !stock.isProductionStock)
+  .forEach(stock => {
+    if (!stock.states[getPrevDate(period.dateStart)]) {
+      console.log("[ERROR] état manquant pour le compte de stock "+stock.accountNum+" au "+getPrevDate(period.dateStart));
+    }
+  })
+  return;
 }
 
 /* ---------- Empreinte des stocks d'achats ---------- */
-
 // Agrégation des comptes de charges rattachés au compte de stock
+// update to build all states within period
 
-export const updatePurchasesStocksIndicator = async (indic,financialData) =>
+const updatePurchasesStocksStatesFpt = async (financialData,period) =>
 {
   let stocks = financialData.stocks.filter(stock => !stock.isProductionStock);
   await Promise.all(stocks.map(async (stock) =>
   {
-    let accountsRelatedToStock = getAccountsRelatedToStock(stock,financialData.expenseAccounts);
-    if (accountsRelatedToStock.length > 0) stock.footprint.indicators[indic] = await buildIndicatorAggregate(indic, accountsRelatedToStock);
-    else                                   stock.footprint.indicators[indic] = stock.prevFootprint.indicators[indic];
-    return;
-  }));
-  return;
-}
+    let finalState = stock.states[period.dateEnd];
+    let prevStateDateEnd = getPrevDate(period.dateStart);
+    let prevState = stock.states[prevStateDateEnd];
 
-const getAccountsRelatedToStock = (stock,accounts) =>
-{
-  let accountsRelatedToStock = accounts.filter(account => account.accountNum.startsWith(stock.accountAux));
-  // case - no expenses related to stock
-  if (accountsRelatedToStock.length == 0) accountsRelatedToStock = accounts.filter(account => account.accountNum.startsWith("60"+stock.account.charAt(1)));
-  return accountsRelatedToStock;
-}
+    if (!finalState) {
+      console.log("[ERROR] état manquant pour le compte de stock "+stock.accountNum+" au "+period.dateEnd);
+    } else if (!prevState) {
+      console.log("[ERROR] état manquant pour le compte de stock "+stock.accountNum+" au "+getPrevDate(period.dateStart));
+    }
+    
+    let unstorages = financialData.stockVariations
+      .filter(variation => variation.stockAccountNum==stock.accountNum)
+      .filter(variation => period.regex.test(variation.date))
+      .filter(variation => variation.amount < 0); // all unstorages
+    
+    let oldStockAmount = Math.max(-getAmountItems(unstorages, 2), 0);     // 0 if no unstorages
+    let newStockAmount = roundValue(finalState.amount-oldStockAmount, 2);
 
-/* ---------- Empreinte des variations de stocks d'achats ---------- */
+    let purchases = financialData.externalExpenses
+      .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))
+      .filter(expense => period.regex.test(expense.date))
+      .filter(expense => expense.amount > 0);
+    let purchasesFootprint = await buildAggregateFootprint(purchases);
 
-// stock variation footprint is based on initial & final footprint of the stock account
-// VS = SI - SF
-// stock account appears in only one stock variation item
-
-export const updatePurchasesStocksVariationsIndicator = async (indic,financialData) =>
-{
-  let stocksVariations = financialData.stockVariations.filter(stockVariation => /^6/.test(stockVariation.account));
-  await Promise.all(stocksVariations.map(async (variation) =>
-  {
-    let stock = financialData.getStockByAccount(variation.accountAux);
-    variation.footprint.indicators[indic] = await buildIndicatorMerge(stock.prevFootprint.indicators[indic], stock.prevAmount,
-                                                                      stock.footprint.indicators[indic], -stock.amount);
-    // Le calcul de l'incertitude peut entraîner des résultats erronés, les valeurs étant traitées comme décorrélées
-    // L'incertitude associée est donc celle de la valeur courante
-    variation.footprint.indicators[indic].setUncertainty(stock.footprint.indicators[indic].getUncertainty());
+    if (newStockAmount>0 && purchases.length==0) {
+      console.log("[ERROR] pas d'achats relatifs au compte de stock "+stock.accountNum+" ("+stock.purchasesAccounts.join(",")+") sur la période "+period.periodKey);
+    }
+    
+    if (newStockAmount > 0) { // if storage from purchases
+      finalState.footprint = await mergeFootprints([
+        {amount: oldStockAmount, footprint: prevState.footprint},    // old stock (remains)
+        {amount: newStockAmount, footprint: purchasesFootprint}]);   // new stock
+    } else { // if only unstorage prev stock
+      finalState.footprint = prevState.footprint;
+    }
     return;
   }));
   return;
 }
 
 /* ----- Empreinte des comptes de variations de stocks d'achats ----- */
-
 // stock variation footprint is based on initial & final footprint of the stock account
 
-export const updatePurchasesStocksVariationsAccountsIndicator = async (indic,financialData) =>
+const updatePurchasesStocksVariationsFpt = async (financialData,period) =>
 {
-    await Promise.all(financialData.expenseAccounts.filter(account => /^603/.test(account.accountNum))
-                                                   .map(async ({accountNum,footprint}) => 
-    {
-        // filter expenses
-        let stockVariations = financialData.stockVariations.filter(variation => variation.account == accountNum);
-        // build indicator
-        footprint.indicators[indic] = await buildIndicatorAggregate(indic,stockVariations);
-        return;
-    }));
-    return;
+  // await Promise.all(financialData.stockVariations
+  //   .map(async (variation) => 
+  // {
+  //   let stock = financialData.stocks.filter(stock => stock.defaultStockVariationAccountNum==variation.accountNum)[0];
+    
+  //   if (stock) {
+  //     let finalState = stock.states[period.dateEnd];
+  //     let prevStateDateEnd = getPrevDate(period.dateStart);
+  //     let initialState = stock.states[prevStateDateEnd];
+  
+  //     let stockVariationFootprint = await buildDifferenceFootprint(finalState,initialState);
+  //     variation.periodsData[period.periodKey].footprint =stockVariationFootprint;
+  //   }
+  //   return;
+  // }));
+  // return;
 }
 
-/* ----- Depreciation expenses footprints ----- */
+/* ----- Empreinte des comptes de variations de stocks d'achats ----- */
+// stock variation footprint is based on initial & final footprint of the stock account
 
-// footprint based on immobilisation footprint (before immobilised production) & previous depreciation footprint
-/** Formules :
- *    Empreinte sociétale du reste à ammortir du compte d'immobilisation.
- *    Les investissements réalisés sur l'exercice sont pris en compte. La production immobilisée est exclue (empreinte dépendante de la production).
- *  3 étapes :
- *    - Empreinte des investissements réalisés sur l'exercice
- *    - Empreinte du compte d'immobilisation (hors production immobilisée)
- *    - Déduction de l'empreinte du compte d'amortissement
- */
-
-export const updateDepreciationExpensesIndicator = async (indic,financialData) =>
+const updatePurchasesStocksVariationsAccountsFpt = async (financialData,period) =>
 {
-  await Promise.all(financialData.depreciationExpenses.map(async (expense) =>
+  await Promise.all(financialData.stockVariationsAccounts
+    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount!=0) // account defined for period with amount not null
+    .map(async (account) => 
   {
-    let depreciation = financialData.getDepreciationByAccount(expense.accountAux);
-    let immobilisation = financialData.getImmobilisationByAccount(depreciation.accountAux);
-
-    // Indicator of immobilisation before immobilised production
-    let investments = financialData.investments.filter(investment => investment.account == immobilisation.account);
-    let investmentsIndicator = await buildIndicatorAggregate(indic,investments);
-
-    let amountInvestments = investments.map(investment => investment.amount)
-                                       .reduce((a,b) => a+b,0);
-    let amountImmobilisedProduction = financialData.immobilisationProductions.filter(immobilisationProduction => immobilisationProduction.account == immobilisation.account)
-                                                                             .map(immobilisationProduction => immobilisationProduction.amount)
-                                                                             .reduce((a,b) => a+b,0);
+    let stock = financialData.stocks.find(stock => stock.defaultStockVariationAccountNum==account.accountNum);
     
-    let immobilisationIndicator = investments.length > 0 ? await buildIndicatorMerge(immobilisation.prevFootprint.indicators[indic], immobilisation.amount-amountInvestments-amountImmobilisedProduction,
-                                                                                     investmentsIndicator, amountInvestments) 
-                                                         : immobilisation.prevFootprint.indicators[indic];
-    // Footprint (reste à amortir)
-    expense.footprint.indicators[indic] = await buildIndicatorMerge(immobilisationIndicator, immobilisation.amount-amountImmobilisedProduction,
-                                                                    depreciation.prevFootprint.indicators[indic], -(depreciation.amount-expense.amount));
-    // Le calcul de l'incertitude peut entraîner des résultats erronés, les valeurs étant supposées décorrélées et l'impact brut restant à amortir pouvant être faible
-    // L'incertitude associée est donc celle de la valeur associée à l'immobilisation
-    expense.footprint.indicators[indic].setUncertainty(immobilisationIndicator.getUncertainty());
+    if (stock && stock.states[period.dateEnd] && stock.states[getPrevDate(period.dateStart)]) 
+    {
+      let finalState = stock.states[period.dateEnd];
+      let prevStateDateEnd = getPrevDate(period.dateStart);
+      let initialState = stock.states[prevStateDateEnd];
+  
+      let stockVariationFootprint = await buildDifferenceFootprint(finalState,initialState);
+      account.periodsData[period.periodKey].footprint = stockVariationFootprint;
+    } 
+    else if (!stock) {
+      console.log("[ERROR] compte de stock non trouvé pour compte de variation de stock "+account.accountNum)
+    } 
+    else if (!stock.states[getPrevDate(period.dateStart)]) {
+      console.log("[ERROR] état manquant pour le compte de stock "+stock.accountNum+" au "+getPrevDate(period.dateStart));
+    }
+    else if (!stock.states[period.dateEnd]) {
+      console.log("[ERROR] état manquant pour le compte de stock "+stock.accountNum+" au "+period.dateEnd);
+    }
     return;
   }));
   return;
 }
 
-/* ---------- Empreintes des comptes de charges externes ---------- */
+/* ----------------------------------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- FIXED CAPITAL CONSUMPTIONS & IMMOBILISATIONS FOOTPRINTS ---------------------------------------- */
+/* ----------------------------------------------------------------------------------------------------------------------------------------- */
 
-// Agrégation des dotations rattachées au compte
+/** 
+ *    -> set prev footprint for account with initial state "currentFootprint" -> when update periods
+ */
 
-export const updateDepreciationExpensesAccountsIndicator = async (indic,financialData) =>
+export const updateFixedCapitalConsumptionsFootprints = async (financialData,period) =>
 {
-    await Promise.all(financialData.expenseAccounts.filter(account => /^68/.test(account.accountNum))
-                                                   .map(async ({accountNum,footprint}) => 
+  // init state
+  await updateInitialStateImmobilisationsFpt(financialData,period);
+
+  // immobilisations & amortisations states
+  await updateImmobilisationsStatesFpt(financialData,period);
+
+  // amortisation expenses
+  await updateAmortisationExpensesFpt(financialData,period);
+
+  // amortisation expenses accounts
+  await updateAmortisationExpenseAccountsFpt(financialData,period);
+}
+
+/* ----- Empreintes initiales des comptes d'immobilisation ----- */
+// ...
+
+export const updateInitialStateImmobilisationsFpt = async (financialData,period) =>
+{
+  // => initial state fpt based on current financial period
+  await Promise.all(financialData.immobilisations
+    .filter(immobilisation => immobilisation.isAmortisable)
+    .filter(immobilisation => immobilisation.initialState.date==getPrevDate(period.dateStart))
+    .filter(immobilisation => immobilisation.initialStateType=="currentFootprint")
+    .map(async (immobilisation) => 
+  {
+    // investments
+    let investments = financialData.investments
+      .filter(investment => investment.accountNum==immobilisation.accountNum)
+      .filter(investment => period.regex.test(investment.date))
+      .filter(investment => investment.amount>0);
+    let investmentsFootprint = await buildAggregateFootprint(investments);
+    
+    if (investments.length==0) {
+      console.log("[ERROR] pas d'investissements relatifs au compte de stock "+immobilisation.accountNum+" sur la période "+period.periodKey);
+    }
+
+    immobilisation.initialState.footprint = investmentsFootprint;
+    immobilisation.states[immobilisation.initialState.date].footprint = investmentsFootprint;
+    immobilisation.states[immobilisation.initialState.date].amortisationFootprint = investmentsFootprint;
+    return;
+  }));
+
+  // initial state fpt based on default data
+  await Promise.all(financialData.immobilisations
+    .filter(immobilisation => immobilisation.isAmortisable)
+    .filter(immobilisation => immobilisation.initialState.date==getPrevDate(period.dateStart))
+    .filter(immobilisation => immobilisation.initialStateType=="defaultData" && immobilisation.initialStateSet)
+    .map(async (immobilisation) => 
+  {
+    immobilisation.states[immobilisation.initialState.date].footprint = immobilisation.initialState.footprint;
+    immobilisation.states[immobilisation.initialState.date].amortisationFootprint = immobilisation.initialState.amortisationFootprint;
+    return;
+  }));
+  return;
+}
+
+/* ---------- Empreinte des immobilisations ---------- */
+// mises à jour des états successivements (empreinte immobilisation et empreinte amortissement)
+
+const updateImmobilisationsStatesFpt = async (financialData,period) =>
+{
+  let immobilisations = financialData.immobilisations.filter(immobilisation => immobilisation.isAmortisable);
+  await Promise.all(immobilisations.map(async (immobilisation) =>
+  {
+    let states = Object.values(immobilisation.states)
+      .filter(state => period.regex.test(state.date))
+      .sort((a,b) => sortChronologicallyDates(a,b));
+
+    for (let state of states) 
     {
-        // filter expenses
-        let expenses = financialData.depreciationExpenses.filter(expense => expense.account == accountNum);
-        // build indicator
-        footprint.indicators[indic] = await buildIndicatorAggregate(indic,expenses);
-        return;
-    }));
+      let prevState = immobilisation.states[state.prevStateDate];
+      let newImmobilisations = [];
+
+      // investissements
+      let investments = financialData.investments
+        .filter(investment => investment.accountNum==immobilisation.accountNum)
+        .filter(investment => investment.date==state.date);      
+      if (investments.length>0) {
+        let investmentsAmount = getAmountItems(investments);
+        let investmentsFootprint = await buildAggregateFootprint(investments);
+        newImmobilisations.push({
+          amount: investmentsAmount,
+          footprint: investmentsFootprint
+        })
+      }
+
+      // immobilised production
+      // TO DO
+
+      let newImmobilisationsAmount = getAmountItems(newImmobilisations, 2);
+      // immobilisation footprint
+      state.footprint = await mergeFootprints([
+        ...newImmobilisations,                                                                             // investments
+        {amount: roundValue(state.amount-newImmobilisationsAmount, 2), footprint: prevState.footprint}]);  // remains
+
+      // amortisation footprint
+      if (state.amortisationExpenseAmount>0) 
+      {
+        // amortisation expense footprint
+        let amortisationExpenseFootprint = await buildDifferenceFootprint(
+          {amount: prevState.amount, footprint: prevState.footprint},                        // immobilisation
+          {amount: prevState.amortisationAmount, footprint: prevState.amortisationFootprint} // amortisation
+        )
+        // amortisation footprint
+        state.amortisationFootprint = await mergeFootprints([
+          {amount: state.amortisationExpenseAmount, footprint: amortisationExpenseFootprint},                                            // amortisation expense
+          {amount: roundValue(state.amortisationAmount-state.amortisationExpenseAmount, 2), footprint: prevState.amortisationFootprint}  // amortisation
+        ])
+      }
+      else {
+        state.amortisationFootprint = prevState.amortisationFootprint;
+      }
+
+    }
     return;
+  }));
+  return;
 }
 
-/* ---------------------------------------------------------------------------------- */
-/* -------------------- FINANCIAL AGGREGATES INDICATORS FORMULAS -------------------- */
-/* ---------------------------------------------------------------------------------- */
+/* ----- Empreintes des dotations aux amortissements ----- */
+// amortisation expenses footprint based on immobilisation states
 
-export const updateAggregatesFootprints = async (indic,financialData) =>
+const updateAmortisationExpensesFpt = async (financialData,period) =>
 {
-    const {netValueAdded,
-           externalExpenses,
-           storedPurchases,
-           intermediateConsumption,
-           grossFixedCapitalFormation,
-           capitalConsumption,
-           grossValueAdded,
-           production} = financialData.aggregates;
+  let amortisationExpenses = financialData.adjustedAmortisationExpenses.filter(expense => period.regex.test(expense.date) && expense.amount>0);
+  await Promise.all(amortisationExpenses.map(async (expense) =>
+  {
+    let immobilisation = financialData.immobilisations.find(immobilisation => immobilisation.amortisationAccountNum==expense.amortisationAccountNum);
+    if (immobilisation) 
+    {
+      let state = immobilisation.states[expense.date];
+      let prevState = immobilisation.states[state.prevStateDate];
 
-    // External expenses
-    let externalExpensesAccounts = financialData.expenseAccounts.filter(account => /^6(0[^3]|1|2)/.test(account.accountNum));
-    externalExpenses.footprint.indicators[indic] = await buildIndicatorAggregate(indic,externalExpensesAccounts);
-    
-    // Purchasing stock Variations
-    let purchaseStocksVariationsAccounts = financialData.expenseAccounts.filter(account => /^603/.test(account.accountNum));
-    storedPurchases.footprint.indicators[indic] = await buildIndicatorAggregate(indic,purchaseStocksVariationsAccounts);
-    
-    // Intermediate consumption
-    let expensesAccounts = financialData.expenseAccounts.filter(account => /^6(0|1|2)/.test(account.accountNum));
-    intermediateConsumption.footprint.indicators[indic] = await buildIndicatorAggregate(indic,expensesAccounts);;
-    
-    // Formation brute de capital fixe
-    let investments = financialData.investments;
-    grossFixedCapitalFormation.footprint.indicators[indic] = await buildIndicatorAggregate(indic,investments);
+      if (!state) {
+        console.log("[ERROR] état manquant pour immobilisation "+immobilisation.accountNum+" au "+expense.date);
+      } else if (!prevState) {
+        console.log("[ERROR] état manquant pour immobilisation "+immobilisation.accountNum+" au "+state.prevStateDate);
+      }
 
-    // Capital consumption
-    let depreciationExpensesAccounts = financialData.expenseAccounts.filter(account => /^68/.test(account.accountNum));
-    capitalConsumption.footprint.indicators[indic] = await buildIndicatorAggregate(indic,depreciationExpensesAccounts);
-    
-    // Gross value added
-    grossValueAdded.footprint.indicators[indic] = await buildIndicatorMerge(netValueAdded.footprint.indicators[indic], netValueAdded.amount,
-                                                                            capitalConsumption.footprint.indicators[indic], capitalConsumption.amount)
-    // Current production
-
-    production.footprint.indicators[indic] = await buildIndicatorMerge(intermediateConsumption.footprint.indicators[indic], intermediateConsumption.amount,
-                                                                       grossValueAdded.footprint.indicators[indic], grossValueAdded.amount);
-    
+      // footprint of what remains to amortise
+      expense.footprint = await buildDifferenceFootprint(
+        {amount: prevState.amount, footprint: prevState.footprint},                        // immobilisation
+        {amount: prevState.amortisationAmount, footprint: prevState.amortisationFootprint} // amortisation
+      );
+    } else {
+      console.log("[ERROR] immobilisation non trouvée pour dotations : "+expense.accountNum+" (compte d'amortissement "+expense.amortisationAccountNum+")")
+    }
     return;
+  }));
+  return;
 }
 
-/* ------------------------------------------------------------------------------ */
-/* -------------------- PRODUCTION ITEMS INDICATORS FORMULAS -------------------- */
-/* ------------------------------------------------------------------------------ */
+/* ----- Empreintes des comptes de dotations aux amortissements ----- */
+// amortisation expenses footprint is based on...
 
-export const updateProductionItemsFootprints = async (indic,financialData) =>
+const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
 {
-  const {production,
-         productionStocks,
-         storedProduction,
-         immobilisedProduction,
-         revenue} = financialData.aggregates;
+  let amortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0);
+  await Promise.all(amortisationExpensesAccounts
+    .map(async (account) => 
+  {
+    let amortisationExpenses = financialData.adjustedAmortisationExpenses
+      .filter(expense => expense.accountNum==account.accountNum)
+      .filter(expense => expense.amount>0)
+      .filter(expense => period.regex.test(expense.date));
+      
+    account.periodsData[period.periodKey].footprint = await buildAggregateFootprint(amortisationExpenses);
+    return;
+  }));
+  return;
+}
 
-  // Production stocks ----------------------------------------------------------- //
+/* -------------------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- FINANCIAL AGGREGATES INDICATORS FORMULAS ---------------------------------------- */
+/* -------------------------------------------------------------------------------------------------------------------------- */
 
-  // Set production footprint to final production stocks footprint
-  financialData.stocks.filter(stock => stock.isProductionStock)
-                      .forEach(stock => stock.footprint.indicators[indic] = financialData.aggregates.production.footprint.indicators[indic]);
+export const updateMainAggregatesFootprints = async (indic,financialData,period) =>
+{
+  const {netValueAdded,
+          intermediateConsumptions,
+          fixedCapitalConsumptions,
+          production} = financialData.mainAggregates;
+
+  // Intermediate consumptions
+  let intermediateConsumptionsAccounts = financialData.externalExpensesAccounts.concat(financialData.stockVariationsAccounts)
+    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
+  intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
+    await buildAggregatePeriodIndicator(indic,intermediateConsumptionsAccounts,period.periodKey);
   
-  // ...initial production stock footprint based on current production footprint
-  financialData.stocks.filter(stock => stock.isProductionStock)
-                      .filter(stock => stock.prevFootprint.indicators[indic].value == null)
-                      .forEach(stock => stock.prevFootprint.indicators[indic] = financialData.aggregates.production.footprint.indicators[indic]);
+  // Fixed capital consumtpions
+  let fixedCapitalConsumptionsAccounts = financialData.amortisationExpensesAccounts
+    .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
+  fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
+    await buildAggregatePeriodIndicator(indic,fixedCapitalConsumptionsAccounts,period.periodKey);
+  
+  // Production
+  production.periodsData[period.periodKey].footprint.indicators[indic] = 
+    await buildAggregatePeriodIndicator(indic,[netValueAdded,intermediateConsumptions,fixedCapitalConsumptions],period.periodKey);
+  
+  return;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- PRODUCTION ITEMS INDICATORS FORMULAS ---------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------------- */
+
+export const updateProductionItemsFootprints = async (indic,financialData,period) =>
+{
+  // Production stocks
+  await updateProductionStocksStatesFpt(indic,financialData,period);
 
   // Stored production
-  productionStocks.prevFootprint.indicators[indic] = await buildIndicatorAggregate(indic,financialData.stocks.filter(stock => stock.isProductionStock),{usePrev: true});
-  productionStocks.footprint.indicators[indic] = await buildIndicatorAggregate(indic,financialData.stocks.filter(stock => stock.isProductionStock));
-  storedProduction.footprint.indicators[indic] = await buildIndicatorMerge(productionStocks.footprint.indicators[indic], productionStocks.amount,
-                                                                           productionStocks.prevFootprint.indicators[indic], productionStocks.prevAmount);
-  // Le calcul de l'incertitude peut entraîner des résultats erronés, les valeurs étant supposées décorrélées et l'impact brut restant à amortir pouvant être faible
-  // L'incertitude associée est donc celle de la production courante
-  storedProduction.footprint.indicators[indic].setUncertainty(productionStocks.prevFootprint.indicators[indic].getUncertainty());
+  await updateStoredProductionFpt(indic,financialData,period);
 
   // Immobilised production
-  immobilisedProduction.footprint.indicators[indic] = production.footprint.indicators[indic];
+  await updateImmobilisedProductionFpt(indic,financialData,period);
 
-  // Revenue footprint
-  revenue.footprint.indicators[indic] = await buildIndicatorMerge(production.footprint.indicators[indic], production.amount-productionStocks.prevAmount,
-                                                                  productionStocks.prevFootprint.indicators[indic], productionStocks.prevAmount);
-  
+  // Sold production
+  await updateSoldProductionFpt(indic,financialData,period);
+
   return;
 }
 
-/* -------------------------------------------------------------------------------------- */
-/* -------------------- IMMOBILISATIONS & STOCKS INDICATORS FORMULAS -------------------- */
-/* -------------------------------------------------------------------------------------- */
+/* ---------- Empreinte des stocks de production ---------- */
+// ...
 
-export const updateFinalStatesFootprints = async (indic,financialData) =>
+const updateProductionStocksStatesFpt = async (indic,financialData,period) =>
 {
-    // Immobilisations
-    await updateImmobilisationsIndicator(indic,financialData);
-    
-    // Depreciations
-    await updateDepreciationsIndicator(indic,financialData);
-    
-    return;
-}
-
-/* ----- Immoblisations footprints ----- */
-
-/** Empreinte déduite à partir de l'empreinte initiale, des investissements et des immobilisations de production
- *  2 étapes :
- *    - Calcul de l'empreinte des investissements, et association à l'empreinte initiale
- *    - Calcul de l'empreinte des immobilisations de production, et association à l'empreinte précédement obtenue (intiale + investissements)
- */
-
-const updateImmobilisationsIndicator = async (indic,financialData) =>
-{
-  await Promise.all(financialData.immobilisations.map(async (immobilisation) => 
+  let stocks = financialData.stocks.filter(stock => stock.isProductionStock);
+  await Promise.all(stocks.map(async (stock) =>
   {
-    // Investments
-    let investments = financialData.investments.filter(investment => investment.account == immobilisation.account);
-    let amountInvestments = investments.map(investment => investment.amount)
-                                       .reduce((a,b) => a+b,0);
-    // Immobilised production
-    let immobilisedProductions = financialData.immobilisationProductions.filter(immobilisationProduction => immobilisationProduction.account == immobilisation.account);
-    let amountImmobilisedProduction = immobilisedProductions.map(immobilisationProduction => immobilisationProduction.amount)
-                                                            .reduce((a,b) => a+b,0);
-    
-    // Merge investments indicator
-    let investmentsIndicator = await buildIndicatorAggregate(indic,investments);
-    let immobilisationIndicator = investments.length > 0 ? await buildIndicatorMerge(immobilisation.prevFootprint.indicators[indic], immobilisation.amount-amountInvestments-amountImmobilisedProduction,
-                                                                                     investmentsIndicator, amountInvestments) 
-                                                         : immobilisation.prevFootprint.indicators[indic];
-    // Merge immobilised productions indicator
-    let immobilisationProductionsIndicator = await buildIndicatorAggregate(indic,immobilisedProductions);
-    immobilisationIndicator = immobilisedProductions.length > 0 ? await buildIndicatorMerge(immobilisationIndicator, immobilisation.amount-amountImmobilisedProduction,
-                                                                                            immobilisationProductionsIndicator, amountImmobilisedProduction) 
-                                                                : immobilisation.prevFootprint.indicators[indic];
+    // initial state
+    if (stock.initialState.date==getPrevDate(period.dateStart) && stock.initialStateType=="currentFootprint") {
+      stock.initialState.footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
+      stock.states[stock.initialState.date].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
+    }
 
-    // Assign indicator
-    immobilisation.footprint.indicators[indic] = immobilisationIndicator;
+    // states
+    stock.states[period.dateEnd].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
     return;
   }));
   return;
 }
 
- /* ----- Depreciations footprints ----- */
+/* ----- Empreinte de la production stockée ----- */
+// ...
 
-/** Empreinte obtenue à partir de l'empreinte initiale et des empreinte des dotations aux amortissements
- *  L'empreinte des dotations est pondérée à hauteur du montant des dotations.
- *  L'empreinte initiale du compte d'amortissement est pondrée à hauteur du montant "restant" (montant final du compte - montant des dotations)
- *  En l'absence de dotations, l'empreinte finale correspond à l'empreinte initiale.
- */
-
-const updateDepreciationsIndicator = async (indic,financialData) =>
+const updateStoredProductionFpt = async (indic,financialData,period) =>
 {
-  await Promise.all(financialData.depreciations.map(async (depreciation) => 
+  let prevStateDateEnd = getPrevDate(period.dateStart);
+  let productionStocks = financialData.stocks.filter(stock => stock.isProductionStock);
+
+  let initialProductionStockAmount = getAmountItems(productionStocks.map(stock => stock.states[prevStateDateEnd])); // initial amount
+  let initialProductionStockFootprint = await buildAggregateFootprint(productionStocks.map(stock => stock.states[prevStateDateEnd])); // inital footprint
+
+  let finalProductionStockAmount = getAmountItems(productionStocks.map(stock => stock.states[period.dateEnd])); // final amount
+  let finalProductionStockFootprint = await buildAggregateFootprint(productionStocks.map(stock => stock.states[period.dateEnd])); // final footprint
+
+  financialData.productionAggregates.storedProduction.periodsData[period.periodKey].footprint.indicators[indic]
+    = await buildDifferenceIndicator(indic,
+      {amount: finalProductionStockAmount, footprint: finalProductionStockFootprint},     // final production
+      {amount: initialProductionStockAmount, footprint: initialProductionStockFootprint}  // initial production
+    )
+  return;
+}
+
+/* ----- Empreinte de la production immobilisée ----- */
+// set production footprint
+
+const updateImmobilisedProductionFpt = async (indic,financialData,period) =>
+{
+  if (financialData.productionAggregates.immobilisedProduction.periodsData[period.periodKey] &&
+      financialData.productionAggregates.immobilisedProduction.periodsData[period.periodKey].amount>0) 
   {
-    // Depreciation expenses
-    let depreciationExpense = financialData.getDepreciationExpenseByAccountAux(depreciation.account);
-    // Merge if expense defined
-    depreciation.footprint.indicators[indic] = depreciationExpense!=undefined ? await buildIndicatorMerge(depreciation.prevFootprint.indicators[indic], depreciation.amount-depreciationExpense.amount,
-                                                                                                          depreciationExpense.footprint.indicators[indic], depreciationExpense.amount)
-                                                                              : depreciation.prevFootprint.indicators[indic];
-    return;
-  }));
+    financialData.productionAggregates.immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic]
+      = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
+  } else {
+    financialData.productionAggregates.immobilisedProduction.periodsData[period.periodKey].footprint = new SocialFootprint();
+  }
+  return;
+}
+
+/* ----- Empreinte de la production vendue ----- */
+// revenue fpt from production fpt & init stocks amount
+
+const updateSoldProductionFpt = async (indic,financialData,period) =>
+{
+  let prevStateDateEnd = getPrevDate(period.dateStart);
+  let productionStocks = financialData.stocks.filter(stock => stock.isProductionStock);
+
+  let initialProductionStockAmount = getAmountItems(productionStocks.map(stock => stock.states[prevStateDateEnd])); // initial production stocks amount
+  let initialProductionStockFootprint = await buildAggregateFootprint(productionStocks.map(stock => stock.states[prevStateDateEnd])); // initial production stocks fpt
+
+  let revenueAmount = financialData.productionAggregates.revenue.periodsData[period.periodKey].amount;
+  let productionFootprint = financialData.mainAggregates.production.periodsData[period.periodKey].footprint;
+
+  financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint.indicators[indic]
+    = await mergeIndicators(indic,[
+      {amount: initialProductionStockAmount, footprint: initialProductionStockFootprint},
+      {amount: roundValue(revenueAmount-initialProductionStockAmount,2), footprint: productionFootprint}
+    ]);
   return;
 }

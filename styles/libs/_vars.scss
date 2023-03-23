@@ -55,7 +55,7 @@ $input-font-size: 0.9rem;
 $input-group-addon-bg: #f4f4fb;
 
 // TABLE
-$table-border-color: $bg-light;
+$table-border-color: darken($light, 1%);
 $table-border-width: 0;
 
 $hr-margin-y: 2rem;

@@ -6,35 +6,36 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
 
     let netValueAddedFootprint;
     let productionFootprint;
-    let intermediateConsumptionFootprint;
-    let fixedCapitalConsumptionFootprint;
+    let intermediateConsumptionsFootprint;
+    let fixedCapitalConsumptionsFootprint;
     
     const getNetValueAdded = SerieDataService.getMacroData(indic.toUpperCase(), code, "NVA");
     const getProduction = SerieDataService.getMacroData(indic.toUpperCase(), code, "PRD");
-    const getIntermediateConsumption = SerieDataService.getMacroData(indic.toUpperCase(),code, "IC");
-    const getFixedCapitalConsumption = SerieDataService.getMacroData(indic.toUpperCase(), code, "CFC");
+    const getIntermediateConsumptions = SerieDataService.getMacroData(indic.toUpperCase(),code, "IC");
+    const getFixedCapitalConsumptions = SerieDataService.getMacroData(indic.toUpperCase(), code, "CFC");
 
     await axios
-      .all([getNetValueAdded, getProduction, getIntermediateConsumption, getFixedCapitalConsumption])
+      .all([getNetValueAdded, getProduction, getIntermediateConsumptions, getFixedCapitalConsumptions])
       .then(
         axios.spread((...responses) => {
           const netValueAdded = responses[0];
           const production = responses[1];
-          const intermediateConsumption = responses[2];
-          const fixedCapitalConsumption = responses[3];
+          const intermediateConsumptions = responses[2];
+          const fixedCapitalConsumptions = responses[3];
           if (netValueAdded.data.header.code == 200) {
             netValueAddedFootprint = netValueAdded.data.data.at(-1);
           }
           if (production.data.header.code == 200) {
             productionFootprint = production.data.data.at(-1);
           }
-  
-          if (intermediateConsumption.data.header.code == 200) {
-            intermediateConsumptionFootprint = intermediateConsumption.data.data.at(-1);
+     
+          if (intermediateConsumptions.data.header.code == 200) {
+          
+            intermediateConsumptionsFootprint = intermediateConsumptions.data.data.at(-1);
           }
 
-          if (fixedCapitalConsumption.data.header.code == 200) {
-            fixedCapitalConsumptionFootprint = fixedCapitalConsumption.data.data.at(-1);
+          if (fixedCapitalConsumptions.data.header.code == 200) {
+            fixedCapitalConsumptionsFootprint = fixedCapitalConsumptions.data.data.at(-1);
           }
         })
       )
@@ -43,8 +44,11 @@ const getMacroSerieData = async (indic, code,comparativeData,serie) => {
       });
   
 
-
-      const newComparativeData = {fixedCapitalConsumption : fixedCapitalConsumptionFootprint,intermediateConsumption : intermediateConsumptionFootprint, production : productionFootprint, netValueAdded : netValueAddedFootprint}
+      const newComparativeData = {
+        fixedCapitalConsumptions : fixedCapitalConsumptionsFootprint,
+        intermediateConsumptions : intermediateConsumptionsFootprint, 
+        production : productionFootprint, 
+        netValueAdded : netValueAddedFootprint}
       const divisionFootprint = await updateComparativeFootprint(indic,comparativeData, newComparativeData, serie)
 
       return divisionFootprint;

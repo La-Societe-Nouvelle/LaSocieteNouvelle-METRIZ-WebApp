@@ -5,12 +5,14 @@ import React from "react";
 import { Table } from "react-bootstrap";
 
 // Utils
-import { getAmountItems, printValue } from "../../src/utils/Utils";
+import { getAmountItems, getPrevDate, getSumItems, printValue } from "../../src/utils/Utils";
 
 /* ---------- IMMOBILISATIONS TABLE ---------- */
 
-export class ImmobilisationsTable extends React.Component {
-  constructor(props) {
+export class ImmobilisationsTable extends React.Component 
+{
+  constructor(props) 
+  {
     super(props);
     this.state = {
       columnSorted: "account",
@@ -19,9 +21,11 @@ export class ImmobilisationsTable extends React.Component {
   }
 
   render() {
-    const { immobilisations, investments, aggregates } =
-      this.props.financialData;
+    const { immobilisations, investments } = this.props.financialData;
     const { columnSorted } = this.state;
+    const period = this.props.period;
+    const prevStateDateEnd = getPrevDate(period.dateStart);
+    console.log(period);
 
     this.sortItems(immobilisations, columnSorted);
 
@@ -47,22 +51,18 @@ export class ImmobilisationsTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {immobilisations.map(
-              ({ account, accountLib, amount, prevAmount }) => {
-                let augmentation = investments
-                  .filter((investment) => investment.account == account)
-                  .map((investment) => investment.amount)
-                  .reduce((a, b) => a + b, 0);
-                let dimininution = prevAmount + augmentation - amount;
+            {immobilisations.map((immobilisation) => {
+                let augmentation = getAmountItems(immobilisation.entries.filter((entry) => period.regex.test(entry.date) && entry.amount > 0), 0);
+                let dimininution = getAmountItems(immobilisation.entries.filter((entry) => period.regex.test(entry.date) && entry.amount < 0), 0);
                 return (
-                  <tr key={account}>
-                    <td>{account}</td>
+                  <tr key={immobilisation.accountNum}>
+                    <td>{immobilisation.accountNum}</td>
                     <td>
-                      {accountLib.charAt(0).toUpperCase() +
-                        accountLib.slice(1).toLowerCase()}
+                      {immobilisation.accountLib.charAt(0).toUpperCase() +
+                        immobilisation.accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end">
-                      {printValue(prevAmount, 0)} &euro;
+                      {printValue(immobilisation.states[prevStateDateEnd].amount, 0)} &euro;
                     </td>
                     <td className="text-end">
                       {printValue(augmentation, 0)} &euro;
@@ -70,7 +70,7 @@ export class ImmobilisationsTable extends React.Component {
                     <td className="text-end">
                       {printValue(dimininution, 0)} &euro;
                     </td>
-                    <td className="text-end">{printValue(amount, 0)} &euro;</td>
+                    <td className="text-end">{printValue(immobilisation.states[period.dateEnd].amount, 0)} &euro;</td>
                   </tr>
                 );
               }
@@ -82,27 +82,22 @@ export class ImmobilisationsTable extends React.Component {
               <tr>
                 <td colSpan="2">TOTAL</td>
                 <td className="text-end">
-                  {printValue(
-                    aggregates.grossAmountImmobilisation.prevAmount,
-                    0
-                  )}{" "}
-                  &euro;
+                  {printValue(getSumItems(immobilisations.map(immobilisation => getGrossAmountImmobilisation(immobilisation,prevStateDateEnd)), 0)
+                  , 0)}{" "}&euro;
                 </td>
                 <td className="text-end">
                   {printValue(getAmountItems(investments), 0)} &euro;
                 </td>
                 <td className="text-end">
                   {printValue(
-                    aggregates.grossAmountImmobilisation.prevAmount +
-                      getAmountItems(investments) -
-                      aggregates.grossAmountImmobilisation.amount,
-                    0
-                  )}{" "}
-                  &euro;
+                    getSumItems(immobilisations.map(immobilisation => getGrossAmountImmobilisation(immobilisation,prevStateDateEnd)), 0)
+                    + getAmountItems(investments)
+                    - getSumItems(immobilisations.map(immobilisation => getGrossAmountImmobilisation(immobilisation,period.dateEnd)), 0)
+                    , 0)}{" "}&euro;
                 </td>
                 <td className="text-end">
-                  {printValue(aggregates.grossAmountImmobilisation.amount, 0)}{" "}
-                  &euro;
+                  {printValue(getSumItems(immobilisations.map(immobilisation => getGrossAmountImmobilisation(immobilisation,period.dateEnd)), 0)
+                  , 0)}{" "}&euro;
                 </td>
               </tr>
             </tfoot>
@@ -128,7 +123,7 @@ export class ImmobilisationsTable extends React.Component {
         items.sort((a, b) => a.accountLib.localeCompare(b.accountLib));
         break;
       case "account":
-        items.sort((a, b) => a.account.localeCompare(b.account));
+        items.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
         break;
       //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
       //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;
@@ -138,3 +133,6 @@ export class ImmobilisationsTable extends React.Component {
     if (this.state.reverseSort) items.reverse();
   }
 }
+
+
+const getGrossAmountImmobilisation = (immobilisation,date) => immobilisation.states[date].amount

@@ -8,6 +8,8 @@ import { Table } from "react-bootstrap";
 import {
   getAmountItems,
   getPrevAmountItems,
+  getPrevDate,
+  getSumItems,
   printValue,
 } from "../../src/utils/Utils";
 
@@ -23,16 +25,11 @@ export class AmortisationsTable extends React.Component {
   }
 
   render() {
-    const { immobilisations, depreciations, depreciationExpenses } =
+    const { immobilisations, amortisationExpenses } =
       this.props.financialData;
+    const period = this.props.period;
+    const prevStateDateEnd = getPrevDate(period.dateStart);
     const { columnSorted } = this.state;
-
-    const amortisations = depreciations.filter((depreciation) =>
-      /^28/.test(depreciation.account)
-    );
-    const amortisationExpenses = depreciationExpenses.filter((expense) =>
-      /^28/.test(expense.accountAux)
-    );
 
     this.sortItems(immobilisations, columnSorted);
 
@@ -58,26 +55,18 @@ export class AmortisationsTable extends React.Component {
             </tr>
           </thead>
           <tbody>
-            {immobilisations.map(({ account, accountLib }) => {
-              let amortisation = amortisations.filter(
-                (amortisation) => amortisation.accountAux == account
-              )[0];
-              if (amortisation != undefined) {
-                let expenses = amortisationExpenses.filter(
-                  (expense) => expense.accountAux == amortisation.account
-                );
-                let augmentation = getAmountItems(expenses);
-                let dimininution =
-                  amortisation.prevAmount + augmentation - amortisation.amount;
+            {immobilisations.map((immobilisation) => {
+              if (immobilisation.amortisationAccountNum) {
+                let augmentation = getAmountItems(immobilisation.amortisationEntries.filter((entry) => period.regex.test(entry.date) && entry.amount > 0), 0);
+                let dimininution = getAmountItems(immobilisation.amortisationEntries.filter((entry) => period.regex.test(entry.date) && entry.amount < 0), 0);
                 return (
-                  <tr key={account}>
-                    <td>{account}</td>
+                  <tr key={immobilisation.accountNum}>
+                    <td>{immobilisation.accountNum}</td>
                     <td>
-                      {accountLib.charAt(0).toUpperCase() +
-                        accountLib.slice(1).toLowerCase()}
+                      {immobilisation.accountLib.charAt(0).toUpperCase() + immobilisation.accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end">
-                      {printValue(amortisation.prevAmount, 0)} &euro;
+                      {printValue(immobilisation.states[prevStateDateEnd].amortisationAmount, 0)} &euro;
                     </td>
                     <td className="text-end">
                       {printValue(augmentation, 0)} &euro;
@@ -86,17 +75,17 @@ export class AmortisationsTable extends React.Component {
                       {printValue(dimininution, 0)} &euro;
                     </td>
                     <td className="text-end">
-                      {printValue(amortisation.amount, 0)} &euro;
+                      {printValue(immobilisation.states[period.dateEnd].amortisationAmount, 0)} &euro;
                     </td>
                   </tr>
                 );
               } else {
                 return (
-                  <tr key={account}>
-                    <td>{account}</td>
+                  <tr key={immobilisation.accountNum}>
+                    <td>{immobilisation.accountNum}</td>
                     <td>
-                      {accountLib.charAt(0).toUpperCase() +
-                        accountLib.slice(1).toLowerCase()}
+                      {immobilisation.accountLib.charAt(0).toUpperCase() +
+                        immobilisation.accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end"></td>
                     <td className="text-end"></td>
@@ -113,22 +102,21 @@ export class AmortisationsTable extends React.Component {
               <tr>
                 <td colSpan="2">TOTAL</td>
                 <td className="text-end">
-                  {printValue(getPrevAmountItems(amortisations), 0)} &euro;
+                  {printValue(getSumItems(immobilisations.map(immobilisation => immobilisation.states[prevStateDateEnd].amortisationAmount))
+                  , 0)}{" "}&euro;
                 </td>
                 <td className="text-end">
                   {printValue(getAmountItems(amortisationExpenses), 0)} &euro;
                 </td>
                 <td className="text-end">
                   {printValue(
-                    getPrevAmountItems(amortisations) +
-                      getAmountItems(amortisationExpenses) -
-                      getAmountItems(amortisations),
-                    0
-                  )}{" "}
-                  &euro;
+                     getSumItems(immobilisations.map(immobilisation => immobilisation.states[prevStateDateEnd].amortisationAmount)) 
+                    + getAmountItems(amortisationExpenses) 
+                    - getSumItems(immobilisations.map(immobilisation => immobilisation.states[period.dateEnd].amortisationAmount)) 
+                  , 0)}{" "} &euro;
                 </td>
                 <td className="text-end">
-                  {printValue(getAmountItems(amortisations), 0)} &euro;
+                  {printValue(getSumItems(immobilisations.map(immobilisation => immobilisation.states[period.dateEnd].amortisationAmount)), 0)} &euro;
                 </td>
               </tr>
             </tfoot>
@@ -154,7 +142,7 @@ export class AmortisationsTable extends React.Component {
         items.sort((a, b) => a.accountLib.localeCompare(b.accountLib));
         break;
       case "account":
-        items.sort((a, b) => a.account.localeCompare(b.account));
+        items.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
         break;
       //case "prevAmount": items.sort((a,b) => b.prevAmount - a.prevAmount); break;
       //case "variation": items.sort((a,b) => (b.amount-b.prevAmount) - (a.amount-a.prevAmount)); break;

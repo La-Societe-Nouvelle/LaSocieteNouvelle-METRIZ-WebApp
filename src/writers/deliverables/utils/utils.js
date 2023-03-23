@@ -1,9 +1,11 @@
 import { printValue } from "../../../utils/Utils";
 
-export function sortCompaniesByFootprint(expenses, indicator, order) {
-  const sortedExpenses = expenses.sort((a, b) => {
-    const valueA = a.footprint.indicators[indicator].value;
-    const valueB = b.footprint.indicators[indicator].value;
+
+export function sortAccountsByFootprint(accounts, period, indicator, order) {
+
+  const sortedAccounts = accounts.sort((a, b) => {
+    const valueA = a.periodsData[period.periodKey].footprint.indicators[indicator].value;
+    const valueB = b.periodsData[period.periodKey].footprint.indicators[indicator].value;
     if (order === "asc") {
       return valueA - valueB;
     } else {
@@ -11,9 +13,13 @@ export function sortCompaniesByFootprint(expenses, indicator, order) {
     }
   });
 
-  return sortedExpenses;
+  return sortedAccounts;
 }
-export function sortCompaniesByImpact(expensesAccounts, indicator, order) {
+
+
+
+export function sortProvidersByImpact(expensesAccounts, indicator, order) {
+
   const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
     const valueA = a.footprint.indicators[indicator].getGrossImpact(a.amount);
     const valueB = b.footprint.indicators[indicator].getGrossImpact(b.amount);
@@ -24,6 +30,27 @@ export function sortCompaniesByImpact(expensesAccounts, indicator, order) {
       return valueB - valueA;
     }
   });
+
+  return sortedExpensesAccounts;
+}
+
+export function sortProvidersByContrib(periodKey,expensesAccounts, indicator, order) {
+  
+  const sortedExpensesAccounts = expensesAccounts.sort((a, b) => {
+    const valueA = a.footprint.indicators[indicator].getGrossImpact(a.periodsData[periodKey].amount);
+    const valueB = b.footprint.indicators[indicator].getGrossImpact(b.periodsData[periodKey].amount);
+  
+    if (order === "asc") {
+      return valueA - valueB;
+    } else {
+      return valueB - valueA;
+    }
+  }).slice(0, 4).sort((a, b) => {
+    let sortedAccountA = 100 - a.footprint.indicators[indicator].value;
+    let sortedAccountB = 100 - b.footprint.indicators[indicator].value;
+    return sortedAccountB - sortedAccountA;
+  });
+  
 
   return sortedExpensesAccounts;
 }
@@ -91,7 +118,7 @@ export function getKeySuppliers(companies, indic, unit, precision) {
       keySuppliers.push({
         stack: [
           {
-            text: cutString(company.corporateName, 40),
+            text: cutString(company.providerLib, 40),
             fontSize: 8,
             bold: true,
           },
@@ -112,37 +139,37 @@ export function getKeySuppliers(companies, indic, unit, precision) {
   return keySuppliers;
 }
 
-export function getIntensKeySuppliers(
-  companies,
+export function getIntensKeyProviders(
+  providers,
   indic,
   unit,
   unitGrossImpact,
-  precision
+  precision,
+  period
 ) {
   const keySuppliers = [];
 
   const precisionImpact = unitGrossImpact == "€" ? 0 : precision;
-
-  companies
-    .filter((company) => !company.isDefaultAccount)
-    .map((company) =>
+  providers
+    .filter((provider) => !provider.isDefaultAccount)
+    .map((provider) =>
       keySuppliers.push({
         stack: [
           {
-            text: cutString(company.corporateName, 40),
+            text: cutString(provider.providerLib, 40),
             fontSize: 8,
             bold: true,
           },
           {
             margin: [0, 2, 0, 2],
             text:
-              company.footprint.indicators[indic].value.toFixed(precision) +
+              provider.footprint.indicators[indic].value.toFixed(precision) +
               " " +
               unit +
               " - " +
               printValue(
-                company.footprint.indicators[indic].getGrossImpact(
-                  company.amount
+                provider.footprint.indicators[indic].getGrossImpact(
+                  provider.periodsData[period.periodKey].amount
                 ),
                 precisionImpact
               ) +
@@ -189,6 +216,7 @@ export const getMostImpactfulExpenseAccountRows = (
 };
 
 export function cutString(str, nbChar) {
+
   if (str.length <= nbChar) return str;
   return str.substring(0, nbChar) + "...";
 }

@@ -2,7 +2,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 // Table
-import { IdentifiedCompaniesTable } from "../../tables/IdentifiedCompaniesTable";
+import { IdentifiedProvidersTable } from "../../tables/IdentifiedCompaniesTable";
 
 // Reader & Writers
 import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
@@ -14,13 +14,13 @@ import { ProgressBar } from "../../popups/ProgressBar";
 import { MessagePopup } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
-export class SirenSection extends React.Component {
-  constructor(props) {
-    super(props);
 
+export class SirenSection extends React.Component 
+{
+  constructor(props) 
+  {
+    super(props);
     this.state = {
-      companies: props.session.financialData.companies,
-      companiesShowed: props.session.financialData.companies,
       view: "all",
       nbItems: 20,
       fetching: false,
@@ -28,16 +28,17 @@ export class SirenSection extends React.Component {
       progression: 0,
       synchronised: 0,
       popup: false,
-      isDisabled: true,
+      isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
+      isNextStepAvailable: checkNextStepAvailable(props.financialData.providers),
       errorFile: false,
       error: false,
     };
 
-    this.onDrop = (files) => {
+    this.onDrop = (files) => 
+    {
       if (files.length) {
         this.importFile(files[0]);
         this.openPopup();
-        this.setState({ isDisabled: false });
         this.setState({ errorFile: false });
       } else {
         this.setState({ errorFile: true });
@@ -45,93 +46,42 @@ export class SirenSection extends React.Component {
     };
   }
 
-  handleChange = (event) => {
-    let view = event.target.value;
-
-    switch (view) {
-      case "undefined":
-        return this.setState({
-          companiesShowed: this.state.companies.filter(
-            (company) => company.state != "siren"
-          ),
-          view: view,
-        });
-      case "unsync":
-        return this.setState({
-          companiesShowed: this.state.companies.filter(
-            (company) => company.status != 200
-          ),
-          view: view,
-        });
-      case "error":
-        return this.setState({
-          companiesShowed: this.state.companies.filter(
-            (company) => company.status == 404
-          ),
-          view: view,
-        });
-      default:
-        return this.setState({
-          companiesShowed: this.state.companies,
-          view: view,
-        });
+  componentDidUpdate = () =>
+  {
+    
+    // next step available
+    const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
+    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+      this.setState({ isNextStepAvailable });
     }
-  };
+    // providers fpt to sync
+    const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
+    if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
+      this.setState({ isSyncButtonEnable });
+    }
+  }
 
   render() {
     const {
-      companies,
       view,
       nbItems,
       fetching,
       progression,
-      synchronised,
-      companiesShowed,
       popup,
-      isDisabled,
+      isSyncButtonEnable,
+      isNextStepAvailable,
       errorFile,
       error,
     } = this.state;
 
-    const financialData = this.props.session.financialData;
+    const financialData = this.props.financialData;
+    const financialPeriod = this.props.financialPeriod;
 
-    const isNextStepAvailable = nextStepAvailable(companies);
+    const providers = financialData.providers.filter(provider => provider.periodsData.hasOwnProperty(financialPeriod.periodKey));
 
-    let buttonNextStep;
-    if (
-      this.state.companies.filter((company) => company.status == 200).length ==
-      this.state.companies.length
-    ) {
-      buttonNextStep = (
-        <div>
-          <button
-            onClick={() => this.props.nextStep()}
-            className={"btn btn-primary me-3"}
-          >
-            Secteurs d'activité <i className="bi bi-chevron-right"></i>
-          </button>
-          <button
-            className={"btn btn-secondary"}
-            id="validation-button"
-            onClick={this.props.submit}
-          >
-            Mesurer mon impact
-            <i className="bi bi-chevron-right"></i>
-          </button>
-        </div>
-      );
-    } else {
-      buttonNextStep = (
-        <button
-          className={"btn btn-secondary"}
-          id="validation-button"
-          onClick={() => this.props.nextStep()}
-          disabled={!isNextStepAvailable}>
-          Valider les fournisseurs
-          <i className="bi bi-chevron-right"></i>
-        </button>
-      );
-    }
+    //const providers = financialData.providers ;
+    const showedProviders = getShowedProviders(view,providers);
+    const allProvidersIdentified = (providers.filter((provider) => provider.footprintStatus == 200).length == providers.length);
 
     return (
       <Container fluid id="siren-section">
@@ -199,14 +149,14 @@ export class SirenSection extends React.Component {
             <div className="table-container">
               <div className="table-data table-company">
                 {error && <ErrorApi />}
-                { companies.some(company => company.status == "404") && (
+                {providers.some(provider => provider.footprintStatus == 404) && (
                   <div className="alert alert-danger">
                     <p>
                       <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas pu être synchroniser. Vérifiez le numéro de siren et
                       resynchronisez les données.
                     </p>
                     <button
-                      onClick={this.handleChange}
+                      onClick={this.changeView}
                       value="unsync"
                       className="btn btn-secondary"
                     >
@@ -220,20 +170,19 @@ export class SirenSection extends React.Component {
                       <i className="bi bi-check2 me-2"></i> Tous les comptes ayant un
                       n° de Siren ont bien été synchronisés.
                     </p>
-                    {companies.filter((company) => company.state == "default")
-                      .length > 0 && (
+                    {providers.some((provider) => provider.useDefaultFootprint) && (
                       <button
-                        onClick={this.handleChange}
+                        onClick={this.changeView}
                         value="undefined"
                         className={"btn btn-tertiary"}
                       >
                         Comptes sans numéro de siren (
                         {
-                          companies.filter(
-                            (company) => company.state == "default"
+                          providers.filter(
+                            (provider) => provider.useDefaultFootprint
                           ).length
                         }
-                        /{companies.length})
+                        /{providers.length})
                       </button>
                     )}
                   </div>
@@ -244,9 +193,9 @@ export class SirenSection extends React.Component {
                   empreintes de certains comptes doivent être synchronisées.
                 </p>
                 <button
-                  onClick={() => this.synchroniseCompanies()}
+                  onClick={() => this.synchroniseProviders()}
                   className="btn btn-secondary"
-                  disabled={isDisabled}
+                  disabled={!isSyncButtonEnable}
                 >
                   <i className="bi bi-arrow-repeat"></i> Synchroniser les
                   données
@@ -257,7 +206,7 @@ export class SirenSection extends React.Component {
                 <div className="d-flex mb-3">
                   <div className="form-group me-2">
                     <select
-                      onChange={this.handleChange}
+                      onChange={this.changeView}
                       value={view}
                       className="form-select"
                     >
@@ -295,17 +244,17 @@ export class SirenSection extends React.Component {
                     </select>
                   </div>
                 </div>
-                {companies.length && (
-                  <IdentifiedCompaniesTable
+                {providers.length && (
+                  <IdentifiedProvidersTable
                     nbItems={
                       nbItems == "all"
-                        ? companiesShowed.length
+                        ? showedProviders.length
                         : parseInt(nbItems)
                     }
-                    onUpdate={this.updateFootprints.bind(this)}
-                    companies={companiesShowed}
+                    providers={showedProviders}
                     financialData={financialData}
-                    checkSync={this.enableButton.bind(this)}
+                    financialPeriod={financialPeriod}
+                    refreshSection={this.refreshSection}
                   />
                 )}
               </div>
@@ -320,7 +269,35 @@ export class SirenSection extends React.Component {
           )}
 
           <div className="text-end">
-            {buttonNextStep}</div>
+            {allProvidersIdentified && (
+              <div>
+                <button
+                  className={"btn btn-primary me-3"}
+                  onClick={() => this.props.nextStep()}
+                >
+                  Secteurs d'activité <i className="bi bi-chevron-right"></i>
+                </button>
+                <button
+                  className={"btn btn-secondary"}
+                  id="validation-button"
+                  onClick={() => this.props.nextStep()}
+                >
+                  Mesurer mon impact
+                  <i className="bi bi-chevron-right"></i>
+                </button>
+              </div>
+            )}
+            {!allProvidersIdentified && (
+              <button
+                className={"btn btn-secondary"}
+                id="validation-button"
+                onClick={() => this.props.nextStep()}
+                disabled={!isNextStepAvailable}>
+                Valider les fournisseurs
+                <i className="bi bi-chevron-right"></i>
+              </button>
+            )}
+          </div>
         </section>
       </Container>
     );
@@ -329,27 +306,23 @@ export class SirenSection extends React.Component {
   /* ---------- VIEW ---------- */
 
   changeNbItems = (event) => this.setState({ nbItems: event.target.value });
+  changeView = (event) => this.setState({ view: event.target.value });
 
   /* ---------- UPDATES ---------- */
 
-  updateFootprints = () => {
-    this.props.session.updateFootprints();
-    this.setState({ companies: this.props.session.financialData.companies });
-  };
-
-  enableButton = () => {
-    let companies = this.props.session.financialData.companies;
-
-    let nonSyncWithSiren = companies.filter(
-      (company) => company.state == "siren" && company.status != 200
-    );
-
-    let disable;
-
-    nonSyncWithSiren.length > 0 ? (disable = false) : (disable = true);
-
-    this.setState({ isDisabled: disable });
-  };
+  refreshSection = () => 
+  {
+    const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
+    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+      this.setState({ isNextStepAvailable });
+    }
+    const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
+    if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
+      this.setState({ isSyncButtonEnable });
+    }
+    // temp
+    this.forceUpdate();
+  }
 
   /* ---------- FILE IMPORT ---------- */
 
@@ -368,22 +341,30 @@ export class SirenSection extends React.Component {
   };
 
   // Import CSV File
-  importCSVFile = (file) => {
+  importCSVFile = (file) => 
+  {
     let reader = new FileReader();
-    reader.onload = async () => {
+
+    reader.onload = async () => 
+    {
       let CSVData = await CSVFileReader(reader.result);
 
       let companiesIds = await processCSVCompaniesData(CSVData);
       await Promise.all(
-        Object.entries(companiesIds).map(async ([corporateName, corporateId]) =>
-          this.props.session.financialData.updateCorporateId(
-            corporateName,
-            corporateId
-          )
-        )
+        Object.entries(companiesIds).map(async ([providerNum, corporateName, corporateId]) => {
+          let provider  = providerNum ? 
+              this.props.financialData.providers.find(provider => provider.providerNum==providerNum) 
+            : this.props.financialData.providers.find(provider => provider.providerLib==corporateName);
+          if (provider) {
+            provider.corporateId = corporateId;
+            provider.legalUnitData.denomination = denomination;
+            provider.useDefaultFootprint = false;
+            provider.footprintStatus = 0; // check if changes or use update()
+          }
+        })
       );
       this.setState({
-        companies: this.props.session.financialData.companies,
+        providers: this.props.financialData.providers,
       });
     };
 
@@ -391,22 +372,28 @@ export class SirenSection extends React.Component {
   };
 
   // Import XLSX File
-  importXLSXFile = (file) => {
+  importXLSXFile = async (file) => 
+  {
     let reader = new FileReader();
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
-
       await Promise.all(
-        XLSXData.map(async ({ account, denomination, siren }) =>
-          this.props.session.financialData.updateCorporateId(
-            account,
-            denomination,
-            siren
-          )
-        )
+        XLSXData.map(async ({ accountNum, accountLib, denomination, siren, account }) => {
+          if (account && !accountNum) accountNum = account;
+          let provider = accountNum ? 
+              this.props.financialData.providers.filter(provider => provider.providerNum == accountNum)[0]    // based on num
+            : this.props.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
+          if (provider) {
+            provider.corporateId = siren;
+            provider.legalUnitData.denomination = denomination;
+            provider.useDefaultFootprint = false;
+            provider.footprintStatus = 0; // check if changes or use update()
+          }
+          return;
+        })
       );
       this.setState({
-        companies: this.props.session.financialData.companies,
+        providers: this.props.financialData.providers,
       });
     };
 
@@ -417,13 +404,13 @@ export class SirenSection extends React.Component {
 
   // Export CSV File
   exportXLSXFile = async () => {
-    let jsonContent = await this.props.session.financialData.companies
-      .filter((company) => company.account.charAt(0) != "_")
-      .map((company) => {
+    let jsonContent = await this.props.financialData.providers
+      .filter((provider) => provider.providerNum.charAt(0) != "_")
+      .map((provider) => {
         return {
-          account: company.account,
-          denomination: company.corporateName,
-          siren: company.corporateId,
+          accountNum: provider.providerNum,
+          denomination: provider.corporateName,
+          siren: provider.corporateId,
         };
       });
     let fileProps = { wsclos: [{ wch: 50 }, { wch: 20 }] };
@@ -445,21 +432,33 @@ export class SirenSection extends React.Component {
 
   /* ---------- FETCHING DATA ---------- */
 
-  synchroniseCompanies = async () => {
-    let companiesToSynchronise = this.state.companies.filter(
-      (company) => company.state == "siren" && company.status != 200
-    );
-
+  // fetch data for showed providers
+  synchroniseProviders = async () => 
+  {
+    // providers with fpt unfetched
+    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
 
     let i = 0;
-    let n = companiesToSynchronise.length;
+    let n = providersToSynchronise.length;
 
-    for (let company of companiesToSynchronise) {
-      try {
-        await company.updateFromRemote();
-      } catch (error) {
+    for (let provider of providersToSynchronise) 
+    {
+      try 
+      {
+        // fetch footprint
+        await provider.updateFromRemote();
+        // assign to expenses & investments
+        this.props.financialData.externalExpenses
+          .concat(this.props.financialData.investments)
+          .filter(expense => expense.providerNum==provider.providerNum)
+          .forEach(expense => {
+            expense.footprint = provider.footprint;
+          });
+      } 
+      catch (error) {
+        console.log(error)
         this.setState({ error: true });
         break;
       }
@@ -468,22 +467,16 @@ export class SirenSection extends React.Component {
     }
 
     // update state
-
     this.setState({
       fetching: false,
       progression: 0,
       view: "all",
-      companiesShowed: this.state.companies,
-      synchronised: this.state.companies.filter(
-        (company) => company.status == 200
+      synchronised: this.props.financialData.providers.filter(
+        (provider) => provider.footprintStatus == 200
       ).length,
     });
 
     document.getElementById("step-3").scrollIntoView();
-
-    this.enableButton();
-    // update session
-    this.props.session.updateFootprints();
   };
 
   /* ----- POP-UP ----- */
@@ -491,17 +484,36 @@ export class SirenSection extends React.Component {
   closePopup = () => this.setState({ popup: false });
   openPopup = () => this.setState({ popup: true });
 }
+
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const nextStepAvailable = (companies) => {
-  let nbSirenSynchronised = companies.filter(
-    (company) => company.state == "siren" && company.status == 200
+const checkNextStepAvailable = (providers) => 
+{
+  let nbSirenSynchronised = providers.filter(
+    (provider) => !provider.useDefaultFootprint && provider.footprintStatus == 200
   ).length;
 
-  let nbSiren = companies.filter((company) => company.state == "siren").length;
+  let nbSiren = providers.filter((provider) => !provider.useDefaultFootprint).length;
   if (nbSirenSynchronised == nbSiren && nbSiren != 0) {
     return true;
   } else {
     return false;
+  }
+};
+
+// provider not using default footprint & footprint status not OK
+const checkSyncButtonEnable = (providers) => 
+{
+  let enable = providers.some((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200 || provider.footprintStatus == 203);
+  return enable;
+};
+
+const getShowedProviders = (view,providers) => 
+{
+  switch (view) {
+    case "undefined": return providers.filter((provider) => provider.useDefaultFootprint);
+    case "unsync":    return providers.filter((provider) => provider.footprintStatus != 200);
+    case "error":     return providers.filter((provider) => provider.footprintStatus == 404);
+    default:          return providers;
   }
 };

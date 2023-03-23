@@ -776,7 +776,7 @@ export class AssessmentNRG extends React.Component
   // update props
   onSubmit = async () => 
   {
-    let { impactsData } = this.props;
+    let impactsData = this.props.impactsData;
 
     // update nrg data
     impactsData.nrgDetails = this.state.nrgDetails;

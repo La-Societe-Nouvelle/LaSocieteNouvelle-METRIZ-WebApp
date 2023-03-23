@@ -1,6 +1,7 @@
 // PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "../../formulas/aggregatesBuilder";
 // Utils
 
 import { getShortCurrentDateString } from "../../utils/Utils";
@@ -19,8 +20,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const createIndicReport = (
-  year,
+export const createIndicReport = async(
   legalUnit,
   indic,
   label,
@@ -28,42 +28,58 @@ export const createIndicReport = (
   financialData,
   impactsData,
   comparativeData,
-  download
+  download,
+  period
 ) => {
   // ---------------------------------------------------------------
   // Utils : Text Generation
 
-  const statementNotes = getStatementNote(impactsData, indic);
+  const currentPeriod = period.periodKey.slice(2);
 
+  const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
+ 
   const analysisNotes = getAnalyse(
     impactsData,
     financialData,
     comparativeData,
-    indic
+    indic,
+    period
   );
  
+    // get Intermediate Aggregates
+    const intermediateConsumptionsAggregates =
+      await buildIntermediateConsumptionsAggregates(
+        financialData,
+        period.periodKey
+      );
+
+    const fixedCapitalConsumptionsAggregates =
+      await buildFixedCapitalConsumptionsAggregates(
+        financialData,
+        period.periodKey
+      );
+        
+
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
-
   const canvasProduction = document.getElementById("production-" + indic);
   const canvasValueAdded = document.getElementById("netValueAdded-" + indic);
-  const canvasIntermediateConsumption = document.getElementById(
-    "intermediateConsumption-" + indic
+  const canvasIntermediateConsumptions = document.getElementById(
+    "intermediateConsumptions-" + indic
   );
-  const canvasFixedCapitalConsumption = document.getElementById(
-    "capitalConsumption-" + indic
+  const canvasFixedCapitalConsumptions = document.getElementById(
+    "fixedCapitalConsumptions-" + indic
   );
 
   const productionChartImage = canvasProduction.toDataURL("image/png");
-  const canvasIntermediateConsumptionImage =
-    canvasIntermediateConsumption.toDataURL("image/png");
+  const canvasIntermediateConsumptionsImage =
+    canvasIntermediateConsumptions.toDataURL("image/png");
   const canvasValueAddedImage = canvasValueAdded.toDataURL("image/png");
-  const canvasFixedCapitalConsumptionImage =
-    canvasFixedCapitalConsumption.toDataURL("image/png");
+  const canvasFixedCapitalConsumptionsImage =
+    canvasFixedCapitalConsumptions.toDataURL("image/png");
 
   // ---------------------------------------------------------------
   // Document Property
-
   const margins = {
     top: 50,
     bottom: 50,
@@ -77,7 +93,7 @@ export const createIndicReport = (
 
   const documentTitle =
     "Rapport_" +
-    year +
+    currentPeriod +
     "_" +
     legalUnit.replaceAll(" ", "") +
     "-" +
@@ -92,7 +108,7 @@ export const createIndicReport = (
       columns: [
         { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
         {
-          text: "Exercice  " + year,
+          text: "Exercice  " + currentPeriod,
           alignment: "right",
           margin: [0, 15, 20, 0],
           bold: true,
@@ -151,17 +167,18 @@ export const createIndicReport = (
         style: "h2",
         margin: [0, 10, 0, 20],
       },
-      // SIG Table
       {
         style: "table",
         table: {
           widths: ["*", "auto", "auto", "auto"],
           body: SIGtableBody(
-            financialData.aggregates,
+            financialData.mainAggregates,
+            financialData.productionAggregates,
             indic,
             unit,
-            financialData.getIntermediateConsumptionsAggregates(),
-            financialData.getFixedCapitalConsumptionsAggregates()
+            intermediateConsumptionsAggregates,
+            fixedCapitalConsumptionsAggregates,
+            period
           ),
         },
         layout: {
@@ -189,7 +206,7 @@ export const createIndicReport = (
       //--------------------------------------------------
       { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
       statementNotes.map((note) => note),
-      { text: impactsData.comments[indic], margin: [0, 10, 0, 10] },
+      { text: impactsData[period.periodKey].comments[indic], margin: [0, 10, 0, 10] },
 
       // ---------------------------------------------------------------------------
       //  PAGE 2
@@ -250,12 +267,12 @@ export const createIndicReport = (
         columns: [
           {
             stack: [
-              {
+              { 
                 text: "Consommations intermédiaires ",
                 style: "h4",
               },
               {
-                image: canvasIntermediateConsumptionImage,
+                image: canvasIntermediateConsumptionsImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
                 alignment: "center",
@@ -385,7 +402,7 @@ export const createIndicReport = (
                 style: "h4",
               },
               {
-                image: canvasFixedCapitalConsumptionImage,
+                image: canvasFixedCapitalConsumptionsImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
                 alignment: "center",

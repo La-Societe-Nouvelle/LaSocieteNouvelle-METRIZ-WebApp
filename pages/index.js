@@ -1,30 +1,31 @@
 // La Société Nouvelle
 
 // React / Next
-import React from 'react';
-import Head from 'next/head';
-import {BrowserView, MobileView} from 'react-device-detect';
+import React from "react";
+import Head from "next/head";
+import { BrowserView, MobileView } from "react-device-detect";
 
 // Objects
-import { Session } from '/src/Session';
+import { Session } from "/src/Session";
 
-// Sections 
-import { StartSection } from '/components/sections/StartSection';
-import ImportSection from '../components/sections/import/ImportSection';
-import { InitialStatesSection } from '/components/sections/InitialStatesSection';
-import { CompaniesSection } from '/components/sections/companies/CompaniesSection';
-import StatementSection from '../components/sections/statements/StatementSection';
-import { PublishStatementSection } from '../components/sections/PublishStatementSection';
+// Sections
+import { StartSection } from "/components/sections/StartSection";
+import ImportSection from "../components/sections/import/ImportSection";
+import { InitialStatesSection } from "/components/sections/InitialStatesSection";
+import { ProvidersSection } from "../components/sections/companies/CompaniesSection";
+import StatementSection from "../components/sections/statements/StatementSection";
+import { PublishStatementSection } from "../components/sections/PublishStatementSection";
 
 // Others components
-import { Header } from '/components/parts/headers/Header';
-import { HeaderSection } from '../components/parts/headers/HeaderSection';
-import { HeaderPublish } from '../components/parts/headers/HeaderPublish';
+import { Header } from "/components/parts/headers/Header";
+import { HeaderSection } from "../components/parts/headers/HeaderSection";
+import { HeaderPublish } from "../components/parts/headers/HeaderPublish";
 
-import { getPrevAmountItems } from '/src/utils/Utils';
-import { updateVersion } from '/src/version/updateVersion';
-import { Footer } from '../components/parts/Footer';
-import { Mobile} from '../components/Mobile'
+import { getPrevAmountItems } from "/src/utils/Utils";
+import { updateVersion } from "/src/version/updateVersion";
+import { Footer } from "../components/parts/Footer";
+import { Mobile } from "../components/Mobile";
+import { getAmountItems } from "../src/utils/Utils";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -39,7 +40,6 @@ import { Mobile} from '../components/Mobile'
  *  |_________________________________________________________________________________________________________|
  */
 
-
 /* -------------------------------------------------------------------------------------- */
 /* ---------------------------------------- HOME ---------------------------------------- */
 /* -------------------------------------------------------------------------------------- */
@@ -49,22 +49,31 @@ export default function Home() {
     <>
       <Head>
         <title>METRIZ by La Société Nouvelle</title>
-        <meta name="description" content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs." />
+        <meta
+          name="description"
+          content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs."
+        />
         <meta property="og:title" content="Metriz by La Société Nouvelle" />
-        <meta property="og:description" content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs."/>
+        <meta
+          property="og:description"
+          content="Metriz est une application web libre et open source qui vous permet de faire le lien entre vos données comptables, les empreintes sociétales de vos fournisseurs et vos impacts directs."
+        />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://metriz.lasocietenouvelle.org" />
+        <meta
+          property="og:url"
+          content="https://metriz.lasocietenouvelle.org"
+        />
         <meta property="og:image" content="/metriz_illus.jpg" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <BrowserView>
-         <Metriz />
+        <Metriz />
       </BrowserView>
       <MobileView>
-        <Mobile/>
+        <Mobile />
       </MobileView>
     </>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------------------------- */
@@ -78,37 +87,43 @@ export default function Home() {
  */
 
 class Metriz extends React.Component {
-
   constructor(props) {
     super(props);
-    this.state =
-    {
+    this.state = {
       session: new Session(),
       step: 0,
-      loading : false
-    }
+      loading: false,
+    };
   }
 
   render() {
     const { step, session } = this.state;
     return (
       <>
-        <div className={step == 0 ? "wrapper bg-white" : "wrapper"} id="wrapper" >
+        <div
+          className={step == 0 ? "wrapper bg-white" : "wrapper"}
+          id="wrapper"
+        >
           {step == 0 ? (
             <Header />
-          ) :
-          step == 5 ? (
-            <HeaderPublish setStep={this.setStep} downloadSession={this.downloadSession} />
-          ) :
-            (
-              <HeaderSection step={step} stepMax={session.progression} setStep={this.setStep} downloadSession={this.downloadSession} />
-            )
-          }
+          ) : step == 5 ? (
+            <HeaderPublish
+              setStep={this.setStep}
+              downloadSession={this.downloadSession}
+            />
+          ) : (
+            <HeaderSection
+              step={step}
+              stepMax={session.progression}
+              setStep={this.setStep}
+              downloadSession={this.downloadSession}
+            />
+          )}
           {this.buildSectionView(step)}
         </div>
         <Footer step={step} />
       </>
-    )
+    );
   }
 
   // change session
@@ -118,41 +133,42 @@ class Metriz extends React.Component {
   downloadSession = async () => {
     // build JSON
     const session = this.state.session;
-    const fileName =  session.legalUnit.siren ?  "svg_ese_" +  session.legalUnit.siren : "svg_ese_" + session.legalUnit.corporateName; // To update
+    const fileName = session.legalUnit.siren
+      ? "session-metriz-" + session.legalUnit.siren + "-" + session.financialPeriod.periodKey.slice(2)
+      : "session-metriz-" + session.legalUnit.corporateName  + "-" + session.financialPeriod.periodKey.slice(2); // To update
     const json = JSON.stringify(session);
 
     // build download link & activate
-    const blob = new Blob([json], { type: 'application/json' });
-    const href =  URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const blob = new Blob([json], { type: "application/json" });
+    const href = URL.createObjectURL(blob);
+    const link = document.createElement("a");
     link.href = href;
     link.download = fileName + ".json";
     link.click();
-  }
+  };
 
   // import session (JSON data -> session)
-  loadPrevSession = async(file) => {
-
-    this.setState({loading : true});
+  loadPrevSession = async (file) => {
+    this.setState({ loading: true });
     const reader = new FileReader();
 
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
-     
+
       // update to current version
       await updateVersion(prevProps);
       // JSON -> session
-      const session =  new Session(prevProps);
-      
+      const session = new Session(prevProps);
+
       this.setState({
         session: session,
         step: session.progression,
-        loading : false,
-      })
-    }
+        loading: false,
+      });
+    };
     reader.readAsText(file);
-  }
+  };
 
   /* ----- SECTION ----- */
 
@@ -162,36 +178,83 @@ class Metriz extends React.Component {
 
     const sectionProps = {
       session: session,
-      submit: () => this.validStep(this.state.step),
-    }
+    };
 
     switch (step) {
-      case 0: return (<StartSection startNewSession={() => this.setStep(1)} loadPrevSession={this.loadPrevSession} isLoading={this.state.loading} />)
-      case 1: return (<ImportSection {...sectionProps} />)
-      case 2: return (<InitialStatesSection {...sectionProps} return={() => this.setStep(1)}/>)
-      case 3: return (<CompaniesSection {...sectionProps} />)
-      case 4: return (<StatementSection {...sectionProps} publish={() => this.setStep(5)} />)
-      case 5: return (<PublishStatementSection {...sectionProps} return={() => this.setStep(4)} />)
-
+      case 0:
+        return (
+          <StartSection
+            startNewSession={() => this.setStep(1)}
+            loadPrevSession={this.loadPrevSession}
+            isLoading={this.state.loading}
+          />
+        );
+      case 1:
+        return (
+          <ImportSection {...sectionProps} submit={this.validImportedData} />
+        );
+      case 2:
+        return (
+          <InitialStatesSection
+            {...sectionProps}
+            submit={this.validInitialStates}
+            return={() => this.setStep(1)}
+          />
+        );
+      case 3:
+        return (
+          <ProvidersSection {...sectionProps} submit={this.validProviders} />
+        );
+      case 4:
+        return (
+          <StatementSection {...sectionProps} publish={() => this.setStep(5)} />
+        );
+      case 5:
+        return (
+          <PublishStatementSection
+            {...sectionProps}
+            return={() => this.setStep(4)}
+          />
+        );
     }
-  }
-
+  };
 
   /* ----- PROGESSION ---- */
 
+  validImportedData = async () => {
+    console.log("--------------------------------------------------");
+    console.log("Ecritures comptables importées");
+    console.log(this.state.session.financialData);
 
-  validStep = (step) => 
-  {
-    // Increase progression
-    this.state.session.progression = Math.max(step + 1, this.state.session.progression);
+    // first year..
+    // if (getAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks).map(asset => asset.InitialState)) == 0) {
+    //   this.state.session.progression++;
+    // }
 
-    // skip initial states if first year
-    if (this.state.session.progression == 2 && getPrevAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks)) == 0) {
-      this.state.session.progression++;
-    }
+    this.setStep(2);
+    this.updateProgression(1);
+  };
 
-    // update current step
-    this.setStep(this.state.session.progression);
-  }
+  validInitialStates = async () => {
+    console.log("--------------------------------------------------");
+    console.log("Empreintes des stocks et immobilisations initialisées");
 
+    this.setStep(3);
+    this.updateProgression(2);
+  };
+
+  validProviders = async () => {
+    console.log("--------------------------------------------------");
+    console.log("Empreintes des fournisseurs récupérées");
+
+    this.setStep(4);
+    this.updateProgression(3);
+  };
+
+  updateProgression = (step) => {
+    this.state.session.progression = Math.max(
+      step + 1,
+      this.state.session.progression
+    );
+  };
 }

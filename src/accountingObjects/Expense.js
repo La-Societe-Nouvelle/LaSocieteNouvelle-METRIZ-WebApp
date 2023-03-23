@@ -5,26 +5,27 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 export class Expense {
 
-  constructor({id,
-               account,
+  constructor({accountNum,
                accountLib,
-               accountAux,
-               accountAuxLib,
-               isDefaultAccountAux,
+               providerNum,
+               providerLib,
+               isDefaultProviderAccount,
                amount,
-               footprint}) 
+               footprint,
+               date}) 
   {
-  // ---------------------------------------------------------------------------------------------------- //
-    this.id = id;
-    
-    this.account = account;
+  // ---------------------------------------------------------------------------------------------------- //    
+    this.accountNum = accountNum;
     this.accountLib = accountLib;
-    this.accountAux = accountAux;
-    this.accountAuxLib = accountAuxLib;
-    this.isDefaultAccountAux = isDefaultAccountAux;
+
+    this.providerNum = providerNum;
+    this.providerLib = providerLib;
+    this.isDefaultProviderAccount = isDefaultProviderAccount;
 
     this.amount = amount || 0;
     this.footprint = new SocialFootprint(footprint);
+
+    this.date = date;
   // ---------------------------------------------------------------------------------------------------- //
   }
 

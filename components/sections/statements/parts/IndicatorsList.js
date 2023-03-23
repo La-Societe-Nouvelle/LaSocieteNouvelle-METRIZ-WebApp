@@ -54,7 +54,7 @@ import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 
 import { getTargetSerieId } from "/src/utils/Utils";
-import { printValue } from "../../../../src/utils/Utils";
+import { getPrevDate, printValue } from "../../../../src/utils/Utils";
 
 // PDF Generation
 import { createIndicReport } from "../../../../src/writers/deliverables/indicReportPDF";
@@ -63,10 +63,13 @@ import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/i
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 
 const IndicatorsList = (props) => {
+  const [period] = useState(props.period);
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
 
-  const [validations, SetValidations] = useState(props.session.validations);
+  const [validations, SetValidations] = useState(
+    props.session.validations[period.periodKey]
+  );
   const [updatedIndic, setUpdatedIndic] = useState("");
   const [popUp, setPopUp] = useState();
   const [indicToExport, setIndicToExport] = useState();
@@ -77,6 +80,14 @@ const IndicatorsList = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeData.activityCode
   );
+
+  // Prev Period
+
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod = props.session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
   useEffect(async () => {
     if (validations.length > 0) {
       props.publish();
@@ -86,7 +97,7 @@ const IndicatorsList = (props) => {
   useEffect(() => {
     // return indics not included in available list of indicators
     const filteredIndics = Object.keys(metaIndics).filter(
-      (key) => !prevIndics.includes(key)
+      (key) => !prevIndics[period.periodKey].includes(key)
     );
     if (filteredIndics.length > 0) {
       setnotAvailableIndics(filteredIndics);
@@ -94,15 +105,12 @@ const IndicatorsList = (props) => {
   }, []);
 
   useEffect(async () => {
-    if(comparativeDivision !== props.session.comparativeData.activityCode) {
-
-      await updateDivision(props.session.comparativeData.activityCode)
-
+    if (comparativeDivision !== props.session.comparativeData.activityCode) {
+      await updateDivision(props.session.comparativeData.activityCode);
     }
   }, [props.session.comparativeData.activityCode]);
 
   const updateComparativeAreaData = async (indic) => {
-
     let idTarget = getTargetSerieId(indic);
 
     let newComparativeData = await getMacroSerieData(
@@ -159,22 +167,25 @@ const IndicatorsList = (props) => {
     setUpdatedIndic();
 
     // get new value
-    let nextIndicator = props.session.getNetValueAddedIndicator(indic);
+    let nextIndicator = props.session.getNetValueAddedIndicator(
+      indic,
+      period.periodKey
+    );
 
     if (
       nextIndicator !==
-      props.session.financialData.aggregates.netValueAdded.footprint.indicators[
-        indic
-      ]
+      props.session.financialData.mainAggregates.netValueAdded.periodsData[
+        period.periodKey
+      ].footprint.indicators[indic]
     ) {
       // remove validation
-      props.session.validations = props.session.validations.filter(
-        (item) => item != indic
-      );
+      props.session.validations[period.periodKey] = props.session.validations[
+        period.periodKey
+      ].filter((item) => item != indic);
       SetValidations(validations.filter((item) => item != indic));
 
       // update footprint
-      await props.session.updateIndicator(indic);
+      await props.session.updateFootprints(period);
     }
   };
 
@@ -200,11 +211,11 @@ const IndicatorsList = (props) => {
     props.onValidation(indic);
 
     // add validation
-    if (!props.session.validations.includes(indic)) {
-      props.session.validations.push(indic);
+    if (!props.session.validations[period.periodKey].includes(indic)) {
+      props.session.validations[period.periodKey].push(indic);
     }
     // update footprint
-    await props.session.updateIndicator(indic);
+    await props.session.updateFootprints(period);
     setUpdatedIndic(indic);
   };
 
@@ -245,7 +256,7 @@ const IndicatorsList = (props) => {
       await generateIndicatorReportPDF(
         props.session,
         key,
-        divisions[comparativeDivision]
+        period
       );
 
       setPopUp("");
@@ -253,7 +264,7 @@ const IndicatorsList = (props) => {
     props.updateVisibleGraphs(false);
   };
 
-  // Resusable Components
+  // Reusable Components
 
   const SuccessMessage = () => {
     return (
@@ -287,30 +298,32 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-      {/* Charts generation */}
-
-      {validations.length > 0 &&
+      {validations.length > 0  &&
         validations.map((indic, key) => (
           <div key={key} className="hidden charts-container">
             <Row>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
                   id={"production-" + indic}
-                  graphDataset={[
+                  firstDataset={[
                     comparativeData.production.areaFootprint.indicators[indic]
                       .value,
-                    props.session.financialData.aggregates.production.footprint.getIndicator(
-                      indic
-                    ).value,
+
+                    prevPeriod &&
+                      props.session.financialData.mainAggregates.production.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.production.divisionFootprint.indicators[
                       indic
                     ].value,
                   ]}
-                  targetData={[
+                  secondDataset={[
                     comparativeData.production.targetAreaFootprint.indicators[
                       indic
                     ].value,
-                    null,
+                    props.session.financialData.mainAggregates.production.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
                     comparativeData.production.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -322,21 +335,25 @@ const IndicatorsList = (props) => {
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"intermediateConsumption-" + indic}
-                  graphDataset={[
-                    comparativeData.intermediateConsumption.areaFootprint
+                  id={"intermediateConsumptions-" + indic}
+                  firstDataset={[
+                    comparativeData.intermediateConsumptions.areaFootprint
                       .indicators[indic].value,
-                    props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                      indic
-                    ).value,
-                    comparativeData.intermediateConsumption.divisionFootprint
+                    prevPeriod &&
+                      props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
+                    comparativeData.intermediateConsumptions.divisionFootprint
                       .indicators[indic].value,
                   ]}
-                  targetData={[
-                    comparativeData.intermediateConsumption.targetAreaFootprint
+                  secondDataset={[
+                    comparativeData.intermediateConsumptions.targetAreaFootprint
                       .indicators[indic].value,
-                    null,
-                    comparativeData.intermediateConsumption.targetDivisionFootprint.indicators[
+                    props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
+
+                    comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
                   ]}
@@ -346,21 +363,25 @@ const IndicatorsList = (props) => {
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
-                  id={"capitalConsumption-" + indic}
-                  graphDataset={[
-                    comparativeData.fixedCapitalConsumption.areaFootprint
+                  id={"fixedCapitalConsumptions-" + indic}
+                  firstDataset={[
+                    comparativeData.fixedCapitalConsumptions.areaFootprint
                       .indicators[indic].value,
-                    props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                      indic
-                    ).value,
-                    comparativeData.fixedCapitalConsumption.divisionFootprint
+                    prevPeriod &&
+                      props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
+                    comparativeData.fixedCapitalConsumptions.divisionFootprint
                       .indicators[indic].value,
                   ]}
-                  targetData={[
-                    comparativeData.fixedCapitalConsumption.targetAreaFootprint
+                  secondDataset={[
+                    comparativeData.fixedCapitalConsumptions.targetAreaFootprint
                       .indicators[indic].value,
-                    null,
-                    comparativeData.fixedCapitalConsumption.targetDivisionFootprint.indicators[
+                    props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
+
+                    comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
                   ]}
@@ -371,21 +392,25 @@ const IndicatorsList = (props) => {
               <Col sm={3} xl={3} lg={3} md={3}>
                 <ComparativeGraphs
                   id={"netValueAdded-" + indic}
-                  graphDataset={[
+                  firstDataset={[
                     comparativeData.netValueAdded.areaFootprint.indicators[
                       indic
                     ].value,
-                    props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                      indic
-                    ).value,
+                    prevPeriod &&
+                      props.session.financialData.mainAggregates.netValueAdded.periodsData[
+                        prevPeriod.periodKey
+                      ].footprint.getIndicator(indic).value,
                     comparativeData.netValueAdded.divisionFootprint.indicators[
                       indic
                     ].value,
                   ]}
-                  targetData={[
+                  secondDataset={[
                     comparativeData.netValueAdded.targetAreaFootprint
                       .indicators[indic].value,
-                    null,
+                    props.session.financialData.mainAggregates.netValueAdded.periodsData[
+                      period.periodKey
+                    ].footprint.getIndicator(indic).value,
+
                     comparativeData.netValueAdded.targetDivisionFootprint.indicators[
                       indic
                     ].data.at(-1).value,
@@ -401,8 +426,10 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates.production
-                          .footprint.indicators[indic].value,
+                        props.session.financialData.mainAggregates.production
+                          .periodsData[period.periodKey].footprint.indicators[
+                          indic
+                        ].value,
                         metaIndics[indic].nbDecimals
                       )}
                       title={"Production"}
@@ -414,9 +441,10 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates
-                          .intermediateConsumption.footprint.indicators[indic]
-                          .value,
+                        props.session.financialData.mainAggregates
+                          .intermediateConsumptions.periodsData[
+                          period.periodKey
+                        ].footprint.indicators[indic].value,
                         metaIndics[indic].nbDecimals
                       )}
                       title={"Consommations intermédiaires"}
@@ -428,8 +456,10 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates
-                          .capitalConsumption.footprint.indicators[indic].value,
+                        props.session.financialData.mainAggregates
+                          .fixedCapitalConsumptions.periodsData[
+                          period.periodKey
+                        ].footprint.indicators[indic].value,
                         metaIndics[indic].nbDecimals
                       )}
                       title={"Consommation de capital fixe"}
@@ -441,9 +471,9 @@ const IndicatorsList = (props) => {
                   <div className="doughtnut-chart-container">
                     <SigPieChart
                       value={printValue(
-                        props.session.financialData.aggregates.netValueAdded.footprint.indicators[
-                          indic
-                        ].getValue(),
+                        props.session.financialData.mainAggregates.netValueAdded.periodsData[
+                          period.periodKey
+                        ].footprint.indicators[indic].getValue(),
                         metaIndics[indic].nbDecimals
                       )}
                       title={"Valeur ajoutée nette"}
@@ -460,23 +490,27 @@ const IndicatorsList = (props) => {
                   <Col sm={3}>
                     <GrossImpactChart
                       id={"part-" + indic}
-                      intermediateConsumption={props.session.financialData.aggregates.intermediateConsumption.footprint.indicators[
-                        indic
-                      ].getGrossImpact(
-                        props.session.financialData.aggregates
-                          .intermediateConsumption.amount
+                      intermediateConsumptions={props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[
+                        period.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        props.session.financialData.mainAggregates
+                          .intermediateConsumptions.periodsData[
+                          period.periodKey
+                        ].amount
                       )}
-                      capitalConsumption={props.session.financialData.aggregates.capitalConsumption.footprint.indicators[
-                        indic
-                      ].getGrossImpact(
-                        props.session.financialData.aggregates
-                          .capitalConsumption.amount
+                      fixedCapitalConsumptions={props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                        period.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        props.session.financialData.mainAggregates
+                          .fixedCapitalConsumptions.periodsData[
+                          period.periodKey
+                        ].amount
                       )}
-                      netValueAdded={props.session.financialData.aggregates.netValueAdded.footprint.indicators[
-                        indic
-                      ].getGrossImpact(
-                        props.session.financialData.aggregates.netValueAdded
-                          .amount
+                      netValueAdded={props.session.financialData.mainAggregates.netValueAdded.periodsData[
+                        period.periodKey
+                      ].footprint.indicators[indic].getGrossImpact(
+                        props.session.financialData.mainAggregates.netValueAdded
+                          .periodsData[period.periodKey].amount
                       )}
                     />
                   </Col>
@@ -484,26 +518,26 @@ const IndicatorsList = (props) => {
                     <DeviationChart
                       id={"deviationChart-" + indic}
                       legalUnitData={[
-                        props.session.financialData.aggregates.production.footprint.getIndicator(
-                          indic
-                        ).value,
-                        props.session.financialData.aggregates.intermediateConsumption.footprint.getIndicator(
-                          indic
-                        ).value,
-                        props.session.financialData.aggregates.capitalConsumption.footprint.getIndicator(
-                          indic
-                        ).value,
-                        props.session.financialData.aggregates.netValueAdded.footprint.getIndicator(
-                          indic
-                        ).value,
+                        props.session.financialData.mainAggregates.production.periodsData[
+                          period.periodKey
+                        ].footprint.getIndicator(indic).value,
+                        props.session.financialData.mainAggregates.intermediateConsumptions.periodsData[
+                          period.periodKey
+                        ].footprint.getIndicator(indic).value,
+                        props.session.financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                          period.periodKey
+                        ].footprint.getIndicator(indic).value,
+                        props.session.financialData.mainAggregates.netValueAdded.periodsData[
+                          period.periodKey
+                        ].footprint.getIndicator(indic).value,
                       ]}
                       branchData={[
                         comparativeData.production.divisionFootprint.indicators[
                           indic
                         ].value,
-                        comparativeData.intermediateConsumption
+                        comparativeData.intermediateConsumptions
                           .divisionFootprint.indicators[indic].value,
-                        comparativeData.fixedCapitalConsumption
+                        comparativeData.fixedCapitalConsumptions
                           .divisionFootprint.indicators[indic].value,
                         comparativeData.netValueAdded.divisionFootprint
                           .indicators[indic].value,
@@ -532,10 +566,18 @@ const IndicatorsList = (props) => {
                             .indicators[indic]
                         }
                         current={
-                          props.session.financialData.aggregates.production.footprint.getIndicator(
-                            indic
-                          ).value
+                          props.session.financialData.mainAggregates.production.periodsData[
+                            period.periodKey
+                          ].footprint.getIndicator(indic).value
                         }
+                        prev={
+                          prevPeriod &&
+                          props.session.financialData.mainAggregates.production.periodsData[
+                            prevPeriod.periodKey
+                          ].footprint.getIndicator(indic).value
+                        }
+                        period={period}
+                        prevPeriod={prevPeriod}
                       />
                     </Col>
                   </Row>
@@ -598,7 +640,7 @@ const IndicatorsList = (props) => {
                       case "eco":
                         return (
                           <StatementECO
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("eco")}
                             onValidate={() => validateIndicator("eco")}
                           />
@@ -606,7 +648,7 @@ const IndicatorsList = (props) => {
                       case "art":
                         return (
                           <StatementART
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("art")}
                             onValidate={() => validateIndicator("art")}
                           />
@@ -614,7 +656,7 @@ const IndicatorsList = (props) => {
                       case "soc":
                         return (
                           <StatementSOC
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("soc")}
                             onValidate={() => validateIndicator("soc")}
                           />
@@ -679,7 +721,7 @@ const IndicatorsList = (props) => {
                         return (
                           <>
                             <StatementIDR
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               disableStatement={notAvailableIndics.includes(
                                 key
                               )}
@@ -695,7 +737,7 @@ const IndicatorsList = (props) => {
                         return (
                           <>
                             <StatementGEQ
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("geq")}
                               onValidate={() => validateIndicator("geq")}
                               toAssessment={() => triggerPopup("geq")}
@@ -707,7 +749,7 @@ const IndicatorsList = (props) => {
                         return (
                           <>
                             <StatementKNW
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("knw")}
                               onValidate={() => validateIndicator("knw")}
                               toAssessment={() => triggerPopup("knw")}
@@ -742,11 +784,13 @@ const IndicatorsList = (props) => {
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
-                        props.impactsData.greenhousesGazEmissions != 0 &&
+                        props.impactsData[period.periodKey]
+                          .greenhousesGazEmissions != 0 &&
                         validations.includes("nrg") &&
                         !validations.includes("ghg") && <IconWarning />}
                       {key == "nrg" &&
-                        props.impactsData.energyConsumption != 0 &&
+                        props.impactsData[period.periodKey].energyConsumption !=
+                          0 &&
                         validations.includes("ghg") &&
                         !validations.includes("nrg") && <IconWarning />}
                     </ArrowToggle>
@@ -779,7 +823,7 @@ const IndicatorsList = (props) => {
                         return (
                           <>
                             <StatementGHG
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("ghg")}
                               onValidate={() => validateIndicator("ghg")}
                               toAssessment={() => triggerPopup("ghg")}
@@ -790,7 +834,7 @@ const IndicatorsList = (props) => {
                         return (
                           <>
                             <StatementNRG
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("nrg")}
                               onValidate={() => validateIndicator("nrg")}
                               toAssessment={() => triggerPopup("nrg")}
@@ -801,7 +845,7 @@ const IndicatorsList = (props) => {
                         return (
                           <>
                             <StatementWAT
-                              impactsData={props.impactsData}
+                              impactsData={props.impactsData[period.periodKey]}
                               onUpdate={willNetValueAddedIndicator.bind("wat")}
                               onValidate={() => validateIndicator("wat")}
                             />
@@ -810,7 +854,7 @@ const IndicatorsList = (props) => {
                       case "mat":
                         return (
                           <StatementMAT
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("mat")}
                             onValidate={() => validateIndicator("mat")}
                           />
@@ -818,7 +862,7 @@ const IndicatorsList = (props) => {
                       case "was":
                         return (
                           <StatementWAS
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("was")}
                             onValidate={() => validateIndicator("was")}
                           />
@@ -826,7 +870,7 @@ const IndicatorsList = (props) => {
                       case "haz":
                         return (
                           <StatementHAZ
-                            impactsData={props.impactsData}
+                            impactsData={props.impactsData[period.periodKey]}
                             onUpdate={willNetValueAddedIndicator.bind("haz")}
                             onValidate={() => validateIndicator("haz")}
                           />
@@ -845,7 +889,7 @@ const IndicatorsList = (props) => {
       {/* // MODAL  */}
       <ModalAssesment
         indic="knw"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("knw")}
         onValidate={() => validateIndicator("knw")}
         popUp={popUp}
@@ -855,7 +899,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="idr"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("idr")}
         onValidate={() => validateIndicator("idr")}
         onGoBack={handleClose}
@@ -865,7 +909,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="dsn"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("idr")}
         onValidate={() => validateIndicator("idr")}
         onGoBack={handleClose}
@@ -875,7 +919,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="nrg"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("nrg")}
         onValidate={() => validateIndicator("nrg")}
         onGoBack={handleClose}
@@ -885,7 +929,7 @@ const IndicatorsList = (props) => {
       />
       <ModalAssesment
         indic="ghg"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("ghg")}
         onValidate={() => validateIndicator("ghg")}
         onGoBack={handleClose}
@@ -896,7 +940,7 @@ const IndicatorsList = (props) => {
 
       <ModalAssesment
         indic="geq"
-        impactsData={props.impactsData}
+        impactsData={props.impactsData[period.periodKey]}
         onUpdate={willNetValueAddedIndicator.bind("geq")}
         onValidate={() => validateIndicator("geq")}
         onGoBack={handleClose}
@@ -966,13 +1010,19 @@ function ModalAssesment(props) {
   );
 }
 
-async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
+async function generateIndicatorReportPDF(
+  session,
+  indic,
+  period
+) {
   // Create an array of promises for generating PDF files
   const pdfPromises = [];
+  console.log(period);
+  const year = period.periodKey.slice(2);
 
   const documentTitle =
     "Rapport_" +
-    session.year +
+    year +
     "_" +
     session.legalUnit.corporateName.replaceAll(" ", "") +
     "-" +
@@ -985,26 +1035,26 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
       pdfPromises.push(
         createContribIndicatorPDF(
           metaIndics[indic].libelle,
-          session.year,
           session.legalUnit.corporateName,
           indic,
           session.financialData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
       break;
     case "intensité":
       pdfPromises.push(
         createIntensIndicatorPDF(
-          session.year,
           session.legalUnit.corporateName,
           indic,
           metaIndics[indic].libelle,
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
       break;
@@ -1013,13 +1063,13 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
         createIndiceIndicatorPDF(
           metaIndics[indic].libelle,
           metaIndics[indic].libelleGrandeur,
-          session.year,
           session.legalUnit.corporateName,
           indic,
           metaIndics[indic].unit,
           session.financialData,
           session.comparativeData,
-          false
+          false,
+          period
         )
       );
       break;
@@ -1029,7 +1079,6 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
 
   pdfPromises.push(
     createIndicReport(
-      session.year,
       session.legalUnit.corporateName,
       indic,
       metaIndics[indic].libelle,
@@ -1037,8 +1086,8 @@ async function generateIndicatorReportPDF(session, indic, comparativeDivision) {
       session.financialData,
       session.impactsData,
       session.comparativeData,
-      divisions[comparativeDivision],
-      false
+      false,
+      period
     )
   );
   Promise.all(pdfPromises).then(async (pdfs) => {
