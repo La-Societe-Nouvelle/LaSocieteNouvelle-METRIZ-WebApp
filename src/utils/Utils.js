@@ -284,6 +284,16 @@ const formatMonth = (date) =>
   (date.getMonth() + 1 >= 10 ? "" : "0") +
   (date.getMonth() + 1);
 
+export const sortChronologicallyDates = (dateA,dateB) =>
+{
+  return parseInt(dateA)-parseInt(dateB);
+}
+
+export const sortUnchronologicallyDates = (dateA,dateB) =>
+{
+  return parseInt(dateB)-parseInt(dateA);
+}
+
 /* ----- SERIES ID ----- */
 export const getShortCurrentDateString = () => {
   const currentDate = new Date();
