@@ -256,7 +256,6 @@ const IndicatorsList = (props) => {
       await generateIndicatorReportPDF(
         props.session,
         key,
-        divisions[comparativeDivision],
         period
       );
 
@@ -265,7 +264,7 @@ const IndicatorsList = (props) => {
     props.updateVisibleGraphs(false);
   };
 
-  // Resusable Components
+  // Reusable Components
 
   const SuccessMessage = () => {
     return (
@@ -1014,7 +1013,6 @@ function ModalAssesment(props) {
 async function generateIndicatorReportPDF(
   session,
   indic,
-  comparativeDivision,
   period
 ) {
   // Create an array of promises for generating PDF files
