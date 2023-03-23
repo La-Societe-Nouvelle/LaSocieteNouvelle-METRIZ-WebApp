@@ -619,36 +619,6 @@ export class FinancialData {
     }
   };
 
-  /* ---------------------------------------- INITIAL STATES LOADER ---------------------------------------- */
-  async loadInitialStates(data) {
-    // Available accounts
-    let prevAccountsData = data.stocks.concat(data.immobilisations);
-    let currentAccountsData = this.stocks.concat(this.immobilisations);
-
-    // Assets accounts
-    currentAccountsData.forEach((account) => {
-      let prevAccount = prevAccountsData.find(
-        (prevItem) => prevItem.accountNum === account.accountNum
-      );
-      if (prevAccount) {
-        const entries = prevAccount.entries.concat(account.entries);
-        const depreciationEntries = prevAccount.depreciationEntries.concat(
-          account.depreciationEntries
-        );
-        const states = { ...prevAccount.states, ...account.states };
-        account.initialStateType = "prevFootprint";
-        account.initialState = prevAccount.initialState;
-        // update objets
-        account.entries = entries;
-        account.depreciationEntries = depreciationEntries;
-        account.states = states;
-        prevAccountsData.splice(prevAccountsData.indexOf(prevAccount), 1);
-      } else {
-        // TO DO init initial state
-      }
-    });
-  }
-
   /* ---------------------------------------- GETTERS ---------------------------------------- */
 
   getProvider = (providerNum) =>
