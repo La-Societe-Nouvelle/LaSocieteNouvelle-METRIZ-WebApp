@@ -247,6 +247,11 @@ class Metriz extends React.Component {
     console.log("--------------------------------------------------");
     console.log("Empreintes des fournisseurs récupérées");
 
+    let availablePeriods = this.state.session.availablePeriods;
+    for (let period of availablePeriods) {
+      this.state.session.updateFootprints(period);
+    }
+
     this.setStep(4);
     this.updateProgression(3);
   };

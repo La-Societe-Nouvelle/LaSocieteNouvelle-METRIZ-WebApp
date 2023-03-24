@@ -302,6 +302,9 @@ export class InitialStatesSection extends React.Component {
           prevSession.financialPeriod.dateEnd !=
             getPrevDate(currSession.financialPeriod.dateStart)
         ) {
+          console.log(prevYear+" - "+currYear);
+          console.log(prevSession.financialPeriod.dateEnd);
+          console.log(getPrevDate(currSession.financialPeriod.dateStart));
           this.setState({
             titlePopup: "Erreur de Fichier",
             message: "La sauvegarde ne correspond pas à l'année précédente. Veuillez vérifier le fichier et réessayer.",

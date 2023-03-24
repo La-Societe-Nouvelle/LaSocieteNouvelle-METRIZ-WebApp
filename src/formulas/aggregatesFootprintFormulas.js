@@ -465,6 +465,11 @@ const updateProductionStocksStatesFpt = async (indic,financialData,period) =>
       stock.states[stock.initialState.date].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
     }
 
+    // if indics not validated
+    if (stock.states[getPrevDate(period.dateStart)].footprint.indicators[indic].value==null) {
+      stock.states[getPrevDate(period.dateStart)].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
+    }
+
     // states
     stock.states[period.dateEnd].footprint.indicators[indic] = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic];
     return;
