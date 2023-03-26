@@ -130,7 +130,7 @@ export class ImportDSN extends React.Component {
       <div className="assessment">
         <div>
           <h4>Importez les déclarations mensuelles</h4>
-          <Dropzone onDrop={this.onDrop} accept={[".edi"]}>
+          <Dropzone onDrop={this.onDrop} accept={[".edi",".txt"]}>
             {({ getRootProps, getInputProps }) => (
               <div className="dropzone-section">
                 <div {...getRootProps()} className="dropzone">
@@ -248,7 +248,7 @@ export class ImportDSN extends React.Component {
 
   importFile = async (file) => {
     let extension = file.name.split(".").pop();
-    if (extension == "edi") {
+    if (extension == "edi" || extension =="txt") {
       let reader = new FileReader();
       reader.onload = async () => {
         try {
