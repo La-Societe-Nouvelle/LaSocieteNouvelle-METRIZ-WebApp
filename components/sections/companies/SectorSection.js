@@ -18,20 +18,21 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 // api
 import api from "/src/api";
 
-/* ----------------------------------------------------------- */
-/* -------------------- COMPANIES SECTION -------------------- */
-/* ----------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------------------------------------- */
+/* -------------------------------------------------- PROVIDERS SECTION - IDENTIFIED PROVIDERS -------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------------------------------------- */
 
 export class SectorSection extends React.Component 
 {
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
-      significativeProviders: [],                                 // significative companies
-      view: "all",                                                // filter view
-      nbItems: 20,                                                // nb items
-      fetching: false,                                            // -> to show popup
-      progression: 0,                                             // progession -> popup
+      significativeProviders: [],   // significative companies
+      view: "all",                  // filter view
+      nbItems: 20,                  // nb items
+      fetching: false,              // -> to show popup
+      progression: 0,               // progession -> popup
       error: false,
       minFpt: null,
       maxFpt: null,
@@ -53,6 +54,12 @@ export class SectorSection extends React.Component
 
   render() 
   {
+    // props
+    const {
+      financialData,
+      financialPeriod
+    } = this.props;
+    // state
     const {
       view,
       nbItems,
@@ -63,15 +70,10 @@ export class SectorSection extends React.Component
       significativeProviders
     } = this.state;
 
-    const financialData = this.props.financialData;
-    const period = this.props.financialPeriod;
-
-    const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint && provider.periodsData.hasOwnProperty(period.periodKey));
-
+    // providers to show (unidentied and concerned by financial period)
+    const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint && provider.periodsData.hasOwnProperty(financialPeriod.periodKey));
     const showedProviders = getShowedProviders(view,unidentifiedProviders,significativeProviders);
-        
-    //if (showedProviders.length == 0 && view!="") this.setState({view: ""}); // reset filter
-
+    
     const nbSignificativeProvidersWithoutActivity = unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00" && significativeProviders.includes(provider.providerNum)).length;
     const someSignificativeProvidersWithoutActivity = nbSignificativeProvidersWithoutActivity > 0;
     
@@ -85,23 +87,27 @@ export class SectorSection extends React.Component
           <div className="step 3">
             <div className="table-container">
               <div className="table-data table-company">
+                {/* ------------------------- Messages ------------------------- */}
                 {/* ---------- Show error popup ---------- */}
                 {error && 
-                  <ErrorApi />}
+                  <ErrorApi />
+                }
                 {/* ---------- Show message next step available ---------- */}
                 {(!error && isNextStepAvailable) &&
                   <div className="alert alert-success">
                     <p><i className="bi bi-check2-all"></i> Tous les comptes ont bien été synchronisés.</p>
-                  </div>}
+                  </div>
+                }
                 {/* ---------- Show message missing data ---------- */}
                 {(!error && !isNextStepAvailable) &&
                   <div className="alert alert-info">
-                  <p><i className="bi bi bi-exclamation-circle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
-                  <button className={"btn btn-secondary"}
-                    onClick={() => this.synchroniseProviders()}>
-                    <i className="bi bi-arrow-repeat"></i> Synchroniser les données
-                  </button>
-                </div>}
+                    <p><i className="bi bi bi-exclamation-circle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
+                    <button className={"btn btn-secondary"}
+                      onClick={() => this.synchroniseProviders()}>
+                      <i className="bi bi-arrow-repeat"></i> Synchroniser les données
+                    </button>
+                  </div>
+                }
                 {/* ---------- Show message significative accounts have default activity ---------- */}
                 {someSignificativeProvidersWithoutActivity &&
                   <div className="alert alert-warning"> 
@@ -114,7 +120,7 @@ export class SectorSection extends React.Component
                     </button>
                   </div>}
                 
-                {/* ---------- Head ---------- */}
+                {/* ------------------------- Head ------------------------- */}
                 <div className="pagination mb-3">
                   <div className="form-group">
                     <select
@@ -141,26 +147,29 @@ export class SectorSection extends React.Component
                   </div>
                 </div>
 
-                {/* ---------- Table ---------- */}
+                {/* ------------------------- Table ------------------------- */}
                 <UnidentifiedCompaniesTable
                   nbItems={nbItems == "all" ? unidentifiedProviders.length : parseInt(nbItems)}
                   providers={showedProviders}
                   significativeProviders={significativeProviders}
-                  financialPeriod={period}
+                  financialPeriod={financialPeriod}
                   refreshSection={this.refreshSection}
                 />
-
               </div>
             </div>
 
+            {/* ------------------------- Progress bar ------------------------- */}
             {fetching &&
               <div className="popup">
                 <ProgressBar
                   message="Récupération des données fournisseurs..."
                   progression={progression}/>
-              </div>}
+              </div>
+            }
 
           </div>
+
+          {/* ------------------------- Footer ------------------------- */}
           <div className="text-end">
             <button
               className={"btn btn-primary me-2"}
@@ -188,37 +197,38 @@ export class SectorSection extends React.Component
 
   synchroniseProviders = async () => 
   {
+    // providers to synchronise : all providers unidentified & with fpt not fetched (footprint status != 200)
     let providersToSynchronise = this.props.financialData.providers
-      .filter((provider) => provider.useDefaultFootprint && provider.footprintStatus != 200); // only showed ?
+      .filter((provider) => provider.useDefaultFootprint && provider.footprintStatus != 200);
 
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
 
     let i = 0;
     let n = providersToSynchronise.length;
-
     for (let provider of providersToSynchronise) 
     {
       try 
       {
-        // fetch footprint
+        // fetch footprint & assign to expenses & investments
         await provider.updateFromRemote();
-        // assign to expenses & investments
         this.props.financialData.externalExpenses
           .concat(this.props.financialData.investments)
           .filter(expense => expense.providerNum==provider.providerNum)
           .forEach(expense => expense.footprint = provider.footprint);
       } 
       catch (error) {
+        // error API
         console.log(error);
         this.setState({ error: true });
         break;
       }
+      // update progression
       i++;
       this.setState({ progression: Math.round((i / n) * 100) });
     }
 
-    // check if providers is a significative companies
+    // update significative providers
     let {minFpt,maxFpt} = this.state;
     let significativeProviders = await getSignificativeCompanies(
       this.props.financialData.providers,
@@ -226,18 +236,21 @@ export class SectorSection extends React.Component
       this.props.financialPeriod
     );
 
-    // update state
+    // check next step available
     const isNextStepAvailable = nextStepAvailable(this.props.financialData.providers);
+
+    // update state
     this.setState({
       fetching: false,
       progression: 0,
-      significativeProviders: significativeProviders,
+      significativeProviders,
       isNextStepAvailable
     });
   }
 
   refreshSection = () => 
   {
+    // check next step available
     const isNextStepAvailable = nextStepAvailable(this.props.financialData.providers);
     if (this.state.isNextStepAvailable!=isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
@@ -247,7 +260,7 @@ export class SectorSection extends React.Component
   }
 }
 
-/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
+/* -------------------------------------------------- ANNEXES FUNCTIONS -------------------------------------------------- */
 
 const fetchMinFootprint = async () =>
 {
@@ -264,9 +277,9 @@ const fetchMinFootprint = async () =>
         return null;
       }
     }).catch((err) => {
+      console.log(err);
       return null;
     });
-  
   return footprint;
 }
 
@@ -285,14 +298,11 @@ const fetchMaxFootprint = async () =>
         return null;
       }
     }).catch((err) => {
+      console.log(err);
       return null;
     });
-
   return footprint;
 }
-
-
-/* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
 const nextStepAvailable = (providers) => 
 {
@@ -304,17 +314,17 @@ const getShowedProviders = (view,providers,significativeProviders) =>
 {
   switch (view) 
   {
-    case "aux": // provider account
+    case "aux":                               // provider account
       return providers.filter((provider) => !provider.isDefaultProviderAccount);
-    case "expenses": // default provider account
+    case "expenses":                          // default provider account
       return providers.filter((provider) => provider.isDefaultProviderAccount);
-    case "significative": // significative provider
+    case "significative":                     // significative provider
       return providers.filter((provider) => significativeProviders.includes(provider.providerNum));
-    case "significativeWithoutActivity":  // significative provider & no activity code set
+    case "significativeWithoutActivity":      // significative provider & no activity code set
       return providers.filter((provider) => significativeProviders.includes(provider.providerNum) && provider.defaultFootprintParams.code == "00");
-    case "defaultActivity": // no activity code set
+    case "defaultActivity":                   // no activity code set
       return providers.filter((provider) => provider.defaultFootprintParams.code == "00");
-    default: // default
+    default:                                  // default
       return providers;
   }
 }

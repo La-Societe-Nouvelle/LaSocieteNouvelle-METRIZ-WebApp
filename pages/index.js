@@ -12,7 +12,7 @@ import { Session } from "/src/Session";
 import { StartSection } from "/components/sections/StartSection";
 import ImportSection from "../components/sections/import/ImportSection";
 import { InitialStatesSection } from "/components/sections/InitialStatesSection";
-import { ProvidersSection } from "../components/sections/companies/CompaniesSection";
+import { ProvidersSection } from "../components/sections/companies/ProvidersSection";
 import StatementSection from "../components/sections/statements/StatementSection";
 import { PublishStatementSection } from "../components/sections/PublishStatementSection";
 

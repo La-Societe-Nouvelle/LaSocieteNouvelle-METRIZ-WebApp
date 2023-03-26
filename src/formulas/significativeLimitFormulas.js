@@ -22,9 +22,11 @@ export async function getSignificativeCompanies(providers,minFpt,maxFpt,period)
 
   // significative companies
   let identifiedProviders = providers
-    .filter(provider => !provider.useDefaultFootprint);
+    .filter(provider => !provider.useDefaultFootprint)
+    .filter(provider => provider.periodsData.hasOwnProperty(period.periodKey));
   let unidentifiedProviders = providers
     .filter(provider => provider.useDefaultFootprint)
+    .filter(provider => provider.periodsData.hasOwnProperty(period.periodKey))
     .sort((a,b) => Math.abs(a.periodsData[period.periodKey].amountExpenses) - Math.abs(b.periodsData[period.periodKey].amountExpenses));
 
   let significativeProviders = [];
