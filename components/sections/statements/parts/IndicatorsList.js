@@ -32,7 +32,6 @@ import {
   StatementWAT,
 } from "../forms";
 
-import { AssessmentDIS } from "/components/assessments/AssessmentDIS";
 import { AssessmentKNW } from "/components/assessments/AssessmentKNW";
 import { AssessmentNRG } from "/components/assessments/AssessmentNRG";
 import { AssessmentGHG } from "/components/assessments/AssessmentGHG";
@@ -61,6 +60,7 @@ import { createIndicReport } from "../../../../src/writers/deliverables/indicRep
 import { createContribIndicatorPDF } from "../../../../src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
+import { IndividualsDataPopup } from "../../../assessments/AssessmentDIS";
 
 const IndicatorsList = (props) => {
   const [period] = useState(props.period);
@@ -990,9 +990,9 @@ function ModalAssesment(props) {
         {(() => {
           switch (props.indic) {
             case "idr":
-              return <AssessmentDIS {...props} />;
+              return <IndividualsDataPopup {...props} />;
             case "geq":
-              return <AssessmentDIS {...props} />;
+              return <IndividualsDataPopup {...props} />;
             case "knw":
               return <AssessmentKNW {...props} />;
             case "ghg":

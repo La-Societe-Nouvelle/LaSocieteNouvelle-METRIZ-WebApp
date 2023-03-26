@@ -312,7 +312,8 @@ export class ImportDSN extends React.Component {
   };
 
   // Submit
-  onSubmit = async () => {
+  onSubmit = async () => 
+  {
     let impactsData = this.props.impactsData;
 
     impactsData.socialStatements = this.state.socialStatements;
@@ -329,8 +330,7 @@ export class ImportDSN extends React.Component {
     await this.props.onUpdate("geq");
 
     // update knw data
-    impactsData.knwDetails.apprenticesRemunerations =
-      await getApprenticeshipRemunerations(impactsData.individualsData);
+    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(impactsData.individualsData);
     await this.props.onUpdate("knw");
 
     this.props.onGoBack();
@@ -343,7 +343,7 @@ export class ImportDSN extends React.Component {
  *  Elements in json for each individual :
  *    - id
  *    - sex (1 for man & 2 for woman)
- *    - workingHourse
+ *    - workingHours
  *    - wage
  *    - hourlyRate
  *    - apprenticeshipHours
@@ -358,9 +358,11 @@ const getIndividualsData = async (declarations) =>
     for (let individu of individus) {
       let id = individu.identifiant || individu.identifiantTechnique;
       let sex = getIndividualSex(individu);
+      let name = individu.prenoms+" "+individu.nomFamille;
       let workingHours = await getIndividualWorkingHours(individu);
       let wage = await getIndividualWage(individu);
       let apprenticeshipHours = await getIndividualApprenticeshipHours(individu);
+      let apprenticeshipContract = await getIndividualApprenticeshipContract(individu);
 
       let individual = individualsData.filter((individual) => individual.id == id)[0];
       if (individual != undefined) {
@@ -369,11 +371,13 @@ const getIndividualsData = async (declarations) =>
         individual.apprenticeshipHours += apprenticeshipHours;
       } else {
         individualsData.push({
-          id: id,
-          sex: sex,
-          workingHours: workingHours,
-          wage: wage,
-          apprenticeshipHours: apprenticeshipHours
+          id,
+          sex,
+          name,
+          workingHours,
+          wage,
+          apprenticeshipHours,
+          apprenticeshipContract
         });
       }
     }
@@ -393,7 +397,7 @@ const getIndividualsData = async (declarations) =>
 
 /* -------------------- FORMULAS -------------------- */
 
-const getInterdecileRange = async (individualsData) => 
+export const getInterdecileRange = async (individualsData) => 
 {
   // sort individuals by hourly rate
   individualsData = individualsData
@@ -433,7 +437,7 @@ const getInterdecileRange = async (individualsData) =>
   return interdecileRange;
 };
 
-const getGenderWageGap = async (individualsData) => 
+export const getGenderWageGap = async (individualsData) => 
 {
   // filter individuals without hourly rate or defined sex
   individualsData = individualsData
@@ -526,11 +530,30 @@ const getGenderWageGap_pctHourlyRateMen = async (individualsData) =>
 };
 
 // Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
-const getApprenticeshipRemunerations = async (individualsData) => 
+export const getApprenticeshipRemunerations = async (individualsData) => 
 {
   // filter individuals without hourly rate or defined sex
   individualsData = individualsData
     .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
+    .filter((individual) => individual.apprenticeshipContract)
+    .filter((individual) => individual.apprenticeshipHours != null && !isNaN(individual.apprenticeshipHours) && individual.apprenticeshipHours > 0);
+
+  let apprenticesRemunerations = individualsData
+    .map(
+      ({ hourlyRate, apprenticeshipHours }) => hourlyRate * apprenticeshipHours
+    )
+    .reduce((a, b) => a + b, 0);
+
+  return roundValue(apprenticesRemunerations, 0);
+};
+
+// Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
+export const getEmployeesTrainingCompensations = async (individualsData) => 
+{
+  // filter individuals without hourly rate or defined sex
+  individualsData = individualsData
+    .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
+    .filter((individual) => !individual.apprenticeshipContract)
     .filter((individual) => individual.apprenticeshipHours != null && !isNaN(individual.apprenticeshipHours) && individual.apprenticeshipHours > 0);
 
   let apprenticesRemunerations = individualsData
@@ -712,6 +735,30 @@ const getIndividualApprenticeshipHours = (individu) => {
   });
 
   return roundValue(trainingHours, 2);
+};
+
+const getIndividualApprenticeshipContract = async (individu) => 
+{
+  let apprenticeshipContract = false;
+
+  let versements = individu.versements;
+  versements.forEach((versement) => {
+    // Rémunérations
+    let remunerations = versement.remunerations;
+    remunerations
+      .filter((remuneration) => remuneration.type == "002")
+      .forEach((remuneration) => 
+      {
+        let contrat = individu.contrats.find((contrat) => contrat.numero == remuneration.numeroContrat);
+        if (contrat && (contrat.nature == "29" ||
+          ["61", "64", "65", "66", "81", "92"].includes(contrat.dispositifPolitique))
+        ) {
+          apprenticeshipContract = true;
+        }
+      });
+  });
+
+  return apprenticeshipContract;
 };
 
 /* -------------------- OTHER FUNCTIONS -------------------- */

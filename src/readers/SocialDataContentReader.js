@@ -4,36 +4,50 @@ import { roundValue } from "../utils/Utils";
 
 export { SocialDataContentReader, XLSXSocialDataBuilder, CSVSocialDataBuilder };
 
+const sexInt = {
+  "H": 1,
+  "F": 2
+}
+
 /* ---------- CONTENT READER ---------- */ 
 
 const SocialDataContentReader = async (socialData) =>
 // ...build data from JSON content
 {
-  let employees = [];
+  let individualsData = [];
   
   socialData.forEach((employee) => 
   {
-
     let employeeData = 
     {
-      id: employee.index,
+      id: "_"+employee.index,
       name: employee.name,
-      sex: /^(F|H)$/.test(employee.sex.toUpperCase()) ? employee.sex : "",
+      sex: /^(F|H)$/.test(employee.sex.toUpperCase()) ? sexInt[employee.sex] : "",
       wage: parseFloat(employee.wage) ? parseFloat(employee.wage) : null,
       workingHours: parseFloat(employee.workingHours) ? parseFloat(employee.workingHours) : null,
       hourlyRate: parseFloat(employee.hourlyRate) ? parseFloat(employee.hourlyRate) : null,
-      trainingContract: /^(O|N)$/.test(employee.trainingContract.toUpperCase()) ? employee.trainingContract=="O" : false,
-      trainingHours: parseFloat(employee.trainingHours) ? parseFloat(employee.trainingHours) : 0
+      apprenticeshipContract: /^(O|N)$/.test(employee.trainingContract.toUpperCase()) ? employee.trainingContract=="O" : false,
+      apprenticeshipHours: parseFloat(employee.trainingHours) ? parseFloat(employee.trainingHours) : 0
+    }
+
+    // check apprenticeship hours
+    if (employeeData.apprenticeshipContract && employeeData.workingHours>0) {
+      employeeData.apprenticeshipHours = employeeData.workingHours;
+    }
+
+    // check hourly rate
+    if (employeeData.wage>0 && employeeData.workingHours>0) {
+      employeeData.hourlyRate = roundValue(employeeData.wage/employeeData.workingHours, 2);
     }
 
     if (!employeeData.hourlyRate && employeeData.wage && employeeData.workingHours) {
       employeeData.hourlyRate = roundValue((employeeData.wage/employeeData.workingHours),2);
     }
 
-    employees.push(employeeData);
+    individualsData.push(employeeData);
   });
 
-  return {employees};
+  return individualsData;
 }
 
 const XLSXSocialDataBuilder = async (content) =>

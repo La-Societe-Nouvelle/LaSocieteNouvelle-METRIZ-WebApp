@@ -16,7 +16,7 @@ export class InputNumber extends React.Component {
   componentDidUpdate(prevProps) {
     if (this.props.value != prevProps.value || this.props.isInvalid != prevProps.isInvalid) {
       this.setState({
-        input: this.props.value,
+        input: this.props.value != undefined ? this.props.value : " ",
         isInvalid: this.props.isInvalid,
       });
     }

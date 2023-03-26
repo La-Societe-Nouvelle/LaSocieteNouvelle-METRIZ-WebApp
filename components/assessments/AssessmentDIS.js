@@ -15,59 +15,47 @@ import { InputNumber } from "/components/input/InputNumber";
 import { valueOrDefault } from "/src/utils/Utils";
 import { getNewId, roundValue } from "/src/utils/Utils";
 import { XLSXSocialDataBuilder } from "../../src/readers/SocialDataContentReader";
+import { getApprenticeshipRemunerations, getEmployeesTrainingCompensations, getGenderWageGap, getInterdecileRange } from "./ImportDSN";
 
-/* -------------------- ASSESSMENT DIS -------------------- */
+/* -------------------- INDIVIDUALS DATA FOR SOCIAL FOOTPRINT -------------------- */
 
-/* The assessment tool is the same for DIS & GEQ
-   it's also used for KNW with the training hourse and the training contracts 
-*/
+/*  The assessment tool is the same for IDR & GEQ
+ *  it's also used for KNW with the training hourse and the training contracts
+ */
 
 /** Component in IndicatorSection
  *  Props :
  *    - impactsData
  *    - onGoBack -> close popup
  *  Behaviour :
- *    Edit directly impactsData (session) on inputs blur
- *    Redirect to assessment tool (if defined)
- *    Update footprints on validation
+ *    Edit indivualsData in state
+ *    Update impacts data and footprints on validation
  *  State :
  *    inputs
  */
 
-export class AssessmentDIS extends React.Component 
+export class IndividualsDataPopup extends React.Component 
 {
-  constructor(props) {
+  constructor(props) 
+  {
     super(props);
     this.state = {
       // gini index
       indexGini: props.impactsData.indexGini,
       // details
       hasEmployees: props.impactsData.hasEmployees,
-      employees: props.impactsData.employees,
+      // individuals data
+      individualsData: [...props.impactsData.individualsData],
       // display
       columnSorted: "id",
       reverseSort: false,
     };
   }
 
-  componentDidUpdate(prevProps) 
-  {
-    if (prevProps.impactsData.employees != this.state.employees) {
-      this.props.impactsData.employees = this.state.employees;
-    }
-  }
-
   render() 
   {
-    const { employees, columnSorted } = this.state;
-    const isAllValid = employees
-      .map(
-        (employee) =>
-          employee.hourlyRate != null && employee.workingHours != null
-      )
-      .reduce((a, b) => a && b, true);
-
-    //this.sortCompanies(employees, columnSorted);
+    const { individualsData } = this.state;
+    const isAllValid = !individualsData.some((individualData) => ! checkIndividualData(individualData));
 
     return (
       <div className="assessment">
@@ -101,7 +89,6 @@ export class AssessmentDIS extends React.Component
             onClick={this.exportXLSXFile}>
              <i className="bi bi-download"></i> Télécharger modèle XLSX
           </button>
-
         </div>
             
         <div className="table-main">
@@ -129,30 +116,18 @@ export class AssessmentDIS extends React.Component
               </tr>
             </thead>
             <tbody>
-              {employees.map((employee, index) => (
-                <tr key={index}>
+              {individualsData.map((individualData) => (
+                <tr key={individualData.id}>
                   <td>
-                    <i
-                      className="bi bi-trash3-fill"
-                      onClick={() => this.deleteEmployee(index)}/>
+                    <i className="bi bi-trash3-fill"
+                        onClick={() => this.removeIndividual(individualData.id)}/>
                   </td>
                   <Row
-                    {...employee}
+                    {...individualData}
                     isNewEmployeeRow={false}
-                    updateSocialData={this.updateSocialData.bind(this)}/>
+                    updateSocialData={this.updateIndividualData.bind(this)}/>
                 </tr>
               ))}
-              {/* {employees.length == 0 && (
-                <tr>
-                  <td></td>
-                  <Row
-                  {...employees}
-                    isNewEmployeeRow={true}
-                    updateSocialData={this.updateSocialData.bind(this)}
-                  />
-                </tr>
-              )} */}
-         
             </tbody>
           </Table>
           <div className="">
@@ -161,10 +136,10 @@ export class AssessmentDIS extends React.Component
               onClick={this.addEmployee}>
               <i className="bi bi-plus-lg"></i> Ajouter
             </button>
-            <button onClick={this.deleteAll} className="btn btn-secondary btn-sm">
-              <i 
-                className="bi bi-trash3-fill"/>
-              Supprimer tout
+            <button 
+              className="btn btn-secondary btn-sm"
+              onClick={this.deleteAll}>
+              <i className="bi bi-trash3-fill"/> Supprimer tout
           </button>
           </div>
         </div>
@@ -178,7 +153,7 @@ export class AssessmentDIS extends React.Component
           </button>
           <button
             className="btn btn-secondary "
-            disabled={!isAllValid || employees.length == 0}
+            disabled={!isAllValid || individualsData.length == 0}
             onClick={() => this.onSubmit()}>
             Valider
           </button>
@@ -192,23 +167,23 @@ export class AssessmentDIS extends React.Component
   // Submit
   onSubmit = async () => 
   {
-    let impactsData = this.props.impactsData;
+    let {impactsData} = this.props;
+    let {individualsData} = this.state;
 
-    // update dis data
-    //impactsData.indexGini = getIndexGini(impactsData.employees);
-    //await this.props.onUpdate("dis");
+    // indiividuals data
+    impactsData.individualsData = individualsData;
 
-    // update dis data
-    impactsData.interdecileRange = getInterdecileRange(impactsData.employees);
+    // update idr data
+    impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
     await this.props.onUpdate("idr");
 
     // update geq data
-    impactsData.wageGap = getGenderWageGap(impactsData.employees);
+    impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
     await this.props.onUpdate("geq");
 
     // update knw data
-    impactsData.knwDetails.apprenticesRemunerations = getApprenticesRemunerations(impactsData.employees);
-    impactsData.knwDetails.employeesTrainingsCompensations = getEmployeesTrainingCompensations(impactsData.employees);
+    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(individualsData);
+    impactsData.knwDetails.employeesTrainingsCompensations = await getEmployeesTrainingCompensations(individualsData);
     await this.props.onUpdate("knw");
 
     this.props.onGoBack();
@@ -225,7 +200,7 @@ export class AssessmentDIS extends React.Component
     reader.onload = async () =>
       CSVFileReader(reader.result)
         .then((content) => SocialDataContentReader(content))
-        .then((data) => this.setState({employees: data.employees}));
+        .then((individualsData) => this.setState({individualsData}));
     
     reader.readAsText(file);
   };
@@ -240,7 +215,7 @@ export class AssessmentDIS extends React.Component
       XLSXFileReader(reader.result)
         .then((XLSXData) => XLSXSocialDataBuilder(XLSXData))
         .then((socialData) => SocialDataContentReader(socialData))
-        .then((data) => this.setState({employees: data.employees}));
+        .then((individualsData) => this.setState({individualsData}));
 
     reader.readAsArrayBuffer(file);
   };
@@ -266,15 +241,16 @@ export class AssessmentDIS extends React.Component
     link.click();
   };
 
-  // Delete all
-  deleteAll = () => this.setState({ employees: [] })
+  /* ---------- MANAGE ROWS ---------- */
 
-  deleteEmployee = (index) => this.setState({employees: this.state.employees.filter((_, i) => i !== index)}); // use id instead
+  deleteAll = () => this.setState({ individualsData: [] })
+
+  removeIndividual = (id) => this.setState({individualsData: this.state.individualsData.filter((individualData) => individualData.id!=id)}); // use id instead
 
   addEmployee = () => 
   {
-    const newEmployee = {
-      id: getNewId(this.state.employees),
+    const newIndividualData = {
+      id: "_"+getNewId(this.state.individualsData.filter(individualData => individualData.id.startsWith("_")).map(item => ({id: item.id.substring(1)}))),
       name: "",
       sex: "",
       wage: null,
@@ -283,7 +259,7 @@ export class AssessmentDIS extends React.Component
       trainingHours: null,
       trainingContract: false,
     };
-    this.setState({employees: this.state.employees.concat([newEmployee])});
+    this.setState({ individualsData: this.state.individualsData.concat([newIndividualData])});
   };
 
   /* ---------- TABLE DISPLAY ---------- */
@@ -298,7 +274,7 @@ export class AssessmentDIS extends React.Component
   }
 
   // Sorting
-  sortCompanies(items, columSorted) {
+  sortIndividuals(items, columSorted) {
     switch (columSorted) {
       case "id":
         items.sort((a, b) => a.id - b.id);
@@ -312,19 +288,16 @@ export class AssessmentDIS extends React.Component
     if (this.state.reverseSort) items.reverse();
   }
 
-  /* ---------- ROW ACTIONS ---------- */
+  /* ---------- UPDATE INDIVIDUALS DATA ---------- */
 
-  // Update -> needed ?
-  updateSocialData = (nextProps) => 
+  updateIndividualData = (nextProps) => 
   {
-    let employee = this.props.impactsData.employees.filter((employee) => employee.id == nextProps.id)[0];
-    if (employee == undefined) {
-      this.addEmployee();
-    } else {
-      employee = {...employee, ...nextProps};
-      //Object.entries(nextProps).forEach(([propName, propValue]) => employee[propName] = propValue);
+    let {individualsData} = this.state;
+    let individualDataIndex = individualsData.findIndex(individualData => individualData.id==nextProps.id);
+    if (individualDataIndex>=0) {
+      individualsData[individualDataIndex] = {...individualsData[individualDataIndex], ...nextProps};
+      this.setState({ individualsData });
     }
-    //this.setState({ employees: this.props.impactsData.employees });
   };
 }
 
@@ -341,24 +314,9 @@ class Row extends React.Component
       wage: props.wage || null,
       workingHours: props.workingHours || null,
       hourlyRate: props.hourlyRate || null,
-      trainingHours: props.trainingHours || null,
-      trainingContract: props.trainingContract || false,
+      apprenticeshipHours: props.apprenticeshipHours || null,
+      apprenticeshipContract: props.apprenticeshipContract || false,
     };
-  }
-
-  componentDidUpdate(prevProps) 
-  {
-    if (prevProps !== this.props) {
-      this.setState({
-        name: this.props.isNewEmployeeRow ? "" : this.props.name || "",
-        sex: this.props.sex || "",
-        wage: this.props.wage || null,
-        workingHours: this.props.workingHours || null,
-        hourlyRate: this.props.hourlyRate || null,
-        trainingHours: this.props.trainingHours || null,
-        trainingContract: this.props.trainingContract || false,
-      });
-    }
   }
 
   render() 
@@ -370,8 +328,8 @@ class Row extends React.Component
       wage,
       workingHours,
       hourlyRate,
-      trainingHours,
-      trainingContract,
+      apprenticeshipHours,
+      apprenticeshipContract,
     } = this.state;
 
     const isValid = hourlyRate != null && workingHours != null;
@@ -389,9 +347,8 @@ class Row extends React.Component
           value={sex} 
           onChange={this.updateSex}>
             <option key="" value="">{" "}-{" "}</option>
-            <option key="F" value="F">F</option>
-            <option key="H" value="H">H</option>
-            {sex == null && (<option key="" value=""> - </option>)}
+            <option key="F" value="2">F</option>
+            <option key="H" value="1">H</option>
         </Form.Select>
         </td>
         <td className="text-end">
@@ -413,14 +370,14 @@ class Row extends React.Component
           <Form.Check
             type="checkbox"
             value={id}
-            checked={trainingContract}
-            onChange={this.updateTrainingContract}/>
+            checked={apprenticeshipContract}
+            onChange={this.updateApprenticeshipContract}/>
         </td>
         <td className="text-end">
           <InputNumber
-            value={trainingHours}
-            disabled={trainingContract}
-            onUpdate={this.updateTrainingHours}/>
+            value={apprenticeshipHours}
+            disabled={apprenticeshipContract}
+            onUpdate={this.updateApprenticeshipHours}/>
         </td>
       </>
     );
@@ -434,282 +391,108 @@ class Row extends React.Component
   };
 
   updateSex = (input) =>{
+    this.setState({ sex: input.target.value });
     this.props.updateSocialData({ id: this.props.id, sex: input.target.value });
   }
 
   updateWage = (input) => 
   {
     let wage = roundValue(input, 2);
+    let nextProps = { wage };
 
     if (wage == null) {
-      this.props.updateSocialData({ id: this.props.id, wage: null, hourlyRate: null });
+      nextProps.hourlyRate = null;
+    } else if (wage == 0) {
+      nextProps.workingHours = 0;
+      nextProps.hourlyRate = 0;
+    } else if (this.state.workingHours >= 0) {  // wage + workingHours -> hourlyRate
+      nextProps.hourlyRate = this.state.workingHours > 0 ? roundValue(wage / this.state.workingHours, 2) : null;
+    } else if (this.state.hourlyRate >= 0) {    // wage + hourlyRate -> workingHours
+      nextProps.workingHours = this.state.hourlyRate > 0 ? roundValue(wage * this.state.hourlyRate, 2) : null;
     }
-    else if (wage == 0) {
-      this.props.updateSocialData({ id: this.props.id, wage: 0, workingHours: 0, hourlyRate: 0 });
-    }
-    else if (this.state.workingHours >= 0) {
-      let hourlyRate = this.state.workingHours > 0 ? roundValue(wage / this.state.hourlyRate, 2) : null;
-      this.props.updateSocialData({ id: this.props.id, wage, hourlyRate });
-    }
-    else if (this.state.hourlyRate >= 0) {
-      let workingHours = this.state.hourlyRate > 0 ? roundValue(wage * this.state.hourlyRate, 2) : null;
-      this.props.updateSocialData({ id: this.props.id, wage, workingHours });
-    }
-    else {
-      this.props.updateSocialData({ id: this.props.id, wage });
-    }
+
+    this.setState({...nextProps});
+    this.props.updateSocialData({ id: this.props.id, ...nextProps });
   };
 
   updateWorkingHours = (input) => 
   {
-    let workingHours = parseInt(input);
-
+    let workingHours = input!=null ? parseInt(input) : null;
+    let nextProps = { workingHours };
+    
     if (workingHours == null) {
-      this.props.updateSocialData({ id: this.props.id, workingHours: null, hourlyRate: null });
-    }
-    else if (workingHours == 0) {
-      this.props.updateSocialData({ id: this.props.id, workingHours: 0, wage: 0, hourlyRate: 0 });
-    } 
-    else if (this.state.wage >= 0) {
-      let hourlyRate = roundValue(this.state.wage / workingHours, 2);
-      this.props.updateSocialData({ id: this.props.id, workingHours, hourlyRate });
-    }
-    else if (this.state.hourlyRate >= 0) {
-      let wage = roundValue(workingHours * this.state.hourlyRate, 2);
-      this.props.updateSocialData({ id: this.props.id, workingHours, wage });
-    }
-    else {
-      this.props.updateSocialData({ id: this.props.id, workingHours });
+      nextProps.hourlyRate = null;
+    } else if (workingHours == 0) {
+      nextProps.wage = 0;
+      nextProps.hourlyRate = 0;
+    } else if (this.state.wage >= 0) {
+      nextProps.hourlyRate = roundValue(this.state.wage / workingHours, 2);
+    } else if (this.state.hourlyRate >= 0) {
+      nextProps.wage = roundValue(workingHours * this.state.hourlyRate, 2);
     }
 
-  };
+    if (this.state.apprenticeshipContract) {
+      nextProps.apprenticeshipHours = workingHours;
+    }
+
+    if (this.state.apprenticeshipHours>0 && workingHours!=null && this.state.apprenticeshipHours>workingHours) {
+      nextProps.apprenticeshipHours = this.state.apprenticeshipContract ? workingHours : 0;
+    }
+
+    this.setState({...nextProps});
+    this.props.updateSocialData({ id: this.props.id, ...nextProps });
+  }
 
   updateHourlyRate = (input) => 
   {
     let hourlyRate = roundValue(input, 2);
+    let nextProps = { hourlyRate };
 
     if (hourlyRate == null) {
-      this.props.updateSocialData({ id: this.props.id, hourlyRate: null, wage: null });
+      nextProps.wage = null;
+    } else if (hourlyRate == 0) {
+      nextProps.wage = 0;
+    } else if (this.state.workingHours >= 0) {
+      nextProps.wage = roundValue(this.state.workingHours * hourlyRate, 2);
+    } else if (this.state.wage >= 0) {
+      nextProps.workingHours = roundValue(this.state.wage / hourlyRate, 2);
     }
-    else if (hourlyRate == 0) {
-      this.props.updateSocialData({ id: this.props.id, hourlyRate: 0, wage: 0 });
-    } 
-    else if (this.state.workingHours >= 0) {
-      let wage = roundValue(this.state.workingHours * hourlyRate, 2);
-      this.props.updateSocialData({ id: this.props.id, hourlyRate, wage });
-    }
-    else if (this.state.wage >= 0) {
-      let workingHours = roundValue(this.state.wage / hourlyRate, 2);
-      this.props.updateSocialData({ id: this.props.id, hourlyRate, workingHours });
-    }
-    else {
-      this.props.updateSocialData({ id: this.props.id, hourlyRate });
-    }
-  };
 
-  updateTrainingContract = (event) => 
+    this.setState({...nextProps});
+    this.props.updateSocialData({ id: this.props.id, ...nextProps });
+  }
+
+  updateApprenticeshipContract = (event) => 
   {
-    let trainingContract = event.target.checked;
-    if (trainingContract) {
-      this.props.updateSocialData({ id: this.props.id, trainingContract, trainingHours: null })
-    } else {
-      this.props.updateSocialData({ id: this.props.id, trainingContract, trainingHours: 0})
-    }
+    let apprenticeshipContract = event.target.checked;
+    let apprenticeshipHours = apprenticeshipContract ? this.state.workingHours : 0;
+
+    this.setState({ apprenticeshipContract, apprenticeshipHours });
+    this.props.updateSocialData({ id: this.props.id, apprenticeshipContract, apprenticeshipHours });
   };
 
-  updateTrainingHours = (input) => {
-    let trainingHours = parseInt(input);
+  updateApprenticeshipHours = (input) => 
+  {
+    let apprenticeshipHours = input!=null ? parseInt(input) : input;
+    let nextProps = { apprenticeshipHours };
 
-    if (trainingHours == null || this.state.workingHours == null) {
-      this.props.updateSocialData({ id: this.props.id, trainingHours: 0 })
+    
+    if (apprenticeshipHours>0 && this.state.workingHours>0 && apprenticeshipHours>this.state.workingHours) {
+      nextProps.apprenticeshipHours = this.state.workingHours;
     }
-    else if (trainingHours > this.state.workingHours) {
-      this.props.updateSocialData({ id: this.props.id, trainingHours: this.state.workingHours })
-    }
-    else {
-      this.props.updateSocialData({ id: this.props.id, trainingHours });
-    }
+
+    this.setState({...nextProps});
+    this.props.updateSocialData({ id: this.props.id, ...nextProps });
   }
 }
 
-/* -------------------- LOADER -------------------- */
+/* -------------------- CHECK IF ALL DATA OK -------------------- */
 
-// const SocialDataContentReader_ = async (content) =>
-//   // ...build data from JSON content
-//   {
-//     console.log(content);
-
-//     let employees = [];
-
-//     Object.entries(content).forEach(([index, contentItem]) => 
-//     {
-//       let employeeData = {
-//         id: index,
-//         name: contentItem["Nom - Prénom"] || contentItem.nom || "",
-//         sex: /^(F|H)$/.match(contentItem["Sexe (F/H)"]) ? contentItem.sexe : "",
-//         workingHours:
-//           contentItem["Heures travaillées"] ||
-//           contentItem.heuresTravail ||
-//           null,
-//         wage:
-//           contentItem["Rémunérations brutes"] ||
-//           contentItem.remuneration ||
-//           null,
-//         hourlyRate:
-//           contentItem["Taux horaire"] || contentItem.tauxHoraire || null,
-//         trainingContract:
-//           contentItem["Contrat de formation (O/N)"] ||
-//           contentItem.contratFormation ||
-//           false,
-//         trainingHours:
-//           contentItem["Heures de formation"] ||
-//           contentItem.heuresFormation ||
-//           0,
-//       };
-//       employees.push(employeeData);
-//     });
-
-//     return { employees };
-//   };
-
-/* -------------------- FORMULAS -------------------- */
-
-// Coefficient de GINI
-const getIndexGini = (employees) => {
-  // order acoording to the hourly rate
-  employees.sort((a, b) => a.hourlyRate - b.hourlyRate);
-
-  // Nombre total d'heures travaillées
-  let n = parseInt(
-    employees
-      .map((employee) => parseInt(employee.workingHours))
-      .reduce((a, b) => a + b, 0)
-  );
-
-  let s1 = 0;
-  let s2 = 0;
-  let i = 0;
-
-  employees.forEach((employee) => {
-    // S1
-    for (let j = 1; j <= parseInt(employee.workingHours); j++) {
-      s1 += (i + j) * employee.hourlyRate;
-    }
-    i += parseInt(employee.workingHours);
-    // S2
-    s2 += parseInt(employee.workingHours) * employee.hourlyRate;
-  });
-
-  let indexGini = Math.abs((2 * s1) / (n * s2) - (n + 1) / n) * 100;
-
-  /*-- Other formula
-
-  // Nombre total d'heures travaillées
-  let total_workingHours = employees.map(employee => employee.workingHours).reduce((a,b) => a + b,0);
-  let total_wage = employees.map(employee => employee.wage).reduce((a,b) => a + b,0);
-  
-  let s = 0;
-  let cumul_wage = 0;
-
-  employees.forEach(employee =>
-  {
-    s+= (parseInt(employee.workingHours)/total_workingHours) * ((employee.wage)/total_wage);
-    console.log(s);
-    cumul_wage+=employee.wage;
-  })
-
-  let indexGini = Math.abs(s-1)*100; */
-
-  return roundValue(indexGini, 1);
-};
-
-// Ecart de rémunération F/H
-const getGenderWageGap = (employees) => {
-  const women = employees.filter((employee) => employee.sex == "F");
-  const men = employees.filter((employee) => employee.sex == "H");
-
-  if (men.length > 0 && women.length > 0) {
-    let hourlyRateWomen =
-      women
-        .map((employee) => parseFloat(employee.wage))
-        .reduce((a, b) => a + b, 0) /
-      women
-        .map((employee) => parseInt(employee.workingHours))
-        .reduce((a, b) => a + b, 0);
-    let hourlyRateMen =
-      men
-        .map((employee) => parseFloat(employee.wage))
-        .reduce((a, b) => a + b, 0) /
-      men
-        .map((employee) => parseInt(employee.workingHours))
-        .reduce((a, b) => a + b, 0);
-    let hourlyRateEmployees =
-      employees
-        .map((employee) => parseFloat(employee.wage))
-        .reduce((a, b) => a + b, 0) /
-      employees
-        .map((employee) => parseInt(employee.workingHours))
-        .reduce((a, b) => a + b, 0);
-
-    let wageGap =
-      (Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateEmployees) * 100;
-    return roundValue(wageGap, 1);
-  } else {
-    return 0;
-  }
-};
-
-// Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
-const getApprenticesRemunerations = (employees) => {
-  let apprenticesRemunerations = employees
-    .filter((employee) => employee.trainingContract)
-    .map((employee) => employee.wage || 0)
-    .reduce((a, b) => a + b, 0);
-  return roundValue(apprenticesRemunerations, 0);
-};
-
-// Rémunérations liées à des heures de formation
-const getEmployeesTrainingCompensations = (employees) => {
-  let employeesTrainingsCompensations = employees
-    .filter((employee) => !employee.trainingContract)
-    .map(
-      (employee) => (employee.hourlyRate || 0) * (employee.trainingHours || 0)
-    )
-    .reduce((a, b) => a + b, 0);
-  return roundValue(employeesTrainingsCompensations, 0);
-};
-
-
-const getInterdecileRange = async (employees) =>
+const checkIndividualData = (individualData) => 
 {
-  employees = employees.filter(employee => employee.hourlyRate!=null).sort((a,b) => a.hourlyRate - b.hourlyRate);
-  let totalHours = getSumItems(employees.map(employee => employee.workingHours), 0);
-
-  if (employees.length < 2 || totalHours==0) return 1;
-
-  // Limits
-  let limitD1 = Math.round(totalHours*0.1);
-  let limitD9 = Math.round(totalHours*0.9);
-
-  // D1
-  let indexEmployeeD1 = 0;
-  let hoursD1 = employees[indexEmployeeD1].workingHours;
-  while (hoursD1 < limitD1 && indexEmployeeD1 < employees.length) {
-    indexEmployeeD1+=1;
-    hoursD1+= employees[indexEmployeeD1].workingHours;
-  }
-  let hourlyRateD1 = employees[indexEmployeeD1].hourlyRate;
-
-  // D9
-  let indexEmployeeD9 = 0;
-  let hoursD9 = employees[indexEmployeeD9].workingHours;
-  while (hoursD9 < limitD9 && indexEmployeeD9 < employees.length) {
-    indexEmployeeD9+=1;
-    hoursD9+= employees[indexEmployeeD9].workingHours;
-  }
-  let hourlyRateD9 = employees[indexEmployeeD9].hourlyRate;
-
-  // Interdecile range
-  let interdecileRange = roundValue(hourlyRateD9/hourlyRateD1,2);
-  return interdecileRange;
+  if (individualData.sex!=1 && individualData.sex!=2) return false;
+  else if (individualData.wage==null) return false;
+  else if (individualData.workingHours==null) return false;
+  else if (individualData.hourlyRate==null) return false;
+  else return true;
 }
