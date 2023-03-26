@@ -8,13 +8,6 @@ export class SocialFootprint {
   {
     if (props==undefined) props = {indicators: {}};
   // ---------------------------------------------------------------------------------------------------- //
-
-    // parameters
-    this.footprintId = props.footprintId || null;
-    this.areaCode = props.areaCode || null;
-    this.activityCode = props.activityCode || null;
-    this.flowCode = props.flowCode || null;
-
     // indicators
     this.indicators = {};
     indics.forEach(indic => this.indicators[indic] = new Indicator({indic,...props.indicators[indic]}));
