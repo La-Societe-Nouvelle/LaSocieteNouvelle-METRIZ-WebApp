@@ -141,7 +141,10 @@ export class Session {
   // ... and allows to have all the values directly in the json back up file
 
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
-  updateFootprints = async (period) => {
+  updateFootprints = async (period) => 
+  {
+    console.log("Mise à jour des empreintes pour la période : "+period.periodKey);
+
     // Net Value Added
     await this.updateNetValueAddedFootprint(period);
 

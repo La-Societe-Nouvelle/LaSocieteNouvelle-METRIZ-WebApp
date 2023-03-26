@@ -105,7 +105,7 @@ export const IncomeStatementTable = ({ financialData, period }) =>
 const getFinancialItems = (financialData, periodKey) => 
 {
   let financialItems = {};
-  console.log(financialData.otherFinancialData);
+
   // Resultat d'exploitation -------------------------- //
 
   // incomes
@@ -218,7 +218,6 @@ const buildOperatingExpensesItems = (financialData, periodKey) =>
 
   // Variation des stocks de matières premières et autres approvisionnements 
   accounts = filteredStockVariationsAccounts.filter(account => /^603(1|2)/.test(account.accountNum));
-  console.log(accounts)
   if (accounts.length>0) {
     aggregates.push({
         label: "Variation des stocks de matières premières et autres approvisionnements",

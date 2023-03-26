@@ -3,8 +3,7 @@
 // Generic formulas
 import { SocialFootprint } from '../footprintObjects/SocialFootprint';
 import { getAmountItems, getPrevDate, getSumItems, roundValue, sortChronologicallyDates } from '../utils/Utils';
-import { getImmobilisedProductionFootprint } from './aggregatesFootprintFormulasForPeriods';
-import { buildAggregateIndicator, buildAggregatePeriodIndicator, buildDifferenceFootprint, mergeFootprints, buildDifferenceIndicator, mergeIndicators, buildAggregateFootprint } from './footprintFormulas';
+import { buildAggregateIndicator, buildAggregatePeriodIndicator, buildDifferenceFootprint, mergeFootprints, buildDifferenceIndicator, mergeIndicators, buildAggregateFootprint, buildAggregatePeriodFootprint } from './footprintFormulas';
 
 /** Structure of file
  *    - Intermediate consumptions & purchase stocks footprints
@@ -54,7 +53,7 @@ const updateExternalExpensesAccountsFpt = async (financialData,period) =>
 // Agrégation des dépenses rattachées au compte de charge
 // to update using external expenses accounts for period
 
-export const updateInitialStateStocksFpt = async (financialData,period) =>
+const updateInitialStateStocksFpt = async (financialData,period) =>
 {
   // => initial state fpt based on current financial period
   await Promise.all(financialData.stocks
@@ -244,7 +243,7 @@ export const updateFixedCapitalConsumptionsFootprints = async (financialData,per
 /* ----- Empreintes initiales des comptes d'immobilisation ----- */
 // ...
 
-export const updateInitialStateImmobilisationsFpt = async (financialData,period) =>
+const updateInitialStateImmobilisationsFpt = async (financialData,period) =>
 {
   // => initial state fpt based on current financial period
   await Promise.all(financialData.immobilisations
@@ -315,7 +314,18 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
       }
 
       // immobilised production
-      // TO DO
+      let immobilisedProductions = financialData.immobilisedProductions
+        .filter(immobilisedProduction => immobilisedProduction.accountNum==immobilisation.accountNum)
+        .filter(immobilisedProduction => immobilisedProduction.date==state.date);
+      if (immobilisedProductions.length>0) {
+        let immobilisedProductionFootprint = await getImmobilisedProductionFpt(financialData,period,period.dateStart,state.date);
+        immobilisedProductions.forEach(immobilisedProduction => immobilisedProduction.footprint = immobilisedProductionFootprint);
+        let immobilisedProductionAmount = getAmountItems(immobilisedProductions);
+        newImmobilisations.push({
+          amount: immobilisedProductionAmount,
+          footprint: immobilisedProductionFootprint
+        })
+      }
 
       let newImmobilisationsAmount = getAmountItems(newImmobilisations, 2);
       // immobilisation footprint
@@ -345,6 +355,39 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
     return;
   }));
   return;
+}
+
+const getImmobilisedProductionFpt = async (financialData,period,dateStart,dateEnd) =>
+{
+  const {
+    netValueAdded,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+  } = financialData.mainAggregates;
+
+  // Fixed capital consumtpions footprint based on fixed capital consumptions before immobilisation of production
+  let amortisationExpenses = financialData.adjustedAmortisationExpenses
+    .filter(expense => parseInt(expense.date)>=parseInt(dateStart) && parseInt(expense.date)<=parseInt(dateEnd) && expense.amount>0); // amortisation expenses before immobilised production
+  
+  if (amortisationExpenses.length > 0) 
+  {
+    let fixedCapitalConsumptionsFpt = await buildAggregateFootprint(amortisationExpenses);
+    let adjustedFixedCapitalConsumptions = {
+      periodsData: {
+        [period.periodKey]: {
+          amount: fixedCapitalConsumptions.periodsData[period.periodKey].amount,
+          footprint: fixedCapitalConsumptionsFpt
+        }
+      }
+    };
+    let immobilisedProductionFootprint = await buildAggregatePeriodFootprint([netValueAdded,intermediateConsumptions,adjustedFixedCapitalConsumptions],period.periodKey);
+    return immobilisedProductionFootprint;
+  }
+  else
+  {
+    let immobilisedProductionFootprint = await buildAggregatePeriodFootprint([netValueAdded,intermediateConsumptions],period.periodKey);
+    return immobilisedProductionFootprint;
+  }
 }
 
 /* ----- Empreintes des dotations aux amortissements ----- */

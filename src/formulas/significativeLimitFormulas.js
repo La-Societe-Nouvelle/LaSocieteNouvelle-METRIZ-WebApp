@@ -26,7 +26,6 @@ export async function getSignificativeCompanies(providers,minFpt,maxFpt,period)
   let unidentifiedProviders = providers
     .filter(provider => provider.useDefaultFootprint)
     .sort((a,b) => Math.abs(a.periodsData[period.periodKey].amountExpenses) - Math.abs(b.periodsData[period.periodKey].amountExpenses));
-  console.log(unidentifiedProviders);
 
   let significativeProviders = [];
   for (let indic of Object.keys(metaIndics)) 
@@ -41,7 +40,6 @@ export async function getSignificativeCompanies(providers,minFpt,maxFpt,period)
   significativeProviders.push(...immobilisationProviders);
 
   // Remove duplicates & return
-  console.log(significativeProviders.filter((value, index, self) => index === self.findIndex(item => item === value)));
   return significativeProviders.filter((value, index, self) => index === self.findIndex(item => item === value));
 }
 

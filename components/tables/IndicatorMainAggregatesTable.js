@@ -385,12 +385,10 @@ export const IndicatorMainAggregatesTable = ({
             <tr>
               <td>&emsp;Production immobilisée</td>
               <td className="text-end">
-                (
                 {printValue(
                   immobilisedProduction.periodsData[period.periodKey].amount,
                   0
                 )}
-                ) 
               </td>
               <td className="text-end">
                 {printValue(

@@ -192,7 +192,7 @@ export class Immobilisation
         .filter((value, index, self) => index === self.findIndex(item => item === value))   // remove duplicates dates and empty string
         .sort((a, b) => parseInt(a) - parseInt(b));   // sort by date (chronology)
 
-    let immobilisationAmount = this.initialState.amount;
+      let immobilisationAmount = this.initialState.amount;
     let amortisationAmount = this.initialState.amortisationAmount;
     let amortisationExpensesAmount = 0;
     let maxAmortisationExpensesAmount = 0;
