@@ -188,10 +188,8 @@ function RowTableImmobilisations(props)
   const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "TOTAL");
 
   useEffect(() => {
-  
     setInitialStateSet(immobilisation.initialStateSet);
     setInitialStateType(immobilisation.initialStateType);
-   
   }, [props]);
 
   const onActivityCodeChange = (event) => {
@@ -218,9 +216,10 @@ function RowTableImmobilisations(props)
   const getInitialStateOptions = () => 
   {
     switch (initialStateType) {
-      case "none": return ([initialStateTypeOptions["none"], initialStateTypeOptions["defaultData"]]);                    // options -> none, defaultData
-      case "defaultData": return ([initialStateTypeOptions["defaultData"]]);                                              // options -> defaultData
-      case "prevFootprint": return ([initialStateTypeOptions["prevFootprint"], initialStateTypeOptions["defaultData"]]);  // options -> prevFootprint, defaultData
+      case "none": return ([initialStateTypeOptions["none"], initialStateTypeOptions["defaultData"]]);                          // options -> none, defaultData
+      case "defaultData": return ([initialStateTypeOptions["defaultData"]]);                                                    // options -> defaultData
+      case "prevFootprint": return ([initialStateTypeOptions["prevFootprint"], initialStateTypeOptions["defaultData"]]);        // options -> prevFootprint, defaultData
+      default: return ([initialStateTypeOptions["defaultData"]]);                                                               // options -> defaultData
     }
   }
 

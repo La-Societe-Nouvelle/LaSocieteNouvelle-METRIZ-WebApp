@@ -19,7 +19,8 @@ import { MessagePopup, MessagePopupErrors, MessagePopupSuccess } from "../popups
 /* -------------------- INITIAL STATES SECTION -------------------- */
 /* ---------------------------------------------------------------- */
 
-export class InitialStatesSection extends React.Component {
+export class InitialStatesSection extends React.Component 
+{
   constructor(props) {
     super(props);
     this.onDrop = (files) => {
@@ -56,11 +57,11 @@ export class InitialStatesSection extends React.Component {
       popupSuccess
     } = this.state;
 
-    const accountsShowed = financialData.immobilisations.concat(
-      financialData.stocks
-    );
+    const accountsShowed = financialData.immobilisations
+      .concat(financialData.stocks);
 
     const isNextStepAvailable = nextStepAvailable(this.state);
+
     return (
       <Container fluid>
         <section className="step">
@@ -163,8 +164,7 @@ export class InitialStatesSection extends React.Component {
                 </p>
               </div>
             )}
-            {financialData.immobilisations.concat(financialData.stocks).length >
-              0 && (
+            {financialData.immobilisations.concat(financialData.stocks).length>0 && (
               <div className="table-data mt-2">
                 <InitialStatesTable
                   financialData={financialData}
