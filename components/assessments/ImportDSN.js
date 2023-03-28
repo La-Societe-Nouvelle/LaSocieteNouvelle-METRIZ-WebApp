@@ -570,7 +570,7 @@ export const getEmployeesTrainingCompensations = async (individualsData) =>
 const getIndividualSex = (individu) => {
   let sex = individu.sexe
     ? parseInt(individu.sexe)
-    : parseInt(individu.identifiant.charAt(0));
+    : parseInt((individu.identifiant || individu.identifiantTechnique).charAt(0)); // erro if both id missing
   return sex;
 };
 
