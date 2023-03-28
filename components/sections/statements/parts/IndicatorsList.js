@@ -784,13 +784,11 @@ const IndicatorsList = (props) => {
                       {value.libelle}
                       {value.isBeta && <span className="beta ms-1">BETA</span>}
                       {key == "ghg" &&
-                        props.impactsData[period.periodKey]
-                          .greenhousesGazEmissions != 0 &&
+                        props.impactsData[period.periodKey].greenhousesGazEmissions != null &&
                         validations.includes("nrg") &&
                         !validations.includes("ghg") && <IconWarning />}
                       {key == "nrg" &&
-                        props.impactsData[period.periodKey].energyConsumption !=
-                          0 &&
+                        props.impactsData[period.periodKey].energyConsumption != null &&
                         validations.includes("ghg") &&
                         !validations.includes("nrg") && <IconWarning />}
                     </ArrowToggle>

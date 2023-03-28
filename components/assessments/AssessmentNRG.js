@@ -778,62 +778,63 @@ export class AssessmentNRG extends React.Component
   {
     let impactsData = this.props.impactsData;
 
+    // --------------------------------------------------
     // update nrg data
+
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails);
     impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
+
     await this.props.onUpdate("nrg");
 
-    // update ghg data if total hasn't been directly filled out
-    if(!impactsData.ghgTotal) 
+    // --------------------------------------------------
+    // update ghg data
+
+    // ...delete
+    Object.entries(impactsData.ghgDetails)
+          .filter(([_, itemData]) => itemData.factorId != undefined)
+          .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
+          .forEach(([itemId, _]) => 
     {
-      // ...delete
-      Object.entries(impactsData.ghgDetails)
-            .filter(([_, itemData]) => itemData.factorId != undefined)
-            .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
-            .forEach(([itemId, _]) => 
-      {
-        let nrgItem = Object.entries(impactsData.nrgDetails)
-                            .map(([_, nrgItemData]) => nrgItemData)
-                            .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
-        if (nrgItem == undefined) delete impactsData.ghgDetails[itemId];
-      });
+      let nrgItem = Object.entries(impactsData.nrgDetails)
+                          .map(([_, nrgItemData]) => nrgItemData)
+                          .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
+      if (nrgItem == undefined) delete impactsData.ghgDetails[itemId]
+    });
 
-      // ...add & update
-      Object.entries(impactsData.nrgDetails)
-            .filter(([_, data]) => data.type == "fossil" || data.type == "biomass")
-            .forEach(([itemId, itemData]) => 
-      {
-        let ghgItem = Object.entries(impactsData.ghgDetails)
-                            .map(([_, ghgItemData]) => ghgItemData)
-                            .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
-        // init if undefined
-        if (ghgItem == undefined) {
-          const id = getNewId(Object.entries(impactsData.ghgDetails).map(([_, data]) => data));
-          impactsData.ghgDetails[id] = { id: id, idNRG: itemId };
-          itemData.idGHG = id;
-          ghgItem = impactsData.ghgDetails[id];
-        }
-        // update values
-        ghgItem.assessmentItem = fuels[itemData.fuelCode].usageSourcesFixes ? "1" : "2";
-        ghgItem.label = itemData.label;
-        ghgItem.factorId = itemData.fuelCode;
-        ghgItem.gaz = "co2e";
-        ghgItem.consumption = itemData.consumption;
-        ghgItem.consumptionUnit = itemData.consumptionUnit;
-        ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
-        ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
-        ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
-      });
-
-      if(this.state.message) 
-      {
-        // ...total & uncertainty
-        impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
-        impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
-        await this.props.onUpdate("ghg");
+    // ...add & update
+    Object.entries(impactsData.nrgDetails)
+          .filter(([_, data]) => data.type == "fossil" || data.type == "biomass")
+          .forEach(([itemId, itemData]) => 
+    {
+      let ghgItem = Object.entries(impactsData.ghgDetails)
+                          .map(([_, ghgItemData]) => ghgItemData)
+                          .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
+      // init if undefined
+      if (ghgItem == undefined) {
+        const id = getNewId(Object.entries(impactsData.ghgDetails).map(([_, data]) => data));
+        impactsData.ghgDetails[id] = { id: id, idNRG: itemId };
+        itemData.idGHG = id;
+        ghgItem = impactsData.ghgDetails[id];
       }
-    }
+      // update values
+      ghgItem.assessmentItem = fuels[itemData.fuelCode].usageSourcesFixes ? "1" : "2";
+      ghgItem.label = itemData.label;
+      ghgItem.factorId = itemData.fuelCode;
+      ghgItem.gaz = "co2e";
+      ghgItem.consumption = itemData.consumption;
+      ghgItem.consumptionUnit = itemData.consumptionUnit;
+      ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
+      ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
+      ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
+    });
+
+    // ...total & uncertainty
+    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
+    impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
+    await this.props.onUpdate("ghg");
+
+    // --------------------------------------------------
 
     // go back
     this.props.onGoBack();
