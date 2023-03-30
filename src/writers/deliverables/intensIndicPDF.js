@@ -60,7 +60,7 @@ export const createIntensIndicatorPDF = (
     indic
   ].data.filter((item) => item.flag == "e" && item.year <= currentPeriod);
 
-
+  console.log(lastEstimatedData)
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)
   );
@@ -905,9 +905,9 @@ export const createIntensIndicatorPDF = (
               {
                 text:
                   "Taux d'évolution moyen observé entre " +
-                  lastEstimatedData[0].currentPeriod +
+                  lastEstimatedData[0].year +
                   " et " +
-                  lastEstimatedData[1].currentPeriod,
+                  lastEstimatedData[1].year,
                 alignment: "center",
                 fontSize: "8",
               },
