@@ -65,21 +65,22 @@ export class Provider {
   }
 
   // get footrpint id (siren)
-  getDefaultFootprintId() 
+  getDefaultFootprintId()
   {
     if (!this.corporateId) {
       return null;
     }
     // SIREN
-    else if (/[0-9]{9}/.test(this.corporateId)) {
+    else if (/^[0-9]{9}$/.test(this.corporateId)) {
       return this.corporateId;
     }
     // SIRET
-    else if (/[0-9]{14}/.test(this.corporateId)) {
+    else if (/^[0-9]{14}$/.test(this.corporateId)) {
+      console.log(this.corporateId);
       return this.corporateId.substring(0, 9);
     }
     // VAT NUMBER
-    else if (/FR[0-9]{11}/.test(this.corporateId)) {
+    else if (/^FR[0-9]{11}$/.test(this.corporateId)) {
       return this.corporateId.substring(4, 11);
     }
     // DEFAULT
