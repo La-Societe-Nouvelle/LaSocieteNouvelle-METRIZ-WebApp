@@ -160,6 +160,9 @@ class Metriz extends React.Component {
       await updateVersion(prevProps);
       // JSON -> session
       const session = new Session(prevProps);
+      for (let period of session.availablePeriods) {
+        await session.updateFootprints(period);
+      }
 
       this.setState({
         session: session,
