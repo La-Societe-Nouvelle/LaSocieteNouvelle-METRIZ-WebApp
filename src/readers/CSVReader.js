@@ -1,6 +1,6 @@
-/* ---------------------------------------------------- */
-/* -------------------- CSV READER -------------------- */
-/* ---------------------------------------------------- */
+/* -------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- CSV READER ---------------------------------------- */
+/* -------------------------------------------------------------------------------------------- */
 
 /* ---------- CONTENT READER ---------- */ 
 
@@ -21,9 +21,9 @@ async function CSVFileReader(content)
 
   // read rows
   const rows = content.slice(content.indexOf('\n')+1).split('\n');
-  await rows.forEach((rowString) => {
-    if (rowString!="") 
-    {
+  await rows.forEach((rowString) => 
+  {
+    if (rowString!="") {
       let row = rowString.split(";");
       readCSVFileRow(columns,row)
         .then((rowData) => CSVData.push(rowData));
@@ -34,13 +34,16 @@ async function CSVFileReader(content)
 }
 
 // Read line
-async function readCSVFileRow(columns,row) {
+async function readCSVFileRow(columns,row) 
+{
   let rowData = {}
   Object.entries(columns).forEach(([column,index]) => {
     rowData[column] = row[index].replace(/^\"/,"").replace(/\"$/,"");
   })
   return rowData;
 }
+
+/* -------------------------------------------------------------------------------------------- */
 
 /* ---------- COMPANIES FILE ---------- */ 
 
