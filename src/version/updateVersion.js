@@ -6,7 +6,7 @@ import {
   getGhgEmissionsUncertainty,
   getTotalGhgEmissionsUncertainty,
 } from "../../components/assessments/AssessmentGHG";
-import { buildIndicatorAggregate } from "../formulas/footprintFormulas";
+import { buildAggregateIndicator } from "../formulas/footprintFormulas";
 
 import { getAmountItems, getTargetSerieId } from "../utils/Utils";
 
@@ -23,7 +23,8 @@ import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
-export const updateVersion = async (sessionData) => {
+export const updateVersion = async (sessionData) => 
+{
   switch (sessionData.version) {
     case "2.0.0":
       break;
@@ -124,7 +125,7 @@ const updater_1_0_4 = async (sessionData) => {
   let investmentsFootprint = new SocialFootprint();
   Object.keys(metaIndics).forEach(
     async (indic) =>
-      (investmentsFootprint[indic] = await buildIndicatorAggregate(
+      (investmentsFootprint[indic] = await buildAggregateIndicator(
         indic,
         investments
       ))
@@ -134,7 +135,7 @@ const updater_1_0_4 = async (sessionData) => {
     amount: getAmountItems(investments),
     footprint: investmentsFootprint,
   };
-  sessionData.financialData.mainAggregates.grossFixedCapitalFormation =
+  sessionData.financialData.aggregates.grossFixedCapitalFormation =
     dataGrossFixedCapitalFormationAggregate;
 };
 
