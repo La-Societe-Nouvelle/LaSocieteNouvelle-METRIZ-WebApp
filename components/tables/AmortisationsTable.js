@@ -7,7 +7,6 @@ import { Table } from "react-bootstrap";
 // Utils
 import {
   getAmountItems,
-  getPrevAmountItems,
   getPrevDate,
   getSumItems,
   printValue,

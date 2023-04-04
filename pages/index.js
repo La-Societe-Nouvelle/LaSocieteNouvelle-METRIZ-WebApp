@@ -21,7 +21,6 @@ import { Header } from "/components/parts/headers/Header";
 import { HeaderSection } from "../components/parts/headers/HeaderSection";
 import { HeaderPublish } from "../components/parts/headers/HeaderPublish";
 
-import { getPrevAmountItems } from "/src/utils/Utils";
 import { updateVersion } from "/src/version/updateVersion";
 import { Footer } from "../components/parts/Footer";
 import { Mobile } from "../components/Mobile";
