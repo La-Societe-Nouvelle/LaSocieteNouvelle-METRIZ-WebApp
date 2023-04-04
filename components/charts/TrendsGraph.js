@@ -12,8 +12,7 @@ function TrendsGraph(props) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const { trends, target, period, current, prevPeriod, prev, unit } = props;
-
+    const { trends, target,  unit, aggregate,indic } = props;
     const trendsDataForecast = [];
 
     for (const data of trends.data) {
@@ -43,7 +42,21 @@ function TrendsGraph(props) {
       y: data.value,
     }));
 
-    // Ajouter une entrée pour 2020 dans trendsDataForecast
+
+    const legalUnitData = []
+    for (const period in aggregate) {
+
+      const periodDetails = aggregate[period];
+
+      legalUnitData.push({
+        x: period.slice(2),
+        y: periodDetails.footprint.indicators[indic].value,
+        r: 5
+      })
+      
+     
+    }
+ 
     const chartData = {
       datasets: [
         {
@@ -66,34 +79,21 @@ function TrendsGraph(props) {
         {
           label: "Situation",
           type: "bubble",
-          data: [{ x: period.periodKey.slice(2), y: current, r: 5 }],
+          data: legalUnitData,
           backgroundColor: "rgb(250,89,95)",
           borderColor: "rgb(250,89,95)",
           borderWidth: 4,
           order: 1,
         },
-      ],
-    };
-    if (prevPeriod) {
-      chartData.datasets.push(
         {
-          type: "bubble",
-          data: [{ x: prevPeriod.periodKey.slice(2), y: prev, r: 5 }],
-          backgroundColor: "rgb(250,89,95)",
-          borderColor: "rgb(250,89,95)",
-          borderWidth: 4,
-        },
-        {
-          data: [
-            { x: prevPeriod.periodKey.slice(2), y: prev, r: 5 },
-            { x: period.periodKey.slice(2), y: current, r: 5 },
-          ],
+          data: legalUnitData,
           type: "line",
           borderColor: "rgb(250,89,95)",
           fill: false,
         }
-      );
-    }
+      ],
+    };
+
 
     if (targetData.length > 1) {
       chartData.datasets.push({

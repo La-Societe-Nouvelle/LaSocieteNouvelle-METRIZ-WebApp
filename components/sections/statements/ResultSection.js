@@ -526,6 +526,7 @@ const ResultSection = (props) => {
         </Row>
       </section>
       {/* ---------- Trend Line Chart ----------  */}
+      {console.log(production)}
       {comparativeDivision != "00" && (
         <section className="step">
           <h3>Courbes d'évolution</h3>
@@ -563,19 +564,8 @@ const ResultSection = (props) => {
                     comparativeData.production.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={
-                    production.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  prev={
-                    prevPeriod &&
-                    production.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  period={period}
-                  prevPeriod={prevPeriod}
+                  aggregate={production.periodsData}
+                  indic={indic}
                 />
               </div>
               <div
@@ -603,19 +593,8 @@ const ResultSection = (props) => {
                     comparativeData.intermediateConsumptions
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={
-                    intermediateConsumptions.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  prev={
-                    prevPeriod &&
-                    intermediateConsumptions.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  period={period}
-                  prevPeriod={prevPeriod}
+                  aggregate={intermediateConsumptions.periodsData}
+                  indic={indic}
                 />
               </div>
               <div
@@ -643,19 +622,8 @@ const ResultSection = (props) => {
                     comparativeData.fixedCapitalConsumptions
                       .targetDivisionFootprint.indicators[indic]
                   }
-                  current={
-                    fixedCapitalConsumptions.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  prev={
-                    prevPeriod &&
-                    fixedCapitalConsumptions.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  period={period}
-                  prevPeriod={prevPeriod}
+                  aggregate={fixedCapitalConsumptions.periodsData}
+                  indic={indic}
                 />
               </div>
               <div
@@ -685,19 +653,8 @@ const ResultSection = (props) => {
                     comparativeData.netValueAdded.targetDivisionFootprint
                       .indicators[indic]
                   }
-                  current={
-                    netValueAdded.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  prev={
-                    prevPeriod &&
-                    netValueAdded.periodsData[
-                      prevPeriod.periodKey
-                    ].footprint.getIndicator(indic).value
-                  }
-                  period={period}
-                  prevPeriod={prevPeriod}
+                  aggregate={netValueAdded.periodsData}
+                  indic={indic}
                 />
               </div>
             </Col>
