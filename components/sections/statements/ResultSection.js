@@ -526,7 +526,6 @@ const ResultSection = (props) => {
         </Row>
       </section>
       {/* ---------- Trend Line Chart ----------  */}
-      {console.log(production)}
       {comparativeDivision != "00" && (
         <section className="step">
           <h3>Courbes d'évolution</h3>
