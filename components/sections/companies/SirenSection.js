@@ -15,6 +15,10 @@ import { MessagePopup } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
 
+// pdf extractor
+import pdf from 'pdf-extraction';
+//const pdf = require("pdf-extraction");
+
 export class SirenSection extends React.Component 
 {
   constructor(props) 
@@ -38,6 +42,17 @@ export class SirenSection extends React.Component
     {
       if (files.length) {
         this.importFile(files[0]);
+        this.openPopup();
+        this.setState({ errorFile: false });
+      } else {
+        this.setState({ errorFile: true });
+      }
+    };
+
+    this.onInvoicesDrop = (files) => 
+    {
+      if (files.length) {
+        this.readInvoice(files[0]);
         this.openPopup();
         this.setState({ errorFile: false });
       } else {
@@ -124,6 +139,44 @@ export class SirenSection extends React.Component
                     <p className="small">OU</p>
                     <p className="btn btn-primary">
                       Selectionner votre fichier
+                    </p>
+                  </div>
+                </div>
+              )}
+            </Dropzone>
+
+            {errorFile && (
+              <div className="alert alert-danger">
+                <p> <i className="bi bi-x-octagon"></i> Fichier incorrect</p>
+              </div>
+            )}
+            {popup && (
+              <MessagePopup
+                message="Votre fichier a bien été importé !"
+                type="success"
+                closePopup={() => this.closePopup()}
+              />
+            )}
+          </div>
+          <div className="step">
+            <h4>Déposer des factures</h4>
+
+            <Dropzone
+              onDrop={this.onInvoicesDrop}
+              accept={[".pdf"]}
+              maxFiles={1}
+            >
+              {({ getRootProps, getInputProps }) => (
+                <div className="dropzone-section">
+                  <div {...getRootProps()} className="dropzone">
+                    <input {...getInputProps()} />
+                    <p>
+                      <i className="bi bi-file-arrow-up-fill"></i>
+                      Glisser vos factures ici
+                    </p>
+                    <p className="small">OU</p>
+                    <p className="btn btn-primary">
+                      Selectionner les fichiers
                     </p>
                   </div>
                 </div>
@@ -396,6 +449,23 @@ export class SirenSection extends React.Component
         providers: this.props.financialData.providers,
       });
     };
+
+    reader.readAsArrayBuffer(file);
+  };
+
+  readInvoice = (file) => 
+  {
+    let reader = new FileReader();
+
+    reader.onload = async () => 
+    {
+      let dataBuffer = reader.result;
+      pdf(dataBuffer).then(function (data) {
+        console.log(data.text);
+        let numbers = data.text.match(/FR[0-9]{11}/g);
+        console.log(numbers);
+      })
+    }
 
     reader.readAsArrayBuffer(file);
   };
