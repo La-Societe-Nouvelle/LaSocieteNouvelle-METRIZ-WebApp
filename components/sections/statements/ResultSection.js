@@ -99,6 +99,8 @@ const ResultSection = (props) => {
 
   useEffect(async () => {
     if (comparativeDivision != props.session.comparativeData.activityCode) {
+      props.session.comparativeData.activityCode = comparativeDivision;
+
       let newComparativeData = comparativeData;
 
       for await (const indic of props.session.validations[
@@ -116,7 +118,6 @@ const ResultSection = (props) => {
       // Update session with comparative data for all validated indicators
 
       props.session.comparativeData = newComparativeData;
-      props.session.comparativeData.activityCode = comparativeDivision;
     }
   }, [comparativeDivision]);
 
