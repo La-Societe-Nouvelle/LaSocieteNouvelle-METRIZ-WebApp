@@ -6,7 +6,7 @@ import { Table, Row, Col } from "react-bootstrap";
 
 // Utils
 import { InputNumber } from "../input/InputNumber";
-import { getNewId, getUncertainty, printValue } from "../../src/utils/Utils";
+import { getNewId, printValue } from "../../src/utils/Utils";
 
 // Libs
 import fuels from "/lib/emissionFactors/fuels.json";
@@ -974,3 +974,9 @@ const getNrgConsumptionUncertaintyByType = (nrgDetails, type) =>
     }
   } else return null;
 };
+
+export function getUncertainty(value, valueMin, valueMax) {
+  return Math.round(
+    (Math.max(valueMax - value, value - valueMin) / value) * 100
+  );
+}

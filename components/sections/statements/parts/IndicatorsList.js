@@ -552,6 +552,7 @@ const IndicatorsList = (props) => {
                 {comparativeDivision !== "00" && (
                   <Row>
                     <Col sm={8}>
+                
                       <TrendsGraph
                         id={"trend-prd-" + indic}
                         unit={metaIndics[indic].unit}
@@ -565,19 +566,9 @@ const IndicatorsList = (props) => {
                           comparativeData.production.targetDivisionFootprint
                             .indicators[indic]
                         }
-                        current={
-                          props.session.financialData.mainAggregates.production.periodsData[
-                            period.periodKey
-                          ].footprint.getIndicator(indic).value
-                        }
-                        prev={
-                          prevPeriod &&
-                          props.session.financialData.mainAggregates.production.periodsData[
-                            prevPeriod.periodKey
-                          ].footprint.getIndicator(indic).value
-                        }
-                        period={period}
-                        prevPeriod={prevPeriod}
+                        aggregate={props.session.financialData.mainAggregates.production.periodsData}
+                        indic={indic}
+
                       />
                     </Col>
                   </Row>
@@ -1015,7 +1006,6 @@ async function generateIndicatorReportPDF(
 ) {
   // Create an array of promises for generating PDF files
   const pdfPromises = [];
-  console.log(period);
   const year = period.periodKey.slice(2);
 
   const documentTitle =
