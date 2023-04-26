@@ -19,9 +19,8 @@ export class LegalUnit
     this.isEmployeur = props.isEmployeur || null;
     this.trancheEffectifs = props.trancheEffectifs || "";
     this.isEconomieSocialeSolidaire = props.isEconomieSocialeSolidaire || null;
-
-    // Accounting period
-    this.year = props.year || "";
+    this.isSocieteMission = props.isSocieteMission || null;
+    this.hasCraftedActivities = props.hasCraftedActivities || null;
 
     // ---------------------------------------------------------------------------------------------------- //
   }
