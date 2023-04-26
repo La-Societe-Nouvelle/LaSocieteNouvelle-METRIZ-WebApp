@@ -24,7 +24,7 @@ import { HeaderPublish } from "../components/parts/headers/HeaderPublish";
 import { updateVersion } from "/src/version/updateVersion";
 import { Footer } from "../components/parts/Footer";
 import { Mobile } from "../components/Mobile";
-import { DataUpdater } from "../components/popups/DataUpdater";
+import { DataUpdater } from "../components/popups/dataUpdater/DataUpdater";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
