@@ -325,7 +325,7 @@ export class ImportDSN extends React.Component {
     impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
     await this.props.onUpdate("idr");
 
-    // update geq data
+    // update geq data (in pct i.e. 14.2 for 14.2 %)
     impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
     await this.props.onUpdate("geq");
 
@@ -480,8 +480,8 @@ export const getGenderWageGap = async (individualsData) =>
 
   // Gander gap
   let genderWageGap = roundValue(
-    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll,
-    2
+    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll *100,
+    1
   );
   return genderWageGap;
 };
