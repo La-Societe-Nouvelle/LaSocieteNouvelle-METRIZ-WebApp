@@ -88,12 +88,14 @@ const updater_1_0_5 = async (sessionData) => {
   let newComparativeData = new ComparativeData();
 
   for await (const indic of sessionData.validations) {
-    // update comparative data for each validated indicators
+    
+ // update comparative data for each validated indicators
     const updatedData = await updateComparativeData(
       indic,
       code,
       newComparativeData
     );
+
     newComparativeData = updatedData;
   }
 
@@ -182,7 +184,7 @@ const updater_1_0_1 = (sessionData) => {
 
 // ----------------------------------------------------------------
 
-async function updateComparativeData(
+export async function updateComparativeData(
   indic,
   comparativeDivision,
   comparativeData
