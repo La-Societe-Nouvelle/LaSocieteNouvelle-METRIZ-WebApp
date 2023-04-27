@@ -6,3 +6,4 @@ class LegalUnitService {
   }
 }
 
+export default new LegalUnitService();

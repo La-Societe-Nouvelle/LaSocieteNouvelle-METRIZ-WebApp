@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
 import { ComparativeData } from "../../../src/ComparativeData";
 import { updateComparativeData } from "../../../src/version/updateVersion";
-import UpdatedDataTable from "./UpdatedDataTable";
+import UpdateDataView from "./UpdatedDataView";
 
 export const DataUpdater = ({ session }) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [updatedSession, setUpdatedSession] = useState({});
-  const [prevSession, setPrevSession] = useState(session);
   const [isDatafetched, setIsDatafetched] = useState(false);
 
   const handleRefresh = async () => {
     setIsLoading(true);
     const updatedSession = new Session({ ...session });
+
     await fetchLatestData(updatedSession);
 
     setUpdatedSession(updatedSession);
@@ -35,10 +35,10 @@ export const DataUpdater = ({ session }) => {
           </div>
         )}
         {isDatafetched && (
-          <UpdatedDataTable
+          <UpdateDataView
             prevSession={session}
             updatedSession={updatedSession}
-          ></UpdatedDataTable>
+          ></UpdateDataView>
         )}
         {!isDatafetched && !isLoading && (
           <div className="text-center">
@@ -127,6 +127,7 @@ const fetchLatestProviders = async (
 
 const fetchLatestLegalUnit = async (legalUnit) => {
   await LegalUnitService.getLegalUnitData(legalUnit.siren).then((res) => {
+    console.log( res.data.legalUnit)
     let status = res.data.header.code;
     if (status == 200) {
       legalUnit.corporateName = res.data.legalUnit.denomination;
