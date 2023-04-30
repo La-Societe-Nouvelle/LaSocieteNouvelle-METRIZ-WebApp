@@ -17,7 +17,15 @@ import { ErrorApi } from "../../ErrorAPI";
 
 // pdf extractor
 import pdf from 'pdf-extraction';
+import { number } from "prop-types";
 //const pdf = require("pdf-extraction");
+
+const identificationPatterns = [
+  /FR[0-9]{11}( |$|\r\n|\r|\n)/g,
+  /FR [0-9]{2} [0-9]{3} [0-9]{3} [0-9]{3}( |$|\r\n|\r|\n)/g,
+  /(SIRET|SIREN|RCS)( |)[0-9]{9,15}( |)($|\r\n|\r|\n)/g,
+  /(^|)( |)[0-9]{9,15}( |)(SIRET|SIREN|RCS)/g,
+]
 
 export class SirenSection extends React.Component 
 {
@@ -49,10 +57,13 @@ export class SirenSection extends React.Component
       }
     };
 
-    this.onInvoicesDrop = (files) => 
+    this.onInvoicesDrop = async (files) => 
     {
-      if (files.length) {
-        this.readInvoice(files[0]);
+      console.log(files);
+      console.log(files.length);
+      if (files.length>0) {
+        let invoicesData = await this.readInvoices(files);
+        console.log(invoicesData);
         this.openPopup();
         this.setState({ errorFile: false });
       } else {
@@ -164,7 +175,7 @@ export class SirenSection extends React.Component
             <Dropzone
               onDrop={this.onInvoicesDrop}
               accept={[".pdf"]}
-              maxFiles={1}
+              //maxFiles={1}
             >
               {({ getRootProps, getInputProps }) => (
                 <div className="dropzone-section">
@@ -453,21 +464,55 @@ export class SirenSection extends React.Component
     reader.readAsArrayBuffer(file);
   };
 
-  readInvoice = (file) => 
+  readInvoices = async (files) => 
   {
-    let reader = new FileReader();
-
-    reader.onload = async () => 
+    let invoicesData = [];
+    let promises = [];
+    for (let file of files)
     {
-      let dataBuffer = reader.result;
-      pdf(dataBuffer).then(function (data) {
-        console.log(data.text);
-        let numbers = data.text.match(/FR[0-9]{11}/g);
-        console.log(numbers);
-      })
+      let filePromise = new Promise(resolve => 
+      {
+        let reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.readAsArrayBuffer(file);
+      });
+      promises.push(filePromise);
     }
 
-    reader.readAsArrayBuffer(file);
+    Promise.all(promises).then(async (fileContents) => 
+    {
+      for (let fileContent of fileContents) 
+      {
+        let data = await pdf(fileContent);
+  
+        //console.log(data.text);
+  
+        // VAT Identification Numbers
+        let identificationNumbers = identificationPatterns.map((regex) => (data.text.match(regex) || []))
+          .reduce((a,b) => a.concat(b),[])
+          .map((number) => number.replace(/( |\r\n|\r|\n|RCS|SIREN|SIRET)/g,''))
+          .filter((value, index, self) => index === self.findIndex((item) => item == value));
+        // Dates
+        let dates = (data.text.match(/[0-9]{2}\/[0-9]{2}\/(20|)[0-9]{2}/g) || [])
+          .map((date) => "20"+(date.length==8 ? date.substring(6,8) : date.substring(8,10))+date.substring(3,5)+date.substring(0,2))
+          .filter((value, index, self) => index === self.findIndex((item) => item == value));
+        // Amounts
+        let amounts = (data.text.match(/[0-9| ]+(.|,)[0-9]{0,2}( |)€/g) || [])
+          .map((amount) => amount.replace(/€/g,'').replace(/ /g,'').replace(',','.'))
+          .map((amount) => parseFloat(amount))
+          .filter((value, index, self) => index === self.findIndex((item) => item == value));
+        
+        let extractedData = {
+          identificationNumbers,
+          dates,
+          amounts
+        }
+  
+        console.log(extractedData);
+        invoicesData.push(extractedData);        
+      }
+    });    
+    return invoicesData;
   };
 
   /* ---------- FILE EXPORT ---------- */
