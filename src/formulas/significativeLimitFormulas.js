@@ -56,7 +56,7 @@ const getSignificativeProvidersByIndic = async (indic,identifiedProviders,uniden
   unidentifiedProviders.sort((a,b) => Math.abs(a.periodsData[period.periodKey].amountExpenses) - Math.abs(b.periodsData[period.periodKey].amountExpenses));
   let index = 0; // under -> providers not significative
 
-  while (!isSignificative && index < unidentifiedProviders.length)
+  while (!isSignificative && index <= unidentifiedProviders.length)
   {    
     // build impact for upper limit providers (mininum footprint case) -> use activity footprint if defined otherwise use min footprint
     let upperLimitProviders = unidentifiedProviders.slice(index);
@@ -79,6 +79,6 @@ const getSignificativeProvidersByIndic = async (indic,identifiedProviders,uniden
   }
 
   // Retrieve list of companies
-  let significativeProviders = unidentifiedProviders.slice(index).map(provider => provider.providerNum);
+  let significativeProviders = index>0 ? unidentifiedProviders.slice(index-1).map(provider => provider.providerNum) : [];
   return significativeProviders;
 }
