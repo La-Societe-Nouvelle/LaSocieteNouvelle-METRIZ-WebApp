@@ -1,4 +1,4 @@
-import React, {useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
@@ -18,16 +18,28 @@ export const DataUpdater = ({ session }) => {
 
     await fetchLatestData(updatedSession);
 
+    for (let period of session.availablePeriods) {
+      await session.updateFootprints(period);
+    }
     setUpdatedSession(updatedSession);
     setIsLoading(false);
     setIsDatafetched(true);
   };
 
-
+  useEffect(async () => {
+    if (isDatafetched) {
+      console.log("Mise à jour des empreintes avec les nouvelles données")
+      for (let period of session.availablePeriods) {
+        await updatedSession.updateFootprints(period);
+      }
+    }
+  }, [isDatafetched]);
   return (
-    <Modal show={show} size="lg" centered>
+    <Modal show={show} size="md"  >
+         <Modal.Header closeButton closeLabel="Fermer" >
+          <Modal.Title >Mise à jour des données</Modal.Title>
+        </Modal.Header>
       <Modal.Body>
-        <h3 className="text-center my-4">Mise à jour des données</h3>
 
         {isLoading && (
           <div className="loader-container my-4">
@@ -41,26 +53,23 @@ export const DataUpdater = ({ session }) => {
           ></UpdateDataView>
         )}
         {!isDatafetched && !isLoading && (
-          <div className="text-center">
+          <>
             <p>
               Des données plus récentes sont peut-être disponibles.
               Souhaitez-vous vérifier si les données sont à jour ?
             </p>
             <Button
+              className="mt-2"
               variant="secondary"
               disabled={isLoading}
               onClick={() => handleRefresh()}
             >
-              Actualiser
+            Actualiser mes données 
             </Button>
-          </div>
+          </>
         )}
 
-        <div className="text-end">
-          <Button onClick={() => setShow(false)} className="me-1">
-            Fermer
-          </Button>
-        </div>
+    
       </Modal.Body>
     </Modal>
   );
@@ -127,7 +136,7 @@ const fetchLatestProviders = async (
 
 const fetchLatestLegalUnit = async (legalUnit) => {
   await LegalUnitService.getLegalUnitData(legalUnit.siren).then((res) => {
-    console.log( res.data.legalUnit)
+    console.log(res.data.legalUnit);
     let status = res.data.header.code;
     if (status == 200) {
       legalUnit.corporateName = res.data.legalUnit.denomination;

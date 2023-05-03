@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
 
 const UpdateDataView = (props) => {
   const [updatedLegalUnit, setUpdatedLegalUnit] = useState(null);
   const [updatedProviders, setUpdatedProviders] = useState(null);
   const [updatedAccounts, setUpdatedAccounts] = useState(null);
-  const [updatedComparison, setUpdatedComparison] = useState(null);
+  const [updatedComparativeData, setUpdatedComparativeData] = useState(null);
+  const [updatedFootprint, setUpdatedFootprint] = useState(null);
+  const [showButton, setShowButton] = useState(true);
+  const [isSessionUpdated, setIsSessionUpdated] = useState(false);
 
-  useEffect(() => {
-    const compareLegalUnit = compareData(
+  useEffect(async () => {
+    const compareLegalUnit = await compareData(
       props.prevSession.legalUnit,
       props.updatedSession.legalUnit
     );
@@ -16,7 +20,7 @@ const UpdateDataView = (props) => {
       setUpdatedLegalUnit(compareLegalUnit);
     }
 
-    const compareProviders = compareProvidersFpt(
+    const compareProviders = await compareProvidersFpt(
       props.prevSession.financialData.providers,
       props.updatedSession.financialData.providers
     );
@@ -32,18 +36,85 @@ const UpdateDataView = (props) => {
       .concat(props.updatedSession.financialData.stocks)
       .filter((asset) => asset.initialStateType == "defaultData");
 
-    const compareAccounts = compareInitialStateFpt(prevAccounts, currAccounts);
+    const compareAccounts = await compareInitialStateFpt(
+      prevAccounts,
+      currAccounts
+    );
     if (compareAccounts) {
       setUpdatedAccounts(compareAccounts);
     }
 
-    const compareAggregates = compareAggregatesData(
+    const compareAggregates = await compareComparativeData(
       props.prevSession.comparativeData,
       props.updatedSession.comparativeData
     );
+
+    if (compareAggregates) {
+      setUpdatedComparativeData(compareAggregates);
+    }
+
+    if (
+      updatedLegalUnit ||
+      updatedProviders ||
+      updatedAccounts ||
+      updatedComparativeData
+    ) {
+      setShowButton(true);
+    }
   }, [props]);
 
-  return (
+  async function updateAggregatesFootprints(prevSession, currSession) {
+    let compareProductionFootprint = {};
+
+    for (let period of prevSession.availablePeriods) {
+      await currSession.updateFootprints(period);
+    }
+
+    for (let period of prevSession.availablePeriods) {
+      const result = compareAggregateFootprint(
+        prevSession.financialData.mainAggregates.production.periodsData[
+          period.periodKey
+        ].footprint.indicators,
+        currSession.financialData.mainAggregates.production.periodsData[
+          period.periodKey
+        ].footprint.indicators
+      );
+
+      if (result) {
+        if (!compareProductionFootprint[period.periodKey]) {
+          compareProductionFootprint[period.periodKey] = {};
+        }
+        compareProductionFootprint[period.periodKey] = result;
+      }
+    }
+    // TO DO : Compare prev and curr value and show significative impact update
+    
+
+    setUpdatedFootprint(compareProductionFootprint);
+    setIsSessionUpdated(true);
+  }
+
+  return isSessionUpdated ? (
+    <>
+  {console.log( Object.values(updatedFootprint))}
+      <div className="">
+        <p className="">Toutes les données ont bien été mises à jour ! </p>
+
+        {updatedFootprint.length > 0 &&
+          Object.values(updatedFootprint).map((data) => {
+            console.log(data)
+          })}
+        <Button
+          variant="secondary"
+          className="me-1 mt-2"
+        >
+
+          Sauvegarder ma session
+        </Button>
+   
+      </div>
+    </>
+  ) : (
     <>
       {updatedLegalUnit && <LegalUnitDataPreview data={updatedLegalUnit} />}
 
@@ -57,11 +128,30 @@ const UpdateDataView = (props) => {
           label={"comptes de stocks et d'immobilisations"}
         />
       )}
+
+      {updatedComparativeData && (
+        <div className="small border-top my-3 pt-3">
+          <h4 className="h6">Données comparatives</h4>
+          <p>Les données de comparaisons vont être mises à jour.</p>
+        </div>
+      )}
+
+      {showButton && (
+        <Button
+          variant="secondary"
+          className="mt-2"
+          onClick={() =>
+            updateAggregatesFootprints(props.prevSession, props.updatedSession)
+          }
+        >
+          <i className="bi bi-arrow-repeat"></i> Mettre à jour ma session
+        </Button>
+      )}
     </>
   );
 };
 
-function compareData(prevData, currData) {
+async function compareData(prevData, currData) {
   let diffs = {};
 
   // Compare the keys of both objects
@@ -101,7 +191,7 @@ function compareData(prevData, currData) {
   return Object.keys(diffs).length ? diffs : false;
 }
 
-function compareProvidersFpt(prevProviders, currProviders) {
+async function compareProvidersFpt(prevProviders, currProviders) {
   const updates = {};
 
   // Parcours de tous les fournisseurs
@@ -148,7 +238,7 @@ function compareProvidersFpt(prevProviders, currProviders) {
   return updates;
 }
 
-function compareInitialStateFpt(prevAccounts, currAccounts) {
+async function compareInitialStateFpt(prevAccounts, currAccounts) {
   const updates = {};
 
   // Parcours de tous les fournisseurs
@@ -195,7 +285,7 @@ function compareInitialStateFpt(prevAccounts, currAccounts) {
   return updates;
 }
 
-function compareAggregatesData(prevData, currData) {
+async function compareComparativeData(prevData, currData) {
   const aggregates = Object.keys(prevData).filter(
     (data) => data != "activityCode"
   );
@@ -218,29 +308,59 @@ function compareAggregatesData(prevData, currData) {
       currData[aggregate].targetDivisionFootprint.indicators;
     const currTrendsFootprint = currData[aggregate].trendsFootprint.indicators;
 
-    
-      const compareAreaFpt = compareData(prevAreaFpt, currAreaFpt);
-      const compareDivisionFpt =  compareData(prevDivisionFpt, currDivisionFpt);
-      const compareTgtArea = compareData(prevTargetAreaFpt, currTargetAreaFpt);
-      const compareTgtDivision = compareData(prevTargetDivisionFpt,currTargetDivisionFpt);
-      const comparetrendFpt = compareData(prevTrendsFootprint, currTrendsFootprint);
+    const compareAreaFpt = compareData(prevAreaFpt, currAreaFpt);
+    const compareDivisionFpt = compareData(prevDivisionFpt, currDivisionFpt);
+    const compareTgtArea = compareData(prevTargetAreaFpt, currTargetAreaFpt);
+    const compareTgtDivision = compareData(
+      prevTargetDivisionFpt,
+      currTargetDivisionFpt
+    );
+    const comparetrendFpt = compareData(
+      prevTrendsFootprint,
+      currTrendsFootprint
+    );
 
-
-      if (!updates[aggregate]) {
-        updates[aggregate] = {};
-      }
-      updates[aggregate] = {
-        areaFootprint: compareAreaFpt,
-        divisionFootprint: compareDivisionFpt,
-        targetAreaFootprint: compareTgtArea,
-        targetDivisionFootprint : compareTgtDivision,
-        trendsFootprint : comparetrendFpt,
-      };
-   
-
+    if (!updates[aggregate]) {
+      updates[aggregate] = {};
+    }
+    updates[aggregate] = {
+      areaFootprint: compareAreaFpt,
+      divisionFootprint: compareDivisionFpt,
+      targetAreaFootprint: compareTgtArea,
+      targetDivisionFootprint: compareTgtDivision,
+      trendsFootprint: comparetrendFpt,
+    };
   }
+  return Object.keys(updates).length ? updates : false;
+}
 
-  console.log(updates);
+function compareAggregateFootprint(prevData, currData) {
+  const updates = {};
+
+  for (const indicator in prevData) {
+    let diffs = {};
+
+    const currFootprint = currData[indicator];
+    const prevFootprint = prevData[indicator];
+
+    const prevKeys = Object.keys(prevFootprint);
+    // Compare the values of each key
+    for (const key of prevKeys) {
+      if (key == "value") {
+        const prevValue = prevFootprint[key];
+        const currValue = currFootprint[key] + 10;
+
+        if (prevValue !== currValue) {
+          diffs[key] = {
+            prevValue,
+            currValue,
+          };
+          updates[indicator] = diffs;
+        }
+      }
+    }
+  }
+  return Object.keys(updates).length ? updates : false;
 }
 
 const LegalUnitDataPreview = ({ data, title }) => {
@@ -279,8 +399,8 @@ const LegalUnitDataPreview = ({ data, title }) => {
 
   return (
     <div className="small">
-      <h5 className="text-secondary h4 ">Données de l'unité légale</h5>
-      <p>Les données de l'unité légale doivent être mises à jour.</p>
+      <h4 className="h6">Données de l'unité légale</h4>
+      <p>Les données suivantes vont être mises à jour.</p>
       <ul>
         {Object.entries(data).map(([property, { prevValue, currValue }]) => (
           <li key={property}>
@@ -294,17 +414,14 @@ const LegalUnitDataPreview = ({ data, title }) => {
 };
 
 const FootprintPreview = ({ data, label }) => {
+  const nb = Object.entries(data).length;
+
   return (
     <div className="small border-top my-3 pt-3">
-      <h5 className="text-secondary h4 ">Données des {label}</h5>
-      {Object.entries(data).length} {label} doivent être mis à jour.
-      {/* <ul>
-        {Object.entries(data).map(([property, data]) => (
-          <li key={property}>
-            {console.log(data)}
-          </li>
-        ))}
-      </ul> */}
+      <h4 className="h6">Données des {label}</h4>
+      {nb > 1
+        ? nb + " " + label + " vont être mis à jour"
+        : nb + " va être mis à jour"}
     </div>
   );
 };
