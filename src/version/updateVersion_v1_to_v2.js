@@ -58,8 +58,8 @@ export const updater_2_0_0 = async (sessionData) =>
   // Comparative data
   sessionData.comparativeData = {
     activityCode : prevSession.comparativeData.activityCode,
-    fixedCapitalConsumptions : prevSession.comparativeData.fixedCapitalConsumption,
-    intermediateConsumptions : prevSession.comparativeData.intermediateConsumption,
+    fixedCapitalConsumptions : prevSession.comparativeData.fixedCapitalConsumption || prevSession.comparativeData.fixedCapitalConsumptions,
+    intermediateConsumptions : prevSession.comparativeData.intermediateConsumption || prevSession.comparativeData.intermediateConsumptions,
     netValueAdded :  prevSession.comparativeData.netValueAdded,
     production :  prevSession.comparativeData.production,
   };
