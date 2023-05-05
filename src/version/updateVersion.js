@@ -41,6 +41,7 @@ export const updateVersion = async (sessionData) =>
       await updater_2_0_0(sessionData);
       break;
     case "1.0.3":
+      // updater 1_0_3 removed -> build old comparative data (useless with updater_1_0_5 : fetch comparative data)
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
