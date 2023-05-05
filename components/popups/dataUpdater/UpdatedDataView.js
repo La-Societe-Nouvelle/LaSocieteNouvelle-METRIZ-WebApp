@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+import metaIndics from "/lib/indics";
 
 const UpdateDataView = (props) => {
   const [updatedLegalUnit, setUpdatedLegalUnit] = useState(null);
@@ -9,6 +10,7 @@ const UpdateDataView = (props) => {
   const [updatedFootprint, setUpdatedFootprint] = useState(null);
   const [showButton, setShowButton] = useState(true);
   const [isSessionUpdated, setIsSessionUpdated] = useState(false);
+  const [isUptodate, setIsuptodate] = useState(false);
 
   useEffect(async () => {
     const compareLegalUnit = await compareData(
@@ -54,14 +56,30 @@ const UpdateDataView = (props) => {
     }
 
     if (
-      updatedLegalUnit ||
-      updatedProviders ||
-      updatedAccounts ||
-      updatedComparativeData
+      compareLegalUnit ||
+      compareProviders ||
+      compareAccounts ||
+      compareAggregates
     ) {
       setShowButton(true);
     }
+
+    if (
+      !compareLegalUnit &&
+      !compareProviders &&
+      !compareAccounts &&
+      !compareAggregates
+    ) {
+      setIsuptodate(true);
+    }
   }, [props]);
+
+  useEffect(async () => {
+    if(isSessionUpdated) {
+      props.updatePrevSession(props.updatedSession)
+    }
+
+  }, [isSessionUpdated]);
 
   async function updateAggregatesFootprints(prevSession, currSession) {
     let compareProductionFootprint = {};
@@ -87,35 +105,78 @@ const UpdateDataView = (props) => {
         compareProductionFootprint[period.periodKey] = result;
       }
     }
-    // TO DO : Compare prev and curr value and show significative impact update
-    
-
     setUpdatedFootprint(compareProductionFootprint);
     setIsSessionUpdated(true);
   }
 
   return isSessionUpdated ? (
     <>
-  {console.log( Object.values(updatedFootprint))}
       <div className="">
-        <p className="">Toutes les données ont bien été mises à jour ! </p>
+        <p>Vos données ont bien été mises à jour! </p>
+        {Object.keys(updatedFootprint).length > 0 &&
+          Object.entries(updatedFootprint).map(([key, value]) => {
+            const indics = Object.keys(value);
+            let items = [];
+            indics.forEach((indic,index) => {
+              const currValue = value[indic].value.currValue;
+              const prevValue = value[indic].value.prevValue;
+              const diff = Math.abs((currValue - prevValue) / prevValue);
 
-        {updatedFootprint.length > 0 &&
-          Object.values(updatedFootprint).map((data) => {
-            console.log(data)
+              if (prevValue !== null && diff >= 0.1) {
+                items.push(
+                  <li key={index}>
+                    <b>{metaIndics[indic].libelle} </b>: L'impact de la production pour{" "}
+                    {key.slice(2)} est maintenant de {currValue}{" "}
+                    {metaIndics[indic].unit}. La valeur précédente était de{" "}
+                    {prevValue} {metaIndics[indic].unit}.
+                  </li>
+                );
+              }
+            });
+            return (
+              <div>
+                {items.length > 0 && (
+                  <>
+                    <p className="">
+                      L'empreinte de certains indicateurs a été recalculée en
+                      conséquence :
+                    </p>
+                    <ul className="small">{items}</ul>
+                  </>
+                )}
+              </div>
+            );
           })}
-        <Button
-          variant="secondary"
-          className="me-1 mt-2"
-        >
-
+        <Button variant="secondary" className="me-1 mt-2" onClick={props.downloadSession} >
           Sauvegarder ma session
         </Button>
-   
+        <Button variant="primary" onClick={props.close}>
+          Reprendre mon analyse
+        </Button>
       </div>
     </>
   ) : (
     <>
+      {isUptodate ? (
+        <>
+          <p>
+            Toutes les données de votre session sont à jour. Vous pouvez
+            reprendre votre analyse.
+          </p>
+          <div className="text-end">
+            <Button
+              variant="primary"
+              size="md"
+              className="me-1"
+              onClick={props.close}
+            >
+              Fermer
+            </Button>
+          </div>
+        </>
+      ) : (
+        <p className="mb-3">Des données plus récentes sont disponibles :</p>
+      )}
       {updatedLegalUnit && <LegalUnitDataPreview data={updatedLegalUnit} />}
 
       {updatedProviders && (
@@ -131,7 +192,11 @@ const UpdateDataView = (props) => {
 
       {updatedComparativeData && (
         <div className="small border-top my-3 pt-3">
-          <h4 className="h6">Données comparatives</h4>
+          <h4 className="h6">
+            {" "}
+            <i className="text-info me-1 bi bi-arrow-repeat"></i>Données
+            comparatives
+          </h4>
           <p>Les données de comparaisons vont être mises à jour.</p>
         </div>
       )}
@@ -144,7 +209,7 @@ const UpdateDataView = (props) => {
             updateAggregatesFootprints(props.prevSession, props.updatedSession)
           }
         >
-          <i className="bi bi-arrow-repeat"></i> Mettre à jour ma session
+          Mettre à jour ma session
         </Button>
       )}
     </>
@@ -348,7 +413,7 @@ function compareAggregateFootprint(prevData, currData) {
     for (const key of prevKeys) {
       if (key == "value") {
         const prevValue = prevFootprint[key];
-        const currValue = currFootprint[key] + 10;
+        const currValue = currFootprint[key];
 
         if (prevValue !== currValue) {
           diffs[key] = {
@@ -363,7 +428,7 @@ function compareAggregateFootprint(prevData, currData) {
   return Object.keys(updates).length ? updates : false;
 }
 
-const LegalUnitDataPreview = ({ data, title }) => {
+const LegalUnitDataPreview = ({ data }) => {
   const propertyMap = {
     isEconomieSocialeSolidaire:
       "Est-ce une entreprise de l'économie sociale et solidaire?",
@@ -399,7 +464,11 @@ const LegalUnitDataPreview = ({ data, title }) => {
 
   return (
     <div className="small">
-      <h4 className="h6">Données de l'unité légale</h4>
+      <h4 className="h6">
+        {" "}
+        <i className="text-info me-1 bi bi-arrow-repeat"></i>Données de l'unité
+        légale
+      </h4>
       <p>Les données suivantes vont être mises à jour.</p>
       <ul>
         {Object.entries(data).map(([property, { prevValue, currValue }]) => (
@@ -418,7 +487,10 @@ const FootprintPreview = ({ data, label }) => {
 
   return (
     <div className="small border-top my-3 pt-3">
-      <h4 className="h6">Données des {label}</h4>
+      <h4 className="h6">
+        {" "}
+        <i className="text-info me-1 bi bi-arrow-repeat"></i>Données des {label}
+      </h4>
       {nb > 1
         ? nb + " " + label + " vont être mis à jour"
         : nb + " va être mis à jour"}

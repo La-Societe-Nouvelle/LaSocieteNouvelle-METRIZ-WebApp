@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
 import { ComparativeData } from "../../../src/ComparativeData";
 import { updateComparativeData } from "../../../src/version/updateVersion";
 import UpdateDataView from "./UpdatedDataView";
 
-export const DataUpdater = ({ session }) => {
+export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [updatedSession, setUpdatedSession] = useState({});
@@ -18,29 +18,20 @@ export const DataUpdater = ({ session }) => {
 
     await fetchLatestData(updatedSession);
 
-    for (let period of session.availablePeriods) {
-      await session.updateFootprints(period);
-    }
+
     setUpdatedSession(updatedSession);
     setIsLoading(false);
     setIsDatafetched(true);
   };
 
-  useEffect(async () => {
-    if (isDatafetched) {
-      console.log("Mise à jour des empreintes avec les nouvelles données")
-      for (let period of session.availablePeriods) {
-        await updatedSession.updateFootprints(period);
-      }
-    }
-  }, [isDatafetched]);
-  return (
-    <Modal show={show} size="md"  >
-         <Modal.Header closeButton closeLabel="Fermer" >
-          <Modal.Title >Mise à jour des données</Modal.Title>
-        </Modal.Header>
-      <Modal.Body>
+  const handleClose = () => {setShow(false)};
 
+  return (
+    <Modal show={show} size="lg" onHide={handleClose}>
+      <Modal.Header closeButton closeLabel="Fermer">
+        <h3>Vérification des données...</h3>
+      </Modal.Header>
+      <Modal.Body>
         {isLoading && (
           <div className="loader-container my-4">
             <div className="dot-pulse m-auto"></div>
@@ -50,6 +41,9 @@ export const DataUpdater = ({ session }) => {
           <UpdateDataView
             prevSession={session}
             updatedSession={updatedSession}
+            downloadSession={downloadSession}
+            close={() => setShow(false)}
+            updatePrevSession={updatePrevSession}
           ></UpdateDataView>
         )}
         {!isDatafetched && !isLoading && (
@@ -64,12 +58,10 @@ export const DataUpdater = ({ session }) => {
               disabled={isLoading}
               onClick={() => handleRefresh()}
             >
-            Actualiser mes données 
+              Vérifier mes données
             </Button>
           </>
         )}
-
-    
       </Modal.Body>
     </Modal>
   );

@@ -121,7 +121,13 @@ class Metriz extends React.Component {
             />
           )}
 
-          {needsUpdate && <DataUpdater session={session}></DataUpdater>}
+          {needsUpdate && (
+            <DataUpdater
+              session={session}
+              downloadSession={this.downloadSession}
+              updatePrevSession={this.updatePrevSession}
+            ></DataUpdater>
+          )}
 
           {this.buildSectionView(step)}
         </div>
@@ -157,7 +163,12 @@ class Metriz extends React.Component {
     link.download = fileName + ".json";
     link.click();
   };
-
+  // Update previous session with updated session
+  updatePrevSession = (updatedSession) => {
+    this.setState({
+      session: updatedSession,
+    });
+  };
   // import session (JSON data -> session)
   loadPrevSession = async (file) => {
     this.setState({ loading: true });
