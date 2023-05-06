@@ -104,14 +104,6 @@ const updater_1_0_5 = async (sessionData) => {
   // delete old property and assign division code into comparative data object
   delete sessionData.comparativeDivision;
 
-  // ----------------------------------------------------------------
-  // Get latest updated data for companies (Wip)
-  // ----------------------------------------------------------------
-
-  const companiesUpdated = await updateCompaniesData(sessionData);
-
-  sessionData.financialData.companies = companiesUpdated;
-
   // set previous analysis to True to disable new indicators assessment with missing data
   sessionData.indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
 
@@ -234,26 +226,3 @@ async function updateComparativeData(
   }
   return newComparativeData;
 }
-
-const updateCompaniesData = async (session) => {
-  let providers = session.financialData.providers
-    ? session.financialData.companies.map(
-        (props, index) => new Provider({ id: index, ...props })
-      )
-    : [];
-
-  let companiesToSynchronise = providers.filter(
-    (provider) => provider.state == "siren"
-  );
-
-  for (let provider of companiesToSynchronise) {
-    try {
-      await provider.updateFromRemote();
-    } catch (error) {
-      console.log(error);
-      break;
-    }
-  }
-
-  return providers;
-};
