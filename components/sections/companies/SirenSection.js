@@ -18,6 +18,7 @@ import { ErrorApi } from "../../ErrorAPI";
 // pdf extractor
 import pdf from 'pdf-extraction';
 import { number } from "prop-types";
+import { InvoicesPopup } from "./InvoicesPopup";
 //const pdf = require("pdf-extraction");
 
 const identificationPatterns = [
@@ -44,6 +45,7 @@ export class SirenSection extends React.Component
       isNextStepAvailable: checkNextStepAvailable(props.financialData.providers),
       errorFile: false,
       error: false,
+      invoicesData: null,
     };
 
     this.onDrop = (files) => 
@@ -65,9 +67,9 @@ export class SirenSection extends React.Component
         let invoicesData = await this.readInvoices(files);
         console.log(invoicesData);
         this.openPopup();
-        this.setState({ errorFile: false });
+        this.setState({ errorFile: false, invoicesData });
       } else {
-        this.setState({ errorFile: true });
+        this.setState({ errorFile: true, invoicesData: null });
       }
     };
   }
@@ -98,6 +100,7 @@ export class SirenSection extends React.Component
       isNextStepAvailable,
       errorFile,
       error,
+      invoicesData
     } = this.state;
 
     const financialData = this.props.financialData;
@@ -206,6 +209,13 @@ export class SirenSection extends React.Component
                 closePopup={() => this.closePopup()}
               />
             )}
+            {invoicesData &&
+              <InvoicesPopup 
+                invoicesData={invoicesData}
+                closePopup={() => this.closePopup()}
+                onGoBack={(invoicesData) => this.setInvoicesProvider(invoicesData)}
+              />
+            }
           </div>
           <div className="step" id="step-3">
             <h4>3. Synchroniser les données de vos fournisseurs</h4>
@@ -479,14 +489,12 @@ export class SirenSection extends React.Component
       promises.push(filePromise);
     }
 
-    Promise.all(promises).then(async (fileContents) => 
+    await Promise.all(promises).then(async (fileContents) => 
     {
       for (let fileContent of fileContents) 
       {
         let data = await pdf(fileContent);
-  
-        //console.log(data.text);
-  
+    
         // VAT Identification Numbers
         let identificationNumbers = identificationPatterns.map((regex) => (data.text.match(regex) || []))
           .reduce((a,b) => a.concat(b),[])
@@ -502,18 +510,45 @@ export class SirenSection extends React.Component
           .map((amount) => parseFloat(amount))
           .filter((value, index, self) => index === self.findIndex((item) => item == value));
         
-        let extractedData = {
+        let invoiceData = {
           identificationNumbers,
           dates,
           amounts
         }
   
-        console.log(extractedData);
-        invoicesData.push(extractedData);        
+        invoicesData.push(invoiceData);        
       }
-    });    
-    return invoicesData;
+    });
+
+    // group by provider
+    let invoicesProviders = {};
+    for (let invoiceData of invoicesData) {
+      if (invoiceData.identificationNumbers.length==1) {
+        let idProvider = invoiceData.identificationNumbers[0];
+        if (!Object.keys(invoicesProviders).includes(idProvider)) {
+          // fetch data
+          invoicesProviders[idProvider] = {
+            invoices: []
+          }
+        }
+        // push data
+        invoicesProviders[idProvider].invoices.push({ 
+          dates: invoiceData.dates,
+          amounts: invoiceData.amounts 
+        });
+      }
+    }
+
+    return invoicesProviders;
   };
+
+  setInvoicesProvider = (invoicesData) =>
+  {
+    //console.log("set data");
+    for (let invoiceData of Object.values(invoicesData)) {
+
+    }
+  }
 
   /* ---------- FILE EXPORT ---------- */
 
