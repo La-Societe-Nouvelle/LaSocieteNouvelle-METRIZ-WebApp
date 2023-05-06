@@ -31,11 +31,11 @@ export class InvoicesPopup extends React.Component
 
   render() 
   {
-    const { invoicesData,closePopup } = this.props;
+    const { invoicesData,providers,closePopup } = this.props;
     const { mapping } = this.state;
 
     return (
-      <Modal show="true" onHide={closePopup} size="md" centered>
+      <Modal show="true" onHide={closePopup} size="xl" centered>
         <Modal.Body>
           <div className="assessment">
                 
@@ -49,11 +49,26 @@ export class InvoicesPopup extends React.Component
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(invoicesData).map(([key,value]) => (
+                  {Object.entries(invoicesData).map(([key,{legalUnitData}]) => (
                     <tr key={key}>
                       <td>{key}</td>
-                      <td></td>
-                      <td></td>
+                      <td>{legalUnitData.denomination}</td>
+                      <td>
+                        <select
+                          className="form-select"
+                          //onChange={(e) => handleOnchange(accountToMapNum, e.target.value)}
+                          value={""}
+                        >
+                          <option value="">Aucun compte fournisseur associé</option>
+                          {providers
+                            .filter((provider) => !provider.isDefaultProviderAccount)
+                            .map(({providerNum,providerLib}, index) => (
+                              <option key={index} value={providerNum}>
+                                {providerNum} - {providerLib}
+                              </option>
+                            ))}
+                        </select>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
