@@ -15,12 +15,19 @@ import { MessagePopup } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
 
+// Formulas
+import { getSignificativeProviders } from "/src/formulas/significativeLimitFormulas";
+
+// API
+import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
+
 export class SirenSection extends React.Component 
 {
   constructor(props) 
   {
     super(props);
     this.state = {
+      significativeProviders: [],   // significative companies
       view: "all",
       nbItems: 20,
       fetching: false,
@@ -32,6 +39,8 @@ export class SirenSection extends React.Component
       isNextStepAvailable: checkNextStepAvailable(props.financialData.providers),
       errorFile: false,
       error: false,
+      minFpt: null,
+      maxFpt: null
     };
 
     this.onDrop = (files) => 
@@ -44,6 +53,18 @@ export class SirenSection extends React.Component
         this.setState({ errorFile: true });
       }
     };
+  }
+
+  componentDidMount = async () =>
+  {
+    let minFpt = await fetchMinFootprint();
+    let maxFpt = await fetchMaxFootprint();
+    let significativeProviders = await getSignificativeProviders(
+      this.props.financialData.providers,
+      minFpt,maxFpt,
+      this.props.financialPeriod
+    );
+    this.setState({significativeProviders,minFpt,maxFpt})
   }
 
   componentDidUpdate = () =>
@@ -63,6 +84,7 @@ export class SirenSection extends React.Component
 
   render() {
     const {
+      significativeProviders,
       view,
       nbItems,
       fetching,
@@ -80,8 +102,11 @@ export class SirenSection extends React.Component
     const providers = financialData.providers.filter(provider => provider.periodsData.hasOwnProperty(financialPeriod.periodKey));
 
     //const providers = financialData.providers ;
-    const showedProviders = getShowedProviders(view,providers);
+    const showedProviders = getShowedProviders(view,providers,significativeProviders);
     const allProvidersIdentified = (providers.filter((provider) => provider.footprintStatus == 200).length == providers.length);
+
+    const nbSignificativeProvidersUnidentified = providers.filter((provider) => provider.useDefaultFootprint && significativeProviders.includes(provider.providerNum)).length;
+    const someSignificativeProvidersUnidentified = nbSignificativeProvidersUnidentified > 0;
 
     return (
       <Container fluid id="siren-section">
@@ -223,6 +248,8 @@ export class SirenSection extends React.Component
                       <option key="4" value="error">
                         Numéros de siren incorrects
                       </option>
+                      <option key="5" value="significative">Comptes significatifs</option>
+                      {someSignificativeProvidersUnidentified && <option key="6" value="significativeUnidentified">Comptes significatifs non identifiés</option>}
                     </select>
                   </div>
 
@@ -252,6 +279,7 @@ export class SirenSection extends React.Component
                         : parseInt(nbItems)
                     }
                     providers={showedProviders}
+                    significativeProviders={significativeProviders}
                     financialData={financialData}
                     financialPeriod={financialPeriod}
                     refreshSection={this.refreshSection}
@@ -310,18 +338,27 @@ export class SirenSection extends React.Component
 
   /* ---------- UPDATES ---------- */
 
-  refreshSection = () => 
+  refreshSection = async () => 
   {
+    // next step available
     const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
-    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
-      this.setState({ isNextStepAvailable });
-    }
+
+    // data to sync
     const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
-    if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
-      this.setState({ isSyncButtonEnable });
-    }
-    // temp
-    this.forceUpdate();
+
+    // significative prodiders
+    let {minFpt,maxFpt} = this.state;
+    let significativeProviders = await getSignificativeProviders(
+      this.props.financialData.providers,
+      minFpt,maxFpt,
+      this.props.financialPeriod
+    );
+
+    this.setState({
+      isNextStepAvailable,
+      isSyncButtonEnable,
+      significativeProviders 
+    })
   }
 
   /* ---------- FILE IMPORT ---------- */
@@ -338,6 +375,8 @@ export class SirenSection extends React.Component
         this.importXLSXFile(file);
         break;
     }
+
+    this.setState({ view: "all" });
   };
 
   // Import CSV File
@@ -466,6 +505,14 @@ export class SirenSection extends React.Component
       this.setState({ progression: Math.round((i / n) * 100) });
     }
 
+    // significative prodiders
+    let {minFpt,maxFpt} = this.state;
+    let significativeProviders = await getSignificativeProviders(
+      this.props.financialData.providers,
+      minFpt,maxFpt,
+      this.props.financialPeriod
+    );
+
     // update state
     this.setState({
       fetching: false,
@@ -474,6 +521,7 @@ export class SirenSection extends React.Component
       synchronised: this.props.financialData.providers.filter(
         (provider) => provider.footprintStatus == 200
       ).length,
+      significativeProviders
     });
 
     document.getElementById("step-3").scrollIntoView();
@@ -508,12 +556,19 @@ const checkSyncButtonEnable = (providers) =>
   return enable;
 };
 
-const getShowedProviders = (view,providers) => 
+const getShowedProviders = (view,providers,significativeProviders) => 
 {
   switch (view) {
-    case "undefined": return providers.filter((provider) => provider.useDefaultFootprint);
-    case "unsync":    return providers.filter((provider) => provider.footprintStatus != 200);
-    case "error":     return providers.filter((provider) => provider.footprintStatus == 404);
+    case "undefined": 
+      return providers.filter((provider) => provider.useDefaultFootprint);
+    case "unsync":    
+      return providers.filter((provider) => provider.footprintStatus != 200);
+    case "error":     
+      return providers.filter((provider) => provider.footprintStatus == 404);
+    case "significative":                     // significative provider
+      return providers.filter((provider) => significativeProviders.includes(provider.providerNum));
+    case "significativeUnidentified":        // significative provider & no id set
+      return providers.filter((provider) => significativeProviders.includes(provider.providerNum) && provider.useDefaultFootprint);
     default:          return providers;
   }
 };
