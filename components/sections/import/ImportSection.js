@@ -27,7 +27,7 @@ function ImportSection(props)
   );
   const [file, setFile] = useState([]);
   const [importedData, setImportedData] = useState(null);
-  const [view, setView] = useState(props.session.progression > 1 ? 4 : 0);
+  const [view, setView] = useState(props.session.financialData.isFinancialDataLoaded ? 4 : 0);
   const [errorFile, setErrorFile] = useState(false);
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
