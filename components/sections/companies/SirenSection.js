@@ -19,6 +19,8 @@ import { ErrorApi } from "../../ErrorAPI";
 import pdf from 'pdf-extraction';
 import { number } from "prop-types";
 import { InvoicesPopup } from "./InvoicesPopup";
+import { getDefaultFootprintId } from "../../../src/Provider";
+import api from "../../../src/api";
 //const pdf = require("pdf-extraction");
 
 const identificationPatterns = [
@@ -212,6 +214,7 @@ export class SirenSection extends React.Component
             {invoicesData &&
               <InvoicesPopup 
                 invoicesData={invoicesData}
+                providers={providers}
                 closePopup={() => this.closePopup()}
                 onGoBack={(invoicesData) => this.setInvoicesProvider(invoicesData)}
               />
@@ -525,11 +528,24 @@ export class SirenSection extends React.Component
     for (let invoiceData of invoicesData) {
       if (invoiceData.identificationNumbers.length==1) {
         let idProvider = invoiceData.identificationNumbers[0];
-        if (!Object.keys(invoicesProviders).includes(idProvider)) {
+        if (!Object.keys(invoicesProviders).includes(idProvider)) 
+        {
+          let siren = getDefaultFootprintId(idProvider);
+          let legalUnitData = {};
+          await api.get("legalunitfootprint/" + siren).then((res) => {
+            let status = res.data.header.code;
+            if (status == 200) {
+              legalUnitData = res.data.legalUnit;
+            }
+          }).catch((err) => {
+            console.log(err);
+            //throw err;
+          });
           // fetch data
           invoicesProviders[idProvider] = {
+            legalUnitData,
             invoices: []
-          }
+          };
         }
         // push data
         invoicesProviders[idProvider].invoices.push({ 
@@ -548,6 +564,8 @@ export class SirenSection extends React.Component
     for (let invoiceData of Object.values(invoicesData)) {
 
     }
+
+    this.setState({ invoicesData: null, popup: false });
   }
 
   /* ---------- FILE EXPORT ---------- */
