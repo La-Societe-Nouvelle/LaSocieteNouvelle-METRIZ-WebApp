@@ -122,7 +122,7 @@ const UpdateDataView = (props) => {
               const prevValue = value[indic].value.prevValue;
               const diff = Math.abs((currValue - prevValue) / prevValue);
 
-              if (prevValue !== null && diff >= 0.1) {
+              if (prevValue !== null && currValue !== null && diff >= 0.1) {
                 items.push(
                   <li key={index}>
                     <b>{metaIndics[indic].libelle} </b>: L'impact de la production pour{" "}
@@ -400,6 +400,7 @@ async function compareComparativeData(prevData, currData) {
 }
 
 function compareAggregateFootprint(prevData, currData) {
+
   const updates = {};
 
   for (const indicator in prevData) {
