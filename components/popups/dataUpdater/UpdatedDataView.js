@@ -111,7 +111,6 @@ const UpdateDataView = (props) => {
 
   return isSessionUpdated ? (
     <>
-      <div className="">
         <p>Vos données ont bien été mises à jour! </p>
         {Object.keys(updatedFootprint).length > 0 &&
           Object.entries(updatedFootprint).map(([key, value]) => {
@@ -147,13 +146,13 @@ const UpdateDataView = (props) => {
               </div>
             );
           })}
-        <Button variant="secondary" className="me-1 mt-2" onClick={props.downloadSession} >
+        <Button variant="secondary" className="me-1 my-2" onClick={props.downloadSession} >
           Sauvegarder ma session
         </Button>
-        <Button variant="primary" onClick={props.close}>
+        <Button variant="primary" className="my-2" onClick={props.close}>
           Reprendre mon analyse
         </Button>
-      </div>
+
     </>
   ) : (
     <>
