@@ -349,7 +349,7 @@ export class ImportDSN extends React.Component {
  *    - apprenticeshipHours
  */
 
-const getIndividualsData = async (declarations) => 
+export const getIndividualsData = async (declarations) => 
 {
   // array of data
   let individualsData = [];
