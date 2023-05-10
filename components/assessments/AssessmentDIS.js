@@ -15,7 +15,7 @@ import { InputNumber } from "/components/input/InputNumber";
 import { valueOrDefault } from "/src/utils/Utils";
 import { getNewId, roundValue } from "/src/utils/Utils";
 import { XLSXSocialDataBuilder } from "../../src/readers/SocialDataContentReader";
-import { getApprenticeshipRemunerations, getEmployeesTrainingCompensations, getGenderWageGap, getInterdecileRange } from "./ImportDSN";
+import { getApprenticeshipRemunerations, getEmployeesTrainingCompensations, getGenderWageGap, getIndividualsData, getInterdecileRange } from "./ImportDSN";
 
 /* -------------------- INDIVIDUALS DATA FOR SOCIAL FOOTPRINT -------------------- */
 
@@ -40,16 +40,20 @@ export class IndividualsDataPopup extends React.Component
   {
     super(props);
     this.state = {
-      // gini index
-      indexGini: props.impactsData.indexGini,
-      // details
-      hasEmployees: props.impactsData.hasEmployees,
       // individuals data
       individualsData: [...props.impactsData.individualsData],
       // display
       columnSorted: "id",
       reverseSort: false,
     };
+  }
+
+  componentDidMount = async () =>
+  {
+    if (this.props.impactsData.socialStatements.length>0 && this.props.impactsData.individualsData.length==0) {
+      let individualsData = await getIndividualsData(this.props.impactsData.socialStatements);
+      this.setState({ individualsData })
+    }
   }
 
   render() 
