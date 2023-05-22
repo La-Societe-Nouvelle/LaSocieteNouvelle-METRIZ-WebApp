@@ -233,8 +233,15 @@ class Metriz extends React.Component {
     //   this.state.session.progression++;
     // }
 
-    this.setStep(2);
-    this.updateProgression(1);
+    let accountsShowed = this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks);
+    if (accountsShowed.length>0) {
+      this.setStep(2);
+      this.updateProgression(1);
+    } else {
+      this.setStep(3);
+      this.updateProgression(2);
+    }
+
   };
 
   validInitialStates = async () => {

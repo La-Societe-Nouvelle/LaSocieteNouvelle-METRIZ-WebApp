@@ -53,6 +53,30 @@ function ImportSection(props)
     }
   });
 
+  function nextView (currentView) 
+  {
+    // next view depreciation assets mapping
+    if (currentView==1) 
+    {
+      let accountsToMap = Object.keys(importedData.meta.accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
+      if (accountsToMap.length>0) {
+        setView(2);
+      } else {
+        nextView(2);
+      }
+    }
+    // next view stock accounts mapping
+    else if (currentView==2)
+    {
+      let stocksAccounts = Object.keys(importedData.meta.accounts).filter((accountNum) => /^3(1|2|7)/.test(accountNum));
+      if (stocksAccounts.length>0) {
+        setView(3);
+      } else {
+        loadFECData(importedData)
+      }
+    }
+  }
+
   return (
     <Container fluid>
       <section className="step">
@@ -103,14 +127,14 @@ function ImportSection(props)
           <FECImport
             return={() => setView(0)}
             FECData={importedData}
-            onClick={() => setView(2)}
+            onClick={() => nextView(1)}
           />
         )}
 
         {view == 2 && (
           <DepreciationAssetsMapping
             return={() => setView(1)}
-            onClick={() => setView(3)}
+            onClick={() => nextView(2)}
             meta={importedData.meta}
           />
         )}
