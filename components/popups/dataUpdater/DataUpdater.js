@@ -29,7 +29,7 @@ export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => 
   return (
     <Modal show={show} size="lg" onHide={handleClose}>
       <Modal.Header closeButton closeLabel="Fermer">
-        <h3>Vérification des données...</h3>
+        <h3>Actualisation des données...</h3>
       </Modal.Header>
       <Modal.Body>
         {isLoading && (

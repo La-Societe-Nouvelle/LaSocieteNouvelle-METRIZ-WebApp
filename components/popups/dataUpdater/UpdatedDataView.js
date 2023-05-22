@@ -111,7 +111,7 @@ const UpdateDataView = (props) => {
 
   return isSessionUpdated ? (
     <>
-        <p>Vos données ont bien été mises à jour! </p>
+        <p>Les données ont bien été mises à jour! </p>
         {Object.keys(updatedFootprint).length > 0 &&
           Object.entries(updatedFootprint).map(([key, value]) => {
             const indics = Object.keys(value);
@@ -124,7 +124,7 @@ const UpdateDataView = (props) => {
               if (prevValue !== null && currValue !== null && diff >= 0.1) {
                 items.push(
                   <li key={index}>
-                    <b>{metaIndics[indic].libelle} </b>: L'impact de la production pour{" "}
+                    <b>{metaIndics[indic].libelle} </b>: L'empreinte de la production pour{" "}
                     {key.slice(2)} est maintenant de {currValue}{" "}
                     {metaIndics[indic].unit}. La valeur précédente était de{" "}
                     {prevValue} {metaIndics[indic].unit}.
@@ -176,13 +176,13 @@ const UpdateDataView = (props) => {
       ) : (
         <p className="mb-3">Des données plus récentes sont disponibles :</p>
       )}
-      {updatedLegalUnit && <LegalUnitDataPreview data={updatedLegalUnit} />}
+      {/* {updatedLegalUnit && <LegalUnitDataPreview data={updatedLegalUnit} />} */}
 
-      {updatedProviders && (
-        <FootprintPreview data={updatedProviders} label={"fournisseurs"} />
+      {updatedProviders && Object.entries(updatedProviders).length>0 && (
+        <FootprintPreview data={updatedProviders} label={"fournisseurs"}/>
       )}
 
-      {updatedAccounts && (
+      {updatedAccounts && Object.entries(updatedAccounts).length>0 && (
         <FootprintPreview
           data={updatedAccounts}
           label={"comptes de stocks et d'immobilisations"}
@@ -491,9 +491,7 @@ const FootprintPreview = ({ data, label }) => {
         {" "}
         <i className="text-info me-1 bi bi-arrow-repeat"></i>Données des {label}
       </h4>
-      {nb > 1
-        ? nb + " " + label + " vont être mis à jour"
-        : nb + " va être mis à jour"}
+      {nb + " " + (nb>1 ? "empreintes vont" : "empreinte va") + " être mise" + (nb>1 ? "s" : "") + " à jour"}
     </div>
   );
 };
