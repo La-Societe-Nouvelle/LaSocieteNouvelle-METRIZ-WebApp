@@ -92,6 +92,7 @@ const ResultSection = (props) => {
       division,
       comparativeData
     );
+    newComparativeData.activityCode = division;
     setComparativeData(newComparativeData);
     setComparativeDivision(division);
   };
