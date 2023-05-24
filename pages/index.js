@@ -24,7 +24,7 @@ import { HeaderPublish } from "../components/parts/headers/HeaderPublish";
 import { updateVersion } from "/src/version/updateVersion";
 import { Footer } from "../components/parts/Footer";
 import { Mobile } from "../components/Mobile";
-import { getAmountItems } from "../src/utils/Utils";
+import { DataUpdater } from "../components/popups/dataUpdater/DataUpdater";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -92,11 +92,13 @@ class Metriz extends React.Component {
       session: new Session(),
       step: 0,
       loading: false,
+      needsUpdate: false,
     };
   }
 
   render() {
-    const { step, session } = this.state;
+    const { step, session, needsUpdate } = this.state;
+
     return (
       <>
         <div
@@ -118,8 +120,18 @@ class Metriz extends React.Component {
               downloadSession={this.downloadSession}
             />
           )}
+
+          {needsUpdate && (
+            <DataUpdater
+              session={session}
+              downloadSession={this.downloadSession}
+              updatePrevSession={this.updatePrevSession}
+            ></DataUpdater>
+          )}
+
           {this.buildSectionView(step)}
         </div>
+
         <Footer step={step} />
       </>
     );
@@ -133,8 +145,14 @@ class Metriz extends React.Component {
     // build JSON
     const session = this.state.session;
     const fileName = session.legalUnit.siren
-      ? "session-metriz-" + session.legalUnit.siren + "-" + session.financialPeriod.periodKey.slice(2)
-      : "session-metriz-" + session.legalUnit.corporateName  + "-" + session.financialPeriod.periodKey.slice(2); // To update
+      ? "session-metriz-" +
+        session.legalUnit.siren +
+        "-" +
+        session.financialPeriod.periodKey.slice(2)
+      : "session-metriz-" +
+        session.legalUnit.corporateName +
+        "-" +
+        session.financialPeriod.periodKey.slice(2); // To update
     const json = JSON.stringify(session);
 
     // build download link & activate
@@ -145,7 +163,12 @@ class Metriz extends React.Component {
     link.download = fileName + ".json";
     link.click();
   };
-
+  // Update previous session with updated session
+  updatePrevSession = (updatedSession) => {
+    this.setState({
+      session: updatedSession,
+    });
+  };
   // import session (JSON data -> session)
   loadPrevSession = async (file) => {
     this.setState({ loading: true });
@@ -154,11 +177,11 @@ class Metriz extends React.Component {
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
-
       // update to current version
       await updateVersion(prevProps);
       // JSON -> session
       const session = new Session(prevProps);
+
       for (let period of session.availablePeriods) {
         await session.updateFootprints(period);
       }
@@ -167,6 +190,7 @@ class Metriz extends React.Component {
         session: session,
         step: session.progression,
         loading: false,
+        needsUpdate: true,
       });
     };
     reader.readAsText(file);

@@ -12,7 +12,7 @@ export class Indicator {
     this.uncertainty = props.uncertainty!=undefined ? props.uncertainty : null;
     this.source = props.source!=undefined ? props.source : "";
     this.info = props.info!=undefined ? props.info : "";
-    
+    this.lastupdate = props.lastupdate != undefined ? props.lastupdate : null;
     // Complements
     this.libelleFlag = props.libelleFlag!=undefined ? props.libelleFlag : null;
   // ---------------------------------------------------------------------------------------------------- //
@@ -85,10 +85,11 @@ export class Indicator {
     
   update(data) {
     this.value = data.value;
-    this.flag = data.flag;
+    this.flag = data.flag || 'd';
     this.uncertainty = data.uncertainty;
     this.info = data.info;
     this.source = data.source;
+    this.lastupdate = data.lastupdate;
     // Complements
     this.libelleFlag = data.libelleFlag;
   }

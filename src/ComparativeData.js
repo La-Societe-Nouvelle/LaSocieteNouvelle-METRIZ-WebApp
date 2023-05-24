@@ -16,7 +16,7 @@ export class ComparativeData {
       divisionFootprint: new ComparativeFootprint(),
       targetDivisionFootprint: new HistoricalFootprint(),
       trendsFootprint: new HistoricalFootprint(),
-    };  
+    };
 
     this.intermediateConsumptions = props.intermediateConsumptions || {
       areaFootprint: new ComparativeFootprint(),
@@ -52,7 +52,7 @@ export async function updateHistoricalFootprint(
   serie
 ) {
   let newFixedCapitalConsumptions;
-  
+
   newFixedCapitalConsumptions = Object.assign(
     {},
     prevComparativeData.fixedCapitalConsumptions[serie].indicators,
@@ -125,24 +125,26 @@ export async function updateComparativeFootprint(
   newComparativeData,
   serie
 ) {
-
   let newFixedCapitalConsumptions;
 
-    newFixedCapitalConsumptions = Object.assign(
-      {},
-      prevComparativeData.fixedCapitalConsumptions[serie].indicators,
-      {
-        ...prevComparativeData.fixedCapitalConsumptions[serie].indicators,
-        [indic]: {
-          value: newComparativeData.fixedCapitalConsumptions
-            ? newComparativeData.fixedCapitalConsumptions.value
-            : null,
-          flag: newComparativeData.fixedCapitalConsumptions
-            ? newComparativeData.fixedCapitalConsumptions.flag
-            : null,
-        },
-      }
-    );
+  newFixedCapitalConsumptions = Object.assign(
+    {},
+    prevComparativeData.fixedCapitalConsumptions[serie].indicators,
+    {
+      ...prevComparativeData.fixedCapitalConsumptions[serie].indicators,
+      [indic]: {
+        value: newComparativeData.fixedCapitalConsumptions
+          ? newComparativeData.fixedCapitalConsumptions.value
+          : null,
+        flag: newComparativeData.fixedCapitalConsumptions
+          ? newComparativeData.fixedCapitalConsumptions.flag
+          : null,
+        lastupdate: newComparativeData.fixedCapitalConsumptions
+          ? newComparativeData.fixedCapitalConsumptions.lastupdate
+          : null,
+      },
+    }
+  );
 
   const newIntermediateConsumptions = Object.assign(
     {},
@@ -156,11 +158,13 @@ export async function updateComparativeFootprint(
         flag: newComparativeData.intermediateConsumptions
           ? newComparativeData.intermediateConsumptions.flag
           : null,
+        lastupdate: newComparativeData.fixedCapitalConsumptions
+          ? newComparativeData.fixedCapitalConsumptions.lastupdate
+          : null,
       },
     }
   );
 
- 
   const newProduction = Object.assign(
     {},
     prevComparativeData.production[serie].indicators,
@@ -172,6 +176,9 @@ export async function updateComparativeFootprint(
           : null,
         flag: newComparativeData.production
           ? newComparativeData.production.flag
+          : null,
+        lastupdate: newComparativeData.fixedCapitalConsumptions
+          ? newComparativeData.fixedCapitalConsumptions.lastupdate
           : null,
       },
     }
@@ -189,11 +196,13 @@ export async function updateComparativeFootprint(
         flag: newComparativeData.netValueAdded
           ? newComparativeData.netValueAdded.flag
           : null,
+        lastupdate: newComparativeData.fixedCapitalConsumptions
+          ? newComparativeData.fixedCapitalConsumptions.lastupdate
+          : null,
       },
     }
   );
 
- 
   const updatedAggregatesFootprint = Object.assign({}, prevComparativeData, {
     fixedCapitalConsumptions: {
       ...prevComparativeData.fixedCapitalConsumptions,

@@ -27,8 +27,8 @@ $h1-font-size: 2rem;
 $h2-font-size: 1.6rem;
 $h3-font-size: 1.2rem;
 $h4-font-size: 1.1rem;
-$h5-font-size: 0.8rem;
-$h6-font-size: 0.8rem;
+$h5-font-size: 1rem;
+$h6-font-size: 1rem;
 $headings-font-family: "Raleway", "Roboto", sans-serif;
 $headings-color: $primary;
 $headings-font-weight: 800;
@@ -58,6 +58,15 @@ $input-group-addon-bg: #f4f4fb;
 $table-border-color: darken($light, 1%);
 $table-border-width: 0;
 
+// MODAL
+
+$modal-header-padding-x: 1.5rem;
+$modal-header-padding-y: 1.5rem;
+
+$modal-content-border-width: 0;
+$btn-close-color: $primary;
+$btn-close-opacity: 1;
+$btn-close-width: 0.6em;
 $hr-margin-y: 2rem;
 $hr-color: #dbdef1;
 
