@@ -296,7 +296,7 @@ export class FinancialData {
     this.stockVariationsAccounts.forEach((account) =>
       account.buildPeriods(
         this.stockVariations.filter(
-          (variation) => variation.stockAccountNum == account.accountNum
+          (variation) => variation.stockAccountNum == account.accountNum.substring(2)
         ),
         periods
       )
