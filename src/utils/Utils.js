@@ -12,19 +12,20 @@
  *    spaces between 3-digits group
  */
 
-export function printValue(value, precision) 
-{
+export function printValue(value, precision) {
   // value null/undefined/empty
   if (value === null || value === undefined || value === "") {
     return " - ";
-  } 
-
-  else {
+  } else {
     if (!precision) precision = 0;
-    let roundedValue = roundValue(value,precision).toFixed(precision);
+    let roundedValue = roundValue(value, precision).toFixed(precision);
 
     if (roundedValue < 0) {
-      return "(" + (-roundedValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ")";
+      return (
+        "(" +
+        (-roundedValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") +
+        ")"
+      );
     } else {
       return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
@@ -38,13 +39,10 @@ export function printValue(value, precision)
  *    spaces between 3-digits group
  */
 
-export function printValueInput(value, precision) 
-{
+export function printValueInput(value, precision) {
   if ((value == null) | (value === "")) {
     return "";
-  } 
-  
-  else {
+  } else {
     if (!precision) precision = 0;
     let formattedValue = roundValue(value, precision)
       .toString()
@@ -58,42 +56,53 @@ export function printValueInput(value, precision)
 
 /** SUM OF ITEMS & Derivated
  *    if precision defined -> round value
- *    
+ *
  */
 
-export function getSumItems(items, precision) 
-{
+export function getSumItems(items, precision) {
   let sum = items.reduce((a, b) => a + b, 0);
   return precision != undefined ? roundValue(sum, precision) : sum;
 }
 
-export const getAmountItems = (items, precision) => getSumItems(items.map((item) => item.amount), precision)
-export const getPrevAmountItems = (items, precision) => getSumItems(items.map((item) => item.prevAmount), precision)
-export const getAmountItemsForPeriod = (items, periodKey, precision) => getAmountItems(items.map((item) => item.periodsData[periodKey]), precision)
+export const getAmountItems = (items, precision) =>
+  getSumItems(
+    items.map((item) => item.amount),
+    precision
+  );
+export const getPrevAmountItems = (items, precision) =>
+  getSumItems(
+    items.map((item) => item.prevAmount),
+    precision
+  );
+export const getAmountItemsForPeriod = (items, periodKey, precision) =>
+  getAmountItems(
+    items.map((item) => item.periodsData[periodKey]),
+    precision
+  );
 
 /* -------------------------- ROUNDING FUNCTION -------------------------- */
 // round value
 
-export function roundValue(value, precision) 
-{
+export function roundValue(value, precision) {
   if (value == undefined || value == null || value === "") {
     return value;
   } else {
-    return (Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision));
+    return (
+      Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)
+    );
   }
 }
 
 /** VALUE OR DEFAULT
  *    init value if null or undefined
- *    
+ *
  */
 
-export function valueOrDefault(value, defaultValue) 
-{
+export function valueOrDefault(value, defaultValue) {
   // value defined
   if (value !== undefined && value !== null) {
     return value;
-  } 
+  }
   // value undefined/null
   else {
     return defaultValue;
@@ -107,22 +116,21 @@ export function valueOrDefault(value, defaultValue)
  *    value -> value to compare
  *    ref -> value to compare with
  *    margin -> margin within values are "close"
- *    
+ *
  */
 
-export function compareToReference(value, reference, margin) 
-{
+export function compareToReference(value, reference, margin) {
   // value close to reference -> 0
   if (
     Math.abs(value) >= Math.abs(reference) * (1 - margin / 100) &&
     Math.abs(value) <= Math.abs(reference) * (1 + margin / 100)
   ) {
     return 0;
-  } 
+  }
   // value under reference -> -1
   else if (value < reference) {
     return -1;
-  } 
+  }
   // value upper reference -> +1
   else {
     return 1;
@@ -134,16 +142,11 @@ export function compareToReference(value, reference, margin)
 
 /** NEW ID
  *    get new id in list (no existing)
- *    
+ *
  */
 
-export function getNewId(items) 
-{
-  return (
-    items
-      .map((item) => item.id)
-      .reduce((a, b) => Math.max(a, b), 0) + 1
-  );
+export function getNewId(items) {
+  return items.map((item) => item.id).reduce((a, b) => Math.max(a, b), 0) + 1;
 }
 
 /* -------------------------- DATES -------------------------- */
@@ -153,8 +156,7 @@ export function getNewId(items)
  *    format : dd-MM-yyyy hh:mm
  */
 
-export const getCurrentDateString = () =>
-{
+export const getCurrentDateString = () => {
   const today = new Date();
   const dateString =
     String(today.getDate()).padStart(2, "0") +
@@ -169,8 +171,7 @@ export const getCurrentDateString = () =>
   return dateString;
 };
 
-export const getShortCurrentDateString = () => 
-{
+export const getShortCurrentDateString = () => {
   const currentDate = new Date();
   const dateString = currentDate.toLocaleString("fr-FR", {
     year: "numeric",
@@ -185,8 +186,7 @@ export const getShortCurrentDateString = () =>
  *    format input : "yyyyMMdd"
  */
 
-export const parseDate = (stringDate) => 
-{
+export const parseDate = (stringDate) => {
   // if full date (yyyyMMdd)
   if (/^[0-9]{8}$/.test(stringDate)) {
     return new Date(
@@ -194,7 +194,7 @@ export const parseDate = (stringDate) =>
       parseInt(stringDate.substring(4, 6)) - 1,
       parseInt(stringDate.substring(6, 8))
     );
-  } 
+  }
   // if just month (yyyyMM)
   else if (/^[0-9]{6}$/.test(stringDate)) {
     return new Date(
@@ -202,15 +202,11 @@ export const parseDate = (stringDate) =>
       parseInt(stringDate.substring(4, 6)) - 1,
       1
     );
-  } 
+  }
   // if just year (yyyy)
   else if (/^[0-9]{4}$/.test(stringDate)) {
-    return new Date(
-      parseInt(stringDate.substring(0, 4)),
-      0,
-      1
-    );
-  } 
+    return new Date(parseInt(stringDate.substring(0, 4)), 0, 1);
+  }
   // error format date
   else return null;
 };
@@ -220,16 +216,24 @@ export const parseDate = (stringDate) =>
  *    format input : date
  */
 
-const formatDate = (date) => "" + date.getFullYear() + (date.getMonth() + 1 >= 10 ? "" : "0") + (date.getMonth() + 1) + date.getDate();
-const formatMonth = (date) => "" + date.getFullYear() + (date.getMonth() + 1 >= 10 ? "" : "0") + (date.getMonth() + 1);
+const formatDate = (date) =>
+  "" +
+  date.getFullYear() +
+  (date.getMonth() + 1 >= 10 ? "" : "0") +
+  (date.getMonth() + 1) +
+  date.getDate();
+const formatMonth = (date) =>
+  "" +
+  date.getFullYear() +
+  (date.getMonth() + 1 >= 10 ? "" : "0") +
+  (date.getMonth() + 1);
 
 /** GET PREV/NEXT DATE
  *    get day just before
  *    format input : "yyyyMMdd" (string)
  */
 
-export const getPrevDate = (stringDate) => 
-{
+export const getPrevDate = (stringDate) => {
   let date = parseDate(stringDate);
   let prevDate = new Date(
     date.getFullYear(),
@@ -239,8 +243,7 @@ export const getPrevDate = (stringDate) =>
   return formatDate(prevDate);
 };
 
-export const getNextDate = (stringDate) => 
-{
+export const getNextDate = (stringDate) => {
   let date = parseDate(stringDate);
   let nextDate = new Date(
     date.getFullYear(),
@@ -255,8 +258,7 @@ export const getNextDate = (stringDate) =>
  *    format input : "yyyyMM" (string)
  */
 
-export const getNextMonth = (month) => 
-{
+export const getNextMonth = (month) => {
   let currentMonth = parseDate(month);
   let nextMonth = new Date(
     currentMonth.getFullYear(),
@@ -271,23 +273,21 @@ export const getNextMonth = (month) =>
  *    format input : "yyyyMMdd" (string)
  */
 
-export const getLastDateOfMonth = (month) => 
-{
+export const getLastDateOfMonth = (month) => {
   let date = new Date(
     parseInt(month.substring(0, 4)), // year
     parseInt(month.substring(4, 6)), // month after (-1+1)
-    0                                // day 0 -> end of month before
+    0 // day 0 -> end of month before
   );
   return formatDate(date);
 };
 
-export const getDatesEndMonths = (dateStart, dateEnd) => 
-{
+export const getDatesEndMonths = (dateStart, dateEnd) => {
   let datesEndMonths = [];
   let month = dateStart.substring(0, 6); // month
   let dateEndMonth = getLastDateOfMonth(month);
-  while (parseInt(dateEndMonth) <= parseInt(dateEnd)) // while date at end of month before date end
-  {
+  while (parseInt(dateEndMonth) <= parseInt(dateEnd)) {
+    // while date at end of month before date end
     datesEndMonths.push(dateEndMonth);
     month = getNextMonth(month);
     dateEndMonth = getLastDateOfMonth(month);
@@ -296,34 +296,38 @@ export const getDatesEndMonths = (dateStart, dateEnd) =>
 };
 
 /** GET NB DAYS BETWEEN DATES
- *  
+ *
  */
 
-export const getNbDaysBetweenDates = (stringDateA, stringDateB) => 
-{
+export const getNbDaysBetweenDates = (stringDateA, stringDateB) => {
   let dateA = parseDate(stringDateA);
   let dateB = parseDate(stringDateB);
   return Math.round(Math.abs(dateB - dateA) / (1000 * 60 * 60 * 24));
 };
 
 /** SORT DATES
- *  
+ *
  */
 
-export const sortChronologicallyDates = (dateA,dateB) =>
-{
-  return parseInt(dateA)-parseInt(dateB);
-}
+export const sortChronologicallyDates = (dateA, dateB) => {
+  return parseInt(dateA) - parseInt(dateB);
+};
 
-export const sortUnchronologicallyDates = (dateA,dateB) =>
-{
-  return parseInt(dateB)-parseInt(dateA);
-}
+export const sortUnchronologicallyDates = (dateA, dateB) => {
+  return parseInt(dateB) - parseInt(dateA);
+};
 
 /* -------------------------- UNCLASSIFIED -------------------------- */
 
-export const getTargetSerieId = (indic) => 
-{
+/** CHECK IF OBJECT HAS PROPERTIES
+* Return true OR false 
+*/ 
+
+export const isObjEmpty = (obj) => {
+  return Object.keys(obj).length === 0;
+};
+
+export const getTargetSerieId = (indic) => {
   let id;
   switch (indic) {
     case "dis":
