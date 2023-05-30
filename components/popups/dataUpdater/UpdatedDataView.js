@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import metaIndics from "/lib/indics";
+import { isObjEmpty } from "../../../src/utils/Utils";
 
 const UpdateDataView = (props) => {
-  const [updatedLegalUnit, setUpdatedLegalUnit] = useState(null);
+  // const [updatedLegalUnit, setUpdatedLegalUnit] = useState(null);
   const [updatedProviders, setUpdatedProviders] = useState(null);
   const [updatedAccounts, setUpdatedAccounts] = useState(null);
   const [updatedComparativeData, setUpdatedComparativeData] = useState(null);
   const [updatedFootprint, setUpdatedFootprint] = useState(null);
-  const [showButton, setShowButton] = useState(true);
+  const [showButton, setShowButton] = useState(false);
   const [isSessionUpdated, setIsSessionUpdated] = useState(false);
   const [isUptodate, setIsuptodate] = useState(false);
 
   useEffect(async () => {
-    const compareLegalUnit = await compareData(
-      props.prevSession.legalUnit,
-      props.updatedSession.legalUnit
-    );
+    // const compareLegalUnit = await compareData(
+    //   props.prevSession.legalUnit,
+    //   props.updatedSession.legalUnit
+    // );
 
-    if (compareLegalUnit) {
-      setUpdatedLegalUnit(compareLegalUnit);
-    }
+    // if (compareLegalUnit) {
+    //   setUpdatedLegalUnit(compareLegalUnit);
+    // }
 
     const compareProviders = await compareProvidersFpt(
       props.prevSession.financialData.providers,
@@ -56,29 +57,23 @@ const UpdateDataView = (props) => {
     }
 
     if (
-      compareLegalUnit ||
-      compareProviders ||
-      compareAccounts ||
-      compareAggregates
+      // compareLegalUnit ||
+      isObjEmpty(compareProviders) ||
+      isObjEmpty(compareAccounts) ||
+      isObjEmpty(compareAggregates)
     ) {
-      setShowButton(true);
-    }
-
-    if (
-      !compareLegalUnit &&
-      !compareProviders &&
-      !compareAccounts &&
-      !compareAggregates
-    ) {
+      setShowButton(false);
       setIsuptodate(true);
+    } else {
+      setShowButton(true);
+      setIsuptodate(false);
     }
   }, [props]);
 
   useEffect(async () => {
-    if(isSessionUpdated) {
-      props.updatePrevSession(props.updatedSession)
+    if (isSessionUpdated) {
+      props.updatePrevSession(props.updatedSession);
     }
-
   }, [isSessionUpdated]);
 
   async function updateAggregatesFootprints(prevSession, currSession) {
@@ -111,55 +106,58 @@ const UpdateDataView = (props) => {
 
   return isSessionUpdated ? (
     <>
-        <p>Les données ont bien été mises à jour! </p>
-        {Object.keys(updatedFootprint).length > 0 &&
-          Object.entries(updatedFootprint).map(([key, value]) => {
-            const indics = Object.keys(value);
-            let items = [];
-            indics.forEach((indic,index) => {
-              const currValue = value[indic].value.currValue;
-              const prevValue = value[indic].value.prevValue;
-              const diff = Math.abs((currValue - prevValue) / prevValue);
+      <p>Les données ont bien été mises à jour ! </p>
+      {Object.keys(updatedFootprint).length > 0 &&
+        Object.entries(updatedFootprint).map(([key, value]) => {
+          const indics = Object.keys(value);
+          let items = [];
+          indics.forEach((indic, index) => {
+            const currValue = value[indic].value.currValue;
+            const prevValue = value[indic].value.prevValue;
+            const diff = Math.abs((currValue - prevValue) / prevValue);
 
-              if (prevValue !== null && currValue !== null && diff >= 0.1) {
-                items.push(
-                  <li key={index}>
-                    <b>{metaIndics[indic].libelle} </b>: L'empreinte de la production pour{" "}
-                    {key.slice(2)} est maintenant de {currValue}{" "}
-                    {metaIndics[indic].unit}. La valeur précédente était de{" "}
-                    {prevValue} {metaIndics[indic].unit}.
-                  </li>
-                );
-              }
-            });
-            return (
-              <div>
-                {items.length > 0 && (
-                  <>
-                    <p className="">
-                      L'empreinte de certains indicateurs a été recalculée en
-                      conséquence :
-                    </p>
-                    <ul className="small">{items}</ul>
-                  </>
-                )}
-              </div>
-            );
-          })}
-        <Button variant="secondary" className="me-1 my-2" onClick={props.downloadSession} >
-          Sauvegarder ma session
-        </Button>
-        <Button variant="primary" className="my-2" onClick={props.close}>
-          Reprendre mon analyse
-        </Button>
-
+            if (prevValue !== null && currValue !== null && diff >= 0.1) {
+              items.push(
+                <li key={index}>
+                  <b>{metaIndics[indic].libelle} </b>: L'empreinte de la
+                  production pour {key.slice(2)} est maintenant de {currValue}{" "}
+                  {metaIndics[indic].unit}. La valeur précédente était de{" "}
+                  {prevValue} {metaIndics[indic].unit}.
+                </li>
+              );
+            }
+          });
+          return (
+            <div>
+              {items.length > 0 && (
+                <>
+                  <p className="">
+                    L'empreinte de certains indicateurs a été recalculée en
+                    conséquence :
+                  </p>
+                  <ul className="small">{items}</ul>
+                </>
+              )}
+            </div>
+          );
+        })}
+      <Button
+        variant="secondary"
+        className="me-1 my-2"
+        onClick={props.downloadSession}
+      >
+        Sauvegarder ma session
+      </Button>
+      <Button variant="primary" className="my-2" onClick={props.close}>
+        Reprendre mon analyse
+      </Button>
     </>
   ) : (
     <>
       {isUptodate ? (
         <>
           <p>
-            Toutes les données de votre session sont à jour. Vous pouvez
+          <i className="success bi bi-check2-circle"></i>   Toutes les données de votre session sont à jour. Vous pouvez
             reprendre votre analyse.
           </p>
           <div className="text-end">
@@ -178,21 +176,19 @@ const UpdateDataView = (props) => {
       )}
       {/* {updatedLegalUnit && <LegalUnitDataPreview data={updatedLegalUnit} />} */}
 
-      {updatedProviders && Object.entries(updatedProviders).length>0 && (
-        <FootprintPreview data={updatedProviders} label={"fournisseurs"}/>
+      {updatedProviders && !isObjEmpty(updatedProviders) && (
+        <FootprintPreview data={updatedProviders} label={"fournisseurs"} />
       )}
 
-      {updatedAccounts && Object.entries(updatedAccounts).length>0 && (
+      {updatedAccounts && !isObjEmpty(updatedAccounts) && (
         <FootprintPreview
           data={updatedAccounts}
           label={"comptes de stocks et d'immobilisations"}
         />
       )}
-
-      {updatedComparativeData && (
+      {updatedComparativeData && !isObjEmpty(updatedComparativeData) && (
         <div className="small border-top my-3 pt-3">
           <h4 className="h6">
-            {" "}
             <i className="text-info me-1 bi bi-arrow-repeat"></i>Données
             comparatives
           </h4>
@@ -244,15 +240,23 @@ async function compareData(prevData, currData) {
   for (const key of prevKeys) {
     const prevValue = prevData[key];
     const currValue = currData[key];
-    if (prevValue !== currValue) {
-      diffs[key] = {
-        prevValue,
-        currValue,
-      };
+
+    if (
+      (prevValue.lastupdate !== undefined &&
+        prevValue.lastupdate !== currValue.lastupdate) ||
+      (prevValue.data !== undefined &&
+        prevValue.data[0].lastupdate !== currValue.data[0].lastupdate)
+    ) {
+      if (prevValue !== currValue) {
+        diffs[key] = {
+          prevValue,
+          currValue,
+        };
+      }
     }
   }
 
-  return Object.keys(diffs).length ? diffs : false;
+  return !isObjEmpty(diffs) ? diffs : false;
 }
 
 async function compareProvidersFpt(prevProviders, currProviders) {
@@ -274,28 +278,32 @@ async function compareProvidersFpt(prevProviders, currProviders) {
 
       const prevKeys = Object.keys(prevFootprint);
 
-      // Compare the values of each key
-      for (const key of prevKeys) {
-        if (typeof prevFootprint[key] !== "function") {
-          const prevValue = prevFootprint[key];
-          const currValue = currFootprint[key];
-          if (prevValue !== currValue) {
-            diffs[key] = {
-              prevValue,
-              currValue,
-            };
+      // Check if lastupdate is different
+      if (currFootprint.lastupdate != prevFootprint.lastupdate) {
+        // Compare the values of each key
+        for (const key of prevKeys) {
+          if (typeof prevFootprint[key] !== "function") {
+            const prevValue = prevFootprint[key];
+            const currValue = currFootprint[key];
+
+            if (prevValue !== currValue) {
+              diffs[key] = {
+                prevValue,
+                currValue,
+              };
+            }
           }
         }
-      }
 
-      if (!updates[provider]) {
-        updates[provider] = { id: providerId };
+        if (!updates[provider]) {
+          updates[provider] = { id: providerId };
+        }
+        // Stockage des indicateurs modifiés dans l'objet updates
+        if (!updates[provider]) {
+          updates[provider] = {};
+        }
+        updates[provider][indicator] = diffs;
       }
-      // Stockage des indicateurs modifiés dans l'objet updates
-      if (!updates[provider]) {
-        updates[provider] = {};
-      }
-      updates[provider][indicator] = diffs;
     }
   }
 
@@ -320,29 +328,31 @@ async function compareInitialStateFpt(prevAccounts, currAccounts) {
         prevAccount.initialState.footprint.indicators[indicator];
 
       const prevKeys = Object.keys(prevFootprint);
-
-      // Compare the values of each key
-      for (const key of prevKeys) {
-        if (typeof prevFootprint[key] !== "function") {
-          const prevValue = prevFootprint[key];
-          const currValue = currFootprint[key];
-          if (prevValue !== currValue) {
-            diffs[key] = {
-              prevValue,
-              currValue,
-            };
+      // Check if lastupdate is different
+      if (currFootprint.lastupdate != prevFootprint.lastupdate) {
+        // Compare the values of each key
+        for (const key of prevKeys) {
+          if (typeof prevFootprint[key] !== "function") {
+            const prevValue = prevFootprint[key];
+            const currValue = currFootprint[key];
+            if (prevValue !== currValue) {
+              diffs[key] = {
+                prevValue,
+                currValue,
+              };
+            }
           }
         }
-      }
 
-      if (!updates[account]) {
-        updates[account] = { accountNum: prevAccount.accountNum };
+        if (!updates[account]) {
+          updates[account] = { accountNum: prevAccount.accountNum };
+        }
+        // Stockage des indicateurs modifiés dans l'objet updates
+        if (!updates[account]) {
+          updates[account] = {};
+        }
+        updates[account][indicator] = diffs;
       }
-      // Stockage des indicateurs modifiés dans l'objet updates
-      if (!updates[account]) {
-        updates[account] = {};
-      }
-      updates[account][indicator] = diffs;
     }
   }
 
@@ -354,7 +364,6 @@ async function compareComparativeData(prevData, currData) {
     (data) => data != "activityCode"
   );
   const updates = {};
-
   for (const aggregate of aggregates) {
     const prevAreaFpt = prevData[aggregate].areaFootprint.indicators;
     const prevDivisionFpt = prevData[aggregate].divisionFootprint.indicators;
@@ -372,14 +381,20 @@ async function compareComparativeData(prevData, currData) {
       currData[aggregate].targetDivisionFootprint.indicators;
     const currTrendsFootprint = currData[aggregate].trendsFootprint.indicators;
 
-    const compareAreaFpt = compareData(prevAreaFpt, currAreaFpt);
-    const compareDivisionFpt = compareData(prevDivisionFpt, currDivisionFpt);
-    const compareTgtArea = compareData(prevTargetAreaFpt, currTargetAreaFpt);
-    const compareTgtDivision = compareData(
+    const compareAreaFpt = await compareData(prevAreaFpt, currAreaFpt);
+    const compareDivisionFpt = await compareData(
+      prevDivisionFpt,
+      currDivisionFpt
+    );
+    const compareTgtArea = await compareData(
+      prevTargetAreaFpt,
+      currTargetAreaFpt
+    );
+    const compareTgtDivision = await compareData(
       prevTargetDivisionFpt,
       currTargetDivisionFpt
     );
-    const comparetrendFpt = compareData(
+    const compareTrendFpt = await compareData(
       prevTrendsFootprint,
       currTrendsFootprint
     );
@@ -387,19 +402,32 @@ async function compareComparativeData(prevData, currData) {
     if (!updates[aggregate]) {
       updates[aggregate] = {};
     }
-    updates[aggregate] = {
-      areaFootprint: compareAreaFpt,
-      divisionFootprint: compareDivisionFpt,
-      targetAreaFootprint: compareTgtArea,
-      targetDivisionFootprint: compareTgtDivision,
-      trendsFootprint: comparetrendFpt,
-    };
+
+    if (compareAreaFpt) {
+      updates[aggregate].areaFootprint = compareAreaFpt;
+    }
+    if (compareDivisionFpt) {
+      updates[aggregate].divisionFootprint = compareDivisionFpt;
+    }
+    if (compareTgtArea) {
+      updates[aggregate].targetAreaFootprint = compareTgtArea;
+    }
+    if (compareTgtDivision) {
+      updates[aggregate].targetDivisionFootprint = compareTgtDivision;
+    }
+    if (compareTrendFpt) {
+      updates[aggregate].trendsFootprint = compareTrendFpt;
+    }
   }
-  return Object.keys(updates).length ? updates : false;
+
+  const comparativeDataToUpdate = Object.keys(updates).filter((aggregate) => {
+    return  !isObjEmpty(updates[aggregate]) ;
+  });
+
+  return comparativeDataToUpdate.length > 0 ? updates : {};
 }
 
 function compareAggregateFootprint(prevData, currData) {
-
   const updates = {};
 
   for (const indicator in prevData) {
@@ -408,24 +436,29 @@ function compareAggregateFootprint(prevData, currData) {
     const currFootprint = currData[indicator];
     const prevFootprint = prevData[indicator];
 
-    const prevKeys = Object.keys(prevFootprint);
-    // Compare the values of each key
-    for (const key of prevKeys) {
-      if (key == "value") {
-        const prevValue = prevFootprint[key];
-        const currValue = currFootprint[key];
+    // Check if lastupdate is different
 
-        if (prevValue !== currValue) {
-          diffs[key] = {
-            prevValue,
-            currValue,
-          };
-          updates[indicator] = diffs;
+    if (currFootprint.lastupdate != prevFootprint.lastupdate) {
+      const prevKeys = Object.keys(prevFootprint);
+      // Compare the values of each key
+      for (const key of prevKeys) {
+        if (key == "value") {
+          const prevValue = prevFootprint[key];
+          const currValue = currFootprint[key];
+
+          if (prevValue !== currValue) {
+            diffs[key] = {
+              prevValue,
+              currValue,
+            };
+            updates[indicator] = diffs;
+          }
         }
       }
     }
   }
-  return Object.keys(updates).length ? updates : false;
+
+  return !isObjEmpty(updates) ? updates : false;
 }
 
 const LegalUnitDataPreview = ({ data }) => {
@@ -491,7 +524,12 @@ const FootprintPreview = ({ data, label }) => {
         {" "}
         <i className="text-info me-1 bi bi-arrow-repeat"></i>Données des {label}
       </h4>
-      {nb + " " + (nb>1 ? "empreintes vont" : "empreinte va") + " être mise" + (nb>1 ? "s" : "") + " à jour"}
+      {nb +
+        " " +
+        (nb > 1 ? "empreintes vont" : "empreinte va") +
+        " être mise" +
+        (nb > 1 ? "s" : "") +
+        " à jour"}
     </div>
   );
 };
