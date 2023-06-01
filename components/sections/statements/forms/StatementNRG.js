@@ -2,14 +2,11 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
+import Select from "react-select";
 
 // Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
@@ -22,6 +19,7 @@ export class StatementNRG extends React.Component {
         props.impactsData.energyConsumption,
         undefined
       ),
+      energyConsumptionUnit: props.impactsData.energyConsumptionUnit,
       energyConsumptionUncertainty: valueOrDefault(
         props.impactsData.energyConsumptionUncertainty,
         undefined
@@ -51,8 +49,18 @@ export class StatementNRG extends React.Component {
 
   render() {
     const { netValueAdded } = this.props.impactsData;
-    const { energyConsumption, energyConsumptionUncertainty, info } =
-      this.state;
+    const {
+      energyConsumption,
+      energyConsumptionUnit,
+      energyConsumptionUncertainty,
+      info,
+    } = this.state;
+    const options = [
+      { value: "MJ", label: "MJ" },
+      { value: "GJ", label: "GJ" },
+      { value: "kWh", label: "kWh" },
+      { value: "MWh", label: "MWh" },
+    ];
 
     let isValid = energyConsumption != null && netValueAdded != null;
 
@@ -61,11 +69,24 @@ export class StatementNRG extends React.Component {
         <div className="statement-form">
           <div className="form-group">
             <label>Consommation totale d'énergie</label>
-            <InputNumber
-              value={roundValue(energyConsumption, 0)}
-              onUpdate={this.updateEnergyConsumption}
-              placeholder="MJ"
-            />
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(energyConsumption, 0)}
+                  onUpdate={this.updateEnergyConsumption}
+                />
+              </Col>
+              <Col sm={4}>
+                <Select
+                  options={options}
+                  defaultValue={{
+                    label: energyConsumptionUnit,
+                    value: energyConsumptionUnit,
+                  }}
+                  onChange={this.updateEnergyConsumptionUnit}
+                />
+              </Col>
+            </Row>
           </div>
           <div className="form-group">
             <label>Incertitude</label>
@@ -86,7 +107,6 @@ export class StatementNRG extends React.Component {
             value={info}
             onBlur={this.saveInfo}
           />
-   
         </div>
         <div className="statement-validation">
           <button
@@ -122,6 +142,18 @@ export class StatementNRG extends React.Component {
     this.props.impactsData.energyConsumptionUncertainty = input;
     this.props.onUpdate("nrg");
   };
+
+  updateEnergyConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
+    this.setState({
+      energyConsumptionUnit: selectedUnit,
+    });
+
+    this.props.impactsData.energyConsumptionUnit = selectedUnit;
+
+    this.props.onUpdate("nrg");
+  };
+  
 
   updateInfo = (event) => this.setState({ info: event.target.value });
   saveInfo = () => (this.props.impactsData.comments.nrg = this.state.info);
