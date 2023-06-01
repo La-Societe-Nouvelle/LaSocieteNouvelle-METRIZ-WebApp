@@ -220,7 +220,7 @@ export const parseDate = (stringDate) =>
  *    format input : date
  */
 
-const formatDate = (date) => "" + date.getFullYear() + (date.getMonth() + 1 >= 10 ? "" : "0") + (date.getMonth() + 1) + date.getDate();
+const formatDate = (date) => "" + date.getFullYear() + (date.getMonth() + 1 >= 10 ? "" : "0") + (date.getMonth() + 1) + (date.getDate()<10 ? "0"+date.getDate() : date.getDate());
 const formatMonth = (date) => "" + date.getFullYear() + (date.getMonth() + 1 >= 10 ? "" : "0") + (date.getMonth() + 1);
 
 /** GET PREV/NEXT DATE
