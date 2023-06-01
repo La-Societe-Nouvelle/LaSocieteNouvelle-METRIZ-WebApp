@@ -149,10 +149,6 @@ export class StatementMAT extends React.Component {
     );
   }
 
-  onEnterPress = (event) => {
-    if (event.which == 13) event.target.blur();
-  };
-
   onIsExtractiveActivitiesChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
