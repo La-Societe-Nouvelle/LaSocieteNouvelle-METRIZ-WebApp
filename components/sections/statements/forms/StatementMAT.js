@@ -2,14 +2,11 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
+import Select from "react-select";
 
 //Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #MAT ---------- */
@@ -22,6 +19,7 @@ export class StatementMAT extends React.Component {
         props.impactsData.materialsExtraction,
         undefined
       ),
+      materialsExtractionUnit: props.impactsData.materialsExtractionUnit,
       materialsExtractionUncertainty: valueOrDefault(
         props.impactsData.materialsExtractionUncertainty,
         undefined
@@ -52,8 +50,17 @@ export class StatementMAT extends React.Component {
 
   render() {
     const { isExtractiveActivities, netValueAdded } = this.props.impactsData;
-    const { materialsExtraction, materialsExtractionUncertainty, info } =
-      this.state;
+    const {
+      materialsExtraction,
+      materialsExtractionUncertainty,
+      materialsExtractionUnit,
+      info,
+    } = this.state;
+
+    const options = [
+      { value: "kg", label: "kg" },
+      { value: "t", label: "t" },
+    ];
 
     let isValid = materialsExtraction != null && netValueAdded != null;
 
@@ -88,12 +95,26 @@ export class StatementMAT extends React.Component {
           </div>
           <div className="form-group">
             <label>Quantité extraite de matières premières</label>
-            <InputNumber
-              value={roundValue(materialsExtraction, 0)}
-              disabled={isExtractiveActivities === false}
-              onUpdate={this.updateMaterialsExtraction}
-              placeholder="KG"
-            />
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(materialsExtraction, 0)}
+                  disabled={isExtractiveActivities === false}
+                  onUpdate={this.updateMaterialsExtraction}
+                />
+              </Col>
+              <Col sm={4}>
+                <Select
+                  isDisabled={isExtractiveActivities === false}
+                  options={options}
+                  defaultValue={{
+                    label: materialsExtractionUnit,
+                    value: materialsExtractionUnit,
+                  }}
+                  onChange={this.updateUnit}
+                />
+              </Col>
+            </Row>
           </div>
           <div className="form-group">
             <label>Incertitude</label>
@@ -114,7 +135,6 @@ export class StatementMAT extends React.Component {
             value={info}
             onBlur={this.saveInfo}
           />
-
         </div>
         <div className="statement-validation">
           <button
@@ -161,6 +181,17 @@ export class StatementMAT extends React.Component {
       materialsExtractionUncertainty:
         this.props.impactsData.materialsExtractionUncertainty,
     });
+    this.props.onUpdate("mat");
+  };
+
+  updateUnit = (selected) => {
+    const selectedUnit = selected.value;
+    this.setState({
+      materialsExtractionUnit: selectedUnit,
+    });
+
+    this.props.impactsData.materialsExtractionUnit = selectedUnit;
+
     this.props.onUpdate("mat");
   };
 

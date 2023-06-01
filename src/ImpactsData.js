@@ -45,6 +45,7 @@ export class ImpactsData  {
 
     this.isExtractiveActivities = props.isExtractiveActivities !== undefined ? props.isExtractiveActivities : null;
     this.materialsExtraction =  props.materialsExtraction !== undefined ? props.materialsExtraction : null;
+    this.materialsExtractionUnit = props.materialsExtractionUnit !== undefined ? props.materialsExtractionUnit : "kg";
     this.materialsExtractionUncertainty = props.materialsExtractionUncertainty !== undefined ? props.materialsExtractionUncertainty : null;
 
     this.energyConsumption = props.energyConsumption !== undefined ? props.energyConsumption : null;

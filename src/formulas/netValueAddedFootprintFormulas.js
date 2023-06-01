@@ -96,7 +96,14 @@ const buildValueKNW = (indicator,impactsData) =>
 const buildValueMAT = (indicator,impactsData) => 
 {
     if (impactsData.materialsExtraction!=null) {
-        indicator.setValue(impactsData.materialsExtraction/impactsData.netValueAdded *1000);
+
+        const materialsExtraction =
+        impactsData.materialsExtractionUnit == "t"
+          ? impactsData.materialsExtraction * 1000
+          : impactsData.materialsExtraction;
+
+
+        indicator.setValue(materialsExtraction/impactsData.netValueAdded *1000);
         indicator.setUncertainty(impactsData.materialsExtractionUncertainty);
     }
 }
