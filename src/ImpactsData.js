@@ -50,6 +50,7 @@ export class ImpactsData  {
     this.materialsExtractionUncertainty = props.materialsExtractionUncertainty !== undefined ? props.materialsExtractionUncertainty : null;
 
     this.energyConsumption = props.energyConsumption !== undefined ? props.energyConsumption : null;
+    this.energyConsumptionUnit = props.energyConsumptionUnit !== undefined ? props.energyConsumptionUnit : "MJ";
     this.energyConsumptionUncertainty = props.energyConsumptionUncertainty !== undefined ? props.energyConsumptionUncertainty : null;
     this.nrgDetails = props.nrgDetails || {};
     this.nrgTotal = props.nrgTotal || false;
