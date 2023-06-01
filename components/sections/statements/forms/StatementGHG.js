@@ -2,7 +2,7 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
 import Select from "react-select";
 
 // Utils
@@ -30,7 +30,6 @@ export class StatementGHG extends React.Component {
   }
 
   componentDidUpdate() {
-  
     if (
       this.state.greenhousesGazEmissions !=
       this.props.impactsData.greenhousesGazEmissions
@@ -71,20 +70,26 @@ export class StatementGHG extends React.Component {
         <div className="statement-form">
           <div className="form-group">
             <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
-            <InputNumber
-              value={roundValue(greenhousesGazEmissions, 0)}
-              onUpdate={this.updateGreenhousesGazEmissions}
-            />
-            <Select
-              options={options}
-              defaultValue={{
-                label: greenhousesGazEmissionsUnit,
-                value: greenhousesGazEmissionsUnit,
-              }}
-              onChange={this.updateUnit}
-            />
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(greenhousesGazEmissions, 0)}
+                  onUpdate={this.updateGreenhousesGazEmissions}
+                />
+              </Col>
+              <Col sm={4}>
+                <Select
+                  options={options}
+                  defaultValue={{
+                    label: greenhousesGazEmissionsUnit,
+                    value: greenhousesGazEmissionsUnit,
+                  }}
+                  onChange={this.updateUnit}
+                />
+              </Col>
+            </Row>
           </div>
-    
+
           <div className="form-group">
             <label>Incertitude</label>
             <InputNumber
@@ -131,7 +136,6 @@ export class StatementGHG extends React.Component {
   }
 
   updateGreenhousesGazEmissions = (input) => {
-
     this.props.impactsData.ghgTotal = true;
 
     this.props.impactsData.setGreenhousesGazEmissions(input);
@@ -143,7 +147,6 @@ export class StatementGHG extends React.Component {
   };
 
   updateGreenhousesGazEmissionsUncertainty = (input) => {
-
     this.props.impactsData.greenhousesGazEmissionsUncertainty = input;
     this.props.onUpdate("ghg");
   };
@@ -162,8 +165,6 @@ export class StatementGHG extends React.Component {
   saveInfo = () => (this.props.impactsData.comments.ghg = this.state.info);
 
   onValidate = () => {
-
-
     this.setState({ isUpdated: true });
     this.props.onValidate();
   };
