@@ -35,6 +35,8 @@ export class ImpactsData  {
 
     this.greenhousesGazEmissions =  props.greenhousesGazEmissions !== undefined ? props.greenhousesGazEmissions : null;
     this.greenhousesGazEmissionsUncertainty =  props.greenhousesGazEmissionsUncertainty !== undefined ? props.greenhousesGazEmissionsUncertainty : null;
+    this.greenhousesGazEmissionsUnit = props.greenhousesGazEmissionsUnit !== undefined ? props.greenhousesGazEmissionsUnit : "kgCO2e";
+
     this.ghgDetails = props.ghgDetails || {};
     this.ghgTotal = props.ghgTotal || false;
 
