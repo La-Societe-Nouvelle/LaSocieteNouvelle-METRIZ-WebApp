@@ -148,7 +148,13 @@ const buildValueWAS = (indicator,impactsData) =>
 const buildValueWAT = (indicator,impactsData) => 
 {
     if (impactsData.waterConsumption!=null) {
-        indicator.setValue(impactsData.waterConsumption/impactsData.netValueAdded *1000);
+
+        const waterConsumption =
+        impactsData.waterConsumptionUnit == "l"
+          ? impactsData.waterConsumption / 1000
+          : impactsData.waterConsumption;
+
+        indicator.setValue(waterConsumption/impactsData.netValueAdded *1000);
         indicator.setUncertainty(impactsData.waterConsumptionUncertainty);
     }
 }

@@ -60,6 +60,7 @@ export class ImpactsData  {
     this.wasteProductionUncertainty = props.wasteProductionUncertainty !== undefined ? props.wasteProductionUncertainty : null;
 
     this.waterConsumption =  props.waterConsumption !== undefined ? props.waterConsumption : null;
+    this.waterConsumptionUnit = props.waterConsumptionUnit !== undefined ? props.waterConsumptionUnit : "m³";
     this.waterConsumptionUncertainty =  props.waterConsumptionUncertainty !== undefined ? props.waterConsumptionUncertainty : null;
 
     /* --- Commentaires --- */
