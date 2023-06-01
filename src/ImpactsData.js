@@ -55,6 +55,7 @@ export class ImpactsData  {
 
 
     this.wasteProduction = props.wasteProduction !== undefined ? props.wasteProduction : null;
+    this.wasteProductionUnit = props.wasteProductionUnit !== undefined ? props.wasteProductionUnit : "kg";
     this.wasteProductionUncertainty = props.wasteProductionUncertainty !== undefined ? props.wasteProductionUncertainty : null;
 
     this.waterConsumption =  props.waterConsumption !== undefined ? props.waterConsumption : null;

@@ -2,14 +2,11 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
+import Select from "react-select";
 
 //Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
@@ -22,6 +19,7 @@ export class StatementWAS extends React.Component {
         props.impactsData.wasteProduction,
         undefined
       ),
+      wasteProductionUnit: props.impactsData.wasteProductionUnit,
       wasteProductionUncertainty: valueOrDefault(
         props.impactsData.wasteProductionUncertainty,
         undefined
@@ -49,7 +47,17 @@ export class StatementWAS extends React.Component {
 
   render() {
     const { netValueAdded } = this.props.impactsData;
-    const { wasteProduction, wasteProductionUncertainty, info } = this.state;
+    const {
+      wasteProduction,
+      wasteProductionUnit,
+      wasteProductionUncertainty,
+      info,
+    } = this.state;
+
+    const options = [
+      { value: "kg", label: "kg" },
+      { value: "t", label: "t" },
+    ];
 
     let isValid = wasteProduction != null && netValueAdded != null;
 
@@ -60,16 +68,29 @@ export class StatementWAS extends React.Component {
             <label>
               Productiont totale de déchets (y compris DAOM<sup>1</sup>)
             </label>
-            <InputNumber
-              value={roundValue(wasteProduction, 0)}
-              onUpdate={this.updateWasteProduction}
-              placeholder="KG"
-            />
-            <div className="notes">
-              <p className="small">
-                <sup>1</sup> Déchets assimilés aux ordures ménagères
-              </p>
-            </div>
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(wasteProduction, 0)}
+                  onUpdate={this.updateWasteProduction}
+                />
+                <div className="notes">
+                  <p className="small">
+                    <sup>1</sup> Déchets assimilés aux ordures ménagères
+                  </p>
+                </div>
+              </Col>
+              <Col sm={4}>
+                <Select
+                  options={options}
+                  defaultValue={{
+                    label: wasteProductionUnit,
+                    value: wasteProductionUnit,
+                  }}
+                  onChange={this.updateWasteProductionUnit}
+                />
+              </Col>
+            </Row>
           </div>
           <div className="form-group">
             <label>Incertitude</label>
@@ -90,7 +111,6 @@ export class StatementWAS extends React.Component {
             value={info}
             onBlur={this.saveInfo}
           />
-
         </div>
         <div className="statement-validation">
           <button
@@ -114,6 +134,16 @@ export class StatementWAS extends React.Component {
     this.props.onUpdate("was");
   };
 
+  updateWasteProductionUnit = (selected) => {
+    const selectedUnit = selected.value;
+    this.setState({
+      wasteProductionUnit: selectedUnit,
+    });
+
+    this.props.impactsData.wasteProductionUnit = selectedUnit;
+
+    this.props.onUpdate("was");
+  };
   updateWasteProductionUncertainty = (input) => {
     this.props.impactsData.wasteProductionUncertainty = input;
     this.props.onUpdate("was");

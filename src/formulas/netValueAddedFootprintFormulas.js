@@ -127,7 +127,13 @@ const buildValueSOC = (indicator,impactsData) =>
 const buildValueWAS = (indicator,impactsData) => 
 {
     if (impactsData.wasteProduction!=null) {
-        indicator.setValue(impactsData.wasteProduction/impactsData.netValueAdded *1000);
+
+        const wasteProduction =
+        impactsData.wasteProductionUnit == "t"
+          ? impactsData.wasteProduction * 1000
+          : impactsData.wasteProduction;
+
+        indicator.setValue(wasteProduction/impactsData.netValueAdded *1000);
         indicator.setUncertainty(impactsData.wasteProductionUncertainty);
     }
 }
