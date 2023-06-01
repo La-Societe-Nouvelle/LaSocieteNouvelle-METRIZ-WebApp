@@ -41,6 +41,7 @@ export class ImpactsData  {
     this.ghgTotal = props.ghgTotal || false;
 
     this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption !== undefined ? props.hazardousSubstancesConsumption : null;
+    this.hazardousSubstancesConsumptionUnit = props.hazardousSubstancesConsumptionUnit !== undefined ? props.hazardousSubstancesConsumptionUnit : "kg";
     this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty !== undefined ? props.hazardousSubstancesConsumptionUncertainty : null;
 
     this.isExtractiveActivities = props.isExtractiveActivities !== undefined ? props.isExtractiveActivities : null;

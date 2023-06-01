@@ -80,7 +80,14 @@ const buildValueGHG = (indicator,impactsData) =>
 const buildValueHAZ = (indicator,impactsData) => 
 {
     if (impactsData.hazardousSubstancesConsumption!=null) {
-        indicator.setValue(impactsData.hazardousSubstancesConsumption/impactsData.netValueAdded *1000);
+
+        const hazardousSubstancesConsumption =
+        impactsData.hazardousSubstancesConsumptionUnit == "t"
+          ? impactsData.hazardousSubstancesConsumption * 1000
+          : impactsData.hazardousSubstancesConsumption;
+
+
+        indicator.setValue(hazardousSubstancesConsumption/impactsData.netValueAdded *1000);
         indicator.setUncertainty(impactsData.hazardousSubstancesConsumptionUncertainty);
     }
 }
