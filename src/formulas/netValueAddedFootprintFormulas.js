@@ -64,8 +64,16 @@ const buildValueGEQ = (indicator,impactsData) =>
 const buildValueGHG = (indicator,impactsData) => 
 {
     if (impactsData.greenhousesGazEmissions!=null) {
-        indicator.setValue(impactsData.greenhousesGazEmissions/impactsData.netValueAdded *1000);
-        indicator.setUncertainty(impactsData.greenhousesGazEmissionsUncertainty);
+      // Convert greenhouses gas emissions to kilograms if the unit is 'tCO2e'
+      const greenhousesGazEmissions =
+        impactsData.greenhousesGazEmissionsUnit == "tCO2e"
+          ? impactsData.greenhousesGazEmissions * 1000
+          : impactsData.greenhousesGazEmissions;
+
+      indicator.setValue(
+        (greenhousesGazEmissions / impactsData.netValueAdded) * 1000
+      );
+      indicator.setUncertainty(impactsData.greenhousesGazEmissionsUncertainty);
     }
 }
 
