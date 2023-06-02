@@ -13,6 +13,8 @@ import StatementNRG from "../forms/StatementNRG";
 import StatementWAS from "../forms/StatementWAS";
 import StatementWAT from "../forms/StatementWAT";
 
+import StatementART from "../forms/StatementART";
+
 const StatementComponent = ({
   indic,
   impactsData,
