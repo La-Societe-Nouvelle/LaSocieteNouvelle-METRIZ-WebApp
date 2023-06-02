@@ -24,7 +24,6 @@ const StatementComponent = ({
     onUpdate: handleNetValueChange,
     onValidate: handleValidation,
   };
-
   switch (indic) {
     case "eco":
       return <StatementECO {...componentProps} />;
