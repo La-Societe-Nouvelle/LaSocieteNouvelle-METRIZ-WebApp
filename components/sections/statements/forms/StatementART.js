@@ -1,12 +1,8 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
-
-// Utils
+import React, { useState, useEffect } from "react";
+import { Form, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
@@ -25,141 +21,137 @@ import { InputNumber } from "../../../input/InputNumber";
  *    inputs
  */
 
-export class StatementART extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      craftedProduction: valueOrDefault(
-        props.impactsData.craftedProduction,
-        undefined
-      ),
-      info: props.impactsData.comments.art || "",
-    };
-  }
+const StatementART = (props) => {
+  const [craftedProduction, setCraftedProduction] = useState(
+    valueOrDefault(props.impactsData.craftedProduction, undefined)
+  );
+  const [info, setInfo] = useState(props.impactsData.comments.art || "");
 
-  componentDidUpdate() {
-    if (
-      this.state.craftedProduction != this.props.impactsData.craftedProduction
-    ) {
-      this.setState({
-        craftedProduction: this.props.impactsData.craftedProduction,
-      });
+  useEffect(() => {
+    if (craftedProduction !== props.impactsData.craftedProduction) {
+      setCraftedProduction(props.impactsData.craftedProduction);
     }
-  }
+  }, [props.impactsData.craftedProduction]);
 
-  render() {
-    const { isValueAddedCrafted, netValueAdded } = this.props.impactsData;
-    const { craftedProduction, info } = this.state;
+  const { isValueAddedCrafted, netValueAdded } = props.impactsData;
 
-    let isValid =
-      netValueAdded != null &&
-      craftedProduction >= 0 &&
-      craftedProduction <= netValueAdded;
+  const isValid =
+    netValueAdded != null &&
+    craftedProduction >= 0 &&
+    craftedProduction <= netValueAdded;
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>L'entreprise est-elle une entreprise artisanale ?</label>
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="hasValueAdded"
-                label="Oui"
-                value="true"
-                checked={isValueAddedCrafted === true}
-                onChange={this.onIsValueAddedCraftedChange}
-              />
-
-              <Form.Check
-                inline
-                type="radio"
-                id="hasValueAdded"
-                label="Partiellement"
-                value="null"
-                checked={isValueAddedCrafted === null}
-                onChange={this.onIsValueAddedCraftedChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="hasValueAdded"
-                label="Non"
-                value="false"
-                checked={isValueAddedCrafted === false}
-                onChange={this.onIsValueAddedCraftedChange}
-              />
-            </Form>
-          </div>
-          <div className="form-group">
-            <label>Part de la valeur ajoutée artisanale</label>
-
-            <InputNumber
-              value={roundValue(craftedProduction, 0)}
-              onUpdate={this.updateCraftedProduction.bind(this)}
-              disabled={isValueAddedCrafted != null}
-              placeholder="&euro;"
-              isInvalid={!isValid}
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-action">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  onIsValueAddedCraftedChange = (event) => {
+  const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.isValueAddedCrafted = true;
-        this.props.impactsData.craftedProduction =
-          this.props.impactsData.netValueAdded;
+        props.impactsData.isValueAddedCrafted = true;
+        props.impactsData.craftedProduction = props.impactsData.netValueAdded;
         break;
       case "null":
-        this.props.impactsData.isValueAddedCrafted = null;
-        this.props.impactsData.craftedProduction = null;
+        props.impactsData.isValueAddedCrafted = null;
+        props.impactsData.craftedProduction = null;
         break;
       case "false":
-        this.props.impactsData.isValueAddedCrafted = false;
-        this.props.impactsData.craftedProduction = 0;
+        props.impactsData.isValueAddedCrafted = false;
+        props.impactsData.craftedProduction = 0;
         break;
     }
-    this.setState({
-      craftedProduction: this.props.impactsData.craftedProduction,
-    });
-    this.props.onUpdate("art");
+    setCraftedProduction(props.impactsData.craftedProduction);
+    props.onUpdate("art");
   };
 
-  updateCraftedProduction = (input) => {
-    this.props.impactsData.craftedProduction = input;
-    this.setState({
-      craftedProduction: this.props.impactsData.craftedProduction,
-    });
-    this.props.onUpdate("art");
+  const updateCraftedProduction = (event) => {
+    props.impactsData.craftedProduction = event.target.value;
+    setCraftedProduction(event.target.value);
+    props.onUpdate("art");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.art = this.state.info);
+  const updateInfo = (event) => setInfo(event.target.value);
 
-  onValidate = () => this.props.onValidate();
-}
+  const saveInfo = () => (props.impactsData.comments.art = info);
+
+  const onValidate = () => props.onValidate();
+
+  return (
+    <Form className="statement">
+      <Form.Group>
+        <Form.Label>
+          L'entreprise est-elle une entreprise artisanale ?
+        </Form.Label>
+        <Form>
+          <Form.Check
+            inline
+            type="radio"
+            id="hasValueAdded"
+            label="Oui"
+            value="true"
+            checked={isValueAddedCrafted === true}
+            onChange={onIsValueAddedCraftedChange}
+          />
+
+          <Form.Check
+            inline
+            type="radio"
+            id="hasValueAdded"
+            label="Partiellement"
+            value="null"
+            checked={isValueAddedCrafted === null}
+            onChange={onIsValueAddedCraftedChange}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="hasValueAdded"
+            label="Non"
+            value="false"
+            checked={isValueAddedCrafted === false}
+            onChange={onIsValueAddedCraftedChange}
+          />
+        </Form>
+      </Form.Group>
+      {console.log(craftedProduction)}
+      <Form.Group>
+        <Form.Label>Part de la valeur ajoutée artisanale</Form.Label>
+        <InputGroup>
+          <Form.Control
+            type="number"
+            value={roundValue(craftedProduction, 0)}
+            inputMode="numeric"
+            onChange={updateCraftedProduction}
+            isInvalid={!isValid}
+            disabled={isValueAddedCrafted !== null}
+          />
+          <InputGroup.Text>&euro;</InputGroup.Text>
+        </InputGroup>
+
+        {/* <InputNumber
+          value={roundValue(craftedProduction, 0)}
+          onUpdate={updateCraftedProduction}
+          disabled={isValueAddedCrafted !== null}
+          placeholder="&euro;"
+          isInvalid={!isValid}
+        /> */}
+      </Form.Group>
+
+      <Form.Group>
+        <Form.Label>Informations complémentaires</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          onChange={updateInfo}
+          value={info}
+          onBlur={saveInfo}
+        />
+      </Form.Group>
+      <button
+        disabled={!isValid}
+        className="btn btn-secondary btn-sm"
+        onClick={onValidate}
+      >
+        Valider
+      </button>
+    </Form>
+  );
+};
+
+export default StatementART;
