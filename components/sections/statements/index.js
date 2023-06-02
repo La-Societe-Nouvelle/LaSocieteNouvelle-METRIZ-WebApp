@@ -84,7 +84,69 @@ const DirectImpacts = ({ session }) => {
         </div>
         <Row>
           {Object.entries(valueCreationIndics).map(([key, value]) => (
-            <Col key={key}>
+            <Col key={key} sm={4}>
+              <Card>
+                <Card.Header className="text-center">
+                  <Image
+                    src={"icons-ese/" + key + ".svg"}
+                    alt={key}
+                    height={50}
+                  />
+                  <h4 className="h5 fw-light-bold mt-3">
+                    {value.libelle}
+                    {value.isBeta && <span className="beta ms-1">BETA</span>}
+                  </h4>
+                </Card.Header>
+                <Card.Body>
+                  <StatementComponent
+                    indic={key}
+                    impactsData={session.impactsData[period.periodKey]}
+                    handleNetValueChange={handleNetValueChange}
+                    handleValidation={handleValidation}
+                  />
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+            <hr></hr>
+        <div className="text-center p-2  mb-3">
+          <h3 className="mb-0">  Empreinte sociale </h3>
+        </div>
+        <Row>
+          {Object.entries(socialFootprintIndic).map(([key, value]) => (
+            <Col key={key} sm={4}>
+              <Card>
+                <Card.Header className="text-center">
+                  <Image
+                    src={"icons-ese/" + key + ".svg"}
+                    alt={key}
+                    height={50}
+                  />
+                  <h4 className="h5 fw-light-bold mt-3">
+                    {value.libelle}
+                    {value.isBeta && <span className="beta ms-1">BETA</span>}
+                  </h4>
+                </Card.Header>
+                <Card.Body>
+                  <StatementComponent
+                    indic={key}
+                    impactsData={session.impactsData[period.periodKey]}
+                    handleNetValueChange={handleNetValueChange}
+                    handleValidation={handleValidation}
+                  />
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+        <hr></hr>
+        <div className="text-center p-2  mb-3">
+          <h3 className="mb-0"> Empreinte environnementale </h3>
+        </div>
+        <Row>
+          {Object.entries(EnvFootprintIndic).map(([key, value]) => (
+            <Col key={key} sm={4}>
               <Card>
                 <Card.Header className="text-center">
                   <Image
