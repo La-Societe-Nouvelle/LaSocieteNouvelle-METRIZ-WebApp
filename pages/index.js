@@ -15,6 +15,8 @@ import { InitialStatesSection } from "/components/sections/InitialStatesSection"
 import { ProvidersSection } from "../components/sections/companies/ProvidersSection";
 import StatementSection from "../components/sections/statements/StatementSection";
 import { PublishStatementSection } from "../components/sections/PublishStatementSection";
+import DirectImpacts from "../components/sections/statements";
+
 
 // Others components
 import { Header } from "/components/parts/headers/Header";
@@ -232,9 +234,12 @@ class Metriz extends React.Component {
           <ProvidersSection {...sectionProps} submit={this.validProviders} />
         );
       case 4:
-        return (
-          <StatementSection {...sectionProps} publish={() => this.setStep(5)} />
+        return(
+          <DirectImpacts {...sectionProps} />
         );
+        // return (
+        //   <StatementSection {...sectionProps} publish={() => this.setStep(5)} />
+        // );
       case 5:
         return (
           <PublishStatementSection
