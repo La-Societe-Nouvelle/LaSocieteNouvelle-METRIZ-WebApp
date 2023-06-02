@@ -46,6 +46,24 @@ section {
 }
 
 /* Indicator Section*/
+  .card {
+    margin-bottom: 5px;
+    border: none;
+  }
+  .card-header {
+    padding: 0.75rem 1rem;
+    background-color: #fff;
+    border: 1px solid darken(#fbfbff, 5%);
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
+      border-radius 0.15s ease;
+  }
+  .card-body {
+    background-color: #fbfbff;
+    border-left: 1px solid darken(#fbfbff, 5%);
+    border-right: 1px solid darken(#fbfbff, 5%);
+    border-bottom: 1px solid darken(#fbfbff, 5%);
+  }
 .indicator-section {
   .card {
     margin-bottom: 5px;
