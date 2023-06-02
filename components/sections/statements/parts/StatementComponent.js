@@ -1,14 +1,32 @@
 import React from "react";
-import { StatementART, StatementECO, StatementSOC } from "../forms";
+import {
+  StatementART,
+  StatementECO,
+  StatementGEQ,
+  StatementGHG,
+  StatementHAZ,
+  StatementIDR,
+  StatementKNW,
+  StatementMAT,
+  StatementNRG,
+  StatementSOC,
+  StatementWAS,
+  StatementWAT,
+} from "../forms";
 
-const StatementComponent = ({indic, impactsData, handleNetValueChange, handleValidation}) => {
-  console.log(handleNetValueChange)
+const StatementComponent = ({
+  indic,
+  impactsData,
+  handleNetValueChange,
+  handleValidation,
+}) => {
+
   const componentProps = {
     impactsData: impactsData,
     onUpdate: handleNetValueChange,
     onValidate: handleValidation,
   };
-  console.log(indic)
+
   switch (indic) {
     case "eco":
       return <StatementECO {...componentProps} />;
@@ -16,6 +34,25 @@ const StatementComponent = ({indic, impactsData, handleNetValueChange, handleVal
       return <StatementART {...componentProps} />;
     case "soc":
       return <StatementSOC {...componentProps} />;
+    case "idr":
+      return <StatementIDR {...componentProps} />;
+    case "geq":
+      return <StatementGEQ {...componentProps} />;
+    case "knw":
+      return <StatementKNW {...componentProps} />;
+    case "ghg":
+      return <StatementGHG {...componentProps} />;
+    case "nrg":
+      return <StatementNRG {...componentProps} />;
+    case "wat":
+      return <StatementWAT {...componentProps} />;
+    case "mat":
+      return <StatementMAT {...componentProps} />;
+    case "was":
+      return <StatementWAS {...componentProps} />;
+    case "haz":
+      return <StatementHAZ {...componentProps} />;
+
     default:
       return null;
   }
