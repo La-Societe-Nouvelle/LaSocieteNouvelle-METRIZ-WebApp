@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  StatementART,
   StatementECO,
   StatementGEQ,
   StatementGHG,
@@ -14,13 +13,14 @@ import {
   StatementWAT,
 } from "../forms";
 
+import StatementART from "../forms/StatementART";
+
 const StatementComponent = ({
   indic,
   impactsData,
   handleNetValueChange,
   handleValidation,
 }) => {
-
   const componentProps = {
     impactsData: impactsData,
     onUpdate: handleNetValueChange,
