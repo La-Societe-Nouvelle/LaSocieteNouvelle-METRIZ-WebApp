@@ -107,33 +107,43 @@ const StatementGEQ = (props) => {
           Ecart de rémunérations Femmes/Hommes (en % du taux horaire brut moyen)
         </Form.Label>
         <Col sm={6}>
-          <InputNumber
-            value={roundValue(wageGap, 1)}
-            disabled={hasEmployees === false}
-            onUpdate={updateWageGap}
-            placeholder="%"
-            isInvalid={isDisabled}
-          />
-          <div>
-            <Button
-              variant="primary"
-              className="btn-sm me-2"
-              onClick={() => setShowDSN(true)}
-              disabled={hasEmployees ? false : true}
-            >
-              <i className="bi bi-calculator"></i>
-              &nbsp;Import Fichiers DSN
-            </Button>
-            <Button
-              variant="primary"
-              className="btn-sm"
-              onClick={() => setShowCalulatorModal(true)}
-              disabled={hasEmployees ? false : true}
-            >
-              <i className="bi bi-calculator"></i>
-              &nbsp;Outil d'évaluation
-            </Button>
-          </div>
+          <Row className="align-items-center">
+            <Col>
+            <Form.Control
+                type="number"
+                value={roundValue(wageGap, 1)}
+                disabled={hasEmployees === false}
+                inputMode="numeric"
+                onChange={updateWageGap}
+                placeholder="%"
+                isInvalid={isDisabled}
+              />
+       
+          
+            </Col>
+            <Col>
+              <div>
+                <Button
+                  variant="primary"
+                  className="btn-sm me-2"
+                  onClick={() => setShowDSN(true)}
+                  disabled={hasEmployees ? false : true}
+                >
+                  <i className="bi bi-calculator"></i>
+                  &nbsp;Import Fichiers DSN
+                </Button>
+                <Button
+                  variant="primary"
+                  className="btn-sm"
+                  onClick={() => setShowCalulatorModal(true)}
+                  disabled={hasEmployees ? false : true}
+                >
+                  <i className="bi bi-calculator"></i>
+                  &nbsp;Outil d'évaluation
+                </Button>
+              </div>
+            </Col>
+          </Row>
         </Col>
       </Form.Group>
 
@@ -142,15 +152,14 @@ const StatementGEQ = (props) => {
           Informations complémentaires
         </Form.Label>
         <Col sm={6}>
-
-        <Form.Control
-          as="textarea"
-          rows={3}
-          className="w-100"
-          onChange={updateInfo}
-          value={info}
-          onBlur={saveInfo}
-        />
+          <Form.Control
+            as="textarea"
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
+            value={info}
+            onBlur={saveInfo}
+          />
         </Col>
       </Form.Group>
       <div className="text-end">
