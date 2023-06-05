@@ -14,6 +14,7 @@ import StatementWAS from "../forms/StatementWAS";
 import StatementWAT from "../forms/StatementWAT";
 
 import StatementART from "../forms/StatementART";
+import  StatementECO   from "../forms/StatementECO";
 
 const StatementComponent = ({
   indic,
