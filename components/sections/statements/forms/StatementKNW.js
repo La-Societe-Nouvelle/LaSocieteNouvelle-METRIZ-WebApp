@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Modal } from "react-bootstrap";
-import { InputNumber } from "../../../input/InputNumber";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { AssessmentKNW } from "../modals/AssessmentKNW";
 

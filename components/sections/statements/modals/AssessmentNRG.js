@@ -5,7 +5,8 @@ import React from "react";
 import { Table, Row, Col } from "react-bootstrap";
 
 // Utils
-import { getNewId, printValue } from "../../src/utils/Utils";
+import { InputNumber } from "../../../input/InputNumber";
+import { getNewId, printValue } from "/src/utils/Utils";
 
 // Libs
 import fuels from "/lib/emissionFactors/fuels.json";
@@ -15,7 +16,6 @@ import {
   getTotalGhgEmissions,
   getTotalGhgEmissionsUncertainty,
 } from "./AssessmentGHG";
-import { InputNumber } from "../input/InputNumber";
 
 const orderGroupsFossilFuels = [
   "Gaz",
