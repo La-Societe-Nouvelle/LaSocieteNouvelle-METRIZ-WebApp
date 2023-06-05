@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { div, Col, Container, Image, Row } from "react-bootstrap";
+import {  Col, Container, Image, Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 import StatementComponent from "./parts/StatementComponent";
 
@@ -82,7 +82,8 @@ const DirectImpacts = ({ session }) => {
         <div className="text-center p-2 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Création de la valeur</h3>
         </div>
-        <Row>
+        
+        <Row className="hidden">
           {Object.entries(valueCreationIndics).map(([key, value]) => (
             <Col key={key} sm={12}>
               <div className="border rounded border-1 p-3 mb-3">
@@ -113,6 +114,7 @@ const DirectImpacts = ({ session }) => {
             </Col>
           ))}
         </Row>
+
         <div className="text-center p-2 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Empreinte sociale </h3>
         </div>
@@ -120,7 +122,7 @@ const DirectImpacts = ({ session }) => {
           {Object.entries(socialFootprintIndic).map(([key, value]) => (
             <Col key={key} sm={12}>
               <div className="border rounded border-1 p-4 mb-3 ">
-                <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                   <Image
                     className="me-2"
                     src={"icons-ese/" + key + ".svg"}
@@ -151,7 +153,7 @@ const DirectImpacts = ({ session }) => {
           {Object.entries(EnvFootprintIndic).map(([key, value]) => (
             <Col key={key} sm={12}>
               <div className="border rounded border-1 p-4 mb-3">
-                <div className="d-flex align-items-center ">
+              <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                   <Image
                     className="me-2"
                     src={"icons-ese/" + key + ".svg"}
