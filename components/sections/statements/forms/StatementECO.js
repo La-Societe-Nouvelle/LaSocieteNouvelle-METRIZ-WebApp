@@ -8,12 +8,6 @@ const StatementECO = (props) => {
   );
   const [info, setInfo] = useState(props.impactsData.comments.eco || "");
 
-  useEffect(() => {
-    if (domesticProduction !== props.impactsData.domesticProduction) {
-      setDomesticProduction(props.impactsData.domesticProduction);
-    }
-  }, [props.impactsData.domesticProduction]);
-
   const isAllActivitiesInFrance = props.impactsData.isAllActivitiesInFrance;
   const netValueAdded = props.impactsData.netValueAdded;
 
@@ -22,25 +16,31 @@ const StatementECO = (props) => {
     domesticProduction >= 0 &&
     domesticProduction <= netValueAdded;
 
+  useEffect(() => {
+    if (domesticProduction !== props.impactsData.domesticProduction) {
+      setDomesticProduction(props.impactsData.domesticProduction);
+    }
+  }, [props.impactsData.domesticProduction]);
+
   const onIsAllActivitiesInFranceChange = (event) => {
-    let radioValue = event.target.value;
+    const radioValue = event.target.value;
+    let newIsAllActivitiesInFrance = null;
+    let newDomesticProduction = 0;
+
     switch (radioValue) {
       case "true":
-        props.impactsData.setIsAllActivitiesInFrance(true);
-        props.impactsData.domesticProduction = props.impactsData.netValueAdded;
-        break;
-      case "null":
-        props.impactsData.setIsAllActivitiesInFrance(null);
-        props.impactsData.domesticProduction = 0;
+        newIsAllActivitiesInFrance = true;
+        newDomesticProduction = props.impactsData.netValueAdded;
         break;
       case "false":
-        props.impactsData.setIsAllActivitiesInFrance(false);
-        props.impactsData.domesticProduction = 0;
+        newIsAllActivitiesInFrance = false;
         break;
     }
-    setDomesticProduction(
-      valueOrDefault(props.impactsData.domesticProduction, "")
-    );
+
+    props.impactsData.setIsAllActivitiesInFrance(newIsAllActivitiesInFrance);
+    props.impactsData.domesticProduction = newDomesticProduction;
+
+    setDomesticProduction(valueOrDefault(newDomesticProduction, ""));
     props.onUpdate("eco");
   };
 
