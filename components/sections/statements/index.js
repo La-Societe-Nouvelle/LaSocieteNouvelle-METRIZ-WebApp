@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Col, Container, Image, Row } from "react-bootstrap";
+import { div, Col, Container, Image, Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 import StatementComponent from "./parts/StatementComponent";
 
@@ -36,7 +36,7 @@ const DirectImpacts = ({ session }) => {
 
   // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
-    console.log(indic)
+    console.log(indic);
     // get new value
     let nextIndicator = session.getNetValueAddedIndicator(
       indic,
@@ -79,46 +79,50 @@ const DirectImpacts = ({ session }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-        <div className="text-center p-2  mb-3">
+        <div className="text-center p-2 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Création de la valeur</h3>
         </div>
         <Row>
           {Object.entries(valueCreationIndics).map(([key, value]) => (
-            <Col key={key} sm={4}>
-              <Card>
-                <Card.Header className="text-center">
+            <Col key={key} sm={12}>
+              <div className="border rounded border-1 p-3 mb-3">
+                <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                   <Image
+                    className="me-2"
                     src={"icons-ese/" + key + ".svg"}
                     alt={key}
-                    height={50}
+                    height={40}
                   />
-                  <h4 className="h5 fw-light-bold mt-3">
+                  <h4 className="h5 fw-light-bold ">
                     {value.libelle}
                     {value.isBeta && <span className="beta ms-1">BETA</span>}
                   </h4>
-                </Card.Header>
-                <Card.Body>
+                  {/* <div>
+                    <i className="bi bi-question-circle"></i>
+                  </div> */}
+                </div>
+                <div>
                   <StatementComponent
                     indic={key}
                     impactsData={session.impactsData[period.periodKey]}
                     handleNetValueChange={handleNetValueChange}
                     handleValidation={handleValidation}
                   />
-                </Card.Body>
-              </Card>
+                </div>
+              </div>
             </Col>
           ))}
         </Row>
-            <hr></hr>
-        <div className="text-center p-2  mb-3">
-          <h3 className="mb-0">  Empreinte sociale </h3>
+        <div className="text-center p-2 mb-3 bg-light-secondary">
+          <h3 className="mb-0"> Empreinte sociale </h3>
         </div>
         <Row>
           {Object.entries(socialFootprintIndic).map(([key, value]) => (
-            <Col key={key} sm={4}>
-              <Card>
-                <Card.Header className="text-center">
+            <Col key={key} sm={12}>
+              <div className="border rounded border-1 p-4 mb-3 ">
+                <div className="d-flex align-items-center">
                   <Image
+                    className="me-2"
                     src={"icons-ese/" + key + ".svg"}
                     alt={key}
                     height={50}
@@ -127,29 +131,29 @@ const DirectImpacts = ({ session }) => {
                     {value.libelle}
                     {value.isBeta && <span className="beta ms-1">BETA</span>}
                   </h4>
-                </Card.Header>
-                <Card.Body>
+                </div>
+                <div>
                   <StatementComponent
                     indic={key}
                     impactsData={session.impactsData[period.periodKey]}
                     handleNetValueChange={handleNetValueChange}
                     handleValidation={handleValidation}
                   />
-                </Card.Body>
-              </Card>
+                </div>
+              </div>
             </Col>
           ))}
         </Row>
-        <hr></hr>
-        <div className="text-center p-2  mb-3">
+        <div className="text-center p-2 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Empreinte environnementale </h3>
         </div>
         <Row>
           {Object.entries(EnvFootprintIndic).map(([key, value]) => (
-            <Col key={key} sm={4}>
-              <Card>
-                <Card.Header className="text-center">
+            <Col key={key} sm={12}>
+              <div className="border rounded border-1 p-4 mb-3">
+                <div className="d-flex align-items-center ">
                   <Image
+                    className="me-2"
                     src={"icons-ese/" + key + ".svg"}
                     alt={key}
                     height={50}
@@ -158,16 +162,16 @@ const DirectImpacts = ({ session }) => {
                     {value.libelle}
                     {value.isBeta && <span className="beta ms-1">BETA</span>}
                   </h4>
-                </Card.Header>
-                <Card.Body>
+                </div>
+                <div>
                   <StatementComponent
                     indic={key}
                     impactsData={session.impactsData[period.periodKey]}
                     handleNetValueChange={handleNetValueChange}
                     handleValidation={handleValidation}
                   />
-                </Card.Body>
-              </Card>
+                </div>
+              </div>
             </Col>
           ))}
         </Row>
