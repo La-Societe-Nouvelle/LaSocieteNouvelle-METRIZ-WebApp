@@ -14,7 +14,7 @@ const StatementGEQ = (props) => {
   const [info, setInfo] = useState(props.impactsData.comments.geq || "");
   const [isDisabled, setIsDisabled] = useState(false);
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
-  const [showDSN , setShowDSN] = useState(false);
+  const [showDSN, setShowDSN] = useState(false);
 
   const hasEmployees = props.impactsData.hasEmployees;
 
@@ -114,13 +114,13 @@ const StatementGEQ = (props) => {
             placeholder="%"
             isInvalid={isDisabled}
           />
-              <div>
+          <div>
             <Button
               variant="primary"
               className="btn-sm me-2"
               onClick={() => setShowDSN(true)}
               disabled={hasEmployees ? false : true}
-              >
+            >
               <i className="bi bi-calculator"></i>
               &nbsp;Import Fichiers DSN
             </Button>
@@ -129,13 +129,11 @@ const StatementGEQ = (props) => {
               className="btn-sm"
               onClick={() => setShowCalulatorModal(true)}
               disabled={hasEmployees ? false : true}
-              >
+            >
               <i className="bi bi-calculator"></i>
               &nbsp;Outil d'évaluation
             </Button>
           </div>
-
-      
         </Col>
       </Form.Group>
 
@@ -143,13 +141,17 @@ const StatementGEQ = (props) => {
         <Form.Label column sm={4}>
           Informations complémentaires
         </Form.Label>
+        <Col sm={6}>
+
         <Form.Control
           as="textarea"
-          rows={4}
+          rows={3}
+          className="w-100"
           onChange={updateInfo}
           value={info}
           onBlur={saveInfo}
         />
+        </Col>
       </Form.Group>
       <div className="text-end">
         <Button variant="secondary" disabled={isDisabled} onClick={onValidate}>
@@ -157,32 +159,43 @@ const StatementGEQ = (props) => {
         </Button>
       </div>
 
-
-      
-      <Modal show={showCalculatorModal} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+      <Modal
+        show={showCalculatorModal}
+        size="xl"
+        centered
+        onHide={() => setShowCalulatorModal(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Données sociales</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <IndividualsData impactsData={props.impactsData} onGoBack={() => setShowCalulatorModal(false)} 
-          handleClose={() => setShowCalulatorModal(false)}
-          onUpdate={props.onUpdate}
+          <IndividualsData
+            impactsData={props.impactsData}
+            onGoBack={() => setShowCalulatorModal(false)}
+            handleClose={() => setShowCalulatorModal(false)}
+            onUpdate={props.onUpdate}
           />
         </Modal.Body>
       </Modal>
 
-      <Modal show={showDSN} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+      <Modal
+        show={showDSN}
+        size="xl"
+        centered
+        onHide={() => setShowCalulatorModal(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Données sociales</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ImportDSN impactsData={props.impactsData} onGoBack={() => setShowDSN(false)} 
-          handleClose={() => setShowDSN(false)}
-          onUpdate={props.onUpdate}
+          <ImportDSN
+            impactsData={props.impactsData}
+            onGoBack={() => setShowDSN(false)}
+            handleClose={() => setShowDSN(false)}
+            onUpdate={props.onUpdate}
           />
         </Modal.Body>
       </Modal>
-
     </Form>
   );
 };
