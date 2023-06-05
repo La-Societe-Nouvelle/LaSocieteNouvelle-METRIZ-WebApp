@@ -53,17 +53,25 @@ const StatementKNW = (props) => {
           Valeur ajoutée nette dédiée à la recherche ou à la formation
         </Form.Label>
         <Col sm={6}>
-          <InputNumber
-            value={roundValue(researchAndTrainingContribution, 1)}
-            onUpdate={updateResearchAndTrainingContribution}
-            placeholder="&euro;"
-          />
-          <Button
-            className="btn btn-primary btn-sm"
-            onClick={() => setShowModal(true)}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation
-          </Button>
+          <Row className="align-items-center">
+            <Col>
+              <Form.Control
+                type="number"
+                value={roundValue(researchAndTrainingContribution, 0)}
+                inputMode="numeric"
+                onChange={updateResearchAndTrainingContribution}
+                isInvalid={!isValid}
+              />
+            </Col>
+            <Col>
+              <Button
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowModal(true)}
+              >
+                <i className="bi bi-calculator"></i> Outil d'évaluation
+              </Button>
+            </Col>
+          </Row>
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="form-group">
@@ -97,13 +105,12 @@ const StatementKNW = (props) => {
           <Modal.Title>Outils de mesure pour l'indicateur</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        <AssessmentKNW 
-          impactsData={props.impactsData}
-          onGoBack={() => setShowModal(false)}
-          handleClose={() => setShowModal(false)}
-          onUpdate={props.onUpdate}
-        />
- 
+          <AssessmentKNW
+            impactsData={props.impactsData}
+            onGoBack={() => setShowModal(false)}
+            handleClose={() => setShowModal(false)}
+            onUpdate={props.onUpdate}
+          />
         </Modal.Body>
       </Modal>
     </Form>

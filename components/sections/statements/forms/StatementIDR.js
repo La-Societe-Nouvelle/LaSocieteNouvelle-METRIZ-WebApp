@@ -10,7 +10,7 @@ import { ImportDSN } from "../modals/ImportDSN";
 /* ---------- DECLARATION - INDIC #IDR ---------- */
 
 const StatementIDR = (props) => {
-  console.log(props)
+  console.log(props);
   const [interdecileRange, setInterdecileRange] = useState(
     valueOrDefault(props.impactsData.interdecileRange, "")
   );
@@ -21,7 +21,7 @@ const StatementIDR = (props) => {
   );
 
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
-  const [showDSN , setShowDSN] = useState(false);
+  const [showDSN, setShowDSN] = useState(false);
 
   useEffect(() => {
     if (disableStatement !== props.disableStatement) {
@@ -139,33 +139,40 @@ const StatementIDR = (props) => {
           Rapport interdécile D9/D1 des taux horaires bruts
         </Form.Label>
         <Col sm={6}>
-          <InputNumber
-            value={roundValue(interdecileRange, 1)}
-            disabled={hasEmployees === false || disableStatement}
-            onUpdate={updateInterdecileRange}
-            placeholder=" "
-            isInvalid={interdecileRange > 100 ? true : false}
-          />
-          <div>
-            <Button
-              variant="primary"
-              className="btn-sm me-2"
-              onClick={() => setShowDSN(true)}
-              disabled={hasEmployees && !disableStatement ? false : true}
-            >
-              <i className="bi bi-calculator"></i>
-              &nbsp;Import Fichiers DSN
-            </Button>
-            <Button
-              variant="primary"
-              className="btn-sm"
-              onClick={() => setShowCalulatorModal(true)}
-              disabled={hasEmployees && !disableStatement ? false : true}
-            >
-              <i className="bi bi-calculator"></i>
-              &nbsp;Outil d'évaluation
-            </Button>
-          </div>
+          <Row className="align-items-center">
+            <Col>
+              <Form.Control
+                type="number"
+                value={roundValue(interdecileRange, 1)}
+                disabled={hasEmployees === false || disableStatement}
+                inputMode="numeric"
+                onChange={updateInterdecileRange}
+                isInvalid={interdecileRange > 100 ? true : false}
+              />
+            </Col>
+            <Col>
+              <div>
+                <Button
+                  variant="primary"
+                  className="btn-sm me-2"
+                  onClick={() => setShowDSN(true)}
+                  disabled={hasEmployees && !disableStatement ? false : true}
+                >
+                  <i className="bi bi-calculator"></i>
+                  &nbsp;Import Fichiers DSN
+                </Button>
+                <Button
+                  variant="primary"
+                  className="btn-sm"
+                  onClick={() => setShowCalulatorModal(true)}
+                  disabled={hasEmployees && !disableStatement ? false : true}
+                >
+                  <i className="bi bi-calculator"></i>
+                  &nbsp;Outil d'évaluation
+                </Button>
+              </div>
+            </Col>
+          </Row>
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="form-group">
@@ -194,35 +201,46 @@ const StatementIDR = (props) => {
           Valider
         </Button>
       </div>
-      
 
-      <Modal show={showCalculatorModal} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+      <Modal
+        show={showCalculatorModal}
+        size="xl"
+        centered
+        onHide={() => setShowCalulatorModal(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Données sociales</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <IndividualsData impactsData={props.impactsData} onGoBack={() => setShowCalulatorModal(false)} 
-          handleClose={() => setShowCalulatorModal(false)}
-          onUpdate={props.onUpdate}
+          <IndividualsData
+            impactsData={props.impactsData}
+            onGoBack={() => setShowCalulatorModal(false)}
+            handleClose={() => setShowCalulatorModal(false)}
+            onUpdate={props.onUpdate}
           />
         </Modal.Body>
       </Modal>
 
-      <Modal show={showDSN} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+      <Modal
+        show={showDSN}
+        size="xl"
+        centered
+        onHide={() => setShowCalulatorModal(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Données sociales</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <ImportDSN impactsData={props.impactsData} onGoBack={() => setShowDSN(false)} 
-          handleClose={() => setShowDSN(false)}
-          onUpdate={props.onUpdate}
+          <ImportDSN
+            impactsData={props.impactsData}
+            onGoBack={() => setShowDSN(false)}
+            handleClose={() => setShowDSN(false)}
+            onUpdate={props.onUpdate}
           />
         </Modal.Body>
       </Modal>
     </div>
   );
 };
-
-
 
 export default StatementIDR;
