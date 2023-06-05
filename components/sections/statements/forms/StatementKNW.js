@@ -1,97 +1,113 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
-
-// Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import React, { useState, useEffect } from "react";
+import { Form, Button, Row, Col, Modal } from "react-bootstrap";
 import { InputNumber } from "../../../input/InputNumber";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { AssessmentKNW } from "../modals/AssessmentKNW";
 
-/* ---------- DECLARATION - INDIC #KNW ---------- */
-
-export class StatementKNW extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      researchAndTrainingContribution: valueOrDefault(
+const StatementKNW = (props) => {
+  const [researchAndTrainingContribution, setResearchAndTrainingContribution] =
+    useState(
+      valueOrDefault(
         props.impactsData.researchAndTrainingContribution,
         undefined
-      ),
-      info: props.impactsData.comments.knw || " ",
-    };
-  }
-
-  componentDidUpdate() {
-    if (
-      this.state.researchAndTrainingContribution !=
-      this.props.impactsData.researchAndTrainingContribution
-    ) {
-      this.setState({
-        researchAndTrainingContribution:
-          this.props.impactsData.researchAndTrainingContribution,
-      });
-    }
-  }
-
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const { researchAndTrainingContribution, info } = this.state;
-
-    let isValid =
-      researchAndTrainingContribution != null && netValueAdded != null;
-    return (
-      <div className="statement">
-        <div className={"form-group small-input"}>
-          <label>
-            Valeur ajoutée nette dédiée à la recherche ou à la formation
-          </label>
-          <InputNumber
-            value={roundValue(researchAndTrainingContribution, 1)}
-            onUpdate={this.updateResearchAndTrainingContribution}
-            placeholder="&euro;"
-          />
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={this.props.toAssessment}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation
-          </button>
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
+      )
     );
-  }
+  const [info, setInfo] = useState(props.impactsData.comments.knw || " ");
+  const [showModal, setShowModal] = useState(false);
 
-  updateResearchAndTrainingContribution = (input) => {
-    this.props.impactsData.researchAndTrainingContribution = input;
-    this.props.onUpdate("knw");
+  const netValueAdded = props.impactsData.netValueAdded;
+
+  useEffect(() => {
+    if (
+      researchAndTrainingContribution !==
+      props.impactsData.researchAndTrainingContribution
+    ) {
+      setResearchAndTrainingContribution(
+        props.impactsData.researchAndTrainingContribution
+      );
+    }
+  }, [
+    props.impactsData.researchAndTrainingContribution,
+    researchAndTrainingContribution,
+  ]);
+
+  const updateResearchAndTrainingContribution = (input) => {
+    props.impactsData.researchAndTrainingContribution = input;
+    props.onUpdate("knw");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.knw = this.state.info);
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.knw = info);
 
-  onValidate = () => this.props.onValidate();
-}
+  const onValidate = () => props.onValidate();
+
+  const isValid =
+    researchAndTrainingContribution !== null && netValueAdded !== null;
+
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Valeur ajoutée nette dédiée à la recherche ou à la formation
+        </Form.Label>
+        <Col sm={6}>
+          <InputNumber
+            value={roundValue(researchAndTrainingContribution, 1)}
+            onUpdate={updateResearchAndTrainingContribution}
+            placeholder="&euro;"
+          />
+          <Button
+            className="btn btn-primary btn-sm"
+            onClick={() => setShowModal(true)}
+          >
+            <i className="bi bi-calculator"></i> Outil d'évaluation
+          </Button>
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
+            value={info}
+            onBlur={saveInfo}
+          />
+        </Col>
+      </Form.Group>
+      <div className="text-end">
+        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+          Valider
+        </Button>
+      </div>
+
+      <Modal
+        show={showModal}
+        size="xl"
+        centered
+        onHide={() => setShowModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Outils de mesure pour l'indicateur</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+        <AssessmentKNW 
+          impactsData={props.impactsData}
+          onGoBack={() => setShowModal(false)}
+          handleClose={() => setShowModal(false)}
+          onUpdate={props.onUpdate}
+        />
+ 
+        </Modal.Body>
+      </Modal>
+    </Form>
+  );
+};
+
+export default StatementKNW;
