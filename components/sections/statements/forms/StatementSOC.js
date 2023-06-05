@@ -1,98 +1,88 @@
-// La Société Nouvelle
-
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
-import { printValue } from "../../../../src/utils/Utils";
+import React, { useState } from "react";
+import { Form, Row, Col, Button } from "react-bootstrap";
 
 /* ---------- DECLARATION - INDIC #SOC ---------- */
 
-export class StatementSOC extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      info: props.impactsData.comments.soc || "",
-    };
-  }
+const StatementSOC = (props) => {
+  
+  const [info, setInfo] = useState(props.impactsData.comments.soc || "");
 
-  render() {
-    const { hasSocialPurpose, netValueAdded } = this.props.impactsData;
-    const { info } = this.state;
+  const hasSocialPurpose = props.impactsData.hasSocialPurpose;
+  const netValueAdded = props.impactsData.netValueAdded;
 
-    let isValid = hasSocialPurpose !== null && netValueAdded != null;
+  const isValid = hasSocialPurpose !== null && netValueAdded != null;
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
-              L'entreprise est-elle d'utilité sociale ou dotée d'une raison
-              d'être ?
-            </label>
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="hasSocialPurpose"
-                label="Oui"
-                value="true"
-                checked={hasSocialPurpose === true}
-                onChange={this.onSocialPurposeChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="hasSocialPurpose"
-                label="Non"
-                value="false"
-                checked={hasSocialPurpose === false}
-                onChange={this.onSocialPurposeChange}
-              />
-            </Form>
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
+  const onSocialPurposeChange = (event) => {
+    const radioValue = event.target.value;
+    let newHasSocialPurpose = null;
 
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  onSocialPurposeChange = (event) => {
-    let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.hasSocialPurpose = true;
+        newHasSocialPurpose = true;
         break;
       case "false":
-        this.props.impactsData.hasSocialPurpose = false;
+        newHasSocialPurpose = false;
         break;
     }
-    this.props.onUpdate("soc");
-    this.forceUpdate();
+
+    props.impactsData.hasSocialPurpose = newHasSocialPurpose;
+    props.onUpdate("soc");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.soc = this.state.info);
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.soc = info);
+  const onValidate = () => props.onValidate();
 
-  onValidate = () => this.props.onValidate();
-}
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group align-items-center">
+        <Form.Label column sm={4}>
+          L'entreprise est-elle d'utilité sociale ou dotée d'une raison d'être ?
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Check
+            inline
+            type="radio"
+            id="hasSocialPurpose"
+            label="Oui"
+            value="true"
+            checked={hasSocialPurpose === true}
+            onChange={onSocialPurposeChange}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="hasSocialPurpose"
+            label="Non"
+            value="false"
+            checked={hasSocialPurpose === false}
+            onChange={onSocialPurposeChange}
+          />
+        </Col>
+      </Form.Group>
 
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
+            value={info}
+            onBlur={saveInfo}
+          />
+        </Col>
+      </Form.Group>
+      <div className="text-end">
+        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+          Valider
+        </Button>
+      </div>
+    </Form>
+  );
+};
 
+export default StatementSOC;
