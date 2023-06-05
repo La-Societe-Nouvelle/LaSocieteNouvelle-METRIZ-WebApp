@@ -18,6 +18,7 @@ import  StatementECO   from "../forms/StatementECO";
 import StatementSOC from "../forms/StatementSOC";
 import StatementIDR from "../forms/StatementIDR";
 import StatementGEQ from "../forms/StatementGEQ";
+import StatementKNW from "../forms/StatementKNW";
 
 const StatementComponent = ({
   indic,
