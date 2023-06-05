@@ -1,181 +1,134 @@
-// La Société Nouvelle
+import React, { useState, useEffect } from "react";
+import { Form, Row, Col, Button } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
+const StatementECO = (props) => {
+  const [domesticProduction, setDomesticProduction] = useState(
+    valueOrDefault(props.impactsData.domesticProduction, undefined)
+  );
+  const [info, setInfo] = useState(props.impactsData.comments.eco || "");
 
-// Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
-
-/* ---------- DECLARATION - INDIC #ECO ---------- */
-
-export class StatementECO extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      domesticProduction: valueOrDefault(
-        props.impactsData.domesticProduction,
-        undefined
-      ),
-      info: props.impactsData.comments.eco || "",
-    };
-  }
-
-  componentDidUpdate() {
-    if (
-      this.state.domesticProduction != this.props.impactsData.domesticProduction
-    ) {
-      this.setState({
-        domesticProduction: this.props.impactsData.domesticProduction,
-      });
+  useEffect(() => {
+    if (domesticProduction !== props.impactsData.domesticProduction) {
+      setDomesticProduction(props.impactsData.domesticProduction);
     }
-  }
+  }, [props.impactsData.domesticProduction]);
 
-  render() {
-    const { isAllActivitiesInFrance, netValueAdded } = this.props.impactsData;
-    const { domesticProduction, info } = this.state;
+  const isAllActivitiesInFrance = props.impactsData.isAllActivitiesInFrance;
+  const netValueAdded = props.impactsData.netValueAdded;
 
-    let isValid =
-      netValueAdded != null &&
-      domesticProduction >= 0 &&
-      domesticProduction <= netValueAdded;
+  const isValid =
+    netValueAdded != null &&
+    domesticProduction >= 0 &&
+    domesticProduction <= netValueAdded;
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
-              Les activités de l'entreprise sont-elles localisées en France ?
-            </label>
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="isAllActivitiesInFrance"
-                label="Oui"
-                value="true"
-                checked={isAllActivitiesInFrance === true}
-                onChange={this.onIsAllActivitiesInFranceChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="isAllActivitiesInFrance"
-                label="Partiellement"
-                value="null"
-                checked={
-                  isAllActivitiesInFrance === null && domesticProduction !== ""
-                }
-                onChange={this.onIsAllActivitiesInFranceChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="isAllActivitiesInFrance"
-                label="Non"
-                value="false"
-                checked={isAllActivitiesInFrance === false}
-                onChange={this.onIsAllActivitiesInFranceChange}
-              />
-            </Form>
-          </div>
-          <div className="form-group">
-            <label>Valeur ajoutée nette produite en France </label>
-            <InputNumber
-              value={roundValue(domesticProduction, 0)}
-              disabled={isAllActivitiesInFrance != null}
-              onUpdate={this.updateDomesticProduction}
-              placeholder="€"
-              isInvalid={!isValid}
-            />
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            onBlur={this.saveInfo}
-            value={info}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className={"btn btn-secondary btn-sm"}
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  onIsAllActivitiesInFranceChange = (event) => {
+  const onIsAllActivitiesInFranceChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.setIsAllActivitiesInFrance(true);
-        this.props.impactsData.domesticProduction =
-          this.props.impactsData.netValueAdded;
+        props.impactsData.setIsAllActivitiesInFrance(true);
+        props.impactsData.domesticProduction = props.impactsData.netValueAdded;
         break;
       case "null":
-        this.props.impactsData.setIsAllActivitiesInFrance(null);
-        this.props.impactsData.domesticProduction = 0;
+        props.impactsData.setIsAllActivitiesInFrance(null);
+        props.impactsData.domesticProduction = 0;
         break;
       case "false":
-        this.props.impactsData.setIsAllActivitiesInFrance(false);
-        this.props.impactsData.domesticProduction = 0;
+        props.impactsData.setIsAllActivitiesInFrance(false);
+        props.impactsData.domesticProduction = 0;
         break;
     }
-    this.setState({
-      domesticProduction: valueOrDefault(
-        this.props.impactsData.domesticProduction,
-        ""
-      ),
-      isValid: true,
-    });
-    this.props.onUpdate("eco");
-  };
-
-  updateDomesticProduction = (input) => {
-    this.props.impactsData.domesticProduction = input;
-    this.setState({
-      domesticProduction: this.props.impactsData.domesticProduction,
-    });
-    this.props.onUpdate("eco");
-  };
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.eco = this.state.info);
-  onValidate = () => this.props.onValidate();
-}
-
-export const writeStatementECO = (doc, x, y, impactsData) => {
-  doc.text(
-    "Valeur ajoutée nette produite en France : " +
-      printValue(impactsData.domesticProduction, 0) +
-      " €" +
-      (impactsData.isAllActivitiesInFrance ? "*" : ""),
-    x,
-    y
-  );
-  if (impactsData.isAllActivitiesInFrance) {
-    y += 6;
-    doc.setFont("Helvetica", "italic");
-    doc.text(
-      "*Les activités de l'entreprise sont déclarées entièrement localisées en France",
-      x,
-      y
+    setDomesticProduction(
+      valueOrDefault(props.impactsData.domesticProduction, "")
     );
-    doc.setFont("Helvetica", "normal");
-  }
-  return y;
+    props.onUpdate("eco");
+  };
+
+  const updateDomesticProduction = (input) => {
+    props.impactsData.domesticProduction = input;
+    setDomesticProduction(props.impactsData.domesticProduction);
+    props.onUpdate("eco");
+  };
+
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.eco = info);
+  const onValidate = () => props.onValidate();
+
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group align-items-center">
+        <Form.Label column sm={4}>
+          Les activités de l'entreprise sont-elles localisées en France ?
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Check
+            inline
+            type="radio"
+            id="isAllActivitiesInFrance"
+            label="Oui"
+            value="true"
+            checked={isAllActivitiesInFrance === true}
+            onChange={onIsAllActivitiesInFranceChange}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="isAllActivitiesInFrance"
+            label="Partiellement"
+            value="null"
+            checked={
+              isAllActivitiesInFrance === null && domesticProduction !== ""
+            }
+            onChange={onIsAllActivitiesInFranceChange}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="isAllActivitiesInFrance"
+            label="Non"
+            value="false"
+            checked={isAllActivitiesInFrance === false}
+            onChange={onIsAllActivitiesInFranceChange}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Valeur ajoutée nette produite en France
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(domesticProduction, 0)}
+            inputMode="numeric"
+            onChange={updateDomesticProduction}
+            isInvalid={!isValid}
+            disabled={isAllActivitiesInFrance !== null}
+          />
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            as="textarea"
+            className="w-100"
+            rows={3}
+            onChange={updateInfo}
+            onBlur={saveInfo}
+            value={info}
+          />
+        </Col>
+      </Form.Group>
+      <div className="text-end">
+        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+          Valider
+        </Button>
+      </div>
+    </Form>
+  );
 };
+export default StatementECO;
