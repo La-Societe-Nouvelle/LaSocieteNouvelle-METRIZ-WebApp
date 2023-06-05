@@ -5,11 +5,6 @@
   border: 1px solid $success;
 }
 
-label {
-  font-weight: 600;
-  font-size: 0.8rem;
-}
-
 table select,
 table input {
   // Disabled and read-only inputs
@@ -20,9 +15,6 @@ table input {
   }
 }
 
-//
-// Labels
-//
 
 .dropzone {
   text-align: center;
@@ -96,5 +88,16 @@ table input {
   flex-direction: column;
   div {
     margin-bottom: 1em;
+  }
+}
+
+// Form Statements
+.statement {
+  .form-group {
+    margin-bottom: 1rem;
+    color : $primary;
+  }
+  .form-label, .form-check-label {
+    font-size: 0.9rem;
   }
 }
