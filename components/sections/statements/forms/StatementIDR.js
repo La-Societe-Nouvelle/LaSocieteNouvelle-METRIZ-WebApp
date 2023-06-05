@@ -194,7 +194,7 @@ const StatementIDR = (props) => {
           Valider
         </Button>
       </div>
-        {console.log(props)}
+      
 
       <Modal show={showCalculatorModal} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
         <Modal.Header closeButton>
@@ -219,14 +219,6 @@ const StatementIDR = (props) => {
           />
         </Modal.Body>
       </Modal>
-      {/* 
-      <ModalAssesment
-        indic="dsn"
-        impactsData={props.impactsData[period.periodKey]}
-        onGoBack={handleClose}
-        handleClose={handleClose}
-        title="Déclarations Sociales Nominatives"
-      /> */}
     </div>
   );
 };
