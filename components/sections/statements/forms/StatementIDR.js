@@ -10,7 +10,6 @@ import { ImportDSN } from "../modals/ImportDSN";
 /* ---------- DECLARATION - INDIC #IDR ---------- */
 
 const StatementIDR = (props) => {
-
   const [interdecileRange, setInterdecileRange] = useState(
     valueOrDefault(props.impactsData.interdecileRange, "")
   );
