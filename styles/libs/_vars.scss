@@ -4,6 +4,7 @@ $primary: #191558;
 $secondary: #fa595f;
 $tertiary: #251f81;
 $light: #dbdef1;
+$light-secondary : #fee0e1;
 $bg-light: #f0f0f8;
 $valid-color: #e2efd9;
 $unvalid-color: #efdcd9;
@@ -12,6 +13,9 @@ $error: #f65656;
 $warning: #ffc107;
 $info: #8994d1;
 
+// border
+$border-color : $light;
+$border-radius : 0.5rem;
 // Font.
 $font-family-sans-serif: "Roboto", sans-serif;
 $font-weight: 400 !default;

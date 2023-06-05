@@ -87,7 +87,6 @@ sup {
 
 /* ----- charts ----- */
 
-
 @keyframes spinner {
   0% {
     transform: rotate(0deg);
@@ -129,4 +128,11 @@ i.warning {
 
 i.error {
   color: $error;
+}
+/* ---------- Background ---------- */
+
+.bg-light-secondary {
+  background: $light-secondary;
+  border-radius: 1rem;
+
 }
