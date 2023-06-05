@@ -7,13 +7,13 @@ import {
   StatementKNW,
   StatementMAT,
   StatementNRG,
-  StatementSOC,
   StatementWAS,
   StatementWAT,
 } from "../forms";
 
 import StatementART from "../forms/StatementART";
 import  StatementECO   from "../forms/StatementECO";
+import StatementSOC from "../forms/StatementSOC";
 
 const StatementComponent = ({
   indic,
