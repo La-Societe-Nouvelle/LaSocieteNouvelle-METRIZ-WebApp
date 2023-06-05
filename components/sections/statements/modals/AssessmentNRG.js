@@ -5,7 +5,8 @@ import React from "react";
 import { Table, Row, Col } from "react-bootstrap";
 
 // Utils
-import { getNewId, printValue } from "../../src/utils/Utils";
+import { InputNumber } from "../../../input/InputNumber";
+import { getNewId, printValue } from "/src/utils/Utils";
 
 // Libs
 import fuels from "/lib/emissionFactors/fuels.json";
@@ -15,7 +16,6 @@ import {
   getTotalGhgEmissions,
   getTotalGhgEmissionsUncertainty,
 } from "./AssessmentGHG";
-import { InputNumber } from "../input/InputNumber";
 
 const orderGroupsFossilFuels = [
   "Gaz",
@@ -86,7 +86,6 @@ export class AssessmentNRG extends React.Component
   {
     // Create basic nrg product (electricity/heat/renewable)
     let { nrgDetails } = this.state;
-
     const productsToInit = [
       "electricity",
       "heat",
@@ -109,14 +108,6 @@ export class AssessmentNRG extends React.Component
         };
       });
     this.setState({ nrgDetails: nrgDetails });
-
-    this.setState({
-      energyConsumption: getTotalNrgConsumption(this.state.nrgDetails),
-      energyConsumptionUncertainty: getTotalNrgConsumptionUncertainty(
-        this.state.nrgDetails
-      ),
-    });
-
   }
 
   render() 
@@ -793,7 +784,6 @@ export class AssessmentNRG extends React.Component
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails);
     impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
-    impactsData.energyConsumptionUnit = "MJ";
 
     await this.props.onUpdate("nrg");
 
