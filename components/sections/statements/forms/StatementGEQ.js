@@ -1,168 +1,190 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
-
-// Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import React, { useState, useEffect } from "react";
+import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import { InputNumber } from "../../../input/InputNumber";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { ImportDSN } from "../modals/ImportDSN";
+import { IndividualsData } from "../modals/IndividualsData";
 
-/* ---------- DECLARATION - INDIC #GEQ ---------- */
+const StatementGEQ = (props) => {
+  const [wageGap, setWageGap] = useState(
+    valueOrDefault(props.impactsData.wageGap, "")
+  );
+  const [info, setInfo] = useState(props.impactsData.comments.geq || "");
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [showCalculatorModal, setShowCalulatorModal] = useState(false);
+  const [showDSN , setShowDSN] = useState(false);
 
-export class StatementGEQ extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      wageGap: valueOrDefault(props.impactsData.wageGap, ""),
-      info: props.impactsData.comments.geq || "",
-    };
-  }
+  const hasEmployees = props.impactsData.hasEmployees;
 
-  componentDidUpdate() {
-    if (!this.props.impactsData.hasEmployees && this.state.wageGap == 0) {
-      this.state.isDisabled = false;
+  useEffect(() => {
+    if (!props.impactsData.hasEmployees && wageGap === 0) {
+      setIsDisabled(false);
     }
     if (
-      this.props.impactsData.hasEmployees &&
-      this.state.wageGap != "" &&
-      this.props.impactsData.netValueAdded != null
+      props.impactsData.hasEmployees &&
+      wageGap !== "" &&
+      props.impactsData.netValueAdded !== null
     ) {
-      this.state.isDisabled = false;
+      setIsDisabled(false);
     }
 
-    if (this.props.impactsData.hasEmployees && this.state.wageGap == "") {
-      this.state.isDisabled = true;
+    if (props.impactsData.hasEmployees && wageGap === "") {
+      setIsDisabled(true);
     }
 
-    if (
-      this.state.wageGap != valueOrDefault(this.props.impactsData.wageGap, "")
-    ) {
-      this.setState({
-        wageGap: valueOrDefault(this.props.impactsData.wageGap, ""),
-      });
+    if (wageGap !== valueOrDefault(props.impactsData.wageGap, "")) {
+      setWageGap(valueOrDefault(props.impactsData.wageGap, ""));
     }
-  }
+  }, [
+    props.impactsData.hasEmployees,
+    props.impactsData.netValueAdded,
+    props.impactsData.wageGap,
+    wageGap,
+  ]);
 
-  render() {
-    const { hasEmployees } = this.props.impactsData;
-    const { wageGap, info, isDisabled } = this.state;
-
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>L'entreprise est-elle employeur ?</label>
-
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="hasEmployees"
-                label="Oui"
-                value="true"
-                checked={hasEmployees === true}
-                onChange={this.onHasEmployeesChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="hasEmployees"
-                label="Non"
-                value="false"
-                checked={hasEmployees === false}
-                onChange={this.onHasEmployeesChange}
-              />
-            </Form>
-          </div>
-
-          <div className="form-group">
-            <label>
-              Ecart de rémunérations Femmes/Hommes (en % du taux horaire brut moyen)
-            </label>
-            <InputNumber
-              value={roundValue(wageGap, 1)}
-              disabled={hasEmployees === false}
-              onUpdate={this.updateWageGap}
-              placeholder="%"
-              isInvalid={isDisabled}
-            />
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={this.props.toImportDSN}
-            disabled={hasEmployees ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Import Fichiers DSN
-          </button>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={this.props.toAssessment}
-            disabled={hasEmployees ? false : true}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation
-          </button>
-          <button
-            disabled={isDisabled}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  onHasEmployeesChange = (event) => {
+  const onHasEmployeesChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.setHasEmployees(true);
-        this.props.impactsData.wageGap = null;
+        props.impactsData.setHasEmployees(true);
+        props.impactsData.wageGap = null;
         break;
       case "false":
-        this.props.impactsData.setHasEmployees(false);
-        this.props.impactsData.wageGap = 0;
-        this.state.isDisabled = false;
+        props.impactsData.setHasEmployees(false);
+        props.impactsData.wageGap = 0;
+        setIsDisabled(false);
         break;
     }
-    this.setState({
-      wageGap: valueOrDefault(this.props.impactsData.wageGap, ""),
-    });
-    this.props.onUpdate("geq");
-    this.props.onUpdate("idr");
+    setWageGap(valueOrDefault(props.impactsData.wageGap, ""));
+    props.onUpdate("geq");
+    props.onUpdate("idr");
   };
 
-  updateWageGap = (input) => {
-    this.props.impactsData.wageGap = input;
-    this.setState({
-      wageGap: this.props.impactsData.wageGap,
-      isDisabled: false,
-    });
-    this.props.onUpdate("geq");
+  const updateWageGap = (input) => {
+    props.impactsData.wageGap = input;
+    setWageGap(props.impactsData.wageGap);
+    setIsDisabled(false);
+    props.onUpdate("geq");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.geq = this.state.info);
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.geq = info);
 
-  onValidate = () => this.props.onValidate();
-}
+  const onValidate = () => props.onValidate();
 
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group align-items-center">
+        <Form.Label column sm={4}>
+          L'entreprise est-elle employeur ?
+        </Form.Label>
+
+        <Col sm={6}>
+          <Form.Check
+            inline
+            type="radio"
+            id="hasEmployees"
+            label="Oui"
+            value="true"
+            checked={hasEmployees === true}
+            onChange={onHasEmployeesChange}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="hasEmployees"
+            label="Non"
+            value="false"
+            checked={hasEmployees === false}
+            onChange={onHasEmployeesChange}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Ecart de rémunérations Femmes/Hommes (en % du taux horaire brut moyen)
+        </Form.Label>
+        <Col sm={6}>
+          <InputNumber
+            value={roundValue(wageGap, 1)}
+            disabled={hasEmployees === false}
+            onUpdate={updateWageGap}
+            placeholder="%"
+            isInvalid={isDisabled}
+          />
+              <div>
+            <Button
+              variant="primary"
+              className="btn-sm me-2"
+              onClick={() => setShowDSN(true)}
+              disabled={hasEmployees ? false : true}
+              >
+              <i className="bi bi-calculator"></i>
+              &nbsp;Import Fichiers DSN
+            </Button>
+            <Button
+              variant="primary"
+              className="btn-sm"
+              onClick={() => setShowCalulatorModal(true)}
+              disabled={hasEmployees ? false : true}
+              >
+              <i className="bi bi-calculator"></i>
+              &nbsp;Outil d'évaluation
+            </Button>
+          </div>
+
+      
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={4}
+          onChange={updateInfo}
+          value={info}
+          onBlur={saveInfo}
+        />
+      </Form.Group>
+      <div className="text-end">
+        <Button variant="secondary" disabled={isDisabled} onClick={onValidate}>
+          Valider
+        </Button>
+      </div>
+
+
+      
+      <Modal show={showCalculatorModal} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Données sociales</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <IndividualsData impactsData={props.impactsData} onGoBack={() => setShowCalulatorModal(false)} 
+          handleClose={() => setShowCalulatorModal(false)}
+          onUpdate={props.onUpdate}
+          />
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={showDSN} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Données sociales</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ImportDSN impactsData={props.impactsData} onGoBack={() => setShowDSN(false)} 
+          handleClose={() => setShowDSN(false)}
+          onUpdate={props.onUpdate}
+          />
+        </Modal.Body>
+      </Modal>
+
+    </Form>
+  );
+};
+
+export default StatementGEQ;
