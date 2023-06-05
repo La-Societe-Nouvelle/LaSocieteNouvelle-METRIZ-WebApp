@@ -1,192 +1,236 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Alert, Form } from "react-bootstrap";
-
-// Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import React, { useState, useEffect } from "react";
+import { Alert, Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
+import { IndividualsData } from "../modals/IndividualsData";
+import { ImportDSN } from "../modals/ImportDSN";
 
 /* ---------- DECLARATION - INDIC #IDR ---------- */
-export class StatementIDR extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      interdecileRange: valueOrDefault(props.impactsData.interdecileRange, ""),
-      info: props.impactsData.comments.idr || "",
-      isDisabled: true,
-      disableStatement: props.disableStatement,
-    };
-  }
 
-  componentDidUpdate() {
-    if (this.state.disableStatement != this.props.disableStatement) {
-      this.setState({ disableStatement: this.props.disableStatement });
+const StatementIDR = (props) => {
+  console.log(props)
+  const [interdecileRange, setInterdecileRange] = useState(
+    valueOrDefault(props.impactsData.interdecileRange, "")
+  );
+  const [info, setInfo] = useState(props.impactsData.comments.idr || "");
+  const [isDisabled, setIsDisabled] = useState(true);
+  const [disableStatement, setDisableStatement] = useState(
+    props.disableStatement
+  );
+
+  const [showCalculatorModal, setShowCalulatorModal] = useState(false);
+  const [showDSN , setShowDSN] = useState(false);
+
+  useEffect(() => {
+    if (disableStatement !== props.disableStatement) {
+      setDisableStatement(props.disableStatement);
     }
-    if (
-      !this.props.impactsData.hasEmployees &&
-      this.state.interdecileRange == 1
-    ) {
-      this.state.isDisabled = false;
-    }
-    if (
-      this.props.impactsData.hasEmployees &&
-      this.state.interdecileRange != "" &&
-      this.props.impactsData.netValueAdded != null
-    ) {
-      this.state.isDisabled = false;
+
+    if (!props.impactsData.hasEmployees && interdecileRange === 1) {
+      setIsDisabled(false);
     }
 
     if (
-      this.props.impactsData.hasEmployees &&
-      this.state.interdecileRange == ""
+      props.impactsData.hasEmployees &&
+      interdecileRange !== "" &&
+      props.impactsData.netValueAdded !== null
     ) {
-      this.state.isDisabled = true;
+      setIsDisabled(false);
+    }
+
+    if (props.impactsData.hasEmployees && interdecileRange === "") {
+      setIsDisabled(true);
     }
 
     if (
-      this.state.interdecileRange !=
-      valueOrDefault(this.props.impactsData.interdecileRange, "")
+      interdecileRange !==
+      valueOrDefault(props.impactsData.interdecileRange, "")
     ) {
-      this.setState({
-        interdecileRange: valueOrDefault(
-          this.props.impactsData.interdecileRange,
-          ""
-        ),
-      });
+      setInterdecileRange(
+        valueOrDefault(props.impactsData.interdecileRange, "")
+      );
     }
-  }
+  }, [
+    props.disableStatement,
+    props.impactsData.hasEmployees,
+    interdecileRange,
+    props.impactsData.netValueAdded,
+    props.impactsData.interdecileRange,
+  ]);
 
-  render() {
-    const { hasEmployees } = this.props.impactsData;
-    const { interdecileRange, info, isDisabled, disableStatement } = this.state;
-    return (
-      <div className="statement">
-        {disableStatement && (
-          <Alert variant="warning">
-            <p>
-              <i className="bi bi-exclamation-circle  me-2"></i>Indicateur
-              indisponible lors de la précédente analyse
-            </p>
-          </Alert>
-        )}
-        <div className="statement-form">
-          <div className="form-group">
-            <label>L'entreprise est-elle employeur ?</label>
+  const hasEmployees = props.impactsData.hasEmployees;
 
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="hasEmployees"
-                label="Oui"
-                value="true"
-                checked={hasEmployees === true}
-                onChange={this.onHasEmployeesChange}
-                disabled={disableStatement}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="hasEmployees"
-                label="Non"
-                value="false"
-                checked={hasEmployees === false}
-                onChange={this.onHasEmployeesChange}
-                disabled={disableStatement}
-              />
-            </Form>
-          </div>
-          <div className="form-group">
-            <label>Rapport interdécile D9/D1 des taux horaires bruts</label>
-            <InputNumber
-              value={roundValue(interdecileRange, 1)}
-              disabled={hasEmployees === false || disableStatement}
-              onUpdate={this.updateInterdecileRange}
-              placeholder=" "
-              isInvalid={interdecileRange > 100 ? true : false}
-            />
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-            disabled={disableStatement}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={this.props.toImportDSN}
-            disabled={hasEmployees && !disableStatement ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Import Fichiers DSN
-          </button>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={this.props.toAssessment}
-            disabled={hasEmployees && !disableStatement ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Outil d'évaluation
-          </button>
-          <button
-            disabled={isDisabled || disableStatement}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const onHasEmployeesChange = (event) => {
+    const radioValue = event.target.value;
+    let newHasEmployees = null;
+    let newWageGap = null;
 
-  onHasEmployeesChange = (event) => {
-    let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.setHasEmployees(true);
-        this.props.impactsData.wageGap = null;
+        newHasEmployees = true;
+        newWageGap = null;
         break;
       case "false":
-        this.props.impactsData.setHasEmployees(false);
-        this.props.impactsData.wageGap = 0;
-        this.state.isDisabled = false;
+        newHasEmployees = false;
+        newWageGap = 0;
+        setIsDisabled(false);
         break;
     }
-    this.setState({
-      interdecileRange: valueOrDefault(
-        this.props.impactsData.interdecileRange,
-        ""
-      ),
-    });
-    this.props.onUpdate("idr");
-    this.props.onUpdate("geq");
+
+    props.impactsData.setHasEmployees(newHasEmployees);
+    props.impactsData.wageGap = newWageGap;
+    setInterdecileRange(valueOrDefault(props.impactsData.interdecileRange, ""));
+    props.onUpdate("idr");
+    props.onUpdate("geq");
   };
 
-  updateInterdecileRange = (input) => {
-    this.props.impactsData.interdecileRange = input;
-    this.setState({
-      interdecileRange: this.props.impactsData.interdecileRange,
-      isDisabled: false,
-    });
-    this.props.onUpdate("idr");
+  const updateInterdecileRange = (input) => {
+    props.impactsData.interdecileRange = input;
+    setInterdecileRange(props.impactsData.interdecileRange);
+    setIsDisabled(false);
+    props.onUpdate("idr");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.idr = this.state.info);
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.idr = info);
+  const onValidate = () => props.onValidate();
 
-  onValidate = () => this.props.onValidate();
-}
+  return (
+    <div className="statement">
+      {disableStatement && (
+        <Alert variant="warning">
+          <p>
+            <i className="bi bi-exclamation-circle  me-2"></i>Indicateur
+            indisponible lors de la précédente analyse
+          </p>
+        </Alert>
+      )}
+      <Form.Group as={Row} className="form-group align-items-center">
+        <Form.Label column sm={4}>
+          L'entreprise est-elle employeur ?
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Check
+            inline
+            type="radio"
+            id="hasEmployees"
+            label="Oui"
+            value="true"
+            checked={hasEmployees === true}
+            onChange={onHasEmployeesChange}
+            disabled={disableStatement}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="hasEmployees"
+            label="Non"
+            value="false"
+            checked={hasEmployees === false}
+            onChange={onHasEmployeesChange}
+            disabled={disableStatement}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Rapport interdécile D9/D1 des taux horaires bruts
+        </Form.Label>
+        <Col sm={6}>
+          <InputNumber
+            value={roundValue(interdecileRange, 1)}
+            disabled={hasEmployees === false || disableStatement}
+            onUpdate={updateInterdecileRange}
+            placeholder=" "
+            isInvalid={interdecileRange > 100 ? true : false}
+          />
+          <div>
+            <Button
+              variant="primary"
+              className="btn-sm me-2"
+              onClick={() => setShowDSN(true)}
+              disabled={hasEmployees && !disableStatement ? false : true}
+            >
+              <i className="bi bi-calculator"></i>
+              &nbsp;Import Fichiers DSN
+            </Button>
+            <Button
+              variant="primary"
+              className="btn-sm"
+              onClick={() => setShowCalulatorModal(true)}
+              disabled={hasEmployees && !disableStatement ? false : true}
+            >
+              <i className="bi bi-calculator"></i>
+              &nbsp;Outil d'évaluation
+            </Button>
+          </div>
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
+            value={info}
+            onBlur={saveInfo}
+            disabled={disableStatement}
+          />
+        </Col>
+      </Form.Group>
+
+      <div className="text-end">
+        <Button
+          disabled={isDisabled || disableStatement}
+          variant="secondary"
+          onClick={onValidate}
+        >
+          Valider
+        </Button>
+      </div>
+        {console.log(props)}
+
+      <Modal show={showCalculatorModal} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Données sociales</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <IndividualsData impactsData={props.impactsData} onGoBack={() => setShowCalulatorModal(false)} 
+          handleClose={() => setShowCalulatorModal(false)}
+          onUpdate={props.onUpdate}
+          />
+        </Modal.Body>
+      </Modal>
+
+      <Modal show={showDSN} size="xl" centered onHide={() => setShowCalulatorModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Données sociales</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <ImportDSN impactsData={props.impactsData} onGoBack={() => setShowDSN(false)} 
+          handleClose={() => setShowDSN(false)}
+          onUpdate={props.onUpdate}
+          />
+        </Modal.Body>
+      </Modal>
+      {/* 
+      <ModalAssesment
+        indic="dsn"
+        impactsData={props.impactsData[period.periodKey]}
+        onGoBack={handleClose}
+        handleClose={handleClose}
+        title="Déclarations Sociales Nominatives"
+      /> */}
+    </div>
+  );
+};
+
+
+
+export default StatementIDR;
