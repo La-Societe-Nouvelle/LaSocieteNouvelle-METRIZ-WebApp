@@ -1,9 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Form, InputGroup } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
 
@@ -74,11 +73,11 @@ const StatementART = (props) => {
 
   return (
     <Form className="statement">
-      <Form.Group>
-        <Form.Label>
+      <Form.Group as={Row} className="form-group align-items-center">
+        <Form.Label column sm={4}>
           L'entreprise est-elle une entreprise artisanale ?
         </Form.Label>
-        <Form>
+        <Col sm={6}>
           <Form.Check
             inline
             type="radio"
@@ -107,49 +106,51 @@ const StatementART = (props) => {
             checked={isValueAddedCrafted === false}
             onChange={onIsValueAddedCraftedChange}
           />
-        </Form>
+        </Col>
       </Form.Group>
-      {console.log(craftedProduction)}
-      <Form.Group>
-        <Form.Label>Part de la valeur ajoutée artisanale</Form.Label>
-        <InputGroup>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Part de la valeur ajoutée artisanale
+        </Form.Label>
+        <Col sm={6}>
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(craftedProduction, 0)}
+              inputMode="numeric"
+              onChange={updateCraftedProduction}
+              isInvalid={!isValid}
+              disabled={isValueAddedCrafted !== null}
+            />
+            <InputGroup.Text>&euro;</InputGroup.Text>
+          </InputGroup>
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
           <Form.Control
-            type="number"
-            value={roundValue(craftedProduction, 0)}
-            inputMode="numeric"
-            onChange={updateCraftedProduction}
-            isInvalid={!isValid}
-            disabled={isValueAddedCrafted !== null}
+            as="textarea"
+            className="w-100"
+            rows={3}
+            onChange={updateInfo}
+            value={info}
+            onBlur={saveInfo}
           />
-          <InputGroup.Text>&euro;</InputGroup.Text>
-        </InputGroup>
-
-        {/* <InputNumber
-          value={roundValue(craftedProduction, 0)}
-          onUpdate={updateCraftedProduction}
-          disabled={isValueAddedCrafted !== null}
-          placeholder="&euro;"
-          isInvalid={!isValid}
-        /> */}
+        </Col>
       </Form.Group>
-
-      <Form.Group>
-        <Form.Label>Informations complémentaires</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          onChange={updateInfo}
-          value={info}
-          onBlur={saveInfo}
-        />
-      </Form.Group>
-      <button
-        disabled={!isValid}
-        className="btn btn-secondary btn-sm"
-        onClick={onValidate}
-      >
-        Valider
-      </button>
+      <div className="text-end">
+        <Button
+          disabled={!isValid}
+          variant="secondary"
+          onClick={onValidate}
+        >
+          Valider
+        </Button>
+      </div>
     </Form>
   );
 };
