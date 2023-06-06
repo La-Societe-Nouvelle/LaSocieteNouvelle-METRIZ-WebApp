@@ -52,7 +52,7 @@ const StatementECO = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.eco = info);
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('eco');
 
   return (
     <Form className="statement">

@@ -31,7 +31,7 @@ const StatementSOC = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.soc = info);
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('soc');
 
   return (
     <Form className="statement">

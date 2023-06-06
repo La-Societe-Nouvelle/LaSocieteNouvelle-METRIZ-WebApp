@@ -55,7 +55,7 @@ const StatementNRG = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.nrg = info);
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('nrg');
 
   return (
     <Form className="statement">

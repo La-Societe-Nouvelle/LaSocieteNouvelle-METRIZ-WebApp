@@ -64,7 +64,7 @@ const StatementHAZ = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.haz = info);
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('haz');
 
   return (
     <Form className="statement">

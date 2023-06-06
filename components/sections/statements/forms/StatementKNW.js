@@ -40,7 +40,7 @@ const StatementKNW = (props) => {
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.knw = info);
 
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('knw');
 
   const isValid =
     researchAndTrainingContribution !== null && netValueAdded !== null;
