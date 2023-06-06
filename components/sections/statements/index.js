@@ -83,7 +83,6 @@ const DirectImpacts = ({ session }) => {
         <div className="text-center p-3 mb-3 bg-light">
           <h3 className="mb-0"> Création de la valeur</h3>
         </div>
-
         <Row>
           {Object.entries(valueCreationIndics).map(([key, value]) => (
             <Col key={key} sm={12}>
