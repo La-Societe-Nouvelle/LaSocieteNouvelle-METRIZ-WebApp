@@ -1,11 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
-import {
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
 
@@ -89,13 +86,16 @@ const StatementWAS = (props) => {
           Productiont totale de déchets (y compris DAOM<sup>1</sup>)
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(wasteProduction, 0)}
-            inputMode="numeric"
-            onChange={updateWasteProduction}
-          />
-           {/* <Select
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(wasteProduction, 0)}
+              inputMode="numeric"
+              onChange={updateWasteProduction}
+            />
+            <InputGroup.Text>kg</InputGroup.Text>
+          </InputGroup>
+             {/* <Select
                   options={options}
                   defaultValue={{
                     label: wasteProductionUnit,
@@ -110,12 +110,15 @@ const StatementWAS = (props) => {
           Incertitude
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(wasteProductionUncertainty, 0)}
-            inputMode="numeric"
-            onChange={updateWasteProductionUncertainty}
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(wasteProductionUncertainty, 0)}
+              inputMode="numeric"
+              onChange={updateWasteProductionUncertainty}
+            />
+            <InputGroup.Text>%</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
 

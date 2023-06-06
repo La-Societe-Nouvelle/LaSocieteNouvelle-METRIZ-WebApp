@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 /* ---------- DECLARATION - INDIC #MAT ---------- */
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
@@ -141,15 +141,18 @@ const StatementMAT = (props) => {
           Quantité extraite de matières premières
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(materialsExtraction, 0)}
-            inputMode="numeric"
-            disabled={isExtractiveActivities === false}
-            onChange={updateMaterialsExtraction}
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(materialsExtraction, 0)}
+              inputMode="numeric"
+              disabled={isExtractiveActivities === false}
+              onChange={updateMaterialsExtraction}
+            />
 
-        {/* // <Select
+            <InputGroup.Text>kg</InputGroup.Text>
+          </InputGroup>
+            {/* // <Select
         // isDisabled={isExtractiveActivities === false}
         // options={options}
         // defaultValue={{
@@ -158,7 +161,6 @@ const StatementMAT = (props) => {
         // }}
         // onChange={this.updateUnit}
         // /> */}
-
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="form-group">
@@ -166,13 +168,17 @@ const StatementMAT = (props) => {
           Incertitude
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(materialsExtractionUncertainty, 0)}
-            inputMode="numeric"
-            disabled={isExtractiveActivities === false}
-            onChange={updateMaterialsExtractionUncertainty}
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(materialsExtractionUncertainty, 0)}
+              inputMode="numeric"
+              disabled={isExtractiveActivities === false}
+              onChange={updateMaterialsExtractionUncertainty}
+            />
+
+            <InputGroup.Text>%</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
 
