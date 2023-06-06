@@ -1,9 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, Modal, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
 import { AssessmentNRG } from "../modals/AssessmentNRG";
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
@@ -67,19 +66,20 @@ const StatementNRG = (props) => {
         <Col sm={6}>
           <Row className="align-items-center">
             <Col>
-              <Form.Control
-                type="number"
-                value={roundValue(energyConsumption, 0)}
-                inputMode="numeric"
-                onChange={updateEnergyConsumption}
-              />
-           
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(energyConsumption, 0)}
+                  inputMode="numeric"
+                  onChange={updateEnergyConsumption}
+                />
+                <InputGroup.Text>MJ</InputGroup.Text>
+              </InputGroup>
             </Col>
             <Col>
               <Button
                 className="btn btn-primary btn-sm"
                 onClick={() => setShowModal(true)}
-
               >
                 <i className="bi bi-calculator"></i> Outil d'évaluation
               </Button>
@@ -92,11 +92,16 @@ const StatementNRG = (props) => {
           Incertitude
         </Form.Label>
         <Col sm={6}>
-          <InputNumber
-            value={roundValue(energyConsumptionUncertainty, 0)}
-            onUpdate={updateEnergyConsumptionUncertainty}
-            placeholder="%"
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(energyConsumptionUncertainty, 0)}
+              inputMode="numeric"
+              onChange={updateEnergyConsumptionUncertainty}
+            />
+
+            <InputGroup.Text>%</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
 
@@ -128,7 +133,9 @@ const StatementNRG = (props) => {
         onHide={() => setShowModal(false)}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Outils de mesure des émissions directes de Gaz à effet de serre</Modal.Title>
+          <Modal.Title>
+            Outils de mesure des émissions directes de Gaz à effet de serre
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <AssessmentNRG
@@ -138,7 +145,7 @@ const StatementNRG = (props) => {
             onUpdate={props.onUpdate}
           />
         </Modal.Body>
-      </Modal>  
+      </Modal>
     </Form>
   );
 };
