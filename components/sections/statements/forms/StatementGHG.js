@@ -75,7 +75,7 @@ const StatementGHG = (props) => {
   };
 
   return (
-    <Form>
+    <Form className="statement">
       <Form.Group as={Row} className="form-group">
         <Form.Label column sm={4}>
           Emissions directes de Gaz à effet de serre - SCOPE 1
