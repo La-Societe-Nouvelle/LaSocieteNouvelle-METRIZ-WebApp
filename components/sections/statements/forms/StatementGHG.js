@@ -1,6 +1,6 @@
 // La Société Nouvelle
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { AssessmentGHG } from "../modals/AssessmentGHG";
 
@@ -83,21 +83,24 @@ const StatementGHG = (props) => {
         <Col sm={6}>
           <Row className="align-items-center">
             <Col>
-              <Form.Control
-                type="number"
-                value={roundValue(greenhousesGazEmissions, 0)}
-                inputMode="numeric"
-                onChange={updateGreenhousesGazEmissions}
-                isInvalid={!isValid}
-              />
-             <Select
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(greenhousesGazEmissions, 0)}
+                  inputMode="numeric"
+                  onChange={updateGreenhousesGazEmissions}
+                  isInvalid={!isValid}
+                />
+                <InputGroup.Text>kgCO2e</InputGroup.Text>
+              </InputGroup>
+              {/* <Select
                   options={options}
                   value={{
                     label: greenhousesGazEmissionsUnit,
                     value: greenhousesGazEmissionsUnit,
                   }}
                   // onChange={}
-                />
+                /> */}
             </Col>
             <Col>
               <Button
@@ -115,12 +118,15 @@ const StatementGHG = (props) => {
           Incertitude
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(greenhousesGazEmissionsUncertainty, 0)}
-            inputMode="numeric"
-            onChange={updateGreenhousesGazEmissionsUncertainty}
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(greenhousesGazEmissionsUncertainty, 0)}
+              inputMode="numeric"
+              onChange={updateGreenhousesGazEmissionsUncertainty}
+            />
+            <InputGroup.Text>%</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
       <Form.Group as={Row} className="form-group">
@@ -159,14 +165,16 @@ const StatementGHG = (props) => {
         </Button>
       </div>
 
-   <Modal
+      <Modal
         show={showModal}
         size="xl"
         centered
         onHide={() => setShowModal(false)}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Outils de mesure des émissions directes de Gaz à effet de serre</Modal.Title>
+          <Modal.Title>
+            Outils de mesure des émissions directes de Gaz à effet de serre
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <AssessmentGHG
@@ -176,7 +184,7 @@ const StatementGHG = (props) => {
             onUpdate={props.onUpdate}
           />
         </Modal.Body>
-      </Modal>  
+      </Modal>
     </Form>
   );
 };

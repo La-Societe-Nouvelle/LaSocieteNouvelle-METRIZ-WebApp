@@ -2,7 +2,7 @@
 /* ---------- DECLARATION - INDIC #WAT ---------- */
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { InputNumber } from "../../../input/InputNumber";
 import {
   printValue,
@@ -104,12 +104,15 @@ const StatementWAT = (props) => {
           Consommation totale d'eau
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(waterConsumption, 0)}
-            inputMode="numeric"
-            onChange={updateWaterConsumption}
-          /> 
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(waterConsumption, 0)}
+              inputMode="numeric"
+              onChange={updateWaterConsumption}
+            />
+            <InputGroup.Text>m³</InputGroup.Text>
+          </InputGroup>
              {/* <Select
                   options={options}
                   defaultValue={{
@@ -125,13 +128,15 @@ const StatementWAT = (props) => {
           Incertitude
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(waterConsumptionUncertainty, 0)}
-            inputMode="numeric"
-            onChange={updateWaterConsumptionUncertainty}
-          />
-        
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(waterConsumptionUncertainty, 0)}
+              inputMode="numeric"
+              onChange={updateWaterConsumptionUncertainty}
+            />
+            <InputGroup.Text>%</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
 

@@ -83,7 +83,7 @@ const DirectImpacts = ({ session }) => {
           <h3 className="mb-0"> Création de la valeur</h3>
         </div>
         
-        <Row className="hidden">
+        <Row>
           {Object.entries(valueCreationIndics).map(([key, value]) => (
             <Col key={key} sm={12}>
               <div className="border rounded border-1 p-3 mb-3">

@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
 const StatementHAZ = (props) => {
@@ -78,12 +78,16 @@ const StatementHAZ = (props) => {
           Utilisation de produits dangereux - santé/environnement
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(hazardousSubstancesConsumption, 0)}
-            inputMode="numeric"
-            onChange={updateHazardousSubstancesConsumption}
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(hazardousSubstancesConsumption, 0)}
+              inputMode="numeric"
+              onChange={updateHazardousSubstancesConsumption}
+            />
+
+            <InputGroup.Text>kg</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
 
@@ -92,13 +96,16 @@ const StatementHAZ = (props) => {
           Incertitude
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(hazardousSubstancesConsumptionUncertainty, 0)}
-            inputMode="numeric"
-            onChange={updateHazardousSubstancesConsumptionUncertainty}
-          />
-              {/* <Select
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(hazardousSubstancesConsumptionUncertainty, 0)}
+              inputMode="numeric"
+              onChange={updateHazardousSubstancesConsumptionUncertainty}
+            />
+            <InputGroup.Text>%</InputGroup.Text>
+          </InputGroup>
+                {/* <Select
                   options={options}
                   defaultValue={{
                     label: hazardousSubstancesConsumptionUnit,
@@ -125,11 +132,7 @@ const StatementHAZ = (props) => {
         </Col>
       </Form.Group>
       <div className="text-end">
-        <Button
-          disabled={!isValid}
-          variant="secondary"
-          onClick={onValidate}
-        >
+        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
           Valider
         </Button>
       </div>

@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import { InputNumber } from "../../../input/InputNumber";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { ImportDSN } from "../modals/ImportDSN";
@@ -109,17 +109,18 @@ const StatementGEQ = (props) => {
         <Col sm={6}>
           <Row className="align-items-center">
             <Col>
-            <Form.Control
+              <InputGroup>
+              <Form.Control
                 type="number"
                 value={roundValue(wageGap, 1)}
                 disabled={hasEmployees === false}
                 inputMode="numeric"
                 onChange={updateWageGap}
-                placeholder="%"
                 isInvalid={isDisabled}
               />
-       
-          
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+           
             </Col>
             <Col>
               <div>

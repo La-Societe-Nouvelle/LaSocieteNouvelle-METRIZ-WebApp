@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button } from "react-bootstrap";
+import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
 const StatementECO = (props) => {
@@ -97,14 +97,17 @@ const StatementECO = (props) => {
           Valeur ajoutée nette produite en France
         </Form.Label>
         <Col sm={6}>
-          <Form.Control
-            type="number"
-            value={roundValue(domesticProduction, 0)}
-            inputMode="numeric"
-            onChange={updateDomesticProduction}
-            isInvalid={!isValid}
-            disabled={isAllActivitiesInFrance !== null}
-          />
+          <InputGroup>
+            <Form.Control
+              type="number"
+              value={roundValue(domesticProduction, 0)}
+              inputMode="numeric"
+              onChange={updateDomesticProduction}
+              isInvalid={!isValid}
+              disabled={isAllActivitiesInFrance !== null}
+            />
+            <InputGroup.Text>&euro;</InputGroup.Text>
+          </InputGroup>
         </Col>
       </Form.Group>
 

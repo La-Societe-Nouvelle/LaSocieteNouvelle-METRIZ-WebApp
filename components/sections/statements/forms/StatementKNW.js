@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Form, Button, Row, Col, Modal } from "react-bootstrap";
+import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { AssessmentKNW } from "../modals/AssessmentKNW";
 
@@ -54,13 +54,16 @@ const StatementKNW = (props) => {
         <Col sm={6}>
           <Row className="align-items-center">
             <Col>
-              <Form.Control
-                type="number"
-                value={roundValue(researchAndTrainingContribution, 0)}
-                inputMode="numeric"
-                onChange={updateResearchAndTrainingContribution}
-                isInvalid={!isValid}
-              />
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(researchAndTrainingContribution, 0)}
+                  inputMode="numeric"
+                  onChange={updateResearchAndTrainingContribution}
+                  isInvalid={!isValid}
+                />
+                <InputGroup.Text>&euro;</InputGroup.Text>
+              </InputGroup>
             </Col>
             <Col>
               <Button
