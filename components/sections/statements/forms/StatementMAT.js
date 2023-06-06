@@ -107,7 +107,7 @@ const StatementMAT = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.mat = info);
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('mat');
 
   return (
     <Form className="statement">

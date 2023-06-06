@@ -95,7 +95,7 @@ const StatementIDR = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.idr = info);
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('idr');
 
   return (
     <div className="statement">

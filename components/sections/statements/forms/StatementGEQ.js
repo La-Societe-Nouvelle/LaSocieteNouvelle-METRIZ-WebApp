@@ -72,7 +72,7 @@ const StatementGEQ = (props) => {
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.geq = info);
 
-  const onValidate = () => props.onValidate();
+  const onValidate = () => props.onValidate('geq');
 
   return (
     <Form className="statement">
