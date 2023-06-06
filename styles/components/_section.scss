@@ -65,35 +65,12 @@ section {
     border-bottom: 1px solid darken(#fbfbff, 5%);
   }
 .indicator-section {
-  .card {
-    margin-bottom: 5px;
-    border: none;
-  }
-  .card-header {
-    padding: 0.75rem 1rem;
-    background-color: #fff;
-    border: 1px solid darken(#fbfbff, 5%);
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
-      border-radius 0.15s ease;
-  }
-  .card-body {
-    background-color: #fbfbff;
-    border-left: 1px solid darken(#fbfbff, 5%);
-    border-right: 1px solid darken(#fbfbff, 5%);
-    border-bottom: 1px solid darken(#fbfbff, 5%);
-  }
-  .btn {
-    margin-right: 1rem;
-  }
+  
   .icon-success {
     color: #0c9;
     margin-right: 0.3rem;
   }
-  .step {
-    padding: 2rem;
-    margin: 1rem 0;
-  }
+
 
   h3 {
     font-size: 1.2rem;
@@ -107,37 +84,15 @@ section {
     text-align: center;
   }
 
-  .indicator-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid $light;
-    padding: 1em 0;
-  }
-  .indicator-img img {
-    margin-left: 0.5rem;
-  }
+
 
   .icon-ese {
     height: 50px;
   }
 
-  .dwn-group {
-    padding: 0.75rem 1rem;
-    border: 1px solid darken(#fbfbff, 5%);
-    margin: 1rem 0;
-    p {
-      font-size: 0.85rem;
-      letter-spacing: 0.01rem;
-      font-weight: 600;
-    }
-  }
+
 }
 
-.selected-indicator {
-  background-color: $light;
-  padding: 2em 0;
-}
 
 .statement-section {
   label {
