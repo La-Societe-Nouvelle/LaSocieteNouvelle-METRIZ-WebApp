@@ -1,7 +1,4 @@
 import React from "react";
-import {
-  StatementWAT,
-} from "../forms";
 
 import StatementART from "../forms/StatementART";
 import StatementECO from "../forms/StatementECO";
@@ -14,6 +11,7 @@ import StatementHAZ from "../forms/StatementHAZ";
 import StatementMAT from "../forms/StatementMAT";
 import StatementNRG from "../forms/StatementNRG";
 import StatementWAS from "../forms/StatementWAS";
+import StatementWAT from "../forms/StatementWAT";
 
 const StatementComponent = ({
   indic,
