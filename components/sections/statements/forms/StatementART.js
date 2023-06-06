@@ -27,8 +27,8 @@ const StatementART = (props) => {
   const [info, setInfo] = useState(props.impactsData.comments.art || "");
 
   const [isInvalid, setIsInvalid] = useState(false);
-  const [formErrors, setFormErrors] = useState();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const { isValueAddedCrafted, netValueAdded } = props.impactsData;
 
   /* ------------------------- */
   useEffect(() => {
@@ -36,19 +36,23 @@ const StatementART = (props) => {
       setCraftedProduction(props.impactsData.craftedProduction);
     }
   }, [props.impactsData.craftedProduction]);
+  /* ------------------------- */
 
-  const { isValueAddedCrafted, netValueAdded } = props.impactsData;
 
   const onIsValueAddedCraftedChange = (event) => {
+    
+    // To do : change null radio value'
     setShowSuccessMessage(false);
+
     let radioValue = event.target.value;
+    
     switch (radioValue) {
       case "true":
         props.impactsData.isValueAddedCrafted = true;
-        props.impactsData.craftedProduction = props.impactsData.netValueAdded;
+        props.impactsData.craftedProduction = netValueAdded;
         break;
       case "null":
-        props.impactsData.isValueAddedCrafted = null;
+        props.impactsData.isValueAddedCrafted = null; 
         props.impactsData.craftedProduction = null;
         break;
       case "false":
@@ -71,24 +75,20 @@ const StatementART = (props) => {
 
     const inputValue = event.target.valueAsNumber;
 
-    if (isValueAddedCrafted != null) {
+    if ( props.impactsData.isValueAddedCrafted != null) {
       return;
     }
 
-    let errors = {};
-
     if (
       isNaN(inputValue) ||
-      props.impactsData.netValueAdded == null ||
-      inputValue >= props.impactsData.netValueAdded
+      netValueAdded == null ||
+      inputValue >= netValueAdded
     ) {
-      errors.craftedProduction = "Valeur incorrecte";
       setIsInvalid(true);
     } else {
       setIsInvalid(false);
     }
-    console.log(errors);
-    setFormErrors(errors);
+ 
   };
 
   const updateInfo = (event) => {
@@ -100,7 +100,7 @@ const StatementART = (props) => {
 
   const onValidate = () => {
     setShowSuccessMessage(true);
-    props.onValidate();
+    props.onValidate('art');
   };
 
   return (
