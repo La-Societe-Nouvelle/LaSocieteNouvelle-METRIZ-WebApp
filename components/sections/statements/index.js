@@ -79,14 +79,14 @@ const DirectImpacts = ({ session }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-        <div className="text-center p-2 mb-3 bg-light-secondary">
+        <div className="text-center p-3 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Création de la valeur</h3>
         </div>
         
         <Row>
           {Object.entries(valueCreationIndics).map(([key, value]) => (
             <Col key={key} sm={12}>
-              <div className="border rounded border-1 p-3 mb-3">
+              <div className="border border-1 rounded p-3 mb-3 shadow-sm">
                 <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                   <Image
                     className="me-2"
@@ -115,13 +115,13 @@ const DirectImpacts = ({ session }) => {
           ))}
         </Row>
 
-        <div className="text-center p-2 mb-3 bg-light-secondary">
+        <div className="text-center p-3 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Empreinte sociale </h3>
         </div>
         <Row>
           {Object.entries(socialFootprintIndic).map(([key, value]) => (
             <Col key={key} sm={12}>
-              <div className="border rounded border-1 p-4 mb-3 ">
+              <div className="border rounded p-4 mb-3 shadow-sm ">
               <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                   <Image
                     className="me-2"
@@ -146,13 +146,13 @@ const DirectImpacts = ({ session }) => {
             </Col>
           ))}
         </Row>
-        <div className="text-center p-2 mb-3 bg-light-secondary">
+        <div className="text-center p-3 mb-3 bg-light-secondary">
           <h3 className="mb-0"> Empreinte environnementale </h3>
         </div>
         <Row>
           {Object.entries(EnvFootprintIndic).map(([key, value]) => (
             <Col key={key} sm={12}>
-              <div className="border rounded border-1 p-4 mb-3">
+              <div className="border rounded p-4 mb-3">
               <div className="d-flex align-items-center mb-3 border-bottom pb-3">
                   <Image
                     className="me-2"
