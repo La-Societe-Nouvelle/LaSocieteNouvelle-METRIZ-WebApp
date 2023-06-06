@@ -26,6 +26,9 @@ const StatementART = (props) => {
   );
   const [info, setInfo] = useState(props.impactsData.comments.art || "");
 
+  const [isInvalid, setIsInvalid] = useState(false);
+  const [formErrors, setFormErrors] = useState();
+  
   useEffect(() => {
     if (craftedProduction !== props.impactsData.craftedProduction) {
       setCraftedProduction(props.impactsData.craftedProduction);
@@ -33,11 +36,6 @@ const StatementART = (props) => {
   }, [props.impactsData.craftedProduction]);
 
   const { isValueAddedCrafted, netValueAdded } = props.impactsData;
-
-  const isValid =
-    netValueAdded != null &&
-    craftedProduction >= 0 &&
-    craftedProduction <= netValueAdded;
 
   const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
@@ -64,6 +62,30 @@ const StatementART = (props) => {
     setCraftedProduction(event.target.value);
     props.onUpdate("art");
   };
+
+  const handleIsValueAddedCrafted = (event) => {
+    const inputValue = event.target.valueAsNumber;
+
+    if (isValueAddedCrafted != null) {
+      return;
+    }
+
+    let errors = {};
+
+    if (
+      isNaN(inputValue) ||
+      props.impactsData.netValueAdded == null ||
+      inputValue >= props.impactsData.netValueAdded
+    ) {
+      errors.craftedProduction = "Valeur incorrecte";
+      setIsInvalid(true);
+    } else {
+      setIsInvalid(false);
+    }
+    console.log(errors)
+    setFormErrors(errors);
+  };
+
 
   const updateInfo = (event) => setInfo(event.target.value);
 
@@ -119,11 +141,14 @@ const StatementART = (props) => {
               value={roundValue(craftedProduction, 0)}
               inputMode="numeric"
               onChange={updateCraftedProduction}
-              isInvalid={!isValid}
+              onInput={handleIsValueAddedCrafted}
               disabled={isValueAddedCrafted !== null}
+              isInvalid={isInvalid}
             />
             <InputGroup.Text>&euro;</InputGroup.Text>
+
           </InputGroup>
+       
         </Col>
       </Form.Group>
 
@@ -144,7 +169,7 @@ const StatementART = (props) => {
       </Form.Group>
       <div className="text-end">
         <Button
-          disabled={!isValid}
+          disabled={isInvalid || isValueAddedCrafted == ""}
           variant="secondary"
           onClick={onValidate}
         >

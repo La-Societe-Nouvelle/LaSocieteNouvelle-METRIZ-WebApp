@@ -52,11 +52,14 @@ $btn-link-disabled-color: "#FFF";
 // INPUT
 $input-color: #191558;
 $input-bg: #ffffff;
-$input-border-color: #cfcff7;
+$input-border-color: $light;
 $table-hover-bg: $bg-light;
 $table-border-color: #cac9de;
 $input-font-size: 0.9rem;
 $input-group-addon-bg: #f4f4fb;
+
+
+$input-disabled-bg: lighten($light, 7%);
 
 // TABLE
 $table-border-color: darken($light, 1%);
