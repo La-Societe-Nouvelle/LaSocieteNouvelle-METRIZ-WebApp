@@ -7,7 +7,6 @@ import { InputNumber } from "../../../input/InputNumber";
 
 import React, { useState, useEffect } from "react";
 
-
 const StatementMAT = (props) => {
   const [materialsExtraction, setMaterialsExtraction] = useState(
     valueOrDefault(props.impactsData.materialsExtraction, undefined)
