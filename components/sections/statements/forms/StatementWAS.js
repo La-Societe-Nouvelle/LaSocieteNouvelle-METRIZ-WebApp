@@ -1,126 +1,115 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
-
-//Utils
+import React, { useState, useEffect } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import {
-  printValue,
   roundValue,
   valueOrDefault,
 } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
 
-export class StatementWAS extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      wasteProduction: valueOrDefault(
-        props.impactsData.wasteProduction,
-        undefined
-      ),
-      wasteProductionUncertainty: valueOrDefault(
-        props.impactsData.wasteProductionUncertainty,
-        undefined
-      ),
-      info: props.impactsData.comments.was || "",
-    };
-  }
+const StatementWAS = (props) => {
+  const [wasteProduction, setWasteProduction] = useState(
+    valueOrDefault(props.impactsData.wasteProduction, undefined)
+  );
+  const [wasteProductionUncertainty, setWasteProductionUncertainty] = useState(
+    valueOrDefault(props.impactsData.wasteProductionUncertainty, undefined)
+  );
+  const [info, setInfo] = useState(props.impactsData.comments.was || "");
 
-  componentDidUpdate() {
-    if (this.state.wasteProduction != this.props.impactsData.wasteProduction) {
-      this.setState({
-        wasteProduction: this.props.impactsData.wasteProduction,
-      });
+  useEffect(() => {
+    if (wasteProduction !== props.impactsData.wasteProduction) {
+      setWasteProduction(props.impactsData.wasteProduction);
     }
     if (
-      this.state.wasteProductionUncertainty !=
-      this.props.impactsData.wasteProductionUncertainty
+      wasteProductionUncertainty !==
+      props.impactsData.wasteProductionUncertainty
     ) {
-      this.setState({
-        wasteProductionUncertainty:
-          this.props.impactsData.wasteProductionUncertainty,
-      });
+      setWasteProductionUncertainty(
+        props.impactsData.wasteProductionUncertainty
+      );
     }
-  }
+  }, [
+    props.impactsData.wasteProduction,
+    props.impactsData.wasteProductionUncertainty,
+  ]);
 
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const { wasteProduction, wasteProductionUncertainty, info } = this.state;
+  const netValueAdded = props.impactsData.netValueAdded;
+  const isValid = wasteProduction !== null && netValueAdded !== null;
 
-    let isValid = wasteProduction != null && netValueAdded != null;
+  const updateWasteProduction = (input) => {
+    props.impactsData.setWasteProduction(input);
+    setWasteProductionUncertainty(props.impactsData.wasteProductionUncertainty);
+    props.onUpdate("was");
+  };
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
-              Productiont totale de déchets (y compris DAOM<sup>1</sup>)
-            </label>
-            <InputNumber
-              value={roundValue(wasteProduction, 0)}
-              onUpdate={this.updateWasteProduction}
-              placeholder="KG"
-            />
-            <div className="notes">
-              <p className="small">
-                <sup>1</sup> Déchets assimilés aux ordures ménagères
-              </p>
-            </div>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(wasteProductionUncertainty, 0)}
-              onUpdate={this.updateWasteProductionUncertainty}
-              placeholder="%"
-            />
-          </div>
-        </div>
+  const updateWasteProductionUncertainty = (input) => {
+    props.impactsData.wasteProductionUncertainty = input;
+    props.onUpdate("was");
+  };
 
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.was = info);
+  const onValidate = () => props.onValidate();
+
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Productiont totale de déchets (y compris DAOM<sup>1</sup>)
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(wasteProduction, 0)}
+            inputMode="numeric"
+            onChange={updateWasteProduction}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Incertitude
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(wasteProductionUncertainty, 0)}
+            inputMode="numeric"
+            onChange={updateWasteProductionUncertainty}
+          />
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
           <Form.Control
             as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
             value={info}
-            onBlur={this.saveInfo}
+            onBlur={saveInfo}
           />
+        </Col>
+      </Form.Group>
 
+      <div className="d-flex justify-between">
+        <div className="notes">
+          <p className="small">
+            <sup>1</sup> Déchets assimilés aux ordures ménagères
+          </p>
         </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
+        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+          Valider
+        </Button>
       </div>
-    );
-  }
+    </Form>
+  );
+};
 
-  updateWasteProduction = (input) => {
-    this.props.impactsData.setWasteProduction(input);
-    this.setState({
-      wasteProductionUncertainty:
-        this.props.impactsData.wasteProductionUncertainty,
-    });
-    this.props.onUpdate("was");
-  };
-
-  updateWasteProductionUncertainty = (input) => {
-    this.props.impactsData.wasteProductionUncertainty = input;
-    this.props.onUpdate("was");
-  };
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.was = this.state.info);
-
-  onValidate = () => this.props.onValidate();
-}
+export default StatementWAS;
