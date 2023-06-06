@@ -1,180 +1,140 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
-import Select from "react-select";
-
-// Utils
+import React, { useState, useEffect } from "react";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
 
-/* ---------- DECLARATION - INDIC #HAZ ---------- */
-
-export class StatementHAZ extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      hazardousSubstancesConsumption: valueOrDefault(
+const StatementHAZ = (props) => {
+  const [hazardousSubstancesConsumption, setHazardousSubstancesConsumption] =
+    useState(
+      valueOrDefault(
         props.impactsData.hazardousSubstancesConsumption,
         undefined
-      ),
-      hazardousSubstancesConsumptionUnit:
-        props.impactsData.hazardousSubstancesConsumptionUnit,
-      hazardousSubstancesConsumptionUncertainty: valueOrDefault(
-        props.impactsData.hazardousSubstancesConsumptionUncertainty,
-        undefined
-      ),
-      info: props.impactsData.comments.haz || "",
-    };
-  }
+      )
+    );
+  const [
+    hazardousSubstancesConsumptionUncertainty,
+    setHazardousSubstancesConsumptionUncertainty,
+  ] = useState(
+    valueOrDefault(
+      props.impactsData.hazardousSubstancesConsumptionUncertainty,
+      undefined
+    )
+  );
+  const [info, setInfo] = useState(props.impactsData.comments.haz || "");
 
-  componentDidUpdate() {
+  useEffect(() => {
     if (
-      this.state.hazardousSubstancesConsumption !=
-      this.props.impactsData.hazardousSubstancesConsumption
+      hazardousSubstancesConsumption !==
+      props.impactsData.hazardousSubstancesConsumption
     ) {
-      this.setState({
-        hazardousSubstancesConsumption:
-          this.props.impactsData.hazardousSubstancesConsumption,
-      });
+      setHazardousSubstancesConsumption(
+        props.impactsData.hazardousSubstancesConsumption
+      );
     }
     if (
-      this.state.hazardousSubstancesConsumptionUncertainty !=
-      this.props.impactsData.hazardousSubstancesConsumptionUncertainty
+      hazardousSubstancesConsumptionUncertainty !==
+      props.impactsData.hazardousSubstancesConsumptionUncertainty
     ) {
-      this.setState({
-        hazardousSubstancesConsumptionUncertainty:
-          this.props.impactsData.hazardousSubstancesConsumptionUncertainty,
-      });
+      setHazardousSubstancesConsumptionUncertainty(
+        props.impactsData.hazardousSubstancesConsumptionUncertainty
+      );
     }
-  }
+  }, [
+    props.impactsData.hazardousSubstancesConsumption,
+    props.impactsData.hazardousSubstancesConsumptionUncertainty,
+  ]);
 
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const {
-      hazardousSubstancesConsumption,
-      hazardousSubstancesConsumptionUnit,
-      hazardousSubstancesConsumptionUncertainty,
-      info,
-    } = this.state;
+  const options = [
+    { value: "kg", label: "kg" },
+    { value: "t", label: "t" },
+  ];
+  
+  const { netValueAdded } = props.impactsData;
+  const isValid =
+    hazardousSubstancesConsumption != null && netValueAdded != null;
 
-    const options = [
-      { value: "kg", label: "kg" },
-      { value: "t", label: "t" },
-    ];
+  const updateHazardousSubstancesConsumption = (input) => {
+    props.impactsData.setHazardousSubstancesConsumption(input);
+    setHazardousSubstancesConsumptionUncertainty(
+      props.impactsData.hazardousSubstancesConsumptionUncertainty
+    );
+    props.onUpdate("haz");
+  };
 
-    let isValid =
-      hazardousSubstancesConsumption != null && netValueAdded != null;
+  const updateHazardousSubstancesConsumptionUncertainty = (input) => {
+    props.impactsData.hazardousSubstancesConsumptionUncertainty = input;
+    props.onUpdate("haz");
+  };
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
-              Utilisation de produits dangereux - santé/environnement
-            </label>
-            <Row>
-              <Col>
-                <InputNumber
-                  value={roundValue(hazardousSubstancesConsumption, 0)}
-                  onUpdate={this.updateHazardousSubstancesConsumption}
-                />
-              </Col>
-              <Col sm={4}>
-                <Select
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.haz = info);
+  const onValidate = () => props.onValidate();
+
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Utilisation de produits dangereux - santé/environnement
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(hazardousSubstancesConsumption, 0)}
+            inputMode="numeric"
+            onChange={updateHazardousSubstancesConsumption}
+          />
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Incertitude
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(hazardousSubstancesConsumptionUncertainty, 0)}
+            inputMode="numeric"
+            onChange={updateHazardousSubstancesConsumptionUncertainty}
+          />
+              {/* <Select
                   options={options}
                   defaultValue={{
                     label: hazardousSubstancesConsumptionUnit,
                     value: hazardousSubstancesConsumptionUnit,
                   }}
                   onChange={this.updatehazardousSubstancesConsumptionUnit}
-                />
-              </Col>{" "}
-            </Row>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(hazardousSubstancesConsumptionUncertainty, 0)}
-              onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}
-              placeholder="%"
-            />
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
+                /> */}
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
           <Form.Control
             as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
             value={info}
-            onBlur={this.saveInfo}
+            onBlur={saveInfo}
           />
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
+        </Col>
+      </Form.Group>
+      <div className="text-end">
+        <Button
+          disabled={!isValid}
+          variant="secondary"
+          onClick={onValidate}
+        >
+          Valider
+        </Button>
       </div>
-    );
-  }
+    </Form>
+  );
+};
 
-  updateHazardousSubstancesConsumption = (input) => {
-    this.props.impactsData.setHazardousSubstancesConsumption(input);
-    this.setState({
-      hazardousSubstancesConsumptionUncertainty:
-        this.props.impactsData.hazardousSubstancesConsumptionUncertainty,
-    });
-    this.props.onUpdate("haz");
-  };
-
-  updateHazardousSubstancesConsumptionUncertainty = (input) => {
-    this.props.impactsData.hazardousSubstancesConsumptionUncertainty = input;
-    this.props.onUpdate("haz");
-  };
-
-  updatehazardousSubstancesConsumptionUnit = (selected) => {
-    const selectedUnit = selected.value;
-
-    const {
-      hazardousSubstancesConsumption,
-      hazardousSubstancesConsumptionUnit,
-    } = this.props.impactsData;
-
-    if (selectedUnit !== hazardousSubstancesConsumptionUnit) {
-      let updatedHazardousSubstancesConsumption =
-        hazardousSubstancesConsumption;
-
-      if (selectedUnit === "t") {
-        updatedHazardousSubstancesConsumption =
-          hazardousSubstancesConsumption / 1000;
-      } else if (selectedUnit === "kg") {
-        updatedHazardousSubstancesConsumption =
-          hazardousSubstancesConsumption * 1000;
-      }
-
-      this.updateHazardousSubstancesConsumption(
-        updatedHazardousSubstancesConsumption
-      );
-    }
-
-    this.setState({
-      hazardousSubstancesConsumptionUnit: selectedUnit,
-    });
-
-    this.props.impactsData.hazardousSubstancesConsumptionUnit = selectedUnit;
-
-    this.props.onUpdate("haz");
-  };
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.haz = this.state.info);
-
-  onValidate = () => this.props.onValidate();
-}
+export default StatementHAZ;
