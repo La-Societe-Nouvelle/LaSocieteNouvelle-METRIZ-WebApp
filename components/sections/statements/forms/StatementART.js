@@ -28,7 +28,9 @@ const StatementART = (props) => {
 
   const [isInvalid, setIsInvalid] = useState(false);
   const [formErrors, setFormErrors] = useState();
-  
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  /* ------------------------- */
   useEffect(() => {
     if (craftedProduction !== props.impactsData.craftedProduction) {
       setCraftedProduction(props.impactsData.craftedProduction);
@@ -38,6 +40,7 @@ const StatementART = (props) => {
   const { isValueAddedCrafted, netValueAdded } = props.impactsData;
 
   const onIsValueAddedCraftedChange = (event) => {
+    setShowSuccessMessage(false);
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
@@ -64,6 +67,8 @@ const StatementART = (props) => {
   };
 
   const handleIsValueAddedCrafted = (event) => {
+    setShowSuccessMessage(false);
+
     const inputValue = event.target.valueAsNumber;
 
     if (isValueAddedCrafted != null) {
@@ -82,16 +87,21 @@ const StatementART = (props) => {
     } else {
       setIsInvalid(false);
     }
-    console.log(errors)
+    console.log(errors);
     setFormErrors(errors);
   };
 
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    props.impactsData.comments.art = event.target.value
+    setShowSuccessMessage(false);
+  };
 
-  const updateInfo = (event) => setInfo(event.target.value);
 
-  const saveInfo = () => (props.impactsData.comments.art = info);
-
-  const onValidate = () => props.onValidate();
+  const onValidate = () => {
+    setShowSuccessMessage(true);
+    props.onValidate();
+  };
 
   return (
     <Form className="statement">
@@ -146,9 +156,7 @@ const StatementART = (props) => {
               isInvalid={isInvalid}
             />
             <InputGroup.Text>&euro;</InputGroup.Text>
-
           </InputGroup>
-       
         </Col>
       </Form.Group>
 
@@ -163,13 +171,20 @@ const StatementART = (props) => {
             rows={3}
             onChange={updateInfo}
             value={info}
-            onBlur={saveInfo}
           />
         </Col>
       </Form.Group>
+      {showSuccessMessage && (
+        <p className="alert alert-success">
+          L'indicateur "Contribution aux Métiers d'Art et aux Savoir-Faire" a
+          bien été déclaré !
+        </p>
+      )}
       <div className="text-end">
         <Button
-          disabled={isInvalid || isValueAddedCrafted == ""}
+          disabled={
+            isInvalid  || showSuccessMessage
+          }
           variant="secondary"
           onClick={onValidate}
         >
