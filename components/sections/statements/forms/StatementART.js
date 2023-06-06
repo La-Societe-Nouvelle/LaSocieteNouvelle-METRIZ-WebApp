@@ -97,6 +97,11 @@ const StatementART = (props) => {
     setShowSuccessMessage(false);
   };
 
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    props.impactsData.comments.art = event.target.value
+    setShowSuccessMessage(false);
+  };
 
   const onValidate = () => {
     setShowSuccessMessage(true);
@@ -156,9 +161,7 @@ const StatementART = (props) => {
               isInvalid={isInvalid}
             />
             <InputGroup.Text>&euro;</InputGroup.Text>
-
           </InputGroup>
-       
         </Col>
       </Form.Group>
 
