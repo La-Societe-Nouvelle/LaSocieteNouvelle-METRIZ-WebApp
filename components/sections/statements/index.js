@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  Col, Container, Image, Row } from "react-bootstrap";
+import { Col, Container, Image, Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 import StatementComponent from "./parts/StatementComponent";
 
@@ -61,6 +61,7 @@ const DirectImpacts = ({ session }) => {
   };
 
   const handleValidation = async (indic) => {
+    console.log(indic);
     SetValidations((validations) => [...validations, indic]);
 
     // add validation
@@ -79,28 +80,36 @@ const DirectImpacts = ({ session }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-        <div className="text-center p-3 mb-3 bg-light-secondary">
+        <div className="text-center p-3 mb-3 bg-light">
           <h3 className="mb-0"> Création de la valeur</h3>
         </div>
-        
+
         <Row>
           {Object.entries(valueCreationIndics).map(([key, value]) => (
             <Col key={key} sm={12}>
               <div className="border border-1 rounded p-3 mb-3 shadow-sm">
-                <div className="d-flex align-items-center mb-3 border-bottom pb-3">
-                  <Image
-                    className="me-2"
-                    src={"icons-ese/" + key + ".svg"}
-                    alt={key}
-                    height={40}
-                  />
-                  <h4 className="h5 fw-light-bold ">
-                    {value.libelle}
-                    {value.isBeta && <span className="beta ms-1">BETA</span>}
-                  </h4>
-                  {/* <div>
-                    <i className="bi bi-question-circle"></i>
-                  </div> */}
+                <div className="d-flex justify-content-between mb-3 border-bottom pb-3">
+                  <div className="d-flex align-items-center">
+                    <Image
+                      className="me-2"
+                      src={"icons-ese/logo_ese_" + key + "_bleu.svg"}
+                      alt={key}
+                      height={40}
+                    />
+
+                    <h4 className=" fw-light-bold ">
+                      {value.libelle}
+                      {value.isBeta && <span className="beta ms-1">BETA</span>}
+                    </h4>
+                  </div>
+
+                  <div className="text-end">
+                    {validations.includes(key) && (
+                      <span className="display-6">
+                        <i className=" text-success ms-3 bi bi-patch-check"></i>
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <StatementComponent
@@ -121,18 +130,29 @@ const DirectImpacts = ({ session }) => {
         <Row>
           {Object.entries(socialFootprintIndic).map(([key, value]) => (
             <Col key={key} sm={12}>
-              <div className="border rounded p-4 mb-3 shadow-sm ">
-              <div className="d-flex align-items-center mb-3 border-bottom pb-3">
-                  <Image
-                    className="me-2"
-                    src={"icons-ese/" + key + ".svg"}
-                    alt={key}
-                    height={50}
-                  />
-                  <h4 className="h5 fw-light-bold mt-3">
-                    {value.libelle}
-                    {value.isBeta && <span className="beta ms-1">BETA</span>}
-                  </h4>
+              <div className="border border-1 rounded p-3 mb-3 shadow-sm">
+                <div className="d-flex justify-content-between mb-3 border-bottom pb-3">
+                  <div className="d-flex align-items-center">
+                    <Image
+                      className="me-2"
+                      src={"icons-ese/logo_ese_" + key + "_bleu.svg"}
+                      alt={key}
+                      height={40}
+                    />
+
+                    <h4 className=" fw-light-bold ">
+                      {value.libelle}
+                      {value.isBeta && <span className="beta ms-1">BETA</span>}
+                    </h4>
+                  </div>
+
+                  <div className="text-end">
+                    {validations.includes(key) && (
+                      <span className="display-6">
+                        <i className=" text-success ms-3 bi bi-patch-check"></i>
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <StatementComponent
@@ -152,18 +172,29 @@ const DirectImpacts = ({ session }) => {
         <Row>
           {Object.entries(EnvFootprintIndic).map(([key, value]) => (
             <Col key={key} sm={12}>
-              <div className="border rounded p-4 mb-3">
-              <div className="d-flex align-items-center mb-3 border-bottom pb-3">
-                  <Image
-                    className="me-2"
-                    src={"icons-ese/" + key + ".svg"}
-                    alt={key}
-                    height={50}
-                  />
-                  <h4 className="h5 fw-light-bold mt-3">
-                    {value.libelle}
-                    {value.isBeta && <span className="beta ms-1">BETA</span>}
-                  </h4>
+              <div className="border border-1 rounded p-3 mb-3 shadow-sm">
+                <div className="d-flex justify-content-between mb-3 border-bottom pb-3">
+                  <div className="d-flex align-items-center">
+                    <Image
+                      className="me-2"
+                      src={"icons-ese/logo_ese_" + key + "_bleu.svg"}
+                      alt={key}
+                      height={40}
+                    />
+
+                    <h4 className=" fw-light-bold ">
+                      {value.libelle}
+                      {value.isBeta && <span className="beta ms-1">BETA</span>}
+                    </h4>
+                  </div>
+
+                  <div className="text-end">
+                    {validations.includes(key) && (
+                      <span className="display-6">
+                        <i className=" text-success ms-3 bi bi-patch-check"></i>
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <StatementComponent
