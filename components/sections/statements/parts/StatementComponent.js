@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  StatementMAT,
   StatementNRG,
   StatementWAS,
   StatementWAT,
@@ -14,6 +13,7 @@ import StatementGEQ from "../forms/StatementGEQ";
 import StatementKNW from "../forms/StatementKNW";
 import StatementGHG from "../forms/StatementGHG";
 import StatementHAZ from "../forms/StatementHAZ";
+import StatementMAT from "../forms/StatementMAT";
 
 const StatementComponent = ({
   indic,

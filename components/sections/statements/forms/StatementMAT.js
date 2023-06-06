@@ -1,222 +1,203 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
-import Select from "react-select";
-
-//Utils
+/* ---------- DECLARATION - INDIC #MAT ---------- */
+import { Button, Col, Form, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
-/* ---------- DECLARATION - INDIC #MAT ---------- */
+import React, { useState, useEffect } from "react";
 
-export class StatementMAT extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      materialsExtraction: valueOrDefault(
-        props.impactsData.materialsExtraction,
-        undefined
-      ),
-      materialsExtractionUnit: props.impactsData.materialsExtractionUnit,
-      materialsExtractionUncertainty: valueOrDefault(
+
+const StatementMAT = (props) => {
+  const [materialsExtraction, setMaterialsExtraction] = useState(
+    valueOrDefault(props.impactsData.materialsExtraction, undefined)
+  );
+  const [materialsExtractionUncertainty, setMaterialsExtractionUncertainty] =
+    useState(
+      valueOrDefault(
         props.impactsData.materialsExtractionUncertainty,
         undefined
-      ),
-      info: props.impactsData.comments.mat || "",
-    };
-  }
-
-  componentDidUpdate() {
-    if (
-      this.state.materialsExtraction !=
-      this.props.impactsData.materialsExtraction
-    ) {
-      this.setState({
-        materialsExtraction: this.props.impactsData.materialsExtraction,
-      });
-    }
-    if (
-      this.state.materialsExtractionUncertainty !=
-      this.props.impactsData.materialsExtractionUncertainty
-    ) {
-      this.setState({
-        materialsExtractionUncertainty:
-          this.props.impactsData.materialsExtractionUncertainty,
-      });
-    }
-  }
-
-  render() {
-    const { isExtractiveActivities, netValueAdded } = this.props.impactsData;
-    const {
-      materialsExtraction,
-      materialsExtractionUncertainty,
-      materialsExtractionUnit,
-      info,
-    } = this.state;
-
-    const options = [
-      { value: "kg", label: "kg" },
-      { value: "t", label: "t" },
-    ];
-
-    let isValid = materialsExtraction != null && netValueAdded != null;
-
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
-              L'entreprise réalisent-elles des activités agricoles ou
-              extractives ?
-            </label>
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="isExtractiveActivities"
-                label="Oui"
-                value="true"
-                checked={isExtractiveActivities === true}
-                onChange={this.onIsExtractiveActivitiesChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="isNotExtractiveActivities"
-                label="Non"
-                value="false"
-                checked={isExtractiveActivities === false}
-                onChange={this.onIsExtractiveActivitiesChange}
-              />
-            </Form>
-          </div>
-          <div className="form-group">
-            <label>Quantité extraite de matières premières</label>
-            <Row>
-              <Col>
-                <InputNumber
-                  value={roundValue(materialsExtraction, 0)}
-                  disabled={isExtractiveActivities === false}
-                  onUpdate={this.updateMaterialsExtraction}
-                />
-              </Col>
-              <Col sm={4}>
-                <Select
-                  isDisabled={isExtractiveActivities === false}
-                  options={options}
-                  defaultValue={{
-                    label: materialsExtractionUnit,
-                    value: materialsExtractionUnit,
-                  }}
-                  onChange={this.updateUnit}
-                />
-              </Col>
-            </Row>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(materialsExtractionUncertainty, 0)}
-              disabled={isExtractiveActivities === false}
-              onUpdate={this.updateMaterialsExtractionUncertainty}
-              placeholder="%"
-            />
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
+      )
     );
-  }
+  const [info, setInfo] = useState(props.impactsData.comments.mat || "");
 
-  onIsExtractiveActivitiesChange = (event) => {
-    let radioValue = event.target.value;
+  useEffect(() => {
+    if (materialsExtraction !== props.impactsData.materialsExtraction) {
+      setMaterialsExtraction(props.impactsData.materialsExtraction);
+    }
+    if (
+      materialsExtractionUncertainty !==
+      props.impactsData.materialsExtractionUncertainty
+    ) {
+      setMaterialsExtractionUncertainty(
+        props.impactsData.materialsExtractionUncertainty
+      );
+    }
+  }, [
+    props.impactsData.materialsExtraction,
+    props.impactsData.materialsExtractionUncertainty,
+  ]);
+
+  const { isExtractiveActivities, netValueAdded } = props.impactsData;
+  const isValid = materialsExtraction != null && netValueAdded != null;
+
+  const onIsExtractiveActivitiesChange = (event) => {
+    const radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.setIsExtractiveActivities(true);
+        props.impactsData.setIsExtractiveActivities(true);
         break;
       case "false":
-        this.props.impactsData.setIsExtractiveActivities(false);
+        props.impactsData.setIsExtractiveActivities(false);
         break;
     }
-    this.setState({
-      materialsExtraction: valueOrDefault(
-        this.props.impactsData.materialsExtraction,
-        ""
-      ),
-      materialsExtractionUncertainty: valueOrDefault(
-        this.props.impactsData.materialsExtractionUncertainty,
-        ""
-      ),
-    });
+    setMaterialsExtraction(
+      valueOrDefault(props.impactsData.materialsExtraction, "")
+    );
+    setMaterialsExtractionUncertainty(
+      valueOrDefault(props.impactsData.materialsExtractionUncertainty, "")
+    );
   };
 
-  updateMaterialsExtraction = (input) => {
-    this.props.impactsData.setMaterialsExtraction(input);
-    this.setState({
-      materialsExtractionUncertainty:
-        this.props.impactsData.materialsExtractionUncertainty,
-    });
-    this.props.onUpdate("mat");
+  const updateMaterialsExtraction = (input) => {
+    props.impactsData.setMaterialsExtraction(input);
+    setMaterialsExtractionUncertainty(
+      props.impactsData.materialsExtractionUncertainty
+    );
+    props.onUpdate("mat");
   };
 
-  updateUnit = (selected) => {
+  // updateUnit = (selected) => {
     
-    const selectedUnit = selected.value;
-    const { materialsExtraction, materialsExtractionUnit } =
-      this.props.impactsData;
+  //   const selectedUnit = selected.value;
+  //   const { materialsExtraction, materialsExtractionUnit } =
+  //     this.props.impactsData;
 
-    if (selectedUnit !== materialsExtractionUnit) {
-      let updatedMaterialsExtraction = materialsExtraction;
+  //   if (selectedUnit !== materialsExtractionUnit) {
+  //     let updatedMaterialsExtraction = materialsExtraction;
 
-      if (selectedUnit === "t") {
-        updatedMaterialsExtraction = materialsExtraction / 1000;
-      } else if (selectedUnit === "kg") {
-        updatedMaterialsExtraction = materialsExtraction * 1000;
-      }
+  //     if (selectedUnit === "t") {
+  //       updatedMaterialsExtraction = materialsExtraction / 1000;
+  //     } else if (selectedUnit === "kg") {
+  //       updatedMaterialsExtraction = materialsExtraction * 1000;
+  //     }
 
-      this.updateMaterialsExtraction(updatedMaterialsExtraction);
-    }
+  //     this.updateMaterialsExtraction(updatedMaterialsExtraction);
+  //   }
 
-    this.setState({
-      materialsExtractionUnit: selectedUnit,
-    });
+  //   this.setState({
+  //     materialsExtractionUnit: selectedUnit,
+  //   });
 
-    this.props.impactsData.materialsExtractionUnit = selectedUnit;
+  //   this.props.impactsData.materialsExtractionUnit = selectedUnit;
 
-    this.props.onUpdate("mat");
+  //   this.props.onUpdate("mat");
+  // };
+
+  // const options = [
+//   { value: "kg", label: "kg" },
+//   { value: "t", label: "t" },
+// ];
+
+  const updateMaterialsExtractionUncertainty = (input) => {
+    props.impactsData.materialsExtractionUncertainty = input;
+    setMaterialsExtraction(props.impactsData.materialsExtraction);
+    props.onUpdate("mat");
   };
 
-  updateMaterialsExtractionUncertainty = (input) => {
-    this.props.impactsData.materialsExtractionUncertainty = input;
-    this.setState({
-      materialsExtraction: this.props.impactsData.materialsExtraction,
-    });
-    this.props.onUpdate("mat");
-  };
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (props.impactsData.comments.mat = info);
+  const onValidate = () => props.onValidate();
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.mat = this.state.info);
+  return (
+    <Form className="statement">
+      <Form.Group as={Row} className="form-group align-items-center">
+        <Form.Label column sm={4}>
+          L'entreprise réalise-t-elle des activités agricoles ou extractives ?
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Check
+            inline
+            type="radio"
+            id="isExtractiveActivities"
+            label="Oui"
+            value="true"
+            checked={isExtractiveActivities === true}
+            onChange={onIsExtractiveActivitiesChange}
+          />
+          <Form.Check
+            inline
+            type="radio"
+            id="isNotExtractiveActivities"
+            label="Non"
+            value="false"
+            checked={isExtractiveActivities === false}
+            onChange={onIsExtractiveActivitiesChange}
+          />
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Quantité extraite de matières premières
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(materialsExtraction, 0)}
+            inputMode="numeric"
+            disabled={isExtractiveActivities === false}
+            onChange={updateMaterialsExtraction}
+          />
 
-  onValidate = () => this.props.onValidate();
-}
+        {/* // <Select
+        // isDisabled={isExtractiveActivities === false}
+        // options={options}
+        // defaultValue={{
+        //   label: materialsExtractionUnit,
+        //   value: materialsExtractionUnit,
+        // }}
+        // onChange={this.updateUnit}
+        // /> */}
+
+        </Col>
+      </Form.Group>
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Incertitude
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            type="number"
+            value={roundValue(materialsExtractionUncertainty, 0)}
+            inputMode="numeric"
+            disabled={isExtractiveActivities === false}
+            onChange={updateMaterialsExtractionUncertainty}
+          />
+        </Col>
+      </Form.Group>
+
+      <Form.Group as={Row} className="form-group">
+        <Form.Label column sm={4}>
+          Informations complémentaires
+        </Form.Label>
+        <Col sm={6}>
+          <Form.Control
+            as="textarea"
+            rows={3}
+            className="w-100"
+            onChange={updateInfo}
+            value={info}
+            onBlur={saveInfo}
+          />
+        </Col>
+      </Form.Group>
+      <div className="text-end">
+        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+          Valider
+        </Button>
+      </div>
+    </Form>
+  );
+};
+
+export default StatementMAT;
