@@ -161,20 +161,33 @@ export class StatementGHG extends React.Component {
   };
   updateUnit = (selected) => {
     const selectedUnit = selected.value;
-    let greenhousesGazEmissions =
-      this.props.impactsData.greenhousesGazEmissions;
 
-    if (selectedUnit == "tCO2e") {
-      greenhousesGazEmissions = greenhousesGazEmissions / 1000;
-    } else {
-      greenhousesGazEmissions = greenhousesGazEmissions * 1000;
+    const {
+      greenhousesGazEmissions,
+      greenhousesGazEmissionsUnit,
+    } = this.props.impactsData;
+
+    if (selectedUnit !== greenhousesGazEmissionsUnit) {
+      let updatedGreenhousesGazEmissions =
+        greenhousesGazEmissions;
+
+      if (selectedUnit === "tCO2e") {
+        updatedGreenhousesGazEmissions =
+          greenhousesGazEmissions / 1000;
+      } else if (selectedUnit === "kgCO2e") {
+        updatedGreenhousesGazEmissions =
+          greenhousesGazEmissions * 1000;
+      }
+
+      this.updateGreenhousesGazEmissions(
+        updatedGreenhousesGazEmissions
+      );
     }
+
 
     this.setState({
       greenhousesGazEmissionsUnit: selectedUnit,
     });
-
-    this.updateGreenhousesGazEmissions(greenhousesGazEmissions);
 
     this.props.impactsData.greenhousesGazEmissionsUnit = selectedUnit;
 
