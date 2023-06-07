@@ -72,12 +72,17 @@ table {
 
   thead {
     background-color: $primary;
-    color: #fff;
+    tr th, tr td {
+      color: #fff !important;
+    }
     font-weight: 700;
     font-size: 1em;
     tr:nth-child(2),
     tr:nth-child(3) {
       background-color: lighten($primary, 5%);
+      th,td {
+        color: #fff !important;
+      }
     }
   }
   .subth {
@@ -94,7 +99,6 @@ table {
   tbody {
     td {
       vertical-align: middle;
-
     }
 
     // select
@@ -163,7 +167,6 @@ table {
 
 // MAIN AGGREGATE TABLE
 
-
 .table-menu {
   margin: 2em 0 0.5rem 0;
   text-align: center;
@@ -226,12 +229,13 @@ table {
   width: 250px;
 }
 
-#mainAggregates, #indicatorExpenses {
+#mainAggregates,
+#indicatorExpenses {
   .border-left {
     border-left: 2px solid darken($light, 1%);
   }
 }
-.comparative-table  {
+.comparative-table {
   .border-left {
     border-left: 2px solid lighten($light, 2%);
   }

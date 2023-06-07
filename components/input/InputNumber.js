@@ -9,7 +9,7 @@ export class InputNumber extends React.Component {
     this.state = {
       input: props.value != undefined ? props.value : " ",
       isInvalid: props.isInvalid != undefined ? props.isInvalid : false,
-      placeholder: props.placeholder,
+      placeholder: props.placeholder || null,
     };
   }
 

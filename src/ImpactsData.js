@@ -35,26 +35,33 @@ export class ImpactsData  {
 
     this.greenhousesGazEmissions =  props.greenhousesGazEmissions !== undefined ? props.greenhousesGazEmissions : null;
     this.greenhousesGazEmissionsUncertainty =  props.greenhousesGazEmissionsUncertainty !== undefined ? props.greenhousesGazEmissionsUncertainty : null;
+    this.greenhousesGazEmissionsUnit = props.greenhousesGazEmissionsUnit !== undefined ? props.greenhousesGazEmissionsUnit : "kgCO2e";
+
     this.ghgDetails = props.ghgDetails || {};
     this.ghgTotal = props.ghgTotal || false;
 
     this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption !== undefined ? props.hazardousSubstancesConsumption : null;
+    this.hazardousSubstancesConsumptionUnit = props.hazardousSubstancesConsumptionUnit !== undefined ? props.hazardousSubstancesConsumptionUnit : "kg";
     this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty !== undefined ? props.hazardousSubstancesConsumptionUncertainty : null;
 
     this.isExtractiveActivities = props.isExtractiveActivities !== undefined ? props.isExtractiveActivities : null;
     this.materialsExtraction =  props.materialsExtraction !== undefined ? props.materialsExtraction : null;
+    this.materialsExtractionUnit = props.materialsExtractionUnit !== undefined ? props.materialsExtractionUnit : "kg";
     this.materialsExtractionUncertainty = props.materialsExtractionUncertainty !== undefined ? props.materialsExtractionUncertainty : null;
 
     this.energyConsumption = props.energyConsumption !== undefined ? props.energyConsumption : null;
+    this.energyConsumptionUnit = props.energyConsumptionUnit !== undefined ? props.energyConsumptionUnit : "MJ";
     this.energyConsumptionUncertainty = props.energyConsumptionUncertainty !== undefined ? props.energyConsumptionUncertainty : null;
     this.nrgDetails = props.nrgDetails || {};
     this.nrgTotal = props.nrgTotal || false;
 
 
     this.wasteProduction = props.wasteProduction !== undefined ? props.wasteProduction : null;
+    this.wasteProductionUnit = props.wasteProductionUnit !== undefined ? props.wasteProductionUnit : "kg";
     this.wasteProductionUncertainty = props.wasteProductionUncertainty !== undefined ? props.wasteProductionUncertainty : null;
 
     this.waterConsumption =  props.waterConsumption !== undefined ? props.waterConsumption : null;
+    this.waterConsumptionUnit = props.waterConsumptionUnit !== undefined ? props.waterConsumptionUnit : "m³";
     this.waterConsumptionUncertainty =  props.waterConsumptionUncertainty !== undefined ? props.waterConsumptionUncertainty : null;
 
     /* --- Commentaires --- */

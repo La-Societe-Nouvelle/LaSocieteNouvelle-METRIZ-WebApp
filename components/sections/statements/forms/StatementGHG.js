@@ -2,14 +2,11 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
+import Select from "react-select";
 
 // Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #GHG ---------- */
@@ -22,6 +19,8 @@ export class StatementGHG extends React.Component {
         props.impactsData.greenhousesGazEmissions,
         undefined
       ),
+      greenhousesGazEmissionsUnit:
+        props.impactsData.greenhousesGazEmissionsUnit,
       greenhousesGazEmissionsUncertainty: valueOrDefault(
         props.impactsData.greenhousesGazEmissionsUncertainty,
         undefined
@@ -55,22 +54,42 @@ export class StatementGHG extends React.Component {
     const {
       greenhousesGazEmissions,
       greenhousesGazEmissionsUncertainty,
+      greenhousesGazEmissionsUnit,
       info,
     } = this.state;
 
     let isValid = greenhousesGazEmissions != null && netValueAdded != null;
+
+    const options = [
+      { value: "kgCO2e", label: "kgCO2e" },
+      { value: "tCO2e", label: "tCO2e" },
+    ];
+
     return (
       <div className="statement">
         <div className="statement-form">
           <div className="form-group">
             <label>Emissions directes de Gaz à effet de serre - SCOPE 1</label>
-            <InputNumber
-              value={roundValue(greenhousesGazEmissions, 0)}
-              onUpdate={this.updateGreenhousesGazEmissions}
-              placeholder={"kgCO2e"}
-            />
-            <div className="assessment-button-container"></div>
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(greenhousesGazEmissions, 0)}
+                  onUpdate={this.updateGreenhousesGazEmissions}
+                />
+              </Col>
+              <Col sm={4}>
+                <Select
+                  options={options}
+                  defaultValue={{
+                    label: greenhousesGazEmissionsUnit,
+                    value: greenhousesGazEmissionsUnit,
+                  }}
+                  onChange={this.updateUnit}
+                />
+              </Col>
+            </Row>
           </div>
+
           <div className="form-group">
             <label>Incertitude</label>
             <InputNumber
@@ -129,6 +148,16 @@ export class StatementGHG extends React.Component {
 
   updateGreenhousesGazEmissionsUncertainty = (input) => {
     this.props.impactsData.greenhousesGazEmissionsUncertainty = input;
+    this.props.onUpdate("ghg");
+  };
+  updateUnit = (selected) => {
+    const selectedUnit = selected.value;
+    this.setState({
+      greenhousesGazEmissionsUnit: selectedUnit,
+    });
+
+    this.props.impactsData.greenhousesGazEmissionsUnit = selectedUnit;
+
     this.props.onUpdate("ghg");
   };
 

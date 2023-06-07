@@ -2,14 +2,11 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
+import Select from "react-select";
 
 //Utils
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #WAT ---------- */
@@ -22,6 +19,7 @@ export class StatementWAT extends React.Component {
         props.impactsData.waterConsumption,
         undefined
       ),
+      waterConsumptionUnit: props.impactsData.waterConsumptionUnit,
       waterConsumptionUncertainty: valueOrDefault(
         props.impactsData.waterConsumptionUncertainty,
         undefined
@@ -51,7 +49,17 @@ export class StatementWAT extends React.Component {
 
   render() {
     const { netValueAdded } = this.props.impactsData;
-    const { waterConsumption, waterConsumptionUncertainty, info } = this.state;
+    const {
+      waterConsumption,
+      waterConsumptionUnit,
+      waterConsumptionUncertainty,
+      info,
+    } = this.state;
+
+    const options = [
+      { value: "m³", label: "m³" },
+      { value: "l", label: "l" },
+    ];
 
     let isValid = waterConsumption != null && netValueAdded != null;
 
@@ -60,11 +68,24 @@ export class StatementWAT extends React.Component {
         <div className="statement-form">
           <div className="form-group">
             <label>Consommation totale d'eau</label>
-            <InputNumber
-              value={roundValue(waterConsumption, 0)}
-              onUpdate={this.updateWaterConsumption}
-              placeholder="m³"
-            />
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(waterConsumption, 0)}
+                  onUpdate={this.updateWaterConsumption}
+                />
+              </Col>
+              <Col sm={4}>
+                <Select
+                  options={options}
+                  defaultValue={{
+                    label: waterConsumptionUnit,
+                    value: waterConsumptionUnit,
+                  }}
+                  onChange={this.updateWaterConsumptionUnit}
+                />
+              </Col>
+            </Row>
           </div>
           <div className="form-group">
             <label>Incertitude</label>
@@ -110,6 +131,17 @@ export class StatementWAT extends React.Component {
 
   updateWaterConsumptionUncertainty = (input) => {
     this.props.impactsData.waterConsumptionUncertainty = input;
+    this.props.onUpdate("wat");
+  };
+
+  updateWaterConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
+    this.setState({
+      waterConsumptionUnit: selectedUnit,
+    });
+
+    this.props.impactsData.waterConsumptionUnit = selectedUnit;
+
     this.props.onUpdate("wat");
   };
 

@@ -2,13 +2,11 @@
 
 // React
 import React from "react";
-import { Form } from "react-bootstrap";
+import { Col, Form, Row } from "react-bootstrap";
+import Select from "react-select";
 
 // Utils
-import {
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { InputNumber } from "../../../input/InputNumber";
 
 /* ---------- DECLARATION - INDIC #HAZ ---------- */
@@ -21,6 +19,8 @@ export class StatementHAZ extends React.Component {
         props.impactsData.hazardousSubstancesConsumption,
         undefined
       ),
+      hazardousSubstancesConsumptionUnit:
+        props.impactsData.hazardousSubstancesConsumptionUnit,
       hazardousSubstancesConsumptionUncertainty: valueOrDefault(
         props.impactsData.hazardousSubstancesConsumptionUncertainty,
         undefined
@@ -54,9 +54,15 @@ export class StatementHAZ extends React.Component {
     const { netValueAdded } = this.props.impactsData;
     const {
       hazardousSubstancesConsumption,
+      hazardousSubstancesConsumptionUnit,
       hazardousSubstancesConsumptionUncertainty,
       info,
     } = this.state;
+
+    const options = [
+      { value: "kg", label: "kg" },
+      { value: "t", label: "t" },
+    ];
 
     let isValid =
       hazardousSubstancesConsumption != null && netValueAdded != null;
@@ -68,11 +74,24 @@ export class StatementHAZ extends React.Component {
             <label>
               Utilisation de produits dangereux - santé/environnement
             </label>
-            <InputNumber
-              value={roundValue(hazardousSubstancesConsumption, 0)}
-              onUpdate={this.updateHazardousSubstancesConsumption}
-              placeholder="KG"
-            />
+            <Row>
+              <Col>
+                <InputNumber
+                  value={roundValue(hazardousSubstancesConsumption, 0)}
+                  onUpdate={this.updateHazardousSubstancesConsumption}
+                />
+              </Col>
+              <Col sm={4}>
+                <Select
+                  options={options}
+                  defaultValue={{
+                    label: hazardousSubstancesConsumptionUnit,
+                    value: hazardousSubstancesConsumptionUnit,
+                  }}
+                  onChange={this.updatehazardousSubstancesConsumptionUnit}
+                />
+              </Col>{" "}
+            </Row>
           </div>
           <div className="form-group">
             <label>Incertitude</label>
@@ -92,7 +111,6 @@ export class StatementHAZ extends React.Component {
             value={info}
             onBlur={this.saveInfo}
           />
-     
         </div>
         <div className="statement-validation">
           <button
@@ -121,9 +139,19 @@ export class StatementHAZ extends React.Component {
     this.props.onUpdate("haz");
   };
 
+  updatehazardousSubstancesConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
+    this.setState({
+      hazardousSubstancesConsumptionUnit: selectedUnit,
+    });
+
+    this.props.impactsData.hazardousSubstancesConsumptionUnit = selectedUnit;
+
+    this.props.onUpdate("haz");
+  };
+
   updateInfo = (event) => this.setState({ info: event.target.value });
   saveInfo = () => (this.props.impactsData.comments.haz = this.state.info);
 
   onValidate = () => this.props.onValidate();
 }
-
