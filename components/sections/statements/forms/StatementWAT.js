@@ -135,7 +135,31 @@ export class StatementWAT extends React.Component {
   };
 
   updateWaterConsumptionUnit = (selected) => {
-    const selectedUnit = selected.value;
+    const selectedUnit = selected.value; 
+
+    const {
+      waterConsumption,
+      waterConsumptionUnit,
+    } = this.props.impactsData;
+
+    if (selectedUnit !== waterConsumptionUnit) {
+      let updatedWaterConsumption =
+        waterConsumption;
+
+      if (selectedUnit === "m³") {
+        updatedWaterConsumption =
+          waterConsumption / 1000;
+      } else if (selectedUnit === "l") {
+        updatedWaterConsumption =
+          waterConsumption * 1000;
+      }
+
+      this.updateWaterConsumption(
+        updatedWaterConsumption
+      );
+    }
+
+
     this.setState({
       waterConsumptionUnit: selectedUnit,
     });
