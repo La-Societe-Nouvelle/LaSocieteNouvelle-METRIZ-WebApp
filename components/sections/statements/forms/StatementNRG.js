@@ -45,6 +45,17 @@ export class StatementNRG extends React.Component {
           this.props.impactsData.energyConsumptionUncertainty,
       });
     }
+
+    if (
+      this.state.energyConsumptionUnit !=
+      this.props.impactsData.energyConsumptionUnit
+    ) {
+      this.setState({
+        energyConsumptionUnit:
+          this.props.impactsData.energyConsumptionUnit,
+      });
+    }
+
   }
 
   render() {
@@ -79,7 +90,7 @@ export class StatementNRG extends React.Component {
               <Col sm={4}>
                 <Select
                   options={options}
-                  defaultValue={{
+                  value={{
                     label: energyConsumptionUnit,
                     value: energyConsumptionUnit,
                   }}

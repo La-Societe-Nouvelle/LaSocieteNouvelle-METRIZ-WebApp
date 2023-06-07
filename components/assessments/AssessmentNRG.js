@@ -86,6 +86,7 @@ export class AssessmentNRG extends React.Component
   {
     // Create basic nrg product (electricity/heat/renewable)
     let { nrgDetails } = this.state;
+
     const productsToInit = [
       "electricity",
       "heat",
@@ -108,6 +109,14 @@ export class AssessmentNRG extends React.Component
         };
       });
     this.setState({ nrgDetails: nrgDetails });
+
+    this.setState({
+      energyConsumption: getTotalNrgConsumption(this.state.nrgDetails),
+      energyConsumptionUncertainty: getTotalNrgConsumptionUncertainty(
+        this.state.nrgDetails
+      ),
+    });
+
   }
 
   render() 
@@ -784,6 +793,7 @@ export class AssessmentNRG extends React.Component
     impactsData.nrgDetails = this.state.nrgDetails;
     impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails);
     impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
+    impactsData.energyConsumptionUnit = "MJ";
 
     await this.props.onUpdate("nrg");
 
