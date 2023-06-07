@@ -81,6 +81,7 @@ const orderGroupsAssessmentItem_2 = [
 
 export class AssessmentGHG extends React.Component {
   constructor(props) {
+
     super(props);
     this.state = {
       // total ghg emissions & uncertainty
@@ -97,7 +98,17 @@ export class AssessmentGHG extends React.Component {
       message: false,
     };
   }
+  componentDidMount() {
+    
+    this.setState({
+      greenhousesGazEmissions: getTotalGhgEmissions(this.state.ghgDetails),
+      greenhousesGazEmissionsUncertainty: getTotalGhgEmissionsUncertainty(
+        this.state.ghgDetails
+      ),
+    });
 
+
+  }
   render() {
     const {
       greenhousesGazEmissions,
@@ -107,7 +118,9 @@ export class AssessmentGHG extends React.Component {
       message,
     } = this.state;
 
+
     return (
+      
       <div className="assessment">
         <Table>
           <thead>
@@ -1236,7 +1249,7 @@ export class AssessmentGHG extends React.Component {
     );
     impactsData.greenhousesGazEmissionsUncertainty =
       getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
-
+    impactsData.greenhousesGazEmissionsUnit = "kgCO2e"
     await this.props.onUpdate("ghg");
 
     // --------------------------------------------------
