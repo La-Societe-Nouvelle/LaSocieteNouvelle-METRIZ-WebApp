@@ -182,9 +182,21 @@ export class StatementMAT extends React.Component {
 
   updateUnit = (selected) => {
     const selectedUnit = selected.value;
+
+    let materialsExtraction =
+    this.props.impactsData.materialsExtraction;
+
+  if (selectedUnit == "t") {
+    materialsExtraction = materialsExtraction / 1000;
+  } else {
+    materialsExtraction = materialsExtraction * 1000;
+  }
+
     this.setState({
       materialsExtractionUnit: selectedUnit,
     });
+
+    this.updateMaterialsExtraction(materialsExtraction);
 
     this.props.impactsData.materialsExtractionUnit = selectedUnit;
 
