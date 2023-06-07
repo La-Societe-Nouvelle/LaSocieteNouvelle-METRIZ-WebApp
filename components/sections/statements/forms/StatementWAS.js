@@ -136,6 +136,20 @@ export class StatementWAS extends React.Component {
 
   updateWasteProductionUnit = (selected) => {
     const selectedUnit = selected.value;
+
+    const { wasteProduction, wasteProductionUnit } = this.props.impactsData;
+
+    if (selectedUnit !== wasteProductionUnit) {
+      let updatedWasteProduction = wasteProduction;
+  
+      if (selectedUnit === "t") {
+        updatedWasteProduction = wasteProduction / 1000;
+      } else if (selectedUnit === "kg") {
+        updatedWasteProduction = wasteProduction * 1000;
+      }
+      this.updateWasteProduction(updatedWasteProduction);
+    }
+
     this.setState({
       wasteProductionUnit: selectedUnit,
     });
