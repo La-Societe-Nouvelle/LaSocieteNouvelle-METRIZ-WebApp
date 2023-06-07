@@ -46,6 +46,16 @@ export class StatementGHG extends React.Component {
         greenhousesGazEmissionsUncertainty:
           this.props.impactsData.greenhousesGazEmissionsUncertainty,
       });
+
+      if (
+        this.state.greenhousesGazEmissionsUnit !==
+        this.props.impactsData.greenhousesGazEmissionsUnit
+      ) {
+      }
+      this.setState({
+        greenhousesGazEmissionsUnit:
+          this.props.impactsData.greenhousesGazEmissionsUnit,
+      });
     }
   }
 
@@ -64,7 +74,6 @@ export class StatementGHG extends React.Component {
       { value: "kgCO2e", label: "kgCO2e" },
       { value: "tCO2e", label: "tCO2e" },
     ];
-
     return (
       <div className="statement">
         <div className="statement-form">
@@ -80,7 +89,7 @@ export class StatementGHG extends React.Component {
               <Col sm={4}>
                 <Select
                   options={options}
-                  defaultValue={{
+                  value={{
                     label: greenhousesGazEmissionsUnit,
                     value: greenhousesGazEmissionsUnit,
                   }}
@@ -152,9 +161,20 @@ export class StatementGHG extends React.Component {
   };
   updateUnit = (selected) => {
     const selectedUnit = selected.value;
+    let greenhousesGazEmissions =
+      this.props.impactsData.greenhousesGazEmissions;
+
+    if (selectedUnit == "tCO2e") {
+      greenhousesGazEmissions = greenhousesGazEmissions / 1000;
+    } else {
+      greenhousesGazEmissions = greenhousesGazEmissions * 1000;
+    }
+
     this.setState({
       greenhousesGazEmissionsUnit: selectedUnit,
     });
+
+    this.updateGreenhousesGazEmissions(greenhousesGazEmissions);
 
     this.props.impactsData.greenhousesGazEmissionsUnit = selectedUnit;
 
