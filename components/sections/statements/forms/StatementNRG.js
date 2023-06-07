@@ -145,6 +145,19 @@ export class StatementNRG extends React.Component {
 
   updateEnergyConsumptionUnit = (selected) => {
     const selectedUnit = selected.value;
+
+    const { energyConsumption, energyConsumptionUnit } = this.props.impactsData;
+
+    if (selectedUnit !== energyConsumptionUnit) {
+      const convertedValue = this.convertEnergyConsumption(
+        energyConsumption,
+        energyConsumptionUnit,
+        selectedUnit
+      );
+
+      this.updateEnergyConsumption(convertedValue);
+    }
+
     this.setState({
       energyConsumptionUnit: selectedUnit,
     });
@@ -153,10 +166,37 @@ export class StatementNRG extends React.Component {
 
     this.props.onUpdate("nrg");
   };
-  
 
   updateInfo = (event) => this.setState({ info: event.target.value });
   saveInfo = () => (this.props.impactsData.comments.nrg = this.state.info);
 
   onValidate = () => this.props.onValidate();
+
+  convertEnergyConsumption = (value, fromUnit, toUnit) => {
+    const conversionFactors = {
+      GJ: {
+        MJ: 1000,
+        kWh: 3.6,
+        MWh: 3600,
+      },
+      MJ: {
+        GJ: 1 / 1000,
+        kWh: 1 / 3.6,
+        MWh: 1 / 3600,
+      },
+      kWh: {
+        GJ: 1 / 3.6,
+        MJ: 3.6,
+        MWh: 1 / 1000,
+      },
+      MWh: {
+        GJ: 1 / 3600,
+        MJ: 3600,
+        kWh: 1000,
+      },
+    };
+    const conversionFactor = conversionFactors[fromUnit][toUnit];
+    const convertedValue = value * conversionFactor;
+    return convertedValue;
+  };
 }
