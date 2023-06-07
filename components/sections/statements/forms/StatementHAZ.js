@@ -141,6 +141,29 @@ export class StatementHAZ extends React.Component {
 
   updatehazardousSubstancesConsumptionUnit = (selected) => {
     const selectedUnit = selected.value;
+
+    const {
+      hazardousSubstancesConsumption,
+      hazardousSubstancesConsumptionUnit,
+    } = this.props.impactsData;
+
+    if (selectedUnit !== hazardousSubstancesConsumptionUnit) {
+      let updatedHazardousSubstancesConsumption =
+        hazardousSubstancesConsumption;
+
+      if (selectedUnit === "t") {
+        updatedHazardousSubstancesConsumption =
+          hazardousSubstancesConsumption / 1000;
+      } else if (selectedUnit === "kg") {
+        updatedHazardousSubstancesConsumption =
+          hazardousSubstancesConsumption * 1000;
+      }
+
+      this.updateHazardousSubstancesConsumption(
+        updatedHazardousSubstancesConsumption
+      );
+    }
+
     this.setState({
       hazardousSubstancesConsumptionUnit: selectedUnit,
     });
