@@ -114,7 +114,7 @@ const ImportForm = (props) => {
           </div>
 
           {fileRejectionItems.length > 0 && (
-            <div className="alert alert-error">
+            <div className="alert alert-danger">
               <ul className="list-group list-unstyled">{fileRejectionItems}</ul>
             </div>
           )}

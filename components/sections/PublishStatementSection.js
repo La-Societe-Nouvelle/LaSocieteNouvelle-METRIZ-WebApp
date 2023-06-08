@@ -330,7 +330,7 @@ const Summary = (props) => {
             }
                   {
                 error && 
-                <div className="alert alert-error">
+                <div className="alert alert-danger">
                      <p>Erreur lors de l'envoi de la publication. Si l'erreur persiste, contactez le support.</p>
                 </div>
             }

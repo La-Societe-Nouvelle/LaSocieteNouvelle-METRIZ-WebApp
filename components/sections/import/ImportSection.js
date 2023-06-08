@@ -94,9 +94,8 @@ function ImportSection(props)
         <Row className="my-3">
           {errorFile && (
             <Col lg={{ span: 6, offset: 6 }}>
-              <div className={"alert alert-error"}>
+              <div className={"alert alert-danger"}>
                 <div>
-                  <h4>Erreur</h4>
                   <p>{errorMessage}</p>
                   {errors.map((error, index) => (
                     <p key={index}> - {error}</p>
