@@ -1,6 +1,9 @@
 // La Société Nouvelle
 import React, { useState, useEffect } from "react";
+
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
+import Select from "react-select";
+
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 import { AssessmentGHG } from "../modals/AssessmentGHG";
 
@@ -8,6 +11,9 @@ const StatementGHG = (props) => {
   const [greenhousesGazEmissions, setGreenhousesGazEmissions] = useState(
     valueOrDefault(props.impactsData.greenhousesGazEmissions, undefined)
   );
+
+  const [greenhousesGazEmissionsUnit, setGreenhousesGazEmissionsUnit] =
+    useState(props.impactsData.greenhousesGazEmissionsUnit);
   const [
     greenhousesGazEmissionsUncertainty,
     setGreenhousesGazEmissionsUncertainty,
@@ -34,6 +40,11 @@ const StatementGHG = (props) => {
     if (greenhousesGazEmissions !== props.impactsData.greenhousesGazEmissions) {
       setGreenhousesGazEmissions(props.impactsData.greenhousesGazEmissions);
     }
+
+    if (greenhousesGazEmissionsUnit !== props.impactsData.greenhousesGazEmissionsUnit) {
+      setGreenhousesGazEmissionsUnit(props.impactsData.greenhousesGazEmissionsUnit);
+    }
+
     if (
       greenhousesGazEmissionsUncertainty !==
       props.impactsData.greenhousesGazEmissionsUncertainty
@@ -46,10 +57,12 @@ const StatementGHG = (props) => {
     props.impactsData.greenhousesGazEmissions,
     props.impactsData.greenhousesGazEmissionsUncertainty,
   ]);
+
   const options = [
     { value: "kgCO2e", label: "kgCO2e" },
     { value: "tCO2e", label: "tCO2e" },
   ];
+
   const { netValueAdded } = props.impactsData;
   const isValid = greenhousesGazEmissions != null && netValueAdded != null;
 
@@ -64,6 +77,30 @@ const StatementGHG = (props) => {
 
   const updateGreenhousesGazEmissionsUncertainty = (input) => {
     props.impactsData.greenhousesGazEmissionsUncertainty = input;
+    props.onUpdate("ghg");
+  };
+
+  const updateGreenhousesGazEmissionsUnit = (selected) => {
+    const selectedUnit = selected.value;
+
+
+    if (selectedUnit !== props.impactsData.greenhousesGazEmissionsUnit) {
+      let updatedGreenhousesGazEmissions = props.impactsData.greenhousesGazEmissions;
+
+      if (selectedUnit === "tCO2e") {
+        updatedGreenhousesGazEmissions = props.impactsData.greenhousesGazEmissions / 1000;
+      } else if (selectedUnit === "kgCO2e") {
+        updatedGreenhousesGazEmissions = props.impactsData.greenhousesGazEmissions * 1000;
+      }
+
+      updateGreenhousesGazEmissions(updatedGreenhousesGazEmissions);
+
+    }
+    setGreenhousesGazEmissionsUnit(selectedUnit)
+  
+
+    props.impactsData.greenhousesGazEmissionsUnit = selectedUnit;
+
     props.onUpdate("ghg");
   };
 
@@ -83,24 +120,23 @@ const StatementGHG = (props) => {
         <Col sm={6}>
           <Row className="align-items-center">
             <Col>
-              <InputGroup>
-                <Form.Control
-                  type="number"
-                  value={roundValue(greenhousesGazEmissions, 0)}
-                  inputMode="numeric"
-                  onChange={updateGreenhousesGazEmissions}
-                  isInvalid={!isValid}
-                />
-                <InputGroup.Text>kgCO2e</InputGroup.Text>
-              </InputGroup>
-              {/* <Select
-                  options={options}
-                  value={{
-                    label: greenhousesGazEmissionsUnit,
-                    value: greenhousesGazEmissionsUnit,
-                  }}
-                  // onChange={}
-                /> */}
+              <Form.Control
+                type="number"
+                value={roundValue(greenhousesGazEmissions, 0)}
+                inputMode="numeric"
+                onChange={updateGreenhousesGazEmissions}
+                isInvalid={!isValid}
+              />
+            </Col>
+            <Col sm={3}>
+              <Select
+                options={options}
+                value={{
+                  label: greenhousesGazEmissionsUnit,
+                  value: greenhousesGazEmissionsUnit,
+                }}
+                onChange={updateGreenhousesGazEmissionsUnit}
+              />
             </Col>
             <Col>
               <Button
