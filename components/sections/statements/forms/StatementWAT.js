@@ -58,7 +58,7 @@ export class StatementWAT extends React.Component {
 
     const options = [
       { value: "m³", label: "m³" },
-      { value: "l", label: "l" },
+      { value: "L", label: "L" },
     ];
 
     let isValid = waterConsumption != null && netValueAdded != null;
@@ -149,7 +149,7 @@ export class StatementWAT extends React.Component {
       if (selectedUnit === "m³") {
         updatedWaterConsumption =
           waterConsumption / 1000;
-      } else if (selectedUnit === "l") {
+      } else if (selectedUnit === "L") {
         updatedWaterConsumption =
           waterConsumption * 1000;
       }
