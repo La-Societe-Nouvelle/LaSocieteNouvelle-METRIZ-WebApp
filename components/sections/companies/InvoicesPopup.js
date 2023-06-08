@@ -49,15 +49,15 @@ export class InvoicesPopup extends React.Component
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(invoicesData).map(([key,{legalUnitData}]) => (
+                  {Object.entries(invoicesData).map(([key,{legalUnitData,defaultMatching}]) => (
                     <tr key={key}>
                       <td>{key}</td>
                       <td>{legalUnitData.denomination}</td>
                       <td>
                         <select
                           className="form-select"
-                          //onChange={(e) => handleOnchange(accountToMapNum, e.target.value)}
-                          value={""}
+                          onChange={(e) => handleOnchange(key, e.target.value)}
+                          value={defaultMatching || ""}
                         >
                           <option value="">Aucun compte fournisseur associé</option>
                           {providers
@@ -89,6 +89,13 @@ export class InvoicesPopup extends React.Component
   }
 
   /* ---------- HEADER ACTIONS ---------- */
+
+  handleOnchange = async (providerId,providerNum) =>
+  {
+    let mapping = this.state.mapping;
+    mapping[providerId] = providerNum;
+    this.setState({ mapping });
+  }
 
   // Submit
   onSubmit = async () => 

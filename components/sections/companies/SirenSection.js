@@ -593,6 +593,43 @@ export class SirenSection extends React.Component
       }
     }
 
+    // default matching
+    console.log(invoicesProviders);
+    let defaultMatching = [];
+    // for each provider identified in invoices
+    for (let providerId of Object.keys(invoicesProviders))
+    {
+      let providerData = invoicesProviders[providerId];
+      let providersMatching = {};
+      // for each invoice
+      for (let invoiceData of providerData.invoices) 
+      {
+        let expensesMatching = this.props.financialData.externalExpenses.filter((expense) => invoiceData.dates.includes(expense.date) && invoiceData.amounts.includes(expense.amount));
+        // for each expense matching a date & an amount in invoices -> add to matching scores
+        expensesMatching.map(expense => expense.providerNum)
+          .filter((value, index, self) => index === self.findIndex((item) => item == value))
+          .forEach(providerNum => providersMatching[providerNum] = (providersMatching[providerNum] || 0)+1);
+      }
+      // if a least a match
+      if (Object.entries(providersMatching).length>0) 
+      {
+        // get providers (account aux) with max matching in invoices
+        let maxMatches = Math.max(...Object.values(providersMatching));
+        let providersWithMax = Object.entries(providersMatching).filter(([_,nbMatches]) => nbMatches==maxMatches).map(([providerNum,_]) => providerNum);
+        // if a single provider has max -> add to default matching array
+        if (providersWithMax.length==1) {
+          defaultMatching.push({
+            providerId,
+            denomination: providerData.legalUnitData.denomination,
+            providerNum: providersWithMax[0]
+          })
+        }
+      }
+    }
+    console.log(defaultMatching);
+    defaultMatching.filter((value,_,self) => self.filter((item) => item.providerId == value.providerId).length==1)
+      .forEach(matching => invoicesProviders[matching.providerId].defaultMatching = matching.providerNum);
+
     return invoicesProviders;
   };
 
