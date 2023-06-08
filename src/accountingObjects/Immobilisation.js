@@ -270,12 +270,18 @@ export class Immobilisation
         
         // update values
         let adjustedAmount = 0;
+        
         for (let stateToUpdate of statesToUpdate)
         {
-          let adjustedAmortisationExpenseAmount = roundValue(((stateToUpdate.amountToAmortise*stateToUpdate.nbDaysToAmortise)/totalToAmortise)*amortisationExpenseAmount, 2);
-          adjustedAmount = roundValue(adjustedAmount+adjustedAmortisationExpenseAmount, 2);
-          stateToUpdate.amortisationExpenseAmount = adjustedAmortisationExpenseAmount;
-          stateToUpdate.amortisationAmount = roundValue(stateToUpdate.amortisationAmount + adjustedAmount, 2);
+          // if last state -> add difference between total & initial
+          if (stateToUpdate.date==stateWithAmortisationExpenseToDivide.date) {
+            let difference = roundValue(adjustedAmount- amortisationExpenseAmount,2);
+            if (difference!=0) {
+              stateToUpdate.amortisationExpenseAmount = roundValue(stateToUpdate.amortisationExpenseAmount-difference, 2);
+              stateToUpdate.amortisationAmount = roundValue(stateToUpdate.amortisationAmount-difference, 2);
+            }
+          }
+    
         };
       }
     }
