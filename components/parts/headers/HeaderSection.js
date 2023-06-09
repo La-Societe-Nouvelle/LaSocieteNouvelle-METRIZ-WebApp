@@ -84,7 +84,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               <div className="step-name">Traitement des fournisseurs</div>
             </div>
             <div
-              className={"stepper-item" + (stepMax == 4 ? " completed" : "")}
+              className={"stepper-item" + (stepMax > 4 ? " completed" : "")}
             >
               <button
                 className={"step-counter" + (step == 4 ? " current" : "")}
@@ -94,6 +94,18 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
                 4
               </button>
               <div className="step-name">Déclaration des impacts directs</div>
+            </div>
+            <div
+              className={"stepper-item" + (stepMax == 5 ? " completed" : "")}
+            >
+              <button
+                className={"step-counter" + (step == 5 ? " current" : "")}
+                disabled={stepMax < 5}
+                onClick={() => setStep(5)}
+              >
+                5
+              </button>
+              <div className="step-name">Résultats</div>
             </div>
           </nav>
         </Container>

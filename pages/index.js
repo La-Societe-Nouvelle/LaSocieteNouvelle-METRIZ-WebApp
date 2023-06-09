@@ -16,6 +16,7 @@ import { ProvidersSection } from "../components/sections/companies/ProvidersSect
 import StatementSection from "../components/sections/statements/StatementSection";
 import { PublishStatementSection } from "../components/sections/PublishStatementSection";
 import DirectImpacts from "../components/sections/statements";
+import Results from "../components/sections/results";
 
 
 // Others components
@@ -109,7 +110,7 @@ class Metriz extends React.Component {
         >
           {step == 0 ? (
             <Header />
-          ) : step == 5 ? (
+          ) : step == 6 ? (
             <HeaderPublish
               setStep={this.setStep}
               downloadSession={this.downloadSession}
@@ -235,12 +236,16 @@ class Metriz extends React.Component {
         );
       case 4:
         return(
-          <DirectImpacts {...sectionProps} />
+          <DirectImpacts {...sectionProps} submit={this.validStatements}  />
         );
         // return (
         //   <StatementSection {...sectionProps} publish={() => this.setStep(5)} />
         // );
-      case 5:
+        case 5:
+          return(
+            <Results {...sectionProps}  publish={() => this.setStep(5)}/>
+          );
+      case 6:
         return (
           <PublishStatementSection
             {...sectionProps}
@@ -293,6 +298,14 @@ class Metriz extends React.Component {
     this.setStep(4);
     this.updateProgression(3);
   };
+  validStatements = async () => {
+    console.log("--------------------------------------------------");
+    console.log("Indicateurs déclarés");
+
+    this.setStep(5);
+    this.updateProgression(4);
+  };
+
 
   updateProgression = (step) => {
     this.state.session.progression = Math.max(
