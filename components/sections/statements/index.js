@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Col, Container, Image, Row } from "react-bootstrap";
+import { Button, Col, Container, Image, Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 import StatementComponent from "./parts/StatementComponent";
 
-const DirectImpacts = ({ session }) => {
-  console.log(session);
+const DirectImpacts = ({ session, submit}) => {
+ 
   const [period, setPeriod] = useState(session.financialPeriod);
   const [validations, SetValidations] = useState(
     session.validations[period.periodKey]
@@ -207,6 +207,15 @@ const DirectImpacts = ({ session }) => {
             </Col>
           ))}
         </Row>
+        {console.log(submit)}
+        <Button
+          variant="secondary"
+          onClick={() => submit()}
+          disabled={validations.length == 0 ? true : false}
+        >
+          Accéder aux résultats
+          <i className="bi bi-chevron-right"></i>
+        </Button>
       </section>
     </Container>
   );
