@@ -369,3 +369,22 @@ export function getEvolution(value, target) {
     return "-";
   }
 }
+
+
+export const getExpensesGroupByAccount = (expenses) => {
+  const expensesByAccount = {};
+  expenses.forEach(({ accountNum, accountLib, amount }) => {
+    if (!expensesByAccount[accountNum]) {
+      expensesByAccount[accountNum] = { accountNum, amount, accountLib };
+    } else {
+      expensesByAccount[accountNum].amount += amount;
+    }
+  });
+  return Object.entries(expensesByAccount).map(
+    ([accountNum, { amount, accountLib }]) => ({
+      accountNum,
+      amount,
+      accountLib,
+    })
+  );
+};
