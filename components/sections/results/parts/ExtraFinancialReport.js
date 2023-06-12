@@ -9,7 +9,7 @@ const ExtraFinancialReport = ({ indic, metaIndic, financialData, period, prevPer
     <section className="step">
       <h3 className="text-secondary">{metaIndic.libelle}</h3>
       <h4>Rapport - Analyse extra-financière</h4>
-{console.log(period)}
+
       <Row>
         <Col>
           <Tabs
