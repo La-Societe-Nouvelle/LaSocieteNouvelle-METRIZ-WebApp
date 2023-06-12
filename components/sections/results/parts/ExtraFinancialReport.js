@@ -2,13 +2,14 @@ import { Tab } from "bootstrap";
 import React from "react";
 import { Col, Row, Tabs } from "react-bootstrap";
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
+import { ExpensesTable } from "../tables/ExpensesTable";
 
 const ExtraFinancialReport = ({ indic, metaIndic, financialData, period, prevPeriod }) => {
   return (
     <section className="step">
       <h3 className="text-secondary">{metaIndic.libelle}</h3>
       <h4>Rapport - Analyse extra-financière</h4>
-
+{console.log(period)}
       <Row>
         <Col>
           <Tabs
@@ -25,7 +26,7 @@ const ExtraFinancialReport = ({ indic, metaIndic, financialData, period, prevPer
                 financialData={financialData}
                 indic={indic}
                 metaIndic={metaIndic}
-                periodKey={period}
+                period={period}
                 prevPeriod={prevPeriod}
               />
             </Tab>
@@ -33,12 +34,13 @@ const ExtraFinancialReport = ({ indic, metaIndic, financialData, period, prevPer
               eventKey="expensesAccounts"
               title=" Détails - Comptes de charges"
             >
-              {/* <IndicatorExpensesTable
-                session={session}
+              <ExpensesTable
+                externalExpensesAccounts={financialData.externalExpensesAccounts}
                 indic={indic}
+                metaIndic={metaIndic}
                 period={period}
                 prevPeriod={prevPeriod}
-              /> */}
+              />
             </Tab>
           </Tabs>
         </Col>
