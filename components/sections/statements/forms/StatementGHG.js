@@ -120,6 +120,7 @@ const StatementGHG = (props) => {
             </Col>
             <Col sm={3}>
               <Select
+              className="form-select-control"
                 options={options}
                 value={{
                   label: greenhousesGazEmissionsUnit,

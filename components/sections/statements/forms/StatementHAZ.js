@@ -1,6 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
+
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
@@ -12,6 +14,12 @@ const StatementHAZ = (props) => {
         undefined
       )
     );
+
+  const [
+    hazardousSubstancesConsumptionUnit,
+    setHazardousSubstancesConsumptionUnit,
+  ] = useState(props.impactsData.hazardousSubstancesConsumptionUnit);
+
   const [
     hazardousSubstancesConsumptionUncertainty,
     setHazardousSubstancesConsumptionUncertainty,
@@ -49,7 +57,7 @@ const StatementHAZ = (props) => {
     { value: "kg", label: "kg" },
     { value: "t", label: "t" },
   ];
-  
+
   const { netValueAdded } = props.impactsData;
   const isValid =
     hazardousSubstancesConsumption != null && netValueAdded != null;
@@ -67,9 +75,11 @@ const StatementHAZ = (props) => {
     props.onUpdate("haz");
   };
 
+  const updateHazardousSubstancesConsumptionUnit = (input) => {};
+
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.haz = info);
-  const onValidate = () => props.onValidate('haz');
+  const onValidate = () => props.onValidate("haz");
 
   return (
     <Form className="statement">
@@ -77,17 +87,27 @@ const StatementHAZ = (props) => {
         <Form.Label column sm={4}>
           Utilisation de produits dangereux - santé/environnement
         </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(hazardousSubstancesConsumption, 0)}
-              inputMode="numeric"
-              onChange={updateHazardousSubstancesConsumption}
-            />
-
-            <InputGroup.Text>kg</InputGroup.Text>
-          </InputGroup>
+        <Col sm={3}>
+          <Row>
+            <Col>
+              <Form.Control
+                type="number"
+                value={roundValue(hazardousSubstancesConsumption, 0)}
+                inputMode="numeric"
+                onChange={updateHazardousSubstancesConsumption}
+              />
+            </Col>
+            <Col sm={3}>
+              <Select
+                options={options}
+                defaultValue={{
+                  label: hazardousSubstancesConsumptionUnit,
+                  value: hazardousSubstancesConsumptionUnit,
+                }}
+                onChange={updateHazardousSubstancesConsumptionUnit}
+              />
+            </Col>{" "}
+          </Row>
         </Col>
       </Form.Group>
 
@@ -105,17 +125,8 @@ const StatementHAZ = (props) => {
             />
             <InputGroup.Text>%</InputGroup.Text>
           </InputGroup>
-                {/* <Select
-                  options={options}
-                  defaultValue={{
-                    label: hazardousSubstancesConsumptionUnit,
-                    value: hazardousSubstancesConsumptionUnit,
-                  }}
-                  onChange={this.updatehazardousSubstancesConsumptionUnit}
-                /> */}
         </Col>
       </Form.Group>
-
       <Form.Group as={Row} className="form-group">
         <Form.Label column sm={4}>
           Informations complémentaires
