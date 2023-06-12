@@ -18,7 +18,7 @@ export const MainAggregatesTable = ({
     financialData,
   indic,
   metaIndic,
-  periodKey,
+  period,
   prevPeriod,
 }) => {
 
@@ -46,14 +46,14 @@ export const MainAggregatesTable = ({
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
         financialData,
-        periodKey
+        period.periodKey
       );
     setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
 
     const fixedCapitalConsumptionsAggregates =
       await buildFixedCapitalConsumptionsAggregates(
         financialData,
-        periodKey
+        period.periodKey
       );
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
 
@@ -62,7 +62,7 @@ export const MainAggregatesTable = ({
       const prevIntermediateConsumptionsAggregates =
         await buildIntermediateConsumptionsAggregates(
           financialData,
-          prevPeriod.periodKey
+          prevPeriod.period.periodKey
         );
       const filteredPrevIntermediateConsumptionsAggregates =
         prevIntermediateConsumptionsAggregates.filter(
@@ -75,7 +75,7 @@ export const MainAggregatesTable = ({
       const prevFixedCapitalConsumptionsAggregates =
         await buildFixedCapitalConsumptionsAggregates(
           financialData,
-          prevPeriod.periodKey
+          prevPeriod.period.periodKey
         );
       const filteredPrevFixedCapitalConsumptionsAggregates =
         prevFixedCapitalConsumptionsAggregates.filter(
@@ -154,12 +154,12 @@ export const MainAggregatesTable = ({
           <tr className="fw-bold">
             <td>Production</td>
             <td className="text-end">
-              {printValue(production.periodsData[periodKey].amount, 0)}
+              {printValue(production.periodsData[period.periodKey].amount, 0)}
             </td>
   
             <td className="text-end">
               {printValue(
-                production.periodsData[periodKey].footprint.indicators[
+                production.periodsData[period.periodKey].footprint.indicators[
                   indic
                 ].getValue(),
                 nbDecimals
@@ -168,7 +168,7 @@ export const MainAggregatesTable = ({
             <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                production.periodsData[periodKey].footprint.indicators[
+                production.periodsData[period.periodKey].footprint.indicators[
                   indic
                 ].getUncertainty(),
                 0
@@ -177,10 +177,10 @@ export const MainAggregatesTable = ({
             {printGrossImpact && (
               <td className="text-end">
                 {printValue(
-                  production.periodsData[periodKey].footprint.indicators[
+                  production.periodsData[period.periodKey].footprint.indicators[
                     indic
                   ].getGrossImpact(
-                    production.periodsData[periodKey].amount
+                    production.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}
@@ -192,7 +192,7 @@ export const MainAggregatesTable = ({
                 <td className="text-end border-left">
                   {printValue(
                     production.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
@@ -202,7 +202,7 @@ export const MainAggregatesTable = ({
                   <u>+</u>
                   {printValue(
                     production.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getUncertainty(),
                     0
                   )}
@@ -212,9 +212,9 @@ export const MainAggregatesTable = ({
                   <td className="text-end">
                     {printValue(
                       production.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getGrossImpact(
-                        production.periodsData[prevPeriod.periodKey].amount
+                        production.periodsData[prevPeriod.period.periodKey].amount
                       ),
                       nbDecimals
                     )}
@@ -227,12 +227,12 @@ export const MainAggregatesTable = ({
           <tr>
             <td>&emsp;Production vendue</td>
             <td className="text-end">
-              {printValue(revenue.periodsData[periodKey].amount, 0)}{" "}
+              {printValue(revenue.periodsData[period.periodKey].amount, 0)}{" "}
               
             </td>
             <td className="text-end">
               {printValue(
-                revenue.periodsData[periodKey].footprint.indicators[
+                revenue.periodsData[period.periodKey].footprint.indicators[
                   indic
                 ].getValue(),
                 nbDecimals
@@ -242,7 +242,7 @@ export const MainAggregatesTable = ({
             <td className="text-end  pe-3">
               <u>+</u>
               {printValue(
-                revenue.periodsData[periodKey].footprint.indicators[
+                revenue.periodsData[period.periodKey].footprint.indicators[
                   indic
                 ].getUncertainty(),
                 0
@@ -252,10 +252,10 @@ export const MainAggregatesTable = ({
             {printGrossImpact ? (
               <td className="text-end">
                 {printValue(
-                  revenue.periodsData[periodKey].footprint.indicators[
+                  revenue.periodsData[period.periodKey].footprint.indicators[
                     indic
                   ].getGrossImpact(
-                    revenue.periodsData[periodKey].amount
+                    revenue.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}
@@ -267,7 +267,7 @@ export const MainAggregatesTable = ({
                 <td className="text-end border-left">
                   {printValue(
                     revenue.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
@@ -277,7 +277,7 @@ export const MainAggregatesTable = ({
                   <u>+</u>
                   {printValue(
                     revenue.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getUncertainty(),
                     0
                   )}
@@ -287,9 +287,9 @@ export const MainAggregatesTable = ({
                   <td className="text-end">
                     {printValue(
                       revenue.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getGrossImpact(
-                        revenue.periodsData[prevPeriod.periodKey].amount
+                        revenue.periodsData[prevPeriod.period.periodKey].amount
                       ),
                       nbDecimals
                     )}
@@ -304,7 +304,7 @@ export const MainAggregatesTable = ({
               <td>&emsp;Production stockée</td>
               <td className="text-end">
                 {printValue(
-                  storedProduction.periodsData[periodKey].amount,
+                  storedProduction.periodsData[period.periodKey].amount,
                   0
                 )}{" "}
                 
@@ -312,7 +312,7 @@ export const MainAggregatesTable = ({
               <td className="text-end">
                 {printValue(
                   storedProduction.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getValue(),
                   nbDecimals
                 )}{" "}
@@ -322,7 +322,7 @@ export const MainAggregatesTable = ({
                 <u>+</u>
                 {printValue(
                   storedProduction.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getUncertainty(),
                   0
                 )}
@@ -332,9 +332,9 @@ export const MainAggregatesTable = ({
                 <td className="text-end">
                   {printValue(
                     storedProduction.periodsData[
-                      periodKey
+                      period.periodKey
                     ].footprint.indicators[indic].getGrossImpact(
-                      storedProduction.periodsData[periodKey].amount
+                      storedProduction.periodsData[period.periodKey].amount
                     ),
                     nbDecimals
                   )}
@@ -347,7 +347,7 @@ export const MainAggregatesTable = ({
                   <td className="text-end border-left">
                     {printValue(
                       storedProduction.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getValue(),
                       nbDecimals
                     )}{" "}
@@ -357,7 +357,7 @@ export const MainAggregatesTable = ({
                     <u>+</u>
                     {printValue(
                       storedProduction.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getUncertainty(),
                       0
                     )}
@@ -367,9 +367,9 @@ export const MainAggregatesTable = ({
                     <td className="text-end">
                       {printValue(
                         storedProduction.periodsData[
-                          prevPeriod.periodKey
+                          prevPeriod.period.periodKey
                         ].footprint.indicators[indic].getGrossImpact(
-                          storedProduction.periodsData[periodKey].amount
+                          storedProduction.periodsData[period.periodKey].amount
                         ),
                         nbDecimals
                       )}
@@ -380,19 +380,19 @@ export const MainAggregatesTable = ({
               )}
             </tr>
           )}
-          {immobilisedProduction.periodsData[periodKey].amount > 0 && (
+          {immobilisedProduction.periodsData[period.periodKey].amount > 0 && (
             <tr>
               <td>&emsp;Production immobilisée</td>
               <td className="text-end">
                 {printValue(
-                  immobilisedProduction.periodsData[periodKey].amount,
+                  immobilisedProduction.periodsData[period.periodKey].amount,
                   0
                 )}
               </td>
               <td className="text-end">
                 {printValue(
                   immobilisedProduction.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getValue(),
                   nbDecimals
                 )}{" "}
@@ -402,7 +402,7 @@ export const MainAggregatesTable = ({
                 <u>+</u>
                 {printValue(
                   immobilisedProduction.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getUncertainty(),
                   0
                 )}
@@ -413,9 +413,9 @@ export const MainAggregatesTable = ({
                   (
                   {printValue(
                     immobilisedProduction.periodsData[
-                      periodKey
+                      period.periodKey
                     ].footprint.indicators[indic].getGrossImpact(
-                      immobilisedProduction.periodsData[periodKey].amount
+                      immobilisedProduction.periodsData[period.periodKey].amount
                     ),
                     nbDecimals
                   )}
@@ -428,7 +428,7 @@ export const MainAggregatesTable = ({
                   <td className="text-end border-left">
                     {printValue(
                       immobilisedProduction.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getValue(),
                       nbDecimals
                     )}{" "}
@@ -438,7 +438,7 @@ export const MainAggregatesTable = ({
                     <u>+</u>
                     {printValue(
                       immobilisedProduction.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getUncertainty(),
                       0
                     )}
@@ -449,10 +449,10 @@ export const MainAggregatesTable = ({
                       (
                       {printValue(
                         immobilisedProduction.periodsData[
-                          prevPeriod.periodKey
+                          prevPeriod.period.periodKey
                         ].footprint.indicators[indic].getGrossImpact(
                           immobilisedProduction.periodsData[
-                            prevPeriod.periodKey
+                            prevPeriod.period.periodKey
                           ].amount
                         ),
                         nbDecimals
@@ -468,7 +468,7 @@ export const MainAggregatesTable = ({
             <td>Consommations intermédiaires</td>
             <td className="text-end">
               {printValue(
-                intermediateConsumptions.periodsData[periodKey].amount,
+                intermediateConsumptions.periodsData[period.periodKey].amount,
                 0
               )}{" "}
               
@@ -476,7 +476,7 @@ export const MainAggregatesTable = ({
             <td className="text-end">
               {printValue(
                 intermediateConsumptions.periodsData[
-                  periodKey
+                  period.periodKey
                 ].footprint.indicators[indic].getValue(),
                 nbDecimals
               )}{" "}
@@ -486,7 +486,7 @@ export const MainAggregatesTable = ({
               <u>+</u>
               {printValue(
                 intermediateConsumptions.periodsData[
-                  periodKey
+                  period.periodKey
                 ].footprint.indicators[indic].getUncertainty(),
                 0
               )}
@@ -496,9 +496,9 @@ export const MainAggregatesTable = ({
               <td className="text-end">
                 {printValue(
                   intermediateConsumptions.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getGrossImpact(
-                    intermediateConsumptions.periodsData[periodKey]
+                    intermediateConsumptions.periodsData[period.periodKey]
                       .amount
                   ),
                   nbDecimals
@@ -512,7 +512,7 @@ export const MainAggregatesTable = ({
                 <td className="text-end border-left">
                   {printValue(
                     intermediateConsumptions.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
@@ -522,7 +522,7 @@ export const MainAggregatesTable = ({
                   <u>+</u>
                   {printValue(
                     intermediateConsumptions.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getUncertainty(),
                     0
                   )}
@@ -532,10 +532,10 @@ export const MainAggregatesTable = ({
                   <td className="text-end">
                     {printValue(
                       intermediateConsumptions.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getGrossImpact(
                         intermediateConsumptions.periodsData[
-                          prevPeriod.periodKey
+                          prevPeriod.period.periodKey
                         ].amount
                       ),
                       nbDecimals
@@ -617,7 +617,7 @@ export const MainAggregatesTable = ({
             <td>Consommations de capital fixe</td>
             <td className="text-end">
               {printValue(
-                fixedCapitalConsumptions.periodsData[periodKey].amount,
+                fixedCapitalConsumptions.periodsData[period.periodKey].amount,
                 0
               )}{" "}
               
@@ -625,7 +625,7 @@ export const MainAggregatesTable = ({
             <td className="text-end">
               {printValue(
                 fixedCapitalConsumptions.periodsData[
-                  periodKey
+                  period.periodKey
                 ].footprint.indicators[indic].getValue(),
                 nbDecimals
               )}{" "}
@@ -635,7 +635,7 @@ export const MainAggregatesTable = ({
               <u>+</u>
               {printValue(
                 fixedCapitalConsumptions.periodsData[
-                  periodKey
+                  period.periodKey
                 ].footprint.indicators[indic].getUncertainty(),
                 0
               )}
@@ -645,9 +645,9 @@ export const MainAggregatesTable = ({
               <td className="text-end">
                 {printValue(
                   fixedCapitalConsumptions.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getGrossImpact(
-                    fixedCapitalConsumptions.periodsData[periodKey]
+                    fixedCapitalConsumptions.periodsData[period.periodKey]
                       .amount
                   ),
                   nbDecimals
@@ -660,7 +660,7 @@ export const MainAggregatesTable = ({
                 <td className="text-end border-left">
                   {printValue(
                     fixedCapitalConsumptions.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
@@ -670,7 +670,7 @@ export const MainAggregatesTable = ({
                   <u>+</u>
                   {printValue(
                     fixedCapitalConsumptions.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getUncertainty(),
                     0
                   )}
@@ -680,10 +680,10 @@ export const MainAggregatesTable = ({
                   <td className="text-end">
                     {printValue(
                       fixedCapitalConsumptions.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getGrossImpact(
                         fixedCapitalConsumptions.periodsData[
-                          prevPeriod.periodKey
+                          prevPeriod.period.periodKey
                         ].amount
                       ),
                       nbDecimals
@@ -765,7 +765,7 @@ export const MainAggregatesTable = ({
             <td>Valeur ajoutée nette</td>
             <td className="text-end">
               {printValue(
-                netValueAdded.periodsData[periodKey].amount,
+                netValueAdded.periodsData[period.periodKey].amount,
                 0
               )}{" "}
               
@@ -773,7 +773,7 @@ export const MainAggregatesTable = ({
             <td className="text-end">
               {printValue(
                 netValueAdded.periodsData[
-                  periodKey
+                  period.periodKey
                 ].footprint.indicators[indic].getValue(),
                 nbDecimals
               )}{" "}
@@ -783,7 +783,7 @@ export const MainAggregatesTable = ({
               <u>+</u>
               {printValue(
                 netValueAdded.periodsData[
-                  periodKey
+                  period.periodKey
                 ].footprint.indicators[indic].getUncertainty(),
                 0
               )}
@@ -793,9 +793,9 @@ export const MainAggregatesTable = ({
               <td className="text-end" title="Impact direct de l'entreprise">
                 {printValue(
                   netValueAdded.periodsData[
-                    periodKey
+                    period.periodKey
                   ].footprint.indicators[indic].getGrossImpact(
-                    netValueAdded.periodsData[periodKey].amount
+                    netValueAdded.periodsData[period.periodKey].amount
                   ),
                   nbDecimals
                 )}
@@ -807,7 +807,7 @@ export const MainAggregatesTable = ({
                 <td className="text-end border-left">
                   {printValue(
                     netValueAdded.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}{" "}
@@ -817,7 +817,7 @@ export const MainAggregatesTable = ({
                   <u>+</u>
                   {printValue(
                     netValueAdded.periodsData[
-                      prevPeriod.periodKey
+                      prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getUncertainty(),
                     0
                   )}
@@ -830,9 +830,9 @@ export const MainAggregatesTable = ({
                   >
                     {printValue(
                       netValueAdded.periodsData[
-                        prevPeriod.periodKey
+                        prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getGrossImpact(
-                        netValueAdded.periodsData[prevPeriod.periodKey].amount
+                        netValueAdded.periodsData[prevPeriod.period.periodKey].amount
                       ),
                       nbDecimals
                     )}

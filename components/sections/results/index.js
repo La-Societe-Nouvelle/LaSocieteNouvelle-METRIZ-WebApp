@@ -25,7 +25,6 @@ const Results = ({ session, publish }) => {
     (period) => period.dateEnd == prevDateEnd
   );
 
-console.log(session.availablePeriods);
 
   useEffect(() => {
     const divisionsOptions = Object.entries(divisions)
@@ -108,7 +107,7 @@ console.log(session.availablePeriods);
           indic={selectedIndicator}
           metaIndic={indicators[selectedIndicator]}
           financialData={session.financialData}
-          period={financialPeriod}
+          period={session.financialPeriod}
           prevPeriod={prevPeriod}
         ></ExtraFinancialReport>
       )}
