@@ -164,7 +164,7 @@ const StatementGEQ = (props) => {
         </Col>
       </Form.Group>
       <div className="text-end">
-        <Button variant="secondary" disabled={isDisabled} onClick={onValidate}>
+        <Button variant="light-secondary" disabled={isDisabled} onClick={onValidate}>
           Valider
         </Button>
       </div>

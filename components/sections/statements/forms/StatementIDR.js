@@ -195,7 +195,7 @@ const StatementIDR = (props) => {
       <div className="text-end">
         <Button
           disabled={isDisabled || disableStatement}
-          variant="secondary"
+          variant="light-secondary"
           onClick={onValidate}
         >
           Valider

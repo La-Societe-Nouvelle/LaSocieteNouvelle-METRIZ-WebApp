@@ -5,9 +5,12 @@ import { Button, Col, Container, Row } from "react-bootstrap";
 
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
+
+import { getPrevDate } from "/src/utils/Utils";
+
 import ExtraFinancialReport from "./parts/ExtraFinancialReport";
 import FootprintReport from "./parts/FootprintReport";
-import { getPrevDate } from "/src/utils/Utils";
+import DonwloadComponent from "./parts/DonwloadComponent";
 
 const Results = ({ session, publish }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -144,6 +147,9 @@ const Results = ({ session, publish }) => {
           prevPeriod={prevPeriod}
         ></ExtraFinancialReport>
       )}
+     <DonwloadComponent>
+      
+      </DonwloadComponent> 
     </Container>
   );
 };

@@ -142,7 +142,7 @@ const StatementWAS = (props) => {
           <p className="small">
             <sup>1</sup> Déchets assimilés aux ordures ménagères
           </p>
-        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
           Valider
         </Button>
       </div>
