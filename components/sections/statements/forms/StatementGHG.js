@@ -197,7 +197,7 @@ const StatementGHG = (props) => {
         </p>
       </div>
       <div className="text-end">
-        <Button variant="secondary" disabled={!isValid} onClick={onValidate}>
+        <Button variant="light-secondary" disabled={!isValid} onClick={onValidate}>
           Valider
         </Button>
       </div>

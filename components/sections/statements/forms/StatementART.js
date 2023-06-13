@@ -190,7 +190,7 @@ const StatementART = (props) => {
           disabled={
             isInvalid  || showSuccessMessage
           }
-          variant="secondary"
+          variant="light-secondary"
           onClick={onValidate}
         >
           Valider

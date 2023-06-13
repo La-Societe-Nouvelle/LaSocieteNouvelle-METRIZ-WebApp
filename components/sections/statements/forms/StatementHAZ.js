@@ -143,7 +143,7 @@ const StatementHAZ = (props) => {
         </Col>
       </Form.Group>
       <div className="text-end">
-        <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
+        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
           Valider
         </Button>
       </div>
