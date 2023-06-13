@@ -139,11 +139,9 @@ const StatementWAS = (props) => {
       </Form.Group>
 
       <div className="d-flex justify-between">
-        <div className="notes">
           <p className="small">
             <sup>1</sup> Déchets assimilés aux ordures ménagères
           </p>
-        </div>
         <Button disabled={!isValid} variant="secondary" onClick={onValidate}>
           Valider
         </Button>
