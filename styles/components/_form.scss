@@ -57,12 +57,7 @@ table input {
   padding-left: 1.5rem;
 }
 
-.statement {
-  textarea {
-    width: 50%;
-    outline: none;
-  }
-}
+
 .statement-form {
   display: flex;
   justify-content: space-around;
@@ -100,4 +95,8 @@ table input {
   .form-label, .form-check-label {
     font-size: 0.9rem;
   }
+}
+
+.css-1s2u09g-control{
+  border: 1px solid $light;
 }

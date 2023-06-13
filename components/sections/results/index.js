@@ -15,16 +15,41 @@ const Results = ({ session, publish }) => {
   const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicator, setSelectedIndicator] = useState();
 
-  const [financialPeriod] = useState(
-    session.financialPeriod.periodKey
-  );
+  const [financialPeriod] = useState(session.financialPeriod.periodKey);
 
   const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
 
-  const prevPeriod =session.availablePeriods.find(
+  const prevPeriod = session.availablePeriods.find(
     (period) => period.dateEnd == prevDateEnd
   );
 
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      border: state.isFocused ? "2px solid #dbdef1" : "2px solid #f0f0f8",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#dbdef1",
+      },
+    }),
+    dropdownIndicator: (provided) => ({
+      ...provided,
+      color: "#dbdef1",
+      "&:hover": {
+        color: "#dbdef1",
+      },
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      fontSize: "0.85rem",
+      backgroundColor: state.isSelected ? '#191558' : 'transparent',
+      background: state.isFocused ? "#f0f0f8" : "",
+      "&:hover": {
+        color: "#191558",
+      },
+    }),
+  };
 
   useEffect(() => {
     const divisionsOptions = Object.entries(divisions)
@@ -54,53 +79,58 @@ const Results = ({ session, publish }) => {
   };
 
   return (
-    <Container fluid>
-      <section className="step">
-        <div className="d-flex justify-content-between">
-          <h2 className="mb-3">Etape 5 - Empreinte Sociétale </h2>
+    <Container fluid className="results">
+      <div className="box">
+        <div className="d-flex justify-content-between mb-3">
+          <h2>Etape 5 - Empreinte Sociétale </h2>
 
           <Button className=" btn-download">
             <i className="bi bi-download"></i> Rapport
           </Button>
         </div>
-        <p>Découvrez les résultats pour chaque indicateur mesuré</p>
+        <p className="mb-4">
+          Découvrez les résultats pour chaque indicateur mesuré et comparez les
+          avec votre branche.
+        </p>
         <Row>
           <Col>
-            <div className="p-5">
-              <Select
-                className="form-select-control"
-                options={divisionsOptions}
-                value={{
-                  label: selectedDivision + " - " + divisions[selectedDivision],
-                  value: selectedDivision,
-                }}
-                placeholder="Choisissez une division"
-                onChange={handleDivisionChange}
-              />
-            </div>
+            <Select
+              styles={customStyles}
+              components={{
+                IndicatorSeparator: () => null,
+              }}
+              options={indicatorsOptions}
+              value={
+                selectedIndicator
+                  ? {
+                      label: indicators[selectedIndicator].libelle,
+                      value: selectedIndicator,
+                    }
+                  : null
+              }
+              placeholder="Choisissez un indicateur"
+              onChange={handleIndicatorChange}
+            />
           </Col>
           <Col>
-            <div className="p-5">
-              <Select
-                className="form-select-control"
-                options={indicatorsOptions}
-                value={
-                  selectedIndicator
-                    ? {
-                        label: indicators[selectedIndicator].libelle,
-                        value: selectedIndicator,
-                      }
-                    : null
-                }
-                placeholder="Choisissez un indicateur"
-                onChange={handleIndicatorChange}
-              />
-            </div>
+            <Select
+              styles={customStyles}
+              options={divisionsOptions}
+              components={{
+                IndicatorSeparator: () => null,
+              }}
+              value={{
+                label: selectedDivision + " - " + divisions[selectedDivision],
+                value: selectedDivision,
+              }}
+              placeholder="Choisissez une division"
+              onChange={handleDivisionChange}
+            />
           </Col>
         </Row>
-      </section>
+      </div>
 
-      {(!selectedIndicator || !selectedDivision) && <FootprintReport /> } 
+      {(!selectedIndicator || !selectedDivision) && <FootprintReport />}
 
       {selectedIndicator && selectedDivision && selectedDivision != "00" && (
         <ExtraFinancialReport

@@ -97,12 +97,23 @@ section {
 }
 
 
-
-
-// STATEMENT
-
-
 /* ---------- Results ---------- */
+
+.results {
+  .box {
+    border: 2px solid #f0f0f8;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    h4{
+      margin-bottom: 2rem;
+    }
+
+  }
+  
+ 
+}
 
 .progressbar {
   width: 100%;

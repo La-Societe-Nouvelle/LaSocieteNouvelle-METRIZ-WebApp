@@ -93,8 +93,8 @@ const TrendsComponent = ({
       <div>
         <Row>
           <Col lg={8}>
-            <div className="step p-4">
-              <h3>Courbes d'évolution</h3>
+            <div className="box ">
+              <h4>Courbes d'évolution</h4>
 
               <Select
                 className="mb-4"
@@ -107,8 +107,8 @@ const TrendsComponent = ({
             </div>
           </Col>
           <Col>
-            <div className="step p-4">
-              <h3>Notes</h3>
+            <div className="box ">
+              <h4>Notes</h4>
               <p className="small-text">
                 Données pour la branche "{divisions[division]}"
               </p>

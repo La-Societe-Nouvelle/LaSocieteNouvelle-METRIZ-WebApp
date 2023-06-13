@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Col, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Image, Row, Tab, Tabs } from "react-bootstrap";
 
 import { printValue } from "/src/utils/Utils";
 
@@ -33,20 +33,29 @@ const ExtraFinancialReport = ({
 
   return (
     <>
-      <div className="step text-center p-3">
-        <h3 className="h2 text-secondary m-0">{metaIndic.libelle}</h3>
+      <div className="box ">
+        <div className="d-flex align-items-center">
+          <Image
+            className="me-2"
+            src={"icons-ese/" + indic + ".svg"}
+            alt={indic}
+            height={60}
+          />
+
+          <h3 className="text-secondary m-0">{metaIndic.libelle}</h3>
+        </div>
       </div>
-      <div className="my-3">
+      <div className="">
         {/* SIG and external expenses table */}
         <Row>
           <Col>
-            <div className="step p-4">
-              <h4 className="h3 mb-3">Rapport - Analyse extra-financière</h4>
+            <div className="box p-4">
+              <h4 >Rapport - Analyse extra-financière</h4>
               <Tabs
                 defaultActiveKey="mainAggregates"
                 transition={false}
                 id="noanim-tab-example"
-                className="mb-3"
+                className=""
               >
                 <Tab
                   eventKey="mainAggregates"
@@ -80,9 +89,9 @@ const ExtraFinancialReport = ({
           {/* ----------Gross Impact Chart ----------  */}
 
           {metaIndic.type == "intensité" && (
-            <Col lg={3}>
-              <div className="step p-4">
-                <h3 className="mb-5">Répartition des impacts bruts</h3>
+            <Col lg={4}>
+              <div className="box p-4">
+                <h4>Répartition des impacts bruts</h4>
                 <GrossImpactChart
                   id={"part-" + indic}
                   intermediateConsumptions={intermediateConsumptions.periodsData[
@@ -111,11 +120,11 @@ const ExtraFinancialReport = ({
 
       {/* --------- SIG Footprints charts ----------  */}
       {metaIndic.type == "proportion" && (
-        <section className="step my-3">
+        <div className="box ">
           <Row>
-            <h3 className="mb-5">
+            <h4>
               Empreintes des Soldes Intermédiaires de Gestion
-            </h3>
+            </h4>
             <Col>
               <h5 className="mb-4 text-center">▪ Production</h5>
               <div className="doughtnut-chart-container">
@@ -178,12 +187,12 @@ const ExtraFinancialReport = ({
               </div>
             </Col>
           </Row>
-        </section>
+        </div>
       )}
       {/* ---------Comparative data charts ----------  */}
 
-      <section className="step my-3 charts-container">
-        <h3>Comparaison par activité</h3>
+      <div className="box  charts-container">
+        <h4>Comparaison par activité</h4>
 
         <Row className="charts">
           <Col sm={3} xl={3} lg={3} md={3}>
@@ -304,10 +313,10 @@ const ExtraFinancialReport = ({
             />
           </Col>
         </Row>
-      </section>
+      </div>
       {/* ---------Comparative data Table ----------  */}
 
-      <section className="step my-3">
+      <div className="box ">
         <ComparativeTable
           financialData={financialData}
           indic={indic}
@@ -315,7 +324,7 @@ const ExtraFinancialReport = ({
           period={period}
           prevPeriod={prevPeriod}
         />
-      </section>
+      </div>
 
       {/* ---------- Trend Line Chart ----------  */}
       <TrendsComponent
@@ -328,16 +337,16 @@ const ExtraFinancialReport = ({
 
       {/* ---------- Analyse Note  ----------  */}
 
-      <section className="step">
-        <h3>Note d'analyse</h3>
-          <Analyse
-            indic={indic}
-            impactsData={impactsData}
-            financialData={financialData}
-            comparativeData={comparativeData}
-            period={period}
-          />
-      </section>
+      <div className="box">
+        <h4>Note d'analyse</h4>
+        <Analyse
+          indic={indic}
+          impactsData={impactsData}
+          financialData={financialData}
+          comparativeData={comparativeData}
+          period={period}
+        />
+      </div>
     </>
   );
 };
