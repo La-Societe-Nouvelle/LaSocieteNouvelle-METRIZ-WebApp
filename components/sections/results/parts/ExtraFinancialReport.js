@@ -1,6 +1,5 @@
-import { Tab } from "bootstrap";
 import React from "react";
-import { Col, Row, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs } from "react-bootstrap";
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
 
