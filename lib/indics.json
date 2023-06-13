@@ -70,7 +70,7 @@
     "isAvailable" : true
   },
   "haz": {
-    "isBeta": true,
+    "isBeta": false,
     "libelle": "Intensité d'Utilisation de produits dangereux",
     "libelleDeclaredValue": "Quantité utilisée de produits dangereux pour la santé et/ou l'environnement",
     "libelleGrandeur": "Utilisation de produits dangereux",

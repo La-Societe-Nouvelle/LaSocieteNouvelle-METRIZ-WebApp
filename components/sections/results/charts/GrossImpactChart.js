@@ -5,15 +5,10 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
-function GrossImpactChart(props) {
-  let intermediateConsumptions = props.intermediateConsumptions;
-  let fixedCapitalConsumptions = props.fixedCapitalConsumptions;
-  let netValueAdded = props.netValueAdded;
+function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, netValueAdded,id}) {
 
-  let total =
-    props.intermediateConsumptions +
-    props.fixedCapitalConsumptions +
-    props.netValueAdded;
+
+  let total = intermediateConsumptions + fixedCapitalConsumptions + netValueAdded;
 
   intermediateConsumptions = (intermediateConsumptions / total) * 100;
   fixedCapitalConsumptions = (fixedCapitalConsumptions / total) * 100;
@@ -81,7 +76,7 @@ function GrossImpactChart(props) {
     },
   };
 
-  return <Doughnut id={props.id} data={data} options={options} />;
+  return <Doughnut id={id} data={data} options={options} />;
 }
 
 export default GrossImpactChart;
