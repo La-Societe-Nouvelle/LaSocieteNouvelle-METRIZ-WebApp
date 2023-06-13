@@ -10,13 +10,8 @@ p.toChecked {
 }
 
 table {
-  font-size: 0.85em;
-  border-radius: 1rem;
-  border: 2px solid $bg-light;
-
   tr.fw-bold td {
-    padding: 0.5rem 0.25rem;
-    background-color: darken($bg-light, 1%);
+    background-color: $bg-light;
   }
 
   .siren {
@@ -72,15 +67,16 @@ table {
 
   thead {
     background-color: $primary;
-    tr th, tr td {
+    tr th,
+    tr td {
       color: #fff !important;
     }
     font-weight: 700;
-    font-size: 1em;
     tr:nth-child(2),
     tr:nth-child(3) {
       background-color: lighten($primary, 5%);
-      th,td {
+      th,
+      td {
         color: #fff !important;
       }
     }
@@ -149,6 +145,10 @@ table {
   }
 }
 
+.table{
+  font-size: 0.8rem;
+
+}
 .table-navigation {
   margin: 0 2px;
   padding: 5px 2px;

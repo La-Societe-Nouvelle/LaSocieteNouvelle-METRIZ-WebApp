@@ -106,8 +106,7 @@ export const MainAggregatesTable = ({
     indic
   );
   return (
-    <>
-      <Table id="mainAggregates" size="sm" responsive>
+      <Table id="mainAggregates" className="shadow-sm">
         <thead>
           <tr>
             <th>Agrégat</th>
@@ -194,7 +193,7 @@ export const MainAggregatesTable = ({
                       prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
 
                 </td>
                 <td className="text-end  pe-3">
@@ -226,7 +225,7 @@ export const MainAggregatesTable = ({
           <tr>
             <td>&emsp;Production vendue</td>
             <td className="text-end">
-              {printValue(revenue.periodsData[period.periodKey].amount, 0)}{" "}
+              {printValue(revenue.periodsData[period.periodKey].amount, 0)}
               
             </td>
             <td className="text-end">
@@ -235,8 +234,8 @@ export const MainAggregatesTable = ({
                   indic
                 ].getValue(),
                 nbDecimals
-              )}{" "}
-              <span className="unit"></span>
+              )}
+              
             </td>
             <td className="text-end  pe-3">
               <u>+</u>
@@ -269,7 +268,7 @@ export const MainAggregatesTable = ({
                       prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
 
                 </td>
                 <td className="text-end  pe-3">
@@ -305,7 +304,7 @@ export const MainAggregatesTable = ({
                 {printValue(
                   storedProduction.periodsData[period.periodKey].amount,
                   0
-                )}{" "}
+                )}
                 
               </td>
               <td className="text-end">
@@ -314,8 +313,8 @@ export const MainAggregatesTable = ({
                     period.periodKey
                   ].footprint.indicators[indic].getValue(),
                   nbDecimals
-                )}{" "}
-                <span className="unit"></span>
+                )}
+                
               </td>
               <td className="text-end  pe-3">
                 <u>+</u>
@@ -349,7 +348,7 @@ export const MainAggregatesTable = ({
                         prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getValue(),
                       nbDecimals
-                    )}{" "}
+                    )}
   
                   </td>
                   <td className="text-end  pe-3">
@@ -394,8 +393,8 @@ export const MainAggregatesTable = ({
                     period.periodKey
                   ].footprint.indicators[indic].getValue(),
                   nbDecimals
-                )}{" "}
-                <span className="unit"></span>
+                )}
+                
               </td>
               <td className="text-end  pe-3">
                 <u>+</u>
@@ -430,7 +429,7 @@ export const MainAggregatesTable = ({
                         prevPeriod.period.periodKey
                       ].footprint.indicators[indic].getValue(),
                       nbDecimals
-                    )}{" "}
+                    )}
   
                   </td>
                   <td className="text-end  pe-3">
@@ -469,7 +468,7 @@ export const MainAggregatesTable = ({
               {printValue(
                 intermediateConsumptions.periodsData[period.periodKey].amount,
                 0
-              )}{" "}
+              )}
               
             </td>
             <td className="text-end">
@@ -478,8 +477,8 @@ export const MainAggregatesTable = ({
                   period.periodKey
                 ].footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}{" "}
-              <span className="unit"></span>
+              )}
+              
             </td>
             <td className="text-end  pe-3">
               <u>+</u>
@@ -514,7 +513,7 @@ export const MainAggregatesTable = ({
                       prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
 
                 </td>
                 <td className="text-end  pe-3">
@@ -556,7 +555,7 @@ export const MainAggregatesTable = ({
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
 
                 </td>
                 <td className="text-end  pe-3">
@@ -581,7 +580,7 @@ export const MainAggregatesTable = ({
                             index
                           ].footprint.indicators[indic].getValue(),
                           nbDecimals
-                        )}{" "}
+                        )}
       
                       </td>
                       <td className="text-end  pe-3">
@@ -618,7 +617,7 @@ export const MainAggregatesTable = ({
               {printValue(
                 fixedCapitalConsumptions.periodsData[period.periodKey].amount,
                 0
-              )}{" "}
+              )}
               
             </td>
             <td className="text-end">
@@ -627,8 +626,8 @@ export const MainAggregatesTable = ({
                   period.periodKey
                 ].footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}{" "}
-              <span className="unit"></span>
+              )}
+              
             </td>
             <td className="text-end  pe-3">
               <u>+</u>
@@ -650,7 +649,7 @@ export const MainAggregatesTable = ({
                       .amount
                   ),
                   nbDecimals
-                )}{" "}
+                )}
                
               </td>
             ) }
@@ -662,7 +661,7 @@ export const MainAggregatesTable = ({
                       prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
 
                 </td>
                 <td className="text-end  pe-3">
@@ -686,7 +685,7 @@ export const MainAggregatesTable = ({
                         ].amount
                       ),
                       nbDecimals
-                    )}{" "}
+                    )}
                    
                   </td>
                 )}
@@ -704,7 +703,7 @@ export const MainAggregatesTable = ({
                   {printValue(
                     footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
                   <span className="unit">  </span>
                 </td>
                 <td className="text-end  pe-3">
@@ -729,7 +728,7 @@ export const MainAggregatesTable = ({
                             index
                           ].footprint.indicators[indic].getValue(),
                           nbDecimals
-                        )}{" "}
+                        )}
                         <span className="unit">  </span>
                       </td>
                       <td className="text-end  pe-3">
@@ -766,7 +765,7 @@ export const MainAggregatesTable = ({
               {printValue(
                 netValueAdded.periodsData[period.periodKey].amount,
                 0
-              )}{" "}
+              )}
               
             </td>
             <td className="text-end">
@@ -775,8 +774,8 @@ export const MainAggregatesTable = ({
                   period.periodKey
                 ].footprint.indicators[indic].getValue(),
                 nbDecimals
-              )}{" "}
-              <span className="unit"></span>
+              )}
+              
             </td>
             <td className="text-end  pe-3">
               <u>+</u>
@@ -809,7 +808,7 @@ export const MainAggregatesTable = ({
                       prevPeriod.period.periodKey
                     ].footprint.indicators[indic].getValue(),
                     nbDecimals
-                  )}{" "}
+                  )}
 
                 </td>
                 <td className="text-end  pe-3">
@@ -843,8 +842,6 @@ export const MainAggregatesTable = ({
           </tr>
         </tbody>
       </Table>
- 
 
-    </>
   );
 };

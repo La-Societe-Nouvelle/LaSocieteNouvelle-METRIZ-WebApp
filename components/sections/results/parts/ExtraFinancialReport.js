@@ -45,7 +45,7 @@ const ExtraFinancialReport = ({
           <h3 className="text-secondary m-0">{metaIndic.libelle}</h3>
         </div>
       </div>
-      <div className="">
+      <div>
         {/* SIG and external expenses table */}
         <Row>
           <Col>
@@ -55,7 +55,7 @@ const ExtraFinancialReport = ({
                 defaultActiveKey="mainAggregates"
                 transition={false}
                 id="noanim-tab-example"
-                className=""
+                
               >
                 <Tab
                   eventKey="mainAggregates"
@@ -90,7 +90,7 @@ const ExtraFinancialReport = ({
 
           {metaIndic.type == "intensité" && (
             <Col lg={4}>
-              <div className="box p-4">
+              <div className="box">
                 <h4>Répartition des impacts bruts</h4>
                 <GrossImpactChart
                   id={"part-" + indic}

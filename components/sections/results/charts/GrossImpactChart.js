@@ -42,6 +42,9 @@ function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, n
     devicePixelRatio: 2,
     maintainAspectRatio: true,
     aspectRatio: 1, // specify aspect ratio
+    layout : {
+      padding : 50
+    },
     plugins: {
       legend: {
         display: false,
