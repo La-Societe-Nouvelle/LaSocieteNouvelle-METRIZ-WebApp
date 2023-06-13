@@ -88,69 +88,95 @@ const TrendsComponent = ({
     );
   };
 
+  const customStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      border: state.isFocused ? "2px solid #dbdef1" : "2px solid #f0f0f8",
+      borderRadius: "0.5rem",
+      boxShadow: "none",
+      "&:hover": {
+        borderColor: "#dbdef1",
+      },
+    }),
+    dropdownIndicator: (provided) => ({
+      ...provided,
+      color: "#dbdef1",
+      "&:hover": {
+        color: "#dbdef1",
+      },
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      fontSize: "0.85rem",
+      backgroundColor: state.isSelected ? '#191558' : 'transparent',
+      background: state.isFocused ? "#f0f0f8" : "",
+      "&:hover": {
+        color: "#191558",
+      },
+    }),
+  };
+  
   return (
-    <>
-      <div>
-        <Row>
-          <Col lg={8}>
-            <div className="box ">
-              <h4>Courbes d'évolution</h4>
+    <Row>
+      <Col lg={8}>
+        <div className="box ">
+          <h4>Courbes d'évolution</h4>
 
-              <Select
-                className="mb-4"
-                defaultValue={trendGraphView}
-                options={graphOptions}
-                onChange={changeTrendGraphView}
-              />
+          <Select
+            styles={customStyles}
+            className="mb-4"
+            defaultValue={trendGraphView}
+            options={graphOptions}
+            onChange={changeTrendGraphView}
+          />
 
-              {renderTrendsChart()}
-            </div>
-          </Col>
-          <Col>
-            <div className="box ">
-              <h4>Notes</h4>
-              <p className="small-text">
-                Données pour la branche "{divisions[division]}"
-              </p>
-              <h5>Tendance de la branche :</h5>
-              <p className="small-text">
+          {renderTrendsChart()}
+        </div>
+      </Col>
+      <Col>
+        <div className="box ">
+          <h4>Notes</h4>
+          <p className="small-text">
+            Données pour la branche "{divisions[division]}"
+          </p>
+          <h5>Tendance de la branche :</h5>
+          <p className="small-text">
+            {
+              comparativeData.production.trendsFootprint.indicators[indic].meta
+                .info
+            }
+          </p>
+
+          {comparativeData.production.targetDivisionFootprint.indicators[indic]
+            .meta.info && (
+            <>
+              <h5>Objectif de la branche :</h5>
+              <p>
                 {
-                  comparativeData.production.trendsFootprint.indicators[indic]
-                    .meta.info
+                  comparativeData.production.targetDivisionFootprint.indicators[
+                    indic
+                  ].meta.info
                 }
               </p>
-
-              {comparativeData.production.targetDivisionFootprint.indicators[
-                indic
-              ].meta.info && (
-                <>
-                  <h5>Objectif de la branche :</h5>
-                  <p>
-                    {
-                      comparativeData.production.targetDivisionFootprint
-                        .indicators[indic].meta.info
-                    }
-                  </p>
-                </>
-              )}
-              <hr />
-              <p>
-                Source :&nbsp;
-                {comparativeData.production.trendsFootprint.indicators[indic]
-                  .meta.source + " (Tendance)"}
-                {comparativeData.production.targetDivisionFootprint.indicators[
+            </>
+          )}
+          <hr />
+          <p>
+            Source :&nbsp;
+            {comparativeData.production.trendsFootprint.indicators[indic].meta
+              .source + " (Tendance)"}
+            {comparativeData.production.targetDivisionFootprint.indicators[
+              indic
+            ].meta.source &&
+              ", " +
+                comparativeData.production.targetDivisionFootprint.indicators[
                   indic
-                ].meta.source &&
-                  ", " +
-                    comparativeData.production.targetDivisionFootprint
-                      .indicators[indic].meta.source +
-                    " (Objectif)"}
-              </p>
-            </div>
-          </Col>
-        </Row>
-      </div>
-    </>
+                ].meta.source +
+                " (Objectif)"}
+          </p>
+        </div>
+      </Col>
+    </Row>
   );
 };
 

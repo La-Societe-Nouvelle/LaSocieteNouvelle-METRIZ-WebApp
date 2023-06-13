@@ -53,8 +53,7 @@ export const  ExpensesTable = ({
   };
 
   return (
-    <div className="table-main">
-      <Table id="indicatorExpenses">
+      <Table id="indicatorExpenses"  className="shadow-sm ">
         <thead>
           <tr>
             <th></th>
@@ -205,7 +204,6 @@ export const  ExpensesTable = ({
           )}
         </tbody>
       </Table>
-    </div>
   );
 };
 

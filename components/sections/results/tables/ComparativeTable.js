@@ -82,7 +82,7 @@ export const ComparativeTable = ({
       : true;
 
   return (
-    <Table className="mt-5 comparative-table">
+    <Table className="comparative-table shadow-sm" >
       <thead>
         <tr>
           <td>Agrégat</td>
