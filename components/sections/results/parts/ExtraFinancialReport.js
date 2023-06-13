@@ -330,7 +330,6 @@ const ExtraFinancialReport = ({
 
       <section className="step">
         <h3>Note d'analyse</h3>
-        <div id="analyse">
           <Analyse
             indic={indic}
             impactsData={impactsData}
@@ -338,7 +337,6 @@ const ExtraFinancialReport = ({
             comparativeData={comparativeData}
             period={period}
           />
-        </div>
       </section>
     </>
   );

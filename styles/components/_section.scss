@@ -46,24 +46,7 @@ section {
 }
 
 /* Indicator Section*/
-  .card {
-    margin-bottom: 5px;
-    border: none;
-  }
-  .card-header {
-    padding: 0.75rem 1rem;
-    background-color: #fff;
-    border: 1px solid darken(#fbfbff, 5%);
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
-      border-radius 0.15s ease;
-  }
-  .card-body {
-    background-color: #fbfbff;
-    border-left: 1px solid darken(#fbfbff, 5%);
-    border-right: 1px solid darken(#fbfbff, 5%);
-    border-bottom: 1px solid darken(#fbfbff, 5%);
-  }
+
 .indicator-section {
   
   .icon-success {
@@ -113,62 +96,12 @@ section {
   }
 }
 
-// validation button
-.statement-validation {
-  text-align: right;
-}
 
-.impact-result {
-  padding: 1em 0;
-}
 
-// GRAPH
-
-.analysis-container {
-  display: flex;
-  align-items: center;
-
-  p {
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
-  }
-}
 
 // STATEMENT
 
-/* ---------- STATEMENT ---------- */
 
-.statement {
-  .statement-area {
-    margin-bottom: 15px;
-    padding: 10px;
-    //border: solid 1px $secondary;
-  }
-
-  // statement item
-  .statement-item {
-    // assessment button
-    .assessment-button-container {
-      margin-left: auto;
-
-      .assessment-button {
-        width: 150px;
-      }
-    }
-  }
-}
-
-.or {
-  text-align: center;
-  font-weight: 800;
-}
-
-/* ---------- Results ---------- */
-
-.rapport-indic h3 {
-  color: $primary;
-  font-size: 1.4rem;
-}
 /* ---------- Results ---------- */
 
 .progressbar {
