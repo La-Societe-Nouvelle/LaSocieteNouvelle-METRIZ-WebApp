@@ -15,7 +15,7 @@ const Results = ({ session, publish }) => {
   const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicator, setSelectedIndicator] = useState();
 
-  const [financialPeriod, setFinancialPeriod] = useState(
+  const [financialPeriod] = useState(
     session.financialPeriod.periodKey
   );
 
@@ -100,13 +100,15 @@ const Results = ({ session, publish }) => {
         </Row>
       </section>
 
-      {(!selectedIndicator || !selectedDivision) && <FootprintReport />}
+      {(!selectedIndicator || !selectedDivision) && <FootprintReport /> } 
 
       {selectedIndicator && selectedDivision && selectedDivision != "00" && (
         <ExtraFinancialReport
           indic={selectedIndicator}
+          division={selectedDivision}
           metaIndic={indicators[selectedIndicator]}
           financialData={session.financialData}
+          comparativeData={session.comparativeData}
           period={session.financialPeriod}
           prevPeriod={prevPeriod}
         ></ExtraFinancialReport>

@@ -105,7 +105,6 @@ export const MainAggregatesTable = ({
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
     indic
   );
-  {console.log(prevPeriod)}
   return (
     <>
       <Table id="mainAggregates" size="sm" responsive>

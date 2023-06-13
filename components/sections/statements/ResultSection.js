@@ -358,7 +358,7 @@ const ResultSection = (props) => {
           onChange={changeComparativeDivision}
         />
         {error && <ErrorApi />}
-        <div className="graph-container">
+        <div className="charts-container">
           <div className="mt-5">
             <Row className="charts">
               <Col sm={3} xl={3} lg={3} md={3}>
