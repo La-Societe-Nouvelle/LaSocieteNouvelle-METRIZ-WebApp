@@ -108,6 +108,7 @@ const Results = ({ session, publish }) => {
           division={selectedDivision}
           metaIndic={indicators[selectedIndicator]}
           financialData={session.financialData}
+          impactsData={session.impactsData}
           comparativeData={session.comparativeData}
           period={session.financialPeriod}
           prevPeriod={prevPeriod}
