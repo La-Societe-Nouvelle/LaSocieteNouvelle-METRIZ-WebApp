@@ -1,4 +1,4 @@
-import React  from "react";
+import React from "react";
 
 import { Col, Row, Tab, Tabs } from "react-bootstrap";
 
@@ -12,12 +12,14 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 import ComparativeChart from "../charts/ComparativeChart";
 import SigPieChart from "../charts/SigPieChart";
 import TrendsComponent from "./TrendsComponent";
+import Analyse from "./AnalyseComponent";
 
 const ExtraFinancialReport = ({
   indic,
   division,
   metaIndic,
   financialData,
+  impactsData,
   comparativeData,
   period,
   prevPeriod,
@@ -28,7 +30,6 @@ const ExtraFinancialReport = ({
     fixedCapitalConsumptions,
     netValueAdded,
   } = financialData.mainAggregates;
-
 
   return (
     <>
@@ -324,6 +325,21 @@ const ExtraFinancialReport = ({
         unit={metaIndic.unit}
         division={division}
       />
+
+      {/* ---------- Analyse Note  ----------  */}
+
+      <section className="step">
+        <h3>Note d'analyse</h3>
+        <div id="analyse">
+          <Analyse
+            indic={indic}
+            impactsData={impactsData}
+            financialData={financialData}
+            comparativeData={comparativeData}
+            period={period}
+          />
+        </div>
+      </section>
     </>
   );
 };
