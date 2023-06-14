@@ -21,7 +21,7 @@ import { getSignificativeProviders } from "/src/formulas/significativeLimitFormu
 // API
 import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
 // pdf extractor
-import pdf from 'pdf-extraction';
+import pdf from "pdf-extraction";
 import { number } from "prop-types";
 import { InvoicesPopup } from "./InvoicesPopup";
 import { getDefaultFootprintId } from "../../../src/Provider";
@@ -33,15 +33,13 @@ const identificationPatterns = [
   /FR [0-9]{2} [0-9]{3} [0-9]{3} [0-9]{3}( |$|\r\n|\r|\n)/g,
   /(SIRET|SIREN|RCS)( |)[0-9]{9,15}( |)($|\r\n|\r|\n)/g,
   /(^|)( |)[0-9]{9,15}( |)(SIRET|SIREN|RCS)/g,
-]
+];
 
-export class SirenSection extends React.Component 
-{
-  constructor(props) 
-  {
+export class SirenSection extends React.Component {
+  constructor(props) {
     super(props);
     this.state = {
-      significativeProviders: [],   // significative companies
+      significativeProviders: [], // significative companies
       view: "all",
       nbItems: 20,
       fetching: false,
@@ -49,8 +47,11 @@ export class SirenSection extends React.Component
       progression: 0,
       synchronised: 0,
       popup: false,
+      invoicesPopup: false,
       isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
-      isNextStepAvailable: checkNextStepAvailable(props.financialData.providers),
+      isNextStepAvailable: checkNextStepAvailable(
+        props.financialData.providers
+      ),
       errorFile: false,
       error: false,
       minFpt: null,
@@ -58,8 +59,7 @@ export class SirenSection extends React.Component
       invoicesData: null,
     };
 
-    this.onDrop = (files) => 
-    {
+    this.onDrop = (files) => {
       if (files.length) {
         this.importFile(files[0]);
         this.openPopup();
@@ -69,47 +69,56 @@ export class SirenSection extends React.Component
       }
     };
 
-    this.onInvoicesDrop = async (files) => 
-    {
+    this.onInvoicesDrop = async (files) => {
       console.log(files);
       console.log(files.length);
-      if (files.length>0) {
+      if (files.length > 0) {
         let invoicesData = await this.readInvoices(files);
-        console.log(invoicesData);
-        this.openPopup();
-        this.setState({ errorFile: false, invoicesData });
+        this.setState({
+          fetching: false,
+          progression: 0,
+          invoicesPopup: true,
+          errorFile: false,
+          invoicesData,
+        });
       } else {
-        this.setState({ errorFile: true, invoicesData: null });
+        this.setState({
+          invoicesPopup: false,
+          errorFile: true,
+          invoicesData: null,
+        });
       }
     };
   }
 
-  componentDidMount = async () =>
-  {
+  componentDidMount = async () => {
     let minFpt = await fetchMinFootprint();
     let maxFpt = await fetchMaxFootprint();
     let significativeProviders = await getSignificativeProviders(
       this.props.financialData.providers,
-      minFpt,maxFpt,
+      minFpt,
+      maxFpt,
       this.props.financialPeriod
     );
-    this.setState({significativeProviders,minFpt,maxFpt})
-  }
+    this.setState({ significativeProviders, minFpt, maxFpt });
+  };
 
-  componentDidUpdate = () =>
-  {
-    
+  componentDidUpdate = () => {
     // next step available
-    const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
-    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+    const isNextStepAvailable = checkNextStepAvailable(
+      this.props.financialData.providers
+    );
+    if (this.state.isNextStepAvailable != isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
     // providers fpt to sync
-    const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
-    if (this.state.isSyncButtonEnable!=isSyncButtonEnable) {
+    const isSyncButtonEnable = checkSyncButtonEnable(
+      this.props.financialData.providers
+    );
+    if (this.state.isSyncButtonEnable != isSyncButtonEnable) {
       this.setState({ isSyncButtonEnable });
     }
-  }
+  };
 
   render() {
     const {
@@ -119,24 +128,38 @@ export class SirenSection extends React.Component
       fetching,
       progression,
       popup,
+      invoicesPopup,
       isSyncButtonEnable,
       isNextStepAvailable,
       errorFile,
       error,
-      invoicesData
+      invoicesData,
     } = this.state;
 
     const financialData = this.props.financialData;
     const financialPeriod = this.props.financialPeriod;
 
-    const providers = financialData.providers.filter(provider => provider.periodsData.hasOwnProperty(financialPeriod.periodKey));
+    const providers = financialData.providers.filter((provider) =>
+      provider.periodsData.hasOwnProperty(financialPeriod.periodKey)
+    );
 
     //const providers = financialData.providers ;
-    const showedProviders = getShowedProviders(view,providers,significativeProviders);
-    const allProvidersIdentified = (providers.filter((provider) => provider.footprintStatus == 200).length == providers.length);
+    const showedProviders = getShowedProviders(
+      view,
+      providers,
+      significativeProviders
+    );
+    const allProvidersIdentified =
+      providers.filter((provider) => provider.footprintStatus == 200).length ==
+      providers.length;
 
-    const nbSignificativeProvidersUnidentified = providers.filter((provider) => provider.useDefaultFootprint && significativeProviders.includes(provider.providerNum)).length;
-    const someSignificativeProvidersUnidentified = nbSignificativeProvidersUnidentified > 0;
+    const nbSignificativeProvidersUnidentified = providers.filter(
+      (provider) =>
+        provider.useDefaultFootprint &&
+        significativeProviders.includes(provider.providerNum)
+    ).length;
+    const someSignificativeProvidersUnidentified =
+      nbSignificativeProvidersUnidentified > 0;
 
     return (
       <Container fluid id="siren-section">
@@ -187,7 +210,9 @@ export class SirenSection extends React.Component
 
             {errorFile && (
               <div className="alert alert-danger">
-                <p> <i className="bi bi-x-octagon"></i> Fichier incorrect</p>
+                <p>
+                  <i className="bi bi-x-octagon"></i> Fichier incorrect
+                </p>
               </div>
             )}
             {popup && (
@@ -215,34 +240,22 @@ export class SirenSection extends React.Component
                       Glisser vos factures ici
                     </p>
                     <p className="small">OU</p>
-                    <p className="btn btn-primary">
-                      Selectionner les fichiers
-                    </p>
+                    <p className="btn btn-primary">Selectionner les fichiers</p>
                   </div>
                 </div>
               )}
             </Dropzone>
 
-            {errorFile && (
-              <div className="alert alert-danger">
-                <p> <i className="bi bi-x-octagon"></i> Fichier incorrect</p>
-              </div>
-            )}
-            {popup && (
-              <MessagePopup
-                message="Votre fichier a bien été importé !"
-                type="success"
-                closePopup={() => this.closePopup()}
-              />
-            )}
-            {invoicesData &&
-              <InvoicesPopup 
+            {invoicesPopup && (
+              <InvoicesPopup
                 invoicesData={invoicesData}
                 providers={providers}
-                closePopup={() => this.closePopup()}
-                onGoBack={(invoicesData) => this.setInvoicesProvider(invoicesData)}
+                closeinvoicesPopup={() => this.closeinvoicesPopup()}
+                onGoBack={(invoicesData) =>
+                  this.setInvoicesProvider(invoicesData)
+                }
               />
-            }
+            )}
           </div>
           <div className="step" id="step-3">
             <h4>3. Synchroniser les données de vos fournisseurs</h4>
@@ -287,22 +300,22 @@ export class SirenSection extends React.Component
                       </button>
                     )}
                   </div>
-                ) : 
-                <div className="alert alert-info">
-                <p>
-                  <i className="bi bi bi-exclamation-circle"></i> Les
-                  empreintes de certains comptes doivent être synchronisées.
-                </p>
-                <button
-                  onClick={() => this.synchroniseProviders()}
-                  className="btn btn-secondary"
-                  disabled={!isSyncButtonEnable}
-                >
-                  <i className="bi bi-arrow-repeat"></i> Synchroniser les
-                  données
-                </button>
-              </div>}
-
+                ) : (
+                  <div className="alert alert-info">
+                    <p>
+                      <i className="bi bi bi-exclamation-circle"></i> Les
+                      empreintes de certains comptes doivent être synchronisées.
+                    </p>
+                    <button
+                      onClick={() => this.synchroniseProviders()}
+                      className="btn btn-secondary"
+                      disabled={!isSyncButtonEnable}
+                    >
+                      <i className="bi bi-arrow-repeat"></i> Synchroniser les
+                      données
+                    </button>
+                  </div>
+                )}
 
                 <div className="d-flex mb-3">
                   <div className="form-group me-2">
@@ -324,8 +337,14 @@ export class SirenSection extends React.Component
                       <option key="4" value="error">
                         Numéros de siren incorrects
                       </option>
-                      <option key="5" value="significative">Comptes significatifs</option>
-                      {someSignificativeProvidersUnidentified && <option key="6" value="significativeUnidentified">Comptes significatifs non identifiés</option>}
+                      <option key="5" value="significative">
+                        Comptes significatifs
+                      </option>
+                      {someSignificativeProvidersUnidentified && (
+                        <option key="6" value="significativeUnidentified">
+                          Comptes significatifs non identifiés
+                        </option>
+                      )}
                     </select>
                   </div>
 
@@ -396,7 +415,8 @@ export class SirenSection extends React.Component
                 className={"btn btn-secondary"}
                 id="validation-button"
                 onClick={() => this.props.nextStep()}
-                disabled={!isNextStepAvailable}>
+                disabled={!isNextStepAvailable}
+              >
                 Valider les fournisseurs
                 <i className="bi bi-chevron-right"></i>
               </button>
@@ -456,27 +476,31 @@ export class SirenSection extends React.Component
   };
 
   // Import CSV File
-  importCSVFile = (file) => 
-  {
+  importCSVFile = (file) => {
     let reader = new FileReader();
 
-    reader.onload = async () => 
-    {
+    reader.onload = async () => {
       let CSVData = await CSVFileReader(reader.result);
 
       let companiesIds = await processCSVCompaniesData(CSVData);
       await Promise.all(
-        Object.entries(companiesIds).map(async ([providerNum, corporateName, corporateId]) => {
-          let provider  = providerNum ? 
-              this.props.financialData.providers.find(provider => provider.providerNum==providerNum) 
-            : this.props.financialData.providers.find(provider => provider.providerLib==corporateName);
-          if (provider) {
-            provider.corporateId = corporateId;
-            provider.legalUnitData.denomination = denomination;
-            provider.useDefaultFootprint = false;
-            provider.footprintStatus = 0; // check if changes or use update()
+        Object.entries(companiesIds).map(
+          async ([providerNum, corporateName, corporateId]) => {
+            let provider = providerNum
+              ? this.props.financialData.providers.find(
+                  (provider) => provider.providerNum == providerNum
+                )
+              : this.props.financialData.providers.find(
+                  (provider) => provider.providerLib == corporateName
+                );
+            if (provider) {
+              provider.corporateId = corporateId;
+              provider.legalUnitData.denomination = denomination;
+              provider.useDefaultFootprint = false;
+              provider.footprintStatus = 0; // check if changes or use update()
+            }
           }
-        })
+        )
       );
       this.setState({
         providers: this.props.financialData.providers,
@@ -487,25 +511,30 @@ export class SirenSection extends React.Component
   };
 
   // Import XLSX File
-  importXLSXFile = async (file) => 
-  {
+  importXLSXFile = async (file) => {
     let reader = new FileReader();
     reader.onload = async () => {
       let XLSXData = await XLSXFileReader(reader.result);
       await Promise.all(
-        XLSXData.map(async ({ accountNum, accountLib, denomination, siren, account }) => {
-          if (account && !accountNum) accountNum = account;
-          let provider = accountNum ? 
-              this.props.financialData.providers.filter(provider => provider.providerNum == accountNum)[0]    // based on num
-            : this.props.financialData.providers.filter(provider => provider.providerLib == accountLib)[0];   // based on lib
-          if (provider) {
-            provider.corporateId = siren;
-            provider.legalUnitData.denomination = denomination;
-            provider.useDefaultFootprint = false;
-            provider.footprintStatus = 0; // check if changes or use update()
+        XLSXData.map(
+          async ({ accountNum, accountLib, denomination, siren, account }) => {
+            if (account && !accountNum) accountNum = account;
+            let provider = accountNum
+              ? this.props.financialData.providers.filter(
+                  (provider) => provider.providerNum == accountNum
+                )[0] // based on num
+              : this.props.financialData.providers.filter(
+                  (provider) => provider.providerLib == accountLib
+                )[0]; // based on lib
+            if (provider) {
+              provider.corporateId = siren;
+              provider.legalUnitData.denomination = denomination;
+              provider.useDefaultFootprint = false;
+              provider.footprintStatus = 0; // check if changes or use update()
+            }
+            return;
           }
-          return;
-        })
+        )
       );
       this.setState({
         providers: this.props.financialData.providers,
@@ -515,14 +544,11 @@ export class SirenSection extends React.Component
     reader.readAsArrayBuffer(file);
   };
 
-  readInvoices = async (files) => 
-  {
+  readInvoices = async (files) => {
     let invoicesData = [];
     let promises = [];
-    for (let file of files)
-    {
-      let filePromise = new Promise(resolve => 
-      {
+    for (let file of files) {
+      let filePromise = new Promise((resolve) => {
         let reader = new FileReader();
         reader.onload = () => resolve(reader.result);
         reader.readAsArrayBuffer(file);
@@ -554,94 +580,121 @@ export class SirenSection extends React.Component
         let invoiceData = {
           identificationNumbers,
           dates,
-          amounts
-        }
-  
-        invoicesData.push(invoiceData);        
+          amounts,
+        };
+
+        invoicesData.push(invoiceData);
       }
     });
 
+    // start fetching data
+    this.setState({ fetching: true, progression: 0 });
+
+    let i = 0;
+    let n = invoicesData.length;
     // group by provider
     let invoicesProviders = {};
     for (let invoiceData of invoicesData) {
-      if (invoiceData.identificationNumbers.length==1) {
+      if (invoiceData.identificationNumbers.length == 1) {
         let idProvider = invoiceData.identificationNumbers[0];
-        if (!Object.keys(invoicesProviders).includes(idProvider)) 
-        {
+        if (!Object.keys(invoicesProviders).includes(idProvider)) {
           let siren = getDefaultFootprintId(idProvider);
           let legalUnitData = {};
-          await api.get("legalunitfootprint/" + siren).then((res) => {
-            let status = res.data.header.code;
-            if (status == 200) {
-              legalUnitData = res.data.legalUnit;
-            }
-          }).catch((err) => {
-            console.log(err);
-            //throw err;
-          });
+          await api
+            .get("legalunitfootprint/" + siren)
+            .then((res) => {
+              let status = res.data.header.code;
+              if (status == 200) {
+                legalUnitData = res.data.legalUnit;
+              }
+            })
+            .catch((err) => {
+              console.log(err);
+              //throw err;
+            });
           // fetch data
           invoicesProviders[idProvider] = {
             legalUnitData,
-            invoices: []
+            invoices: [],
           };
         }
         // push data
-        invoicesProviders[idProvider].invoices.push({ 
+        invoicesProviders[idProvider].invoices.push({
           dates: invoiceData.dates,
-          amounts: invoiceData.amounts 
+          amounts: invoiceData.amounts,
         });
       }
+      // update progression
+      i++;
+      this.setState({ progression: Math.round((i / n) * 100) });
     }
 
     // default matching
     console.log(invoicesProviders);
     let defaultMatching = [];
     // for each provider identified in invoices
-    for (let providerId of Object.keys(invoicesProviders))
-    {
+    for (let providerId of Object.keys(invoicesProviders)) {
       let providerData = invoicesProviders[providerId];
       let providersMatching = {};
       // for each invoice
-      for (let invoiceData of providerData.invoices) 
-      {
-        let expensesMatching = this.props.financialData.externalExpenses.filter((expense) => invoiceData.dates.includes(expense.date) && invoiceData.amounts.includes(expense.amount));
+      for (let invoiceData of providerData.invoices) {
+        let expensesMatching = this.props.financialData.externalExpenses.filter(
+          (expense) =>
+            invoiceData.dates.includes(expense.date) &&
+            invoiceData.amounts.includes(expense.amount)
+        );
         // for each expense matching a date & an amount in invoices -> add to matching scores
-        expensesMatching.map(expense => expense.providerNum)
-          .filter((value, index, self) => index === self.findIndex((item) => item == value))
-          .forEach(providerNum => providersMatching[providerNum] = (providersMatching[providerNum] || 0)+1);
+        expensesMatching
+          .map((expense) => expense.providerNum)
+          .filter(
+            (value, index, self) =>
+              index === self.findIndex((item) => item == value)
+          )
+          .forEach(
+            (providerNum) =>
+              (providersMatching[providerNum] =
+                (providersMatching[providerNum] || 0) + 1)
+          );
       }
       // if a least a match
-      if (Object.entries(providersMatching).length>0) 
-      {
+      if (Object.entries(providersMatching).length > 0) {
         // get providers (account aux) with max matching in invoices
         let maxMatches = Math.max(...Object.values(providersMatching));
-        let providersWithMax = Object.entries(providersMatching).filter(([_,nbMatches]) => nbMatches==maxMatches).map(([providerNum,_]) => providerNum);
+        let providersWithMax = Object.entries(providersMatching)
+          .filter(([_, nbMatches]) => nbMatches == maxMatches)
+          .map(([providerNum, _]) => providerNum);
         // if a single provider has max -> add to default matching array
-        if (providersWithMax.length==1) {
+        if (providersWithMax.length == 1) {
           defaultMatching.push({
             providerId,
             denomination: providerData.legalUnitData.denomination,
-            providerNum: providersWithMax[0]
-          })
+            providerNum: providersWithMax[0],
+          });
         }
       }
     }
     console.log(defaultMatching);
-    defaultMatching.filter((value,_,self) => self.filter((item) => item.providerId == value.providerId).length==1)
-      .forEach(matching => invoicesProviders[matching.providerId].defaultMatching = matching.providerNum);
+    defaultMatching
+      .filter(
+        (value, _, self) =>
+          self.filter((item) => item.providerId == value.providerId).length == 1
+      )
+      .forEach(
+        (matching) =>
+          (invoicesProviders[matching.providerId].defaultMatching =
+            matching.providerNum)
+      );
 
     return invoicesProviders;
   };
 
-  setInvoicesProvider = (invoicesData) =>
-  {
+  setInvoicesProvider = (invoicesData) => {
     //console.log("set data");
     for (let invoiceData of Object.values(invoicesData)) {
-
     }
 
-    this.setState({ invoicesData: null, popup: false });
-  }
+    this.setState({ invoicesData: null, invoicesPopup: false });
+  };
 
   /* ---------- FILE EXPORT ---------- */
 
@@ -676,8 +729,7 @@ export class SirenSection extends React.Component
   /* ---------- FETCHING DATA ---------- */
 
   // fetch data for showed providers
-  synchroniseProviders = async () => 
-  {
+  synchroniseProviders = async () => {
     // providers with fpt unfetched
     let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
     // synchronise data
@@ -686,22 +738,19 @@ export class SirenSection extends React.Component
     let i = 0;
     let n = providersToSynchronise.length;
 
-    for (let provider of providersToSynchronise) 
-    {
-      try 
-      {
+    for (let provider of providersToSynchronise) {
+      try {
         // fetch footprint
         await provider.updateFromRemote();
         // assign to expenses & investments
         this.props.financialData.externalExpenses
           .concat(this.props.financialData.investments)
-          .filter(expense => expense.providerNum==provider.providerNum)
-          .forEach(expense => {
+          .filter((expense) => expense.providerNum == provider.providerNum)
+          .forEach((expense) => {
             expense.footprint = provider.footprint;
           });
-      } 
-      catch (error) {
-        console.log(error)
+      } catch (error) {
+        console.log(error);
         this.setState({ error: true });
         break;
       }
@@ -710,10 +759,11 @@ export class SirenSection extends React.Component
     }
 
     // significative prodiders
-    let {minFpt,maxFpt} = this.state;
+    let { minFpt, maxFpt } = this.state;
     let significativeProviders = await getSignificativeProviders(
       this.props.financialData.providers,
-      minFpt,maxFpt,
+      minFpt,
+      maxFpt,
       this.props.financialPeriod
     );
 
@@ -725,7 +775,7 @@ export class SirenSection extends React.Component
       synchronised: this.props.financialData.providers.filter(
         (provider) => provider.footprintStatus == 200
       ).length,
-      significativeProviders
+      significativeProviders,
     });
 
     document.getElementById("step-3").scrollIntoView();
@@ -733,19 +783,23 @@ export class SirenSection extends React.Component
 
   /* ----- POP-UP ----- */
 
-  closePopup = () => this.setState({ popup: false });
   openPopup = () => this.setState({ popup: true });
+  closePopup = () => this.setState({ popup: false });
+  openinvoicesPopup = () => this.setState({ invoicesPopup: true });
+  closeinvoicesPopup = () => this.setState({ invoicesPopup: false, invoicesData: null, file: [] });
 }
 
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
 
-const checkNextStepAvailable = (providers) => 
-{
+const checkNextStepAvailable = (providers) => {
   let nbSirenSynchronised = providers.filter(
-    (provider) => !provider.useDefaultFootprint && provider.footprintStatus == 200
+    (provider) =>
+      !provider.useDefaultFootprint && provider.footprintStatus == 200
   ).length;
 
-  let nbSiren = providers.filter((provider) => !provider.useDefaultFootprint).length;
+  let nbSiren = providers.filter(
+    (provider) => !provider.useDefaultFootprint
+  ).length;
   if (nbSirenSynchronised == nbSiren && nbSiren != 0) {
     return true;
   } else {
@@ -754,25 +808,34 @@ const checkNextStepAvailable = (providers) =>
 };
 
 // provider not using default footprint & footprint status not OK
-const checkSyncButtonEnable = (providers) => 
-{
-  let enable = providers.some((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200 || provider.footprintStatus == 203);
+const checkSyncButtonEnable = (providers) => {
+  let enable = providers.some(
+    (provider) =>
+      (!provider.useDefaultFootprint && provider.footprintStatus != 200) ||
+      provider.footprintStatus == 203
+  );
   return enable;
 };
 
-const getShowedProviders = (view,providers,significativeProviders) => 
-{
+const getShowedProviders = (view, providers, significativeProviders) => {
   switch (view) {
-    case "undefined": 
+    case "undefined":
       return providers.filter((provider) => provider.useDefaultFootprint);
-    case "unsync":    
+    case "unsync":
       return providers.filter((provider) => provider.footprintStatus != 200);
-    case "error":     
+    case "error":
       return providers.filter((provider) => provider.footprintStatus == 404);
-    case "significative":                     // significative provider
-      return providers.filter((provider) => significativeProviders.includes(provider.providerNum));
-    case "significativeUnidentified":        // significative provider & no id set
-      return providers.filter((provider) => significativeProviders.includes(provider.providerNum) && provider.useDefaultFootprint);
-    default:          return providers;
+    case "significative": // significative provider
+      return providers.filter((provider) =>
+        significativeProviders.includes(provider.providerNum)
+      );
+    case "significativeUnidentified": // significative provider & no id set
+      return providers.filter(
+        (provider) =>
+          significativeProviders.includes(provider.providerNum) &&
+          provider.useDefaultFootprint
+      );
+    default:
+      return providers;
   }
 };
