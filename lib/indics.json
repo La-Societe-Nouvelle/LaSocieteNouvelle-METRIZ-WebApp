@@ -2,10 +2,8 @@
   "art": {
     "isBeta": false,
     "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Métiers d'Art et aux Savoir-Faire",
-    "libelleMenu": "Artisanat et Savoir-Faire",
-    "category" : "valueCreation",
+    
+    "category" : "Création de la valeur",
     "nbDecimals": 1,
     "odds": ["08","09","12"],
     "type": "proportion",
@@ -16,10 +14,8 @@
   "idr": {
     "isBeta": false,
     "libelle": "Indice d'écart des rémunérations",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Ecart des rémunérations",
-    "libelleMenu": "Ecart des rémunérations",
-    "category" : "socialFootprint",
+    
+    "category" : "Empreinte sociale",
     "nbDecimals": 2,
     "odds": ["08","10"],
     "type": "indice",
@@ -30,10 +26,7 @@
   "eco": {
     "isBeta": false,
     "libelle": "Contribution à l'économie nationale",
-    "libelleDeclaredValue": "Valeur ajoutée nette produite en France",
-    "libelleGrandeur": "Économie nationale",
-    "libelleMenu": "Economie nationale",
-    "category" : "valueCreation",
+    "category" : "Création de la valeur",
     "nbDecimals": 1,
     "odds": ["08","12"],
     "type": "proportion",
@@ -44,10 +37,8 @@
   "geq": {
     "isBeta": false,
     "libelle": "Indice d'écart de rémunérations Femmes/Hommes",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Écart de rémunérations Femmes/Hommes",
-    "libelleMenu": "Ecart de rémunérations Femmes/Hommes",
-    "category" : "socialFootprint",
+    
+    "category" : "Empreinte sociale",
     "nbDecimals": 1,
     "odds": ["05","10"],
     "type": "indice",
@@ -58,10 +49,8 @@
   "ghg": {
     "isBeta": false,
     "libelle": "Intensité d'émission de gaz à effet de serre",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Émissions de Gaz à effet de serre",
-    "libelleMenu": "Gaz à effet de serre",
-    "category" : "environmentalFootprint",
+    
+    "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["12","13","14","15"],
     "type": "intensité",
@@ -72,10 +61,7 @@
   "haz": {
     "isBeta": false,
     "libelle": "Intensité d'Utilisation de produits dangereux",
-    "libelleDeclaredValue": "Quantité utilisée de produits dangereux pour la santé et/ou l'environnement",
-    "libelleGrandeur": "Utilisation de produits dangereux",
-    "libelleMenu": "Produits dangereux",
-    "category" : "environmentalFootprint",
+    "category" : "Empreinte environnementale",
     "nbDecimals": 1,
     "odds": ["02","03","12","14","15"],
     "type": "intensité",
@@ -86,10 +72,8 @@
   "knw": {
     "isBeta": false,
     "libelle": "Contribution à l'Evolution des compétences et des connaissances",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Compétences et connaissances",
-    "libelleMenu": "Compétences et Connaissances",
-    "category" : "socialFootprint",
+    
+    "category" : "Empreinte sociale",
     "nbDecimals": 1,
     "odds": ["08","09","12"],
     "type": "proportion",
@@ -100,10 +84,8 @@
   "mat": {
     "isBeta": false,
     "libelle": "Intensité d'Extraction de Matières premières",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Extraction de matières premières",
-    "libelleMenu": "Matières premières",
-    "category" : "environmentalFootprint",
+    
+    "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["12","14","15"],
     "type": "intensité",
@@ -114,10 +96,8 @@
   "nrg": {
     "isBeta": false,
     "libelle": "Intensité de Consommation d'Energie",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Consommation d'énergie",
-    "libelleMenu": "Energie",
-    "category" : "environmentalFootprint",
+    
+    "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["07","12","13"],
     "type": "intensité",
@@ -128,10 +108,8 @@
   "soc": {
     "isBeta": false,
     "libelle": "Contribution aux Acteurs d'Intérêt social",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Acteurs d'Intérêt social",
-    "libelleMenu": "Acteurs sociaux",
-    "category" : "valueCreation",
+    
+    "category" : "Création de la valeur",
     "nbDecimals": 1,
     "odds": ["08","12"],
     "type": "proportion",
@@ -142,10 +120,8 @@
   "was": {
     "isBeta": false,
     "libelle": "Intensité de Production de Déchets",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Production de déchets",
-    "libelleMenu": "Déchets",
-    "category" : "environmentalFootprint",
+    
+    "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["03","11","12","14","15"],
     "type": "intensité",
@@ -156,10 +132,8 @@
   "wat": {
     "isBeta": false,
     "libelle": "Intensité de Consommation d'Eau",
-    "libelleDeclaredValue": "",
-    "libelleGrandeur": "Consommation d'eau",
-    "libelleMenu": "Eau",
-    "category" : "environmentalFootprint",
+    
+    "category" : "Empreinte environnementale",
     "nbDecimals": 1,
     "odds": ["06","12","14","15"],
     "type": "intensité",
