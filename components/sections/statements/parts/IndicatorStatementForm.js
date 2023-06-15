@@ -13,7 +13,7 @@ import StatementNRG from "../forms/StatementNRG";
 import StatementWAS from "../forms/StatementWAS";
 import StatementWAT from "../forms/StatementWAT";
 
-const StatementComponent = ({
+const IndicatorStatementForm = ({
   indic,
   impactsData,
   handleNetValueChange,
@@ -56,4 +56,4 @@ const StatementComponent = ({
   }
 };
 
-export default StatementComponent;
+export default IndicatorStatementForm;
