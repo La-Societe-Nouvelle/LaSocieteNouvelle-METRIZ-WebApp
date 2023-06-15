@@ -69,9 +69,8 @@ export class SirenSection extends React.Component {
       }
     };
 
-    this.onInvoicesDrop = async (files) => {
-      console.log(files);
-      console.log(files.length);
+    this.onInvoicesDrop = async (files) => 
+    {
       if (files.length > 0) {
         let invoicesData = await this.readInvoices(files);
         this.setState({
@@ -630,7 +629,6 @@ export class SirenSection extends React.Component {
     }
 
     // default matching
-    console.log(invoicesProviders);
     let defaultMatching = [];
     // for each provider identified in invoices
     for (let providerId of Object.keys(invoicesProviders)) {
@@ -673,7 +671,7 @@ export class SirenSection extends React.Component {
         }
       }
     }
-    console.log(defaultMatching);
+
     defaultMatching
       .filter(
         (value, _, self) =>
@@ -681,16 +679,29 @@ export class SirenSection extends React.Component {
       )
       .forEach(
         (matching) =>
-          (invoicesProviders[matching.providerId].defaultMatching =
+          (invoicesProviders[matching.providerId].matching =
             matching.providerNum)
       );
 
     return invoicesProviders;
   };
 
-  setInvoicesProvider = (invoicesData) => {
-    //console.log("set data");
-    for (let invoiceData of Object.values(invoicesData)) {
+  setInvoicesProvider = (invoicesData) => 
+  {
+    for (let invoiceData of Object.values(invoicesData)) 
+    {
+      if (invoiceData.matching!="") 
+      {
+        let provider = this.props.financialData.providers.find((provider) => provider.providerNum == invoiceData.matching);
+        if (provider) {
+          provider.corporateId = invoiceData.legalUnitData.siren;
+          provider.legalUnitData = invoiceData.legalUnitData;
+          provider.useDefaultFootprint = false;
+          provider.footprintStatus = 0;
+        }
+      } else {
+        // remove data from provier
+      }
     }
 
     this.setState({ invoicesData: null, invoicesPopup: false });

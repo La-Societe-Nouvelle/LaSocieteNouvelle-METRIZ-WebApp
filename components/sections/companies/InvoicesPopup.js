@@ -18,21 +18,22 @@ import { Modal, Table } from "react-bootstrap";
  *    mapping
  */
 
-export class InvoicesPopup extends React.Component {
+export class InvoicesPopup extends React.Component 
+{
   constructor(props) {
     super(props);
     this.state = {
       // mapping
-      mapping: props.mapping || {},
+      mapping: props.invoicesData || {},
     };
   }
 
 
-  render() {
+  render() 
+  {
     const { invoicesData, providers, closeInvoicePopup} = this.props;
     const { mapping } = this.state;
     
-
     return (
       <Modal show="true" onHide={closeInvoicePopup} size="xl" centered>
         <Modal.Header  closeButton>
@@ -60,7 +61,7 @@ export class InvoicesPopup extends React.Component {
                           onChange={(e) =>
                             this.handleOnchange(key, e.target.value)
                           }
-                          value={mapping[key]}
+                          value={mapping[key].matching}
                         >
                           <option value="">
                             Aucun compte fournisseur associé
@@ -105,17 +106,19 @@ export class InvoicesPopup extends React.Component {
 
   /* ---------- HEADER ACTIONS ---------- */
 
-  handleOnchange = async (providerId, providerNum) => {
+  handleOnchange = async (providerId, providerNum) => 
+  {
     let mapping = this.state.mapping;
-    mapping[providerId] = providerNum;
+    Object.values(mapping).filter((invoiceData) => invoiceData.matching==providerNum).forEach((invoiceData) => invoiceData.matching="");
+    mapping[providerId].matching = providerNum;
     this.setState({ mapping });
   };
 
   // Submit
-  onSubmit = async () => {
+  onSubmit = async () => 
+  {
     // to do
-
-    this.props.onGoBack({});
+    this.props.onGoBack(this.state.mapping);
   };
 
   /* ---------- TABLE DISPLAY ---------- */
