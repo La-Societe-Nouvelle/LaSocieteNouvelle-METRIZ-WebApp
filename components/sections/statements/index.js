@@ -76,15 +76,11 @@ const DirectImpacts = ({ session, submit }) => {
         {!showStatementForms && (
           <>
             <div className="text-center p-3 mb-3 bg-light rounded">
-              <h3 className="h4 mb-0 text-uppercase">
-                Création de la valeur
-              </h3>
+              <h3 className="h4 mb-0 text-uppercase">Création de la valeur</h3>
             </div>
             <Row>{renderIndicators("Création de la valeur")}</Row>
             <div className="text-center p-3 mb-3 bg-light rounded">
-              <h3 className="h4 mb-0  text-uppercase">
-                Empreinte sociale
-              </h3>
+              <h3 className="h4 mb-0  text-uppercase">Empreinte sociale</h3>
             </div>
             <Row>{renderIndicators("Empreinte sociale")}</Row>
             <div className="text-center p-3 mb-3 bg-light rounded">
@@ -94,7 +90,11 @@ const DirectImpacts = ({ session, submit }) => {
             </div>
             <Row>{renderIndicators("Empreinte environnementale")}</Row>
             <div className="text-end mt-3">
-              <Button variant="secondary" onClick={handleSubmit}   disabled={selectedIndicators.length == 0 ? true : false}>
+              <Button
+                variant="secondary"
+                onClick={handleSubmit}
+                disabled={selectedIndicators.length == 0 ? true : false}
+              >
                 Déclarer les indicateurs <i className="bi bi-chevron-right"></i>
               </Button>
             </div>
@@ -103,11 +103,9 @@ const DirectImpacts = ({ session, submit }) => {
         {showStatementForms && (
           <>
             <StatementForms
-            session={session}
-              impactsData={session.impactsData}
+              session={session}
               period={period}
-              selectedIndicators={selectedIndicators}
-   
+              initialSelectedIndicators={selectedIndicators}
               handleSubmit={() => submit()}
             />
 

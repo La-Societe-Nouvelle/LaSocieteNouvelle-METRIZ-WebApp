@@ -58,7 +58,7 @@ const StatementWAS = (props) => {
 
   //   if (selectedUnit !== wasteProductionUnit) {
   //     let updatedWasteProduction = wasteProduction;
-  
+
   //     if (selectedUnit === "t") {
   //       updatedWasteProduction = wasteProduction / 1000;
   //     } else if (selectedUnit === "kg") {
@@ -77,7 +77,7 @@ const StatementWAS = (props) => {
   // };
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.was = info);
-  const onValidate = () => props.onValidate('was');
+  const onValidate = () => props.onValidate("was");
 
   return (
     <Form className="statement">
@@ -95,7 +95,7 @@ const StatementWAS = (props) => {
             />
             <InputGroup.Text>kg</InputGroup.Text>
           </InputGroup>
-             {/* <Select
+          {/* <Select
                   options={options}
                   defaultValue={{
                     label: wasteProductionUnit,
@@ -138,11 +138,15 @@ const StatementWAS = (props) => {
         </Col>
       </Form.Group>
 
-      <div className="d-flex justify-between">
-          <p className="small">
-            <sup>1</sup> Déchets assimilés aux ordures ménagères
-          </p>
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
+      <div className="d-flex justify-content-between">
+        <p className="small">
+          <sup>1</sup> Déchets assimilés aux ordures ménagères
+        </p>
+        <Button
+          disabled={!isValid}
+          variant="light-secondary"
+          onClick={onValidate}
+        >
           Valider
         </Button>
       </div>
