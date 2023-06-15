@@ -26,6 +26,9 @@ const StatementGHG = (props) => {
   const [info, setInfo] = useState(props.impactsData.comments.ghg || "");
   const [showModal, setShowModal] = useState(false);
 
+  const [isInvalid, setIsInvalid] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   useEffect(() => {
     if (greenhousesGazEmissions !== props.impactsData.greenhousesGazEmissions) {
       setGreenhousesGazEmissions(props.impactsData.greenhousesGazEmissions);
@@ -98,8 +101,8 @@ const StatementGHG = (props) => {
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.ghg = info);
   const onValidate = () => {
-    setUpdated(true);
-    props.onValidate();
+    setShowSuccessMessage(true);
+    props.onValidate('ghg');
   };
 
   return (
@@ -187,6 +190,12 @@ const StatementGHG = (props) => {
           .
         </p>
       </div>
+      {showSuccessMessage && (
+        <p className="alert alert-success">
+          L'indicateur  a
+          bien été déclaré !
+        </p>
+      )}
       <div className="text-end">
         <Button variant="light-secondary" disabled={!isValid} onClick={onValidate}>
           Valider
