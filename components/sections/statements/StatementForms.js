@@ -22,14 +22,14 @@ import { useEffect } from "react";
 const StatementForms = ({ session, period, initialSelectedIndicators }) => {
   const [indicatorsToShow, setIndicatorsToShow] = useState([]);
   const [indicatorsOptions, setIndicatorsOptions] = useState([]);
-  const [selectedIndicators, setSelectedIndicators] =
-    useState(initialSelectedIndicators);
+  const [selectedIndicators, setSelectedIndicators] = useState(
+    initialSelectedIndicators
+  );
 
   const [validations, setValidations] = useState(
     session.validations[period.periodKey]
   );
   useEffect(() => {
-
     const updatedIndicatorsToShow = selectedIndicators.map((key) => {
       const indicator = indicators[key];
       return [key, indicator];
@@ -155,51 +155,55 @@ const StatementForms = ({ session, period, initialSelectedIndicators }) => {
 
   return (
     <>
-      <Row>
+    
         {indicatorsToShow.map(([key, value]) => (
-          <Col key={key} sm={12}>
-            <div className="border border-1 rounded p-3 mb-3 shadow-sm">
-              <div className="d-flex justify-content-between mb-3 border-bottom pb-3">
-                <div className="d-flex align-items-center">
+          
+          
+              <div className="d-flex border border-1 rounded  p-3 mb-3 shadow-sm ">
+                <div className="p-4">
                   <Image
                     className="me-2"
-                    src={`icons-ese/logo_ese_${key}_bleu.svg`}
+                    src={`icons-ese/${key}.svg`}
                     alt={key}
-                    height={40}
+                    height={60}
                   />
-
-                  <h4 className="fw-light-bold">
-                    {value.libelle}
-                    {value.isBeta && <span className="beta ms-1">BETA</span>}
-                  </h4>
                 </div>
+                <div className="flex-fill">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <h4 className="h6 mb-0 ">
+                      {value.libelle}
+                      {value.isBeta && <span className="beta ms-1">BETA</span>}
+                    </h4>
+                    <div className="text-end">
+                      {validations.includes(key) && (
+                        <span className="display-6">
+                          <i className="text-success ms-3 bi bi-patch-check"></i>
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                <div className="text-end">
-                  {validations.includes(key) && (
-                    <span className="display-6">
-                      <i className="text-success ms-3 bi bi-patch-check"></i>
-                    </span>
-                  )}
+                  <div >{renderStatementForm(key)}</div>
                 </div>
               </div>
-              <div>{renderStatementForm(key)}</div>
-            </div>
-          </Col>
+       
+         
         ))}
-      </Row>
+     
+      <hr></hr>
+
       {indicatorsToShow.length < Object.keys(indicators).length && (
-        <div className="border border-1 rounded p-3 mb-3 shadow-sm">
-          <div className="d-flex justify-content-between">
-            <h5>
+        <div className="border border-1 rounded p-3 my-3 shadow-sm bg-primary">
+          <div className="d-flex justify-content-between align-items-center">
+            <h4 className="h5 mb-0 text-white">
               <i className="bi bi-plus-circle me-2"></i> Ajouter un indicateur
-            </h5>
+            </h4>
             <Select
               styles={customStyles}
               components={{
                 IndicatorSeparator: () => null,
               }}
               options={indicatorsOptions}
-              
               placeholder="Ajouter un indicateur à déclarer"
               onChange={handleIndicatorChange}
             />

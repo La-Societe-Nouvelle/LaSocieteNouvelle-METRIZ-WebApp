@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Container, Form, Image, Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 import StatementForms from "./StatementForms";
@@ -11,6 +11,14 @@ const DirectImpacts = ({ session, submit }) => {
     session.validations[period.periodKey]
   );
 
+
+  useEffect(() => {
+    if(validations.length > 0) {
+      setSelectedIndicators(validations);
+      setShowStatementForms(true);
+    }
+    
+  }, []);
 
   const handleSelectedIndicators = (event) => {
     const isChecked = event.target.checked;
