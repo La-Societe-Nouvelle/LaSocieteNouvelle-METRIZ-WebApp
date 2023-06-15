@@ -1,0 +1,16 @@
+diff --git a/node_modules/pdf-extraction/package.json b/node_modules/pdf-extraction/package.json
+index b70cc91..13fca83 100644
+--- a/node_modules/pdf-extraction/package.json
++++ b/node_modules/pdf-extraction/package.json
+@@ -46,5 +46,10 @@
+ 	"license": "MIT",
+ 	"engines": {
+ 		"node": ">=6.8.1"
+-	}
++	},
++	"browser": {
++    "fs": false,
++    "os": false,
++    "path": false
++  }
+ }
