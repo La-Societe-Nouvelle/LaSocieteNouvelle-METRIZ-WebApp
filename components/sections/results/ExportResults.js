@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import { generateCompleteFile } from "../../../../src/writers/deliverables/generateCompleteFile";
-import ZipGenerator from "../../../../src/writers/deliverables/ZIPGenerator";
+import { generateCompleteFile } from "../../../src/writers/deliverables/generateCompleteFile";
+import ZipGenerator from "../../../src/writers/deliverables/ZIPGenerator";
 
-import { exportFootprintPDF } from "../../../../src/writers/Export";
-import ChangeDivision from "../../../popups/ChangeDivision";
+import { exportFootprintPDF } from "../../../src/writers/Export";
+import ChangeDivision from "../../popups/ChangeDivision";
 
 const ExportResults = (props) => {
   const [isGenerating, setIsGenerating] = useState(false);
