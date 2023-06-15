@@ -12,8 +12,7 @@ import { Session } from "/src/Session";
 import { StartSection } from "/components/sections/StartSection";
 import ImportSection from "../components/sections/import/ImportSection";
 import { InitialStatesSection } from "/components/sections/InitialStatesSection";
-import { ProvidersSection } from "../components/sections/companies/ProvidersSection";
-import StatementSection from "../components/sections/statements/StatementSection";
+import { ProvidersSection } from "../components/sections/providers/ProvidersSection";
 import { PublishStatementSection } from "../components/sections/PublishStatementSection";
 import DirectImpacts from "../components/sections/statements";
 import Results from "../components/sections/results";
@@ -238,9 +237,6 @@ class Metriz extends React.Component {
         return(
           <DirectImpacts {...sectionProps} submit={this.validStatements}  />
         );
-        // return (
-        //   <StatementSection {...sectionProps} publish={() => this.setStep(5)} />
-        // );
         case 5:
           return(
             <Results {...sectionProps}  publish={() => this.setStep(5)}/>
