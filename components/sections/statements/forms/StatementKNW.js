@@ -33,7 +33,7 @@ const StatementKNW = (props) => {
   ]);
 
   const updateResearchAndTrainingContribution = (input) => {
-    props.impactsData.researchAndTrainingContribution = input;
+    props.impactsData.researchAndTrainingContribution = input.target.value;
     props.onUpdate("knw");
   };
 

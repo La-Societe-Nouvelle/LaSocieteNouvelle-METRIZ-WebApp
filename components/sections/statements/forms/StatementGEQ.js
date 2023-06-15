@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
-import { InputNumber } from "../../../input/InputNumber";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { ImportDSN } from "../modals/ImportDSN";
 import { IndividualsData } from "../modals/IndividualsData";
 
@@ -63,7 +62,7 @@ const StatementGEQ = (props) => {
   };
 
   const updateWageGap = (input) => {
-    props.impactsData.wageGap = input;
+    props.impactsData.wageGap = input.target.value;
     setWageGap(props.impactsData.wageGap);
     setIsDisabled(false);
     props.onUpdate("geq");

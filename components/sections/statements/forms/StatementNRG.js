@@ -47,7 +47,7 @@ const StatementNRG = (props) => {
   // ];
   const updateEnergyConsumption = (input) => {
     props.impactsData.nrgTotal = true;
-    props.impactsData.setEnergyConsumption(input);
+    props.impactsData.setEnergyConsumption(input.target.value);
     setEnergyConsumptionUncertainty(
       props.impactsData.energyConsumptionUncertainty
     );
@@ -55,7 +55,7 @@ const StatementNRG = (props) => {
   };
 
   const updateEnergyConsumptionUncertainty = (input) => {
-    props.impactsData.energyConsumptionUncertainty = input;
+    props.impactsData.energyConsumptionUncertainty = input.target.value;
     props.onUpdate("nrg");
   };
 

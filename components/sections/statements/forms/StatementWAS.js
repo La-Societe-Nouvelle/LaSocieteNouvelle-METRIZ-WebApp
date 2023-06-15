@@ -41,13 +41,13 @@ const StatementWAS = (props) => {
   ];
 
   const updateWasteProduction = (input) => {
-    props.impactsData.setWasteProduction(input);
+    props.impactsData.setWasteProduction(input.target.value);
     setWasteProductionUncertainty(props.impactsData.wasteProductionUncertainty);
     props.onUpdate("was");
   };
 
   const updateWasteProductionUncertainty = (input) => {
-    props.impactsData.wasteProductionUncertainty = input;
+    props.impactsData.wasteProductionUncertainty = input.target.value;
     props.onUpdate("was");
   };
 
