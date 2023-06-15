@@ -13,11 +13,11 @@ const DirectImpacts = ({ session, submit }) => {
 
 
   useEffect(() => {
-    if(validations.length > 0) {
+    if (validations.length > 0) {
       setSelectedIndicators(validations);
       setShowStatementForms(true);
     }
-    
+
   }, []);
 
   const handleSelectedIndicators = (event) => {
@@ -37,6 +37,18 @@ const DirectImpacts = ({ session, submit }) => {
 
   const handleSubmit = () => {
     setShowStatementForms(true);
+  };
+
+  const handleValidation = async (indic) => {
+    console.log(validations)
+    setValidations((validations) => [...validations, indic]);
+
+    // add validation
+    if (!session.validations[period.periodKey].includes(indic)) {
+      session.validations[period.periodKey].push(indic);
+    }
+    // update footprint
+    await session.updateFootprints(period);
   };
 
   const renderIndicators = (category) => {
@@ -115,6 +127,7 @@ const DirectImpacts = ({ session, submit }) => {
               period={period}
               initialSelectedIndicators={selectedIndicators}
               handleSubmit={() => submit()}
+              onValidation={handleValidation} // Passer la fonction de validation à StatementForms
             />
 
             <div className="text-end">

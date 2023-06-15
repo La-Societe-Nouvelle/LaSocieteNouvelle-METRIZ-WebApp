@@ -19,7 +19,7 @@ import {
 import indicators from "/lib/indics";
 import { useEffect } from "react";
 
-const StatementForms = ({ session, period, initialSelectedIndicators }) => {
+const StatementForms = ({ session, period, initialSelectedIndicators, onValidation }) => {
   const [indicatorsToShow, setIndicatorsToShow] = useState([]);
   const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicators, setSelectedIndicators] = useState(
@@ -70,15 +70,11 @@ const StatementForms = ({ session, period, initialSelectedIndicators }) => {
     }
   };
 
-  const handleValidation = async (indic) => {
+  const handleValidation = (indic) => {
     setValidations((validations) => [...validations, indic]);
+    onValidation(indic); 
 
-    // add validation
-    if (!session.validations[period.periodKey].includes(indic)) {
-      session.validations[period.periodKey].push(indic);
-    }
-    // update footprint
-    await session.updateFootprints(period);
+  
   };
 
   const handleIndicatorChange = (selected) => {
@@ -159,7 +155,7 @@ const StatementForms = ({ session, period, initialSelectedIndicators }) => {
         {indicatorsToShow.map(([key, value]) => (
           
           
-              <div className="d-flex border border-1 rounded  p-3 mb-3 shadow-sm ">
+              <div key={key} className="d-flex border border-1 rounded  p-3 mb-3 shadow-sm ">
                 <div className="p-4">
                   <Image
                     className="me-2"
