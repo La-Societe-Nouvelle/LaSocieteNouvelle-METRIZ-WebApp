@@ -31,11 +31,11 @@ export class InvoicesPopup extends React.Component
 
   render() 
   {
-    const { invoicesData, providers, closeInvoicePopup} = this.props;
+    const { invoicesData, providers, closeinvoicesPopup} = this.props;
     const { mapping } = this.state;
     
     return (
-      <Modal show="true" onHide={closeInvoicePopup} size="xl" centered>
+      <Modal show="true" onHide={closeinvoicesPopup} size="xl" centered>
         <Modal.Header  closeButton>
           <h3>Associer les comptes fournisseurs </h3>
         </Modal.Header>
@@ -86,7 +86,7 @@ export class InvoicesPopup extends React.Component
             <div className="view-footer text-end mt-2">
             <button
                 className="btn btn-light me-1 "
-                onClick={closeInvoicePopup}
+                onClick={closeinvoicesPopup}
               >
                 Annuler
               </button>
