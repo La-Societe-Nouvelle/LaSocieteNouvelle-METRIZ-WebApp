@@ -45,7 +45,7 @@ const StatementWAT = (props) => {
     { value: "L", label: "L" },
   ];
   const updateWaterConsumption = (input) => {
-    props.impactsData.setWaterConsumption(input);
+    props.impactsData.setWaterConsumption(input.target.value);
     setWaterConsumptionUncertainty(
       props.impactsData.waterConsumptionUncertainty
     );
@@ -53,7 +53,7 @@ const StatementWAT = (props) => {
   };
 
   const updateWaterConsumptionUncertainty = (input) => {
-    props.impactsData.waterConsumptionUncertainty = input;
+    props.impactsData.waterConsumptionUncertainty = input.target.value;
     props.onUpdate("wat");
   };
 

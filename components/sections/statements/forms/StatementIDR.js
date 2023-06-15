@@ -87,7 +87,7 @@ const StatementIDR = (props) => {
   };
 
   const updateInterdecileRange = (input) => {
-    props.impactsData.interdecileRange = input;
+    props.impactsData.interdecileRange = input.target.value;
     setInterdecileRange(props.impactsData.interdecileRange);
     setIsDisabled(false);
     props.onUpdate("idr");

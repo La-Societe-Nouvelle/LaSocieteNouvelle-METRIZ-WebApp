@@ -45,7 +45,11 @@ const StatementECO = (props) => {
   };
 
   const updateDomesticProduction = (input) => {
-    props.impactsData.domesticProduction = input;
+    console.log("updateDomesticProduction")
+    console.log(input.target.value);
+    console.log(props);
+    props.impactsData.domesticProduction = input.target.value;
+    
     setDomesticProduction(props.impactsData.domesticProduction);
     props.onUpdate("eco");
   };

@@ -59,7 +59,7 @@ const StatementMAT = (props) => {
   };
 
   const updateMaterialsExtraction = (input) => {
-    props.impactsData.setMaterialsExtraction(input);
+    props.impactsData.setMaterialsExtraction(input.target.value);
     setMaterialsExtractionUncertainty(
       props.impactsData.materialsExtractionUncertainty
     );
@@ -99,7 +99,7 @@ const StatementMAT = (props) => {
 // ];
 
   const updateMaterialsExtractionUncertainty = (input) => {
-    props.impactsData.materialsExtractionUncertainty = input;
+    props.impactsData.materialsExtractionUncertainty = input.target.value;
     setMaterialsExtraction(props.impactsData.materialsExtraction);
     props.onUpdate("mat");
   };

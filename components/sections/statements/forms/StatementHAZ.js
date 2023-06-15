@@ -63,7 +63,7 @@ const StatementHAZ = (props) => {
     hazardousSubstancesConsumption != null && netValueAdded != null;
 
   const updateHazardousSubstancesConsumption = (input) => {
-    props.impactsData.setHazardousSubstancesConsumption(input);
+    props.impactsData.setHazardousSubstancesConsumption(input.target.value);
     setHazardousSubstancesConsumptionUncertainty(
       props.impactsData.hazardousSubstancesConsumptionUncertainty
     );
@@ -71,7 +71,7 @@ const StatementHAZ = (props) => {
   };
 
   const updateHazardousSubstancesConsumptionUncertainty = (input) => {
-    props.impactsData.hazardousSubstancesConsumptionUncertainty = input;
+    props.impactsData.hazardousSubstancesConsumptionUncertainty = input.target.value;
     props.onUpdate("haz");
   };
 

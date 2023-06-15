@@ -57,8 +57,9 @@ const StatementGHG = (props) => {
   const isValid = greenhousesGazEmissions != null && netValueAdded != null;
 
   const updateGreenhousesGazEmissions = (input) => {
+    console.log(input.target.value)
     props.impactsData.ghgTotal = true;
-    props.impactsData.setGreenhousesGazEmissions(input);
+    props.impactsData.setGreenhousesGazEmissions(input.target.value);
     setGreenhousesGazEmissionsUncertainty(
       props.impactsData.greenhousesGazEmissionsUncertainty
     );
@@ -66,7 +67,7 @@ const StatementGHG = (props) => {
   };
 
   const updateGreenhousesGazEmissionsUncertainty = (input) => {
-    props.impactsData.greenhousesGazEmissionsUncertainty = input;
+    props.impactsData.greenhousesGazEmissionsUncertainty = input.target.value;
     props.onUpdate("ghg");
   };
 
