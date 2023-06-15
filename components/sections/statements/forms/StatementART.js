@@ -139,6 +139,7 @@ const StatementART = (props) => {
             onChange={onIsValueAddedCraftedChange}
           />
         </Col>
+        
       </Form.Group>
       <Form.Group as={Row} className="form-group">
         <Form.Label column sm={4}>
