@@ -1,8 +1,7 @@
 {
   "art": {
     "isBeta": false,
-    "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",
-    
+    "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",  
     "category" : "Création de la valeur",
     "nbDecimals": 1,
     "odds": ["08","09","12"],
@@ -49,7 +48,6 @@
   "ghg": {
     "isBeta": false,
     "libelle": "Intensité d'émission de gaz à effet de serre",
-    
     "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["12","13","14","15"],
@@ -72,7 +70,6 @@
   "knw": {
     "isBeta": false,
     "libelle": "Contribution à l'Evolution des compétences et des connaissances",
-    
     "category" : "Empreinte sociale",
     "nbDecimals": 1,
     "odds": ["08","09","12"],
@@ -96,7 +93,6 @@
   "nrg": {
     "isBeta": false,
     "libelle": "Intensité de Consommation d'Energie",
-    
     "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["07","12","13"],
@@ -119,8 +115,7 @@
   },
   "was": {
     "isBeta": false,
-    "libelle": "Intensité de Production de Déchets",
-    
+    "libelle": "Intensité de Production de Déchets",   
     "category" : "Empreinte environnementale",
     "nbDecimals": 0,
     "odds": ["03","11","12","14","15"],
@@ -132,7 +127,6 @@
   "wat": {
     "isBeta": false,
     "libelle": "Intensité de Consommation d'Eau",
-    
     "category" : "Empreinte environnementale",
     "nbDecimals": 1,
     "odds": ["06","12","14","15"],
