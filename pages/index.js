@@ -13,20 +13,20 @@ import { StartSection } from "/components/sections/StartSection";
 import ImportSection from "../components/sections/import/ImportSection";
 import { InitialStatesSection } from "/components/sections/InitialStatesSection";
 import { ProvidersSection } from "../components/sections/providers/ProvidersSection";
-import { PublishStatementSection } from "../components/sections/PublishStatementSection";
 import DirectImpacts from "../components/sections/statements";
 import Results from "../components/sections/results";
+import { PublishStatementSection } from "../components/sections/PublishStatementSection";
 
 
 // Others components
 import { Header } from "/components/parts/headers/Header";
-import { HeaderSection } from "../components/parts/headers/HeaderSection";
-import { HeaderPublish } from "../components/parts/headers/HeaderPublish";
+import { HeaderSection } from "/components/parts/headers/HeaderSection";
+import { HeaderPublish } from "/components/parts/headers/HeaderPublish";
 
 import { updateVersion } from "/src/version/updateVersion";
-import { Footer } from "../components/parts/Footer";
-import { Mobile } from "../components/Mobile";
-import { DataUpdater } from "../components/popups/dataUpdater/DataUpdater";
+import { Footer } from "/components/parts/Footer";
+import { Mobile } from "/components/Mobile";
+import { DataUpdater } from "/components/popups/dataUpdater/DataUpdater";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
