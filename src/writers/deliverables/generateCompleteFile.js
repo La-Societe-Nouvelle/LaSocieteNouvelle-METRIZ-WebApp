@@ -18,6 +18,7 @@ export async function generateCompleteFile(
   onDownloadComplete,
   period
 ) {
+
   const year = period.periodKey.slice(2);
 
   const documentTitle =

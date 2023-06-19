@@ -13,6 +13,10 @@ import ComparativeChart from "../charts/ComparativeChart";
 import SigPieChart from "../charts/SigPieChart";
 import TrendsComponent from "./TrendsComponent";
 import Analyse from "./AnalyseComponent";
+import { createContribIndicatorPDF } from "/src/writers/deliverables/contribIndicPDF";
+import { createIntensIndicatorPDF } from "/src/writers/deliverables/intensIndicPDF";
+import { createIndiceIndicatorPDF } from "/src/writers/deliverables/indiceIndicPDF";
+import DeviationChart from "../../../charts/HorizontalBarChart";
 
 const ExtraFinancialReport = ({
   indic,
@@ -23,6 +27,7 @@ const ExtraFinancialReport = ({
   comparativeData,
   period,
   prevPeriod,
+  legalUnit,
 }) => {
   const {
     production,
@@ -31,9 +36,29 @@ const ExtraFinancialReport = ({
     netValueAdded,
   } = financialData.mainAggregates;
 
+  const handleDownload = () => {
+    const reportType = metaIndic.type;
+    const libelle = metaIndic.libelle;
+    const unit = metaIndic.unit;
+  
+    switch (reportType) {
+      case "proportion":
+        createContribIndicatorPDF(reportType, legalUnit.corporateName, indic, financialData, comparativeData, true, period);
+        break;
+      case "intensité":
+        createIntensIndicatorPDF(legalUnit.corporateName, indic, libelle, unit, financialData, comparativeData, true, period);
+        break;
+      case "indice":
+        createIndiceIndicatorPDF(libelle, legalUnit.corporateName, indic, unit, financialData, comparativeData, true, period);
+        break;
+      default:
+        break;
+    }
+  };
+  
   return (
     <>
-      <div className="box ">
+      <div className="box">
         <div className="d-flex align-items-center justify-content-between">
           <div className="d-flex align-items-center">
             <Image
@@ -46,83 +71,80 @@ const ExtraFinancialReport = ({
             <h3 className="text-secondary m-0">{metaIndic.libelle}</h3>
           </div>
           <div>
-            <Button variant="download">
+            <Button variant="download" onClick={handleDownload}>
               <i className="bi bi-download"></i> Rapport sur l'indicateur
             </Button>
           </div>
         </div>
       </div>
-      <div>
-        {/* SIG and external expenses table */}
-        <Row>
-          <Col>
-            <div className="box p-4">
-              <h4>Rapport - Analyse extra-financière</h4>
-              <Tabs
-                defaultActiveKey="mainAggregates"
-                transition={false}
-                id="noanim-tab-example"
+
+      {/* SIG and external expenses table */}
+      <Row>
+        <Col>
+          <div className="box p-4">
+            <h4>Rapport - Analyse extra-financière</h4>
+            <Tabs
+              defaultActiveKey="mainAggregates"
+              transition={false}
+              id="noanim-tab-example"
+            >
+              <Tab
+                eventKey="mainAggregates"
+                title=" Soldes intermédiaires de gestion"
               >
-                <Tab
-                  eventKey="mainAggregates"
-                  title=" Soldes intermédiaires de gestion"
-                >
-                  <MainAggregatesTable
-                    financialData={financialData}
-                    indic={indic}
-                    metaIndic={metaIndic}
-                    period={period}
-                    prevPeriod={prevPeriod}
-                  />
-                </Tab>
-                <Tab
-                  eventKey="expensesAccounts"
-                  title=" Détails - Comptes de charges"
-                >
-                  <ExpensesTable
-                    externalExpensesAccounts={
-                      financialData.externalExpensesAccounts
-                    }
-                    indic={indic}
-                    metaIndic={metaIndic}
-                    period={period}
-                    prevPeriod={prevPeriod}
-                  />
-                </Tab>
-              </Tabs>
+                <MainAggregatesTable
+                  financialData={financialData}
+                  indic={indic}
+                  metaIndic={metaIndic}
+                  period={period}
+                  prevPeriod={prevPeriod}
+                />
+              </Tab>
+              <Tab
+                eventKey="expensesAccounts"
+                title=" Détails - Comptes de charges"
+              >
+                <ExpensesTable
+                  externalExpensesAccounts={
+                    financialData.externalExpensesAccounts
+                  }
+                  indic={indic}
+                  metaIndic={metaIndic}
+                  period={period}
+                  prevPeriod={prevPeriod}
+                />
+              </Tab>
+            </Tabs>
+          </div>
+        </Col>
+        {/* ----------Gross Impact Chart ----------  */}
+
+        {metaIndic.type == "intensité" && (
+          <Col lg={4}>
+            <div className="box">
+              <h4>Répartition des impacts bruts</h4>
+              <GrossImpactChart
+                id={"part-" + indic}
+                intermediateConsumptions={intermediateConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getGrossImpact(
+                  intermediateConsumptions.periodsData[period.periodKey].amount
+                )}
+                fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getGrossImpact(
+                  fixedCapitalConsumptions.periodsData[period.periodKey].amount
+                )}
+                netValueAdded={netValueAdded.periodsData[
+                  period.periodKey
+                ].footprint.indicators[indic].getGrossImpact(
+                  netValueAdded.periodsData[period.periodKey].amount
+                )}
+              />
             </div>
           </Col>
-          {/* ----------Gross Impact Chart ----------  */}
-
-          {metaIndic.type == "intensité" && (
-            <Col lg={4}>
-              <div className="box">
-                <h4>Répartition des impacts bruts</h4>
-                <GrossImpactChart
-                  id={"part-" + indic}
-                  intermediateConsumptions={intermediateConsumptions.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getGrossImpact(
-                    intermediateConsumptions.periodsData[period.periodKey]
-                      .amount
-                  )}
-                  fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getGrossImpact(
-                    fixedCapitalConsumptions.periodsData[period.periodKey]
-                      .amount
-                  )}
-                  netValueAdded={netValueAdded.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getGrossImpact(
-                    netValueAdded.periodsData[period.periodKey].amount
-                  )}
-                />
-              </div>
-            </Col>
-          )}
-        </Row>
-      </div>
+        )}
+      </Row>
 
       {/* --------- SIG Footprints charts ----------  */}
       {metaIndic.type == "proportion" && (
@@ -195,7 +217,7 @@ const ExtraFinancialReport = ({
       )}
       {/* ---------Comparative data charts ----------  */}
 
-      <div className="box  charts-container">
+      <div className="box charts-container">
         <h4>Comparaison par activité</h4>
 
         <Row className="charts">
@@ -319,16 +341,53 @@ const ExtraFinancialReport = ({
         </Row>
       </div>
       {/* ---------Comparative data Table ----------  */}
-
-      <div className="box ">
-        <ComparativeTable
-          financialData={financialData}
-          indic={indic}
-          comparativeData={comparativeData}
-          period={period}
-          prevPeriod={prevPeriod}
-        />
-      </div>
+      <Row>
+        <Col>
+          <div className="box ">
+            <ComparativeTable
+              financialData={financialData}
+              indic={indic}
+              comparativeData={comparativeData}
+              period={period}
+              prevPeriod={prevPeriod}
+            />
+          </div>
+        </Col>
+        <Col lg={4}>
+          <div className="box ">
+          <h5 className="h6 mb-4">▪ Ecart par rapport à la moyenne de la branche</h5>
+            <DeviationChart
+              id={"deviationChart-" + indic}
+              legalUnitData={[
+                financialData.mainAggregates.production.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                financialData.mainAggregates.intermediateConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                financialData.mainAggregates.netValueAdded.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+              ]}
+              branchData={[
+                comparativeData.production.divisionFootprint.indicators[indic]
+                  .value,
+                comparativeData.intermediateConsumptions.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.fixedCapitalConsumptions.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.netValueAdded.divisionFootprint.indicators[
+                  indic
+                ].value,
+              ]}
+              indic={indic}
+            />
+          </div>
+        </Col>
+      </Row>
 
       {/* ---------- Trend Line Chart ----------  */}
       <TrendsComponent

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
-import { Button, Col, Container, Row } from "react-bootstrap";
+import { Button, Col, Container, Modal, Row } from "react-bootstrap";
 
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
@@ -10,13 +10,14 @@ import { getPrevDate } from "/src/utils/Utils";
 
 import ExtraFinancialReport from "./parts/ExtraFinancialReport";
 import FootprintReport from "./parts/FootprintReport";
-import DonwloadComponent from "./parts/DonwloadComponent";
 
 // Fetch API data
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import getSerieData from "/src/services/responses/SerieData";
-import { getTargetSerieId } from "../../../src/utils/Utils";
+import { getTargetSerieId } from "/src/utils/Utils";
+import { generateCompleteFile } from "/src/writers/deliverables/generateCompleteFile";
+// import DonwloadComponent from "./parts/DonwloadComponent";
 
 const Results = ({ session, publish }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -29,6 +30,7 @@ const Results = ({ session, publish }) => {
     session.comparativeData
   );
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
 
@@ -163,12 +165,34 @@ const Results = ({ session, publish }) => {
     setSelectedIndicator(selectedOption.value);
   };
 
+  const handleDownloadCompleteFile = async () => {
+  
+    const period = session.financialPeriod;
+      setIsGenerating(true);
+
+    console.log(session.financialPeriod)
+      await generateCompleteFile(
+        session.legalUnit.corporateName,
+        session.validations[period.periodKey],
+        session.financialData,
+        session.impactsData,
+        session.comparativeData,
+        () => updateIsGenerating(false),
+        period,
+      );
+
+
+
+  };
+  const updateIsGenerating = (value) => {
+    setIsGenerating(value);
+  };
   return (
     <Container fluid className="results">
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
-          <Button variant="download" disabled={!selectedDivision}>
+          <Button variant="download" disabled={!selectedDivision} onClick={handleDownloadCompleteFile}>
             <i className="bi bi-download"></i> Télécharger tous les résultats
           </Button>
         </div>
@@ -226,9 +250,18 @@ const Results = ({ session, publish }) => {
           comparativeData={session.comparativeData}
           period={session.financialPeriod}
           prevPeriod={prevPeriod}
+          legalUnit={session.legalUnit}
         ></ExtraFinancialReport>
       )}
       {/* <DonwloadComponent></DonwloadComponent> */}
+      <Modal show={isGenerating}>
+        <Modal.Header>Génération du dossier en cours ... </Modal.Header>
+        <Modal.Body>
+          <div className="loader-container my-4">
+            <div className="dot-pulse m-auto"></div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
