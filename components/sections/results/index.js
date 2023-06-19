@@ -24,7 +24,9 @@ import { ChartsContainer } from "./charts/ChartsContainer";
 import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import getSerieData from "/src/services/responses/SerieData";
-import { getTargetSerieId } from "../../../src/utils/Utils";
+import { getTargetSerieId } from "/src/utils/Utils";
+import { generateCompleteFile } from "/src/writers/deliverables/generateCompleteFile";
+// import DonwloadComponent from "./parts/DonwloadComponent";
 
 const Results = ({ session, publish }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);

@@ -82,7 +82,6 @@ const ExtraFinancialReport = ({
         break;
     }
   };
-
   return (
     <>
       <div className="box">

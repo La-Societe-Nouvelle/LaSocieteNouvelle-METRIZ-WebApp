@@ -17,6 +17,7 @@ export async function generateCompleteFile(
   onDownloadComplete,
   period
 ) {
+
   const year = period.periodKey.slice(2);
   const documentTitle = `Empreinte-Societale_${legalUnit.replaceAll(
     /[^a-zA-Z0-9]/g,
