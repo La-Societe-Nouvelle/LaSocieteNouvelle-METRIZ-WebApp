@@ -1297,33 +1297,39 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
 
   if (/^6(0[^3]|[1-2])/.test(ligneCourante.CompteNum)) {
     // lecture du compte auxiliaire
-    let ligneFournisseur =
-      journal.filter(
-        (ligne) =>
-          ligne.EcritureNum == ligneCourante.EcritureNum &&
-          /^40/.test(ligne.CompteNum)
-      ) || {};
-  
-    if (ligneFournisseur.length > 1) {
-      throw  "Erreur d'association pour le compte de charge " + ligneCourante.CompteNum + " (Numéro d'écriture : " + ligneCourante.EcritureNum + " ) : Plusieurs comptes fournisseurs détectés ";
+    let lignesFournisseur = journal.filter(
+      (ligne) =>
+        ligne.EcritureNum == ligneCourante.EcritureNum &&
+        /^40/.test(ligne.CompteNum)
+    );
+
+    if (lignesFournisseur.length > 1) {
+      throw (
+        "Erreur d'association pour le compte de charge " +
+        ligneCourante.CompteNum +
+        " (Numéro d'écriture : " +
+        ligneCourante.EcritureNum +
+        " ) : Plusieurs comptes fournisseurs détectés "
+      );
     }
+
+    let ligneFournisseur = lignesFournisseur[0] || {};
     // expense data
     let expenseData = {
       label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
       accountNum: ligneCourante.CompteNum,
       accountLib: ligneCourante.CompteLib,
-      providerNum:
-        ligneFournisseur[0].CompAuxNum || "_" + ligneCourante.CompteNum,
+      providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
       providerLib:
-        ligneFournisseur[0].CompAuxLib || "DEPENSES " + ligneCourante.CompteLib,
-      isDefaultProviderAccount: ligneFournisseur[0].CompAuxNum ? false : true,
+        ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCourante.CompteLib,
+      isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
       amount:
         parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
       date: ligneCourante.EcritureDate,
     };
     // push data
     data.externalExpenses.push(expenseData);
-    if (!ligneFournisseur[0].CompAuxNum)
+    if (!ligneFournisseur.CompAuxNum)
       data.defaultProviders.push(expenseData.providerNum);
   }
 
