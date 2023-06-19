@@ -20,6 +20,12 @@ import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
 // import DonwloadComponent from "./parts/DonwloadComponent";
 
+// Fetch API data
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
+import getSerieData from "/src/services/responses/SerieData";
+import { getTargetSerieId } from "../../../src/utils/Utils";
+
 const Results = ({ session, publish }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState(
