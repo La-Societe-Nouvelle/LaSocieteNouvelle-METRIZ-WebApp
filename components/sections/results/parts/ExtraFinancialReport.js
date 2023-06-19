@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Col, Image, Row, Tab, Tabs } from "react-bootstrap";
+import { Button, Col, Image, Row, Tab, Tabs } from "react-bootstrap";
 
 import { printValue } from "/src/utils/Utils";
 
@@ -34,15 +34,22 @@ const ExtraFinancialReport = ({
   return (
     <>
       <div className="box ">
-        <div className="d-flex align-items-center">
-          <Image
-            className="me-2"
-            src={"icons-ese/" + indic + ".svg"}
-            alt={indic}
-            height={60}
-          />
+        <div className="d-flex align-items-center justify-content-between">
+          <div className="d-flex align-items-center">
+            <Image
+              className="me-2"
+              src={"icons-ese/" + indic + ".svg"}
+              alt={indic}
+              height={60}
+            />
 
-          <h3 className="text-secondary m-0">{metaIndic.libelle}</h3>
+            <h3 className="text-secondary m-0">{metaIndic.libelle}</h3>
+          </div>
+          <div>
+            <Button variant="download">
+              <i className="bi bi-download"></i> Rapport sur l'indicateur
+            </Button>
+          </div>
         </div>
       </div>
       <div>
@@ -50,12 +57,11 @@ const ExtraFinancialReport = ({
         <Row>
           <Col>
             <div className="box p-4">
-              <h4 >Rapport - Analyse extra-financière</h4>
+              <h4>Rapport - Analyse extra-financière</h4>
               <Tabs
                 defaultActiveKey="mainAggregates"
                 transition={false}
                 id="noanim-tab-example"
-                
               >
                 <Tab
                   eventKey="mainAggregates"
@@ -122,9 +128,7 @@ const ExtraFinancialReport = ({
       {metaIndic.type == "proportion" && (
         <div className="box ">
           <Row>
-            <h4>
-              Empreintes des Soldes Intermédiaires de Gestion
-            </h4>
+            <h4>Empreintes des Soldes Intermédiaires de Gestion</h4>
             <Col>
               <h5 className="mb-4 text-center">▪ Production</h5>
               <div className="doughtnut-chart-container">

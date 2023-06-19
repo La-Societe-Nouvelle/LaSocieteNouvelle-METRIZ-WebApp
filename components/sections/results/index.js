@@ -12,12 +12,22 @@ import ExtraFinancialReport from "./parts/ExtraFinancialReport";
 import FootprintReport from "./parts/FootprintReport";
 import DonwloadComponent from "./parts/DonwloadComponent";
 
+// Fetch API data
+import getMacroSerieData from "/src/services/responses/MacroSerieData";
+import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
+import getSerieData from "/src/services/responses/SerieData";
+import { getTargetSerieId } from "../../../src/utils/Utils";
+
 const Results = ({ session, publish }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
-  const [selectedDivision, setSelectedDivision] = useState(25);
+  const [selectedDivision, setSelectedDivision] = useState(
+    session.comparativeData.activityCode
+  );
   const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicator, setSelectedIndicator] = useState();
-
+  const [comparativeData, setComparativeData] = useState(
+    session.comparativeData
+  );
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
 
   const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
@@ -46,7 +56,7 @@ const Results = ({ session, publish }) => {
     option: (provided, state) => ({
       ...provided,
       fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? '#191558' : 'transparent',
+      backgroundColor: state.isSelected ? "#191558" : "transparent",
       background: state.isFocused ? "#f0f0f8" : "",
       "&:hover": {
         color: "#191558",
@@ -72,9 +82,81 @@ const Results = ({ session, publish }) => {
     setIndicatorsOptions(indicatorsOptions);
   }, []);
 
+  useEffect(async () => {
+   
+    session.comparativeData.activityCode = selectedDivision;
+
+    let updatedComparativeData = comparativeData;
+
+    for await (const indic of session.validations[
+      session.financialPeriod.periodKey
+    ]) {
+      // update comparative data for each  indicators
+      const updatedData = await getComparativeData(
+        indic,
+        selectedDivision,
+        updatedComparativeData
+      );
+
+      updatedComparativeData = updatedData;
+    }
+    // Update session with comparative data for all validated indicators
+
+    session.comparativeData = updatedComparativeData;
+    console.log(updatedComparativeData);
+    setComparativeData(updatedComparativeData);
+  }, [selectedDivision]);
+
   const handleDivisionChange = (selectedOption) => {
-    session.comparativeData.activityCode = selectedOption.value;
-    setSelectedDivision(selectedOption.value);
+    const division = selectedOption.value;
+    session.comparativeData.activityCode = division;
+    setSelectedDivision(division);
+  };
+
+  const getComparativeData = async (indic, code, comparativeData) => {
+    let updatedComparativeData = comparativeData;
+    let idTarget = getTargetSerieId(indic);
+
+    updatedComparativeData = await getMacroSerieData(
+      indic,
+      code,
+      updatedComparativeData,
+      "divisionFootprint"
+    );
+
+    updatedComparativeData = await getHistoricalSerieData(
+      code,
+      indic,
+      updatedComparativeData,
+      "trendsFootprint"
+    );
+
+    updatedComparativeData = await getHistoricalSerieData(
+      code,
+      indic,
+      updatedComparativeData,
+      "targetDivisionFootprint"
+    );
+    updatedComparativeData = await getMacroSerieData(
+      indic,
+      "00",
+      updatedComparativeData,
+      "areaFootprint"
+    );
+
+    // Target Area Footprint
+
+    if (idTarget) {
+      updatedComparativeData = await getSerieData(
+        idTarget,
+        "00",
+        indic,
+        updatedComparativeData,
+        "targetAreaFootprint"
+      );
+    }
+
+    return updatedComparativeData;
   };
 
   const handleIndicatorChange = (selectedOption) => {
@@ -86,9 +168,8 @@ const Results = ({ session, publish }) => {
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
-
-          <Button className=" btn-download">
-            <i className="bi bi-download"></i> Rapport
+          <Button variant="download" disabled={!selectedDivision}>
+            <i className="bi bi-download"></i> Télécharger tous les résultats
           </Button>
         </div>
         <p className="mb-4">
@@ -147,9 +228,7 @@ const Results = ({ session, publish }) => {
           prevPeriod={prevPeriod}
         ></ExtraFinancialReport>
       )}
-     <DonwloadComponent>
-      
-      </DonwloadComponent> 
+      {/* <DonwloadComponent></DonwloadComponent> */}
     </Container>
   );
 };
