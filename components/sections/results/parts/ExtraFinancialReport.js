@@ -12,11 +12,11 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 import ComparativeChart from "../charts/ComparativeChart";
 import SigPieChart from "../charts/SigPieChart";
 import TrendsComponent from "./TrendsComponent";
+import DeviationChart from "../charts/HorizontalBarChart";
 import Analyse from "./AnalyseComponent";
 import { createContribIndicatorPDF } from "/src/writers/deliverables/contribIndicPDF";
 import { createIntensIndicatorPDF } from "/src/writers/deliverables/intensIndicPDF";
 import { createIndiceIndicatorPDF } from "/src/writers/deliverables/indiceIndicPDF";
-import DeviationChart from "../../../charts/HorizontalBarChart";
 
 const ExtraFinancialReport = ({
   indic,
