@@ -16,7 +16,8 @@ import getMacroSerieData from "/src/services/responses/MacroSerieData";
 import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
 import getSerieData from "/src/services/responses/SerieData";
 import { getTargetSerieId } from "/src/utils/Utils";
-import { generateCompleteFile } from "/src/writers/deliverables/generateCompleteFile";
+import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
+import { ChartsContainer } from "./charts/ChartsContainer";
 // import DonwloadComponent from "./parts/DonwloadComponent";
 
 const Results = ({ session, publish }) => {
@@ -31,6 +32,7 @@ const Results = ({ session, publish }) => {
   );
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showChartComponent, setShowChartComponent] = useState(false);
 
   const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
 
@@ -85,28 +87,30 @@ const Results = ({ session, publish }) => {
   }, []);
 
   useEffect(async () => {
-   
-    session.comparativeData.activityCode = selectedDivision;
+    if (session.comparativeData.activityCode != selectedDivision) {
+      console.log("update comparative data");
 
-    let updatedComparativeData = comparativeData;
+      session.comparativeData.activityCode = selectedDivision;
 
-    for await (const indic of session.validations[
-      session.financialPeriod.periodKey
-    ]) {
-      // update comparative data for each  indicators
-      const updatedData = await getComparativeData(
-        indic,
-        selectedDivision,
-        updatedComparativeData
-      );
+      let updatedComparativeData = comparativeData;
 
-      updatedComparativeData = updatedData;
+      for await (const indic of session.validations[
+        session.financialPeriod.periodKey
+      ]) {
+        // update comparative data for each  indicators
+        const updatedData = await getComparativeData(
+          indic,
+          selectedDivision,
+          updatedComparativeData
+        );
+
+        updatedComparativeData = updatedData;
+      }
+      // Update session with comparative data for all validated indicators
+
+      session.comparativeData = updatedComparativeData;
+      setComparativeData(updatedComparativeData);
     }
-    // Update session with comparative data for all validated indicators
-
-    session.comparativeData = updatedComparativeData;
-    console.log(updatedComparativeData);
-    setComparativeData(updatedComparativeData);
   }, [selectedDivision]);
 
   const handleDivisionChange = (selectedOption) => {
@@ -166,33 +170,48 @@ const Results = ({ session, publish }) => {
   };
 
   const handleDownloadCompleteFile = async () => {
-  
+
     const period = session.financialPeriod;
-      setIsGenerating(true);
+    const prevPeriod = session.availablePeriods.find(
+      (period) => period.dateEnd == prevDateEnd
+    );
 
-    console.log(session.financialPeriod)
-      await generateCompleteFile(
-        session.legalUnit.corporateName,
-        session.validations[period.periodKey],
-        session.financialData,
-        session.impactsData,
-        session.comparativeData,
-        () => updateIsGenerating(false),
-        period,
-      );
+    setIsGenerating(true);
+    setShowChartComponent(true);
 
+    const chartPromise = new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 1000); 
+    });
 
+    await chartPromise;
 
+    await generateFullReport(
+      session.legalUnit.corporateName,
+      session.validations[period.periodKey],
+      session.financialData,
+      session.impactsData,
+      session.comparativeData,
+      () => {
+        setShowChartComponent(false);
+        setIsGenerating(false);
+      },
+      period,
+      prevPeriod
+    );
   };
-  const updateIsGenerating = (value) => {
-    setIsGenerating(value);
-  };
+
   return (
     <Container fluid className="results">
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
-          <Button variant="download" disabled={!selectedDivision} onClick={handleDownloadCompleteFile}>
+          <Button
+            variant="download"
+            disabled={!selectedDivision}
+            onClick={handleDownloadCompleteFile}
+          >
             <i className="bi bi-download"></i> Télécharger tous les résultats
           </Button>
         </div>
@@ -253,6 +272,16 @@ const Results = ({ session, publish }) => {
           legalUnit={session.legalUnit}
         ></ExtraFinancialReport>
       )}
+      {showChartComponent && (
+        <ChartsContainer
+          validations={session.validations[financialPeriod]}
+          comparativeData={session.comparativeData}
+          aggregates={session.financialData.mainAggregates}
+          period={session.financialPeriod}
+          prevPeriod={prevPeriod}
+        />
+      )}
+
       {/* <DonwloadComponent></DonwloadComponent> */}
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
