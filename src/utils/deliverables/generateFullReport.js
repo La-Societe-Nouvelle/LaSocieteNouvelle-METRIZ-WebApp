@@ -3,7 +3,10 @@ import fontkit from "@pdf-lib/fontkit";
 
 import metaIndics from "/lib/indics";
 import { generateCover } from "./generateCover";
-import { generateIndicReport } from "./generateIndicReport";
+import { generateIndicatorReport } from "./generateIndicatorReport";
+import { generateContributionIndicatorSheet } from "./generateContributionIndicatorSheet";
+import { generateIntensityIndicatorSheet } from "./generateIntensityIndicatorSheet";
+import { generateIndiceIndicatorSheet } from "./generateIndiceIndicatorSheet";
 
 export async function generateFullReport(
   legalUnit,
@@ -29,7 +32,7 @@ export async function generateFullReport(
     const { type, libelle, unit, libelleGrandeur } = metaIndics[indic];
 
     basicPDFpromises.push(
-      generateIndicReport(
+      generateIndicatorReport(
         legalUnit,
         indic,
         libelle,
@@ -43,52 +46,52 @@ export async function generateFullReport(
       )
     );
 
-    // switch (type) {
-    //   case "proportion":
-    //     reportPDFpromises.push(
-    //       createContribIndicatorPDF(
-    //         libelle,
-    //         legalUnit,
-    //         indic,
-    //         financialData,
-    //         comparativeData,
-    //         false,
-    //         period
-    //       )
-    //     );
-    //     break;
-    //   case "intensité":
-    //     reportPDFpromises.push(
-    //       createIntensIndicatorPDF(
-    //         legalUnit,
-    //         indic,
-    //         libelle,
-    //         unit,
-    //         financialData,
-    //         comparativeData,
-    //         false,
-    //         period
-    //       )
-    //     );
-    //     break;
-    //   case "indice":
-    //     reportPDFpromises.push(
-    //       createIndiceIndicatorPDF(
-    //         libelle,
-    //         libelleGrandeur,
-    //         legalUnit,
-    //         indic,
-    //         unit,
-    //         financialData,
-    //         comparativeData,
-    //         false,
-    //         period
-    //       )
-    //     );
-    //     break;
-    //   default:
-    //     break;
-    // }
+    switch (type) {
+      case "proportion":
+        reportPDFpromises.push(
+            generateContributionIndicatorSheet(
+            libelle,
+            legalUnit,
+            indic,
+            financialData,
+            comparativeData,
+            false,
+            period
+          )
+        );
+        break;
+      case "intensité":
+        reportPDFpromises.push(
+          generateIntensityIndicatorSheet(
+            legalUnit,
+            indic,
+            libelle,
+            unit,
+            financialData,
+            comparativeData,
+            false,
+            period
+          )
+        );
+        break;
+      case "indice":
+        reportPDFpromises.push(
+          generateIndiceIndicatorSheet(
+            libelle,
+            libelleGrandeur,
+            legalUnit,
+            indic,
+            unit,
+            financialData,
+            comparativeData,
+            false,
+            period
+          )
+        );
+        break;
+      default:
+        break;
+    }
   }
 
   try {

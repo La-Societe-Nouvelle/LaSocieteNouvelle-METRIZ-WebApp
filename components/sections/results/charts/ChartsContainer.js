@@ -6,6 +6,8 @@ import ComparativeChart from "./ComparativeChart";
 import TrendsChart from "./TrendsChart";
 import SigPieChart from "./SigPieChart";
 import DeviationChart from "./HorizontalBarChart";
+import { printValue } from "../../../../src/utils/Utils";
+import GrossImpactChart from "./GrossImpactChart";
 
 export const ChartsContainer = ({
   validations,
@@ -213,7 +215,7 @@ export const ChartsContainer = ({
           />
         </Col>
         {/* Target/Trends charts */}
-        <Col>
+        <Col lg={4} sm={4}>
           <TrendsChart
             id={`trend-prd-${indic}`}
             unit={indicators[indic].unit}
@@ -227,6 +229,26 @@ export const ChartsContainer = ({
             }
             aggregate={production.periodsData}
             indic={indic}
+          />
+        </Col>
+        <Col>
+          <GrossImpactChart
+            id={"part-" + indic}
+            intermediateConsumptions={intermediateConsumptions.periodsData[
+              period.periodKey
+            ].footprint.indicators[indic].getGrossImpact(
+              intermediateConsumptions.periodsData[period.periodKey].amount
+            )}
+            fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
+              period.periodKey
+            ].footprint.indicators[indic].getGrossImpact(
+              fixedCapitalConsumptions.periodsData[period.periodKey].amount
+            )}
+            netValueAdded={netValueAdded.periodsData[
+              period.periodKey
+            ].footprint.indicators[indic].getGrossImpact(
+              netValueAdded.periodsData[period.periodKey].amount
+            )}
           />
         </Col>
       </Row>
