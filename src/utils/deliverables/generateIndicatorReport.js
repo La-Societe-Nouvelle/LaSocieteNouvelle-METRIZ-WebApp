@@ -38,7 +38,6 @@ export const generateIndicatorReport = async (
   const currentPeriod = period.periodKey.slice(2);
 
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
-
   const analysisNotes = getAnalyse(
     impactsData,
     financialData,
