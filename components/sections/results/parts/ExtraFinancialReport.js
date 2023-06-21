@@ -275,7 +275,6 @@ const ExtraFinancialReport = ({
                 ].data.at(-1).value,
               ]}
               indic={indic}
-              year={period.periodKey.slice(-4)}
             />
           </Col>
           <Col sm={3} xl={3} lg={3} md={3}>
@@ -304,7 +303,6 @@ const ExtraFinancialReport = ({
                 ].data.at(-1).value,
               ]}
               indic={indic}
-              year={period.periodKey.slice(-4)}
             />
           </Col>
 
@@ -335,7 +333,6 @@ const ExtraFinancialReport = ({
                 ].data.at(-1).value,
               ]}
               indic={indic}
-              year={period.periodKey.slice(-4)}
             />
           </Col>
         </Row>
