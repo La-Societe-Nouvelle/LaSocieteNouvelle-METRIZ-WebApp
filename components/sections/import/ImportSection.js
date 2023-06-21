@@ -21,22 +21,42 @@ import { StockPurchasesMapping } from "./StockPurchasesMapping";
 
 function ImportSection(props) 
 {
+  const {session} = props;
   //STATE
   const [corporateName, setCorporateName] = useState(
-    props.session.legalUnit.corporateName || ""
+    session.legalUnit.corporateName || ""
   );
+  const [siren, setSiren] = useState(session.legalUnit.siren || "");
+
   const [file, setFile] = useState([]);
   const [importedData, setImportedData] = useState(null);
-  const [view, setView] = useState(props.session.financialData.isFinancialDataLoaded ? 4 : 0);
+  const [view, setView] = useState(session.financialData.isFinancialDataLoaded ? 4 : 0);
   const [errorFile, setErrorFile] = useState(false);
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
   const [isImported, setIsImported] = useState(false);
 
-  function handeCorporateName(corporateName) {
-    props.session.legalUnit.corporateName = corporateName;
+  function defineCorporateName() {
+    if (
+      session.legalUnit.corporateName &&
+      session.legalUnit.corporateName != ""
+    ) {
+      setCorporateName(session.legalUnit.corporateName);
+    }
+  }
+
+  function handleCorporateName(corporateName) {
+    session.legalUnit.corporateName = corporateName;
     setCorporateName(corporateName);
+  }
+
+  function handleSiren(siren) {
+    console.log(session.legalUnit)
+    if (siren.length == 9) {
+      session.legalUnit.setSiren(siren);
+    }
+    setSiren(siren);
   }
 
   function handleFile(file) {
@@ -83,9 +103,12 @@ function ImportSection(props)
         <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
         {view == 0 && (
           <ImportForm
-            onChangeCorporateName={handeCorporateName}
+            onChangeCorporateName={handleCorporateName}
+            onChangeSiren={handleSiren}
+            defineCorporateName={defineCorporateName}
             uploadFile={handleFile}
             corporateName={corporateName}
+            siren={siren}
             onClick={() => importFECFile(file)}
             isDataImported={isImported}
             nextStep={() => setView(2)}
@@ -214,16 +237,16 @@ function ImportSection(props)
       let monthPeriods = getMonthPeriodsFECData(FECData);
       let periods = [financialPeriod,...monthPeriods];
 
-      props.session.addPeriods(periods);
-      props.session.financialPeriod = financialPeriod;
-      await props.session.financialData.loadFECData(FECData,financialPeriod,periods);
+      session.addPeriods(periods);
+      session.financialPeriod = financialPeriod;
+      await session.financialData.loadFECData(FECData,financialPeriod,periods);
 
       // load impacts data -> to update
-      props.session.impactsData[financialPeriod.periodKey].knwDetails.apprenticeshipTax = FECData.KNWData.apprenticeshipTax;
-      props.session.impactsData[financialPeriod.periodKey].knwDetails.vocationalTrainingTax = FECData.KNWData.vocationalTrainingTax;
+      session.impactsData[financialPeriod.periodKey].knwDetails.apprenticeshipTax = FECData.KNWData.apprenticeshipTax;
+      session.impactsData[financialPeriod.periodKey].knwDetails.vocationalTrainingTax = FECData.KNWData.vocationalTrainingTax;
 
       // update progression
-      props.session.progression = 1;
+      session.progression = 1;
 
       setView(4);
     }
@@ -266,7 +289,7 @@ const getMonthPeriodsFECData = (FECData) =>
   //             periodKey: month
   //         })
   //     })
-  //     .concat(props.session.financialPeriod);
+  //     .concat(session.financialPeriod);
 
   return [];
 }
