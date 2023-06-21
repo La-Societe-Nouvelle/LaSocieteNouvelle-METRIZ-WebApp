@@ -1,21 +1,19 @@
-import metaIndics from "/lib/indics";
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
 
-import { createContribIndicatorPDF } from "./contribIndicPDF";
-import { createCoverPage } from "./coverPage";
-import { createIndiceIndicatorPDF } from "./indiceIndicPDF";
-import { createIndicReport } from "./indicReportPDF";
-import { createIntensIndicatorPDF } from "./intensIndicPDF";
+import metaIndics from "/lib/indics";
+import { generateCover } from "./generateCover";
+import { generateIndicReport } from "./generateIndicReport";
 
-export async function generateCompleteFile(
+export async function generateFullReport(
   legalUnit,
   validations,
   financialData,
   impactsData,
   comparativeData,
   onDownloadComplete,
-  period
+  period,
+  prevPeriod
 ) {
   const year = period.periodKey.slice(2);
   const documentTitle = `Empreinte-Societale_${legalUnit.replaceAll(
@@ -23,7 +21,7 @@ export async function generateCompleteFile(
     "_"
   )}_${year}`;
 
-  const coverPage = createCoverPage(year, legalUnit);
+  const coverPage = generateCover(year, legalUnit);
   const basicPDFpromises = [];
   const reportPDFpromises = [];
 
@@ -31,7 +29,7 @@ export async function generateCompleteFile(
     const { type, libelle, unit, libelleGrandeur } = metaIndics[indic];
 
     basicPDFpromises.push(
-      createIndicReport(
+      generateIndicReport(
         legalUnit,
         indic,
         libelle,
@@ -40,7 +38,8 @@ export async function generateCompleteFile(
         impactsData,
         comparativeData,
         false,
-        period
+        period,
+        prevPeriod,
       )
     );
 
@@ -154,7 +153,9 @@ export async function generateCompleteFile(
     }
   } catch (error) {
     // Gérer l'erreur ici
-    onDownloadComplete();
+    if (typeof onDownloadComplete === "function") {
+        onDownloadComplete();
+      }
     console.error("Une erreur s'est produite lors de la génération du PDF :", error);
   }
 }
