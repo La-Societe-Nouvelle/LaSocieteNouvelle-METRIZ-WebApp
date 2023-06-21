@@ -15,6 +15,7 @@ const ImportForm = (props) => {
   
   const [errorFile, setErrorFile] = useState(false);
   const [disabled, setDisabled] = useState(true);
+  const [isSirenValid, setSirenValid] = useState(true);
 
   useEffect(() => {
 
@@ -68,6 +69,18 @@ const ImportForm = (props) => {
     props.onChangeCorporateName(event.target.value);
   }
 
+  function handleSiren(event) {
+
+    if (event.target.value != "" && !/[0-9]{9}/.test(event.target.value) && !/^[^a-zA-Z]+$/.test(event.target.value)) {
+      setSirenValid(false);
+    } else {
+      setSirenValid(true);
+    }
+
+    props.onChangeSiren(event.target.value);
+
+  }
+
   return (
     <Row>
       <Col>
@@ -88,6 +101,19 @@ const ImportForm = (props) => {
             type="text"
             value={props.corporateName}
             onChange={handleChange}
+          ></Form.Control>
+        </FormGroup>
+        <FormGroup className="my-3">
+          <FormLabel>
+            <label>Numéro SIREN ou SIRET</label>
+          </FormLabel>
+          <Form.Control
+            type="text"
+            value={props.siren}
+            required
+            onChange={handleSiren}
+            onBlur={props.defineCorporateName}
+            className={!isSirenValid ? "unvalid" : ""}
           ></Form.Control>
         </FormGroup>
         <FormGroup className="my-3">
