@@ -91,7 +91,6 @@ const ComparativeChart = (props) => {
       id={id}
       data={chartData}
       options={{
-
         devicePixelRatio: 2,
         scales: {
           y: {
