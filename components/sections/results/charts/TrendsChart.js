@@ -6,7 +6,7 @@ Chart.register(ChartDataLabels);
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-moment";
 
-function TrendsChart({ trends, target, unit, aggregate, indic, id }) {
+function TrendsChart({ trends, target, unit, aggregate, indic, id, isPrinting }) {
 
   const [chartData, setChartData] = useState({
     datasets: [
@@ -162,6 +162,7 @@ function TrendsChart({ trends, target, unit, aggregate, indic, id }) {
     }));
 
     const options = {
+      maintainAspectRatio: isPrinting ? false : true,
       devicePixelRatio: 2,
       pointRadius: 0,
       scales: {

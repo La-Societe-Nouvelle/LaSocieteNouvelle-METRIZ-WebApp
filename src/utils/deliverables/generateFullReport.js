@@ -155,10 +155,7 @@ export async function generateFullReport(
       onDownloadComplete();
     }
   } catch (error) {
-    // Gérer l'erreur ici
-    if (typeof onDownloadComplete === "function") {
-        onDownloadComplete();
-      }
+
     console.error("Une erreur s'est produite lors de la génération du PDF :", error);
   }
 }
