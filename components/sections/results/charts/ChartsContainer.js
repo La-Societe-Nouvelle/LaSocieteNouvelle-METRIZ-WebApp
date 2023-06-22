@@ -28,7 +28,7 @@ export const ChartsContainer = ({
       <div key={"chart-" + indic}>
         <div className="comparative-chart-container">
           <ComparativeChart
-            id={"production-" + indic}
+            id={`comparative-chart-production-${indic}-print`}
             isPrinting={true}
             firstDataset={[
               comparativeData.production.areaFootprint.indicators[indic].value,
@@ -54,7 +54,7 @@ export const ChartsContainer = ({
         </div>
         <div className="comparative-chart-container">
           <ComparativeChart
-            id={"intermediateConsumptions-" + indic}
+            id={`comparative-chart-intermediateConsumptions-${indic}-print`}
             isPrinting={true}
             firstDataset={[
               comparativeData.intermediateConsumptions.areaFootprint.indicators[
@@ -84,7 +84,7 @@ export const ChartsContainer = ({
 
         <div className="comparative-chart-container">
           <ComparativeChart
-            id={"fixedCapitalConsumptions-" + indic}
+            id={`comparative-chart-fixedCapitalConsumptions-${indic}-print`}
             isPrinting={true}
             firstDataset={[
               comparativeData.fixedCapitalConsumptions.areaFootprint.indicators[
@@ -114,7 +114,7 @@ export const ChartsContainer = ({
 
         <div className="comparative-chart-container">
           <ComparativeChart
-            id={"netValueAdded-" + indic}
+            id={`comparative-chart-netValueAdded-${indic}-print`}
             isPrinting={true}
             firstDataset={[
               comparativeData.netValueAdded.areaFootprint.indicators[indic]
@@ -140,6 +140,7 @@ export const ChartsContainer = ({
             indic={indic}
           />
         </div>
+        {console.log(indicators[indic].type)}
         {indicators[indic].type == "proportion" && (
           <>
             {/* --------- SIG Footprints charts ----------  */}
@@ -152,7 +153,7 @@ export const ChartsContainer = ({
                   indicators[indic].nbDecimals
                 )}
                 title={"Production"}
-                id={"prd-" + indic}
+                id={`sig-chart-production-${indic}-print`}
                 isPrinting={true}
               />
             </div>
@@ -164,7 +165,7 @@ export const ChartsContainer = ({
                   indicators[indic].nbDecimals
                 )}
                 title={"Consommations intermédiaires"}
-                id={"ic-" + indic}
+                id={`sig-chart-intermediateConsumptions-${indic}-print`}
                 isPrinting={true}
               />
             </div>
@@ -176,7 +177,7 @@ export const ChartsContainer = ({
                   indicators[indic].nbDecimals
                 )}
                 title={"Consommation de capital fixe"}
-                id={"ccf-" + indic}
+                id={`sig-chart-fixedCapitalConsumptions-${indic}-print`}
                 isPrinting={true}
               />
             </div>
@@ -189,17 +190,17 @@ export const ChartsContainer = ({
                   indicators[indic].nbDecimals
                 )}
                 title={"Valeur ajoutée nette"}
-                id={"nva-" + indic}
+                id={`sig-chart-netValueAdded-${indic}-print`}
                 isPrinting={true}
               />
             </div>
           </>
         )}
-      
+
         {indicators[indic].type == "intensité" && (
           <div className="deviation-chart-container">
             <DeviationChart
-              id={"deviationChart-" + indic}
+              id={`deviation-chart-${indic}-print`}
               legalUnitData={[
                 aggregates.production.periodsData[
                   period.periodKey
@@ -234,7 +235,7 @@ export const ChartsContainer = ({
         {/* ---------- Target and Trend Line Chart ----------  */}
         <div className="trend-chart-container">
           <TrendsChart
-            id={`trend-prd-${indic}`}
+            id={`trend-chart-${indic}-print`}
             unit={indicators[indic].unit}
             trends={
               comparativeData.production.trendsFootprint.indicators[indic]
@@ -253,7 +254,7 @@ export const ChartsContainer = ({
         {indicators[indic].type == "intensité" && (
           <div className="impact-chart-container">
             <GrossImpactChart
-              id={"part-" + indic}
+              id={`gross-impact-chart-${indic}-print`}
               isPrinting={true}
               intermediateConsumptions={intermediateConsumptions.periodsData[
                 period.periodKey
@@ -280,7 +281,7 @@ export const ChartsContainer = ({
   return (
     <div
       className="charts-container"
-      // style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
+      style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
     >
       {renderCharts()}
     </div>

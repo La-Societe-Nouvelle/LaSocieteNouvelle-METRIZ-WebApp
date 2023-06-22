@@ -101,16 +101,20 @@ export const generateContributionIndicatorSheet = (
   // ---------------------------------------------------------------
   // Get charts canvas and encode it to import in document
 
-  const canvasProduction = document.getElementById("production-" + indic);
-  const productionChartImage = canvasProduction.toDataURL("image/png");
 
-  const doughtnutIC = document.getElementById("dn-ic-" + indic);
+  const prodChartCanvas = document.getElementById(
+    `comparative-chart-production-${indic}-print`
+  );
+  const prodChartImage = prodChartCanvas.toDataURL("image/png");
+ 
+  const doughtnutIC = document.getElementById(`sig-chart-intermediateConsumptions-${indic}-print`);
+  console.log(doughtnutIC)
   const doughtnutICImage = doughtnutIC.toDataURL("image/png");
 
-  const doughtnutCCF = document.getElementById("dn-ccf-" + indic);
+  const doughtnutCCF = document.getElementById(`sig-chart-fixedCapitalConsumptions-${indic}-print`);
   const doughtnutCCFImage = doughtnutCCF.toDataURL("image/png");
-
-  const doughtnutNVA = document.getElementById("dn-nva-" + indic);
+ 
+  const doughtnutNVA = document.getElementById(`sig-chart-netValueAdded-${indic}-print`);
   const doughtnutNVAImage = doughtnutNVA.toDataURL("image/png");
 
   // ---------------------------------------------------------------
@@ -445,7 +449,7 @@ export const generateContributionIndicatorSheet = (
                 bold: true,
               },
               {
-                image: productionChartImage,
+                image: prodChartImage,
                 width: 200,
                 alignment: "center",
               },

@@ -4,7 +4,10 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 // Lib
 import divisions from "/lib/divisions";
 // Utils
-import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "../../formulas/aggregatesBuilder";
+import {
+  buildFixedCapitalConsumptionsAggregates,
+  buildIntermediateConsumptionsAggregates,
+} from "../../formulas/aggregatesBuilder";
 import { getAnalyse, getStatementNote } from "../Writers";
 import { getShortCurrentDateString } from "../Utils";
 import { loadFonts } from "./deliverablesUtils";
@@ -18,7 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateIndicatorReport = async(
+export const generateIndicatorReport = async (
   legalUnit,
   indic,
   label,
@@ -29,14 +32,13 @@ export const generateIndicatorReport = async(
   download,
   period
 ) => {
-
   // ---------------------------------------------------------------
   // Text Generation
 
   const currentPeriod = period.periodKey.slice(2);
 
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
- 
+
   const analysisNotes = getAnalyse(
     impactsData,
     financialData,
@@ -44,39 +46,41 @@ export const generateIndicatorReport = async(
     indic,
     period
   );
- 
-    // build IC and FCC aggregates 
-    const intermediateConsumptionsAggregates =
-      await buildIntermediateConsumptionsAggregates(
-        financialData,
-        period.periodKey
-      );
 
-    const fixedCapitalConsumptionsAggregates =
-      await buildFixedCapitalConsumptionsAggregates(
-        financialData,
-        period.periodKey
-      );
-        
+  // build IC and FCC aggregates
+  const intermediateConsumptionsAggregates =
+    await buildIntermediateConsumptionsAggregates(
+      financialData,
+      period.periodKey
+    );
+
+  const fixedCapitalConsumptionsAggregates =
+    await buildFixedCapitalConsumptionsAggregates(
+      financialData,
+      period.periodKey
+    );
 
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
-  
-  const canvasProduction = document.getElementById("production-" + indic);
-  const canvasValueAdded = document.getElementById("netValueAdded-" + indic);
-  const canvasIntermediateConsumptions = document.getElementById(
-    "intermediateConsumptions-" + indic
-  );
-  const canvasFixedCapitalConsumptions = document.getElementById(
-    "fixedCapitalConsumptions-" + indic
-  );
 
-  const productionChartImage = canvasProduction.toDataURL("image/png");
-  const canvasIntermediateConsumptionsImage =
-    canvasIntermediateConsumptions.toDataURL("image/png");
-  const canvasValueAddedImage = canvasValueAdded.toDataURL("image/png");
-  const canvasFixedCapitalConsumptionsImage =
-    canvasFixedCapitalConsumptions.toDataURL("image/png");
+  const prodChartCanvas = document.getElementById(
+    `comparative-chart-production-${indic}-print`
+  );
+  const prodChartImage = prodChartCanvas.toDataURL("image/png");
+
+  const interConsChartCanvas = document.getElementById(
+    `comparative-chart-intermediateConsumptions-${indic}-print`
+  );
+  const interConsChartImage = interConsChartCanvas.toDataURL("image/png");
+
+  const valueAddedCanvas = document.getElementById(`comparative-chart-netValueAdded-${indic}-print`); 
+  
+  const valueAddedImage = valueAddedCanvas.toDataURL("image/png");
+
+  const fixedCapConsChartCanvas = document.getElementById(
+    `comparative-chart-fixedCapitalConsumptions-${indic}-print`
+  );
+  const fixedCapConsChartImage = fixedCapConsChartCanvas.toDataURL("image/png");
 
   // ---------------------------------------------------------------
   // Document Property
@@ -206,7 +210,10 @@ export const generateIndicatorReport = async(
       //--------------------------------------------------
       { text: "Impacts directs", style: "h2", margin: [0, 10, 0, 10] },
       statementNotes.map((note) => note),
-      { text: impactsData[period.periodKey].comments[indic], margin: [0, 10, 0, 10] },
+      {
+        text: impactsData[period.periodKey].comments[indic],
+        margin: [0, 10, 0, 10],
+      },
 
       // ---------------------------------------------------------------------------
       //  PAGE 2
@@ -217,8 +224,12 @@ export const generateIndicatorReport = async(
       },
       // Analysis note
 
-      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] }, 
-      analysisNotes.map((note) => ({ text: note.reduce((a, b) => a + " " + b), style: "text", fontSize: 9 })),
+      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
+      analysisNotes.map((note) => ({
+        text: note.reduce((a, b) => a + " " + b),
+        style: "text",
+        fontSize: 9,
+      })),
       // ---------------------------------------------------------------------------
       // Charts
       {
@@ -240,7 +251,7 @@ export const generateIndicatorReport = async(
             stack: [
               { text: "Production ", style: "h4" },
               {
-                image: productionChartImage,
+                image: prodChartImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
                 alignment: "center",
@@ -254,7 +265,7 @@ export const generateIndicatorReport = async(
                 style: "h4",
               },
               {
-                image: canvasValueAddedImage,
+                image: valueAddedImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
                 alignment: "center",
@@ -267,12 +278,12 @@ export const generateIndicatorReport = async(
         columns: [
           {
             stack: [
-              { 
+              {
                 text: "Consommations intermédiaires ",
                 style: "h4",
               },
               {
-                image: canvasIntermediateConsumptionsImage,
+                image: interConsChartImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
                 alignment: "center",
@@ -402,7 +413,7 @@ export const generateIndicatorReport = async(
                 style: "h4",
               },
               {
-                image: canvasFixedCapitalConsumptionsImage,
+                image: fixedCapConsChartImage,
                 width: 225,
                 margin: [0, 10, 0, 20],
                 alignment: "center",

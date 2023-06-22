@@ -182,7 +182,7 @@ const Results = ({ session, publish }) => {
     const chartPromise = new Promise((resolve) => {
       setTimeout(() => {
         resolve();
-      }, 1000); 
+      }, 2000); 
     });
 
     await chartPromise;
