@@ -40,7 +40,7 @@ const Results = ({ session, publish }) => {
   );
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showChartComponent, setShowChartComponent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
 
@@ -94,40 +94,55 @@ const Results = ({ session, publish }) => {
     setIndicatorsOptions(indicatorsOptions);
   }, []);
 
-  useEffect(async () => {
-    if (session.comparativeData.activityCode != selectedDivision) {
-      console.log("update comparative data");
+  useEffect(() => {
+    console.log(session.comparativeData.activityCode);
+    console.log(selectedDivision);
 
-      session.comparativeData.activityCode = selectedDivision;
+    let isCancelled = false; // Variable pour vérifier si le composant est toujours monté
 
-      let updatedComparativeData = comparativeData;
+    const fetchData = async () => {
+      if (session.comparativeData.activityCode !== selectedDivision) {
+        console.log("Mise à jour des données comparatives");
+        session.comparativeData.activityCode = selectedDivision;
 
-      for await (const indic of session.validations[
-        session.financialPeriod.periodKey
-      ]) {
-        // update comparative data for each  indicators
-        const updatedData = await getComparativeData(
-          indic,
-          selectedDivision,
-          updatedComparativeData
-        );
+        let updatedComparativeData = comparativeData;
 
-        updatedComparativeData = updatedData;
+        for await (const indic of session.validations[
+          session.financialPeriod.periodKey
+        ]) {
+          const updatedData = await getComparativeData(
+            indic,
+            selectedDivision,
+            updatedComparativeData
+          );
+
+          updatedComparativeData = updatedData;
+        }
+
+        if (!isCancelled) {
+          session.comparativeData = updatedComparativeData;
+          setComparativeData(updatedComparativeData);
+          setIsLoading(false);
+        }
       }
-      // Update session with comparative data for all validated indicators
+    };
 
-      session.comparativeData = updatedComparativeData;
-      setComparativeData(updatedComparativeData);
-    }
+    fetchData();
+
+    // Clean-up function pour marquer l'annulation lorsque le composant est démonté
+    return () => {
+      isCancelled = true;
+    };
   }, [selectedDivision]);
 
   const handleDivisionChange = (selectedOption) => {
     const division = selectedOption.value;
-    session.comparativeData.activityCode = division;
+    setIsLoading(true);
     setSelectedDivision(division);
   };
 
   const getComparativeData = async (indic, code, comparativeData) => {
+    console.log("Get comparative Data");
     let updatedComparativeData = comparativeData;
     let idTarget = getTargetSerieId(indic);
 
@@ -178,22 +193,12 @@ const Results = ({ session, publish }) => {
   };
 
   const handleDownloadCompleteFile = async () => {
-
     const period = session.financialPeriod;
     const prevPeriod = session.availablePeriods.find(
       (period) => period.dateEnd == prevDateEnd
     );
 
     setIsGenerating(true);
-    setShowChartComponent(true);
-
-    const chartPromise = new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 2000); 
-    });
-
-    await chartPromise;
 
     await generateFullReport(
       session.legalUnit.corporateName,
@@ -202,7 +207,6 @@ const Results = ({ session, publish }) => {
       session.impactsData,
       session.comparativeData,
       () => {
-        setShowChartComponent(false);
         setIsGenerating(false);
       },
       period,
@@ -215,9 +219,10 @@ const Results = ({ session, publish }) => {
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
+
           <Button
             variant="download"
-            disabled={!selectedDivision}
+            disabled={!selectedDivision || isLoading}
             onClick={handleDownloadCompleteFile}
           >
             <i className="bi bi-download"></i> Télécharger tous les résultats
@@ -267,20 +272,24 @@ const Results = ({ session, publish }) => {
 
       {(!selectedIndicator || !selectedDivision) && <FootprintReport />}
 
-      {selectedIndicator && selectedDivision && selectedDivision != "00" && (
-        <ExtraFinancialReport
-          indic={selectedIndicator}
-          division={selectedDivision}
-          metaIndic={indicators[selectedIndicator]}
-          financialData={session.financialData}
-          impactsData={session.impactsData}
-          comparativeData={session.comparativeData}
-          period={session.financialPeriod}
-          prevPeriod={prevPeriod}
-          legalUnit={session.legalUnit}
-        ></ExtraFinancialReport>
-      )}
-      {showChartComponent && (
+      {selectedIndicator &&
+        selectedDivision &&
+        selectedDivision != "00" &&
+        !isLoading && (
+          <ExtraFinancialReport
+            indic={selectedIndicator}
+            division={selectedDivision}
+            metaIndic={indicators[selectedIndicator]}
+            financialData={session.financialData}
+            impactsData={session.impactsData}
+            comparativeData={session.comparativeData}
+            period={session.financialPeriod}
+            prevPeriod={prevPeriod}
+            legalUnit={session.legalUnit}
+          ></ExtraFinancialReport>
+        )}
+
+      {selectedDivision != "00" && !isLoading && (
         <ChartsContainer
           validations={session.validations[financialPeriod]}
           comparativeData={session.comparativeData}
@@ -288,6 +297,14 @@ const Results = ({ session, publish }) => {
           period={session.financialPeriod}
           prevPeriod={prevPeriod}
         />
+      )}
+
+      {isLoading && selectedIndicator && (
+        <div className="box">
+          <div className="loader-container my-4">
+            <div className="dot-pulse m-auto"></div>
+          </div>
+        </div>
       )}
 
       {/* <DonwloadComponent></DonwloadComponent> */}

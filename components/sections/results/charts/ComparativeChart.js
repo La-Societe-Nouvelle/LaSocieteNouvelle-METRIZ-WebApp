@@ -12,10 +12,11 @@ const ComparativeChart = ({
   secondDataset,
   isPrinting,
 }) => {
+
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
   const labels = ["France", "Exercice", "Branche"];
-  console.log(isPrinting);
+
   // Remove "Branche" label if no comparative division selected
   if (firstDataset[2] == null) {
     labels.pop();
