@@ -140,89 +140,98 @@ export const ChartsContainer = ({
             indic={indic}
           />
         </div>
-        {/* SIG Pie chart */}
-        <div className="doughnut-chart-container">
-          <SigPieChart
-            value={printValue(
-              production.periodsData[period.periodKey].footprint.indicators[
-                indic
-              ].value,
-              indicators[indic].nbDecimals
-            )}
-            title={"Production"}
-            id={"prd-" + indic}
-            isPrinting={true}
-          />
-        </div>
-        <div className="doughnut-chart-container">
-          <SigPieChart
-            value={printValue(
-              intermediateConsumptions.periodsData[period.periodKey].footprint
-                .indicators[indic].value,
-              indicators[indic].nbDecimals
-            )}
-            title={"Consommations intermédiaires"}
-            id={"ic-" + indic}
-            isPrinting={true}
-          />
-        </div>
-        <div className="doughnut-chart-container">
-          <SigPieChart
-            value={printValue(
-              fixedCapitalConsumptions.periodsData[period.periodKey].footprint
-                .indicators[indic].value,
-              indicators[indic].nbDecimals
-            )}
-            title={"Consommation de capital fixe"}
-            id={"ccf-" + indic}
-            isPrinting={true}
-          />
-        </div>
-        <div className="doughnut-chart-container">
-          <SigPieChart
-            value={printValue(
-              netValueAdded.periodsData[period.periodKey].footprint.indicators[
-                indic
-              ].getValue(),
-              indicators[indic].nbDecimals
-            )}
-            title={"Valeur ajoutée nette"}
-            id={"nva-" + indic}
-            isPrinting={true}
-          />
-        </div>
-        <div className="deviation-chart-container">
-          <DeviationChart
-            id={"deviationChart-" + indic}
-            legalUnitData={[
-              aggregates.production.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-              aggregates.intermediateConsumptions.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-              aggregates.fixedCapitalConsumptions.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-              aggregates.netValueAdded.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-            ]}
-            branchData={[
-              comparativeData.production.divisionFootprint.indicators[indic]
-                .value,
-              comparativeData.intermediateConsumptions.divisionFootprint
-                .indicators[indic].value,
-              comparativeData.fixedCapitalConsumptions.divisionFootprint
-                .indicators[indic].value,
-              comparativeData.netValueAdded.divisionFootprint.indicators[indic]
-                .value,
-            ]}
-            indic={indic}
-            isPrinting={true}
-          />
-        </div>
-        {/* Target/Trends charts */}
+        {indicators[indic].type == "proportion" && (
+          <>
+            {/* --------- SIG Footprints charts ----------  */}
+            <div className="doughnut-chart-container">
+              <SigPieChart
+                value={printValue(
+                  production.periodsData[period.periodKey].footprint.indicators[
+                    indic
+                  ].value,
+                  indicators[indic].nbDecimals
+                )}
+                title={"Production"}
+                id={"prd-" + indic}
+                isPrinting={true}
+              />
+            </div>
+            <div className="doughnut-chart-container">
+              <SigPieChart
+                value={printValue(
+                  intermediateConsumptions.periodsData[period.periodKey]
+                    .footprint.indicators[indic].value,
+                  indicators[indic].nbDecimals
+                )}
+                title={"Consommations intermédiaires"}
+                id={"ic-" + indic}
+                isPrinting={true}
+              />
+            </div>
+            <div className="doughnut-chart-container">
+              <SigPieChart
+                value={printValue(
+                  fixedCapitalConsumptions.periodsData[period.periodKey]
+                    .footprint.indicators[indic].value,
+                  indicators[indic].nbDecimals
+                )}
+                title={"Consommation de capital fixe"}
+                id={"ccf-" + indic}
+                isPrinting={true}
+              />
+            </div>
+            <div className="doughnut-chart-container">
+              <SigPieChart
+                value={printValue(
+                  netValueAdded.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getValue(),
+                  indicators[indic].nbDecimals
+                )}
+                title={"Valeur ajoutée nette"}
+                id={"nva-" + indic}
+                isPrinting={true}
+              />
+            </div>
+          </>
+        )}
+      
+        {indicators[indic].type == "intensité" && (
+          <div className="deviation-chart-container">
+            <DeviationChart
+              id={"deviationChart-" + indic}
+              legalUnitData={[
+                aggregates.production.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                aggregates.intermediateConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                aggregates.fixedCapitalConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                aggregates.netValueAdded.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+              ]}
+              branchData={[
+                comparativeData.production.divisionFootprint.indicators[indic]
+                  .value,
+                comparativeData.intermediateConsumptions.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.fixedCapitalConsumptions.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.netValueAdded.divisionFootprint.indicators[
+                  indic
+                ].value,
+              ]}
+              indic={indic}
+              isPrinting={true}
+            />
+          </div>
+        )}
+
+        {/* ---------- Target and Trend Line Chart ----------  */}
         <div className="trend-chart-container">
           <TrendsChart
             id={`trend-prd-${indic}`}
@@ -240,27 +249,30 @@ export const ChartsContainer = ({
             isPrinting={true}
           />
         </div>
-        <div className="impact-chart-container">
-          <GrossImpactChart
-            id={"part-" + indic}
-            isPrinting={true}
-            intermediateConsumptions={intermediateConsumptions.periodsData[
-              period.periodKey
-            ].footprint.indicators[indic].getGrossImpact(
-              intermediateConsumptions.periodsData[period.periodKey].amount
-            )}
-            fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
-              period.periodKey
-            ].footprint.indicators[indic].getGrossImpact(
-              fixedCapitalConsumptions.periodsData[period.periodKey].amount
-            )}
-            netValueAdded={netValueAdded.periodsData[
-              period.periodKey
-            ].footprint.indicators[indic].getGrossImpact(
-              netValueAdded.periodsData[period.periodKey].amount
-            )}
-          />
-        </div>
+        {/* ----------Gross Impact Chart ----------  */}
+        {indicators[indic].type == "intensité" && (
+          <div className="impact-chart-container">
+            <GrossImpactChart
+              id={"part-" + indic}
+              isPrinting={true}
+              intermediateConsumptions={intermediateConsumptions.periodsData[
+                period.periodKey
+              ].footprint.indicators[indic].getGrossImpact(
+                intermediateConsumptions.periodsData[period.periodKey].amount
+              )}
+              fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
+                period.periodKey
+              ].footprint.indicators[indic].getGrossImpact(
+                fixedCapitalConsumptions.periodsData[period.periodKey].amount
+              )}
+              netValueAdded={netValueAdded.periodsData[
+                period.periodKey
+              ].footprint.indicators[indic].getGrossImpact(
+                netValueAdded.periodsData[period.periodKey].amount
+              )}
+            />
+          </div>
+        )}
       </div>
     ));
   };
