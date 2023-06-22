@@ -32,14 +32,6 @@ function SigPieChart({ value, title, id,isPrinting }) {
     maintainAspectRatio: isPrinting ? false : true,
     cutout: 55,
     hover: { mode: null },
-    layout: {
-      padding: {
-
-        autoPadding: false,
-
-    }
-    
-    },
     scales: {
       x: {
         display: false,
