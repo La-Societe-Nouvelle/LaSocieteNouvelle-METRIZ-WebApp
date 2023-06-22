@@ -101,10 +101,10 @@ export const generateIndiceIndicatorSheet = (
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
 
-  const deviationChart = document.getElementById("deviationChart-" + indic);
+  const deviationChart = document.getElementById(`deviation-chart-${indic}-print`);
   const deviationImage = deviationChart.toDataURL("image/png");
 
-  const trendChart = document.getElementById("trend-prd-" + indic);
+  const trendChart = document.getElementById(`trend-chart-${indic}-print`);
   const trendImage = trendChart.toDataURL("image/png");
 
   // ---------------------------------------------------------------

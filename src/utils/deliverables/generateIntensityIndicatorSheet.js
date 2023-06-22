@@ -113,13 +113,13 @@ export const generateIntensityIndicatorSheet = (
 
   // Get chart canvas and encode it to import in document
 
-  const canvasChart = document.getElementById("part-" + indic);
+  const canvasChart = document.getElementById(`gross-impact-chart-${indic}-print`);
   const chartImage = canvasChart.toDataURL("image/png");
 
-  const deviationChart = document.getElementById("deviationChart-" + indic);
+  const deviationChart = document.getElementById(`deviation-chart-${indic}-print`);
   const deviationImage = deviationChart.toDataURL("image/png");
 
-  const trendChart = document.getElementById("trend-prd-" + indic);
+  const trendChart = document.getElementById(`trend-chart-${indic}-print`);
   const trendImage = trendChart.toDataURL("image/png", 1.0);
 
   // ---------------------------------------------------------------
