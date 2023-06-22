@@ -390,7 +390,43 @@ const ExtraFinancialReport = ({
             />
           </div>
         </Col>
-       
+        <Col lg={4}>
+          <div className="box ">
+            <h5 className="h6 mb-4">
+              ▪ Ecart par rapport à la moyenne de la branche
+            </h5>
+            <DeviationChart
+              id={"deviationChart-" + indic}
+              legalUnitData={[
+                financialData.mainAggregates.production.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                financialData.mainAggregates.intermediateConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+                financialData.mainAggregates.netValueAdded.periodsData[
+                  period.periodKey
+                ].footprint.getIndicator(indic).value,
+              ]}
+              branchData={[
+                comparativeData.production.divisionFootprint.indicators[indic]
+                  .value,
+                comparativeData.intermediateConsumptions.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.fixedCapitalConsumptions.divisionFootprint
+                  .indicators[indic].value,
+                comparativeData.netValueAdded.divisionFootprint.indicators[
+                  indic
+                ].value,
+              ]}
+              indic={indic}
+              isPrinting={false}
+            />
+          </div>
+        </Col>
       </Row>
 
       {/* ---------- Trend Line Chart ----------  */}
