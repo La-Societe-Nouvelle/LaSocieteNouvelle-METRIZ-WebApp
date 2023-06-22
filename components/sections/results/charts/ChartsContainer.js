@@ -1,5 +1,4 @@
 import React from "react";
-import { Col, Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
 import ComparativeChart from "./ComparativeChart";
@@ -26,10 +25,11 @@ export const ChartsContainer = ({
 
   const renderCharts = () => {
     return validations.map((indic) => (
-      <Row key={"chart-" + indic}>
-        <Col>
+      <div key={"chart-" + indic}>
+        <div className="comparative-chart-container">
           <ComparativeChart
             id={"production-" + indic}
+            isPrinting={true}
             firstDataset={[
               comparativeData.production.areaFootprint.indicators[indic].value,
               prevPeriod &&
@@ -51,10 +51,11 @@ export const ChartsContainer = ({
             ]}
             indic={indic}
           />
-        </Col>
-        <Col>
+        </div>
+        <div className="comparative-chart-container">
           <ComparativeChart
             id={"intermediateConsumptions-" + indic}
+            isPrinting={true}
             firstDataset={[
               comparativeData.intermediateConsumptions.areaFootprint.indicators[
                 indic
@@ -79,11 +80,12 @@ export const ChartsContainer = ({
             ]}
             indic={indic}
           />
-        </Col>
+        </div>
 
-        <Col>
+        <div className="comparative-chart-container">
           <ComparativeChart
             id={"fixedCapitalConsumptions-" + indic}
+            isPrinting={true}
             firstDataset={[
               comparativeData.fixedCapitalConsumptions.areaFootprint.indicators[
                 indic
@@ -108,11 +110,12 @@ export const ChartsContainer = ({
             ]}
             indic={indic}
           />
-        </Col>
+        </div>
 
-        <Col>
+        <div className="comparative-chart-container">
           <ComparativeChart
             id={"netValueAdded-" + indic}
+            isPrinting={true}
             firstDataset={[
               comparativeData.netValueAdded.areaFootprint.indicators[indic]
                 .value,
@@ -136,9 +139,9 @@ export const ChartsContainer = ({
             ]}
             indic={indic}
           />
-        </Col>
+        </div>
         {/* SIG Pie chart */}
-        <Col>
+        <div className="doughnut-chart-container">
           <SigPieChart
             value={printValue(
               production.periodsData[period.periodKey].footprint.indicators[
@@ -148,9 +151,10 @@ export const ChartsContainer = ({
             )}
             title={"Production"}
             id={"prd-" + indic}
+            isPrinting={true}
           />
-        </Col>
-        <Col>
+        </div>
+        <div className="doughnut-chart-container">
           <SigPieChart
             value={printValue(
               intermediateConsumptions.periodsData[period.periodKey].footprint
@@ -159,9 +163,10 @@ export const ChartsContainer = ({
             )}
             title={"Consommations intermédiaires"}
             id={"ic-" + indic}
+            isPrinting={true}
           />
-        </Col>
-        <Col>
+        </div>
+        <div className="doughnut-chart-container">
           <SigPieChart
             value={printValue(
               fixedCapitalConsumptions.periodsData[period.periodKey].footprint
@@ -170,9 +175,10 @@ export const ChartsContainer = ({
             )}
             title={"Consommation de capital fixe"}
             id={"ccf-" + indic}
+            isPrinting={true}
           />
-        </Col>
-        <Col>
+        </div>
+        <div className="doughnut-chart-container">
           <SigPieChart
             value={printValue(
               netValueAdded.periodsData[period.periodKey].footprint.indicators[
@@ -182,9 +188,10 @@ export const ChartsContainer = ({
             )}
             title={"Valeur ajoutée nette"}
             id={"nva-" + indic}
+            isPrinting={true}
           />
-        </Col>
-        <Col>
+        </div>
+        <div className="deviation-chart-container">
           <DeviationChart
             id={"deviationChart-" + indic}
             legalUnitData={[
@@ -212,10 +219,11 @@ export const ChartsContainer = ({
                 .value,
             ]}
             indic={indic}
+            isPrinting={true}
           />
-        </Col>
+        </div>
         {/* Target/Trends charts */}
-        <Col lg={4} sm={4}>
+        <div className="trend-chart-container">
           <TrendsChart
             id={`trend-prd-${indic}`}
             unit={indicators[indic].unit}
@@ -229,11 +237,13 @@ export const ChartsContainer = ({
             }
             aggregate={production.periodsData}
             indic={indic}
+            isPrinting={true}
           />
-        </Col>
-        <Col>
+        </div>
+        <div className="impact-chart-container">
           <GrossImpactChart
             id={"part-" + indic}
+            isPrinting={true}
             intermediateConsumptions={intermediateConsumptions.periodsData[
               period.periodKey
             ].footprint.indicators[indic].getGrossImpact(
@@ -250,15 +260,15 @@ export const ChartsContainer = ({
               netValueAdded.periodsData[period.periodKey].amount
             )}
           />
-        </Col>
-      </Row>
+        </div>
+      </div>
     ));
   };
 
   return (
     <div
-      id="chartContainer"
-      style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
+      className="charts-container"
+      // style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
     >
       {renderCharts()}
     </div>

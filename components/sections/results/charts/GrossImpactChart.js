@@ -5,7 +5,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
-function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, netValueAdded,id}) {
+function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, netValueAdded,id,isPrinting}) {
 
 
   let total = intermediateConsumptions + fixedCapitalConsumptions + netValueAdded;
@@ -40,11 +40,8 @@ function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, n
 
   const options = {
     devicePixelRatio: 2,
-    maintainAspectRatio: true,
-    aspectRatio: 1, // specify aspect ratio
-    layout : {
-      padding : 50
-    },
+    maintainAspectRatio: isPrinting ? false : true,
+
     plugins: {
       legend: {
         display: false,

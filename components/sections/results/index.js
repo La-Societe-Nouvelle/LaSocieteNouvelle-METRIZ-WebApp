@@ -32,7 +32,7 @@ const Results = ({ session, publish }) => {
   );
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [showChartComponent, setShowChartComponent] = useState(false);
+  const [showChartComponent, setShowChartComponent] = useState(true);
 
   const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
 
@@ -194,7 +194,7 @@ const Results = ({ session, publish }) => {
       session.impactsData,
       session.comparativeData,
       () => {
-        setShowChartComponent(false);
+        // setShowChartComponent(false);
         setIsGenerating(false);
       },
       period,
