@@ -8,7 +8,7 @@ import { Doughnut } from "react-chartjs-2";
 
 function SigPieChart({ value, title, id,isPrinting }) {
   const chartData = [value, 100 - value];
-  console.log(id)
+ 
   const filteredData = chartData.filter((d) => d !== 0);
 
   const data = {
@@ -32,6 +32,14 @@ function SigPieChart({ value, title, id,isPrinting }) {
     maintainAspectRatio: isPrinting ? false : true,
     cutout: 55,
     hover: { mode: null },
+    layout: {
+      padding: {
+
+        autoPadding: false,
+
+    }
+    
+    },
     scales: {
       x: {
         display: false,
