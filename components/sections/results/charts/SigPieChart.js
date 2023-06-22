@@ -8,7 +8,6 @@ import { Doughnut } from "react-chartjs-2";
 
 function SigPieChart({ value, title, id,isPrinting }) {
   const chartData = [value, 100 - value];
-  console.log(id)
   const filteredData = chartData.filter((d) => d !== 0);
 
   const data = {

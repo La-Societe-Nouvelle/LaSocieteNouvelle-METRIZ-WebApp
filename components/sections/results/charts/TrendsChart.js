@@ -289,7 +289,7 @@ function TrendsChart({ trends, target, unit, aggregate, indic, id, isPrinting })
     };
     setOptions(options);
   }, [indic, aggregate, id]);
-console.log(chartData)
+
   return <Line data={chartData} id={id} options={options} />;
 }
 

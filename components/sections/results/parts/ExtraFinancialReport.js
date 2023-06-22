@@ -5,19 +5,22 @@ import { Button, Col, Image, Row, Tab, Tabs } from "react-bootstrap";
 //
 import { printValue } from "/src/utils/Utils";
 
+// PDF Generation
+import { generateContributionIndicatorSheet } from "/src/utils/deliverables/generateContributionIndicatorSheet";
+import { generateIntensityIndicatorSheet } from "/src/utils/deliverables/generateIntensityIndicatorSheet";
+import { generateIndiceIndicatorSheet } from "/src/utils/deliverables/generateIndiceIndicatorSheet";
+// Tables
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
 import { ComparativeTable } from "../tables/ComparativeTable";
-
+// Charts
 import GrossImpactChart from "../charts/GrossImpactChart";
 import ComparativeChart from "../charts/ComparativeChart";
 import SigPieChart from "../charts/SigPieChart";
+// Child components
 import TrendsComponent from "./TrendsComponent";
-import DeviationChart from "../charts/HorizontalBarChart";
 import Analyse from "./AnalyseComponent";
-import { createContribIndicatorPDF } from "/src/writers/deliverables/contribIndicPDF";
-import { createIntensIndicatorPDF } from "/src/writers/deliverables/intensIndicPDF";
-import { createIndiceIndicatorPDF } from "/src/writers/deliverables/indiceIndicPDF";
+
 
 const ExtraFinancialReport = ({
   indic,
@@ -29,6 +32,7 @@ const ExtraFinancialReport = ({
   period,
   prevPeriod,
   legalUnit,
+  onDownloadChartComponent
 }) => {
   const {
     production,
@@ -37,15 +41,17 @@ const ExtraFinancialReport = ({
     netValueAdded,
   } = financialData.mainAggregates;
 
-  const handleDownload = () => {
+  const handleDownload = async() => {
     const reportType = metaIndic.type;
     const libelle = metaIndic.libelle;
     const unit = metaIndic.unit;
+ 
 
+    console.log(legalUnit)
     switch (reportType) {
       case "proportion":
-        createContribIndicatorPDF(
-          reportType,
+        generateContributionIndicatorSheet(
+          libelle,
           legalUnit.corporateName,
           indic,
           financialData,
@@ -55,7 +61,7 @@ const ExtraFinancialReport = ({
         );
         break;
       case "intensité":
-        createIntensIndicatorPDF(
+        generateIntensityIndicatorSheet(
           legalUnit.corporateName,
           indic,
           libelle,
@@ -67,8 +73,9 @@ const ExtraFinancialReport = ({
         );
         break;
       case "indice":
-        createIndiceIndicatorPDF(
+        generateIndiceIndicatorSheet(
           libelle,
+          libelleGrandeur,
           legalUnit.corporateName,
           indic,
           unit,
@@ -76,11 +83,12 @@ const ExtraFinancialReport = ({
           comparativeData,
           true,
           period
-        );
+        )
         break;
       default:
         break;
     }
+
   };
 
   return (
@@ -390,7 +398,6 @@ const ExtraFinancialReport = ({
             />
           </div>
         </Col>
-       
       </Row>
 
       {/* ---------- Trend Line Chart ----------  */}

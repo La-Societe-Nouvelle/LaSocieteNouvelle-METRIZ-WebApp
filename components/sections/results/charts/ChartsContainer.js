@@ -14,7 +14,6 @@ export const ChartsContainer = ({
   aggregates,
   period,
   prevPeriod,
-  unit,
 }) => {
   const {
     production,
@@ -28,7 +27,7 @@ export const ChartsContainer = ({
       <div key={"chart-" + indic}>
         <div className="comparative-chart-container">
           <ComparativeChart
-            id={`comparative-chart-production-${indic}-print`}
+            id={`comparative-chart-production-${indic}-print`} 
             isPrinting={true}
             firstDataset={[
               comparativeData.production.areaFootprint.indicators[indic].value,
@@ -140,7 +139,7 @@ export const ChartsContainer = ({
             indic={indic}
           />
         </div>
-        {console.log(indicators[indic].type)}
+ 
         {indicators[indic].type == "proportion" && (
           <>
             {/* --------- SIG Footprints charts ----------  */}
