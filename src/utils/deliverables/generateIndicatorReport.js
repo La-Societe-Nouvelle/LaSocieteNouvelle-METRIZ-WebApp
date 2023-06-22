@@ -72,7 +72,6 @@ export const generateIndicatorReport = async(
   );
 
   const productionChartImage = canvasProduction.toDataURL("image/png");
-  console.log(productionChartImage)
   const canvasIntermediateConsumptionsImage =
     canvasIntermediateConsumptions.toDataURL("image/png");
   const canvasValueAddedImage = canvasValueAdded.toDataURL("image/png");
