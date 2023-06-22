@@ -185,7 +185,7 @@ const ExtraFinancialReport = ({
             <h4>Empreintes des Soldes Intermédiaires de Gestion</h4>
             <Col lg={3}>
               <h5 className="mb-4 text-center">▪ Production</h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     production.periodsData[period.periodKey].footprint
@@ -202,7 +202,7 @@ const ExtraFinancialReport = ({
               <h5 className="mb-4 text-center">
                 ▪ Consommations intermédiaires
               </h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     intermediateConsumptions.periodsData[period.periodKey]
@@ -219,7 +219,7 @@ const ExtraFinancialReport = ({
               <h5 className="mb-4 text-center">
                 ▪ Consommations de capital fixe
               </h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     fixedCapitalConsumptions.periodsData[period.periodKey]
@@ -234,7 +234,7 @@ const ExtraFinancialReport = ({
             </Col>
             <Col lg={3}>
               <h5 className="mb-4 text-center">▪ Valeur ajoutée nette</h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     netValueAdded.periodsData[
@@ -390,43 +390,7 @@ const ExtraFinancialReport = ({
             />
           </div>
         </Col>
-        <Col lg={4}>
-          <div className="box ">
-            <h5 className="h6 mb-4">
-              ▪ Ecart par rapport à la moyenne de la branche
-            </h5>
-            <DeviationChart
-              id={"deviationChart-" + indic}
-              legalUnitData={[
-                financialData.mainAggregates.production.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                financialData.mainAggregates.intermediateConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                financialData.mainAggregates.netValueAdded.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-              ]}
-              branchData={[
-                comparativeData.production.divisionFootprint.indicators[indic]
-                  .value,
-                comparativeData.intermediateConsumptions.divisionFootprint
-                  .indicators[indic].value,
-                comparativeData.fixedCapitalConsumptions.divisionFootprint
-                  .indicators[indic].value,
-                comparativeData.netValueAdded.divisionFootprint.indicators[
-                  indic
-                ].value,
-              ]}
-              indic={indic}
-              isPrinting={false}
-            />
-          </div>
-        </Col>
+       
       </Row>
 
       {/* ---------- Trend Line Chart ----------  */}
