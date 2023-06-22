@@ -195,8 +195,7 @@ export const ChartsContainer = ({
             </div>
           </>
         )}
-
-        {indicators[indic].type == "intensité" && (
+        {(indicators[indic].type == "intensité" || indicators[indic].type == "indice")  && (
           <div className="deviation-chart-container">
             <DeviationChart
               id={`deviation-chart-${indic}-print`}

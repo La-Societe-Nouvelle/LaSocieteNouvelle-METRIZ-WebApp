@@ -1,5 +1,6 @@
 import { PDFDocument, rgb } from "pdf-lib";
 import fontkit from "@pdf-lib/fontkit";
+import jsZip from "jszip";
 
 import metaIndics from "/lib/indics";
 import { generateCover } from "./generateCover";
@@ -23,7 +24,8 @@ export async function generateFullReport(
     /[^a-zA-Z0-9]/g,
     "_"
   )}_${year}`;
-
+  const zip = new jsZip();
+  // Génération des PDFS 
   const coverPage = generateCover(year, legalUnit);
   const basicPDFpromises = [];
   const reportPDFpromises = [];
@@ -31,6 +33,7 @@ export async function generateFullReport(
   for (const indic of validations) {
     const { type, libelle, unit, libelleGrandeur } = metaIndics[indic];
 
+    // Générations des rapports pour chaque indicateur validé
     basicPDFpromises.push(
       generateIndicatorReport(
         legalUnit,
@@ -45,7 +48,7 @@ export async function generateFullReport(
         prevPeriod,
       )
     );
-
+// Génération des fiches pour chaque indicateur validés
     switch (type) {
       case "proportion":
         reportPDFpromises.push(
@@ -93,7 +96,7 @@ export async function generateFullReport(
         break;
     }
   }
-
+  // Fusion de tous les PDFs Générés
   try {
     const mergedPromises = [coverPage, ...reportPDFpromises, ...basicPDFpromises];
     const pdfs = await Promise.all(mergedPromises);
@@ -139,17 +142,19 @@ export async function generateFullReport(
         });
       }
     }
+    const mergedPdfBytes = await mergedPdfDoc.save();
 
-    const mergedPdfData = new Blob([await mergedPdfDoc.save()], {
-      type: "application/pdf",
-    });
-
-    const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(mergedPdfData);
-    downloadLink.download = `${documentTitle}.pdf`;
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
+    zip.file(documentTitle + ".pdf", mergedPdfBytes, { binary: true });
+ 
+    zip
+    .generateAsync({ type: "blob" })
+    .then((content) => {
+      // Télécharger le zip
+      saveAs(
+        content,
+        "Empreinte-Societale_" + legalUnit + "_" + year + ".zip"
+      );
+    })
 
     if (typeof onDownloadComplete === "function") {
       onDownloadComplete();

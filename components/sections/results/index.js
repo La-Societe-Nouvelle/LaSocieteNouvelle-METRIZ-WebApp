@@ -214,7 +214,7 @@ const Results = ({ session, publish }) => {
 
           <Button
             variant="download"
-            disabled={!selectedDivision || isLoading}
+            disabled={!selectedDivision || selectedDivision == '00' || isLoading}
             onClick={handleDownloadCompleteFile}
           >
             <i className="bi bi-download"></i> Télécharger tous les résultats
