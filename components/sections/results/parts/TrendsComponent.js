@@ -83,6 +83,7 @@ const TrendsComponent = ({
           target={target}
           aggregate={aggregate}
           indic={indic}
+          isPrinting={false}
         />
       </div>
     );

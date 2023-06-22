@@ -5,34 +5,38 @@ import { Bar } from "react-chartjs-2";
 import metaIndics from "/lib/indics";
 import { printValue } from "/src/utils/Utils";
 
-const ComparativeChart = (props) => {
-
-  const id  = props.id;
-  const unit  = metaIndics[props.indic].unit;
-  const precision = metaIndics[props.indic].nbDecimals;
-  const labels = ["France", "Exercice", "Branche" ];
-
+const ComparativeChart = ({
+  id,
+  indic,
+  firstDataset,
+  secondDataset,
+  isPrinting,
+}) => {
+  const unit = metaIndics[indic].unit;
+  const precision = metaIndics[indic].nbDecimals;
+  const labels = ["France", "Exercice", "Branche"];
+  console.log(isPrinting);
   // Remove "Branche" label if no comparative division selected
-  if( props.firstDataset[2] == null) {
-    labels.pop()
+  if (firstDataset[2] == null) {
+    labels.pop();
   }
   let suggestedMax;
   if (unit == "%") {
-    let max = Math.max(... props.firstDataset.map((o) => o));
+    let max = Math.max(...firstDataset.map((o) => o));
 
-    if(max < 10) {
+    if (max < 10) {
       suggestedMax = 10;
     }
-   
+
     switch (true) {
       case max < 10:
-         suggestedMax = 10;
+        suggestedMax = 10;
         break;
       case max > 10 && max < 25:
-         suggestedMax = 25;
+        suggestedMax = 25;
         break;
       case max > 25 && max < 50:
-         suggestedMax = 50;
+        suggestedMax = 50;
         break;
       default:
         suggestedMax = 100;
@@ -42,23 +46,18 @@ const ComparativeChart = (props) => {
     suggestedMax = null;
   }
 
-  // Data for chart 
+  // Data for chart
   const chartData = {
     labels: labels,
     datasets: [
       {
-        label: [
-          "Valeur",
-          "Année N-1",
-          "Valeur",
-        ],
-        data: props.firstDataset.map(data => data ? data : null),
+        label: ["Valeur", "Année N-1", "Valeur"],
+        data: firstDataset.map((data) => (data ? data : null)),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
           "RGBA(250,89,95,0.5)",
           "rgb(255, 182, 66)",
-         
         ],
         borderWidth: 0,
         type: "bar",
@@ -67,12 +66,8 @@ const ComparativeChart = (props) => {
         minBarLength: 2,
       },
       {
-        label: [
-          "Objectif",
-          "Année N",
-          "Objectif",
-        ],
-        data: props.secondDataset.map(data => data ? data : null),
+        label: ["Objectif", "Année N", "Objectif"],
+        data: secondDataset.map((data) => (data ? data : null)),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
@@ -91,15 +86,17 @@ const ComparativeChart = (props) => {
       id={id}
       data={chartData}
       options={{
+        responsive: true,
+        maintainAspectRatio: isPrinting ? false : true,
         devicePixelRatio: 2,
         scales: {
           y: {
             display: true,
-            min : 0,
+            min: 0,
             suggestedMax: suggestedMax,
             ticks: {
               color: "#191558",
-              font : {
+              font: {
                 size: 10,
               },
             },
@@ -110,9 +107,9 @@ const ComparativeChart = (props) => {
           x: {
             ticks: {
               color: "#191558",
-              font : {
+              font: {
                 size: 12,
-              }
+              },
             },
             grid: {
               color: "#ececff",
@@ -126,10 +123,9 @@ const ComparativeChart = (props) => {
           datalabels: {
             anchor: "end",
             align: "top",
-            formatter: function (value, context) 
-            {
-              if(value) {
-                return  printValue(value, precision) ;
+            formatter: function (value, context) {
+              if (value) {
+                return printValue(value, precision);
               }
             },
             color: "#191558",
@@ -142,29 +138,32 @@ const ComparativeChart = (props) => {
             display: true,
             padding: {
               top: 10,
-              bottom: 20
-          },
-            align : "start",
+              bottom: 20,
+            },
+            align: "start",
             text: unit,
             color: "#191558",
-            font : {
+            font: {
               size: 11,
-            }
+            },
           },
           tooltip: {
-
-            backgroundColor: '#191558',
-            padding : 10,
+            backgroundColor: "#191558",
+            padding: 10,
             cornerRadius: 2,
             callbacks: {
               label: function (context) {
-                let label = context.dataset.label[context.dataIndex] + " :  " + context.parsed.y + " " + unit;
+                let label =
+                  context.dataset.label[context.dataIndex] +
+                  " :  " +
+                  context.parsed.y +
+                  " " +
+                  unit;
                 return label;
               },
             },
-          }
+          },
         },
-     
       }}
     />
   );

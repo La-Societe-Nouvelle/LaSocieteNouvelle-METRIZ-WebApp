@@ -47,13 +47,33 @@
   margin: 0 1rem;
 }
 
-.charts-container {
+
+.comparative-chart-container{
   position: relative;
+  height: 20vh;
+  width: 40vh; 
 }
 
-.doughtnut-chart-container {
+.doughnut-chart-container{
   position: relative;
+  width: 25h;
+  height: 20vh;
   canvas {
     margin: 0 auto;
   }
+}
+.impact-chart-container{
+  position : relative;
+  height: 50vh;
+  width: 50vh; 
+}
+.trend-chart-container {
+  position : relative;
+  height: 50vh;
+  width: 100vh; 
+}
+.deviation-chart-container {
+  position : relative;
+  height: 70vh;
+  width: 150vh; 
 }

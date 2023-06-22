@@ -140,6 +140,7 @@ const ExtraFinancialReport = ({
                 ].footprint.indicators[indic].getGrossImpact(
                   netValueAdded.periodsData[period.periodKey].amount
                 )}
+                isPrinting={false}
               />
             </div>
           </Col>
@@ -151,9 +152,9 @@ const ExtraFinancialReport = ({
         <div className="box ">
           <Row>
             <h4>Empreintes des Soldes Intermédiaires de Gestion</h4>
-            <Col>
+            <Col lg={3}>
               <h5 className="mb-4 text-center">▪ Production</h5>
-              <div className="doughtnut-chart-container">
+              <div className="px-5">
                 <SigPieChart
                   value={printValue(
                     production.periodsData[period.periodKey].footprint
@@ -162,14 +163,15 @@ const ExtraFinancialReport = ({
                   )}
                   title={"Production"}
                   id={"prd-" + indic}
+                  isPrinting={false}
                 />
               </div>
             </Col>
-            <Col>
+            <Col lg={3}>
               <h5 className="mb-4 text-center">
                 ▪ Consommations intermédiaires
               </h5>
-              <div className="doughtnut-chart-container">
+              <div className="px-5">
                 <SigPieChart
                   value={printValue(
                     intermediateConsumptions.periodsData[period.periodKey]
@@ -178,14 +180,15 @@ const ExtraFinancialReport = ({
                   )}
                   title={"Consommations intermédiaires"}
                   id={"ic-" + indic}
+                  isPrinting={false}
                 />
               </div>
             </Col>
-            <Col>
+            <Col lg={3}>
               <h5 className="mb-4 text-center">
                 ▪ Consommations de capital fixe
               </h5>
-              <div className="doughtnut-chart-container">
+              <div className="px-5">
                 <SigPieChart
                   value={printValue(
                     fixedCapitalConsumptions.periodsData[period.periodKey]
@@ -194,12 +197,13 @@ const ExtraFinancialReport = ({
                   )}
                   title={"Consommation de capital fixe"}
                   id={"ccf-" + indic}
+                  isPrinting={false}
                 />
               </div>
             </Col>
-            <Col>
+            <Col lg={3}>
               <h5 className="mb-4 text-center">▪ Valeur ajoutée nette</h5>
-              <div className="doughtnut-chart-container">
+              <div className="px-5">
                 <SigPieChart
                   value={printValue(
                     netValueAdded.periodsData[
@@ -209,6 +213,7 @@ const ExtraFinancialReport = ({
                   )}
                   title={"Valeur ajoutée nette"}
                   id={"nva-" + indic}
+                  isPrinting={false}
                 />
               </div>
             </Col>
@@ -225,6 +230,7 @@ const ExtraFinancialReport = ({
             <h5 className="mb-4">▪ Production</h5>
             <ComparativeChart
               id={"production-" + indic}
+              isPrinting={false}
               firstDataset={[
                 comparativeData.production.areaFootprint.indicators[indic]
                   .value,
@@ -275,6 +281,7 @@ const ExtraFinancialReport = ({
                 ].data.at(-1).value,
               ]}
               indic={indic}
+              isPrinting={false}
             />
           </Col>
           <Col sm={3} xl={3} lg={3} md={3}>
@@ -303,6 +310,8 @@ const ExtraFinancialReport = ({
                 ].data.at(-1).value,
               ]}
               indic={indic}
+              isPrinting={false}
+
             />
           </Col>
 
@@ -333,6 +342,8 @@ const ExtraFinancialReport = ({
                 ].data.at(-1).value,
               ]}
               indic={indic}
+              isPrinting={false}
+
             />
           </Col>
         </Row>
@@ -381,6 +392,8 @@ const ExtraFinancialReport = ({
                 ].value,
               ]}
               indic={indic}
+              isPrinting={false}
+
             />
           </div>
         </Col>
