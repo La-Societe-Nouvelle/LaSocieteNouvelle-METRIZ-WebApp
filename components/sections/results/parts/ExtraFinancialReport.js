@@ -2,6 +2,7 @@ import React from "react";
 
 import { Button, Col, Image, Row, Tab, Tabs } from "react-bootstrap";
 
+//
 import { printValue } from "/src/utils/Utils";
 
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
@@ -40,22 +41,48 @@ const ExtraFinancialReport = ({
     const reportType = metaIndic.type;
     const libelle = metaIndic.libelle;
     const unit = metaIndic.unit;
-  
+
     switch (reportType) {
       case "proportion":
-        createContribIndicatorPDF(reportType, legalUnit.corporateName, indic, financialData, comparativeData, true, period);
+        createContribIndicatorPDF(
+          reportType,
+          legalUnit.corporateName,
+          indic,
+          financialData,
+          comparativeData,
+          true,
+          period
+        );
         break;
       case "intensité":
-        createIntensIndicatorPDF(legalUnit.corporateName, indic, libelle, unit, financialData, comparativeData, true, period);
+        createIntensIndicatorPDF(
+          legalUnit.corporateName,
+          indic,
+          libelle,
+          unit,
+          financialData,
+          comparativeData,
+          true,
+          period
+        );
         break;
       case "indice":
-        createIndiceIndicatorPDF(libelle, legalUnit.corporateName, indic, unit, financialData, comparativeData, true, period);
+        createIndiceIndicatorPDF(
+          libelle,
+          legalUnit.corporateName,
+          indic,
+          unit,
+          financialData,
+          comparativeData,
+          true,
+          period
+        );
         break;
       default:
         break;
     }
   };
-  
+
   return (
     <>
       <div className="box">
@@ -123,25 +150,29 @@ const ExtraFinancialReport = ({
           <Col lg={4}>
             <div className="box">
               <h4>Répartition des impacts bruts</h4>
-              <GrossImpactChart
-                id={"part-" + indic}
-                intermediateConsumptions={intermediateConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.indicators[indic].getGrossImpact(
-                  intermediateConsumptions.periodsData[period.periodKey].amount
-                )}
-                fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.indicators[indic].getGrossImpact(
-                  fixedCapitalConsumptions.periodsData[period.periodKey].amount
-                )}
-                netValueAdded={netValueAdded.periodsData[
-                  period.periodKey
-                ].footprint.indicators[indic].getGrossImpact(
-                  netValueAdded.periodsData[period.periodKey].amount
-                )}
-                isPrinting={false}
-              />
+              <div className="px-5">
+                <GrossImpactChart
+                  id={"part-" + indic}
+                  intermediateConsumptions={intermediateConsumptions.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getGrossImpact(
+                    intermediateConsumptions.periodsData[period.periodKey]
+                      .amount
+                  )}
+                  fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getGrossImpact(
+                    fixedCapitalConsumptions.periodsData[period.periodKey]
+                      .amount
+                  )}
+                  netValueAdded={netValueAdded.periodsData[
+                    period.periodKey
+                  ].footprint.indicators[indic].getGrossImpact(
+                    netValueAdded.periodsData[period.periodKey].amount
+                  )}
+                  isPrinting={false}
+                />
+              </div>
             </div>
           </Col>
         )}
@@ -154,7 +185,7 @@ const ExtraFinancialReport = ({
             <h4>Empreintes des Soldes Intermédiaires de Gestion</h4>
             <Col lg={3}>
               <h5 className="mb-4 text-center">▪ Production</h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     production.periodsData[period.periodKey].footprint
@@ -171,7 +202,7 @@ const ExtraFinancialReport = ({
               <h5 className="mb-4 text-center">
                 ▪ Consommations intermédiaires
               </h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     intermediateConsumptions.periodsData[period.periodKey]
@@ -188,7 +219,7 @@ const ExtraFinancialReport = ({
               <h5 className="mb-4 text-center">
                 ▪ Consommations de capital fixe
               </h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     fixedCapitalConsumptions.periodsData[period.periodKey]
@@ -203,7 +234,7 @@ const ExtraFinancialReport = ({
             </Col>
             <Col lg={3}>
               <h5 className="mb-4 text-center">▪ Valeur ajoutée nette</h5>
-              <div className="px-5">
+              <div className="sig-piechart-container">
                 <SigPieChart
                   value={printValue(
                     netValueAdded.periodsData[
@@ -311,7 +342,6 @@ const ExtraFinancialReport = ({
               ]}
               indic={indic}
               isPrinting={false}
-
             />
           </Col>
 
@@ -343,7 +373,6 @@ const ExtraFinancialReport = ({
               ]}
               indic={indic}
               isPrinting={false}
-
             />
           </Col>
         </Row>
@@ -361,42 +390,7 @@ const ExtraFinancialReport = ({
             />
           </div>
         </Col>
-        <Col lg={4}>
-          <div className="box ">
-          <h5 className="h6 mb-4">▪ Ecart par rapport à la moyenne de la branche</h5>
-            <DeviationChart
-              id={"deviationChart-" + indic}
-              legalUnitData={[
-                financialData.mainAggregates.production.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                financialData.mainAggregates.intermediateConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                financialData.mainAggregates.fixedCapitalConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                financialData.mainAggregates.netValueAdded.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-              ]}
-              branchData={[
-                comparativeData.production.divisionFootprint.indicators[indic]
-                  .value,
-                comparativeData.intermediateConsumptions.divisionFootprint
-                  .indicators[indic].value,
-                comparativeData.fixedCapitalConsumptions.divisionFootprint
-                  .indicators[indic].value,
-                comparativeData.netValueAdded.divisionFootprint.indicators[
-                  indic
-                ].value,
-              ]}
-              indic={indic}
-              isPrinting={false}
-
-            />
-          </div>
-        </Col>
+       
       </Row>
 
       {/* ---------- Trend Line Chart ----------  */}
