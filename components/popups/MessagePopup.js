@@ -4,7 +4,7 @@
 import React from "react";
 
 // Icon
-import { Modal } from "react-bootstrap";
+import { Alert, Button, Modal } from "react-bootstrap";
 
 /* ---------- MESSAGE POP-UP ---------- */
 
@@ -60,6 +60,54 @@ export const MessagePopupErrors = ({ title, message, closePopup }) => {
           <p>{message}</p>
         </div>
       </Modal.Body>
+    </Modal>
+  );
+};
+
+export const ErrorModal = ({ errorFile, title, errorMessage, error, onClose }) => {
+  return (
+    <Modal show={errorFile} onHide={onClose} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p>{errorMessage}</p>
+        <Alert variant="danger">
+          <div className="small">
+            <p>{error}</p>
+          </div>
+        </Alert>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" size="sm" onClick={onClose}>
+          Fermer
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+export const SuccessModal = ({
+  success,
+  title,
+  message,
+  alertMessage,
+  onClose,
+}) => {
+  return (
+    <Modal show={success} onHide={onClose} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p className="">{message}</p>
+        <Alert variant="info">{alertMessage}</Alert>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" size="sm" onClick={onClose}>
+          Fermer
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };
