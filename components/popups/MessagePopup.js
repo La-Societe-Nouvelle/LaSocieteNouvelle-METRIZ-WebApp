@@ -63,3 +63,20 @@ export const MessagePopupErrors = ({ title, message, closePopup }) => {
     </Modal>
   );
 };
+
+export const ErrorModal = ({ errorFile, title, errorMessage, errors,onClose }) => {
+  return (
+    <Modal show={errorFile} onHide={onClose} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title className="text-danger d-flex align-items-center">
+          <i className=" danger bi bi-x-circle-fill me-3"></i> {title}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="small">
+          <p>- {errorMessage}</p>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+};

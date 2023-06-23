@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { sendReportToSupport } from "../../pages/api/mail-api";
 
-function ErrorReportModal({ errorFile, onClose, errorMessage, errors }) {
+function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
   const [isSend, setIsSend] = useState(null);
@@ -21,7 +21,7 @@ function ErrorReportModal({ errorFile, onClose, errorMessage, errors }) {
   };
 
   return (
-    <Modal show={errorFile} onHide={onClose}>
+    <Modal show={errorFEC} onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>Erreur lors du traitement du FEC</Modal.Title>
       </Modal.Header>

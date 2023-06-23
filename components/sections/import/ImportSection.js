@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 // Components
-import {
-  Container,
-
-} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
 // Views
 import ImportForm from "./ImportForm";
@@ -21,6 +18,7 @@ import {
 } from "../../../src/Session";
 import { StockPurchasesMapping } from "./StockPurchasesMapping";
 import ErrorReportModal from "../../popups/ErrorReportModal";
+import { ErrorModal, MessagePopupErrors } from "../../popups/MessagePopup";
 
 function ImportSection(props) {
   //STATE
@@ -33,6 +31,7 @@ function ImportSection(props) {
     props.session.financialData.isFinancialDataLoaded ? 4 : 0
   );
   const [errorFile, setErrorFile] = useState(false);
+  const [errorFEC, setErrorFEC] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
   const [isImported, setIsImported] = useState(false);
@@ -43,7 +42,7 @@ function ImportSection(props) {
   }
 
   function handleFile(file) {
-    setErrorFile(false);
+    setErrorFEC(false);
     setErrors([]);
     setFile(file);
   }
@@ -99,12 +98,22 @@ function ImportSection(props) {
           ></ImportForm>
         )}
 
-        {errorFile && (
+        {errorFEC && (
           <ErrorReportModal
-            errorFile={errorFile}
-            onClose={() => setErrorFile(false)}
+            errorFEC={errorFEC}
+            onClose={() => setErrorFEC(false)}
             errorMessage={errorMessage}
             errors={errors}
+          />
+        )}
+
+        {errorFile && (
+          <ErrorModal
+          errorFile={errorFile}
+           onClose={() => setErrorFile(false)}
+            errorMessage={errorMessage}
+            errors={errors}
+            title={"Erreur lors de l'import du fichier"}
           />
         )}
 
@@ -170,7 +179,7 @@ function ImportSection(props) {
     try {
       reader.readAsText(currentFile, "iso-8859-1"); // Read file
     } catch (error) {
-      setErrorFile(true);
+      setErrorFEC(true);
       setErrorMessage(error);
     } // show error (file)
   }
@@ -184,7 +193,7 @@ function ImportSection(props) {
       // show error(s) (content)
       FECData.errors.forEach((error) => console.log(error));
       setView(0);
-      setErrorFile(true);
+      setErrorFEC(true);
       setErrorMessage("Erreur(s) relevée(s) : ");
       setErrors(FECData.errors);
       setImportedData(null);
@@ -217,7 +226,6 @@ function ImportSection(props) {
       setView(4);
     }
   }
-
 }
 
 export default ImportSection;
