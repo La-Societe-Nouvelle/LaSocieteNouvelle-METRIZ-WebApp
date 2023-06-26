@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { sendReportToSupport } from "../../pages/api/mail-api";
 
 function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
@@ -28,14 +28,17 @@ function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
       <Modal.Body>
         <div className="small mb-3">
           <p className="fw-bold">{errorMessage}</p>
+          <Alert variant="danger">
           <ul className="small list-unstyled">
             {errors.map((error, index) => (
               <li key={index}>&raquo; {error}</li>
             ))}
           </ul>
+
+          </Alert>
         </div>
         <hr />
-        <Form.Group className="my-3">
+        <Form.Group className="mb-3">
           <Form.Label>Email</Form.Label>
           <Form.Control
             type="text"

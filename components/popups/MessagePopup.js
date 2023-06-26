@@ -4,7 +4,7 @@
 import React from "react";
 
 // Icon
-import { Modal } from "react-bootstrap";
+import { Alert, Button, Modal } from "react-bootstrap";
 
 /* ---------- MESSAGE POP-UP ---------- */
 
@@ -64,19 +64,50 @@ export const MessagePopupErrors = ({ title, message, closePopup }) => {
   );
 };
 
-export const ErrorModal = ({ errorFile, title, errorMessage, errors,onClose }) => {
+export const ErrorModal = ({ errorFile, title, errorMessage, error, onClose }) => {
   return (
     <Modal show={errorFile} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
-        <Modal.Title className="text-danger d-flex align-items-center">
-          <i className=" danger bi bi-x-circle-fill me-3"></i> {title}
-        </Modal.Title>
+        <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="small">
-          <p>- {errorMessage}</p>
-        </div>
+        <p>{errorMessage}</p>
+        <Alert variant="danger">
+          <div className="small">
+            <p>{error}</p>
+          </div>
+        </Alert>
       </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" size="sm" onClick={onClose}>
+          Fermer
+        </Button>
+      </Modal.Footer>
+    </Modal>
+  );
+};
+
+export const SuccessModal = ({
+  success,
+  title,
+  message,
+  alertMessage,
+  onClose,
+}) => {
+  return (
+    <Modal show={success} onHide={onClose} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p className="">{message}</p>
+        <Alert variant="info">{alertMessage}</Alert>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" size="sm" onClick={onClose}>
+          Fermer
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };
