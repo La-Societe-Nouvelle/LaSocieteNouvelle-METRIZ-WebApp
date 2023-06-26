@@ -8,17 +8,12 @@ import indicators from "/lib/indics";
 
 import { getPrevDate } from "/src/utils/Utils";
 
-import ExtraFinancialReport from "./parts/ExtraFinancialReport";
-import FootprintReport from "./parts/FootprintReport";
+import ExtraFinancialReport from "./components/ExtraFinancialReport";
+import FootprintReport from "./components/FootprintReport";
 
-// Fetch API data
-import getMacroSerieData from "/src/services/responses/MacroSerieData";
-import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import getSerieData from "/src/services/responses/SerieData";
-import { getTargetSerieId } from "/src/utils/Utils";
 import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
-// import DonwloadComponent from "./parts/DonwloadComponent";
+import { updateComparativeData } from "./utils";
 
 const Results = ({ session, publish }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -87,14 +82,13 @@ const Results = ({ session, publish }) => {
   }, []);
 
   useEffect(() => {
-    console.log(session.comparativeData.activityCode);
-    console.log(selectedDivision);
 
-    let isCancelled = false; // Variable pour vérifier si le composant est toujours monté
+
+    let isCancelled = false; 
 
     const fetchData = async () => {
       if (session.comparativeData.activityCode !== selectedDivision) {
-        console.log("Mise à jour des données comparatives");
+     
         session.comparativeData.activityCode = selectedDivision;
 
         let updatedComparativeData = comparativeData;
@@ -102,7 +96,7 @@ const Results = ({ session, publish }) => {
         for await (const indic of session.validations[
           session.financialPeriod.periodKey
         ]) {
-          const updatedData = await getComparativeData(
+          const updatedData = await updateComparativeData(
             indic,
             selectedDivision,
             updatedComparativeData
@@ -121,7 +115,6 @@ const Results = ({ session, publish }) => {
 
     fetchData();
 
-    // Clean-up function pour marquer l'annulation lorsque le composant est démonté
     return () => {
       isCancelled = true;
     };
@@ -133,52 +126,7 @@ const Results = ({ session, publish }) => {
     setSelectedDivision(division);
   };
 
-  const getComparativeData = async (indic, code, comparativeData) => {
-    console.log("Get comparative Data");
-    let updatedComparativeData = comparativeData;
-    let idTarget = getTargetSerieId(indic);
 
-    updatedComparativeData = await getMacroSerieData(
-      indic,
-      code,
-      updatedComparativeData,
-      "divisionFootprint"
-    );
-
-    updatedComparativeData = await getHistoricalSerieData(
-      code,
-      indic,
-      updatedComparativeData,
-      "trendsFootprint"
-    );
-
-    updatedComparativeData = await getHistoricalSerieData(
-      code,
-      indic,
-      updatedComparativeData,
-      "targetDivisionFootprint"
-    );
-    updatedComparativeData = await getMacroSerieData(
-      indic,
-      "00",
-      updatedComparativeData,
-      "areaFootprint"
-    );
-
-    // Target Area Footprint
-
-    if (idTarget) {
-      updatedComparativeData = await getSerieData(
-        idTarget,
-        "00",
-        indic,
-        updatedComparativeData,
-        "targetAreaFootprint"
-      );
-    }
-
-    return updatedComparativeData;
-  };
 
   const handleIndicatorChange = (selectedOption) => {
     setSelectedIndicator(selectedOption.value);
@@ -278,6 +226,7 @@ const Results = ({ session, publish }) => {
             period={session.financialPeriod}
             prevPeriod={prevPeriod}
             legalUnit={session.legalUnit}
+            isLoading={isLoading}
           ></ExtraFinancialReport>
         )}
 
@@ -299,7 +248,7 @@ const Results = ({ session, publish }) => {
         </div>
       )}
 
-      {/* <DonwloadComponent></DonwloadComponent> */}
+
       <Modal show={isGenerating}>
         <Modal.Header>Génération du dossier en cours ... </Modal.Header>
         <Modal.Body>

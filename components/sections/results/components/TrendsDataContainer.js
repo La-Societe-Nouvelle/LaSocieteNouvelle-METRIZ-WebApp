@@ -11,7 +11,7 @@ const graphOptions = [
   { label: "Valeur ajoutée nette", value: "nva" },
 ];
 
-const TrendsComponent = ({
+const TrendsDataContainer = ({
   aggregates,
   comparativeData,
   indic,
@@ -181,4 +181,4 @@ const TrendsComponent = ({
   );
 };
 
-export default TrendsComponent;
+export default TrendsDataContainer;
