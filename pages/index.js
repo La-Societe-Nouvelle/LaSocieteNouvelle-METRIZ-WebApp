@@ -239,13 +239,13 @@ class Metriz extends React.Component {
         );
         case 5:
           return(
-            <Results {...sectionProps}  publish={() => this.setStep(5)}/>
+            <Results {...sectionProps} goBack={() => this.setStep(4)}  publish={() => this.setStep(6)}/>
           );
       case 6:
         return (
           <PublishStatementSection
             {...sectionProps}
-            return={() => this.setStep(4)}
+            return={() => this.setStep(5)}
           />
         );
     }

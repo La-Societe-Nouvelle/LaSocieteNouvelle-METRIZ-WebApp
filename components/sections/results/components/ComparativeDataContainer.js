@@ -27,7 +27,7 @@ const ComparativeDataContainer = ({
   );
 
   return (
-    <div className="box charts-container">
+    <div className="charts-container">
       <h4>Comparaison par activité</h4>
 
       <Row className="charts">
