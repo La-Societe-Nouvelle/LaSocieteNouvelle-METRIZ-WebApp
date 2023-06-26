@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
+import {
+  Button,
+  Col,
+  Container,
+  Dropdown,
+  DropdownButton,
+  Form,
+  Row,
+} from "react-bootstrap";
 
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
@@ -14,14 +22,23 @@ import FootprintReport from "./components/FootprintReport";
 import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
 import { updateComparativeData } from "./utils";
+import { Loader } from "../../popups/Loader";
 
 const Results = ({ session, publish }) => {
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedLegalUnit, setEditedLegalUnit] = useState({
+    ...session.legalUnit,
+  });
+
   const [divisionsOptions, setDivisionsOptions] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState(
     session.comparativeData.activityCode
   );
-  const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicator, setSelectedIndicator] = useState();
+  const [selectedIndicatorLabel, setSelectedIndicatorLabel] = useState(
+    "Sélectionner un indicateur..."
+  );
+
   const [comparativeData, setComparativeData] = useState(
     session.comparativeData
   );
@@ -71,24 +88,13 @@ const Results = ({ session, publish }) => {
       });
 
     setDivisionsOptions(divisionsOptions);
-
-    const indicatorsOptions = Object.entries(indicators)
-      .filter(([indic]) => session.validations[financialPeriod].includes(indic))
-      .map(([code, indic]) => {
-        return { value: code, label: indic.libelle };
-      });
-
-    setIndicatorsOptions(indicatorsOptions);
   }, []);
 
   useEffect(() => {
-
-
-    let isCancelled = false; 
+    let isCancelled = false;
 
     const fetchData = async () => {
       if (session.comparativeData.activityCode !== selectedDivision) {
-     
         session.comparativeData.activityCode = selectedDivision;
 
         let updatedComparativeData = comparativeData;
@@ -120,16 +126,19 @@ const Results = ({ session, publish }) => {
     };
   }, [selectedDivision]);
 
+  const handleEditClick = () => {
+    setIsEditMode(true);
+  };
+
   const handleDivisionChange = (selectedOption) => {
     const division = selectedOption.value;
     setIsLoading(true);
     setSelectedDivision(division);
   };
 
-
-
-  const handleIndicatorChange = (selectedOption) => {
-    setSelectedIndicator(selectedOption.value);
+  const handleIndicatorChange = (code, label) => {
+    setSelectedIndicator(code);
+    setSelectedIndicatorLabel(label);
   };
 
   const handleDownloadCompleteFile = async () => {
@@ -154,6 +163,13 @@ const Results = ({ session, publish }) => {
     );
   };
 
+  const handleSaveChanges = () => {
+    // Effectuez ici les actions pour sauvegarder les modifications, par exemple, appeler une fonction de mise à jour des données
+
+    // Après avoir sauvegardé les modifications, désactivez le mode édition
+    setIsEditMode(false);
+  };
+
   return (
     <Container fluid className="results">
       <div className="box">
@@ -162,7 +178,9 @@ const Results = ({ session, publish }) => {
 
           <Button
             variant="download"
-            disabled={!selectedDivision || selectedDivision == '00' || isLoading}
+            disabled={
+              !selectedDivision || selectedDivision == "00" || isLoading
+            }
             onClick={handleDownloadCompleteFile}
           >
             <i className="bi bi-download"></i> Télécharger tous les résultats
@@ -172,63 +190,132 @@ const Results = ({ session, publish }) => {
           Découvrez les résultats pour chaque indicateur mesuré et comparez les
           avec votre branche.
         </p>
-        <Row>
-          <Col>
-            <Select
-              styles={customStyles}
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              options={indicatorsOptions}
-              value={
-                selectedIndicator
-                  ? {
-                      label: indicators[selectedIndicator].libelle,
-                      value: selectedIndicator,
-                    }
-                  : null
-              }
-              placeholder="Choisissez un indicateur"
-              onChange={handleIndicatorChange}
-            />
-          </Col>
-          <Col>
-            <Select
-              styles={customStyles}
-              options={divisionsOptions}
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              value={{
-                label: selectedDivision + " - " + divisions[selectedDivision],
-                value: selectedDivision,
-              }}
-              placeholder="Choisissez une division"
-              onChange={handleDivisionChange}
-            />
-          </Col>
-        </Row>
+        {isEditMode ? (
+  <Form>
+  <Form.Group as={Row} controlId="formLegalUnitName">
+    <Form.Label column sm={2}>
+      Unité légale :
+    </Form.Label>
+    <Col sm={8}>
+      <Form.Control
+        type="text"
+        value={editedLegalUnit.corporateName}
+        onChange={(e) =>
+          setEditedLegalUnit({
+            ...editedLegalUnit,
+            corporateName: e.target.value,
+          })
+        }
+      />
+    </Col>
+  </Form.Group>
+
+  <Form.Group as={Row} controlId="formSirenSiret">
+    <Form.Label column sm={2}>
+      SIREN/SIRET :
+    </Form.Label>
+    <Col sm={8}>
+      <Form.Control
+        type="text"
+        value={editedLegalUnit.siren}
+        onChange={(e) =>
+          setEditedLegalUnit({
+            ...editedLegalUnit,
+            siren: e.target.value,
+          })
+        }
+      />
+    </Col>
+  </Form.Group>
+
+  <Form.Group as={Row} controlId="formComparativeDivision">
+    <Form.Label column sm={2}>
+      Branche de comparaison :
+    </Form.Label>
+    <Col sm={8}>
+      <Select
+        styles={customStyles}
+        options={divisionsOptions}
+        components={{
+          IndicatorSeparator: () => null,
+        }}
+        value={{
+          label: selectedDivision + ' - ' + divisions[selectedDivision],
+          value: selectedDivision,
+        }}
+        placeholder="Choisissez une division"
+        onChange={handleDivisionChange}
+      />
+    </Col>
+  </Form.Group>
+</Form>
+) : (
+  <ul className="list-unstyled">
+    <li>
+      Unité légale : {session.legalUnit.corporateName}
+    </li>
+    <li>
+      SIREN/SIRET : {session.legalUnit.siren}
+    </li>
+    <li>Code APE : {session.legalUnit.activityCode}</li>
+    <li>
+      Branche de comparaison : {divisions[comparativeData.activityCode]}
+    </li>
+  </ul>
+)}
+        <div>
+          <Button onClick={handleEditClick} size="sm" disabled={isEditMode}>
+            Modifier
+          </Button>
+          {isEditMode && (
+            <Button variant={"secondary"} size="sm" onClick={handleSaveChanges}>
+              Enregistrer
+            </Button>
+          )}
+        </div>
+        <hr></hr>
+
+        <DropdownButton
+          variant="light"
+          drop={"down-centered"}
+          key={"down-centered"}
+          id="dropdown-indics-button"
+          title={selectedIndicatorLabel}
+        >
+          {Object.entries(indicators)
+            .filter(([indic]) =>
+              session.validations[financialPeriod].includes(indic)
+            )
+            .map(([code, indic]) => {
+              if (code === selectedIndicator) return null;
+              return (
+                <Dropdown.Item
+                  key={code}
+                  onClick={() => handleIndicatorChange(code, indic.libelle)}
+                >
+                  {indic.libelle}
+                </Dropdown.Item>
+              );
+            })}
+        </DropdownButton>
       </div>
 
       {(!selectedIndicator || !selectedDivision) && <FootprintReport />}
 
-      {selectedIndicator &&
-        selectedDivision &&
-        selectedDivision != "00" &&
-        !isLoading && (
-          <ExtraFinancialReport
-            indic={selectedIndicator}
-            division={selectedDivision}
-            metaIndic={indicators[selectedIndicator]}
-            financialData={session.financialData}
-            impactsData={session.impactsData}
-            comparativeData={session.comparativeData}
-            period={session.financialPeriod}
-            prevPeriod={prevPeriod}
-            legalUnit={session.legalUnit}
-            isLoading={isLoading}
-          ></ExtraFinancialReport>
-        )}
+      {selectedIndicator && selectedDivision && selectedDivision != "00" && (
+        <ExtraFinancialReport
+          indic={selectedIndicator}
+          division={selectedDivision}
+          metaIndic={indicators[selectedIndicator]}
+          financialData={session.financialData}
+          impactsData={session.impactsData}
+          comparativeData={session.comparativeData}
+          period={session.financialPeriod}
+          prevPeriod={prevPeriod}
+          legalUnit={session.legalUnit}
+          isLoading={isLoading}
+        ></ExtraFinancialReport>
+      )}
 
       {selectedDivision != "00" && !isLoading && (
         <ChartsContainer
@@ -240,23 +327,7 @@ const Results = ({ session, publish }) => {
         />
       )}
 
-      {isLoading && selectedIndicator && (
-        <div className="box">
-          <div className="loader-container my-4">
-            <div className="dot-pulse m-auto"></div>
-          </div>
-        </div>
-      )}
-
-
-      <Modal show={isGenerating}>
-        <Modal.Header>Génération du dossier en cours ... </Modal.Header>
-        <Modal.Body>
-          <div className="loader-container my-4">
-            <div className="dot-pulse m-auto"></div>
-          </div>
-        </Modal.Body>
-      </Modal>
+      {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
     </Container>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Button, Col, Image, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs } from "react-bootstrap";
 
 // PDF Generation
 import { generateContributionIndicatorSheet } from "/src/utils/deliverables/generateContributionIndicatorSheet";
@@ -18,6 +18,7 @@ import Analyse from "./AnalyseNote";
 import ComparativeDataContainer from "./ComparativeDataContainer";
 import TrendsDataContainer from "./TrendsDataContainer";
 import SigFootprintsContainer from "./SigFootprintsContainer";
+import { Loader } from "../../../popups/Loader";
 
 const ExtraFinancialReport = ({
   indic,
@@ -85,28 +86,11 @@ const ExtraFinancialReport = ({
     }
   };
 
+  const intensityType = metaIndic.type === "intensité";
+  const proportionType = metaIndic.type === "proportion";
+
   return (
     <>
-      <div className="box">
-        <div className="d-flex align-items-center justify-content-between">
-          <div className="d-flex align-items-center">
-            <Image
-              className="me-2"
-              src={"icons-ese/" + indic + ".svg"}
-              alt={indic}
-              height={60}
-            />
-
-            <h3 className="text-secondary m-0">{metaIndic.libelle}</h3>
-          </div>
-          <div>
-            <Button variant="download" onClick={handleDownload}>
-              <i className="bi bi-download"></i> Rapport sur l'indicateur
-            </Button>
-          </div>
-        </div>
-      </div>
-
       {/* SIG and external expenses table */}
       <Row>
         <Col>
@@ -148,7 +132,7 @@ const ExtraFinancialReport = ({
         </Col>
         {/* ----------Gross Impact Chart ----------  */}
 
-        {metaIndic.type == "intensité" && (
+        {intensityType && (
           <Col lg={4}>
             <div className="box">
               <h4>Répartition des impacts bruts</h4>
@@ -180,7 +164,7 @@ const ExtraFinancialReport = ({
         )}
       </Row>
 
-      {metaIndic.type === "proportion" && (
+      {proportionType && (
         <SigFootprintsContainer
           production={production}
           intermediateConsumptions={intermediateConsumptions}
@@ -191,36 +175,45 @@ const ExtraFinancialReport = ({
           metaIndic={metaIndic}
         />
       )}
+
       {/* ---------Comparative data charts ----------  */}
-      <ComparativeDataContainer
-        indic={indic}
-        comparativeData={comparativeData}
-        production={production}
-        intermediateConsumptions={intermediateConsumptions}
-        fixedCapitalConsumptions={fixedCapitalConsumptions}
-        netValueAdded={netValueAdded}
-        period={period}
-        prevPeriod={prevPeriod}
-      />
+      {!isLoading && (
+        <ComparativeDataContainer
+          indic={indic}
+          comparativeData={comparativeData}
+          production={production}
+          intermediateConsumptions={intermediateConsumptions}
+          fixedCapitalConsumptions={fixedCapitalConsumptions}
+          netValueAdded={netValueAdded}
+          period={period}
+          prevPeriod={prevPeriod}
+        />
+      )}
 
       {/* ---------Comparative data Table ----------  */}
-
-      <ComparativeTable
-        financialData={financialData}
-        indic={indic}
-        comparativeData={comparativeData}
-        period={period}
-        prevPeriod={prevPeriod}
-      />
+      {!isLoading && (
+        <ComparativeTable
+          financialData={financialData}
+          indic={indic}
+          comparativeData={comparativeData}
+          period={period}
+          prevPeriod={prevPeriod}
+        />
+      )}
 
       {/* ---------- Trend Line Chart ----------  */}
-      <TrendsDataContainer
-        aggregates={financialData.mainAggregates}
-        comparativeData={comparativeData}
-        indic={indic}
-        unit={metaIndic.unit}
-        division={division}
-      />
+      {!isLoading && (
+        <TrendsDataContainer
+          aggregates={financialData.mainAggregates}
+          comparativeData={comparativeData}
+          indic={indic}
+          unit={metaIndic.unit}
+          division={division}
+        />
+      )}
+      {isLoading && (
+        <Loader title={"Récupération des données de comparaison ..."} />
+      )}
 
       {/* ---------- Analyse Note  ----------  */}
 
