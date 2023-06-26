@@ -74,7 +74,7 @@ const TrendsDataContainer = ({
     const { title, data, target, aggregate } = trendData[trendGraphView.value];
 
     return (
-      <div>
+      <div >
         <h5>{title}</h5>
         <TrendsChart
           id={`trend-${trendGraphView.value}-${indic}`}
@@ -120,7 +120,7 @@ const TrendsDataContainer = ({
   return (
     <Row>
       <Col lg={8}>
-        <div className="box ">
+        <div id="evolution" className="box ">
           <h4>Courbes d'évolution</h4>
 
           <Select

@@ -1,11 +1,7 @@
 import React from "react";
 
-import { Col, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Nav, Navbar, Row, Tab, Tabs } from "react-bootstrap";
 
-// PDF Generation
-import { generateContributionIndicatorSheet } from "/src/utils/deliverables/generateContributionIndicatorSheet";
-import { generateIntensityIndicatorSheet } from "/src/utils/deliverables/generateIntensityIndicatorSheet";
-import { generateIndiceIndicatorSheet } from "/src/utils/deliverables/generateIndiceIndicatorSheet";
 // Tables
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
@@ -39,53 +35,6 @@ const ExtraFinancialReport = ({
     netValueAdded,
   } = financialData.mainAggregates;
 
-  const handleDownload = async () => {
-    const reportType = metaIndic.type;
-    const libelle = metaIndic.libelle;
-    const unit = metaIndic.unit;
-
-    switch (reportType) {
-      case "proportion":
-        generateContributionIndicatorSheet(
-          libelle,
-          legalUnit.corporateName,
-          indic,
-          financialData,
-          comparativeData,
-          true,
-          period
-        );
-        break;
-      case "intensité":
-        generateIntensityIndicatorSheet(
-          legalUnit.corporateName,
-          indic,
-          libelle,
-          unit,
-          financialData,
-          comparativeData,
-          true,
-          period
-        );
-        break;
-      case "indice":
-        generateIndiceIndicatorSheet(
-          libelle,
-          libelleGrandeur,
-          legalUnit.corporateName,
-          indic,
-          unit,
-          financialData,
-          comparativeData,
-          true,
-          period
-        );
-        break;
-      default:
-        break;
-    }
-  };
-
   const intensityType = metaIndic.type === "intensité";
   const proportionType = metaIndic.type === "proportion";
 
@@ -94,7 +43,7 @@ const ExtraFinancialReport = ({
       {/* SIG and external expenses table */}
       <Row>
         <Col>
-          <div className="box p-4">
+          <div id="rapport" className="box p-4">
             <h4>Rapport - Analyse extra-financière</h4>
             <Tabs
               defaultActiveKey="mainAggregates"
@@ -176,29 +125,27 @@ const ExtraFinancialReport = ({
         />
       )}
 
-      {/* ---------Comparative data charts ----------  */}
+      {/* ---------Comparative data charts & Table ----------  */}
       {!isLoading && (
-        <ComparativeDataContainer
-          indic={indic}
-          comparativeData={comparativeData}
-          production={production}
-          intermediateConsumptions={intermediateConsumptions}
-          fixedCapitalConsumptions={fixedCapitalConsumptions}
-          netValueAdded={netValueAdded}
-          period={period}
-          prevPeriod={prevPeriod}
-        />
-      )}
-
-      {/* ---------Comparative data Table ----------  */}
-      {!isLoading && (
-        <ComparativeTable
-          financialData={financialData}
-          indic={indic}
-          comparativeData={comparativeData}
-          period={period}
-          prevPeriod={prevPeriod}
-        />
+        <div id="comparaisons" className="box">
+          <ComparativeDataContainer
+            indic={indic}
+            comparativeData={comparativeData}
+            production={production}
+            intermediateConsumptions={intermediateConsumptions}
+            fixedCapitalConsumptions={fixedCapitalConsumptions}
+            netValueAdded={netValueAdded}
+            period={period}
+            prevPeriod={prevPeriod}
+          />
+          <ComparativeTable
+            financialData={financialData}
+            indic={indic}
+            comparativeData={comparativeData}
+            period={period}
+            prevPeriod={prevPeriod}
+          />
+        </div>
       )}
 
       {/* ---------- Trend Line Chart ----------  */}
@@ -217,7 +164,7 @@ const ExtraFinancialReport = ({
 
       {/* ---------- Analyse Note  ----------  */}
 
-      <div className="box">
+      <div className="box" id="analyse">
         <h4>Note d'analyse</h4>
         <Analyse
           indic={indic}

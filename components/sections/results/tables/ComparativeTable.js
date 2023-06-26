@@ -84,7 +84,6 @@ export const ComparativeTable = ({
   return (
     <Row>
       <Col>
-        <div className="box ">
           <Table className="comparative-table shadow-sm">
             <thead>
               <tr>
@@ -410,7 +409,6 @@ export const ComparativeTable = ({
               </tr>
             </tbody>
           </Table>
-        </div>
       </Col>
     </Row>
   );
