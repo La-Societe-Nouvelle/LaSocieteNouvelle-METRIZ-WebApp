@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 
-import ImportForm from "./ImportForm";
-import DepreciationAssetsMapping from "./DepreciationAssetsMapping";
-import { FinancialDatas } from "./FinancialDatas";
-import { StockPurchasesMapping } from "./StockPurchasesMapping";
-
 // MODAL
 import ErrorReportModal from "../../popups/ErrorReportModal";
 import { ErrorModal } from "../../popups/MessagePopup";
+
+// VIEWS
+import ImportForm from "./ImportForm";
 import { FECImport } from "./FECImport";
+import DepreciationAssetsMapping from "./DepreciationAssetsMapping";
+import { StockPurchasesMapping } from "./StockPurchasesMapping";
+import { FinancialDatas } from "./FinancialDatas";
 
 // UTILS
 import { buildRegexFinancialPeriod } from "/src/Session";
