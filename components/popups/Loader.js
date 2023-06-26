@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal } from "react-bootstrap";
 
-export const Loader = () => {
+export const Loader = ({title}) => {
   return (
     <Modal show="true" size="md" centered>
       <Modal.Body>
