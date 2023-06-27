@@ -38,7 +38,6 @@ export class IdentifiedProvidersTable extends React.Component
     const { nbItems, financialPeriod } = this.props;
     const { providers, columnSorted, page } = this.state;
     this.sortProviders(providers, financialPeriod, columnSorted);
-
     return (
       <div className="table-main" id="table">
         <Table>
@@ -88,6 +87,7 @@ export class IdentifiedProvidersTable extends React.Component
             Aucun résultat
           </p>
         )}
+
         {providers.length > nbItems && (
           <div className="table-navigation">
             <button
@@ -98,7 +98,7 @@ export class IdentifiedProvidersTable extends React.Component
             </button>
             <div>
               <p>
-                {page + 1}/{parseInt(providers.length / nbItems + 1)}
+              {page + 1}/{Math.ceil(providers.length / nbItems)}
               </p>
             </div>
             <button
