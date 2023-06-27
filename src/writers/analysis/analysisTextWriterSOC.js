@@ -58,7 +58,6 @@ export const analysisTextWriterSOC = (props) => {
   analysis.push(currentParagraph);
 
   // Consommations intermédiaires ------------------------------------------------------------------ //
-  console.log(mainAggregates.production)
   currentParagraph = [];
  
   // résultat

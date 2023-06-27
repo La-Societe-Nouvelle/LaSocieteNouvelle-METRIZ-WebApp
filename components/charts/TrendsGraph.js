@@ -99,7 +99,7 @@ function TrendsGraph(props) {
       trendsEstimatedData.push(estimatedData);
       trendsForecastData.push(trendForecast);
     }
-
+  
     const firstForecastData = trendsForecastData.find(
       (element) => element.y != null
     );

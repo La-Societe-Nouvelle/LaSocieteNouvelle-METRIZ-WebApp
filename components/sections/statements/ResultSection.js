@@ -43,8 +43,6 @@ import { createIndiceIndicatorPDF } from "../../../src/writers/deliverables/indi
 import ChangeDivision from "../../popups/ChangeDivision";
 import { getPrevDate } from "../../../src/utils/Utils";
 
-const indicsWithGrossImpacts = ["ghg", "haz", "mat", "nrg", "was", "wat"];
-
 const divisionsOptions = Object.entries(divisions)
   .sort((a, b) => parseInt(a) - parseInt(b))
   .map(([value, label]) => {
@@ -57,6 +55,7 @@ const ResultSection = (props) => {
   const [session] = useState(props.session);
   const [error] = useState(false);
   const [popUp, setPopUp] = useState();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     production,
@@ -86,7 +85,7 @@ const ResultSection = (props) => {
 
   const changeComparativeDivision = async (event) => {
     let division = event.value ? event.value : event;
-
+    setIsLoading(true);
     const newComparativeData = await updateComparativeData(
       indic,
       division,
@@ -95,31 +94,48 @@ const ResultSection = (props) => {
     newComparativeData.activityCode = division;
     setComparativeData(newComparativeData);
     setComparativeDivision(division);
+    setIsLoading(false);
   };
   /* ---------- Update comparative data according to comparative division ---------- */
+  useEffect(() => {
+    let isMounted = true; // Variable to track component mount state
 
-  useEffect(async () => {
-    if (comparativeDivision != props.session.comparativeData.activityCode) {
-      props.session.comparativeData.activityCode = comparativeDivision;
+    const fetchData = async () => {
+      if (comparativeDivision !== props.session.comparativeData.activityCode) {
+        setIsLoading(true);
+        props.session.comparativeData.activityCode = comparativeDivision;
 
-      let newComparativeData = comparativeData;
+        let newComparativeData = comparativeData;
 
-      for await (const indic of props.session.validations[
-        props.session.financialPeriod.periodKey
-      ]) {
-        // update comparative data for each  indicators
-        const updatedData = await updateComparativeData(
-          indic,
-          comparativeDivision,
-          newComparativeData
-        );
+        for await (const indic of props.session.validations[
+          props.session.financialPeriod.periodKey
+        ]) {
+          // update comparative data for each indicators
+          const updatedData = await updateComparativeData(
+            indic,
+            comparativeDivision,
+            newComparativeData
+          );
 
-        newComparativeData = updatedData;
+          newComparativeData = updatedData;
+        }
+
+        // Update session with comparative data for all validated indicators
+        if (isMounted) {
+          props.session.comparativeData = newComparativeData;
+        }
       }
-      // Update session with comparative data for all validated indicators
 
-      props.session.comparativeData = newComparativeData;
-    }
+      if (isMounted) {
+        setIsLoading(false); // Set isLoading to false after data fetching and updating
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false; // Clean up function to update the mount state
+    };
   }, [comparativeDivision]);
 
   const updateComparativeData = async (indic, code, newComparativeData) => {
@@ -248,11 +264,16 @@ const ResultSection = (props) => {
               {metaIndics[indic].libelle}
             </Button>
           )}
-          <Button variant="secondary" onClick={handleindicReportPDF}>
+          <Button
+            variant="secondary"
+            onClick={handleindicReportPDF}
+            disabled={isLoading}
+          >
             Plaquette <i className="bi bi-download"></i>
           </Button>
           <Button
             variant="secondary"
+            disabled={isLoading}
             onClick={() =>
               createIndicReport(
                 session.legalUnit.corporateName,
@@ -356,103 +377,122 @@ const ResultSection = (props) => {
           placeholder={"Choisissez un secteur d'activité"}
           options={divisionsOptions}
           onChange={changeComparativeDivision}
+          isDisabled={isLoading}
         />
         {error && <ErrorApi />}
+        
         <div className="graph-container">
           <div className="mt-5">
             <Row className="charts">
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Production</h5>
-                <ComparativeGraphs
-                  id={"production-" + indic}
-                  firstDataset={[
-                    comparativeData.production.areaFootprint.indicators[indic]
-                      .value,
-                    prevPeriod &&
+           
+                {isLoading ? (
+                    <div className="dot-pulse m-auto"></div>
+                ) : (
+                  <ComparativeGraphs
+                    id={"production-" + indic}
+                    firstDataset={[
+                      comparativeData.production.areaFootprint.indicators[indic]
+                        .value,
+                      prevPeriod &&
+                        production.periodsData[
+                          prevPeriod.periodKey
+                        ].footprint.getIndicator(indic).value,
+                      comparativeData.production.divisionFootprint.indicators[
+                        indic
+                      ].value,
+                    ]}
+                    secondDataset={[
+                      comparativeData.production.targetAreaFootprint.indicators[
+                        indic
+                      ].value,
                       production.periodsData[
-                        prevPeriod.periodKey
+                        period.periodKey
                       ].footprint.getIndicator(indic).value,
-                    comparativeData.production.divisionFootprint.indicators[
-                      indic
-                    ].value,
-                  ]}
-                  secondDataset={[
-                    comparativeData.production.targetAreaFootprint.indicators[
-                      indic
-                    ].value,
-                    production.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
 
-                    comparativeData.production.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  indic={indic}
-                />
+                      comparativeData.production.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    indic={indic}
+                  />
+                )}
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommations intermédiaires</h5>
-                <ComparativeGraphs
-                  id={"intermediateConsumptions-" + indic}
-                  firstDataset={[
-                    comparativeData.intermediateConsumptions.areaFootprint
-                      .indicators[indic].value,
-                    prevPeriod &&
+                {isLoading ? (
+                    <div className="dot-pulse m-auto"></div>
+                ) : (
+                  <ComparativeGraphs
+                    id={"intermediateConsumptions-" + indic}
+                    firstDataset={[
+                      comparativeData.intermediateConsumptions.areaFootprint
+                        .indicators[indic].value,
+                      prevPeriod &&
+                        intermediateConsumptions.periodsData[
+                          prevPeriod.periodKey
+                        ].footprint.getIndicator(indic).value,
+                      comparativeData.intermediateConsumptions.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    secondDataset={[
+                      comparativeData.intermediateConsumptions
+                        .targetAreaFootprint.indicators[indic].value,
                       intermediateConsumptions.periodsData[
-                        prevPeriod.periodKey
+                        period.periodKey
                       ].footprint.getIndicator(indic).value,
-                    comparativeData.intermediateConsumptions.divisionFootprint
-                      .indicators[indic].value,
-                  ]}
-                  secondDataset={[
-                    comparativeData.intermediateConsumptions.targetAreaFootprint
-                      .indicators[indic].value,
-                    intermediateConsumptions.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
 
-                    comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  indic={indic}
-                  year={session.year}
-                />
+                      comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    indic={indic}
+                    year={session.year}
+                  />
+                )}
               </Col>
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Consommations de capital fixe</h5>
-                <ComparativeGraphs
-                  id={"fixedCapitalConsumptions-" + indic}
-                  firstDataset={[
-                    comparativeData.fixedCapitalConsumptions.areaFootprint
-                      .indicators[indic].value,
-                    prevPeriod &&
+                {isLoading ? (
+                    <div className="dot-pulse m-auto"></div>    
+                ) : (
+                  <ComparativeGraphs
+                    id={"fixedCapitalConsumptions-" + indic}
+                    firstDataset={[
+                      comparativeData.fixedCapitalConsumptions.areaFootprint
+                        .indicators[indic].value,
+                      prevPeriod &&
+                        fixedCapitalConsumptions.periodsData[
+                          prevPeriod.periodKey
+                        ].footprint.getIndicator(indic).value,
+                      comparativeData.fixedCapitalConsumptions.divisionFootprint
+                        .indicators[indic].value,
+                    ]}
+                    secondDataset={[
+                      comparativeData.fixedCapitalConsumptions
+                        .targetAreaFootprint.indicators[indic].value,
                       fixedCapitalConsumptions.periodsData[
-                        prevPeriod.periodKey
+                        period.periodKey
                       ].footprint.getIndicator(indic).value,
-                    comparativeData.fixedCapitalConsumptions.divisionFootprint
-                      .indicators[indic].value,
-                  ]}
-                  secondDataset={[
-                    comparativeData.fixedCapitalConsumptions.targetAreaFootprint
-                      .indicators[indic].value,
-                    fixedCapitalConsumptions.periodsData[
-                      period.periodKey
-                    ].footprint.getIndicator(indic).value,
 
-                    comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
-                      indic
-                    ].data.at(-1).value,
-                  ]}
-                  indic={indic}
-                  year={session.year}
-                />
+                      comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
+                        indic
+                      ].data.at(-1).value,
+                    ]}
+                    indic={indic}
+                    year={session.year}
+                  />
+                )}
               </Col>
 
               <Col sm={3} xl={3} lg={3} md={3}>
                 <h5 className="mb-4">▪ Valeur ajoutée nette</h5>
-                <ComparativeGraphs
+                {isLoading ? (
+                    <div className="dot-pulse m-auto"></div>
+                ) : 
+                (
+                  <ComparativeGraphs
                   id={"netValueAdded-" + indic}
                   firstDataset={[
                     comparativeData.netValueAdded.areaFootprint.indicators[
@@ -479,6 +519,8 @@ const ResultSection = (props) => {
                   indic={indic}
                   year={session.year}
                 />
+                )
+                }
               </Col>
             </Row>
           </div>
@@ -715,7 +757,7 @@ const ResultSection = (props) => {
 
       <section className="step">
         <div className="d-flex justify-content-end">
-          <Button variant="light" onClick={props.goBack}>
+          <Button variant="light" onClick={props.goBack} disabled={isLoading}>
             <i className="bi bi-chevron-left"></i> Retour
           </Button>
           <Button variant="secondary" onClick={handleindicReportPDF}>
@@ -741,6 +783,7 @@ const ResultSection = (props) => {
           </Button>
         </div>
       </section>
+
       {popUp == "division" && (
         <ChangeDivision
           indic={indic}

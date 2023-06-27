@@ -15,7 +15,6 @@ import {
 
 // Libs
 import metaIndics from "/lib/indics";
-import divisions from "/lib/divisions";
 
 import {
   StatementART,
@@ -61,12 +60,14 @@ import { createContribIndicatorPDF } from "../../../../src/writers/deliverables/
 import { createIntensIndicatorPDF } from "../../../../src/writers/deliverables/intensIndicPDF";
 import { createIndiceIndicatorPDF } from "../../../../src/writers/deliverables/indiceIndicPDF";
 import { IndividualsDataPopup } from "../../../assessments/AssessmentDIS";
+import { Loader } from "../../../popups/Loader";
 
 const IndicatorsList = (props) => {
+
   const [period] = useState(props.period);
   const [prevIndics] = useState(props.session.indics);
   const [notAvailableIndics, setnotAvailableIndics] = useState([]);
-
+  
   const [validations, SetValidations] = useState(
     props.session.validations[period.periodKey]
   );
@@ -80,6 +81,8 @@ const IndicatorsList = (props) => {
   const [comparativeDivision, setComparativeDivision] = useState(
     props.session.comparativeData.activityCode
   );
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // Prev Period
 
@@ -105,12 +108,14 @@ const IndicatorsList = (props) => {
   }, []);
 
   useEffect(async () => {
+   
     if (comparativeDivision !== props.session.comparativeData.activityCode) {
       await updateDivision(props.session.comparativeData.activityCode);
     }
   }, [props.session.comparativeData.activityCode]);
 
   const updateComparativeAreaData = async (indic) => {
+
     let idTarget = getTargetSerieId(indic);
 
     let newComparativeData = await getMacroSerieData(
@@ -221,6 +226,7 @@ const IndicatorsList = (props) => {
 
   // Update comparative division
   const updateDivision = async (division) => {
+    setIsLoading(true);
     props.session.comparativeData.activityCode = division;
 
     let newComparativeData = comparativeData;
@@ -238,6 +244,7 @@ const IndicatorsList = (props) => {
     props.session.comparativeData = newComparativeData;
     setComparativeData(newComparativeData);
     setComparativeDivision(division);
+    setIsLoading(false);
   };
 
   // Export pdf on click
@@ -298,7 +305,8 @@ const IndicatorsList = (props) => {
 
   return (
     <>
-      {validations.length > 0  &&
+    
+      {validations.length > 0 && !isLoading &&
         validations.map((indic, key) => (
           <div key={key} className="hidden charts-container">
             <Row>
@@ -586,6 +594,7 @@ const IndicatorsList = (props) => {
           onGoBack={handleClose}
           handleClose={handleClose}
           handleDownload={handleDownloadPDF}
+          isLoading={isLoading}
         ></ChangeDivision>
       )}
       <h3> Création de la valeur</h3>

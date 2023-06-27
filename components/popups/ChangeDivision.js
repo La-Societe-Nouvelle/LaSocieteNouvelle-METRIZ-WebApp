@@ -42,7 +42,13 @@ const ChangeDivision = (props) => {
           onChange={changeComparativeDivision}
         />
 
-        <Button variant="secondary" size="sm" onClick={handleOnClick}>
+        {props.isLoading && <div className="dot-pulse m-auto my-2"></div>}
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={handleOnClick}
+          disabled={props.isLoading}
+        >
           Télécharger le rapport <i className="bi bi-download"></i>
         </Button>
       </Modal.Body>

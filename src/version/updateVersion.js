@@ -69,7 +69,6 @@ export const updateVersion = async (sessionData) =>
     default:
       break;
   }
-  console.log(sessionData);
 };
 
 const updater_1_0_5 = async (sessionData) => {
