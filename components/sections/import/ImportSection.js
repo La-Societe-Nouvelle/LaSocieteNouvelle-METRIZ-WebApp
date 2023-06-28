@@ -1,33 +1,27 @@
-import React, { useEffect, useState } from "react";
-// Components
-import { Col, Container, Row } from "react-bootstrap";
 
-// Views
-import ImportForm from "./ImportForm";
-import DepreciationAssetsMapping from "./DepreciationAssetsMapping";
+import React, { useState } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
 
-import { FinancialDatas } from "./FinancialDatas";
+import ImportForm from './ImportForm';
+import FECImport from './FECImport';
+import DepreciationAssetsMapping from './DepreciationAssetsMapping';
+import StockPurchasesMapping from './StockPurchasesMapping';
+import FinancialDatas from './FinancialDatas';
+
 // Readers
 import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
 
 // Mail Report Error
 import { sendReportToSupport } from "../../../pages/api/mail-api";
-import { FECImport } from "./FECImport";
-import {
-  buildRegexFinancialPeriod,
-  getListMonthsFinancialPeriod,
-} from "../../../src/Session";
-import { StockPurchasesMapping } from "./StockPurchasesMapping";
 
-function ImportSection(props) 
-{
-  const {session} = props;
-  //STATE
-  const [corporateName, setCorporateName] = useState(
-    session.legalUnit.corporateName || ""
-  );
+import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
+
+
+const ImportSection = (props) => {
+  const { session } = props;
+
+  const [corporateName, setCorporateName] = useState(session.legalUnit.corporateName || "");
   const [siren, setSiren] = useState(session.legalUnit.siren || "");
-
   const [file, setFile] = useState([]);
   const [importedData, setImportedData] = useState(null);
   const [view, setView] = useState(session.financialData.isFinancialDataLoaded ? 4 : 0);
@@ -35,84 +29,133 @@ function ImportSection(props)
   const [errorMail, setErrorMail] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
-  const [isImported, setIsImported] = useState(false);
 
-  function defineCorporateName() {
-    if (
-      session.legalUnit.corporateName &&
-      session.legalUnit.corporateName != ""
-    ) {
-      setCorporateName(session.legalUnit.corporateName);
-    }
-  }
-
-  function handleCorporateName(corporateName) {
+  const handleCorporateName = (corporateName) => {
     session.legalUnit.corporateName = corporateName;
     setCorporateName(corporateName);
-  }
-
-  function handleSiren(siren) {
-    console.log(session.legalUnit)
-    if (siren.length == 9) {
+  };
+  
+  const handleSiren = (siren) => {
+    if (siren !== "" && /^[0-9]{9}$/.test(siren) && /^[^a-zA-Z]+$/.test(siren)) {
       session.legalUnit.setSiren(siren);
+      console.log(session.legalUnit);
     }
     setSiren(siren);
-  }
-
-  function handleFile(file) {
+  };
+  
+  const handleFile = (file) => {
     setErrorFile(false);
     setErrors([]);
     setFile(file);
-  }
-
-  useEffect(() => {
-    if (importedData) {
-      setIsImported(true);
-    } else {
-      setIsImported(false);
-    }
-  });
-
-  function nextView (currentView) 
-  {
-    // next view depreciation assets mapping
-    if (currentView==1) 
-    {
-      let accountsToMap = Object.keys(importedData.meta.accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
-      if (accountsToMap.length>0) {
+  };
+  
+  const nextView = (currentView) => {
+    if (currentView === 1) {
+      let accountsToMap = Object.keys(importedData.meta.accounts).filter(
+        (accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum)
+      );
+      if (accountsToMap.length > 0) {
         setView(2);
       } else {
         nextView(2);
       }
-    }
-    // next view stock accounts mapping
-    else if (currentView==2)
-    {
-      let stocksAccounts = Object.keys(importedData.meta.accounts).filter((accountNum) => /^3(1|2|7)/.test(accountNum));
-      if (stocksAccounts.length>0) {
+    } else if (currentView === 2) {
+      let stocksAccounts = Object.keys(importedData.meta.accounts).filter(
+        (accountNum) => /^3(1|2|7)/.test(accountNum)
+      );
+      if (stocksAccounts.length > 0) {
         setView(3);
       } else {
-        loadFECData(importedData)
+        loadFECData(importedData);
       }
     }
-  }
+  };
+  
+  const importFECFile = async (file) => {
+    let currentFile = file[0];
+    let reader = new FileReader();
+  
+    reader.onload = async () => {
+      try {
+        let FECData = await FECFileReader(reader.result);
+        console.log("--------------------------------------------------");
+        console.log("Lecture du FEC");
+        console.log(FECData.meta);
+        console.log(FECData.books);
+        setImportedData(FECData);
+        setView(1);
+      } catch (error) {
+        console.log(error);
+        setErrorFile(true);
+        setErrorMessage(error);
+      }
+    };
+  
+    try {
+      reader.readAsText(currentFile, "iso-8859-1");
+    } catch (error) {
+      setErrorFile(true);
+      setErrorMessage(error);
+    }
+  };
+  
+  const loadFECData = async (importedData) => {
+    let FECData = await FECDataReader(importedData);
+    console.log("--------------------------------------------------");
+    console.log("Lecture des écritures comptables");
+    console.log(FECData);
+    if (FECData.errors.length > 0) {
+      FECData.errors.forEach((error) => console.log(error));
+      setView(0);
+      setErrorFile(true);
+      setErrorMessage("Erreur(s) relevée(s) : ");
+      setErrors(FECData.errors);
+      setImportedData(null);
+    } else {
+      let financialPeriod = getFinancialPeriodFECData(FECData);
+      let monthPeriods = getMonthPeriodsFECData(FECData);
+      let periods = [financialPeriod, ...monthPeriods];
+  
+      session.addPeriods(periods);
+      session.financialPeriod = financialPeriod;
+      await session.financialData.loadFECData(FECData, financialPeriod, periods);
+  
+      session.impactsData[financialPeriod.periodKey].knwDetails.apprenticeshipTax =
+        FECData.KNWData.apprenticeshipTax;
+      session.impactsData[financialPeriod.periodKey].knwDetails.vocationalTrainingTax =
+        FECData.KNWData.vocationalTrainingTax;
+  
+      session.progression = 1;
+  
+      setView(4);
+    }
+  };
+  
+  const sendErrorReport = async (errors) => {
+    const res = await sendReportToSupport(errors);
+  
+    res.status < 300
+      ? setErrorMail("✔ Le rapport d'erreur a bien été envoyé.")
+      : setErrorMail(
+          "✖ Echec lors de l'envoi du rapport d'erreur. Si le problème persiste, veuillez contacter le support."
+        );
+  };
+  
 
   return (
     <Container fluid>
       <section className="step">
         <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
-        {view == 0 && (
+        {view === 0 && (
           <ImportForm
             onChangeCorporateName={handleCorporateName}
             onChangeSiren={handleSiren}
-            defineCorporateName={defineCorporateName}
             uploadFile={handleFile}
             corporateName={corporateName}
             siren={siren}
             onClick={() => importFECFile(file)}
-            isDataImported={isImported}
             nextStep={() => setView(2)}
-          ></ImportForm>
+          />
         )}
         <Row className="my-3">
           {errorFile && (
@@ -145,7 +188,7 @@ function ImportSection(props)
           )}
         </Row>
 
-        {view == 1 && (
+        {view === 1 && (
           <FECImport
             return={() => setView(0)}
             FECData={importedData}
@@ -153,21 +196,23 @@ function ImportSection(props)
           />
         )}
 
-        {view == 2 && (
+        {view === 2 && (
           <DepreciationAssetsMapping
             return={() => setView(1)}
             onClick={() => nextView(2)}
             meta={importedData.meta}
           />
         )}
-        {view == 3 && (
+
+        {view === 3 && (
           <StockPurchasesMapping
             return={() => setView(2)}
             onClick={() => loadFECData(importedData)}
             meta={importedData.meta}
           />
         )}
-        {view == 4 && (
+
+        {view === 4 && (
           <FinancialDatas
             {...props}
             return={() => setView(1)}
@@ -177,119 +222,7 @@ function ImportSection(props)
       </section>
     </Container>
   );
-
-  /* ---------- FEC IMPORT ---------- */
-
-  // Import FEC File
-
-  function importFECFile(file) 
-  {
-    let currentFile = file[0];
-    let reader = new FileReader();
-
-    reader.onload = async () =>
-    // Action after file loaded
-    {
-      try 
-      {
-        let FECData = await FECFileReader(reader.result); // read file (file -> JSON)
-        console.log("--------------------------------------------------");
-        console.log("Lecture du FEC")
-        console.log(FECData.meta);
-        console.log(FECData.books);
-        setImportedData(FECData);
-        setView(1);
-      } 
-      catch (error) {
-        console.log(error);
-        setErrorFile(true);
-        setErrorMessage(error);
-      } // show error(s) (file structure)
-    };
-
-    try {
-      reader.readAsText(currentFile, "iso-8859-1"); // Read file
-    } catch (error) {
-      setErrorFile(true);
-      setErrorMessage(error);
-    } // show error (file)
-  }
-
-  async function loadFECData(importedData) 
-  {
-    let FECData = await FECDataReader(importedData); // read data from JSON (JSON -> financialData JSON)
-    console.log("--------------------------------------------------");
-    console.log("Lecture des écritures comptables")
-    console.log(FECData)
-    if (FECData.errors.length > 0) {
-      // show error(s) (content)
-      FECData.errors.forEach((error) => console.log(error));
-      setView(0);
-      setErrorFile(true);
-      setErrorMessage("Erreur(s) relevée(s) : ");
-      setErrors(FECData.errors);
-      setImportedData(null);
-    } 
-    else 
-    {
-      // load financial data
-      let financialPeriod = getFinancialPeriodFECData(FECData);
-      let monthPeriods = getMonthPeriodsFECData(FECData);
-      let periods = [financialPeriod,...monthPeriods];
-
-      session.addPeriods(periods);
-      session.financialPeriod = financialPeriod;
-      await session.financialData.loadFECData(FECData,financialPeriod,periods);
-
-      // load impacts data -> to update
-      session.impactsData[financialPeriod.periodKey].knwDetails.apprenticeshipTax = FECData.KNWData.apprenticeshipTax;
-      session.impactsData[financialPeriod.periodKey].knwDetails.vocationalTrainingTax = FECData.KNWData.vocationalTrainingTax;
-
-      // update progression
-      session.progression = 1;
-
-      setView(4);
-    }
-  }
-
-  // Send Errors
-
-  async function sendErrorReport(errors) {
-    const res = await sendReportToSupport(errors);
-
-    res.status < 300
-      ? setErrorMail("✔ Le rapport d'erreur a bien été envoyé.")
-      : setErrorMail(
-          "✖ Echec lors de l'envoi du rapport d'erreur. Si le problème persiste, veuillez contacter le support."
-        );
-  }
 }
 
 export default ImportSection;
 
-const getFinancialPeriodFECData = (FECData) =>
-{
-  // periods to build
-  let financialPeriod = {
-    dateStart: FECData.firstDate,
-    dateEnd: FECData.lastDate,
-    periodKey: "FY" + FECData.lastDate.substring(0, 4),
-    regex: buildRegexFinancialPeriod(FECData.firstDate, FECData.lastDate),
-  };
-  
-  return financialPeriod;
-}
-
-const getMonthPeriodsFECData = (FECData) =>
-{
-  // let periods = getListMonthsFinancialPeriod(importedData.meta.firstDate, importedData.meta.lastDate)
-  //     .map(month => {
-  //         return ({
-  //             regex: new RegExp("^" + month),
-  //             periodKey: month
-  //         })
-  //     })
-  //     .concat(session.financialPeriod);
-
-  return [];
-}
