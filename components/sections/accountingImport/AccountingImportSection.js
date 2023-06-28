@@ -2,11 +2,11 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
-import ImportForm from './ImportForm';
+import ImportForm from './views/FinancialDataForm';
 import FECImport from './FECImport';
-import DepreciationAssetsMapping from './DepreciationAssetsMapping';
-import StockPurchasesMapping from './StockPurchasesMapping';
-import FinancialDatas from './FinancialDatas';
+import DepreciationAssetsMapping from './views/DepreciationAssetsMapping';
+import StockPurchasesMapping from './views/StockPurchasesMapping';
+import FinancialDatas from './views/FinancialDatas';
 
 // Readers
 import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
@@ -15,13 +15,15 @@ import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
 import { sendReportToSupport } from "../../../pages/api/mail-api";
 
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
+import FinancialDataForm from './views/FinancialDataForm';
 
 
-const ImportSection = (props) => {
+const AccountingImportSection = (props) => {
   const { session } = props;
 
   const [corporateName, setCorporateName] = useState(session.legalUnit.corporateName || "");
   const [siren, setSiren] = useState(session.legalUnit.siren || "");
+  const [selectedDivision, setSelectedDivision] = useState(session.legalUnit.activityCode || "");
   const [file, setFile] = useState([]);
   const [importedData, setImportedData] = useState(null);
   const [view, setView] = useState(session.financialData.isFinancialDataLoaded ? 4 : 0);
@@ -35,14 +37,23 @@ const ImportSection = (props) => {
     setCorporateName(corporateName);
   };
   
-  const handleSiren = (siren) => {
+  const handleSiren = async(siren) => {
+
     if (siren !== "" && /^[0-9]{9}$/.test(siren) && /^[^a-zA-Z]+$/.test(siren)) {
-      session.legalUnit.setSiren(siren);
+      await session.legalUnit.setSiren(siren);
       console.log(session.legalUnit);
+      const divisionCode = session.legalUnit.activityCode.slice(0,2);
+      session.comparativeData.activityCode = divisionCode;
+      console.log(divisionCode)
+      setSelectedDivision(divisionCode);
+      setCorporateName(session.legalUnit.corporateName);
     }
     setSiren(siren);
   };
-  
+  const handleDivision = (division) => {
+    session.legalUnit.activityCode = division;
+    setSelectedDivision(division);
+  }
   const handleFile = (file) => {
     setErrorFile(false);
     setErrors([]);
@@ -147,12 +158,14 @@ const ImportSection = (props) => {
       <section className="step">
         <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
         {view === 0 && (
-          <ImportForm
+          <FinancialDataForm
             onChangeCorporateName={handleCorporateName}
             onChangeSiren={handleSiren}
+            onChangeDivision={handleDivision}
             uploadFile={handleFile}
             corporateName={corporateName}
             siren={siren}
+            selectedDivision={selectedDivision}
             onClick={() => importFECFile(file)}
             nextStep={() => setView(2)}
           />
@@ -224,5 +237,5 @@ const ImportSection = (props) => {
   );
 }
 
-export default ImportSection;
+export default AccountingImportSection;
 

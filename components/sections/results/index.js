@@ -24,16 +24,9 @@ import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
 import { updateComparativeData } from "./utils";
 import { Loader } from "../../popups/Loader";
+import { fetchLatestLegalUnit } from "../../popups/dataUpdater/DataUpdater";
 
-// Fetch API data
-import getMacroSerieData from "/src/services/responses/MacroSerieData";
-import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import getSerieData from "/src/services/responses/SerieData";
-import { getTargetSerieId } from "/src/utils/Utils";
-import { generateCompleteFile } from "/src/writers/deliverables/generateCompleteFile";
-// import DonwloadComponent from "./parts/DonwloadComponent";
-
-const Results = ({ session, publish }) => {
+const Results = ({ session, publish, goBack }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedLegalUnit, setEditedLegalUnit] = useState({
     ...session.legalUnit,
@@ -60,7 +53,7 @@ const Results = ({ session, publish }) => {
   const prevPeriod = session.availablePeriods.find(
     (period) => period.dateEnd == prevDateEnd
   );
-
+  // To do : extract custom style and import it
   const customStyles = {
     control: (provided, state) => ({
       ...provided,
@@ -173,12 +166,28 @@ const Results = ({ session, publish }) => {
   };
 
   const handleSaveChanges = () => {
-    // Effectuez ici les actions pour sauvegarder les modifications, par exemple, appeler une fonction de mise à jour des données
+    // to do : update legal unit info in session
 
-    // Après avoir sauvegardé les modifications, désactivez le mode édition
+    console.log(editedLegalUnit);
+
     setIsEditMode(false);
   };
 
+  const handleSirenChange = (e) => {
+
+
+    setEditedLegalUnit({
+      ...editedLegalUnit,
+      siren: e.target.value,
+    });
+
+    // To do : fetch legal unit infos
+    if (e.target.value.length == 9) {
+    fetchLatestLegalUnit(editedLegalUnit).then(response => 
+      console.log(response))
+    }
+ 
+  };
   return (
     <Container fluid className="results">
       <div className="box">
@@ -201,8 +210,21 @@ const Results = ({ session, publish }) => {
         </p>
         {isEditMode ? (
           <Form>
-            <Form.Group as={Row} controlId="formLegalUnitName">
-              <Form.Label column sm={2}>
+            <Form.Group as={Row} controlId="formSirenSiret" className="my-2">
+              <Form.Label column sm={2} className="fw-bold">
+                SIREN/SIRET :
+              </Form.Label>
+              <Col sm={8}>
+                <Form.Control
+                  type="text"
+                  value={editedLegalUnit.siren}
+                  onChange={handleSirenChange}
+                />
+              </Col>
+            </Form.Group>
+
+            <Form.Group as={Row} controlId="formLegalUnitName" className="my-2">
+              <Form.Label column sm={2} className="fw-bold">
                 Unité légale :
               </Form.Label>
               <Col sm={8}>
@@ -219,26 +241,24 @@ const Results = ({ session, publish }) => {
               </Col>
             </Form.Group>
 
-            <Form.Group as={Row} controlId="formSirenSiret">
-              <Form.Label column sm={2}>
-                SIREN/SIRET :
+            <Form.Group as={Row} controlId="formLegalUnitName" className="my-2">
+              <Form.Label column sm={2} className="fw-bold">
+               Code APE :
               </Form.Label>
               <Col sm={8}>
                 <Form.Control
                   type="text"
-                  value={editedLegalUnit.siren}
-                  onChange={(e) =>
-                    setEditedLegalUnit({
-                      ...editedLegalUnit,
-                      siren: e.target.value,
-                    })
-                  }
+                  value={editedLegalUnit.activityCode}
+                  disabled
                 />
               </Col>
             </Form.Group>
-
-            <Form.Group as={Row} controlId="formComparativeDivision">
-              <Form.Label column sm={2}>
+            <Form.Group
+              as={Row}
+              controlId="formComparativeDivision"
+              className="my-2"
+            >
+              <Form.Label column sm={2} className="fw-bold">
                 Branche de comparaison :
               </Form.Label>
               <Col sm={8}>
@@ -260,14 +280,43 @@ const Results = ({ session, publish }) => {
             </Form.Group>
           </Form>
         ) : (
-          <ul className="list-unstyled legal-unit">
-            <li>Unité légale : {session.legalUnit.corporateName}</li>
-            <li>SIREN/SIRET : {session.legalUnit.siren}</li>
-            <li>Code APE : {session.legalUnit.activityCode}</li>
-            <li>
-              Branche de comparaison : {divisions[comparativeData.activityCode]}
-            </li>
-          </ul>
+          <div className="legal-unit-info">
+            <Row>
+              <Col lg="2">
+                  <p className="fw-bold col-form-label">SIREN/SIRET :</p>
+              </Col>
+              <Col>
+              <p className="py-2">{session.legalUnit.siren}</p>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg="2">
+                  <p className="fw-bold col-form-label">Unité légale :</p>
+              </Col>
+              <Col>
+              <p className="py-2" >{session.legalUnit.corporateName}</p>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg="2">
+                  <p className="fw-bold col-form-label">Code APE :</p>
+              </Col>
+              <Col>
+              <p  className="py-2">{session.legalUnit.activityCode}</p>
+              </Col>
+            </Row>
+            <Row>
+              <Col lg="2">
+                  <p  className="fw-bold col-form-label">Branche de comparaison :</p>
+              </Col>
+              <Col>
+              <p  className="py-2"> {comparativeData.activityCode == "00" && (
+                <i class="bi bi-exclamation-triangle"></i>
+              )} {divisions[comparativeData.activityCode]}</p>
+              </Col>
+            </Row>
+          </div>
+  
         )}
         <div>
           <Button onClick={handleEditClick} size="sm" disabled={isEditMode}>
@@ -359,7 +408,7 @@ const Results = ({ session, publish }) => {
       )}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
-      {console.log(publish)}
+
       <div className="box text-end">
         <Button onClick={goBack} className="me-1">
           Retour
