@@ -2,11 +2,10 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 
-import ImportForm from './views/FinancialDataForm';
 import FECImport from './FECImport';
 import DepreciationAssetsMapping from './views/DepreciationAssetsMapping';
-import StockPurchasesMapping from './views/StockPurchasesMapping';
-import FinancialDatas from './views/FinancialDatas';
+import { StockPurchasesMapping } from "./views/StockPurchasesMapping";
+import {FinancialDatas} from './views/FinancialDatas';
 
 // Readers
 import { FECDataReader, FECFileReader } from "/src/readers/FECReader";

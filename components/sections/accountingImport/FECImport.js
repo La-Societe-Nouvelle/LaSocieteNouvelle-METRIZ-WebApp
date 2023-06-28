@@ -7,7 +7,7 @@ import { Table } from "react-bootstrap";
 
 /* ---------- FEC IMPORT  ---------- */
 
-export class FECImport extends React.Component 
+export default class FECImport extends React.Component 
 {
   constructor(props) {
     super(props);
