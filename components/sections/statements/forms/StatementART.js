@@ -97,11 +97,6 @@ const StatementART = (props) => {
     setShowSuccessMessage(false);
   };
 
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    props.impactsData.comments.art = event.target.value
-    setShowSuccessMessage(false);
-  };
 
   const onValidate = () => {
     setShowSuccessMessage(true);

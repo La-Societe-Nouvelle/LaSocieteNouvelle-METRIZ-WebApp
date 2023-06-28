@@ -23,16 +23,6 @@ const StatementGHG = (props) => {
       undefined
     )
   );
-  const [
-    greenhousesGazEmissionsUnit,
-    setGreenhousesGazEmissionsUnit,
-  ] = useState(
-    valueOrDefault(
-      props.impactsData.greenhousesGazEmissionsUnit,
-      undefined
-    )
-  );
-
   const [info, setInfo] = useState(props.impactsData.comments.ghg || "");
   const [showModal, setShowModal] = useState(false);
 
