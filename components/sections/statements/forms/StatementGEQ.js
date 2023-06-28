@@ -71,102 +71,94 @@ const StatementGEQ = (props) => {
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.geq = info);
 
-  const onValidate = () => props.onValidate('geq');
-
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group align-items-center">
-        <Form.Label column sm={4}>
-          L'entreprise est-elle employeur ?
-        </Form.Label>
+      <Row>
+      <Col lg={7}>
+          <Form.Group as={Row} className="form-group align-items-center">
+            <Form.Label column >
+              L'entreprise est-elle employeur ?
+            </Form.Label>
 
-        <Col sm={6}>
-          <Form.Check
-            inline
-            type="radio"
-            id="hasEmployees"
-            label="Oui"
-            value="true"
-            checked={hasEmployees === true}
-            onChange={onHasEmployeesChange}
-          />
-          <Form.Check
-            inline
-            type="radio"
-            id="hasEmployees"
-            label="Non"
-            value="false"
-            checked={hasEmployees === false}
-            onChange={onHasEmployeesChange}
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Ecart de rémunérations Femmes/Hommes (en % du taux horaire brut moyen)
-        </Form.Label>
-        <Col sm={6}>
-          <Row className="align-items-center">
+            <Col className="text-end">
+              <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Oui"
+                value="true"
+                checked={hasEmployees === true}
+                onChange={onHasEmployeesChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Non"
+                value="false"
+                checked={hasEmployees === false}
+                onChange={onHasEmployeesChange}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column >
+              Ecart de rémunérations Femmes/Hommes{" "}
+              <span className="d-block small">
+                (en % du taux horaire brut moyen)
+              </span>
+            </Form.Label>
             <Col>
               <InputGroup>
-              <Form.Control
-                type="number"
-                value={roundValue(wageGap, 1)}
-                disabled={hasEmployees === false}
-                inputMode="numeric"
-                onChange={updateWageGap}
-                isInvalid={isDisabled}
-              />
+                <Form.Control
+                  type="number"
+                  value={roundValue(wageGap, 1)}
+                  disabled={hasEmployees === false}
+                  inputMode="numeric"
+                  onChange={updateWageGap}
+                  isInvalid={isDisabled}
+                />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
-           
             </Col>
-            <Col>
-              <div>
-                <Button
-                  variant="primary"
-                  className="btn-sm me-2"
-                  onClick={() => setShowDSN(true)}
-                  disabled={hasEmployees ? false : true}
-                >
-                  <i className="bi bi-calculator"></i>
-                  &nbsp;Import Fichiers DSN
-                </Button>
-                <Button
-                  variant="primary"
-                  className="btn-sm"
-                  onClick={() => setShowCalulatorModal(true)}
-                  disabled={hasEmployees ? false : true}
-                >
-                  <i className="bi bi-calculator"></i>
-                  &nbsp;Outil d'évaluation
-                </Button>
-              </div>
-            </Col>
-          </Row>
+          </Form.Group>
         </Col>
-      </Form.Group>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>            <Col>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                className="w-100"
+                onChange={updateInfo}
+                value={info}
+                onBlur={saveInfo}
+              />
+            </Col>
+          </Form.Group>
+        </Col>
 
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
-        </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button variant="light-secondary" disabled={isDisabled} onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+        <div className="my-3 text-end">
+          <Button
+            variant="light-secondary"
+            className="btn-sm me-2"
+            onClick={() => setShowDSN(true)}
+            disabled={hasEmployees ? false : true}
+          >
+            <i className="bi bi-calculator"></i>
+            &nbsp;Import Fichiers DSN
+          </Button>
+          <Button
+            variant="light-secondary"
+            className="btn-sm"
+            onClick={() => setShowCalulatorModal(true)}
+            disabled={hasEmployees ? false : true}
+          >
+            <i className="bi bi-calculator"></i>
+            &nbsp;Outil d'évaluation
+          </Button>
+        </div>
+      </Row>
 
       <Modal
         show={showCalculatorModal}

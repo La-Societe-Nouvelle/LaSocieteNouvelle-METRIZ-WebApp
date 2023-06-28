@@ -10,7 +10,7 @@ import { Session } from "/src/Session";
 
 // Sections
 import { StartSection } from "/components/sections/StartSection";
-import ImportSection from "../components/sections/import/ImportSection";
+import AccountingImportSection from "/components/sections/accountingImport/AccountingImportSection";
 import { InitialStatesSection } from "/components/sections/InitialStatesSection";
 import { ProvidersSection } from "../components/sections/providers/ProvidersSection";
 import DirectImpacts from "../components/sections/statements";
@@ -219,7 +219,7 @@ class Metriz extends React.Component {
         );
       case 1:
         return (
-          <ImportSection {...sectionProps} submit={this.validImportedData} />
+          <AccountingImportSection {...sectionProps} submit={this.validImportedData} />
         );
       case 2:
         return (

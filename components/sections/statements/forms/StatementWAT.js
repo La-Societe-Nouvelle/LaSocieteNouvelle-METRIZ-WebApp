@@ -1,165 +1,144 @@
 // La Société Nouvelle
 /* ---------- DECLARATION - INDIC #WAT ---------- */
 
-import React, { useState, useEffect } from "react";
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { InputNumber } from "../../../input/InputNumber";
-import {
-  printValue,
-  roundValue,
-  valueOrDefault,
-} from "../../../../src/utils/Utils";
+import React, { useState } from "react";
+import Select from "react-select";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { unitSelectStyles } from "../../../../src/utils/customStyles";
 
-const StatementWAT = (props) => {
+const StatementWAT = ({ impactsData, onUpdate, onError }) => {
   const [waterConsumption, setWaterConsumption] = useState(
-    valueOrDefault(props.impactsData.waterConsumption, undefined)
+    valueOrDefault(impactsData.waterConsumption, "")
   );
   const [waterConsumptionUncertainty, setWaterConsumptionUncertainty] =
-    useState(
-      valueOrDefault(props.impactsData.waterConsumptionUncertainty, undefined)
-    );
-  const [info, setInfo] = useState(props.impactsData.comments.wat || "");
+    useState(valueOrDefault(impactsData.waterConsumptionUncertainty, ""));
 
-  useEffect(() => {
-    if (waterConsumption !== props.impactsData.waterConsumption) {
-      setWaterConsumption(props.impactsData.waterConsumption);
-    }
-    if (
-      waterConsumptionUncertainty !==
-      props.impactsData.waterConsumptionUncertainty
-    ) {
-      setWaterConsumptionUncertainty(
-        props.impactsData.waterConsumptionUncertainty
-      );
-    }
-  }, [
-    props.impactsData.waterConsumption,
-    props.impactsData.waterConsumptionUncertainty,
-  ]);
-
-  const netValueAdded = props.impactsData.netValueAdded;
-  const isValid = waterConsumption !== null && netValueAdded !== null;
+  const [waterConsumptionUnit, setWaterConsumptionUnit] = useState(
+    impactsData.waterConsumptionUnit
+  );
+  const [info, setInfo] = useState(impactsData.comments.wat || "");
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const options = [
     { value: "m³", label: "m³" },
     { value: "L", label: "L" },
   ];
   const updateWaterConsumption = (input) => {
-    props.impactsData.setWaterConsumption(input.target.value);
-    setWaterConsumptionUncertainty(
-      props.impactsData.waterConsumptionUncertainty
-    );
-    props.onUpdate("wat");
+    let errorMessage = "";
+
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    }
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    }
+    setIsInvalid(errorMessage !== "");
+    onError("wat", errorMessage);
+
+    impactsData.setWaterConsumption(input.target.value);
+    setWaterConsumption(input.target.value);
+    setWaterConsumptionUncertainty(impactsData.waterConsumptionUncertainty);
+    onUpdate("wat");
   };
 
   const updateWaterConsumptionUncertainty = (input) => {
-    props.impactsData.waterConsumptionUncertainty = input.target.value;
-    props.onUpdate("wat");
+    impactsData.waterConsumptionUncertainty = input.target.value;
+    onUpdate("wat");
   };
 
-  // updateWaterConsumptionUnit = (selected) => {
-  //   const selectedUnit = selected.value; 
+  const updateWaterConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
 
-  //   const {
-  //     waterConsumption,
-  //     waterConsumptionUnit,
-  //   } = this.props.impactsData;
+    const { waterConsumption, waterConsumptionUnit } = impactsData;
 
-  //   if (selectedUnit !== waterConsumptionUnit) {
-  //     let updatedWaterConsumption =
-  //       waterConsumption;
+    if (selectedUnit !== impactsData.waterConsumptionUnit) {
+      let updatedWaterConsumption = impactsData.waterConsumption;
 
-  //     if (selectedUnit === "m³") {
-  //       updatedWaterConsumption =
-  //         waterConsumption / 1000;
-  //     } else if (selectedUnit === "L") {
-  //       updatedWaterConsumption =
-  //         waterConsumption * 1000;
-  //     }
+      if (selectedUnit === "m³") {
+        updatedWaterConsumption = impactsData.waterConsumption / 1000;
+      } else if (selectedUnit === "L") {
+        updatedWaterConsumption = impactsData.waterConsumption * 1000;
+      }
 
-  //     this.updateWaterConsumption(
-  //       updatedWaterConsumption
-  //     );
-  //   }
+      setWaterConsumption(updatedWaterConsumption);
+      impactsData.waterConsumption = updatedWaterConsumption;
+    }
 
+    setWaterConsumptionUnit(selectedUnit);
 
-  //   this.setState({
-  //     waterConsumptionUnit: selectedUnit,
-  //   });
+    impactsData.waterConsumptionUnit = selectedUnit;
 
-  //   this.props.impactsData.waterConsumptionUnit = selectedUnit;
+    onUpdate("wat");
+  };
 
-  //   this.props.onUpdate("wat");
-  // };
-
-
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.wat = info);
-  const onValidate = () => props.onValidate('wat');
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.wat = event.target.value;
+  };
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Consommation totale d'eau
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column>Consommation totale d'eau</Form.Label>
+            <Col>
+              <Row>
+                <Col>
+                  <Form.Control
+                    type="number"
+                    value={roundValue(waterConsumption, 0)}
+                    inputMode="numeric"
+                    onChange={updateWaterConsumption}
+                  />
+                </Col>
+                <Col sm={4}>
+                  <Select
+                    options={options}
+                    styles={unitSelectStyles}
+                    value={{
+                      label: waterConsumptionUnit,
+                      value: waterConsumptionUnit,
+                    }}
+                    onChange={updateWaterConsumptionUnit}
+                  />
+                </Col>
+              </Row>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column>Incertitude</Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(waterConsumptionUncertainty, 0)}
+                  inputMode="numeric"
+                  onChange={updateWaterConsumptionUncertainty}
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
             <Form.Control
-              type="number"
-              value={roundValue(waterConsumption, 0)}
-              inputMode="numeric"
-              onChange={updateWaterConsumption}
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
             />
-            <InputGroup.Text>m³</InputGroup.Text>
-          </InputGroup>
-             {/* <Select
-                  options={options}
-                  defaultValue={{
-                    label: waterConsumptionUnit,
-                    value: waterConsumptionUnit,
-                  }}
-                  onChange={this.updateWaterConsumptionUnit}
-                /> */}
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Incertitude
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(waterConsumptionUncertainty, 0)}
-              inputMode="numeric"
-              onChange={updateWaterConsumptionUncertainty}
-            />
-            <InputGroup.Text>%</InputGroup.Text>
-          </InputGroup>
-        </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
-        </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+      </Row>
     </Form>
   );
 };

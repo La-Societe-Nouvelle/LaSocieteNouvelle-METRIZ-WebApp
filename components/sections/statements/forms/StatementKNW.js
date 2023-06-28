@@ -2,57 +2,60 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentKNW } from "../modals/AssessmentKNW";
 
-const StatementKNW = (props) => {
+const StatementKNW = ({ impactsData, onUpdate, onError }) => {
   const [researchAndTrainingContribution, setResearchAndTrainingContribution] =
     useState(
       valueOrDefault(
-        props.impactsData.researchAndTrainingContribution,
-        undefined
+        impactsData.researchAndTrainingContribution,
+        ""
       )
     );
-  const [info, setInfo] = useState(props.impactsData.comments.knw || " ");
+  const [info, setInfo] = useState(impactsData.comments.knw || " ");
   const [showModal, setShowModal] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
 
-  const netValueAdded = props.impactsData.netValueAdded;
-
-  useEffect(() => {
-    if (
-      researchAndTrainingContribution !==
-      props.impactsData.researchAndTrainingContribution
-    ) {
-      setResearchAndTrainingContribution(
-        props.impactsData.researchAndTrainingContribution
-      );
-    }
-  }, [
-    props.impactsData.researchAndTrainingContribution,
-    researchAndTrainingContribution,
-  ]);
 
   const updateResearchAndTrainingContribution = (input) => {
-    props.impactsData.researchAndTrainingContribution = input.target.value;
-    props.onUpdate("knw");
+    let errorMessage = "";
+    const inputValue = input.target.valueAsNumber;
+  
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    } else if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    } else if (inputValue >= impactsData.netValueAdded) {
+      errorMessage =
+        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+    }
+    console.log(errorMessage);
+
+    setIsInvalid(errorMessage !== "");
+    onError("knw", errorMessage);
+
+    impactsData.researchAndTrainingContribution = input.target.value;
+    setResearchAndTrainingContribution( input.target.value);
+
+    onUpdate("knw");
   };
 
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.knw = info);
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.knw = event.target.value;
+  };
 
-  const onValidate = () => props.onValidate('knw');
-
-  const isValid =
-    researchAndTrainingContribution !== null && netValueAdded !== null;
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Valeur ajoutée nette dédiée à la recherche ou à la formation
-        </Form.Label>
-        <Col sm={6}>
-          <Row className="align-items-center">
+      <Row>
+      <Col lg={7}>
+    {console.log(isInvalid)}
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column>
+              Valeur ajoutée nette dédiée à la recherche ou à la formation
+            </Form.Label>
             <Col>
               <InputGroup>
                 <Form.Control
@@ -60,42 +63,35 @@ const StatementKNW = (props) => {
                   value={roundValue(researchAndTrainingContribution, 0)}
                   inputMode="numeric"
                   onChange={updateResearchAndTrainingContribution}
-                  isInvalid={!isValid}
+                  isInvalid={isInvalid}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
               </InputGroup>
             </Col>
-            <Col>
-              <Button
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowModal(true)}
-              >
-                <i className="bi bi-calculator"></i> Outil d'évaluation
-              </Button>
-            </Col>
-          </Row>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+            />
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+        <div className="text-end my-3">
+          <Button
+          variant="light-secondary"
+            className="btn-sm"
+            onClick={() => setShowModal(true)}
+          >
+            <i className="bi bi-calculator"></i> Outil d'évaluation
+          </Button>
+        </div>
+      </Row>
 
       <Modal
         show={showModal}
@@ -108,10 +104,10 @@ const StatementKNW = (props) => {
         </Modal.Header>
         <Modal.Body>
           <AssessmentKNW
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>

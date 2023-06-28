@@ -102,9 +102,13 @@ table input {
 
 .indic-form {
   .form-check-input {
-    width: 2em !important;
-    height: 2em;
-    margin-top: 0.25em;
+    width: 1.5em !important;
+    height: 1.5em;
+
     border: 2px solid rgba(25, 21, 88, 0.31);
   }
+}
+
+.form-label {
+  font-weight: 600;
 }

@@ -3,6 +3,7 @@ import { Col, Row } from "react-bootstrap";
 import Select from "react-select";
 import TrendsChart from "../charts/TrendsChart";
 import divisions from "/lib/divisions";
+import { customSelectStyles } from "../../../../src/utils/customStyles";
 
 const graphOptions = [
   { label: "Production", value: "prd" },
@@ -89,34 +90,6 @@ const TrendsDataContainer = ({
     );
   };
 
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      border: state.isFocused ? "2px solid #dbdef1" : "2px solid #f0f0f8",
-      borderRadius: "0.5rem",
-      boxShadow: "none",
-      "&:hover": {
-        borderColor: "#dbdef1",
-      },
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: "#dbdef1",
-      "&:hover": {
-        color: "#dbdef1",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? '#191558' : 'transparent',
-      background: state.isFocused ? "#f0f0f8" : "",
-      "&:hover": {
-        color: "#191558",
-      },
-    }),
-  };
-  
   return (
     <Row>
       <Col lg={8}>
@@ -124,7 +97,7 @@ const TrendsDataContainer = ({
           <h4>Courbes d'évolution</h4>
 
           <Select
-            styles={customStyles}
+            styles={customSelectStyles}
             className="mb-4"
             defaultValue={trendGraphView}
             options={graphOptions}

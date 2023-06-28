@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Select from "react-select";
+import { Image, Form, Button } from "react-bootstrap";
+import { useEffect } from "react";
 
-import { Row, Col, Image } from "react-bootstrap";
 import {
   StatementART,
   StatementECO,
@@ -17,77 +17,96 @@ import {
   StatementWAT,
 } from "./forms";
 import indicators from "/lib/indics";
-import { useEffect } from "react";
+import IndicatorDetailsModal from "./modals/IndicatorDetailsModal";
 
-const StatementForms = ({ session, period, initialSelectedIndicators, onValidation }) => {
-  const [indicatorsToShow, setIndicatorsToShow] = useState([]);
-  const [indicatorsOptions, setIndicatorsOptions] = useState([]);
+const StatementForms = ({
+  session,
+  period,
+  initialSelectedIndicators,
+  updateValidations,
+}) => {
+
   const [selectedIndicators, setSelectedIndicators] = useState(
     initialSelectedIndicators
   );
 
-  const [validations, setValidations] = useState(
-    session.validations[period.periodKey]
-  );
+  const [invalidIndicators, setInvalidIndicators] = useState({}); 
+
+  const [indicatorModal, setIndicatorModal] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
   useEffect(() => {
-    const updatedIndicatorsToShow = selectedIndicators.map((key) => {
-      const indicator = indicators[key];
-      return [key, indicator];
-    });
-    initialSelectedIndicators = updatedIndicatorsOptions;
-    setIndicatorsToShow(updatedIndicatorsToShow);
+  
+    // Filter out the selected indicators that are not in the invalidIndicators list
+    const validSelectedIndicators = selectedIndicators.filter(
+      (indicator) => !Object.keys(invalidIndicators).includes(indicator)
+    );
+  
+    // Update validations for validSelectedIndicators here
+    updateValidations(validSelectedIndicators, Object.keys(invalidIndicators));
+  
+  }, [selectedIndicators, invalidIndicators]);
+  
 
-    const updatedIndicatorsOptions = Object.entries(indicators)
-      .filter(([indic]) => !selectedIndicators.includes(indic))
-      .map(([code, indic]) => {
-        return { value: code, label: indic.libelle };
-      });
+  const handleModalOpen = (indicator) => {
+    setIndicatorModal(indicator);
+    setShowModal(true);
+  };
 
-    setIndicatorsOptions(updatedIndicatorsOptions);
-  }, [selectedIndicators]);
+  const handleModalClose = () => {
+    setIndicatorModal(null);
+    setShowModal(false);
+  };
 
   // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
-    let nextIndicator = session.getNetValueAddedIndicator(
-      indic,
-      period.periodKey
-    );
+    session.getNetValueAddedIndicator(indic, period.periodKey);
+    await session.updateFootprints(period);
 
-    if (
-      nextIndicator !==
-      session.financialData.mainAggregates.netValueAdded.periodsData[
-        period.periodKey
-      ].footprint.indicators[indic]
-    ) {
-      // remove validation
-      session.validations[period.periodKey] = session.validations[
-        period.periodKey
-      ].filter((item) => item != indic);
-      setValidations(validations.filter((item) => item != indic));
+  };
 
-      // update footprint
-      await session.updateFootprints(period);
+
+
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+    if (checked) {
+      setSelectedIndicators((prevSelectedIndicators) => [
+        ...prevSelectedIndicators,
+        value,
+      ]);
+    } else {
+      setSelectedIndicators((prevSelectedIndicators) =>
+        prevSelectedIndicators.filter((indicator) => indicator !== value)
+      );
+      setInvalidIndicators((prevInvalidIndicators) => {
+        const updatedInvalidIndicators = { ...prevInvalidIndicators };
+        delete updatedInvalidIndicators[value];
+        return updatedInvalidIndicators;
+      });
     }
   };
 
-  const handleValidation = (indic) => {
-    setValidations((validations) => [...validations, indic]);
-    onValidation(indic); 
+  const handleError = (field, errorMessage) => {
 
-  
-  };
-
-  const handleIndicatorChange = (selected) => {
-    const updatedSelectedIndicators = [...selectedIndicators, selected.value];
-
-    setSelectedIndicators(updatedSelectedIndicators);
+    if (errorMessage) {
+      setInvalidIndicators((prevInvalidIndicators) => ({
+        ...prevInvalidIndicators,
+        [field]: errorMessage,
+      }));
+    } else {
+      setInvalidIndicators((prevInvalidIndicators) => {
+        const updatedInvalidIndicators = { ...prevInvalidIndicators };
+        delete updatedInvalidIndicators[field];
+        return updatedInvalidIndicators;
+      });
+    }
   };
 
   const renderStatementForm = (key) => {
     const componentProps = {
       impactsData: session.impactsData[period.periodKey],
+      onError: handleError,
       onUpdate: handleNetValueChange,
-      onValidate: handleValidation,
     };
 
     switch (key) {
@@ -121,90 +140,85 @@ const StatementForms = ({ session, period, initialSelectedIndicators, onValidati
     }
   };
 
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      border: state.isFocused ? "2px solid #dbdef1" : "2px solid #f0f0f8",
-      borderRadius: "0.5rem",
-      boxShadow: "none",
-      "&:hover": {
-        borderColor: "#dbdef1",
-      },
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: "#dbdef1",
-      "&:hover": {
-        color: "#dbdef1",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? "#191558" : "transparent",
-      background: state.isFocused ? "#f0f0f8" : "",
-      "&:hover": {
-        color: "#191558",
-      },
-    }),
+  const renderIndicators = (category) => {
+    const filteredIndicators = Object.entries(indicators).filter(
+      ([key, value]) => value.isAvailable && value.category === category
+    );
+
+    return filteredIndicators.map(([key, value]) => (
+      <div key={key} className="border rounded mb-3 indic-statement bg-light">
+        <div className="d-flex align-items-center px-2 py-3">
+          <Form className="indic-form me-3">
+            <Form.Check
+              type="checkbox"
+              value={key}
+              checked={selectedIndicators.includes(key)}
+              onChange={handleCheckboxChange}
+            />
+          </Form>
+          <div className="d-flex align-items-center flex-grow-1 ">
+            <Image
+              className="me-2"
+              src={`icons-ese/logo_ese_${key}_bleu.svg`}
+              alt={key}
+              height={20}
+            />
+            <h4>
+              {value.libelle}
+              {value.isBeta && <span className="beta ms-1">BETA</span>}
+            </h4>
+            <div className="text-end flex-grow-1">
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => handleModalOpen(key)}
+              >
+                Informations
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {selectedIndicators.includes(key) && (
+          <div className="px-2 py-2">{renderStatementForm(key)}</div>
+        )}
+        {renderErrorMessage(key)}
+      </div>
+    ));
+  };
+
+  const renderErrorMessage = (indicator) => {
+    if (invalidIndicators[indicator]) {
+      return (
+        <div className="mx-2 my-2 alert alert-danger">
+          {invalidIndicators[indicator]}
+        </div>
+      );
+    }
+    return null;
   };
 
   return (
     <>
-    
-        {indicatorsToShow.map(([key, value]) => (
-          
-          
-              <div key={key} className="d-flex border border-1 rounded  p-3 mb-3 shadow-sm ">
-                <div className="p-4">
-                  <Image
-                    className="me-2"
-                    src={`icons-ese/${key}.svg`}
-                    alt={key}
-                    height={60}
-                  />
-                </div>
-                <div className="flex-fill">
-                  <div className="d-flex align-items-center justify-content-between">
-                    <h4 className="h6 mb-0 ">
-                      {value.libelle}
-                      {value.isBeta && <span className="beta ms-1">BETA</span>}
-                    </h4>
-                    <div className="text-end">
-                      {validations.includes(key) && (
-                        <span className="display-6">
-                          <i className="text-success ms-3 bi bi-patch-check"></i>
-                        </span>
-                      )}
-                    </div>
-                  </div>
+      <h3>
+        <i className="bi bi-pencil-square"></i> Création de la valeur
+      </h3>
+      {renderIndicators("Création de la valeur")}
+      <h3>
+        <i className="bi bi-pencil-square"></i> Empreinte sociale
+      </h3>
+      {renderIndicators("Empreinte sociale")}
+      <h3>
+        <i className="bi bi-pencil-square"></i> Empreinte environnementale
+      </h3>
+      {renderIndicators("Empreinte environnementale")}
 
-                  <div >{renderStatementForm(key)}</div>
-                </div>
-              </div>
-       
-         
-        ))}
-     
-      <hr></hr>
-
-      {indicatorsToShow.length < Object.keys(indicators).length && (
-        <div className="border border-1 rounded p-3 my-3 shadow-sm bg-primary">
-          <div className="d-flex justify-content-between align-items-center">
-            <h4 className="h5 mb-0 text-white">
-              <i className="bi bi-plus-circle me-2"></i> Ajouter un indicateur
-            </h4>
-            <Select
-              styles={customStyles}
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              options={indicatorsOptions}
-              placeholder="Ajouter un indicateur à déclarer"
-              onChange={handleIndicatorChange}
-            />
-          </div>
-        </div>
+      {indicatorModal && (
+        <IndicatorDetailsModal
+          show={showModal}
+          handleClose={handleModalClose}
+          indicator={indicatorModal}
+        />
       )}
     </>
   );

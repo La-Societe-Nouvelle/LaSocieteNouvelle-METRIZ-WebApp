@@ -1,32 +1,10 @@
 import * as XLSX from 'xlsx';
-import { getExpensesGroupByAccount } from '../../components/tables/IndicatorExpensesTable';
-import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../formulas/aggregatesBuilder';
-import {  roundValue } from '../utils/Utils';
-
 import metaIndics from "/lib/indics";
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../../formulas/aggregatesBuilder';
+import { roundValue } from '../Utils';
 
-async function exportIndicXLSX(
-  indic,
-  session,
-  period
-) {
-  // Build file
-  let file = await IndicXLSXFileWriter(
-    indic,
-    session,
-    period
-  );
 
-  let blob = new Blob([file], { type: "application/octet-stream" });
-  let link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "results.xlsx";
-  link.click();
-}
-
-/* ---------- CONTENT BUILDER ---------- */
-
-export async function IndicXLSXFileWriter(indic,session,period)
+export async function generateXLSXFile(indic,session,period)
 {
   const workbook = XLSX.utils.book_new();
 
@@ -55,6 +33,7 @@ export async function IndicXLSXFileWriter(indic,session,period)
 
   return buf;
 }
+
 
 /* ---------- CONTENT BUILDERS ---------- */ 
 
@@ -220,8 +199,6 @@ async function buildExpensesContent(indic,session)
   externalExpenses
     .forEach(({ accountNum, accountLib, amount, footprint }) => 
     {
-     // let indicator = session.getExpensesAccountIndicator(accountNum,indic); // TO FIX
-
       aoaContent.push([
         accountNum,
         accountLib,
@@ -232,10 +209,4 @@ async function buildExpensesContent(indic,session)
     });
 
   return aoaContent;
-}
-
-/* ---------- EXPORT ---------- */ 
-
-export {
-  exportIndicXLSX
 }

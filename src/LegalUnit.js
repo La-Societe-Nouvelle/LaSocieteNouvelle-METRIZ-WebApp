@@ -38,7 +38,7 @@ export class LegalUnit {
 
   // Fetch legal unit data
   fetchLegalUnitData = async () => {
-    if (/[0-9]{9}/.test(this.siren)) {
+
       // request
       await api.get("legalunitfootprint/" + this.siren).then((res) => {
         let status = res.data.header.code;
@@ -58,33 +58,20 @@ export class LegalUnit {
             res.data.legalUnit.economieSocialeSolidaire;
           this.isSocieteMission = res.data.legalUnit.societeMission;
           this.hasCraftedActivities = res.data.legalUnit.hasCraftedActivities;
-          this.dataFetched = true;
-        } else {
+        }
+        else {
           this.corporateName = "";
           this.corporateHeadquarters = "";
-          this.areaCode = "FRA";
-          this.activityCode = "00";
+          this.areaCode = "";
+          this.activityCode = "";
           this.isEmployeur = null;
           this.trancheEffectifs = null;
           this.isEconomieSocialeSolidaire = null;
           this.isSocieteMission = null;
           this.hasCraftedActivities = null;
-          this.dataFetched = false;
+          this.siren = null;
         }
-        this.status = status;
       });
-    } else {
-      this.corporateName = "";
-      this.corporateHeadquarters = "";
-      this.areaCode = "";
-      this.activityCode = "";
-      this.isEmployeur = null;
-      this.trancheEffectifs = null;
-      this.isEconomieSocialeSolidaire = null;
-      this.isSocieteMission = null;
-      this.hasCraftedActivities = null;
-      this.status = null;
-      this.dataFetched = false;
-    }
+    
   };
 }

@@ -254,6 +254,7 @@ const ZipGenerator = ({
         );
         setGeneratedPDFs((prevPDFs) => [...prevPDFs, docEES]);
 
+
         zip.file(
           "Rapport_Empreinte-Societale_SIG_" +
             legalUnit.replaceAll(" ", "") +

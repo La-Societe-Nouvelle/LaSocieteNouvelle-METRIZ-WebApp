@@ -1,206 +1,174 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Alert, Form, Row, Col, Button, Modal } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
+import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { IndividualsData } from "../modals/IndividualsData";
 import { ImportDSN } from "../modals/ImportDSN";
 
 /* ---------- DECLARATION - INDIC #IDR ---------- */
 
-const StatementIDR = (props) => {
+const StatementIDR = ({ impactsData, onUpdate, onError }) => {
   const [interdecileRange, setInterdecileRange] = useState(
-    valueOrDefault(props.impactsData.interdecileRange, "")
+    valueOrDefault(impactsData.interdecileRange, "")
   );
-  const [info, setInfo] = useState(props.impactsData.comments.idr || "");
-  const [isDisabled, setIsDisabled] = useState(true);
-  const [disableStatement, setDisableStatement] = useState(
-    props.disableStatement
-  );
+  const [info, setInfo] = useState(impactsData.comments.idr || "");
+  const [disableStatement, setDisableStatement] = useState(disableStatement);
+
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
   const [showDSN, setShowDSN] = useState(false);
 
   useEffect(() => {
-    if (disableStatement !== props.disableStatement) {
-      setDisableStatement(props.disableStatement);
+    if (disableStatement !== disableStatement) {
+      setDisableStatement(disableStatement);
     }
 
-    if (!props.impactsData.hasEmployees && interdecileRange === 1) {
-      setIsDisabled(false);
-    }
-
-    if (
-      props.impactsData.hasEmployees &&
-      interdecileRange !== "" &&
-      props.impactsData.netValueAdded !== null
-    ) {
-      setIsDisabled(false);
-    }
-
-    if (props.impactsData.hasEmployees && interdecileRange === "") {
-      setIsDisabled(true);
-    }
-
-    if (
-      interdecileRange !==
-      valueOrDefault(props.impactsData.interdecileRange, "")
-    ) {
-      setInterdecileRange(
-        valueOrDefault(props.impactsData.interdecileRange, "")
-      );
+    if (interdecileRange !== valueOrDefault(impactsData.interdecileRange, "")) {
+      setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
     }
   }, [
-    props.disableStatement,
-    props.impactsData.hasEmployees,
+    disableStatement,
+    impactsData.hasEmployees,
     interdecileRange,
-    props.impactsData.netValueAdded,
-    props.impactsData.interdecileRange,
+    impactsData.netValueAdded,
+    impactsData.interdecileRange,
   ]);
 
-  const hasEmployees = props.impactsData.hasEmployees;
+  const hasEmployees = impactsData.hasEmployees;
 
   const onHasEmployeesChange = (event) => {
     const radioValue = event.target.value;
     let newHasEmployees = null;
     let newWageGap = null;
 
-    switch (radioValue) {
-      case "true":
-        newHasEmployees = true;
-        newWageGap = null;
-        break;
-      case "false":
-        newHasEmployees = false;
-        newWageGap = 0;
-        setIsDisabled(false);
-        break;
+    if (radioValue === "true") {
+      newHasEmployees = true;
+      setIsInvalid(false);
+      onError("idr", false);
+    } else if (radioValue === "false") {
+      newHasEmployees = false;
+      newWageGap = 0;
+      setIsInvalid(false);
+      onError("idr", false);
     }
 
-    props.impactsData.setHasEmployees(newHasEmployees);
-    props.impactsData.wageGap = newWageGap;
-    setInterdecileRange(valueOrDefault(props.impactsData.interdecileRange, ""));
-    props.onUpdate("idr");
-    props.onUpdate("geq");
+    impactsData.setHasEmployees(newHasEmployees);
+    impactsData.wageGap = newWageGap;
+    setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
+    onUpdate("idr");
+    onUpdate("geq");
   };
 
-  const updateInterdecileRange = (input) => {
-    props.impactsData.interdecileRange = input.target.value;
-    setInterdecileRange(props.impactsData.interdecileRange);
-    setIsDisabled(false);
-    props.onUpdate("idr");
+  const updateInterdecileRange = (event) => {
+    console.log("change");
+    const inputValue = event.target.valueAsNumber;
+    let errorMessage = "";
+    console.log(inputValue);
+    // Validation checks for the input value
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    } else if (inputValue > 100) {
+      errorMessage = "La valeur ne peut pas être supérieure à 100.";
+    }
+
+    setIsInvalid(errorMessage !== "");
+    onError("idr", errorMessage);
+
+    impactsData.interdecileRange = event.target.value;
+    setInterdecileRange(event.target.value);
+    onUpdate("idr");
   };
 
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.idr = info);
-  const onValidate = () => props.onValidate('idr');
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.idr = event.target.value;
+  };
 
   return (
-    <div className="statement">
-      {disableStatement && (
-        <Alert variant="warning">
-          <p>
-            <i className="bi bi-exclamation-circle  me-2"></i>Indicateur
-            indisponible lors de la précédente analyse
-          </p>
-        </Alert>
-      )}
-      <Form.Group as={Row} className="form-group align-items-center">
-        <Form.Label column sm={4}>
-          L'entreprise est-elle employeur ?
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Check
-            inline
-            type="radio"
-            id="hasEmployees"
-            label="Oui"
-            value="true"
-            checked={hasEmployees === true}
-            onChange={onHasEmployeesChange}
-            disabled={disableStatement}
-          />
-          <Form.Check
-            inline
-            type="radio"
-            id="hasEmployees"
-            label="Non"
-            value="false"
-            checked={hasEmployees === false}
-            onChange={onHasEmployeesChange}
-            disabled={disableStatement}
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Rapport interdécile D9/D1 des taux horaires bruts
-        </Form.Label>
-        <Col sm={6}>
-          <Row className="align-items-center">
+    <Form className="statement">
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group align-items-center">
+            <Form.Label column lg={7}>
+              L'entreprise est-elle employeur ?
+            </Form.Label>
+            <Col>
+              <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Oui"
+                value="true"
+                checked={hasEmployees === true}
+                onChange={onHasEmployeesChange}
+                disabled={disableStatement}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                id="hasEmployees"
+                label="Non"
+                value="false"
+                checked={hasEmployees === false}
+                onChange={onHasEmployeesChange}
+                disabled={disableStatement}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
+              Rapport interdécile D9/D1 des taux horaires bruts
+            </Form.Label>
             <Col>
               <Form.Control
                 type="number"
                 value={roundValue(interdecileRange, 1)}
-                disabled={hasEmployees === false || disableStatement}
                 inputMode="numeric"
                 onChange={updateInterdecileRange}
-                isInvalid={interdecileRange > 100 ? true : false}
+                disabled={hasEmployees === false || disableStatement}
+                isInvalid={isInvalid}
               />
             </Col>
-            <Col>
-              <div>
-                <Button
-                  variant="primary"
-                  className="btn-sm me-2"
-                  onClick={() => setShowDSN(true)}
-                  disabled={hasEmployees && !disableStatement ? false : true}
-                >
-                  <i className="bi bi-calculator"></i>
-                  &nbsp;Import Fichiers DSN
-                </Button>
-                <Button
-                  variant="primary"
-                  className="btn-sm"
-                  onClick={() => setShowCalulatorModal(true)}
-                  disabled={hasEmployees && !disableStatement ? false : true}
-                >
-                  <i className="bi bi-calculator"></i>
-                  &nbsp;Outil d'évaluation
-                </Button>
-              </div>
-            </Col>
-          </Row>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-            disabled={disableStatement}
-          />
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+              disabled={disableStatement}
+            />
+          </Form.Group>
         </Col>
-      </Form.Group>
-
-      <div className="text-end">
-        <Button
-          disabled={isDisabled || disableStatement}
-          variant="light-secondary"
-          onClick={onValidate}
-        >
-          Valider
-        </Button>
-      </div>
-
+        <div className="m-3 text-end">
+          <Button
+            variant="light-secondary"
+            className="btn-sm me-2"
+            onClick={() => setShowDSN(true)}
+            disabled={hasEmployees && !disableStatement ? false : true}
+          >
+            <i className="bi bi-calculator"></i>
+            &nbsp;Import Fichiers DSN
+          </Button>
+          <Button
+            variant="light-secondary"
+            className="btn-sm"
+            onClick={() => setShowCalulatorModal(true)}
+            disabled={hasEmployees && !disableStatement ? false : true}
+          >
+            <i className="bi bi-calculator"></i>
+            &nbsp;Outil d'évaluation
+          </Button>
+        </div>
+      </Row>
       <Modal
         show={showCalculatorModal}
         size="xl"
@@ -212,10 +180,10 @@ const StatementIDR = (props) => {
         </Modal.Header>
         <Modal.Body>
           <IndividualsData
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowCalulatorModal(false)}
             handleClose={() => setShowCalulatorModal(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>
@@ -231,14 +199,14 @@ const StatementIDR = (props) => {
         </Modal.Header>
         <Modal.Body>
           <ImportDSN
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowDSN(false)}
             handleClose={() => setShowDSN(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>
-    </div>
+    </Form>
   );
 };
 

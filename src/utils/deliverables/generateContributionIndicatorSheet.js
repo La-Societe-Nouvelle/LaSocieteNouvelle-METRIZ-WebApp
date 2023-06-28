@@ -108,7 +108,6 @@ export const generateContributionIndicatorSheet = (
   const prodChartImage = prodChartCanvas.toDataURL("image/png");
  
   const doughtnutIC = document.getElementById(`sig-chart-intermediateConsumptions-${indic}-print`);
-  console.log(doughtnutIC)
   const doughtnutICImage = doughtnutIC.toDataURL("image/png");
 
   const doughtnutCCF = document.getElementById(`sig-chart-fixedCapitalConsumptions-${indic}-print`);

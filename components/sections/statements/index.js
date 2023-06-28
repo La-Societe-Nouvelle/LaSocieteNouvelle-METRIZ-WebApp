@@ -1,87 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Image, Row } from "react-bootstrap";
-import indicators from "/lib/indics";
+import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
+import { updateComparativeData } from "../../../src/version/updateVersion";
+import { Loader } from "../../popups/Loader";
 
 const DirectImpacts = ({ session, submit }) => {
   const [period, setPeriod] = useState(session.financialPeriod);
-  const [selectedIndicators, setSelectedIndicators] = useState([]);
-  const [showStatementForms, setShowStatementForms] = useState(false);
   const [validations, setValidations] = useState(
     session.validations[period.periodKey]
   );
+  const [isLoading, setIsLoading] = useState(false);
 
 
-  useEffect(() => {
-    if (validations.length > 0) {
-      setSelectedIndicators(validations);
-      setShowStatementForms(true);
+  const [invalidIndicators, setInvalidIndicators] = useState(null);
+
+  const handleSubmitStatements = async () => {
+    console.log(invalidIndicators);
+
+    if (invalidIndicators.length > 0) {
+      window.scroll(0, 0);
+      return;
     }
 
-  }, []);
+    // Handle submit on for first submit ?
+    // fetch comparative data
+    //
+    setIsLoading(true);
+    await fetchData();
+    setIsLoading(false);
+    submit();
+  };
 
-  const handleSelectedIndicators = (event) => {
-    const isChecked = event.target.checked;
-    const indic = event.target.value;
+  const fetchData = async () => {
+    let updatedComparativeData = session.comparativeData;
 
-    if (isChecked && !selectedIndicators.includes(indic)) {
-      setSelectedIndicators([...selectedIndicators, indic]);
-    }
-
-    if (!isChecked && selectedIndicators.includes(indic)) {
-      setSelectedIndicators(
-        selectedIndicators.filter((item) => item !== indic)
+    for await (const indic of session.validations[
+      session.financialPeriod.periodKey
+    ]) {
+      const updatedData = await updateComparativeData(
+        indic,
+        session.comparativeData.activityCode,
+        updatedComparativeData
       );
+
+      updatedComparativeData = updatedData;
     }
+
+    session.comparativeData = updatedComparativeData;
   };
 
-  const handleSubmit = () => {
-    setShowStatementForms(true);
-  };
-
-  const handleValidation = async (indic) => {
-    console.log(validations)
-    setValidations((validations) => [...validations, indic]);
-
-    // add validation
-    if (!session.validations[period.periodKey].includes(indic)) {
-      session.validations[period.periodKey].push(indic);
-    }
-    // update footprint
-    await session.updateFootprints(period);
-  };
-
-  const renderIndicators = (category) => {
-    const filteredIndicators = Object.entries(indicators).filter(
-      ([key, value]) => value.isAvailable && value.category === category
-    );
-
-    return filteredIndicators.map(([key, value]) => (
-      <Col key={key} sm={4}>
-        <div className="border border-1 rounded p-4 mb-3 shadow-sm">
-          <div className="text-center">
-            <Image
-              className="me-2"
-              src={`icons-ese/${key}.svg`}
-              alt={key}
-              height={70}
-            />
-            <h4 className="h5 mt-4 w-75 m-auto">
-              {value.libelle}
-              {value.isBeta && <span className="beta ms-1">BETA</span>}
-            </h4>
-          </div>
-          <Form className="indic-form text-center mt-4">
-            <Form.Check
-              type="checkbox"
-              value={key}
-              onChange={handleSelectedIndicators}
-            />
-          </Form>
-        </div>
-        <div></div>
-      </Col>
-    ));
+  const handleValidations = async (indicators, invalidIndicators) => {
+    console.log(invalidIndicators);
+    setValidations(indicators);
+    setInvalidIndicators(invalidIndicators);
+    session.validations[period.periodKey] = indicators;
   };
 
   return (
@@ -92,56 +64,42 @@ const DirectImpacts = ({ session, submit }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-
-        {!showStatementForms && (
-          <>
-            <div className="text-center p-3 mb-3 bg-light rounded">
-              <h3 className="h4 mb-0 text-uppercase">Création de la valeur</h3>
-            </div>
-            <Row>{renderIndicators("Création de la valeur")}</Row>
-            <div className="text-center p-3 mb-3 bg-light rounded">
-              <h3 className="h4 mb-0  text-uppercase">Empreinte sociale</h3>
-            </div>
-            <Row>{renderIndicators("Empreinte sociale")}</Row>
-            <div className="text-center p-3 mb-3 bg-light rounded">
-              <h3 className="h4 mb-0  text-uppercase">
-                Empreinte environnementale
-              </h3>
-            </div>
-            <Row>{renderIndicators("Empreinte environnementale")}</Row>
-            <div className="text-end mt-3">
-              <Button
-                variant="secondary"
-                onClick={handleSubmit}
-                disabled={selectedIndicators.length == 0 ? true : false}
-              >
-                Déclarer les indicateurs <i className="bi bi-chevron-right"></i>
-              </Button>
-            </div>
-          </>
+        {invalidIndicators && invalidIndicators.length > 0 && (
+          <Alert variant="danger">
+            {`Attention : ${
+              invalidIndicators.length > 1
+                ? "plusieurs erreurs ont été détectées"
+                : "une erreur a été détectée"
+            }  ${
+              invalidIndicators.length > 1
+                ? "dans certains formulaires de déclarations"
+                : ""
+            }. Veuillez vérifier et corriger ${
+              invalidIndicators.length > 1
+                ? `les ${invalidIndicators.length} formulaires concernés`
+                : "le formulaire concerné"
+            } avant de pouvoir passer aux résultats.`}
+          </Alert>
         )}
-        {showStatementForms && (
-          <>
-            <StatementForms
-              session={session}
-              period={period}
-              initialSelectedIndicators={selectedIndicators}
-              handleSubmit={() => submit()}
-              onValidation={handleValidation} // Passer la fonction de validation à StatementForms
-            />
 
-            <div className="text-end">
-              <Button
-                variant="secondary"
-                onClick={() => submit()}
-                disabled={validations.length == 0 ? true : false}
-              >
-                Accéder aux résultats
-                <i className="bi bi-chevron-right"></i>
-              </Button>
-            </div>
-          </>
-        )}
+        <StatementForms
+          session={session}
+          period={period}
+          initialSelectedIndicators={validations}
+          updateValidations={handleValidations}
+        />
+      {isLoading && <Loader title={"Chargement en cours..."} />}
+
+        <div className="text-end">
+          <Button
+            variant="secondary"
+            onClick={handleSubmitStatements}
+            disabled={validations.length == 0 ? true : false}
+          >
+            Valider et accéder aux résultats
+            <i className="bi bi-chevron-right"></i>
+          </Button>
+        </div>
       </section>
     </Container>
   );
