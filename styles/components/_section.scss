@@ -76,7 +76,24 @@ section {
 
 }
 
-
+.indic-statement.bg-light{
+  background-color: lighten($bg-light, 2%) !important;
+}
+.indic-statement {
+.statement {
+  padding : 1rem 2rem 0 2rem;
+  border-radius: 1rem;
+  background-color: #fff;
+  .form-label {
+    font-weight: normal;
+  }
+}
+    h4{
+      font-weight: 600;
+      font-size: 1rem;
+      margin : 0;
+    }
+}
 
 
 /* ---------- Results ---------- */

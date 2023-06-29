@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 const StatementHAZ = (props) => {
   const [hazardousSubstancesConsumption, setHazardousSubstancesConsumption] =
@@ -58,10 +58,6 @@ const StatementHAZ = (props) => {
     { value: "t", label: "t" },
   ];
 
-  const { netValueAdded } = props.impactsData;
-  const isValid =
-    hazardousSubstancesConsumption != null && netValueAdded != null;
-
   const updateHazardousSubstancesConsumption = (input) => {
     props.impactsData.setHazardousSubstancesConsumption(input.target.value);
     setHazardousSubstancesConsumptionUncertainty(
@@ -71,7 +67,8 @@ const StatementHAZ = (props) => {
   };
 
   const updateHazardousSubstancesConsumptionUncertainty = (input) => {
-    props.impactsData.hazardousSubstancesConsumptionUncertainty = input.target.value;
+    props.impactsData.hazardousSubstancesConsumptionUncertainty =
+      input.target.value;
     props.onUpdate("haz");
   };
 
@@ -79,74 +76,75 @@ const StatementHAZ = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.haz = info);
-  const onValidate = () => props.onValidate("haz");
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Utilisation de produits dangereux - santé/environnement
-        </Form.Label>
-        <Col sm={3}>
-          <Row>
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Utilisation de produits dangereux - santé/environnement
+            </Form.Label>
             <Col>
-              <Form.Control
-                type="number"
-                value={roundValue(hazardousSubstancesConsumption, 0)}
-                inputMode="numeric"
-                onChange={updateHazardousSubstancesConsumption}
-              />
+              <Row>
+                <Col>
+                  <Form.Control
+                    type="number"
+                    value={roundValue(hazardousSubstancesConsumption, 0)}
+                    inputMode="numeric"
+                    onChange={updateHazardousSubstancesConsumption}
+                  />
+                </Col>
+                <Col sm={4}>
+                  <Select
+                    options={options}
+                    defaultValue={{
+                      label: hazardousSubstancesConsumptionUnit,
+                      value: hazardousSubstancesConsumptionUnit,
+                    }}
+                    className="small"
+                    onChange={updateHazardousSubstancesConsumptionUnit}
+                  />
+                </Col>
+              </Row>
             </Col>
-            <Col sm={3}>
-              <Select
-                options={options}
-                defaultValue={{
-                  label: hazardousSubstancesConsumptionUnit,
-                  value: hazardousSubstancesConsumptionUnit,
-                }}
-                onChange={updateHazardousSubstancesConsumptionUnit}
-              />
-            </Col>{" "}
-          </Row>
-        </Col>
-      </Form.Group>
+          </Form.Group>
 
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Incertitude
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Incertitude
+            </Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(
+                    hazardousSubstancesConsumptionUncertainty,
+                    0
+                  )}
+                  inputMode="numeric"
+                  onChange={updateHazardousSubstancesConsumptionUncertainty}
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
+
             <Form.Control
-              type="number"
-              value={roundValue(hazardousSubstancesConsumptionUncertainty, 0)}
-              inputMode="numeric"
-              onChange={updateHazardousSubstancesConsumptionUncertainty}
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+              onBlur={saveInfo}
             />
-            <InputGroup.Text>%</InputGroup.Text>
-          </InputGroup>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
-        </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+      </Row>
     </Form>
   );
 };

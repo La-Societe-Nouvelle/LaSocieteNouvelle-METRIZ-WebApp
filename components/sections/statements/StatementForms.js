@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Select from "react-select";
 
-import { Row, Col, Image } from "react-bootstrap";
+import { Row, Col, Image, Form, Button } from "react-bootstrap";
 import {
   StatementART,
   StatementECO,
@@ -19,7 +19,12 @@ import {
 import indicators from "/lib/indics";
 import { useEffect } from "react";
 
-const StatementForms = ({ session, period, initialSelectedIndicators, onValidation }) => {
+const StatementForms = ({
+  session,
+  period,
+  initialSelectedIndicators,
+  onValidation,
+}) => {
   const [indicatorsToShow, setIndicatorsToShow] = useState([]);
   const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicators, setSelectedIndicators] = useState(
@@ -72,9 +77,7 @@ const StatementForms = ({ session, period, initialSelectedIndicators, onValidati
 
   const handleValidation = (indic) => {
     setValidations((validations) => [...validations, indic]);
-    onValidation(indic); 
-
-  
+    onValidation(indic);
   };
 
   const handleIndicatorChange = (selected) => {
@@ -121,91 +124,54 @@ const StatementForms = ({ session, period, initialSelectedIndicators, onValidati
     }
   };
 
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      border: state.isFocused ? "2px solid #dbdef1" : "2px solid #f0f0f8",
-      borderRadius: "0.5rem",
-      boxShadow: "none",
-      "&:hover": {
-        borderColor: "#dbdef1",
-      },
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: "#dbdef1",
-      "&:hover": {
-        color: "#dbdef1",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? "#191558" : "transparent",
-      background: state.isFocused ? "#f0f0f8" : "",
-      "&:hover": {
-        color: "#191558",
-      },
-    }),
+  const renderIndicators = (category) => {
+    const filteredIndicators = Object.entries(indicators).filter(
+      ([key, value]) => value.isAvailable && value.category === category
+    );
+
+    return filteredIndicators.map(([key, value]) => (
+      <div key={key} className="border rounded mb-3 indic-statement bg-light">
+        <div className="d-flex align-items-center px-2 py-3">
+          <Form className="indic-form me-3">
+            <Form.Check type="checkbox" value={key} />
+          </Form>
+          <div className="d-flex align-items-center flex-grow-1 ">
+            <Image
+              className="me-2"
+              src={`icons-ese/logo_ese_${key}_bleu.svg`}
+              alt={key}
+              height={20}
+            />
+            <h4>
+              {value.libelle}
+              {value.isBeta && <span className="beta ms-1">BETA</span>}
+            </h4>
+            <div className="text-end flex-grow-1 ">
+              <Button variant="light" size="sm">
+                Informations
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="px-2 pb-3">{renderStatementForm(key)}</div>
+      </div>
+    ));
   };
 
   return (
     <>
-    
-        {indicatorsToShow.map(([key, value]) => (
-          
-          
-              <div key={key} className="d-flex border border-1 rounded  p-3 mb-3 shadow-sm ">
-                <div className="p-4">
-                  <Image
-                    className="me-2"
-                    src={`icons-ese/${key}.svg`}
-                    alt={key}
-                    height={60}
-                  />
-                </div>
-                <div className="flex-fill">
-                  <div className="d-flex align-items-center justify-content-between">
-                    <h4 className="h6 mb-0 ">
-                      {value.libelle}
-                      {value.isBeta && <span className="beta ms-1">BETA</span>}
-                    </h4>
-                    <div className="text-end">
-                      {validations.includes(key) && (
-                        <span className="display-6">
-                          <i className="text-success ms-3 bi bi-patch-check"></i>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div >{renderStatementForm(key)}</div>
-                </div>
-              </div>
-       
-         
-        ))}
-     
-      <hr></hr>
-
-      {indicatorsToShow.length < Object.keys(indicators).length && (
-        <div className="border border-1 rounded p-3 my-3 shadow-sm bg-primary">
-          <div className="d-flex justify-content-between align-items-center">
-            <h4 className="h5 mb-0 text-white">
-              <i className="bi bi-plus-circle me-2"></i> Ajouter un indicateur
-            </h4>
-            <Select
-              styles={customStyles}
-              components={{
-                IndicatorSeparator: () => null,
-              }}
-              options={indicatorsOptions}
-              placeholder="Ajouter un indicateur à déclarer"
-              onChange={handleIndicatorChange}
-            />
-          </div>
-        </div>
-      )}
+      <h3 className="h4 text-secondary mb-4 border-bottom border-light-secondary pb-3">
+        <i class="bi bi-pencil-square"></i> Création de la valeur
+      </h3>
+      {renderIndicators("Création de la valeur")}
+      <h3 className="h4 text-secondary my-4 ">
+        <i class="bi bi-pencil-square"></i> Empreinte sociale
+      </h3>
+      {renderIndicators("Empreinte sociale")}
+      <h3 className="h4  text-secondary my-4 ">
+        <i class="bi bi-pencil-square"></i> Empreinte environnementale
+      </h3>
+      {renderIndicators("Empreinte environnementale")}
     </>
   );
 };

@@ -1,9 +1,8 @@
 // La Société Nouvelle
 
 /* ---------- DECLARATION - INDIC #MAT ---------- */
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 import React, { useState, useEffect } from "react";
 
@@ -38,7 +37,6 @@ const StatementMAT = (props) => {
   ]);
 
   const { isExtractiveActivities, netValueAdded } = props.impactsData;
-  const isValid = materialsExtraction != null && netValueAdded != null;
 
   const onIsExtractiveActivitiesChange = (event) => {
     const radioValue = event.target.value;
@@ -67,7 +65,7 @@ const StatementMAT = (props) => {
   };
 
   // updateUnit = (selected) => {
-    
+
   //   const selectedUnit = selected.value;
   //   const { materialsExtraction, materialsExtractionUnit } =
   //     this.props.impactsData;
@@ -94,9 +92,9 @@ const StatementMAT = (props) => {
   // };
 
   // const options = [
-//   { value: "kg", label: "kg" },
-//   { value: "t", label: "t" },
-// ];
+  //   { value: "kg", label: "kg" },
+  //   { value: "t", label: "t" },
+  // ];
 
   const updateMaterialsExtractionUncertainty = (input) => {
     props.impactsData.materialsExtractionUncertainty = input.target.value;
@@ -106,52 +104,54 @@ const StatementMAT = (props) => {
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.mat = info);
-  const onValidate = () => props.onValidate('mat');
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group align-items-center">
-        <Form.Label column sm={4}>
-          L'entreprise réalise-t-elle des activités agricoles ou extractives ?
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Check
-            inline
-            type="radio"
-            id="isExtractiveActivities"
-            label="Oui"
-            value="true"
-            checked={isExtractiveActivities === true}
-            onChange={onIsExtractiveActivitiesChange}
-          />
-          <Form.Check
-            inline
-            type="radio"
-            id="isNotExtractiveActivities"
-            label="Non"
-            value="false"
-            checked={isExtractiveActivities === false}
-            onChange={onIsExtractiveActivitiesChange}
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Quantité extraite de matières premières
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(materialsExtraction, 0)}
-              inputMode="numeric"
-              disabled={isExtractiveActivities === false}
-              onChange={updateMaterialsExtraction}
-            />
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group align-items-center">
+            <Form.Label column sm={7}>
+              L'entreprise réalise-t-elle des activités agricoles ou extractives
+              ?
+            </Form.Label>
+            <Col>
+              <Form.Check
+                inline
+                type="radio"
+                id="isExtractiveActivities"
+                label="Oui"
+                value="true"
+                checked={isExtractiveActivities === true}
+                onChange={onIsExtractiveActivitiesChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                id="isNotExtractiveActivities"
+                label="Non"
+                value="false"
+                checked={isExtractiveActivities === false}
+                onChange={onIsExtractiveActivitiesChange}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Quantité extraite de matières premières
+            </Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(materialsExtraction, 0)}
+                  inputMode="numeric"
+                  disabled={isExtractiveActivities === false}
+                  onChange={updateMaterialsExtraction}
+                />
 
-            <InputGroup.Text>kg</InputGroup.Text>
-          </InputGroup>
-            {/* // <Select
+                <InputGroup.Text>kg</InputGroup.Text>
+              </InputGroup>
+              {/* // <Select
         // isDisabled={isExtractiveActivities === false}
         // options={options}
         // defaultValue={{
@@ -160,47 +160,41 @@ const StatementMAT = (props) => {
         // }}
         // onChange={this.updateUnit}
         // /> */}
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Incertitude
+            </Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(materialsExtractionUncertainty, 0)}
+                  inputMode="numeric"
+                  disabled={isExtractiveActivities === false}
+                  onChange={updateMaterialsExtractionUncertainty}
+                />
+
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Incertitude
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
             <Form.Control
-              type="number"
-              value={roundValue(materialsExtractionUncertainty, 0)}
-              inputMode="numeric"
-              disabled={isExtractiveActivities === false}
-              onChange={updateMaterialsExtractionUncertainty}
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+              onBlur={saveInfo}
             />
-
-            <InputGroup.Text>%</InputGroup.Text>
-          </InputGroup>
+          </Form.Group>
         </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
-        </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+      </Row>
     </Form>
   );
 };

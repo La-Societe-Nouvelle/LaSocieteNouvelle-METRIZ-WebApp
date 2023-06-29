@@ -1,8 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
 
@@ -77,25 +77,26 @@ const StatementWAS = (props) => {
   // };
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.was = info);
-  const onValidate = () => props.onValidate("was");
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Productiont totale de déchets (y compris DAOM<sup>1</sup>)
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(wasteProduction, 0)}
-              inputMode="numeric"
-              onChange={updateWasteProduction}
-            />
-            <InputGroup.Text>kg</InputGroup.Text>
-          </InputGroup>
-          {/* <Select
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Productiont totale de déchets (y compris DAOM<sup>1</sup>)
+            </Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(wasteProduction, 0)}
+                  inputMode="numeric"
+                  onChange={updateWasteProduction}
+                />
+                <InputGroup.Text>kg</InputGroup.Text>
+              </InputGroup>
+              {/* <Select
                   options={options}
                   defaultValue={{
                     label: wasteProductionUnit,
@@ -103,52 +104,46 @@ const StatementWAS = (props) => {
                   }}
                   onChange={this.updateWasteProductionUnit}
                 /> */}
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Incertitude
+            </Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(wasteProductionUncertainty, 0)}
+                  inputMode="numeric"
+                  onChange={updateWasteProductionUncertainty}
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Incertitude
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(wasteProductionUncertainty, 0)}
-              inputMode="numeric"
-              onChange={updateWasteProductionUncertainty}
-            />
-            <InputGroup.Text>%</InputGroup.Text>
-          </InputGroup>
+        <Col>
+          <Form.Group  className="form-group">
+            <Form.Label>
+              Informations complémentaires
+            </Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                className="w-100"
+                onChange={updateInfo}
+                value={info}
+                onBlur={saveInfo}
+              />
+          </Form.Group>
         </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
-        </Col>
-      </Form.Group>
+      </Row>
 
       <div className="d-flex justify-content-between">
         <p className="small">
           <sup>1</sup> Déchets assimilés aux ordures ménagères
         </p>
-        <Button
-          disabled={!isValid}
-          variant="light-secondary"
-          onClick={onValidate}
-        >
-          Valider
-        </Button>
       </div>
     </Form>
   );

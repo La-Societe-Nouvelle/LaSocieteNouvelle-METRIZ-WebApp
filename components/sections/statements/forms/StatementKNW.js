@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentKNW } from "../modals/AssessmentKNW";
 
 const StatementKNW = (props) => {
@@ -40,19 +40,17 @@ const StatementKNW = (props) => {
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.knw = info);
 
-  const onValidate = () => props.onValidate('knw');
-
   const isValid =
     researchAndTrainingContribution !== null && netValueAdded !== null;
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Valeur ajoutée nette dédiée à la recherche ou à la formation
-        </Form.Label>
-        <Col sm={6}>
-          <Row className="align-items-center">
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Valeur ajoutée nette dédiée à la recherche ou à la formation
+            </Form.Label>
             <Col>
               <InputGroup>
                 <Form.Control
@@ -65,37 +63,32 @@ const StatementKNW = (props) => {
                 <InputGroup.Text>&euro;</InputGroup.Text>
               </InputGroup>
             </Col>
-            <Col>
-              <Button
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowModal(true)}
-              >
-                <i className="bi bi-calculator"></i> Outil d'évaluation
-              </Button>
-            </Col>
-          </Row>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
+
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+              onBlur={saveInfo}
+            />
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+        <div className="text-end my-3">
+          <Button
+          variant="light-secondary"
+            className="btn-sm"
+            onClick={() => setShowModal(true)}
+          >
+            <i className="bi bi-calculator"></i> Outil d'évaluation
+          </Button>
+        </div>
+      </Row>
 
       <Modal
         show={showModal}

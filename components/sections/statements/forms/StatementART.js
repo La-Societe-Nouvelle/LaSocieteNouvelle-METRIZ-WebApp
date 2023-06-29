@@ -1,8 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
 
@@ -10,7 +10,6 @@ import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
  *  Props :
  *    - impactsData
  *    - onUpdate -> update footprints, update table
- *    - onValidate -> update validations
  *    - toAssessment -> open assessment view (if defined)
  *  Behaviour :
  *    Edit directly impactsData (session) on inputs blur
@@ -27,7 +26,7 @@ const StatementART = (props) => {
   const [info, setInfo] = useState(props.impactsData.comments.art || "");
 
   const [isInvalid, setIsInvalid] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const { isValueAddedCrafted, netValueAdded } = props.impactsData;
 
   /* ------------------------- */
@@ -38,21 +37,19 @@ const StatementART = (props) => {
   }, [props.impactsData.craftedProduction]);
   /* ------------------------- */
 
-
   const onIsValueAddedCraftedChange = (event) => {
-    
     // To do : change null radio value'
     setShowSuccessMessage(false);
 
     let radioValue = event.target.value;
-    
+
     switch (radioValue) {
       case "true":
         props.impactsData.isValueAddedCrafted = true;
         props.impactsData.craftedProduction = netValueAdded;
         break;
       case "null":
-        props.impactsData.isValueAddedCrafted = null; 
+        props.impactsData.isValueAddedCrafted = null;
         props.impactsData.craftedProduction = null;
         break;
       case "false":
@@ -71,11 +68,10 @@ const StatementART = (props) => {
   };
 
   const handleIsValueAddedCrafted = (event) => {
-    setShowSuccessMessage(false);
 
     const inputValue = event.target.valueAsNumber;
 
-    if ( props.impactsData.isValueAddedCrafted != null) {
+    if (props.impactsData.isValueAddedCrafted != null) {
       return;
     }
 
@@ -88,110 +84,85 @@ const StatementART = (props) => {
     } else {
       setIsInvalid(false);
     }
- 
   };
 
   const updateInfo = (event) => {
     setInfo(event.target.value);
-    props.impactsData.comments.art = event.target.value
-    setShowSuccessMessage(false);
-  };
-
-
-  const onValidate = () => {
-    setShowSuccessMessage(true);
-    props.onValidate('art');
+    props.impactsData.comments.art = event.target.value;
+  
   };
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group align-items-center">
-        <Form.Label column sm={4}>
-          L'entreprise est-elle une entreprise artisanale ?
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Check
-            inline
-            type="radio"
-            id="hasValueAdded"
-            label="Oui"
-            value="true"
-            checked={isValueAddedCrafted === true}
-            onChange={onIsValueAddedCraftedChange}
-          />
-
-          <Form.Check
-            inline
-            type="radio"
-            id="hasValueAdded"
-            label="Partiellement"
-            value="null"
-            checked={isValueAddedCrafted === null}
-            onChange={onIsValueAddedCraftedChange}
-          />
-          <Form.Check
-            inline
-            type="radio"
-            id="hasValueAdded"
-            label="Non"
-            value="false"
-            checked={isValueAddedCrafted === false}
-            onChange={onIsValueAddedCraftedChange}
-          />
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group align-items-center">
+          <Form.Label column lg={7}>
+              L'entreprise est-elle une entreprise artisanale ?
+            </Form.Label>
+            <Col>
+              <Form.Check
+                inline
+                type="radio"
+                id="hasValueAdded"
+                label="Oui"
+                value="true"
+                checked={isValueAddedCrafted === true}
+                onChange={onIsValueAddedCraftedChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                id="hasValueAdded"
+                label="Non"
+                value="false"
+                checked={isValueAddedCrafted === false}
+                onChange={onIsValueAddedCraftedChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                id="hasValueAdded"
+                label="Partiellement"
+                value="null"
+                checked={isValueAddedCrafted === null}
+                onChange={onIsValueAddedCraftedChange}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+          <Form.Label column lg={7}>Part de la valeur ajoutée artisanale</Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(craftedProduction, 0)}
+                  inputMode="numeric"
+                  onChange={updateCraftedProduction}
+                  onInput={handleIsValueAddedCrafted}
+                  disabled={isValueAddedCrafted !== null}
+                  isInvalid={isInvalid}
+                />
+                <InputGroup.Text>&euro;</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
         </Col>
-        
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Part de la valeur ajoutée artisanale
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(craftedProduction, 0)}
-              inputMode="numeric"
-              onChange={updateCraftedProduction}
-              onInput={handleIsValueAddedCrafted}
-              disabled={isValueAddedCrafted !== null}
-              isInvalid={isInvalid}
-            />
-            <InputGroup.Text>&euro;</InputGroup.Text>
-          </InputGroup>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
+            <Col>
+              <Form.Control
+                as="textarea"
+                className="w-100"
+                rows={3}
+                onChange={updateInfo}
+                value={info}
+              />
+            </Col>
+          </Form.Group>
         </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            className="w-100"
-            rows={3}
-            onChange={updateInfo}
-            value={info}
-          />
-        </Col>
-      </Form.Group>
-      {showSuccessMessage && (
-        <p className="alert alert-success">
-          L'indicateur "Contribution aux Métiers d'Art et aux Savoir-Faire" a
-          bien été déclaré !
-        </p>
-      )}
-      <div className="text-end">
-        <Button
-          disabled={
-            isInvalid  || showSuccessMessage
-          }
-          variant="light-secondary"
-          onClick={onValidate}
-        >
-          Valider
-        </Button>
-      </div>
+      </Row>
     </Form>
   );
 };

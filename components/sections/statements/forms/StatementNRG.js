@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentNRG } from "../modals/AssessmentNRG";
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
@@ -37,7 +37,6 @@ const StatementNRG = (props) => {
   ]);
 
   const { netValueAdded } = props.impactsData;
-  const isValid = energyConsumption != null && netValueAdded != null;
 
   // const options = [
   //   { value: "MJ", label: "MJ" },
@@ -112,27 +111,29 @@ const StatementNRG = (props) => {
   // };
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.nrg = info);
-  const onValidate = () => props.onValidate('nrg');
+  const onValidate = () => props.onValidate("nrg");
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Consommation totale d'énergie
-        </Form.Label>
-        <Col sm={6}>
-          <Row className="align-items-center">
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Consommation totale d'énergie
+            </Form.Label>
             <Col>
-              <InputGroup>
-                <Form.Control
-                  type="number"
-                  value={roundValue(energyConsumption, 0)}
-                  inputMode="numeric"
-                  onChange={updateEnergyConsumption}
-                />
-                <InputGroup.Text>MJ</InputGroup.Text>
-              </InputGroup>
-                   {/* <Select
+              <Row className="align-items-center">
+                <Col>
+                  <InputGroup>
+                    <Form.Control
+                      type="number"
+                      value={roundValue(energyConsumption, 0)}
+                      inputMode="numeric"
+                      onChange={updateEnergyConsumption}
+                    />
+                    <InputGroup.Text>MJ</InputGroup.Text>
+                  </InputGroup>
+                  {/* <Select
                   options={options}
                   value={{
                     label: energyConsumptionUnit,
@@ -140,56 +141,52 @@ const StatementNRG = (props) => {
                   }}
                   onChange={this.updateEnergyConsumptionUnit}
                 /> */}
+                </Col>
+                <Col></Col>
+              </Row>
             </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column sm={7}>
+              Incertitude
+            </Form.Label>
             <Col>
-              <Button
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowModal(true)}
-              >
-                <i className="bi bi-calculator"></i> Outil d'évaluation
-              </Button>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(energyConsumptionUncertainty, 0)}
+                  inputMode="numeric"
+                  onChange={updateEnergyConsumptionUncertainty}
+                />
+
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
             </Col>
-          </Row>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Incertitude
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
             <Form.Control
-              type="number"
-              value={roundValue(energyConsumptionUncertainty, 0)}
-              inputMode="numeric"
-              onChange={updateEnergyConsumptionUncertainty}
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+              onBlur={saveInfo}
             />
-
-            <InputGroup.Text>%</InputGroup.Text>
-          </InputGroup>
+          </Form.Group>
         </Col>
-      </Form.Group>
-
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            className="w-100"
-            onChange={updateInfo}
-            value={info}
-            onBlur={saveInfo}
-          />
-        </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+        <div className="text-end my-3">
+          <Button
+          variant="light-secondary"
+            className="btn-sm"
+            onClick={() => setShowModal(true)}
+          >
+            <i className="bi bi-calculator"></i> Outil d'évaluation
+          </Button>
+        </div>
+      </Row>
 
       <Modal
         show={showModal}

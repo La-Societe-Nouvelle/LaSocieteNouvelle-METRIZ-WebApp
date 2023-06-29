@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button, InputGroup } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { Form, Row, Col, InputGroup } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 const StatementECO = (props) => {
   const [domesticProduction, setDomesticProduction] = useState(
@@ -45,96 +45,91 @@ const StatementECO = (props) => {
   };
 
   const updateDomesticProduction = (input) => {
-    console.log("updateDomesticProduction")
-    console.log(input.target.value);
-    console.log(props);
+
     props.impactsData.domesticProduction = input.target.value;
-    
+
     setDomesticProduction(props.impactsData.domesticProduction);
     props.onUpdate("eco");
   };
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.eco = info);
-  const onValidate = () => props.onValidate('eco');
 
   return (
     <Form className="statement">
-      <Form.Group as={Row} className="form-group align-items-center">
-        <Form.Label column sm={4}>
-          Les activités de l'entreprise sont-elles localisées en France ?
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Check
-            inline
-            type="radio"
-            id="isAllActivitiesInFrance"
-            label="Oui"
-            value="true"
-            checked={isAllActivitiesInFrance === true}
-            onChange={onIsAllActivitiesInFranceChange}
-          />
-          <Form.Check
-            inline
-            type="radio"
-            id="isAllActivitiesInFrance"
-            label="Partiellement"
-            value="null"
-            checked={
-              isAllActivitiesInFrance === null && domesticProduction !== ""
-            }
-            onChange={onIsAllActivitiesInFranceChange}
-          />
-          <Form.Check
-            inline
-            type="radio"
-            id="isAllActivitiesInFrance"
-            label="Non"
-            value="false"
-            checked={isAllActivitiesInFrance === false}
-            onChange={onIsAllActivitiesInFranceChange}
-          />
-        </Col>
-      </Form.Group>
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Valeur ajoutée nette produite en France
-        </Form.Label>
-        <Col sm={6}>
-          <InputGroup>
-            <Form.Control
-              type="number"
-              value={roundValue(domesticProduction, 0)}
-              inputMode="numeric"
-              onChange={updateDomesticProduction}
-              isInvalid={!isValid}
-              disabled={isAllActivitiesInFrance !== null}
-            />
-            <InputGroup.Text>&euro;</InputGroup.Text>
-          </InputGroup>
-        </Col>
-      </Form.Group>
+      <Row>
+        <Col>
+          <Form.Group as={Row} className="form-group align-items-center">
+            <Form.Label column lg={7}>
+              Les activités de l'entreprise sont-elles localisées en France ?
+            </Form.Label>
+            <Col>
+              <Form.Check
+                inline
+                type="radio"
+                id="isAllActivitiesInFrance"
+                label="Oui"
+                value="true"
+                checked={isAllActivitiesInFrance === true}
+                onChange={onIsAllActivitiesInFranceChange}
+              />
 
-      <Form.Group as={Row} className="form-group">
-        <Form.Label column sm={4}>
-          Informations complémentaires
-        </Form.Label>
-        <Col sm={6}>
-          <Form.Control
-            as="textarea"
-            className="w-100"
-            rows={3}
-            onChange={updateInfo}
-            onBlur={saveInfo}
-            value={info}
-          />
+              <Form.Check
+                inline
+                type="radio"
+                id="isAllActivitiesInFrance"
+                label="Non"
+                value="false"
+                checked={isAllActivitiesInFrance === false}
+                onChange={onIsAllActivitiesInFranceChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                id="isAllActivitiesInFrance"
+                label="Partiellement"
+                value="null"
+                checked={
+                  isAllActivitiesInFrance === null && domesticProduction !== ""
+                }
+                onChange={onIsAllActivitiesInFranceChange}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
+              Valeur ajoutée nette produite en France
+            </Form.Label>
+            <Col>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={roundValue(domesticProduction, 0)}
+                  inputMode="numeric"
+                  onChange={updateDomesticProduction}
+                  isInvalid={!isValid}
+                  disabled={isAllActivitiesInFrance !== null}
+                />
+                <InputGroup.Text>&euro;</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
         </Col>
-      </Form.Group>
-      <div className="text-end">
-        <Button disabled={!isValid} variant="light-secondary" onClick={onValidate}>
-          Valider
-        </Button>
-      </div>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
+
+            <Form.Control
+              as="textarea"
+              className="w-100"
+              rows={3}
+              onChange={updateInfo}
+              onBlur={saveInfo}
+              value={info}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
     </Form>
   );
 };
