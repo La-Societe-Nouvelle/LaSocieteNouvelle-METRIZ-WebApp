@@ -1,29 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Image, Row } from "react-bootstrap";
-import indicators from "/lib/indics";
+import React, { useState } from "react";
+import { Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 
 const DirectImpacts = ({ session, submit }) => {
   const [period, setPeriod] = useState(session.financialPeriod);
-  const [selectedIndicators, setSelectedIndicators] = useState([]);
   const [validations, setValidations] = useState(
     session.validations[period.periodKey]
   );
-
-  useEffect(() => {
-    if (validations.length > 0) {
-      setSelectedIndicators(validations);
-    }
-  }, []);
-
-  const handleValidation = async (indic) => {
-    console.log(validations);
-    setValidations((validations) => [...validations, indic]);
-
-    // add validation
-    if (!session.validations[period.periodKey].includes(indic)) {
-      session.validations[period.periodKey].push(indic);
-    }
+ 
+  const handleSubmitStatements = () => {
+    console.log(validations)
+    // fetch comparative data
+    // Submit and go to results
+    submit();
+  }
+  const handleValidations = async (indicators) => {
+    console.log(indicators)
+    setValidations(indicators);
+    session.validations[period.periodKey] = indicators;
     // update footprint
     await session.updateFootprints(period);
   };
@@ -40,18 +34,17 @@ const DirectImpacts = ({ session, submit }) => {
         <StatementForms
           session={session}
           period={period}
-          initialSelectedIndicators={selectedIndicators}
-          handleSubmit={() => submit()}
-          onValidation={handleValidation}
+          initialSelectedIndicators={validations}
+          updateValidations={handleValidations}
         />
 
         <div className="text-end">
           <Button
             variant="secondary"
-            onClick={() => submit()}
+            onClick={handleSubmitStatements}
             disabled={validations.length == 0 ? true : false}
           >
-            Accéder aux résultats
+           Valider et accéder aux résultats
             <i className="bi bi-chevron-right"></i>
           </Button>
         </div>

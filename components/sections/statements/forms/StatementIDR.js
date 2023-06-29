@@ -76,7 +76,7 @@ const StatementIDR = (props) => {
   const saveInfo = () => (props.impactsData.comments.idr = info);
 
   return (
-    <div className="statement">
+    <Form className="statement">
       <Row>
         <Col>
           <Form.Group as={Row} className="form-group align-items-center">
@@ -124,7 +124,9 @@ const StatementIDR = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label>Informations complémentaires</Form.Label>
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
             <Form.Control
               as="textarea"
               rows={3}
@@ -194,7 +196,7 @@ const StatementIDR = (props) => {
           />
         </Modal.Body>
       </Modal>
-    </div>
+    </Form>
   );
 };
 

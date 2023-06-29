@@ -67,8 +67,7 @@ const StatementKNW = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label>Informations complémentaires</Form.Label>
-
+            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}

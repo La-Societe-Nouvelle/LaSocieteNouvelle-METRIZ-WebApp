@@ -1,8 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
 
 /* ---------- DECLARATION - INDIC #ART ---------- */
 
@@ -10,6 +10,7 @@ import { roundValue, valueOrDefault } from "/src/utils/Utils";
  *  Props :
  *    - impactsData
  *    - onUpdate -> update footprints, update table
+ *    - onValidate -> update validations
  *    - toAssessment -> open assessment view (if defined)
  *  Behaviour :
  *    Edit directly impactsData (session) on inputs blur
@@ -26,7 +27,7 @@ const StatementART = (props) => {
   const [info, setInfo] = useState(props.impactsData.comments.art || "");
 
   const [isInvalid, setIsInvalid] = useState(false);
-
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const { isValueAddedCrafted, netValueAdded } = props.impactsData;
 
   /* ------------------------- */
@@ -68,6 +69,7 @@ const StatementART = (props) => {
   };
 
   const handleIsValueAddedCrafted = (event) => {
+    setShowSuccessMessage(false);
 
     const inputValue = event.target.valueAsNumber;
 
@@ -89,15 +91,15 @@ const StatementART = (props) => {
   const updateInfo = (event) => {
     setInfo(event.target.value);
     props.impactsData.comments.art = event.target.value;
-  
+    setShowSuccessMessage(false);
   };
 
   return (
     <Form className="statement">
       <Row>
-        <Col>
+        <Col className="pe-2">
           <Form.Group as={Row} className="form-group align-items-center">
-          <Form.Label column lg={7}>
+            <Form.Label column sm={7}>
               L'entreprise est-elle une entreprise artisanale ?
             </Form.Label>
             <Col>
@@ -131,7 +133,9 @@ const StatementART = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-          <Form.Label column lg={7}>Part de la valeur ajoutée artisanale</Form.Label>
+            <Form.Label column sm={7}>
+              Part de la valeur ajoutée artisanale
+            </Form.Label>
             <Col>
               <InputGroup>
                 <Form.Control
@@ -150,16 +154,14 @@ const StatementART = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label>Informations complémentaires</Form.Label>
-            <Col>
-              <Form.Control
-                as="textarea"
-                className="w-100"
-                rows={3}
-                onChange={updateInfo}
-                value={info}
-              />
-            </Col>
+            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
+            <Form.Control
+              as="textarea"
+              className="w-100"
+              rows={3}
+              onChange={updateInfo}
+              value={info}
+            />
           </Form.Group>
         </Col>
       </Row>

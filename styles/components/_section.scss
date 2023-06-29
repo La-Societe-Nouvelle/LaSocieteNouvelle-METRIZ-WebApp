@@ -79,13 +79,29 @@ section {
 .indic-statement.bg-light{
   background-color: lighten($bg-light, 2%) !important;
 }
-.indic-statement {
+.indic-statement { 
+
+  form.statement > div.row > div.col:nth-child(2) {
+    border-left : 1px solid $light;
+
+    .form-group {
+      padding-left: 1rem;
+    }
+  }
+  form.statement > div.row > div.col:nth-child(1) {
+
+    .form-group {
+      padding-right: 1rem;
+      
+    }
+  }
+
 .statement {
-  padding : 1rem 2rem 0 2rem;
+  padding :  2rem;
   border-radius: 1rem;
   background-color: #fff;
   .form-label {
-    font-weight: normal;
+    font-weight: 500;
   }
 }
     h4{

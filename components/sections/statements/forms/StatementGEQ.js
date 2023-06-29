@@ -125,8 +125,7 @@ const StatementGEQ = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label>Informations complémentaires</Form.Label>
-            <Col>
+            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>            <Col>
               <Form.Control
                 as="textarea"
                 rows={3}

@@ -45,15 +45,16 @@ const StatementECO = (props) => {
   };
 
   const updateDomesticProduction = (input) => {
-
     props.impactsData.domesticProduction = input.target.value;
 
     setDomesticProduction(props.impactsData.domesticProduction);
     props.onUpdate("eco");
   };
 
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.eco = info);
+  const updateInfo = (event) => {
+    props.impactsData.comments.eco = info;
+    setInfo(event.target.value);
+  };
 
   return (
     <Form className="statement">
@@ -117,14 +118,12 @@ const StatementECO = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label>Informations complémentaires</Form.Label>
-
+            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
             <Form.Control
               as="textarea"
               className="w-100"
               rows={3}
               onChange={updateInfo}
-              onBlur={saveInfo}
               value={info}
             />
           </Form.Group>

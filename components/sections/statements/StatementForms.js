@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import Select from "react-select";
+import { Image, Form, Button } from "react-bootstrap";
 
-import { Row, Col, Image, Form, Button } from "react-bootstrap";
 import {
   StatementART,
   StatementECO,
@@ -17,80 +16,41 @@ import {
   StatementWAT,
 } from "./forms";
 import indicators from "/lib/indics";
-import { useEffect } from "react";
 
 const StatementForms = ({
   session,
   period,
   initialSelectedIndicators,
-  onValidation,
+  updateValidations,
 }) => {
-  const [indicatorsToShow, setIndicatorsToShow] = useState([]);
-  const [indicatorsOptions, setIndicatorsOptions] = useState([]);
   const [selectedIndicators, setSelectedIndicators] = useState(
     initialSelectedIndicators
   );
 
-  const [validations, setValidations] = useState(
-    session.validations[period.periodKey]
-  );
-  useEffect(() => {
-    const updatedIndicatorsToShow = selectedIndicators.map((key) => {
-      const indicator = indicators[key];
-      return [key, indicator];
-    });
-    initialSelectedIndicators = updatedIndicatorsOptions;
-    setIndicatorsToShow(updatedIndicatorsToShow);
-
-    const updatedIndicatorsOptions = Object.entries(indicators)
-      .filter(([indic]) => !selectedIndicators.includes(indic))
-      .map(([code, indic]) => {
-        return { value: code, label: indic.libelle };
-      });
-
-    setIndicatorsOptions(updatedIndicatorsOptions);
-  }, [selectedIndicators]);
-
   // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
-    let nextIndicator = session.getNetValueAddedIndicator(
-      indic,
-      period.periodKey
-    );
+    session.getNetValueAddedIndicator(indic, period.periodKey);
+    updateValidations(selectedIndicators);
+  };
 
-    if (
-      nextIndicator !==
-      session.financialData.mainAggregates.netValueAdded.periodsData[
-        period.periodKey
-      ].footprint.indicators[indic]
-    ) {
-      // remove validation
-      session.validations[period.periodKey] = session.validations[
-        period.periodKey
-      ].filter((item) => item != indic);
-      setValidations(validations.filter((item) => item != indic));
-
-      // update footprint
-      await session.updateFootprints(period);
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+    if (checked) {
+      setSelectedIndicators((prevSelectedIndicators) => [
+        ...prevSelectedIndicators,
+        value,
+      ]);
+    } else {
+      setSelectedIndicators((prevSelectedIndicators) =>
+        prevSelectedIndicators.filter((indicator) => indicator !== value)
+      );
     }
-  };
-
-  const handleValidation = (indic) => {
-    setValidations((validations) => [...validations, indic]);
-    onValidation(indic);
-  };
-
-  const handleIndicatorChange = (selected) => {
-    const updatedSelectedIndicators = [...selectedIndicators, selected.value];
-
-    setSelectedIndicators(updatedSelectedIndicators);
   };
 
   const renderStatementForm = (key) => {
     const componentProps = {
       impactsData: session.impactsData[period.periodKey],
       onUpdate: handleNetValueChange,
-      onValidate: handleValidation,
     };
 
     switch (key) {
@@ -133,7 +93,12 @@ const StatementForms = ({
       <div key={key} className="border rounded mb-3 indic-statement bg-light">
         <div className="d-flex align-items-center px-2 py-3">
           <Form className="indic-form me-3">
-            <Form.Check type="checkbox" value={key} />
+            <Form.Check
+              type="checkbox"
+              value={key}
+              checked={selectedIndicators.includes(key)}
+              onChange={handleCheckboxChange}
+            />
           </Form>
           <div className="d-flex align-items-center flex-grow-1 ">
             <Image
@@ -153,7 +118,10 @@ const StatementForms = ({
             </div>
           </div>
         </div>
-        <div className="px-2 pb-3">{renderStatementForm(key)}</div>
+
+        {selectedIndicators.includes(key) && (
+          <div className="px-2 py-3">{renderStatementForm(key)}</div>
+        )}
       </div>
     ));
   };
@@ -161,15 +129,15 @@ const StatementForms = ({
   return (
     <>
       <h3 className="h4 text-secondary mb-4 border-bottom border-light-secondary pb-3">
-        <i class="bi bi-pencil-square"></i> Création de la valeur
+        <i className="bi bi-pencil-square"></i> Création de la valeur
       </h3>
       {renderIndicators("Création de la valeur")}
       <h3 className="h4 text-secondary my-4 ">
-        <i class="bi bi-pencil-square"></i> Empreinte sociale
+        <i className="bi bi-pencil-square"></i> Empreinte sociale
       </h3>
       {renderIndicators("Empreinte sociale")}
       <h3 className="h4  text-secondary my-4 ">
-        <i class="bi bi-pencil-square"></i> Empreinte environnementale
+        <i className="bi bi-pencil-square"></i> Empreinte environnementale
       </h3>
       {renderIndicators("Empreinte environnementale")}
     </>
