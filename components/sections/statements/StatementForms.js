@@ -148,7 +148,7 @@ const StatementForms = ({
   const renderErrorMessage = (indicator) => {
     if (invalidIndicators[indicator]) {
       return (
-        <div className="alert alert-danger">{invalidIndicators[indicator]}</div>
+        <div className="mx-2 my-2 alert alert-danger">{invalidIndicators[indicator]}</div>
       );
     }
     return null;

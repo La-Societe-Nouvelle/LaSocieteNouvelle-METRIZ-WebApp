@@ -3,30 +3,31 @@ import { Form, Row, Col } from "react-bootstrap";
 
 /* ---------- DECLARATION - INDIC #SOC ---------- */
 
-const StatementSOC = (props) => {
-  const [info, setInfo] = useState(props.impactsData.comments.soc || "");
-
-  const hasSocialPurpose = props.impactsData.hasSocialPurpose;
+const StatementSOC = ({ impactsData, onUpdate }) => {
+  const [info, setInfo] = useState(impactsData.comments.soc || "");
+  const [hasSocialPurpose, setHasSocialPurpose] = useState(
+    impactsData.hasSocialPurpose
+  );
 
   const onSocialPurposeChange = (event) => {
     const radioValue = event.target.value;
-    let newHasSocialPurpose = null;
 
     switch (radioValue) {
       case "true":
-        newHasSocialPurpose = true;
+        impactsData.hasSocialPurpose = true;
         break;
       case "false":
-        newHasSocialPurpose = false;
+        impactsData.hasSocialPurpose = false;
         break;
     }
 
-    props.impactsData.hasSocialPurpose = newHasSocialPurpose;
-    props.onUpdate("soc");
+    setHasSocialPurpose(impactsData.hasSocialPurpose);
+    onUpdate("soc");
   };
-
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.soc = info);
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.soc = event.target.value;
+  };
 
   return (
     <Form className="statement">
@@ -61,13 +62,15 @@ const StatementSOC = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>            <Form.Control
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
+            <Form.Control
               as="textarea"
               rows={3}
               className="w-100"
               onChange={updateInfo}
               value={info}
-              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
