@@ -2,57 +2,74 @@ import React, { useState, useEffect } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
-const StatementECO = (props) => {
+const StatementECO = ({ impactsData, onUpdate, onError }) => {
   const [domesticProduction, setDomesticProduction] = useState(
-    valueOrDefault(props.impactsData.domesticProduction, undefined)
+    valueOrDefault(impactsData.domesticProduction, undefined)
   );
-  const [info, setInfo] = useState(props.impactsData.comments.eco || "");
-
-  const isAllActivitiesInFrance = props.impactsData.isAllActivitiesInFrance;
-  const netValueAdded = props.impactsData.netValueAdded;
-
-  const isValid =
-    netValueAdded != null &&
-    domesticProduction >= 0 &&
-    domesticProduction <= netValueAdded;
+  const [info, setInfo] = useState(impactsData.comments.eco || "");
+  const [isInvalid, setIsInvalid] = useState(false);
 
   useEffect(() => {
-    if (domesticProduction !== props.impactsData.domesticProduction) {
-      setDomesticProduction(props.impactsData.domesticProduction);
+    if (domesticProduction !== impactsData.domesticProduction) {
+      setDomesticProduction(impactsData.domesticProduction);
     }
-  }, [props.impactsData.domesticProduction]);
+  }, [impactsData.domesticProduction]);
+
+
 
   const onIsAllActivitiesInFranceChange = (event) => {
     const radioValue = event.target.value;
-    let newIsAllActivitiesInFrance = null;
-    let newDomesticProduction = 0;
-
+  
     switch (radioValue) {
       case "true":
-        newIsAllActivitiesInFrance = true;
-        newDomesticProduction = props.impactsData.netValueAdded;
+        impactsData.isAllActivitiesInFrance = true;
+        impactsData.domesticProduction = impactsData.netValueAdded;
+        setIsInvalid(false);
+        onError("eco", false);
+        break;
+      case "null":
+        impactsData.isAllActivitiesInFrance = null;
+        impactsData.domesticProduction = null;
         break;
       case "false":
-        newIsAllActivitiesInFrance = false;
+        impactsData.isAllActivitiesInFrance = false;
+        impactsData.domesticProduction = 0;
+        setIsInvalid(false);
+        onError("eco", false);
         break;
     }
 
-    props.impactsData.setIsAllActivitiesInFrance(newIsAllActivitiesInFrance);
-    props.impactsData.domesticProduction = newDomesticProduction;
-
-    setDomesticProduction(valueOrDefault(newDomesticProduction, ""));
-    props.onUpdate("eco");
+    setDomesticProduction(impactsData.domesticProduction);
+    onUpdate("eco"); 
   };
 
-  const updateDomesticProduction = (input) => {
-    props.impactsData.domesticProduction = input.target.value;
+  const updateDomesticProduction = (event) => {
 
-    setDomesticProduction(props.impactsData.domesticProduction);
-    props.onUpdate("eco");
+    const inputValue = event.target.valueAsNumber;
+    let errorMessage = "";
+
+    // Validation checks for the input value
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    } else if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    } else if (inputValue >= impactsData.netValueAdded) {
+      errorMessage =
+        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+    }
+
+    
+    setIsInvalid(errorMessage !== "");
+    onError("eco", errorMessage);
+
+    impactsData.domesticProduction = event.target.value;
+
+    setDomesticProduction(event.target.value);
+    onUpdate("eco");
   };
 
   const updateInfo = (event) => {
-    props.impactsData.comments.eco = info;
+    impactsData.comments.eco = info;
     setInfo(event.target.value);
   };
 
@@ -71,7 +88,7 @@ const StatementECO = (props) => {
                 id="isAllActivitiesInFrance"
                 label="Oui"
                 value="true"
-                checked={isAllActivitiesInFrance === true}
+                checked={impactsData.isAllActivitiesInFrance === true}
                 onChange={onIsAllActivitiesInFranceChange}
               />
 
@@ -81,7 +98,7 @@ const StatementECO = (props) => {
                 id="isAllActivitiesInFrance"
                 label="Non"
                 value="false"
-                checked={isAllActivitiesInFrance === false}
+                checked={impactsData.isAllActivitiesInFrance === false}
                 onChange={onIsAllActivitiesInFranceChange}
               />
               <Form.Check
@@ -91,7 +108,7 @@ const StatementECO = (props) => {
                 label="Partiellement"
                 value="null"
                 checked={
-                  isAllActivitiesInFrance === null && domesticProduction !== ""
+                  impactsData.isAllActivitiesInFrance === null && domesticProduction !== ""
                 }
                 onChange={onIsAllActivitiesInFranceChange}
               />
@@ -108,8 +125,8 @@ const StatementECO = (props) => {
                   value={roundValue(domesticProduction, 0)}
                   inputMode="numeric"
                   onChange={updateDomesticProduction}
-                  isInvalid={!isValid}
-                  disabled={isAllActivitiesInFrance !== null}
+                  isInvalid={isInvalid}
+                  disabled={impactsData.isAllActivitiesInFrance !== null}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
               </InputGroup>

@@ -1,36 +1,24 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
-/* ---------- DECLARATION - INDIC #ART ---------- */
+/* ---------- STATEMENT - INDIC #ART ---------- */
 
-/** Component in IndicatorMainTab
- *  Props :
- *    - impactsData
- *    - onUpdate -> update footprints, update table
- *  Behaviour :
- *    Edit directly impactsData (session) on inputs change
- *    Update footprints 
- */
-
-const StatementART = ({impactsData,onUpdate, onValidation, onError}) => {
-
+const StatementART = ({ impactsData, onUpdate, onError }) => {
   const [craftedProduction, setCraftedProduction] = useState(
     valueOrDefault(impactsData.craftedProduction, undefined)
   );
   const [info, setInfo] = useState(impactsData.comments.art || "");
-
   const [isInvalid, setIsInvalid] = useState(false);
 
-
-  /* ------------------------- */
   useEffect(() => {
     if (craftedProduction !== impactsData.craftedProduction) {
       setCraftedProduction(impactsData.craftedProduction);
     }
   }, [impactsData.craftedProduction]);
+
   /* ------------------------- */
 
   const onIsValueAddedCraftedChange = (event) => {
@@ -41,7 +29,7 @@ const StatementART = ({impactsData,onUpdate, onValidation, onError}) => {
     switch (radioValue) {
       case "true":
         impactsData.isValueAddedCrafted = true;
-        impactsData.craftedProduction =  impactsData.netValueAdded;
+        impactsData.craftedProduction = impactsData.netValueAdded;
         setIsInvalid(false);
         onError("art", false);
         break;
@@ -63,26 +51,24 @@ const StatementART = ({impactsData,onUpdate, onValidation, onError}) => {
   const handleIsValueAddedCrafted = (event) => {
     const inputValue = event.target.valueAsNumber;
     let errorMessage = "";
-    if (impactsData.isValueAddedCrafted != null) {
-      return;
-    }
-  
- 
+
+    // Validation checks for the input value
     if (isNaN(inputValue)) {
       errorMessage = "Veuillez saisir un nombre valide.";
     } else if (impactsData.netValueAdded == null) {
       errorMessage = "La valeur ajoutée nette n'est pas définie.";
     } else if (inputValue >= impactsData.netValueAdded) {
-      errorMessage = "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+      errorMessage =
+        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
     }
+
     setIsInvalid(errorMessage !== "");
     onError("art", errorMessage);
-    
+
     impactsData.craftedProduction = event.target.value;
     setCraftedProduction(event.target.value);
     onUpdate("art");
   };
-  
 
   const updateInfo = (event) => {
     setInfo(event.target.value);
@@ -148,7 +134,9 @@ const StatementART = ({impactsData,onUpdate, onValidation, onError}) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
             <Form.Control
               as="textarea"
               className="w-100"

@@ -140,7 +140,7 @@ const StatementForms = ({
         {selectedIndicators.includes(key) && (
           <div className="px-2">{renderStatementForm(key)}</div>
         )}
-        <div className="px-2 py-3">{renderErrorMessage(key)}</div>
+        {renderErrorMessage(key)}
       </div>
     ));
   };
