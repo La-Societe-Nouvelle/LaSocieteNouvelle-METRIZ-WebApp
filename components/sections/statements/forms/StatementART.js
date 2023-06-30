@@ -10,88 +10,83 @@ import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
  *  Props :
  *    - impactsData
  *    - onUpdate -> update footprints, update table
- *    - onValidate -> update validations
- *    - toAssessment -> open assessment view (if defined)
  *  Behaviour :
- *    Edit directly impactsData (session) on inputs blur
- *    Redirect to assessment tool (if defined)
- *    Update footprints on validation
- *  State :
- *    inputs
+ *    Edit directly impactsData (session) on inputs change
+ *    Update footprints 
  */
 
-const StatementART = (props) => {
+const StatementART = ({impactsData,onUpdate, onValidation, onError}) => {
+
   const [craftedProduction, setCraftedProduction] = useState(
-    valueOrDefault(props.impactsData.craftedProduction, undefined)
+    valueOrDefault(impactsData.craftedProduction, undefined)
   );
-  const [info, setInfo] = useState(props.impactsData.comments.art || "");
+  const [info, setInfo] = useState(impactsData.comments.art || "");
 
   const [isInvalid, setIsInvalid] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const { isValueAddedCrafted, netValueAdded } = props.impactsData;
+
 
   /* ------------------------- */
   useEffect(() => {
-    if (craftedProduction !== props.impactsData.craftedProduction) {
-      setCraftedProduction(props.impactsData.craftedProduction);
+    if (craftedProduction !== impactsData.craftedProduction) {
+      setCraftedProduction(impactsData.craftedProduction);
     }
-  }, [props.impactsData.craftedProduction]);
+  }, [impactsData.craftedProduction]);
   /* ------------------------- */
 
   const onIsValueAddedCraftedChange = (event) => {
     // To do : change null radio value'
-    setShowSuccessMessage(false);
 
     let radioValue = event.target.value;
 
     switch (radioValue) {
       case "true":
-        props.impactsData.isValueAddedCrafted = true;
-        props.impactsData.craftedProduction = netValueAdded;
+        impactsData.isValueAddedCrafted = true;
+        impactsData.craftedProduction =  impactsData.netValueAdded;
+        setIsInvalid(false);
+        onError("art", false);
         break;
       case "null":
-        props.impactsData.isValueAddedCrafted = null;
-        props.impactsData.craftedProduction = null;
+        impactsData.isValueAddedCrafted = null;
+        impactsData.craftedProduction = null;
         break;
       case "false":
-        props.impactsData.isValueAddedCrafted = false;
-        props.impactsData.craftedProduction = 0;
+        impactsData.isValueAddedCrafted = false;
+        impactsData.craftedProduction = 0;
+        setIsInvalid(false);
+        onError("art", false);
         break;
     }
-    setCraftedProduction(props.impactsData.craftedProduction);
-    props.onUpdate("art");
-  };
-
-  const updateCraftedProduction = (event) => {
-    props.impactsData.craftedProduction = event.target.value;
-    setCraftedProduction(event.target.value);
-    props.onUpdate("art");
+    setCraftedProduction(impactsData.craftedProduction);
+    onUpdate("art");
   };
 
   const handleIsValueAddedCrafted = (event) => {
-    setShowSuccessMessage(false);
-
     const inputValue = event.target.valueAsNumber;
-
-    if (props.impactsData.isValueAddedCrafted != null) {
+    let errorMessage = "";
+    if (impactsData.isValueAddedCrafted != null) {
       return;
     }
-
-    if (
-      isNaN(inputValue) ||
-      netValueAdded == null ||
-      inputValue >= netValueAdded
-    ) {
-      setIsInvalid(true);
-    } else {
-      setIsInvalid(false);
+  
+ 
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    } else if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    } else if (inputValue >= impactsData.netValueAdded) {
+      errorMessage = "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
     }
+    setIsInvalid(errorMessage !== "");
+    onError("art", errorMessage);
+    
+    impactsData.craftedProduction = event.target.value;
+    setCraftedProduction(event.target.value);
+    onUpdate("art");
   };
+  
 
   const updateInfo = (event) => {
     setInfo(event.target.value);
-    props.impactsData.comments.art = event.target.value;
-    setShowSuccessMessage(false);
+    impactsData.comments.art = event.target.value;
   };
 
   return (
@@ -109,7 +104,7 @@ const StatementART = (props) => {
                 id="hasValueAdded"
                 label="Oui"
                 value="true"
-                checked={isValueAddedCrafted === true}
+                checked={impactsData.isValueAddedCrafted === true}
                 onChange={onIsValueAddedCraftedChange}
               />
               <Form.Check
@@ -118,7 +113,7 @@ const StatementART = (props) => {
                 id="hasValueAdded"
                 label="Non"
                 value="false"
-                checked={isValueAddedCrafted === false}
+                checked={impactsData.isValueAddedCrafted === false}
                 onChange={onIsValueAddedCraftedChange}
               />
               <Form.Check
@@ -127,7 +122,7 @@ const StatementART = (props) => {
                 id="hasValueAdded"
                 label="Partiellement"
                 value="null"
-                checked={isValueAddedCrafted === null}
+                checked={impactsData.isValueAddedCrafted === null}
                 onChange={onIsValueAddedCraftedChange}
               />
             </Col>
@@ -142,9 +137,8 @@ const StatementART = (props) => {
                   type="number"
                   value={roundValue(craftedProduction, 0)}
                   inputMode="numeric"
-                  onChange={updateCraftedProduction}
-                  onInput={handleIsValueAddedCrafted}
-                  disabled={isValueAddedCrafted !== null}
+                  onChange={handleIsValueAddedCrafted}
+                  disabled={impactsData.isValueAddedCrafted !== null}
                   isInvalid={isInvalid}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>

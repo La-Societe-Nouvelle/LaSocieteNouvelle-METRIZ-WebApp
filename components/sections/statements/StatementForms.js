@@ -27,6 +27,8 @@ const StatementForms = ({
     initialSelectedIndicators
   );
 
+  const [invalidIndicators, setInvalidIndicators] = useState({});
+
   // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
     session.getNetValueAddedIndicator(indic, period.periodKey);
@@ -47,10 +49,26 @@ const StatementForms = ({
     }
   };
 
+  const handleError = (field, errorMessage) => {
+    if (errorMessage) {
+      setInvalidIndicators((prevInvalidIndicators) => ({
+        ...prevInvalidIndicators,
+        [field]: errorMessage,
+      }));
+    } else {
+      setInvalidIndicators((prevInvalidIndicators) => {
+        const updatedInvalidIndicators = { ...prevInvalidIndicators };
+        delete updatedInvalidIndicators[field];
+        return updatedInvalidIndicators;
+      });
+    }
+  };
+
   const renderStatementForm = (key) => {
     const componentProps = {
       impactsData: session.impactsData[period.periodKey],
       onUpdate: handleNetValueChange,
+      onError: handleError,
     };
 
     switch (key) {
@@ -120,14 +138,28 @@ const StatementForms = ({
         </div>
 
         {selectedIndicators.includes(key) && (
-          <div className="px-2 py-3">{renderStatementForm(key)}</div>
+          <div className="px-2">{renderStatementForm(key)}</div>
         )}
+        <div className="px-2 py-3">{renderErrorMessage(key)}</div>
       </div>
     ));
   };
 
+  const renderErrorMessage = (indicator) => {
+    if (invalidIndicators[indicator]) {
+      return (
+        <div className="alert alert-danger">{invalidIndicators[indicator]}</div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
+      {/* {Object.entries(invalidIndicators).map(([field, errorMessage]) => (
+  <div key={field}>{errorMessage}</div>
+))} */}
+      {console.log(invalidIndicators)}
       <h3 className="h4 text-secondary mb-4 border-bottom border-light-secondary pb-3">
         <i className="bi bi-pencil-square"></i> Création de la valeur
       </h3>
