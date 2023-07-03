@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Image, Form, Button } from "react-bootstrap";
+import { useEffect } from "react";
 
 import {
   StatementART,
@@ -24,30 +25,46 @@ const StatementForms = ({
   initialSelectedIndicators,
   updateValidations,
 }) => {
+
   const [selectedIndicators, setSelectedIndicators] = useState(
     initialSelectedIndicators
   );
 
   const [invalidIndicators, setInvalidIndicators] = useState({});
 
-  const [selectedIndicator, setSelectedIndicator] = useState(null);
+  const [indicatorModal, setIndicatorModal] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  useEffect(() => {
+  
+    // Filter out the selected indicators that are not in the invalidIndicators list
+    const validSelectedIndicators = selectedIndicators.filter(
+      (indicator) => !Object.keys(invalidIndicators).includes(indicator)
+    );
+  
+    // Update validations for validSelectedIndicators here
+    updateValidations(validSelectedIndicators);
+  }, [selectedIndicators, invalidIndicators]);
+  
+
   const handleModalOpen = (indicator) => {
-    setSelectedIndicator(indicator);
+    setIndicatorModal(indicator);
     setShowModal(true);
   };
 
   const handleModalClose = () => {
-    setSelectedIndicator(null);
+    setIndicatorModal(null);
     setShowModal(false);
   };
 
   // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
     session.getNetValueAddedIndicator(indic, period.periodKey);
-    updateValidations(selectedIndicators);
+    await session.updateFootprints(period);
+
   };
+
+
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -81,8 +98,8 @@ const StatementForms = ({
   const renderStatementForm = (key) => {
     const componentProps = {
       impactsData: session.impactsData[period.periodKey],
-      onUpdate: handleNetValueChange,
       onError: handleError,
+      onUpdate: handleNetValueChange,
     };
 
     switch (key) {
@@ -176,7 +193,6 @@ const StatementForms = ({
 
   return (
     <>
-      {console.log(invalidIndicators)}
       <h3>
         <i className="bi bi-pencil-square"></i> Création de la valeur
       </h3>
@@ -190,11 +206,11 @@ const StatementForms = ({
       </h3>
       {renderIndicators("Empreinte environnementale")}
 
-      {selectedIndicator && (
+      {indicatorModal && (
         <IndicatorDetailsModal
           show={showModal}
           handleClose={handleModalClose}
-          indicator={selectedIndicator}
+          indicator={indicatorModal}
         />
       )}
     </>
