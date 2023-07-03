@@ -1,6 +1,8 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
+
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentNRG } from "../modals/AssessmentNRG";
@@ -36,14 +38,12 @@ const StatementNRG = (props) => {
     props.impactsData.energyConsumptionUncertainty,
   ]);
 
-  const { netValueAdded } = props.impactsData;
-
-  // const options = [
-  //   { value: "MJ", label: "MJ" },
-  //   { value: "GJ", label: "GJ" },
-  //   { value: "kWh", label: "kWh" },
-  //   { value: "MWh", label: "MWh" },
-  // ];
+  const options = [
+    { value: "MJ", label: "MJ" },
+    { value: "GJ", label: "GJ" },
+    { value: "kWh", label: "kWh" },
+    { value: "MWh", label: "MWh" },
+  ];
   const updateEnergyConsumption = (input) => {
     props.impactsData.nrgTotal = true;
     props.impactsData.setEnergyConsumption(input.target.value);
@@ -58,98 +58,91 @@ const StatementNRG = (props) => {
     props.onUpdate("nrg");
   };
 
-  // updateEnergyConsumptionUnit = (selected) => {
-  //   const selectedUnit = selected.value;
+  const updateEnergyConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
 
-  //   const { energyConsumption, energyConsumptionUnit } = this.props.impactsData;
+    const { energyConsumption, energyConsumptionUnit } = this.props.impactsData;
 
-  //   if (selectedUnit !== energyConsumptionUnit) {
-  //     const convertedValue = this.convertEnergyConsumption(
-  //       energyConsumption,
-  //       energyConsumptionUnit,
-  //       selectedUnit
-  //     );
+    if (selectedUnit !== energyConsumptionUnit) {
+      const convertedValue = this.convertEnergyConsumption(
+        energyConsumption,
+        energyConsumptionUnit,
+        selectedUnit
+      );
 
-  //     this.updateEnergyConsumption(convertedValue);
-  //   }
+      this.updateEnergyConsumption(convertedValue);
+    }
 
-  //   this.setState({
-  //     energyConsumptionUnit: selectedUnit,
-  //   });
+    this.setState({
+      energyConsumptionUnit: selectedUnit,
+    });
 
-  //   this.props.impactsData.energyConsumptionUnit = selectedUnit;
+    this.props.impactsData.energyConsumptionUnit = selectedUnit;
 
-  //   this.props.onUpdate("nrg");
-  // };
+    this.props.onUpdate("nrg");
+  };
 
-  // convertEnergyConsumption = (value, fromUnit, toUnit) => {
-  //   const conversionFactors = {
-  //     GJ: {
-  //       MJ: 1000,
-  //       kWh: 3.6,
-  //       MWh: 3600,
-  //     },
-  //     MJ: {
-  //       GJ: 1 / 1000,
-  //       kWh: 1 / 3.6,
-  //       MWh: 1 / 3600,
-  //     },
-  //     kWh: {
-  //       GJ: 1 / 3.6,
-  //       MJ: 3.6,
-  //       MWh: 1 / 1000,
-  //     },
-  //     MWh: {
-  //       GJ: 1 / 3600,
-  //       MJ: 3600,
-  //       kWh: 1000,
-  //     },
-  //   };
-  //   const conversionFactor = conversionFactors[fromUnit][toUnit];
-  //   const convertedValue = value * conversionFactor;
-  //   return convertedValue;
-  // };
+  const convertEnergyConsumption = (value, fromUnit, toUnit) => {
+    const conversionFactors = {
+      GJ: {
+        MJ: 1000,
+        kWh: 3.6,
+        MWh: 3600,
+      },
+      MJ: {
+        GJ: 1 / 1000,
+        kWh: 1 / 3.6,
+        MWh: 1 / 3600,
+      },
+      kWh: {
+        GJ: 1 / 3.6,
+        MJ: 3.6,
+        MWh: 1 / 1000,
+      },
+      MWh: {
+        GJ: 1 / 3600,
+        MJ: 3600,
+        kWh: 1000,
+      },
+    };
+    const conversionFactor = conversionFactors[fromUnit][toUnit];
+    const convertedValue = value * conversionFactor;
+    return convertedValue;
+  };
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (props.impactsData.comments.nrg = info);
-  const onValidate = () => props.onValidate("nrg");
 
   return (
     <Form className="statement">
       <Row>
-        <Col>
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
-              Consommation totale d'énergie
-            </Form.Label>
+            <Form.Label column>Consommation totale d'énergie</Form.Label>
             <Col>
               <Row className="align-items-center">
                 <Col>
-                  <InputGroup>
-                    <Form.Control
-                      type="number"
-                      value={roundValue(energyConsumption, 0)}
-                      inputMode="numeric"
-                      onChange={updateEnergyConsumption}
-                    />
-                    <InputGroup.Text>MJ</InputGroup.Text>
-                  </InputGroup>
-                  {/* <Select
-                  options={options}
-                  value={{
-                    label: energyConsumptionUnit,
-                    value: energyConsumptionUnit,
-                  }}
-                  onChange={this.updateEnergyConsumptionUnit}
-                /> */}
+                  <Form.Control
+                    type="number"
+                    value={roundValue(energyConsumption, 0)}
+                    inputMode="numeric"
+                    onChange={updateEnergyConsumption}
+                  />
                 </Col>
-                <Col></Col>
+                <Col>
+                  <Select
+                    options={options}
+                    // value={{
+                    //   label: energyConsumptionUnit,
+                    //   value: energyConsumptionUnit,
+                    // }}
+                    onChange={updateEnergyConsumptionUnit}
+                  />
+                </Col>
               </Row>
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
-              Incertitude
-            </Form.Label>
+            <Form.Label column>Incertitude</Form.Label>
             <Col>
               <InputGroup>
                 <Form.Control
@@ -166,7 +159,10 @@ const StatementNRG = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>            <Form.Control
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
+            <Form.Control
               as="textarea"
               rows={3}
               className="w-100"
@@ -178,7 +174,7 @@ const StatementNRG = (props) => {
         </Col>
         <div className="text-end my-3">
           <Button
-          variant="light-secondary"
+            variant="light-secondary"
             className="btn-sm"
             onClick={() => setShowModal(true)}
           >

@@ -3,31 +3,43 @@ section {
   margin-bottom: 3rem;
 }
 
-// START SECTION
-
-.illu-box {
-  border-radius: 20px;
-  img {
-    height: 60px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-  h3 {
-    margin-bottom: 1rem;
-    margin-top: 1rem;
-  }
-  p {
-    font-size: 14px;
-  }
-}
-
-// COMPANY SECTION
 .step {
   border: 2px solid $bg-light;
   border-radius: 1rem;
   background-color: #ffffff;
 }
 
+/**
+ * ==============================================
+ * HOMEPAGE
+ * ==============================================
+ */
+
+.illu-box {
+  border-radius: 20px;
+
+  img {
+    height: 60px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin-bottom: 1rem;
+
+    margin-top: 1rem;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}
+
+/**
+ * ==============================================
+ * STEP 3 - PROVIDERS
+ * ==============================================
+ */
 #siren-section,
 #sector-section {
   .step:not(:first-child) {
@@ -35,7 +47,7 @@ section {
     padding: 1rem 2rem;
   }
 
-  .step ~ .step {
+  .step~.step {
     margin-bottom: inherit;
     padding: inherit;
   }
@@ -45,74 +57,67 @@ section {
   }
 }
 
-/* Indicator Section*/
+/**
+ * ==============================================
+ * STEP 4 - STATEMENTS
+ * ==============================================
+ */
 
-.indicator-section {
-  
-  .icon-success {
-    color: #0c9;
-    margin-right: 0.3rem;
-  }
-
-
+ .statement-section {
   h3 {
-    font-size: 1.2rem;
-    color: #251f81;
-    margin: 1.5rem 0;
+    color : $secondary;
+    padding-bottom: 0.5rem;
+    margin : 1.5rem 0;
+    border-bottom: 2px solid $light-secondary;
+    font-size: 1.3rem;
   }
+ }
 
-  h4 {
-    font-size: 1.3em;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
-  }
-
-
-
-  .icon-ese {
-    height: 50px;
-  }
-
-
-}
-
-.indic-statement.bg-light{
+.indic-statement.bg-light {
   background-color: lighten($bg-light, 2%) !important;
 }
-.indic-statement { 
 
-  form.statement > div.row > div.col:nth-child(2) {
-    border-left : 1px solid $light;
+.indic-statement {
+
+  form.statement>div.row>div.col:nth-child(2) {
+    border-left: 1px solid $light;
 
     .form-group {
       padding-left: 1rem;
     }
   }
-  form.statement > div.row > div.col:nth-child(1) {
+
+  form.statement>div.row>div.col-lg-7 {
 
     .form-group {
       padding-right: 1rem;
-      
+
     }
   }
 
-.statement {
-  padding :  2rem;
-  border-radius: 1rem;
-  background-color: #fff;
-  .form-label {
-    font-weight: 500;
+  .statement {
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: #fff;
+
+    .form-label {
+      font-weight: 500;
+    }
+  }
+
+  h4 {
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 0;
   }
 }
-    h4{
-      font-weight: 600;
-      font-size: 1rem;
-      margin : 0;
-    }
-}
 
 
-/* ---------- Results ---------- */
+/**
+ * ==============================================
+ * STEP 5 - RESULTS
+ * ==============================================
+ */
 
 .results {
   .box {
@@ -121,14 +126,23 @@ section {
     background-color: #ffffff;
     padding: 2rem;
     margin-bottom: 2rem;
+
     // min-height: calc(100% - 2rem);
-    h4{
+    h4 {
       margin-bottom: 2rem;
     }
 
   }
-  
- 
+
+
+}
+
+// Graphs Container
+.charts-container .loader-container {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .progressbar {
@@ -161,8 +175,10 @@ section {
   border-radius: 5px;
   background-color: $secondary;
   color: $secondary;
-  will-change: transform; /* Ajout de la propriété will-change */
-  transform: translateZ(0); /* Ajout de la propriété transform */
+  will-change: transform;
+  /* Ajout de la propriété will-change */
+  transform: translateZ(0);
+  /* Ajout de la propriété transform */
   box-shadow: 9999px 0 0 -5px $secondary;
   animation: dotPulse 1.5s infinite linear;
   animation-delay: 0.25s;
@@ -236,12 +252,4 @@ section {
   100% {
     box-shadow: 10014px 0 0 -5px $secondary;
   }
-}
-
-// Graphs Container
-.charts-container .loader-container {
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }

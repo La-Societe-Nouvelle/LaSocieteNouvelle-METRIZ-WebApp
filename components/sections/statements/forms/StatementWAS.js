@@ -81,9 +81,9 @@ const StatementWAS = (props) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               Productiont totale de déchets (y compris DAOM<sup>1</sup>)
             </Form.Label>
             <Col>
@@ -107,7 +107,7 @@ const StatementWAS = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               Incertitude
             </Form.Label>
             <Col>

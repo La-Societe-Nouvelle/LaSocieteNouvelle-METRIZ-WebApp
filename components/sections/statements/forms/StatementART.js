@@ -78,12 +78,12 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
   return (
     <Form className="statement">
       <Row>
-        <Col className="pe-2">
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               L'entreprise est-elle une entreprise artisanale ?
             </Form.Label>
-            <Col>
+            <Col className="text-end">
               <Form.Check
                 inline
                 type="radio"
@@ -114,7 +114,7 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               Part de la valeur ajoutée artisanale
             </Form.Label>
             <Col>

@@ -76,12 +76,12 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+      <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column lg={7}>
+            <Form.Label column >
               Les activités de l'entreprise sont-elles localisées en France ?
             </Form.Label>
-            <Col>
+            <Col className="text-end">
               <Form.Check
                 inline
                 type="radio"
@@ -115,7 +115,7 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column lg={7}>
+            <Form.Label column >
               Valeur ajoutée nette produite en France
             </Form.Label>
             <Col>

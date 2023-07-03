@@ -32,13 +32,13 @@ const StatementSOC = ({ impactsData, onUpdate }) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column lg={7}>
+            <Form.Label column >
               L'entreprise est-elle d'utilité sociale ou dotée d'une raison
               d'être ?
             </Form.Label>
-            <Col>
+            <Col className="text-end">
               <Form.Check
                 inline
                 type="radio"

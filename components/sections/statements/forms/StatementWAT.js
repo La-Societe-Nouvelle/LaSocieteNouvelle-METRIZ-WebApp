@@ -92,9 +92,9 @@ const StatementWAT = (props) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column>
               Consommation totale d'eau
             </Form.Label>
             <Col>
@@ -118,7 +118,7 @@ const StatementWAT = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column>
               Incertitude
             </Form.Label>
             <Col>

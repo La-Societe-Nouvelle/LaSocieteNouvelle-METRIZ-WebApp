@@ -46,9 +46,10 @@ const StatementKNW = (props) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+      <Col lg={7}>
+
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column>
               Valeur ajoutée nette dédiée à la recherche ou à la formation
             </Form.Label>
             <Col>

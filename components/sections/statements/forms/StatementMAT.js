@@ -1,6 +1,7 @@
 // La Société Nouvelle
 
 /* ---------- DECLARATION - INDIC #MAT ---------- */
+
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
@@ -108,13 +109,13 @@ const StatementMAT = (props) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+      <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               L'entreprise réalise-t-elle des activités agricoles ou extractives
               ?
             </Form.Label>
-            <Col>
+            <Col className="text-end">
               <Form.Check
                 inline
                 type="radio"
@@ -136,7 +137,7 @@ const StatementMAT = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               Quantité extraite de matières premières
             </Form.Label>
             <Col>
@@ -163,7 +164,7 @@ const StatementMAT = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               Incertitude
             </Form.Label>
             <Col>

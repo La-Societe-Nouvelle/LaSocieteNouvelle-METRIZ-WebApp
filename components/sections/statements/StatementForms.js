@@ -138,7 +138,7 @@ const StatementForms = ({
         </div>
 
         {selectedIndicators.includes(key) && (
-          <div className="px-2">{renderStatementForm(key)}</div>
+          <div className="px-2 py-2">{renderStatementForm(key)}</div>
         )}
         {renderErrorMessage(key)}
       </div>
@@ -156,19 +156,16 @@ const StatementForms = ({
 
   return (
     <>
-      {/* {Object.entries(invalidIndicators).map(([field, errorMessage]) => (
-  <div key={field}>{errorMessage}</div>
-))} */}
       {console.log(invalidIndicators)}
-      <h3 className="h4 text-secondary mb-4 border-bottom border-light-secondary pb-3">
+      <h3>
         <i className="bi bi-pencil-square"></i> Création de la valeur
       </h3>
       {renderIndicators("Création de la valeur")}
-      <h3 className="h4 text-secondary my-4 ">
+      <h3>
         <i className="bi bi-pencil-square"></i> Empreinte sociale
       </h3>
       {renderIndicators("Empreinte sociale")}
-      <h3 className="h4  text-secondary my-4 ">
+      <h3>
         <i className="bi bi-pencil-square"></i> Empreinte environnementale
       </h3>
       {renderIndicators("Empreinte environnementale")}

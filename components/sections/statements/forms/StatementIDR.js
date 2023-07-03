@@ -8,72 +8,83 @@ import { ImportDSN } from "../modals/ImportDSN";
 
 /* ---------- DECLARATION - INDIC #IDR ---------- */
 
-const StatementIDR = (props) => {
+const StatementIDR = ({ impactsData, onUpdate, onError }) => {
   const [interdecileRange, setInterdecileRange] = useState(
-    valueOrDefault(props.impactsData.interdecileRange, "")
+    valueOrDefault(impactsData.interdecileRange, "")
   );
-  const [info, setInfo] = useState(props.impactsData.comments.idr || "");
-  const [disableStatement, setDisableStatement] = useState(
-    props.disableStatement
-  );
+  const [info, setInfo] = useState(impactsData.comments.idr || "");
+  const [disableStatement, setDisableStatement] = useState(disableStatement);
+
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
   const [showDSN, setShowDSN] = useState(false);
 
   useEffect(() => {
-    if (disableStatement !== props.disableStatement) {
-      setDisableStatement(props.disableStatement);
+    if (disableStatement !== disableStatement) {
+      setDisableStatement(disableStatement);
     }
 
-    if (
-      interdecileRange !==
-      valueOrDefault(props.impactsData.interdecileRange, "")
-    ) {
-      setInterdecileRange(
-        valueOrDefault(props.impactsData.interdecileRange, "")
-      );
+    if (interdecileRange !== valueOrDefault(impactsData.interdecileRange, "")) {
+      setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
     }
   }, [
-    props.disableStatement,
-    props.impactsData.hasEmployees,
+    disableStatement,
+    impactsData.hasEmployees,
     interdecileRange,
-    props.impactsData.netValueAdded,
-    props.impactsData.interdecileRange,
+    impactsData.netValueAdded,
+    impactsData.interdecileRange,
   ]);
 
-  const hasEmployees = props.impactsData.hasEmployees;
+  const hasEmployees = impactsData.hasEmployees;
 
   const onHasEmployeesChange = (event) => {
     const radioValue = event.target.value;
     let newHasEmployees = null;
     let newWageGap = null;
 
-    switch (radioValue) {
-      case "true":
-        newHasEmployees = true;
-        newWageGap = null;
-        break;
-      case "false":
-        newHasEmployees = false;
-        newWageGap = 0;
-        break;
+    if (radioValue === "true") {
+      newHasEmployees = true;
+      setIsInvalid(false);
+      onError("idr", false);
+    } else if (radioValue === "false") {
+      newHasEmployees = false;
+      newWageGap = 0;
+      setIsInvalid(false);
+      onError("idr", false);
     }
 
-    props.impactsData.setHasEmployees(newHasEmployees);
-    props.impactsData.wageGap = newWageGap;
-    setInterdecileRange(valueOrDefault(props.impactsData.interdecileRange, ""));
-    props.onUpdate("idr");
-    props.onUpdate("geq");
+    impactsData.setHasEmployees(newHasEmployees);
+    impactsData.wageGap = newWageGap;
+    setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
+    onUpdate("idr");
+    onUpdate("geq");
   };
 
-  const updateInterdecileRange = (input) => {
-    props.impactsData.interdecileRange = input.target.value;
-    setInterdecileRange(props.impactsData.interdecileRange);
-    props.onUpdate("idr");
+  const updateInterdecileRange = (event) => {
+    console.log("change");
+    const inputValue = event.target.valueAsNumber;
+    let errorMessage = "";
+    console.log(inputValue);
+    // Validation checks for the input value
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    } else if (inputValue > 100) {
+      errorMessage = "La valeur ne peut pas être supérieure à 100.";
+    }
+
+    setIsInvalid(errorMessage !== "");
+    onError("idr", errorMessage);
+
+    impactsData.interdecileRange = event.target.value;
+    setInterdecileRange(event.target.value);
+    onUpdate("idr");
   };
 
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.idr = info);
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.idr = event.target.value;
+  };
 
   return (
     <Form className="statement">
@@ -114,10 +125,10 @@ const StatementIDR = (props) => {
               <Form.Control
                 type="number"
                 value={roundValue(interdecileRange, 1)}
-                disabled={hasEmployees === false || disableStatement}
                 inputMode="numeric"
                 onChange={updateInterdecileRange}
-                isInvalid={interdecileRange > 100 ? true : false}
+                disabled={hasEmployees === false || disableStatement}
+                isInvalid={isInvalid}
               />
             </Col>
           </Form.Group>
@@ -133,7 +144,6 @@ const StatementIDR = (props) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
-              onBlur={saveInfo}
               disabled={disableStatement}
             />
           </Form.Group>
@@ -170,10 +180,10 @@ const StatementIDR = (props) => {
         </Modal.Header>
         <Modal.Body>
           <IndividualsData
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowCalulatorModal(false)}
             handleClose={() => setShowCalulatorModal(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>
@@ -189,10 +199,10 @@ const StatementIDR = (props) => {
         </Modal.Header>
         <Modal.Body>
           <ImportDSN
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowDSN(false)}
             handleClose={() => setShowDSN(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>

@@ -1,8 +1,8 @@
 // La Société Nouvelle
 import React, { useState, useEffect } from "react";
+import Select from "react-select";
 
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
-import Select from "react-select";
 
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentGHG } from "../modals/AssessmentGHG";
@@ -106,9 +106,9 @@ const StatementGHG = (props) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column >
               Emissions directes de Gaz à effet de serre - SCOPE 1
             </Form.Label>
             <Col>
@@ -122,7 +122,7 @@ const StatementGHG = (props) => {
                     isInvalid={!isValid}
                   />
                 </Col>
-                <Col sm={5}>
+                <Col>
                   <Select
                     className="form-select-control small"
                     options={options}
@@ -137,7 +137,7 @@ const StatementGHG = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column sm={7}>
+            <Form.Label column>
               Incertitude
             </Form.Label>
             <Col>
