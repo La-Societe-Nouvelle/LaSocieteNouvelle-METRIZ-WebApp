@@ -16,6 +16,7 @@ import {
   StatementWAT,
 } from "./forms";
 import indicators from "/lib/indics";
+import IndicatorDetailsModal from "./modals/IndicatorDetailsModal";
 
 const StatementForms = ({
   session,
@@ -28,6 +29,19 @@ const StatementForms = ({
   );
 
   const [invalidIndicators, setInvalidIndicators] = useState({});
+
+  const [selectedIndicator, setSelectedIndicator] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleModalOpen = (indicator) => {
+    setSelectedIndicator(indicator);
+    setShowModal(true);
+  };
+
+  const handleModalClose = () => {
+    setSelectedIndicator(null);
+    setShowModal(false);
+  };
 
   // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
@@ -129,8 +143,12 @@ const StatementForms = ({
               {value.libelle}
               {value.isBeta && <span className="beta ms-1">BETA</span>}
             </h4>
-            <div className="text-end flex-grow-1 ">
-              <Button variant="light" size="sm">
+            <div className="text-end flex-grow-1">
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => handleModalOpen(key)}
+              >
                 Informations
               </Button>
             </div>
@@ -148,7 +166,9 @@ const StatementForms = ({
   const renderErrorMessage = (indicator) => {
     if (invalidIndicators[indicator]) {
       return (
-        <div className="mx-2 my-2 alert alert-danger">{invalidIndicators[indicator]}</div>
+        <div className="mx-2 my-2 alert alert-danger">
+          {invalidIndicators[indicator]}
+        </div>
       );
     }
     return null;
@@ -169,6 +189,14 @@ const StatementForms = ({
         <i className="bi bi-pencil-square"></i> Empreinte environnementale
       </h3>
       {renderIndicators("Empreinte environnementale")}
+
+      {selectedIndicator && (
+        <IndicatorDetailsModal
+          show={showModal}
+          handleClose={handleModalClose}
+          indicator={selectedIndicator}
+        />
+      )}
     </>
   );
 };
