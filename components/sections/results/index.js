@@ -24,10 +24,9 @@ import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
 import { updateComparativeData } from "./utils";
 import { Loader } from "../../popups/Loader";
-import { fetchLatestLegalUnit } from "../../popups/dataUpdater/DataUpdater";
+import { customSelectStyles } from "../../../src/utils/customStyles";
 
 const Results = ({ session, publish, goBack }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
   const [editedLegalUnit, setEditedLegalUnit] = useState({
     ...session.legalUnit,
   });
@@ -53,34 +52,6 @@ const Results = ({ session, publish, goBack }) => {
   const prevPeriod = session.availablePeriods.find(
     (period) => period.dateEnd == prevDateEnd
   );
-  // To do : extract custom style and import it
-  const customStyles = {
-    control: (provided, state) => ({
-      ...provided,
-      border: state.isFocused ? "2px solid #dbdef1" : "2px solid #f0f0f8",
-      borderRadius: "0.5rem",
-      boxShadow: "none",
-      "&:hover": {
-        borderColor: "#dbdef1",
-      },
-    }),
-    dropdownIndicator: (provided) => ({
-      ...provided,
-      color: "#dbdef1",
-      "&:hover": {
-        color: "#dbdef1",
-      },
-    }),
-    option: (provided, state) => ({
-      ...provided,
-      fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? "#191558" : "transparent",
-      background: state.isFocused ? "#f0f0f8" : "",
-      "&:hover": {
-        color: "#191558",
-      },
-    }),
-  };
 
   useEffect(() => {
     const divisionsOptions = Object.entries(divisions)
@@ -128,10 +99,6 @@ const Results = ({ session, publish, goBack }) => {
     };
   }, [selectedDivision]);
 
-  const handleEditClick = () => {
-    setIsEditMode(true);
-  };
-
   const handleDivisionChange = (selectedOption) => {
     const division = selectedOption.value;
     setIsLoading(true);
@@ -165,175 +132,86 @@ const Results = ({ session, publish, goBack }) => {
     );
   };
 
-  const handleSaveChanges = () => {
-    // to do : update legal unit info in session
-
-    console.log(editedLegalUnit);
-
-    setIsEditMode(false);
-  };
-
-  const handleSirenChange = (e) => {
-
-
-    setEditedLegalUnit({
-      ...editedLegalUnit,
-      siren: e.target.value,
-    });
-
-    // To do : fetch legal unit infos
-    if (e.target.value.length == 9) {
-    fetchLatestLegalUnit(editedLegalUnit).then(response => 
-      console.log(response))
-    }
- 
-  };
   return (
     <Container fluid className="results">
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
-
-          <Button
-            variant="download"
-            disabled={
-              !selectedDivision || selectedDivision == "00" || isLoading
-            }
-            onClick={handleDownloadCompleteFile}
-          >
-            <i className="bi bi-download"></i> Télécharger tous les résultats
-          </Button>
+          <div>
+            <Button
+              variant="primary"
+              disabled={
+                !selectedDivision || selectedDivision == "00" || isLoading
+              }
+              onClick={handleDownloadCompleteFile}
+            >
+              <i className="bi bi-download"></i> Télécharger
+            </Button>
+            <Button variant="secondary" onClick={publish}>
+              Publier mes résultats
+            </Button>
+          </div>
         </div>
         <p className="mb-4">
           Découvrez les résultats pour chaque indicateur mesuré et comparez les
           avec votre branche.
         </p>
-        {isEditMode ? (
-          <Form>
-            <Form.Group as={Row} controlId="formSirenSiret" className="my-2">
-              <Form.Label column sm={2} className="fw-bold">
-                SIREN/SIRET :
-              </Form.Label>
-              <Col sm={8}>
-                <Form.Control
-                  type="text"
-                  value={editedLegalUnit.siren}
-                  onChange={handleSirenChange}
-                />
-              </Col>
-            </Form.Group>
 
-            <Form.Group as={Row} controlId="formLegalUnitName" className="my-2">
-              <Form.Label column sm={2} className="fw-bold">
-                Unité légale :
-              </Form.Label>
-              <Col sm={8}>
-                <Form.Control
-                  type="text"
-                  value={editedLegalUnit.corporateName}
-                  onChange={(e) =>
-                    setEditedLegalUnit({
-                      ...editedLegalUnit,
-                      corporateName: e.target.value,
-                    })
-                  }
-                />
-              </Col>
-            </Form.Group>
+        <div className="legal-unit-info">
+          <Row>
+            <Col>
+              <p className="fw-bold col-form-label">SIREN/SIRET :</p>
 
-            <Form.Group as={Row} controlId="formLegalUnitName" className="my-2">
-              <Form.Label column sm={2} className="fw-bold">
-               Code APE :
-              </Form.Label>
-              <Col sm={8}>
-                <Form.Control
-                  type="text"
-                  value={editedLegalUnit.activityCode}
-                  disabled
-                />
-              </Col>
-            </Form.Group>
-            <Form.Group
-              as={Row}
-              controlId="formComparativeDivision"
-              className="my-2"
-            >
-              <Form.Label column sm={2} className="fw-bold">
-                Branche de comparaison :
-              </Form.Label>
-              <Col sm={8}>
-                <Select
-                  styles={customStyles}
-                  options={divisionsOptions}
-                  components={{
-                    IndicatorSeparator: () => null,
-                  }}
-                  value={{
-                    label:
-                      selectedDivision + " - " + divisions[selectedDivision],
-                    value: selectedDivision,
-                  }}
-                  placeholder="Choisissez une division"
-                  onChange={handleDivisionChange}
-                />
-              </Col>
-            </Form.Group>
-          </Form>
-        ) : (
-          <div className="legal-unit-info">
-            <Row>
-              <Col lg="2">
-                  <p className="fw-bold col-form-label">SIREN/SIRET :</p>
-              </Col>
-              <Col>
               <p className="py-2">{session.legalUnit.siren}</p>
-              </Col>
-            </Row>
-            <Row>
-              <Col lg="2">
-                  <p className="fw-bold col-form-label">Unité légale :</p>
-              </Col>
-              <Col>
-              <p className="py-2" >{session.legalUnit.corporateName}</p>
-              </Col>
-            </Row>
-            <Row>
-              <Col lg="2">
-                  <p className="fw-bold col-form-label">Code APE :</p>
-              </Col>
-              <Col>
-              <p  className="py-2">{session.legalUnit.activityCode}</p>
-              </Col>
-            </Row>
-            <Row>
-              <Col lg="2">
-                  <p  className="fw-bold col-form-label">Branche de comparaison :</p>
-              </Col>
-              <Col>
-              <p  className="py-2"> {comparativeData.activityCode == "00" && (
-                <i class="bi bi-exclamation-triangle"></i>
-              )} {divisions[comparativeData.activityCode]}</p>
-              </Col>
-            </Row>
+            </Col>
+
+            <Col>
+              <p className="fw-bold col-form-label">Unité légale :</p>
+
+              <p className="py-2">{session.legalUnit.corporateName}</p>
+            </Col>
+
+            <Col>
+              <p className="fw-bold col-form-label">Code APE :</p>
+
+              <p className="py-2">{session.legalUnit.activityCode}</p>
+            </Col>
+          </Row>
+          <div>
+            <p className="fw-bold col-form-label">Branche de comparaison :</p>
+
+            <Form>
+              <Form.Group
+                as={Row}
+                controlId="formComparativeDivision"
+                className="my-2"
+              >
+                <Col sm={8}>
+                  <Select
+                    styles={customSelectStyles}
+                    options={divisionsOptions}
+                    components={{
+                      IndicatorSeparator: () => null,
+                    }}
+                    value={{
+                      label:
+                        selectedDivision + " - " + divisions[selectedDivision],
+                      value: selectedDivision,
+                    }}
+                    placeholder="Choisissez une division"
+                    onChange={handleDivisionChange}
+                  />
+                </Col>
+              </Form.Group>
+            </Form>
           </div>
-  
-        )}
-        <div>
-          <Button onClick={handleEditClick} size="sm" disabled={isEditMode}>
-            Modifier
-          </Button>
-          {isEditMode && (
-            <Button variant={"secondary"} size="sm" onClick={handleSaveChanges}>
-              Enregistrer
-            </Button>
-          )}
         </div>
       </div>
       {selectedDivision != "00" && (
         <div className="box">
           <div className="d-flex align-items-center">
             <DropdownButton
-              variant="light"
+              variant="light-secondary"
               drop={"down-centered"}
               key={"down-centered"}
               id="dropdown-indics-button"
@@ -370,9 +248,6 @@ const Results = ({ session, publish, goBack }) => {
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link eventKey="link-1">Publier mes résultats</Nav.Link>
                 </Nav.Item>
               </Nav>
             )}
@@ -412,9 +287,6 @@ const Results = ({ session, publish, goBack }) => {
       <div className="box text-end">
         <Button onClick={goBack} className="me-1">
           Retour
-        </Button>
-        <Button variant="secondary" onClick={publish}>
-          Publier mes résultats
         </Button>
       </div>
     </Container>

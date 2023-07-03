@@ -63,15 +63,15 @@ section {
  * ==============================================
  */
 
- .statement-section {
+.statement-section {
   h3 {
-    color : $secondary;
+    color: $secondary;
     padding-bottom: 0.5rem;
-    margin : 1.5rem 0;
+    margin: 1.5rem 0;
     border-bottom: 2px solid $light-secondary;
     font-size: 1.3rem;
   }
- }
+}
 
 .indic-statement.bg-light {
   background-color: lighten($bg-light, 2%) !important;
@@ -116,19 +116,23 @@ section {
   .modal-content {
     background-color: $bg-light;
   }
-  .modal-header{
+
+  .modal-header {
     padding: 1.5rem 2rem;
   }
-  .modal-body{
+
+  .modal-body {
     background-color: #fff;
     padding: 2rem;
     margin: 0 2rem;
     border-radius: 1rem;
   }
-  .modal-footer{
+
+  .modal-footer {
     padding: 1rem 2rem;
   }
 }
+
 /**
  * ==============================================
  * STEP 5 - RESULTS
@@ -150,6 +154,13 @@ section {
 
   }
 
+  .nav-underline {
+    a {
+      font-weight: 600;
+      border-bottom: 2px solid $light;
+      margin: 0 0.5rem;
+    }
+  }
 
 }
 
@@ -173,6 +184,10 @@ section {
   border-radius: 15px;
   transition: width 400ms ease-in-out;
   height: 100%;
+}
+
+#dropdown-indics-button {
+  padding: 1rem
 }
 
 /* ---------- Loading Animation ---------- */

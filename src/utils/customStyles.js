@@ -1,7 +1,7 @@
 export const customSelectStyles = {
     control: (provided, state) => ({
       ...provided,
-      border: "1px solid #dbdef1",
+      border: "2px solid #dbdef1",
       borderRadius: "0.5rem",
       boxShadow: "none",
       "&:hover": {
