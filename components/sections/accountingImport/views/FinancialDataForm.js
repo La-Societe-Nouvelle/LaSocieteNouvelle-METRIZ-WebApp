@@ -110,7 +110,7 @@ const FinancialDataForm = (props) => {
       <Col>
         <Form className="border-left">
           <Form.Group as={Row} className="my-3">
-            <Form.Label column sm={4}>
+            <Form.Label column sm={4} className="fw-normal fst-italic">
               Numéro SIREN  :
             </Form.Label>
             <Col sm={8}>
