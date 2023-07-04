@@ -8,6 +8,7 @@ import {
   Dropdown,
   DropdownButton,
   Form,
+  Image,
   Nav,
   Row,
 } from "react-bootstrap";
@@ -25,12 +26,9 @@ import { ChartsContainer } from "./charts/ChartsContainer";
 import { updateComparativeData } from "./utils";
 import { Loader } from "../../popups/Loader";
 import { customSelectStyles } from "../../../src/utils/customStyles";
+import DownloadDropdown from "./components/DownloadDropdown";
 
 const Results = ({ session, publish, goBack }) => {
-  const [editedLegalUnit, setEditedLegalUnit] = useState({
-    ...session.legalUnit,
-  });
-
   const [divisionsOptions, setDivisionsOptions] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState(
     session.comparativeData.activityCode
@@ -107,10 +105,19 @@ const Results = ({ session, publish, goBack }) => {
 
   const handleIndicatorChange = (code, label) => {
     setSelectedIndicator(code);
-    setSelectedIndicatorLabel(label);
+    let labelMenu = (
+      <>
+        <Image className="me-2" src={`icons-ese/${code}.svg`} height={40} />
+        {label}
+      </>
+    );
+
+    setSelectedIndicatorLabel(labelMenu);
   };
 
-  const handleDownloadCompleteFile = async () => {
+  const handleDownload = async (selectedFiles) => {
+    console.log(selectedFiles);
+
     const period = session.financialPeriod;
     const prevPeriod = session.availablePeriods.find(
       (period) => period.dateEnd == prevDateEnd
@@ -137,16 +144,9 @@ const Results = ({ session, publish, goBack }) => {
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
-          <div>
-            <Button
-              variant="primary"
-              disabled={
-                !selectedDivision || selectedDivision == "00" || isLoading
-              }
-              onClick={handleDownloadCompleteFile}
-            >
-              <i className="bi bi-download"></i> Télécharger
-            </Button>
+          <div className="d-flex">
+            <DownloadDropdown onDownload={handleDownload} />
+
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
             </Button>
@@ -177,10 +177,10 @@ const Results = ({ session, publish, goBack }) => {
               <p className="py-2">{session.legalUnit.activityCode}</p>
             </Col>
           </Row>
-          <div>
-            <p className="fw-bold col-form-label">Branche de comparaison :</p>
+          <div className="d-flex align-items-center">
+            <p className="fw-bold col-form-label me-2 mb-0 ">Branche de comparaison :</p>
 
-            <Form>
+            <Form className="flex-grow-1">
               <Form.Group
                 as={Row}
                 controlId="formComparativeDivision"
@@ -207,32 +207,56 @@ const Results = ({ session, publish, goBack }) => {
           </div>
         </div>
       </div>
+
       {selectedDivision != "00" && (
-        <div className="box">
-          <div className="d-flex align-items-center">
-            <DropdownButton
-              variant="light-secondary"
-              drop={"down-centered"}
-              key={"down-centered"}
-              id="dropdown-indics-button"
-              title={selectedIndicatorLabel}
-            >
-              {Object.entries(indicators)
-                .filter(([indic]) =>
-                  session.validations[financialPeriod].includes(indic)
-                )
-                .map(([code, indic]) => {
-                  if (code === selectedIndicator) return null;
-                  return (
-                    <Dropdown.Item
-                      key={code}
-                      onClick={() => handleIndicatorChange(code, indic.libelle)}
-                    >
-                      {indic.libelle}
-                    </Dropdown.Item>
-                  );
-                })}
-            </DropdownButton>
+        <div className="box indic-result-menu">
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center">
+              <DropdownButton
+                variant="light-secondary"
+                drop={"down-centered"}
+                key={"down-centered"}
+                id="dropdown-indics-button"
+                title={selectedIndicatorLabel}
+              >
+                {selectedIndicator && (
+                  <Dropdown.Item
+                    onClick={() =>
+                      handleIndicatorChange(
+                        null,
+                        " Empreinte Sociale et environnementale"
+                      )
+                    }
+                  >
+                    Empreinte Sociale et environnementale
+                  </Dropdown.Item>
+                )}
+
+                {Object.entries(indicators)
+                  .filter(([indic]) =>
+                    session.validations[financialPeriod].includes(indic)
+                  )
+                  .map(([code, indic]) => {
+                    if (code === selectedIndicator) return null;
+                    return (
+                      <Dropdown.Item
+                        key={code}
+                        onClick={() =>
+                          handleIndicatorChange(code, indic.libelle)
+                        }
+                      >
+                        <Image
+                          className="me-2"
+                          src={`icons-ese/logo_ese_${code}_bleu.svg`}
+                          alt={code}
+                          height={20}
+                        />
+                        {indic.libelle}
+                      </Dropdown.Item>
+                    );
+                  })}
+              </DropdownButton>
+            </div>
             {selectedIndicator && (
               <Nav variant="underline" defaultActiveKey="/home">
                 <Nav.Item>

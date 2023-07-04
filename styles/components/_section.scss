@@ -162,6 +162,47 @@ section {
     }
   }
 
+  .indic-result-menu {
+
+    .btn:focus {
+      outline: 0;
+      box-shadow: 0 0 0 0.15rem rgba(250, 89, 95, 0.33);
+    }
+    .dropdown-menu {
+      border: 2px solid $light;
+      border-radius: 1rem;
+    }
+
+    .dropdown-item {
+      font-size: 0.8rem;
+      color: $primary;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $bg-light;
+      }
+    }
+  }
+
+
+
+  .download-dropdown {
+    border: 2px solid $light;
+    border-radius: 1rem;
+
+    .dropdown-item {
+      font-size: 0.8rem;
+      color: $primary;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $bg-light;
+      }
+    }
+  }
+
 }
 
 // Graphs Container
@@ -187,7 +228,9 @@ section {
 }
 
 #dropdown-indics-button {
-  padding: 1rem
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+
 }
 
 /* ---------- Loading Animation ---------- */
