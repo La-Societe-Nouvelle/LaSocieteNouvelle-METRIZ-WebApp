@@ -21,12 +21,12 @@ import { getPrevDate } from "/src/utils/Utils";
 import ExtraFinancialReport from "./components/ExtraFinancialReport";
 import FootprintReport from "./components/FootprintReport";
 
-import { generateFullReport } from "/src/utils/deliverables/generateFullReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
 import { updateComparativeData } from "./utils";
 import { Loader } from "../../popups/Loader";
 import { customSelectStyles } from "../../../src/utils/customStyles";
 import DownloadDropdown from "./components/DownloadDropdown";
+import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
 const Results = ({ session, publish, goBack }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -125,12 +125,9 @@ const Results = ({ session, publish, goBack }) => {
 
     setIsGenerating(true);
 
-    await generateFullReport(
-      session.legalUnit.corporateName,
-      session.validations[period.periodKey],
-      session.financialData,
-      session.impactsData,
-      session.comparativeData,
+    await generateDownloadableFiles(
+      selectedFiles,
+      session,
       () => {
         setIsGenerating(false);
       },

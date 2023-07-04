@@ -4,7 +4,7 @@ import { Button, Dropdown, Form } from "react-bootstrap";
 const DownloadDropdown = ({ onDownload }) => {
   const files = [
     { id: "sig-pdf", name: "Empreinte des soldes intermédiaires de gestion (.pdf)" },
-    { id: "sig-xlx", name: "Empreinte des soldes intermédiaires de gestion (.xlx)" },
+    { id: "sig-xlsx", name: "Empreinte des soldes intermédiaires de gestion (.xlsx)" },
     { id: "full-report", name: "Rapport complet (.pdf)" },
     { id: "svg", name: "Fichier de sauvegarde (.json)" },
   ];
