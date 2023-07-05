@@ -2,12 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 import { updateComparativeData } from "../../../src/version/updateVersion";
+import { Loader } from "../../popups/Loader";
 
 const DirectImpacts = ({ session, submit }) => {
   const [period, setPeriod] = useState(session.financialPeriod);
   const [validations, setValidations] = useState(
     session.validations[period.periodKey]
   );
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const [invalidIndicators, setInvalidIndicators] = useState(null);
 
@@ -22,8 +25,9 @@ const DirectImpacts = ({ session, submit }) => {
     // Handle submit on for first submit ?
     // fetch comparative data
     //
-    //await fetchData();
-
+    setIsLoading(true);
+    await fetchData();
+    setIsLoading(false);
     submit();
   };
 
@@ -60,7 +64,7 @@ const DirectImpacts = ({ session, submit }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-        {invalidIndicators.length > 0 && (
+        {invalidIndicators && invalidIndicators.length > 0 && (
           <Alert variant="danger">
             {`Attention : ${
               invalidIndicators.length > 1
@@ -84,6 +88,7 @@ const DirectImpacts = ({ session, submit }) => {
           initialSelectedIndicators={validations}
           updateValidations={handleValidations}
         />
+      {isLoading && <Loader title={"Chargement en cours..."} />}
 
         <div className="text-end">
           <Button

@@ -52,6 +52,8 @@ const Results = ({ session, publish, goBack }) => {
   );
 
   useEffect(() => {
+    window.scroll(0, 0);
+
     const divisionsOptions = Object.entries(divisions)
       .sort((a, b) => parseInt(a) - parseInt(b))
       .map(([value, label]) => {
