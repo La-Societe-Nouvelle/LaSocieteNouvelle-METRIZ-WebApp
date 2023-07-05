@@ -1,5 +1,5 @@
-import React, {useEffect, useState } from "react";
-import { Button, Container } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 import { updateComparativeData } from "../../../src/version/updateVersion";
 
@@ -9,17 +9,23 @@ const DirectImpacts = ({ session, submit }) => {
     session.validations[period.periodKey]
   );
 
-  const handleSubmitStatements = async() => {
-   
-    // Handle submit on for first submit ? 
-    // fetch comparative data
-    // 
-    //await fetchData();
-    
-    //submit();
-  };
+  const [invalidIndicators, setInvalidIndicators] = useState(null);
 
- 
+  const handleSubmitStatements = async () => {
+    console.log(invalidIndicators);
+
+    if (invalidIndicators.length > 0) {
+      window.scroll(0, 0);
+      return;
+    }
+
+    // Handle submit on for first submit ?
+    // fetch comparative data
+    //
+    //await fetchData();
+
+    submit();
+  };
 
   const fetchData = async () => {
     let updatedComparativeData = session.comparativeData;
@@ -37,12 +43,12 @@ const DirectImpacts = ({ session, submit }) => {
     }
 
     session.comparativeData = updatedComparativeData;
-
   };
 
-  
-  const handleValidations = async (indicators) => {
+  const handleValidations = async (indicators, invalidIndicators) => {
+    console.log(invalidIndicators);
     setValidations(indicators);
+    setInvalidIndicators(invalidIndicators);
     session.validations[period.periodKey] = indicators;
   };
 
@@ -54,6 +60,23 @@ const DirectImpacts = ({ session, submit }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
+        {invalidIndicators.length > 0 && (
+          <Alert variant="danger">
+            {`Attention : ${
+              invalidIndicators.length > 1
+                ? "plusieurs erreurs ont été détectées"
+                : "une erreur a été détectée"
+            }  ${
+              invalidIndicators.length > 1
+                ? "dans certains formulaires de déclarations"
+                : ""
+            }. Veuillez vérifier et corriger ${
+              invalidIndicators.length > 1
+                ? `les ${invalidIndicators.length} formulaires concernés`
+                : "le formulaire concerné"
+            } avant de pouvoir passer aux résultats.`}
+          </Alert>
+        )}
 
         <StatementForms
           session={session}

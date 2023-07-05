@@ -43,7 +43,8 @@ const StatementForms = ({
     );
   
     // Update validations for validSelectedIndicators here
-    updateValidations(validSelectedIndicators);
+    updateValidations(validSelectedIndicators, Object.keys(invalidIndicators));
+  
   }, [selectedIndicators, invalidIndicators]);
   
 
