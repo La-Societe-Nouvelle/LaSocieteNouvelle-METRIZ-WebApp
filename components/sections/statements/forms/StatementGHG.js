@@ -1,114 +1,103 @@
 // La Société Nouvelle
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentGHG } from "../modals/AssessmentGHG";
+import { unitSelectStyles } from "../../../../src/utils/customStyles";
 
-const StatementGHG = (props) => {
+const StatementGHG = ({ impactsData, onUpdate, onError }) => {
   const [greenhousesGazEmissions, setGreenhousesGazEmissions] = useState(
-    valueOrDefault(props.impactsData.greenhousesGazEmissions, undefined)
+    valueOrDefault(impactsData.greenhousesGazEmissions, "")
   );
 
   const [greenhousesGazEmissionsUnit, setGreenhousesGazEmissionsUnit] =
-    useState(props.impactsData.greenhousesGazEmissionsUnit);
+    useState(impactsData.greenhousesGazEmissionsUnit);
+
   const [
     greenhousesGazEmissionsUncertainty,
     setGreenhousesGazEmissionsUncertainty,
   ] = useState(
-    valueOrDefault(
-      props.impactsData.greenhousesGazEmissionsUncertainty,
-      undefined
-    )
+    valueOrDefault(impactsData.greenhousesGazEmissionsUncertainty, "")
   );
-  const [info, setInfo] = useState(props.impactsData.comments.ghg || "");
+  const [info, setInfo] = useState(impactsData.comments.ghg || "");
   const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    if (greenhousesGazEmissions !== props.impactsData.greenhousesGazEmissions) {
-      setGreenhousesGazEmissions(props.impactsData.greenhousesGazEmissions);
-    }
-
-    if (
-      greenhousesGazEmissionsUnit !==
-      props.impactsData.greenhousesGazEmissionsUnit
-    ) {
-      setGreenhousesGazEmissionsUnit(
-        props.impactsData.greenhousesGazEmissionsUnit
-      );
-    }
-
-    if (
-      greenhousesGazEmissionsUncertainty !==
-      props.impactsData.greenhousesGazEmissionsUncertainty
-    ) {
-      setGreenhousesGazEmissionsUncertainty(
-        props.impactsData.greenhousesGazEmissionsUncertainty
-      );
-    }
-  }, [
-    props.impactsData.greenhousesGazEmissions,
-    props.impactsData.greenhousesGazEmissionsUncertainty,
-  ]);
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const options = [
     { value: "kgCO2e", label: "kgCO2e" },
     { value: "tCO2e", label: "tCO2e" },
   ];
 
-  const { netValueAdded } = props.impactsData;
-  const isValid = greenhousesGazEmissions != null && netValueAdded != null;
-
   const updateGreenhousesGazEmissions = (input) => {
-    console.log(input.target.value);
-    props.impactsData.ghgTotal = true;
-    props.impactsData.setGreenhousesGazEmissions(input.target.value);
+    let errorMessage = "";
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    }
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    }
+
+    setIsInvalid(errorMessage !== "");
+    onError("ghg", errorMessage);
+
+    setGreenhousesGazEmissions(input.target.value);
+
+    impactsData.ghgTotal = true;
+
+    impactsData.setGreenhousesGazEmissions(input.target.value);
     setGreenhousesGazEmissionsUncertainty(
-      props.impactsData.greenhousesGazEmissionsUncertainty
+      impactsData.greenhousesGazEmissionsUncertainty
     );
-    props.onUpdate("ghg");
+
+    onUpdate("ghg");
   };
 
   const updateGreenhousesGazEmissionsUncertainty = (input) => {
-    props.impactsData.greenhousesGazEmissionsUncertainty = input.target.value;
-    props.onUpdate("ghg");
+    impactsData.greenhousesGazEmissionsUncertainty = input.target.value;
+    setGreenhousesGazEmissionsUncertainty(input.target.value);
+    onUpdate("ghg");
   };
 
   const updateGreenhousesGazEmissionsUnit = (selected) => {
     const selectedUnit = selected.value;
 
-    if (selectedUnit !== props.impactsData.greenhousesGazEmissionsUnit) {
-      let updatedGreenhousesGazEmissions =
-        props.impactsData.greenhousesGazEmissions;
+    if (selectedUnit !== impactsData.greenhousesGazEmissionsUnit) {
+      let updatedGreenhousesGazEmissions = impactsData.greenhousesGazEmissions;
 
       if (selectedUnit === "tCO2e") {
         updatedGreenhousesGazEmissions =
-          props.impactsData.greenhousesGazEmissions / 1000;
+          impactsData.greenhousesGazEmissions / 1000;
       } else if (selectedUnit === "kgCO2e") {
         updatedGreenhousesGazEmissions =
-          props.impactsData.greenhousesGazEmissions * 1000;
+          impactsData.greenhousesGazEmissions * 1000;
       }
 
-      updateGreenhousesGazEmissions(updatedGreenhousesGazEmissions);
+      setGreenhousesGazEmissions(updatedGreenhousesGazEmissions);
+      impactsData.setGreenhousesGazEmissions(updatedGreenhousesGazEmissions);
     }
     setGreenhousesGazEmissionsUnit(selectedUnit);
 
-    props.impactsData.greenhousesGazEmissionsUnit = selectedUnit;
+    impactsData.greenhousesGazEmissionsUnit = selectedUnit;
 
-    props.onUpdate("ghg");
+    onUpdate("ghg");
   };
 
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.ghg = info);
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.ghg = event.target.value;
+  };
 
   return (
     <Form className="statement">
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column >
+            <Form.Label column>
               Emissions directes de Gaz à effet de serre - SCOPE 1
             </Form.Label>
             <Col>
@@ -119,12 +108,12 @@ const StatementGHG = (props) => {
                     value={roundValue(greenhousesGazEmissions, 0)}
                     inputMode="numeric"
                     onChange={updateGreenhousesGazEmissions}
-                    isInvalid={!isValid}
+                    isInvalid={isInvalid}
                   />
                 </Col>
-                <Col>
+                <Col sm={4}>
                   <Select
-                    className="form-select-control small"
+                    styles={unitSelectStyles}
                     options={options}
                     value={{
                       label: greenhousesGazEmissionsUnit,
@@ -137,9 +126,7 @@ const StatementGHG = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
-              Incertitude
-            </Form.Label>
+            <Form.Label column>Incertitude</Form.Label>
             <Col>
               <InputGroup>
                 <Form.Control
@@ -155,14 +142,16 @@ const StatementGHG = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>            <Col>
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
+            <Col>
               <Form.Control
                 as="textarea"
                 rows={3}
                 className="w-100"
                 onChange={updateInfo}
                 value={info}
-                onBlur={saveInfo}
               />
             </Col>
           </Form.Group>
@@ -206,10 +195,10 @@ const StatementGHG = (props) => {
         </Modal.Header>
         <Modal.Body>
           <AssessmentGHG
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>

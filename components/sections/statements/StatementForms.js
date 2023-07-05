@@ -30,7 +30,7 @@ const StatementForms = ({
     initialSelectedIndicators
   );
 
-  const [invalidIndicators, setInvalidIndicators] = useState({});
+  const [invalidIndicators, setInvalidIndicators] = useState({}); 
 
   const [indicatorModal, setIndicatorModal] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -77,10 +77,16 @@ const StatementForms = ({
       setSelectedIndicators((prevSelectedIndicators) =>
         prevSelectedIndicators.filter((indicator) => indicator !== value)
       );
+      setInvalidIndicators((prevInvalidIndicators) => {
+        const updatedInvalidIndicators = { ...prevInvalidIndicators };
+        delete updatedInvalidIndicators[value];
+        return updatedInvalidIndicators;
+      });
     }
   };
 
   const handleError = (field, errorMessage) => {
+
     if (errorMessage) {
       setInvalidIndicators((prevInvalidIndicators) => ({
         ...prevInvalidIndicators,

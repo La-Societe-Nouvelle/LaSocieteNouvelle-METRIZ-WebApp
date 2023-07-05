@@ -1,57 +1,31 @@
 // La Société Nouvelle
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { unitSelectStyles } from "../../../../src/utils/customStyles";
 
-const StatementHAZ = (props) => {
+const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
   const [hazardousSubstancesConsumption, setHazardousSubstancesConsumption] =
-    useState(
-      valueOrDefault(
-        props.impactsData.hazardousSubstancesConsumption,
-        undefined
-      )
-    );
+    useState(valueOrDefault(impactsData.hazardousSubstancesConsumption, ""));
 
   const [
     hazardousSubstancesConsumptionUnit,
     setHazardousSubstancesConsumptionUnit,
-  ] = useState(props.impactsData.hazardousSubstancesConsumptionUnit);
+  ] = useState(impactsData.hazardousSubstancesConsumptionUnit);
 
   const [
     hazardousSubstancesConsumptionUncertainty,
     setHazardousSubstancesConsumptionUncertainty,
   ] = useState(
-    valueOrDefault(
-      props.impactsData.hazardousSubstancesConsumptionUncertainty,
-      undefined
-    )
+    valueOrDefault(impactsData.hazardousSubstancesConsumptionUncertainty, "")
   );
-  const [info, setInfo] = useState(props.impactsData.comments.haz || "");
 
-  useEffect(() => {
-    if (
-      hazardousSubstancesConsumption !==
-      props.impactsData.hazardousSubstancesConsumption
-    ) {
-      setHazardousSubstancesConsumption(
-        props.impactsData.hazardousSubstancesConsumption
-      );
-    }
-    if (
-      hazardousSubstancesConsumptionUncertainty !==
-      props.impactsData.hazardousSubstancesConsumptionUncertainty
-    ) {
-      setHazardousSubstancesConsumptionUncertainty(
-        props.impactsData.hazardousSubstancesConsumptionUncertainty
-      );
-    }
-  }, [
-    props.impactsData.hazardousSubstancesConsumption,
-    props.impactsData.hazardousSubstancesConsumptionUncertainty,
-  ]);
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  const [info, setInfo] = useState(impactsData.comments.haz || "");
 
   const options = [
     { value: "kg", label: "kg" },
@@ -59,31 +33,73 @@ const StatementHAZ = (props) => {
   ];
 
   const updateHazardousSubstancesConsumption = (input) => {
-    props.impactsData.setHazardousSubstancesConsumption(input.target.value);
+
+    let errorMessage = "";
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    }
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    }
+
+    setIsInvalid(errorMessage !== "");
+    onError("haz", errorMessage);
+
+    setHazardousSubstancesConsumption(input.target.value);
+
+    impactsData.setHazardousSubstancesConsumption(input.target.value);
     setHazardousSubstancesConsumptionUncertainty(
-      props.impactsData.hazardousSubstancesConsumptionUncertainty
+      impactsData.hazardousSubstancesConsumptionUncertainty
     );
-    props.onUpdate("haz");
+
+    onUpdate("haz");
   };
 
   const updateHazardousSubstancesConsumptionUncertainty = (input) => {
-    props.impactsData.hazardousSubstancesConsumptionUncertainty =
-      input.target.value;
-    props.onUpdate("haz");
+    impactsData.hazardousSubstancesConsumptionUncertainty = input.target.value;
+    onUpdate("haz");
   };
 
-  const updateHazardousSubstancesConsumptionUnit = (input) => {};
+  const updateHazardousSubstancesConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
 
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.haz = info);
+    if (selectedUnit !== impactsData.hazardousSubstancesConsumptionUnit) {
+      let updatedHazardousSubstancesConsumption =
+        impactsData.hazardousSubstancesConsumption;
+
+      if (selectedUnit === "t") {
+        updatedHazardousSubstancesConsumption =
+          impactsData.hazardousSubstancesConsumption / 1000;
+      } else if (selectedUnit === "kg") {
+        updatedHazardousSubstancesConsumption =
+          impactsData.hazardousSubstancesConsumption * 1000;
+      }
+
+      setHazardousSubstancesConsumption(updatedHazardousSubstancesConsumption);
+      impactsData.setHazardousSubstancesConsumption(
+        updatedHazardousSubstancesConsumption
+      );
+    }
+    setHazardousSubstancesConsumptionUnit(selectedUnit);
+
+    impactsData.hazardousSubstancesConsumptionUnit = selectedUnit;
+
+    onUpdate("ghg");
+  };
+
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.haz = event.target.value;
+  };
 
   return (
     <Form className="statement">
       <Row>
-      <Col lg={7}>
-
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column >
+            <Form.Label column>
               Utilisation de produits dangereux - santé/environnement
             </Form.Label>
             <Col>
@@ -94,10 +110,12 @@ const StatementHAZ = (props) => {
                     value={roundValue(hazardousSubstancesConsumption, 0)}
                     inputMode="numeric"
                     onChange={updateHazardousSubstancesConsumption}
+                    isInvalid={isInvalid}
                   />
                 </Col>
                 <Col sm={4}>
                   <Select
+                    styles={unitSelectStyles}
                     options={options}
                     defaultValue={{
                       label: hazardousSubstancesConsumptionUnit,
@@ -112,9 +130,7 @@ const StatementHAZ = (props) => {
           </Form.Group>
 
           <Form.Group as={Row} className="form-group">
-            <Form.Label column >
-              Incertitude
-            </Form.Label>
+            <Form.Label column>Incertitude</Form.Label>
             <Col>
               <InputGroup>
                 <Form.Control
@@ -133,14 +149,15 @@ const StatementHAZ = (props) => {
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               className="w-100"
               onChange={updateInfo}
               value={info}
-              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>

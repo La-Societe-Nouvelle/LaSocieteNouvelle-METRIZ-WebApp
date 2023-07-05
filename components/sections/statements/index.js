@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState } from "react";
 import { Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 import { updateComparativeData } from "../../../src/version/updateVersion";
@@ -10,13 +10,16 @@ const DirectImpacts = ({ session, submit }) => {
   );
 
   const handleSubmitStatements = async() => {
-    console.log(validations);
+   
+    // Handle submit on for first submit ? 
     // fetch comparative data
-    // Submit and go to results
-   await fetchData();
-   console.log(session.comparativeData)
-    submit();
+    // 
+    //await fetchData();
+    
+    //submit();
   };
+
+ 
 
   const fetchData = async () => {
     let updatedComparativeData = session.comparativeData;
@@ -37,8 +40,8 @@ const DirectImpacts = ({ session, submit }) => {
 
   };
 
+  
   const handleValidations = async (indicators) => {
-    console.log(indicators);
     setValidations(indicators);
     session.validations[period.periodKey] = indicators;
   };

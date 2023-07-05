@@ -1,42 +1,31 @@
 // La Société Nouvelle
 
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import Select from "react-select";
 
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentNRG } from "../modals/AssessmentNRG";
+import { unitSelectStyles } from "../../../../src/utils/customStyles";
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
 
-const StatementNRG = (props) => {
+const StatementNRG = ({ impactsData, onUpdate, onError }) => {
+  
   const [energyConsumption, setEnergyConsumption] = useState(
-    valueOrDefault(props.impactsData.energyConsumption, undefined)
+    valueOrDefault(impactsData.energyConsumption, "")
   );
   const [energyConsumptionUncertainty, setEnergyConsumptionUncertainty] =
-    useState(
-      valueOrDefault(props.impactsData.energyConsumptionUncertainty, undefined)
-    );
-  const [info, setInfo] = useState(props.impactsData.comments.nrg || "");
+    useState(valueOrDefault(impactsData.energyConsumptionUncertainty, ""));
+
+  const [energyConsumptionUnit, setEnergyConsumptionUnit] = useState(
+    impactsData.energyConsumptionUnit
+  );
+
+  const [isInvalid, setIsInvalid] = useState(false);
+  const [info, setInfo] = useState(impactsData.comments.nrg || "");
 
   const [showModal, setShowModal] = useState(false);
-
-  useEffect(() => {
-    if (energyConsumption !== props.impactsData.energyConsumption) {
-      setEnergyConsumption(props.impactsData.energyConsumption);
-    }
-    if (
-      energyConsumptionUncertainty !==
-      props.impactsData.energyConsumptionUncertainty
-    ) {
-      setEnergyConsumptionUncertainty(
-        props.impactsData.energyConsumptionUncertainty
-      );
-    }
-  }, [
-    props.impactsData.energyConsumption,
-    props.impactsData.energyConsumptionUncertainty,
-  ]);
 
   const options = [
     { value: "MJ", label: "MJ" },
@@ -45,41 +34,49 @@ const StatementNRG = (props) => {
     { value: "MWh", label: "MWh" },
   ];
   const updateEnergyConsumption = (input) => {
-    props.impactsData.nrgTotal = true;
-    props.impactsData.setEnergyConsumption(input.target.value);
-    setEnergyConsumptionUncertainty(
-      props.impactsData.energyConsumptionUncertainty
-    );
-    props.onUpdate("nrg");
+    let errorMessage = "";
+
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    }
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    }
+    setIsInvalid(errorMessage !== "");
+    onError("nrg", errorMessage);
+
+    impactsData.nrgTotal = true;
+    impactsData.setEnergyConsumption(input.target.value);
+
+    setEnergyConsumption(input.target.value);
+    setEnergyConsumptionUncertainty(impactsData.energyConsumptionUncertainty);
+    onUpdate("nrg");
   };
 
   const updateEnergyConsumptionUncertainty = (input) => {
-    props.impactsData.energyConsumptionUncertainty = input.target.value;
-    props.onUpdate("nrg");
+    impactsData.energyConsumptionUncertainty = input.target.value;
+    onUpdate("nrg");
   };
 
   const updateEnergyConsumptionUnit = (selected) => {
     const selectedUnit = selected.value;
 
-    const { energyConsumption, energyConsumptionUnit } = this.props.impactsData;
-
-    if (selectedUnit !== energyConsumptionUnit) {
-      const convertedValue = this.convertEnergyConsumption(
-        energyConsumption,
-        energyConsumptionUnit,
+    if (selectedUnit !== impactsData.energyConsumptionUnit) {
+      const convertedValue = convertEnergyConsumption(
+        impactsData.energyConsumption,
+        impactsData.energyConsumptionUnit,
         selectedUnit
       );
-
-      this.updateEnergyConsumption(convertedValue);
+      setEnergyConsumption(convertedValue);
+      impactsData.setEnergyConsumption(convertedValue);
     }
+    setEnergyConsumptionUnit(selectedUnit);
 
-    this.setState({
-      energyConsumptionUnit: selectedUnit,
-    });
+    impactsData.energyConsumptionUnit = selectedUnit;
 
-    this.props.impactsData.energyConsumptionUnit = selectedUnit;
-
-    this.props.onUpdate("nrg");
+    onUpdate("nrg");
   };
 
   const convertEnergyConsumption = (value, fromUnit, toUnit) => {
@@ -109,8 +106,11 @@ const StatementNRG = (props) => {
     const convertedValue = value * conversionFactor;
     return convertedValue;
   };
-  const updateInfo = (event) => setInfo(event.target.value);
-  const saveInfo = () => (props.impactsData.comments.nrg = info);
+
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.nrg = event.target.value;
+  };
 
   return (
     <Form className="statement">
@@ -125,16 +125,18 @@ const StatementNRG = (props) => {
                     type="number"
                     value={roundValue(energyConsumption, 0)}
                     inputMode="numeric"
+                    isInvalid={isInvalid}
                     onChange={updateEnergyConsumption}
                   />
                 </Col>
-                <Col>
+                <Col sm={4}>
                   <Select
+                    styles={unitSelectStyles}
                     options={options}
-                    // value={{
-                    //   label: energyConsumptionUnit,
-                    //   value: energyConsumptionUnit,
-                    // }}
+                    value={{
+                      label: energyConsumptionUnit,
+                      value: energyConsumptionUnit,
+                    }}
                     onChange={updateEnergyConsumptionUnit}
                   />
                 </Col>
@@ -168,7 +170,6 @@ const StatementNRG = (props) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
-              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -196,10 +197,10 @@ const StatementNRG = (props) => {
         </Modal.Header>
         <Modal.Body>
           <AssessmentNRG
-            impactsData={props.impactsData}
+            impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            onUpdate={props.onUpdate}
+            onUpdate={onUpdate}
           />
         </Modal.Body>
       </Modal>
