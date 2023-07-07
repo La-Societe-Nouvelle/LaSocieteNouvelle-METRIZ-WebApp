@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { IndividualsData } from "../modals/IndividualsData";
-import { ImportDSN } from "../modals/ImportDSN";
+import { IndividualsData } from "../modals/socialData/IndividualsData";
+import ImportDSN from "../modals/socialData/ImportDSN";
 
 /* ---------- DECLARATION - INDIC #IDR ---------- */
 
@@ -13,31 +13,28 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
     valueOrDefault(impactsData.interdecileRange, "")
   );
   const [info, setInfo] = useState(impactsData.comments.idr || "");
-  const [disableStatement, setDisableStatement] = useState(disableStatement);
 
   const [isInvalid, setIsInvalid] = useState(false);
 
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
   const [showDSN, setShowDSN] = useState(false);
 
-  useEffect(() => {
-    if (disableStatement !== disableStatement) {
-      setDisableStatement(disableStatement);
-    }
-
-    if (interdecileRange !== valueOrDefault(impactsData.interdecileRange, "")) {
-      setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
-    }
-  }, [
-    disableStatement,
-    impactsData.hasEmployees,
-    interdecileRange,
-    impactsData.netValueAdded,
-    impactsData.interdecileRange,
-  ]);
-
   const hasEmployees = impactsData.hasEmployees;
 
+  useEffect(() => {
+    if (impactsData.hasEmployees == false) {
+      onUpdate("idr");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      impactsData.interdecileRange &&
+      interdecileRange != impactsData.interdecileRange
+    ) {
+      setInterdecileRange(impactsData.interdecileRange);
+    }
+  }, [impactsData.interdecileRange]);
   const onHasEmployeesChange = (event) => {
     const radioValue = event.target.value;
     let newHasEmployees = null;
@@ -58,14 +55,11 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
     impactsData.wageGap = newWageGap;
     setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
     onUpdate("idr");
-    onUpdate("geq");
   };
 
   const updateInterdecileRange = (event) => {
-    console.log("change");
     const inputValue = event.target.valueAsNumber;
     let errorMessage = "";
-    console.log(inputValue);
     // Validation checks for the input value
     if (isNaN(inputValue)) {
       errorMessage = "Veuillez saisir un nombre valide.";
@@ -89,7 +83,8 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
   return (
     <Form className="statement">
       <Row>
-        <Col>
+      <Col lg={7}>
+
           <Form.Group as={Row} className="form-group align-items-center">
             <Form.Label column lg={7}>
               L'entreprise est-elle employeur ?
@@ -103,7 +98,6 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
                 value="true"
                 checked={hasEmployees === true}
                 onChange={onHasEmployeesChange}
-                disabled={disableStatement}
               />
               <Form.Check
                 inline
@@ -113,7 +107,6 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
                 value="false"
                 checked={hasEmployees === false}
                 onChange={onHasEmployeesChange}
-                disabled={disableStatement}
               />
             </Col>
           </Form.Group>
@@ -122,14 +115,36 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
               Rapport interdécile D9/D1 des taux horaires bruts
             </Form.Label>
             <Col>
+         
               <Form.Control
                 type="number"
                 value={roundValue(interdecileRange, 1)}
                 inputMode="numeric"
                 onChange={updateInterdecileRange}
-                disabled={hasEmployees === false || disableStatement}
+                disabled={hasEmployees === false}
                 isInvalid={isInvalid}
               />
+              <Button
+                variant="light-secondary"
+                className="btn-sm mt-1 me-2 rounded-2  w-100 p-1"
+                onClick={() => setShowDSN(true)}
+                disabled={hasEmployees ? false : true}
+              >
+                <i className="bi bi-upload me-1"></i>
+                &nbsp;Importer les DSN
+              </Button>
+             
+                <Button
+          
+                  variant="light"
+                  className="btn-sm mt-1 me-2 rounded-2 w-100 p-1 fw-bold"
+                  onClick={() => setShowCalulatorModal(true)}
+                  disabled={hasEmployees && impactsData.socialStatements.length > 0 ? false : true}
+                >
+               <i className="bi bi-pencil me-1"></i>
+                  Gérer les données importées
+                </Button>
+           
             </Col>
           </Form.Group>
         </Col>
@@ -144,30 +159,9 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
-              disabled={disableStatement}
             />
           </Form.Group>
         </Col>
-        <div className="m-3 text-end">
-          <Button
-            variant="light-secondary"
-            className="btn-sm me-2"
-            onClick={() => setShowDSN(true)}
-            disabled={hasEmployees && !disableStatement ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Import Fichiers DSN
-          </Button>
-          <Button
-            variant="light-secondary"
-            className="btn-sm"
-            onClick={() => setShowCalulatorModal(true)}
-            disabled={hasEmployees && !disableStatement ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Outil d'évaluation
-          </Button>
-        </div>
       </Row>
       <Modal
         show={showCalculatorModal}
@@ -188,14 +182,9 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
         </Modal.Body>
       </Modal>
 
-      <Modal
-        show={showDSN}
-        size="xl"
-        centered
-        onHide={() => setShowCalulatorModal(false)}
-      >
+      <Modal show={showDSN} size="xl" centered onHide={() => setShowDSN(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Données sociales</Modal.Title>
+          <Modal.Title>Données Sociales Nominatives</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <ImportDSN

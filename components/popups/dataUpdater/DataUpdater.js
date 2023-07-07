@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
-import { ComparativeData } from "../../../src/ComparativeData";
-import { updateComparativeData } from "../../../src/version/updateVersion";
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import UpdateDataView from "./UpdatedDataView";
 
-export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => {
+export const DataUpdater = ({
+  session,
+  downloadSession,
+  updatePrevSession,
+}) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [updatedSession, setUpdatedSession] = useState({});
@@ -14,17 +17,18 @@ export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => 
 
   const handleRefresh = async () => {
     setIsLoading(true);
-    const updatedSession = new Session({ ...session });
+    const updatedSession = new Session(JSON.parse(JSON.stringify(session)));
 
     await fetchLatestData(updatedSession);
-
 
     setUpdatedSession(updatedSession);
     setIsLoading(false);
     setIsDatafetched(true);
   };
 
-  const handleClose = () => {setShow(false)};
+  const handleClose = () => {
+    setShow(false);
+  };
 
   return (
     <Modal show={show} size="lg" onHide={handleClose}>
@@ -96,12 +100,10 @@ const fetchLatestData = async (updatedSession) => {
 
   // Récupère les dernières données comparatives
 
-  const latestComparativeData = await fetchLatestComparativeData(
-    validations,
-    updatedSession.comparativeData.activityCode
-  );
 
-  updatedSession.comparativeData = latestComparativeData;
+  if (indicators.length > 0) {
+    await fetchComparativeData(updatedSession, validations);
+  }
 };
 
 const fetchLatestProviders = async (
@@ -128,7 +130,6 @@ const fetchLatestProviders = async (
 
 const fetchLatestLegalUnit = async (legalUnit) => {
   await LegalUnitService.getLegalUnitData(legalUnit.siren).then((res) => {
-    console.log(res.data.legalUnit);
     let status = res.data.header.code;
     if (status == 200) {
       legalUnit.corporateName = res.data.legalUnit.denomination;
@@ -161,21 +162,4 @@ const fetchLatestAccountsData = async (immobilisations, stocks) => {
       break;
     }
   }
-};
-
-const fetchLatestComparativeData = async (validations, activityCode) => {
-  let latestComparativeData = new ComparativeData();
-
-  for await (const indic of validations) {
-    // update comparative data for each validated indicators
-    const updatedData = await updateComparativeData(
-      indic,
-      activityCode,
-      latestComparativeData
-    );
-
-    latestComparativeData = updatedData;
-  }
-
-  return latestComparativeData;
 };

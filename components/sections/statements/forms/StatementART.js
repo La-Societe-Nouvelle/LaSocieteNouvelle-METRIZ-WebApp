@@ -1,27 +1,20 @@
 // La Société Nouvelle
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { roundValue } from "/src/utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ART ---------- */
 
 
 const StatementART = ({ impactsData, onUpdate, onError }) => {
   const [craftedProduction, setCraftedProduction] = useState( impactsData.craftedProduction || "" );
-  const [isValueAddedCrafted, setIsValueAddedCrafted] = useState(impactsData.isValueAddedCrafted || "");
   const [info, setInfo] = useState(impactsData.comments.art || "");
   const [isInvalid, setIsInvalid] = useState(false);
 
-  useEffect(() => {
-    if (craftedProduction !== impactsData.craftedProduction) {
-      setCraftedProduction(impactsData.craftedProduction || "");
-    }
-  }, [impactsData.craftedProduction]);
 
   const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
-
     switch (radioValue) {
       case "true":
         impactsData.isValueAddedCrafted = true;
@@ -29,8 +22,8 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
         setIsInvalid(false);
         onError("art", false);
         break;
-      case "partial":
-        impactsData.isValueAddedCrafted = null;
+      case "partially":
+        impactsData.isValueAddedCrafted = "partially";
         impactsData.craftedProduction = "";
         setIsInvalid(false);
         onError("art", false);
@@ -42,8 +35,10 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
         onError("art", false);
         break;
     }
-    setCraftedProduction(impactsData.craftedProduction);
+ 
     onUpdate("art");
+    setCraftedProduction(impactsData.craftedProduction);
+
   };
 
   const handleIsValueAddedCrafted = (event) => {
@@ -75,7 +70,6 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
   return (
     <Form className="statement">
       <Row>
-        {console.log(craftedProduction)}
         <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
             <Form.Label column>
@@ -102,8 +96,8 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
                 inline
                 type="radio"
                 label="Partiellement"
-                value="partial"
-                checked={impactsData.isValueAddedCrafted === null}
+                value="partially"
+                checked={impactsData.isValueAddedCrafted === "partially"}
                 onChange={onIsValueAddedCraftedChange}
               />
             </Col>
@@ -119,7 +113,7 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
                   value={roundValue(craftedProduction, 0)}
                   inputMode="numeric"
                   onChange={handleIsValueAddedCrafted}
-                  disabled={impactsData.isValueAddedCrafted !== null}
+                  disabled={impactsData.isValueAddedCrafted !== "partially"}
                   isInvalid={isInvalid}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>

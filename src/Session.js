@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-const currentVersion = "2.0.0";
+const currentVersion = "3.0.0";
 
 // Libraries
 import metaIndics from "../lib/indics.json";
@@ -21,8 +21,8 @@ import {
   updateFixedCapitalConsumptionsFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
-import { ComparativeData } from "./ComparativeData";
 import { getDatesEndMonths, getLastDateOfMonth, getPrevDate } from "./utils/Utils";
+import { ComparativeData } from "./models/ComparativeData";
 
 /* ---------- OBJECT SESSION ---------- */
 

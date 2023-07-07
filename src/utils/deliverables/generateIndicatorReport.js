@@ -21,7 +21,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateIndicatorReport = async (
+export const generateReport = async (
   legalUnit,
   indic,
   label,

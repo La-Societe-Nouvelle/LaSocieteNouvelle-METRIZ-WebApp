@@ -16,31 +16,30 @@ import {
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
 
-import { getPrevDate } from "/src/utils/Utils";
+import { customSelectStyles } from "../../../config/customStyles";
+
+import { getPrevDate } from "../../../src/utils/Utils";
 
 import ExtraFinancialReport from "./components/ExtraFinancialReport";
 import FootprintReport from "./components/FootprintReport";
-
-import { ChartsContainer } from "./charts/ChartsContainer";
-import { updateComparativeData } from "./utils";
-import { Loader } from "../../popups/Loader";
-import { customSelectStyles } from "../../../src/utils/customStyles";
 import DownloadDropdown from "./components/DownloadDropdown";
+import { ChartsContainer } from "./components/ChartsContainer";
+import { Loader } from "../../popups/Loader";
+
 import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
 const Results = ({ session, publish, goBack }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState(
     session.comparativeData.activityCode
   );
+
   const [selectedIndicator, setSelectedIndicator] = useState();
   const [selectedIndicatorLabel, setSelectedIndicatorLabel] = useState(
     "Sélectionner un indicateur..."
   );
 
-  const [comparativeData, setComparativeData] = useState(
-    session.comparativeData
-  );
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,39 +63,29 @@ const Results = ({ session, publish, goBack }) => {
   }, []);
 
   useEffect(() => {
-    let isCancelled = false;
+    if (session.comparativeData.activityCode !== selectedDivision) {
+      let isCancelled = false;
+      setIsLoading(true);
 
-    const fetchData = async () => {
-      if (session.comparativeData.activityCode !== selectedDivision) {
+      const fetchData = async () => {
+
         session.comparativeData.activityCode = selectedDivision;
-
-        let updatedComparativeData = comparativeData;
-
-        for await (const indic of session.validations[
+        await fetchComparativeData(session.comparativeData,session.validations[
           session.financialPeriod.periodKey
-        ]) {
-          const updatedData = await updateComparativeData(
-            indic,
-            selectedDivision,
-            updatedComparativeData
-          );
+        ] )
 
-          updatedComparativeData = updatedData;
-        }
 
         if (!isCancelled) {
-          session.comparativeData = updatedComparativeData;
-          setComparativeData(updatedComparativeData);
           setIsLoading(false);
         }
-      }
-    };
+      };
 
-    fetchData();
+      fetchData();
 
-    return () => {
-      isCancelled = true;
-    };
+      return () => {
+        isCancelled = true;
+      };
+    }
   }, [selectedDivision]);
 
   const handleDivisionChange = (selectedOption) => {
@@ -109,7 +98,13 @@ const Results = ({ session, publish, goBack }) => {
     setSelectedIndicator(code);
     let labelMenu = (
       <>
-        <Image className="me-2" src={`icons-ese/${code}.svg`} height={40} />
+        {code && (
+          <Image
+            className="me-2"
+            src={`icons-ese/logo_ese_${code}_rose.svg`}
+            height={25}
+          />
+        )}
         {label}
       </>
     );
@@ -118,8 +113,6 @@ const Results = ({ session, publish, goBack }) => {
   };
 
   const handleDownload = async (selectedFiles) => {
-    console.log(selectedFiles);
-
     const period = session.financialPeriod;
     const prevPeriod = session.availablePeriods.find(
       (period) => period.dateEnd == prevDateEnd
@@ -129,6 +122,7 @@ const Results = ({ session, publish, goBack }) => {
 
     await generateDownloadableFiles(
       selectedFiles,
+      selectedIndicator,
       session,
       () => {
         setIsGenerating(false);
@@ -137,86 +131,91 @@ const Results = ({ session, publish, goBack }) => {
       prevPeriod
     );
   };
-
   return (
     <Container fluid className="results">
       <div className="box">
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
           <div className="d-flex">
-            <DownloadDropdown onDownload={handleDownload} />
+            <DownloadDropdown onDownload={handleDownload} view={selectedIndicator} />
 
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
             </Button>
+   
           </div>
         </div>
         <p className="mb-4">
           Découvrez les résultats pour chaque indicateur mesuré et comparez les
           avec votre branche.
         </p>
+        <Row>
+          <Col lg={6}>
+            <div className="legal-unit-info d-flex justify-content-between pe-2">
+              <p className="fw-bold col-form-label">
+                Unité légale : {session.legalUnit.corporateName}
+              </p>
+              <p className="fw-bold col-form-label">
+                Année de l'exercice :{" "}
+                {session.financialPeriod.periodKey.slice(2)}
+              </p>
+              {session.legalUnit.siren && (
+                <p className="fw-bold col-form-label">
+                  SIREN/SIRET : {session.legalUnit.siren}
+                </p>
+              )}
 
-        <div className="legal-unit-info">
-          <Row>
-            <Col>
-              <p className="fw-bold col-form-label">SIREN/SIRET :</p>
+              {session.legalUnit.activityCode && (
+                <p className="fw-bold col-form-label">
+                  Code APE : {session.legalUnit.activityCode}
+                </p>
+              )}
+            </div>
+          </Col>
+        </Row>
+        <div className="d-flex align-items-center ">
+          <p className="fw-bold col-form-label me-2 mb-0 ">
+            Branche de comparaison :
+          </p>
 
-              <p className="py-2">{session.legalUnit.siren}</p>
-            </Col>
-
-            <Col>
-              <p className="fw-bold col-form-label">Unité légale :</p>
-
-              <p className="py-2">{session.legalUnit.corporateName}</p>
-            </Col>
-
-            <Col>
-              <p className="fw-bold col-form-label">Code APE :</p>
-
-              <p className="py-2">{session.legalUnit.activityCode}</p>
-            </Col>
-          </Row>
-          <div className="d-flex align-items-center">
-            <p className="fw-bold col-form-label me-2 mb-0 ">Branche de comparaison :</p>
-
-            <Form className="flex-grow-1">
-              <Form.Group
-                as={Row}
-                controlId="formComparativeDivision"
-                className="my-2"
-              >
-                <Col sm={8}>
-                  <Select
-                    styles={customSelectStyles}
-                    options={divisionsOptions}
-                    components={{
-                      IndicatorSeparator: () => null,
-                    }}
-                    value={{
-                      label:
-                        selectedDivision + " - " + divisions[selectedDivision],
-                      value: selectedDivision,
-                    }}
-                    placeholder="Choisissez une division"
-                    onChange={handleDivisionChange}
-                  />
-                </Col>
-              </Form.Group>
-            </Form>
-          </div>
+          <Form className="flex-grow-1">
+            <Form.Group
+              as={Row}
+              controlId="formComparativeDivision"
+              className="my-2"
+            >
+              <Col sm={8}>
+                <Select
+                  styles={customSelectStyles}
+                  options={divisionsOptions}
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                  value={{
+                    label:
+                      selectedDivision + " - " + divisions[selectedDivision],
+                    value: selectedDivision,
+                  }}
+                  placeholder="Choisissez une division"
+                  onChange={handleDivisionChange}
+                />
+              </Col>
+            </Form.Group>
+          </Form>
         </div>
-      </div>
+        <hr></hr>
 
-      {selectedDivision != "00" && (
-        <div className="box indic-result-menu">
+        <div className=" indic-result-menu">
           <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center">
+           
               <DropdownButton
+                className="flex-grow-1 dropdown-container"
                 variant="light-secondary"
                 drop={"down-centered"}
                 key={"down-centered"}
                 id="dropdown-indics-button"
                 title={selectedIndicatorLabel}
+                disabled={selectedDivision == "00"}
               >
                 {selectedIndicator && (
                   <Dropdown.Item
@@ -237,6 +236,7 @@ const Results = ({ session, publish, goBack }) => {
                   )
                   .map(([code, indic]) => {
                     if (code === selectedIndicator) return null;
+
                     return (
                       <Dropdown.Item
                         key={code}
@@ -255,7 +255,7 @@ const Results = ({ session, publish, goBack }) => {
                     );
                   })}
               </DropdownButton>
-            </div>
+         
             {selectedIndicator && (
               <Nav variant="underline" defaultActiveKey="/home">
                 <Nav.Item>
@@ -276,9 +276,15 @@ const Results = ({ session, publish, goBack }) => {
             )}
           </div>
         </div>
-      )}
+      </div>
 
-      {(!selectedIndicator || !selectedDivision) && <FootprintReport />}
+      {(!selectedIndicator || !selectedDivision) && (
+        <FootprintReport
+          comparativeData={session.comparativeData}
+          financialData={session.financialData.mainAggregates}
+          period={session.financialPeriod}
+        />
+      )}
 
       {selectedIndicator && selectedDivision && selectedDivision != "00" && (
         <ExtraFinancialReport
@@ -296,20 +302,30 @@ const Results = ({ session, publish, goBack }) => {
       )}
 
       {selectedDivision != "00" && !isLoading && (
-        <ChartsContainer
-          validations={session.validations[financialPeriod]}
-          comparativeData={session.comparativeData}
-          aggregates={session.financialData.mainAggregates}
-          period={session.financialPeriod}
-          prevPeriod={prevPeriod}
-        />
+        <>
+          {session.validations[session.financialPeriod.periodKey].map(
+            (indic) => (
+              <div key={indic}>
+                <ChartsContainer
+                  indic={indic}
+                  comparativeData={session.comparativeData}
+                  mainAggregates={session.financialData.mainAggregates}
+                  period={session.financialPeriod}
+                  prevPeriod={prevPeriod}
+                />
+              </div>
+            )
+          )}
+        </>
       )}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
-
-      <div className="box text-end">
-        <Button onClick={goBack} className="me-1">
-          Retour
+      {isLoading && (
+        <Loader title={"Récupération des données de comparaison ..."} />
+      )}
+      <div className=" text-end">
+        <Button onClick={goBack} className="mb-4">
+          <i className="bi bi-chevron-left"></i> Retour aux déclarations
         </Button>
       </div>
     </Container>

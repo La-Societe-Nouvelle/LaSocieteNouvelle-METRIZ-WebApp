@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Col, Nav, Navbar, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs } from "react-bootstrap";
 
 // Tables
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
@@ -12,9 +12,8 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 // Child components
 import Analyse from "./AnalyseNote";
 import ComparativeDataContainer from "./ComparativeDataContainer";
-import TrendsDataContainer from "./TrendsDataContainer";
 import SigFootprintsContainer from "./SigFootprintsContainer";
-import { Loader } from "../../../popups/Loader";
+import TrendContainer from "./TrendContainer";
 
 const ExtraFinancialReport = ({
   indic,
@@ -25,7 +24,6 @@ const ExtraFinancialReport = ({
   comparativeData,
   period,
   prevPeriod,
-  legalUnit,
   isLoading,
 }) => {
   const {
@@ -131,15 +129,12 @@ const ExtraFinancialReport = ({
           <ComparativeDataContainer
             indic={indic}
             comparativeData={comparativeData}
-            production={production}
-            intermediateConsumptions={intermediateConsumptions}
-            fixedCapitalConsumptions={fixedCapitalConsumptions}
-            netValueAdded={netValueAdded}
+            financialData={financialData.mainAggregates}
             period={period}
             prevPeriod={prevPeriod}
           />
           <ComparativeTable
-            financialData={financialData}
+            financialData={financialData.mainAggregates}
             indic={indic}
             comparativeData={comparativeData}
             period={period}
@@ -150,7 +145,7 @@ const ExtraFinancialReport = ({
 
       {/* ---------- Trend Line Chart ----------  */}
       {!isLoading && (
-        <TrendsDataContainer
+        <TrendContainer
           aggregates={financialData.mainAggregates}
           comparativeData={comparativeData}
           indic={indic}
@@ -158,9 +153,7 @@ const ExtraFinancialReport = ({
           division={division}
         />
       )}
-      {isLoading && (
-        <Loader title={"Récupération des données de comparaison ..."} />
-      )}
+
 
       {/* ---------- Analyse Note  ----------  */}
 

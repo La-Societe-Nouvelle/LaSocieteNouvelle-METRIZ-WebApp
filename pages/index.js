@@ -9,14 +9,13 @@ import { BrowserView, MobileView } from "react-device-detect";
 import { Session } from "/src/Session";
 
 // Sections
-import { StartSection } from "/components/sections/StartSection";
-import AccountingImportSection from "/components/sections/accountingImport/AccountingImportSection";
-import { InitialStatesSection } from "/components/sections/InitialStatesSection";
+import { StartSection } from "../components/sections/StartSection";
+import AccountingImportSection from "../components/sections/accountingImport/AccountingImportSection";
+import { InitialStatesSection } from "../components/sections/InitialStatesSection";
 import { ProvidersSection } from "../components/sections/providers/ProvidersSection";
 import DirectImpacts from "../components/sections/statements";
 import Results from "../components/sections/results";
 import { PublishStatementSection } from "../components/sections/PublishStatementSection";
-
 
 // Others components
 import { Header } from "/components/parts/headers/Header";
@@ -94,19 +93,22 @@ class Metriz extends React.Component {
       session: new Session(),
       step: 0,
       loading: false,
-      needsUpdate: false,
+      showDataUpdater: false,
     };
   }
 
+  
+  
   render() {
-    const { step, session, needsUpdate } = this.state;
-
+    const { step, session, showDataUpdater } = this.state;
+    
     return (
       <>
         <div
           className={step == 0 ? "wrapper bg-white" : "wrapper"}
           id="wrapper"
         >
+
           {step == 0 ? (
             <Header />
           ) : step == 6 ? (
@@ -123,7 +125,7 @@ class Metriz extends React.Component {
             />
           )}
 
-          {needsUpdate && (
+          {showDataUpdater && (
             <DataUpdater
               session={session}
               downloadSession={this.downloadSession}
@@ -179,11 +181,12 @@ class Metriz extends React.Component {
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
+      console.log(prevProps.version);
       // update to current version
       await updateVersion(prevProps);
+
       // JSON -> session
       const session = new Session(prevProps);
-
       for (let period of session.availablePeriods) {
         await session.updateFootprints(period);
       }
@@ -192,7 +195,7 @@ class Metriz extends React.Component {
         session: session,
         step: session.progression,
         loading: false,
-        needsUpdate: true,
+        showDataUpdater: prevProps.version == "3.0.0",
       });
     };
     reader.readAsText(file);
@@ -219,7 +222,10 @@ class Metriz extends React.Component {
         );
       case 1:
         return (
-          <AccountingImportSection {...sectionProps} submit={this.validImportedData} />
+          <AccountingImportSection
+            {...sectionProps}
+            submit={this.validImportedData}
+          />
         );
       case 2:
         return (
@@ -234,13 +240,17 @@ class Metriz extends React.Component {
           <ProvidersSection {...sectionProps} submit={this.validProviders} />
         );
       case 4:
-        return(
-          <DirectImpacts {...sectionProps} submit={this.validStatements}  />
+        return (
+          <DirectImpacts {...sectionProps} submit={this.validStatements} />
         );
-        case 5:
-          return(
-            <Results {...sectionProps} goBack={() => this.setStep(4)}  publish={() => this.setStep(6)}/>
-          );
+      case 5:
+        return (
+          <Results
+            {...sectionProps}
+            goBack={() => this.setStep(4)}
+            publish={() => this.setStep(6)}
+          />
+        );
       case 6:
         return (
           <PublishStatementSection
@@ -263,15 +273,17 @@ class Metriz extends React.Component {
     //   this.state.session.progression++;
     // }
 
-    let accountsShowed = this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks);
-    if (accountsShowed.length>0) {
+    let accountsShowed =
+      this.state.session.financialData.immobilisations.concat(
+        this.state.session.financialData.stocks
+      );
+    if (accountsShowed.length > 0) {
       this.setStep(2);
       this.updateProgression(1);
     } else {
       this.setStep(3);
       this.updateProgression(2);
     }
-
   };
 
   validInitialStates = async () => {
@@ -302,11 +314,11 @@ class Metriz extends React.Component {
     this.updateProgression(4);
   };
 
-
   updateProgression = (step) => {
     this.state.session.progression = Math.max(
       step + 1,
       this.state.session.progression
     );
+   
   };
 }

@@ -51,6 +51,7 @@ const AccountingImportSection = (props) => {
   };
   const handleDivision = (division) => {
     session.legalUnit.activityCode = division;
+    session.comparativeData.activityCode = division;
     setSelectedDivision(division);
   }
   const handleFile = (file) => {

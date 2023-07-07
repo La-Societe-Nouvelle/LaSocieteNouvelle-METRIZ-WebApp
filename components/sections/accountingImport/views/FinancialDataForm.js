@@ -11,7 +11,7 @@ import {
   Image,
   Row,
 } from "react-bootstrap";
-import { customSelectStyles } from "/src/utils/customStyles";
+import { customSelectStyles } from "../../../../config/customStyles";
 
 const FinancialDataForm = (props) => {
 

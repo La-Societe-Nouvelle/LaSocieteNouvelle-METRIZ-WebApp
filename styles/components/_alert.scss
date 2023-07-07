@@ -22,6 +22,8 @@
 .alert-warning {
   background-color: lighten($warning, 45%);
   border-left: 6px solid $warning;
+  color : #663f03;
+
 }
 
 .alert-danger {

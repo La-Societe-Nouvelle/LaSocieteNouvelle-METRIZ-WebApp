@@ -17,6 +17,7 @@ import {
 // Lib
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
+import { getClosestYearData } from "../../../components/sections/results/utils";
 
 // --------------------------------------------------------------------------
 //  Contribution Indicator Sheet
@@ -98,22 +99,34 @@ export const generateContributionIndicatorSheet = (
       .uncertainty
   );
 
+  const currentICdivisionData = getClosestYearData(
+    comparativeData.intermediateConsumptions.division.macrodata.data[
+      indic.toUpperCase()
+    ],
+    currentPeriod
+  );
+
   // ---------------------------------------------------------------
   // Get charts canvas and encode it to import in document
-
 
   const prodChartCanvas = document.getElementById(
     `comparative-chart-production-${indic}-print`
   );
   const prodChartImage = prodChartCanvas.toDataURL("image/png");
- 
-  const doughtnutIC = document.getElementById(`sig-chart-intermediateConsumptions-${indic}-print`);
+
+  const doughtnutIC = document.getElementById(
+    `sig-chart-intermediateConsumptions-${indic}-print`
+  );
   const doughtnutICImage = doughtnutIC.toDataURL("image/png");
 
-  const doughtnutCCF = document.getElementById(`sig-chart-fixedCapitalConsumptions-${indic}-print`);
+  const doughtnutCCF = document.getElementById(
+    `sig-chart-fixedCapitalConsumptions-${indic}-print`
+  );
   const doughtnutCCFImage = doughtnutCCF.toDataURL("image/png");
- 
-  const doughtnutNVA = document.getElementById(`sig-chart-netValueAdded-${indic}-print`);
+
+  const doughtnutNVA = document.getElementById(
+    `sig-chart-netValueAdded-${indic}-print`
+  );
   const doughtnutNVAImage = doughtnutNVA.toDataURL("image/png");
 
   // ---------------------------------------------------------------
@@ -472,12 +485,7 @@ export const generateContributionIndicatorSheet = (
                 margin: [0, 0, 0, 10],
               },
               {
-                text:
-                  printValue(
-                    comparativeData.intermediateConsumptions.divisionFootprint
-                      .indicators[indic].value,
-                    1
-                  ) + " %",
+                text: currentICdivisionData.value + " %",
                 alignment: "center",
                 style: "branchNumber",
               },

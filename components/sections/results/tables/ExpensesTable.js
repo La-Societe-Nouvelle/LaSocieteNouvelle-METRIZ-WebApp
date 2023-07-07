@@ -53,7 +53,7 @@ export const  ExpensesTable = ({
   };
 
   return (
-      <Table id="indicatorExpenses"  className="shadow-sm ">
+      <Table id="indicatorExpenses">
         <thead>
           <tr>
             <th></th>

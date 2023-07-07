@@ -1,4 +1,4 @@
-import { getAnalyse } from "/src/utils/Writers";
+import { getAnalyse } from "../../../../src/utils/Writers";
 
 const Analyse = ({
   indic,

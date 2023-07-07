@@ -34,7 +34,7 @@ const StatementSOC = ({ impactsData, onUpdate }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column >
+            <Form.Label column lg={7} >
               L'entreprise est-elle d'utilité sociale ou dotée d'une raison
               d'être ?
             </Form.Label>

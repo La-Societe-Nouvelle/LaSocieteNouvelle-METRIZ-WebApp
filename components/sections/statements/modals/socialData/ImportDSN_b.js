@@ -2,9 +2,9 @@
 
 // React
 import React from "react";
-import { Alert, Table } from "react-bootstrap";
+import { Alert, Button, Table } from "react-bootstrap";
 import Dropzone from "react-dropzone";
-import { getNewId, getSumItems, roundValue } from "../../../../src/utils/Utils";
+import { getNewId, getSumItems, roundValue } from "/src/utils/Utils";
 
 // readers
 import { DSNDataReader, DSNFileReader } from "/src/readers/DSNReader";
@@ -129,8 +129,8 @@ export class ImportDSN extends React.Component {
     return (
       <div className="assessment">
         <div>
-          <h4>Importez les déclarations mensuelles</h4>
-          <Dropzone onDrop={this.onDrop} accept={[".edi",".txt"]}>
+          <h5 className="h6">Importez les déclarations mensuelles</h5>
+          <Dropzone onDrop={this.onDrop} accept={[".edi", ".txt"]}>
             {({ getRootProps, getInputProps }) => (
               <div className="dropzone-section">
                 <div {...getRootProps()} className="dropzone">
@@ -146,9 +146,8 @@ export class ImportDSN extends React.Component {
             )}
           </Dropzone>
         </div>
-
+        <hr></hr>
         <div>
-          <h4>Fichiers importés</h4>
           {this.state.errorFile == true && (
             <Alert variant="danger"> Format de fichier incorrect.</Alert>
           )}
@@ -160,78 +159,81 @@ export class ImportDSN extends React.Component {
             </Alert>
           ))}
 
-          <div className="text-end mb-2">
-            <button
-              className="btn btn-light me-2 btn-sm"
-              onClick={() => this.deleteAll()}
-            >
-              <i className="bi bi-trash3-fill"></i>
-              &nbsp;Supprimer tout
-            </button>
-          </div>
-          <div className="table-main">
-            <Table size="sm" responsive>
-              <thead>
-                <tr>
-                  <td>Etat</td>
-                  <td>Nom du fichier</td>
-                  <td>Mois</td>
-                  <td>Fraction</td>
-                  <td>Ecart D9/D1</td>
-                  <td>Ecart Femmes/Hommes</td>
-                  <td></td>
-                </tr>
-              </thead>
-              <tbody>
-                {socialStatements.map((socialStatement) => (
-                  <tr key={socialStatement.id}>
-                    <td>{socialStatement.error ? "ERROR" : "OK"}</td>
-                    <td>
-                      {metaRubriques.declaration.nature[socialStatement.nature]}
-                    </td>
-                    <td>
-                      {socialStatement.mois.substring(2, 4) +
-                        "/" +
-                        socialStatement.mois.substring(4, 8)}
-                    </td>
-                    <td>
-                      {socialStatement.fraction.charAt(0) +
-                        "/" +
-                        socialStatement.fraction.charAt(1)}
-                    </td>
-                    <td>{socialStatement.interdecileRange}</td>
-                    <td>{socialStatement.genderWageGap} %</td>
-                    <td className="text-end">
-                      <button
-                        className="btn btn-light m-2 btn-sm "
-                        onClick={() => this.deleteStatement(socialStatement.id)}
-                      >
-                        <i className="bi bi-trash3-fill"></i>
-                        &nbsp;Supprimer
-                      </button>
-                    </td>
+          {socialStatements.length > 0 && (
+            <>
+              <Table size="sm" responsive>
+                <thead>
+                  <tr>
+                    <td>Etat</td>
+                    <td>Nom du fichier</td>
+                    <td>Mois</td>
+                    <td>Fraction</td>
+                    <td>Ecart D9/D1</td>
+                    <td>Ecart Femmes/Hommes</td>
+                    <td></td>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
-          </div>
+                </thead>
+                <tbody>
+                  {socialStatements.map((socialStatement) => (
+                    <tr key={socialStatement.id}>
+                      <td>{socialStatement.error ? "ERROR" : "OK"}</td>
+                      <td>
+                        {
+                          metaRubriques.declaration.nature[
+                            socialStatement.nature
+                          ]
+                        }
+                      </td>
+                      <td>
+                        {socialStatement.mois.substring(2, 4) +
+                          "/" +
+                          socialStatement.mois.substring(4, 8)}
+                      </td>
+                      <td>
+                        {socialStatement.fraction.charAt(0) +
+                          "/" +
+                          socialStatement.fraction.charAt(1)}
+                      </td>
+                      <td>{socialStatement.interdecileRange}</td>
+                      <td>{socialStatement.genderWageGap} %</td>
+                      <td className="text-end">
+                        <button
+                          className="btn btn-light m-2 btn-sm "
+                          onClick={() =>
+                            this.deleteStatement(socialStatement.id)
+                          }
+                        >
+                          <i className="bi bi-trash3-fill"></i>
+                          &nbsp;Supprimer
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              <div className="text-end mb-2">
+                <Button
+                  variant="light"
+                  size="sm"
+                  onClick={() => this.deleteAll()}
+                >
+                  <i className="bi bi-trash3-fill"></i>
+                  &nbsp;Supprimer tout
+                </Button>{" "}
+              </div>
+            </>
+          )}
         </div>
         <hr />
-        <div className="view-footer text-end mt-2">
-          <button
-            className="btn btn-light me-2"
-            onClick={() => this.props.onGoBack()}
-          >
-            <i className="bi bi-chevron-left"></i>
-            Retour
-          </button>
-          <button
-            className="btn btn-secondary "
-            //disabled={!isAllValid || employees.length == 0}
+        <div className="text-end mt-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={socialStatements.length == 0}
             onClick={() => this.onSubmit()}
           >
             Valider
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -248,7 +250,7 @@ export class ImportDSN extends React.Component {
 
   importFile = async (file) => {
     let extension = file.name.split(".").pop();
-    if (extension == "edi" || extension =="txt") {
+    if (extension == "edi" || extension == "txt") {
       let reader = new FileReader();
       reader.onload = async () => {
         try {
@@ -260,8 +262,12 @@ export class ImportDSN extends React.Component {
             let individualsData = await getIndividualsData([socialStatement]);
             try {
               // check if data measurable
-              socialStatement.interdecileRange = await getInterdecileRange(individualsData);
-              socialStatement.genderWageGap = await getGenderWageGap(individualsData);
+              socialStatement.interdecileRange = await getInterdecileRange(
+                individualsData
+              );
+              socialStatement.genderWageGap = await getGenderWageGap(
+                individualsData
+              );
               // add to list of statements
               socialStatement.id = getNewId(this.state.socialStatements);
               socialStatement.nicEtablissement =
@@ -312,17 +318,20 @@ export class ImportDSN extends React.Component {
   };
 
   // Submit
-  onSubmit = async () => 
-  {
+  onSubmit = async () => {
     let impactsData = this.props.impactsData;
 
     impactsData.socialStatements = this.state.socialStatements;
 
     // indiividuals data
-    impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
+    impactsData.individualsData = await getIndividualsData(
+      impactsData.socialStatements
+    );
 
     // update idr data
-    impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
+    impactsData.interdecileRange = await getInterdecileRange(
+      impactsData.individualsData
+    );
     await this.props.onUpdate("idr");
 
     // update geq data (in pct i.e. 14.2 for 14.2 %)
@@ -330,7 +339,8 @@ export class ImportDSN extends React.Component {
     await this.props.onUpdate("geq");
 
     // update knw data
-    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(impactsData.individualsData);
+    impactsData.knwDetails.apprenticesRemunerations =
+      await getApprenticeshipRemunerations(impactsData.individualsData);
     await this.props.onUpdate("knw");
 
     this.props.onGoBack();
@@ -349,8 +359,7 @@ export class ImportDSN extends React.Component {
  *    - apprenticeshipHours
  */
 
-export const getIndividualsData = async (declarations) => 
-{
+export const getIndividualsData = async (declarations) => {
   // array of data
   let individualsData = [];
   for (let declaration of declarations) {
@@ -358,13 +367,19 @@ export const getIndividualsData = async (declarations) =>
     for (let individu of individus) {
       let id = individu.identifiant || individu.identifiantTechnique;
       let sex = getIndividualSex(individu);
-      let name = individu.prenoms+" "+individu.nomFamille;
+      let name = individu.prenoms + " " + individu.nomFamille;
       let workingHours = await getIndividualWorkingHours(individu);
       let wage = await getIndividualWage(individu);
-      let apprenticeshipHours = await getIndividualApprenticeshipHours(individu);
-      let apprenticeshipContract = await getIndividualApprenticeshipContract(individu);
+      let apprenticeshipHours = await getIndividualApprenticeshipHours(
+        individu
+      );
+      let apprenticeshipContract = await getIndividualApprenticeshipContract(
+        individu
+      );
 
-      let individual = individualsData.filter((individual) => individual.id == id)[0];
+      let individual = individualsData.filter(
+        (individual) => individual.id == id
+      )[0];
       if (individual != undefined) {
         individual.workingHours += workingHours;
         individual.wage += wage;
@@ -377,7 +392,7 @@ export const getIndividualsData = async (declarations) =>
           workingHours,
           wage,
           apprenticeshipHours,
-          apprenticeshipContract
+          apprenticeshipContract,
         });
       }
     }
@@ -397,16 +412,28 @@ export const getIndividualsData = async (declarations) =>
 
 /* -------------------- FORMULAS -------------------- */
 
-export const getInterdecileRange = async (individualsData) => 
-{
+export const getInterdecileRange = async (individualsData) => {
   // sort individuals by hourly rate
   individualsData = individualsData
-    .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
-    .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
+    .filter(
+      (individual) =>
+        individual.hourlyRate != null &&
+        !isNaN(individual.hourlyRate) &&
+        individual.hourlyRate > 0
+    )
+    .filter(
+      (individual) =>
+        individual.workingHours != null &&
+        !isNaN(individual.workingHours) &&
+        individual.workingHours > 0
+    )
     .sort((a, b) => a.hourlyRate - b.hourlyRate);
 
   // get nb total hours
-  let totalHours = getSumItems(individualsData.map((individual) => individual.workingHours), 2);
+  let totalHours = getSumItems(
+    individualsData.map((individual) => individual.workingHours),
+    2
+  );
 
   if (individualsData.length < 2 || totalHours <= 0) return 1;
 
@@ -437,12 +464,21 @@ export const getInterdecileRange = async (individualsData) =>
   return interdecileRange;
 };
 
-export const getGenderWageGap = async (individualsData) => 
-{
+export const getGenderWageGap = async (individualsData) => {
   // filter individuals without hourly rate or defined sex
   individualsData = individualsData
-    .filter((individual) => individual.wage != null && !isNaN(individual.wage) && individual.wage > 0)
-    .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
+    .filter(
+      (individual) =>
+        individual.wage != null &&
+        !isNaN(individual.wage) &&
+        individual.wage > 0
+    )
+    .filter(
+      (individual) =>
+        individual.workingHours != null &&
+        !isNaN(individual.workingHours) &&
+        individual.workingHours > 0
+    )
     .filter((individual) => individual.sex == 1 || individual.sex == 2);
 
   let men = individualsData.filter((individual) => individual.sex == 1);
@@ -480,18 +516,27 @@ export const getGenderWageGap = async (individualsData) =>
 
   // Gander gap
   let genderWageGap = roundValue(
-    Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll *100,
+    (Math.abs(hourlyRateMen - hourlyRateWomen) / hourlyRateAll) * 100,
     1
   );
   return genderWageGap;
 };
 
-const getGenderWageGap_pctHourlyRateMen = async (individualsData) => 
-{
+const getGenderWageGap_pctHourlyRateMen = async (individualsData) => {
   // filter individuals without hourly rate or defined sex
   individualsData = individualsData
-    .filter((individual) => individual.wage != null && !isNaN(individual.wage) && individual.wage > 0)
-    .filter((individual) => individual.workingHours != null && !isNaN(individual.workingHours) && individual.workingHours > 0)
+    .filter(
+      (individual) =>
+        individual.wage != null &&
+        !isNaN(individual.wage) &&
+        individual.wage > 0
+    )
+    .filter(
+      (individual) =>
+        individual.workingHours != null &&
+        !isNaN(individual.workingHours) &&
+        individual.workingHours > 0
+    )
     .filer((individual) => individual.sex == 1 || individual.sex == 2);
 
   let men = individualsData.filter((individual) => individual.sex == 1);
@@ -530,13 +575,22 @@ const getGenderWageGap_pctHourlyRateMen = async (individualsData) =>
 };
 
 // Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
-export const getApprenticeshipRemunerations = async (individualsData) => 
-{
+export const getApprenticeshipRemunerations = async (individualsData) => {
   // filter individuals without hourly rate or defined sex
   individualsData = individualsData
-    .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
+    .filter(
+      (individual) =>
+        individual.hourlyRate != null &&
+        !isNaN(individual.hourlyRate) &&
+        individual.hourlyRate > 0
+    )
     .filter((individual) => individual.apprenticeshipContract)
-    .filter((individual) => individual.apprenticeshipHours != null && !isNaN(individual.apprenticeshipHours) && individual.apprenticeshipHours > 0);
+    .filter(
+      (individual) =>
+        individual.apprenticeshipHours != null &&
+        !isNaN(individual.apprenticeshipHours) &&
+        individual.apprenticeshipHours > 0
+    );
 
   let apprenticesRemunerations = individualsData
     .map(
@@ -548,13 +602,22 @@ export const getApprenticeshipRemunerations = async (individualsData) =>
 };
 
 // Rémunérations liées à des contrats d'apprentissage (stage, alternance, etc.)
-export const getEmployeesTrainingCompensations = async (individualsData) => 
-{
+export const getEmployeesTrainingCompensations = async (individualsData) => {
   // filter individuals without hourly rate or defined sex
   individualsData = individualsData
-    .filter((individual) => individual.hourlyRate != null && !isNaN(individual.hourlyRate) && individual.hourlyRate > 0)
+    .filter(
+      (individual) =>
+        individual.hourlyRate != null &&
+        !isNaN(individual.hourlyRate) &&
+        individual.hourlyRate > 0
+    )
     .filter((individual) => !individual.apprenticeshipContract)
-    .filter((individual) => individual.apprenticeshipHours != null && !isNaN(individual.apprenticeshipHours) && individual.apprenticeshipHours > 0);
+    .filter(
+      (individual) =>
+        individual.apprenticeshipHours != null &&
+        !isNaN(individual.apprenticeshipHours) &&
+        individual.apprenticeshipHours > 0
+    );
 
   let apprenticesRemunerations = individualsData
     .map(
@@ -570,7 +633,9 @@ export const getEmployeesTrainingCompensations = async (individualsData) =>
 const getIndividualSex = (individu) => {
   let sex = individu.sexe
     ? parseInt(individu.sexe)
-    : parseInt((individu.identifiant || individu.identifiantTechnique).charAt(0)); // erro if both id missing
+    : parseInt(
+        (individu.identifiant || individu.identifiantTechnique).charAt(0)
+      ); // erro if both id missing
   return sex;
 };
 
@@ -737,8 +802,7 @@ const getIndividualApprenticeshipHours = (individu) => {
   return roundValue(trainingHours, 2);
 };
 
-const getIndividualApprenticeshipContract = async (individu) => 
-{
+const getIndividualApprenticeshipContract = async (individu) => {
   let apprenticeshipContract = false;
 
   let versements = individu.versements;
@@ -747,11 +811,16 @@ const getIndividualApprenticeshipContract = async (individu) =>
     let remunerations = versement.remunerations;
     remunerations
       .filter((remuneration) => remuneration.type == "002")
-      .forEach((remuneration) => 
-      {
-        let contrat = individu.contrats.find((contrat) => contrat.numero == remuneration.numeroContrat);
-        if (contrat && (contrat.nature == "29" ||
-          ["61", "64", "65", "66", "81", "92"].includes(contrat.dispositifPolitique))
+      .forEach((remuneration) => {
+        let contrat = individu.contrats.find(
+          (contrat) => contrat.numero == remuneration.numeroContrat
+        );
+        if (
+          contrat &&
+          (contrat.nature == "29" ||
+            ["61", "64", "65", "66", "81", "92"].includes(
+              contrat.dispositifPolitique
+            ))
         ) {
           apprenticeshipContract = true;
         }

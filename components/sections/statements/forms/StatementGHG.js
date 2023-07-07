@@ -6,7 +6,7 @@ import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentGHG } from "../modals/AssessmentGHG";
-import { unitSelectStyles } from "../../../../src/utils/customStyles";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
 const StatementGHG = ({ impactsData, onUpdate, onError }) => {
   const [greenhousesGazEmissions, setGreenhousesGazEmissions] = useState(
