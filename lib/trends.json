@@ -1,0 +1,38 @@
+{
+    "art": {
+        "source": "Insee, DGE - Traitement La Société Nouvelle"
+    },
+    "idr": {
+        "source": "Insee"
+    },
+    "eco": {
+        "source": "Insee - Traitement La Société Nouvelle"
+    },
+    "geq": {
+        "source": "Insee, Eurostat - Traitement La Société Nouvelle"
+    },
+    "ghg": {
+        "source": "Insee, Eurostat, Banque Mondiale - Traitement La Société Nouvelle"
+    },
+    "haz": {
+        "source": "Insee, Eurostat - Traitement La Société Nouvelle"
+    },
+    "knw": {
+        "source": "Insee, Eurostat - Traitement La Société Nouvelle"
+    },
+    "mat": {
+        "source": "Insee, Eurostat - Traitement La Société Nouvelle"
+    },
+    "nrg": {
+        "source": "Insee, Eurostat - Traitement La Société Nouvelle"
+    },
+    "soc": {
+        "source": "Insee, Atlas de l'ESS (2020) - Traitement La Société Nouvelle"
+    },
+    "was": {
+        "source": "Insee, Eurostat - Traitement La Société Nouvelle"
+    },
+    "wat": {
+        "source": "Insee, Eurostat, SDES - Traitement La Société Nouvelle"
+    }
+}

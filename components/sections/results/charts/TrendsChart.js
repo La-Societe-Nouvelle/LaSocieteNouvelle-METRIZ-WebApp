@@ -8,6 +8,10 @@ import "chartjs-adapter-moment";
 
 function TrendsChart({ trends, target, unit, aggregate, indic, id, isPrinting }) {
 
+  
+  const linearTarget = target.filter(data => data.path == "LIN")
+
+
   const [chartData, setChartData] = useState({
     datasets: [
       {
@@ -79,14 +83,14 @@ function TrendsChart({ trends, target, unit, aggregate, indic, id, isPrinting })
     const trendsEstimatedData = [];
     const trendsForecastData = [];
 
-    const targetData = target.data.map((data) => ({
+    const targetData = linearTarget.map((data) => ({
       x: data.year,
       y: data.value,
     }));
 
     //separate data in trendsEstimatedData into observed trends and trend forecasts.
 
-    for (const data of trends.data) {
+    for (const data of trends) {
       const estimatedData = {
         x: new Date(data.year),
         y: data.flag == "e" ? data.value : null,

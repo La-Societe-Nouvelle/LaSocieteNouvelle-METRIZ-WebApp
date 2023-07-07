@@ -1,11 +1,34 @@
-
 {
-    "GEQ" : "Objectif d'écart de 0% en 2050 (Objectif défini par La Société Nouvelle)",
-    "GHG" : "Budgets carbone sectoriels de la Stratégie Nationale Bas-Carbone (SNBC)",
-    "KNW" : "Augmentation de 0.8 pt (pourcentage du PIB) d'ici 2030 par rapport à 2020  (Objectif défini par La Société Nouvelle)",
-    "MAT" : "Quantité extraite de matières premières stable  (Objectif défini par La Société Nouvelle)",
-    "NRG" : "Planification Pluriannuelle de l'Energie (PPE)",
-    "SOC" : "Objectif de 100% en 2050  (Objectif défini par La Société Nouvelle)",
-    "WAS" : "Plan national de prévention des déchets (PNPD)",
-    "WAT" : "Consommation d'eau stable  (Objectif défini par La Société Nouvelle)"
+  "geq": {
+    "info": "Les objectifs définis pour l'indice d'écart des rémunérations femmes/hommes visent l'égalité en 2050 i.e. l'absence d'écart brut de rémunération entre les sexes au sein des entreprises françaises.",
+    "source": "La Société Nouvelle"
+  },
+  "ghg": {
+    "info" : "Les objectifs définis pour l'indicateur d'intensité d'émission de gaz à effet de serre se basent sur les budgets carbone sectoriels de la Stratégie Nationale Bas Carbone 2 (SNBC 2).",
+    "source" : "SNCB - Traitement La Société Nouvelle"
+  },
+  "knw": {
+    "info" : "Les objectifs définis pour l'indicateur de contribution à l'évolution des compétences et des connaissances visent à atteindre un niveau de 3% de la production intérieure, soit un effort de 0.8 point d’ici 2030 par rapport à 2017.",
+    "source" : "La Société Nouvelle"
+  },
+  "mat": {
+    "info" : "Les objectifs définis pour l'indicateur d'intensité d'extraction de matières premières visent à rejoindre la moyenne du G20 en 2030 (15 tonnes par habitant contre 21 tonnes par habitant en France).",
+    "source": "La Société Nouvelle"
+  },
+  "nrg": {
+    "info": "Les objectifs définis pour l'indicateur d'intensité de consommation énergétique s'appuient sur la Programmation Pluriannuelle de l'Energie (PPE) 2019-2028, dont l'objectif est d'inscrire « la France dans une trajectoire permettant d'atteindre la neutralité carbone en 2050 ».",
+    "source" : "PPE - Traitement La Société Nouvelle"
+  },
+  "soc": {
+    "info" : "Les objectifs définis pour l’indicateur de contribution aux acteurs d'intérêt social visent à ce que l'ensemble des entreprises françaises inscrivent une raison d’être dans leurs statuts d'ici 2050.",
+    "source" : "La Société Nouvelle"
+  },
+  "was": {
+    "info" : "Les objectifs définis pour l’indicateur d'intensité de production de déchets se basent sur le Plan National de Prévention des Déchets qui prévoit une « réduction de 5 % des quantités de déchets d'activités économiques par unité de valeur produite, en 2030 par rapport à 2010 ».",
+    "source" : "PNPD - Traitement La Société Nouvelle"
+  },
+  "wat": {
+    "info" : "Les objectifs définis pour l'indicateur d'intensité de consommation d'eau correspondent à un maintien des quantités d'eau prélevées.",
+    "source" : "La Société Nouvelle"
   }
+}
