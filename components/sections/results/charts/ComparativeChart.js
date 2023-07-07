@@ -8,8 +8,8 @@ import { printValue } from "/src/utils/Utils";
 const ComparativeChart = ({
   id,
   indic,
-  firstDataset,
-  secondDataset,
+  areaDataset,
+  divisionDataset,
   isPrinting,
 }) => {
 
@@ -17,13 +17,10 @@ const ComparativeChart = ({
   const precision = metaIndics[indic].nbDecimals;
   const labels = ["France", "Exercice", "Branche"];
 
-  // Remove "Branche" label if no comparative division selected
-  if (firstDataset[2] == null) {
-    labels.pop();
-  }
+
   let suggestedMax;
   if (unit == "%") {
-    let max = Math.max(...firstDataset.map((o) => o));
+    let max = Math.max(...areaDataset.map((o) => o));
 
     if (max < 10) {
       suggestedMax = 10;
@@ -53,7 +50,7 @@ const ComparativeChart = ({
     datasets: [
       {
         label: ["Valeur", "Année N-1", "Valeur"],
-        data: firstDataset.map((data) => (data ? data : null)),
+        data: areaDataset.map((data) => (data ? data : null)),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
@@ -68,7 +65,7 @@ const ComparativeChart = ({
       },
       {
         label: ["Objectif", "Année N", "Objectif"],
-        data: secondDataset.map((data) => (data ? data : null)),
+        data: divisionDataset.map((data) => (data ? data : null)),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",

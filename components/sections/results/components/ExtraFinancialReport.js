@@ -138,13 +138,13 @@ const ExtraFinancialReport = ({
             period={period}
             prevPeriod={prevPeriod}
           />
-          <ComparativeTable
+          {/* <ComparativeTable
             financialData={financialData}
             indic={indic}
             comparativeData={comparativeData}
             period={period}
             prevPeriod={prevPeriod}
-          />
+          /> */}
         </div>
       )}
 
@@ -164,7 +164,7 @@ const ExtraFinancialReport = ({
 
       {/* ---------- Analyse Note  ----------  */}
 
-      <div className="box" id="analyse">
+      {/* <div className="box" id="analyse">
         <h4>Note d'analyse</h4>
         <Analyse
           indic={indic}
@@ -173,7 +173,7 @@ const ExtraFinancialReport = ({
           comparativeData={comparativeData}
           period={period}
         />
-      </div>
+      </div> */}
     </>
   );
 };

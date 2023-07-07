@@ -75,7 +75,6 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
   return (
     <Form className="statement">
       <Row>
-        {console.log(craftedProduction)}
         <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
             <Form.Label column>

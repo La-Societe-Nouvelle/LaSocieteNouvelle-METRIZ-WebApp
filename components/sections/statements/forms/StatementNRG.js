@@ -6,7 +6,7 @@ import Select from "react-select";
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { AssessmentNRG } from "../modals/AssessmentNRG";
-import { unitSelectStyles } from "../../../../src/utils/customStyles";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
 

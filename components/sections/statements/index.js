@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
-import { updateComparativeData } from "../../../src/version/updateVersion";
 import { Loader } from "../../popups/Loader";
+import { endpoints } from "../../../config/endpoint";
+import { fetchDataForComparativeData } from "../../../src/services/MacrodataService";
 
 const DirectImpacts = ({ session, submit }) => {
   const [period, setPeriod] = useState(session.financialPeriod);
@@ -10,7 +11,6 @@ const DirectImpacts = ({ session, submit }) => {
     session.validations[period.periodKey]
   );
   const [isLoading, setIsLoading] = useState(false);
-
 
   const [invalidIndicators, setInvalidIndicators] = useState(null);
 
@@ -26,28 +26,41 @@ const DirectImpacts = ({ session, submit }) => {
     // fetch comparative data
     //
     setIsLoading(true);
-    await fetchData();
+
+    for (const validation of validations) {
+      const indicatorCode = validation.toUpperCase();
+      // const hasData = checkIfDataExists(session.comparativeData, indicatorCode); TO DO !
+      const hasData = false;
+      if (!hasData) {
+        await fetchDataForComparativeData(
+          session.comparativeData,
+          indicatorCode,
+          endpoints
+        );
+      }
+    }
+
     setIsLoading(false);
     submit();
   };
 
-  const fetchData = async () => {
-    let updatedComparativeData = session.comparativeData;
+  // const fetchData = async () => {
+  //   let updatedComparativeData = session.comparativeData;
 
-    for await (const indic of session.validations[
-      session.financialPeriod.periodKey
-    ]) {
-      const updatedData = await updateComparativeData(
-        indic,
-        session.comparativeData.activityCode,
-        updatedComparativeData
-      );
+  //   for await (const indic of session.validations[
+  //     session.financialPeriod.periodKey
+  //   ]) {
+  //     const updatedData = await updateComparativeData(
+  //       indic,
+  //       session.comparativeData.activityCode,
+  //       updatedComparativeData
+  //     );
 
-      updatedComparativeData = updatedData;
-    }
+  //     updatedComparativeData = updatedData;
+  //   }
 
-    session.comparativeData = updatedComparativeData;
-  };
+  //   session.comparativeData = updatedComparativeData;
+  // };
 
   const handleValidations = async (indicators, invalidIndicators) => {
     console.log(invalidIndicators);
@@ -88,7 +101,7 @@ const DirectImpacts = ({ session, submit }) => {
           initialSelectedIndicators={validations}
           updateValidations={handleValidations}
         />
-      {isLoading && <Loader title={"Chargement en cours..."} />}
+        {isLoading && <Loader title={"Chargement en cours..."} />}
 
         <div className="text-end">
           <Button

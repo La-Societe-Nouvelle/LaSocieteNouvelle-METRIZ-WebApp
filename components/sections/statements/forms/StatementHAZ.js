@@ -5,7 +5,7 @@ import Select from "react-select";
 
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { unitSelectStyles } from "../../../../src/utils/customStyles";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
 const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
   const [hazardousSubstancesConsumption, setHazardousSubstancesConsumption] =

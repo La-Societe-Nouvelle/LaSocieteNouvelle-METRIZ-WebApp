@@ -24,7 +24,7 @@ import FootprintReport from "./components/FootprintReport";
 import { ChartsContainer } from "./charts/ChartsContainer";
 import { updateComparativeData } from "./utils";
 import { Loader } from "../../popups/Loader";
-import { customSelectStyles } from "../../../src/utils/customStyles";
+import { customSelectStyles } from "../../../config/customStyles";
 import DownloadDropdown from "./components/DownloadDropdown";
 import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
@@ -294,7 +294,7 @@ const Results = ({ session, publish, goBack }) => {
           isLoading={isLoading}
         ></ExtraFinancialReport>
       )}
-
+{/* 
       {selectedDivision != "00" && !isLoading && (
         <ChartsContainer
           validations={session.validations[financialPeriod]}
@@ -303,7 +303,7 @@ const Results = ({ session, publish, goBack }) => {
           period={session.financialPeriod}
           prevPeriod={prevPeriod}
         />
-      )}
+      )} */}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
 

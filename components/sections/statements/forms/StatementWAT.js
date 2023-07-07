@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { unitSelectStyles } from "../../../../src/utils/customStyles";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
 const StatementWAT = ({ impactsData, onUpdate, onError }) => {
   const [waterConsumption, setWaterConsumption] = useState(

@@ -7,14 +7,14 @@ export class Indicator {
     // ---------------------------------------------------------------------------------------------------- //
     
     this.indic = props.indic;
-    this.value = props.value!=undefined ? props.value : null;
-    this.flag = props.flag!=undefined ? props.flag : null;
-    this.uncertainty = props.uncertainty!=undefined ? props.uncertainty : null;
-    this.source = props.source!=undefined ? props.source : "";
-    this.info = props.info!=undefined ? props.info : "";
-    this.lastupdate = props.lastupdate != undefined ? props.lastupdate : null;
-    // Complements
-    this.libelleFlag = props.libelleFlag!=undefined ? props.libelleFlag : null;
+    this.value = props.value || null;
+    this.flag = props.flag || null;
+    this.uncertainty = props.uncertainty || null; // A check 
+    this.source = props.source || null; // A check
+    this.info = props.info || null;// A check 
+    this.lastupdate = props.lastupdate || null;
+    this.currency =  props.currency || null;
+    this.libelleFlag = props.libelleFlag || null;
   // ---------------------------------------------------------------------------------------------------- //
   }
 

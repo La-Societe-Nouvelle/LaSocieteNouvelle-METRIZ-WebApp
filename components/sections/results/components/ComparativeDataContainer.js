@@ -13,6 +13,8 @@ const ComparativeDataContainer = ({
   period,
   prevPeriod,
 }) => {
+
+  
   const renderChart = (title, chartId, firstDataset, secondDataset, indic) => (
     <Col sm={3} xl={3} lg={3} md={3}>
       <h5 className="mb-4">{title}</h5>
@@ -29,7 +31,7 @@ const ComparativeDataContainer = ({
   return (
     <div className="charts-container">
       <h4>Comparaison par activité</h4>
-
+{/* 
       <Row className="charts">
         {renderChart(
           "Production",
@@ -138,7 +140,7 @@ const ComparativeDataContainer = ({
           ],
           indic
         )}
-      </Row>
+      </Row> */}
     </div>
   );
 };
