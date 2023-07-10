@@ -135,13 +135,13 @@ const ExtraFinancialReport = ({
             period={period}
             prevPeriod={prevPeriod}
           />
-          {/* <ComparativeTable
-            financialData={financialData}
+          <ComparativeTable
+            financialData={financialData.mainAggregates}
             indic={indic}
             comparativeData={comparativeData}
             period={period}
             prevPeriod={prevPeriod}
-          /> */}
+          />
         </div>
       )}
 

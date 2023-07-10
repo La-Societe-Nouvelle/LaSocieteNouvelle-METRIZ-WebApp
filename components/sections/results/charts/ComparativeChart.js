@@ -5,7 +5,6 @@ import { Bar } from "react-chartjs-2";
 import metaIndics from "/lib/indics";
 import { printValue } from "/src/utils/Utils";
 
-
 const getSuggestedMax = (max) => {
   if (max < 10) {
     return 10;
@@ -21,8 +20,6 @@ const getSuggestedMax = (max) => {
   }
 };
 
-
-
 const ComparativeChart = ({
   id,
   indic,
@@ -34,7 +31,7 @@ const ComparativeChart = ({
   const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
 
-  const max = Math.max(...footprintDataset.map((o) => o));
+  const max = Math.max(...footprintDataset.map((o) => o.value));
   const suggestedMax = unit === "%" ? getSuggestedMax(max) : null;
 
   // Data for chart
@@ -43,7 +40,7 @@ const ComparativeChart = ({
     datasets: [
       {
         label: "Empreinte",
-        data: footprintDataset,
+        data: footprintDataset.map((data) => data ? data.value : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
@@ -72,7 +69,7 @@ const ComparativeChart = ({
       },
       {
         label: "Objectif",
-        data: targetDataset,
+        data: targetDataset.map((data) => data ? data.value : null),
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
@@ -154,9 +151,9 @@ const ComparativeChart = ({
         cornerRadius: 2,
         callbacks: {
           label: function (context) {
-            console.log(context)
             return (
-              context.dataset.label + " : " + 
+              context.dataset.label +
+              " : " +
               printValue(context.parsed.y, precision) +
               " " +
               unit
@@ -166,7 +163,7 @@ const ComparativeChart = ({
       },
     },
   };
-  
+
   return (
     <Bar
       id={id}

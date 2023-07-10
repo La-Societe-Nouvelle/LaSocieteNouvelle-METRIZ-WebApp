@@ -85,8 +85,10 @@ const ComparativeDataContainer = ({
             `${aggregate}-${indic}`,
             [
               datasets[aggregate].area,
-              financialData[aggregate].periodsData[period.periodKey].footprint
-                .indicators[indic].value,
+             {
+              value :  financialData[aggregate].periodsData[period.periodKey].footprint
+              .indicators[indic].value, year : year
+             },
               datasets[aggregate].division,
             ],
             [
