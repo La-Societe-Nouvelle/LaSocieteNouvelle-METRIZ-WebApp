@@ -131,10 +131,7 @@ const ExtraFinancialReport = ({
           <ComparativeDataContainer
             indic={indic}
             comparativeData={comparativeData}
-            production={production}
-            intermediateConsumptions={intermediateConsumptions}
-            fixedCapitalConsumptions={fixedCapitalConsumptions}
-            netValueAdded={netValueAdded}
+            financialData={financialData.mainAggregates}
             period={period}
             prevPeriod={prevPeriod}
           />

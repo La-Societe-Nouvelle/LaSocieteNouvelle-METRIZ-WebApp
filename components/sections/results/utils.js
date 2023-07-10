@@ -49,6 +49,13 @@ export const updateComparativeData = async (indic, code, comparativeData) => {
   return updatedComparativeData;
 };
 
+/**
+ * Retrieves the value for the closest year to the given year from the dataset,
+ * or the closest available year if there is no data for the given year.
+ * @param {object} dataset - The dataset containing year-value pairs.
+ * @param {string} year - The target year.
+ * @returns {number|null} - The value for the closest year or null if no data is available.
+ */
 export const getClosestYearData = (data, currentYear) => {
   if (!data) {
     return null;
@@ -62,5 +69,5 @@ export const getClosestYearData = (data, currentYear) => {
 
   closestYearData = data[closestYear];
 
-  return closestYearData || null;
+  return closestYearData.value || null;
 };
