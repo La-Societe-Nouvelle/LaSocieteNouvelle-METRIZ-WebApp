@@ -26,7 +26,11 @@ const TrendsDataContainer = ({
   const trendData = {
     prd: {
       title: "",
-      data:
+      historical:
+        comparativeData.production.division.macrodata.data[
+          indic.toUpperCase()
+        ] || [],
+      trend:
         comparativeData.production.division.trends.data[indic.toUpperCase()] ||
         [],
       target:
@@ -36,7 +40,11 @@ const TrendsDataContainer = ({
     },
     ic: {
       title: "",
-      data:
+      historical:
+      comparativeData.intermediateConsumptions.division.macrodata.data[
+        indic.toUpperCase()
+      ] || [],
+      trend:
         comparativeData.intermediateConsumptions.division.trends.data[
           indic.toUpperCase()
         ] || [],
@@ -48,7 +56,11 @@ const TrendsDataContainer = ({
     },
     cfc: {
       title: "",
-      data:
+      historical:
+      comparativeData.fixedCapitalConsumptions.division.macrodata.data[
+        indic.toUpperCase()
+      ] || [],
+      trend:
         comparativeData.fixedCapitalConsumptions.division.trends.data[
           indic.toUpperCase()
         ] || [],
@@ -60,7 +72,11 @@ const TrendsDataContainer = ({
     },
     nva: {
       title: "",
-      data:
+      historical:
+      comparativeData.netValueAdded.division.macrodata.data[
+        indic.toUpperCase()
+      ] || [],
+      trend:
         comparativeData.netValueAdded.division.trends.data[
           indic.toUpperCase()
         ] || [],
@@ -78,7 +94,7 @@ const TrendsDataContainer = ({
   };
 
   const renderTrendsChart = () => {
-    const { title, data, target, aggregate } = trendData[trendGraphView.value];
+    const { title,historical, trend, target, aggregate } = trendData[trendGraphView.value];
 
     return (
       <div>
@@ -86,7 +102,8 @@ const TrendsDataContainer = ({
         <TrendsChart
           id={`trend-${trendGraphView.value}-${indic}`}
           unit={unit}
-          trends={data}
+          historical={historical}
+          trend={trend}
           target={target}
           aggregate={aggregate}
           indic={indic}
@@ -110,7 +127,7 @@ const TrendsDataContainer = ({
             onChange={changeTrendGraphView}
           />
 
-          {/* {renderTrendsChart()} */}
+          {renderTrendsChart()}
         </div>
       </Col>
       <Col>
@@ -131,26 +148,18 @@ const TrendsDataContainer = ({
                 l'économie nationale, ses interactions avec l’extérieur et de la
                 dynamique des prix par branche.
               </p>
-            <p className="small mt-3">
-              Source :  {trendsMeta[indic].source}
-            </p>
+              <p className="small mt-3">Source : {trendsMeta[indic].source}</p>
             </>
           )}
           {comparativeData.production.division.target.data[
             indic.toUpperCase()
           ] && (
             <>
-
-              <h5>Objectif de la branche :</h5> 
-            {targetMeta[indic].info}
-            <p className="small mt-3">
-              Source :  {targetMeta[indic].source}
-            </p>
+              <h5>Objectif de la branche :</h5>
+              {targetMeta[indic].info}
+              <p className="small mt-3">Source : {targetMeta[indic].source}</p>
             </>
           )}
-
-
-
         </div>
       </Col>
     </Row>

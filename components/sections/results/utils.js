@@ -71,3 +71,18 @@ export const getClosestYearData = (data, currentYear) => {
 
   return closestYearData ? { value: closestYearData.value, year: closestYearData.year } : null;
 };
+
+export const getSuggestedMax = (max) => {
+  if (max < 10) {
+    return 10;
+  }
+
+  switch (true) {
+    case max > 10 && max < 25:
+      return 25;
+    case max > 25 && max < 50:
+      return 50;
+    default:
+      return 100;
+  }
+};
