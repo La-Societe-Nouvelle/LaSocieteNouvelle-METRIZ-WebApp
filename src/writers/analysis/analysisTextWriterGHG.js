@@ -1,11 +1,14 @@
 // La Société Nouvelle
 
+import { getClosestYearData } from "../../../components/sections/results/utils";
 import { compareToReference, printValue } from "../../utils/Utils";
 
 export const analysisTextWriterGHG = (props) => {
   const { impactsData, comparativeData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
-  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
+  const { revenue} = productionAggregates;
+  const year = period.periodKey.slice(2);
+
   // array of paragraphs
   let analysis = [];
   let currentParagraph = [];
@@ -54,6 +57,11 @@ export const analysisTextWriterGHG = (props) => {
 
   currentParagraph = [];
 
+  const netValueAddedComparativeData = getClosestYearData(
+    comparativeData.intermediateConsumptions.division.macrodata.data["GHG"],
+    year
+  );
+
   if (impactsData.greenhousesGazEmissions == 0) {
     currentParagraph.push(
       "Les activités de l'entreprise ne génère aucune émission directe de gaz à effet de serre. L'intensité liée à la valeur ajoutée nette est donc de 0 gCO2e/€."
@@ -76,12 +84,12 @@ export const analysisTextWriterGHG = (props) => {
     );
     // intensité & comparaison
     if (
-      comparativeData.netValueAdded.divisionFootprint.indicators.ghg.value !=
+      netValueAddedComparativeData.value !=
       null
     ) {
       let comparison = compareToReference(
         mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.ghg.value,
-        comparativeData.netValueAdded.divisionFootprint.indicators.ghg.value,
+        netValueAddedComparativeData.value,
         10
       );
       if (comparison == 0) {
@@ -180,14 +188,18 @@ export const analysisTextWriterGHG = (props) => {
 
   // comparaison branche
 
+  const intermediateConsumptionsComparativeData = getClosestYearData(
+    comparativeData.intermediateConsumptions.division.macrodata.data["GHG"],
+    year
+  );
+
   if (
-    comparativeData.intermediateConsumptions.divisionFootprint.indicators.ghg
+    intermediateConsumptionsComparativeData
       .value != null
   ) {
     let comparison = compareToReference(
       mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.ghg.value,
-      comparativeData.intermediateConsumptions.divisionFootprint.indicators.ghg
-        .value,
+      intermediateConsumptionsComparativeData.value,
       10
     );
     if (comparison == 0) {
