@@ -8,16 +8,11 @@ import {
 } from "../../components/assessments/AssessmentGHG";
 import { buildAggregateIndicator } from "../formulas/footprintFormulas";
 
-import { getAmountItems, getTargetSerieId } from "../utils/Utils";
-
+import { getAmountItems } from "../utils/Utils";
 import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
-import { ComparativeData } from "../ComparativeData";
-import getSerieData from "/src/services/responses/SerieData";
-import getMacroSerieData from "/src/services/responses/MacroSerieData";
-import getHistoricalSerieData from "/src/services/responses/HistoricalSerieData";
-import { Provider } from "../Provider";
 import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
+import { ComparativeData } from "../models/ComparativeData";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -86,23 +81,17 @@ const updater_1_0_5 = async (sessionData) => {
   let code = sessionData.comparativeDivision;
 
   let newComparativeData = new ComparativeData();
-
-  for await (const indic of sessionData.validations) {
-    
- // update comparative data for each validated indicators
-    const updatedData = await updateComparativeData(
-      indic,
-      code,
-      newComparativeData
-    );
-
-    newComparativeData = updatedData;
-  }
-
-  // update session with new values
   sessionData.comparativeData = newComparativeData;
   sessionData.comparativeData.activityCode = code;
-  // delete old property and assign division code into comparative data object
+
+  for await (const indic of sessionData.validations) {
+    const indicatorCode = indic.toUpperCase();
+
+    await fetchComparativeDataForArea(newComparativeData, indicatorCode, endpoints);
+    await fetchComparativeDataForDivision(newComparativeData, indicatorCode, endpoints); 
+
+  }
+
   delete sessionData.comparativeDivision;
 
   // set previous analysis to True to disable new indicators assessment with missing data
@@ -174,56 +163,5 @@ const updater_1_0_1 = (sessionData) => {
     getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
-// ----------------------------------------------------------------
 
-export async function updateComparativeData(
-  indic,
-  comparativeDivision,
-  comparativeData
-) {
-  let idTarget = getTargetSerieId(indic);
 
-  // Area Footprint
-  let newComparativeData = await getMacroSerieData(
-    indic,
-    "00",
-    comparativeData,
-    "areaFootprint"
-  );
-
-  // Target Area Footprint
-  if (idTarget) {
-    newComparativeData = await getSerieData(
-      idTarget,
-      "00",
-      indic,
-      newComparativeData,
-      "targetAreaFootprint"
-    );
-  }
-
-  if (comparativeDivision != "00") {
-    // Division Footprint
-    newComparativeData = await getMacroSerieData(
-      indic,
-      comparativeDivision,
-      newComparativeData,
-      "divisionFootprint"
-    );
-
-    newComparativeData = await getHistoricalSerieData(
-      comparativeDivision,
-      indic,
-      newComparativeData,
-      "trendsFootprint"
-    );
-    // Target Division Footprint
-    newComparativeData = await getHistoricalSerieData(
-      comparativeDivision,
-      indic,
-      newComparativeData,
-      "targetDivisionFootprint"
-    );
-  }
-  return newComparativeData;
-}

@@ -21,7 +21,6 @@ import {
   updateFixedCapitalConsumptionsFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
-// import { ComparativeData } from "./ComparativeData";
 import { getDatesEndMonths, getLastDateOfMonth, getPrevDate } from "./utils/Utils";
 import { ComparativeData } from "./models/ComparativeData";
 

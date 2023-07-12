@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
+import React, {  useState } from "react";
+import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
 import { ComparativeData } from "../../../src/ComparativeData";
-import { updateComparativeData } from "../../../src/version/updateVersion";
 import UpdateDataView from "./UpdatedDataView";
+import { fetchComparativeDataForArea, fetchComparativeDataForDivision } from "../../../src/services/MacrodataService";
 
 export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => {
   const [show, setShow] = useState(true);
@@ -96,12 +96,12 @@ const fetchLatestData = async (updatedSession) => {
 
   // Récupère les dernières données comparatives
 
-  const latestComparativeData = await fetchLatestComparativeData(
+   await fetchLatestComparativeData(
     validations,
-    updatedSession.comparativeData.activityCode
+    updatedSession.comparativeData
   );
 
-  updatedSession.comparativeData = latestComparativeData;
+
 };
 
 const fetchLatestProviders = async (
@@ -128,7 +128,6 @@ const fetchLatestProviders = async (
 
 const fetchLatestLegalUnit = async (legalUnit) => {
   await LegalUnitService.getLegalUnitData(legalUnit.siren).then((res) => {
-    console.log(res.data.legalUnit);
     let status = res.data.header.code;
     if (status == 200) {
       legalUnit.corporateName = res.data.legalUnit.denomination;
@@ -163,19 +162,15 @@ const fetchLatestAccountsData = async (immobilisations, stocks) => {
   }
 };
 
-const fetchLatestComparativeData = async (validations, activityCode) => {
-  let latestComparativeData = new ComparativeData();
+const fetchLatestComparativeData = async (validations, comparativeData) => {
 
   for await (const indic of validations) {
-    // update comparative data for each validated indicators
-    const updatedData = await updateComparativeData(
-      indic,
-      activityCode,
-      latestComparativeData
-    );
+    const indicatorCode = indic.toUpperCase();
 
-    latestComparativeData = updatedData;
+    await fetchComparativeDataForArea(comparativeData, indicatorCode, endpoints);
+    await fetchComparativeDataForDivision(comparativeData, indicatorCode, endpoints); 
+
   }
 
-  return latestComparativeData;
+
 };
