@@ -14,7 +14,6 @@ import Analyse from "./AnalyseNote";
 import ComparativeDataContainer from "./ComparativeDataContainer";
 import TrendsDataContainer from "./TrendsDataContainer";
 import SigFootprintsContainer from "./SigFootprintsContainer";
-import { Loader } from "../../../popups/Loader";
 
 const ExtraFinancialReport = ({
   indic,
@@ -155,9 +154,7 @@ const ExtraFinancialReport = ({
           division={division}
         />
       )}
-      {isLoading && (
-        <Loader title={"Récupération des données de comparaison ..."} />
-      )}
+
 
       {/* ---------- Analyse Note  ----------  */}
 

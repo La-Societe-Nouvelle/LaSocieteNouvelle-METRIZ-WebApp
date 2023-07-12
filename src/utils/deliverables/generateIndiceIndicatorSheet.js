@@ -44,9 +44,7 @@ export const generateIndiceIndicatorSheet = (
   const precision = metaIndics[indic].nbDecimals;
   const divisionName = divisions[comparativeData.activityCode];
 
-  const {
-    revenue,
-  } = financialData.productionAggregates;
+  const { revenue } = financialData.productionAggregates;
 
   const {
     production,
@@ -61,13 +59,19 @@ export const generateIndiceIndicatorSheet = (
   // utils
 
   const indicDescription = getIndicDescription(indic);
-  const branchProductionTarget = targetAnnualReduction(
-    comparativeData.production.targetDivisionFootprint.indicators[indic].data
-  );
 
-  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[
-    indic
-  ].data.filter((item) => item.flag == "e" && item.year <= currentPeriod);
+  let branchProductionTarget = null;
+
+  if (comparativeData.production.division.target.data[indic.toUpperCase()]) {
+    branchProductionTarget = targetAnnualReduction(
+      comparativeData.production.division.target.data[indic.toUpperCase()]
+    );
+  }
+
+  let lastEstimatedData = comparativeData.production.division.macrodata.data[
+    indic.toUpperCase()
+  ].filter((item) => item.year <= currentPeriod);
+
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)
   );
@@ -75,14 +79,14 @@ export const generateIndiceIndicatorSheet = (
   const branchProductionEvolution =
     calculateAverageEvolutionRate(lastEstimatedData);
 
-
-    const providers = financialData.providers.filter(provider => {
-      return Object.keys(provider.periodsData).some(key => key === period.periodKey);
-    });
-
+  const providers = financialData.providers.filter((provider) => {
+    return Object.keys(provider.periodsData).some(
+      (key) => key === period.periodKey
+    );
+  });
 
   const firstMostImpactfulCompanies = sortProvidersByImpact(
-   providers,
+    providers,
     indic,
     "desc"
   ).slice(0, 2);
@@ -92,16 +96,19 @@ export const generateIndiceIndicatorSheet = (
     indic,
     "desc"
   ).slice(2, 4);
- 
+
   const uncertaintyText = getUncertaintyDescription(
     "indice",
-    production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty
+    production.periodsData[period.periodKey].footprint.indicators[indic]
+      .uncertainty
   );
 
   // ---------------------------------------------------------------
   // Get chart canvas and encode it to import in document
 
-  const deviationChart = document.getElementById(`deviation-chart-${indic}-print`);
+  const deviationChart = document.getElementById(
+    `deviation-chart-${indic}-print`
+  );
   const deviationImage = deviationChart.toDataURL("image/png");
 
   const trendChart = document.getElementById(`trend-chart-${indic}-print`);
@@ -279,7 +286,9 @@ export const generateIndiceIndicatorSheet = (
                 margin: [0, 5, 0, 5],
                 text:
                   printValue(
-                    revenue.periodsData[period.periodKey].footprint.indicators[indic].value,
+                    revenue.periodsData[period.periodKey].footprint.indicators[
+                      indic
+                    ].value,
                     precision
                   ) +
                   " " +
@@ -323,7 +332,8 @@ export const generateIndiceIndicatorSheet = (
                 text: [
                   {
                     text: printValue(
-                      production.periodsData[period.periodKey].footprint.indicators[indic].value,
+                      production.periodsData[period.periodKey].footprint
+                        .indicators[indic].value,
                       precision
                     ),
                   },
@@ -356,7 +366,8 @@ export const generateIndiceIndicatorSheet = (
                 text: [
                   {
                     text: printValue(
-                      intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+                      intermediateConsumptions.periodsData[period.periodKey]
+                        .footprint.indicators[indic].value,
                       precision
                     ),
                   },
@@ -389,7 +400,8 @@ export const generateIndiceIndicatorSheet = (
                 text: [
                   {
                     text: printValue(
-                      fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic].value,
+                      fixedCapitalConsumptions.periodsData[period.periodKey]
+                        .footprint.indicators[indic].value,
                       precision
                     ),
                   },
@@ -422,7 +434,8 @@ export const generateIndiceIndicatorSheet = (
                 text: [
                   {
                     text: printValue(
-                      netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
+                      netValueAdded.periodsData[period.periodKey].footprint
+                        .indicators[indic].value,
                       precision
                     ),
                   },
@@ -535,7 +548,11 @@ export const generateIndiceIndicatorSheet = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(production.periodsData[period.periodKey].amount, 0) + " €",
+                    text:
+                      printValue(
+                        production.periodsData[period.periodKey].amount,
+                        0
+                      ) + " €",
                     margin: [2, 7, 2, 8],
                     alignment: "right",
                   },
@@ -545,7 +562,8 @@ export const generateIndiceIndicatorSheet = (
                         text: [
                           {
                             text: printValue(
-                              production.periodsData[period.periodKey].footprint.indicators[indic].value,
+                              production.periodsData[period.periodKey].footprint
+                                .indicators[indic].value,
                               precision
                             ),
                           },
@@ -558,7 +576,8 @@ export const generateIndiceIndicatorSheet = (
 
                   {
                     text: printValue(
-                      production.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
+                      production.periodsData[period.periodKey].footprint
+                        .indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",
@@ -573,7 +592,12 @@ export const generateIndiceIndicatorSheet = (
                     alignment: "left",
                   },
                   {
-                    text: printValue(intermediateConsumptions.periodsData[period.periodKey].amount, 0) + " €",
+                    text:
+                      printValue(
+                        intermediateConsumptions.periodsData[period.periodKey]
+                          .amount,
+                        0
+                      ) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -584,9 +608,9 @@ export const generateIndiceIndicatorSheet = (
                         text: [
                           {
                             text: printValue(
-                              intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[
-                                indic
-                              ].value,
+                              intermediateConsumptions.periodsData[
+                                period.periodKey
+                              ].footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -598,8 +622,8 @@ export const generateIndiceIndicatorSheet = (
                   },
                   {
                     text: printValue(
-                      intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
-                        .uncertainty,
+                      intermediateConsumptions.periodsData[period.periodKey]
+                        .footprint.indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",
@@ -614,7 +638,12 @@ export const generateIndiceIndicatorSheet = (
                     margin: [2, 7, 2, 8],
                   },
                   {
-                    text: printValue(fixedCapitalConsumptions.periodsData[period.periodKey].amount, 0) + " €",
+                    text:
+                      printValue(
+                        fixedCapitalConsumptions.periodsData[period.periodKey]
+                          .amount,
+                        0
+                      ) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -626,8 +655,9 @@ export const generateIndiceIndicatorSheet = (
                         text: [
                           {
                             text: printValue(
-                              fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
-                                .value,
+                              fixedCapitalConsumptions.periodsData[
+                                period.periodKey
+                              ].footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -637,8 +667,8 @@ export const generateIndiceIndicatorSheet = (
                   },
                   {
                     text: printValue(
-                      fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic]
-                        .uncertainty,
+                      fixedCapitalConsumptions.periodsData[period.periodKey]
+                        .footprint.indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",
@@ -653,7 +683,11 @@ export const generateIndiceIndicatorSheet = (
                     margin: [2, 7, 2, 8],
                   },
                   {
-                    text: printValue(netValueAdded.periodsData[period.periodKey].amount, 0) + " €",
+                    text:
+                      printValue(
+                        netValueAdded.periodsData[period.periodKey].amount,
+                        0
+                      ) + " €",
                     alignment: "right",
                     margin: [2, 7, 2, 8],
                   },
@@ -663,7 +697,8 @@ export const generateIndiceIndicatorSheet = (
                         text: [
                           {
                             text: printValue(
-                              netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].value,
+                              netValueAdded.periodsData[period.periodKey]
+                                .footprint.indicators[indic].value,
                               precision
                             ),
                           },
@@ -676,7 +711,8 @@ export const generateIndiceIndicatorSheet = (
 
                   {
                     text: printValue(
-                      netValueAdded.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
+                      netValueAdded.periodsData[period.periodKey].footprint
+                        .indicators[indic].uncertainty,
                       0
                     ),
                     fontSize: "5",

@@ -15,6 +15,7 @@ import {
 
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
+import { endpoints } from "../../../config/endpoint";
 
 import { getPrevDate } from "/src/utils/Utils";
 
@@ -38,9 +39,7 @@ const Results = ({ session, publish, goBack }) => {
     "Sélectionner un indicateur..."
   );
 
-  const [comparativeData, setComparativeData] = useState(
-    session.comparativeData
-  );
+
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -64,41 +63,36 @@ const Results = ({ session, publish, goBack }) => {
   }, []);
 
   useEffect(() => {
-    let isCancelled = false;
+    if (session.comparativeData.activityCode !== selectedDivision) {
+      let isCancelled = false;
+      setIsLoading(true);
 
-    const fetchData = async () => {
-      if (session.comparativeData.activityCode !== selectedDivision) {
+      const fetchData = async () => {
         session.comparativeData.activityCode = selectedDivision;
 
-        let updatedComparativeData = comparativeData;
-
-        for await (const indic of session.validations[
+        for await (const validation of session.validations[
           session.financialPeriod.periodKey
         ]) {
           const indicatorCode = validation.toUpperCase();
 
-          const updatedData = await fetchDataForComparativeData(
+          await fetchDataForComparativeData(
             session.comparativeData,
             indicatorCode,
             endpoints
           );
-
-          updatedComparativeData = updatedData;
         }
 
         if (!isCancelled) {
-          session.comparativeData = updatedComparativeData;
-          setComparativeData(updatedComparativeData);
           setIsLoading(false);
         }
-      }
-    };
+      };
 
-    fetchData();
+      fetchData();
 
-    return () => {
-      isCancelled = true;
-    };
+      return () => {
+        isCancelled = true;
+      };
+    }
   }, [selectedDivision]);
 
   const handleDivisionChange = (selectedOption) => {
@@ -120,8 +114,6 @@ const Results = ({ session, publish, goBack }) => {
   };
 
   const handleDownload = async (selectedFiles) => {
-    console.log(selectedFiles);
-
     const period = session.financialPeriod;
     const prevPeriod = session.availablePeriods.find(
       (period) => period.dateEnd == prevDateEnd
@@ -303,20 +295,24 @@ const Results = ({ session, publish, goBack }) => {
         <>
           {session.validations[session.financialPeriod.periodKey].map(
             (indic) => (
-              <ChartsContainer
-                indic={indic}
-                comparativeData={session.comparativeData}
-                mainAggregates={session.financialData.mainAggregates}
-                period={session.financialPeriod}
-                prevPeriod={prevPeriod}
-              />
+              <div key={indic}>
+                <ChartsContainer
+                  indic={indic}
+                  comparativeData={session.comparativeData}
+                  mainAggregates={session.financialData.mainAggregates}
+                  period={session.financialPeriod}
+                  prevPeriod={prevPeriod}
+                />
+              </div>
             )
           )}
         </>
       )}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
-
+      {isLoading && (
+        <Loader title={"Récupération des données de comparaison ..."} />
+      )}
       <div className="box text-end">
         <Button onClick={goBack} className="me-1">
           Retour

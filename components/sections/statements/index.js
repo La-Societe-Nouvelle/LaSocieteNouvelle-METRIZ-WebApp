@@ -4,6 +4,7 @@ import StatementForms from "./StatementForms";
 import { Loader } from "../../popups/Loader";
 import { endpoints } from "../../../config/endpoint";
 import { fetchDataForComparativeData } from "../../../src/services/MacrodataService";
+import { checkIfDataExists } from "./utils";
 
 const DirectImpacts = ({ session, submit }) => {
   const [period, setPeriod] = useState(session.financialPeriod);
@@ -15,28 +16,30 @@ const DirectImpacts = ({ session, submit }) => {
   const [invalidIndicators, setInvalidIndicators] = useState(null);
 
   const handleSubmitStatements = async () => {
-    console.log(invalidIndicators);
-
     if (invalidIndicators.length > 0) {
       window.scroll(0, 0);
       return;
     }
 
-    // Handle submit on for first submit ?
-    // fetch comparative data
-    //
     setIsLoading(true);
 
     for (const validation of validations) {
       const indicatorCode = validation.toUpperCase();
-      // const hasData = checkIfDataExists(session.comparativeData, indicatorCode); TO DO !
-      const hasData = false;
-      if (!hasData) {
-        await fetchDataForComparativeData(
-          session.comparativeData,
-          indicatorCode,
-          endpoints
-        );
+      // fetch comparative data
+      //
+      const missingIndicators = checkIfDataExists(
+        session.comparativeData,
+        indicatorCode
+      );
+
+      if (missingIndicators.length > 0) {
+        for (const missingIndicator of missingIndicators) {
+          await fetchDataForComparativeData(
+            session.comparativeData,
+            missingIndicator,
+            endpoints
+          );
+        }
       }
     }
 
@@ -44,26 +47,7 @@ const DirectImpacts = ({ session, submit }) => {
     submit();
   };
 
-  // const fetchData = async () => {
-  //   let updatedComparativeData = session.comparativeData;
-
-  //   for await (const indic of session.validations[
-  //     session.financialPeriod.periodKey
-  //   ]) {
-  //     const updatedData = await updateComparativeData(
-  //       indic,
-  //       session.comparativeData.activityCode,
-  //       updatedComparativeData
-  //     );
-
-  //     updatedComparativeData = updatedData;
-  //   }
-
-  //   session.comparativeData = updatedComparativeData;
-  // };
-
   const handleValidations = async (indicators, invalidIndicators) => {
-    console.log(invalidIndicators);
     setValidations(indicators);
     setInvalidIndicators(invalidIndicators);
     session.validations[period.periodKey] = indicators;
