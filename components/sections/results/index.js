@@ -22,11 +22,11 @@ import ExtraFinancialReport from "./components/ExtraFinancialReport";
 import FootprintReport from "./components/FootprintReport";
 
 import { ChartsContainer } from "./charts/ChartsContainer";
-import { updateComparativeData } from "./utils";
 import { Loader } from "../../popups/Loader";
 import { customSelectStyles } from "../../../config/customStyles";
 import DownloadDropdown from "./components/DownloadDropdown";
 import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
+import { fetchDataForComparativeData } from "../../../src/services/MacrodataService";
 
 const Results = ({ session, publish, goBack }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -75,10 +75,12 @@ const Results = ({ session, publish, goBack }) => {
         for await (const indic of session.validations[
           session.financialPeriod.periodKey
         ]) {
-          const updatedData = await updateComparativeData(
-            indic,
-            selectedDivision,
-            updatedComparativeData
+          const indicatorCode = validation.toUpperCase();
+
+          const updatedData = await fetchDataForComparativeData(
+            session.comparativeData,
+            indicatorCode,
+            endpoints
           );
 
           updatedComparativeData = updatedData;
@@ -177,7 +179,9 @@ const Results = ({ session, publish, goBack }) => {
             </Col>
           </Row>
           <div className="d-flex align-items-center">
-            <p className="fw-bold col-form-label me-2 mb-0 ">Branche de comparaison :</p>
+            <p className="fw-bold col-form-label me-2 mb-0 ">
+              Branche de comparaison :
+            </p>
 
             <Form className="flex-grow-1">
               <Form.Group
@@ -294,16 +298,22 @@ const Results = ({ session, publish, goBack }) => {
           isLoading={isLoading}
         ></ExtraFinancialReport>
       )}
-{/* 
+
       {selectedDivision != "00" && !isLoading && (
-        <ChartsContainer
-          validations={session.validations[financialPeriod]}
-          comparativeData={session.comparativeData}
-          aggregates={session.financialData.mainAggregates}
-          period={session.financialPeriod}
-          prevPeriod={prevPeriod}
-        />
-      )} */}
+        <>
+          {session.validations[session.financialPeriod.periodKey].map(
+            (indic) => (
+              <ChartsContainer
+                indic={indic}
+                comparativeData={session.comparativeData}
+                mainAggregates={session.financialData.mainAggregates}
+                period={session.financialPeriod}
+                prevPeriod={prevPeriod}
+              />
+            )
+          )}
+        </>
+      )}
 
       {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
 

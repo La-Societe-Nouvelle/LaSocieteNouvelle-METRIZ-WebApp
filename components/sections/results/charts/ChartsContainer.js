@@ -1,4 +1,5 @@
 import React from "react";
+import { Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
 import ComparativeChart from "./ComparativeChart";
@@ -7,281 +8,230 @@ import SigPieChart from "./SigPieChart";
 import DeviationChart from "./HorizontalBarChart";
 import { printValue } from "../../../../src/utils/Utils";
 import GrossImpactChart from "./GrossImpactChart";
+import { getClosestYearData } from "../utils";
 
 export const ChartsContainer = ({
-  validations,
+  indic,
   comparativeData,
-  aggregates,
+  mainAggregates,
   period,
   prevPeriod,
 }) => {
-  const {
-    production,
-    fixedCapitalConsumptions,
-    intermediateConsumptions,
-    netValueAdded,
-  } = aggregates;
+  const year = period.periodKey.slice(2);
+  // Define the aggregates and their corresponding titles
+  const aggregates = {
+    production: "Production",
+    intermediateConsumptions: "Consommations intermédiaires",
+    fixedCapitalConsumptions: "Consommations de capital fixe",
+    netValueAdded: "Valeur ajoutée nette",
+  };
 
-  const renderCharts = () => {
-    return validations.map((indic) => (
-      <div key={"chart-" + indic}>
-        <div className="comparative-chart-container">
-          <ComparativeChart
-            id={`comparative-chart-production-${indic}-print`} 
-            isPrinting={true}
-            firstDataset={[
-              comparativeData.production.areaFootprint.indicators[indic].value,
-              prevPeriod &&
-                production.periodsData[
-                  prevPeriod.periodKey
-                ].footprint.getIndicator(indic).value,
-              comparativeData.production.divisionFootprint.indicators[indic]
-                .value,
-            ]}
-            secondDataset={[
-              comparativeData.production.targetAreaFootprint.indicators[indic]
-                .value,
-              production.periodsData[period.periodKey].footprint.getIndicator(
-                indic
-              ).value,
-              comparativeData.production.targetDivisionFootprint.indicators[
-                indic
-              ].data.at(-1).value,
-            ]}
+  const datasets = {}; // macro datasets for each aggregate
+  const targetDatasets = {}; //  target datasets for each aggregate
+
+  Object.keys(aggregates).forEach((aggregate) => {
+    datasets[aggregate] = {
+      area: comparativeData[aggregate].area.macrodata.data[indic.toUpperCase()],
+      division:
+        comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()],
+    };
+
+    targetDatasets[aggregate] = {
+      area: comparativeData[aggregate].area.target.data[indic.toUpperCase()],
+      division:
+        comparativeData[aggregate].division.target.data[indic.toUpperCase()],
+    };
+
+    // Get the closest year data
+    Object.keys(datasets[aggregate]).forEach((category) => {
+      datasets[aggregate][category] = getClosestYearData(
+        datasets[aggregate][category],
+        year
+      );
+    });
+
+    Object.keys(targetDatasets[aggregate]).forEach((category) => {
+      targetDatasets[aggregate][category] = getClosestYearData(
+        targetDatasets[aggregate][category],
+        year
+      );
+    });
+  });
+  return (
+    <div
+      className={"charts-container " + indic}
+      style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
+    >
+      <Row className="charts">
+        {Object.keys(aggregates).map((aggregate) => (
+          <React.Fragment key={aggregate}>
+            {renderComparativeCharts(
+              `comparative-chart-${aggregate}-${indic}-print`,
+              [
+                datasets[aggregate].area,
+                {
+                  value:
+                    mainAggregates[aggregate].periodsData[period.periodKey]
+                      .footprint.indicators[indic].value,
+                  year: year,
+                },
+                datasets[aggregate].division,
+              ],
+              [
+                null,
+                prevPeriod
+                  ? mainAggregates[aggregate].periodsData[prevPeriod.periodKey]
+                      .footprint.indicators[indic].value
+                  : null,
+                null,
+              ],
+              [
+                targetDatasets[aggregate].area,
+                null,
+                targetDatasets[aggregate].division,
+              ],
+              indic
+            )}
+            {renderSigCharts(
+              `sig-chart-${aggregate}-${indic}-print`,
+              indic,
+              printValue(
+                mainAggregates[aggregate].periodsData[period.periodKey]
+                  .footprint.indicators[indic].value,
+                indicators[indic].nbDecimals
+              ),
+              aggregates[aggregate]
+            )}
+          </React.Fragment>
+        ))}
+      </Row>
+      <Row>
+        <div className="trend-chart-container">
+          <TrendsChart
+            id={`trend-chart-${indic}-print`}
+            unit={indicators[indic].unit}
+            historical={
+              comparativeData["production"].division.macrodata.data[
+                indic.toUpperCase()
+              ]
+            }
+            trend={
+              comparativeData["production"].division.trends.data[
+                indic.toUpperCase()
+              ]
+            }
+            target={
+              comparativeData["production"].division.trends.data[
+                indic.toUpperCase()
+              ]
+            }
+            aggregate={mainAggregates.production.periodsData}
             indic={indic}
+            isPrinting={true}
           />
         </div>
-        <div className="comparative-chart-container">
-          <ComparativeChart
-            id={`comparative-chart-intermediateConsumptions-${indic}-print`}
-            isPrinting={true}
-            firstDataset={[
-              comparativeData.intermediateConsumptions.areaFootprint.indicators[
-                indic
-              ].value,
-              prevPeriod &&
-                intermediateConsumptions.periodsData[
-                  prevPeriod.periodKey
-                ].footprint.getIndicator(indic).value,
-              comparativeData.intermediateConsumptions.divisionFootprint
-                .indicators[indic].value,
-            ]}
-            secondDataset={[
-              comparativeData.intermediateConsumptions.targetAreaFootprint
-                .indicators[indic].value,
-              intermediateConsumptions.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-
-              comparativeData.intermediateConsumptions.targetDivisionFootprint.indicators[
-                indic
-              ].data.at(-1).value,
-            ]}
-            indic={indic}
-          />
-        </div>
-
-        <div className="comparative-chart-container">
-          <ComparativeChart
-            id={`comparative-chart-fixedCapitalConsumptions-${indic}-print`}
-            isPrinting={true}
-            firstDataset={[
-              comparativeData.fixedCapitalConsumptions.areaFootprint.indicators[
-                indic
-              ].value,
-              prevPeriod &&
-                fixedCapitalConsumptions.periodsData[
-                  prevPeriod.periodKey
-                ].footprint.getIndicator(indic).value,
-              comparativeData.fixedCapitalConsumptions.divisionFootprint
-                .indicators[indic].value,
-            ]}
-            secondDataset={[
-              comparativeData.fixedCapitalConsumptions.targetAreaFootprint
-                .indicators[indic].value,
-              fixedCapitalConsumptions.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-
-              comparativeData.fixedCapitalConsumptions.targetDivisionFootprint.indicators[
-                indic
-              ].data.at(-1).value,
-            ]}
-            indic={indic}
-          />
-        </div>
-
-        <div className="comparative-chart-container">
-          <ComparativeChart
-            id={`comparative-chart-netValueAdded-${indic}-print`}
-            isPrinting={true}
-            firstDataset={[
-              comparativeData.netValueAdded.areaFootprint.indicators[indic]
-                .value,
-              prevPeriod &&
-                netValueAdded.periodsData[
-                  prevPeriod.periodKey
-                ].footprint.getIndicator(indic).value,
-              comparativeData.netValueAdded.divisionFootprint.indicators[indic]
-                .value,
-            ]}
-            secondDataset={[
-              comparativeData.netValueAdded.targetAreaFootprint.indicators[
-                indic
-              ].value,
-              netValueAdded.periodsData[
-                period.periodKey
-              ].footprint.getIndicator(indic).value,
-              comparativeData.netValueAdded.targetDivisionFootprint.indicators[
-                indic
-              ].data.at(-1).value,
-            ]}
-            indic={indic}
-          />
-        </div>
- 
-        {indicators[indic].type == "proportion" && (
-          <>
-            {/* --------- SIG Footprints charts ----------  */}
-            <div className="doughnut-chart-container">
-              <SigPieChart
-                value={printValue(
-                  production.periodsData[period.periodKey].footprint.indicators[
-                    indic
-                  ].value,
-                  indicators[indic].nbDecimals
-                )}
-                title={"Production"}
-                id={`sig-chart-production-${indic}-print`}
-                isPrinting={true}
-              />
-            </div>
-            <div className="doughnut-chart-container">
-              <SigPieChart
-                value={printValue(
-                  intermediateConsumptions.periodsData[period.periodKey]
-                    .footprint.indicators[indic].value,
-                  indicators[indic].nbDecimals
-                )}
-                title={"Consommations intermédiaires"}
-                id={`sig-chart-intermediateConsumptions-${indic}-print`}
-                isPrinting={true}
-              />
-            </div>
-            <div className="doughnut-chart-container">
-              <SigPieChart
-                value={printValue(
-                  fixedCapitalConsumptions.periodsData[period.periodKey]
-                    .footprint.indicators[indic].value,
-                  indicators[indic].nbDecimals
-                )}
-                title={"Consommation de capital fixe"}
-                id={`sig-chart-fixedCapitalConsumptions-${indic}-print`}
-                isPrinting={true}
-              />
-            </div>
-            <div className="doughnut-chart-container">
-              <SigPieChart
-                value={printValue(
-                  netValueAdded.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getValue(),
-                  indicators[indic].nbDecimals
-                )}
-                title={"Valeur ajoutée nette"}
-                id={`sig-chart-netValueAdded-${indic}-print`}
-                isPrinting={true}
-              />
-            </div>
-          </>
-        )}
-        {(indicators[indic].type == "intensité" || indicators[indic].type == "indice")  && (
+      </Row>
+      {(indicators[indic].type == "intensité" ||
+        indicators[indic].type == "indice") && (
+        <Row>
           <div className="deviation-chart-container">
             <DeviationChart
               id={`deviation-chart-${indic}-print`}
               legalUnitData={[
-                aggregates.production.periodsData[
+                mainAggregates.production.periodsData[period.periodKey].footprint
+                  .indicators[indic].value,
+                mainAggregates.intermediateConsumptions.periodsData[
                   period.periodKey
-                ].footprint.getIndicator(indic).value,
-                aggregates.intermediateConsumptions.periodsData[
+                ].footprint.indicators[indic].value,
+                mainAggregates.fixedCapitalConsumptions.periodsData[
                   period.periodKey
-                ].footprint.getIndicator(indic).value,
-                aggregates.fixedCapitalConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
-                aggregates.netValueAdded.periodsData[
-                  period.periodKey
-                ].footprint.getIndicator(indic).value,
+                ].footprint.indicators[indic].value,
+                mainAggregates.netValueAdded.periodsData[period.periodKey].footprint
+                  .indicators[indic].value,
               ]}
               branchData={[
-                comparativeData.production.divisionFootprint.indicators[indic]
-                  .value,
-                comparativeData.intermediateConsumptions.divisionFootprint
-                  .indicators[indic].value,
-                comparativeData.fixedCapitalConsumptions.divisionFootprint
-                  .indicators[indic].value,
-                comparativeData.netValueAdded.divisionFootprint.indicators[
-                  indic
-                ].value,
+                datasets["production"].division,
+                datasets["intermediateConsumptions"].division,
+                datasets["fixedCapitalConsumptions"].division,
+                datasets["netValueAdded"].division,
               ]}
               indic={indic}
               isPrinting={true}
             />
           </div>
-        )}
+        </Row>
+      )}
 
-        {/* ---------- Target and Trend Line Chart ----------  */}
-        <div className="trend-chart-container">
-          <TrendsChart
-            id={`trend-chart-${indic}-print`}
-            unit={indicators[indic].unit}
-            trends={
-              comparativeData.production.trendsFootprint.indicators[indic]
-            }
-            target={
-              comparativeData.production.targetDivisionFootprint.indicators[
-                indic
-              ]
-            }
-            aggregate={production.periodsData}
-            indic={indic}
+      {/* ----------Gross Impact Chart ----------  */}
+      {indicators[indic].type == "intensité" && (
+        <div className="impact-chart-container">
+          <GrossImpactChart
+            id={`gross-impact-chart-${indic}-print`}
             isPrinting={true}
+            intermediateConsumptions={mainAggregates.intermediateConsumptions.periodsData[
+              period.periodKey
+            ].footprint.indicators[indic].getGrossImpact(
+              mainAggregates.intermediateConsumptions.periodsData[
+                period.periodKey
+              ].amount
+            )}
+            fixedCapitalConsumptions={mainAggregates.fixedCapitalConsumptions.periodsData[
+              period.periodKey
+            ].footprint.indicators[indic].getGrossImpact(
+              mainAggregates.fixedCapitalConsumptions.periodsData[
+                period.periodKey
+              ].amount
+            )}
+            netValueAdded={mainAggregates.netValueAdded.periodsData[
+              period.periodKey
+            ].footprint.indicators[indic].getGrossImpact(
+              mainAggregates.netValueAdded.periodsData[period.periodKey].amount
+            )}
           />
         </div>
-        {/* ----------Gross Impact Chart ----------  */}
-        {indicators[indic].type == "intensité" && (
-          <div className="impact-chart-container">
-            <GrossImpactChart
-              id={`gross-impact-chart-${indic}-print`}
-              isPrinting={true}
-              intermediateConsumptions={intermediateConsumptions.periodsData[
-                period.periodKey
-              ].footprint.indicators[indic].getGrossImpact(
-                intermediateConsumptions.periodsData[period.periodKey].amount
-              )}
-              fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
-                period.periodKey
-              ].footprint.indicators[indic].getGrossImpact(
-                fixedCapitalConsumptions.periodsData[period.periodKey].amount
-              )}
-              netValueAdded={netValueAdded.periodsData[
-                period.periodKey
-              ].footprint.indicators[indic].getGrossImpact(
-                netValueAdded.periodsData[period.periodKey].amount
-              )}
-            />
-          </div>
-        )}
-      </div>
-    ));
-  };
-
-  return (
-    <div
-      className="charts-container"
-      style={{ position: "absolute", left: "-9999px", top: "-99999px" }}
-    >
-      {renderCharts()}
+      )}
     </div>
   );
 };
+
+const renderComparativeCharts = (
+  chartId,
+  datasets,
+  prevFootprint,
+  targetDatasets,
+  indic
+) => {
+  return (
+    <div key={chartId} className={"comparative-chart-container"}>
+      <ComparativeChart
+        id={chartId}
+        footprintDataset={datasets}
+        prevFootprint={prevFootprint}
+        targetDataset={targetDatasets}
+        indic={indic}
+        isPrinting={false}
+      />
+    </div>
+  );
+};
+{
+  /* --------- SIG Footprints charts ----------  */
+}
+
+const renderSigCharts = (chartId, indic, aggregateFootprint, title) => {
+  return (
+    <>
+      {indicators[indic].type == "proportion" && (
+        <div key={chartId} className="doughnut-chart-container">
+          <SigPieChart
+            value={aggregateFootprint}
+            title={title}
+            id={chartId}
+            isPrinting={true}
+          />
+        </div>
+      )}
+    </>
+  );
+};
+

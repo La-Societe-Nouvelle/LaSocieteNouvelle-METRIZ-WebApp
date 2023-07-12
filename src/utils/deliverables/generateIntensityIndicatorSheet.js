@@ -52,13 +52,19 @@ export const generateIntensityIndicatorSheet = (
   const divisionName = divisions[comparativeData.activityCode];
 
   // UTILS
+
+
   const branchProductionTarget = targetAnnualReduction(
-    comparativeData.production.targetDivisionFootprint.indicators[indic].data
+    comparativeData.production.division.target.data[
+      indic.toUpperCase()
+    ]
   );
 
-  let lastEstimatedData = comparativeData.production.trendsFootprint.indicators[
-    indic
-  ].data.filter((item) => item.flag == "e" && item.year <= currentPeriod);
+  let lastEstimatedData = comparativeData.production.division.macrodata.data[
+    indic.toUpperCase()].filter((item) => item.year <= currentPeriod);
+
+    console.log(comparativeData.production.division.macrodata.data[
+      indic.toUpperCase()])
 
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)
