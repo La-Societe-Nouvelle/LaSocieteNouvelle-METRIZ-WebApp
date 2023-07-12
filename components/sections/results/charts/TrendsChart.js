@@ -218,9 +218,11 @@ function TrendsChart({
         },
         callbacks: {
           title: function (tooltipItems, data) {
-            let date = new Date(tooltipItems[0].raw.x);
-            let year = date.getFullYear();
-            return year;
+            if (tooltipItems) {
+              let date = new Date(tooltipItems[0].raw.x);
+              let year = date.getFullYear();
+              return year;
+            }
           },
           label: function (context) {
             let label = " " + context.parsed.y + " " + unit;

@@ -27,7 +27,7 @@ import { Loader } from "../../popups/Loader";
 import { customSelectStyles } from "../../../config/customStyles";
 import DownloadDropdown from "./components/DownloadDropdown";
 import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
-import { fetchDataForComparativeData } from "../../../src/services/MacrodataService";
+import { fetchComparativeDataForDivision } from "../../../src/services/MacrodataService";
 
 const Results = ({ session, publish, goBack }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -73,9 +73,10 @@ const Results = ({ session, publish, goBack }) => {
         for await (const validation of session.validations[
           session.financialPeriod.periodKey
         ]) {
+
           const indicatorCode = validation.toUpperCase();
 
-          await fetchDataForComparativeData(
+          await fetchComparativeDataForDivision(
             session.comparativeData,
             indicatorCode,
             endpoints

@@ -1,8 +1,8 @@
 import api from "../../config/api";
 
-
 export async function fetchMacrodata(dataset, activityCode, aggregate, indic) {
   try {
+    
     const response = await api.get(`/macrodata/${dataset}`, {
       params: {
         division: activityCode,
@@ -23,7 +23,35 @@ export async function fetchMacrodata(dataset, activityCode, aggregate, indic) {
   }
 }
 
-export async function fetchDataForComparativeData(
+export async function fetchComparativeDataForArea(
+  comparativeData,
+  indicator,
+  endpoints
+) {
+  const aggregates = {
+    fixedCapitalConsumptions: "CFC",
+    production: "PRD",
+    netValueAdded: "NVA",
+    intermediateConsumptions: "IC",
+  };
+
+  for (const key in comparativeData) {
+    if (key !== "activityCode") {
+      const areaDataset = comparativeData[key].area;
+      const aggregate = aggregates[key];
+
+      await fetchDataForDatasets(
+        areaDataset,
+        "00",
+        aggregate,
+        indicator,
+        endpoints
+      );
+    }
+  }
+}
+
+export async function fetchComparativeDataForDivision(
   comparativeData,
   indicator,
   endpoints
@@ -39,11 +67,12 @@ export async function fetchDataForComparativeData(
 
   for (const key in comparativeData) {
     if (key !== "activityCode") {
-      const dataSet = comparativeData[key];
+      const divisionDataset = comparativeData[key].division;
+
       const aggregate = aggregates[key];
 
-      await fetchDataForDataSet(
-        dataSet,
+      await fetchDataForDatasets(
+        divisionDataset,
         activityCode,
         aggregate,
         indicator,
@@ -53,40 +82,42 @@ export async function fetchDataForComparativeData(
   }
 }
 
-async function fetchDataForSeries(series, activityCode, aggregate, indicator, endpoints) {
-    const { macrodata, target, trends } = series;
-  
-    const macrodataResult = await fetchMacrodata(endpoints.macrodata, activityCode, aggregate, indicator);
-    const targetResult = await fetchMacrodata(endpoints.target, activityCode, aggregate, indicator);
-    const trendsResult = await fetchMacrodata(endpoints.trends, activityCode, aggregate, indicator);
-  
-    if (macrodataResult !== null) {
-      macrodata.data[indicator] = macrodataResult;
-    }
-    if (targetResult !== null) {
-      target.data[indicator] = targetResult;
-    }
-    if (trendsResult !== null) {
-      trends.data[indicator] = trendsResult;
-    }
-  }
-  
-
-async function fetchDataForDataSet(
-  dataSet,
+async function fetchDataForDatasets(
+  series,
   activityCode,
   aggregate,
   indicator,
   endpoints
 ) {
-  const { area, division } = dataSet;
+  const { macrodata, target, trends } = series;
 
-  await fetchDataForSeries(area, "00", aggregate, indicator, endpoints);
-  await fetchDataForSeries(
-    division,
+  const macrodataResult = await fetchMacrodata(
+    endpoints.macrodata,
     activityCode,
     aggregate,
-    indicator,
-    endpoints
+    indicator
   );
+  const targetResult = await fetchMacrodata(
+    endpoints.target,
+    activityCode,
+    aggregate,
+    indicator
+  );
+  const trendsResult = await fetchMacrodata(
+    endpoints.trends,
+    activityCode,
+    aggregate,
+    indicator
+  );
+
+  if (macrodataResult !== null) {
+    macrodata.data[indicator] = macrodataResult;
+  }
+  if (targetResult !== null) {
+    target.data[indicator] = targetResult;
+  }
+  if (trendsResult !== null) {
+    trends.data[indicator] = trendsResult;
+  }
 }
+
