@@ -124,6 +124,7 @@ function TrendsChart({
         },
         grid: {
           color: "#ececff",
+          lineWidth : 2,
         },
       },
       x: {
@@ -135,6 +136,7 @@ function TrendsChart({
         },
         grid: {
           color: "#ececff",
+          lineWidth : 2,
         },
         type: "time",
         time: {

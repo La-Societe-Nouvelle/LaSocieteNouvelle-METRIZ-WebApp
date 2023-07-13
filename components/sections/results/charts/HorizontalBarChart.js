@@ -6,7 +6,7 @@ Chart.register(ChartDataLabels);
 
 // Libraries
 
-const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
+const DeviationChart = ({ id, legalUnitData, branchData }) => {
   const labels = [
     "Production",
     "Consommations intermédiaires",
@@ -15,9 +15,10 @@ const DeviationChart = ({ id, legalUnitData, branchData, unit, precision }) => {
   ];
 
   const data = legalUnitData.map((value, key) => {
+
     if (value) {
-      const difference = value - branchData[key];
-      const percentage = (difference / branchData[key]) * 100;
+      const difference = value - branchData[key].value;
+      const percentage = (difference / branchData[key].value) * 100;
       return Math.round(percentage);
     } else {
       return 0;

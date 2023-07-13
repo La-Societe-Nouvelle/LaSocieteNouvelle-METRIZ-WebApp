@@ -2,9 +2,10 @@ import React, {  useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
-import { ComparativeData } from "../../../src/ComparativeData";
 import UpdateDataView from "./UpdatedDataView";
 import { fetchComparativeDataForArea, fetchComparativeDataForDivision } from "../../../src/services/MacrodataService";
+import { endpoints } from "../../../config/endpoint";
+
 
 export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => {
   const [show, setShow] = useState(true);

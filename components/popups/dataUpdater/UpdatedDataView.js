@@ -47,20 +47,25 @@ const UpdateDataView = (props) => {
       setUpdatedAccounts(compareAccounts);
     }
 
-    const compareAggregates = await compareComparativeData(
+    const updatedElements = compareDataUpdates(
       props.prevSession.comparativeData,
       props.updatedSession.comparativeData
     );
 
-    if (compareAggregates) {
-      setUpdatedComparativeData(compareAggregates);
+    // const compareAggregates = await compareComparativeData(
+    //   props.prevSession.comparativeData,
+    //   props.updatedSession.comparativeData
+    // );
+
+    if (updatedElements.length > 0) {
+      setUpdatedComparativeData(updatedElements);
     }
 
     if (
       // compareLegalUnit ||
       isObjEmpty(compareProviders) ||
       isObjEmpty(compareAccounts) ||
-      isObjEmpty(compareAggregates)
+      updatedElements.length > 0
     ) {
       setShowButton(false);
       setIsuptodate(true);
@@ -157,8 +162,8 @@ const UpdateDataView = (props) => {
       {isUptodate ? (
         <>
           <p>
-          <i className="success bi bi-check2-circle"></i>   Toutes les données de votre session sont à jour. Vous pouvez
-            reprendre votre analyse.
+            <i className="success bi bi-check2-circle"></i> Toutes les données
+            de votre session sont à jour. Vous pouvez reprendre votre analyse.
           </p>
           <div className="text-end">
             <Button
@@ -175,7 +180,6 @@ const UpdateDataView = (props) => {
         <p className="mb-3">Des données plus récentes sont disponibles :</p>
       )}
       {/* {updatedLegalUnit && <LegalUnitDataPreview data={updatedLegalUnit} />} */}
-
       {updatedProviders && !isObjEmpty(updatedProviders) && (
         <FootprintPreview data={updatedProviders} label={"fournisseurs"} />
       )}
@@ -359,72 +363,119 @@ async function compareInitialStateFpt(prevAccounts, currAccounts) {
   return updates;
 }
 
-async function compareComparativeData(prevData, currData) {
-  const aggregates = Object.keys(prevData).filter(
-    (data) => data != "activityCode"
-  );
-  const updates = {};
-  for (const aggregate of aggregates) {
-    const prevAreaFpt = prevData[aggregate].areaFootprint.indicators;
-    const prevDivisionFpt = prevData[aggregate].divisionFootprint.indicators;
-    const prevTargetAreaFpt =
-      prevData[aggregate].targetAreaFootprint.indicators;
-    const prevTargetDivisionFpt =
-      prevData[aggregate].targetDivisionFootprint.indicators;
-    const prevTrendsFootprint = prevData[aggregate].trendsFootprint.indicators;
+// async function compareComparativeData(prevData, currData) {
+//   const aggregates = Object.keys(prevData).filter(
+//     (data) => data != "activityCode"
+//   );
+//   console.log(prevData);
+//   console.log(currData);
 
-    const currAreaFpt = currData[aggregate].areaFootprint.indicators;
-    const currDivisionFpt = currData[aggregate].divisionFootprint.indicators;
-    const currTargetAreaFpt =
-      currData[aggregate].targetAreaFootprint.indicators;
-    const currTargetDivisionFpt =
-      currData[aggregate].targetDivisionFootprint.indicators;
-    const currTrendsFootprint = currData[aggregate].trendsFootprint.indicators;
+//   const updates = {};
+//   for (const aggregate of aggregates) {
 
-    const compareAreaFpt = await compareData(prevAreaFpt, currAreaFpt);
-    const compareDivisionFpt = await compareData(
-      prevDivisionFpt,
-      currDivisionFpt
-    );
-    const compareTgtArea = await compareData(
-      prevTargetAreaFpt,
-      currTargetAreaFpt
-    );
-    const compareTgtDivision = await compareData(
-      prevTargetDivisionFpt,
-      currTargetDivisionFpt
-    );
-    const compareTrendFpt = await compareData(
-      prevTrendsFootprint,
-      currTrendsFootprint
-    );
+//     const prevAreaFpt = prevData[aggregate].areaFootprint.indicators;
+//     const prevDivisionFpt = prevData[aggregate].divisionFootprint.indicators;
+//     const prevTargetAreaFpt =
+//       prevData[aggregate].targetAreaFootprint.indicators;
+//     const prevTargetDivisionFpt =
+//       prevData[aggregate].targetDivisionFootprint.indicators;
+//     const prevTrendsFootprint = prevData[aggregate].trendsFootprint.indicators;
 
-    if (!updates[aggregate]) {
-      updates[aggregate] = {};
-    }
+//     const currAreaFpt = currData[aggregate].areaFootprint.indicators;
+//     const currDivisionFpt = currData[aggregate].divisionFootprint.indicators;
+//     const currTargetAreaFpt =
+//       currData[aggregate].targetAreaFootprint.indicators;
+//     const currTargetDivisionFpt =
+//       currData[aggregate].targetDivisionFootprint.indicators;
+//     const currTrendsFootprint = currData[aggregate].trendsFootprint.indicators;
 
-    if (compareAreaFpt) {
-      updates[aggregate].areaFootprint = compareAreaFpt;
-    }
-    if (compareDivisionFpt) {
-      updates[aggregate].divisionFootprint = compareDivisionFpt;
-    }
-    if (compareTgtArea) {
-      updates[aggregate].targetAreaFootprint = compareTgtArea;
-    }
-    if (compareTgtDivision) {
-      updates[aggregate].targetDivisionFootprint = compareTgtDivision;
-    }
-    if (compareTrendFpt) {
-      updates[aggregate].trendsFootprint = compareTrendFpt;
+//     const compareAreaFpt = await compareData(prevAreaFpt, currAreaFpt);
+//     const compareDivisionFpt = await compareData(
+//       prevDivisionFpt,
+//       currDivisionFpt
+//     );
+//     const compareTgtArea = await compareData(
+//       prevTargetAreaFpt,
+//       currTargetAreaFpt
+//     );
+//     const compareTgtDivision = await compareData(
+//       prevTargetDivisionFpt,
+//       currTargetDivisionFpt
+//     );
+//     const compareTrendFpt = await compareData(
+//       prevTrendsFootprint,
+//       currTrendsFootprint
+//     );
+
+//     if (!updates[aggregate]) {
+//       updates[aggregate] = {};
+//     }
+
+//     if (compareAreaFpt) {
+//       updates[aggregate].areaFootprint = compareAreaFpt;
+//     }
+//     if (compareDivisionFpt) {
+//       updates[aggregate].divisionFootprint = compareDivisionFpt;
+//     }
+//     if (compareTgtArea) {
+//       updates[aggregate].targetAreaFootprint = compareTgtArea;
+//     }
+//     if (compareTgtDivision) {
+//       updates[aggregate].targetDivisionFootprint = compareTgtDivision;
+//     }
+//     if (compareTrendFpt) {
+//       updates[aggregate].trendsFootprint = compareTrendFpt;
+//     }
+//   }
+
+//   const comparativeDataToUpdate = Object.keys(updates).filter((aggregate) => {
+//     return  !isObjEmpty(updates[aggregate]) ;
+//   });
+
+//   return comparativeDataToUpdate.length > 0 ? updates : {};
+// }
+
+function compareDataUpdates(prevData, currData) {
+  const updatedElements = [];
+
+  // Parcours des agrégats
+  for (const aggregate in prevData) {
+    if (aggregate !== "activityCode") {
+      const prevSector = prevData[aggregate];
+      const currSector = currData[aggregate];
+
+      // Parcours des datasets "area" et "division"
+      for (const datasetKey in prevSector) {
+        const prevDataset = prevSector[datasetKey];
+        const currDataset = currSector[datasetKey];
+
+        // Parcours des indicateurs dans le dataset
+        for (const dataset in prevDataset) {
+          const prevData = prevDataset[dataset].data;
+          const currData = currDataset[dataset].data;
+
+          for (const indic in prevData) {
+            const prevValues = prevData[indic];
+            const currValues = currData[indic];
+
+            for (let i = 0; i < prevValues.length; i++) {
+              const prevValue = prevValues[i];
+              const currValue = currValues[i];
+
+              const prevLastUpdate = new Date(prevValue.lastupdate);
+              const currLastUpdate = new Date(currValue.lastupdate);
+
+              if (prevLastUpdate < currLastUpdate) {
+                updatedElements.push(prevValue);
+              }
+            }
+          }
+        }
+      }
     }
   }
 
-  const comparativeDataToUpdate = Object.keys(updates).filter((aggregate) => {
-    return  !isObjEmpty(updates[aggregate]) ;
-  });
-
-  return comparativeDataToUpdate.length > 0 ? updates : {};
+  return updatedElements;
 }
 
 function compareAggregateFootprint(prevData, currData) {
