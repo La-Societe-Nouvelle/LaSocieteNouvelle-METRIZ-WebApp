@@ -13,45 +13,55 @@ import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 import { ComparativeData } from "../models/ComparativeData";
+import { updatedComparativeData } from "./utils";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
-export const updateVersion = async (sessionData) => 
-{
+export const updateVersion = async (sessionData) => {
+
   switch (sessionData.version) {
+    case "3.0.0":
+      break;
     case "2.0.0":
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.6":
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.5":
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.4":
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.3":
       // updater 1_0_3 removed -> build old comparative data (useless with updater_1_0_5 : fetch comparative data)
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.2":
       updater_1_0_2(sessionData);
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.1":
       updater_1_0_1(sessionData);
       updater_1_0_2(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     case "1.0.0":
       updater_1_0_0(sessionData);
@@ -60,17 +70,36 @@ export const updateVersion = async (sessionData) =>
       await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
+      await updater_3_0_0(sessionData);
       break;
     default:
       break;
   }
 };
 
+// ------------------------------------------------------------------
+// Updater
+// ------------------------------------------------------------------
+
+const updater_3_0_0 = async (sessionData) => {
+  sessionData.comparativeData = new ComparativeData();
+  const period = sessionData.financialPeriod;
+
+  for (const indic of sessionData.validations[period.periodKey]) {
+    const indicatorCode = indic.toUpperCase();
+
+    await updatedComparativeData(sessionData, indicatorCode);
+  }
+
+  if (
+    sessionData.progression === 4 &&
+    sessionData.validations[period.periodKey].length > 0
+  ) {
+    sessionData.progression = 5;
+  }
+};
+
 const updater_1_0_5 = async (sessionData) => {
-  // ----------------------------------------------------------------
-  // Get comparative data (Division, Target & Trends)
-  // for each aggregate and update session for each validated indicators
-  // ----------------------------------------------------------------
 
   // delete useless objects from  previous session
   delete sessionData.comparativeAreaFootprints;
@@ -80,23 +109,26 @@ const updater_1_0_5 = async (sessionData) => {
   // get previous session division code
   let code = sessionData.comparativeDivision;
 
-  let newComparativeData = new ComparativeData();
-  sessionData.comparativeData = newComparativeData;
+  sessionData.comparativeData = new ComparativeData();
   sessionData.comparativeData.activityCode = code;
-
-  for await (const indic of sessionData.validations) {
-    const indicatorCode = indic.toUpperCase();
-
-    await fetchComparativeDataForArea(newComparativeData, indicatorCode, endpoints);
-    await fetchComparativeDataForDivision(newComparativeData, indicatorCode, endpoints); 
-
-  }
 
   delete sessionData.comparativeDivision;
 
   // set previous analysis to True to disable new indicators assessment with missing data
-  sessionData.indics = ["eco","art","soc","knw","dis","geq","ghg","mat","was","nrg","wat","haz"];
-
+  sessionData.indics = [
+    "eco",
+    "art",
+    "soc",
+    "knw",
+    "dis",
+    "geq",
+    "ghg",
+    "mat",
+    "was",
+    "nrg",
+    "wat",
+    "haz",
+  ];
 };
 
 const updater_1_0_4 = async (sessionData) => {
@@ -122,15 +154,24 @@ const updater_1_0_4 = async (sessionData) => {
     dataGrossFixedCapitalFormationAggregate;
 };
 
-// ------------------------------------------------------------------
-// Updater
-// ------------------------------------------------------------------
-
 const updater_1_0_2 = (sessionData) => {
   // update progression according to current number of steps
   if (sessionData.progression > 1) {
     sessionData.progression = sessionData.progression - 1;
   }
+};
+
+const updater_1_0_1 = (sessionData) => {
+  // update ghgDetails (error with variable name in NRG tool : getGhgEmissionsUncertainty used instead of ghgEmissionsUncertainty)
+  Object.entries(sessionData.impactsData.ghgDetails).forEach(
+    ([_, itemData]) => {
+      // update name
+      itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
+    }
+  );
+  // update value
+  sessionData.impactsData.ghgEmissionsUncertainty =
+    getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
 };
 
 const updater_1_0_0 = (sessionData) => {
@@ -149,19 +190,3 @@ const updater_1_0_0 = (sessionData) => {
     }
   );
 };
-
-const updater_1_0_1 = (sessionData) => {
-  // update ghgDetails (error with variable name in NRG tool : getGhgEmissionsUncertainty used instead of ghgEmissionsUncertainty)
-  Object.entries(sessionData.impactsData.ghgDetails).forEach(
-    ([_, itemData]) => {
-      // update name
-      itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    }
-  );
-  // update value
-  sessionData.impactsData.ghgEmissionsUncertainty =
-    getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
-};
-
-
-
