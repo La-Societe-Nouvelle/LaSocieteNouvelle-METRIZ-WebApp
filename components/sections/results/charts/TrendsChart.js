@@ -31,7 +31,8 @@ function TrendsChart({
     });
   }
 
-  if (historical.length > 1 && trend.length > 1) {
+
+  if (historical.length >= 1 && trend.length >= 1) {
     let lastHistoricalYear = historical[historical.length - 1].year;
     let firstForecastYear = trend[0].year;
 
@@ -161,9 +162,12 @@ function TrendsChart({
           },
           generateLabels: function (chart) {
             const dataset = chart.data.datasets;
+            console.log(dataset)
             return dataset
-              .map((data, i) => ({
-                hidden: !chart.getDataVisibility(i),
+              .map((data, i) => (
+             console.log(data.data),
+                {
+                hidden: !chart.getDataVisibility(i) ,
                 index: i,
                 lineWidth: 3,
                 lineDashOffset: i === 1 ? 10 : 0,
@@ -172,7 +176,7 @@ function TrendsChart({
                 pointStyle: "line",
                 strokeStyle: data.borderColor,
                 text:
-                  data.label === undefined || data.label === ""
+                  data.label === undefined || data.label === "" || data.data.length == 0
                     ? null
                     : data.label,
               }))

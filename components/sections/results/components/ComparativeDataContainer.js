@@ -58,7 +58,7 @@ const ComparativeDataContainer = ({
         comparativeData[aggregate].division.target.data[indic.toUpperCase()],
     };
 
-    // Get the closest year data 
+    // Get the closest year data
     Object.keys(datasets[aggregate]).forEach((category) => {
       datasets[aggregate][category] = getClosestYearData(
         datasets[aggregate][category],
@@ -79,34 +79,38 @@ const ComparativeDataContainer = ({
       <h4>Comparaison par activité</h4>
 
       <Row className="charts">
-        {Object.keys(aggregates).map((aggregate) =>
-          renderChart(
-            aggregates[aggregate],
-            `${aggregate}-${indic}`,
-            [
-              datasets[aggregate].area,
-             {
-              value :  financialData[aggregate].periodsData[period.periodKey].footprint
-              .indicators[indic].value, year : year
-             },
-              datasets[aggregate].division,
-            ],
-            [
-              null,
-              prevPeriod
-                ? financialData[aggregate].periodsData[prevPeriod.periodKey]
-                    .footprint.indicators[indic].value
-                : null,
-              null,
-            ],
-            [
-              targetDatasets[aggregate].area,
-              null,
-              targetDatasets[aggregate].division,
-            ],
-            indic
-          )
-        )}
+        {Object.keys(aggregates).map((aggregate) => (
+          <React.Fragment key={aggregate}>
+            {renderChart(
+              aggregates[aggregate],
+              `${aggregate}-${indic}`,
+              [
+                datasets[aggregate].area,
+                {
+                  value:
+                    financialData[aggregate].periodsData[period.periodKey]
+                      .footprint.indicators[indic].value,
+                  year: year,
+                },
+                datasets[aggregate].division,
+              ],
+              [
+                null,
+                prevPeriod
+                  ? financialData[aggregate].periodsData[prevPeriod.periodKey]
+                      .footprint.indicators[indic].value
+                  : null,
+                null,
+              ],
+              [
+                targetDatasets[aggregate].area,
+                null,
+                targetDatasets[aggregate].division,
+              ],
+              indic
+            )}
+          </React.Fragment>
+        ))}
       </Row>
     </div>
   );
