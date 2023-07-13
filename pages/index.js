@@ -9,9 +9,9 @@ import { BrowserView, MobileView } from "react-device-detect";
 import { Session } from "/src/Session";
 
 // Sections
-import { StartSection } from "/components/sections/StartSection";
-import AccountingImportSection from "/components/sections/accountingImport/AccountingImportSection";
-import { InitialStatesSection } from "/components/sections/InitialStatesSection";
+import { StartSection } from "../components/sections/StartSection";
+import AccountingImportSection from "../components/sections/accountingImport/AccountingImportSection";
+import { InitialStatesSection } from "../components/sections/InitialStatesSection";
 import { ProvidersSection } from "../components/sections/providers/ProvidersSection";
 import DirectImpacts from "../components/sections/statements";
 import Results from "../components/sections/results";
@@ -94,12 +94,12 @@ class Metriz extends React.Component {
       session: new Session(),
       step: 0,
       loading: false,
-      needsUpdate: false,
+      showDataUpdater: false,
     };
   }
 
   render() {
-    const { step, session, needsUpdate } = this.state;
+    const { step, session, showDataUpdater } = this.state;
 
     return (
       <>
@@ -123,7 +123,7 @@ class Metriz extends React.Component {
             />
           )}
 
-          {needsUpdate && (
+          {showDataUpdater && (
             <DataUpdater
               session={session}
               downloadSession={this.downloadSession}
@@ -179,8 +179,10 @@ class Metriz extends React.Component {
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
+
       // update to current version
       await updateVersion(prevProps);
+
       // JSON -> session
       const session = new Session(prevProps);
 
@@ -192,7 +194,7 @@ class Metriz extends React.Component {
         session: session,
         step: session.progression,
         loading: false,
-        needsUpdate: true,
+        showDataUpdater: true,
       });
     };
     reader.readAsText(file);

@@ -3,7 +3,10 @@ import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 import { Loader } from "../../popups/Loader";
 import { endpoints } from "../../../config/endpoint";
-import { fetchComparativeDataForArea, fetchComparativeDataForDivision } from "../../../src/services/MacrodataService";
+import {
+  fetchComparativeDataForArea,
+  fetchComparativeDataForDivision,
+} from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 
 const DirectImpacts = ({ session, submit }) => {
@@ -31,11 +34,20 @@ const DirectImpacts = ({ session, submit }) => {
         session.comparativeData,
         indicatorCode
       );
-
       if (missingIndicators.length > 0) {
         for (const missingIndicator of missingIndicators) {
-          await fetchComparativeDataForArea(session.comparativeData, missingIndicator, endpoints);
-          await fetchComparativeDataForDivision(session.comparativeData, missingIndicator, endpoints); 
+          await fetchComparativeDataForArea(
+            session.comparativeData,
+            missingIndicator,
+            endpoints
+          );
+          if (session.comparativeData.activityCode != "00") {
+            await fetchComparativeDataForDivision(
+              session.comparativeData,
+              missingIndicator,
+              endpoints
+            );
+          }
         }
       }
     }
