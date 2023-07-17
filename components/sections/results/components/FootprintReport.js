@@ -23,7 +23,6 @@ const FootprintReport = ({comparativeData,financialData, period}) => {
   }, {});
 
 
-  console.log(getSocialsLabels)
   const getCategoryIndicatorDivisionValue = (data, category) =>
   Object.keys(data).reduce((filtered, indicator) => {
     const { value } = getClosestYearData(data[indicator], year) || {};
@@ -60,14 +59,11 @@ const FootprintReport = ({comparativeData,financialData, period}) => {
   const productionSocialFootprint = getCategoryIndicatorValue(financialData.production.periodsData[period.periodKey].footprint.indicators,"Empreinte sociale")
 
 
-
-
-
   return (
       <Row>
         <Col>
           <div className="box">
-            <div className="text-center bg-light py-2">
+            <div className="text-center rounded-pill bg-light py-2">
               <h3 className="mb-0">Empreinte sociale</h3>
             </div>
             <RadarChart labels={getSocialsLabels} divisionFootprint={divisionProductionSocialFootprint} productionFootprint={productionSocialFootprint} />
@@ -76,7 +72,7 @@ const FootprintReport = ({comparativeData,financialData, period}) => {
         </Col>
         <Col>
           <div className="box">
-            <div className="text-center bg-light py-2">
+            <div className="text-center  rounded-pill bg-light py-2">
               <h3 className="mb-0">Empreinte environnementale</h3>
 
             </div>

@@ -10,8 +10,12 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
   console.log(productionFootprint);
 
   const data = {
-    labels: Object.values(labels).map((indicator) => indicator.libelleGrandeur),
-    datasets: [
+    labels: Object.values(labels).map((indicator) => {
+        const label = indicator.libelleGrandeur;
+        const unit = indicator.unit;
+        return unit ? `${label} (${unit})` : label;
+      }),
+          datasets: [
       {
         label: "Exercice",
         data: Object.values(productionFootprint),
@@ -41,8 +45,9 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
 
     scales: {
       r: {
+
         grid: {
-          color: "rgb(240, 240, 248)",
+          color: "rgb(219, 222, 241)",
         },
         ticks: {
           display: false,
@@ -61,11 +66,11 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
 
     elements: {
       point: {
-        radius: 2, // Masque les points dans le graphique
-        hoverRadius: 3, // Masque les points au survol
+        radius: 3, 
+        hoverRadius: 3,
       },
       line: {
-        borderWidth: 0, // Largeur des traits du graphique
+        borderWidth: 0, 
       },
     },
     plugins: {
@@ -75,7 +80,7 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
       legend: {
         display: true,
         position: "bottom",
-        padding: 0,
+        padding: 0, 
         labels: {
           color: "#191558",
           font: {
@@ -85,6 +90,9 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
           },
         },
       },
+        tooltip: {
+            
+    },
     },
   };
 
