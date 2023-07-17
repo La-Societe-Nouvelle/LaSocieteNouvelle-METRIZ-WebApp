@@ -18,6 +18,7 @@ function TrendsChart({
   isPrinting,
 }) {
   const linearTarget = target.filter((data) => data.path == "LIN");
+  const filteredHistorical = historical.filter((data) => data.currency != "EUR2022");
 
   const legalUnitData = [];
 
@@ -32,20 +33,17 @@ function TrendsChart({
   }
 
 
-  if (historical.length >= 1 && trend.length >= 1) {
-    let lastHistoricalYear = historical[historical.length - 1].year;
-    let firstForecastYear = trend[0].year;
+  let updatedTrend = trend;
 
-    if (lastHistoricalYear !== firstForecastYear) {
-      historical.push(trend[0]);
-    }
-  }
+if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filteredHistorical.length - 1].year !== trend[0].year) {
+  updatedTrend = [...trend, filteredHistorical[filteredHistorical.length - 1]].sort((a, b) => a.year - b.year);
+}
 
   const chartData = {
     datasets: [
       {
         label: "Historique",
-        data: historical.map((data) => ({ x: data.year, y: data.value })),
+        data: filteredHistorical.map((data) => ({ x: data.year, y: data.value })),
         borderColor: "rgb(255, 182, 66)",
         backgroundColor: "rgb(255, 182, 66)",
         order: 2,
@@ -53,9 +51,9 @@ function TrendsChart({
         tension: 0.3,
       },
       {
-        label: "Tendance",
-        data: trend.map((data) => ({ x: data.year, y: data.value })),
-        borderColor: "rgb(255, 182, 66)",
+        label: "Tendance", 
+        data: updatedTrend.map((data) => ({ x: data.year, y: data.value })),
+            borderColor: "rgb(255, 182, 66)",
         backgroundColor: "rgb(255, 182, 66)",
         borderWidth: 4,
         borderDash: [12, 6],
@@ -103,18 +101,12 @@ function TrendsChart({
     devicePixelRatio: 2,
     maintainAspectRatio: isPrinting ? false : true,
     pointRadius: 0,
+    
     scales: {
       y: {
         min: 0,
         title: {
-          display: true,
-          text: unit,
-          color: "#191558",
-          font: {
-            size: 12,
-            weight: "bold",
-            family: "Roboto",
-          },
+          display: false,
         },
         ticks: {
           color: "#191558",
@@ -147,6 +139,7 @@ function TrendsChart({
         },
       },
     },
+    
     plugins: {
       legend: {
         display: true,
@@ -162,10 +155,8 @@ function TrendsChart({
           },
           generateLabels: function (chart) {
             const dataset = chart.data.datasets;
-            console.log(dataset)
             return dataset
               .map((data, i) => (
-             console.log(data.data),
                 {
                 hidden: !chart.getDataVisibility(i) ,
                 index: i,
@@ -176,11 +167,16 @@ function TrendsChart({
                 pointStyle: "line",
                 strokeStyle: data.borderColor,
                 text:
-                  data.label === undefined || data.label === "" || data.data.length == 0
+                  data.label === undefined || data.label === "" 
                     ? null
                     : data.label,
               }))
               .filter((label) => label.text !== null)
+              .filter((label) => {
+                const datasetIndex = label.index;
+                const dataset = chart.data.datasets[datasetIndex];
+                return dataset.data.some((value) => value !== null);
+              })
               .sort((a, b) => a.order - b.order);
           },
         },
