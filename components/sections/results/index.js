@@ -106,7 +106,9 @@ const Results = ({ session, publish, goBack }) => {
     setSelectedIndicator(code);
     let labelMenu = (
       <>
-        <Image className="me-2" src={`icons-ese/${code}.svg`} height={40} />
+        {code && (
+          <Image className="me-2" src={`icons-ese/${code}.svg`} height={40} />
+        )}
         {label}
       </>
     );
@@ -236,6 +238,7 @@ const Results = ({ session, publish, goBack }) => {
                   )
                   .map(([code, indic]) => {
                     if (code === selectedIndicator) return null;
+
                     return (
                       <Dropdown.Item
                         key={code}

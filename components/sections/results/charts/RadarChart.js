@@ -5,9 +5,6 @@ import Chart from "chart.js/auto";
 import { Radar } from "react-chartjs-2";
 
 function RadarChart({ labels, divisionFootprint, productionFootprint }) {
-  console.log(labels);
-  console.log(divisionFootprint);
-  console.log(productionFootprint);
 
   const data = {
     labels: Object.values(labels).map((indicator) => {
