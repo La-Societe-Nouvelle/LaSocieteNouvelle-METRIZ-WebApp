@@ -4,7 +4,7 @@ export class ComparativeData {
   constructor(props) {
     props = props || {};
 
-    this.activityCode = props.activityCode || "00";
+    this.activityCode = props.activityCode || "";
     this.fixedCapitalConsumptions = {
       area: {
         macrodata: new Dataset(props.fixedCapitalConsumptions?.area?.macrodata),
