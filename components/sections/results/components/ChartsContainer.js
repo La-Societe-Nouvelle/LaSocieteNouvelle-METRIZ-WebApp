@@ -2,12 +2,12 @@ import React from "react";
 import { Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
-import ComparativeChart from "./ComparativeChart";
-import TrendChart from "./TrendChart";
-import SigPieChart from "./SigPieChart";
-import DeviationChart from "./HorizontalBarChart";
+import ComparativeChart from "../charts/ComparativeChart";
+import TrendChart from "../charts/TrendChart";
+import SigPieChart from "../charts/SigPieChart";
+import DeviationChart from "../charts/HorizontalBarChart";
 import { printValue } from "../../../../src/utils/Utils";
-import GrossImpactChart from "./GrossImpactChart";
+import GrossImpactChart from "../charts/GrossImpactChart";
 import { getClosestYearData } from "../utils";
 
 export const ChartsContainer = ({

@@ -15,17 +15,18 @@ import {
 
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
-import { endpoints } from "../../../config/endpoint";
 
-import { getPrevDate } from "/src/utils/Utils";
+import { endpoints } from "../../../config/endpoint";
+import { customSelectStyles } from "../../../config/customStyles";
+
+import { getPrevDate } from "../../../src/utils/Utils";
 
 import ExtraFinancialReport from "./components/ExtraFinancialReport";
 import FootprintReport from "./components/FootprintReport";
-
-import { ChartsContainer } from "./charts/ChartsContainer";
-import { Loader } from "../../popups/Loader";
-import { customSelectStyles } from "../../../config/customStyles";
 import DownloadDropdown from "./components/DownloadDropdown";
+import { ChartsContainer } from "./components/ChartsContainer";
+import { Loader } from "../../popups/Loader";
+
 import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
 import { fetchComparativeDataForDivision } from "../../../src/services/MacrodataService";
 
@@ -276,7 +277,13 @@ const Results = ({ session, publish, goBack }) => {
         </div>
       )}
 
-      {(!selectedIndicator || !selectedDivision) && <FootprintReport />}
+      {(!selectedIndicator || !selectedDivision) && (
+        <FootprintReport
+          comparativeData={session.comparativeData}
+          financialData={session.financialData.mainAggregates}
+          period={session.financialPeriod}
+        />
+      )}
 
       {selectedIndicator && selectedDivision && selectedDivision != "00" && (
         <ExtraFinancialReport

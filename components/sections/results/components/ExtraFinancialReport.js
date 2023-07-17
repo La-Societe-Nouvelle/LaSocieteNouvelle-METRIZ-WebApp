@@ -24,7 +24,6 @@ const ExtraFinancialReport = ({
   comparativeData,
   period,
   prevPeriod,
-  legalUnit,
   isLoading,
 }) => {
   const {
