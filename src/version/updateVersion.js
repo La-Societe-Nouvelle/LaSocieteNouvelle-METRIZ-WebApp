@@ -13,7 +13,7 @@ import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 import { ComparativeData } from "../models/ComparativeData";
-import { updatedComparativeData } from "./utils";
+import { fetchComparativeData } from "./utils";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -88,7 +88,7 @@ const updater_3_0_0 = async (sessionData) => {
   for (const indic of sessionData.validations[period.periodKey]) {
     const indicatorCode = indic.toUpperCase();
 
-    await updatedComparativeData(sessionData, indicatorCode);
+    await fetchComparativeData(sessionData, indicatorCode);
   }
 
   if (

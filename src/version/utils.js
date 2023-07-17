@@ -4,13 +4,13 @@ import {
   fetchComparativeDataForDivision,
 } from "../services/MacrodataService";
 
-export const updatedComparativeData = async (sessionData, indicatorCode) => {
+export const fetchComparativeData = async (sessionData, indicatorCode) => {
   await fetchComparativeDataForArea(
     sessionData.comparativeData,
     indicatorCode,
     endpoints
   );
-  if (sessionData.comparativeData.activityCode !== "00") {
+  if (sessionData.comparativeData.activityCode !== "00" ) {
     await fetchComparativeDataForDivision(
       sessionData.comparativeData,
       indicatorCode,

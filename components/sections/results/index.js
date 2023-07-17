@@ -34,6 +34,7 @@ const Results = ({ session, publish, goBack }) => {
   const [selectedDivision, setSelectedDivision] = useState(
     session.comparativeData.activityCode
   );
+  
   const [selectedIndicator, setSelectedIndicator] = useState();
   const [selectedIndicatorLabel, setSelectedIndicatorLabel] = useState(
     "Sélectionner un indicateur..."
@@ -203,7 +204,6 @@ const Results = ({ session, publish, goBack }) => {
           </div>
         </div>
       </div>
-
       {selectedDivision != "00" && (
         <div className="box indic-result-menu">
           <div className="d-flex align-items-center justify-content-between">

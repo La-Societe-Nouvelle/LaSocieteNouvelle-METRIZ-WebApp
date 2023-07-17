@@ -97,10 +97,9 @@ class Metriz extends React.Component {
       showDataUpdater: false,
     };
   }
-
   render() {
     const { step, session, showDataUpdater } = this.state;
-
+    console.log(showDataUpdater)
     return (
       <>
         <div
@@ -179,13 +178,12 @@ class Metriz extends React.Component {
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
-
+      console.log(prevProps.version)
       // update to current version
       await updateVersion(prevProps);
 
       // JSON -> session
       const session = new Session(prevProps);
-
       for (let period of session.availablePeriods) {
         await session.updateFootprints(period);
       }
@@ -194,7 +192,7 @@ class Metriz extends React.Component {
         session: session,
         step: session.progression,
         loading: false,
-        showDataUpdater: true,
+        showDataUpdater: prevProps.version == '3.0.0',
       });
     };
     reader.readAsText(file);

@@ -2,12 +2,8 @@ import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
+import { fetchComparativeData } from "../../../src/version/utils";
 import UpdateDataView from "./UpdatedDataView";
-import {
-  fetchComparativeDataForArea,
-  fetchComparativeDataForDivision,
-} from "../../../src/services/MacrodataService";
-import { endpoints } from "../../../config/endpoint";
 
 export const DataUpdater = ({
   session,
@@ -21,7 +17,7 @@ export const DataUpdater = ({
 
   const handleRefresh = async () => {
     setIsLoading(true);
-    const updatedSession = new Session({ ...session });
+    const updatedSession = new Session(JSON.parse(JSON.stringify(session)));
 
     await fetchLatestData(updatedSession);
 
@@ -104,7 +100,7 @@ const fetchLatestData = async (updatedSession) => {
 
   // Récupère les dernières données comparatives
 
-  await fetchLatestComparativeData(validations, updatedSession.comparativeData);
+  await fetchLatestComparativeData(validations, updatedSession);
 };
 
 const fetchLatestProviders = async (
@@ -165,21 +161,9 @@ const fetchLatestAccountsData = async (immobilisations, stocks) => {
   }
 };
 
-const fetchLatestComparativeData = async (validations, comparativeData) => {
+const fetchLatestComparativeData = async (validations, updatedSession) => {
   for await (const indic of validations) {
     const indicatorCode = indic.toUpperCase();
-
-    await fetchComparativeDataForArea(
-      comparativeData,
-      indicatorCode,
-      endpoints
-    );
-    if (comparativeData.activityCode !== "00") {
-      await fetchComparativeDataForDivision(
-        comparativeData,
-        indicatorCode,
-        endpoints
-      );
-    }
+    await fetchComparativeData(updatedSession, indicatorCode);
   }
 };
