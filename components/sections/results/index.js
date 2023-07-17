@@ -34,12 +34,11 @@ const Results = ({ session, publish, goBack }) => {
   const [selectedDivision, setSelectedDivision] = useState(
     session.comparativeData.activityCode
   );
-  
+
   const [selectedIndicator, setSelectedIndicator] = useState();
   const [selectedIndicatorLabel, setSelectedIndicatorLabel] = useState(
     "Sélectionner un indicateur..."
   );
-
 
   const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -74,7 +73,6 @@ const Results = ({ session, publish, goBack }) => {
         for await (const validation of session.validations[
           session.financialPeriod.periodKey
         ]) {
-
           const indicatorCode = validation.toUpperCase();
 
           await fetchComparativeDataForDivision(
@@ -154,23 +152,26 @@ const Results = ({ session, publish, goBack }) => {
 
         <div className="legal-unit-info">
           <Row>
-            <Col>
-              <p className="fw-bold col-form-label">SIREN/SIRET :</p>
+            {session.legalUnit.siren && (
+              <Col>
+                <p className="fw-bold col-form-label">SIREN/SIRET :</p>
 
-              <p className="py-2">{session.legalUnit.siren}</p>
-            </Col>
+                <p className="py-2">{session.legalUnit.siren}</p>
+              </Col>
+            )}
 
             <Col>
               <p className="fw-bold col-form-label">Unité légale :</p>
 
               <p className="py-2">{session.legalUnit.corporateName}</p>
             </Col>
+            {session.legalUnit.activityCode && (
+              <Col>
+                <p className="fw-bold col-form-label">Code APE :</p>
 
-            <Col>
-              <p className="fw-bold col-form-label">Code APE :</p>
-
-              <p className="py-2">{session.legalUnit.activityCode}</p>
-            </Col>
+                <p className="py-2">{session.legalUnit.activityCode}</p>
+              </Col>
+            )}
           </Row>
           <div className="d-flex align-items-center">
             <p className="fw-bold col-form-label me-2 mb-0 ">
