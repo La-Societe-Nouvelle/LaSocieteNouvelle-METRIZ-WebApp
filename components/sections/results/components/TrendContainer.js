@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import Select from "react-select";
-import TrendsChart from "../charts/TrendsChart";
-import targetMeta from "/lib/target";
-import trendsMeta from "/lib/trends";
+import TrendChart from "../charts/TrendChart";
+import targetMeta from "../../../../lib/target";
+import trendMeta from "../../../../lib/trend.json"
 
 import { customSelectStyles } from "../../../../config/customStyles";
 
@@ -14,12 +14,11 @@ const graphOptions = [
   { label: "Valeur ajoutée nette", value: "nva" },
 ];
 
-const TrendsDataContainer = ({
+const TrendContainer = ({
   aggregates,
   comparativeData,
   indic,
   unit,
-  division,
 }) => {
   const [trendGraphView, setTrendGraphView] = useState(graphOptions[0]);
 
@@ -31,7 +30,7 @@ const TrendsDataContainer = ({
           indic.toUpperCase()
         ] || [],
       trend:
-        comparativeData.production.division.trends.data[indic.toUpperCase()] ||
+        comparativeData.production.division.trend.data[indic.toUpperCase()] ||
         [],
       target:
         comparativeData.production.division.target.data[indic.toUpperCase()] ||
@@ -45,7 +44,7 @@ const TrendsDataContainer = ({
         indic.toUpperCase()
       ] || [],
       trend:
-        comparativeData.intermediateConsumptions.division.trends.data[
+        comparativeData.intermediateConsumptions.division.trend.data[
           indic.toUpperCase()
         ] || [],
       target:
@@ -61,7 +60,7 @@ const TrendsDataContainer = ({
         indic.toUpperCase()
       ] || [],
       trend:
-        comparativeData.fixedCapitalConsumptions.division.trends.data[
+        comparativeData.fixedCapitalConsumptions.division.trend.data[
           indic.toUpperCase()
         ] || [],
       target:
@@ -77,7 +76,7 @@ const TrendsDataContainer = ({
         indic.toUpperCase()
       ] || [],
       trend:
-        comparativeData.netValueAdded.division.trends.data[
+        comparativeData.netValueAdded.division.trend.data[
           indic.toUpperCase()
         ] || [],
       target:
@@ -88,18 +87,17 @@ const TrendsDataContainer = ({
     },
   };
 
-  console.log(trendData);
   const changeTrendGraphView = (selectedOption) => {
     setTrendGraphView(selectedOption);
   };
 
-  const renderTrendsChart = () => {
+  const renderTrendChart = () => {
     const { title,historical, trend, target, aggregate } = trendData[trendGraphView.value];
 
     return (
       <div>
         <h5>{title}</h5>
-        <TrendsChart
+        <TrendChart
           id={`trend-${trendGraphView.value}-${indic}`}
           unit={unit}
           historical={historical}
@@ -127,14 +125,14 @@ const TrendsDataContainer = ({
             onChange={changeTrendGraphView}
           />
 
-          {renderTrendsChart()}
+          {renderTrendChart()}
         </div>
       </Col>
       <Col>
         <div className="box ">
           <h4>Notes</h4>
 
-          {comparativeData.production.division.trends.data[
+          {comparativeData.production.division.trend.data[
             indic.toUpperCase()
           ] && (
             <>
@@ -148,7 +146,7 @@ const TrendsDataContainer = ({
                 l'économie nationale, ses interactions avec l’extérieur et de la
                 dynamique des prix par branche.
               </p>
-              <p className="small mt-3">Source : {trendsMeta[indic].source}</p>
+              <p className="small mt-3">Source : {trendMeta[indic].source}</p>
             </>
           )}
           {comparativeData.production.division.target.data[
@@ -166,4 +164,4 @@ const TrendsDataContainer = ({
   );
 };
 
-export default TrendsDataContainer;
+export default TrendContainer;

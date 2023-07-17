@@ -9,52 +9,52 @@ export class ComparativeData {
       area: {
         macrodata: new Dataset(props.fixedCapitalConsumptions?.area?.macrodata),
         target: new Dataset(props.fixedCapitalConsumptions?.area?.target),
-        trends: new Dataset(props.fixedCapitalConsumptions?.area?.trends),
+        trend: new Dataset(props.fixedCapitalConsumptions?.area?.trend),
       },
       division: {
         macrodata: new Dataset(
           props.fixedCapitalConsumptions?.division?.macrodata
         ),
         target: new Dataset(props.fixedCapitalConsumptions?.division?.target),
-        trends: new Dataset(props.fixedCapitalConsumptions?.division?.trends),
+        trend: new Dataset(props.fixedCapitalConsumptions?.division?.trend),
       },
     };
     this.intermediateConsumptions = {
       area: {
         macrodata: new Dataset(props.intermediateConsumptions?.area?.macrodata),
         target: new Dataset(props.intermediateConsumptions?.area?.target),
-        trends: new Dataset(props.intermediateConsumptions?.area?.trends),
+        trend: new Dataset(props.intermediateConsumptions?.area?.trend),
       },
       division: {
         macrodata: new Dataset(
           props.intermediateConsumptions?.division?.macrodata
         ),
         target: new Dataset(props.intermediateConsumptions?.division?.target),
-        trends: new Dataset(props.intermediateConsumptions?.division?.trends),
+        trend: new Dataset(props.intermediateConsumptions?.division?.trend),
       },
     };
     this.netValueAdded = {
       area: {
         macrodata: new Dataset(props.netValueAdded?.area?.macrodata),
         target: new Dataset(props.netValueAdded?.area?.target),
-        trends: new Dataset(props.netValueAdded?.area?.trends),
+        trend: new Dataset(props.netValueAdded?.area?.trend),
       },
       division: {
         macrodata: new Dataset(props.netValueAdded?.division?.macrodata),
         target: new Dataset(props.netValueAdded?.division?.target),
-        trends: new Dataset(props.netValueAdded?.division?.trends),
+        trend: new Dataset(props.netValueAdded?.division?.trend),
       },
     };
     this.production = {
       area: {
         macrodata: new Dataset(props.production?.area?.macrodata),
         target: new Dataset(props.production?.area?.target),
-        trends: new Dataset(props.production?.area?.trends),
+        trend: new Dataset(props.production?.area?.trend),
       },
       division: {
         macrodata: new Dataset(props.production?.division?.macrodata),
         target: new Dataset(props.production?.division?.target),
-        trends: new Dataset(props.production?.division?.trends),
+        trend: new Dataset(props.production?.division?.trend),
       },
     };
   }

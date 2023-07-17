@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 // Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
@@ -7,7 +7,7 @@ import { Line } from "react-chartjs-2";
 import "chartjs-adapter-moment";
 import { getSuggestedMax } from "../utils";
 
-function TrendsChart({
+function TrendChart({
   historical,
   trend,
   target,
@@ -244,4 +244,4 @@ if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filt
   );
 }
 
-export default TrendsChart;
+export default TrendChart;

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Col, Nav, Navbar, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs } from "react-bootstrap";
 
 // Tables
 import { MainAggregatesTable } from "../tables/MainAggregatesTable";
@@ -12,8 +12,8 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 // Child components
 import Analyse from "./AnalyseNote";
 import ComparativeDataContainer from "./ComparativeDataContainer";
-import TrendsDataContainer from "./TrendsDataContainer";
 import SigFootprintsContainer from "./SigFootprintsContainer";
+import TrendContainer from "./TrendContainer";
 
 const ExtraFinancialReport = ({
   indic,
@@ -146,7 +146,7 @@ const ExtraFinancialReport = ({
 
       {/* ---------- Trend Line Chart ----------  */}
       {!isLoading && (
-        <TrendsDataContainer
+        <TrendContainer
           aggregates={financialData.mainAggregates}
           comparativeData={comparativeData}
           indic={indic}

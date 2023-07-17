@@ -89,7 +89,7 @@ async function fetchDataForDatasets(
   indicator,
   endpoints
 ) {
-  const { macrodata, target, trends } = series;
+  const { macrodata, target, trend } = series;
 
   const macrodataResult = await fetchMacrodata(
     endpoints.macrodata,
@@ -103,8 +103,8 @@ async function fetchDataForDatasets(
     aggregate,
     indicator
   );
-  const trendsResult = await fetchMacrodata(
-    endpoints.trends,
+  const trendResult = await fetchMacrodata(
+    endpoints.trend,
     activityCode,
     aggregate,
     indicator
@@ -116,8 +116,8 @@ async function fetchDataForDatasets(
   if (targetResult !== null) {
     target.data[indicator] = targetResult;
   }
-  if (trendsResult !== null) {
-    trends.data[indicator] = trendsResult;
+  if (trendResult !== null) {
+    trend.data[indicator] = trendResult;
   }
 }
 

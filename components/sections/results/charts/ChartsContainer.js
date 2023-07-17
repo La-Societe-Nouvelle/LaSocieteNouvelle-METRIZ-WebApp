@@ -3,7 +3,7 @@ import { Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
 import ComparativeChart from "./ComparativeChart";
-import TrendsChart from "./TrendsChart";
+import TrendChart from "./TrendChart";
 import SigPieChart from "./SigPieChart";
 import DeviationChart from "./HorizontalBarChart";
 import { printValue } from "../../../../src/utils/Utils";
@@ -107,7 +107,7 @@ export const ChartsContainer = ({
       </Row>
       <Row>
         <div className="trend-chart-container">
-          <TrendsChart
+          <TrendChart
             id={`trend-chart-${indic}-print`}
             unit={indicators[indic].unit}
             historical={
@@ -116,12 +116,12 @@ export const ChartsContainer = ({
               ]
             }
             trend={
-              comparativeData["production"].division.trends.data[
+              comparativeData["production"].division.trend.data[
                 indic.toUpperCase()
               ]
             }
             target={
-              comparativeData["production"].division.trends.data[
+              comparativeData["production"].division.trend.data[
                 indic.toUpperCase()
               ]
             }
