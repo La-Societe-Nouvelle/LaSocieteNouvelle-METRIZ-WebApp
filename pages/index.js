@@ -99,7 +99,7 @@ class Metriz extends React.Component {
   }
   render() {
     const { step, session, showDataUpdater } = this.state;
-    console.log(showDataUpdater)
+ 
     return (
       <>
         <div

@@ -14,10 +14,11 @@ const StatementGEQ = (props) => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
   const [showDSN, setShowDSN] = useState(false);
-
+  
   const hasEmployees = props.impactsData.hasEmployees;
 
   useEffect(() => {
+
     if (!props.impactsData.hasEmployees && wageGap === 0) {
       setIsDisabled(false);
     }
@@ -34,7 +35,9 @@ const StatementGEQ = (props) => {
     }
 
     if (wageGap !== valueOrDefault(props.impactsData.wageGap, "")) {
+     
       setWageGap(valueOrDefault(props.impactsData.wageGap, ""));
+      props.onUpdate("geq");
     }
   }, [
     props.impactsData.hasEmployees,
@@ -58,7 +61,6 @@ const StatementGEQ = (props) => {
     }
     setWageGap(valueOrDefault(props.impactsData.wageGap, ""));
     props.onUpdate("geq");
-    props.onUpdate("idr");
   };
 
   const updateWageGap = (input) => {
@@ -66,6 +68,7 @@ const StatementGEQ = (props) => {
     setWageGap(props.impactsData.wageGap);
     setIsDisabled(false);
     props.onUpdate("geq");
+
   };
 
   const updateInfo = (event) => setInfo(event.target.value);

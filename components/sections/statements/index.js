@@ -16,35 +16,34 @@ const DirectImpacts = ({ session, submit }) => {
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  const [invalidIndicators, setInvalidIndicators] = useState(null);
+  const [invalidStatements, setInvalidStatements] = useState([]);
+  const [emptyStatements, setEmptyStatements] = useState([]);
 
   const handleSubmitStatements = async () => {
-    if (invalidIndicators.length > 0) {
-      window.scroll(0, 0);
-      return;
-    }
 
     setIsLoading(true);
 
     for (const validation of validations) {
+      
       const indicatorCode = validation.toUpperCase();
       // fetch comparative data
       //
-      const missingIndicators = checkIfDataExists(
+      const missingIndicComparativeData = checkIfDataExists(
         session.comparativeData,
         indicatorCode
       );
-      if (missingIndicators.length > 0) {
-        for (const missingIndicator of missingIndicators) {
+      if (missingIndicComparativeData.length > 0) {
+
+        for (const indic of missingIndicComparativeData) {
           await fetchComparativeDataForArea(
             session.comparativeData,
-            missingIndicator,
+            indic,
             endpoints
           );
           if (session.comparativeData.activityCode != "00") {
             await fetchComparativeDataForDivision(
               session.comparativeData,
-              missingIndicator,
+              indic,
               endpoints
             );
           }
@@ -56,9 +55,13 @@ const DirectImpacts = ({ session, submit }) => {
     submit();
   };
 
-  const handleValidations = async (indicators, invalidIndicators) => {
+  const handleValidations = async (indicators, invalidStatements, emptyStatements) => {
+
+
     setValidations(indicators);
-    setInvalidIndicators(invalidIndicators);
+    setInvalidStatements(invalidStatements);
+    setEmptyStatements(emptyStatements);
+    
     session.validations[period.periodKey] = indicators;
   };
 
@@ -70,23 +73,6 @@ const DirectImpacts = ({ session, submit }) => {
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-        {invalidIndicators && invalidIndicators.length > 0 && (
-          <Alert variant="danger">
-            {`Attention : ${
-              invalidIndicators.length > 1
-                ? "plusieurs erreurs ont été détectées"
-                : "une erreur a été détectée"
-            }  ${
-              invalidIndicators.length > 1
-                ? "dans certains formulaires de déclarations"
-                : ""
-            }. Veuillez vérifier et corriger ${
-              invalidIndicators.length > 1
-                ? `les ${invalidIndicators.length} formulaires concernés`
-                : "le formulaire concerné"
-            } avant de pouvoir passer aux résultats.`}
-          </Alert>
-        )}
 
         <StatementForms
           session={session}
@@ -96,11 +82,46 @@ const DirectImpacts = ({ session, submit }) => {
         />
         {isLoading && <Loader title={"Chargement en cours..."} />}
 
+        {invalidStatements && invalidStatements.length > 0 && (
+          <Alert variant="danger">
+            {`Attention : ${
+              invalidStatements.length > 1
+                ? "plusieurs erreurs ont été détectées"
+                : "une erreur a été détectée"
+            }  ${
+              invalidStatements.length > 1
+                ? "dans certains formulaires de déclarations"
+                : ""
+            }. Veuillez vérifier et corriger ${
+              invalidStatements.length > 1
+                ? `les ${invalidStatements.length} formulaires concernés`
+                : "le formulaire concerné"
+            } avant de pouvoir passer aux résultats.`}
+          </Alert>
+        )}
+          {emptyStatements.length > 0 && (
+          <Alert variant="warning">
+            {`Attention : ${
+              emptyStatements.length > 1
+                ? "plusieurs formulaires n'ont pas été remplis"
+                : "un formulaire n'a pas été rempli"
+            }  ${
+              emptyStatements.length > 1
+                ? "dans certains formulaires de déclarations"
+                : ""
+            }. Veuillez remplir ou déselectionner ${
+              emptyStatements.length > 1
+                ? `les ${emptyStatements.length} formulaires concernés`
+                : "le formulaire concerné"
+            } avant de pouvoir passer aux résultats.`}
+          </Alert>
+        )}
+
         <div className="text-end">
           <Button
             variant="secondary"
             onClick={handleSubmitStatements}
-            disabled={validations.length == 0 ? true : false}
+            disabled={ emptyStatements.length  > 0 || invalidStatements.length > 0 || validations.length == 0 ? true : false}
           >
             Valider et accéder aux résultats
             <i className="bi bi-chevron-right"></i>

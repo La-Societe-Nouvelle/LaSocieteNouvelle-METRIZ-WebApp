@@ -25,28 +25,38 @@ const StatementForms = ({
   initialSelectedIndicators,
   updateValidations,
 }) => {
-
   const [selectedIndicators, setSelectedIndicators] = useState(
     initialSelectedIndicators
   );
 
-  const [invalidIndicators, setInvalidIndicators] = useState({}); 
+  const [invalidStatements, setInvalidStatements] = useState({});
 
+  const [declaredIndicators, setDeclaredIndicators] = useState(
+    initialSelectedIndicators
+  );
   const [indicatorModal, setIndicatorModal] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
   
-    // Filter out the selected indicators that are not in the invalidIndicators list
-    const validSelectedIndicators = selectedIndicators.filter(
-      (indicator) => !Object.keys(invalidIndicators).includes(indicator)
+    // Filter out the selected indicators that are not in the invalidStatements list
+    const ValidStatements = selectedIndicators.filter(
+      (indicator) =>
+        !Object.keys(invalidStatements).includes(indicator) &&
+        declaredIndicators.includes(indicator)
     );
   
-    // Update validations for validSelectedIndicators here
-    updateValidations(validSelectedIndicators, Object.keys(invalidIndicators));
-  
-  }, [selectedIndicators, invalidIndicators]);
-  
+    const missingStatements = selectedIndicators.filter(
+      (indicator) => !declaredIndicators.includes(indicator)
+    );
+    
+    // Update validations for ValidStatements here
+    updateValidations(
+      ValidStatements,
+      Object.keys(invalidStatements),
+      missingStatements
+    );
+  }, [declaredIndicators, selectedIndicators, invalidStatements]);
 
   const handleModalOpen = (indicator) => {
     setIndicatorModal(indicator);
@@ -62,10 +72,10 @@ const StatementForms = ({
   const handleNetValueChange = async (indic) => {
     session.getNetValueAddedIndicator(indic, period.periodKey);
     await session.updateFootprints(period);
-
+    if (!declaredIndicators.includes(indic)) {
+      setDeclaredIndicators([...declaredIndicators, indic]);
+    }
   };
-
-
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -78,7 +88,7 @@ const StatementForms = ({
       setSelectedIndicators((prevSelectedIndicators) =>
         prevSelectedIndicators.filter((indicator) => indicator !== value)
       );
-      setInvalidIndicators((prevInvalidIndicators) => {
+      setInvalidStatements((prevInvalidIndicators) => {
         const updatedInvalidIndicators = { ...prevInvalidIndicators };
         delete updatedInvalidIndicators[value];
         return updatedInvalidIndicators;
@@ -87,14 +97,13 @@ const StatementForms = ({
   };
 
   const handleError = (field, errorMessage) => {
-
     if (errorMessage) {
-      setInvalidIndicators((prevInvalidIndicators) => ({
+      setInvalidStatements((prevInvalidIndicators) => ({
         ...prevInvalidIndicators,
         [field]: errorMessage,
       }));
     } else {
-      setInvalidIndicators((prevInvalidIndicators) => {
+      setInvalidStatements((prevInvalidIndicators) => {
         const updatedInvalidIndicators = { ...prevInvalidIndicators };
         delete updatedInvalidIndicators[field];
         return updatedInvalidIndicators;
@@ -147,6 +156,7 @@ const StatementForms = ({
 
     return filteredIndicators.map(([key, value]) => (
       <div key={key} className="border rounded mb-3 indic-statement bg-light">
+      
         <div className="d-flex align-items-center px-2 py-3">
           <Form className="indic-form me-3">
             <Form.Check
@@ -166,6 +176,7 @@ const StatementForms = ({
             <h4>
               {value.libelle}
               {value.isBeta && <span className="beta ms-1">BETA</span>}
+              
             </h4>
             <div className="text-end flex-grow-1">
               <Button
@@ -188,10 +199,10 @@ const StatementForms = ({
   };
 
   const renderErrorMessage = (indicator) => {
-    if (invalidIndicators[indicator]) {
+    if (invalidStatements[indicator]) {
       return (
         <div className="mx-2 my-2 alert alert-danger">
-          {invalidIndicators[indicator]}
+          {invalidStatements[indicator]}
         </div>
       );
     }

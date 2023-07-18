@@ -26,8 +26,11 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
     }
 
     if (interdecileRange !== valueOrDefault(impactsData.interdecileRange, "")) {
+
       setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
     }
+
+
   }, [
     disableStatement,
     impactsData.hasEmployees,
@@ -52,20 +55,18 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
       newWageGap = 0;
       setIsInvalid(false);
       onError("idr", false);
+      onUpdate("idr");
+
     }
 
     impactsData.setHasEmployees(newHasEmployees);
     impactsData.wageGap = newWageGap;
     setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
-    onUpdate("idr");
-    onUpdate("geq");
   };
 
   const updateInterdecileRange = (event) => {
-    console.log("change");
     const inputValue = event.target.valueAsNumber;
     let errorMessage = "";
-    console.log(inputValue);
     // Validation checks for the input value
     if (isNaN(inputValue)) {
       errorMessage = "Veuillez saisir un nombre valide.";
