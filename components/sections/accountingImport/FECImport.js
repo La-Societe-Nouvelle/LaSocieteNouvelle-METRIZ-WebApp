@@ -31,7 +31,7 @@ export default class FECImport extends React.Component
             </p>
           </div>
         <div className="table-container">
-          <Table hover responsive borderless>
+          <Table bordered hover responsive >
             <thead>
               <tr>
                 <td>Code</td>

@@ -65,8 +65,8 @@ $input-group-addon-bg: #f4f4fb;
 $input-disabled-bg: lighten($light, 7%);
 
 // TABLE
-$table-border-color: darken($light, 1%);
-$table-border-width: 0;
+$table-border-color: $light;
+$table-border-width: 2;
 $table-bg : transparent;
 
 // MODAL

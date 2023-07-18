@@ -10,6 +10,9 @@ p.toChecked {
 }
 
 table {
+
+  border: 2px solid $light; 
+
   tr.fw-bold td {
     background-color: $bg-light;
   }

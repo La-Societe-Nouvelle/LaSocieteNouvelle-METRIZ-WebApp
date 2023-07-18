@@ -5,7 +5,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 // Components
-import { InitialStatesTable } from "/components/tables/InitialStatesTable";
+import { InitialStatesTable } from "../../components/tables/InitialStatesTable";
 import { ProgressBar } from "../popups/ProgressBar";
 
 import { updateVersion } from "../../src/version/updateVersion";
@@ -13,7 +13,7 @@ import { Container } from "react-bootstrap";
 import { ErrorApi } from "../ErrorAPI";
 import { getPrevDate } from "../../src/utils/Utils";
 import { Session } from "../../src/Session";
-import { MessagePopup, MessagePopupErrors, MessagePopupSuccess } from "../popups/MessagePopup";
+import { MessagePopupErrors, MessagePopupSuccess } from "../popups/MessagePopup";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
