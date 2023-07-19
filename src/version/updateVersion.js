@@ -13,14 +13,13 @@ import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 import { ComparativeData } from "../models/ComparativeData";
-import { fetchComparativeData } from "./utils";
+import { fetchMacroDataForIndicators } from "../services/MacrodataService";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
 export const updateVersion = async (sessionData) => {
-
   switch (sessionData.version) {
     case "3.0.0":
       break;
@@ -82,13 +81,19 @@ export const updateVersion = async (sessionData) => {
 // ------------------------------------------------------------------
 
 const updater_3_0_0 = async (sessionData) => {
+  const prevComparativeCode = sessionData.comparativeData.activityCode;
+
   sessionData.comparativeData = new ComparativeData();
+  sessionData.comparativeData.activityCode = prevComparativeCode;
+
   const period = sessionData.financialPeriod;
 
-  for (const indic of sessionData.validations[period.periodKey]) {
-    const indicatorCode = indic.toUpperCase();
+  const indicators = sessionData.validations[period.periodKey].map((indic) =>
+    indic.toUpperCase()
+  );
 
-    await fetchComparativeData(sessionData, indicatorCode);
+  if (indicators.length > 0) {
+    await fetchMacroDataForIndicators(sessionData, indicators);
   }
 
   if (
@@ -100,7 +105,6 @@ const updater_3_0_0 = async (sessionData) => {
 };
 
 const updater_1_0_5 = async (sessionData) => {
-
   // delete useless objects from  previous session
   delete sessionData.comparativeAreaFootprints;
   delete sessionData.targetSNBCarea;

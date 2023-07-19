@@ -6,6 +6,7 @@ import { endpoints } from "../../../config/endpoint";
 import {
   fetchComparativeDataForArea,
   fetchComparativeDataForDivision,
+  fetchMacroDataForIndicators,
 } from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 
@@ -21,38 +22,31 @@ const DirectImpacts = ({ session, submit }) => {
 
   const handleSubmitStatements = async () => {
 
-    setIsLoading(true);
+     setIsLoading(true);
+
+    const missingIndicators = [];
 
     for (const validation of validations) {
       
       const indicatorCode = validation.toUpperCase();
       // fetch comparative data
       //
-      const missingIndicComparativeData = checkIfDataExists(
+      const hasData = checkIfDataExists(
         session.comparativeData,
         indicatorCode
       );
-      if (missingIndicComparativeData.length > 0) {
 
-        for (const indic of missingIndicComparativeData) {
-          await fetchComparativeDataForArea(
-            session.comparativeData,
-            indic,
-            endpoints
-          );
-          if (session.comparativeData.activityCode != "00") {
-            await fetchComparativeDataForDivision(
-              session.comparativeData,
-              indic,
-              endpoints
-            );
-          }
-        }
+      if(!hasData){
+        missingIndicators.push(indicatorCode)
       }
+      
+    }
+    if(missingIndicators.length > 0){
+      await fetchMacroDataForIndicators(session,missingIndicators)
     }
 
-    setIsLoading(false);
-    submit();
+  setIsLoading(false);
+ submit();
   };
 
   const handleValidations = async (indicators, invalidStatements, emptyStatements) => {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
-import { fetchComparativeData } from "../../../src/version/utils";
+import { fetchMacroDataForIndicators } from "../../../src/services/MacrodataService";
 import UpdateDataView from "./UpdatedDataView";
 
 export const DataUpdater = ({
@@ -100,7 +100,11 @@ const fetchLatestData = async (updatedSession) => {
 
   // Récupère les dernières données comparatives
 
-  await fetchLatestComparativeData(validations, updatedSession);
+  const indicators = validations.map((indic) => indic.toUpperCase());
+
+  if (indicators.length > 0) {
+    await fetchMacroDataForIndicators(updatedSession, indicators);
+  }
 };
 
 const fetchLatestProviders = async (
@@ -158,12 +162,5 @@ const fetchLatestAccountsData = async (immobilisations, stocks) => {
     } catch (error) {
       break;
     }
-  }
-};
-
-const fetchLatestComparativeData = async (validations, updatedSession) => {
-  for await (const indic of validations) {
-    const indicatorCode = indic.toUpperCase();
-    await fetchComparativeData(updatedSession, indicatorCode);
   }
 };

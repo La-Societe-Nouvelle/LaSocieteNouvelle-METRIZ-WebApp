@@ -1,8 +1,8 @@
 import api from "../../config/api";
+import { endpoints } from "../../config/endpoint";
 
 export async function fetchMacrodata(dataset, activityCode, aggregate, indic) {
   try {
-    
     const response = await api.get(`/macrodata/${dataset}`, {
       params: {
         division: activityCode,
@@ -28,6 +28,8 @@ export async function fetchComparativeDataForArea(
   indicator,
   endpoints
 ) {
+  const fetchDataPromises = [];
+
   const aggregates = {
     fixedCapitalConsumptions: "CFC",
     production: "PRD",
@@ -40,15 +42,13 @@ export async function fetchComparativeDataForArea(
       const areaDataset = comparativeData[key].area;
       const aggregate = aggregates[key];
 
-      await fetchDataForDatasets(
-        areaDataset,
-        "00",
-        aggregate,
-        indicator,
-        endpoints
+      fetchDataPromises.push(
+        fetchDataForDatasets(areaDataset, "00", aggregate, indicator, endpoints)
       );
     }
   }
+
+  await Promise.all(fetchDataPromises);
 }
 
 export async function fetchComparativeDataForDivision(
@@ -56,6 +56,8 @@ export async function fetchComparativeDataForDivision(
   indicator,
   endpoints
 ) {
+  const fetchDataPromises = [];
+
   const aggregates = {
     fixedCapitalConsumptions: "CFC",
     production: "PRD",
@@ -71,15 +73,18 @@ export async function fetchComparativeDataForDivision(
 
       const aggregate = aggregates[key];
 
-      await fetchDataForDatasets(
-        divisionDataset,
-        activityCode,
-        aggregate,
-        indicator,
-        endpoints
+      fetchDataPromises.push(
+        fetchDataForDatasets(
+          divisionDataset,
+          activityCode,
+          aggregate,
+          indicator,
+          endpoints
+        )
       );
     }
   }
+  await Promise.all(fetchDataPromises);
 }
 
 async function fetchDataForDatasets(
@@ -91,24 +96,13 @@ async function fetchDataForDatasets(
 ) {
   const { macrodata, target, trend } = series;
 
-  const macrodataResult = await fetchMacrodata(
-    endpoints.macrodata,
-    activityCode,
-    aggregate,
-    indicator
-  );
-  const targetResult = await fetchMacrodata(
-    endpoints.target,
-    activityCode,
-    aggregate,
-    indicator
-  );
-  const trendResult = await fetchMacrodata(
-    endpoints.trend,
-    activityCode,
-    aggregate,
-    indicator
-  );
+
+  const [macrodataResult, targetResult, trendResult] = await Promise.all([
+    fetchMacrodata(endpoints.macrodata, activityCode, aggregate, indicator),
+    fetchMacrodata(endpoints.target, activityCode, aggregate, indicator),
+    fetchMacrodata(endpoints.trend, activityCode, aggregate, indicator)
+  ]);
+
 
   if (macrodataResult !== null) {
     macrodata.data[indicator] = macrodataResult;
@@ -120,4 +114,20 @@ async function fetchDataForDatasets(
     trend.data[indicator] = trendResult;
   }
 }
+
+
+
+// ...
+
+export async function fetchMacroDataForIndicators(session, indicators) {
+  const areaPromises = indicators.map(indic => fetchComparativeDataForArea(session.comparativeData, indic, endpoints));
+
+  await Promise.all(areaPromises);
+
+  if (session.comparativeData.activityCode !== "00") {
+    const divisionPromises = indicators.map(indic => fetchComparativeDataForDivision(session.comparativeData, indic, endpoints));
+    await Promise.all(divisionPromises);
+  }
+}
+
 

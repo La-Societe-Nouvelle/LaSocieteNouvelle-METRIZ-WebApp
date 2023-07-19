@@ -32,12 +32,14 @@ export const checkIfDataExists =  (comparativeData, indicatorCode) => {
             break;
           }
       }
-  
-      if (!foundIndicator && !missingIndicators.includes(indicatorCode)) {
-        missingIndicators.push(indicatorCode);
+
+      if(!foundIndicator) {
+        return false;
       }
+  
+   
     }
-    // Retourner les indicateurs manquants
-    return missingIndicators;
+
+    return true;
   };
   
