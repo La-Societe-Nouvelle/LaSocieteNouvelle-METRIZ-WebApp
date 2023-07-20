@@ -35,7 +35,7 @@ export const updater_2_0_0 = async (sessionData) =>
   
   // Periods
   let prevFinancialPeriod = getFinancialPeriod(prevSession.year);
-  console.log(prevFinancialPeriod);
+ 
   sessionData.availablePeriods = [prevFinancialPeriod];
   sessionData.financialPeriod = prevFinancialPeriod;
 
@@ -69,7 +69,6 @@ export const updater_2_0_0 = async (sessionData) =>
   };
 
   prevSession = sessionData;
-  console.log(prevSession);
 }
 
 const getFinancialPeriod = (prevYear) =>

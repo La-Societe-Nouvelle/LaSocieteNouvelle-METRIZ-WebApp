@@ -80,7 +80,30 @@ export const updateVersion = async (sessionData) => {
 // Updater
 // ------------------------------------------------------------------
 
+// Updater for version 3.0.0
 const updater_3_0_0 = async (sessionData) => {
+  
+  // - Changed values for isAllActivitiesinFrance and isValueAddedCrafted: true/false/null -> true/false/partially.
+  // - Updater handles transition from null to "partially" for isAllActivitiesinFrance based on domesticProduction value.
+  // - Updater handles transition for isValueAddedCrafted based on isValueAddedCrafted value.
+
+  if (
+    sessionData.impactsData.isAllActivitiesinFrance == null &&
+    sessionData.impactsData.domesticProduction != null
+  ) {
+    sessionData.impactsData.isAllActivitiesinFrance = "partially";
+  }
+
+  if (
+    sessionData.impactsData.isValueAddedCrafted == null &&
+    sessionData.impactsData.isValueAddedCrafted != null
+  ) {
+    sessionData.impactsData.isValueAddedCrafted = "partially";
+  }
+
+  // - Utilizes new ComparativeData class and fetches data for declared indicators.
+  // - Updates sessionData structure for comparative data.
+  // - Sets sessionData progression to 5 if indicators are declared and progression is at 4.
   const prevComparativeCode = sessionData.comparativeData.activityCode;
 
   sessionData.comparativeData = new ComparativeData();

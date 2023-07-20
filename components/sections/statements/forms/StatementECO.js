@@ -1,20 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 const StatementECO = ({ impactsData, onUpdate, onError }) => {
   const [domesticProduction, setDomesticProduction] = useState(
-    valueOrDefault(impactsData.domesticProduction, undefined)
+    valueOrDefault(impactsData.domesticProduction, "")
   );
   const [info, setInfo] = useState(impactsData.comments.eco || "");
   const [isInvalid, setIsInvalid] = useState(false);
-
-  useEffect(() => {
-    if (domesticProduction !== impactsData.domesticProduction) {
-      setDomesticProduction(impactsData.domesticProduction);
-    }
-  }, [impactsData.domesticProduction]);
-
 
 
   const onIsAllActivitiesInFranceChange = (event) => {
@@ -27,9 +20,9 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
         setIsInvalid(false);
         onError("eco", false);
         break;
-      case "null":
-        impactsData.isAllActivitiesInFrance = null;
-        impactsData.domesticProduction = null;
+      case "partially":
+        impactsData.isAllActivitiesInFrance = "partially";
+        impactsData.domesticProduction = "";
         break;
       case "false":
         impactsData.isAllActivitiesInFrance = false;
@@ -106,9 +99,9 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
                 type="radio"
                 id="isAllActivitiesInFrance"
                 label="Partiellement"
-                value="null"
+                value="partially"
                 checked={
-                  impactsData.isAllActivitiesInFrance === null && domesticProduction !== ""
+                  impactsData.isAllActivitiesInFrance === "partially"
                 }
                 onChange={onIsAllActivitiesInFranceChange}
               />
@@ -126,7 +119,7 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
                   inputMode="numeric"
                   onChange={updateDomesticProduction}
                   isInvalid={isInvalid}
-                  disabled={impactsData.isAllActivitiesInFrance !== null}
+                  disabled={impactsData.isAllActivitiesInFrance !== "partially"}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
               </InputGroup>

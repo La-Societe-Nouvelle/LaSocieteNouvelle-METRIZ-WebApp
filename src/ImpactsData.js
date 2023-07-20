@@ -118,8 +118,8 @@ export class ImpactsData  {
   setNetValueAdded(netValueAdded) {
     this.netValueAdded = netValueAdded;
     if (netValueAdded!=null) {
-      if (this.isAllActivitiesInFrance) this.domesticProduction = netValueAdded;
-      if (this.isValueAddedCrafted) this.craftedProduction = netValueAdded;
+      if (this.isAllActivitiesInFrance == true) this.domesticProduction = netValueAdded;
+      if (this.isValueAddedCrafted == true) this.craftedProduction = netValueAdded;
     } else {
       this.domesticProduction = null;
       this.craftedProduction = null;
