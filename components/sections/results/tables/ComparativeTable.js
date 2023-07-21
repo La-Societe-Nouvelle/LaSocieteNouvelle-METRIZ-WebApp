@@ -44,7 +44,7 @@ export const ComparativeTable = ({
   return (
     <Row>
       <Col>
-        <Table className="comparative-table shadow-sm">
+        <Table className="comparative-table">
           <thead>
             <tr>
               <td>Agrégat</td>

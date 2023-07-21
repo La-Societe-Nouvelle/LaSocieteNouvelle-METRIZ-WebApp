@@ -5,7 +5,7 @@ $secondary: #fa595f;
 $tertiary: #251f81;
 $light: #dbdef1;
 $light-secondary : #fee0e1;
-$bg-light: #f0f0f8;
+$bg-light: #ededff;
 $valid-color: #e2efd9;
 $unvalid-color: #efdcd9;
 $success: #36c575;
@@ -43,12 +43,13 @@ $alert-padding-y: 0.75rem;
 $alert-padding-x: 1.25rem;
 
 // BUTTONS
-$btn-font-size: 0.85rem;
+$btn-font-size: 0.8rem;
 $btn-padding-y: 0.8rem;
-$btn-padding-x: 1.5rem;
+$btn-padding-x: 1rem;
 $btn-border-radius: 1.5rem;
 $btn-border-radius-sm: 1rem;
 $btn-border-radius-lg: 1rem;
+$btn-font-weight : 600;
 
 $btn-link-disabled-color: "#FFF";
 
@@ -78,7 +79,10 @@ $modal-content-border-width: 0;
 $btn-close-color: $primary;
 $btn-close-opacity: 1;
 $btn-close-width: 0.6em;
+
+// HR
 $hr-margin-y: 2rem;
 $hr-color: #dbdef1;
-
+$hr-opacity : 0.8;
+$hr-height : 2px;
 @import "~bootstrap/scss/bootstrap";

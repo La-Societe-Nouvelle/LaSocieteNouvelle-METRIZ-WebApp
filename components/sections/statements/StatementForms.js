@@ -38,18 +38,17 @@ const StatementForms = ({
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-  
     // Filter out the selected indicators that are not in the invalidStatements list
     const ValidStatements = selectedIndicators.filter(
       (indicator) =>
         !Object.keys(invalidStatements).includes(indicator) &&
         declaredIndicators.includes(indicator)
     );
-  
+
     const missingStatements = selectedIndicators.filter(
       (indicator) => !declaredIndicators.includes(indicator)
     );
-    
+
     // Update validations for ValidStatements here
     updateValidations(
       ValidStatements,
@@ -68,10 +67,10 @@ const StatementForms = ({
     setShowModal(false);
   };
 
-  // check if net value indicator will change with new value & cancel value if necessary
   const handleNetValueChange = async (indic) => {
+
     session.getNetValueAddedIndicator(indic, period.periodKey);
-    await session.updateFootprints(period);
+    
     if (!declaredIndicators.includes(indic)) {
       setDeclaredIndicators([...declaredIndicators, indic]);
     }
@@ -87,6 +86,9 @@ const StatementForms = ({
     } else {
       setSelectedIndicators((prevSelectedIndicators) =>
         prevSelectedIndicators.filter((indicator) => indicator !== value)
+      );
+      setDeclaredIndicators((prevDeclaredIndicators) =>
+      prevDeclaredIndicators.filter((indicator) => indicator !== value)
       );
       setInvalidStatements((prevInvalidIndicators) => {
         const updatedInvalidIndicators = { ...prevInvalidIndicators };
@@ -156,7 +158,6 @@ const StatementForms = ({
 
     return filteredIndicators.map(([key, value]) => (
       <div key={key} className="border rounded mb-3 indic-statement bg-light">
-      
         <div className="d-flex align-items-center px-2 py-3">
           <Form className="indic-form me-3">
             <Form.Check
@@ -176,15 +177,17 @@ const StatementForms = ({
             <h4>
               {value.libelle}
               {value.isBeta && <span className="beta ms-1">BETA</span>}
-              
             </h4>
             <div className="text-end flex-grow-1">
               <Button
                 variant="light"
+                className="text-primary"
                 size="sm"
                 onClick={() => handleModalOpen(key)}
               >
                 Informations
+
+                <i className="ms-2 bi bi-info-circle-fill"></i>
               </Button>
             </div>
           </div>

@@ -3,8 +3,6 @@ export const checkIfDataExists =  (comparativeData, indicatorCode) => {
       (key) => key !== "activityCode"
     );
   
-    const missingIndicators = [];
-  
     for (const aggregate of aggregates) {
       const datasets = comparativeData[aggregate];
       const areaDataTypes = Object.keys(datasets.area);
@@ -42,4 +40,34 @@ export const checkIfDataExists =  (comparativeData, indicatorCode) => {
 
     return true;
   };
-  
+
+    /* ---------- TABLE ACTIONS ---------- */
+
+  // Import CSV File
+  // importCSVFile = (event) => 
+  // {
+  //   let file = event.target.files[0];
+
+  //   let reader = new FileReader();
+  //   reader.onload = async () =>
+  //     CSVFileReader(reader.result)
+  //       .then((content) => SocialDataContentReader(content))
+  //       .then((individualsData) => this.setState({individualsData}));
+    
+  //   reader.readAsText(file);
+  // };
+
+  // // Import XLSX File
+  // importXLSXFile = (event) => 
+  // {
+  //   let file = event.target.files[0];
+
+  //   let reader = new FileReader();
+  //   reader.onload = async () =>
+  //     XLSXFileReader(reader.result)
+  //       .then((XLSXData) => XLSXSocialDataBuilder(XLSXData))
+  //       .then((socialData) => SocialDataContentReader(socialData))
+  //       .then((individualsData) => this.setState({individualsData}));
+
+  //   reader.readAsArrayBuffer(file);
+  // };

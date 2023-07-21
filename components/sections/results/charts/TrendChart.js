@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 // Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
@@ -17,20 +17,29 @@ function TrendChart({
   id,
   isPrinting,
 }) {
-  const linearTarget = target.filter((data) => data.path == "LIN");
-  const filteredHistorical = historical.filter((data) => data.currency != "EUR2022");
+  
+  const [max, setMax] = useState(null);
+  const linearTarget = target.filter((data) => data.path == "LIN" && data.flag == "f");
 
   const legalUnitData = [];
 
+  useEffect(() => {
+    if (unit === "%") {
+      setMax(getSuggestedMax(Math.max(...trend.map((o) => o.value))));
+    }
+  }, [unit, trend]);
+
   for (const period in aggregate) {
     const periodDetails = aggregate[period];
-
     legalUnitData.push({
       x: period.slice(2),
       y: periodDetails.footprint.indicators[indic].value,
       r: 5,
     });
   }
+
+  const filteredHistorical = historical.filter((data) => data.currency != "EUR2022" && data.year >=  (legalUnitData[0].x - 10 ));
+
 
 
   let updatedTrend = trend;
@@ -94,8 +103,7 @@ if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filt
     ],
   };
 
-  const max = Math.max(...trend.map((o) => o.value));
-  const suggestedMax = unit === "%" ? getSuggestedMax(max) : null;
+
 
   const commonOptions = {
     devicePixelRatio: 2,
@@ -239,7 +247,7 @@ if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filt
     <Line
       data={chartData}
       id={id}
-      options={{ ...commonOptions, suggestedMax: suggestedMax }}
+      options={{ ...commonOptions, suggestedMax: max }}
     />
   );
 }

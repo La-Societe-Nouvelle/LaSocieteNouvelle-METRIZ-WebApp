@@ -2,16 +2,14 @@ import React, { useState } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 import { Loader } from "../../popups/Loader";
-import { endpoints } from "../../../config/endpoint";
 import {
-  fetchComparativeDataForArea,
-  fetchComparativeDataForDivision,
   fetchMacroDataForIndicators,
 } from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 
 const DirectImpacts = ({ session, submit }) => {
-  const [period, setPeriod] = useState(session.financialPeriod);
+  const [period] = useState(session.financialPeriod);
+
   const [validations, setValidations] = useState(
     session.validations[period.periodKey]
   );
@@ -23,6 +21,7 @@ const DirectImpacts = ({ session, submit }) => {
   const handleSubmitStatements = async () => {
 
      setIsLoading(true);
+     await session.updateFootprints(period);
 
     const missingIndicators = [];
 
@@ -44,13 +43,12 @@ const DirectImpacts = ({ session, submit }) => {
     if(missingIndicators.length > 0){
       await fetchMacroDataForIndicators(session,missingIndicators)
     }
-
+    
   setIsLoading(false);
  submit();
   };
 
   const handleValidations = async (indicators, invalidStatements, emptyStatements) => {
-
 
     setValidations(indicators);
     setInvalidStatements(invalidStatements);

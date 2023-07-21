@@ -106,7 +106,7 @@ export const MainAggregatesTable = ({
     indic
   );
   return (
-      <Table id="mainAggregates" className="shadow-sm">
+      <Table id="mainAggregates">
         <thead>
           <tr>
             <th>Agrégat</th>
