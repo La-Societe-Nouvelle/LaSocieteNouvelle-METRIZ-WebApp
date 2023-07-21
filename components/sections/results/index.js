@@ -107,7 +107,11 @@ const Results = ({ session, publish, goBack }) => {
     let labelMenu = (
       <>
         {code && (
-          <Image className="me-2" src={`icons-ese/${code}.svg`} height={40} />
+          <Image
+            className="me-2"
+            src={`icons-ese/logo_ese_${code}_rose.svg`}
+            height={25}
+          />
         )}
         {label}
       </>
@@ -152,72 +156,73 @@ const Results = ({ session, publish, goBack }) => {
           Découvrez les résultats pour chaque indicateur mesuré et comparez les
           avec votre branche.
         </p>
+        <Row>
+          <Col lg={6}>
+            <div className="legal-unit-info d-flex justify-content-between pe-2">
+              <p className="fw-bold col-form-label">
+                Unité légale : {session.legalUnit.corporateName}
+              </p>
+              <p className="fw-bold col-form-label">
+                Année de l'exercice :{" "}
+                {session.financialPeriod.periodKey.slice(2)}
+              </p>
+              {session.legalUnit.siren && (
+                <p className="fw-bold col-form-label">
+                  SIREN/SIRET : {session.legalUnit.siren}
+                </p>
+              )}
 
-        <div className="legal-unit-info">
-          <Row>
-            {session.legalUnit.siren && (
-              <Col>
-                <p className="fw-bold col-form-label">SIREN/SIRET :</p>
+              {session.legalUnit.activityCode && (
+                <p className="fw-bold col-form-label">
+                  Code APE : {session.legalUnit.activityCode}
+                </p>
+              )}
+            </div>
+          </Col>
+        </Row>
+        <div className="d-flex align-items-center ">
+          <p className="fw-bold col-form-label me-2 mb-0 ">
+            Branche de comparaison :
+          </p>
 
-                <p className="py-2">{session.legalUnit.siren}</p>
+          <Form className="flex-grow-1">
+            <Form.Group
+              as={Row}
+              controlId="formComparativeDivision"
+              className="my-2"
+            >
+              <Col sm={8}>
+                <Select
+                  styles={customSelectStyles}
+                  options={divisionsOptions}
+                  components={{
+                    IndicatorSeparator: () => null,
+                  }}
+                  value={{
+                    label:
+                      selectedDivision + " - " + divisions[selectedDivision],
+                    value: selectedDivision,
+                  }}
+                  placeholder="Choisissez une division"
+                  onChange={handleDivisionChange}
+                />
               </Col>
-            )}
-
-            <Col>
-              <p className="fw-bold col-form-label">Unité légale :</p>
-
-              <p className="py-2">{session.legalUnit.corporateName}</p>
-            </Col>
-            {session.legalUnit.activityCode && (
-              <Col>
-                <p className="fw-bold col-form-label">Code APE :</p>
-
-                <p className="py-2">{session.legalUnit.activityCode}</p>
-              </Col>
-            )}
-          </Row>
-          <div className="d-flex align-items-center">
-            <p className="fw-bold col-form-label me-2 mb-0 ">
-              Branche de comparaison :
-            </p>
-
-            <Form className="flex-grow-1">
-              <Form.Group
-                as={Row}
-                controlId="formComparativeDivision"
-                className="my-2"
-              >
-                <Col sm={8}>
-                  <Select
-                    styles={customSelectStyles}
-                    options={divisionsOptions}
-                    components={{
-                      IndicatorSeparator: () => null,
-                    }}
-                    value={{
-                      label:
-                        selectedDivision + " - " + divisions[selectedDivision],
-                      value: selectedDivision,
-                    }}
-                    placeholder="Choisissez une division"
-                    onChange={handleDivisionChange}
-                  />
-                </Col>
-              </Form.Group>
-            </Form>
-          </div>
+            </Form.Group>
+          </Form>
         </div>
-      </div>
-      {selectedDivision != "00" && (
-        <div className="box indic-result-menu">
+        <hr></hr>
+
+        <div className=" indic-result-menu">
           <div className="d-flex align-items-center justify-content-between">
-            <div className="d-flex align-items-center">
+           
               <DropdownButton
+                className="flex-grow-1 dropdown-container"
                 variant="light-secondary"
                 drop={"down-centered"}
                 key={"down-centered"}
                 id="dropdown-indics-button"
                 title={selectedIndicatorLabel}
+                disabled={selectedDivision == "00"}
               >
                 {selectedIndicator && (
                   <Dropdown.Item
@@ -257,7 +262,7 @@ const Results = ({ session, publish, goBack }) => {
                     );
                   })}
               </DropdownButton>
-            </div>
+         
             {selectedIndicator && (
               <Nav variant="underline" defaultActiveKey="/home">
                 <Nav.Item>
@@ -278,7 +283,7 @@ const Results = ({ session, publish, goBack }) => {
             )}
           </div>
         </div>
-      )}
+      </div>
 
       {(!selectedIndicator || !selectedDivision) && (
         <FootprintReport
@@ -325,9 +330,9 @@ const Results = ({ session, publish, goBack }) => {
       {isLoading && (
         <Loader title={"Récupération des données de comparaison ..."} />
       )}
-      <div className="box text-end">
-        <Button onClick={goBack} className="me-1">
-          Retour
+      <div className=" text-end">
+        <Button onClick={goBack} className="mb-4">
+          <i className="bi bi-chevron-left"></i> Retour aux déclarations
         </Button>
       </div>
     </Container>
