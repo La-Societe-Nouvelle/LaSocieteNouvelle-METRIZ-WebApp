@@ -16,25 +16,44 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
       {
         label: "Exercice",
         data: Object.values(productionFootprint),
-        fill: true,
-        backgroundColor: "rgba(250,89,95,0.4)",
+        fill: false,
         pointBackgroundColor: "rgb(250,89,95)",
-        pointBorderColor: "#fff",
+        pointBorderColor: "rgb(250,89,95)",
         pointHoverBackgroundColor: "#fff",
         pointHoverBorderColor: "rgb(255, 99, 132)",
       },
       {
         label: "Branche",
         data: Object.values(divisionFootprint),
-        fill: true,
-        backgroundColor: "rgba(255, 182, 66,0.4)",
+        fill: false,
         pointBackgroundColor: "rgb(255, 182, 66)",
-        pointBorderColor: "#fff",
-        pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: "rgb(255, 182, 66)",
+        pointBorderColor: "rgb(255, 182, 66)",
+        pointHoverBackgroundColor: "rgb(255, 182, 66)",
+        pointHoverBorderColor: "rgb(255, 99, 132)",
       },
     ],
   };
+
+  const datasetBorderColor = (context) => {
+    const datasetIndex = context.datasetIndex;
+  
+    const colors = [
+      "rgba(250,89,95,0.5)", 
+      "rgba(255, 182, 66, 0.5)", 
+    ];
+  
+    return colors[datasetIndex];
+  };
+
+  const datasetRadius = (context) => {
+    const datasetIndex = context.datasetIndex;
+  
+    const radius = [4,2
+    ];
+  
+    return radius[datasetIndex];
+  };
+
 
   const options = {
     devicePixelRatio: 2,
@@ -63,11 +82,12 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
 
     elements: {
       point: {
-        radius: 3, 
+        radius: datasetRadius, 
         hoverRadius: 3,
       },
       line: {
-        borderWidth: 0, 
+        borderWidth: 2, 
+        borderColor: datasetBorderColor,
       },
     },
     plugins: {
@@ -87,9 +107,14 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
           },
         },
       },
-        tooltip: {
-            
-    },
+      tooltip: {
+        backgroundColor: "rgba(25,21,88,0.9)",
+        padding: 15,
+        cornerRadius: 3,
+        usePointStyle: true,
+        intersect: false,
+
+      },
     },
   };
 

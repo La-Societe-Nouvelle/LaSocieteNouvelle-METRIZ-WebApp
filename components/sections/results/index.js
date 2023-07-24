@@ -130,6 +130,7 @@ const Results = ({ session, publish, goBack }) => {
 
     await generateDownloadableFiles(
       selectedFiles,
+      selectedIndicator,
       session,
       () => {
         setIsGenerating(false);
@@ -145,7 +146,7 @@ const Results = ({ session, publish, goBack }) => {
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
           <div className="d-flex">
-            <DownloadDropdown onDownload={handleDownload} />
+            <DownloadDropdown onDownload={handleDownload} view={selectedIndicator} />
 
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
