@@ -131,14 +131,6 @@ const Results = ({ session, publish, goBack }) => {
       prevPeriod
     );
   };
-const testFetch = async() =>{
-
-  
-  await fetchComparativeData(session.comparativeData,session.validations[
-    session.financialPeriod.periodKey
-  ] )
-
-}
   return (
     <Container fluid className="results">
       <div className="box">
@@ -150,9 +142,7 @@ const testFetch = async() =>{
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
             </Button>
-            <Button variant="info" onClick={testFetch}>
-            Test FETCH
-            </Button>
+   
           </div>
         </div>
         <p className="mb-4">
