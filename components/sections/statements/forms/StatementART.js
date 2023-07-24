@@ -15,7 +15,6 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
 
   const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
-
     switch (radioValue) {
       case "true":
         impactsData.isValueAddedCrafted = true;
@@ -36,8 +35,10 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
         onError("art", false);
         break;
     }
-    setCraftedProduction(impactsData.craftedProduction);
+ 
     onUpdate("art");
+    setCraftedProduction(impactsData.craftedProduction);
+
   };
 
   const handleIsValueAddedCrafted = (event) => {
