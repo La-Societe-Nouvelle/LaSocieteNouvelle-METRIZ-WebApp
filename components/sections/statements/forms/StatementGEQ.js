@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { ImportDSN } from "../modals/ImportDSN";
-import { IndividualsData } from "../modals/IndividualsData";
+import { ImportDSN } from "../modals/socialData/ImportDSN_b";
+import { IndividualsData } from "../modals/socialData/IndividualsData";
 
 const StatementGEQ = (props) => {
   const [wageGap, setWageGap] = useState(
@@ -14,11 +14,16 @@ const StatementGEQ = (props) => {
   const [isDisabled, setIsDisabled] = useState(false);
   const [showCalculatorModal, setShowCalulatorModal] = useState(false);
   const [showDSN, setShowDSN] = useState(false);
-  
+
   const hasEmployees = props.impactsData.hasEmployees;
 
   useEffect(() => {
+    if (props.impactsData.hasEmployees == false) {
+      props.onUpdate("geq");
+    }
+  }, []);
 
+  useEffect(() => {
     if (!props.impactsData.hasEmployees && wageGap === 0) {
       setIsDisabled(false);
     }
@@ -35,7 +40,6 @@ const StatementGEQ = (props) => {
     }
 
     if (wageGap !== valueOrDefault(props.impactsData.wageGap, "")) {
-     
       setWageGap(valueOrDefault(props.impactsData.wageGap, ""));
       props.onUpdate("geq");
     }
@@ -68,7 +72,6 @@ const StatementGEQ = (props) => {
     setWageGap(props.impactsData.wageGap);
     setIsDisabled(false);
     props.onUpdate("geq");
-
   };
 
   const updateInfo = (event) => setInfo(event.target.value);
@@ -77,9 +80,9 @@ const StatementGEQ = (props) => {
   return (
     <Form className="statement">
       <Row>
-      <Col lg={7}>
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column >
+            <Form.Label column lg={7}>
               L'entreprise est-elle employeur ?
             </Form.Label>
 
@@ -105,7 +108,7 @@ const StatementGEQ = (props) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column >
+            <Form.Label column lg={7}>
               Ecart de rémunérations Femmes/Hommes{" "}
               <span className="d-block small">
                 (en % du taux horaire brut moyen)
@@ -123,12 +126,38 @@ const StatementGEQ = (props) => {
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
+              <Button
+                variant="light-secondary"
+                className="btn-sm mt-1 me-2 rounded-2  w-100 p-1"
+                onClick={() => setShowDSN(true)}
+                disabled={hasEmployees ? false : true}
+              >
+                <i className="bi bi-upload me-1"></i>
+                &nbsp;Importer les DSN
+              </Button>
+
+              <Button
+                variant="light"
+                className="btn-sm mt-1 me-2 rounded-2 w-100 p-1 fw-bold"
+                onClick={() => setShowCalulatorModal(true)}
+                disabled={
+                  hasEmployees && props.impactsData.socialStatements.length > 0
+                    ? false
+                    : true
+                }
+              >
+                <i className="bi bi-pencil me-1"></i>
+                Gérer les données importées
+              </Button>
             </Col>
           </Form.Group>
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>            <Col>
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
+            <Col>
               <Form.Control
                 as="textarea"
                 rows={3}
@@ -140,27 +169,6 @@ const StatementGEQ = (props) => {
             </Col>
           </Form.Group>
         </Col>
-
-        <div className="my-3 text-end">
-          <Button
-            variant="light-secondary"
-            className="btn-sm me-2"
-            onClick={() => setShowDSN(true)}
-            disabled={hasEmployees ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Import Fichiers DSN
-          </Button>
-          <Button
-            variant="light-secondary"
-            className="btn-sm"
-            onClick={() => setShowCalulatorModal(true)}
-            disabled={hasEmployees ? false : true}
-          >
-            <i className="bi bi-calculator"></i>
-            &nbsp;Outil d'évaluation
-          </Button>
-        </div>
       </Row>
 
       <Modal
@@ -182,12 +190,7 @@ const StatementGEQ = (props) => {
         </Modal.Body>
       </Modal>
 
-      <Modal
-        show={showDSN}
-        size="xl"
-        centered
-        onHide={() => setShowCalulatorModal(false)}
-      >
+      <Modal show={showDSN} size="xl" centered onHide={() => setShowDSN(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Données sociales</Modal.Title>
         </Modal.Header>
