@@ -1,16 +1,19 @@
 import api from "../../config/api";
 import { endpoints } from "../../config/endpoint";
 
-export async function fetchMacrodata(dataset, activityCode, aggregate, indic) {
+export async function fetchMacrodata(dataset, activityCodes, indicators) {
+  const aggregates = ["CFC", "PRD", "NVA", "IC"];
+
   try {
     const response = await api.get(`/macrodata/${dataset}`, {
       params: {
-        division: activityCode,
-        aggregate: aggregate,
-        indic: indic,
+        division: activityCodes.join(" "),
+        aggregate: aggregates.join(" "),
+        indic: indicators.join(" "),
         area: "FRA",
       },
     });
+    
 
     if (response.data.header.code === 200) {
       return response.data.data;
@@ -18,116 +21,63 @@ export async function fetchMacrodata(dataset, activityCode, aggregate, indic) {
       return null;
     }
   } catch (error) {
+
     console.error(error);
     return null;
   }
 }
 
-export async function fetchComparativeDataForArea(
-  comparativeData,
-  indicator,
-  endpoints
-) {
-  const fetchDataPromises = [];
-
-  const aggregates = {
-    fixedCapitalConsumptions: "CFC",
-    production: "PRD",
-    netValueAdded: "NVA",
-    intermediateConsumptions: "IC",
-  };
-
-  for (const key in comparativeData) {
-    if (key !== "activityCode") {
-      const areaDataset = comparativeData[key].area;
-      const aggregate = aggregates[key];
-
-      fetchDataPromises.push(
-        fetchDataForDatasets(areaDataset, "00", aggregate, indicator, endpoints)
-      );
-    }
+export async function fetchComparativeData(comparativeData, validations) {
+  let activityCodes = ["00"];
+  if (comparativeData.activityCode && comparativeData.activityCode != "00") {
+    activityCodes.push(comparativeData.activityCode);
   }
 
-  await Promise.all(fetchDataPromises);
-}
+  let indicators = validations.map((validation) => validation.toUpperCase());
 
-export async function fetchComparativeDataForDivision(
-  comparativeData,
-  indicator,
-  endpoints
-) {
-  const fetchDataPromises = [];
+  const excludedIndicators = ["ART", "ECO", "IDR", "HAZ"];
 
-  const aggregates = {
-    fixedCapitalConsumptions: "CFC",
-    production: "PRD",
-    netValueAdded: "NVA",
-    intermediateConsumptions: "IC",
-  };
+  const indicatorsWithTarget = indicators.filter(
+    (indicator) => !excludedIndicators.includes(indicator)
+  );
 
-  const { activityCode } = comparativeData;
-
-  for (const key in comparativeData) {
-    if (key !== "activityCode") {
-      const divisionDataset = comparativeData[key].division;
-
-      const aggregate = aggregates[key];
-
-      fetchDataPromises.push(
-        fetchDataForDatasets(
-          divisionDataset,
-          activityCode,
-          aggregate,
-          indicator,
-          endpoints
-        )
-      );
-    }
-  }
-  await Promise.all(fetchDataPromises);
-}
-
-async function fetchDataForDatasets(
-  series,
-  activityCode,
-  aggregate,
-  indicator,
-  endpoints
-) {
-  const { macrodata, target, trend } = series;
-
-
-  const [macrodataResult, targetResult, trendResult] = await Promise.all([
-    fetchMacrodata(endpoints.macrodata, activityCode, aggregate, indicator),
-    fetchMacrodata(endpoints.target, activityCode, aggregate, indicator),
-    fetchMacrodata(endpoints.trend, activityCode, aggregate, indicator)
+  const [macrodata, target, trend] = await Promise.all([
+    fetchMacrodata(endpoints.macrodata, activityCodes, indicators),
+    fetchMacrodata(endpoints.target, activityCodes, indicatorsWithTarget),
+    fetchMacrodata(endpoints.trend, activityCodes, indicators),
   ]);
 
+  const aggregates = {
+    CFC: "fixedCapitalConsumptions",
+    PRD: "production",
+    NVA: "netValueAdded",
+    IC: "intermediateConsumptions",
+  };
 
-  if (macrodataResult !== null) {
-    macrodata.data[indicator] = macrodataResult;
+  // 2. Organisez les données dans comparativeData
+  const datasets = { macrodata, target, trend };
+  for (const [serie, results] of Object.entries(datasets)) {
+    for (const result of results) {
+      const { aggregate, division, indic } = result;
+
+      const aggregateKey = aggregates[aggregate];
+      const activityCodeKey = division == "00" ? "area" : "division";
+
+      const dataSeries =
+        comparativeData[aggregateKey][activityCodeKey][serie].data;
+
+      // Assurez-vous que l'indicateur est un tableau dans dataSeries
+      dataSeries[indic] = dataSeries[indic] || [];
+
+      // Ajoutez l'objet data au tableau correspondant à l'indicateur
+      dataSeries[indic].push(result);
+      dataSeries[indic].sort((a, b) => a.year - b.year);
+    }
   }
-  if (targetResult !== null) {
-    target.data[indicator] = targetResult;
-  }
-  if (trendResult !== null) {
-    trend.data[indicator] = trendResult;
-  }
+
+
 }
 
 
-
-// ...
-
-export async function fetchMacroDataForIndicators(session, indicators) {
-  const areaPromises = indicators.map(indic => fetchComparativeDataForArea(session.comparativeData, indic, endpoints));
-
-  await Promise.all(areaPromises);
-
-  if (session.comparativeData.activityCode !== "00") {
-    const divisionPromises = indicators.map(indic => fetchComparativeDataForDivision(session.comparativeData, indic, endpoints));
-    await Promise.all(divisionPromises);
-  }
-}
 
 

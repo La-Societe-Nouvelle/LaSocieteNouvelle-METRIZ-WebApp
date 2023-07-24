@@ -16,7 +16,6 @@ import {
 import divisions from "/lib/divisions";
 import indicators from "/lib/indics";
 
-import { endpoints } from "../../../config/endpoint";
 import { customSelectStyles } from "../../../config/customStyles";
 
 import { getPrevDate } from "../../../src/utils/Utils";
@@ -28,7 +27,7 @@ import { ChartsContainer } from "./components/ChartsContainer";
 import { Loader } from "../../popups/Loader";
 
 import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
-import { fetchComparativeDataForDivision } from "../../../src/services/MacrodataService";
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
 const Results = ({ session, publish, goBack }) => {
   const [divisionsOptions, setDivisionsOptions] = useState([]);
@@ -69,19 +68,12 @@ const Results = ({ session, publish, goBack }) => {
       setIsLoading(true);
 
       const fetchData = async () => {
+
         session.comparativeData.activityCode = selectedDivision;
-
-        for await (const validation of session.validations[
+        await fetchComparativeData(session.comparativeData,session.validations[
           session.financialPeriod.periodKey
-        ]) {
-          const indicatorCode = validation.toUpperCase();
+        ] )
 
-          await fetchComparativeDataForDivision(
-            session.comparativeData,
-            indicatorCode,
-            endpoints
-          );
-        }
 
         if (!isCancelled) {
           setIsLoading(false);
@@ -139,7 +131,14 @@ const Results = ({ session, publish, goBack }) => {
       prevPeriod
     );
   };
+const testFetch = async() =>{
 
+  
+  await fetchComparativeData(session.comparativeData,session.validations[
+    session.financialPeriod.periodKey
+  ] )
+
+}
   return (
     <Container fluid className="results">
       <div className="box">
@@ -150,6 +149,9 @@ const Results = ({ session, publish, goBack }) => {
 
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
+            </Button>
+            <Button variant="info" onClick={testFetch}>
+            Test FETCH
             </Button>
           </div>
         </div>

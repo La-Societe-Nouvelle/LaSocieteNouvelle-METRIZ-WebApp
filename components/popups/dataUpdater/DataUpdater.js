@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
-import { fetchMacroDataForIndicators } from "../../../src/services/MacrodataService";
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import UpdateDataView from "./UpdatedDataView";
 
 export const DataUpdater = ({
@@ -100,10 +100,9 @@ const fetchLatestData = async (updatedSession) => {
 
   // Récupère les dernières données comparatives
 
-  const indicators = validations.map((indic) => indic.toUpperCase());
 
   if (indicators.length > 0) {
-    await fetchMacroDataForIndicators(updatedSession, indicators);
+    await fetchComparativeData(updatedSession, validations);
   }
 };
 
