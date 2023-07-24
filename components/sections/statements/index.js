@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
 import { Loader } from "../../popups/Loader";
-import { fetchMacroDataForIndicators } from "../../../src/services/MacrodataService";
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 import indicators from "/lib/indics";
 
@@ -34,7 +34,7 @@ const DirectImpacts = ({ session, submit }) => {
       }
     }
     if (missingIndicators.length > 0) {
-      await fetchMacroDataForIndicators(session, missingIndicators);
+      await fetchComparativeData(session.comparativeData, missingIndicators);
     }
 
     setIsLoading(false);

@@ -84,7 +84,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               <div className="step-name">Traitement des fournisseurs</div>
             </div>
             <div
-              className={"stepper-item" + (stepMax > 4 ? " completed" : "")}
+              className={"stepper-item" + (stepMax >= 4 ? " completed" : "")}
             >
               <button
                 className={"step-counter" + (step == 4 ? " current" : "")}

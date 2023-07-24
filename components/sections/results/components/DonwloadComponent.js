@@ -1,6 +1,5 @@
 import React from "react";
 import { Button } from "react-bootstrap";
-import ZipGenerator from "/src/writers/deliverables/ZIPGenerator";
 
 const DonwloadComponent = () => {
   return (

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Dropdown, Form } from "react-bootstrap";
 
 const DownloadDropdown = ({ onDownload, view }) => {
-  {console.log(view)}
+
   const currentViewFiles = [
     {
       id: "sig-indic-xlsx",

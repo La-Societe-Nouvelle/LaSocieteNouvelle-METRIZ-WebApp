@@ -12,7 +12,7 @@ import {
   getGenderWageGap,
   getIndividualsData,
   getInterdecileRange,
-} from "./ImportDSN_b";
+} from "./ImportDSN";
 import TableRow from "../components/TableRow";
 
 /* -------------------- INDIVIDUALS DATA FOR SOCIAL FOOTPRINT -------------------- */
