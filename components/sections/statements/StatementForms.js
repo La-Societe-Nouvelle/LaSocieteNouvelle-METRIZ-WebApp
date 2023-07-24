@@ -68,9 +68,8 @@ const StatementForms = ({
   };
 
   const handleNetValueChange = async (indic) => {
-
     session.getNetValueAddedIndicator(indic, period.periodKey);
-    
+
     if (!declaredIndicators.includes(indic)) {
       setDeclaredIndicators([...declaredIndicators, indic]);
     }
@@ -88,7 +87,7 @@ const StatementForms = ({
         prevSelectedIndicators.filter((indicator) => indicator !== value)
       );
       setDeclaredIndicators((prevDeclaredIndicators) =>
-      prevDeclaredIndicators.filter((indicator) => indicator !== value)
+        prevDeclaredIndicators.filter((indicator) => indicator !== value)
       );
       setInvalidStatements((prevInvalidIndicators) => {
         const updatedInvalidIndicators = { ...prevInvalidIndicators };
@@ -151,6 +150,15 @@ const StatementForms = ({
     }
   };
 
+const toggleCheckbox = (key) => {
+  setSelectedIndicators((prevSelectedIndicators) =>
+      prevSelectedIndicators.includes(key)
+        ? prevSelectedIndicators.filter((indicator) => indicator !== key)
+        : [...prevSelectedIndicators, key]
+    );
+};
+
+
   const renderIndicators = (category) => {
     const filteredIndicators = Object.entries(indicators).filter(
       ([key, value]) => value.isAvailable && value.category === category
@@ -158,38 +166,45 @@ const StatementForms = ({
 
     return filteredIndicators.map(([key, value]) => (
       <div key={key} className="border rounded mb-3 indic-statement bg-light">
-        <div className="d-flex align-items-center px-2 py-3">
-          <Form className="indic-form me-3">
-            <Form.Check
-              type="checkbox"
-              value={key}
-              checked={selectedIndicators.includes(key)}
-              onChange={handleCheckboxChange}
-            />
+        <div className="d-flex align-items-center px-2 py-3  " id={key}>
+          <Form className="indic-form">
+            <Form.Group key={key}>
+              <Form.Check
+                type="checkbox"
+                value={key}
+                checked={selectedIndicators.includes(key)}
+                onChange={handleCheckboxChange}
+                label={
+                  <Form.Check.Label  onClick={() => toggleCheckbox(key)}>
+                    <div className="d-flex align-items-center">
+                      <Image
+                        className="mx-2"
+                        src={`icons-ese/logo_ese_${key}_bleu.svg`}
+                        alt={key}
+                        height={20}
+                      />
+                      <h4 className="my-1">
+                        {value.libelle}
+                        {value.isBeta && (
+                          <span className="beta ms-1">BETA</span>
+                        )}
+                      </h4>
+                    </div>
+                  </Form.Check.Label>
+                }
+              />
+            </Form.Group>
           </Form>
-          <div className="d-flex align-items-center flex-grow-1 ">
-            <Image
-              className="me-2"
-              src={`icons-ese/logo_ese_${key}_bleu.svg`}
-              alt={key}
-              height={20}
-            />
-            <h4>
-              {value.libelle}
-              {value.isBeta && <span className="beta ms-1">BETA</span>}
-            </h4>
-            <div className="text-end flex-grow-1">
-              <Button
-                variant="light"
-                className="text-primary"
-                size="sm"
-                onClick={() => handleModalOpen(key)}
-              >
-                Informations
-
-                <i className="ms-2 bi bi-info-circle-fill"></i>
-              </Button>
-            </div>
+          <div className="text-end flex-grow-1">
+            <Button
+              variant="light"
+              className="text-primary"
+              size="sm"
+              onClick={() => handleModalOpen(key)}
+            >
+              Informations
+              <i className="ms-2 bi bi-info-circle-fill"></i>
+            </Button>
           </div>
         </div>
 
