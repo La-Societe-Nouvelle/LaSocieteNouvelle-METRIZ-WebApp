@@ -24,7 +24,7 @@ export const analysisTextWriterECO = (props) => {
 
   currentParagraph = [];
 
-  if (impactsData.isAllActivitiesInFrance) {
+  if (impactsData.isAllActivitiesInFrance == true) {
     currentParagraph.push(
       "Les activités de l'entreprise sont localisées en France et contribuent, de ce fait, entièrement à l'économie nationale."
     );
@@ -38,7 +38,7 @@ export const analysisTextWriterECO = (props) => {
         impactsData.domesticProduction +
         "€, soit " +
         mainAggregates.netValueAdded.periodsData[period.periodKey].footprint
-          .indicators.eco.value +
+          .indicators.eco.value.toFixed(1) +
         "% de la valeur ajoutée."
     );
   }

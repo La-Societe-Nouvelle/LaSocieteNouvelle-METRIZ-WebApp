@@ -12,7 +12,9 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
 
   const onIsAllActivitiesInFranceChange = (event) => {
     const radioValue = event.target.value;
-  
+    onUpdate("eco"); 
+   console.log(impactsData.netValueAdded)
+
     switch (radioValue) {
       case "true":
         impactsData.isAllActivitiesInFrance = true;
@@ -31,9 +33,8 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
         onError("eco", false);
         break;
     }
-
+    console.log(impactsData.domesticProduction);
     setDomesticProduction(impactsData.domesticProduction);
-    onUpdate("eco"); 
   };
 
   const updateDomesticProduction = (event) => {

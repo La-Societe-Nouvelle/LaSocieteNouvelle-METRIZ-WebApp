@@ -7,7 +7,6 @@ import UpdateDataView from "./UpdatedDataView";
 
 export const DataUpdater = ({
   session,
-  downloadSession,
   updatePrevSession,
 }) => {
   const [show, setShow] = useState(true);
@@ -45,7 +44,6 @@ export const DataUpdater = ({
           <UpdateDataView
             prevSession={session}
             updatedSession={updatedSession}
-            downloadSession={downloadSession}
             close={() => setShow(false)}
             updatePrevSession={updatePrevSession}
           ></UpdateDataView>
@@ -101,8 +99,8 @@ const fetchLatestData = async (updatedSession) => {
   // Récupère les dernières données comparatives
 
 
-  if (indicators.length > 0) {
-    await fetchComparativeData(updatedSession, validations);
+  if (validations.length > 0) {
+    await fetchComparativeData(updatedSession.comparativeData, validations);
   }
 };
 

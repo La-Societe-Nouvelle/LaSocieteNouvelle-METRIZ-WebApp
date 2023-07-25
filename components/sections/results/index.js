@@ -18,18 +18,20 @@ import indicators from "/lib/indics";
 
 import { customSelectStyles } from "../../../config/customStyles";
 
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
+
 import { getPrevDate } from "../../../src/utils/Utils";
+import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
 import ExtraFinancialReport from "./components/ExtraFinancialReport";
 import FootprintReport from "./components/FootprintReport";
 import DownloadDropdown from "./components/DownloadDropdown";
 import { ChartsContainer } from "./components/ChartsContainer";
+
 import { Loader } from "../../popups/Loader";
 
-import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
-import { fetchComparativeData } from "../../../src/services/MacrodataService";
-
 const Results = ({ session, publish, goBack }) => {
+
   const [divisionsOptions, setDivisionsOptions] = useState([]);
   const [selectedDivision, setSelectedDivision] = useState(
     session.comparativeData.activityCode
@@ -50,6 +52,8 @@ const Results = ({ session, publish, goBack }) => {
     (period) => period.dateEnd == prevDateEnd
   );
 
+
+
   useEffect(() => {
     window.scroll(0, 0);
 
@@ -68,12 +72,11 @@ const Results = ({ session, publish, goBack }) => {
       setIsLoading(true);
 
       const fetchData = async () => {
-
         session.comparativeData.activityCode = selectedDivision;
-        await fetchComparativeData(session.comparativeData,session.validations[
-          session.financialPeriod.periodKey
-        ] )
-
+        await fetchComparativeData(
+          session.comparativeData,
+          session.validations[session.financialPeriod.periodKey]
+        );
 
         if (!isCancelled) {
           setIsLoading(false);
@@ -137,12 +140,14 @@ const Results = ({ session, publish, goBack }) => {
         <div className="d-flex justify-content-between mb-3">
           <h2>Etape 5 - Empreinte Sociétale </h2>
           <div className="d-flex">
-            <DownloadDropdown onDownload={handleDownload} view={selectedIndicator} />
+            <DownloadDropdown
+              onDownload={handleDownload}
+              view={selectedIndicator}
+            />
 
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
             </Button>
-   
           </div>
         </div>
         <p className="mb-4">
@@ -207,55 +212,52 @@ const Results = ({ session, publish, goBack }) => {
 
         <div className=" indic-result-menu">
           <div className="d-flex align-items-center justify-content-between">
-           
-              <DropdownButton
-                className="flex-grow-1 dropdown-container"
-                variant="light-secondary"
-                drop={"down-centered"}
-                key={"down-centered"}
-                id="dropdown-indics-button"
-                title={selectedIndicatorLabel}
-                disabled={selectedDivision == "00"}
-              >
-                {selectedIndicator && (
-                  <Dropdown.Item
-                    onClick={() =>
-                      handleIndicatorChange(
-                        null,
-                        " Empreinte Sociale et environnementale"
-                      )
-                    }
-                  >
-                    Empreinte Sociale et environnementale
-                  </Dropdown.Item>
-                )}
+            <DropdownButton
+              className="flex-grow-1 dropdown-container"
+              variant="light-secondary"
+              drop={"down-centered"}
+              key={"down-centered"}
+              id="dropdown-indics-button"
+              title={selectedIndicatorLabel}
+              disabled={selectedDivision == "00"}
+            >
+              {selectedIndicator && (
+                <Dropdown.Item
+                  onClick={() =>
+                    handleIndicatorChange(
+                      null,
+                      " Empreinte Sociale et environnementale"
+                    )
+                  }
+                >
+                  Empreinte Sociale et environnementale
+                </Dropdown.Item>
+              )}
 
-                {Object.entries(indicators)
-                  .filter(([indic]) =>
-                    session.validations[financialPeriod].includes(indic)
-                  )
-                  .map(([code, indic]) => {
-                    if (code === selectedIndicator) return null;
+              {Object.entries(indicators)
+                .filter(([indic]) =>
+                  session.validations[financialPeriod].includes(indic)
+                )
+                .map(([code, indic]) => {
+                  if (code === selectedIndicator) return null;
 
-                    return (
-                      <Dropdown.Item
-                        key={code}
-                        onClick={() =>
-                          handleIndicatorChange(code, indic.libelle)
-                        }
-                      >
-                        <Image
-                          className="me-2"
-                          src={`icons-ese/logo_ese_${code}_bleu.svg`}
-                          alt={code}
-                          height={20}
-                        />
-                        {indic.libelle}
-                      </Dropdown.Item>
-                    );
-                  })}
-              </DropdownButton>
-         
+                  return (
+                    <Dropdown.Item
+                      key={code}
+                      onClick={() => handleIndicatorChange(code, indic.libelle)}
+                    >
+                      <Image
+                        className="me-2"
+                        src={`icons-ese/logo_ese_${code}_bleu.svg`}
+                        alt={code}
+                        height={20}
+                      />
+                      {indic.libelle}
+                    </Dropdown.Item>
+                  );
+                })}
+            </DropdownButton>
+
             {selectedIndicator && (
               <Nav variant="underline" defaultActiveKey="/home">
                 <Nav.Item>
@@ -328,6 +330,7 @@ const Results = ({ session, publish, goBack }) => {
           <i className="bi bi-chevron-left"></i> Retour aux déclarations
         </Button>
       </div>
+
     </Container>
   );
 };

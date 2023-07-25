@@ -45,10 +45,10 @@ const StatementForms = ({
         declaredIndicators.includes(indicator)
     );
 
-    const missingStatements = selectedIndicators.filter(
-      (indicator) => !declaredIndicators.includes(indicator)
+    const missingStatements = verifySelectedIndicators(
+      selectedIndicators,
+      session.impactsData[period.periodKey]
     );
-
     // Update validations for ValidStatements here
     updateValidations(
       ValidStatements,
@@ -150,14 +150,13 @@ const StatementForms = ({
     }
   };
 
-const toggleCheckbox = (key) => {
-  setSelectedIndicators((prevSelectedIndicators) =>
+  const toggleCheckbox = (key) => {
+    setSelectedIndicators((prevSelectedIndicators) =>
       prevSelectedIndicators.includes(key)
         ? prevSelectedIndicators.filter((indicator) => indicator !== key)
         : [...prevSelectedIndicators, key]
     );
-};
-
+  };
 
   const renderIndicators = (category) => {
     const filteredIndicators = Object.entries(indicators).filter(
@@ -175,7 +174,7 @@ const toggleCheckbox = (key) => {
                 checked={selectedIndicators.includes(key)}
                 onChange={handleCheckboxChange}
                 label={
-                  <Form.Check.Label  onClick={() => toggleCheckbox(key)}>
+                  <Form.Check.Label onClick={() => toggleCheckbox(key)}>
                     <div className="d-flex align-items-center">
                       <Image
                         className="mx-2"
@@ -251,6 +250,49 @@ const toggleCheckbox = (key) => {
       )}
     </>
   );
+};
+
+const verifySelectedIndicators = (selectedIndicators, impactsData) => {
+
+  const propertiesToCheck = {
+    eco: ["isAllActivitiesInFrance", "domesticProduction"],
+    art: ["isValueAddedCrafted", "craftedProduction"],
+    soc: ["hasSocialPurpose"],
+    idr: ["hasEmployees", "interdecileRange"],
+    geq: ["hasEmployees", "wageGap"],
+    knw: ["researchAndTrainingContribution"],
+    ghg: ["greenhousesGazEmissions", "greenhousesGazEmissionsUncertainty"],
+    haz: [
+      "hazardousSubstancesConsumption",
+      "hazardousSubstancesConsumptionUncertainty",
+    ],
+    mat: [
+      "isExtractiveActivities",
+      "materialsExtraction",
+      "materialsExtractionUncertainty",
+    ],
+    nrg: ["energyConsumption", "energyConsumptionUncertainty"],
+    was: ["wasteProduction", "wasteProductionUncertainty"],
+    wat: ["waterConsumption", "waterConsumptionUncertainty"],
+  };
+
+  const missingIndicators = [];
+
+  for (const indicator of selectedIndicators) {
+    const properties = propertiesToCheck[indicator];
+    if (properties) {
+      const isIndicatorMissing = properties.some(
+        (property) =>
+          impactsData[property] === null ||
+          impactsData[property] === undefined
+      );
+      if (isIndicatorMissing) {
+        missingIndicators.push(indicator);
+      }
+    }
+  }
+
+  return missingIndicators;
 };
 
 export default StatementForms;

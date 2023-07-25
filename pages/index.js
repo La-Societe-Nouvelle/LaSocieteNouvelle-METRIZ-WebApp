@@ -26,6 +26,7 @@ import { updateVersion } from "/src/version/updateVersion";
 import { Footer } from "/components/parts/Footer";
 import { Mobile } from "/components/Mobile";
 import { DataUpdater } from "/components/popups/dataUpdater/DataUpdater";
+import SaveModal from "../components/popups/SaveModal";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -94,45 +95,51 @@ class Metriz extends React.Component {
       step: 0,
       loading: false,
       showDataUpdater: false,
+      showSaveModal: false,
     };
   }
 
-  
-  
+
+  handleCloseModal = () => {
+    this.setState({ showSaveModal: false });
+  };
+
   render() {
-    const { step, session, showDataUpdater } = this.state;
-    
+    const { step, session, showDataUpdater, showSaveModal } = this.state;
+
     return (
       <>
         <div
           className={step == 0 ? "wrapper bg-white" : "wrapper"}
           id="wrapper"
         >
-
           {step == 0 ? (
             <Header />
           ) : step == 6 ? (
-            <HeaderPublish
-              setStep={this.setStep}
-              downloadSession={this.downloadSession}
-            />
+            <HeaderPublish setStep={this.setStep} session={session} />
           ) : (
             <HeaderSection
               step={step}
               stepMax={session.progression}
               setStep={this.setStep}
-              downloadSession={this.downloadSession}
+              session={session}
             />
           )}
 
           {showDataUpdater && (
             <DataUpdater
               session={session}
-              downloadSession={this.downloadSession}
               updatePrevSession={this.updatePrevSession}
             ></DataUpdater>
           )}
 
+          {showSaveModal && (
+            <SaveModal
+              show={showSaveModal}
+              handleClose={this.handleCloseModal}
+              session={session}
+            />
+          )}
           {this.buildSectionView(step)}
         </div>
 
@@ -144,29 +151,6 @@ class Metriz extends React.Component {
   // change session
   setStep = (nextStep) => this.setState({ step: nextStep });
 
-  // download session (session -> JSON data)
-  downloadSession = async () => {
-    // build JSON
-    const session = this.state.session;
-    const fileName = session.legalUnit.siren
-      ? "session-metriz-" +
-        session.legalUnit.siren +
-        "-" +
-        session.financialPeriod.periodKey.slice(2)
-      : "session-metriz-" +
-        session.legalUnit.corporateName +
-        "-" +
-        session.financialPeriod.periodKey.slice(2); // To update
-    const json = JSON.stringify(session);
-
-    // build download link & activate
-    const blob = new Blob([json], { type: "application/json" });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = fileName + ".json";
-    link.click();
-  };
   // Update previous session with updated session
   updatePrevSession = (updatedSession) => {
     this.setState({
@@ -245,11 +229,13 @@ class Metriz extends React.Component {
         );
       case 5:
         return (
-          <Results
-            {...sectionProps}
-            goBack={() => this.setStep(4)}
-            publish={() => this.setStep(6)}
-          />
+          <>
+            <Results
+              {...sectionProps}
+              goBack={() => this.setStep(4)}
+              publish={() => this.setStep(6)}
+            />
+          </>
         );
       case 6:
         return (
@@ -311,6 +297,8 @@ class Metriz extends React.Component {
     console.log("Indicateurs déclarés");
 
     this.setStep(5);
+    this.setState({ showSaveModal: true });
+
     this.updateProgression(4);
   };
 
@@ -319,6 +307,5 @@ class Metriz extends React.Component {
       step + 1,
       this.state.session.progression
     );
-   
   };
 }

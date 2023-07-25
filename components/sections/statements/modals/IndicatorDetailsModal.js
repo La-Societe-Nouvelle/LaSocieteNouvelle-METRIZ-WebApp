@@ -102,7 +102,7 @@ const IndicatorARTcontent = () => (
     {indicators["art"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
+          className="mt-2 me-1"
           src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
@@ -133,8 +133,8 @@ const IndicatorECOcontent = () => (
     {indicators["eco"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -190,8 +190,8 @@ const IndicatorGEQcontent = () => (
     {indicators["geq"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -298,8 +298,8 @@ const IndicatorGHGcontent = () => (
     {indicators["ghg"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -332,8 +332,8 @@ const IndicatorHAZcontent = () => (
     {indicators["haz"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -386,8 +386,8 @@ const IndicatorIDRcontent = () => (
     {indicators["idr"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -443,8 +443,8 @@ const IndicatorKNWcontent = () => (
     {indicators["knw"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -477,8 +477,8 @@ const IndicatorMATcontent = () => (
     {indicators["mat"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -552,8 +552,8 @@ const IndicatorNRGcontent = () => (
     {indicators["nrg"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -573,8 +573,8 @@ const IndicatorSOCcontent = () => (
     {indicators["soc"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -597,8 +597,8 @@ const IndicatorWATcontent = () => (
     {indicators["wat"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );
@@ -626,8 +626,8 @@ const IndicatorWAScontent = () => (
     {indicators["was"].odds.map((odd) => {
       return (
         <Image
-          className="mt-2"
-          src={`/odd/F-WEB-Goal-${odd}.png`}
+        className="mt-2 me-1"
+        src={`/odd/F-WEB-Goal-${odd}.png`}
           width={65}
         ></Image>
       );

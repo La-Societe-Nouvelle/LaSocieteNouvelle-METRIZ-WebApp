@@ -3,12 +3,12 @@
 // React
 import React from "react";
 import { Button, Container, Row } from "react-bootstrap";
+import { downloadSession } from "../../../src/utils/Utils";
 
 /* -------------------- HEADER -------------------- */
 
-export function HeaderPublish({ setStep, downloadSession }) {
+export function HeaderPublish({ setStep, session }) {
   const refresh = () => location.reload(true);
-  const saveSession = () => downloadSession();
   return (
     <header>
       <div className="top-bar mb-2">
@@ -35,7 +35,7 @@ export function HeaderPublish({ setStep, downloadSession }) {
         <Button
           className="btn-sm me-4 my-2 p-2"
           variant="secondary"
-          onClick={saveSession}
+          onClick={() => downloadSession(session)}
         >
           <i className="bi bi-arrow-down"></i>
           Sauvegarder ma session

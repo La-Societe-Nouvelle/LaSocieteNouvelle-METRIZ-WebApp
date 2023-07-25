@@ -3,12 +3,13 @@
 // React
 import React from "react";
 import { Button, Container, Navbar} from "react-bootstrap";
+import { downloadSession } from "../../../src/utils/Utils";
 
 /* -------------------- HEADER -------------------- */
 
-export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
+export function HeaderSection({ step, stepMax, setStep,session }) {
   const refresh = () => location.reload(true);
-  const saveSession = () => downloadSession();
+  console.log(session)
   return (
     <header>
       <div className="top-bar">
@@ -32,7 +33,7 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
             </a>
           </li>
         </ul>
-        <Button className="btn-sm me-4 my-2 p-2" variant="secondary" onClick={saveSession}>
+        <Button className="btn-sm me-4 my-2 p-2" variant="secondary" onClick={()=> downloadSession(session)}>
         <i className="bi bi-arrow-down"></i>
           Sauvegarder ma session
         </Button>

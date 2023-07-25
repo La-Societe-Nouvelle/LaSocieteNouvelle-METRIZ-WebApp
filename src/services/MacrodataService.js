@@ -41,7 +41,9 @@ export async function fetchComparativeData(comparativeData, validations) {
 
   const [macrodata, target, trend] = await Promise.all([
     fetchMacrodata(endpoints.macrodata, activityCodes, indicators),
-    fetchMacrodata(endpoints.target, activityCodes, indicatorsWithTarget),
+    indicatorsWithTarget.length > 0
+      ? fetchMacrodata(endpoints.target, activityCodes, indicatorsWithTarget)
+      : Promise.resolve([]),
     fetchMacrodata(endpoints.trend, activityCodes, indicators),
   ]);
 
