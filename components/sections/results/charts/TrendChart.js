@@ -228,7 +228,7 @@ if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filt
         },
         callbacks: {
           title: function (tooltipItems, data) {
-            if (tooltipItems) {
+            if (tooltipItems.length > 0) {
               let date = new Date(tooltipItems[0].raw.x);
               let year = date.getFullYear();
               return year;
