@@ -13,7 +13,6 @@ export async function fetchMacrodata(dataset, activityCodes, indicators) {
         area: "FRA",
       },
     });
-    
 
     if (response.data.header.code === 200) {
       return response.data.data;
@@ -21,7 +20,6 @@ export async function fetchMacrodata(dataset, activityCodes, indicators) {
       return null;
     }
   } catch (error) {
-
     console.error(error);
     return null;
   }
@@ -54,7 +52,6 @@ export async function fetchComparativeData(comparativeData, validations) {
     IC: "intermediateConsumptions",
   };
 
-  // 2. Organisez les données dans comparativeData
   const datasets = { macrodata, target, trend };
   for (const [serie, results] of Object.entries(datasets)) {
     for (const result of results) {
@@ -66,18 +63,23 @@ export async function fetchComparativeData(comparativeData, validations) {
       const dataSeries =
         comparativeData[aggregateKey][activityCodeKey][serie].data;
 
-      // Assurez-vous que l'indicateur est un tableau dans dataSeries
+      // Initialize dataSeries[indic] as an empty array if it doesn't exist
       dataSeries[indic] = dataSeries[indic] || [];
 
-      // Ajoutez l'objet data au tableau correspondant à l'indicateur
-      dataSeries[indic].push(result);
-      dataSeries[indic].sort((a, b) => a.year - b.year);
+      // Check if the indicator already exists in dataSeries[indic]
+      const existingIndex = dataSeries[indic]?.findIndex(
+        (item) => item.division !== division
+      );
+
+      if (existingIndex !== -1) {
+        // update the existing data
+        dataSeries[indic][existingIndex] = result;
+        dataSeries[indic].sort((a, b) => a.year - b.year);
+      } else {
+        // If not, add the new data as a new element to the array
+        dataSeries[indic].push(result);
+        dataSeries[indic].sort((a, b) => a.year - b.year);
+      }
     }
   }
-
-
 }
-
-
-
-
