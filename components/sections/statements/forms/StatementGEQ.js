@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { ImportDSN } from "../modals/socialData/ImportDSN";
+import  ImportDSN  from "../modals/socialData/ImportDSN";
 import { IndividualsData } from "../modals/socialData/IndividualsData";
 
 const StatementGEQ = (props) => {
