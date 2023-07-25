@@ -64,14 +64,25 @@ export async function fetchComparativeData(comparativeData, validations) {
       const activityCodeKey = division == "00" ? "area" : "division";
 
       const dataSeries =
-        comparativeData[aggregateKey][activityCodeKey][serie].data;
+      comparativeData[aggregateKey][activityCodeKey][serie].data;
 
-      // Assurez-vous que l'indicateur est un tableau dans dataSeries
-      dataSeries[indic] = dataSeries[indic] || [];
+    // Check if the indicator already exists in dataSeries[indic]
+    const existingIndex = dataSeries[indic]?.findIndex(
+      (item) => item.division !== division
+    );
 
-      // Ajoutez l'objet data au tableau correspondant à l'indicateur
+    if (existingIndex !== -1) {
+      // update the existing data
+      dataSeries[indic][existingIndex] = result;
+      dataSeries[indic].sort((a, b) => a.year - b.year);
+
+    } else {
+      // If not, add the new data as a new element to the array
       dataSeries[indic].push(result);
       dataSeries[indic].sort((a, b) => a.year - b.year);
+    }
+
+
     }
   }
 
