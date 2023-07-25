@@ -61,7 +61,7 @@ export async function fetchComparativeData(comparativeData, validations) {
       const activityCodeKey = division == "00" ? "area" : "division";
 
       const dataSeries =
-        comparativeData[aggregateKey][activityCodeKey][serie].data;
+      comparativeData[aggregateKey][activityCodeKey][serie].data;
 
       // Initialize dataSeries[indic] as an empty array if it doesn't exist
       dataSeries[indic] = dataSeries[indic] || [];
@@ -81,5 +81,5 @@ export async function fetchComparativeData(comparativeData, validations) {
         dataSeries[indic].sort((a, b) => a.year - b.year);
       }
     }
-  }
+    }
 }
