@@ -2,6 +2,25 @@
 /* -------------------------------------------------- UTILS FUNCTIONS -------------------------------------------------- */
 /* --------------------------------------------------------------------------------------------------------------------- */
 
+
+  // download session (session -> JSON data)
+  export const downloadSession = async (session) => {
+    const { legalUnit, financialPeriod } = session;
+    const siren = legalUnit.siren || legalUnit.corporateName;
+    const periodKey = financialPeriod.periodKey.slice(2);
+  
+    const fileName = `session-metriz-${siren}-${periodKey}`;
+    const json = JSON.stringify(session);
+    const blob = new Blob([json], { type: "application/json" });
+    const href = URL.createObjectURL(blob);
+  
+    const link = document.createElement("a");
+    link.href = href;
+    link.download = `${fileName}.json`;
+    link.click();
+  };
+  
+
 /* -------------------------- PRINT FUNCTIONS -------------------------- */
 // to format values
 

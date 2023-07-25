@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import metaIndics from "/lib/indics";
-import { isObjEmpty } from "../../../src/utils/Utils";
+import { downloadSession, isObjEmpty } from "../../../src/utils/Utils";
 
 const UpdateDataView = (props) => {
 
@@ -135,7 +135,7 @@ const UpdateDataView = (props) => {
       <Button
         variant="secondary"
         className="me-1 my-2"
-        onClick={props.downloadSession}
+        onClick={() => downloadSession(props.updatedSession)}
       >
         Sauvegarder ma session
       </Button>
