@@ -661,6 +661,7 @@ export async function FECDataReader(FECData) {
   // Reader data ---------------------------------------------------------------------------------------- //
   data.ignoreAmortisationEntries = [];
   data.ignoreStockVariationsEntries = [];
+  data.ignoreExternalExpensesEntries = [];
   data.errors = [];
 
   // Production / Incomes ------------------------------------------------------------------------------- //
@@ -1295,42 +1296,67 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
 
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
 
-  if (/^6(0[^3]|[1-2])/.test(ligneCourante.CompteNum)) {
+  if (/^6(0[^3]|[1-2])/.test(ligneCourante.CompteNum) && !data.ignoreExternalExpensesEntries.includes(ligneCourante.EcritureNum)) {
     // lecture du compte auxiliaire
     let lignesFournisseur = journal.filter(
       (ligne) =>
         ligne.EcritureNum == ligneCourante.EcritureNum &&
         /^40/.test(ligne.CompteNum)
     );
+    let paiementBancaire = journal.some((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum && /^512/.test(ligne.CompteNum));
 
-    if (lignesFournisseur.length > 1) {
-      throw (
-        "Erreur d'association pour le compte de charge " +
-        ligneCourante.CompteNum +
-        " (Numéro d'écriture : " +
-        ligneCourante.EcritureNum +
-        " ) : Plusieurs comptes fournisseurs détectés "
-      );
-    }
-
-    let ligneFournisseur = lignesFournisseur[0] || {};
-    // expense data
-    let expenseData = {
-      label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
-      accountNum: ligneCourante.CompteNum,
-      accountLib: ligneCourante.CompteLib,
-      providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
-      providerLib:
-        ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCourante.CompteLib,
-      isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
-      amount:
-        parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
-      date: ligneCourante.EcritureDate,
-    };
-    // push data
-    data.externalExpenses.push(expenseData);
-    if (!ligneFournisseur.CompAuxNum)
+    // paiement bancaire (pas de ligne fournisseur)
+    if (paiementBancaire)
+    {
+      // expense data
+      let expenseData = {
+        label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
+        accountNum: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        providerNum: "_" + ligneCourante.CompteNum,
+        providerLib: "DEPENSES " + ligneCourante.CompteLib,
+        isDefaultProviderAccount: true,
+        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate,
+      };
+      // push data
+      data.externalExpenses.push(expenseData);
       data.defaultProviders.push(expenseData.providerNum);
+    }
+    else if (lignesFournisseur.length > 1) 
+    {
+      let ecriture = journal.filter((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum);
+      let entryData = readExternalExpensesFromEntry(ecriture);
+      if (entryData.isExpensesTracked) {
+        data.externalExpenses.push(...entryData.entryData);
+        data.ignoreExternalExpensesEntries.push(ligneCourante.EcritureNum);
+        data.defaultProviders.push(...entryData.defaultProviders);
+      } else {
+        throw  "Erreur d'association pour le compte de charge " + ligneCourante.CompteNum + " (Numéro d'écriture : " + ligneCourante.EcritureNum + " ) : Plusieurs comptes fournisseurs détectés ";
+      };
+    }
+    else
+    {
+      let ligneFournisseur = lignesFournisseur[0] || {};
+      // expense data
+      let expenseData = {
+        label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
+        accountNum: ligneCourante.CompteNum,
+        accountLib: ligneCourante.CompteLib,
+        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
+        providerLib:
+          ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCourante.CompteLib,
+        isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
+        amount:
+          parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        date: ligneCourante.EcritureDate,
+      };
+      // push data
+      data.externalExpenses.push(expenseData);
+      if (!ligneFournisseur.CompAuxNum) {
+        data.defaultProviders.push(expenseData.providerNum);
+      }
+    }
   }
 
   // Stocks variation (603) --------------------------------------------------------------------------- //
@@ -2071,4 +2097,123 @@ const getSubEntriesByAssetType = (entry) => {
   if (rowsIntangibleAssets.length > 0) subEntries.push(rowsIntangibleAssets);
 
   return subEntries;
+};
+
+/* The function return an object with the following elements :
+ *  - entryData (Array) : data from the entry to add the "main" data object
+ *  - status (Boolean) : status of the reading
+ *  - message (String) : -
+ */
+
+const readExternalExpensesFromEntry = (entry) => 
+{
+  // ---------- Entry ---------- //
+
+  let res = readExternalExpenses(entry);
+  if (res.isExpensesTracked) return res;
+
+  // ---------- Sub-entries ---------- //
+
+  let subEntries = [];
+  
+  // group by balanced group
+  subEntries = getSubEntriesByBalancedGroup(entry);
+  res = readExternalExpensesFromSubEntries(subEntries);
+  if (res.isExpensesTracked) return res;
+
+  // ---------- Error ---------- //
+
+  // if reading unsuccessfull
+  res.isExpensesTracked = false;
+  res.message = "ERROR";
+
+  return res;
+};
+
+const readExternalExpensesFromSubEntries = (subEntries) => 
+{
+  let res = { entryData: [], isExpensesTracked: false, message: "", defaultProviders: [] };
+
+  for (let subEntry of subEntries) 
+  {
+    let resSubEntry = readExternalExpenses(subEntry);
+
+    if (resSubEntry.isExpensesTracked) {
+      res.entryData.push(...resSubEntry.entryData);
+      res.defaultProviders.push(...resSubEntry.defaultProviders);
+    } else {
+      res.isExpensesTracked = false;
+      res.message = resSubEntry.message;
+      return res;
+    }
+  }
+
+  res.isExpensesTracked = true;
+  res.message = "OK";
+  return res;
+};
+
+const readExternalExpenses = (rows) => 
+{
+  // response
+  let res = { entryData: [], isExpensesTracked: false, message: "", defaultProviders: [] };
+
+  // lignes relatives aux comptes de charges
+  let rowsExpensesAccounts = rows.filter((ligne) => /^6(0[^3]|[1-2])/.test(ligne.CompteNum));
+
+  // lignes relatives aux comtpes fournisseurs
+  let rowsProvidersAccounts = rows.filter((ligne) => /^40/.test(ligne.CompteNum));  
+
+  // Empty entry -------------------------------------------------------------------------------------- //
+
+  if (rowsExpensesAccounts.length == 0) {
+    res.isExpensesTracked = true;
+    res.message = "Aucune charge externe.";
+    return res;
+  }
+
+  // Single expense account --------------------------------------------------------------------------- //
+
+  // -> comptAuxNum equals + not empy
+  let sameProviderAccountUsed = rowsProvidersAccounts.filter((value, index, self) => index === self.findIndex((item) => item.CompteNum === value.CompteNum && item.CompAuxNum === value.CompAuxNum)).length == 1;
+  
+  if (sameProviderAccountUsed) 
+  {
+    res.isExpensesTracked = true;
+    res.message = "OK";
+
+    // ligne relative au compte fournisseur
+    let rowProviderAccount = rowsProvidersAccounts[0];
+
+    // build data
+    rowsExpensesAccounts.forEach((rowExpenseAccount) => {
+      // amortisation expense data
+      let expenseData = {
+        label: rowExpenseAccount.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
+        accountNum: rowExpenseAccount.CompteNum,
+        accountLib: rowExpenseAccount.CompteLib,
+        providerNum: rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
+        providerLib: rowProviderAccount.CompAuxLib || "DEPENSES " + rowProviderAccount.CompteLib,
+        isDefaultProviderAccount: rowProviderAccount.CompAuxNum ? false : true,
+        amount: parseAmount(rowExpenseAccount.Debit) - parseAmount(rowExpenseAccount.Credit),
+        date: rowExpenseAccount.EcritureDate
+      };
+      // push data
+      res.entryData.push(expenseData);
+      if (expenseData.isDefaultProviderAccount) {
+        res.defaultProviders.push(expenseData.providerNum);
+      }
+    });
+
+    // return
+    return res;
+  }
+
+  // Single external expense account ------------------------------------------------------------------ //
+
+  // not available now
+
+  res.isExpensesTracked = false;
+  res.message = "NOK";
+  return res;
 };
