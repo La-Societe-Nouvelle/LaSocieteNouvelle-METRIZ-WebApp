@@ -2,7 +2,7 @@
 
 // Libraries
 import booksProps from "../../lib/books";
-import { roundValue } from "../utils/Utils";
+import { getSumItems, roundValue } from "../utils/Utils";
 
 import { distance } from "fastest-levenshtein";
 
@@ -2173,6 +2173,44 @@ const readExternalExpenses = (rows) =>
   }
 
   // Single expense account --------------------------------------------------------------------------- //
+
+  let sameExpenseAccountUsed = rowsExpensesAccounts.filter((value, index, self) => index === self.findIndex((item) => item.CompteNum === value.CompteNum)).length == 1;
+  
+  if (sameExpenseAccountUsed) 
+  {
+    res.isExpensesTracked = true;
+    res.message = "OK";
+
+    // ligne relative au compte fournisseur
+    let rowExpenseAccount = rowsExpensesAccounts[0];
+    let amountExpense = getSumItems(rowsExpensesAccounts.map((row) => parseAmount(row.Debit) - parseAmount(row.Credit)));
+    let amountProviders = getSumItems(rowsProvidersAccounts.map((row) => parseAmount(row.Credit) - parseAmount(row.Debit)));
+
+    // build data
+    rowsProvidersAccounts.forEach((rowProviderAccount) => {
+      // amortisation expense data
+      let amountProvider = parseAmount(rowProviderAccount.Debit) - parseAmount(rowProviderAccount.Credit);
+      let expenseData = {
+        label: rowsExpensesAccounts.map((row) => row.EcritureLib).reduce((a,b) => a+(a.length>0 ? ", " : "")+b, ""),
+        accountNum: rowExpenseAccount.CompteNum,
+        accountLib: rowExpenseAccount.CompteLib,
+        providerNum: rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
+        providerLib: rowProviderAccount.CompAuxLib || "DEPENSES " + rowProviderAccount.CompteLib,
+        isDefaultProviderAccount: rowProviderAccount.CompAuxNum ? false : true,
+        amount: amountProviders>0 ? roundValue( (amountProvider/amountProviders)*amountExpense ,2) : 0,
+        date: rowExpenseAccount.EcritureDate
+      };
+      // push data
+      res.entryData.push(expenseData);
+      if (expenseData.isDefaultProviderAccount) {
+        res.defaultProviders.push(expenseData.providerNum);
+      }
+    })
+
+    return res;
+  }
+
+  // Single provider account -------------------------------------------------------------------------- //
 
   // -> comptAuxNum equals + not empy
   let sameProviderAccountUsed = rowsProvidersAccounts.filter((value, index, self) => index === self.findIndex((item) => item.CompteNum === value.CompteNum && item.CompAuxNum === value.CompAuxNum)).length == 1;
