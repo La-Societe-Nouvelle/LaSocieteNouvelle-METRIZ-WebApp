@@ -68,12 +68,18 @@ const StatementForms = ({
   };
 
   const handleNetValueChange = async (indic) => {
+  
+    // Remove the indicator from declaredIndicators (if exists)
+    const updatedDeclaredIndicators = declaredIndicators.filter(
+      (indicator) => indicator !== indic
+    );
+  
     session.getNetValueAddedIndicator(indic, period.periodKey);
-
-    if (!declaredIndicators.includes(indic)) {
-      setDeclaredIndicators([...declaredIndicators, indic]);
-    }
+  
+    // Add the indicator back to declaredIndicators
+    setDeclaredIndicators([...updatedDeclaredIndicators, indic]);
   };
+  
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -253,7 +259,6 @@ const StatementForms = ({
 };
 
 const verifySelectedIndicators = (selectedIndicators, impactsData) => {
-
   const propertiesToCheck = {
     eco: ["isAllActivitiesInFrance", "domesticProduction"],
     art: ["isValueAddedCrafted", "craftedProduction"],
@@ -277,15 +282,20 @@ const verifySelectedIndicators = (selectedIndicators, impactsData) => {
   };
 
   const missingIndicators = [];
-
   for (const indicator of selectedIndicators) {
     const properties = propertiesToCheck[indicator];
     if (properties) {
-      const isIndicatorMissing = properties.some(
-        (property) =>
-          impactsData[property] === null ||
-          impactsData[property] === undefined
-      );
+      const isIndicatorMissing = properties.some((property) => {
+        if (
+          (indicator === "art" && property === "craftedProduction" && impactsData["isValueAddedCrafted"] === "partially") ||
+          (indicator === "eco" && property === "domesticProduction" && impactsData["isAllActivitiesInFrance"] === "partially")
+        ) {
+          return impactsData[property] === "" || impactsData[property] === null || impactsData[property] === undefined;
+        } else {
+          return impactsData[property] === null || impactsData[property] === undefined;
+        }
+      });
+
       if (isIndicatorMissing) {
         missingIndicators.push(indicator);
       }
@@ -294,5 +304,6 @@ const verifySelectedIndicators = (selectedIndicators, impactsData) => {
 
   return missingIndicators;
 };
+
 
 export default StatementForms;

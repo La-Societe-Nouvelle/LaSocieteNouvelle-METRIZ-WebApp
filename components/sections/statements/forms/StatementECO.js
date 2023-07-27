@@ -3,17 +3,16 @@ import { Form, Row, Col, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 const StatementECO = ({ impactsData, onUpdate, onError }) => {
+
   const [domesticProduction, setDomesticProduction] = useState(
     valueOrDefault(impactsData.domesticProduction, "")
   );
   const [info, setInfo] = useState(impactsData.comments.eco || "");
   const [isInvalid, setIsInvalid] = useState(false);
 
-
   const onIsAllActivitiesInFranceChange = (event) => {
     const radioValue = event.target.value;
     onUpdate("eco"); 
-   console.log(impactsData.netValueAdded)
 
     switch (radioValue) {
       case "true":
@@ -33,7 +32,6 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
         onError("eco", false);
         break;
     }
-    console.log(impactsData.domesticProduction);
     setDomesticProduction(impactsData.domesticProduction);
   };
 
@@ -72,7 +70,7 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
       <Row>
       <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column >
+          <Form.Label column lg={7}>
               Les activités de l'entreprise sont-elles localisées en France ?
             </Form.Label>
             <Col className="text-end">
@@ -109,11 +107,11 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column >
+            <Form.Label column lg={7}>
               Valeur ajoutée nette produite en France
             </Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(domesticProduction, 0)}

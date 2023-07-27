@@ -40,7 +40,6 @@ const AccountingImportSection = (props) => {
 
     if (siren !== "" && /^[0-9]{9}$/.test(siren) && /^[^a-zA-Z]+$/.test(siren)) {
       await session.legalUnit.setSiren(siren);
-      console.log(session.legalUnit);
       const divisionCode = session.legalUnit.activityCode.slice(0,2);
       session.comparativeData.activityCode = divisionCode;
       console.log(divisionCode)
@@ -172,7 +171,8 @@ const AccountingImportSection = (props) => {
         )}
         <Row className="my-3">
           {errorFile && (
-            <Col lg={{ span: 6, offset: 6 }}>
+            <Col lg={{ span: 7, offset: 5 }}>
+              <hr></hr>
               <div className={"alert alert-danger"}>
                 <div>
                   <p>{errorMessage}</p>

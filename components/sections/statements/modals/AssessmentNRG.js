@@ -25,13 +25,9 @@ const orderGroupsFossilFuels = [
   "Carburant - usage aérien",
   "Charbon",
   "Autres",
-]
+];
 
-const orderGroupsBiomassFuels = [
-  "Biomasse",
-  "Bio-gaz",
-  "Bio-carburants"
-]
+const orderGroupsBiomassFuels = ["Biomasse", "Bio-gaz", "Bio-carburants"];
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT NRG -------------------- */
@@ -59,31 +55,27 @@ const orderGroupsBiomassFuels = [
    Modifications are saved only when validation button is pressed, otherwise it stay in the state
 */
 
-export class AssessmentNRG extends React.Component 
-{
-
-  constructor(props) 
-  {
+export class AssessmentNRG extends React.Component {
+  constructor(props) {
     super(props);
-    this.state = 
-    {
+    this.state = {
       // total consumption & uncertainty
       energyConsumption: props.impactsData.energyConsumption,
-      energyConsumptionUncertainty: props.impactsData.energyConsumptionUncertainty,
+      energyConsumptionUncertainty:
+        props.impactsData.energyConsumptionUncertainty,
 
       // details (by products)
       nrgDetails: props.impactsData.nrgDetails,
-      
+
       // adding new product
       typeNewProduct: "",
-      
+
       // alert message
-      message : false,
+      message: false,
     };
   }
 
-  componentDidMount() 
-  {
+  componentDidMount() {
     // Create basic nrg product (electricity/heat/renewable)
     let { nrgDetails } = this.state;
     const productsToInit = [
@@ -93,10 +85,8 @@ export class AssessmentNRG extends React.Component
     ];
     productsToInit
       .filter((product) => nrgDetails[product] == undefined)
-      .forEach((product) => 
-      {
-        nrgDetails[product] = 
-        {
+      .forEach((product) => {
+        nrgDetails[product] = {
           id: product,
           fuelCode: product,
           type: product,
@@ -110,20 +100,18 @@ export class AssessmentNRG extends React.Component
     this.setState({ nrgDetails: nrgDetails });
   }
 
-  render() 
-  {
+  render() {
     const {
       energyConsumption,
       energyConsumptionUncertainty,
       nrgDetails,
       typeNewProduct,
-      message
+      message,
     } = this.state;
 
     return (
       <div className="assessment">
-
-        <Table responsive>
+        <Table>
           <thead>
             <tr>
               <td />
@@ -133,7 +121,6 @@ export class AssessmentNRG extends React.Component
             </tr>
           </thead>
           <tbody>
-
             {nrgDetails["electricity"] && (
               <tr>
                 <td />
@@ -143,33 +130,56 @@ export class AssessmentNRG extends React.Component
                     <Col>
                       <InputNumber
                         value={nrgDetails["electricity"].consumption}
-                        onUpdate={(nextValue) => this.updateConsumption.bind(this)("electricity",nextValue)}
+                        onUpdate={(nextValue) =>
+                          this.updateConsumption.bind(this)(
+                            "electricity",
+                            nextValue
+                          )
+                        }
                       />
                     </Col>
                     <Col lg="2">
                       <select
-                        className="form-control mb-3"
+                        className="form-select form-select-sm"
                         value={nrgDetails["electricity"].consumptionUnit}
-                        onChange={(event) => this.changeNrgProductUnit("electricity",event.target.value)}
+                        onChange={(event) =>
+                          this.changeNrgProductUnit(
+                            "electricity",
+                            event.target.value
+                          )
+                        }
                       >
-                        <option key="MJ" value="MJ">MJ</option>
-                        <option key="kWh" value="kWh">kWh</option>
+                        <option key="MJ" value="MJ">
+                          MJ
+                        </option>
+                        <option key="kWh" value="kWh">
+                          kWh
+                        </option>
                       </select>
                     </Col>
                     <Col lg="2">
                       <InputNumber
                         value={nrgDetails["electricity"].consumptionUncertainty}
-                        onUpdate={(nextValue) => this.updateConsumptionUncertainty.bind(this)("electricity",nextValue)}
+                        onUpdate={(nextValue) =>
+                          this.updateConsumptionUncertainty.bind(this)(
+                            "electricity",
+                            nextValue
+                          )
+                        }
                         placeholder="%"
                       />
                     </Col>
                   </Row>
                 </td>
                 <td>
-                  {printValue(nrgDetails["electricity"].nrgConsumption,0)} MJ
+                  {printValue(nrgDetails["electricity"].nrgConsumption, 0)} MJ
                 </td>
                 <td>
-                  {printValue(nrgDetails["electricity"].nrgConsumptionUncertainty,0)} %
+                  {printValue(
+                    nrgDetails["electricity"].nrgConsumptionUncertainty,
+                    0
+                  )}{" "}
+                  %
                 </td>
               </tr>
             )}
@@ -177,7 +187,7 @@ export class AssessmentNRG extends React.Component
             <tr>
               <td width="50">
                 <button
-                  className="btn"
+                  className="btn btn-sm btn-light"
                   onClick={() => this.addNewLine("fossil")}
                 >
                   <i className="bi bi-plus-lg"></i>
@@ -185,34 +195,41 @@ export class AssessmentNRG extends React.Component
               </td>
               <td colSpan="2">Produits énergétiques fossiles</td>
               <td>
-                {printValue(getNrgConsumptionByType(nrgDetails, "fossil"), 0)} MJ
+                {printValue(getNrgConsumptionByType(nrgDetails, "fossil"), 0)}{" "}
+                MJ
               </td>
               <td>
-                {printValue(getNrgConsumptionUncertaintyByType(nrgDetails, "fossil"), 0)} %
+                {printValue(
+                  getNrgConsumptionUncertaintyByType(nrgDetails, "fossil"),
+                  0
+                )}{" "}
+                %
               </td>
             </tr>
 
             {Object.entries(nrgDetails)
-                   .filter(([_, data]) => data.type == "fossil")
-                   .map(([itemId, itemData]) => (
-              <tr key={itemId}>
-                <td width="50">
-                  <button
-                    className="btn"
-                    onClick={() => this.deleteItem(itemId)}
-                  >
-                    <i className="bi bi-trash"></i>
-                  </button>
-                </td>
-                <td colSpan="2">
-                  <Row>
-                    <Col>
-                      <select
-                        className="form-control mb-3"
-                        value={itemData.fuelCode}
-                        onChange={(event) => this.changeNrgProduct(itemId, event.target.value)}
-                      >
-                        {Object.entries(fuels) 
+              .filter(([_, data]) => data.type == "fossil")
+              .map(([itemId, itemData]) => (
+                <tr key={itemId}>
+                  <td width="50">
+                    <button
+                      className="btn btn-sm"
+                      onClick={() => this.deleteItem(itemId)}
+                    >
+                      <i className="bi bi-trash"></i>
+                    </button>
+                  </td>
+                  <td colSpan="2">
+                    <Row>
+                      <Col>
+                        <select
+                          className="form-select form-select-sm"
+                          value={itemData.fuelCode}
+                          onChange={(event) =>
+                            this.changeNrgProduct(itemId, event.target.value)
+                          }
+                        >
+                          {Object.entries(fuels)
                             .filter(([_, data]) => data.type == "fossil")
                             .map(([_, data]) => data.group)
                             .filter(
@@ -220,7 +237,11 @@ export class AssessmentNRG extends React.Component
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) => orderGroupsFossilFuels.indexOf(a) - orderGroupsFossilFuels.indexOf(b))
+                            .sort(
+                              (a, b) =>
+                                orderGroupsFossilFuels.indexOf(a) -
+                                orderGroupsFossilFuels.indexOf(b)
+                            )
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -239,98 +260,99 @@ export class AssessmentNRG extends React.Component
                                   ))}
                               </optgroup>
                             ))}
-                      </select>
-                    </Col>
-                    <Col lg="2">
-                      <InputNumber
-                        value={itemData.consumption}
-                        onUpdate={(nextValue) => this.updateConsumption.bind(this)(itemId, nextValue)}
-                      />
-                    </Col>
-                    <Col lg="1">
-                      <select
-                        className="form-control mb-3"
-                        value={itemData.consumptionUnit}
-                        onChange={(event) =>
-                          this.changeNrgProductUnit(
-                            itemId,
-                            event.target.value
-                          )
-                        }
-                      >
-                        <option key="MJ" value="MJ">
-                          MJ
-                        </option>
-                        <option key="kWh" value="kWh">
-                          kWh
-                        </option>
-                        {Object.entries(fuels[itemData.fuelCode].units).map(
-                          ([unit, _]) => (
-                            <option key={unit} value={unit}>
-                              {unit}
-                            </option>
-                          )
-                        )}
-                      </select>
-                    </Col>
-                    <Col lg="2">
-                      <InputNumber
-                        value={itemData.consumptionUncertainty}
-                        onUpdate={(nextValue) =>
-                          this.updateConsumptionUncertainty.bind(this)(
-                            itemId,
-                            nextValue
-                          )
-                        }
-                        placeholder="%"
-                      />
-                    </Col>
-                  </Row>
-                </td>
-                <td>{printValue(itemData.nrgConsumption, 0)} MJ</td>
-                <td>{printValue(itemData.nrgConsumptionUncertainty, 0)} %</td>
-              </tr>
-            ))}
+                        </select>
+                      </Col>
+                      <Col lg="2">
+                        <InputNumber
+                          value={itemData.consumption}
+                          onUpdate={(nextValue) =>
+                            this.updateConsumption.bind(this)(itemId, nextValue)
+                          }
+                        />
+                      </Col>
+                      <Col lg="1">
+                        <select
+                          className="form-select form-select-sm"
+                          value={itemData.consumptionUnit}
+                          onChange={(event) =>
+                            this.changeNrgProductUnit(
+                              itemId,
+                              event.target.value
+                            )
+                          }
+                        >
+                          <option key="MJ" value="MJ">
+                            MJ
+                          </option>
+                          <option key="kWh" value="kWh">
+                            kWh
+                          </option>
+                          {Object.entries(fuels[itemData.fuelCode].units).map(
+                            ([unit, _]) => (
+                              <option key={unit} value={unit}>
+                                {unit}
+                              </option>
+                            )
+                          )}
+                        </select>
+                      </Col>
+                      <Col lg="2">
+                        <InputNumber
+                          value={itemData.consumptionUncertainty}
+                          onUpdate={(nextValue) =>
+                            this.updateConsumptionUncertainty.bind(this)(
+                              itemId,
+                              nextValue
+                            )
+                          }
+                          placeholder="%"
+                        />
+                      </Col>
+                    </Row>
+                  </td>
+                  <td>{printValue(itemData.nrgConsumption, 0)} MJ</td>
+                  <td>{printValue(itemData.nrgConsumptionUncertainty, 0)} %</td>
+                </tr>
+              ))}
 
             {typeNewProduct == "fossil" && (
               <tr>
                 <td />
                 <td colSpan="2">
                   <select
-                    className="form-control mb-3"
+                    className="form-select form-select-sm"
                     value="none"
                     onChange={(event) => this.addProduct(event.target.value)}
                   >
                     <option key="none" value="none">
                       ---
                     </option>
-                    {Object.entries(fuels) 
-                            .filter(([_, data]) => data.type == "fossil")
-                            .map(([_, data]) => data.group)
+                    {Object.entries(fuels)
+                      .filter(([_, data]) => data.type == "fossil")
+                      .map(([_, data]) => data.group)
+                      .filter(
+                        (value, index, self) =>
+                          index === self.findIndex((item) => item === value)
+                      )
+                      .sort(
+                        (a, b) =>
+                          orderGroupsFossilFuels.indexOf(a) -
+                          orderGroupsFossilFuels.indexOf(b)
+                      )
+                      .map((groupName) => (
+                        <optgroup label={groupName} key={groupName}>
+                          {Object.entries(fuels)
                             .filter(
-                              (value, index, self) =>
-                                index ===
-                                self.findIndex((item) => item === value)
+                              ([_, data]) =>
+                                data.type == "fossil" && data.group == groupName
                             )
-                            .sort((a, b) => orderGroupsFossilFuels.indexOf(a) - orderGroupsFossilFuels.indexOf(b))
-                            .map((groupName) => (
-                              <optgroup label={groupName} key={groupName}>
-                                {Object.entries(fuels)
-                                  .filter(
-                                    ([_, data]) =>
-                                      data.type == "fossil" &&
-                                      data.group == groupName
-                                  )
-                                  .map(([key, data]) => (
-                                    <option
-                                      key={"_" + key}
-                                      value={key}
-                                    >
-                                      {data.label}
-                                    </option>
-                                  ))}
-                              </optgroup>
+                            .map(([key, data]) => (
+                              <option key={"_" + key} value={key}>
+                                {data.label}
+                              </option>
                             ))}
+                        </optgroup>
+                      ))}
                   </select>
                 </td>
               </tr>
@@ -339,7 +361,7 @@ export class AssessmentNRG extends React.Component
             <tr>
               <td width="50">
                 <button
-                  className="btn"
+                  className="btn btn-sm btn-light"
                   onClick={() => this.addNewLine("biomass")}
                 >
                   <i className="bi bi-plus-lg"></i>
@@ -365,7 +387,7 @@ export class AssessmentNRG extends React.Component
                 <tr key={itemId}>
                   <td width="50">
                     <button
-                      className="btn"
+                      className="btn btn-sm"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -375,13 +397,13 @@ export class AssessmentNRG extends React.Component
                     <Row>
                       <Col>
                         <select
-                          className="form-control mb-3"
+                          className="form-select form-select-sm"
                           value={itemData.fuelCode}
                           onChange={(event) =>
                             this.changeNrgProduct(itemId, event.target.value)
                           }
                         >
-                          {Object.entries(fuels) 
+                          {Object.entries(fuels)
                             .filter(([_, data]) => data.type == "biomass")
                             .map(([_, data]) => data.group)
                             .filter(
@@ -389,7 +411,11 @@ export class AssessmentNRG extends React.Component
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) => orderGroupsBiomassFuels.indexOf(a) - orderGroupsBiomassFuels.indexOf(b))
+                            .sort(
+                              (a, b) =>
+                                orderGroupsBiomassFuels.indexOf(a) -
+                                orderGroupsBiomassFuels.indexOf(b)
+                            )
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -420,7 +446,7 @@ export class AssessmentNRG extends React.Component
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control mb-3"
+                          className="form-select form-select-sm"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeNrgProductUnit(
@@ -468,40 +494,40 @@ export class AssessmentNRG extends React.Component
                 <td />
                 <td colSpan="2">
                   <select
-                    className="form-control mb-3"
+                    className="form-select form-select-sm"
                     value="none"
                     onChange={(event) => this.addProduct(event.target.value)}
                   >
                     <option key="none" value="none">
                       ---
                     </option>
-                    {Object.entries(fuels) 
-                            .filter(([_, data]) => data.type == "biomass")
-                            .map(([_, data]) => data.group)
+                    {Object.entries(fuels)
+                      .filter(([_, data]) => data.type == "biomass")
+                      .map(([_, data]) => data.group)
+                      .filter(
+                        (value, index, self) =>
+                          index === self.findIndex((item) => item === value)
+                      )
+                      .sort(
+                        (a, b) =>
+                          orderGroupsBiomassFuels.indexOf(a) -
+                          orderGroupsBiomassFuels.indexOf(b)
+                      )
+                      .map((groupName) => (
+                        <optgroup label={groupName} key={groupName}>
+                          {Object.entries(fuels)
                             .filter(
-                              (value, index, self) =>
-                                index ===
-                                self.findIndex((item) => item === value)
+                              ([_, data]) =>
+                                data.type == "biomass" &&
+                                data.group == groupName
                             )
-                            .sort((a, b) => orderGroupsBiomassFuels.indexOf(a) - orderGroupsBiomassFuels.indexOf(b))
-                            .map((groupName) => (
-                              <optgroup label={groupName} key={groupName}>
-                                {Object.entries(fuels)
-                                  .filter(
-                                    ([_, data]) =>
-                                      data.type == "biomass" &&
-                                      data.group == groupName
-                                  )
-                                  .map(([key, data]) => (
-                                    <option
-                                      key={"_" + key}
-                                      value={key}
-                                    >
-                                      {data.label}
-                                    </option>
-                                  ))}
-                              </optgroup>
+                            .map(([key, data]) => (
+                              <option key={"_" + key} value={key}>
+                                {data.label}
+                              </option>
                             ))}
+                        </optgroup>
+                      ))}
                   </select>
                 </td>
               </tr>
@@ -523,7 +549,7 @@ export class AssessmentNRG extends React.Component
                     </Col>
                     <Col lg="2">
                       <select
-                        className="form-control mb-3"
+                        className="form-select form-select-sm"
                         value={nrgDetails["heat"].consumptionUnit}
                         onChange={(event) =>
                           this.changeNrgProductUnit("heat", event.target.value)
@@ -553,8 +579,7 @@ export class AssessmentNRG extends React.Component
                 </td>
                 <td>{printValue(nrgDetails["heat"].nrgConsumption, 0)} MJ</td>
                 <td>
-                  {printValue(nrgDetails["heat"].nrgConsumptionUncertainty, 0)}
-                  %
+                  {printValue(nrgDetails["heat"].nrgConsumptionUncertainty, 0)}%
                 </td>
               </tr>
             )}
@@ -580,7 +605,7 @@ export class AssessmentNRG extends React.Component
                     </Col>
                     <Col lg="2">
                       <select
-                        className="form-control mb-3"
+                        className="form-select form-select-sm"
                         value={
                           nrgDetails["renewableTransformedEnergy"]
                             .consumptionUnit
@@ -592,8 +617,12 @@ export class AssessmentNRG extends React.Component
                           )
                         }
                       >
-                        <option key="MJ" value="MJ">MJ</option>
-                        <option key="kWh" value="kWh">kWh</option>
+                        <option key="MJ" value="MJ">
+                          MJ
+                        </option>
+                        <option key="kWh" value="kWh">
+                          kWh
+                        </option>
                       </select>
                     </Col>
                     <Col lg="2">
@@ -640,14 +669,14 @@ export class AssessmentNRG extends React.Component
           </tbody>
         </Table>
 
-        {
-          message && 
-          <p className="small p-2 alert-warning"> 
-          Des modifications ayant été apportées 
-          sur la consommation de produits énergétiques (combustibles), 
-          l'intensité d'émissions de Gaz à effet de serre devra être (re)validée.
+        {message && (
+          <p className="small p-2 alert-warning">
+            modifications ayant été apportées sur la consommation de produits
+            énergétiques (combustibles), l'intensité d'émissions de Gaz à effet
+            de serre sera également modifiée. Veuillez vérifier et (re)valider
+            la déclaration en conséquence.
           </p>
-        }
+        )}
 
         <div className="view-header">
           <button
@@ -656,7 +685,7 @@ export class AssessmentNRG extends React.Component
           >
             <i className="bi bi-chevron-left"></i> Retour
           </button>
-        
+
           <button
             className="btn btn-secondary btn-sm"
             onClick={() => this.onSubmit()}
@@ -674,10 +703,13 @@ export class AssessmentNRG extends React.Component
   addNewLine = (type) => this.setState({ typeNewProduct: type });
 
   // set nrg product
-  addProduct = (fuelCode) => 
-  {
+  addProduct = (fuelCode) => {
     let { nrgDetails } = this.state;
-    const id = getNewId(Object.entries(nrgDetails).map(([_, item]) => item).filter((item) => !isNaN(item.id)));
+    const id = getNewId(
+      Object.entries(nrgDetails)
+        .map(([_, item]) => item)
+        .filter((item) => !isNaN(item.id))
+    );
     nrgDetails[id] = {
       id: id,
       fuelCode: fuelCode,
@@ -694,13 +726,14 @@ export class AssessmentNRG extends React.Component
   /* ----- UPDATES ----- */
 
   // update nrg product
-  changeNrgProduct = (itemId, nextFuelCode) => 
-  {
+  changeNrgProduct = (itemId, nextFuelCode) => {
     let itemData = this.state.nrgDetails[itemId];
     itemData.fuelCode = nextFuelCode;
 
     // check if the unit used is also available for the new product
-    if (Object.keys(fuels[nextFuelCode].units).includes(itemData.consumptionUnit)) {
+    if (
+      Object.keys(fuels[nextFuelCode].units).includes(itemData.consumptionUnit)
+    ) {
       itemData.nrgConsumption = getNrgConsumption(itemData);
       itemData.nrgConsumptionUncertainty =
         getNrgConsumptionUncertainty(itemData);
@@ -716,8 +749,7 @@ export class AssessmentNRG extends React.Component
     this.updateEnergyConsumption();
   };
 
-  changeNrgProductUnit = (itemId, nextConsumptionUnit) => 
-  {
+  changeNrgProductUnit = (itemId, nextConsumptionUnit) => {
     let itemData = this.state.nrgDetails[itemId];
     itemData.consumptionUnit = nextConsumptionUnit;
     itemData.nrgConsumption = getNrgConsumption(itemData);
@@ -726,11 +758,10 @@ export class AssessmentNRG extends React.Component
   };
 
   // update nrg consumption
-  updateConsumption = (itemId, nextValue) => 
-  {
+  updateConsumption = (itemId, nextValue) => {
     let itemData = this.state.nrgDetails[itemId];
-    if(itemData.type == "fossil" || itemData.type == "biomass") {
-      this.setState({ message: true});
+    if (itemData.type == "fossil" || itemData.type == "biomass") {
+      this.setState({ message: true });
     }
 
     itemData.consumption = nextValue;
@@ -740,8 +771,7 @@ export class AssessmentNRG extends React.Component
   };
 
   // update uncertainty
-  updateConsumptionUncertainty = (itemId, nextValue) => 
-  {
+  updateConsumptionUncertainty = (itemId, nextValue) => {
     let item = this.state.nrgDetails[itemId];
     item.consumptionUncertainty = nextValue;
     item.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(item);
@@ -750,11 +780,10 @@ export class AssessmentNRG extends React.Component
 
   /* ----- DELETE ----- */
 
-  deleteItem = (itemId) => 
-  {
+  deleteItem = (itemId) => {
     let itemData = this.state.nrgDetails[itemId];
-    if(itemData.type == "fossil" || itemData.type == "biomass") {
-      this.setState({ message: true});
+    if (itemData.type == "fossil" || itemData.type == "biomass") {
+      this.setState({ message: true });
     }
 
     delete this.state.nrgDetails[itemId];
@@ -764,26 +793,29 @@ export class AssessmentNRG extends React.Component
   /* ---------- STATE / PROPS ---------- */
 
   // update state
-  updateEnergyConsumption = () => 
-  {
+  updateEnergyConsumption = () => {
     // Update state
     this.setState({
       energyConsumption: getTotalNrgConsumption(this.state.nrgDetails),
-      energyConsumptionUncertainty: getTotalNrgConsumptionUncertainty(this.state.nrgDetails),
+      energyConsumptionUncertainty: getTotalNrgConsumptionUncertainty(
+        this.state.nrgDetails
+      ),
     });
   };
 
   // update props
-  onSubmit = async () => 
-  {
+  onSubmit = async () => {
     let impactsData = this.props.impactsData;
 
     // --------------------------------------------------
     // update nrg data
 
     impactsData.nrgDetails = this.state.nrgDetails;
-    impactsData.energyConsumption = getTotalNrgConsumption(impactsData.nrgDetails);
-    impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
+    impactsData.energyConsumption = getTotalNrgConsumption(
+      impactsData.nrgDetails
+    );
+    impactsData.energyConsumptionUncertainty =
+      getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
 
     await this.props.onUpdate("nrg");
 
@@ -792,46 +824,51 @@ export class AssessmentNRG extends React.Component
 
     // ...delete
     Object.entries(impactsData.ghgDetails)
-          .filter(([_, itemData]) => itemData.factorId != undefined)
-          .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
-          .forEach(([itemId, _]) => 
-    {
-      let nrgItem = Object.entries(impactsData.nrgDetails)
-                          .map(([_, nrgItemData]) => nrgItemData)
-                          .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
-      if (nrgItem == undefined) delete impactsData.ghgDetails[itemId]
-    });
+      .filter(([_, itemData]) => itemData.factorId != undefined)
+      .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
+      .forEach(([itemId, _]) => {
+        let nrgItem = Object.entries(impactsData.nrgDetails)
+          .map(([_, nrgItemData]) => nrgItemData)
+          .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
+        if (nrgItem == undefined) delete impactsData.ghgDetails[itemId];
+      });
 
     // ...add & update
     Object.entries(impactsData.nrgDetails)
-          .filter(([_, data]) => data.type == "fossil" || data.type == "biomass")
-          .forEach(([itemId, itemData]) => 
-    {
-      let ghgItem = Object.entries(impactsData.ghgDetails)
-                          .map(([_, ghgItemData]) => ghgItemData)
-                          .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
-      // init if undefined
-      if (ghgItem == undefined) {
-        const id = getNewId(Object.entries(impactsData.ghgDetails).map(([_, data]) => data));
-        impactsData.ghgDetails[id] = { id: id, idNRG: itemId };
-        itemData.idGHG = id;
-        ghgItem = impactsData.ghgDetails[id];
-      }
-      // update values
-      ghgItem.assessmentItem = fuels[itemData.fuelCode].usageSourcesFixes ? "1" : "2";
-      ghgItem.label = itemData.label;
-      ghgItem.factorId = itemData.fuelCode;
-      ghgItem.gaz = "co2e";
-      ghgItem.consumption = itemData.consumption;
-      ghgItem.consumptionUnit = itemData.consumptionUnit;
-      ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
-      ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
-      ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
-    });
+      .filter(([_, data]) => data.type == "fossil" || data.type == "biomass")
+      .forEach(([itemId, itemData]) => {
+        let ghgItem = Object.entries(impactsData.ghgDetails)
+          .map(([_, ghgItemData]) => ghgItemData)
+          .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
+        // init if undefined
+        if (ghgItem == undefined) {
+          const id = getNewId(
+            Object.entries(impactsData.ghgDetails).map(([_, data]) => data)
+          );
+          impactsData.ghgDetails[id] = { id: id, idNRG: itemId };
+          itemData.idGHG = id;
+          ghgItem = impactsData.ghgDetails[id];
+        }
+        // update values
+        ghgItem.assessmentItem = fuels[itemData.fuelCode].usageSourcesFixes
+          ? "1"
+          : "2";
+        ghgItem.label = itemData.label;
+        ghgItem.factorId = itemData.fuelCode;
+        ghgItem.gaz = "co2e";
+        ghgItem.consumption = itemData.consumption;
+        ghgItem.consumptionUnit = itemData.consumptionUnit;
+        ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
+        ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
+        ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
+      });
 
     // ...total & uncertainty
-    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(impactsData.ghgDetails);
-    impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
+    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
+      impactsData.ghgDetails
+    );
+    impactsData.greenhousesGazEmissionsUncertainty =
+      getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
     await this.props.onUpdate("ghg");
 
     // --------------------------------------------------
@@ -843,69 +880,110 @@ export class AssessmentNRG extends React.Component
 
 /* ---------- NRG FORMULAS ---------- */
 
-export const getNrgConsumption = ({consumption,consumptionUnit,fuelCode}) => 
-{
-  switch (consumptionUnit) 
-  {
-    case "MJ":  return consumption;
-    case "GJ":  return consumption * 1000;
-    case "tep": return consumption * 41868;
-    case "kWh": return consumption * 3.6;
-    default:    return consumption * fuels[fuelCode].units[consumptionUnit].coefNRG;
+export const getNrgConsumption = ({
+  consumption,
+  consumptionUnit,
+  fuelCode,
+}) => {
+  switch (consumptionUnit) {
+    case "MJ":
+      return consumption;
+    case "GJ":
+      return consumption * 1000;
+    case "tep":
+      return consumption * 41868;
+    case "kWh":
+      return consumption * 3.6;
+    default:
+      return consumption * fuels[fuelCode].units[consumptionUnit].coefNRG;
   }
 };
 
-const getNrgConsumptionMax = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) => 
-{
-  switch (consumptionUnit) 
-  {
-    case "MJ":  return consumption * (1+consumptionUncertainty/100);
-    case "GJ":  return consumption * (1+consumptionUncertainty/100) * 1000;
-    case "tep": return consumption * (1+consumptionUncertainty/100) * 41868;
-    case "kWh": return consumption * (1+consumptionUncertainty/100) * 3.6;
+const getNrgConsumptionMax = ({
+  consumption,
+  consumptionUnit,
+  consumptionUncertainty,
+  fuelCode,
+}) => {
+  switch (consumptionUnit) {
+    case "MJ":
+      return consumption * (1 + consumptionUncertainty / 100);
+    case "GJ":
+      return consumption * (1 + consumptionUncertainty / 100) * 1000;
+    case "tep":
+      return consumption * (1 + consumptionUncertainty / 100) * 41868;
+    case "kWh":
+      return consumption * (1 + consumptionUncertainty / 100) * 3.6;
     default: {
       let fuel = fuels[fuelCode].units[consumptionUnit];
-      return (consumption * (1+consumptionUncertainty/100) * fuel.coefNRG * (1+fuel.coefNRGUncertainty/100));
+      return (
+        consumption *
+        (1 + consumptionUncertainty / 100) *
+        fuel.coefNRG *
+        (1 + fuel.coefNRGUncertainty / 100)
+      );
     }
   }
 };
 
-const getNrgConsumptionMin = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) => 
-{
-  switch (consumptionUnit) 
-  {
-    case "MJ":  return consumption * (1-consumptionUncertainty/100);
-    case "GJ":  return consumption * (1-consumptionUncertainty/100) * 1000;
-    case "tep": return consumption * (1-consumptionUncertainty/100) * 41868;
-    case "kWh": return consumption * (1-consumptionUncertainty/100) * 3.6;
+const getNrgConsumptionMin = ({
+  consumption,
+  consumptionUnit,
+  consumptionUncertainty,
+  fuelCode,
+}) => {
+  switch (consumptionUnit) {
+    case "MJ":
+      return consumption * (1 - consumptionUncertainty / 100);
+    case "GJ":
+      return consumption * (1 - consumptionUncertainty / 100) * 1000;
+    case "tep":
+      return consumption * (1 - consumptionUncertainty / 100) * 41868;
+    case "kWh":
+      return consumption * (1 - consumptionUncertainty / 100) * 3.6;
     default: {
       let fuel = fuels[fuelCode].units[consumptionUnit];
-      return (consumption * (1-consumptionUncertainty/100) * fuel.coefNRG * (1-fuel.coefNRGUncertainty/100));
+      return (
+        consumption *
+        (1 - consumptionUncertainty / 100) *
+        fuel.coefNRG *
+        (1 - fuel.coefNRGUncertainty / 100)
+      );
     }
   }
 };
 
-export const getNrgConsumptionUncertainty = ({consumption,consumptionUnit,consumptionUncertainty,fuelCode}) => 
-{
-  const value = getNrgConsumption({consumption, consumptionUnit, fuelCode});
-  const valueMax = getNrgConsumptionMax({consumption, consumptionUnit, consumptionUncertainty, fuelCode});
-  const valueMin = getNrgConsumptionMin({consumption, consumptionUnit, consumptionUncertainty, fuelCode});
+export const getNrgConsumptionUncertainty = ({
+  consumption,
+  consumptionUnit,
+  consumptionUncertainty,
+  fuelCode,
+}) => {
+  const value = getNrgConsumption({ consumption, consumptionUnit, fuelCode });
+  const valueMax = getNrgConsumptionMax({
+    consumption,
+    consumptionUnit,
+    consumptionUncertainty,
+    fuelCode,
+  });
+  const valueMin = getNrgConsumptionMin({
+    consumption,
+    consumptionUnit,
+    consumptionUncertainty,
+    fuelCode,
+  });
 
-
-  return value != 0 ? getUncertainty(value,valueMin,valueMax) : 0;
-
+  return value != 0 ? getUncertainty(value, valueMin, valueMax) : 0;
 };
 
-export const getTotalNrgConsumption = (nrgDetails) => 
-{
+export const getTotalNrgConsumption = (nrgDetails) => {
   const sum = Object.entries(nrgDetails)
     .map(([_, data]) => data.nrgConsumption)
     .reduce((a, b) => a + b, 0);
   return sum;
 };
 
-export const getTotalNrgConsumptionUncertainty = (nrgDetails) => 
-{
+export const getTotalNrgConsumptionUncertainty = (nrgDetails) => {
   const items = Object.entries(nrgDetails).map(([_, itemData]) => itemData);
   if (items.length > 0) {
     const value = items
@@ -937,39 +1015,44 @@ export const getTotalNrgConsumptionUncertainty = (nrgDetails) =>
 // Formulas for energy consumption and nrg consumption uncertainty filter by type
 // try reuse other functions
 
-const getNrgConsumptionByType = (nrgDetails, type) => 
-{
+const getNrgConsumptionByType = (nrgDetails, type) => {
   const sum = Object.entries(nrgDetails)
-                    .filter(([_, data]) => data.type == type)
-                    .map(([_, data]) => data.nrgConsumption)
-                    .reduce((a, b) => a + b, 0);
+    .filter(([_, data]) => data.type == type)
+    .map(([_, data]) => data.nrgConsumption)
+    .reduce((a, b) => a + b, 0);
   return sum;
 };
 
-const getNrgConsumptionUncertaintyByType = (nrgDetails, type) => 
-{
+const getNrgConsumptionUncertaintyByType = (nrgDetails, type) => {
   const items = Object.entries(nrgDetails)
-                      .filter(([_, itemData]) => itemData.type == type)
-                      .map(([_, itemData]) => itemData);
-  
-  if (items.length > 0) 
-  {
-    // get value
-    const value = items.map((item) => item.nrgConsumption)
-                       .reduce((a, b) => a + b, 0);
+    .filter(([_, itemData]) => itemData.type == type)
+    .map(([_, itemData]) => itemData);
 
-    if (value > 0) 
-    {
+  if (items.length > 0) {
+    // get value
+    const value = items
+      .map((item) => item.nrgConsumption)
+      .reduce((a, b) => a + b, 0);
+
+    if (value > 0) {
       // get value max
-      const valueMax = items.map((item) => item.nrgConsumption * (1 + item.nrgConsumptionUncertainty / 100))
-                            .reduce((a, b) => a + b, 0);
+      const valueMax = items
+        .map(
+          (item) =>
+            item.nrgConsumption * (1 + item.nrgConsumptionUncertainty / 100)
+        )
+        .reduce((a, b) => a + b, 0);
       // get value min
-      const valueMin = items.map((item) => item.nrgConsumption * (1 - item.nrgConsumptionUncertainty / 100))
-                            .reduce((a, b) => a + b, 0);
-      return Math.round((Math.max(valueMax - value, value - valueMin) / value) * 100);
-    } 
-    else 
-    {
+      const valueMin = items
+        .map(
+          (item) =>
+            item.nrgConsumption * (1 - item.nrgConsumptionUncertainty / 100)
+        )
+        .reduce((a, b) => a + b, 0);
+      return Math.round(
+        (Math.max(valueMax - value, value - valueMin) / value) * 100
+      );
+    } else {
       return 0;
     }
   } else return null;

@@ -11,7 +11,7 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
-import { MessagePopup } from "../../popups/MessagePopup";
+import { FileImportSuccessPopup } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
 import { ErrorApi } from "../../ErrorAPI";
 
@@ -161,9 +161,9 @@ export class SirenSection extends React.Component
               </div>
             )}
             {popup && (
-              <MessagePopup
-                message="Votre fichier a bien été importé !"
-                type="success"
+              <FileImportSuccessPopup
+                message="Vous pouvez maintenant synchroniser les
+                données des fournisseurs."
                 closePopup={() => this.closePopup()}
               />
             )}

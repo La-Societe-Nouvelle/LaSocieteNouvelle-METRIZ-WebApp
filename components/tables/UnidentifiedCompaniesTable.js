@@ -11,21 +11,24 @@ import divisions from "/lib/divisions";
 import areas from "/lib/areas";
 import { Table } from "react-bootstrap";
 import Select from "react-select";
+import { customSelectStyles } from "../../config/customStyles";
 
 /* ---------- COMPANIES TABLE ---------- */
 
 const divisionsOptions = Object.entries(divisions)
-  .sort((a,b) => parseInt(a)-parseInt(b))
-  .map(([value, label]) => {return({ value: value, label: value + " - " + label })});
+  .sort((a, b) => parseInt(a) - parseInt(b))
+  .map(([value, label]) => {
+    return { value: value, label: value + " - " + label };
+  });
 
 const areasOptions = Object.entries(areas)
   .sort()
-  .map(([value, label]) => {return({value: value, label: value + " - " + label })});
+  .map(([value, label]) => {
+    return { value: value, label: value + " - " + label };
+  });
 
-export class UnidentifiedCompaniesTable extends React.Component 
-{
-  constructor(props) 
-  {
+export class UnidentifiedCompaniesTable extends React.Component {
+  constructor(props) {
     super(props);
     this.state = {
       providers: props.providers,
@@ -37,35 +40,40 @@ export class UnidentifiedCompaniesTable extends React.Component
     };
   }
 
-  componentDidUpdate(prevProps) 
-  {
+  componentDidUpdate(prevProps) {
     if (prevProps.providers !== this.props.providers) {
       this.setState({ providers: this.props.providers });
     }
     if (prevProps.nbItems !== this.props.nbItems) {
       this.setState({ nbItems: this.props.nbItems, page: 0 });
     }
-    if (prevProps.significativeProviders !== this.props.significativeProviders) {
-      this.setState({significativeProviders: this.props.significativeProviders });
+    if (
+      prevProps.significativeProviders !== this.props.significativeProviders
+    ) {
+      this.setState({
+        significativeProviders: this.props.significativeProviders,
+      });
     }
   }
 
   render() {
-    const { providers, significativeProviders, columnSorted, page, nbItems } = this.state;
+    const { providers, significativeProviders, columnSorted, page, nbItems } =
+      this.state;
     const period = this.props.financialPeriod;
 
     // sort providers
     this.sortProviders(providers, columnSorted);
-    const showedProviders = providers.slice(page * nbItems, (page + 1) * nbItems);
+    const showedProviders = providers.slice(
+      page * nbItems,
+      (page + 1) * nbItems
+    );
 
     return (
       <div className="table-main">
         <Table>
           <thead>
             <tr>
-          <td width={50}>
-
-          </td>
+              <td width={50}></td>
               <td onClick={() => this.changeColumnSorted("denomination")}>
                 <i className="bi bi-arrow-down-up me-1"></i>Libellé du compte
                 fournisseur
@@ -92,17 +100,17 @@ export class UnidentifiedCompaniesTable extends React.Component
             </tr>
           </thead>
           <tbody>
-          {showedProviders.map((provider) => (
-            <RowTableProviders
-              key={"company_" + provider.providerNum}
-              provider={provider}
-              isSignificative={significativeProviders.includes(
-                provider.providerNum
-              )}
-              period={period}
-              refreshTable={this.refreshTable}
-            />
-          ))}
+            {showedProviders.map((provider) => (
+              <RowTableProviders
+                key={"company_" + provider.providerNum}
+                provider={provider}
+                isSignificative={significativeProviders.includes(
+                  provider.providerNum
+                )}
+                period={period}
+                refreshTable={this.refreshTable}
+              />
+            ))}
           </tbody>
         </Table>
 
@@ -155,12 +163,14 @@ export class UnidentifiedCompaniesTable extends React.Component
         );
         break;
       case "denomination":
-        providers.sort((a, b) =>
-          a.providerLib.localeCompare(b.providerLib)
-        );
+        providers.sort((a, b) => a.providerLib.localeCompare(b.providerLib));
         break;
       case "amount":
-        providers.sort((a, b) => b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount);
+        providers.sort(
+          (a, b) =>
+            b.periodsData[period.periodKey].amount -
+            a.periodsData[period.periodKey].amount
+        );
         break;
     }
     if (this.state.reverseSort) providers.reverse();
@@ -188,10 +198,8 @@ export class UnidentifiedCompaniesTable extends React.Component
 
 /* ----- COMPANY ROW ----- */
 
-class RowTableProviders extends React.Component 
-{
-  constructor(props) 
-  {
+class RowTableProviders extends React.Component {
+  constructor(props) {
     super(props);
     this.state = {
       activityCode: props.provider.defaultFootprintParams.code,
@@ -200,19 +208,26 @@ class RowTableProviders extends React.Component
     };
   }
 
-  componentDidUpdate()
-  {
-    if (this.props.provider.defaultFootprintParams.code != this.state.activityCode) {
-      this.setState({activityCode: this.props.provider.defaultFootprintParams.code});
+  componentDidUpdate() {
+    if (
+      this.props.provider.defaultFootprintParams.code != this.state.activityCode
+    ) {
+      this.setState({
+        activityCode: this.props.provider.defaultFootprintParams.code,
+      });
     }
-    if (this.props.provider.defaultFootprintParams.area != this.state.areaCode) {
-      this.setState({areaCode: this.props.provider.defaultFootprintParams.area});
+    if (
+      this.props.provider.defaultFootprintParams.area != this.state.areaCode
+    ) {
+      this.setState({
+        areaCode: this.props.provider.defaultFootprintParams.area,
+      });
     }
   }
 
-  render() 
-  {
-    const { providerNum, providerLib, periodsData, footprintStatus } = this.props.provider;
+  render() {
+    const { providerNum, providerLib, periodsData, footprintStatus } =
+      this.props.provider;
     const period = this.props.period;
     const { areaCode, activityCode } = this.state;
 
@@ -233,20 +248,19 @@ class RowTableProviders extends React.Component
     return (
       <tr>
         <td>
-        {icon}
-        {isSignificative && activityCode == "00" && (
+          {icon}
+          {isSignificative && activityCode == "00" && (
             <i
               className="ms-1 bi bi-exclamation-triangle text-warning"
               title="Grand risque d'imprécision"
             ></i>
           )}
         </td>
-        <td >
-          {providerLib}
-        </td>
+        <td>{providerLib}</td>
         <td>{providerNum}</td>
         <td>
           <Select
+            styles={customSelectStyles}
             value={{
               label: areaCode + " - " + areas[areaCode],
               value: areaCode,
@@ -259,30 +273,38 @@ class RowTableProviders extends React.Component
         </td>
         <td>
           <Select
+            styles={customSelectStyles}
             value={{
               label: activityCode + " - " + divisions[activityCode],
-              value: activityCode}}
+              value: activityCode,
+            }}
             placeholder={"Choisissez un secteur d'activité"}
             className={footprintStatus == 200 ? "success" : ""}
             options={divisionsOptions}
             onChange={this.onActivityCodeChange}
           />
         </td>
-        <td className="text-end">{printValue(periodsData[period.periodKey].amount, 0)} &euro;</td>
+        <td className="text-end">
+          {printValue(periodsData[period.periodKey].amount, 0)} &euro;
+        </td>
       </tr>
     );
   }
 
   onAreaCodeChange = (event) => {
-    this.props.provider.update({defaultFootprintParams: {area: event.value}});
-    this.setState({areaCode: event.value});
+    this.props.provider.update({
+      defaultFootprintParams: { area: event.value },
+    });
+    this.setState({ areaCode: event.value });
     // fetch data auto ? -> updating expenses / significative providers
     this.props.refreshTable();
   };
 
   onActivityCodeChange = (event) => {
-    this.props.provider.update({defaultFootprintParams: {code: event.value}});
-    this.setState({activityCode: event.value});
+    this.props.provider.update({
+      defaultFootprintParams: { code: event.value },
+    });
+    this.setState({ activityCode: event.value });
     // fetch data auto ? -> updating expenses / significative providers
     this.props.refreshTable();
   };

@@ -25,7 +25,7 @@ export class InputNumber extends React.Component {
   render() {
 
     return (
-      <InputGroup className="mb-3">
+      <InputGroup>
         <Form.Control
           value={this.state.input}
           onChange={this.onChange}

@@ -32,7 +32,7 @@ export class AssessmentKNW extends React.Component {
 
     return (
       <div className="assessment">
-        <Table responsive>
+        <Table >
           <thead>
             <tr>
               <td>Libellé</td>

@@ -2,73 +2,43 @@
 
 // React
 import React from "react";
-import { Button, Container, Row } from "react-bootstrap";
-import { downloadSession } from "../../../src/utils/Utils";
-
-/* -------------------- HEADER -------------------- */
+import { Container, Navbar } from "react-bootstrap";
+import TopBar from "./Topbar";
 
 export function HeaderPublish({ setStep, session }) {
   const refresh = () => location.reload(true);
   return (
     <header>
-      <div className="top-bar mb-2">
-        <ul className="nav">
-          <li>
-            <a href="https://docs.lasocietenouvelle.org/" target="_blank">
-              <i className="bi bi-book-fill"></i> Documentation
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/"
-              target="_blank"
-            >
-              <i className="bi bi-github"></i> GitHub
-            </a>
-          </li>
-          <li>
-            <a href="https://lasocietenouvelle.org/contact" target="_blank">
-              <i className="bi bi-envelope-fill"></i> Contactez-nous
-            </a>
-          </li>
-        </ul>
-        <Button
-          className="btn-sm me-4 my-2 p-2"
-          variant="secondary"
-          onClick={() => downloadSession(session)}
-        >
-          <i className="bi bi-arrow-down"></i>
-          Sauvegarder ma session
-        </Button>
-      </div>
-      <Container fluid id="menu">
-        <Row>
-          <div className="d-flex justify-content-between align-items-center">
-                <img
-                  src="/logo_la-societe-nouvelle_s.svg"
-                  alt="logo"
-                  onClick={refresh}
-                />
-              <div className="action">
-                <button className="btn btn-secondary" onClick={() => setStep(4)}>
-                  <i className="bi bi-chevron-left"></i> Retour à la déclaration des
-                  impacts
-                </button>
-              </div>
-
-          </div>
+      <TopBar session={session} />
+      <Navbar expand="lg">
+        <Container fluid id="menu">
+          <Navbar.Brand href="/">
+            <img
+              src="/logo_la-societe-nouvelle_s.svg"
+              width="120"
+              height="120"
+              className="d-inline-block align-top"
+              alt="logo"
+              onClick={refresh}
+            />
+          </Navbar.Brand>
           <nav id="progression" className="d-flex">
-            <div className={"stepper-item completed"}>
-              <p className={"step-counter"}>
-                <i className="bi bi-arrow-up"></i>{" "}
-              </p>
-              <div className="step-name">
-                <h2>Publier mes résultats</h2>
-              </div>
+            <div className={`stepper-item completed`}>
+              <button className={`step-counter `} onClick={() => setStep(5)}>
+                <i className="bi bi-chevron-left"></i>
+              </button>
+              <div className="step-name">Retour à l'analyse</div>
+            </div>
+            <div className={`stepper-item `}>
+              <button className={`step-counter current`} disabled>
+                <i className="bi bi-cloud-arrow-up-fill"></i>
+              </button>
+              <div className="step-name">Publication</div>
             </div>
           </nav>
-        </Row>
-      </Container>
+        </Container>
+      </Navbar>
+
     </header>
   );
 }

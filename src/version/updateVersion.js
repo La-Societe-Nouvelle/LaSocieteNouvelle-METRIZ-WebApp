@@ -1,19 +1,17 @@
 // La Société Nouvelle
-
 import metaIndics from "/lib/indics.json";
 
-import {
-  getGhgEmissionsUncertainty,
-  getTotalGhgEmissionsUncertainty,
-} from "../../components/assessments/AssessmentGHG";
 import { buildAggregateIndicator } from "../formulas/footprintFormulas";
 
 import { getAmountItems } from "../utils/Utils";
+
 import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+
 import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 import { ComparativeData } from "../models/ComparativeData";
 import { fetchComparativeData } from "../services/MacrodataService";
+import { getGhgEmissionsUncertainty, getTotalGhgEmissionsUncertainty } from "../../components/sections/statements/modals/AssessmentGHG";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
@@ -112,7 +110,7 @@ const updater_3_0_0 = async (sessionData) => {
   const period = sessionData.financialPeriod;
 
 
-  if (indicators.length > 0) {
+  if (sessionData.validations[period.periodKey].length > 0) {
     await fetchComparativeData(sessionData.comparativeData, sessionData.validations[period.periodKey]);
   }
 

@@ -1,379 +1,690 @@
 // La Société Nouvelle
+import React, { useState } from "react";
+import { Container, Table, Form, Row, Col, Image } from "react-bootstrap";
+
+import api from "/src/api";
 
 // Api
-import { sendStatementToAdmin, sendStatementToDeclarant } from '/pages/api/mail-api'
+import {
+  sendStatementToAdmin,
+  sendStatementToDeclarant,
+} from "/pages/api/mail-api";
 
 // React
-import React, { useState } from 'react';
 
 // Sources
-import { exportStatementPDF, getBinaryPDF } from '../../src/writers/StatementWriter';
-import { printValue } from '../../src/utils/Utils';
+import {
+  exportStatementPDF,
+  getBinaryPDF,
+} from "../../src/writers/StatementWriter";
 
-// Utils
-import { InputText } from '../input/InputText';
+import { printValue } from "../../src/utils/Utils";
 
 // Libraries
-import metaIndics from '/lib/indics';
-import { Table } from 'react-bootstrap';
-
+import metaIndics from "/lib/indics";
 
 /* ----------------------------------------------------------- */
 /* -------------------- PUBLISH STATEMENT SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class PublishStatementSection extends React.Component 
-{
-    constructor(props) 
-    {
-        super(props);
+const PublishStatementSection = ({ session }) => {
+  const {
+    legalUnit,
+    financialPeriod,
+    financialData,
+    validations,
+    impactsData,
+  } = session;
 
-        const period = props.session.financialPeriod;
-        const socialFootprint = {};
-        Object.entries(props.session.financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint.indicators).filter(([_, indicator]) => indicator.value != null)
-            .forEach(([indic, indicator]) => socialFootprint[indic] = indicator);
+  const { periodKey } = financialPeriod;
+  const { productionAggregates } = financialData;
+  const { corporateName } = legalUnit;
 
-        this.state =
-        {
-            socialFootprint: socialFootprint,
-            // Legal entity data 
-            siren: props.session.legalUnit.siren || "",
-            denomination: props.session.legalUnit.corporateName || "",
-            year: period.dateEnd.substring(0,4),
+  const year = financialPeriod.dateEnd.substring(0, 4);
+  const comments = impactsData[periodKey].comments;
+  const socialFootprint =
+    productionAggregates.revenue.periodsData[periodKey].footprint;
 
-            // Statements 
-            revenueFootprint: props.session.financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint,
-            validations: props.session.validations[period.periodKey],
-            comments: props.session.impactsData[period.periodKey].comments || {},
+  const indicatorsData =
+    productionAggregates.revenue.periodsData[periodKey].footprint.indicators;
 
-            // declarant 
-            declarant: "",
-            email: "",
-            phone: "",
-            autorisation: false,
-            forThirdParty: false,
-            declarantOrganisation: "",
+  const publishableIndicators = Object.entries(indicatorsData)
+    .filter(([_, indicator]) => indicator.value != null)
+    .reduce((acc, [indic, _]) => {
+      acc[indic] = true;
+      return acc;
+    }, {});
 
-            // tarif 
-            price: "0",
+  const [indicatorsToPublish, setIndicatorsToPublish] = useState(
+    publishableIndicators
+  );
 
-            displayRecap : false,
-            messageSend : false,
-            error : ""
+  const [siren, setSiren] = useState(session.legalUnit.siren || "");
+
+  const [declarant, setDeclarant] = useState("");
+  const [email, setEmail] = useState("");
+  const [autorisation, setAutorisation] = useState(false);
+  const [forThirdParty, setForThirdParty] = useState(false);
+  const [declarantOrganisation, setDeclarantOrganisation] = useState("");
+  const [price, setPrice] = useState("0");
+  const [displayRecap, setDisplayRecap] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const onCheckIndicator = (event) => {
+    const indicator = event.target.value;
+    setIndicatorsToPublish((prevState) => ({
+      ...prevState,
+      [indicator]: !prevState[indicator],
+    }));
+  };
+
+  const onSirenChange = (e) => {
+    setSiren(e.target.value);
+  };
+
+  const onDeclarantChange = (e) => {
+    setDeclarant(e.target.value);
+  };
+
+  const onEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const onThirdPartyChange = () => {
+    setForThirdParty((prevState) => !prevState);
+  };
+
+  const onDeclarantOrganisationChange = (e) => {
+    setDeclarantOrganisation(e.target.value);
+  };
+
+  const onAutorisationChange = () => {
+    setAutorisation((prevState) => !prevState);
+  };
+
+  const changePrice = (event) => setPrice(event.target.value);
+
+  const validateForm = async () => {
+    const newErrors = {};
+    if (!Object.values(indicatorsToPublish).some((value) => value)) {
+      newErrors.indicatorsToPublish =
+        "Sélectionnez au moins un indicateur à publier.";
+    }
+    if (!/^[0-9]{9}$/.test(siren)) {
+      newErrors.siren = "Numero de SIREN incorrect.";
+    } else {
+      const isSirenValid = await checkSirenValidity(siren);
+      if (!isSirenValid) {
+        newErrors.siren = "Numéro de SIREN non reconnu.";
+      }
+    }
+
+    if (declarant.trim() === "") {
+      newErrors.declarant = "Veuillez saisir le nom et prénom du déclarant.";
+    }
+    if (email.trim() === "") {
+      newErrors.email = "Veuillez saisir une adresse e-mail valide.";
+    }
+    if (!autorisation) {
+      newErrors.autorisation =
+        "Vous devez certifier être autorisé(e) à soumettre la déclaration.";
+    }
+    if (forThirdParty && declarantOrganisation.trim() === "") {
+      newErrors.declarantOrganisation =
+        "Veuillez saisir la structure déclarante.";
+    }
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const isFormValid = await validateForm();
+
+    if (isFormValid) {
+      setDisplayRecap(true);
+    }
+  };
+
+  const checkSirenValidity = (siren) => {
+    return api
+      .get("legalunit/" + siren)
+      .then((res) => {
+        const status = res.data.header.code;
+        if (status === 200) {
+          return true;
+        } else {
+          return false;
         }
-    }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la vérification du SIREN :", error);
+        return false;
+      });
+  };
 
-    componentDidMount() {
-        window.scrollTo(0, 0)
-    }
+  return (
+    <Container fluid>
+      <section className="step">
+        <h2>Publication</h2>
+        <p>
+          Valoriser votre empreinte en la publiant au sein de notre base de
+          données ouverte.
+        </p>
+        {!displayRecap && (
+          <>
+            <div className="border p-4 border-2 rounded">
+              <h3 className="mb-4">
+                <i className="bi bi-pencil-square"></i> Formulaire de
+                publication
+              </h3>
+              <h4>Liste des indicateurs</h4>
+              <p>Sélectionnez les indicateurs que vous souhaitez publier : </p>
+              <Table>
+                <thead>
+                  <tr>
+                    <th>Indicateur</th>
+                    <th className="text-end">Valeur</th>
+                    <th></th>
+                    <th className="text-end">Incertitude</th>
+                    <th>Commentaires</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.keys(metaIndics).map((indic) => (
+                    <tr key={indic}>
+                      <td>
+                        <Form>
+                          <Form.Check
+                            type="checkbox"
+                            id={`checkbox-${indic}`}
+                            value={indic}
+                            checked={indicatorsToPublish[indic]}
+                            disabled={validations[periodKey].indexOf(indic) < 0}
+                            onChange={onCheckIndicator}
+                            label={metaIndics[indic].libelle}
+                          />
+                        </Form>
+                      </td>
+                      <td className="text-end">
+                        <span className="fw-bold">
+                          {printValue(
+                            socialFootprint.indicators[indic].value,
+                            metaIndics[indic].nbDecimals
+                          )}
+                        </span>
+                      </td>
+                      <td className="text-start">
+                        <span className="small">
+                          &nbsp;{metaIndics[indic].unit}
+                        </span>
+                      </td>
+                      <td className="text-end small">
+                        <u>+</u>&nbsp;
+                        {printValue(
+                          socialFootprint.indicators[indic].uncertainty,
+                          0
+                        )}
+                        &nbsp;%
+                      </td>
+                      <td>
+                        <span className="small">{comments[indic] || "-"}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              {errors.indicatorsToPublish && (
+                <p className="text-secondary small">
+                  {errors.indicatorsToPublish}{" "}
+                  <i className="bi bi-exclamation-circle"></i>
+                </p>
+              )}
 
-    render() {
+              <h4 className="mt-5 mb-4">Informations du déclarant</h4>
+              <Row>
+                <Col lg={4}>
+                  <Form onSubmit={handleSubmit}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>SIREN</Form.Label>
+                      <Form.Control
+                        size="sm"
+                        type="text"
+                        value={siren}
+                        isInvalid={errors.siren}
+                        onChange={onSirenChange}
+                        required
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.siren}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Nom - Prénom </Form.Label>
+                      <Form.Control
+                        type="text"
+                        size="sm"
+                        value={declarant}
+                        isInvalid={errors.declarant}
+                        onChange={onDeclarantChange}
+                        required
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.declarant}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Adresse e-mail</Form.Label>
+                      <Form.Control
+                        type="text"
+                        size="sm"
+                        value={email}
+                        isInvalid={errors.email}
+                        onChange={onEmailChange}
+                        required
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.email}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                    <Form.Check
+                      type="checkbox"
+                      id="thirdParty"
+                      checked={forThirdParty}
+                      onChange={onThirdPartyChange}
+                      label="Déclaration effectuée pour un tiers."
+                    />
+                    {forThirdParty && (
+                      <Form.Group className="my-3">
+                        <Form.Label>Structure déclarante</Form.Label>
+                        <Form.Control
+                          type="text"
+                          size="sm"
+                          value={declarantOrganisation}
+                          isInvalid={errors.declarantOrganisation}
+                          onChange={onDeclarantOrganisationChange}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                          {errors.declarantOrganisation}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    )}
+                  </Form>
+                </Col>
+                <Col>
+                  <Form className="ms-5">
+                    <Form.Label>Coût de la formalité*</Form.Label>
+                    <Form.Check
+                      type="radio"
+                      id="price-0"
+                      value="0"
+                      checked={price === "0"}
+                      onChange={changePrice}
+                      label="Première déclaration : publication offerte"
+                    />
 
-        const {
-            revenueFootprint,
-            validations,
-            socialFootprint,
-            siren,
-            declarant,
-            email,
-            forThirdParty,
-            declarantOrganisation,
-            displayRecap,
-            autorisation,
-            error,
-            messageSend,
-        } = this.state;
-      
-        if(!displayRecap){
-            return (
-                <div className="container-fluid statement-section">
-                    <section className="step">
-                        <h3>Liste des indicateurs</h3>
-                        <p>
-                            Sélectionnez les indicateurs que vous souhaitez publier
-                        </p>
-                        <Table size='sm'>
-                            <thead>
-                                <tr>
-                                    <td>Indicateur</td>
-                                    <td className="column_value" colSpan="2">Valeur</td>
-                                    <td className="column_uncertainty">Incertitude</td>
-                                    <td>Publication</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {Object.keys(metaIndics).map(indic =>
-                                    <tr key={indic}>
-                                        <td className="auto">{metaIndics[indic].libelle + (metaIndics[indic].isBeta ? " [BETA]" : "")}</td>
-                                        <td className="column_value">{printValue(revenueFootprint.indicators[indic].value, metaIndics[indic].nbDecimals)}</td>
-                                        <td className="column_unit">&nbsp;{metaIndics[indic].unit}</td>
-                                        <td className="column_uncertainty"><u>+</u>&nbsp;{printValue(revenueFootprint.indicators[indic].uncertainty, 0)}&nbsp;%</td>
-                                        <td><input type="checkbox"
-                                            value={indic}
-                                            defaultChecked={socialFootprint[indic] != undefined}
-                                            disabled={validations.indexOf(indic) < 0}
-                                            onChange={this.onCheckIndicator} /></td>
-                                    </tr>)}
-                            </tbody>
-                        </Table>
-                    </section>
-                    <section className="step">
-                        <h3>Informations</h3>
-                        <div className="form-group">
-                            <h4>Numéro de siren</h4>
-                            <label>Entrez votre numéro de siren (9 chiffres) : </label>
-                            <InputText value={siren}
-                                unvalid={siren != "" && !/^[0-9]{9}$/.test(siren)}
-                                onUpdate={this.onSirenChange}
-                            />
-                        </div>
-                        <h4>Déclarant</h4>
-                        <div className="form-group">
-                            <label>Nom - Prénom </label>
-                            <InputText value={declarant}
-                                onUpdate={this.onDeclarantChange} />
-                        </div>
-                        <div className="form-group">
-                            <label>Adresse e-mail </label>
-                            <InputText value={email}
-                                unvalid={email != "" && !/^(.*)@(.*)\.(.*)$/.test(email)}
-                                onUpdate={this.onEmailChange} />
-                        </div>
-                        <div className="form-group">
-                            <div className="custom-control-inline" id="thirdParty">
-                                <input type="checkbox" className="custom-control-input"
-                                    onChange={this.onThirdPartyChange} />
-                                <label htmlFor="thirdParty">&nbsp;Déclaration effectuée pour un tiers.</label>
-                            </div>
-    
-                        </div>
-                        {forThirdParty &&
-                            <div className="form-group">
-                                <label>Structure déclarante</label>
-                                <InputText value={declarantOrganisation}
-                                    onUpdate={this.onDeclarantOrganisationChange} />
-                            </div>}
-                    
-                    </section>
-                    <section className="step">
-                    <PriceInput {...this.state} />
-                    </section>
-                    <section className="step">
-                        <h4>Publication</h4>    
-    
-                     <div className="form-group">
-                            <div className="custom-control-inline" id="certification">
-                                <input type="checkbox" className="custom-control-input"
-                                    checked={autorisation}
-                                    onChange={this.onAutorisationChange} />
-                                <label htmlFor="certification">&nbsp;Je certifie être autorisé(e) à soumettre la déclaration ci-présente.</label>
-                            </div>
-                        </div>
-                            <p className="text-end">
-                            <button className="btn btn-secondary" disabled={autorisation ? false : true}  onClick={this.setDisplayRecap} > 
-                                Publier mes résultats
-                            </button>
+                    <Form.Check
+                      type="radio"
+                      id="price-10"
+                      value="10"
+                      checked={price === "10"}
+                      onChange={changePrice}
+                      label="Organise à but non lucratif : 10 €"
+                    />
 
-                            </p>
-                    </section>            
-                 
-                </div>
-            )
-        }
-        else {
-            return(
-                <div className="container-fluid statement-section">
-                         <Summary {...this.state} exportStatement={this.exportStatement} submitStatement={this.submitStatement} returnPublishForm={this.returnPublishForm} />
-                    </div>
-            )
-        }
+                    <Form.Check
+                      type="radio"
+                      id="price-25"
+                      value="25"
+                      checked={price === "25"}
+                      onChange={changePrice}
+                      label="Société unipersonnelle : 25 €"
+                    />
 
-       
-    }
+                    <Form.Check
+                      type="radio"
+                      id="price-50"
+                      value="50"
+                      checked={price === "50"}
+                      onChange={changePrice}
+                      label="Société : 50 €"
+                    />
+                    <p className="small fst-italic mt-3">
+                      * Les revenus couvrent la réalisation des formalités,
+                      ainsi que les frais d'hébergement et de maintenance pour
+                      l'accessibilité des données.
+                    </p>
+                  </Form>
+                </Col>
 
-    // Commits
-    onSirenChange = (siren) => this.setState({ siren: siren });
-
-    onDeclarantChange = (input) => this.setState({ declarant: input })
-    onEmailChange = (input) => this.setState({ email: input })
-    onAutorisationChange = () => this.setState({ autorisation: !this.state.autorisation })
-    setDisplayRecap = () => this.setState({ displayRecap: true})
-    returnPublishForm = () => this.setState({ displayRecap: false});
-    onThirdPartyChange = () => this.setState({ forThirdParty: !this.state.forThirdParty })
-    onDeclarantOrganisationChange = (input) => this.setState({ declarantOrganisation: input })
-
-    commitSocialFootprint = (socialFootprint) => this.setState({ socialFootprint: socialFootprint })
-
-    commitDeclarant = (declarant, email, autorisation) => this.setState({ declarant: declarant, email: email, autorisation: autorisation })
-
-    commitPrice = (price) => this.setState({ price: price })
-
-    exportStatement = () => exportStatementPDF(this.state);
-
-    submitStatement = async (event) => {
-        event.preventDefault();
-
-        const statementFile = getBinaryPDF(this.state);
-
-        const messageToAdmin = mailToAdminWriter(this.state);
-        const resAdmin = await sendStatementToAdmin(messageToAdmin, statementFile);
-
-        const messageToDeclarant = mailToDeclarantWriter(this.state);
-        const resDeclarant = await sendStatementToDeclarant(this.state.email, messageToDeclarant, statementFile);
-
-        if (resAdmin.status < 300) this.setState({ messageSend: true })
-        else this.setState({ messageSend : false, error: "Erreur lors de l'envoi du message" })
-    }
-
-}
-
-
-/* ----- Declarant form ----- */
-
-class DeclarantForm extends React.Component {
-
-    // form for contact details
-
-    constructor(props) {
-        super(props);
-        this.state = {
-            declarant: props.declarant,
-            email: props.declarant,
-            autorisation: props.autorisation,
-            forThirdParty: props.forThirdParty,
-            declarantOrganisation: props.declarantOrganisation
-        }
-    }
-
-    render() {
-        const { declarant, email, autorisation, forThirdParty, declarantOrganisation } = this.state;
-        const isAllValid = declarant.length > 0
-            && /^(.*)@(.*)\.(.*)$/.test(email)
-            && autorisation
-            && (!forThirdParty || declarantOrganisation.length > 0);
-
-        return (
-            <>
-
-            </>
-        )
-    }
-
-
-
-}
-
-/* --- Price Input --- */
-
-const PriceInput = ({ price }) => {
-    const [priceInput, setPrice] = useState(price);
-    const changePrice = (event) => setPrice(event.target.value);
-
-    return (
-        <>
-            <h4>Coût de la formalité*</h4>
-            <div className="radio-button-input">
-                <div className={"custom-control-inline"}>
-                    <input id="price" type="radio" value="0" checked={priceInput == "0"} onChange={changePrice} className="custom-control-input" />
-                    <label>Première déclaration : publication offerte</label>
-                </div>
-                <div className={"custom-control-inline"} >
-                    <input id="price" type="radio" value="10" checked={priceInput == "10"} onChange={changePrice} className="custom-control-input" />
-                    <label>Organise à but non lucratif : 10 €</label>
-                </div>
-                <div className={"custom-control-inline"} >
-                    <input id="price" type="radio" value="25" checked={priceInput == "25"} onChange={changePrice} className="custom-control-input" />
-                    <label>Société unipersonnelle : 25 €</label>
-                </div>
-                <div className={"custom-control-inline"} >
-                    <input id="price" type="radio" value="50" checked={priceInput == "50"} onChange={changePrice} className="custom-control-input" />
-                    <label>Société : 50 €</label>
-                </div>
-
+                <Form.Group className="mt-4 border-top border-2 pt-4">
+                  <Form.Check
+                    type="checkbox"
+                    id="certification-checkbox"
+                    label="Je certifie être autorisé(e) à soumettre la déclaration ci-présente."
+                    checked={autorisation}
+                    onChange={onAutorisationChange}
+                    className="fw-bold"
+                    required
+                  />
+                </Form.Group>
+              </Row>
             </div>
-            <p className="small fst-italic">* Les revenus couvrent la réalisation des formalités, ainsi que les frais d'hébergement et de maintenance pour l'accessibilité des données.</p>
+            <p className="mt-3">
+              <button
+                className="btn btn-secondary"
+                disabled={!autorisation}
+                onClick={handleSubmit}
+              >
+                Publier mes résultats
+              </button>
+            </p>
+          </>
+        )}
+  
+        {displayRecap && (
+          <Summary
+            siren={siren}
+            corporateName={corporateName}
+            year={year}
+            declarant={declarant}
+            declarantOrganisation={declarantOrganisation}
+            email={email}
+            price={price}
+            socialFootprint={socialFootprint}
+            indicatorsToPublish={indicatorsToPublish}
+            comments={comments}
+            onReturn={() => setDisplayRecap(false)}
+          />
+        )}
+      </section>
+    </Container>
+  );
+};
 
-        </>)
-}
+// /* ----- Summary ----- */
 
-/* ----- Summary ----- */
- 
-const Summary = (props) => {
-    const { siren, denomination, year, declarant, price, socialFootprint, error, messageSend } = props;
-
-    const isStatementValid = true;
-
-    const today = new Date();
-    const todayString = String(today.getDate()).padStart(2, '0') + "/" + String(today.getMonth() + 1).padStart(2, '0') + "/" + today.getFullYear();
-
-    return (
-        <section className="step">
-        <h2>Récapitulatif</h2>
-            <div className="summary">
-                <p><b>Siren : </b>{siren}</p>
-                <p><b>Dénomination : </b>{denomination}</p>
-                <p><b>Année : </b>{year}</p>
-                <p><b>Indicateurs : </b></p>
-                {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).map(([indic, _]) => <p key={indic}>&emsp;{metaIndics[indic].libelle}</p>)}
-                {Object.entries(socialFootprint).filter(([_, indicator]) => indicator.value != null).length == 0 &&
-                    <p>&emsp; - </p>}
-                <p><b>Fait le : </b>{todayString}</p>
-                <p><b>Déclarant : </b>{declarant}</p>
-                <p><b>Coût de la formalité : </b>{price} €</p>
-            </div>
-            
-            {
-                messageSend && 
-                <div className="alert alert-success">
-                     <p>Demande de publication envoyée ! Merci.</p>
-                </div>
-            }
+const PublishSummary = ({
+  siren,
+  corporateName,
+  year,
+  declarant,
+  declarantOrganisation,
+  price,
+  legalUnitFootprint,
+  todayString,
+  comments,
+}) => {
+  return (
+    <div className="border p-4 border-2 rounded mb-3">
+      <h3 className="mb-3">
+        <i className="bi bi-list-check"></i> Récapitulatif
+      </h3>
+      <Row>
+        <Col>
+          <div>
+            <h4 className="h5 mb-4">Données à publier</h4>
+            <p>
+              <b>Siren : </b>
+              {siren}
+            </p>
+            <p>
+              <b>Dénomination : </b>
+              {corporateName}
+            </p>
+            <p>
+              <b>Année : </b>
+              {year}
+            </p>
+            <p>
+              <b>Indicateurs : </b>
+            </p>
+            <ul className="list-unstyled small mt-1">
+              {Object.entries(legalUnitFootprint).map(([indicator, value]) => (
+                <li key={indicator} className="p-1 ">
+                 {metaIndics[indicator].libelle}
                   {
-                error && 
-                <div className="alert alert-danger">
-                     <p>Erreur lors de l'envoi de la publication. Si l'erreur persiste, contactez le support.</p>
-                </div>
+                    comments[indicator]  &&
+                    <span className="d-block m-1 small"> 
+                    Commentaire: {comments[indicator] }
+             
+                  </span>
+                  }
+                
+                </li>
+              ))}
+            </ul>
+            <hr className="w-25"></hr>
+            <p>
+              <b>Fait le : </b>
+              {todayString}
+            </p>
+            <p>
+              <b>Déclarant : </b>
+              {declarant}
+            </p>
+            {
+              declarantOrganisation &&
+              <p>
+                <b>Structure déclarante :</b> {declarantOrganisation}
+              </p>
             }
-            <div className="text-end">
-            <button className={"btn btn-light"}  onClick={props.returnPublishForm}><i className="bi bi-chevron-left"></i> Retour</button>
-                <button className={"btn btn-primary"} onClick={props.exportStatement}>Télécharger</button>
-                <button className={"btn btn-secondary"} onClick={props.submitStatement}>Envoyer</button>
-            </div>
-        </section>)
-}
+            <p>
+              <b>Coût de la formalité : </b>
+              {price} €
+            </p>
+          </div>
+        </Col>
+        <Col lg={3}>
+          <Image
+            src="illus/publish.svg"
+            alt="Illustration d'une publication"
+            height={300}
+          />
+        </Col>
+      </Row>
+    </div>
+  );
+};
 
+const Summary = (props) => {
+  const {
+    siren,
+    corporateName,
+    year,
+    declarant,
+    declarantOrganisation,
+    email,
+    price,
+    socialFootprint,
+    indicatorsToPublish,
+    comments,
+    onReturn,
+  } = props;
+
+  const [isSend, setIsSend] = useState(false);
+  const [error, setError] = useState(false);
+  const today = new Date();
+  const todayString =
+    String(today.getDate()).padStart(2, "0") +
+    "/" +
+    String(today.getMonth() + 1).padStart(2, "0") +
+    "/" +
+    today.getFullYear();
+
+  const legalUnitFootprint = Object.entries(socialFootprint.indicators)
+    .filter(([indicator, _]) => indicatorsToPublish[indicator])
+    .reduce((acc, [indicator, value]) => {
+      acc[indicator] = value;
+      return acc;
+    }, {});
+
+  const exportStatement = () => {
+    exportStatementPDF(
+      siren,
+      corporateName,
+      year,
+      declarant,
+      declarantOrganisation,
+      price,
+      legalUnitFootprint,
+      comments
+    );
+  };
+
+  const submitStatement = async (event) => {
+    event.preventDefault();
+
+    try {
+      const statementFile = getBinaryPDF(
+        siren,
+        corporateName,
+        year,
+        declarant,
+        declarantOrganisation,
+        price,
+        legalUnitFootprint,
+        comments
+      );
+
+      const messageToAdmin = mailToAdminWriter(
+        siren,
+        corporateName,
+        year,
+        legalUnitFootprint,
+        comments,
+        declarant,
+        declarantOrganisation,
+        email,
+        price
+      );
+
+      const resAdmin = await sendStatementToAdmin(
+        messageToAdmin,
+        statementFile
+      );
+
+      const messageToDeclarant = mailToDeclarantWriter(declarant);
+
+      const resDeclarant = await sendStatementToDeclarant(
+        email,
+        messageToDeclarant,
+        statementFile
+      );
+
+      if (resAdmin.status == 300 && resDeclarant.status && 300) {
+        setIsSend(true);
+        setError(false);
+      } else {
+        setIsSend(false);
+        setError(true);
+      }
+      
+    } catch (error) {
+      setIsSend(false);
+      setError(true);
+      console.error("Erreur lors de la soumission de la déclaration :", error);
+    }
+  };
+
+  return (
+    <div>
+      <PublishSummary
+        siren={siren}
+        corporateName={corporateName}
+        declarantOrganisation={declarantOrganisation}
+        year={year}
+        declarant={declarant}
+        price={price}
+        legalUnitFootprint={legalUnitFootprint}
+        todayString={todayString}
+        comments={comments}
+      />
+
+      {isSend && (
+        <div className="alert alert-success">
+          <p>Demande de publication envoyée ! Merci.</p>
+        </div>
+      )}
+      {error && (
+        <div className="alert alert-danger">
+          <p>
+            Erreur lors de l'envoi de la publication. Si l'erreur persiste,
+            contactez le support.
+          </p>
+        </div>
+      )}
+      <div className="mt-4">
+        <button className={"btn btn-primary me-2"} onClick={exportStatement}>
+          <i className="bi bi-download"></i> Télécharger le récapitulatif
+        </button>
+        <button className={"btn btn-secondary"} onClick={submitStatement}>
+          <i className="bi bi-send"></i> Envoyer pour publication
+        </button>
+      </div>
+      <div className="text-end mt-4">
+        <button className="btn btn-light" onClick={onReturn}>
+          <i className="bi bi-chevron-left"></i> Retour au formulaire
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default PublishStatementSection;
 
 /* ----- Builder message mails ----- */
 
-const mailToAdminWriter = (statementData) =>
-(
-    "Unité légale : " + statementData.siren + "\n"
-    + "Dénomination : " + statementData.denomination + "\n"
-    + "Année : " + statementData.year + "\n"
-    + "\n"
-    + "Valeurs à publier :" + "\n"
-    + "\n"
-    + Object.entries(statementData.socialFootprint).map(([_, indicator]) => (indicator.indic + " : " + indicator.value + " +/- " + indicator.uncertainty + " % "))
-        .reduce((a, b) => a + "\r\n" + b, "")
-    + "\n"
-    + "Déclarant :" + "\n"
-    + "Nom : " + " - " + "\n"
-    + "Mail : " + " - " + "\n"
-    + "\n"
-    + "Tarif :" + " - " + " €" + "\n"
-)
+const mailToAdminWriter = (
+  siren,
+  corporateName,
+  year,
+  legalUnitFootprint,
+  comments,
+  declarant,
+  declarantOrganisation,
+  email,
+  price
+) => {
 
-const mailToDeclarantWriter = (statementData) =>
-(
-    ""
-    + statementData.declarant + "," + "\n"
-    + "\n"
-    + "Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration." + "\n"
-    + "Le délai de traitement est de 7 jours." + "\n"
-    + "\n"
-    + "Pour modifier ou supprimer les données publiées, contactez-nous directement via l'adresse mail admin@lasocietenouvelle.org" + "\n"
-    + "\n"
-    + "Bien à vous," + "\n"
-    + "\n"
-    + "La Société Nouvelle."
-)
+console.log(legalUnitFootprint)  
+  let mailContent = `Unité légale : ${siren} \n
+Dénomination : ${corporateName} \n
+Année : ${year}  \n
+Valeurs à publier :\n
+${Object.entries(legalUnitFootprint)
+  .map(([indicator, value]) => {
+    const comment = comments[indicator]
+      ? ` Commentaire : ${comments[indicator]}`
+      : "";
+    return `- ${indicator} : ${value.value} ( incertitude : +/- ${value.uncertainty} % )${comment}`;
+  })
+  .join("\n")}`;
+
+  if (declarantOrganisation) {
+    mailContent += `\nStructure déclarante : ${declarantOrganisation}`;
+  }
+
+  mailContent += `\nDéclarant : ${declarant}\n
+Mail : ${email}\n
+Tarif : ${price} - €`;
+
+console.log(mailContent)
+  return mailContent;
+};
+
+
+const mailToDeclarantWriter = (declarant) => {
+  let mailContent = `${declarant},\n
+
+Votre demande de publication a bien été prise en compte. Vous trouverez ci-joint votre déclaration.
+Le délai de traitement est de 7 jours.\n
+
+Pour modifier ou supprimer les données publiées, contactez-nous directement via l'adresse mail admin@lasocietenouvelle.org.\n
+
+Bien à vous,\n
+La Société Nouvelle.`;
+
+  return mailContent;
+};

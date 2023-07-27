@@ -7,21 +7,28 @@ import { AssessmentKNW } from "../modals/AssessmentKNW";
 
 const StatementKNW = ({ impactsData, onUpdate, onError }) => {
   const [researchAndTrainingContribution, setResearchAndTrainingContribution] =
-    useState(
-      valueOrDefault(
-        impactsData.researchAndTrainingContribution,
-        ""
-      )
-    );
+    useState(valueOrDefault(impactsData.researchAndTrainingContribution, ""));
   const [info, setInfo] = useState(impactsData.comments.knw || " ");
   const [showModal, setShowModal] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
 
+  useEffect(() => {
+    if (
+      researchAndTrainingContribution !=
+        impactsData.researchAndTrainingContribution &&
+      impactsData.researchAndTrainingContribution
+    ) {
+      setResearchAndTrainingContribution(
+        impactsData.researchAndTrainingContribution
+      );
+  
+    }
+  }, [impactsData.researchAndTrainingContribution]);
 
   const updateResearchAndTrainingContribution = (input) => {
     let errorMessage = "";
     const inputValue = input.target.valueAsNumber;
-  
+
     if (isNaN(inputValue)) {
       errorMessage = "Veuillez saisir un nombre valide.";
     } else if (impactsData.netValueAdded == null) {
@@ -30,13 +37,12 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
       errorMessage =
         "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
     }
-    console.log(errorMessage);
 
     setIsInvalid(errorMessage !== "");
     onError("knw", errorMessage);
 
     impactsData.researchAndTrainingContribution = input.target.value;
-    setResearchAndTrainingContribution( input.target.value);
+    setResearchAndTrainingContribution(input.target.value);
 
     onUpdate("knw");
   };
@@ -46,33 +52,41 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
     impactsData.comments.knw = event.target.value;
   };
 
-
   return (
     <Form className="statement">
       <Row>
-      <Col lg={7}>
-    {console.log(isInvalid)}
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
+            <Form.Label column lg={7}>
               Valeur ajoutée nette dédiée à la recherche ou à la formation
             </Form.Label>
             <Col>
-              <InputGroup>
-                <Form.Control
-                  type="number"
-                  value={roundValue(researchAndTrainingContribution, 0)}
-                  inputMode="numeric"
-                  onChange={updateResearchAndTrainingContribution}
-                  isInvalid={isInvalid}
-                />
-                <InputGroup.Text>&euro;</InputGroup.Text>
-              </InputGroup>
+              <div className="d-flex justify-content-between">
+                <InputGroup className="custom-input me-1">
+                  <Form.Control
+                    type="number"
+                    value={roundValue(researchAndTrainingContribution, 0)}
+                    inputMode="numeric"
+                    onChange={updateResearchAndTrainingContribution}
+                    isInvalid={isInvalid}
+                  />
+                  <InputGroup.Text>&euro;</InputGroup.Text>
+                </InputGroup>
+                <Button
+                  variant="light-secondary"
+                  onClick={() => setShowModal(true)}
+                >
+                  <i className="bi bi-calculator"></i>
+                </Button>
+              </div>
             </Col>
           </Form.Group>
         </Col>
         <Col>
           <Form.Group className="form-group">
-            <Form.Label className="col-form-label">Informations complémentaires</Form.Label>
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
@@ -82,15 +96,6 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
             />
           </Form.Group>
         </Col>
-        <div className="text-end my-3">
-          <Button
-          variant="light-secondary"
-            className="btn-sm"
-            onClick={() => setShowModal(true)}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation
-          </Button>
-        </div>
       </Row>
 
       <Modal

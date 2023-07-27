@@ -30,8 +30,8 @@ export default class FECImport extends React.Component
               exercice, validez la sélection sans cocher de case.
             </p>
           </div>
-        <div className="table-container">
-          <Table bordered hover responsive >
+       
+          <Table bordered hover  >
             <thead>
               <tr>
                 <td>Code</td>
@@ -92,7 +92,7 @@ export default class FECImport extends React.Component
               <i className="bi bi-chevron-right"></i>
             </button>
           </div>
-        </div>
+        
       </>
     );
   }

@@ -23,6 +23,7 @@ const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
     valueOrDefault(impactsData.hazardousSubstancesConsumptionUncertainty, "")
   );
 
+  
   const [isInvalid, setIsInvalid] = useState(false);
 
   const [info, setInfo] = useState(impactsData.comments.haz || "");
@@ -58,7 +59,10 @@ const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
   };
 
   const updateHazardousSubstancesConsumptionUncertainty = (input) => {
+    console.log(input.target.value)
     impactsData.hazardousSubstancesConsumptionUncertainty = input.target.value;
+    setHazardousSubstancesConsumptionUncertainty(input.target.value);
+
     onUpdate("haz");
   };
 
@@ -99,22 +103,21 @@ const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
+            <Form.Label column lg={7}>
               Utilisation de produits dangereux - santé/environnement
             </Form.Label>
             <Col>
-              <Row>
-                <Col>
+            <div className=" d-flex align-items-center justify-content-between">
+                <div className="input-group custom-input with-select">
                   <Form.Control
                     type="number"
                     value={roundValue(hazardousSubstancesConsumption, 0)}
                     inputMode="numeric"
                     onChange={updateHazardousSubstancesConsumption}
                     isInvalid={isInvalid}
+                    className="me-1"
                   />
-                </Col>
-                <Col sm={4}>
-                  <Select
+                   <Select
                     styles={unitSelectStyles}
                     options={options}
                     defaultValue={{
@@ -124,15 +127,18 @@ const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
                     className="small"
                     onChange={updateHazardousSubstancesConsumptionUnit}
                   />
-                </Col>
-              </Row>
+                </div>
+                <div>
+                 
+                </div>
+              </div>
             </Col>
           </Form.Group>
 
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Incertitude</Form.Label>
+            <Form.Label column lg={7}>Incertitude</Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input ">
                 <Form.Control
                   type="number"
                   value={roundValue(
@@ -141,6 +147,7 @@ const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
                   )}
                   inputMode="numeric"
                   onChange={updateHazardousSubstancesConsumptionUncertainty}
+                  className="uncertainty-input"
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>

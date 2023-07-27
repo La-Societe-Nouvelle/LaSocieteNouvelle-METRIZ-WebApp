@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Image, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import UpdateDataView from "./UpdatedDataView";
 
-export const DataUpdater = ({
-  session,
-  updatePrevSession,
-}) => {
+export const DataUpdater = ({ session, updatePrevSession }) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [updatedSession, setUpdatedSession] = useState({});
@@ -35,11 +32,12 @@ export const DataUpdater = ({
         <h3>Actualisation des données...</h3>
       </Modal.Header>
       <Modal.Body>
-        {isLoading && (
-          <div className="loader-container my-4">
-            <div className="dot-pulse m-auto"></div>
-          </div>
-        )}
+      <Image
+              src="/illus/sync.svg"
+              alt=""
+              className="d-block mx-auto mb-4"
+              height={150}
+            />
         {isDatafetched && (
           <UpdateDataView
             prevSession={session}
@@ -49,9 +47,10 @@ export const DataUpdater = ({
           ></UpdateDataView>
         )}
         {!isDatafetched && !isLoading && (
-          <>
-            <p>
-              Des données plus récentes sont peut-être disponibles.
+          <div className="text-center">
+            
+            <p className="">
+              Il se pourrait que des données plus récentes soient disponibles.
               Souhaitez-vous vérifier si les données sont à jour ?
             </p>
             <Button
@@ -62,7 +61,13 @@ export const DataUpdater = ({
             >
               Vérifier mes données
             </Button>
-          </>
+          </div>
+        )}
+
+        {isLoading && (
+          <div className="loader-container my-4">
+            <div className="dot-pulse m-auto"></div>
+          </div>
         )}
       </Modal.Body>
     </Modal>
@@ -97,7 +102,6 @@ const fetchLatestData = async (updatedSession) => {
   await fetchLatestAccountsData(prevImmobilisations, prevStocks);
 
   // Récupère les dernières données comparatives
-
 
   if (validations.length > 0) {
     await fetchComparativeData(updatedSession.comparativeData, validations);
