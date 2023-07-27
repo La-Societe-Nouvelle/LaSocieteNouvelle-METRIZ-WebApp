@@ -17,9 +17,10 @@ export const customSelectStyles = {
     }),
     option: (provided, state) => ({
       ...provided,
-      fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? "#191558" : "transparent",
-      background: state.isFocused ? "#f0f0f8" : "",
+      fontSize: "0.7rem",
+      color: "#191558",
+      backgroundColor:"transparent",
+      background: state.isFocused ? "#dbdef1" : "",
       "&:hover": {
         color: "#191558",
       },
@@ -30,7 +31,7 @@ export const customSelectStyles = {
     control: (provided, state) => ({
       ...provided,
       border: "1px solid #dbdef1",
-      fontSize: "0.85rem",
+      fontSize: "0.8rem",
       borderRadius: "0.5rem",
       boxShadow: "none",
       "&:hover": {
@@ -39,6 +40,8 @@ export const customSelectStyles = {
     }),
     dropdownIndicator: (provided) => ({
       ...provided,
+      padding : '4px',
+
       color: "#dbdef1",
       "&:hover": {
         color: "#dbdef1",
@@ -46,9 +49,10 @@ export const customSelectStyles = {
     }),
     option: (provided, state) => ({
       ...provided,
-      fontSize: "0.85rem",
-      backgroundColor: state.isSelected ? "#191558" : "transparent",
-      background: state.isFocused ? "#f0f0f8" : "",
+      fontSize: "0.7rem",
+      color: "#191558",
+      backgroundColor:"transparent",
+      background: state.isFocused ? "#dbdef1" : "",
       "&:hover": {
         color: "#191558",
       },

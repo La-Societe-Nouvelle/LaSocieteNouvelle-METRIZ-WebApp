@@ -112,3 +112,23 @@ table input {
 .form-label {
   font-weight: 600;
 }
+
+.statement {
+  .custom-input {
+    justify-content: end;
+  }
+  .custom-input  > .form-control{
+    flex: inherit;
+    width: 50%;
+    text-align: end;
+ 
+  }
+  .custom-input.with-select .form-control {
+    border-top-right-radius: 0.5rem !important;
+    border-bottom-right-radius: 0.5rem !important;
+  }
+}
+
+.uncertainty-input {
+  width: 55px !important;
+}

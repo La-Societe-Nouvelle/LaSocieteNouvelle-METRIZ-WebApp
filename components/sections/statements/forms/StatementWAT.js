@@ -46,13 +46,12 @@ const StatementWAT = ({ impactsData, onUpdate, onError }) => {
 
   const updateWaterConsumptionUncertainty = (input) => {
     impactsData.waterConsumptionUncertainty = input.target.value;
+    setWaterConsumptionUncertainty(input.target.value)
     onUpdate("wat");
   };
 
   const updateWaterConsumptionUnit = (selected) => {
     const selectedUnit = selected.value;
-
-    const { waterConsumption, waterConsumptionUnit } = impactsData;
 
     if (selectedUnit !== impactsData.waterConsumptionUnit) {
       let updatedWaterConsumption = impactsData.waterConsumption;
@@ -84,40 +83,41 @@ const StatementWAT = ({ impactsData, onUpdate, onError }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Consommation totale d'eau</Form.Label>
+            <Form.Label column lg={7}>
+              Consommation totale d'eau
+            </Form.Label>
             <Col>
-              <Row>
-                <Col>
-                  <Form.Control
-                    type="number"
-                    value={roundValue(waterConsumption, 0)}
-                    inputMode="numeric"
-                    onChange={updateWaterConsumption}
-                  />
-                </Col>
-                <Col sm={4}>
-                  <Select
-                    options={options}
-                    styles={unitSelectStyles}
-                    value={{
-                      label: waterConsumptionUnit,
-                      value: waterConsumptionUnit,
-                    }}
-                    onChange={updateWaterConsumptionUnit}
-                  />
-                </Col>
-              </Row>
+              <div className="custom-input with-select input-group">
+                <Form.Control
+                  type="number"
+                  value={roundValue(waterConsumption, 0)}
+                  inputMode="numeric"
+                  onChange={updateWaterConsumption}
+                  className="me-1"
+                />
+
+                <Select
+                  options={options}
+                  styles={unitSelectStyles}
+                  value={{
+                    label: waterConsumptionUnit,
+                    value: waterConsumptionUnit,
+                  }}
+                  onChange={updateWaterConsumptionUnit}
+                />
+              </div>
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Incertitude</Form.Label>
+            <Form.Label column lg={7}>Incertitude</Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(waterConsumptionUncertainty, 0)}
                   inputMode="numeric"
                   onChange={updateWaterConsumptionUncertainty}
+                  className="uncertainty-input"
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>

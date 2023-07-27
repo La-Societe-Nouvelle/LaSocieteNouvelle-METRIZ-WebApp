@@ -97,22 +97,21 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
-              Emissions directes de Gaz à effet de serre - SCOPE 1
+            <Form.Label column lg={7}>
+              Emissions directes de Gaz à effet de serre - SCOPE 1  *
             </Form.Label>
             <Col>
-              <Row className="align-items-center">
-                <Col>
+              <div className=" d-flex align-items-center justify-content-between">
+                <div className="me-1 custom-input with-select input-group">
                   <Form.Control
                     type="number"
                     value={roundValue(greenhousesGazEmissions, 0)}
                     inputMode="numeric"
                     onChange={updateGreenhousesGazEmissions}
                     isInvalid={isInvalid}
+                    className="me-1"
                   />
-                </Col>
-                <Col sm={4}>
-                  <Select
+                    <Select
                     styles={unitSelectStyles}
                     options={options}
                     value={{
@@ -121,24 +120,48 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
                     }}
                     onChange={updateGreenhousesGazEmissionsUnit}
                   />
-                </Col>
-              </Row>
+                </div>
+          
+                <div>
+                  <Button
+                    variant="light-secondary"             
+                    onClick={() => setShowModal(true)}
+                  >
+                    <i className="bi bi-calculator"></i> 
+                  </Button>
+                </div>
+              </div>
             </Col>
           </Form.Group>
+
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Incertitude</Form.Label>
+            <Form.Label column lg={7}>Incertitude</Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(greenhousesGazEmissionsUncertainty, 0)}
                   inputMode="numeric"
                   onChange={updateGreenhousesGazEmissionsUncertainty}
+                  className="uncertainty-input"
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
             </Col>
           </Form.Group>
+          <div className="my-3 text-end">
+            <p className="small mt-3">
+             *Vous pouvez aussi calculer vos émissions avec l' <a
+                className="text-link text-decoration-underline"
+                href="https://www.bilans-climat-simplifies.ademe.fr/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                 Outil de l'Ademe 
+              </a>
+              .
+            </p>
+        </div>
         </Col>
         <Col>
           <Form.Group className="form-group">
@@ -156,30 +179,7 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
         </Col>
-
-        <div className="my-3 text-end">
-          <Button
-            variant="light-secondary"
-            className="btn-sm mt-2"
-            onClick={() => setShowModal(true)}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation *
-          </Button>
-
-          <p className="small mt-3">
-            * Vous pouvez également calculer vos émissions de gaz à effet de
-            serre en utilisant l'
-            <a
-              className="text-link"
-              href="https://www.bilans-climat-simplifies.ademe.fr/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Outil de l'Ademe <i className="bi bi-box-arrow-up-right"></i>
-            </a>
-            .
-          </p>
-        </div>
+      
       </Row>
 
       <Modal

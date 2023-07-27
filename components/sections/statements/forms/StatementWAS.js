@@ -24,14 +24,12 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
 
   const [info, setInfo] = useState(impactsData.comments.was || "");
 
-
   const options = [
     { value: "kg", label: "kg" },
     { value: "t", label: "t" },
   ];
 
   const updateWasteProduction = (input) => {
-
     let errorMessage = "";
 
     const inputValue = input.target.valueAsNumber;
@@ -45,7 +43,6 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
     setIsInvalid(errorMessage !== "");
     onError("was", errorMessage);
 
-
     impactsData.setWasteProduction(input.target.value);
     setWasteProduction(input.target.value);
     setWasteProductionUncertainty(impactsData.wasteProductionUncertainty);
@@ -54,6 +51,7 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
 
   const updateWasteProductionUncertainty = (input) => {
     impactsData.wasteProductionUncertainty = input.target.value;
+    setWasteProductionUncertainty(input.target.value);
     onUpdate("was");
   };
 
@@ -71,7 +69,6 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
 
       setWasteProduction(updatedWasteProduction);
       impactsData.setWasteProduction(updatedWasteProduction);
-
     }
 
     setWasteProductionUnit(selectedUnit);
@@ -90,43 +87,47 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
+            <Form.Label column lg={7}>
               Productiont totale de déchets (y compris DAOM<sup>1</sup>)
+              <p className="small mb-0 mt-1">
+                <sup>1</sup> Déchets assimilés aux ordures ménagères
+              </p>
             </Form.Label>
             <Col>
-              <Row>
-                <Col>
-                  <Form.Control
-                    type="number"
-                    value={roundValue(wasteProduction, 0)}
-                    inputMode="numeric"
-                    onChange={updateWasteProduction}
-                    isInvalid={isInvalid}
-                  />
-                </Col>
-                <Col sm={4}>
-                  <Select
-                    options={options}
-                    styles={unitSelectStyles}
-                    value={{
-                      label: wasteProductionUnit,
-                      value: wasteProductionUnit,
-                    }}
-                    onChange={updateWasteProductionUnit}
-                  />
-                </Col>
-              </Row>
+              <div className="custom-input with-select input-group me-1">
+                <Form.Control
+                  type="number"
+                  value={roundValue(wasteProduction, 0)}
+                  inputMode="numeric"
+                  onChange={updateWasteProduction}
+                  isInvalid={isInvalid}
+                  className="me-1"
+                />
+
+                <Select
+                  options={options}
+                  styles={unitSelectStyles}
+                  value={{
+                    label: wasteProductionUnit,
+                    value: wasteProductionUnit,
+                  }}
+                  onChange={updateWasteProductionUnit}
+                />
+              </div>
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Incertitude</Form.Label>
+            <Form.Label column lg={7}>
+              Incertitude
+            </Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(wasteProductionUncertainty, 0)}
                   inputMode="numeric"
                   onChange={updateWasteProductionUncertainty}
+                  className="uncertainty-input"
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -146,12 +147,6 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
           </Form.Group>
         </Col>
       </Row>
-
-      <div className="d-flex justify-content-between">
-        <p className="small">
-          <sup>1</sup> Déchets assimilés aux ordures ménagères
-        </p>
-      </div>
     </Form>
   );
 };

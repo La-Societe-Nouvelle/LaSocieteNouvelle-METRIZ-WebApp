@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-import React, { useState} from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
@@ -11,7 +11,6 @@ import { unitSelectStyles } from "../../../../config/customStyles";
 /* ---------- DECLARATION - INDIC #NRG ---------- */
 
 const StatementNRG = ({ impactsData, onUpdate, onError }) => {
-  
   const [energyConsumption, setEnergyConsumption] = useState(
     valueOrDefault(impactsData.energyConsumption, "")
   );
@@ -57,6 +56,7 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
 
   const updateEnergyConsumptionUncertainty = (input) => {
     impactsData.energyConsumptionUncertainty = input.target.value;
+    setEnergyConsumptionUncertainty(input.target.value);
     onUpdate("nrg");
   };
 
@@ -117,19 +117,18 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Consommation totale d'énergie</Form.Label>
+            <Form.Label column lg={7}>Consommation totale d'énergie</Form.Label>
             <Col>
-              <Row className="align-items-center">
-                <Col>
+              <div className=" d-flex align-items-center justify-content-between">
+                <div className="custom-input with-select input-group me-1">
                   <Form.Control
                     type="number"
                     value={roundValue(energyConsumption, 0)}
                     inputMode="numeric"
                     isInvalid={isInvalid}
                     onChange={updateEnergyConsumption}
+                    className="me-1"
                   />
-                </Col>
-                <Col sm={4}>
                   <Select
                     styles={unitSelectStyles}
                     options={options}
@@ -139,19 +138,29 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
                     }}
                     onChange={updateEnergyConsumptionUnit}
                   />
-                </Col>
-              </Row>
+                </div>
+
+                <div>
+                  <Button
+                    variant="light-secondary"
+                    onClick={() => setShowModal(true)}
+                  >
+                    <i className="bi bi-calculator"></i>
+                  </Button>
+                </div>
+              </div>
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>Incertitude</Form.Label>
+            <Form.Label column lg={7}>Incertitude</Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(energyConsumptionUncertainty, 0)}
                   inputMode="numeric"
                   onChange={updateEnergyConsumptionUncertainty}
+                  className="uncertainty-input"
                 />
 
                 <InputGroup.Text>%</InputGroup.Text>
@@ -173,15 +182,6 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
             />
           </Form.Group>
         </Col>
-        <div className="text-end my-3">
-          <Button
-            variant="light-secondary"
-            className="btn-sm"
-            onClick={() => setShowModal(true)}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation
-          </Button>
-        </div>
       </Row>
 
       <Modal

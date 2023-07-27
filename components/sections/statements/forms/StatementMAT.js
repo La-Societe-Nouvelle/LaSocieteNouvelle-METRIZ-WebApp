@@ -29,7 +29,6 @@ const StatementMAT = ({ impactsData, onUpdate, onError }) => {
   const [isInvalid, setIsInvalid] = useState(false);
 
   useEffect(() => {
-
     impactsData.isExtractiveActivities = isExtractiveActivities;
     impactsData.materialsExtraction = materialsExtraction;
     impactsData.materialsExtractionUncertainty = materialsExtractionUncertainty;
@@ -103,7 +102,7 @@ const StatementMAT = ({ impactsData, onUpdate, onError }) => {
 
   const updateMaterialsExtractionUncertainty = (input) => {
     impactsData.materialsExtractionUncertainty = input.target.value;
-    setMaterialsExtraction(impactsData.materialsExtraction);
+    setMaterialsExtractionUncertainty(input.target.value);
   };
 
   const updateInfo = (event) => {
@@ -116,7 +115,7 @@ const StatementMAT = ({ impactsData, onUpdate, onError }) => {
       <Row>
         <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
-            <Form.Label column>
+            <Form.Label column lg={7}>
               L'entreprise réalise-t-elle des activités agricoles ou extractives
               ?
             </Form.Label>
@@ -142,12 +141,12 @@ const StatementMAT = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
+            <Form.Label column lg={7}>
               Quantité extraite de matières premières
             </Form.Label>
             <Col>
-              <Row>
-                <Col>
+              <div className=" d-flex align-items-center justify-content-between">
+                <div className="custom-input with-select input-group">
                   <Form.Control
                     type="number"
                     value={roundValue(materialsExtraction, 0)}
@@ -155,9 +154,8 @@ const StatementMAT = ({ impactsData, onUpdate, onError }) => {
                     disabled={!isExtractiveActivities}
                     onChange={updateMaterialsExtraction}
                     isInvalid={isInvalid}
+                    className="me-1 border-right-3"
                   />
-                </Col>
-                <Col sm={4}>
                   <Select
                     styles={unitSelectStyles}
                     isDisabled={!isExtractiveActivities}
@@ -168,20 +166,21 @@ const StatementMAT = ({ impactsData, onUpdate, onError }) => {
                     }}
                     onChange={updateMaterialsExtractionUnit}
                   />
-                </Col>
-              </Row>
+                </div>
+              </div>
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
             <Form.Label column>Incertitude</Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(materialsExtractionUncertainty, 0)}
                   inputMode="numeric"
                   disabled={!isExtractiveActivities}
                   onChange={updateMaterialsExtractionUncertainty}
+                  className="uncertainty-input"
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>

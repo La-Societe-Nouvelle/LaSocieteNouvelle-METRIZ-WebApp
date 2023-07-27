@@ -1,10 +1,10 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button, Modal } from "react-bootstrap";
+import { Form, Row, Col } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { IndividualsData } from "../modals/socialData/IndividualsData";
-import ImportDSN from "../modals/socialData/ImportDSN";
+
+import AssessmentDSN from "../modals/AssessmentDSN";
 
 /* ---------- DECLARATION - INDIC #IDR ---------- */
 
@@ -16,16 +16,13 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
 
   const [isInvalid, setIsInvalid] = useState(false);
 
-  const [showCalculatorModal, setShowCalulatorModal] = useState(false);
-  const [showDSN, setShowDSN] = useState(false);
-
   const hasEmployees = impactsData.hasEmployees;
 
   useEffect(() => {
     if (impactsData.hasEmployees == false) {
       onUpdate("idr");
     }
-  }, []);
+  }, [impactsData]);
 
   useEffect(() => {
     if (
@@ -35,6 +32,7 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
       setInterdecileRange(impactsData.interdecileRange);
     }
   }, [impactsData.interdecileRange]);
+
   const onHasEmployeesChange = (event) => {
     const radioValue = event.target.value;
     let newHasEmployees = null;
@@ -83,13 +81,12 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
   return (
     <Form className="statement">
       <Row>
-      <Col lg={7}>
-
+        <Col lg={7}>
           <Form.Group as={Row} className="form-group align-items-center">
             <Form.Label column lg={7}>
               L'entreprise est-elle employeur ?
             </Form.Label>
-            <Col>
+            <Col className="d-flex justify-content-end">
               <Form.Check
                 inline
                 type="radio"
@@ -115,36 +112,20 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
               Rapport interdécile D9/D1 des taux horaires bruts
             </Form.Label>
             <Col>
-         
-              <Form.Control
-                type="number"
-                value={roundValue(interdecileRange, 1)}
-                inputMode="numeric"
-                onChange={updateInterdecileRange}
-                disabled={hasEmployees === false}
-                isInvalid={isInvalid}
-              />
-              <Button
-                variant="light-secondary"
-                className="btn-sm mt-1 me-2 rounded-2  w-100 p-1"
-                onClick={() => setShowDSN(true)}
-                disabled={hasEmployees ? false : true}
-              >
-                <i className="bi bi-upload me-1"></i>
-                &nbsp;Importer les DSN
-              </Button>
-             
-                <Button
-          
-                  variant="light"
-                  className="btn-sm mt-1 me-2 rounded-2 w-100 p-1 fw-bold"
-                  onClick={() => setShowCalulatorModal(true)}
-                  disabled={hasEmployees && impactsData.socialStatements.length > 0 ? false : true}
-                >
-               <i className="bi bi-pencil me-1"></i>
-                  Gérer les données importées
-                </Button>
-           
+              <div className="d-flex ">
+                <div className="input-group custom-input me-1">
+                  <Form.Control
+                    type="number"
+                    value={roundValue(interdecileRange, 1)}
+                    inputMode="numeric"
+                    onChange={updateInterdecileRange}
+                    disabled={hasEmployees === false}
+                    isInvalid={isInvalid}
+                  />
+                </div>
+
+                <AssessmentDSN impactsData={impactsData} onUpdate={onUpdate} />
+              </div>
             </Col>
           </Form.Group>
         </Col>
@@ -163,7 +144,7 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
           </Form.Group>
         </Col>
       </Row>
-      <Modal
+      {/* <Modal
         show={showCalculatorModal}
         size="xl"
         centered
@@ -194,7 +175,7 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
             onUpdate={onUpdate}
           />
         </Modal.Body>
-      </Modal>
+      </Modal> */}
     </Form>
   );
 };

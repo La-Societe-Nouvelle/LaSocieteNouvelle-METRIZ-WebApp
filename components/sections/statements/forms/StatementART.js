@@ -8,10 +8,10 @@ import { roundValue } from "/src/utils/Utils";
 
 
 const StatementART = ({ impactsData, onUpdate, onError }) => {
+
   const [craftedProduction, setCraftedProduction] = useState( impactsData.craftedProduction || "" );
   const [info, setInfo] = useState(impactsData.comments.art || "");
   const [isInvalid, setIsInvalid] = useState(false);
-
 
   const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
@@ -103,11 +103,11 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column>
+            <Form.Label column lg={7}>
               Part de la valeur ajoutée artisanale
             </Form.Label>
             <Col>
-              <InputGroup>
+              <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
                   value={roundValue(craftedProduction, 0)}

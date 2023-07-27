@@ -1,10 +1,9 @@
 // La Société Nouvelle
 
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
+import { Form, Row, Col, InputGroup } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import  ImportDSN  from "../modals/socialData/ImportDSN";
-import { IndividualsData } from "../modals/socialData/IndividualsData";
+import AssessmentDSN from "../modals/AssessmentDSN";
 
 const StatementGEQ = (props) => {
   const [wageGap, setWageGap] = useState(
@@ -12,8 +11,6 @@ const StatementGEQ = (props) => {
   );
   const [info, setInfo] = useState(props.impactsData.comments.geq || "");
   const [isDisabled, setIsDisabled] = useState(false);
-  const [showCalculatorModal, setShowCalulatorModal] = useState(false);
-  const [showDSN, setShowDSN] = useState(false);
 
   const hasEmployees = props.impactsData.hasEmployees;
 
@@ -21,7 +18,7 @@ const StatementGEQ = (props) => {
     if (props.impactsData.hasEmployees == false) {
       props.onUpdate("geq");
     }
-  }, []);
+  }, [props.impactsData]);
 
   useEffect(() => {
     if (!props.impactsData.hasEmployees && wageGap === 0) {
@@ -115,40 +112,24 @@ const StatementGEQ = (props) => {
               </span>
             </Form.Label>
             <Col>
-              <InputGroup>
-                <Form.Control
-                  type="number"
-                  value={roundValue(wageGap, 1)}
-                  disabled={hasEmployees === false}
-                  inputMode="numeric"
-                  onChange={updateWageGap}
-                  isInvalid={isDisabled}
-                />
-                <InputGroup.Text>%</InputGroup.Text>
-              </InputGroup>
-              <Button
-                variant="light-secondary"
-                className="btn-sm mt-1 me-2 rounded-2  w-100 p-1"
-                onClick={() => setShowDSN(true)}
-                disabled={hasEmployees ? false : true}
-              >
-                <i className="bi bi-upload me-1"></i>
-                &nbsp;Importer les DSN
-              </Button>
+            <div className="d-flex justify-content-between">
+                  <InputGroup className="custom-input me-1">
+                    <Form.Control
+                      type="number"
+                      value={roundValue(wageGap, 1)}
+                      disabled={hasEmployees === false}
+                      inputMode="numeric"
+                      onChange={updateWageGap}
+                      isInvalid={isDisabled}
+                    />
+                    <InputGroup.Text>%</InputGroup.Text>
+                  </InputGroup>
 
-              <Button
-                variant="light"
-                className="btn-sm mt-1 me-2 rounded-2 w-100 p-1 fw-bold"
-                onClick={() => setShowCalulatorModal(true)}
-                disabled={
-                  hasEmployees && props.impactsData.socialStatements.length > 0
-                    ? false
-                    : true
-                }
-              >
-                <i className="bi bi-pencil me-1"></i>
-                Gérer les données importées
-              </Button>
+                  <AssessmentDSN
+                    impactsData={props.impactsData}
+                    onUpdate={props.onUpdate}
+                  />
+              </div>
             </Col>
           </Form.Group>
         </Col>
@@ -170,39 +151,6 @@ const StatementGEQ = (props) => {
           </Form.Group>
         </Col>
       </Row>
-
-      <Modal
-        show={showCalculatorModal}
-        size="xl"
-        centered
-        onHide={() => setShowCalulatorModal(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Données sociales</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <IndividualsData
-            impactsData={props.impactsData}
-            onGoBack={() => setShowCalulatorModal(false)}
-            handleClose={() => setShowCalulatorModal(false)}
-            onUpdate={props.onUpdate}
-          />
-        </Modal.Body>
-      </Modal>
-
-      <Modal show={showDSN} size="xl" centered onHide={() => setShowDSN(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Données sociales</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ImportDSN
-            impactsData={props.impactsData}
-            onGoBack={() => setShowDSN(false)}
-            handleClose={() => setShowDSN(false)}
-            onUpdate={props.onUpdate}
-          />
-        </Modal.Body>
-      </Modal>
     </Form>
   );
 };
