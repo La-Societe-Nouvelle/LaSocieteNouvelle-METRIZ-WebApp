@@ -38,19 +38,19 @@ export class AmortisationsTable extends React.Component {
           <caption>Tableau des amortissements</caption>
           <thead>
             <tr>
-              <td
+              <th
                 className="short"
                 onClick={() => this.changeColumnSorted("account")}
               >
                 Compte
-              </td>
-              <td onClick={() => this.changeColumnSorted("accountLib")}>
+              </th>
+              <th onClick={() => this.changeColumnSorted("accountLib")}>
                 Libellé
-              </td>
-              <td className="text-end">Valeur brute au début de l'exercice</td>
-              <td className="text-end">Augmentations</td>
-              <td className="text-end">Diminutions</td>
-              <td className="text-end">Valeur brute à la fin de l'exercice</td>
+              </th>
+              <th className="text-end">Valeur brute au début de l'exercice</th>
+              <th className="text-end">Augmentations</th>
+              <th className="text-end">Diminutions</th>
+              <th className="text-end">Valeur brute à la fin de l'exercice</th>
             </tr>
           </thead>
           <tbody>

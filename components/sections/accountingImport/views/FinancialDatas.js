@@ -7,7 +7,6 @@ import React from "react";
 import { MainAggregatesTable } from "../../../tables/MainAggregatesTable";
 import { ImmobilisationsTable } from "../../../tables/ImmobilisationsTable";
 import { AmortisationsTable } from "../../../tables/AmortisationsTable";
-import { DepreciationsTable } from "../../../tables/DepreciationsTable";
 import { IncomeStatementTable } from "../../../tables/IncomeStatementTable";
 import { ExpensesTable } from "../../../tables/ExpensesTable";
 import { StocksTable } from "../../../tables/StocksTable";
@@ -144,16 +143,11 @@ export class FinancialDatas extends React.Component
               financialData={this.props.session.financialData}
               period={period}
             />
-            <hr></hr>
             <AmortisationsTable
               financialData={this.props.session.financialData}
               period={period}
             />
-            {/* <hr></hr>
-            <DepreciationsTable
-              financialData={this.props.session.financialData}
-              period={period}
-            /> */}
+
           </>
         ); // Table des immobilisations
       case "stocks":

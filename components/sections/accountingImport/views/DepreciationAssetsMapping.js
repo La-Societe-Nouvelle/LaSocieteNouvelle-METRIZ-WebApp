@@ -94,10 +94,10 @@ function DepreciationAssetsMapping(props)
 
   return (
     <div>
-      <h3 >
+      <h3 className="mb-4">
         Associez les comptes d'amortissements et de dépréciations
       </h3>
-      <Table size="lg" hover className="mt-3">
+      <Table>
         <thead>
           <tr>
             <th>Numéro de compte</th>

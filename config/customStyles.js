@@ -1,4 +1,5 @@
 export const customSelectStyles = {
+
     control: (provided, state) => ({
       ...provided,
       border: "2px solid #dbdef1",
@@ -10,6 +11,7 @@ export const customSelectStyles = {
     }),
     dropdownIndicator: (provided) => ({
       ...provided,
+      padding : '4px',
       color: "#dbdef1",
       "&:hover": {
         color: "#dbdef1",
@@ -41,7 +43,6 @@ export const customSelectStyles = {
     dropdownIndicator: (provided) => ({
       ...provided,
       padding : '4px',
-
       color: "#dbdef1",
       "&:hover": {
         color: "#dbdef1",
