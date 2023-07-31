@@ -18,7 +18,7 @@ import {
 
 import metaRubriques from "/lib/rubriquesDSN";
 
-const ImportDSN = ({ impactsData,onDSNUpload }) => {
+const ImportSocialData = ({ impactsData, handleSocialStatements }) => {
   const [socialStatements, setSocialStatements] = useState(
     impactsData.socialStatements || []
   );
@@ -26,19 +26,23 @@ const ImportDSN = ({ impactsData,onDSNUpload }) => {
   const [errors, setErrors] = useState([]);
   const [warning, setWarning] = useState([]);
 
-  useEffect(async() => {
+  useEffect(async () => {
+    if (socialStatements != impactsData.socialStatements) {
+      setSocialStatements(impactsData.socialStatements);
+    }
+  }, [impactsData.socialStatements]);
+
+  useEffect(async () => {
     if (socialStatements.length > 0) {
-       verifySocialStatements(socialStatements);
-      }
-  
-      if(impactsData.socialStatements != socialStatements) {
-        impactsData.socialStatements = socialStatements
-      }
-      onDSNUpload(socialStatements)
+      verifySocialStatements(socialStatements);
+    }
+
+    if (impactsData.socialStatements != socialStatements) {
+      await handleSocialStatements(socialStatements);
+    }
   }, [socialStatements]);
 
   const verifySocialStatements = async (statements) => {
-
     const monthlyStatements = statements.filter(
       (statement) => statement.nature === "01"
     );
@@ -126,7 +130,7 @@ const ImportDSN = ({ impactsData,onDSNUpload }) => {
               const reader = new FileReader();
               reader.onload = () => resolve(DSNFileReader(reader.result));
               reader.onerror = reject;
-              reader.readAsText(file);
+              reader.readAsText(file, "ISO-8859-1");
             });
             const socialStatement = await DSNDataReader(dataDSN);
 
@@ -172,7 +176,6 @@ const ImportDSN = ({ impactsData,onDSNUpload }) => {
         ...prevSocialStatements,
         ...validSocialStatements,
       ]);
-
     } catch (error) {
       console.log(error);
     }
@@ -183,6 +186,7 @@ const ImportDSN = ({ impactsData,onDSNUpload }) => {
   };
 
   const deleteStatement = (id) => {
+
     setSocialStatements((prevSocialStatements) =>
       prevSocialStatements.filter((statement) => statement.id !== id)
     );
@@ -234,16 +238,16 @@ const ImportDSN = ({ impactsData,onDSNUpload }) => {
               </Alert>
             ))}
 
-            <Table size="sm" responsive>
+            <Table>
               <thead>
                 <tr>
-                  <td>Etat</td>
-                  <td>Nom du fichier</td>
-                  <td>Mois</td>
-                  <td>Fraction</td>
-                  <td>Ecart D9/D1</td>
-                  <td>Ecart Femmes/Hommes</td>
-                  <td></td>
+                  <th>Etat</th>
+                  <th>Nom du fichier</th>
+                  <th>Mois</th>
+                  <th>Fraction</th>
+                  <th>Ecart D9/D1</th>
+                  <th>Ecart Femmes/Hommes</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -297,4 +301,4 @@ const ImportDSN = ({ impactsData,onDSNUpload }) => {
   );
 };
 
-export default ImportDSN;
+export default ImportSocialData;

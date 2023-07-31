@@ -1,8 +1,10 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Modal, Tab, Tabs } from "react-bootstrap";
-import ImportDSN from "./ImportDSN";
-import IndividualsData from "./IndividualsData";
+
+import ImportSocialData from "./ImportSocialData";
+import IndividualsDataTable from "./IndividualsDataTable";
+
 import {
   getApprenticeshipRemunerations,
   getGenderWageGap,
@@ -10,43 +12,76 @@ import {
   getInterdecileRange,
 } from "./utils";
 
-const AssessmentDSN = ({ impactsData, onUpdate }) => {
-  const [showDSN, setShowDSN] = useState(false);
+/* -------------------- ASSESSMENT FOR SOCIAL FOOTPRINT -------------------- */
 
-  const onDSNUpload = async (socialStatements) => {
-    impactsData.socialStatements = socialStatements;
+/* The AssessmentDSN component handles the assessment tool for social footprint.
+ * It includes logic for handling imported social data and managing individuals' data.
+ * The component uses Tabs to switch between importing DSN and managing social data.
+ */
+const AssessmentDSN = (props) => {
+  const [showModal, setShowModal] = useState(false);
 
-    // individuals data
-    impactsData.individualsData = await getIndividualsData(socialStatements);
-    // // update idr data
-    impactsData.interdecileRange = await getInterdecileRange(
-      impactsData.individualsData
-    );
-    await onUpdate("idr");
+  const [impactsData, setImpactsData] = useState(props.impactsData);
 
-    // update geq data (in pct i.e. 14.2 for 14.2 %)
-    impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
-    await onUpdate("geq");
-
-    // update knw data
-    impactsData.knwDetails.apprenticesRemunerations =
-      await getApprenticeshipRemunerations(impactsData.individualsData);
-    await onUpdate("knw");
+  const handleSocialStatements = async (socialStatements) => {
+    const individualsData = await getIndividualsData(socialStatements);
+    await updateImpactsData(socialStatements, individualsData);
   };
+
+  const handleIndividualsData = async (individualsData) => {
+    let updatedSocialStatements = impactsData.socialStatements;
+    if (individualsData.length == 0) {
+      updatedSocialStatements = [];
+    }
+
+    await updateImpactsData(updatedSocialStatements, individualsData);
+  };
+  const updateImpactsData = async (socialStatements, individualsData) => {
+    const interdecileRange = await getInterdecileRange(individualsData);
+    const wageGap = await getGenderWageGap(individualsData);
+    const apprenticesRemunerations = await getApprenticeshipRemunerations(
+      individualsData
+    );
+
+    setImpactsData({
+      ...impactsData,
+      socialStatements: socialStatements,
+      individualsData: individualsData,
+      interdecileRange: interdecileRange,
+      wageGap: wageGap,
+      knwDetails: {
+        ...impactsData.knwDetails,
+        apprenticesRemunerations: apprenticesRemunerations,
+      },
+    });
+
+    await props.onUpdate("idr");
+    await props.onUpdate("geq");
+    await props.onUpdate("knw");
+  };
+
+  useEffect(() => {
+    props.updateSocialData(impactsData);
+  }, [impactsData]);
 
   return (
     <>
       <Button
         variant="light-secondary"
         className=" rounded-2  w-100 p-2"
-        onClick={() => setShowDSN(true)}
-        disabled={impactsData.hasEmployees ? false : true}
+        onClick={() => setShowModal(true)}
+        disabled={props.impactsData.hasEmployees ? false : true}
       >
         <i className="bi bi-calculator"></i>
         &nbsp;Importer les DSN
       </Button>
 
-      <Modal show={showDSN} size="xl" centered onHide={() => setShowDSN(false)}>
+      <Modal
+        show={showModal}
+        size="xl"
+        centered
+        onHide={() => setShowModal(false)}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Données Sociales Nominatives</Modal.Title>
         </Modal.Header>
@@ -58,15 +93,21 @@ const AssessmentDSN = ({ impactsData, onUpdate }) => {
             className="mb-3"
           >
             <Tab eventKey="import" title="Importer les DSN">
-              <ImportDSN impactsData={impactsData} onDSNUpload={onDSNUpload} />
+              <ImportSocialData
+                impactsData={impactsData}
+                handleSocialStatements={handleSocialStatements}
+              />
             </Tab>
             <Tab eventKey="socialData" title="Gérer les données sociales">
-              <IndividualsData impactsData={impactsData} />
+              <IndividualsDataTable
+                impactsData={impactsData}
+                handleIndividualsData={handleIndividualsData}
+              />
             </Tab>
           </Tabs>
           <hr></hr>
           <div className="text-end">
-            <Button variant="secondary" onClick={() => setShowDSN(false)}>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>
               Valider{" "}
             </Button>
           </div>

@@ -78,6 +78,13 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
     impactsData.comments.idr = event.target.value;
   };
 
+  const updateSocialData = (updatedData) => {
+    impactsData = updatedData;
+    if (impactsData.interdecileRange) {
+      setInterdecileRange(impactsData.interdecileRange);
+    }
+  };
+
   return (
     <Form className="statement">
       <Row>
@@ -124,7 +131,11 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
                   />
                 </div>
 
-                <AssessmentDSN impactsData={impactsData} onUpdate={onUpdate} />
+                <AssessmentDSN
+                  impactsData={impactsData}
+                  onUpdate={onUpdate}
+                  updateSocialData={updateSocialData}
+                />
               </div>
             </Col>
           </Form.Group>
@@ -144,38 +155,6 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
           </Form.Group>
         </Col>
       </Row>
-      {/* <Modal
-        show={showCalculatorModal}
-        size="xl"
-        centered
-        onHide={() => setShowCalulatorModal(false)}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Données sociales</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <IndividualsData
-            impactsData={impactsData}
-            onGoBack={() => setShowCalulatorModal(false)}
-            handleClose={() => setShowCalulatorModal(false)}
-            onUpdate={onUpdate}
-          />
-        </Modal.Body>
-      </Modal>
-
-      <Modal show={showDSN} size="xl" centered onHide={() => setShowDSN(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Données Sociales Nominatives</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <ImportDSN
-            impactsData={impactsData}
-            onGoBack={() => setShowDSN(false)}
-            handleClose={() => setShowDSN(false)}
-            onUpdate={onUpdate}
-          />
-        </Modal.Body>
-      </Modal> */}
     </Form>
   );
 };
