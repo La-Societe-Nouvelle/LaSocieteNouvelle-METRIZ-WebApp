@@ -172,7 +172,8 @@ const AccountingImportSection = (props) => {
         )}
         <Row className="my-3">
           {errorFile && (
-            <Col lg={{ span: 6, offset: 6 }}>
+            <Col lg={{ span: 7, offset: 5 }}>
+              <hr></hr>
               <div className={"alert alert-danger"}>
                 <div>
                   <p>{errorMessage}</p>

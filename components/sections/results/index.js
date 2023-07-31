@@ -208,9 +208,8 @@ const Results = ({ session, publish, goBack }) => {
             </Form.Group>
           </Form>
         </div>
-        <hr></hr>
 
-        <div className=" indic-result-menu">
+        <div className="indic-result-menu mt-4">
           <div className="d-flex align-items-center justify-content-between">
             <DropdownButton
               className="flex-grow-1 dropdown-container"
