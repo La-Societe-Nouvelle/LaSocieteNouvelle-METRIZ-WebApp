@@ -146,12 +146,12 @@ const UpdateDataView = (props) => {
   ) : (
     <>
       {isUptodate ? (
-        <>
+        <div className="text-center">
           <p>
             <i className="success bi bi-check2-circle"></i> Toutes les données
             de votre session sont à jour. Vous pouvez reprendre votre analyse.
           </p>
-          <div className="text-end">
+          <div >
             <Button
               variant="primary"
               size="md"
@@ -161,9 +161,9 @@ const UpdateDataView = (props) => {
               Fermer
             </Button>
           </div>
-        </>
+        </div>
       ) : (
-        <p className="mb-3 fw-bold">Des données plus récentes sont disponibles :</p>
+        <p className="mb-3 ">Des données plus récentes sont disponibles :</p>
       )}
   
       {updatedProviders && !isObjEmpty(updatedProviders) && (

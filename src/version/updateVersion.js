@@ -112,7 +112,7 @@ const updater_3_0_0 = async (sessionData) => {
   const period = sessionData.financialPeriod;
 
 
-  if (indicators.length > 0) {
+  if (sessionData.validations[period.periodKey].length > 0) {
     await fetchComparativeData(sessionData.comparativeData, sessionData.validations[period.periodKey]);
   }
 
