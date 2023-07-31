@@ -21,6 +21,7 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
       setResearchAndTrainingContribution(
         impactsData.researchAndTrainingContribution
       );
+  
     }
   }, [impactsData.researchAndTrainingContribution]);
 
@@ -36,7 +37,6 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
       errorMessage =
         "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
     }
-    console.log(errorMessage);
 
     setIsInvalid(errorMessage !== "");
     onError("knw", errorMessage);

@@ -68,12 +68,18 @@ const StatementForms = ({
   };
 
   const handleNetValueChange = async (indic) => {
+  
+    // Remove the indicator from declaredIndicators (if exists)
+    const updatedDeclaredIndicators = declaredIndicators.filter(
+      (indicator) => indicator !== indic
+    );
+  
     session.getNetValueAddedIndicator(indic, period.periodKey);
-
-    if (!declaredIndicators.includes(indic)) {
-      setDeclaredIndicators([...declaredIndicators, indic]);
-    }
+  
+    // Add the indicator back to declaredIndicators
+    setDeclaredIndicators([...updatedDeclaredIndicators, indic]);
   };
+  
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
@@ -253,7 +259,7 @@ const StatementForms = ({
 };
 
 const verifySelectedIndicators = (selectedIndicators, impactsData) => {
-
+  console.log(selectedIndicators)
   const propertiesToCheck = {
     eco: ["isAllActivitiesInFrance", "domesticProduction"],
     art: ["isValueAddedCrafted", "craftedProduction"],
@@ -277,8 +283,10 @@ const verifySelectedIndicators = (selectedIndicators, impactsData) => {
   };
 
   const missingIndicators = [];
-
   for (const indicator of selectedIndicators) {
+    if(indicator == 'knw') {
+      console.log(impactsData)
+    }
     const properties = propertiesToCheck[indicator];
     if (properties) {
       const isIndicatorMissing = properties.some(

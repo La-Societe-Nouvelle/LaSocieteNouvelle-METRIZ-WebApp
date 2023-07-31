@@ -92,7 +92,9 @@ const StatementGEQ = ({ impactsData, onUpdate, onError }) => {
 
   const updateSocialData = (updatedData) => {
 
-    impactsData = updatedData;
+    impactsData.interdecileRange  = updatedData.interdecileRange ;
+    impactsData.wageGap = updatedData.wageGap;
+    impactsData.knwDetails.apprenticesRemunerations = updatedData.knwDetails.apprenticesRemunerations;
     if (impactsData.wageGap) {
       setWageGap(impactsData.wageGap);
     }

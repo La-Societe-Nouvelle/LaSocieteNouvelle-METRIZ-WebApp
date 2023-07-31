@@ -79,8 +79,11 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
   };
 
   const updateSocialData = (updatedData) => {
-    impactsData = updatedData;
-    if (impactsData.interdecileRange) {
+
+    impactsData.interdecileRange  = updatedData.interdecileRange ;
+    impactsData.wageGap = updatedData.wageGap;
+    impactsData.knwDetails.apprenticesRemunerations = updatedData.knwDetails.apprenticesRemunerations;
+     if (impactsData.interdecileRange) {
       setInterdecileRange(impactsData.interdecileRange);
     }
   };
