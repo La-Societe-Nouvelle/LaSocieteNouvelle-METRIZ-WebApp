@@ -228,11 +228,12 @@ table {
   border-bottom: 1px solid $primary;
 }
 
+
 .total,
 .with-top-line {
   font-weight: 700;
-  border-top: 1px solid $primary;
-  border-bottom: 1px solid $primary;
+
+  background-color: $light;
 }
 
 // TABLE Assesment

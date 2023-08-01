@@ -38,8 +38,8 @@ const orderGroupsAssessmentItem_1 = [
   "Bio-gaz",
   "Biomasse",
   "Charbon",
-  "Autres"
-]
+  "Autres",
+];
 
 const orderGroupsAssessmentItem_2 = [
   "Carburant - usage routier",
@@ -47,8 +47,8 @@ const orderGroupsAssessmentItem_2 = [
   "Gaz",
   "Carburant - usage maritime et fluvial",
   "Carburant - usage aérien",
-  "Autres"
-]
+  "Autres",
+];
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT GHG -------------------- */
@@ -108,19 +108,22 @@ export class AssessmentGHG extends React.Component {
     } = this.state;
 
     return (
-      <div className="assessment">
+      <div className="assessment ghg-assessment">
         <Table>
           <thead>
             <tr>
-              <td colSpan="2">Libellé</td>
-              <td>Valeur</td>
-              <td>Incertitude</td>
+              <th colSpan="2">Libellé</th>
+              <th>Valeur</th>
+              <th>Incertitude</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td width="30px">
-                <button className="btn btn-sm" onClick={() => this.addNewLine("1")}>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={() => this.addNewLine("1")}
+                >
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -151,7 +154,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small "
+                          className="form-select form-select-sm"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -165,7 +168,11 @@ export class AssessmentGHG extends React.Component {
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) => orderGroupsAssessmentItem_1.indexOf(a) - orderGroupsAssessmentItem_1.indexOf(b))
+                            .sort(
+                              (a, b) =>
+                                orderGroupsAssessmentItem_1.indexOf(a) -
+                                orderGroupsAssessmentItem_1.indexOf(b)
+                            )
                             .map((groupName) => (
                               <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
@@ -197,7 +204,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           onChange={(event) =>
                             this.changeConsumptionUnit(
                               itemId,
@@ -239,7 +246,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small"
+                    className="form-select form-select-sm"
                     value="0"
                     onChange={(event) => this.addItem("1", event.target.value)}
                   >
@@ -253,7 +260,11 @@ export class AssessmentGHG extends React.Component {
                         (value, index, self) =>
                           index === self.findIndex((item) => item === value)
                       )
-                      .sort((a, b) => orderGroupsAssessmentItem_1.indexOf(a) - orderGroupsAssessmentItem_1.indexOf(b))
+                      .sort(
+                        (a, b) =>
+                          orderGroupsAssessmentItem_1.indexOf(a) -
+                          orderGroupsAssessmentItem_1.indexOf(b)
+                      )
                       .map((groupName) => (
                         <optgroup label={groupName} key={groupName}>
                           {Object.entries(fuels)
@@ -277,7 +288,10 @@ export class AssessmentGHG extends React.Component {
 
             <tr>
               <td width="30px">
-                <button className="btn btn-sm" onClick={() => this.addNewLine("2")}>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={() => this.addNewLine("2")}
+                >
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -308,7 +322,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -322,9 +336,13 @@ export class AssessmentGHG extends React.Component {
                                 index ===
                                 self.findIndex((item) => item === value)
                             )
-                            .sort((a, b) => orderGroupsAssessmentItem_2.indexOf(a) - orderGroupsAssessmentItem_2.indexOf(b))
+                            .sort(
+                              (a, b) =>
+                                orderGroupsAssessmentItem_2.indexOf(a) -
+                                orderGroupsAssessmentItem_2.indexOf(b)
+                            )
                             .map((groupName) => (
-                              <optgroup label={groupName}  key={groupName}>
+                              <optgroup label={groupName} key={groupName}>
                                 {Object.entries(fuels)
                                   .filter(
                                     ([_, data]) =>
@@ -353,7 +371,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -395,7 +413,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small"
+                    className="form-select form-select-sm"
                     value="0"
                     onChange={(event) => this.addItem("2", event.target.value)}
                   >
@@ -409,9 +427,13 @@ export class AssessmentGHG extends React.Component {
                         (value, index, self) =>
                           index === self.findIndex((item) => item === value)
                       )
-                      .sort((a, b) => orderGroupsAssessmentItem_2.indexOf(a) - orderGroupsAssessmentItem_2.indexOf(b))
+                      .sort(
+                        (a, b) =>
+                          orderGroupsAssessmentItem_2.indexOf(a) -
+                          orderGroupsAssessmentItem_2.indexOf(b)
+                      )
                       .map((groupName) => (
-                        <optgroup label={groupName}  key={groupName}>
+                        <optgroup label={groupName} key={groupName}>
                           {Object.entries(fuels)
                             .filter(
                               ([_, data]) =>
@@ -432,7 +454,10 @@ export class AssessmentGHG extends React.Component {
 
             <tr>
               <td width="30px">
-                <button className="btn btn-sm" onClick={() => this.addNewLine("3.1")}>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={() => this.addNewLine("3.1")}
+                >
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -456,7 +481,7 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td width="30px">
                     <button
-                      className="btn btn-sm"
+                      className="btn btn-sm btn-light"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -466,7 +491,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -491,7 +516,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -539,7 +564,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small"
+                    className="form-select form-select-sm"
                     value="0"
                     onChange={(event) =>
                       this.addItem("3.1", event.target.value)
@@ -560,7 +585,10 @@ export class AssessmentGHG extends React.Component {
 
             <tr>
               <td width="30px">
-                <button className="btn btn-sm" onClick={() => this.addNewLine("3.2")}>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={() => this.addNewLine("3.2")}
+                >
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -584,7 +612,7 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td width="30px">
                     <button
-                      className="btn btn-sm"
+                      className="btn btn-sm "
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -594,7 +622,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -642,7 +670,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -690,7 +718,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small"
+                    className="form-select form-select-sm"
                     value="0"
                     onChange={(event) =>
                       this.addItem("3.2", event.target.value)
@@ -730,7 +758,10 @@ export class AssessmentGHG extends React.Component {
 
             <tr>
               <td width="30px">
-                <button className="btn btn-sm" onClick={() => this.addNewLine("4")}>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={() => this.addNewLine("4")}
+                >
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -761,7 +792,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.factorId}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -801,7 +832,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -844,7 +875,7 @@ export class AssessmentGHG extends React.Component {
                         itemData.consumptionUnit != "tCO2e" && (
                           <Col>
                             <select
-                              className="form-control small"
+                              className="form-select form-select-sm"
                               value={itemData.gaz}
                               onChange={(event) =>
                                 this.updateGaz(itemId, event.target.value)
@@ -872,7 +903,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small"
+                    className="form-select form-select-sm"
                     value="0"
                     onChange={(event) => this.addItem("4", event.target.value)}
                   >
@@ -905,7 +936,10 @@ export class AssessmentGHG extends React.Component {
 
             <tr>
               <td width="30px">
-                <button className="btn btn-sm" onClick={() => this.addNewLine("5")}>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={() => this.addNewLine("5")}
+                >
                   <i className="bi bi-plus-lg"></i>
                 </button>
               </td>
@@ -926,7 +960,7 @@ export class AssessmentGHG extends React.Component {
                 <tr key={itemId}>
                   <td width="30px">
                     <button
-                      className="btn btn-sm"
+                      className="btn btn-sm btn-light"
                       onClick={() => this.deleteItem(itemId)}
                     >
                       <i className="bi bi-trash"></i>
@@ -936,7 +970,7 @@ export class AssessmentGHG extends React.Component {
                     <Row>
                       <Col>
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.sour}
                           onChange={(event) =>
                             this.changeFactor(itemId, event.target.value)
@@ -973,7 +1007,7 @@ export class AssessmentGHG extends React.Component {
                       </Col>
                       <Col lg="1">
                         <select
-                          className="form-control small"
+                          className="form-select form-select-sm"
                           value={itemData.consumptionUnit}
                           onChange={(event) =>
                             this.changeConsumptionUnit(
@@ -1017,7 +1051,7 @@ export class AssessmentGHG extends React.Component {
                 <td />
                 <td>
                   <select
-                    className="form-control small"
+                    className="form-select form-select-sm"
                     value="0"
                     onChange={(event) => this.addItem("5", event.target.value)}
                   >
@@ -1056,9 +1090,10 @@ export class AssessmentGHG extends React.Component {
         </Table>
         {message && (
           <p className="small p-2 alert-warning">
-            Des modifications ayant été apportées sur la consommation de
-            produits énergétiques (combustibles), la déclaration de consommation
-            directe d'énergie devra être (re)validée.
+            modifications ayant été apportées sur la consommation de produits
+            énergétiques (combustibles), l'intensité de consommation d'énergie
+            sera également modifiée. Veuillez vérifier et (re)valider la
+            déclaration en conséquence.
           </p>
         )}
         <div className="view-header">
@@ -1414,13 +1449,19 @@ const getUncertaintyByAssessmentItem = (ghgDetails, assessmentItem) => {
 };
 
 const getGhgEmissionsItems = (items) => {
-  const sum = getSumItems(items.map((item) => item.ghgEmissions), 0);
+  const sum = getSumItems(
+    items.map((item) => item.ghgEmissions),
+    0
+  );
   return sum;
 };
 
 const getGhgEmissionsUncertaintyItems = (items) => {
   if (items.length > 0) {
-    const value = getSumItems(items.map((item) => item.ghgEmissions), 0);
+    const value = getSumItems(
+      items.map((item) => item.ghgEmissions),
+      0
+    );
     if (value != 0) {
       const valueMax = getSumItems(
         items.map((item) =>
@@ -1428,7 +1469,8 @@ const getGhgEmissionsUncertaintyItems = (items) => {
             item.ghgEmissions * (1 + item.ghgEmissionsUncertainty / 100),
             item.ghgEmissions * (1 - item.ghgEmissionsUncertainty / 100)
           )
-        ), 0
+        ),
+        0
       );
       const valueMin = getSumItems(
         items.map((item) =>
@@ -1438,7 +1480,8 @@ const getGhgEmissionsUncertaintyItems = (items) => {
             item.ghgEmissions *
               Math.max(1 - item.ghgEmissionsUncertainty / 100, 0)
           )
-        ), 0
+        ),
+        0
       );
       return Math.round(
         (Math.max(Math.abs(valueMax - value), Math.abs(value - valueMin)) /

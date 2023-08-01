@@ -259,7 +259,7 @@ const StatementForms = ({
 };
 
 const verifySelectedIndicators = (selectedIndicators, impactsData) => {
-  console.log(selectedIndicators)
+
   const propertiesToCheck = {
     eco: ["isAllActivitiesInFrance", "domesticProduction"],
     art: ["isValueAddedCrafted", "craftedProduction"],

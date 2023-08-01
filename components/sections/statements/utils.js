@@ -40,7 +40,6 @@ export const checkIfDataExists =  (comparativeData, indicatorCode) => {
 
     return true;
   };
-
     /* ---------- TABLE ACTIONS ---------- */
 
   // Import CSV File

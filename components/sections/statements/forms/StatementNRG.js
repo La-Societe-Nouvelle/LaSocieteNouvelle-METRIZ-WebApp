@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
@@ -21,10 +21,19 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
     impactsData.energyConsumptionUnit
   );
 
-  const [isInvalid, setIsInvalid] = useState(false);
   const [info, setInfo] = useState(impactsData.comments.nrg || "");
-
   const [showModal, setShowModal] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  useEffect(() => {
+    if (energyConsumption != impactsData.energyConsumption) {
+      setEnergyConsumption(impactsData.energyConsumption);
+      setEnergyConsumptionUncertainty(
+        impactsData.energyConsumptionUncertainty
+      );
+    }
+  }, [impactsData.energyConsumption]);
+
 
   const options = [
     { value: "MJ", label: "MJ" },
@@ -192,7 +201,7 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
       >
         <Modal.Header closeButton>
           <Modal.Title>
-            Outils de mesure des émissions directes de Gaz à effet de serre
+          Outil de mesure des énergies
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>

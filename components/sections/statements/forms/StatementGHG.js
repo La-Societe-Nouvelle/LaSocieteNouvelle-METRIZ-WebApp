@@ -1,5 +1,5 @@
 // La Société Nouvelle
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
@@ -25,6 +25,15 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
   const [info, setInfo] = useState(impactsData.comments.ghg || "");
   const [showModal, setShowModal] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
+
+  useEffect(() => {
+    if (greenhousesGazEmissions != impactsData.greenhousesGazEmissions) {
+      setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
+      setGreenhousesGazEmissionsUncertainty(
+        impactsData.greenhousesGazEmissionsUncertainty
+      );
+    }
+  }, [impactsData.greenhousesGazEmissions]);
 
   const options = [
     { value: "kgCO2e", label: "kgCO2e" },
@@ -98,7 +107,7 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
         <Col lg={7}>
           <Form.Group as={Row} className="form-group">
             <Form.Label column lg={7}>
-              Emissions directes de Gaz à effet de serre - SCOPE 1  *
+              Emissions directes de Gaz à effet de serre - SCOPE 1 *
             </Form.Label>
             <Col>
               <div className=" d-flex align-items-center justify-content-between">
@@ -111,7 +120,7 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
                     isInvalid={isInvalid}
                     className="me-1"
                   />
-                    <Select
+                  <Select
                     styles={unitSelectStyles}
                     options={options}
                     value={{
@@ -121,13 +130,13 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
                     onChange={updateGreenhousesGazEmissionsUnit}
                   />
                 </div>
-          
+
                 <div>
                   <Button
-                    variant="light-secondary"             
+                    variant="light-secondary"
                     onClick={() => setShowModal(true)}
                   >
-                    <i className="bi bi-calculator"></i> 
+                    <i className="bi bi-calculator"></i>
                   </Button>
                 </div>
               </div>
@@ -135,7 +144,9 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
           </Form.Group>
 
           <Form.Group as={Row} className="form-group">
-            <Form.Label column lg={7}>Incertitude</Form.Label>
+            <Form.Label column lg={7}>
+              Incertitude
+            </Form.Label>
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
@@ -151,17 +162,18 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
           </Form.Group>
           <div className="my-3 text-end">
             <p className="small mt-3">
-             *Vous pouvez aussi calculer vos émissions avec l' <a
+              *Vous pouvez aussi calculer vos émissions avec l'{" "}
+              <a
                 className="text-link text-decoration-underline"
                 href="https://www.bilans-climat-simplifies.ademe.fr/"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                 Outil de l'Ademe 
+                Outil de l'Ademe
               </a>
               .
             </p>
-        </div>
+          </div>
         </Col>
         <Col>
           <Form.Group className="form-group">
@@ -179,7 +191,6 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
             </Col>
           </Form.Group>
         </Col>
-      
       </Row>
 
       <Modal

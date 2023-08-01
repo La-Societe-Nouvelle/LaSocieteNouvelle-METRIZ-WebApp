@@ -7,6 +7,7 @@
 
 table select,
 table input {
+
   // Disabled and read-only inputs
   &:disabled,
   &[readonly] {
@@ -19,10 +20,12 @@ table input {
   text-align: center;
   font-weight: 600;
   background-color: #fbfbff;
+
   .fa-file-arrow-up {
     height: 20px;
     margin-right: 10px;
   }
+
   margin: 1rem 0;
   padding: 1rem;
   border: 2px dashed lighten(#5262bc, 15%);
@@ -33,6 +36,7 @@ table input {
   p {
     margin-bottom: 1rem;
   }
+
   .btn {
     margin: 0;
     font-size: 0.8rem;
@@ -49,6 +53,7 @@ table input {
   margin-right: 1rem;
   align-items: baseline;
 }
+
 .custom-control {
   position: relative;
   display: block;
@@ -65,6 +70,7 @@ table input {
     flex-grow: 1;
     flex-shrink: 1;
     flex-basis: 0;
+
     .form-input,
     .input-number {
       width: 50%;
@@ -79,6 +85,7 @@ table input {
 .radio-button-input {
   display: flex;
   flex-direction: column;
+
   div {
     margin-bottom: 1em;
   }
@@ -90,6 +97,7 @@ table input {
     margin-bottom: 1rem;
     color: $primary;
   }
+
   .form-label,
   .form-check-label {
     font-size: 0.85rem;
@@ -117,12 +125,14 @@ table input {
   .custom-input {
     justify-content: end;
   }
-  .custom-input  > .form-control{
+
+  .custom-input>.form-control {
     flex: inherit;
     width: 50%;
     text-align: end;
- 
+
   }
+
   .custom-input.with-select .form-control {
     border-top-right-radius: 0.5rem !important;
     border-bottom-right-radius: 0.5rem !important;
@@ -132,3 +142,23 @@ table input {
 .uncertainty-input {
   width: 55px !important;
 }
+/* ---------- ASSESSMENT ---------- */
+
+.assessment {
+  .view-header {
+    // header in assessment
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin : 1.5rem 0 0.5rem 0;
+  }
+  .form-control,
+  .input-group>.form-control,
+  .input-group>.input-group-text {
+    min-height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7875rem;
+    border-radius: 0.2rem;
+  }
+}
+
