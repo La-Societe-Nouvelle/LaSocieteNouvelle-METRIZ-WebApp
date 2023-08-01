@@ -5,10 +5,7 @@ import jsPDF from "jspdf";
 
 import metaIndics from "../../../lib/indics.json";
 import { generateCover } from "./generateCover";
-import {
-  generateIndicatorReport,
-  generateReport,
-} from "./generateIndicatorReport";
+import { generateReport } from "./generateIndicatorReport";
 import { generateContributionIndicatorSheet } from "./generateContributionIndicatorSheet";
 import { generateIntensityIndicatorSheet } from "./generateIntensityIndicatorSheet";
 import { generateIndiceIndicatorSheet } from "./generateIndiceIndicatorSheet";
@@ -32,10 +29,11 @@ export async function generateDownloadableFiles(
   const year = period.periodKey.slice(2);
   const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
   const documentTitle = `Empreinte-Societale_${legalUnitNameFile}_${year}`;
-  const indicLabel = metaIndics[selectedIndicator].libelle.replaceAll(
-    /[' ]/g,
-    "-"
-  );
+  let indicLabel;
+  if (selectedIndicator) {
+    indicLabel = metaIndics[selectedIndicator].libelle.replaceAll(/[' ]/g, "-");
+  }
+
   const zip = new jsZip();
 
   const includeAllFiles = selectedFiles.includes("checkbox-all");
@@ -95,7 +93,7 @@ export async function generateDownloadableFiles(
       zip.file(`sig_${indic}.xlsx`, blobXLSX);
     }
 
-        // Add session data as a JSON file to the ZIP file
+    // Add session data as a JSON file to the ZIP file
 
     const sessionFile = `session-metriz-${legalUnit.replaceAll(" ", "-")}`;
     const json = JSON.stringify(session);
@@ -103,7 +101,7 @@ export async function generateDownloadableFiles(
     zip.file(`${sessionFile}.json`, blobSession);
   }
 
-    // Generate PDF for the selected indicator (file ID: indic-report)
+  // Generate PDF for the selected indicator (file ID: indic-report)
   if (includeIndicReport) {
     const indicReport = await generateIndicReportPDF(
       legalUnit,
@@ -117,7 +115,6 @@ export async function generateDownloadableFiles(
 
     const reportTitle = `${indicLabel}_${legalUnitNameFile}_${year}.pdf`;
 
-    
     if (!includeSigXLSX) {
       const pdfBlob = new Blob([indicReport], { type: "application/pdf" });
 
@@ -144,7 +141,6 @@ export async function generateDownloadableFiles(
 
   // Generate ZIP file containing the generated files and download the ZIP file
   zip.generateAsync({ type: "blob" }).then((content) => {
-
     saveAs(content, `${documentTitle}.zip`);
     if (typeof onDownloadComplete === "function") {
       onDownloadComplete();
@@ -170,7 +166,7 @@ async function generateCompleteReportPDF(
     const { type, libelle, unit, libelleGrandeur } = metaIndics[indic];
 
     basicPDFpromises.push(
-      generateIndicatorReport(
+      generateReport(
         legalUnit,
         indic,
         libelle,
