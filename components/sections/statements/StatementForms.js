@@ -259,7 +259,6 @@ const StatementForms = ({
 };
 
 const verifySelectedIndicators = (selectedIndicators, impactsData) => {
-
   const propertiesToCheck = {
     eco: ["isAllActivitiesInFrance", "domesticProduction"],
     art: ["isValueAddedCrafted", "craftedProduction"],
@@ -284,16 +283,19 @@ const verifySelectedIndicators = (selectedIndicators, impactsData) => {
 
   const missingIndicators = [];
   for (const indicator of selectedIndicators) {
-    if(indicator == 'knw') {
-      console.log(impactsData)
-    }
     const properties = propertiesToCheck[indicator];
     if (properties) {
-      const isIndicatorMissing = properties.some(
-        (property) =>
-          impactsData[property] === null ||
-          impactsData[property] === undefined
-      );
+      const isIndicatorMissing = properties.some((property) => {
+        if (
+          (indicator === "art" && property === "craftedProduction" && impactsData["isValueAddedCrafted"] === "partially") ||
+          (indicator === "eco" && property === "domesticProduction" && impactsData["isAllActivitiesInFrance"] === "partially")
+        ) {
+          return impactsData[property] === "" || impactsData[property] === null || impactsData[property] === undefined;
+        } else {
+          return impactsData[property] === null || impactsData[property] === undefined;
+        }
+      });
+
       if (isIndicatorMissing) {
         missingIndicators.push(indicator);
       }
@@ -302,5 +304,6 @@ const verifySelectedIndicators = (selectedIndicators, impactsData) => {
 
   return missingIndicators;
 };
+
 
 export default StatementForms;
