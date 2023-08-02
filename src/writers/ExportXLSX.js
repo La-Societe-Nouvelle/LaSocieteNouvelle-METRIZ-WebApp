@@ -135,18 +135,18 @@ async function buildMainAggregatesContent(indic,session,period)
   const intermediateConsumptionsAggregates =
   await buildIntermediateConsumptionsAggregates(
     session.financialData,
-    period.periodKey
+    [period]
   );
 
   intermediateConsumptionsAggregates
-    .filter((aggregate) => aggregate.amount != 0)
-    .forEach(({ label, amount, footprint }) => 
+    //.filter((aggregate) => aggregate.amount != 0)
+    .forEach(({ label, periodsData }) => 
     (
       aoaContent.push([
         "   "+label,
-        roundValue(amount, 0),
-        roundValue(footprint.indicators[indic].getValue(), nbDecimals),
-        roundValue(footprint.indicators[indic].getUncertainty(), 0)
+        roundValue(periodsData[period.periodKey].amount, 0),
+        roundValue(periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+        roundValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
       ])
     ));
 
@@ -162,19 +162,19 @@ async function buildMainAggregatesContent(indic,session,period)
   const fixedCapitalConsumptionsAggregates =
   await buildFixedCapitalConsumptionsAggregates(
     session.financialData,
-    period.periodKey
+    [period]
   );
 
 
   fixedCapitalConsumptionsAggregates
-    .filter((aggregate) => aggregate.amount != 0)
-    .forEach(({ label, amount, footprint }) => 
+    //.filter((aggregate) => aggregate.amount != 0)
+    .forEach(({ label, periodsData }) => 
     (
       aoaContent.push([
         "   "+label,
-        roundValue(amount, 0),
-        roundValue(footprint.indicators[indic].getValue(), nbDecimals),
-        roundValue(footprint.indicators[indic].getUncertainty(), 0)
+        roundValue(periodsData[period.periodKey].amount, 0),
+        roundValue(periodsData[period.periodKey].footprint.indicators[indic].getValue(), nbDecimals),
+        roundValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)
       ])
     ));
 

@@ -76,7 +76,9 @@ export const getPrevAmountItems = (items, precision) =>
   );
 export const getAmountItemsForPeriod = (items, periodKey, precision) =>
   getAmountItems(
-    items.map((item) => item.periodsData[periodKey]),
+    items
+      .filter((item) => item.periodsData.hasOwnProperty(periodKey))
+      .map((item) => item.periodsData[periodKey]),
     precision
   );
 

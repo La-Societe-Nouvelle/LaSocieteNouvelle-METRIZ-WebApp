@@ -36,7 +36,10 @@ export async function getSignificativeUnidentifiedProviders(providers,minFpt,max
   }
 
   // significative companies for investments -> all by default
-  let immobilisationProviders = providers.filter(provider => provider.periodsData[period.periodKey].amountInvestments > 0).map(provider => provider.providerNum);
+  let immobilisationProviders = providers
+    .filter(provider => provider.periodsData.hasOwnProperty(period.periodKey))
+    .filter(provider => provider.periodsData[period.periodKey].amountInvestments > 0)
+    .map(provider => provider.providerNum);
   significativeProviders.push(...immobilisationProviders);
 
   // Remove duplicates & return
@@ -104,7 +107,10 @@ export async function getSignificativeProviders(providers,minFpt,maxFpt,period)
   }
 
   // significative companies for investments -> all by default
-  let immobilisationProviders = providers.filter(provider => provider.periodsData[period.periodKey].amountInvestments > 0).map(provider => provider.providerNum);
+  let immobilisationProviders = providers
+    .filter(provider => provider.periodsData.hasOwnProperty(period.periodKey))
+    .filter(provider => provider.periodsData[period.periodKey].amountInvestments > 0)
+    .map(provider => provider.providerNum);
   significativeProviders.push(...immobilisationProviders);
 
   // Remove duplicates & return

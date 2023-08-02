@@ -50,13 +50,13 @@ export const createIndicReport = async(
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
         financialData,
-        period.periodKey
+        [period]
       );
 
     const fixedCapitalConsumptionsAggregates =
       await buildFixedCapitalConsumptionsAggregates(
         financialData,
-        period.periodKey
+        [period]
       );
         
 
