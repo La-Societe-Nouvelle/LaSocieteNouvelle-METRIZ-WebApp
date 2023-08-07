@@ -40,7 +40,6 @@ const AccountingImportSection = (props) => {
 
     if (siren !== "" && /^[0-9]{9}$/.test(siren) && /^[^a-zA-Z]+$/.test(siren)) {
       await session.legalUnit.setSiren(siren);
-      console.log(session.legalUnit);
       const divisionCode = session.legalUnit.activityCode.slice(0,2);
       session.comparativeData.activityCode = divisionCode;
       console.log(divisionCode)

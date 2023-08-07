@@ -68,7 +68,7 @@ const FootprintReport = ({comparativeData,financialData, period}) => {
         <Col>
         {/* TO DO : Afficher graphiques si il y a plus d'un indicateur déclaré ? */}
           <div className="box">
-            <div className="text-center rounded-pill bg-light py-2">     
+            <div className="text-center rounded-pill ">     
               <h3 className="mb-0">Empreinte économique et sociale</h3>
             </div>
             <RadarChart labels={getSocialsLabels} divisionFootprint={{...divisionProductionSocialFootprint, ...divisionProductionEcoFootprint}} productionFootprint={{...productionSocialFootprint,...productionEcoFootprint}} />
@@ -76,7 +76,7 @@ const FootprintReport = ({comparativeData,financialData, period}) => {
         </Col>
         <Col>
           <div className="box">
-            <div className="text-center  rounded-pill bg-light py-2">
+            <div className="text-center  rounded-pill ">
               <h3 className="mb-0">Empreinte environnementale</h3>
             </div>
               <RadarChart labels={getEnvironmentalLabel} divisionFootprint={divisionProductionEnvironmentalFootprint} productionFootprint={productionEnvironmentalFootprint} />
