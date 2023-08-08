@@ -382,7 +382,7 @@ const PublishStatementSection = ({ session }) => {
             </p>
           </>
         )}
-  
+
         {displayRecap && (
           <Summary
             siren={siren}
@@ -421,69 +421,55 @@ const PublishSummary = ({
       <h3 className="mb-3">
         <i className="bi bi-list-check"></i> Récapitulatif
       </h3>
-      <Row>
-        <Col>
-          <div>
-            <h4 className="h5 mb-4">Données à publier</h4>
-            <p>
-              <b>Siren : </b>
-              {siren}
-            </p>
-            <p>
-              <b>Dénomination : </b>
-              {corporateName}
-            </p>
-            <p>
-              <b>Année : </b>
-              {year}
-            </p>
-            <p>
-              <b>Indicateurs : </b>
-            </p>
-            <ul className="list-unstyled small mt-1">
-              {Object.entries(legalUnitFootprint).map(([indicator, value]) => (
-                <li key={indicator} className="p-1 ">
-                 {metaIndics[indicator].libelle}
-                  {
-                    comments[indicator]  &&
-                    <span className="d-block m-1 small"> 
-                    Commentaire: {comments[indicator] }
-             
-                  </span>
-                  }
-                
-                </li>
-              ))}
-            </ul>
-            <hr className="w-25"></hr>
-            <p>
-              <b>Fait le : </b>
-              {todayString}
-            </p>
-            <p>
-              <b>Déclarant : </b>
-              {declarant}
-            </p>
-            {
-              declarantOrganisation &&
-              <p>
-                <b>Structure déclarante :</b> {declarantOrganisation}
-              </p>
-            }
-            <p>
-              <b>Coût de la formalité : </b>
-              {price} €
-            </p>
-          </div>
-        </Col>
-        <Col lg={3}>
-          <Image
-            src="illus/publish.svg"
-            alt="Illustration d'une publication"
-            height={300}
-          />
-        </Col>
-      </Row>
+
+      <div>
+        <h4 className="h5 mb-4">Données à publier</h4>
+        <p>
+          <b>Siren : </b>
+          {siren}
+        </p>
+        <p>
+          <b>Dénomination : </b>
+          {corporateName}
+        </p>
+        <p>
+          <b>Année : </b>
+          {year}
+        </p>
+        <p>
+          <b>Indicateurs : </b>
+        </p>
+        <ul className="list-unstyled small mt-1">
+          {Object.entries(legalUnitFootprint).map(([indicator, value]) => (
+            <li key={indicator} className="p-1 ">
+              {metaIndics[indicator].libelle}
+              {comments[indicator] && (
+                <span className="d-block m-1 small">
+                  Commentaire: {comments[indicator]}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+        <hr className="w-25"></hr>
+        <p>
+          <b>Fait le : </b>
+          {todayString}
+        </p>
+        <p>
+          <b>Déclarant : </b>
+          {declarant}
+        </p>
+        {declarantOrganisation && (
+          <p>
+            <b>Structure déclarante :</b> {declarantOrganisation}
+          </p>
+        )}
+        <p>
+          <b>Coût de la formalité : </b>
+          {price} €
+        </p>
+      </div>
     </div>
   );
 };
@@ -580,7 +566,6 @@ const Summary = (props) => {
         setIsSend(false);
         setError(true);
       }
-      
     } catch (error) {
       setIsSend(false);
       setError(true);
@@ -647,8 +632,6 @@ const mailToAdminWriter = (
   email,
   price
 ) => {
-
-console.log(legalUnitFootprint)  
   let mailContent = `Unité légale : ${siren} \n
 Dénomination : ${corporateName} \n
 Année : ${year}  \n
@@ -670,10 +653,8 @@ ${Object.entries(legalUnitFootprint)
 Mail : ${email}\n
 Tarif : ${price} - €`;
 
-console.log(mailContent)
   return mailContent;
 };
-
 
 const mailToDeclarantWriter = (declarant) => {
   let mailContent = `${declarant},\n
