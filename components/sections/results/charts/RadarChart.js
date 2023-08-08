@@ -5,18 +5,18 @@ import Chart from "chart.js/auto";
 import { Radar } from "react-chartjs-2";
 
 function RadarChart({ labels, divisionFootprint, productionFootprint }) {
-
   const data = {
     labels: Object.values(labels).map((indicator) => {
-        const label = indicator.libelleGrandeur;
-        const unit = indicator.unit;
-        return unit ? `${label} (${unit})` : label;
-      }),
-          datasets: [
+      const label = indicator.libelleGrandeur;
+      const unit = indicator.unit;
+      return unit ? `${label} (${unit})` : label;
+    }),
+    datasets: [
       {
         label: "Exercice",
         data: Object.values(productionFootprint),
         fill: false,
+        backgroundColor : "rgb(250,89,95)",
         pointBackgroundColor: "rgb(250,89,95)",
         pointBorderColor: "rgb(250,89,95)",
         pointHoverBackgroundColor: "#fff",
@@ -26,6 +26,7 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
         label: "Branche",
         data: Object.values(divisionFootprint),
         fill: false,
+        backgroundColor : "rgb(255, 182, 66)",
         pointBackgroundColor: "rgb(255, 182, 66)",
         pointBorderColor: "rgb(255, 182, 66)",
         pointHoverBackgroundColor: "rgb(255, 182, 66)",
@@ -36,32 +37,16 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
 
   const datasetBorderColor = (context) => {
     const datasetIndex = context.datasetIndex;
-  
-    const colors = [
-      "rgba(250,89,95,0.5)", 
-      "rgba(255, 182, 66, 0.5)", 
-    ];
-  
+
+    const colors = ["rgba(250,89,95,0.5)", "rgba(255, 182, 66, 0.5)"];
+
     return colors[datasetIndex];
   };
 
-  const datasetRadius = (context) => {
-    const datasetIndex = context.datasetIndex;
-  
-    const radius = [4,2
-    ];
-  
-    return radius[datasetIndex];
-  };
-
-
   const options = {
-    devicePixelRatio: 2,
-    responsive: true,
 
     scales: {
       r: {
-
         grid: {
           color: "rgb(219, 222, 241)",
         },
@@ -82,11 +67,11 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
 
     elements: {
       point: {
-        radius: datasetRadius, 
+        radius: 6,
         hoverRadius: 3,
       },
       line: {
-        borderWidth: 2, 
+        borderWidth: 3,
         borderColor: datasetBorderColor,
       },
     },
@@ -96,8 +81,7 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
       },
       legend: {
         display: true,
-        position: "bottom",
-        padding: 0, 
+        position: "top",
         labels: {
           color: "#191558",
           font: {
@@ -113,7 +97,6 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
         cornerRadius: 3,
         usePointStyle: true,
         intersect: false,
-
       },
     },
   };

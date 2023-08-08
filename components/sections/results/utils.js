@@ -1,3 +1,4 @@
+import indicators from "../../../lib/indics";
 
 /**
  * Retrieves the value and year for the closest year to the given year from the dataset,
@@ -19,7 +20,9 @@ export const getClosestYearData = (data, currentYear) => {
 
   closestYearData = data[closestYear];
 
-  return closestYearData ? { value: closestYearData.value, year: closestYearData.year } : null;
+  return closestYearData
+    ? { value: closestYearData.value, year: closestYearData.year }
+    : null;
 };
 
 export const getSuggestedMax = (max) => {
@@ -36,3 +39,72 @@ export const getSuggestedMax = (max) => {
       return 100;
   }
 };
+/**
+ * Get the metadata for indicators belonging to a specific category.
+ * @param {Object} indicators - The object containing all indicators with their metadata.
+ * @param {string} category - The category of indicators to filter.
+ */
+export const getIndicatorsMetaByCategory = (indicators, category) => {
+  return Object.entries(indicators)
+    .filter(([, indicator]) => indicator.category === category)
+    .reduce((result, [key, value]) => {
+      result[key.toLowerCase()] = value;
+      return result;
+    }, {});
+};
+
+/**
+ * Get the metadata for indicators belonging to a specific category.
+ * @param {Object} indicators - The object containing all indicators with their metadata.
+ * @param {string} category - The category of indicators to filter.
+ */
+export const getIndicatorsMetaByType = (indicators, type) => {
+  return Object.entries(indicators)
+    .filter(([, indicator]) => indicator.type === type)
+    .reduce((result, [key, value]) => {
+      result[key.toLowerCase()] = value;
+      return result;
+    }, {});
+};
+
+/**
+ * Get the values for indicators belonging to a specific category and optionally filtered by year.
+ * @param {Object} data - The object containing indicator values, keyed by indicator name.
+ * @param {string} category - The category of indicators to filter.
+ * @param {number} year - Optional parameter to filter indicators by year.
+ */
+
+export const getIndicatorValuesByCategory = (data, category, year) =>
+  Object.keys(data).reduce((filtered, indicator) => {
+    const { value } = year
+      ? getClosestYearData(data[indicator], year) || {}
+      : data[indicator];
+    if (
+      indicators[indicator.toLowerCase()].category === category &&
+      value !== undefined
+    ) {
+      filtered[indicator.toLowerCase()] = value;
+    }
+    return filtered;
+  }, {});
+
+  /**
+ * Get the values for indicators belonging to a specific category and optionally filtered by year.
+ * @param {Object} data - The object containing indicator values, keyed by indicator name.
+ * @param {string} type - The type of indicators to filter.
+ * @param {number} year - Optional parameter to filter indicators by year.
+ */
+
+export const getIndicatorValuesByType = (data, type, year) =>
+Object.keys(data).reduce((filtered, indicator) => {
+  const { value } = year
+    ? getClosestYearData(data[indicator], year) || {}
+    : data[indicator];
+  if (
+    indicators[indicator.toLowerCase()].type === type &&
+    value !== undefined
+  ) {
+    filtered[indicator.toLowerCase()] = value;
+  }
+  return filtered;
+}, {});
