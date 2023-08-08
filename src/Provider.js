@@ -64,31 +64,6 @@ export class Provider {
     })
   }
 
-  // get footrpint id (siren)
-  getDefaultFootprintId()
-  {
-    if (!this.corporateId) {
-      return null;
-    }
-    // SIREN
-    else if (/^[0-9]{9}$/.test(this.corporateId)) {
-      return this.corporateId;
-    }
-    // SIRET
-    else if (/^[0-9]{14}$/.test(this.corporateId)) {
-      console.log(this.corporateId);
-      return this.corporateId.substring(0, 9);
-    }
-    // VAT NUMBER
-    else if (/^FR[0-9]{11}$/.test(this.corporateId)) {
-      return this.corporateId.substring(4, 11);
-    }
-    // DEFAULT
-    else {
-      return this.corporateId;
-    }
-  }
-
   /* -------------------- OPERATIONS -------------------- */
 
   /* ---------- Update ---------- */
@@ -159,7 +134,7 @@ export class Provider {
 
   async updateFromRemote() 
   {
-    let footprintId = this.getDefaultFootprintId();
+    let footprintId = getDefaultFootprintId(this.corporateId);
     // Case - Fetch footprint with id --------------------------------------------------------------------- //
     if (!this.useDefaultFootprint && footprintId && /[0-9]{9}/.test(footprintId)) 
     {
@@ -182,8 +157,8 @@ export class Provider {
             this.dataFetched = false;
           }
       }).catch((err)=>{
-          throw err;
-        });
+        throw err;
+      });
     }
 
     // Case - Fetch id not ok ----------------------------------------------------------------------------- //
@@ -232,5 +207,29 @@ export class Provider {
     );
     this.useDefaultFootprint = prevProvider.useDefaultFootprint;
     this.defaultFootprintParams = prevProvider.defaultFootprintParams;
+  }
+}
+
+// get footrpint id (siren)
+export const getDefaultFootprintId = (corporateId) =>
+{
+  if (!corporateId) {
+    return null;
+  }
+  // SIREN
+  else if (/^[0-9]{9}$/.test(corporateId)) {
+    return corporateId;
+  }
+  // SIRET
+  else if (/^[0-9]{14}$/.test(corporateId)) {
+    return corporateId.substring(0, 9);
+  }
+  // VAT NUMBER
+  else if (/^FR[0-9]{11}$/.test(corporateId)) {
+    return corporateId.substring(4, 13);
+  }
+  // DEFAULT
+  else {
+    return corporateId;
   }
 }
