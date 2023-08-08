@@ -182,14 +182,16 @@ function RowTableImmobilisations(props)
   const immobilisation = props.account;
   const {accountNum,accountLib,initialFootprintParams,isAmortisable} = immobilisation;
 
-  const [initialStateType, setInitialStateType] = useState(immobilisation.initialStateType);
+  const usePrevFootprint = props.prevStateDateEnd!=immobilisation.initialState.date;
+  const [initialStateType, setInitialStateType] = useState(usePrevFootprint ? "prevFootprint" : immobilisation.initialStateType);
   const [initialStateSet, setInitialStateSet] = useState(immobilisation.initialStateSet);
 
   const [activityCode, setActivityCode] = useState(initialFootprintParams.code || "TOTAL");
 
   useEffect(() => {
+    const usePrevFootprint = props.prevStateDateEnd!=immobilisation.initialState.date;
     setInitialStateSet(immobilisation.initialStateSet);
-    setInitialStateType(immobilisation.initialStateType);
+    setInitialStateType(usePrevFootprint ? "prevFootprint" : immobilisation.initialStateType);
   }, [props]);
 
   const onActivityCodeChange = (event) => {
@@ -222,7 +224,7 @@ function RowTableImmobilisations(props)
       default: return ([initialStateTypeOptions["defaultData"]]);                                                               // options -> defaultData
     }
   }
-
+  
   if (isAmortisable) {
     return (
       <tr>
@@ -231,7 +233,7 @@ function RowTableImmobilisations(props)
           {accountLib.charAt(0).toUpperCase() +
            accountLib.slice(1).toLowerCase()}
         </td>
-        <td colSpan={initialStateType == "defaultData" ? 1 : 2}>
+        <td colSpan={(initialStateType=="defaultData") ? 1 : 2}>
           <Select
               value={initialStateTypeOptions[initialStateType]}
               placeholder={"Choisissez..."}

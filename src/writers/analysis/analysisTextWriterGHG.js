@@ -207,8 +207,9 @@ export const analysisTextWriterGHG = (props) => {
 
   // comptes les plus impactants
   currentParagraph = [];
-  let worstAccount = financialData.externalExpensesAccounts.sort(
-    (a, b) =>
+  let worstAccount = financialData.externalExpensesAccounts
+    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey))
+    .sort((a, b) =>
       b.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(b.periodsData[period.periodKey].amount) -
       a.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(a.periodsData[period.periodKey].amount)
   )[0];

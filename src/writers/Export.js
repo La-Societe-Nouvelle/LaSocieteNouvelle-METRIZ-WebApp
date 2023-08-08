@@ -90,9 +90,9 @@ async function generateFootprintPDF(
   // get Intermediate Aggregates
   
   const intermediateConsumptionsAggregates =
-    await buildIntermediateConsumptionsAggregates(financialData, period.periodKey);
+    await buildIntermediateConsumptionsAggregates(financialData, [period]);
   const fixedCapitalConsumptionsAggregates =
-   await buildFixedCapitalConsumptionsAggregates(financialData, period.periodKey);
+   await buildFixedCapitalConsumptionsAggregates(financialData, [period]);
 
 
   let x = 10;
@@ -554,14 +554,14 @@ async function generateFootprintPDF(
       doc.text(aggregate.label, x + 2, y);
 
       doc.setFontSize(6);
-      doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
+      doc.text(printValue(aggregate.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
         align: "right",
       });
 
       xValue = x + 64;
 
       indic.forEach((indic) => {
-        let indicator = aggregate.footprint.indicators[indic];
+        let indicator = aggregate.periodsData[period.periodKey].footprint.indicators[indic];
         doc.setFontSize(6);
         doc.text(printValue(indicator.getValue(), 1), xValue, y, {
           align: "right",
@@ -574,7 +574,7 @@ async function generateFootprintPDF(
           { align: "right" }
         );
         doc.text(
-          printValue(indicator.getGrossImpact(aggregate.amount), 0),
+          printValue(indicator.getGrossImpact(aggregate.periodsData[period.periodKey].amount), 0),
           xValue + 24,
           y,
           { align: "right" }
@@ -657,12 +657,12 @@ async function generateFootprintPDF(
       xValue = x + 64;
       doc.setFontSize(6);
       doc.text(doc.splitTextToSize(aggregate.label, 35), x + 2, y);
-      doc.text(printValue(aggregate.amount, 0) + " €", xAmount, y, {
+      doc.text(printValue(aggregate.periodsData[period.periodKey].amount, 0) + " €", xAmount, y, {
         align: "right",
       });
 
       indic.forEach((indic) => {
-        let indicator = aggregate.footprint.indicators[indic];
+        let indicator = aggregate.periodsData[period.periodKey].footprint.indicators[indic];
         doc.setFontSize(6);
         doc.text(printValue(indicator.getValue(), 1), xValue, y, {
           align: "right",
@@ -675,7 +675,7 @@ async function generateFootprintPDF(
           { align: "right" }
         );
         doc.text(
-          printValue(indicator.getGrossImpact(aggregate.amount), 0),
+          printValue(indicator.getGrossImpact(aggregate.periodsData[period.periodKey].amount), 0),
           xValue + 24,
           y,
           { align: "right" }

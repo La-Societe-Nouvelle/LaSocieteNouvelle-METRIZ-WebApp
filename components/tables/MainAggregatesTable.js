@@ -27,13 +27,13 @@ export const MainAggregatesTable = ({financialData,period}) =>
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
         financialData,
-        period.periodKey
+        [period]
       );
     setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
     const fixedCapitalConsumptionsAggregates =
       await buildFixedCapitalConsumptionsAggregates(
         financialData,
-        period.periodKey
+        [period]
       );
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
   }, []);
@@ -82,10 +82,12 @@ export const MainAggregatesTable = ({financialData,period}) =>
             <td>Consommations intermédiaires</td>
             <td className={"important text-end"}>{printValue(intermediateConsumptions.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
-        {intermediateConsumptionsAggregates.filter(aggregate => aggregate.amount != 0).map(({label,amount},index) => 
+        {intermediateConsumptionsAggregates
+          //.filter(aggregate => aggregate.amount != 0)
+          .map(({label,periodsData},index) => 
           <tr key={index}>
             <td>&emsp;{label}</td>
-            <td className="text-end">{printValue(amount,0)} &euro;</td>
+            <td className="text-end">{printValue(periodsData[period.periodKey].amount,0)} &euro;</td>
             
           </tr>)}
 
@@ -93,10 +95,12 @@ export const MainAggregatesTable = ({financialData,period}) =>
             <td>Consommations de capital fixe</td>
             <td className={"important text-end"}>{printValue(fixedCapitalConsumptions.periodsData[periodKey].amount,0)} &euro;</td>
             </tr>
-        {fixedCapitalConsumptionsAggregates.filter(aggregate => aggregate.amount != 0).map(({label,amount},index) => 
+        {fixedCapitalConsumptionsAggregates
+          //.filter(aggregate => aggregate.amount != 0)
+          .map(({label,periodsData},index) => 
           <tr key={index}>
             <td>&emsp;{label}</td>
-            <td className="text-end">{printValue(amount,0)} &euro;</td>
+            <td className="text-end">{printValue(periodsData[period.periodKey].amount,0)} &euro;</td>
             
           </tr>)}
 

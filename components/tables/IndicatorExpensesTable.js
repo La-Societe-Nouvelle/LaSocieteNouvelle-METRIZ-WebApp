@@ -128,67 +128,67 @@ export class IndicatorExpensesTable extends React.Component {
                         accountLib.slice(1).toLowerCase()}
                     </td>
                     <td className="text-end">
-                      {printValue(periodsData[period.periodKey].amount, 0)}
+                      {periodsData[period.periodKey] ? printValue(periodsData[period.periodKey].amount, 0) : " - "}
                     </td>
                     <td className="text-end">
-                      {printValue(
+                      {periodsData[period.periodKey] ? printValue(
                         periodsData[period.periodKey].footprint.indicators[
                           indic
                         ].getValue(),
                         nbDecimals
-                      )}
+                      ) : " - "}
                     </td>
                     <td className="text-end">
                       <u>+</u>
-                      {printValue(
+                      {periodsData[period.periodKey] ? printValue(
                         periodsData[period.periodKey].footprint.indicators[
                           indic
                         ].getUncertainty(),
                         0
-                      )}
+                      ) : " - "}
                     </td>
                     {impactAbsolu && (
                       <td className="text-end">
-                        {printValue(
+                        {periodsData[period.periodKey] ? printValue(
                           periodsData[period.periodKey].footprint.indicators[
                             indic
                           ].getValueAbsolute(
                             periodsData[period.periodKey].amount
                           ),
                           nbDecimals
-                        )}
+                        ) : " - "}
                       </td>
                     )}
 
                     {prevPeriod && (
                       <>
                         <td className="text-end border-left">
-                          {printValue(
+                          {periodsData[prevPeriod.periodKey] ? printValue(
                             periodsData[prevPeriod.periodKey].footprint.indicators[
                               indic
                             ].getValue(),
                             nbDecimals
-                          )}
+                          ) : " - "}
                         </td>
                         <td className="text-end">
                           <u>+</u>
-                          {printValue(
+                          {periodsData[prevPeriod.periodKey] ? printValue(
                             periodsData[prevPeriod.periodKey].footprint.indicators[
                               indic
                             ].getUncertainty(),
                             0
-                          )}
+                          ) : " - "}
                         </td>
                         {impactAbsolu && (
                           <td className="text-end">
-                            {printValue(
+                            {periodsData[prevPeriod.periodKey] ? printValue(
                               periodsData[
                                 prevPeriod.periodKey
                               ].footprint.indicators[indic].getValueAbsolute(
                                 periodsData[prevPeriod.periodKey].amount
                               ),
                               nbDecimals
-                            )}
+                            ) : " - "}
                           </td>
                         )}
                       </>
@@ -220,9 +220,9 @@ export class IndicatorExpensesTable extends React.Component {
         break;
       case "amount":
         accounts.sort(
-          (a, b) =>
-            b.periodsData[period.periodKey].amount -
-            a.periodsData[period.periodKey].amount
+          (a, b) => (a.periodsData[period.periodKey] && b.periodsData[period.periodKey]) ? 
+            (b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount)
+            : (a.periodsData[period.periodKey] ? -1 : 1)
         );
         break;
     }

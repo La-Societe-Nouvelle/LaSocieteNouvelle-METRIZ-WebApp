@@ -23,123 +23,198 @@ import { buildAggregatePeriodFootprint } from "./footprintFormulas";
  *      6871                                    Dotations aux amortissements exceptionnels des immobilisations
  */
 
-export const buildIntermediateConsumptionsAggregates = async (financialData, periodKey) =>
+export const buildIntermediateConsumptionsAggregates = async (financialData, availablePeriods) =>
 {
     let aggregates = [];
     let accounts = [];
-    let filteredExternalExpensesAccounts = financialData.externalExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
 
     // Achats stockés - Matières premières
-    accounts = filteredExternalExpensesAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
-    if (accounts.length > 0) {
-        aggregates.push({
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60(1|91)/.test(account.accountNum));
+    if (accounts.length>0) {
+        let aggregate = {
             label: "Matières premières",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
-    };
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
+    }
 
     // Achats stockés - Autres approvisionnements
-    accounts = filteredExternalExpensesAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60(2|92)/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Autres approvisionnements",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
     
     // Achats de marchandises
-    accounts = filteredExternalExpensesAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60(7|97)/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Marchandises",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
 
     // Variation des stocks
-    let filteredStockVariationsAccounts = financialData.stockVariationsAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
-
-    accounts = filteredStockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
-
+    accounts = financialData.stockVariationsAccounts.filter(account => /^603/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Variation des stocks",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
 
     // Autres achats
-    accounts = filteredExternalExpensesAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^60([4|5|6|8]|9[4|5|6|8])/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Autres achats",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
 
     // Autres charges externes
-    accounts = filteredExternalExpensesAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
+    accounts = financialData.externalExpensesAccounts.filter(account => /^6(1|2)/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Autres charges externes",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };  
 
     return aggregates;
 }
     
 
-export const buildFixedCapitalConsumptionsAggregates = async (financialData, periodKey) =>
+export const buildFixedCapitalConsumptionsAggregates = async (financialData, availablePeriods) =>
 {
     let aggregates = [];
     let accounts = []
-    let filteredAmortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(periodKey))
 
     // Dotations aux amortissements sur immobilisations incorporelles
-    accounts = filteredAmortisationExpensesAccounts.filter(account => /^68111/.test(account.accountNum));
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^68111/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Dotations aux amortissements sur immobilisations incorporelles",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
 
     // Dotations aux amortissements sur immobilisations corporelles
-    accounts = filteredAmortisationExpensesAccounts.filter(account => /^68112/.test(account.accountNum));
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^68112/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Dotations aux amortissements sur immobilisations corporelles",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
 
     // Dotations aux amortissements sur immobilisations incorporelles
-    accounts = filteredAmortisationExpensesAccounts.filter(account => /^6811[^(1|2)]/.test(account.accountNum));
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^6811[^(1|2)]/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Dotations aux amortissements sur immobilisations",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };
 
     // Dotations aux amortissements exceptionnels des immobilisations
-    accounts = filteredAmortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
+    accounts = financialData.amortisationExpensesAccounts.filter(account => /^6871/.test(account.accountNum));
     if (accounts.length > 0) {
-        aggregates.push({
+        let aggregate = {
             label: "Dotations aux amortissements exceptionnels des immobilisations",
-            amount: getAmountItemsForPeriod(accounts, periodKey, 2),
-            footprint: await buildAggregatePeriodFootprint(accounts, periodKey)
-        });
+            periodsData: {}
+        };
+        for (let period of availablePeriods) {
+            if (accounts.some(account => account.periodsData.hasOwnProperty(period.periodKey))) {
+                aggregate.periodsData[period.periodKey] = {
+                    amount: getAmountItemsForPeriod(accounts, period.periodKey, 2),
+                    footprint: await buildAggregatePeriodFootprint(accounts, period.periodKey)
+                }
+            }
+        };
+        aggregates.push(aggregate);
     };       
 
     return aggregates;

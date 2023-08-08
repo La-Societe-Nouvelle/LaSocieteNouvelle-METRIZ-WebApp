@@ -35,6 +35,7 @@ export const updateIntermediateConsumptionsFootprints = async (financialData,per
 const updateExternalExpensesAccountsFpt = async (financialData,period) =>
 {
   await Promise.all(financialData.externalExpensesAccounts
+    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey))
     .map(async (account) => 
   {
     // retrieve expenses
@@ -189,7 +190,7 @@ const updatePurchasesStocksVariationsFpt = async (financialData,period) =>
 const updatePurchasesStocksVariationsAccountsFpt = async (financialData,period) =>
 {
   await Promise.all(financialData.stockVariationsAccounts
-    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount!=0) // account defined for period with amount not null
+    .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount!=0) // account defined for period with amount not null
     .map(async (account) => 
   {
     let stock = financialData.stocks.find(stock => stock.defaultStockVariationAccountNum==account.accountNum);
@@ -292,7 +293,7 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
   await Promise.all(immobilisations.map(async (immobilisation) =>
   {
     let states = Object.values(immobilisation.states)
-      .filter(state => period.regex.test(state.date))
+      .filter(state => period.regex.test(state.date) && state.date!=immobilisation.initialState.date)
       .sort((a,b) => sortChronologicallyDates(a,b));
 
     for (let state of states) 
@@ -428,15 +429,15 @@ const updateAmortisationExpensesFpt = async (financialData,period) =>
 
 const updateAmortisationExpenseAccountsFpt = async (financialData,period) =>
 {
-  let amortisationExpensesAccounts = financialData.amortisationExpensesAccounts.filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0);
-  await Promise.all(amortisationExpensesAccounts
+  await Promise.all(financialData.amortisationExpensesAccounts
+    .filter((account) => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0)
     .map(async (account) => 
   {
     let amortisationExpenses = financialData.adjustedAmortisationExpenses
       .filter(expense => expense.accountNum==account.accountNum)
       .filter(expense => expense.amount>0)
       .filter(expense => period.regex.test(expense.date));
-      
+    
     account.periodsData[period.periodKey].footprint = await buildAggregateFootprint(amortisationExpenses);
     return;
   }));
@@ -456,7 +457,7 @@ export const updateMainAggregatesFootprints = async (indic,financialData,period)
 
   // Intermediate consumptions
   let intermediateConsumptionsAccounts = financialData.externalExpensesAccounts.concat(financialData.stockVariationsAccounts)
-    .filter(account => account.periodsData[period.periodKey] && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
+    .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
   intermediateConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
     await buildAggregatePeriodIndicator(indic,intermediateConsumptionsAccounts,period.periodKey);
   
