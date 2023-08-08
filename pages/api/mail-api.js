@@ -149,35 +149,34 @@ export const sendReportToAdmin = async (file, fileName) =>
 
 }
 
-export const sendReportToSupport = async (errors) => 
-{
+export const sendReportToSupport = async (errors, userMail, userComment) => {
+  const recipientMail = "support@lasocietenouvelle.org";
+  const objetMail = "Rapport d'erreurs - Lecture du FEC";
 
-  const recipientMail= "support@lasocietenouvelle.org";
-  const objetMail= "Rapport d'erreurs - Lecture du FEC";
+  let messageMail = "METRIZ - Version publique\n\n";
+  messageMail += "Email de contact : " + (userMail ? userMail : "Non renseigné ") + "\n";
+  messageMail += "Commentaire : " + (userComment ? userComment : "Aucun commentaire") + "\n";
+  messageMail += "Liste des erreurs-----------------------\n";
 
-  const messageMail = "Liste des erreurs-----------------------\n" ;
-
-  errors.forEach(error => {
-    messageMail += "-"+ error+"\n"
+  errors.forEach((error) => {
+    messageMail += "-" + error + "\n";
   });
-  
-  const contentMail = { recipientMail, objetMail, messageMail }
+
+  console.log(messageMail);
+
+  const contentMail = { recipientMail, objetMail, messageMail };
 
   const request = {
     body: JSON.stringify(contentMail),
-    headers: {'Content-Type': 'application/json'},
-    method: 'POST'
-  }
-  
-  try 
-  {
-      const res = await fetch('/api/mail-sender', request);
-      return res;
-  } 
-  catch (error) {
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+  };
+
+  try {
+    const res = await fetch('/api/mail-sender', request);
+    return res;
+  } catch (error) {
     return error;
   }
-  
-
-}
+};
 
