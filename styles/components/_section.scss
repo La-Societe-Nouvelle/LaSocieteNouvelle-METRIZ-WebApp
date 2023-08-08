@@ -3,31 +3,43 @@ section {
   margin-bottom: 3rem;
 }
 
-// START SECTION
-
-.illu-box {
-  border-radius: 20px;
-  img {
-    height: 60px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-  h3 {
-    margin-bottom: 1rem;
-    margin-top: 1rem;
-  }
-  p {
-    font-size: 14px;
-  }
-}
-
-// COMPANY SECTION
 .step {
   border: 2px solid $bg-light;
   border-radius: 1rem;
   background-color: #ffffff;
 }
 
+/**
+ * ==============================================
+ * HOMEPAGE
+ * ==============================================
+ */
+
+.illu-box {
+  border-radius: 20px;
+
+  img {
+    height: 60px;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    margin-bottom: 1rem;
+    color : $primary;
+    margin-top: 1rem;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}
+
+/**
+ * ==============================================
+ * STEP 3 - PROVIDERS
+ * ==============================================
+ */
 #siren-section,
 #sector-section {
   .step:not(:first-child) {
@@ -35,7 +47,7 @@ section {
     padding: 1rem 2rem;
   }
 
-  .step ~ .step {
+  .step~.step {
     margin-bottom: inherit;
     padding: inherit;
   }
@@ -45,158 +57,161 @@ section {
   }
 }
 
-/* Indicator Section*/
-.indicator-section {
-  .card {
-    margin-bottom: 5px;
-    border: none;
-  }
-  .card-header {
-    padding: 0.75rem 1rem;
-    background-color: #fff;
-    border: 1px solid darken(#fbfbff, 5%);
-    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
-      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out,
-      border-radius 0.15s ease;
-  }
-  .card-body {
-    background-color: #fbfbff;
-    border-left: 1px solid darken(#fbfbff, 5%);
-    border-right: 1px solid darken(#fbfbff, 5%);
-    border-bottom: 1px solid darken(#fbfbff, 5%);
-  }
-  .btn {
-    margin-right: 1rem;
-  }
-  .icon-success {
-    color: #0c9;
-    margin-right: 0.3rem;
-  }
-  .step {
-    padding: 2rem;
-    margin: 1rem 0;
-  }
-
-  h3 {
-    font-size: 1.2rem;
-    color: #251f81;
-    margin: 1.5rem 0;
-  }
-
-  h4 {
-    font-size: 1.3em;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
-  }
-
-  .indicator-title {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid $light;
-    padding: 1em 0;
-  }
-  .indicator-img img {
-    margin-left: 0.5rem;
-  }
-
-  .icon-ese {
-    height: 50px;
-  }
-
-  .dwn-group {
-    padding: 0.75rem 1rem;
-    border: 1px solid darken(#fbfbff, 5%);
-    margin: 1rem 0;
-    p {
-      font-size: 0.85rem;
-      letter-spacing: 0.01rem;
-      font-weight: 600;
-    }
-  }
-}
-
-.selected-indicator {
-  background-color: $light;
-  padding: 2em 0;
-}
+/**
+ * ==============================================
+ * STEP 4 - STATEMENTS
+ * ==============================================
+ */
 
 .statement-section {
-  label {
-    font-weight: normal;
-    font-size: 0.8em;
-  }
   h3 {
-    color: $tertiary;
-    font-size: 1.4rem;
-    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    margin: 1.5rem 0;
+    border-bottom: 2px solid $light-secondary;
+    font-size: 1.3rem;
   }
+}
+
+.indic-statement.bg-light {
+  background-color: lighten($bg-light, 2.2%) !important;
+}
+
+.indic-statement {
+
+  form.statement>div.row>div.col:nth-child(2) {
+    border-left: 1px solid $light;
+
+    .form-group {
+      padding-left: 1rem;
+    }
+  }
+
+  form.statement>div.row>div.col-lg-7 {
+
+    .form-group {
+      padding-right: 1rem;
+
+    }
+  }
+
+  .statement {
+    padding: 2rem;
+    border-radius: 1rem;
+    background-color: #fff;
+
+    .form-label {
+      font-weight: 500;
+    }
+  }
+
   h4 {
-    color: $primary;
-    font-size: 1em;
-  }
-  .btn {
-    margin-left: 1rem;
+    font-weight: 600;
+    font-size: 1rem;
   }
 }
 
-// validation button
-.statement-validation {
-  text-align: right;
-}
+.indic-modal {
+  .modal-content {
+    background-color: $bg-light;
+  }
 
-.impact-result {
-  padding: 1em 0;
-}
+  .modal-header {
+    padding: 1.5rem 2rem;
+  }
 
-// GRAPH
+  .modal-body {
+    background-color: #fff;
+    padding: 2rem;
+    margin: 0 2rem;
+    border-radius: 1rem;
+  }
 
-.analysis-container {
-  display: flex;
-  align-items: center;
-
-  p {
-    margin-bottom: 0.5rem;
-    font-size: 0.8rem;
+  .modal-footer {
+    padding: 1rem 2rem;
   }
 }
 
-// STATEMENT
+/**
+ * ==============================================
+ * STEP 5 - RESULTS
+ * ==============================================
+ */
 
-/* ---------- STATEMENT ---------- */
+.results {
+  .box {
+    border: 2px solid #f0f0f8;
+    border-radius: 1rem;
+    background-color: #ffffff;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    h3{
+      color : $primary;
+    }
+    // min-height: calc(100% - 2rem);
+    h4 {
+      margin-bottom: 2rem;
+    }
 
-.statement {
-  .statement-area {
-    margin-bottom: 15px;
-    padding: 10px;
-    //border: solid 1px $secondary;
   }
 
-  // statement item
-  .statement-item {
-    // assessment button
-    .assessment-button-container {
-      margin-left: auto;
+  .nav-underline {
+    a {
+      font-weight: 600;
+      border-bottom: 2px solid $light;
+      margin: 0 0.5rem;
+    }
+  }
 
-      .assessment-button {
-        width: 150px;
+  .indic-result-menu {
+
+    .btn:focus {
+      outline: 0;
+      box-shadow: 0 0 0 0.15rem rgba(250, 89, 95, 0.33);
+    }
+    .dropdown-menu {
+      border: 2px solid $light;
+      border-radius: 1rem;
+    }
+
+    .dropdown-item {
+      font-size: 0.8rem;
+      color: $primary;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $bg-light;
       }
     }
   }
+
+
+
+  .download-dropdown {
+    border: 2px solid $light;
+    border-radius: 1rem;
+
+    .dropdown-item {
+      font-size: 0.8rem;
+      color: $primary;
+
+      &:hover,
+      &:focus,
+      &:active {
+        background-color: $bg-light;
+      }
+    }
+  }
+
 }
 
-.or {
-  text-align: center;
-  font-weight: 800;
+// Graphs Container
+.charts-container .loader-container {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-/* ---------- Results ---------- */
-
-.rapport-indic h3 {
-  color: $primary;
-  font-size: 1.4rem;
-}
-/* ---------- Results ---------- */
 
 .progressbar {
   width: 100%;
@@ -210,6 +225,12 @@ section {
   border-radius: 15px;
   transition: width 400ms ease-in-out;
   height: 100%;
+}
+
+#dropdown-indics-button {
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+
 }
 
 /* ---------- Loading Animation ---------- */
@@ -228,8 +249,10 @@ section {
   border-radius: 5px;
   background-color: $secondary;
   color: $secondary;
-  will-change: transform; /* Ajout de la propriété will-change */
-  transform: translateZ(0); /* Ajout de la propriété transform */
+  will-change: transform;
+  /* Ajout de la propriété will-change */
+  transform: translateZ(0);
+  /* Ajout de la propriété transform */
   box-shadow: 9999px 0 0 -5px $secondary;
   animation: dotPulse 1.5s infinite linear;
   animation-delay: 0.25s;
@@ -303,12 +326,4 @@ section {
   100% {
     box-shadow: 10014px 0 0 -5px $secondary;
   }
-}
-
-// Graphs Container
-.graph-container .loader-container {
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }

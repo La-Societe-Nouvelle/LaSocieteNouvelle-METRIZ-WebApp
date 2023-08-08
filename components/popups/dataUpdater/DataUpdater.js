@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Button, Col, Container, Modal, Row } from "react-bootstrap";
+import React, { useState } from "react";
+import { Button, Image, Modal } from "react-bootstrap";
 import { Session } from "../../../src/Session";
 import LegalUnitService from "../../../src/services/LegalUnitService";
-import { ComparativeData } from "../../../src/ComparativeData";
-import { updateComparativeData } from "../../../src/version/updateVersion";
+import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import UpdateDataView from "./UpdatedDataView";
 
-export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => {
+export const DataUpdater = ({ session, updatePrevSession }) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [updatedSession, setUpdatedSession] = useState({});
@@ -14,17 +13,18 @@ export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => 
 
   const handleRefresh = async () => {
     setIsLoading(true);
-    const updatedSession = new Session({ ...session });
+    const updatedSession = new Session(JSON.parse(JSON.stringify(session)));
 
     await fetchLatestData(updatedSession);
-
 
     setUpdatedSession(updatedSession);
     setIsLoading(false);
     setIsDatafetched(true);
   };
 
-  const handleClose = () => {setShow(false)};
+  const handleClose = () => {
+    setShow(false);
+  };
 
   return (
     <Modal show={show} size="lg" onHide={handleClose}>
@@ -32,24 +32,25 @@ export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => 
         <h3>Actualisation des données...</h3>
       </Modal.Header>
       <Modal.Body>
-        {isLoading && (
-          <div className="loader-container my-4">
-            <div className="dot-pulse m-auto"></div>
-          </div>
-        )}
+      <Image
+              src="/illus/sync.svg"
+              alt=""
+              className="d-block mx-auto mb-4"
+              height={150}
+            />
         {isDatafetched && (
           <UpdateDataView
             prevSession={session}
             updatedSession={updatedSession}
-            downloadSession={downloadSession}
             close={() => setShow(false)}
             updatePrevSession={updatePrevSession}
           ></UpdateDataView>
         )}
         {!isDatafetched && !isLoading && (
-          <>
-            <p>
-              Des données plus récentes sont peut-être disponibles.
+          <div className="text-center">
+            
+            <p className="">
+              Il se pourrait que des données plus récentes soient disponibles.
               Souhaitez-vous vérifier si les données sont à jour ?
             </p>
             <Button
@@ -60,7 +61,13 @@ export const DataUpdater = ({ session, downloadSession, updatePrevSession }) => 
             >
               Vérifier mes données
             </Button>
-          </>
+          </div>
+        )}
+
+        {isLoading && (
+          <div className="loader-container my-4">
+            <div className="dot-pulse m-auto"></div>
+          </div>
         )}
       </Modal.Body>
     </Modal>
@@ -96,12 +103,9 @@ const fetchLatestData = async (updatedSession) => {
 
   // Récupère les dernières données comparatives
 
-  const latestComparativeData = await fetchLatestComparativeData(
-    validations,
-    updatedSession.comparativeData.activityCode
-  );
-
-  updatedSession.comparativeData = latestComparativeData;
+  if (validations.length > 0) {
+    await fetchComparativeData(updatedSession.comparativeData, validations);
+  }
 };
 
 const fetchLatestProviders = async (
@@ -128,7 +132,6 @@ const fetchLatestProviders = async (
 
 const fetchLatestLegalUnit = async (legalUnit) => {
   await LegalUnitService.getLegalUnitData(legalUnit.siren).then((res) => {
-    console.log(res.data.legalUnit);
     let status = res.data.header.code;
     if (status == 200) {
       legalUnit.corporateName = res.data.legalUnit.denomination;
@@ -161,21 +164,4 @@ const fetchLatestAccountsData = async (immobilisations, stocks) => {
       break;
     }
   }
-};
-
-const fetchLatestComparativeData = async (validations, activityCode) => {
-  let latestComparativeData = new ComparativeData();
-
-  for await (const indic of validations) {
-    // update comparative data for each validated indicators
-    const updatedData = await updateComparativeData(
-      indic,
-      activityCode,
-      latestComparativeData
-    );
-
-    latestComparativeData = updatedData;
-  }
-
-  return latestComparativeData;
 };

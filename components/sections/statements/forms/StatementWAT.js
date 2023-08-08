@@ -1,176 +1,146 @@
 // La Société Nouvelle
-
-// React
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
-import Select from "react-select";
-
-//Utils
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
-
 /* ---------- DECLARATION - INDIC #WAT ---------- */
 
-export class StatementWAT extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      waterConsumption: valueOrDefault(
-        props.impactsData.waterConsumption,
-        undefined
-      ),
-      waterConsumptionUnit: props.impactsData.waterConsumptionUnit,
-      waterConsumptionUncertainty: valueOrDefault(
-        props.impactsData.waterConsumptionUncertainty,
-        undefined
-      ),
-      info: props.impactsData.comments.wat || "",
-    };
-  }
+import React, { useState } from "react";
+import Select from "react-select";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
-  componentDidUpdate() {
-    if (
-      this.state.waterConsumption != this.props.impactsData.waterConsumption
-    ) {
-      this.setState({
-        waterConsumption: this.props.impactsData.waterConsumption,
-      });
+const StatementWAT = ({ impactsData, onUpdate, onError }) => {
+  const [waterConsumption, setWaterConsumption] = useState(
+    valueOrDefault(impactsData.waterConsumption, "")
+  );
+  const [waterConsumptionUncertainty, setWaterConsumptionUncertainty] =
+    useState(valueOrDefault(impactsData.waterConsumptionUncertainty, ""));
+
+  const [waterConsumptionUnit, setWaterConsumptionUnit] = useState(
+    impactsData.waterConsumptionUnit
+  );
+  const [info, setInfo] = useState(impactsData.comments.wat || "");
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  const options = [
+    { value: "m³", label: "m³" },
+    { value: "L", label: "L" },
+  ];
+  const updateWaterConsumption = (input) => {
+    let errorMessage = "";
+
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
     }
-    if (
-      this.state.waterConsumptionUncertainty !=
-      this.props.impactsData.waterConsumptionUncertainty
-    ) {
-      this.setState({
-        waterConsumptionUncertainty:
-          this.props.impactsData.waterConsumptionUncertainty,
-      });
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
     }
-  }
+    setIsInvalid(errorMessage !== "");
+    onError("wat", errorMessage);
 
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const {
-      waterConsumption,
-      waterConsumptionUnit,
-      waterConsumptionUncertainty,
-      info,
-    } = this.state;
+    impactsData.setWaterConsumption(input.target.value);
+    setWaterConsumption(input.target.value);
+    setWaterConsumptionUncertainty(impactsData.waterConsumptionUncertainty);
+    onUpdate("wat");
+  };
 
-    const options = [
-      { value: "m³", label: "m³" },
-      { value: "L", label: "L" },
-    ];
+  const updateWaterConsumptionUncertainty = (input) => {
+    impactsData.waterConsumptionUncertainty = input.target.value;
+    setWaterConsumptionUncertainty(input.target.value)
+    onUpdate("wat");
+  };
 
-    let isValid = waterConsumption != null && netValueAdded != null;
+  const updateWaterConsumptionUnit = (selected) => {
+    const selectedUnit = selected.value;
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>Consommation totale d'eau</label>
-            <Row>
-              <Col>
-                <InputNumber
+    if (selectedUnit !== impactsData.waterConsumptionUnit) {
+      let updatedWaterConsumption = impactsData.waterConsumption;
+
+      if (selectedUnit === "m³") {
+        updatedWaterConsumption = impactsData.waterConsumption / 1000;
+      } else if (selectedUnit === "L") {
+        updatedWaterConsumption = impactsData.waterConsumption * 1000;
+      }
+
+      setWaterConsumption(updatedWaterConsumption);
+      impactsData.waterConsumption = updatedWaterConsumption;
+    }
+
+    setWaterConsumptionUnit(selectedUnit);
+
+    impactsData.waterConsumptionUnit = selectedUnit;
+
+    onUpdate("wat");
+  };
+
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.wat = event.target.value;
+  };
+
+  return (
+    <Form className="statement">
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
+              Consommation totale d'eau
+            </Form.Label>
+            <Col>
+              <div className="custom-input with-select input-group">
+                <Form.Control
+                  type="number"
                   value={roundValue(waterConsumption, 0)}
-                  onUpdate={this.updateWaterConsumption}
+                  inputMode="numeric"
+                  onChange={updateWaterConsumption}
+                  className="me-1"
                 />
-              </Col>
-              <Col sm={4}>
+
                 <Select
                   options={options}
-                  defaultValue={{
+                  styles={unitSelectStyles}
+                  value={{
                     label: waterConsumptionUnit,
                     value: waterConsumptionUnit,
                   }}
-                  onChange={this.updateWaterConsumptionUnit}
+                  onChange={updateWaterConsumptionUnit}
                 />
-              </Col>
-            </Row>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(waterConsumptionUncertainty, 0)}
-              onUpdate={this.updateWaterConsumptionUncertainty}
-              placeholder="%"
+              </div>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>Incertitude</Form.Label>
+            <Col>
+              <InputGroup className="custom-input">
+                <Form.Control
+                  type="number"
+                  value={roundValue(waterConsumptionUncertainty, 0)}
+                  inputMode="numeric"
+                  onChange={updateWaterConsumptionUncertainty}
+                  className="uncertainty-input"
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
             />
-          </div>
-        </div>
+          </Form.Group>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
 
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  updateWaterConsumption = (input) => {
-    this.props.impactsData.setWaterConsumption(input);
-    this.setState({
-      waterConsumptionUncertainty:
-        this.props.impactsData.waterConsumptionUncertainty,
-    });
-    this.props.onUpdate("wat");
-  };
-
-  updateWaterConsumptionUncertainty = (input) => {
-    this.props.impactsData.waterConsumptionUncertainty = input;
-    this.props.onUpdate("wat");
-  };
-
-  updateWaterConsumptionUnit = (selected) => {
-    const selectedUnit = selected.value; 
-
-    const {
-      waterConsumption,
-      waterConsumptionUnit,
-    } = this.props.impactsData;
-
-    if (selectedUnit !== waterConsumptionUnit) {
-      let updatedWaterConsumption =
-        waterConsumption;
-
-      if (selectedUnit === "m³") {
-        updatedWaterConsumption =
-          waterConsumption / 1000;
-      } else if (selectedUnit === "L") {
-        updatedWaterConsumption =
-          waterConsumption * 1000;
-      }
-
-      this.updateWaterConsumption(
-        updatedWaterConsumption
-      );
-    }
-
-
-    this.setState({
-      waterConsumptionUnit: selectedUnit,
-    });
-
-    this.props.impactsData.waterConsumptionUnit = selectedUnit;
-
-    this.props.onUpdate("wat");
-  };
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.wat = this.state.info);
-
-  onValidate = () => this.props.onValidate();
-}
+export default StatementWAT;

@@ -4,8 +4,7 @@ import { printValue } from "../../utils/Utils";
 
 export const analysisTextWriterART = (props) => {
   const { impactsData, financialData, period } = props;
-  const { mainAggregates, productionAggregates } = financialData;
-  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
+  const { mainAggregates } = financialData;
 
   // array of paragraphs
   let analysis = [];

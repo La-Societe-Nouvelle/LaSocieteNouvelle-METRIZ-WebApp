@@ -1,180 +1,176 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import React, { useState } from "react";
 import Select from "react-select";
 
-// Utils
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
-/* ---------- DECLARATION - INDIC #HAZ ---------- */
+const StatementHAZ = ({ impactsData, onUpdate, onError }) => {
+  const [hazardousSubstancesConsumption, setHazardousSubstancesConsumption] =
+    useState(valueOrDefault(impactsData.hazardousSubstancesConsumption, ""));
 
-export class StatementHAZ extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      hazardousSubstancesConsumption: valueOrDefault(
-        props.impactsData.hazardousSubstancesConsumption,
-        undefined
-      ),
-      hazardousSubstancesConsumptionUnit:
-        props.impactsData.hazardousSubstancesConsumptionUnit,
-      hazardousSubstancesConsumptionUncertainty: valueOrDefault(
-        props.impactsData.hazardousSubstancesConsumptionUncertainty,
-        undefined
-      ),
-      info: props.impactsData.comments.haz || "",
-    };
-  }
+  const [
+    hazardousSubstancesConsumptionUnit,
+    setHazardousSubstancesConsumptionUnit,
+  ] = useState(impactsData.hazardousSubstancesConsumptionUnit);
 
-  componentDidUpdate() {
-    if (
-      this.state.hazardousSubstancesConsumption !=
-      this.props.impactsData.hazardousSubstancesConsumption
-    ) {
-      this.setState({
-        hazardousSubstancesConsumption:
-          this.props.impactsData.hazardousSubstancesConsumption,
-      });
+  const [
+    hazardousSubstancesConsumptionUncertainty,
+    setHazardousSubstancesConsumptionUncertainty,
+  ] = useState(
+    valueOrDefault(impactsData.hazardousSubstancesConsumptionUncertainty, "")
+  );
+
+  
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  const [info, setInfo] = useState(impactsData.comments.haz || "");
+
+  const options = [
+    { value: "kg", label: "kg" },
+    { value: "t", label: "t" },
+  ];
+
+  const updateHazardousSubstancesConsumption = (input) => {
+
+    let errorMessage = "";
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
     }
-    if (
-      this.state.hazardousSubstancesConsumptionUncertainty !=
-      this.props.impactsData.hazardousSubstancesConsumptionUncertainty
-    ) {
-      this.setState({
-        hazardousSubstancesConsumptionUncertainty:
-          this.props.impactsData.hazardousSubstancesConsumptionUncertainty,
-      });
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
     }
-  }
 
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const {
-      hazardousSubstancesConsumption,
-      hazardousSubstancesConsumptionUnit,
-      hazardousSubstancesConsumptionUncertainty,
-      info,
-    } = this.state;
+    setIsInvalid(errorMessage !== "");
+    onError("haz", errorMessage);
 
-    const options = [
-      { value: "kg", label: "kg" },
-      { value: "t", label: "t" },
-    ];
+    setHazardousSubstancesConsumption(input.target.value);
 
-    let isValid =
-      hazardousSubstancesConsumption != null && netValueAdded != null;
-
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
-              Utilisation de produits dangereux - santé/environnement
-            </label>
-            <Row>
-              <Col>
-                <InputNumber
-                  value={roundValue(hazardousSubstancesConsumption, 0)}
-                  onUpdate={this.updateHazardousSubstancesConsumption}
-                />
-              </Col>
-              <Col sm={4}>
-                <Select
-                  options={options}
-                  defaultValue={{
-                    label: hazardousSubstancesConsumptionUnit,
-                    value: hazardousSubstancesConsumptionUnit,
-                  }}
-                  onChange={this.updatehazardousSubstancesConsumptionUnit}
-                />
-              </Col>{" "}
-            </Row>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(hazardousSubstancesConsumptionUncertainty, 0)}
-              onUpdate={this.updateHazardousSubstancesConsumptionUncertainty}
-              placeholder="%"
-            />
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
+    impactsData.setHazardousSubstancesConsumption(input.target.value);
+    setHazardousSubstancesConsumptionUncertainty(
+      impactsData.hazardousSubstancesConsumptionUncertainty
     );
-  }
 
-  updateHazardousSubstancesConsumption = (input) => {
-    this.props.impactsData.setHazardousSubstancesConsumption(input);
-    this.setState({
-      hazardousSubstancesConsumptionUncertainty:
-        this.props.impactsData.hazardousSubstancesConsumptionUncertainty,
-    });
-    this.props.onUpdate("haz");
+    onUpdate("haz");
   };
 
-  updateHazardousSubstancesConsumptionUncertainty = (input) => {
-    this.props.impactsData.hazardousSubstancesConsumptionUncertainty = input;
-    this.props.onUpdate("haz");
+  const updateHazardousSubstancesConsumptionUncertainty = (input) => {
+    console.log(input.target.value)
+    impactsData.hazardousSubstancesConsumptionUncertainty = input.target.value;
+    setHazardousSubstancesConsumptionUncertainty(input.target.value);
+
+    onUpdate("haz");
   };
 
-  updatehazardousSubstancesConsumptionUnit = (selected) => {
+  const updateHazardousSubstancesConsumptionUnit = (selected) => {
     const selectedUnit = selected.value;
 
-    const {
-      hazardousSubstancesConsumption,
-      hazardousSubstancesConsumptionUnit,
-    } = this.props.impactsData;
-
-    if (selectedUnit !== hazardousSubstancesConsumptionUnit) {
+    if (selectedUnit !== impactsData.hazardousSubstancesConsumptionUnit) {
       let updatedHazardousSubstancesConsumption =
-        hazardousSubstancesConsumption;
+        impactsData.hazardousSubstancesConsumption;
 
       if (selectedUnit === "t") {
         updatedHazardousSubstancesConsumption =
-          hazardousSubstancesConsumption / 1000;
+          impactsData.hazardousSubstancesConsumption / 1000;
       } else if (selectedUnit === "kg") {
         updatedHazardousSubstancesConsumption =
-          hazardousSubstancesConsumption * 1000;
+          impactsData.hazardousSubstancesConsumption * 1000;
       }
 
-      this.updateHazardousSubstancesConsumption(
+      setHazardousSubstancesConsumption(updatedHazardousSubstancesConsumption);
+      impactsData.setHazardousSubstancesConsumption(
         updatedHazardousSubstancesConsumption
       );
     }
+    setHazardousSubstancesConsumptionUnit(selectedUnit);
 
-    this.setState({
-      hazardousSubstancesConsumptionUnit: selectedUnit,
-    });
+    impactsData.hazardousSubstancesConsumptionUnit = selectedUnit;
 
-    this.props.impactsData.hazardousSubstancesConsumptionUnit = selectedUnit;
-
-    this.props.onUpdate("haz");
+    onUpdate("ghg");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.haz = this.state.info);
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.haz = event.target.value;
+  };
 
-  onValidate = () => this.props.onValidate();
-}
+  return (
+    <Form className="statement">
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
+              Utilisation de produits dangereux - santé/environnement
+            </Form.Label>
+            <Col>
+            <div className=" d-flex align-items-center justify-content-between">
+                <div className="input-group custom-input with-select">
+                  <Form.Control
+                    type="number"
+                    value={roundValue(hazardousSubstancesConsumption, 0)}
+                    inputMode="numeric"
+                    onChange={updateHazardousSubstancesConsumption}
+                    isInvalid={isInvalid}
+                    className="me-1"
+                  />
+                   <Select
+                    styles={unitSelectStyles}
+                    options={options}
+                    defaultValue={{
+                      label: hazardousSubstancesConsumptionUnit,
+                      value: hazardousSubstancesConsumptionUnit,
+                    }}
+                    className="small"
+                    onChange={updateHazardousSubstancesConsumptionUnit}
+                  />
+                </div>
+                <div>
+                 
+                </div>
+              </div>
+            </Col>
+          </Form.Group>
+
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>Incertitude</Form.Label>
+            <Col>
+              <InputGroup className="custom-input ">
+                <Form.Control
+                  type="number"
+                  value={roundValue(
+                    hazardousSubstancesConsumptionUncertainty,
+                    0
+                  )}
+                  inputMode="numeric"
+                  onChange={updateHazardousSubstancesConsumptionUncertainty}
+                  className="uncertainty-input"
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+
+export default StatementHAZ;

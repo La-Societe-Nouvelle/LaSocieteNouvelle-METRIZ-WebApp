@@ -1,170 +1,154 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import React, { useState } from "react";
 import Select from "react-select";
-
-//Utils
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
 /* ---------- DECLARATION - INDIC #WAS ---------- */
 
-export class StatementWAS extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      wasteProduction: valueOrDefault(
-        props.impactsData.wasteProduction,
-        undefined
-      ),
-      wasteProductionUnit: props.impactsData.wasteProductionUnit,
-      wasteProductionUncertainty: valueOrDefault(
-        props.impactsData.wasteProductionUncertainty,
-        undefined
-      ),
-      info: props.impactsData.comments.was || "",
-    };
-  }
+const StatementWAS = ({ impactsData, onUpdate, onError }) => {
+  const [wasteProduction, setWasteProduction] = useState(
+    valueOrDefault(impactsData.wasteProduction, "")
+  );
+  const [wasteProductionUncertainty, setWasteProductionUncertainty] = useState(
+    valueOrDefault(impactsData.wasteProductionUncertainty, "")
+  );
 
-  componentDidUpdate() {
-    if (this.state.wasteProduction != this.props.impactsData.wasteProduction) {
-      this.setState({
-        wasteProduction: this.props.impactsData.wasteProduction,
-      });
+  const [wasteProductionUnit, setWasteProductionUnit] = useState(
+    impactsData.wasteProductionUnit
+  );
+
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  const [info, setInfo] = useState(impactsData.comments.was || "");
+
+  const options = [
+    { value: "kg", label: "kg" },
+    { value: "t", label: "t" },
+  ];
+
+  const updateWasteProduction = (input) => {
+    let errorMessage = "";
+
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
     }
-    if (
-      this.state.wasteProductionUncertainty !=
-      this.props.impactsData.wasteProductionUncertainty
-    ) {
-      this.setState({
-        wasteProductionUncertainty:
-          this.props.impactsData.wasteProductionUncertainty,
-      });
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
     }
-  }
+    setIsInvalid(errorMessage !== "");
+    onError("was", errorMessage);
 
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const {
-      wasteProduction,
-      wasteProductionUnit,
-      wasteProductionUncertainty,
-      info,
-    } = this.state;
+    impactsData.setWasteProduction(input.target.value);
+    setWasteProduction(input.target.value);
+    setWasteProductionUncertainty(impactsData.wasteProductionUncertainty);
+    onUpdate("was");
+  };
 
-    const options = [
-      { value: "kg", label: "kg" },
-      { value: "t", label: "t" },
-    ];
+  const updateWasteProductionUncertainty = (input) => {
+    impactsData.wasteProductionUncertainty = input.target.value;
+    setWasteProductionUncertainty(input.target.value);
+    onUpdate("was");
+  };
 
-    let isValid = wasteProduction != null && netValueAdded != null;
+  const updateWasteProductionUnit = (selected) => {
+    const selectedUnit = selected.value;
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
+    if (selectedUnit !== impactsData.wasteProductionUnit) {
+      let updatedWasteProduction = impactsData.wasteProduction;
+
+      if (selectedUnit === "t") {
+        updatedWasteProduction = impactsData.wasteProduction / 1000;
+      } else if (selectedUnit === "kg") {
+        updatedWasteProduction = impactsData.wasteProduction * 1000;
+      }
+
+      setWasteProduction(updatedWasteProduction);
+      impactsData.setWasteProduction(updatedWasteProduction);
+    }
+
+    setWasteProductionUnit(selectedUnit);
+
+    impactsData.wasteProductionUnit = selectedUnit;
+    onUpdate("was");
+  };
+
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.was = event.target.value;
+  };
+
+  return (
+    <Form className="statement">
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
               Productiont totale de déchets (y compris DAOM<sup>1</sup>)
-            </label>
-            <Row>
-              <Col>
-                <InputNumber
+              <p className="small mb-0 mt-1">
+                <sup>1</sup> Déchets assimilés aux ordures ménagères
+              </p>
+            </Form.Label>
+            <Col>
+              <div className="custom-input with-select input-group me-1">
+                <Form.Control
+                  type="number"
                   value={roundValue(wasteProduction, 0)}
-                  onUpdate={this.updateWasteProduction}
+                  inputMode="numeric"
+                  onChange={updateWasteProduction}
+                  isInvalid={isInvalid}
+                  className="me-1"
                 />
-                <div className="notes">
-                  <p className="small">
-                    <sup>1</sup> Déchets assimilés aux ordures ménagères
-                  </p>
-                </div>
-              </Col>
-              <Col sm={4}>
+
                 <Select
                   options={options}
-                  defaultValue={{
+                  styles={unitSelectStyles}
+                  value={{
                     label: wasteProductionUnit,
                     value: wasteProductionUnit,
                   }}
-                  onChange={this.updateWasteProductionUnit}
+                  onChange={updateWasteProductionUnit}
                 />
-              </Col>
-            </Row>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(wasteProductionUncertainty, 0)}
-              onUpdate={this.updateWasteProductionUncertainty}
-              placeholder="%"
+              </div>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
+              Incertitude
+            </Form.Label>
+            <Col>
+              <InputGroup className="custom-input">
+                <Form.Control
+                  type="number"
+                  value={roundValue(wasteProductionUncertainty, 0)}
+                  inputMode="numeric"
+                  onChange={updateWasteProductionUncertainty}
+                  className="uncertainty-input"
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label>Informations complémentaires</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
             />
-          </div>
-        </div>
+          </Form.Group>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
 
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  updateWasteProduction = (input) => {
-    this.props.impactsData.setWasteProduction(input);
-    this.setState({
-      wasteProductionUncertainty:
-        this.props.impactsData.wasteProductionUncertainty,
-    });
-    this.props.onUpdate("was");
-  };
-
-  updateWasteProductionUnit = (selected) => {
-    const selectedUnit = selected.value;
-
-    const { wasteProduction, wasteProductionUnit } = this.props.impactsData;
-
-    if (selectedUnit !== wasteProductionUnit) {
-      let updatedWasteProduction = wasteProduction;
-  
-      if (selectedUnit === "t") {
-        updatedWasteProduction = wasteProduction / 1000;
-      } else if (selectedUnit === "kg") {
-        updatedWasteProduction = wasteProduction * 1000;
-      }
-      this.updateWasteProduction(updatedWasteProduction);
-    }
-
-    this.setState({
-      wasteProductionUnit: selectedUnit,
-    });
-
-    this.props.impactsData.wasteProductionUnit = selectedUnit;
-
-    this.props.onUpdate("was");
-  };
-  updateWasteProductionUncertainty = (input) => {
-    this.props.impactsData.wasteProductionUncertainty = input;
-    this.props.onUpdate("was");
-  };
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.was = this.state.info);
-
-  onValidate = () => this.props.onValidate();
-}
+export default StatementWAS;

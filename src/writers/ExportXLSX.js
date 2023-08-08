@@ -26,7 +26,7 @@ async function exportIndicXLSX(
 
 /* ---------- CONTENT BUILDER ---------- */
 
-async function IndicXLSXFileWriter(indic,session,period)
+export async function IndicXLSXFileWriter(indic,session,period)
 {
   const workbook = XLSX.utils.book_new();
 

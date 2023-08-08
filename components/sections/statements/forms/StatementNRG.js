@@ -1,189 +1,94 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
-// Utils
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
-import { InputNumber } from "../../../input/InputNumber";
+import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { AssessmentNRG } from "../modals/AssessmentNRG";
+import { unitSelectStyles } from "../../../../config/customStyles";
 
 /* ---------- DECLARATION - INDIC #NRG ---------- */
 
-export class StatementNRG extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      energyConsumption: valueOrDefault(
-        props.impactsData.energyConsumption,
-        undefined
-      ),
-      energyConsumptionUnit: props.impactsData.energyConsumptionUnit,
-      energyConsumptionUncertainty: valueOrDefault(
-        props.impactsData.energyConsumptionUncertainty,
-        undefined
-      ),
-      info: props.impactsData.comments.nrg || "",
-    };
-  }
+const StatementNRG = ({ impactsData, onUpdate, onError }) => {
+  const [energyConsumption, setEnergyConsumption] = useState(
+    valueOrDefault(impactsData.energyConsumption, "")
+  );
+  const [energyConsumptionUncertainty, setEnergyConsumptionUncertainty] =
+    useState(valueOrDefault(impactsData.energyConsumptionUncertainty, ""));
 
-  componentDidUpdate() {
-    if (
-      this.state.energyConsumption != this.props.impactsData.energyConsumption
-    ) {
-      this.setState({
-        energyConsumption: this.props.impactsData.energyConsumption,
-      });
+  const [energyConsumptionUnit, setEnergyConsumptionUnit] = useState(
+    impactsData.energyConsumptionUnit
+  );
+
+  const [info, setInfo] = useState(impactsData.comments.nrg || "");
+  const [showModal, setShowModal] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
+
+  useEffect(() => {
+    if (energyConsumption != impactsData.energyConsumption) {
+      setEnergyConsumption(impactsData.energyConsumption);
+      setEnergyConsumptionUncertainty(
+        impactsData.energyConsumptionUncertainty
+      );
     }
-    if (
-      this.state.energyConsumptionUncertainty !=
-      this.props.impactsData.energyConsumptionUncertainty
-    ) {
-      this.setState({
-        energyConsumptionUncertainty:
-          this.props.impactsData.energyConsumptionUncertainty,
-      });
+  }, [impactsData.energyConsumption]);
+
+
+  const options = [
+    { value: "MJ", label: "MJ" },
+    { value: "GJ", label: "GJ" },
+    { value: "kWh", label: "kWh" },
+    { value: "MWh", label: "MWh" },
+  ];
+  const updateEnergyConsumption = (input) => {
+    let errorMessage = "";
+
+    const inputValue = input.target.valueAsNumber;
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
     }
-
-    if (
-      this.state.energyConsumptionUnit !=
-      this.props.impactsData.energyConsumptionUnit
-    ) {
-      this.setState({
-        energyConsumptionUnit:
-          this.props.impactsData.energyConsumptionUnit,
-      });
+    if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
     }
+    setIsInvalid(errorMessage !== "");
+    onError("nrg", errorMessage);
 
-  }
+    impactsData.nrgTotal = true;
+    impactsData.setEnergyConsumption(input.target.value);
 
-  render() {
-    const { netValueAdded } = this.props.impactsData;
-    const {
-      energyConsumption,
-      energyConsumptionUnit,
-      energyConsumptionUncertainty,
-      info,
-    } = this.state;
-    const options = [
-      { value: "MJ", label: "MJ" },
-      { value: "GJ", label: "GJ" },
-      { value: "kWh", label: "kWh" },
-      { value: "MWh", label: "MWh" },
-    ];
-
-    let isValid = energyConsumption != null && netValueAdded != null;
-
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>Consommation totale d'énergie</label>
-            <Row>
-              <Col>
-                <InputNumber
-                  value={roundValue(energyConsumption, 0)}
-                  onUpdate={this.updateEnergyConsumption}
-                />
-              </Col>
-              <Col sm={4}>
-                <Select
-                  options={options}
-                  value={{
-                    label: energyConsumptionUnit,
-                    value: energyConsumptionUnit,
-                  }}
-                  onChange={this.updateEnergyConsumptionUnit}
-                />
-              </Col>
-            </Row>
-          </div>
-          <div className="form-group">
-            <label>Incertitude</label>
-            <InputNumber
-              value={roundValue(energyConsumptionUncertainty, 0)}
-              onUpdate={this.updateEnergyConsumptionUncertainty}
-              placeholder="%"
-            />
-          </div>
-        </div>
-
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-validation">
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={this.props.toAssessment}
-          >
-            <i className="bi bi-calculator"></i> Outil d'évaluation
-          </button>
-
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  updateEnergyConsumption = (input) => {
-    this.props.impactsData.nrgTotal = true;
-    this.props.impactsData.setEnergyConsumption(input);
-    this.setState({
-      energyConsumptionUncertainty:
-        this.props.impactsData.energyConsumptionUncertainty,
-    });
-    this.props.onUpdate("nrg");
+    setEnergyConsumption(input.target.value);
+    setEnergyConsumptionUncertainty(impactsData.energyConsumptionUncertainty);
+    onUpdate("nrg");
   };
 
-  updateEnergyConsumptionUncertainty = (input) => {
-    this.props.impactsData.energyConsumptionUncertainty = input;
-    this.props.onUpdate("nrg");
+  const updateEnergyConsumptionUncertainty = (input) => {
+    impactsData.energyConsumptionUncertainty = input.target.value;
+    setEnergyConsumptionUncertainty(input.target.value);
+    onUpdate("nrg");
   };
 
-  updateEnergyConsumptionUnit = (selected) => {
+  const updateEnergyConsumptionUnit = (selected) => {
     const selectedUnit = selected.value;
 
-    const { energyConsumption, energyConsumptionUnit } = this.props.impactsData;
-
-    if (selectedUnit !== energyConsumptionUnit) {
-      const convertedValue = this.convertEnergyConsumption(
-        energyConsumption,
-        energyConsumptionUnit,
+    if (selectedUnit !== impactsData.energyConsumptionUnit) {
+      const convertedValue = convertEnergyConsumption(
+        impactsData.energyConsumption,
+        impactsData.energyConsumptionUnit,
         selectedUnit
       );
-
-      this.updateEnergyConsumption(convertedValue);
+      setEnergyConsumption(convertedValue);
+      impactsData.setEnergyConsumption(convertedValue);
     }
+    setEnergyConsumptionUnit(selectedUnit);
 
-    this.setState({
-      energyConsumptionUnit: selectedUnit,
-    });
+    impactsData.energyConsumptionUnit = selectedUnit;
 
-    this.props.impactsData.energyConsumptionUnit = selectedUnit;
-
-    this.props.onUpdate("nrg");
+    onUpdate("nrg");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.nrg = this.state.info);
-
-  onValidate = () => this.props.onValidate();
-
-  convertEnergyConsumption = (value, fromUnit, toUnit) => {
+  const convertEnergyConsumption = (value, fromUnit, toUnit) => {
     const conversionFactors = {
       GJ: {
         MJ: 1000,
@@ -210,4 +115,106 @@ export class StatementNRG extends React.Component {
     const convertedValue = value * conversionFactor;
     return convertedValue;
   };
-}
+
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.nrg = event.target.value;
+  };
+
+  return (
+    <Form className="statement">
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>Consommation totale d'énergie</Form.Label>
+            <Col>
+              <div className=" d-flex align-items-center justify-content-between">
+                <div className="custom-input with-select input-group me-1">
+                  <Form.Control
+                    type="number"
+                    value={roundValue(energyConsumption, 0)}
+                    inputMode="numeric"
+                    isInvalid={isInvalid}
+                    onChange={updateEnergyConsumption}
+                    className="me-1"
+                  />
+                  <Select
+                    styles={unitSelectStyles}
+                    options={options}
+                    value={{
+                      label: energyConsumptionUnit,
+                      value: energyConsumptionUnit,
+                    }}
+                    onChange={updateEnergyConsumptionUnit}
+                  />
+                </div>
+
+                <div>
+                  <Button
+                    variant="light-secondary"
+                    onClick={() => setShowModal(true)}
+                  >
+                    <i className="bi bi-calculator"></i>
+                  </Button>
+                </div>
+              </div>
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>Incertitude</Form.Label>
+            <Col>
+              <InputGroup className="custom-input">
+                <Form.Control
+                  type="number"
+                  value={roundValue(energyConsumptionUncertainty, 0)}
+                  inputMode="numeric"
+                  onChange={updateEnergyConsumptionUncertainty}
+                  className="uncertainty-input"
+                />
+
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+
+      <Modal
+        show={showModal}
+        size="xl"
+        centered
+        onHide={() => setShowModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>
+          Outil de mesure des énergies
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <AssessmentNRG
+            impactsData={impactsData}
+            onGoBack={() => setShowModal(false)}
+            handleClose={() => setShowModal(false)}
+            onUpdate={onUpdate}
+          />
+        </Modal.Body>
+      </Modal>
+    </Form>
+  );
+};
+
+export default StatementNRG;

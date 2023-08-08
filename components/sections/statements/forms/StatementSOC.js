@@ -1,35 +1,44 @@
-// La Société Nouvelle
-
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
-import { printValue } from "../../../../src/utils/Utils";
+import React, { useState } from "react";
+import { Form, Row, Col } from "react-bootstrap";
 
 /* ---------- DECLARATION - INDIC #SOC ---------- */
 
-export class StatementSOC extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      info: props.impactsData.comments.soc || "",
-    };
-  }
+const StatementSOC = ({ impactsData, onUpdate }) => {
+  const [info, setInfo] = useState(impactsData.comments.soc || "");
+  const [hasSocialPurpose, setHasSocialPurpose] = useState(
+    impactsData.hasSocialPurpose
+  );
 
-  render() {
-    const { hasSocialPurpose, netValueAdded } = this.props.impactsData;
-    const { info } = this.state;
+  const onSocialPurposeChange = (event) => {
+    const radioValue = event.target.value;
 
-    let isValid = hasSocialPurpose !== null && netValueAdded != null;
+    switch (radioValue) {
+      case "true":
+        impactsData.hasSocialPurpose = true;
+        break;
+      case "false":
+        impactsData.hasSocialPurpose = false;
+        break;
+    }
 
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>
+    setHasSocialPurpose(impactsData.hasSocialPurpose);
+    onUpdate("soc");
+  };
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.soc = event.target.value;
+  };
+
+  return (
+    <Form className="statement">
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group align-items-center">
+            <Form.Label column lg={7} >
               L'entreprise est-elle d'utilité sociale ou dotée d'une raison
               d'être ?
-            </label>
-            <Form>
+            </Form.Label>
+            <Col className="text-end">
               <Form.Check
                 inline
                 type="radio"
@@ -37,7 +46,7 @@ export class StatementSOC extends React.Component {
                 label="Oui"
                 value="true"
                 checked={hasSocialPurpose === true}
-                onChange={this.onSocialPurposeChange}
+                onChange={onSocialPurposeChange}
               />
               <Form.Check
                 inline
@@ -46,53 +55,28 @@ export class StatementSOC extends React.Component {
                 label="Non"
                 value="false"
                 checked={hasSocialPurpose === false}
-                onChange={this.onSocialPurposeChange}
+                onChange={onSocialPurposeChange}
               />
-            </Form>
-          </div>
-        </div>
-        <div className="statement-comments">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>{" "}
+            <Form.Control
+              as="textarea"
+              rows={3}
+              className="w-100"
+              onChange={updateInfo}
+              value={info}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
 
-        </div>
-        <div className="statement-validation">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  onSocialPurposeChange = (event) => {
-    let radioValue = event.target.value;
-    switch (radioValue) {
-      case "true":
-        this.props.impactsData.hasSocialPurpose = true;
-        break;
-      case "false":
-        this.props.impactsData.hasSocialPurpose = false;
-        break;
-    }
-    this.props.onUpdate("soc");
-    this.forceUpdate();
-  };
-
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.soc = this.state.info);
-
-  onValidate = () => this.props.onValidate();
-}
-
-
+export default StatementSOC;

@@ -1,42 +1,13 @@
-// La Societe Nouvelle
-
-// React
 import React from "react";
-import { Button, Container, Navbar} from "react-bootstrap";
+import {Container, Navbar } from "react-bootstrap";
+import TopBar from "./Topbar";
 
-/* -------------------- HEADER -------------------- */
-
-export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
+export function HeaderSection({ step, stepMax, setStep, session }) {
   const refresh = () => location.reload(true);
-  const saveSession = () => downloadSession();
+
   return (
     <header>
-      <div className="top-bar">
-        <ul className="nav">
-          <li>
-            <a href="https://docs.lasocietenouvelle.org/application-web" target="_blank">
-            <i className="bi bi-book-fill"></i> Documentation
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://github.com/La-Societe-Nouvelle/LaSocieteNouvelle-METRIZ-WebApp/"
-              target="_blank"
-            >
-              <i className="bi bi-github"></i> GitHub
-            </a>
-          </li>
-          <li>
-            <a href="https://lasocietenouvelle.org/contact" target="_blank">
-            <i className="bi bi-envelope-fill"></i> Contactez-nous
-            </a>
-          </li>
-        </ul>
-        <Button className="btn-sm me-4 my-2 p-2" variant="secondary" onClick={saveSession}>
-        <i className="bi bi-arrow-down"></i>
-          Sauvegarder ma session
-        </Button>
-      </div>
+      <TopBar session={session} />
       <Navbar expand="lg">
         <Container fluid id="menu">
           <Navbar.Brand href="/">
@@ -49,55 +20,59 @@ export function HeaderSection({ step, stepMax, setStep, downloadSession }) {
               onClick={refresh}
             />
           </Navbar.Brand>
-
           <nav id="progression" className="d-flex">
-            <div
-              className={"stepper-item" + (stepMax >= 1 ? " completed" : "")}
-            >
-              <button
-                className={"step-counter" + (step == 1 ? " current" : "")}
-                disabled={stepMax < 1}
-                onClick={() => setStep(1)}
-              >
-                1
-              </button>
-              <div className="step-name">Import comptable</div>
-            </div>
-            <div className={"stepper-item" + (stepMax > 2 ? " completed" : "")}>
-              <button
-                className={"step-counter" + (step == 2 ? " current" : "")}
-                disabled={stepMax < 2}
-                onClick={() => setStep(2)}
-              >
-                2
-              </button>
-              <div className="step-name">Import des états initiaux</div>
-            </div>
-            <div className={"stepper-item" + (stepMax > 3 ? " completed" : "")}>
-              <button
-                className={"step-counter" + (step == 3 ? " current" : "")}
-                disabled={stepMax < 3}
-                onClick={() => setStep(3)}
-              >
-                3
-              </button>
-              <div className="step-name">Traitement des fournisseurs</div>
-            </div>
-            <div
-              className={"stepper-item" + (stepMax == 4 ? " completed" : "")}
-            >
-              <button
-                className={"step-counter" + (step == 4 ? " current" : "")}
-                disabled={stepMax < 4}
-                onClick={() => setStep(4)}
-              >
-                4
-              </button>
-              <div className="step-name">Déclaration des impacts directs</div>
-            </div>
+            {[...Array(5)].map((_, index) => {
+              const stepNumber = index + 1;
+              const stepName = [
+                "Import comptable",
+                "Import des états initiaux",
+                "Traitement des fournisseurs",
+                "Déclaration des impacts directs",
+                "Résultats",
+              ][index];
+              const isCompleted = stepMax >= stepNumber;
+
+              return (
+                <StepperItem
+                  key={stepNumber}
+                  step={step}
+                  stepNumber={stepNumber}
+                  stepName={stepName}
+                  setStep={setStep}
+                  isCompleted={isCompleted}
+                />
+              );
+            })}
           </nav>
         </Container>
       </Navbar>
     </header>
+  );
+}
+
+export function StepperItem({
+  step,
+  stepNumber,
+  stepName,
+  setStep,
+  isCompleted,
+}) {
+  const handleClick = () => {
+    if (isCompleted) {
+      setStep(stepNumber);
+    }
+  };
+
+  return (
+    <div className={`stepper-item ${isCompleted ? "completed" : ""}`}>
+      <button
+        className={`step-counter ${step === stepNumber ? "current" : ""}`}
+        disabled={!isCompleted}
+        onClick={handleClick}
+      >
+        {stepNumber}
+      </button>
+      <div className="step-name">{stepName}</div>
+    </div>
   );
 }

@@ -19,7 +19,7 @@ export class StartSection extends React.Component
   render() {
     return (
       <div className="pb-5">
-        {this.props.isLoading && <Loader />}
+        {this.props.isLoading && <Loader title={"Récupération des données..."}/>}
         <div className="mb-5">
           <Container fluid>
             <div className="w-50 m-auto">

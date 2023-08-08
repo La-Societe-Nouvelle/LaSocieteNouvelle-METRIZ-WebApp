@@ -1,165 +1,143 @@
 // La Société Nouvelle
 
-// React
-import React from "react";
-import { Form } from "react-bootstrap";
+import React, { useState } from "react";
+import { Col, Form, InputGroup, Row } from "react-bootstrap";
+import { roundValue } from "/src/utils/Utils";
 
-// Utils
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+/* ---------- STATEMENT - INDIC #ART ---------- */
 
-import { InputNumber } from "../../../input/InputNumber";
 
-/* ---------- DECLARATION - INDIC #ART ---------- */
+const StatementART = ({ impactsData, onUpdate, onError }) => {
 
-/** Component in IndicatorMainTab
- *  Props :
- *    - impactsData
- *    - onUpdate -> update footprints, update table
- *    - onValidate -> update validations
- *    - toAssessment -> open assessment view (if defined)
- *  Behaviour :
- *    Edit directly impactsData (session) on inputs blur
- *    Redirect to assessment tool (if defined)
- *    Update footprints on validation
- *  State :
- *    inputs
- */
+  const [craftedProduction, setCraftedProduction] = useState( impactsData.craftedProduction || "" );
+  const [info, setInfo] = useState(impactsData.comments.art || "");
+  const [isInvalid, setIsInvalid] = useState(false);
 
-export class StatementART extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      craftedProduction: valueOrDefault(
-        props.impactsData.craftedProduction,
-        undefined
-      ),
-      info: props.impactsData.comments.art || "",
-    };
-  }
-
-  componentDidUpdate() {
-    if (
-      this.state.craftedProduction != this.props.impactsData.craftedProduction
-    ) {
-      this.setState({
-        craftedProduction: this.props.impactsData.craftedProduction,
-      });
-    }
-  }
-
-  render() {
-    const { isValueAddedCrafted, netValueAdded } = this.props.impactsData;
-    const { craftedProduction, info } = this.state;
-
-    let isValid =
-      netValueAdded != null &&
-      craftedProduction >= 0 &&
-      craftedProduction <= netValueAdded;
-
-    return (
-      <div className="statement">
-        <div className="statement-form">
-          <div className="form-group">
-            <label>L'entreprise est-elle une entreprise artisanale ?</label>
-            <Form>
-              <Form.Check
-                inline
-                type="radio"
-                id="hasValueAdded"
-                label="Oui"
-                value="true"
-                checked={isValueAddedCrafted === true}
-                onChange={this.onIsValueAddedCraftedChange}
-              />
-
-              <Form.Check
-                inline
-                type="radio"
-                id="hasValueAdded"
-                label="Partiellement"
-                value="null"
-                checked={isValueAddedCrafted === null}
-                onChange={this.onIsValueAddedCraftedChange}
-              />
-              <Form.Check
-                inline
-                type="radio"
-                id="hasValueAdded"
-                label="Non"
-                value="false"
-                checked={isValueAddedCrafted === false}
-                onChange={this.onIsValueAddedCraftedChange}
-              />
-            </Form>
-          </div>
-          <div className="form-group">
-            <label>Part de la valeur ajoutée artisanale</label>
-
-            <InputNumber
-              value={roundValue(craftedProduction, 0)}
-              onUpdate={this.updateCraftedProduction.bind(this)}
-              disabled={isValueAddedCrafted != null}
-              placeholder="&euro;"
-              isInvalid={!isValid}
-            />
-          </div>
-        </div>
-        <div className="form-group">
-          <label>Informations complémentaires</label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            onChange={this.updateInfo}
-            value={info}
-            onBlur={this.saveInfo}
-          />
-        </div>
-        <div className="statement-action">
-          <button
-            disabled={!isValid}
-            className="btn btn-secondary btn-sm"
-            onClick={this.onValidate}
-          >
-            Valider
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  onIsValueAddedCraftedChange = (event) => {
+  const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        this.props.impactsData.isValueAddedCrafted = true;
-        this.props.impactsData.craftedProduction =
-          this.props.impactsData.netValueAdded;
+        impactsData.isValueAddedCrafted = true;
+        impactsData.craftedProduction = impactsData.netValueAdded;
+        setIsInvalid(false);
+        onError("art", false);
         break;
-      case "null":
-        this.props.impactsData.isValueAddedCrafted = null;
-        this.props.impactsData.craftedProduction = null;
+      case "partially":
+        impactsData.isValueAddedCrafted = "partially";
+        impactsData.craftedProduction = "";
+        setIsInvalid(false);
+        onError("art", false);
         break;
       case "false":
-        this.props.impactsData.isValueAddedCrafted = false;
-        this.props.impactsData.craftedProduction = 0;
+        impactsData.isValueAddedCrafted = false;
+        impactsData.craftedProduction = 0;
+        setIsInvalid(false);
+        onError("art", false);
         break;
     }
-    this.setState({
-      craftedProduction: this.props.impactsData.craftedProduction,
-    });
-    this.props.onUpdate("art");
+ 
+    onUpdate("art");
+    setCraftedProduction(impactsData.craftedProduction);
+
   };
 
-  updateCraftedProduction = (input) => {
-    this.props.impactsData.craftedProduction = input;
-    this.setState({
-      craftedProduction: this.props.impactsData.craftedProduction,
-    });
-    this.props.onUpdate("art");
+  const handleIsValueAddedCrafted = (event) => {
+    const inputValue = event.target.valueAsNumber;
+    let errorMessage = "";
+
+    if (isNaN(inputValue)) {
+      errorMessage = "Veuillez saisir un nombre valide.";
+    } else if (impactsData.netValueAdded == null) {
+      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+    } else if (inputValue >= impactsData.netValueAdded) {
+      errorMessage =
+        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+    }
+
+    setIsInvalid(errorMessage !== "");
+    onError("art", errorMessage);
+
+    impactsData.craftedProduction = event.target.value;
+    setCraftedProduction(event.target.value);
+    onUpdate("art");
   };
 
-  updateInfo = (event) => this.setState({ info: event.target.value });
-  saveInfo = () => (this.props.impactsData.comments.art = this.state.info);
+  const updateInfo = (event) => {
+    setInfo(event.target.value);
+    impactsData.comments.art = event.target.value;
+  };
 
-  onValidate = () => this.props.onValidate();
-}
+  return (
+    <Form className="statement">
+      <Row>
+        <Col lg={7}>
+          <Form.Group as={Row} className="form-group align-items-center">
+            <Form.Label column>
+              L'entreprise est-elle une entreprise artisanale ?
+            </Form.Label>
+            <Col className="text-end">
+              <Form.Check
+                inline
+                type="radio"
+                label="Oui"
+                value="true"
+                checked={impactsData.isValueAddedCrafted === true}
+                onChange={onIsValueAddedCraftedChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                label="Non"
+                value="false"
+                checked={impactsData.isValueAddedCrafted === false}
+                onChange={onIsValueAddedCraftedChange}
+              />
+              <Form.Check
+                inline
+                type="radio"
+                label="Partiellement"
+                value="partially"
+                checked={impactsData.isValueAddedCrafted === "partially"}
+                onChange={onIsValueAddedCraftedChange}
+              />
+            </Col>
+          </Form.Group>
+          <Form.Group as={Row} className="form-group">
+            <Form.Label column lg={7}>
+              Part de la valeur ajoutée artisanale
+            </Form.Label>
+            <Col>
+              <InputGroup className="custom-input">
+                <Form.Control
+                  type="number"
+                  value={roundValue(craftedProduction, 0)}
+                  inputMode="numeric"
+                  onChange={handleIsValueAddedCrafted}
+                  disabled={impactsData.isValueAddedCrafted !== "partially"}
+                  isInvalid={isInvalid}
+                />
+                <InputGroup.Text>&euro;</InputGroup.Text>
+              </InputGroup>
+            </Col>
+          </Form.Group>
+        </Col>
+        <Col>
+          <Form.Group className="form-group">
+            <Form.Label className="col-form-label">
+              Informations complémentaires
+            </Form.Label>
+            <Form.Control
+              as="textarea"
+              className="w-100"
+              rows={3}
+              onChange={updateInfo}
+              value={info}
+            />
+          </Form.Group>
+        </Col>
+      </Row>
+    </Form>
+  );
+};
+
+export default StatementART;

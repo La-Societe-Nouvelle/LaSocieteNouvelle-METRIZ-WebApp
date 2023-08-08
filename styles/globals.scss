@@ -47,32 +47,10 @@ input {
 }
 
 // Exposant
-
 sup {
   font-size: 9px;
 }
 
-/* ---------- GROUP ---------- */
-
-.notes {
-  width: 100%;
-  padding: 0 5px 20px;
-
-  p {
-    margin: 5px 0;
-  }
-}
-
-/* ---------- ASSESSMENT ---------- */
-
-.assessment {
-  .view-header {
-    // header in assessment
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-  }
-}
 
 #import-companies-csv,
 #import-companies-xlsx,
@@ -86,7 +64,6 @@ sup {
 }
 
 /* ----- charts ----- */
-
 
 @keyframes spinner {
   0% {
@@ -129,4 +106,21 @@ i.warning {
 
 i.error {
   color: $error;
+}
+/* ---------- Background ---------- */
+
+.bg-light-secondary {
+  background: $light-secondary;
+  border-radius: 1rem;
+}
+
+/* Hide spinner in Input Number */
+input[type="number"] {
+  -moz-appearance: textfield; /*For FireFox*/
+  appearance: textfield;
+  &::-webkit-inner-spin-button {
+    /*For Webkits like Chrome and Safari*/
+    -webkit-appearance: none;
+    margin: 0;
+  }
 }

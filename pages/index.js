@@ -9,22 +9,23 @@ import { BrowserView, MobileView } from "react-device-detect";
 import { Session } from "/src/Session";
 
 // Sections
-import { StartSection } from "/components/sections/StartSection";
-import ImportSection from "../components/sections/import/ImportSection";
-import { InitialStatesSection } from "/components/sections/InitialStatesSection";
-import { ProvidersSection } from "../components/sections/companies/ProvidersSection";
-import StatementSection from "../components/sections/statements/StatementSection";
-import { PublishStatementSection } from "../components/sections/PublishStatementSection";
-
+import { StartSection } from "../components/sections/StartSection";
+import AccountingImportSection from "../components/sections/accountingImport/AccountingImportSection";
+import { InitialStatesSection } from "../components/sections/InitialStatesSection";
+import { ProvidersSection } from "../components/sections/providers/ProvidersSection";
+import DirectImpacts from "../components/sections/statements";
+import Results from "../components/sections/results";
+import PublishStatementSection from "../components/sections/PublishStatementSection";
 // Others components
 import { Header } from "/components/parts/headers/Header";
-import { HeaderSection } from "../components/parts/headers/HeaderSection";
-import { HeaderPublish } from "../components/parts/headers/HeaderPublish";
+import { HeaderSection } from "/components/parts/headers/HeaderSection";
+import { HeaderPublish } from "/components/parts/headers/HeaderPublish";
 
 import { updateVersion } from "/src/version/updateVersion";
-import { Footer } from "../components/parts/Footer";
-import { Mobile } from "../components/Mobile";
-import { DataUpdater } from "../components/popups/dataUpdater/DataUpdater";
+import { Footer } from "/components/parts/Footer";
+import { Mobile } from "/components/Mobile";
+import { DataUpdater } from "/components/popups/dataUpdater/DataUpdater";
+import SaveModal from "../components/popups/SaveModal";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -92,12 +93,18 @@ class Metriz extends React.Component {
       session: new Session(),
       step: 0,
       loading: false,
-      needsUpdate: false,
+      showDataUpdater: false,
+      showSaveModal: false,
     };
   }
 
+
+  handleCloseModal = () => {
+    this.setState({ showSaveModal: false });
+  };
+
   render() {
-    const { step, session, needsUpdate } = this.state;
+    const { step, session, showDataUpdater, showSaveModal } = this.state;
 
     return (
       <>
@@ -107,28 +114,31 @@ class Metriz extends React.Component {
         >
           {step == 0 ? (
             <Header />
-          ) : step == 5 ? (
-            <HeaderPublish
-              setStep={this.setStep}
-              downloadSession={this.downloadSession}
-            />
+          ) : step == 6 ? (
+            <HeaderPublish setStep={this.setStep} session={session} />
           ) : (
             <HeaderSection
               step={step}
               stepMax={session.progression}
               setStep={this.setStep}
-              downloadSession={this.downloadSession}
+              session={session}
             />
           )}
 
-          {needsUpdate && (
+          {showDataUpdater && (
             <DataUpdater
               session={session}
-              downloadSession={this.downloadSession}
               updatePrevSession={this.updatePrevSession}
             ></DataUpdater>
           )}
 
+          {showSaveModal && (
+            <SaveModal
+              show={showSaveModal}
+              handleClose={this.handleCloseModal}
+              session={session}
+            />
+          )}
           {this.buildSectionView(step)}
         </div>
 
@@ -140,29 +150,6 @@ class Metriz extends React.Component {
   // change session
   setStep = (nextStep) => this.setState({ step: nextStep });
 
-  // download session (session -> JSON data)
-  downloadSession = async () => {
-    // build JSON
-    const session = this.state.session;
-    const fileName = session.legalUnit.siren
-      ? "session-metriz-" +
-        session.legalUnit.siren +
-        "-" +
-        session.financialPeriod.periodKey.slice(2)
-      : "session-metriz-" +
-        session.legalUnit.corporateName +
-        "-" +
-        session.financialPeriod.periodKey.slice(2); // To update
-    const json = JSON.stringify(session);
-
-    // build download link & activate
-    const blob = new Blob([json], { type: "application/json" });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = fileName + ".json";
-    link.click();
-  };
   // Update previous session with updated session
   updatePrevSession = (updatedSession) => {
     this.setState({
@@ -177,11 +164,12 @@ class Metriz extends React.Component {
     reader.onload = async () => {
       // text -> JSON
       const prevProps = await JSON.parse(reader.result);
+      console.log(prevProps.version);
       // update to current version
       await updateVersion(prevProps);
+
       // JSON -> session
       const session = new Session(prevProps);
-
       for (let period of session.availablePeriods) {
         await session.updateFootprints(period);
       }
@@ -190,7 +178,7 @@ class Metriz extends React.Component {
         session: session,
         step: session.progression,
         loading: false,
-        needsUpdate: true,
+        showDataUpdater: prevProps.version == "3.0.0",
       });
     };
     reader.readAsText(file);
@@ -217,7 +205,10 @@ class Metriz extends React.Component {
         );
       case 1:
         return (
-          <ImportSection {...sectionProps} submit={this.validImportedData} />
+          <AccountingImportSection
+            {...sectionProps}
+            submit={this.validImportedData}
+          />
         );
       case 2:
         return (
@@ -233,13 +224,22 @@ class Metriz extends React.Component {
         );
       case 4:
         return (
-          <StatementSection {...sectionProps} publish={() => this.setStep(5)} />
+          <DirectImpacts {...sectionProps} submit={this.validStatements} />
         );
       case 5:
         return (
+          <>
+            <Results
+              {...sectionProps}
+              goBack={() => this.setStep(4)}
+              publish={() => this.setStep(6)}
+            />
+          </>
+        );
+      case 6:
+        return (
           <PublishStatementSection
             {...sectionProps}
-            return={() => this.setStep(4)}
           />
         );
     }
@@ -257,15 +257,17 @@ class Metriz extends React.Component {
     //   this.state.session.progression++;
     // }
 
-    let accountsShowed = this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks);
-    if (accountsShowed.length>0) {
+    let accountsShowed =
+      this.state.session.financialData.immobilisations.concat(
+        this.state.session.financialData.stocks
+      );
+    if (accountsShowed.length > 0) {
       this.setStep(2);
       this.updateProgression(1);
     } else {
       this.setStep(3);
       this.updateProgression(2);
     }
-
   };
 
   validInitialStates = async () => {
@@ -287,6 +289,15 @@ class Metriz extends React.Component {
 
     this.setStep(4);
     this.updateProgression(3);
+  };
+  validStatements = async () => {
+    console.log("--------------------------------------------------");
+    console.log("Indicateurs déclarés");
+
+    this.setStep(5);
+    this.setState({ showSaveModal: true });
+
+    this.updateProgression(4);
   };
 
   updateProgression = (step) => {

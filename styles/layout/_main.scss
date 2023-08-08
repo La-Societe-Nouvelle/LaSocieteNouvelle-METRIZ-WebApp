@@ -30,7 +30,7 @@
   padding: 0 1.5rem 0 1.5rem;
   font-size: 0.9rem;
 }
-
+// to do : refacto
 .container,
 .container-fluid {
   padding-right: 1.9375rem;
@@ -48,13 +48,43 @@
   margin: 0 1rem;
 }
 
-.charts-container {
+
+.comparative-chart-container{
   position: relative;
+  height: 20vh;
+  width: 40vh; 
 }
 
-.doughtnut-chart-container {
+.doughnut-chart-container{
   position: relative;
+  width: 40vh;
+  height: 20vh;
   canvas {
     margin: 0 auto;
   }
+}
+.impact-chart-container{
+  position : relative;
+  height: 50vh;
+  width: 50vh; 
+}
+.trend-chart-container {
+  position : relative;
+  height: 50vh;
+  width: 100vh; 
+}
+.deviation-chart-container {
+  position : relative;
+  height: 70vh;
+  width: 150vh; 
+}
+
+.sig-piechart-container {
+  padding: 0 6rem 0 6rem;
+}
+
+// title
+
+h3 {
+  color : $secondary;
 }

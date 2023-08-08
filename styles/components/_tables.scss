@@ -10,35 +10,27 @@ p.toChecked {
 }
 
 table {
-  font-size: 0.85em;
-  border-radius: 1rem;
-  border: 2px solid $bg-light;
+
+  tbody {
+    border: 2px solid $light;
+    border-top: 0;
+  }
+
 
   tr.fw-bold td {
-    padding: 0.5rem 0.25rem;
-    background-color: darken($bg-light, 1%);
+    background-color: $bg-light;
   }
 
   .siren {
-    width: 250px;
+    width: 200px;
   }
-  .siren-input,
-  .corporate-name {
-    display: flex;
-    align-content: center;
-    align-items: center;
-    gap: 10px;
-    .form-control {
-      margin-bottom: 0 !important;
-    }
-    .fa-triangle-exclamation {
-      color: $warning;
-    }
-  }
+
   .company {
     width: 100px;
   }
+
   .success {
+
     .form-input,
     .form-input:active,
     .form-input:focus,
@@ -47,6 +39,7 @@ table {
       background-color: #ecf9ef;
     }
   }
+
   tr.warning td,
   .warning select {
     background-color: #fff3cd;
@@ -56,6 +49,7 @@ table {
   // --- Cell --- //
 
   td {
+
     // index
     &.sub {
       padding-left: 25px;
@@ -72,30 +66,38 @@ table {
 
   thead {
     background-color: $primary;
-    tr th, tr td {
+
+    tr th,
+    tr td {
       color: #fff !important;
     }
+
     font-weight: 700;
-    font-size: 1em;
+
     tr:nth-child(2),
     tr:nth-child(3) {
       background-color: lighten($primary, 5%);
-      th,td {
+
+      th,
+      td {
         color: #fff !important;
       }
     }
   }
+
   .subth {
     background-color: darken($bg-light, 1%);
     border-bottom: 1px solid $light;
     font-weight: 600;
     font-size: 0.8rem;
   }
+
   // --- Body --- //
   tfoot {
     background-color: darken($bg-light, 2%);
     font-weight: bold;
   }
+
   tbody {
     td {
       vertical-align: middle;
@@ -117,6 +119,7 @@ table {
     // value
     .column_value {
       text-align: right;
+
       input {
         text-align: right;
       }
@@ -126,6 +129,7 @@ table {
     .column_uncertainty {
       text-align: center;
       font-size: 12px;
+
       input {
         text-align: right;
         font-size: 15px;
@@ -138,6 +142,7 @@ table {
       &.valid {
         background-color: $valid-color;
       }
+
       &.unvalid {
         background-color: $unvalid-color;
       }
@@ -147,6 +152,12 @@ table {
       background-color: wheat;
     }
   }
+}
+
+.table {
+  font-size: 0.8rem;
+
+
 }
 
 .table-navigation {
@@ -170,6 +181,7 @@ table {
 .table-menu {
   margin: 2em 0 0.5rem 0;
   text-align: center;
+
   button {
     font-size: 0.9rem;
     background-color: $bg-light;
@@ -181,14 +193,17 @@ table {
     border-bottom: 2px solid $light;
     cursor: pointer;
   }
+
   button:first-child {
     border-left: 1px solid $light;
-    border-radius: 5px 0 0 5px;
+    border-radius: 1rem 0 0  1rem;
   }
+
   button:last-child {
     border-right: 1px solid $light;
-    border-radius: 0px 5px 5px 0;
+    border-radius: 0px 1rem 1rem 0;
   }
+
   button.active,
   button:hover,
   button:focus {
@@ -207,15 +222,18 @@ table {
     border-top: 1px solid $primary;
   }
 }
+
 .profit td {
   border-top: 1px solid $primary;
   border-bottom: 1px solid $primary;
 }
+
+
 .total,
 .with-top-line {
   font-weight: 700;
-  border-top: 1px solid $primary;
-  border-bottom: 1px solid $primary;
+
+  background-color: $light;
 }
 
 // TABLE Assesment
@@ -235,6 +253,7 @@ table {
     border-left: 2px solid darken($light, 1%);
   }
 }
+
 .comparative-table {
   .border-left {
     border-left: 2px solid lighten($light, 2%);
@@ -245,19 +264,22 @@ table {
 
 .immobilisationsTable {
   caption-side: top;
-
+  border-radius: 0 0 1rem 1rem;
   caption {
     background-color: lighten($primary, 10%);
     color: #fff;
     font-weight: 700;
     font-size: 1.1em;
     padding: 0.5rem 0.5rem;
-    border: 1px solid #dbdef1;
+    border-radius: 1rem 1rem 0 0;
   }
 
   thead {
     background-color: $light;
-    color: $text-color;
     font-weight: normal;
+    border : 2px solid $light;  
+    th{
+      color: $primary !important;
+    }
   }
 }

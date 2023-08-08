@@ -1,10 +1,12 @@
 // La Société Nouvelle
+import { getClosestYearData } from "../../../components/sections/results/utils";
 import { printValue } from "../../utils/Utils";
 
 export const analysisTextWriterECO = (props) => {
   const { impactsData, comparativeData, financialData, period } = props;
   const { mainAggregates, productionAggregates } = financialData;
-  const { revenue, storedProduction, immobilisedProduction} = productionAggregates;
+  const { revenue } = productionAggregates;
+  const year = period.periodKey.slice(2);
 
   // array of paragraphs
   let analysis = [];
@@ -22,7 +24,7 @@ export const analysisTextWriterECO = (props) => {
 
   currentParagraph = [];
 
-  if (impactsData.isAllActivitiesInFrance) {
+  if (impactsData.isAllActivitiesInFrance == true) {
     currentParagraph.push(
       "Les activités de l'entreprise sont localisées en France et contribuent, de ce fait, entièrement à l'économie nationale."
     );
@@ -35,7 +37,8 @@ export const analysisTextWriterECO = (props) => {
       "Le volume des activités localisées en France s'élève à " +
         impactsData.domesticProduction +
         "€, soit " +
-        mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.eco.value +
+        mainAggregates.netValueAdded.periodsData[period.periodKey].footprint
+          .indicators.eco.value.toFixed(1) +
         "% de la valeur ajoutée."
     );
   }
@@ -49,11 +52,15 @@ export const analysisTextWriterECO = (props) => {
   // résultat
   currentParagraph.push(
     "Les consommations intermédiaires proviennent à " +
-      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value +
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey]
+        .footprint.indicators.eco.value +
       "% d'activités françaises, soit un volume de " +
       printValue(
-        mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(
-          mainAggregates.intermediateConsumptions.periodsData[period.periodKey].amount
+        mainAggregates.intermediateConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators.eco.getGrossImpact(
+          mainAggregates.intermediateConsumptions.periodsData[period.periodKey]
+            .amount
         ),
         0
       ) +
@@ -63,29 +70,27 @@ export const analysisTextWriterECO = (props) => {
   analysis.push(currentParagraph);
 
   // comparaison branche
-
-  if (
-    comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
-      .value != null
-  ) {
+  const closetYearComparativeData = getClosestYearData(
+    comparativeData.intermediateConsumptions.division.macrodata.data["ECO"],
+    year
+  );
+  
+  if (closetYearComparativeData) {
     if (
-      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value >
-        comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
-          .value *
-          0.9 &&
-      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value <
-        comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
-          .value *
-          1.1
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey]
+        .footprint.indicators.eco.value >
+        closetYearComparativeData.value * 0.9 &&
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey]
+        .footprint.indicators.eco.value <
+        closetYearComparativeData.value * 1.1
     ) {
       currentParagraph.push(
         "Le taux de contribution se situe à un niveau similaire à la branche d'activités."
       );
     }
     if (
-      mainAggregates.intermediateConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value >
-      comparativeData.intermediateConsumptions.divisionFootprint.indicators.eco
-        .value
+      mainAggregates.intermediateConsumptions.periodsData[period.periodKey]
+        .footprint.indicators.eco.value > closetYearComparativeData.value
     ) {
       currentParagraph.push(
         "Le taux de contribution se situe à un niveau supérieur à la branche d'activités."
@@ -122,13 +127,17 @@ export const analysisTextWriterECO = (props) => {
   currentParagraph.push(
     "L'amortissement des immobilisations apporte une contribution indirecte de " +
       printValue(
-        mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.eco.getGrossImpact(
-          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].amount
+        mainAggregates.fixedCapitalConsumptions.periodsData[
+          period.periodKey
+        ].footprint.indicators.eco.getGrossImpact(
+          mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey]
+            .amount
         ),
         0
       ) +
       " €, " +
-      mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators.eco.value +
+      mainAggregates.fixedCapitalConsumptions.periodsData[period.periodKey]
+        .footprint.indicators.eco.value +
       " % du montant des dotations aux amortissements."
   );
 
@@ -140,11 +149,13 @@ export const analysisTextWriterECO = (props) => {
 
   currentParagraph.push(
     "In fine, le taux de contribution de la production sur l'exercice est de " +
-      mainAggregates.production.periodsData[period.periodKey].footprint.indicators.eco.value +
+      mainAggregates.production.periodsData[period.periodKey].footprint
+        .indicators.eco.value +
       " %."
   );
   if (
-    mainAggregates.production.periodsData[period.periodKey].footprint.indicators.eco.value !=
+    mainAggregates.production.periodsData[period.periodKey].footprint.indicators
+      .eco.value !=
     revenue.periodsData[period.periodKey].footprint.indicators.eco.value
   ) {
     currentParagraph.push(

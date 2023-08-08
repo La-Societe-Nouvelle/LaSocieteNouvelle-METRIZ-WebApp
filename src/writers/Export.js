@@ -153,7 +153,6 @@ async function generateFootprintPDF(
 
   let xRect = x + 17;
   doc.setDrawColor(25, 21, 88);
-    console.log(indic)
   // LIBELLE  
   indic.forEach((indic) => {
     doc.rect((xRect += 35), y, 37, 8);
