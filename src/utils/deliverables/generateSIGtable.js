@@ -211,7 +211,8 @@ export const generateSIGtable = (
       intermediateConsumptionsAggregates,
       indic,
       unit,
-      precision
+      precision,
+      period
     ),
     [
       {
@@ -257,7 +258,8 @@ export const generateSIGtable = (
       fixedCapitalConsumptionsAggregates,
       indic,
       unit,
-      precision
+      precision,
+      period
     ),
     [
       {
@@ -353,22 +355,21 @@ const getImmobilisedProductionRow = (
   return immobilisedProductionRow;
 };
 
-const getAggregateRow = (aggregates, indic, unit, precision) => {
+const getAggregateRow = (aggregates, indic, unit, precision,period) => {
   let rows = [];
-
+  console.log(aggregates);
   aggregates
-    .filter((aggregate) => aggregate.amount != 0)
-    .forEach((aggregate) => {
+    .map(({ label, periodsData}, index) => {
 
       let row = [];
       row.push(
         {
-          text: aggregate.label,
+          text: label,
           style: "tableLeft",
           margin: [15, 0, 0, 0],
         },
         {
-          text: printValue(aggregate.amount, 0) + " €",
+          text: printValue(periodsData[period.periodKey].amount, 0) + " €",
           margin: [2, 2, 2, 2],
         },
         {
@@ -378,7 +379,7 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
                 {
                   text:
                     printValue(
-                      aggregate.footprint.indicators[indic].value,
+                      periodsData[period.periodKey].footprint.indicators[indic].value,
                       precision
                     ) + " ",
                 },
@@ -390,7 +391,7 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
         },
         {
           text:
-            printValue(aggregate.footprint.indicators[indic].uncertainty, 0) +
+            printValue( periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) +
             " %",
           fontSize: "7",
           margin: [2, 2, 2, 2],
