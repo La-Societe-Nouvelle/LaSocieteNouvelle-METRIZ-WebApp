@@ -9,24 +9,29 @@ const ProportionalRingChart = ({
   const indicators = Object.keys(metaIndicators);
 
   const colors = {
-    art: [ "rgba(213, 181, 255, 1)", "rgba(213, 181, 255, 0.5)"],
-    eco: [ "rgb(204, 253, 255)", "rgba(204, 253, 255,0.5)"],
-    soc: [ "rgba(255, 220, 160,1)", "rgba(255, 220, 160,0.5)"],
-    knw: [ "rgb(226, 255, 192)", "rgba(226, 255, 192,0.5)"],
+    art: ["rgba(213, 181, 255, 1)", "rgba(213, 181, 255, 0.5)"],
+    eco: ["rgb(204, 253, 255)", "rgba(204, 253, 255,0.5)"],
+    soc: ["rgba(255, 220, 160,1)", "rgba(255, 220, 160,0.5)"],
+    knw: ["rgb(226, 255, 192)", "rgba(226, 255, 192,0.5)"],
   };
-
-  const datasets = indicators.map((indicator) => {
+  const datasets = indicators.reduce((acc, indicator) => {
     const indicatorMeta = metaIndicators[indicator];
+    const production = productionFootprint[indicator] || null;
+    const division = divisionFootprint[indicator] || null;
 
-    return {
-      data: [productionFootprint[indicator], divisionFootprint[indicator]],
-      backgroundColor: [colors[indicator][0], colors[indicator][1]],
-      label: indicatorMeta.libelle,
-      borderWidth : 4,
-      hoverBorderColor :"#FFFFFF"
-    };
-  });
+    if (production !== null && division !== null) {
+      // Add a new dataset to the accumulator if the conditions are met
+      acc.push({
+        data: [production, division],
+        backgroundColor: [colors[indicator][0], colors[indicator][1]],
+        label: indicatorMeta.libelle,
+        borderWidth: 4,
+        hoverBorderColor: "#FFFFFF",
+      });
+    }
 
+    return acc;
+  }, []);
   const data = {
     labels: ["Production", "Branche"],
     datasets: datasets,
@@ -36,7 +41,7 @@ const ProportionalRingChart = ({
     maintainAspectRatio: true,
     responsive: true,
     layout: {
-      padding: 40,
+      padding: 100,
     },
     plugins: {
       datalabels: {
@@ -48,7 +53,7 @@ const ProportionalRingChart = ({
           size: 10,
           family: "Roboto",
         },
-       },
+      },
       tooltip: {
         callbacks: {
           label: (context) => {
@@ -60,12 +65,12 @@ const ProportionalRingChart = ({
       },
       legend: {
         display: true,
-        position: 'bottom',
-        align : 'start',
+        position: "bottom",
+        align: "start",
         labels: {
-          boxWidth : 12,
-          font : {
-            size: 10
+          boxWidth: 12,
+          font: {
+            size: 10,
           },
           generateLabels: (chart) => {
             const labels = [];
@@ -90,7 +95,7 @@ const ProportionalRingChart = ({
         },
       },
     },
-    cutout: 20
+    cutout: 20,
   };
 
   return <Doughnut data={data} options={options} />;

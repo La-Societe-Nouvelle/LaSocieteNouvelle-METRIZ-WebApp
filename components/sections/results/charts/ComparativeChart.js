@@ -113,7 +113,6 @@ const ComparativeChart = ({
         },
         grid: {
           lineWidth : 2,
-
           color: "#ececff",
         },
       },

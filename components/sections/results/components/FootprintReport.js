@@ -62,45 +62,56 @@ const FootprintReport = ({ comparativeData, financialData, period }) => {
     "proportion"
   );
 
+  const showEnvironmentalChart = Object.values(environmentalFootprint).some(value => value != null);
+  const showProportionalChart = Object.values(proportionFootprint).some(value =>  value != null);
+  const showSocialChart = Object.values(socialFootprint).some(value => value != null);
+
+
   return (
     <Row>
 
-      <Col lg={6}>
-        <div className="box">
-          <div className="text-center  rounded-pill ">
-            <h3 className="mb-0">Empreinte environnementale</h3>
+{showEnvironmentalChart && (
+        <Col lg={6}>
+          <div className="box">
+            <div className="text-center  rounded-pill ">
+              <h3 className="mb-0">Empreinte environnementale</h3>
+            </div>
+            <RadarChart
+              labels={environnementalIndic}
+              divisionFootprint={divisionEnvironmentalFootprint}
+              productionFootprint={environmentalFootprint}
+            />
           </div>
-          <RadarChart
-            labels={environnementalIndic}
-            divisionFootprint={divisionEnvironmentalFootprint}
-            productionFootprint={environmentalFootprint}
-          />
-        </div>
-      </Col>
-      <Col lg={6}>
-        <div className="box">
-          <div className="text-center rounded-pill ">
-            <h3 className="mb-0">Empreinte économique</h3>
+        </Col>
+      )}
+      {showProportionalChart && (
+        <Col lg={6}>
+          <div className="box">
+            <div className="text-center rounded-pill ">
+              <h3 className="mb-0">Empreinte économique</h3>
+            </div>
+            <ProportionalRingChart
+              metaIndicators={proportionsIndicsMeta}
+              productionFootprint={proportionFootprint}
+              divisionFootprint={proportionDivisionFootprint}
+            />
           </div>
-          <ProportionalRingChart
-            metaIndicators={proportionsIndicsMeta}
-            productionFootprint={proportionFootprint}
-            divisionFootprint={proportionDivisionFootprint}
-          />
-        </div>
-      </Col>
-      <Col lg={6}>
-        <div className="box">
-          <div className="text-center rounded-pill ">
-            <h3 className="mb-0">Empreinte sociale</h3>
+        </Col>
+      )}
+      {showSocialChart && (
+        <Col lg={6}>
+          <div className="box">
+            <div className="text-center rounded-pill ">
+              <h3 className="mb-0">Empreinte sociale</h3>
+            </div>
+            <SocialBarChart
+              metaIndicators={socialIndic}
+              productionFootprint={socialFootprint}
+              divisionFootprint={divisionSocialFootprint}
+            />
           </div>
-          <SocialBarChart
-            metaIndicators={socialIndic}
-            productionFootprint={socialFootprint}
-            divisionFootprint={divisionSocialFootprint}
-          ></SocialBarChart>
-        </div>
-      </Col>
+        </Col>
+      )}
     </Row>
     
   );
