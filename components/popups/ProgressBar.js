@@ -2,7 +2,7 @@
 
 // React
 import React from "react";
-import { Modal } from "react-bootstrap";
+import { Image, Modal } from "react-bootstrap";
 
 /* ---------- FEC IMPORT POP-UP ---------- */
 
@@ -14,6 +14,12 @@ export const ProgressBar = ({ message, progression }) => {
       </Modal.Header>
 
       <Modal.Body>
+      <Image
+          src="illus/sync.svg"
+          alt=""
+          height={140}
+          className="mx-auto d-block mb-4"
+        />
         <div className="progressbar">
           <div
             className="progression"
@@ -23,15 +29,5 @@ export const ProgressBar = ({ message, progression }) => {
       </Modal.Body>
     </Modal>
   );
-  // return (
-  // <div className="popup-container">
-  //   <div className="popup-inner">
-  //     <h3>{message}</h3>
-  //     <div className="progressbar">
-  //       <svg className="progressbar_shape">
-  //         <rect width={progression+'%'}/>
-  //       </svg>
-  //     </div>
-  //   </div>
-  // </div>)
+
 };

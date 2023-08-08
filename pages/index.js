@@ -105,7 +105,6 @@ class Metriz extends React.Component {
 
   render() {
     const { step, session, showDataUpdater, showSaveModal } = this.state;
-
     return (
       <>
         <div
@@ -173,12 +172,13 @@ class Metriz extends React.Component {
       for (let period of session.availablePeriods) {
         await session.updateFootprints(period);
       }
-
+      
       this.setState({
         session: session,
         step: session.progression,
         loading: false,
         showDataUpdater: prevProps.version == "3.0.0",
+        showSaveModal : false,
       });
     };
     reader.readAsText(file);
