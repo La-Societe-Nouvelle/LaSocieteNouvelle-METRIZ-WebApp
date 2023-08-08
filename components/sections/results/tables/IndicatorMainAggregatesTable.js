@@ -8,13 +8,9 @@ import { printValue } from "/src/utils/Utils";
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 
 
-
-// Chart
-
-
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
-export const MainAggregatesTable = ({
+export const IndicatorMainAggregatesTable = ({
     financialData,
   indic,
   metaIndic,
@@ -46,14 +42,14 @@ export const MainAggregatesTable = ({
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
         financialData,
-        period.periodKey
+        [period]
       );
     setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
-
+    console.log(intermediateConsumptionsAggregates)
     const fixedCapitalConsumptionsAggregates =
       await buildFixedCapitalConsumptionsAggregates(
         financialData,
-        period.periodKey
+        [period]
       );
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
 
@@ -62,8 +58,8 @@ export const MainAggregatesTable = ({
       const prevIntermediateConsumptionsAggregates =
         await buildIntermediateConsumptionsAggregates(
           financialData,
-          prevPeriod.periodKey
-        );
+          [period]
+          );
       const filteredPrevIntermediateConsumptionsAggregates =
         prevIntermediateConsumptionsAggregates.filter(
           (aggregate) => aggregate.amount != 0
@@ -75,7 +71,8 @@ export const MainAggregatesTable = ({
       const prevFixedCapitalConsumptionsAggregates =
         await buildFixedCapitalConsumptionsAggregates(
           financialData,
-          prevPeriod.periodKey
+          [period]
+
         );
       const filteredPrevFixedCapitalConsumptionsAggregates =
         prevFixedCapitalConsumptionsAggregates.filter(

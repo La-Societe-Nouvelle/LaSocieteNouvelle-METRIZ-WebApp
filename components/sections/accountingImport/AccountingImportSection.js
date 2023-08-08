@@ -1,7 +1,10 @@
 import React, { useState } from "react";
-import { Container} from "react-bootstrap";
+import { Container } from "react-bootstrap";
 
-import FECImport from "./FECImport";
+
+// Views
+import FinancialDataForm from "./views/FinancialDataForm";
+import FECImport from "./views/FECImport";
 import DepreciationAssetsMapping from "./views/DepreciationAssetsMapping";
 import { StockPurchasesMapping } from "./views/StockPurchasesMapping";
 import { FinancialDatas } from "./views/FinancialDatas";
@@ -9,9 +12,12 @@ import { FinancialDatas } from "./views/FinancialDatas";
 // Readers
 import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
 
-
+// Utils
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
-import FinancialDataForm from "./views/FinancialDataForm";
+
+// Modals
+import ErrorReportModal from "../../popups/ErrorReportModal";
+import { ErrorFileModal } from "../../popups/MessagePopup";
 
 const AccountingImportSection = (props) => {
   const { session } = props;
@@ -28,8 +34,8 @@ const AccountingImportSection = (props) => {
   const [view, setView] = useState(
     session.financialData.isFinancialDataLoaded ? 4 : 0
   );
-  const [errorFile, setErrorFile] = useState(false);
   const [errorFEC, setErrorFEC] = useState(false);
+  const [errorFile, setErrorFile] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
 
@@ -59,6 +65,7 @@ const AccountingImportSection = (props) => {
     setSelectedDivision(division);
   };
   const handleFile = (file) => {
+    setErrorFEC(false);
     setErrorFile(false);
     setErrors([]);
     setFile(file);
@@ -87,38 +94,32 @@ const AccountingImportSection = (props) => {
         loadFECData(importedData);
       }
     }
-
-    try {
-      reader.readAsText(file, "iso-8859-1");
-    } catch (error) {
-      setErrorFEC(true);
-      setErrorMessage(error);
-    }
   };
 
   const importFECFile = async (file) => {
     let currentFile = file[0];
     let reader = new FileReader();
 
-    reader.onload = async () => {
-      try {
-        let FECData = await FECFileReader(reader.result);
-        console.log("--------------------------------------------------");
-        console.log("Lecture du FEC");
-        console.log(FECData.meta);
-        console.log(FECData.books);
-        setImportedData(FECData);
-        setView(1);
-      } catch (error) {
-        console.log(error);
-        setErrorFile(true);
-        setErrorMessage(error);
-      }
-    };
-
     try {
       reader.readAsText(currentFile, "iso-8859-1");
+
+      // Wait for the reader to finish loading the file
+      await new Promise((resolve) => {
+        reader.onload = resolve;
+      });
+
+      // Parse the file content
+      let FECData = await FECFileReader(reader.result);
+
+      console.log("--------------------------------------------------");
+      console.log("Lecture du FEC");
+      console.log(FECData.meta);
+      console.log(FECData.books);
+
+      setImportedData(FECData);
+      setView(1);
     } catch (error) {
+      console.log(error);
       setErrorFile(true);
       setErrorMessage(error);
     }
@@ -132,7 +133,7 @@ const AccountingImportSection = (props) => {
     if (FECData.errors.length > 0) {
       FECData.errors.forEach((error) => console.log(error));
       setView(0);
-      setErrorFile(true);
+      setErrorFEC(true);
       setErrorMessage("Erreur(s) relevée(s) : ");
       setErrors(FECData.errors);
       setImportedData(null);
@@ -183,13 +184,22 @@ const AccountingImportSection = (props) => {
 
         {errorFEC && (
           <ErrorReportModal
-            errorFEC={errorFEC}
+            hasError={errorFEC}
             onClose={() => setErrorFEC(false)}
             errorMessage={errorMessage}
             errors={errors}
           />
         )}
-
+        {
+          errorFile && (
+            <ErrorFileModal
+            title={"Erreur lors de la lecture du FEC"}
+            errorFile={errorFile}
+            errorMessage={errorMessage}
+            onClose={() => setErrorFile(false)}
+            />
+          )
+        }
         {view === 1 && (
           <FECImport
             return={() => setView(0)}

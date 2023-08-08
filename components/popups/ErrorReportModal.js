@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { sendReportToSupport } from "../../pages/api/mail-api";
 
-function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
+const ErrorReportModal = ({ hasError, onClose, errorMessage, errors }) => {
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
   const [isSend, setIsSend] = useState(null);
@@ -21,26 +21,28 @@ function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
   };
 
   return (
-    <Modal show={errorFEC} onHide={onClose}>
+    <Modal show={hasError} onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>Erreur lors du traitement du FEC</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <div className="small mb-3">
           <p className="fw-bold">{errorMessage}</p>
-          <Alert variant="danger">
-          <ul className="small list-unstyled">
-            {errors.map((error, index) => (
-              <li key={index}>&raquo; {error}</li>
-            ))}
-          </ul>
-
-          </Alert>
-        </div>
+          {errors.length > 0 && (
+            <>
+            <Alert variant="danger">
+              <ul className="small list-unstyled">
+                {errors.map((error, index) => (
+                  <li key={index}>&raquo; {error}</li>
+                ))}
+              </ul>
+            </Alert>
+            </>
+          )}
         <hr />
         <Form.Group className="mb-3">
           <Form.Label>Email</Form.Label>
           <Form.Control
+           size="sm"
             type="text"
             value={email}
             onChange={handleEmailChange}
@@ -49,6 +51,7 @@ function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
         <Form.Group className="my-3">
           <Form.Label>Commentaires</Form.Label>
           <Form.Control
+           size="sm"
             as="textarea"
             value={comment}
             onChange={handleCommentChange}
@@ -81,6 +84,5 @@ function ErrorReportModal({ errorFEC, onClose, errorMessage, errors }) {
       </Modal.Footer>
     </Modal>
   );
-}
-
+};
 export default ErrorReportModal;

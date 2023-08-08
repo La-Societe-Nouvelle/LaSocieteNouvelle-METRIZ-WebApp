@@ -3,7 +3,7 @@ import React from "react";
 import { Col, Row, Tab, Tabs } from "react-bootstrap";
 
 // Tables
-import { MainAggregatesTable } from "../tables/MainAggregatesTable";
+import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
 import { ExpensesTable } from "../tables/ExpensesTable";
 import { ComparativeTable } from "../tables/ComparativeTable";
 // Charts
@@ -52,7 +52,7 @@ const ExtraFinancialReport = ({
                 eventKey="mainAggregates"
                 title=" Soldes intermédiaires de gestion"
               >
-                <MainAggregatesTable
+                <IndicatorMainAggregatesTable
                   financialData={financialData}
                   indic={indic}
                   metaIndic={metaIndic}

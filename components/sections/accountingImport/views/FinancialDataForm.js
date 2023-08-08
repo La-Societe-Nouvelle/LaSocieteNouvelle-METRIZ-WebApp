@@ -15,16 +15,10 @@ import { customSelectStyles } from "../../../../config/customStyles";
 
 const FinancialDataForm = (props) => {
 
-  const [errorFile, setErrorFile] = useState(false);
   const [divisionsOptions, setDivisionsOptions] = useState([]);
   const [isFormValid, setFormValid] = useState(false);
 
   useEffect(() => {
-    if (fileRejections.length > 0) {
-      setErrorFile(true);
-    } else {
-      setErrorFile(false);
-    }
 
 
     const divisionsOptions = Object.entries(divisions)

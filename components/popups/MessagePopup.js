@@ -4,7 +4,7 @@
 import React from "react";
 
 // Icon
-import { Alert, Button, Modal,Image } from "react-bootstrap";
+import { Alert, Button, Modal, Image } from "react-bootstrap";
 
 /* ---------- MESSAGE POP-UP ---------- */
 
@@ -70,22 +70,23 @@ export const MessagePopupErrors = ({ title, message, closePopup }) => {
   );
 };
 
-export const ErrorModal = ({ errorFile, title, errorMessage, error, onClose }) => {
+export const ErrorFileModal = ({ errorFile, title, errorMessage, onClose }) => {
   return (
     <Modal show={errorFile} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
+        <Modal.Title as={"h6"}>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>{errorMessage}</p>
-        <Alert variant="danger">
-          <div className="small">
-            <p>{error}</p>
-          </div>
-        </Alert>
+        <Image
+          src="illus/error.svg"
+          alt="error image"
+          height={120}
+          className="mx-auto my-3 d-block"
+        />
+        <p className="  text-center ">{errorMessage}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" size="sm" onClick={onClose}>
+        <Button variant="secondary" size="md" onClick={onClose}>
           Fermer
         </Button>
       </Modal.Footer>
