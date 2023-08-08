@@ -10,7 +10,6 @@ import { printValue } from '../../src/utils/Utils';
 
 export const MainAggregatesTable = ({financialData,period}) =>
 {
-  console.log(financialData)
   const periodKey = period.periodKey;
 
   const [
@@ -38,8 +37,6 @@ export const MainAggregatesTable = ({financialData,period}) =>
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
   }, []);
 
-  //const intermediateConsumptionsAggregates = buildIntermediateConsumptionsAggregates(financialData, periodKey);
-  //const fixedCapitalConsumptionsAggregates = buildFixedCapitalConsumptionsAggregates(financialData, periodKey);
 
   const {revenue,
          storedProduction,

@@ -23,6 +23,7 @@ export const IndicatorMainAggregatesTable = ({
     intermediateConsumptionsAggregates,
     setIntermediateConsumptionsAggregates,
   ] = useState([]);
+
   const [
     fixedCapitalConsumptionsAggregates,
     setFixedCapitalConsumptionsAggregates,
@@ -45,12 +46,13 @@ export const IndicatorMainAggregatesTable = ({
         [period]
       );
     setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
-    console.log(intermediateConsumptionsAggregates)
+
     const fixedCapitalConsumptionsAggregates =
       await buildFixedCapitalConsumptionsAggregates(
         financialData,
         [period]
       );
+
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
 
     // Previous Aggretates
@@ -58,7 +60,7 @@ export const IndicatorMainAggregatesTable = ({
       const prevIntermediateConsumptionsAggregates =
         await buildIntermediateConsumptionsAggregates(
           financialData,
-          [period]
+          [prevPeriod]
           );
       const filteredPrevIntermediateConsumptionsAggregates =
         prevIntermediateConsumptionsAggregates.filter(
@@ -71,7 +73,7 @@ export const IndicatorMainAggregatesTable = ({
       const prevFixedCapitalConsumptionsAggregates =
         await buildFixedCapitalConsumptionsAggregates(
           financialData,
-          [period]
+          [prevPeriod]
 
         );
       const filteredPrevFixedCapitalConsumptionsAggregates =
@@ -541,28 +543,27 @@ export const IndicatorMainAggregatesTable = ({
               </>
             )}
           </tr>
-
           {intermediateConsumptionsAggregates
-            .filter((aggregate) => aggregate.amount != 0)
-            .map(({ label, amount, footprint }, index) => (
+            // .filter((aggregate) => aggregate.amount != 0)
+            .map(({ label, periodsData}, index) => (
               <tr key={index}>
                 <td>&emsp;{label}</td>
-                <td className="text-end">{printValue(amount, 0)} </td>
+                <td className="text-end">{printValue(periodsData[period.periodKey].amount,0)} &euro;</td>
                 <td className="text-end">
                   {printValue(
-                    footprint.indicators[indic].getValue(),
+                    periodsData[period.periodKey].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}
 
                 </td>
                 <td className="text-end  pe-3">
                   <u>+</u>
-                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}
+                  {printValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
                 {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
-                      footprint.indicators[indic].getGrossImpact(amount),
+                      periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
                     
@@ -575,7 +576,7 @@ export const IndicatorMainAggregatesTable = ({
                         {printValue(
                           prevIntermediateConsumptionsAggregates[
                             index
-                          ].footprint.indicators[indic].getValue(),
+                          ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getValue(),
                           nbDecimals
                         )}
       
@@ -585,7 +586,7 @@ export const IndicatorMainAggregatesTable = ({
                         {printValue(
                           prevIntermediateConsumptionsAggregates[
                             index
-                          ].footprint.indicators[indic].getUncertainty(),
+                          ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getUncertainty(),
                           0
                         )}
                         
@@ -595,7 +596,7 @@ export const IndicatorMainAggregatesTable = ({
                           {printValue(
                             prevIntermediateConsumptionsAggregates[
                               index
-                            ].footprint.indicators[indic].getGrossImpact(
+                            ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getGrossImpact(
                               amount
                             ),
                             nbDecimals
@@ -691,26 +692,26 @@ export const IndicatorMainAggregatesTable = ({
           </tr>
 
           {fixedCapitalConsumptionsAggregates
-            .filter((aggregate) => aggregate.amount != 0)
-            .map(({ label, amount, footprint }, index) => (
+                      .map(({ label, periodsData}, index) => (
+
               <tr key={index}>
                 <td>&emsp;{label}</td>
-                <td className="text-end">{printValue(amount, 0)} </td>
+                <td className="text-end">{printValue(periodsData[period.periodKey].amount, 0)} </td>
                 <td className="text-end">
                   {printValue(
-                    footprint.indicators[indic].getValue(),
+                    periodsData[period.periodKey].footprint.indicators[indic].getValue(),
                     nbDecimals
                   )}
                   <span className="unit">  </span>
                 </td>
                 <td className="text-end  pe-3">
                   <u>+</u>
-                  {printValue(footprint.indicators[indic].getUncertainty(), 0)}
+                  {printValue(periodsData[period.periodKey].footprint.indicators[indic].getUncertainty(), 0)}
                 </td>
                 {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
-                      footprint.indicators[indic].getGrossImpact(amount),
+                      periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(amount),
                       nbDecimals
                     )}
                     
@@ -723,7 +724,7 @@ export const IndicatorMainAggregatesTable = ({
                         {printValue(
                           prevFixedCapitalConsumptionsAggregates[
                             index
-                          ].footprint.indicators[indic].getValue(),
+                          ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getValue(),
                           nbDecimals
                         )}
                         <span className="unit">  </span>
@@ -733,7 +734,7 @@ export const IndicatorMainAggregatesTable = ({
                         {printValue(
                           prevFixedCapitalConsumptionsAggregates[
                             index
-                          ].footprint.indicators[indic].getUncertainty(),
+                          ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getUncertainty(),
                           0
                         )}
                         
@@ -743,7 +744,7 @@ export const IndicatorMainAggregatesTable = ({
                           {printValue(
                             prevFixedCapitalConsumptionsAggregates[
                               index
-                            ].footprint.indicators[indic].getGrossImpact(
+                            ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getGrossImpact(
                               amount
                             ),
                             nbDecimals
