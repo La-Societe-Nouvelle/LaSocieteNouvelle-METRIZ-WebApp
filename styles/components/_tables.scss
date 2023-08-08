@@ -196,7 +196,7 @@ table {
 
   button:first-child {
     border-left: 1px solid $light;
-    border-radius: 1rem 0 0  1rem;
+    border-radius: 1rem 0 0 1rem;
   }
 
   button:last-child {
@@ -264,21 +264,21 @@ table {
 
 .immobilisationsTable {
   caption-side: top;
-  border-radius: 0 0 1rem 1rem;
+
   caption {
-    background-color: lighten($primary, 10%);
+    background-color: $primary;
     color: #fff;
     font-weight: 700;
     font-size: 1.1em;
     padding: 0.5rem 0.5rem;
-    border-radius: 1rem 1rem 0 0;
   }
 
   thead {
     background-color: $light;
     font-weight: normal;
-    border : 2px solid $light;  
-    th{
+    border: 2px solid $light;
+
+    th {
       color: $primary !important;
     }
   }

@@ -125,7 +125,7 @@ class Metriz extends React.Component {
             />
           )}
 
-          {showDataUpdater && (
+          {showDataUpdater && step > 3 && (
             <DataUpdater
               session={session}
               updatePrevSession={this.updatePrevSession}

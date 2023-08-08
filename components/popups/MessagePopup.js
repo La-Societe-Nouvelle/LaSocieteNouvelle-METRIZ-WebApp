@@ -4,14 +4,19 @@
 import React from "react";
 
 // Icon
-import { Alert, Button, Modal, Image } from "react-bootstrap";
+import { Button, Modal, Image } from "react-bootstrap";
 
 /* ---------- MESSAGE POP-UP ---------- */
 
-export const FileImportSuccessPopup = ({ message, closePopup }) => {
+export const SuccessFileModal = ({ message, title,closePopup }) => {
   return (
     <Modal show="true" onHide={closePopup} size="md" centered>
-      <Modal.Header closeButton></Modal.Header>
+      <Modal.Header closeButton>
+      <Modal.Title as={"h5"}>
+       {title}
+        </Modal.Title>
+
+      </Modal.Header>
 
       <Modal.Body>
         <Image
@@ -20,8 +25,11 @@ export const FileImportSuccessPopup = ({ message, closePopup }) => {
           height={140}
           className="mx-auto d-block"
         />
-        <p className="fw-bold text-center my-1">
-          Le fichier a bien été importé. {message}
+        <p className="text-center fw-bold my-1">
+          Le fichier a bien été importé !
+        </p>
+        <p className="small text-center">
+        {message}
         </p>
 
         <p className="text-center mt-4">
@@ -33,43 +41,6 @@ export const FileImportSuccessPopup = ({ message, closePopup }) => {
     </Modal>
   );
 };
-
-export const MessagePopupSuccess = ({ title, message, closePopup }) => {
-  return (
-    <Modal show="true" onHide={closePopup} size="md" centered>
-      <Modal.Header closeButton>
-        <Modal.Title className="text-success d-flex align-items-center">
-          <i className="display-6 success bi bi-check-circle me-3"></i> {title}
-        </Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-        <div className="message">
-          <p>{message}</p>
-        </div>
-      </Modal.Body>
-    </Modal>
-  );
-};
-
-export const MessagePopupErrors = ({ title, message, closePopup }) => {
-  return (
-    <Modal show="true" onHide={closePopup} size="md" centered>
-      <Modal.Header closeButton>
-        <Modal.Title className="text-danger d-flex align-items-center">
-          <i className="display-6 danger bi bi-x-circle-fill me-3"></i> {title}
-        </Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-        <div className="message">
-          <p>{message}</p>
-        </div>
-      </Modal.Body>
-    </Modal>
-  );
-};
-
 export const ErrorFileModal = ({ errorFile, title, errorMessage, onClose }) => {
   return (
     <Modal show={errorFile} onHide={onClose} size="md" centered>
@@ -87,31 +58,6 @@ export const ErrorFileModal = ({ errorFile, title, errorMessage, onClose }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" size="md" onClick={onClose}>
-          Fermer
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-};
-
-export const SuccessModal = ({
-  success,
-  title,
-  message,
-  alertMessage,
-  onClose,
-}) => {
-  return (
-    <Modal show={success} onHide={onClose} size="md" centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <p className="">{message}</p>
-        <Alert variant="info">{alertMessage}</Alert>
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" size="sm" onClick={onClose}>
           Fermer
         </Button>
       </Modal.Footer>

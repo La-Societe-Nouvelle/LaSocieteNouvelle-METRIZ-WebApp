@@ -13,14 +13,16 @@ import { Container } from "react-bootstrap";
 import { ErrorApi } from "../ErrorAPI";
 import { getPrevDate } from "../../src/utils/Utils";
 import { Session } from "../../src/Session";
-import { MessagePopupErrors, MessagePopupSuccess } from "../popups/MessagePopup";
+import {
+  ErrorFileModal,
+  SuccessFileModal
+} from "../popups/MessagePopup";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
 /* ---------------------------------------------------------------- */
 
-export class InitialStatesSection extends React.Component 
-{
+export class InitialStatesSection extends React.Component {
   constructor(props) {
     super(props);
     this.onDrop = (files) => {
@@ -35,8 +37,8 @@ export class InitialStatesSection extends React.Component
       titlePopup: "",
       message: "",
       files: [],
-      popupSuccess:false,
-      popupError:false,
+      popupSuccess: false,
+      popupError: false,
       error: false,
     };
   }
@@ -54,11 +56,12 @@ export class InitialStatesSection extends React.Component
       message,
       error,
       popupError,
-      popupSuccess
+      popupSuccess,
     } = this.state;
 
-    const accountsShowed = financialData.immobilisations
-      .concat(financialData.stocks);
+    const accountsShowed = financialData.immobilisations.concat(
+      financialData.stocks
+    );
 
     const isNextStepAvailable = nextStepAvailable(this.state);
 
@@ -106,23 +109,22 @@ export class InitialStatesSection extends React.Component
                   </div>
                 </div>
               )}
-            </Dropzone>    
+            </Dropzone>
             {popupSuccess && (
-                <MessagePopupSuccess
+              <SuccessFileModal
                 message={message}
-                title={titlePopup} 
-                closePopup={() =>this.setState({ popupSuccess: false })}
+                title={titlePopup}
+                closePopup={() => this.setState({ popupSuccess: false })}
               />
             )}
-           {popupError && (
-              <MessagePopupErrors
-                message={message}
-                title={titlePopup} 
-                closePopup={() =>this.setState({ popupError: false })}
+            {popupError && (
+              <ErrorFileModal
+                errorFile={popupError}
+                title={titlePopup}
+                errorMessage={message}
+                onClose={() => this.setState({ popupError: false })}
               />
             )}
-        
-    
           </div>
           <div className="step p-4 my-3">
             <h3 className="mb-3"> Initialiser les états initiaux </h3>
@@ -164,7 +166,8 @@ export class InitialStatesSection extends React.Component
                 </p>
               </div>
             )}
-            {financialData.immobilisations.concat(financialData.stocks).length>0 && (
+            {financialData.immobilisations.concat(financialData.stocks).length >
+              0 && (
               <div className="table-data mt-2">
                 <InitialStatesTable
                   financialData={financialData}
@@ -259,7 +262,7 @@ export class InitialStatesSection extends React.Component
       try {
         // text -> JSON
         const prevSessionData = JSON.parse(reader.result);
-        
+
         // update to current version
         await updateVersion(prevSessionData);
 
@@ -269,21 +272,24 @@ export class InitialStatesSection extends React.Component
 
         const prevYear = prevSession.financialPeriod.periodKey.slice(2);
         const currYear = currSession.financialPeriod.periodKey.slice(2);
-     
-        const isObjectInAvailablePeriods = prevSession.availablePeriods.find(
-          (obj) => {
+
+        const conflictingPeriod = prevSession.availablePeriods.find(
+          (periodObj) => {
             return currSession.availablePeriods.some((period) => {
-              return period.periodKey === obj.periodKey;
+              return period.periodKey === periodObj.periodKey;
             });
           }
         );
-        if (isObjectInAvailablePeriods) {
 
+        if (conflictingPeriod) {
+          const existingYear = conflictingPeriod.periodKey.slice(2); // Récupérer les années de la période
           this.setState({
-            titlePopup: "Erreur - Fichier",
+            titlePopup: "Erreur - Sauvegarde",
             message:
-              "Des données sont déjà disponibles pour l'année correspondante à la sauvegarde importée. Veuillez vérifier le fichier et réessayer",
-            popupError: true 
+              "Des données existent déjà pour l'exercice de " +
+              existingYear +
+              ". Veuillez vérifier la sauvegarde et réessayer.",
+            popupError: true,
           });
           return;
         }
@@ -291,87 +297,114 @@ export class InitialStatesSection extends React.Component
         if (prevSession.legalUnit.siren != currSession.legalUnit.siren) {
           this.setState({
             titlePopup: "Erreur de Fichier",
-            message: "Les numéros de siren ne correspondent pas. Veuillez vérifier le fichier et réessayer",
-            popupError: true 
+            message:
+              "Les numéros de siren ne correspondent pas. Veuillez vérifier le fichier et réessayer",
+            popupError: true,
           });
           return;
         }
-      
+
         if (
           parseInt(prevYear) != parseInt(currYear) - 1 ||
           prevSession.financialPeriod.dateEnd !=
             getPrevDate(currSession.financialPeriod.dateStart)
         ) {
-          console.log(prevYear+" - "+currYear);
+          console.log(prevYear + " - " + currYear);
           console.log(prevSession.financialPeriod.dateEnd);
           console.log(getPrevDate(currSession.financialPeriod.dateStart));
           this.setState({
             titlePopup: "Erreur de Fichier",
-            message: "La sauvegarde ne correspond pas à l'année précédente. Veuillez vérifier le fichier et réessayer.",
-            popupError: true 
-
+            message:
+              "La sauvegarde ne correspond pas à l'année précédente. Veuillez vérifier le fichier et réessayer.",
+            popupError: true,
           });
           return;
         }
 
         let checkANouveaux = true;
         currSession.financialData.immobilisations
-          .filter(immobilisation => immobilisation.initialState.amount > 0)
-          .forEach(immobilisation => {
-            let prevImmobilisation = prevSession.financialData.immobilisations.find(prevImmobilisation => prevImmobilisation.accountNum==immobilisation.accountNum);
+          .filter((immobilisation) => immobilisation.initialState.amount > 0)
+          .forEach((immobilisation) => {
+            let prevImmobilisation =
+              prevSession.financialData.immobilisations.find(
+                (prevImmobilisation) =>
+                  prevImmobilisation.accountNum == immobilisation.accountNum
+              );
             let prevStateDateEnd = immobilisation.initialState.date;
-            if (!prevImmobilisation) {checkANouveaux = false;}
-            else if (!prevImmobilisation.states[prevStateDateEnd]) {checkANouveaux = false;}
-            else if (prevImmobilisation.states[prevStateDateEnd].amount!=immobilisation.initialState.amount
-              || (immobilisation.amortisationAccountNum && prevImmobilisation.states[prevStateDateEnd].amortisationAmount!=immobilisation.initialState.amortisationAmount)
-              || (immobilisation.depreciationAccountNum && prevImmobilisation.states[prevStateDateEnd].depreciationAmount!=immobilisation.initialState.depreciationAmount)) {
-                checkANouveaux = false;
+            if (!prevImmobilisation) {
+              checkANouveaux = false;
+            } else if (!prevImmobilisation.states[prevStateDateEnd]) {
+              checkANouveaux = false;
+            } else if (
+              prevImmobilisation.states[prevStateDateEnd].amount !=
+                immobilisation.initialState.amount ||
+              (immobilisation.amortisationAccountNum &&
+                prevImmobilisation.states[prevStateDateEnd]
+                  .amortisationAmount !=
+                  immobilisation.initialState.amortisationAmount) ||
+              (immobilisation.depreciationAccountNum &&
+                prevImmobilisation.states[prevStateDateEnd]
+                  .depreciationAmount !=
+                  immobilisation.initialState.depreciationAmount)
+            ) {
+              checkANouveaux = false;
             }
-        });
+          });
         currSession.financialData.stocks
-          .filter(stock => stock.initialState.amount > 0)
-          .forEach(stock => {
-            let prevStock = prevSession.financialData.stocks.find(prevStock => prevStock.accountNum==stock.accountNum);
+          .filter((stock) => stock.initialState.amount > 0)
+          .forEach((stock) => {
+            let prevStock = prevSession.financialData.stocks.find(
+              (prevStock) => prevStock.accountNum == stock.accountNum
+            );
             let prevStateDateEnd = stock.initialState.date;
-            if (!prevStock) {checkANouveaux = false;}
-            else if (!prevStock.states[prevStateDateEnd]) {checkANouveaux = false;}
-            else if (prevStock.states[prevStateDateEnd].amount!=stock.initialState.amount
-              || (stock.depreciationAccountNum && prevStock.states[prevStateDateEnd].depreciationAmount!=stock.initialState.depreciationAmount)) {
-                checkANouveaux = false;
+            if (!prevStock) {
+              checkANouveaux = false;
+            } else if (!prevStock.states[prevStateDateEnd]) {
+              checkANouveaux = false;
+            } else if (
+              prevStock.states[prevStateDateEnd].amount !=
+                stock.initialState.amount ||
+              (stock.depreciationAccountNum &&
+                prevStock.states[prevStateDateEnd].depreciationAmount !=
+                  stock.initialState.depreciationAmount)
+            ) {
+              checkANouveaux = false;
             }
-        });
+          });
         if (!checkANouveaux) {
           this.setState({
             titlePopup: "Erreur - Correspondances des données",
             message:
               "Des données importées ne correspondent pas aux données du journal des A-Nouveaux. Veuillez vérifier le fichier et réessayer.",
-            popupError: true 
+            popupError: true,
           });
           return;
         }
 
         // Update session with prev values
         await currSession.loadSessionFromBackup(prevSession);
-        
+
         // Update financialData with prev values
-        await currSession.financialData.loadFinancialDataFromBackUp(prevSession.financialData);
+        await currSession.financialData.loadFinancialDataFromBackUp(
+          prevSession.financialData
+        );
         await currSession.updateFootprints(prevSession.financialPeriod);
- 
+
         // Update component
         this.setState({
           financialData: this.props.session.financialData,
           popupSuccess: true,
-          titlePopup: "Importation réussie",
+          titlePopup: "Reprise sur l'exercice précédent",
           message:
-            "Les données de l'exercice précédent ont été ajoutées avec succès. Les valeurs des indicateurs de stocks, immobilisations et amortissements en fin d'exercice ont été prises en compte pour l'exercice en cours.",
+            "Les données de l'exercice précédent ont été ajoutées avec succès. Les valeurs des indicateurs de stocks, immobilisations et amortissements en fin d'exercice vont être prises en compte pour l'exercice en cours.",
         });
-        
       } catch (error) {
-        console.log(error)
+        console.log(error);
         this.setState({
           titlePopup: "Erreur - Fichier",
-          message: "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
-          popupError: true 
+          message:
+            "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
+          popupError: true,
         });
       }
     };
@@ -379,10 +412,12 @@ export class InitialStatesSection extends React.Component
     try {
       reader.readAsText(file);
     } catch (error) {
+      console.log(error);
       this.setState({
         titlePopup: "Erreur - Fichier",
-        message: "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
-        popupError: true 
+        message:
+          "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
+        popupError: true,
       });
     }
   };
