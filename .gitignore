@@ -32,7 +32,7 @@ yarn-error.log*
 .env.production.local
 
 # API URL
-src/api.js
+config/api-stats.js
 config/api.js
 
 # vercel

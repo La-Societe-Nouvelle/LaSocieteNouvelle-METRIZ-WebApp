@@ -19,7 +19,8 @@ import { ErrorApi } from "../../ErrorAPI";
 import { getSignificativeProviders } from "/src/formulas/significativeLimitFormulas";
 
 // API
-import api from "../../config/api";
+import api from "../../../config/api";
+
 import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
 
 // pdf extractor

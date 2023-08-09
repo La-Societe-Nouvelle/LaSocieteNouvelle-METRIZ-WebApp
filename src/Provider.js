@@ -1,4 +1,4 @@
-import api from "./api";
+import api from "../config/api";
 import { getAmountItems, getCurrentDateString, valueOrDefault } from "./utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 

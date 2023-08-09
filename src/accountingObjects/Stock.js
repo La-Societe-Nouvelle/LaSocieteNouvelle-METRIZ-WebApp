@@ -5,7 +5,7 @@ import { getAmountItems, getCurrentDateString, getDatesEndMonths, getPrevDate, r
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
 // API url
-import api from '../api';
+import api from "../../config/api";
 
 export class Stock {
 

@@ -1,11 +1,11 @@
 // La Société Nouvelle
+import api from "../../config/api";
 
 // Imports
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 // Utils
 import { getAmountItems, getCurrentDateString, getDatesEndMonths, getNbDaysBetweenDates, getNewId, getPrevDate, getSumItems, roundValue } from "../utils/Utils";
-import api from "../api";
 import { AmortisationExpense } from "./AmortisationExpense";
 
 export class Immobilisation 
