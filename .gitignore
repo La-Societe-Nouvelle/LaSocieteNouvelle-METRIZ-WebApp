@@ -33,7 +33,6 @@ yarn-error.log*
 
 # API URL
 src/api.js
-config/api-stats.js
 config/api.js
 
 # vercel
