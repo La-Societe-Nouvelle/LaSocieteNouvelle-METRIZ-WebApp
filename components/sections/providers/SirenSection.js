@@ -19,14 +19,14 @@ import { ErrorApi } from "../../ErrorAPI";
 import { getSignificativeProviders } from "/src/formulas/significativeLimitFormulas";
 
 // API
+import api from "../../config/api";
 import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
+
 // pdf extractor
 import pdf from "pdf-extraction";
-import { number } from "prop-types";
 import { InvoicesPopup } from "./InvoicesPopup";
 import { getDefaultFootprintId } from "../../../src/Provider";
-import api from "../../../src/api";
-//const pdf = require("pdf-extraction");
+
 
 const identificationPatterns = [
   /FR[0-9]{11}( |$|\r\n|\r|\n)/g,

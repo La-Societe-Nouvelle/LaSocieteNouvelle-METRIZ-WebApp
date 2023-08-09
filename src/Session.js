@@ -21,7 +21,11 @@ import {
   updateFixedCapitalConsumptionsFootprints,
 } from "./formulas/aggregatesFootprintFormulas";
 import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
-import { getDatesEndMonths, getLastDateOfMonth, getPrevDate } from "./utils/Utils";
+import {
+  getDatesEndMonths,
+  getLastDateOfMonth,
+  getPrevDate,
+} from "./utils/Utils";
 import { ComparativeData } from "./models/ComparativeData";
 
 /* ---------- OBJECT SESSION ---------- */
@@ -36,6 +40,10 @@ export class Session {
 
     // Session
     this.progression = props.progression || 0;
+
+    // Identifier
+
+    this.id = props.id || "";
 
     // Year
     this.year = props.year || ""; // obsolete
@@ -79,7 +87,6 @@ export class Session {
     this.availablePeriods.forEach((period) => {
       this.indics[period.periodKey] = props.indics[period.periodKey] || [];
     });
-  
   }
 
   addPeriods = (periods) => {
@@ -141,9 +148,10 @@ export class Session {
   // ... and allows to have all the values directly in the json back up file
 
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
-  updateFootprints = async (period) => 
-  {
-    console.log("Mise à jour des empreintes pour la période : "+period.periodKey);
+  updateFootprints = async (period) => {
+    console.log(
+      "Mise à jour des empreintes pour la période : " + period.periodKey
+    );
 
     // Net Value Added
     await this.updateNetValueAddedFootprint(period);
@@ -223,20 +231,20 @@ export class Session {
   };
 }
 
-export const buildRegexFinancialPeriod = (dateStart, dateEnd) => 
-{ // REVIEW
+export const buildRegexFinancialPeriod = (dateStart, dateEnd) => {
+  // REVIEW
   let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
   let months = datesEndMonths.map((date) => date.substring(0, 6));
 
   let datesLastMonth = [];
-  if (dateEnd!=getLastDateOfMonth(dateEnd)) {
-    let lastMonth = dateEnd.substring(0,6);
+  if (dateEnd != getLastDateOfMonth(dateEnd)) {
+    let lastMonth = dateEnd.substring(0, 6);
     let prevDate = dateEnd;
     while (prevDate.startsWith(lastMonth)) {
       datesLastMonth.push(prevDate);
       prevDate = getPrevDate(prevDate);
     }
-  };
+  }
 
   let regexString = "^(" + months.concat(datesLastMonth).join("|") + ")";
   return new RegExp(regexString);

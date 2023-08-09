@@ -115,7 +115,6 @@ const AccountingImportSection = (props) => {
       console.log("Lecture du FEC");
       console.log(FECData.meta);
       console.log(FECData.books);
-
       setImportedData(FECData);
       setView(1);
     } catch (error) {
@@ -157,6 +156,9 @@ const AccountingImportSection = (props) => {
         financialPeriod.periodKey
       ].knwDetails.vocationalTrainingTax =
         FECData.KNWData.vocationalTrainingTax;
+
+      // FEC id
+      session.id = importedData.id;
 
       session.progression = 1;
 

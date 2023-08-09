@@ -72,6 +72,18 @@ const checkBalance = (rows) => {
     .reduce((a, b) => a + b, 0);
   return Math.round(amount * 100) == 0;
 };
+/* -------------------- FEC ID BUIDER -------------------- */
+
+const buildId = (amount) => {
+  amount = parseInt(amount);
+  while (amount > 9)
+    amount = amount
+      .toString()
+      .split("")
+      .map(Number)
+      .reduce((a, b) => a + b, 0);
+  return amount;
+};
 
 /* ----------------------------------------------------- */
 /* -------------------- FILE READER -------------------- */
@@ -83,6 +95,7 @@ export async function FECFileReader(content) {
 
   let dataFEC = {
     books: [],
+    id: "",
     meta: {
       books: {}, // key : accountNum / values : { label, type }
       accounts: {}, // key : accountNum / value : accountLib
@@ -180,6 +193,12 @@ export async function FECFileReader(content) {
 
       // Ajout des données
       dataFEC.books[rowData.JournalCode].push(rowData);
+
+      // FEC id
+      if (dataFEC.id.length < 15)
+        dataFEC.id =
+          dataFEC.id +
+          buildId(parseAmount(rowData.Debit) + parseAmount(rowData.Credit));
 
       // -------------------------------------------------- //
     } else if (rowString != "")
@@ -1296,18 +1315,24 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
 
   // Charges externes (60, 61, 62 hors 603) ----------------------------------------------------------- //
 
-  if (/^6(0[^3]|[1-2])/.test(ligneCourante.CompteNum) && !data.ignoreExternalExpensesEntries.includes(ligneCourante.EcritureNum)) {
+  if (
+    /^6(0[^3]|[1-2])/.test(ligneCourante.CompteNum) &&
+    !data.ignoreExternalExpensesEntries.includes(ligneCourante.EcritureNum)
+  ) {
     // lecture du compte auxiliaire
     let lignesFournisseur = journal.filter(
       (ligne) =>
         ligne.EcritureNum == ligneCourante.EcritureNum &&
         /^40/.test(ligne.CompteNum)
     );
-    let paiementBancaire = journal.some((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum && /^512/.test(ligne.CompteNum));
+    let paiementBancaire = journal.some(
+      (ligne) =>
+        ligne.EcritureNum == ligneCourante.EcritureNum &&
+        /^512/.test(ligne.CompteNum)
+    );
 
     // paiement bancaire (pas de ligne fournisseur)
-    if (paiementBancaire)
-    {
+    if (paiementBancaire) {
       // expense data
       let expenseData = {
         label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
@@ -1316,34 +1341,40 @@ const readExpenseEntry = async (data, journal, ligneCourante) => {
         providerNum: "_" + ligneCourante.CompteNum,
         providerLib: "DEPENSES " + ligneCourante.CompteLib,
         isDefaultProviderAccount: true,
-        amount: parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
+        amount:
+          parseAmount(ligneCourante.Debit) - parseAmount(ligneCourante.Credit),
         date: ligneCourante.EcritureDate,
       };
       // push data
       data.externalExpenses.push(expenseData);
       data.defaultProviders.push(expenseData.providerNum);
-    }
-    else if (lignesFournisseur.length > 1) 
-    {
-      let ecriture = journal.filter((ligne) => ligne.EcritureNum == ligneCourante.EcritureNum);
+    } else if (lignesFournisseur.length > 1) {
+      let ecriture = journal.filter(
+        (ligne) => ligne.EcritureNum == ligneCourante.EcritureNum
+      );
       let entryData = readExternalExpensesFromEntry(ecriture);
       if (entryData.isExpensesTracked) {
         data.externalExpenses.push(...entryData.entryData);
         data.ignoreExternalExpensesEntries.push(ligneCourante.EcritureNum);
         data.defaultProviders.push(...entryData.defaultProviders);
       } else {
-        throw  "Erreur d'association pour le compte de charge " + ligneCourante.CompteNum + " (Numéro d'écriture : " + ligneCourante.EcritureNum + " ) : Plusieurs comptes fournisseurs détectés ";
-      };
-    }
-    else
-    {
+        throw (
+          "Erreur d'association pour le compte de charge " +
+          ligneCourante.CompteNum +
+          " (Numéro d'écriture : " +
+          ligneCourante.EcritureNum +
+          " ) : Plusieurs comptes fournisseurs détectés "
+        );
+      }
+    } else {
       let ligneFournisseur = lignesFournisseur[0] || {};
       // expense data
       let expenseData = {
         label: ligneCourante.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
         accountNum: ligneCourante.CompteNum,
         accountLib: ligneCourante.CompteLib,
-        providerNum: ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
+        providerNum:
+          ligneFournisseur.CompAuxNum || "_" + ligneCourante.CompteNum,
         providerLib:
           ligneFournisseur.CompAuxLib || "DEPENSES " + ligneCourante.CompteLib,
         isDefaultProviderAccount: ligneFournisseur.CompAuxNum ? false : true,
@@ -2105,8 +2136,7 @@ const getSubEntriesByAssetType = (entry) => {
  *  - message (String) : -
  */
 
-const readExternalExpensesFromEntry = (entry) => 
-{
+const readExternalExpensesFromEntry = (entry) => {
   // ---------- Entry ---------- //
 
   let res = readExternalExpenses(entry);
@@ -2115,7 +2145,7 @@ const readExternalExpensesFromEntry = (entry) =>
   // ---------- Sub-entries ---------- //
 
   let subEntries = [];
-  
+
   // group by balanced group
   subEntries = getSubEntriesByBalancedGroup(entry);
   res = readExternalExpensesFromSubEntries(subEntries);
@@ -2130,12 +2160,15 @@ const readExternalExpensesFromEntry = (entry) =>
   return res;
 };
 
-const readExternalExpensesFromSubEntries = (subEntries) => 
-{
-  let res = { entryData: [], isExpensesTracked: false, message: "", defaultProviders: [] };
+const readExternalExpensesFromSubEntries = (subEntries) => {
+  let res = {
+    entryData: [],
+    isExpensesTracked: false,
+    message: "",
+    defaultProviders: [],
+  };
 
-  for (let subEntry of subEntries) 
-  {
+  for (let subEntry of subEntries) {
     let resSubEntry = readExternalExpenses(subEntry);
 
     if (resSubEntry.isExpensesTracked) {
@@ -2153,16 +2186,24 @@ const readExternalExpensesFromSubEntries = (subEntries) =>
   return res;
 };
 
-const readExternalExpenses = (rows) => 
-{
+const readExternalExpenses = (rows) => {
   // response
-  let res = { entryData: [], isExpensesTracked: false, message: "", defaultProviders: [] };
+  let res = {
+    entryData: [],
+    isExpensesTracked: false,
+    message: "",
+    defaultProviders: [],
+  };
 
   // lignes relatives aux comptes de charges
-  let rowsExpensesAccounts = rows.filter((ligne) => /^6(0[^3]|[1-2])/.test(ligne.CompteNum));
+  let rowsExpensesAccounts = rows.filter((ligne) =>
+    /^6(0[^3]|[1-2])/.test(ligne.CompteNum)
+  );
 
   // lignes relatives aux comtpes fournisseurs
-  let rowsProvidersAccounts = rows.filter((ligne) => /^40/.test(ligne.CompteNum));  
+  let rowsProvidersAccounts = rows.filter((ligne) =>
+    /^40/.test(ligne.CompteNum)
+  );
 
   // Empty entry -------------------------------------------------------------------------------------- //
 
@@ -2174,38 +2215,59 @@ const readExternalExpenses = (rows) =>
 
   // Single expense account --------------------------------------------------------------------------- //
 
-  let sameExpenseAccountUsed = rowsExpensesAccounts.filter((value, index, self) => index === self.findIndex((item) => item.CompteNum === value.CompteNum)).length == 1;
-  
-  if (sameExpenseAccountUsed) 
-  {
+  let sameExpenseAccountUsed =
+    rowsExpensesAccounts.filter(
+      (value, index, self) =>
+        index === self.findIndex((item) => item.CompteNum === value.CompteNum)
+    ).length == 1;
+
+  if (sameExpenseAccountUsed) {
     res.isExpensesTracked = true;
     res.message = "OK";
 
     // ligne relative au compte fournisseur
     let rowExpenseAccount = rowsExpensesAccounts[0];
-    let amountExpense = getSumItems(rowsExpensesAccounts.map((row) => parseAmount(row.Debit) - parseAmount(row.Credit)));
-    let amountProviders = getSumItems(rowsProvidersAccounts.map((row) => parseAmount(row.Credit) - parseAmount(row.Debit)));
+    let amountExpense = getSumItems(
+      rowsExpensesAccounts.map(
+        (row) => parseAmount(row.Debit) - parseAmount(row.Credit)
+      )
+    );
+    let amountProviders = getSumItems(
+      rowsProvidersAccounts.map(
+        (row) => parseAmount(row.Credit) - parseAmount(row.Debit)
+      )
+    );
 
     // build data
     rowsProvidersAccounts.forEach((rowProviderAccount) => {
       // amortisation expense data
-      let amountProvider = parseAmount(rowProviderAccount.Debit) - parseAmount(rowProviderAccount.Credit);
+      let amountProvider =
+        parseAmount(rowProviderAccount.Debit) -
+        parseAmount(rowProviderAccount.Credit);
       let expenseData = {
-        label: rowsExpensesAccounts.map((row) => row.EcritureLib).reduce((a,b) => a+(a.length>0 ? ", " : "")+b, ""),
+        label: rowsExpensesAccounts
+          .map((row) => row.EcritureLib)
+          .reduce((a, b) => a + (a.length > 0 ? ", " : "") + b, ""),
         accountNum: rowExpenseAccount.CompteNum,
         accountLib: rowExpenseAccount.CompteLib,
-        providerNum: rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
-        providerLib: rowProviderAccount.CompAuxLib || "DEPENSES " + rowProviderAccount.CompteLib,
+        providerNum:
+          rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
+        providerLib:
+          rowProviderAccount.CompAuxLib ||
+          "DEPENSES " + rowProviderAccount.CompteLib,
         isDefaultProviderAccount: rowProviderAccount.CompAuxNum ? false : true,
-        amount: amountProviders>0 ? roundValue( (amountProvider/amountProviders)*amountExpense ,2) : 0,
-        date: rowExpenseAccount.EcritureDate
+        amount:
+          amountProviders > 0
+            ? roundValue((amountProvider / amountProviders) * amountExpense, 2)
+            : 0,
+        date: rowExpenseAccount.EcritureDate,
       };
       // push data
       res.entryData.push(expenseData);
       if (expenseData.isDefaultProviderAccount) {
         res.defaultProviders.push(expenseData.providerNum);
       }
-    })
+    });
 
     return res;
   }
@@ -2213,10 +2275,18 @@ const readExternalExpenses = (rows) =>
   // Single provider account -------------------------------------------------------------------------- //
 
   // -> comptAuxNum equals + not empy
-  let sameProviderAccountUsed = rowsProvidersAccounts.filter((value, index, self) => index === self.findIndex((item) => item.CompteNum === value.CompteNum && item.CompAuxNum === value.CompAuxNum)).length == 1;
-  
-  if (sameProviderAccountUsed) 
-  {
+  let sameProviderAccountUsed =
+    rowsProvidersAccounts.filter(
+      (value, index, self) =>
+        index ===
+        self.findIndex(
+          (item) =>
+            item.CompteNum === value.CompteNum &&
+            item.CompAuxNum === value.CompAuxNum
+        )
+    ).length == 1;
+
+  if (sameProviderAccountUsed) {
     res.isExpensesTracked = true;
     res.message = "OK";
 
@@ -2227,14 +2297,22 @@ const readExternalExpenses = (rows) =>
     rowsExpensesAccounts.forEach((rowExpenseAccount) => {
       // amortisation expense data
       let expenseData = {
-        label: rowExpenseAccount.EcritureLib.replace(/^\"/, "").replace(/\"$/, ""),
+        label: rowExpenseAccount.EcritureLib.replace(/^\"/, "").replace(
+          /\"$/,
+          ""
+        ),
         accountNum: rowExpenseAccount.CompteNum,
         accountLib: rowExpenseAccount.CompteLib,
-        providerNum: rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
-        providerLib: rowProviderAccount.CompAuxLib || "DEPENSES " + rowProviderAccount.CompteLib,
+        providerNum:
+          rowProviderAccount.CompAuxNum || "_" + rowProviderAccount.CompteNum,
+        providerLib:
+          rowProviderAccount.CompAuxLib ||
+          "DEPENSES " + rowProviderAccount.CompteLib,
         isDefaultProviderAccount: rowProviderAccount.CompAuxNum ? false : true,
-        amount: parseAmount(rowExpenseAccount.Debit) - parseAmount(rowExpenseAccount.Credit),
-        date: rowExpenseAccount.EcritureDate
+        amount:
+          parseAmount(rowExpenseAccount.Debit) -
+          parseAmount(rowExpenseAccount.Credit),
+        date: rowExpenseAccount.EcritureDate,
       };
       // push data
       res.entryData.push(expenseData);

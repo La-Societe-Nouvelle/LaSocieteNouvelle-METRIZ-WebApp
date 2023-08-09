@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Container, Table, Form, Row, Col, Image } from "react-bootstrap";
 
-import api from "/src/api";
+import api from "../../config/api";
 
 // Api
 import {

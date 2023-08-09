@@ -1,5 +1,5 @@
 // API url
-import api from '/src/api';
+import api from "../../config/api";
 
 /* ---------- LEGAL UNIT DATA ---------- */
 export class LegalUnit {

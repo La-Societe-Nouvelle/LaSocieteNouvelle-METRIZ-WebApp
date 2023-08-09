@@ -27,6 +27,9 @@ import { Mobile } from "/components/Mobile";
 import { DataUpdater } from "/components/popups/dataUpdater/DataUpdater";
 import SaveModal from "../components/popups/SaveModal";
 
+// Services
+import { logUserProgress } from "../src/services/StatsService";
+
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
  *  |   _-_ _-_- -_-_                                                                                         |
@@ -95,6 +98,7 @@ class Metriz extends React.Component {
       loading: false,
       showDataUpdater: false,
       showSaveModal: false,
+      date :  new Date()
     };
   }
 
@@ -257,6 +261,7 @@ class Metriz extends React.Component {
     //   this.state.session.progression++;
     // }
 
+
     let accountsShowed =
       this.state.session.financialData.immobilisations.concat(
         this.state.session.financialData.stocks
@@ -268,19 +273,18 @@ class Metriz extends React.Component {
       this.setStep(3);
       this.updateProgression(2);
     }
+    await logUserProgress(this.state.session.id, 1, this.state.date, []);
   };
 
   validInitialStates = async () => {
-    console.log("--------------------------------------------------");
-    console.log("Empreintes des stocks et immobilisations initialisées");
 
     this.setStep(3);
     this.updateProgression(2);
+    await logUserProgress(this.state.session.id, 2, this.state.date, []);
+
   };
 
   validProviders = async () => {
-    console.log("--------------------------------------------------");
-    console.log("Empreintes des fournisseurs récupérées");
 
     let availablePeriods = this.state.session.availablePeriods;
     for (let period of availablePeriods) {
@@ -289,15 +293,20 @@ class Metriz extends React.Component {
 
     this.setStep(4);
     this.updateProgression(3);
+
+    await logUserProgress(this.state.session.id, 3, this.state.date, []);
+
   };
   validStatements = async () => {
-    console.log("--------------------------------------------------");
-    console.log("Indicateurs déclarés");
 
     this.setStep(5);
     this.setState({ showSaveModal: true });
 
     this.updateProgression(4);
+
+    const financialPeriod = this.state.session.financialPeriod.periodKey;
+    await logUserProgress(this.state.session.id, 4, this.state.date, this.state.session.validations[financialPeriod]);
+
   };
 
   updateProgression = (step) => {
