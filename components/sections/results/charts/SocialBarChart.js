@@ -102,7 +102,7 @@ const SocialBarChart = ({
     },
   };
 
-  return <Bar data={data} options={{ ...commonOptions }} />;
+  return <Bar id="socialChart" data={data} options={{ ...commonOptions }} />;
 };
 
 export default SocialBarChart;

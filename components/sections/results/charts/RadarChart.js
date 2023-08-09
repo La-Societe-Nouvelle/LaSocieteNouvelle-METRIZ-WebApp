@@ -101,7 +101,7 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
     },
   };
 
-  return <Radar data={data} options={options} />;
+  return <Radar id="environmentalChart" data={data} options={options} />;
 }
 
 export default RadarChart;

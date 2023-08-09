@@ -98,7 +98,7 @@ const ProportionalRingChart = ({
     cutout: 20,
   };
 
-  return <Doughnut data={data} options={options} />;
+  return <Doughnut  id="proportionalChart" data={data} options={options} />;
 };
 
 export default ProportionalRingChart;

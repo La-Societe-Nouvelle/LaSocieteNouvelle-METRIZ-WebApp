@@ -1,7 +1,8 @@
 import React from "react";
-import { Col, Row } from "react-bootstrap";
+import { Button, Col, Row } from "react-bootstrap";
 import indicators from "../../../../lib/indics.json";
 import {
+  downloadChartImage,
   getIndicatorValuesByCategory,
   getIndicatorValuesByType,
   getIndicatorsMetaByCategory,
@@ -62,19 +63,37 @@ const FootprintReport = ({ comparativeData, financialData, period }) => {
     "proportion"
   );
 
-  const showEnvironmentalChart = Object.values(environmentalFootprint).some(value => value != null);
-  const showProportionalChart = Object.values(proportionFootprint).some(value =>  value != null);
-  const showSocialChart = Object.values(socialFootprint).some(value => value != null);
+  const showEnvironmentalChart = Object.values(environmentalFootprint).some(
+    (value) => value != null
+  );
+  const showProportionalChart = Object.values(proportionFootprint).some(
+    (value) => value != null
+  );
+  const showSocialChart = Object.values(socialFootprint).some(
+    (value) => value != null
+  );
 
+  
 
   return (
     <Row>
-
-{showEnvironmentalChart && (
+      {showEnvironmentalChart && (
         <Col lg={6}>
           <div className="box">
-            <div className="text-center  rounded-pill ">
+            <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="mb-0">Empreinte environnementale</h3>
+              <Button
+                className="btn-light btn-rounded"
+                size="sm"
+                onClick={() =>
+                  downloadChartImage(
+                    "environmentalChart",
+                    "empreinte_environnementale.png"
+                  )
+                }
+              >
+                <i className="bi bi-download"></i>
+              </Button>
             </div>
             <RadarChart
               labels={environnementalIndic}
@@ -87,9 +106,22 @@ const FootprintReport = ({ comparativeData, financialData, period }) => {
       {showProportionalChart && (
         <Col lg={6}>
           <div className="box">
-            <div className="text-center rounded-pill ">
+          <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="mb-0">Empreinte économique</h3>
+              <Button
+                className="btn-light btn-rounded"
+                size="sm"
+                onClick={() =>
+                  downloadChartImage(
+                    "proportionalChart",
+                    "empreinte_economique.png"
+                  )
+                }
+              >
+                <i className="bi bi-download"></i>
+              </Button>
             </div>
+  
             <ProportionalRingChart
               metaIndicators={proportionsIndicsMeta}
               productionFootprint={proportionFootprint}
@@ -101,9 +133,22 @@ const FootprintReport = ({ comparativeData, financialData, period }) => {
       {showSocialChart && (
         <Col lg={6}>
           <div className="box">
-            <div className="text-center rounded-pill ">
+          <div className="d-flex justify-content-between align-items-center mb-4">
               <h3 className="mb-0">Empreinte sociale</h3>
+              <Button
+                className="btn-light btn-rounded"
+                size="sm"
+                onClick={() =>
+                  downloadChartImage(
+                    "socialChart",
+                    "empreinte_sociale.png"
+                  )
+                }
+              >
+                <i className="bi bi-download"></i>
+              </Button>
             </div>
+    
             <SocialBarChart
               metaIndicators={socialIndic}
               productionFootprint={socialFootprint}
@@ -113,7 +158,6 @@ const FootprintReport = ({ comparativeData, financialData, period }) => {
         </Col>
       )}
     </Row>
-    
   );
 };
 

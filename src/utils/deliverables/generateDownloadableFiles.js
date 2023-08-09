@@ -87,10 +87,11 @@ export async function generateDownloadableFiles(
     );
 
     // Generate Excel (XLSX) files for each indicator and add them to the ZIP file
+    const xlsxFolder = zip.folder("XLSX");
     for (const indic of validations) {
       let file = await generateXLSXFile(indic, session, period);
-      let blobXLSX = new Blob([file], { type: "application/octet-stream" });
-      zip.file(`sig_${indic}.xlsx`, blobXLSX);
+
+      xlsxFolder.file(`sig_${indic}.xlsx`, file);
     }
 
     // Add session data as a JSON file to the ZIP file
@@ -126,6 +127,8 @@ export async function generateDownloadableFiles(
   }
 
   // Generate Excel (XLSX) file for the selected indicator
+
+  const xlsxFolder = zip.folder("xlsx");
   if (includeSigXLSX) {
     let xlsxFile = await generateXLSXFile(selectedIndicator, session, period);
     let blobXLSX = new Blob([xlsxFile], { type: "application/octet-stream" });
@@ -136,8 +139,29 @@ export async function generateDownloadableFiles(
       return;
     }
 
+    await addXLSXFileToZip(xlsxFolder, `sig_${indicLabel}.xlsx`, xlsxFile);
+
     zip.file(`sig_${indicLabel}.xlsx`, blobXLSX);
   }
+
+  // Add charts canvas
+  const imagesFolder = zip.folder("Graphiques");
+
+  await addChartToZip(
+    imagesFolder,
+    "proportionalChart",
+    "graphique-empreinte-economique.png"
+  );
+  await addChartToZip(
+    imagesFolder,
+    "socialChart",
+    "graphique-empreinte-sociale.png"
+  );
+  await addChartToZip(
+    imagesFolder,
+    "environmentalChart",
+    "graphique-empreinte-environnementale.png"
+  );
 
   // Generate ZIP file containing the generated files and download the ZIP file
   zip.generateAsync({ type: "blob" }).then((content) => {
@@ -457,4 +481,15 @@ async function generateSIGFootprintPDF(period, financialData, legalUnit, year) {
   );
 
   return docEES;
+}
+
+async function addChartToZip(folder, chartId, fileName) {
+  const chartCanvas = document.getElementById(chartId);
+
+  if (!chartCanvas) {
+    return;
+  }
+
+  const chartData = chartCanvas.toDataURL("image/png");
+  folder.file(fileName, chartData.split("base64,")[1], { base64: true });
 }

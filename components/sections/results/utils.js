@@ -108,3 +108,13 @@ Object.keys(data).reduce((filtered, indicator) => {
   }
   return filtered;
 }, {});
+
+
+export const downloadChartImage = (chartId, fileName) => {
+  const canvas = document.getElementById(chartId);
+  const dataURL = canvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = dataURL;
+  link.download = fileName;
+  link.click();
+};
