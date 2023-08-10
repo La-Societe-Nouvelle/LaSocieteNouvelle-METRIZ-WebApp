@@ -29,6 +29,7 @@ import SaveModal from "../components/popups/SaveModal";
 
 // Services
 import { logUserProgress } from "../src/services/StatsService";
+import ErrorBoundary from "../src/utils/ErrorBoundary";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -98,10 +99,9 @@ class Metriz extends React.Component {
       loading: false,
       showDataUpdater: false,
       showSaveModal: false,
-      date :  new Date()
+      date: new Date(),
     };
   }
-
 
   handleCloseModal = () => {
     this.setState({ showSaveModal: false });
@@ -142,9 +142,11 @@ class Metriz extends React.Component {
               session={session}
             />
           )}
-          {this.buildSectionView(step)}
+          {}
+          <ErrorBoundary session={session}>
+            {this.buildSectionView(step)}
+          </ErrorBoundary>
         </div>
-
         <Footer step={step} />
       </>
     );
@@ -176,13 +178,13 @@ class Metriz extends React.Component {
       for (let period of session.availablePeriods) {
         await session.updateFootprints(period);
       }
-      
+
       this.setState({
         session: session,
         step: session.progression,
         loading: false,
         showDataUpdater: prevProps.version == "3.0.0",
-        showSaveModal : false,
+        showSaveModal: false,
       });
     };
     reader.readAsText(file);
@@ -241,11 +243,7 @@ class Metriz extends React.Component {
           </>
         );
       case 6:
-        return (
-          <PublishStatementSection
-            {...sectionProps}
-          />
-        );
+        return <PublishStatementSection {...sectionProps} />;
     }
   };
 
@@ -260,7 +258,6 @@ class Metriz extends React.Component {
     // if (getAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks).map(asset => asset.InitialState)) == 0) {
     //   this.state.session.progression++;
     // }
-
 
     let accountsShowed =
       this.state.session.financialData.immobilisations.concat(
@@ -277,15 +274,12 @@ class Metriz extends React.Component {
   };
 
   validInitialStates = async () => {
-
     this.setStep(3);
     this.updateProgression(2);
     await logUserProgress(this.state.session.id, 2, this.state.date, []);
-
   };
 
   validProviders = async () => {
-
     let availablePeriods = this.state.session.availablePeriods;
     for (let period of availablePeriods) {
       this.state.session.updateFootprints(period);
@@ -295,18 +289,20 @@ class Metriz extends React.Component {
     this.updateProgression(3);
 
     await logUserProgress(this.state.session.id, 3, this.state.date, []);
-
   };
   validStatements = async () => {
-
     this.setStep(5);
     this.setState({ showSaveModal: true });
 
     this.updateProgression(4);
 
     const financialPeriod = this.state.session.financialPeriod.periodKey;
-    await logUserProgress(this.state.session.id, 4, this.state.date, this.state.session.validations[financialPeriod]);
-
+    await logUserProgress(
+      this.state.session.id,
+      4,
+      this.state.date,
+      this.state.session.validations[financialPeriod]
+    );
   };
 
   updateProgression = (step) => {

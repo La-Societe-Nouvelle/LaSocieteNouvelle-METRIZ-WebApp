@@ -22,14 +22,27 @@ export const logUserProgress = async (
   }
 };
 
+export const saveErrorLog = async (
+date,
+info,
+errors,
+) => {
+  // Create a Log
+  const errorLog = {
+    date: date,
+    info: info,
+    errors: errors,
+  };
+  try {
+  await stat.post(`logs/error/`, errorLog);
+  } catch (error) {
+    console.error("Error while logging user error :", error);
+  }
+};
+
 
 // REPORTING
 // const createReporting = (data) => {
 //   return stat.post(`/reporting/`, data);
 // };
 
-// LOGS
-
-// const createErrorLog = (data) => {
-//   return stat.post(`logs/error/`, data);
-// };
