@@ -26,10 +26,10 @@ import { Footer } from "/components/parts/Footer";
 import { Mobile } from "/components/Mobile";
 import { DataUpdater } from "/components/popups/dataUpdater/DataUpdater";
 import SaveModal from "../components/popups/SaveModal";
+import ErrorBoundary from "../src/utils/ErrorBoundary";
 
 // Services
 import { logUserProgress } from "../src/services/StatsService";
-import ErrorBoundary from "../src/utils/ErrorBoundary";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |

@@ -1,5 +1,5 @@
 import api from "../config/api";
-import { getAmountItems, getCurrentDateString, valueOrDefault } from "./utils/Utils";
+import { getAmountItems } from "./utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 
 export class Provider {
@@ -157,7 +157,7 @@ export class Provider {
             this.dataFetched = false;
           }
       }).catch((err)=>{
-        throw err;
+        throw Error(err.message);
       });
     }
 

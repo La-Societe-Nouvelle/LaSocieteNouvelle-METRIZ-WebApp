@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // Imports
-import { getAmountItems, getCurrentDateString, getDatesEndMonths, getPrevDate, roundValue } from '../utils/Utils';
+import { getAmountItems, getDatesEndMonths, getPrevDate, roundValue } from '../utils/Utils';
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
 // API url
@@ -135,7 +135,7 @@ export class Stock {
           throw res.data.header.message;
         }
       }).catch((err)=>{
-        throw err;
+        throw Error(err.message);
       });
   }
 

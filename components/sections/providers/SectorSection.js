@@ -9,13 +9,13 @@ import { ProgressBar } from "../../popups/ProgressBar";
 
 // Readers
 import { Container } from "react-bootstrap";
-import { ErrorApi } from "../../ErrorAPI";
 
 // Formulas
 import { getSignificativeUnidentifiedProviders } from "/src/formulas/significativeLimitFormulas";
 
 // API
 import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
+import { ErrorAPIModal } from "../../popups/MessagePopup";
 
 /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- PROVIDERS SECTION - IDENTIFIED PROVIDERS -------------------------------------------------- */
@@ -81,74 +81,125 @@ export class SectorSection extends React.Component
         <section className="step">
           <div className="section-title mb-3">
             <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
-            <h3 className=" mb-4 ">Synchronisation des données grâce au secteur d'activité</h3>
+            <h3 className=" mb-4 ">
+              Synchronisation des données grâce au secteur d'activité
+            </h3>
           </div>
           <div className="step 3">
             <div className="table-container">
               <div className="table-data table-company">
                 {/* ------------------------- Messages ------------------------- */}
                 {/* ---------- Show error popup ---------- */}
-                {error && 
-                  <ErrorApi />
-                }
+                <ErrorAPIModal
+                  hasError={error}
+                  onClose={() => this.setState({ error: false })}
+                ></ErrorAPIModal>
                 {/* ---------- Show message next step available ---------- */}
-                {(!error && isNextStepAvailable) &&
+                {!error && isNextStepAvailable && (
                   <div className="alert alert-success">
-                    <p><i className="bi bi-check2-all"></i> Tous les comptes ont bien été synchronisés.</p>
+                    <p>
+                      <i className="bi bi-check2-all"></i> Tous les comptes ont
+                      bien été synchronisés.
+                    </p>
                   </div>
-                }
+                )}
                 {/* ---------- Show message missing data ---------- */}
-                {(!error && !isNextStepAvailable) &&
+                {!error && !isNextStepAvailable && (
                   <div className="alert alert-info">
-                    <p><i className="bi bi bi-exclamation-circle"></i> Les empreintes de certains comptes doivent être synchronisées.</p>
-                    <button className={"btn btn-secondary"}
-                      onClick={() => this.synchroniseProviders()}>
-                      <i className="bi bi-arrow-repeat"></i> Synchroniser les données
+                    <p>
+                      <i className="bi bi bi-exclamation-circle"></i> Les
+                      empreintes de certains comptes doivent être synchronisées.
+                    </p>
+                    <button
+                      className={"btn btn-secondary"}
+                      onClick={() => this.synchroniseProviders()}
+                    >
+                      <i className="bi bi-arrow-repeat"></i> Synchroniser les
+                      données
                     </button>
                   </div>
-                }
+                )}
                 {/* ---------- Show message significative accounts have default activity ---------- */}
-                {someSignificativeProvidersWithoutActivity &&
-                  <div className="alert alert-warning"> 
-                    <p><i className="bi bi-exclamation-triangle"></i> Grand risque d'imprécision pour les comptes significatifs qui ne sont pas reliés à un secteur d'activité.</p>
+                {someSignificativeProvidersWithoutActivity && (
+                  <div className="alert alert-warning">
+                    <p>
+                      <i className="bi bi-exclamation-triangle"></i> Grand
+                      risque d'imprécision pour les comptes significatifs qui ne
+                      sont pas reliés à un secteur d'activité.
+                    </p>
                     <button
                       className={"btn btn-warning"}
                       value="significative"
-                      onClick={() => this.setState({view: "significativeWithoutActivity"})}>
-                      Afficher les comptes significatifs sans secteur ({nbSignificativeProvidersWithoutActivity} compte{nbSignificativeProvidersWithoutActivity > 1 ? "s" : ""})
+                      onClick={() =>
+                        this.setState({ view: "significativeWithoutActivity" })
+                      }
+                    >
+                      Afficher les comptes significatifs sans secteur (
+                      {nbSignificativeProvidersWithoutActivity} compte
+                      {nbSignificativeProvidersWithoutActivity > 1 ? "s" : ""})
                     </button>
-                  </div>}
-                
+                  </div>
+                )}
+
                 {/* ------------------------- Head ------------------------- */}
                 <div className="pagination mb-3">
                   <div className="form-group">
                     <select
                       className="form-select"
                       value={view}
-                      onChange={(event) => this.setState({view: event.target.value})}>
-                      <option key="1" value="">Tous les comptes (sans siren)</option>
-                      <option key="2" value="aux">Comptes fournisseurs uniquement</option>
-                      <option key="3" value="expenses">Autres comptes tiers</option>
-                      <option key="4" value="significative">Comptes significatifs</option>
-                      <option key="5" value="defaultActivity">Comptes tiers non rattachés à un secteur d'activité</option>
-                      {someSignificativeProvidersWithoutActivity && <option key="6" value="significativeWithoutActivity">Comptes significatifs non rattachés à un secteur d'activité</option>}
+                      onChange={(event) =>
+                        this.setState({ view: event.target.value })
+                      }
+                    >
+                      <option key="1" value="">
+                        Tous les comptes (sans siren)
+                      </option>
+                      <option key="2" value="aux">
+                        Comptes fournisseurs uniquement
+                      </option>
+                      <option key="3" value="expenses">
+                        Autres comptes tiers
+                      </option>
+                      <option key="4" value="significative">
+                        Comptes significatifs
+                      </option>
+                      <option key="5" value="defaultActivity">
+                        Comptes tiers non rattachés à un secteur d'activité
+                      </option>
+                      {someSignificativeProvidersWithoutActivity && (
+                        <option key="6" value="significativeWithoutActivity">
+                          Comptes significatifs non rattachés à un secteur
+                          d'activité
+                        </option>
+                      )}
                     </select>
                   </div>
                   <div className="form-group">
                     <select
                       className="form-select"
                       value={nbItems}
-                      onChange={this.changeNbItems}>
-                      <option key="1" value="20">20 fournisseurs par page</option>
-                      <option key="2" value="50">50 fournisseurs par page</option>
-                      <option key="3" value="all">Afficher tous les fournisseurs</option>
+                      onChange={this.changeNbItems}
+                    >
+                      <option key="1" value="20">
+                        20 fournisseurs par page
+                      </option>
+                      <option key="2" value="50">
+                        50 fournisseurs par page
+                      </option>
+                      <option key="3" value="all">
+                        Afficher tous les fournisseurs
+                      </option>
                     </select>
                   </div>
                 </div>
 
                 {/* ------------------------- Table ------------------------- */}
                 <UnidentifiedCompaniesTable
-                  nbItems={nbItems == "all" ? unidentifiedProviders.length : parseInt(nbItems)}
+                  nbItems={
+                    nbItems == "all"
+                      ? unidentifiedProviders.length
+                      : parseInt(nbItems)
+                  }
                   providers={showedProviders}
                   significativeProviders={significativeProviders}
                   financialPeriod={financialPeriod}
@@ -158,28 +209,30 @@ export class SectorSection extends React.Component
             </div>
 
             {/* ------------------------- Progress bar ------------------------- */}
-            {fetching &&
+            {fetching && (
               <div className="popup">
                 <ProgressBar
                   message="Récupération des données fournisseurs..."
-                  progression={progression}/>
+                  progression={progression}
+                />
               </div>
-            }
-
+            )}
           </div>
 
           {/* ------------------------- Footer ------------------------- */}
           <div className="text-end">
             <button
               className={"btn btn-primary me-2"}
-              onClick={this.props.prevStep}>
+              onClick={this.props.prevStep}
+            >
               <i className="bi bi-chevron-left"></i>Numéros de Siren
             </button>
             <button
               className={"btn btn-secondary"}
               id="validation-button"
               disabled={!isNextStepAvailable}
-              onClick={this.props.nextStep}>
+              onClick={this.props.nextStep}
+            >
               Mesurer l'impact <i className="bi bi-chevron-right"></i>
             </button>
           </div>

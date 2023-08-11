@@ -10,13 +10,9 @@ import { ProgressBar } from "../popups/ProgressBar";
 
 import { updateVersion } from "../../src/version/updateVersion";
 import { Container } from "react-bootstrap";
-import { ErrorApi } from "../ErrorAPI";
 import { getPrevDate } from "../../src/utils/Utils";
 import { Session } from "../../src/Session";
-import {
-  ErrorFileModal,
-  SuccessFileModal
-} from "../popups/MessagePopup";
+import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../popups/MessagePopup";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -125,6 +121,10 @@ export class InitialStatesSection extends React.Component {
                 onClose={() => this.setState({ popupError: false })}
               />
             )}
+            <ErrorAPIModal
+              hasError={error}
+              onClose={() => this.setState({ error: false })}
+            ></ErrorAPIModal>
           </div>
           <div className="step p-4 my-3">
             <h3 className="mb-3"> Initialiser les états initiaux </h3>
@@ -143,7 +143,6 @@ export class InitialStatesSection extends React.Component {
               </p>
             </div>
 
-            {error && <ErrorApi />}
             {!isNextStepAvailable ? (
               <div className="alert alert-info">
                 <p>
@@ -399,13 +398,22 @@ export class InitialStatesSection extends React.Component {
             "Les données de l'exercice précédent ont été ajoutées avec succès. Les valeurs des indicateurs de stocks, immobilisations et amortissements en fin d'exercice vont être prises en compte pour l'exercice en cours.",
         });
       } catch (error) {
-        console.log(error);
-        this.setState({
-          titlePopup: "Erreur - Fichier",
-          message:
-            "Fichier non lisible. Veuillez vérifier le fichier et réessayer",
-          popupError: true,
-        });
+
+        if(error.message == "Network Error") {
+          this.setState({
+            error : true
+          });
+        }
+        else{
+          this.setState({
+            titlePopup: "Erreur - Fichier",
+            message:
+              "Oops ! Quelque chose s'est mal passé lors de l'import de la sauvegarde. "+
+              "Veuillez vérifier le fichier et réessayer.",
+            popupError: true,
+          });
+        }
+       
       }
     };
 

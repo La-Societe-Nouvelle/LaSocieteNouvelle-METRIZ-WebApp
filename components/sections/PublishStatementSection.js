@@ -1,6 +1,6 @@
 // La Société Nouvelle
 import React, { useState } from "react";
-import { Container, Table, Form, Row, Col, Image } from "react-bootstrap";
+import { Container, Table, Form, Row, Col } from "react-bootstrap";
 
 import api from "../../config/api";
 
@@ -147,7 +147,7 @@ const PublishStatementSection = ({ session }) => {
     }
   };
 
-  const checkSirenValidity = (siren) => {
+  const checkSirenValidity = async(siren) => {
     return api
       .get("legalunit/" + siren)
       .then((res) => {

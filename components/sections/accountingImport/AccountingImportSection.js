@@ -17,7 +17,7 @@ import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
 
 // Modals
 import ErrorReportModal from "../../popups/ErrorReportModal";
-import { ErrorFileModal } from "../../popups/MessagePopup";
+import { ErrorAPIModal, ErrorFileModal } from "../../popups/MessagePopup";
 
 const AccountingImportSection = (props) => {
   const { session } = props;
@@ -38,6 +38,7 @@ const AccountingImportSection = (props) => {
   const [errorFile, setErrorFile] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
+  const [errorAPI, setErrorAPI] = useState(false);
 
   const handleCorporateName = (corporateName) => {
     session.legalUnit.corporateName = corporateName;
@@ -45,20 +46,26 @@ const AccountingImportSection = (props) => {
   };
 
   const handleSiren = async (siren) => {
+    setSiren(siren);
+  
     if (
       siren !== "" &&
       /^[0-9]{9}$/.test(siren) &&
       /^[^a-zA-Z]+$/.test(siren)
     ) {
-      await session.legalUnit.setSiren(siren);
-      const divisionCode = session.legalUnit.activityCode.slice(0, 2);
-      session.comparativeData.activityCode = divisionCode;
-      console.log(divisionCode);
-      setSelectedDivision(divisionCode);
-      setCorporateName(session.legalUnit.corporateName);
+      try {
+        await session.legalUnit.setSiren(siren);
+        const divisionCode = session.legalUnit.activityCode.slice(0, 2);
+        session.comparativeData.activityCode = divisionCode;
+        setSelectedDivision(divisionCode);
+        setCorporateName(session.legalUnit.corporateName);
+      } catch (error) {
+        setErrorAPI(true);
+
+      }
     }
-    setSiren(siren);
   };
+  
   const handleDivision = (division) => {
     session.legalUnit.activityCode = division;
     session.comparativeData.activityCode = division;
@@ -202,6 +209,13 @@ const AccountingImportSection = (props) => {
             />
           )
         }
+
+        <ErrorAPIModal
+        hasError = {errorAPI}
+                    onClose={() => setErrorAPI(false)}
+
+        ></ErrorAPIModal>
+
         {view === 1 && (
           <FECImport
             return={() => setView(0)}

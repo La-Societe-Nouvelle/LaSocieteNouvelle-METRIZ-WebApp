@@ -5,7 +5,7 @@ import api from "../../config/api";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 // Utils
-import { getAmountItems, getCurrentDateString, getDatesEndMonths, getNbDaysBetweenDates, getNewId, getPrevDate, getSumItems, roundValue } from "../utils/Utils";
+import { getAmountItems, getDatesEndMonths, getNbDaysBetweenDates, getPrevDate, getSumItems, roundValue } from "../utils/Utils";
 import { AmortisationExpense } from "./AmortisationExpense";
 
 export class Immobilisation 
@@ -144,7 +144,7 @@ export class Immobilisation
           throw res.data.header.message;
         }
       }).catch((err)=>{
-        throw err;
+        throw Error(err.message);
       });
   }
 

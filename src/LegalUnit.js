@@ -2,6 +2,7 @@
 
 import api from "../config/api";
 
+
 /* ---------- LEGAL UNIT DATA ---------- */
 export class LegalUnit {
   constructor(props) {
@@ -31,7 +32,6 @@ export class LegalUnit {
   setSiren = async (siren) => {
     this.siren = siren;
     this.dataFetched = null;
-    // Fetch data
     await this.fetchLegalUnitData();
   };
 
@@ -43,7 +43,6 @@ export class LegalUnit {
       // request
       await api.get("legalunitfootprint/" + this.siren).then((res) => {
         let status = res.data.header.code;
-
         if (status == 200) {
           this.corporateName = res.data.legalUnit.denomination;
           this.corporateHeadquarters =
@@ -72,6 +71,8 @@ export class LegalUnit {
           this.hasCraftedActivities = null;
           this.siren = null;
         }
+      }).catch(error => {
+        throw Error(error.message)      
       });
     
   };

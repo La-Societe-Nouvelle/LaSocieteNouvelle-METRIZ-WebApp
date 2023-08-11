@@ -11,9 +11,8 @@ import { XLSXFileReader } from "/src/readers/XLSXReader";
 
 // Components
 import { ProgressBar } from "../../popups/ProgressBar";
-import { SuccessFileModal } from "../../popups/MessagePopup";
+import { ErrorAPIModal, SuccessFileModal } from "../../popups/MessagePopup";
 import { Container } from "react-bootstrap";
-import { ErrorApi } from "../../ErrorAPI";
 
 // Formulas
 import { getSignificativeProviders } from "/src/formulas/significativeLimitFormulas";
@@ -217,7 +216,7 @@ export class SirenSection extends React.Component {
             )}
             {popup && (
               <SuccessFileModal
-              title={"Import des fournisseurs"}
+                title={"Import des fournisseurs"}
                 message="Vous pouvez maintenant synchroniser les
                 données des fournisseurs."
                 closePopup={() => this.closePopup()}
@@ -263,11 +262,18 @@ export class SirenSection extends React.Component {
 
             <div className="table-container">
               <div className="table-data table-company">
-                {error && <ErrorApi />}
-                {providers.some(provider => provider.footprintStatus == 404) && (
+                <ErrorAPIModal
+                  hasError={error}
+                  onClose={() => this.setState({ error: false })}
+                ></ErrorAPIModal>
+
+                {providers.some(
+                  (provider) => provider.footprintStatus == 404
+                ) && (
                   <div className="alert alert-danger">
                     <p>
-                      <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont pas pu être synchroniser. Vérifiez le numéro de siren et
+                      <i className="bi bi-x-lg me-2"></i> Certains comptes n'ont
+                      pas pu être synchroniser. Vérifiez le numéro de siren et
                       resynchronisez les données.
                     </p>
                     <button
@@ -282,10 +288,12 @@ export class SirenSection extends React.Component {
                 {isNextStepAvailable ? (
                   <div className="alert alert-success">
                     <p>
-                      <i className="bi bi-check2 me-2"></i> Tous les comptes ayant un
-                      n° de Siren ont bien été synchronisés.
+                      <i className="bi bi-check2 me-2"></i> Tous les comptes
+                      ayant un n° de Siren ont bien été synchronisés.
                     </p>
-                    {providers.some((provider) => provider.useDefaultFootprint) && (
+                    {providers.some(
+                      (provider) => provider.useDefaultFootprint
+                    ) && (
                       <button
                         onClick={this.changeView}
                         value="undefined"
@@ -610,8 +618,7 @@ export class SirenSection extends React.Component {
               }
             })
             .catch((err) => {
-              console.log(err);
-              //throw err;
+              this.setState({ error:true });
             });
           // fetch data
           invoicesProviders[idProvider] = {
@@ -763,7 +770,6 @@ export class SirenSection extends React.Component {
             expense.footprint = provider.footprint;
           });
       } catch (error) {
-        console.log(error);
         this.setState({ error: true });
         break;
       }

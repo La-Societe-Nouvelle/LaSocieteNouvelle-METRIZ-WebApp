@@ -20,8 +20,7 @@ export async function fetchMacrodata(dataset, activityCodes, indicators) {
       return null;
     }
   } catch (error) {
-    console.error(error);
-    return null;
+    throw Error(error.message)
   }
 }
 
