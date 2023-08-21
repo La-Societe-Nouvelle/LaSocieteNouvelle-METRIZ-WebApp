@@ -68,23 +68,6 @@ const Results = ({ session, publish, goBack }) =>
   const [isGenerating, setIsGenerating] = useState(false); // building files
   const [isLoading, setIsLoading] = useState(false); // fetching data
 
-  // useEffect(async () => 
-  // {
-  //   if (session.comparativeData.activityCode !== comparativeDivision) 
-  //   {
-  //     setIsLoading(true);
-
-  //     // fetch data
-  //     session.comparativeData.activityCode = comparativeDivision;
-  //     await fetchComparativeData(
-  //       session.comparativeData,
-  //       session.validations[period.periodKey]
-  //     );
-
-  //     setIsLoading(false);
-  //   }
-  // }, [comparativeDivision]);
-
   const handleDivisionChange = async (selectedOption) => {
     const division = selectedOption.value;
     if (division!=comparativeDivision) 
@@ -176,7 +159,6 @@ const Results = ({ session, publish, goBack }) =>
               onDownload={handleDownload}
               view={showedView}
             />
-
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
             </Button>
@@ -210,11 +192,11 @@ const Results = ({ session, publish, goBack }) =>
             </div>
           </Col>
         </Row>
+
         <div className="d-flex align-items-center ">
           <p className="fw-bold col-form-label me-2 mb-0 ">
             Branche de comparaison :
           </p>
-
           <Form className="flex-grow-1">
             <Form.Group
               as={Row}
@@ -229,8 +211,7 @@ const Results = ({ session, publish, goBack }) =>
                     IndicatorSeparator: () => null,
                   }}
                   value={{
-                    label:
-                      comparativeDivision + " - " + divisions[comparativeDivision],
+                    label: comparativeDivision + " - " + divisions[comparativeDivision],
                     value: comparativeDivision,
                   }}
                   placeholder="Choisissez une division"
@@ -244,7 +225,6 @@ const Results = ({ session, publish, goBack }) =>
           <p className="fw-bold col-form-label me-2 mb-0 ">
             Période :
           </p>
-
           <Form className="flex-grow-1">
             <Form.Group
               as={Row}
@@ -266,7 +246,7 @@ const Results = ({ session, publish, goBack }) =>
                     label: period.periodKey,
                     value: period.periodKey,
                   }}
-                  //placeholder="Choisissez une division"
+                  placeholder="Choisissez une division"
                   onChange={handlePeriodChange}
                   isDisabled={session.availablePeriods.length<=1}
                 />
@@ -401,21 +381,21 @@ const buildViewDataFile = async (props) =>
 }
 
 const getViewLabel = (viewCode) =>
-  {
-    if (viewCode) {
-      let labelMenu = (
-        <>
-          {viewsData.views[viewCode].icon && (
-            <Image
-              className="me-2"
-              src={viewsData.views[viewCode].icon}
-              height={25}
-            />
-          )}
-          {viewsData.views[viewCode].label}
-        </>);
-      return labelMenu;
-    } else {
-      return null;
-    }
+{
+  if (viewCode) {
+    let labelMenu = (
+      <>
+        {viewsData.views[viewCode].icon && (
+          <Image
+            className="me-2"
+            src={viewsData.views[viewCode].icon}
+            height={25}
+          />
+        )}
+        {viewsData.views[viewCode].label}
+      </>);
+    return labelMenu;
+  } else {
+    return null;
   }
+}

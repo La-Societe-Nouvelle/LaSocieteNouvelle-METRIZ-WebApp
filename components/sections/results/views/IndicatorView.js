@@ -13,7 +13,7 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 import Analyse from "../components/AnalyseNote";
 import ComparativeDataContainer from "../components/ComparativeDataContainer";
 import SigFootprintsContainer from "../components/SigFootprintsContainer";
-import TrendContainer from "../components/TrendContainer";
+import { EvolutionCurvesContainer } from "../components/EvolutionCurvesContainer";
 
 // Lib
 import indicators from "/lib/indics";
@@ -186,12 +186,10 @@ export const IndicatorView = ({
       </div>
 
       {/* ---------- Trend Line Chart ----------  */}
-      <TrendContainer
-        aggregates={financialData.mainAggregates}
-        comparativeData={comparativeData}
+      <EvolutionCurvesContainer
+        session={session}
+        period={period}
         indic={indic}
-        unit={metaIndic.unit}
-        division={session.comparativeData.activityCode}
       />
 
       {/* ---------- Analyse Note  ----------  */}
