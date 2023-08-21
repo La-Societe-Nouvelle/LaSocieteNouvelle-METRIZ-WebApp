@@ -270,13 +270,18 @@ class Metriz extends React.Component {
       this.setStep(3);
       this.updateProgression(2);
     }
-    await logUserProgress(this.state.session.id, 1, this.state.date, []);
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(this.state.session.id, 1, this.state.date, []);
+    }
   };
 
   validInitialStates = async () => {
     this.setStep(3);
     this.updateProgression(2);
-    await logUserProgress(this.state.session.id, 2, this.state.date, []);
+
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(this.state.session.id, 2, this.state.date, []);
+    }
   };
 
   validProviders = async () => {
@@ -288,7 +293,9 @@ class Metriz extends React.Component {
     this.setStep(4);
     this.updateProgression(3);
 
-    await logUserProgress(this.state.session.id, 3, this.state.date, []);
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(this.state.session.id, 3, this.state.date, []);
+    }
   };
   validStatements = async () => {
     this.setStep(5);
@@ -297,12 +304,14 @@ class Metriz extends React.Component {
     this.updateProgression(4);
 
     const financialPeriod = this.state.session.financialPeriod.periodKey;
-    await logUserProgress(
-      this.state.session.id,
-      4,
-      this.state.date,
-      this.state.session.validations[financialPeriod]
-    );
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(
+        this.state.session.id,
+        4,
+        this.state.date,
+        this.state.session.validations[financialPeriod]
+      );
+    }
   };
 
   updateProgression = (step) => {
