@@ -1,24 +1,72 @@
+// La Société Nouvelle
+
 import React from "react";
 import { Row } from "react-bootstrap";
+
+// Lib
 import indicators from "/lib/indics";
 
+// Charts
 import ComparativeChart from "../charts/ComparativeChart";
 import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
 import DeviationChart from "../charts/HorizontalBarChart";
+
 import { printValue } from "../../../../src/utils/Utils";
 import GrossImpactChart from "../charts/GrossImpactChart";
 import { getClosestYearData } from "../utils";
 
+/* ---------- CHARTS CONTAINER ---------- */
+
+/** Container for charts
+ *  
+ *  Props :
+ *    - session
+ *    - period
+ * 
+ *  Build charts for all indicators (to use in report)
+ */
+
 export const ChartsContainer = ({
-  indic,
-  comparativeData,
-  mainAggregates,
+  session,
   period,
-  prevPeriod,
 }) => {
+  return (
+    <>
+      {session.validations[period.periodKey].map(
+        (indic) => 
+        (
+          <div key={indic}>
+            <IndicatorCharts
+              session={session}
+              period={session.financialPeriod}
+              indic={indic}
+            />
+          </div>
+        )
+      )}
+    </>
+  );
+}
+
+const IndicatorCharts = ({
+  session,
+  period,
+  indic
+}) => {
+
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
   const year = period.periodKey.slice(2);
   // Define the aggregates and their corresponding titles
+  const mainAggregates = financialData.mainAggregates;
   const aggregates = {
     production: "Production",
     intermediateConsumptions: "Consommations intermédiaires",
@@ -192,7 +240,7 @@ export const ChartsContainer = ({
       )}
     </div>
   );
-};
+}
 
 const renderComparativeCharts = (
   chartId,

@@ -26,7 +26,7 @@ import { customSelectStyles } from "../../../config/customStyles";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
 import { getPrevDate } from "../../../src/utils/Utils";
-import { buildFullFile, generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
+import { buildFullFile } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
 import DownloadDropdown from "./components/DownloadDropdown";
 import { ChartsContainer } from "./components/ChartsContainer";
@@ -323,28 +323,20 @@ const Results = ({ session, publish, goBack }) =>
         session={session}
       />
 
-      {comparativeDivision != "00" && !isLoading && (
-        <>
-          {session.validations[session.financialPeriod.periodKey].map(
-            (indic) => (
-              <div key={indic}>
-                <ChartsContainer
-                  indic={indic}
-                  comparativeData={session.comparativeData}
-                  mainAggregates={session.financialData.mainAggregates}
-                  period={session.financialPeriod}
-                  prevPeriod={prevPeriod}
-                />
-              </div>
-            )
-          )}
-        </>
+      {(comparativeDivision!="00" && !isLoading) && (
+        <ChartsContainer
+          session={session}
+          period={session.financialPeriod}
+        />
       )}
 
-      {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
+      {isGenerating && (
+        <Loader title={"Génération du dossier en cours ..."} />
+      )}
       {isLoading && (
         <Loader title={"Récupération des données de comparaison ..."} />
       )}
+
       <div className=" text-end">
         <Button onClick={goBack} className="mb-4">
           <i className="bi bi-chevron-left"></i> Retour aux déclarations
