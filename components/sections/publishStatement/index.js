@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Container, Table, Form, Row, Col } from "react-bootstrap";
 
-import api from "../../config/api";
+import api from "../../../config/api";
 
 // Api
 import {
@@ -16,9 +16,9 @@ import {
 import {
   exportStatementPDF,
   getBinaryPDF,
-} from "../../src/writers/StatementWriter";
+} from "../../../src/writers/StatementWriter";
 
-import { printValue } from "../../src/utils/Utils";
+import { printValue } from "../../../src/utils/Utils";
 
 // Libraries
 import metaIndics from "/lib/indics";
