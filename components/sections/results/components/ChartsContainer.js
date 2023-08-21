@@ -60,6 +60,7 @@ const IndicatorCharts = ({
     comparativeData
   } = session;
 
+  const prevDateEnd = period.dateEnd;
   const prevPeriod = session.availablePeriods.find(
     (period) => period.dateEnd == prevDateEnd
   );

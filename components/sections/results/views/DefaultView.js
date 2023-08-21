@@ -85,87 +85,105 @@ export const DefaultView = ({
   
 
   return (
-    <Row>
-      {showEnvironmentalChart && (
-        <Col lg={6}>
-          <div className="box">
+    <>
+      {/* <div className="box">
+        <Nav variant="underline" defaultActiveKey="/home">
+          <Nav.Item>
+            <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
+          </Nav.Item>
+        </Nav>
+      </div> */}
+      <Row>
+        {showEnvironmentalChart && (
+          <Col lg={6}>
+            <div className="box">
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h3 className="mb-0">Empreinte environnementale</h3>
+                <Button
+                  className="btn-light btn-rounded"
+                  size="sm"
+                  onClick={() =>
+                    downloadChartImage(
+                      "environmentalChart",
+                      "empreinte_environnementale.png"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i>
+                </Button>
+              </div>
+              <RadarChart
+                labels={environnementalIndic}
+                divisionFootprint={divisionEnvironmentalFootprint}
+                productionFootprint={environmentalFootprint}
+              />
+            </div>
+          </Col>
+        )}
+        {showProportionalChart && (
+          <Col lg={6}>
+            <div className="box">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="mb-0">Empreinte environnementale</h3>
-              <Button
-                className="btn-light btn-rounded"
-                size="sm"
-                onClick={() =>
-                  downloadChartImage(
-                    "environmentalChart",
-                    "empreinte_environnementale.png"
-                  )
-                }
-              >
-                <i className="bi bi-download"></i>
-              </Button>
-            </div>
-            <RadarChart
-              labels={environnementalIndic}
-              divisionFootprint={divisionEnvironmentalFootprint}
-              productionFootprint={environmentalFootprint}
-            />
-          </div>
-        </Col>
-      )}
-      {showProportionalChart && (
-        <Col lg={6}>
-          <div className="box">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="mb-0">Empreinte économique</h3>
-              <Button
-                className="btn-light btn-rounded"
-                size="sm"
-                onClick={() =>
-                  downloadChartImage(
-                    "proportionalChart",
-                    "empreinte_economique.png"
-                  )
-                }
-              >
-                <i className="bi bi-download"></i>
-              </Button>
-            </div>
-  
-            <ProportionalRingChart
-              metaIndicators={proportionsIndicsMeta}
-              productionFootprint={proportionFootprint}
-              divisionFootprint={proportionDivisionFootprint}
-            />
-          </div>
-        </Col>
-      )}
-      {showSocialChart && (
-        <Col lg={6}>
-          <div className="box">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-              <h3 className="mb-0">Empreinte sociale</h3>
-              <Button
-                className="btn-light btn-rounded"
-                size="sm"
-                onClick={() =>
-                  downloadChartImage(
-                    "socialChart",
-                    "empreinte_sociale.png"
-                  )
-                }
-              >
-                <i className="bi bi-download"></i>
-              </Button>
-            </div>
+                <h3 className="mb-0">Empreinte économique</h3>
+                <Button
+                  className="btn-light btn-rounded"
+                  size="sm"
+                  onClick={() =>
+                    downloadChartImage(
+                      "proportionalChart",
+                      "empreinte_economique.png"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i>
+                </Button>
+              </div>
     
-            <SocialBarChart
-              metaIndicators={socialIndic}
-              productionFootprint={socialFootprint}
-              divisionFootprint={divisionSocialFootprint}
-            />
-          </div>
-        </Col>
-      )}
-    </Row>
+              <ProportionalRingChart
+                metaIndicators={proportionsIndicsMeta}
+                productionFootprint={proportionFootprint}
+                divisionFootprint={proportionDivisionFootprint}
+              />
+            </div>
+          </Col>
+        )}
+        {showSocialChart && (
+          <Col lg={6}>
+            <div className="box">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h3 className="mb-0">Empreinte sociale</h3>
+                <Button
+                  className="btn-light btn-rounded"
+                  size="sm"
+                  onClick={() =>
+                    downloadChartImage(
+                      "socialChart",
+                      "empreinte_sociale.png"
+                    )
+                  }
+                >
+                  <i className="bi bi-download"></i>
+                </Button>
+              </div>
+      
+              <SocialBarChart
+                metaIndicators={socialIndic}
+                productionFootprint={socialFootprint}
+                divisionFootprint={divisionSocialFootprint}
+              />
+            </div>
+          </Col>
+        )}
+      </Row>
+    </>
   );
 }

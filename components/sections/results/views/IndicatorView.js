@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Col, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs, Nav } from "react-bootstrap";
 
 // Tables
 import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
@@ -65,6 +65,23 @@ export const IndicatorView = ({
 
   return (
     <>
+      {/* Menu */}
+      <div className="box">
+        <Nav variant="underline" defaultActiveKey="/home">
+          <Nav.Item>
+            <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
+          </Nav.Item>
+        </Nav>
+      </div>
       {/* SIG and external expenses table */}
       <Row>
         <Col>

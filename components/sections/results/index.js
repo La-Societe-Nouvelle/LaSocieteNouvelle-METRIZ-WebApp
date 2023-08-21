@@ -50,87 +50,70 @@ const divisionsOptions = Object.entries(divisions)
  *    - publish (?)
  *    - goBack (?)
  * 
+ *  Params :
+ *    - comparative division
+ *    - period
+ *    - view
+ * 
  */
 
 const Results = ({ session, publish, goBack }) => 
 {
-  const [comparativeDivision, setComparativeDivision] = useState(
-    session.comparativeData.activityCode
-  );
-
+  // Selections
+  const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
+  const [period, setPeriod] = useState(session.financialPeriod);
   const [showedView, setShowedView] = useState("default");
-  const [financialPeriod, setFinancialPeriod] = useState(session.financialPeriod.periodKey);
 
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  // temp state
+  const [isGenerating, setIsGenerating] = useState(false); // building files
+  const [isLoading, setIsLoading] = useState(false); // fetching data
 
-  const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
+  // useEffect(async () => 
+  // {
+  //   if (session.comparativeData.activityCode !== comparativeDivision) 
+  //   {
+  //     setIsLoading(true);
 
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
+  //     // fetch data
+  //     session.comparativeData.activityCode = comparativeDivision;
+  //     await fetchComparativeData(
+  //       session.comparativeData,
+  //       session.validations[period.periodKey]
+  //     );
 
-  //
-  useEffect(() => 
-  {
-    if (session.comparativeData.activityCode !== comparativeDivision) {
-      let isCancelled = false;
-      setIsLoading(true);
+  //     setIsLoading(false);
+  //   }
+  // }, [comparativeDivision]);
 
-      const fetchData = async () => {
-        session.comparativeData.activityCode = comparativeDivision;
-        await fetchComparativeData(
-          session.comparativeData,
-          session.validations[session.financialPeriod.periodKey]
-        );
-
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-      };
-
-      fetchData();
-
-      return () => {
-        isCancelled = true;
-      };
-    }
-  }, [comparativeDivision]);
-
-  const handleDivisionChange = (selectedOption) => {
+  const handleDivisionChange = async (selectedOption) => {
     const division = selectedOption.value;
-    setIsLoading(true);
-    setComparativeDivision(division);
-    // change in graphics ? in session ?
-  };
-
-  const getViewLabel = (viewCode) =>
-  {
-    if (viewCode) {
-      let labelMenu = (
-        <>
-          {viewsData.views[viewCode].icon && (
-            <Image
-              className="me-2"
-              src={viewsData.views[viewCode].icon}
-              height={25}
-            />
-          )}
-          {viewsData.views[viewCode].label}
-        </>);
-      return labelMenu;
-    } else {
-      return null;
+    if (division!=comparativeDivision) 
+    {
+      // update state
+      setComparativeDivision(division);
+      
+      // fetch data
+      setIsLoading(true);
+      session.comparativeData.activityCode = comparativeDivision;
+      await fetchComparativeData(
+        session.comparativeData,
+        session.validations[period.periodKey] // to update -> fetch data for all periods
+      );
+      setIsLoading(false);
     }
-  }
-
-  const handleIndicatorChange = (code) => 
-  {
-    setShowedView(code);
   };
 
-  const handleDownload = async (selectedFiles) => 
-  {
+  const handlePeriodChange = (selectedPeriod) => {
+    const period = selectedPeriod.value;
+    setPeriod(period);
+  };
+
+  const handleViewChange = (viewCode) => {
+    setShowedView(viewCode);
+  };
+
+  const handleDownload = async (selectedFiles) => {
+
     setIsGenerating(true);
 
     // Download .zip files
@@ -140,7 +123,6 @@ const Results = ({ session, publish, goBack }) =>
         period
       });
       saveAs(ZIPFile, `${documentTitle}.zip`);
-      setIsGenerating(false);
     }
 
     else if (selectedFiles.length>0) {
@@ -180,6 +162,8 @@ const Results = ({ session, publish, goBack }) =>
       downloadLink.click();
       URL.revokeObjectURL(pdfUrl);
     }
+
+    setIsGenerating(false);
   };
 
   return (
@@ -210,7 +194,7 @@ const Results = ({ session, publish, goBack }) =>
               </p>
               <p className="fw-bold col-form-label">
                 Année de l'exercice :{" "}
-                {session.financialPeriod.periodKey.slice(2)}
+                {period.periodKey.slice(2)}
               </p>
               {session.legalUnit.siren && (
                 <p className="fw-bold col-form-label">
@@ -256,6 +240,40 @@ const Results = ({ session, publish, goBack }) =>
             </Form.Group>
           </Form>
         </div>
+        <div className="d-flex align-items-center ">
+          <p className="fw-bold col-form-label me-2 mb-0 ">
+            Période :
+          </p>
+
+          <Form className="flex-grow-1">
+            <Form.Group
+              as={Row}
+              controlId="formComparativeDivision"
+              className="my-2"
+            >
+              <Col sm={8}>
+                <Select
+                  styles={customSelectStyles}
+                  options={session.availablePeriods.map((period) => {return({
+                      label: period.periodKey,
+                      value: period.periodKey,
+                    })})
+                  }
+                  // components={{
+                  //   IndicatorSeparator: () => null,
+                  // }}
+                  value={{
+                    label: period.periodKey,
+                    value: period.periodKey,
+                  }}
+                  //placeholder="Choisissez une division"
+                  onChange={handlePeriodChange}
+                  isDisabled={session.availablePeriods.length<=1}
+                />
+              </Col>
+            </Form.Group>
+          </Form>
+        </div>
 
         <div className="indic-result-menu mt-4">
           <div className="d-flex align-items-center justify-content-between">
@@ -267,26 +285,13 @@ const Results = ({ session, publish, goBack }) =>
               id="dropdown-indics-button"
               title={getViewLabel(showedView)}
               disabled={comparativeDivision == "00"}
-            >
-              {showedView && (
-                <Dropdown.Item
-                  onClick={() =>
-                    handleIndicatorChange(
-                      null,
-                      " Empreinte Sociale et environnementale"
-                    )
-                  }
-                >
-                  Empreinte Sociale et environnementale
-                </Dropdown.Item>
-              )}
-
+            >              
               {Object.entries(viewsData.views)
-                .filter(([_,view]) => view.validations.every(indic => session.validations[financialPeriod].includes(indic)))
+                .filter(([_,view]) => view.validations.every(indic => session.validations[period.periodKey].includes(indic)))
                 .filter(([code,_]) => code!=showedView)
                 .map(([code,view]) =>
                   <Dropdown.Item key={code}
-                                 onClick={() => handleIndicatorChange(code)}>
+                                 onClick={() => handleViewChange(code)}>
                     {view.icon && <Image className="me-2"
                            src={view.icon}
                            alt={code}
@@ -296,37 +301,20 @@ const Results = ({ session, publish, goBack }) =>
                 )
               }
             </DropdownButton>
-
-            {showedView && (
-              <Nav variant="underline" defaultActiveKey="/home">
-                <Nav.Item>
-                  <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
-                </Nav.Item>
-              </Nav>
-            )}
           </div>
         </div>
       </div>
 
       <View 
         viewCode={showedView}
-        period={session.financialPeriod}
+        period={period}
         session={session}
       />
 
       {(comparativeDivision!="00" && !isLoading) && (
         <ChartsContainer
           session={session}
-          period={session.financialPeriod}
+          period={period}
         />
       )}
 
@@ -411,3 +399,23 @@ const buildViewDataFile = async (props) =>
     default:          return (null);
   }
 }
+
+const getViewLabel = (viewCode) =>
+  {
+    if (viewCode) {
+      let labelMenu = (
+        <>
+          {viewsData.views[viewCode].icon && (
+            <Image
+              className="me-2"
+              src={viewsData.views[viewCode].icon}
+              height={25}
+            />
+          )}
+          {viewsData.views[viewCode].label}
+        </>);
+      return labelMenu;
+    } else {
+      return null;
+    }
+  }
