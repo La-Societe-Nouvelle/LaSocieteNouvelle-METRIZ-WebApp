@@ -1,8 +1,23 @@
+// La Société Nouvelle
+
 import api from "../config/api";
 import { getAmountItems } from "./utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 
-export class Provider {
+/** Provider - object
+ *  -> use to manage data about providers
+ * 
+ *  list of providers in FinancialData object
+ * 
+ *  Méthods :
+ *    - buildPeriods to get amount of expenses & investments on each period
+ *    - update to update props (as coporate id or default footprint params)
+ *    - updateFromRemote to fetch data from SINESE database and update data
+ *    - loadPrevProvider to merge data from previous backup
+ *    - getDefaultFootprintId to get SIREN from corporate id
+ */
+export class Provider 
+{
   constructor({
     id,
     isDefaultProviderAccount,
@@ -32,7 +47,7 @@ export class Provider {
     this.legalUnitData = legalUnitData || {};                       // data unité legale
 
     // Footprint
-    this.footprint = new SocialFootprint(footprint);
+    this.footprint = new SocialFootprint(footprint);                // social footprint
     this.useDefaultFootprint = useDefaultFootprint!=undefined ? useDefaultFootprint : true;         // true by default
     this.defaultFootprintParams = defaultFootprintParams || {       // paramètres (empreinte par défaut)
       area: "FRA",
@@ -44,7 +59,7 @@ export class Provider {
     this.dataFetched = dataFetched || false;                        // response received
     this.footprintStatus = footprintStatus || 0;                    // status response api
 
-    // periods data for amount (expenses & investments) ..no footprint
+    // periods data for amount (expenses & investments) / no footprint in object
     this.periodsData = periodsData || {};
 
     // ---------------------------------------------------------------------------------------------------- //
@@ -195,7 +210,8 @@ export class Provider {
     return;
   }
 
-  async loadPrevProvider(prevProvider) {
+  async loadPrevProvider(prevProvider) 
+  {
     this.corporateId = prevProvider.corporateId;
     this.footprintStatus = prevProvider.footprintStatus==200 ? 203 : prevProvider.footprintStatus;
     this.footprint =  new SocialFootprint(prevProvider.footprint) ;

@@ -15,7 +15,9 @@ import {
 /* ---------- IMMOBILISATIONS TABLE ---------- */
 
 export class AmortisationsTable extends React.Component {
-  constructor(props) {
+
+  constructor(props) 
+  {
     super(props);
     this.state = {
       columnSorted: "account",
@@ -23,9 +25,9 @@ export class AmortisationsTable extends React.Component {
     };
   }
 
-  render() {
-    const { immobilisations, amortisationExpenses } =
-      this.props.financialData;
+  render() 
+  {
+    const { immobilisations, amortisationExpenses } = this.props.financialData;
     const period = this.props.period;
     const prevStateDateEnd = getPrevDate(period.dateStart);
     const { columnSorted } = this.state;
