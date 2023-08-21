@@ -18,20 +18,27 @@ import {
   updateMainAggregatesFootprints,
   updateProductionItemsFootprints,
   updateIntermediateConsumptionsFootprints,
-  updateFixedCapitalConsumptionsFootprints,
+  updateFixedCapitalConsumptionsFootprints
 } from "./formulas/aggregatesFootprintFormulas";
-import { buildNetValueAddedIndicator } from "./formulas/netValueAddedFootprintFormulas";
+import { 
+  buildNetValueAddedIndicator 
+} from "./formulas/netValueAddedFootprintFormulas";
+
 import {
   getDatesEndMonths,
   getLastDateOfMonth,
-  getPrevDate,
+  getPrevDate
 } from "./utils/Utils";
+
 import { ComparativeData } from "./models/ComparativeData";
+import { getAnalysisFromChatGPT } from "./writers/analysis/analysis";
 
 /* ---------- OBJECT SESSION ---------- */
 
-export class Session {
-  constructor(props) {
+export class Session 
+{
+  constructor(props) 
+  {
     if (props == undefined) props = {};
     // ---------------------------------------------------------------------------------------------------- //
 
@@ -42,7 +49,6 @@ export class Session {
     this.progression = props.progression || 0;
 
     // Identifier
-
     this.id = props.id || "";
 
     // Year
@@ -87,6 +93,16 @@ export class Session {
     this.availablePeriods.forEach((period) => {
       this.indics[period.periodKey] = props.indics[period.periodKey] || [];
     });
+
+    // Analysis -> in footprint object ?
+    this.analaysis = {};
+    this.availablePeriods.forEach((period) => {
+      this.analaysis[period.periodKey] = {};
+      Object.keys(metaIndics)
+        .map((indic) => this.analaysis[period.periodKey][indic] = {
+          analysis: ""
+        });
+    });
   }
 
   addPeriods = (periods) => {
@@ -101,7 +117,8 @@ export class Session {
     });
   };
 
-  loadSessionFromBackup = (prevSession) => {
+  loadSessionFromBackup = (prevSession) => 
+  {
     // add previous periods
     this.addPeriods(prevSession.availablePeriods);
 
@@ -142,95 +159,128 @@ export class Session {
     else return 5;
   };
 
+  /* ---------------------------------------------------------------------------------------------------- */
   /* ---------------------------------------- FOOTPRINTS PROCESS ---------------------------------------- */
+  /* ---------------------------------------------------------------------------------------------------- */
 
   // Main footprints are stored in variables to avoid processing multiple times when render the results
   // ... and allows to have all the values directly in the json back up file
 
   // Update all footprints (after loading data : financial data, initial states, fetching companies data)
-  updateFootprints = async (period) => {
-    console.log(
-      "Mise à jour des empreintes pour la période : " + period.periodKey
-    );
+  // Fonction calls :
+  //    - Before accessing to the results
+  //    - When updating data after loading a backup file (to continue session)
+  //    - When updating data after loading a backup file (as initial states)
+
+  updateFootprints = async (period) => 
+  {
+    console.log("Mise à jour des empreintes pour la période : " + period.periodKey);
 
     // Net Value Added
     await this.updateNetValueAddedFootprint(period);
+    console.log(" Mise à jour de l'empreinte de la valeur ajoutée nette");
 
     // Intermediate Consumptions
     await updateIntermediateConsumptionsFootprints(this.financialData, period);
+    console.log(" Mise à jour de l'empreinte des consommations intermédiaires");
 
-    // Intermediate Consumptions
+    // Fixed Capital Consumptions
     await updateFixedCapitalConsumptionsFootprints(this.financialData, period);
+    console.log(" Mise à jour de l'empreinte des consommations de capital fixe");
 
     // Main Aggregates
     await this.updateMainAggregatesFootprints(period);
+    console.log(" Mise à jour de l'empreinte des principaux agrégats");
 
     // Production items
     await this.updateProductionItemsFootprints(period);
+    console.log(" Mise à jour de l'empreinte des agrégats de la production");
 
+    console.log("Données à jour :");
     console.log(this.financialData);
+
+    // Analysis (IA)
+    // if (this.analaysis==undefined) {
+    //   this.analaysis = {};
+    // }
+    // if (this.analaysis[period.periodKey]==undefined) {
+    //   this.analaysis[period.periodKey] = {};
+    // }
+    // await Promise.all(Object.keys(metaIndics)
+    //   .filter((indic) => indic=="eco")
+    //   .map(async (indic) => {
+    //     const analaysis = await getAnalysisFromChatGPT({
+    //       session: this,
+    //       period,
+    //       indic
+    //     });
+    //     if (this.analaysis[period.periodKey][indic]==undefined) {
+    //       this.analaysis[period.periodKey][indic] = {};
+    //     }
+    //     this.analaysis[period.periodKey][indic].analaysis = analaysis;
+    //   })
+    // );
+
     return;
   };
 
   /* -------------------- NET VALUE ADDED FOOTPRINT -------------------- */
 
-  updateNetValueAddedFootprint = async (period) => {
-    await Promise.all(
-      Object.keys(metaIndics).map((indic) =>
+  updateNetValueAddedFootprint = async (period) => 
+  {
+    await Promise.all(Object.keys(metaIndics)
+      .map((indic) =>
         this.updateNetValueAddedIndicator(indic, period.periodKey)
       )
     );
+  }
+
+  updateNetValueAddedIndicator = (indic, periodKey) => 
+  {
+    let indicator = this.validations[periodKey].includes(indic) ? 
+        this.getNetValueAddedIndicator(indic, periodKey)
+      : new Indicator({ indic });
+    this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].footprint.indicators[indic] = indicator;
   };
 
-  updateNetValueAddedIndicator = (indic, periodKey) => {
-    this.financialData.mainAggregates.netValueAdded.periodsData[
-      periodKey
-    ].footprint.indicators[indic] =
-      this.validations[periodKey].indexOf(indic) >= 0
-        ? this.getNetValueAddedIndicator(indic, periodKey)
-        : new Indicator({ indic });
-  };
-
-  getNetValueAddedIndicator = (indic, periodKey) => {
-    const netValueAdded =
-      this.financialData.mainAggregates.netValueAdded.periodsData[periodKey]
-        .amount;
+  getNetValueAddedIndicator = (indic, periodKey) => 
+  {
+    const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].amount;
     const impactsData = this.impactsData[periodKey];
 
-    impactsData.setNetValueAdded(netValueAdded);
+    impactsData.setNetValueAdded(netValueAdded); // replace
 
     if (this.financialData.isFinancialDataLoaded && netValueAdded > 0) {
       return buildNetValueAddedIndicator(indic, impactsData);
-    } else return new Indicator({ indic: indic });
+    } else {
+      return new Indicator({ indic: indic });
+    }
   };
 
-  updateMainAggregatesFootprints = async (period) => {
-    await Promise.all(
-      Object.keys(metaIndics).map(
-        async (indic) =>
-          await updateMainAggregatesFootprints(
-            indic,
-            this.financialData,
-            period
-          )
-      )
-    );
-  };
+  /* -------------------- MAIN AGGREGATES FOOTPRINTS -------------------- */
 
-  updateProductionItemsFootprints = async (period) => {
-    await Promise.all(
-      Object.keys(metaIndics).map(
-        async (indic) =>
-          await updateProductionItemsFootprints(
-            indic,
-            this.financialData,
-            period
-          )
+  updateMainAggregatesFootprints = async (period) => 
+  {
+    await Promise.all(Object.keys(metaIndics)
+      .map(async (indic) =>
+        await updateMainAggregatesFootprints(indic, this.financialData, period)
       )
     );
-  };
+  }
+
+  /* -------------------- PRODUCTION ITEMS FOOTPRINTS -------------------- */
+
+  updateProductionItemsFootprints = async (period) => 
+  {
+    await Promise.all(Object.keys(metaIndics)
+      .map(async (indic) =>
+        await updateProductionItemsFootprints(indic, this.financialData, period)
+      )
+    );
+  }
 }
 
+// remove
 export const buildRegexFinancialPeriod = (dateStart, dateEnd) => {
   // REVIEW
   let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
@@ -248,10 +298,4 @@ export const buildRegexFinancialPeriod = (dateStart, dateEnd) => {
 
   let regexString = "^(" + months.concat(datesLastMonth).join("|") + ")";
   return new RegExp(regexString);
-};
-
-export const getListMonthsFinancialPeriod = (dateStart, dateEnd) => {
-  let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
-  let months = datesEndMonths.map((date) => date.substring(0, 6));
-  return months;
-};
+}
