@@ -1,4 +1,9 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
+
+// Bootstrap
 import {
   Container,
   Image,
@@ -6,17 +11,18 @@ import {
   Navbar,
 } from "react-bootstrap";
 
-const HeaderPage = () => {
+/* -------------------- HEADER PAGES -------------------- */
 
-
+export const HeaderPage = () => 
+{
  return (
     <Navbar expand="lg">
     <Container >
       <Navbar.Brand href="/">
         <Image
+          className="d-inline-block align-center"
           src="/logo_la-societe-nouvelle_s.svg"
           height="80"
-          className="d-inline-block align-center"
           alt="logo"
         />
       </Navbar.Brand>
@@ -25,27 +31,22 @@ const HeaderPage = () => {
           <Nav.Link href="/">
             <i className="bi bi-house-door-fill"></i> Accueil
           </Nav.Link>
-          <Nav.Link
-            href="/a-propos"
-          >
+          <Nav.Link href="/a-propos">
             A propos
           </Nav.Link>
-          <Nav.Link
-            href="/conditions-generales-utilisation"
-          >
+          <Nav.Link href="/conditions-generales-utilisation">
             Conditions générales d'utilisation
           </Nav.Link>
-          <Nav.Link  
-            href="/confidentialite-des-donnees"
-          >
-           Confidentialité des données
+          <Nav.Link href="/confidentialite-des-donnees">
+            Confidentialité des données
           </Nav.Link>
-          <Nav.Link href="https://lasocietenouvelle.org" target="_blank">La société nouvelle</Nav.Link>
+          <Nav.Link href="https://lasocietenouvelle.org" 
+                    target="_blank">
+            La société nouvelle
+          </Nav.Link>
         </Nav>
       </Navbar>
     </Container>
   </Navbar>
  )
-};
-
-export default HeaderPage;
+}

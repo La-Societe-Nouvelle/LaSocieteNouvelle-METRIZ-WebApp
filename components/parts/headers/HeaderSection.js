@@ -1,45 +1,63 @@
-import React from "react";
-import {Container, Navbar } from "react-bootstrap";
-import TopBar from "./Topbar";
+// La Société Nouvelle
 
-export function HeaderSection({ step, stepMax, setStep, session }) {
+// React
+import React from "react";
+
+// Bootstrap
+import {
+  Container, 
+  Navbar } from "react-bootstrap";
+
+// Components
+import { TopBar } from "./TopBar";
+
+// Step names
+const stepNames = [
+  "Import comptable",
+  "Import des états initiaux",
+  "Traitement des fournisseurs",
+  "Déclaration des impacts directs",
+  "Résultats",
+]
+
+/* -------------------- HEADER SECTION -------------------- */
+
+export const HeaderSection = ({ step, stepMax, setStep, session }) => 
+{
   const refresh = () => location.reload(true);
 
   return (
     <header>
-      <TopBar session={session} />
+      <TopBar 
+        session={session}
+      />
       <Navbar expand="lg">
         <Container fluid id="menu">
           <Navbar.Brand href="/">
             <img
+              className="d-inline-block align-top"
               src="/logo_la-societe-nouvelle_s.svg"
               width="120"
               height="120"
-              className="d-inline-block align-top"
               alt="logo"
               onClick={refresh}
             />
           </Navbar.Brand>
-          <nav id="progression" className="d-flex">
-            {[...Array(5)].map((_, index) => {
+          <nav className="d-flex" id="progression">
+            {[...Array(5)].map((_, index) => 
+            {
               const stepNumber = index + 1;
-              const stepName = [
-                "Import comptable",
-                "Import des états initiaux",
-                "Traitement des fournisseurs",
-                "Déclaration des impacts directs",
-                "Résultats",
-              ][index];
+              const stepName = stepNames[index];
               const isCompleted = stepMax >= stepNumber;
-
+              const isCurrentStep = step == stepNumber;
               return (
                 <StepperItem
                   key={stepNumber}
-                  step={step}
                   stepNumber={stepNumber}
+                  isCurrentStep={isCurrentStep}
                   stepName={stepName}
-                  setStep={setStep}
                   isCompleted={isCompleted}
+                  setStep={setStep}
                 />
               );
             })}
@@ -47,32 +65,27 @@ export function HeaderSection({ step, stepMax, setStep, session }) {
         </Container>
       </Navbar>
     </header>
-  );
+  )
 }
 
-export function StepperItem({
-  step,
-  stepNumber,
-  stepName,
-  setStep,
-  isCompleted,
-}) {
+// Stepper item
+const StepperItem = ({ stepNumber, stepName, isCurrentStep, isCompleted, setStep }) => 
+{
+  // handle click => go to step
   const handleClick = () => {
-    if (isCompleted) {
-      setStep(stepNumber);
-    }
+    setStep(stepNumber);
   };
 
   return (
     <div className={`stepper-item ${isCompleted ? "completed" : ""}`}>
-      <button
-        className={`step-counter ${step === stepNumber ? "current" : ""}`}
-        disabled={!isCompleted}
-        onClick={handleClick}
-      >
+      <button className={`step-counter ${isCurrentStep ? "current" : ""}`}
+              disabled={!isCompleted}
+              onClick={handleClick}>
         {stepNumber}
       </button>
-      <div className="step-name">{stepName}</div>
+      <div className="step-name">
+        {stepName}
+      </div>
     </div>
-  );
+  )
 }

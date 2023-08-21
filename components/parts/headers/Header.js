@@ -2,16 +2,21 @@
 
 // React
 import React from "react";
+
+// Bootstrap
 import { Container } from "react-bootstrap";
 
 /* -------------------- HEADER -------------------- */
 
-export function Header() {
+export function Header() 
+{
   return (
     <header className="px-5 py-2">
       <Container fluid>
-        <p className="text-end small">Intiative OpenData - OpenSource</p>
+        <p className="text-end small">
+          Intiative OpenData - OpenSource
+        </p>
       </Container>
     </header>
-  );
+  )
 }
