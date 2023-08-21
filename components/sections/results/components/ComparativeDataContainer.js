@@ -5,12 +5,21 @@ import ComparativeChart from "../charts/ComparativeChart";
 import { getClosestYearData } from "../utils";
 
 const ComparativeDataContainer = ({
-  indic,
-  comparativeData,
-  financialData,
+  session,
   period,
-  prevPeriod,
+  indic
 }) => {
+
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
+  const prevDateEnd = period.dateEnd;
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
   const renderChart = (
     title,
     chartId,
@@ -88,7 +97,7 @@ const ComparativeDataContainer = ({
                 datasets[aggregate].area,
                 {
                   value:
-                    financialData[aggregate].periodsData[period.periodKey]
+                    financialData.mainAggregates[aggregate].periodsData[period.periodKey]
                       .footprint.indicators[indic].value,
                   year: year,
                 },
@@ -97,7 +106,7 @@ const ComparativeDataContainer = ({
               [
                 null,
                 prevPeriod
-                  ? financialData[aggregate].periodsData[prevPeriod.periodKey]
+                  ? financialData.mainAggregates[aggregate].periodsData[prevPeriod.periodKey]
                       .footprint.indicators[indic].value
                   : null,
                 null,

@@ -5,19 +5,29 @@ import {  Table } from "react-bootstrap";
 // Utils
 import { printValue } from "/src/utils/Utils";
 
+import metaIndics from "/lib/indics";
+
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
 export const IndicatorMainAggregatesTable = ({
-    financialData,
+  session,
   indic,
-  metaIndic,
-  period,
-  prevPeriod,
+  period
 }) => {
 
+  const {
+    financialData
+  } = session;
+
+  const prevDateEnd = period.dateEnd;
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
+  const { unit, nbDecimals, unitGrossImpact} = metaIndics[indic];
 
   const [
     intermediateConsumptionsAggregates,
@@ -96,11 +106,7 @@ export const IndicatorMainAggregatesTable = ({
     fixedCapitalConsumptions,
     netValueAdded,
   } = financialData.mainAggregates;
-
-    
-  const nbDecimals = metaIndic.nbDecimals;
-  const unit = metaIndic.unit;
-  const unitGrossImpact = metaIndic.unitAbsolute;
+  
   const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
     indic
   );

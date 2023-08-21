@@ -1,14 +1,29 @@
+// La Société Nouvelle
+
 import React, { useState } from "react";
 import { printValue } from "/src/utils/Utils";
 import { Table } from "react-bootstrap";
 
+import metaIndics from "/lib/indics";
+
 export const  ExpensesTable = ({
-  externalExpensesAccounts,
+  session,
   indic,
-  metaIndic,
-  period,
-  prevPeriod,
+  period
 }) => {
+
+  const {
+    financialData
+  } = session;
+  const externalExpensesAccounts = financialData.externalExpensesAccounts;
+
+  const prevDateEnd = period.dateEnd;
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
+  const { unit, nbDecimals, unitAbsolute} = metaIndics[indic];
+
   const [columnSorted, setColumnSorted] = useState("amount");
   const [reverseSort, setReverseSort] = useState(false);
 
@@ -36,9 +51,6 @@ export const  ExpensesTable = ({
 
   sortAccounts(filteredExternalExpensesAccounts, columnSorted);
 
-  const nbDecimals = metaIndic.nbDecimals;
-  const unit = metaIndic.unit;
-  const unitAbsolute = metaIndic.unitAbsolute;
   const impactAbsolu = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
     indic
   );

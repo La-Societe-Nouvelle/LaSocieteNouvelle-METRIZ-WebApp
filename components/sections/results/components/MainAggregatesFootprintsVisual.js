@@ -1,24 +1,37 @@
+// La Société Nouvelle
+
 import React from "react";
 import { Col, Row } from "react-bootstrap";
 import SigPieChart from "../charts/SigPieChart";
 import { printValue } from "/src/utils/Utils";
 
-const SigFootprintsContainer = ({
-  production,
-  intermediateConsumptions,
-  fixedCapitalConsumptions,
-  netValueAdded,
+// Lib
+import metaIndics from "/lib/indics";
+
+export const MainAggregatesFootprintsVisual = ({
+  session,
   period,
-  indic,
-  metaIndic,
+  indic
 }) => {
+
+  const {
+    financialData
+  } = session;
+
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    netValueAdded,
+  } = financialData.mainAggregates;
+
   const renderChart = (title, value, id) => {
     return (
       <Col lg={3}>
         <h5 className="mb-4 text-center">{title}</h5>
         <div className="sig-piechart-container">
           <SigPieChart
-            value={printValue(value, metaIndic.nbDecimals)}
+            value={printValue(value, metaIndics[indic].nbDecimals)}
             title={title}
             id={id}
             isPrinting={false}
@@ -55,6 +68,4 @@ const SigFootprintsContainer = ({
       </Row>
     </div>
   );
-};
-
-export default SigFootprintsContainer;
+}

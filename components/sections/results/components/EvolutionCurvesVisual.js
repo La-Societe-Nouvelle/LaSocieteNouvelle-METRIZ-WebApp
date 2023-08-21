@@ -34,7 +34,7 @@ const graphOptions = [
  * 
  */
 
-export const EvolutionCurvesContainer = ({
+export const EvolutionCurvesVisual = ({
   session,
   period,
   indic

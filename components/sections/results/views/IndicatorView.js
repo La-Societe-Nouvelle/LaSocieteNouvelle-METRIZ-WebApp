@@ -1,22 +1,19 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
+import { Col, Row, Nav } from "react-bootstrap";
 
-import { Col, Row, Tab, Tabs, Nav } from "react-bootstrap";
-
-// Tables
-import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
-import { ExpensesTable } from "../tables/ExpensesTable";
-import { ComparativeTable } from "../tables/ComparativeTable";
-// Charts
-import GrossImpactChart from "../charts/GrossImpactChart";
-
-// Child components
-import Analyse from "../components/AnalyseNote";
-import ComparativeDataContainer from "../components/ComparativeDataContainer";
-import SigFootprintsContainer from "../components/SigFootprintsContainer";
-import { EvolutionCurvesContainer } from "../components/EvolutionCurvesContainer";
+// Visuals
+import { ComparisonsVisual } from "../components/ComparisonsVisual";
+import { MainAggregatesTableVisual } from "../components/MainAggregatesTableVisual";
+import { GrossImpactDistributionVisual } from "../components/GrossImpactDistributionVisual";
+import { AnalysisNoteVisual } from "../components/AnalysisNoteVisual";
+import { MainAggregatesFootprintsVisual } from "../components/MainAggregatesFootprintsVisual";
+import { EvolutionCurvesVisual } from "../components/EvolutionCurvesVisual";
 
 // Lib
-import indicators from "/lib/indics";
+import metaIndics from "/lib/indics";
 
 /* ---------- INDICATOR VIEW ---------- */
 
@@ -44,24 +41,7 @@ export const IndicatorView = ({
   indic
 }) => {
 
-  const {
-    impactsData,
-    financialData,
-    comparativeData
-  } = session;
-
-  const prevPeriod = null;
-
-  const {
-    production,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-    netValueAdded,
-  } = financialData.mainAggregates;
-
-  const metaIndic = indicators[indic];
-  const intensityType = metaIndic.type === "intensité";
-  const proportionType = metaIndic.type === "proportion";
+  const metaIndic = metaIndics[indic];
 
   return (
     <>
@@ -82,127 +62,58 @@ export const IndicatorView = ({
           </Nav.Item>
         </Nav>
       </div>
+
       {/* SIG and external expenses table */}
       <Row>
         <Col>
-          <div id="rapport" className="box p-4">
-            <h4>Rapport - Analyse extra-financière</h4>
-            <Tabs
-              defaultActiveKey="mainAggregates"
-              transition={false}
-              id="noanim-tab-example"
-            >
-              <Tab
-                eventKey="mainAggregates"
-                title=" Soldes intermédiaires de gestion"
-              >
-                <IndicatorMainAggregatesTable
-                  financialData={financialData}
-                  indic={indic}
-                  metaIndic={metaIndic}
-                  period={period}
-                  prevPeriod={prevPeriod}
-                />
-              </Tab>
-              <Tab
-                eventKey="expensesAccounts"
-                title=" Détails - Comptes de charges"
-              >
-                <ExpensesTable
-                  externalExpensesAccounts={
-                    financialData.externalExpensesAccounts
-                  }
-                  indic={indic}
-                  metaIndic={metaIndic}
-                  period={period}
-                  prevPeriod={prevPeriod}
-                />
-              </Tab>
-            </Tabs>
-          </div>
+          <MainAggregatesTableVisual
+            session={session}
+            period={period}
+            indic={indic}
+          />
         </Col>
 
         {/* ----------Gross Impact Chart ----------  */}
-        {intensityType && (
+        {(metaIndic.type === "intensité") && (
           <Col lg={4}>
-            <div className="box">
-              <h4>Répartition des impacts bruts</h4>
-              <div className="px-5">
-                <GrossImpactChart
-                  id={"part-" + indic}
-                  intermediateConsumptions={intermediateConsumptions.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getGrossImpact(
-                    intermediateConsumptions.periodsData[period.periodKey]
-                      .amount
-                  )}
-                  fixedCapitalConsumptions={fixedCapitalConsumptions.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getGrossImpact(
-                    fixedCapitalConsumptions.periodsData[period.periodKey]
-                      .amount
-                  )}
-                  netValueAdded={netValueAdded.periodsData[
-                    period.periodKey
-                  ].footprint.indicators[indic].getGrossImpact(
-                    netValueAdded.periodsData[period.periodKey].amount
-                  )}
-                  isPrinting={false}
-                />
-              </div>
-            </div>
+            <GrossImpactDistributionVisual
+              session={session}
+              period={period}
+              indic={indic}
+            />
           </Col>
         )}
       </Row>
 
-      {proportionType && (
-        <SigFootprintsContainer
-          production={production}
-          intermediateConsumptions={intermediateConsumptions}
-          fixedCapitalConsumptions={fixedCapitalConsumptions}
-          netValueAdded={netValueAdded}
+      {/* ---------Comparative data charts & Table ----------  */}
+      {(metaIndic.type === "proportion") && (
+        <MainAggregatesFootprintsVisual
+          session={session}
           period={period}
           indic={indic}
-          metaIndic={metaIndic}
         />
       )}
 
       {/* ---------Comparative data charts & Table ----------  */}
-      <div id="comparaisons" className="box">
-        <ComparativeDataContainer
-          indic={indic}
-          comparativeData={comparativeData}
-          financialData={financialData.mainAggregates}
-          period={period}
-          prevPeriod={prevPeriod}
-        />
-        <ComparativeTable
-          financialData={financialData.mainAggregates}
-          indic={indic}
-          comparativeData={comparativeData}
-          period={period}
-          prevPeriod={prevPeriod}
-        />
-      </div>
-
-      {/* ---------- Trend Line Chart ----------  */}
-      <EvolutionCurvesContainer
+      <ComparisonsVisual
         session={session}
         period={period}
         indic={indic}
       />
 
-      {/* ---------- Analyse Note  ----------  */}
-      <div className="box" id="analyse">
-        <h4>Note d'analyse</h4>
-        <Analyse
-          indic={indic}
-          impactsData={impactsData}
-          financialData={financialData}
-          comparativeData={comparativeData}
-          period={period}
-        />
-      </div>
+      {/* ---------- Evolution Curves Chart ----------  */}
+      <EvolutionCurvesVisual
+        session={session}
+        period={period}
+        indic={indic}
+      />
+
+      {/* ---------- Analysis Note Text  ----------  */}
+      <AnalysisNoteVisual
+        session={session}
+        period={period}
+        indic={indic}
+      />
     </>
   );
 }

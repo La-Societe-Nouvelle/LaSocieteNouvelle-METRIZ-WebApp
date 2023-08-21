@@ -9,12 +9,21 @@ import { Table } from "react-bootstrap";
 import { getEvolution } from "../../src/utils/Utils";
 
 export const ComparativeTable = ({
-  financialData,
+  session,
   indic,
-  comparativeData,
-  period,
-  prevPeriod,
+  period
 }) => {
+
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
+  const prevDateEnd = period.dateEnd;
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
   const {
     production,
     intermediateConsumptions,

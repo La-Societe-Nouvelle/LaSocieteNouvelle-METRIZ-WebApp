@@ -6,18 +6,27 @@ import { getClosestYearData } from "../utils";
 import { printValue } from "../../../../src/utils/Utils";
 
 export const ComparativeTable = ({
-  financialData,
+  session,
   indic,
-  comparativeData,
   period,
-  prevPeriod,
 }) => {
+
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
   const {
     production,
     intermediateConsumptions,
     fixedCapitalConsumptions,
     netValueAdded,
-  } = financialData;
+  } = financialData.mainAggregates;
+
+  const prevDateEnd = period.dateEnd;
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
 
   const { unit, nbDecimals } = metaIndics[indic];
   const year = period.periodKey.slice(2);

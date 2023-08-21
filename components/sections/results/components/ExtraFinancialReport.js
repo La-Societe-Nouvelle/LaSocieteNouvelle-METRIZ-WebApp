@@ -10,10 +10,10 @@ import { ComparativeTable } from "../tables/ComparativeTable";
 import GrossImpactChart from "../charts/GrossImpactChart";
 
 // Child components
-import Analyse from "./AnalyseNote";
+import AnalysisNoteVisual from "./AnalysisNoteVisual";
 import ComparativeDataContainer from "./ComparativeDataContainer";
-import SigFootprintsContainer from "./SigFootprintsContainer";
-import { TrendContainer } from "./EvolutionCurvesContainer";
+import MainAggregatesFootprintsVisual from "./MainAggregatesFootprintsVisual";
+import { TrendContainer } from "./EvolutionCurvesVisual";
 
 const ExtraFinancialReport = ({
   session,
@@ -117,7 +117,7 @@ const ExtraFinancialReport = ({
       </Row>
 
       {proportionType && (
-        <SigFootprintsContainer
+        <MainAggregatesFootprintsVisual
           production={production}
           intermediateConsumptions={intermediateConsumptions}
           fixedCapitalConsumptions={fixedCapitalConsumptions}
@@ -165,7 +165,7 @@ const ExtraFinancialReport = ({
 
       <div className="box" id="analyse">
         <h4>Note d'analyse</h4>
-        <Analyse
+        <AnalysisNoteVisual
           indic={indic}
           impactsData={impactsData}
           financialData={financialData}
