@@ -13,9 +13,10 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 import Analyse from "./AnalyseNote";
 import ComparativeDataContainer from "./ComparativeDataContainer";
 import SigFootprintsContainer from "./SigFootprintsContainer";
-import TrendContainer from "./TrendContainer";
+import { TrendContainer } from "./EvolutionCurvesContainer";
 
 const ExtraFinancialReport = ({
+  session,
   indic,
   division,
   metaIndic,
@@ -39,6 +40,9 @@ const ExtraFinancialReport = ({
 
   return (
     <>
+      <Row>
+        
+      </Row>
       {/* SIG and external expenses table */}
       <Row>
         <Col>
@@ -147,6 +151,7 @@ const ExtraFinancialReport = ({
       {/* ---------- Trend Line Chart ----------  */}
       {!isLoading && (
         <TrendContainer
+          session={session}
           aggregates={financialData.mainAggregates}
           comparativeData={comparativeData}
           indic={indic}

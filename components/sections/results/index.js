@@ -26,7 +26,7 @@ import { customSelectStyles } from "../../../config/customStyles";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
 import { getPrevDate } from "../../../src/utils/Utils";
-import { buildFullFile, generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
+import { buildFullFile } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
 import DownloadDropdown from "./components/DownloadDropdown";
 import { ChartsContainer } from "./components/ChartsContainer";
@@ -50,87 +50,53 @@ const divisionsOptions = Object.entries(divisions)
  *    - publish (?)
  *    - goBack (?)
  * 
+ *  Params :
+ *    - comparative division
+ *    - period
+ *    - view
+ * 
  */
 
 const Results = ({ session, publish, goBack }) => 
 {
-  const [comparativeDivision, setComparativeDivision] = useState(
-    session.comparativeData.activityCode
-  );
-
+  // Selections
+  const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
+  const [period, setPeriod] = useState(session.financialPeriod);
   const [showedView, setShowedView] = useState("default");
-  const [financialPeriod, setFinancialPeriod] = useState(session.financialPeriod.periodKey);
 
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  // temp state
+  const [isGenerating, setIsGenerating] = useState(false); // building files
+  const [isLoading, setIsLoading] = useState(false); // fetching data
 
-  const prevDateEnd = getPrevDate(session.financialPeriod.dateStart);
-
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
-
-  //
-  useEffect(() => 
-  {
-    if (session.comparativeData.activityCode !== comparativeDivision) {
-      let isCancelled = false;
-      setIsLoading(true);
-
-      const fetchData = async () => {
-        session.comparativeData.activityCode = comparativeDivision;
-        await fetchComparativeData(
-          session.comparativeData,
-          session.validations[session.financialPeriod.periodKey]
-        );
-
-        if (!isCancelled) {
-          setIsLoading(false);
-        }
-      };
-
-      fetchData();
-
-      return () => {
-        isCancelled = true;
-      };
-    }
-  }, [comparativeDivision]);
-
-  const handleDivisionChange = (selectedOption) => {
+  const handleDivisionChange = async (selectedOption) => {
     const division = selectedOption.value;
-    setIsLoading(true);
-    setComparativeDivision(division);
-    // change in graphics ? in session ?
-  };
-
-  const getViewLabel = (viewCode) =>
-  {
-    if (viewCode) {
-      let labelMenu = (
-        <>
-          {viewsData.views[viewCode].icon && (
-            <Image
-              className="me-2"
-              src={viewsData.views[viewCode].icon}
-              height={25}
-            />
-          )}
-          {viewsData.views[viewCode].label}
-        </>);
-      return labelMenu;
-    } else {
-      return null;
+    if (division!=comparativeDivision) 
+    {
+      // update state
+      setComparativeDivision(division);
+      
+      // fetch data
+      setIsLoading(true);
+      session.comparativeData.activityCode = comparativeDivision;
+      await fetchComparativeData(
+        session.comparativeData,
+        session.validations[period.periodKey] // to update -> fetch data for all periods
+      );
+      setIsLoading(false);
     }
-  }
-
-  const handleIndicatorChange = (code) => 
-  {
-    setShowedView(code);
   };
 
-  const handleDownload = async (selectedFiles) => 
-  {
+  const handlePeriodChange = (selectedPeriod) => {
+    const period = selectedPeriod.value;
+    setPeriod(period);
+  };
+
+  const handleViewChange = (viewCode) => {
+    setShowedView(viewCode);
+  };
+
+  const handleDownload = async (selectedFiles) => {
+
     setIsGenerating(true);
 
     // Download .zip files
@@ -140,7 +106,6 @@ const Results = ({ session, publish, goBack }) =>
         period
       });
       saveAs(ZIPFile, `${documentTitle}.zip`);
-      setIsGenerating(false);
     }
 
     else if (selectedFiles.length>0) {
@@ -180,6 +145,8 @@ const Results = ({ session, publish, goBack }) =>
       downloadLink.click();
       URL.revokeObjectURL(pdfUrl);
     }
+
+    setIsGenerating(false);
   };
 
   return (
@@ -192,7 +159,6 @@ const Results = ({ session, publish, goBack }) =>
               onDownload={handleDownload}
               view={showedView}
             />
-
             <Button variant="secondary" onClick={publish}>
               Publier mes résultats
             </Button>
@@ -210,7 +176,7 @@ const Results = ({ session, publish, goBack }) =>
               </p>
               <p className="fw-bold col-form-label">
                 Année de l'exercice :{" "}
-                {session.financialPeriod.periodKey.slice(2)}
+                {period.periodKey.slice(2)}
               </p>
               {session.legalUnit.siren && (
                 <p className="fw-bold col-form-label">
@@ -226,11 +192,11 @@ const Results = ({ session, publish, goBack }) =>
             </div>
           </Col>
         </Row>
+
         <div className="d-flex align-items-center ">
           <p className="fw-bold col-form-label me-2 mb-0 ">
             Branche de comparaison :
           </p>
-
           <Form className="flex-grow-1">
             <Form.Group
               as={Row}
@@ -245,12 +211,44 @@ const Results = ({ session, publish, goBack }) =>
                     IndicatorSeparator: () => null,
                   }}
                   value={{
-                    label:
-                      comparativeDivision + " - " + divisions[comparativeDivision],
+                    label: comparativeDivision + " - " + divisions[comparativeDivision],
                     value: comparativeDivision,
                   }}
                   placeholder="Choisissez une division"
                   onChange={handleDivisionChange}
+                />
+              </Col>
+            </Form.Group>
+          </Form>
+        </div>
+        <div className="d-flex align-items-center ">
+          <p className="fw-bold col-form-label me-2 mb-0 ">
+            Période :
+          </p>
+          <Form className="flex-grow-1">
+            <Form.Group
+              as={Row}
+              controlId="formComparativeDivision"
+              className="my-2"
+            >
+              <Col sm={8}>
+                <Select
+                  styles={customSelectStyles}
+                  options={session.availablePeriods.map((period) => {return({
+                      label: period.periodKey,
+                      value: period.periodKey,
+                    })})
+                  }
+                  // components={{
+                  //   IndicatorSeparator: () => null,
+                  // }}
+                  value={{
+                    label: period.periodKey,
+                    value: period.periodKey,
+                  }}
+                  placeholder="Choisissez une division"
+                  onChange={handlePeriodChange}
+                  isDisabled={session.availablePeriods.length<=1}
                 />
               </Col>
             </Form.Group>
@@ -267,26 +265,13 @@ const Results = ({ session, publish, goBack }) =>
               id="dropdown-indics-button"
               title={getViewLabel(showedView)}
               disabled={comparativeDivision == "00"}
-            >
-              {showedView && (
-                <Dropdown.Item
-                  onClick={() =>
-                    handleIndicatorChange(
-                      null,
-                      " Empreinte Sociale et environnementale"
-                    )
-                  }
-                >
-                  Empreinte Sociale et environnementale
-                </Dropdown.Item>
-              )}
-
+            >              
               {Object.entries(viewsData.views)
-                .filter(([_,view]) => view.validations.every(indic => session.validations[financialPeriod].includes(indic)))
+                .filter(([_,view]) => view.validations.every(indic => session.validations[period.periodKey].includes(indic)))
                 .filter(([code,_]) => code!=showedView)
                 .map(([code,view]) =>
                   <Dropdown.Item key={code}
-                                 onClick={() => handleIndicatorChange(code)}>
+                                 onClick={() => handleViewChange(code)}>
                     {view.icon && <Image className="me-2"
                            src={view.icon}
                            alt={code}
@@ -296,55 +281,30 @@ const Results = ({ session, publish, goBack }) =>
                 )
               }
             </DropdownButton>
-
-            {showedView && (
-              <Nav variant="underline" defaultActiveKey="/home">
-                <Nav.Item>
-                  <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
-                </Nav.Item>
-                <Nav.Item>
-                  <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
-                </Nav.Item>
-              </Nav>
-            )}
           </div>
         </div>
       </div>
 
       <View 
         viewCode={showedView}
-        period={session.financialPeriod}
+        period={period}
         session={session}
       />
 
-      {comparativeDivision != "00" && !isLoading && (
-        <>
-          {session.validations[session.financialPeriod.periodKey].map(
-            (indic) => (
-              <div key={indic}>
-                <ChartsContainer
-                  indic={indic}
-                  comparativeData={session.comparativeData}
-                  mainAggregates={session.financialData.mainAggregates}
-                  period={session.financialPeriod}
-                  prevPeriod={prevPeriod}
-                />
-              </div>
-            )
-          )}
-        </>
+      {(comparativeDivision!="00" && !isLoading) && (
+        <ChartsContainer
+          session={session}
+          period={period}
+        />
       )}
 
-      {isGenerating && <Loader title={"Génération du dossier en cours ..."} />}
+      {isGenerating && (
+        <Loader title={"Génération du dossier en cours ..."} />
+      )}
       {isLoading && (
         <Loader title={"Récupération des données de comparaison ..."} />
       )}
+
       <div className=" text-end">
         <Button onClick={goBack} className="mb-4">
           <i className="bi bi-chevron-left"></i> Retour aux déclarations
@@ -417,5 +377,25 @@ const buildViewDataFile = async (props) =>
     case "wat":       return (await buildIndicReport({...props, indic:"wat"}));
     case "soc":       return (await buildIndicReport({...props, indic:"soc"}));
     default:          return (null);
+  }
+}
+
+const getViewLabel = (viewCode) =>
+{
+  if (viewCode) {
+    let labelMenu = (
+      <>
+        {viewsData.views[viewCode].icon && (
+          <Image
+            className="me-2"
+            src={viewsData.views[viewCode].icon}
+            height={25}
+          />
+        )}
+        {viewsData.views[viewCode].label}
+      </>);
+    return labelMenu;
+  } else {
+    return null;
   }
 }

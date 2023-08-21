@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Col, Row, Tab, Tabs } from "react-bootstrap";
+import { Col, Row, Tab, Tabs, Nav } from "react-bootstrap";
 
 // Tables
 import { IndicatorMainAggregatesTable } from "../tables/IndicatorMainAggregatesTable";
@@ -13,7 +13,7 @@ import GrossImpactChart from "../charts/GrossImpactChart";
 import Analyse from "../components/AnalyseNote";
 import ComparativeDataContainer from "../components/ComparativeDataContainer";
 import SigFootprintsContainer from "../components/SigFootprintsContainer";
-import TrendContainer from "../components/TrendContainer";
+import { EvolutionCurvesContainer } from "../components/EvolutionCurvesContainer";
 
 // Lib
 import indicators from "/lib/indics";
@@ -65,6 +65,23 @@ export const IndicatorView = ({
 
   return (
     <>
+      {/* Menu */}
+      <div className="box">
+        <Nav variant="underline" defaultActiveKey="/home">
+          <Nav.Item>
+            <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
+          </Nav.Item>
+        </Nav>
+      </div>
       {/* SIG and external expenses table */}
       <Row>
         <Col>
@@ -169,12 +186,10 @@ export const IndicatorView = ({
       </div>
 
       {/* ---------- Trend Line Chart ----------  */}
-      <TrendContainer
-        aggregates={financialData.mainAggregates}
-        comparativeData={comparativeData}
+      <EvolutionCurvesContainer
+        session={session}
+        period={period}
         indic={indic}
-        unit={metaIndic.unit}
-        division={session.comparativeData.activityCode}
       />
 
       {/* ---------- Analyse Note  ----------  */}
