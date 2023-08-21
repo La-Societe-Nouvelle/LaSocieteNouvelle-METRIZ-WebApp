@@ -58,6 +58,7 @@ const AccountingImportSection = (props) =>
   const handleDivision = (division) => {
     session.legalUnit.activityCode = division;
     session.comparativeData.activityCode = division;
+    setDivision(division);   
   };
   const handleFECData = (FECData) => {
     console.log(FECData);
