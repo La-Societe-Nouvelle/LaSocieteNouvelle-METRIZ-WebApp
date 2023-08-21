@@ -1,0 +1,73 @@
+{
+  "views": {
+    "default": {
+      "label": "Empreinte Sociale et environnementale",
+      "icon": null,
+      "validations": []
+    },
+    "art": {
+      "label": "Contribution aux Métiers d'Art et aux Savoir-Faire",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": ["art"]
+    },
+    "eco": {
+      "label": "Contribution à l'économie nationale",
+      "icon": "icons-ese/logo_ese_eco_bleu.svg",
+      "validations": ["eco"],
+      "component": "IndicatorView",
+      "args": {
+        "indic": "eco"
+      }
+    },
+    "geq": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": ["geq"]
+    },
+    "ghg": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": ["ghg"]
+    },
+    "haz": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": ["haz"]
+    },
+    "idr": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": ["idr"]
+    },
+    "knw": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": []
+    },
+    "mat": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": []
+    },
+    "nrg": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": []
+    },
+    "soc": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": []
+    },
+    "was": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": []
+    },
+    "wat": {
+      "label": "",
+      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "validations": []
+    }
+  }
+}

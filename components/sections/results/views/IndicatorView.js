@@ -10,23 +10,48 @@ import { ComparativeTable } from "../tables/ComparativeTable";
 import GrossImpactChart from "../charts/GrossImpactChart";
 
 // Child components
-import Analyse from "./AnalyseNote";
-import ComparativeDataContainer from "./ComparativeDataContainer";
-import SigFootprintsContainer from "./SigFootprintsContainer";
-import TrendContainer from "./TrendContainer";
+import Analyse from "../components/AnalyseNote";
+import ComparativeDataContainer from "../components/ComparativeDataContainer";
+import SigFootprintsContainer from "../components/SigFootprintsContainer";
+import TrendContainer from "../components/TrendContainer";
 
-const ExtraFinancialReport = ({
-  indic,
-  division,
-  metaIndic,
-  financialData,
-  impactsData,
-  comparativeData,
+// Lib
+import indicators from "/lib/indics";
+
+/* ---------- INDICATOR VIEW ---------- */
+
+/** Standard view for each indicator
+ *  
+ *  Props :
+ *    - session
+ *    - period
+ * 
+ *  Args :
+ *    - indic (code)
+ * 
+ *  Structure :
+ *    - SIG/External expenses tables
+ *    - SIG Footprints diagramm
+ *    - Comparative diagrams & table
+ *    - Graphic with historical, trend & target
+ *    - Analysis note
+ * 
+ */
+
+export const IndicatorView = ({
+  session,
   period,
-  prevPeriod,
-  isLoading,
-  view
+  indic
 }) => {
+
+  const {
+    impactsData,
+    financialData,
+    comparativeData
+  } = session;
+
+  const prevPeriod = null;
+
   const {
     production,
     intermediateConsumptions,
@@ -34,6 +59,7 @@ const ExtraFinancialReport = ({
     netValueAdded,
   } = financialData.mainAggregates;
 
+  const metaIndic = indicators[indic];
   const intensityType = metaIndic.type === "intensité";
   const proportionType = metaIndic.type === "proportion";
 
@@ -78,8 +104,8 @@ const ExtraFinancialReport = ({
             </Tabs>
           </div>
         </Col>
-        {/* ----------Gross Impact Chart ----------  */}
 
+        {/* ----------Gross Impact Chart ----------  */}
         {intensityType && (
           <Col lg={4}>
             <div className="box">
@@ -125,39 +151,33 @@ const ExtraFinancialReport = ({
       )}
 
       {/* ---------Comparative data charts & Table ----------  */}
-      {!isLoading && (
-        <div id="comparaisons" className="box">
-          <ComparativeDataContainer
-            indic={indic}
-            comparativeData={comparativeData}
-            financialData={financialData.mainAggregates}
-            period={period}
-            prevPeriod={prevPeriod}
-          />
-          <ComparativeTable
-            financialData={financialData.mainAggregates}
-            indic={indic}
-            comparativeData={comparativeData}
-            period={period}
-            prevPeriod={prevPeriod}
-          />
-        </div>
-      )}
+      <div id="comparaisons" className="box">
+        <ComparativeDataContainer
+          indic={indic}
+          comparativeData={comparativeData}
+          financialData={financialData.mainAggregates}
+          period={period}
+          prevPeriod={prevPeriod}
+        />
+        <ComparativeTable
+          financialData={financialData.mainAggregates}
+          indic={indic}
+          comparativeData={comparativeData}
+          period={period}
+          prevPeriod={prevPeriod}
+        />
+      </div>
 
       {/* ---------- Trend Line Chart ----------  */}
-      {!isLoading && (
-        <TrendContainer
-          aggregates={financialData.mainAggregates}
-          comparativeData={comparativeData}
-          indic={indic}
-          unit={metaIndic.unit}
-          division={division}
-        />
-      )}
-
+      <TrendContainer
+        aggregates={financialData.mainAggregates}
+        comparativeData={comparativeData}
+        indic={indic}
+        unit={metaIndic.unit}
+        division={session.comparativeData.activityCode}
+      />
 
       {/* ---------- Analyse Note  ----------  */}
-
       <div className="box" id="analyse">
         <h4>Note d'analyse</h4>
         <Analyse
@@ -170,6 +190,4 @@ const ExtraFinancialReport = ({
       </div>
     </>
   );
-};
-
-export default ExtraFinancialReport;
+}

@@ -28,24 +28,28 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateContributionIndicatorSheet = (
-  title,
-  legalUnit,
+export const generateContributionIndicatorSheet = ({
+  session,
   indic,
-  financialData,
-  comparativeData,
   download,
   period
-) => {
+}) => {
   // ---------------------------------------------------------------
+
+  const {
+    legalUnit,
+    financialData,
+    comparativeData
+  } = session;
 
   const { production } = financialData.mainAggregates;
   const { revenue } = financialData.productionAggregates;
-  const unit = metaIndics[indic].unit;
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
   const divisionName = divisions[comparativeData.activityCode];
   const currentPeriod = period.periodKey.slice(2);
+
+  const { libelle, unit } = metaIndics[indic];
 
   // ---------------------------------------------------------------
   // utils
@@ -297,7 +301,7 @@ export const generateContributionIndicatorSheet = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: title, style: "header" },
+      { text: libelle, style: "header" },
       //--------------------------------------------------
       {
         columns: [
@@ -332,7 +336,7 @@ export const generateContributionIndicatorSheet = (
                 style: "numbers",
               },
               {
-                text: "de " + title,
+                text: "de " + libelle,
                 alignment: "center",
               },
             ],

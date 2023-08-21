@@ -23,17 +23,19 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateIntensityIndicatorSheet = (
-  legalUnit,
+export const generateIntensityIndicatorSheet = ({
+  session,
   indic,
-  label,
-  unit,
-  financialData,
-  comparativeData,
   download,
   period
-) => {
+}) => {
   // ---------------------------------------------------------------
+
+  const {
+    legalUnit,
+    financialData,
+    comparativeData
+  } = session;
 
   const currentPeriod = period.periodKey.slice(2);
 
@@ -50,6 +52,8 @@ export const generateIntensityIndicatorSheet = (
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
   const divisionName = divisions[comparativeData.activityCode];
+
+  const { libelle, unit } = metaIndics[indic];
 
   // UTILS
   let branchProductionTarget = null;
@@ -304,7 +308,7 @@ export const generateIntensityIndicatorSheet = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: label, style: "header" },
+      { text: libelle, style: "header" },
       {
         columnGap: 30,
         columns: [
@@ -343,7 +347,7 @@ export const generateIntensityIndicatorSheet = (
               },
               {
                 margin: [0, 5, 0, 0],
-                text: "d'" + label,
+                text: "d'" + libelle,
                 alignment: "center",
                 fontSize: 9,
               },

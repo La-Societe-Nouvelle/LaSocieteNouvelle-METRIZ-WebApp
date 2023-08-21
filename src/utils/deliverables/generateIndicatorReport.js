@@ -2,6 +2,7 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 // Lib
+import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
 // Utils
 import {
@@ -14,24 +15,36 @@ import { loadFonts } from "./deliverablesUtils";
 import { generateSIGtable } from "./generateSIGtable";
 
 // --------------------------------------------------------------------------
-//  Indice Indicator Report
+//  Indicator Report
 // --------------------------------------------------------------------------
+
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 //Call function to load fonts
 loadFonts();
 
-export const generateReport = async (
-  legalUnit,
+export const generateReport = async ({
+  session,
   indic,
-  label,
-  unit,
-  financialData,
-  impactsData,
-  comparativeData,
   download,
   period
-) => {
+}) => {
+  // ---------------------------------------------------------------
+
+  // session data
+  const {
+    legalUnit,
+    financialData,
+    impactsData,
+    comparativeData
+  } = session;
+
+  // metadata indicator
+  const {
+    label,
+    unit 
+  } = metaIndics[indic];
+
   // ---------------------------------------------------------------
   // Text Generation
 

@@ -4,7 +4,7 @@ import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsA
 import { roundValue } from '../Utils';
 
 
-export async function generateXLSXFile(indic,session,period)
+export async function generateXLSXFile({indic,session,period})
 {
   const workbook = XLSX.utils.book_new();
 

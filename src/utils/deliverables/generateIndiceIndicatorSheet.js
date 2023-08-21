@@ -26,19 +26,22 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateIndiceIndicatorSheet = (
-  title,
-  libelleGrandeur,
-  legalUnit,
+export const generateIndiceIndicatorSheet = ({
+  session,
   indic,
-  unit,
-  financialData,
-  comparativeData,
   download,
   period
-) => {
+}) => {
   // ---------------------------------------------------------------
   // Variables
+
+  const { libelle, unit, libelleGrandeur } = metaIndics[indic];
+
+  const {
+    legalUnit,
+    financialData,
+    comparativeData
+  } = session;
 
   const currentPeriod = period.periodKey.slice(2);
   const precision = metaIndics[indic].nbDecimals;
@@ -259,7 +262,7 @@ export const generateIndiceIndicatorSheet = (
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: title, style: "header" },
+      { text: libelle, style: "header" },
 
       //--------------------------------------------------
       {

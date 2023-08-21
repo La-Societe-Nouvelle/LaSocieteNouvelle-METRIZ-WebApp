@@ -1,6 +1,10 @@
+// La Société Nouvelle
+
+// react
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 
+// bootstrap
 import {
   Button,
   Col,
@@ -14,35 +18,49 @@ import {
 } from "react-bootstrap";
 
 import divisions from "/lib/divisions";
-import indicators from "/lib/indics";
+
+import viewsData from "./views";
 
 import { customSelectStyles } from "../../../config/customStyles";
 
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
 import { getPrevDate } from "../../../src/utils/Utils";
-import { generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
+import { buildFullFile, generateDownloadableFiles } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
-import ExtraFinancialReport from "./components/ExtraFinancialReport";
-import FootprintReport from "./components/FootprintReport";
 import DownloadDropdown from "./components/DownloadDropdown";
 import { ChartsContainer } from "./components/ChartsContainer";
 
 import { Loader } from "../../popups/Loader";
+import { IndicatorView } from "./views/IndicatorView";
+import { DefaultView } from "./views/DefaultView";
 
-const Results = ({ session, publish, goBack }) => {
+const divisionsOptions = Object.entries(divisions)
+  .sort((a, b) => parseInt(a) - parseInt(b))
+  .map(([value, label]) => {
+    return { value: value, label: value + " - " + label };
+  })
 
-  const [divisionsOptions, setDivisionsOptions] = useState([]);
-  const [selectedDivision, setSelectedDivision] = useState(
+/* ---------- RESULTS SECTION ---------- */
+
+/** View of results
+ *  
+ *  Props :
+ *    - session
+ *    - publish (?)
+ *    - goBack (?)
+ * 
+ */
+
+const Results = ({ session, publish, goBack }) => 
+{
+  const [comparativeDivision, setComparativeDivision] = useState(
     session.comparativeData.activityCode
   );
 
-  const [selectedIndicator, setSelectedIndicator] = useState();
-  const [selectedIndicatorLabel, setSelectedIndicatorLabel] = useState(
-    "Sélectionner un indicateur..."
-  );
+  const [showedView, setShowedView] = useState("default");
+  const [financialPeriod, setFinancialPeriod] = useState(session.financialPeriod.periodKey);
 
-  const [financialPeriod] = useState(session.financialPeriod.periodKey);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,27 +70,15 @@ const Results = ({ session, publish, goBack }) => {
     (period) => period.dateEnd == prevDateEnd
   );
 
-
-
-  useEffect(() => {
-    window.scroll(0, 0);
-
-    const divisionsOptions = Object.entries(divisions)
-      .sort((a, b) => parseInt(a) - parseInt(b))
-      .map(([value, label]) => {
-        return { value: value, label: value + " - " + label };
-      });
-
-    setDivisionsOptions(divisionsOptions);
-  }, []);
-
-  useEffect(() => {
-    if (session.comparativeData.activityCode !== selectedDivision) {
+  //
+  useEffect(() => 
+  {
+    if (session.comparativeData.activityCode !== comparativeDivision) {
       let isCancelled = false;
       setIsLoading(true);
 
       const fetchData = async () => {
-        session.comparativeData.activityCode = selectedDivision;
+        session.comparativeData.activityCode = comparativeDivision;
         await fetchComparativeData(
           session.comparativeData,
           session.validations[session.financialPeriod.periodKey]
@@ -89,51 +95,93 @@ const Results = ({ session, publish, goBack }) => {
         isCancelled = true;
       };
     }
-  }, [selectedDivision]);
+  }, [comparativeDivision]);
 
   const handleDivisionChange = (selectedOption) => {
     const division = selectedOption.value;
     setIsLoading(true);
-    setSelectedDivision(division);
+    setComparativeDivision(division);
+    // change in graphics ? in session ?
   };
 
-  const handleIndicatorChange = (code, label) => {
-    setSelectedIndicator(code);
-    let labelMenu = (
-      <>
-        {code && (
-          <Image
-            className="me-2"
-            src={`icons-ese/logo_ese_${code}_rose.svg`}
-            height={25}
-          />
-        )}
-        {label}
-      </>
-    );
+  const getViewLabel = (viewCode) =>
+  {
+    if (viewCode) {
+      let labelMenu = (
+        <>
+          {viewsData.views[viewCode].icon && (
+            <Image
+              className="me-2"
+              src={viewsData.views[viewCode].icon}
+              height={25}
+            />
+          )}
+          {viewsData.views[viewCode].label}
+        </>);
+      return labelMenu;
+    } else {
+      return null;
+    }
+  }
 
-    setSelectedIndicatorLabel(labelMenu);
+  const handleIndicatorChange = (code) => 
+  {
+    setShowedView(code);
   };
 
-  const handleDownload = async (selectedFiles) => {
-    const period = session.financialPeriod;
-    const prevPeriod = session.availablePeriods.find(
-      (period) => period.dateEnd == prevDateEnd
-    );
-
+  const handleDownload = async (selectedFiles) => 
+  {
     setIsGenerating(true);
 
-    await generateDownloadableFiles(
-      selectedFiles,
-      selectedIndicator,
-      session,
-      () => {
-        setIsGenerating(false);
-      },
-      period,
-      prevPeriod
-    );
+    // Download .zip files
+    if (selectedFiles.includes("checkbox-all")) {
+      let ZIPFile = await buildFullFile({
+        session,
+        period
+      });
+      saveAs(ZIPFile, `${documentTitle}.zip`);
+      setIsGenerating(false);
+    }
+
+    else if (selectedFiles.length>0) {
+      // zip
+    }
+
+    else if (selectedFiles.includes("indic-report")) {
+      //
+      let PDFFile = await buildViewReport({
+        viewCode: showedView,
+        session,
+        period,
+      });
+      let PDFTitle = `${indicLabel}_${legalUnitNameFile}_${year}.pdf`;
+
+      const pdfUrl = URL.createObjectURL(PDFFile);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pdfUrl;
+      downloadLink.download = PDFTitle;
+      downloadLink.click();
+      URL.revokeObjectURL(pdfUrl);
+    }
+
+    else if (selectedFiles.includes("sig-indic-xlsx")) {
+      //
+      let PDFFile = await buildViewReport({
+        viewCode: showedView,
+        session,
+        period,
+      });
+      let PDFTitle = `${indicLabel}_${legalUnitNameFile}_${year}.pdf`;
+
+      const pdfUrl = URL.createObjectURL(PDFFile);
+      const downloadLink = document.createElement("a");
+      downloadLink.href = pdfUrl;
+      downloadLink.download = PDFTitle;
+      downloadLink.click();
+      URL.revokeObjectURL(pdfUrl);
+    }
   };
+
   return (
     <Container fluid className="results">
       <div className="box">
@@ -142,7 +190,7 @@ const Results = ({ session, publish, goBack }) => {
           <div className="d-flex">
             <DownloadDropdown
               onDownload={handleDownload}
-              view={selectedIndicator}
+              view={showedView}
             />
 
             <Button variant="secondary" onClick={publish}>
@@ -198,8 +246,8 @@ const Results = ({ session, publish, goBack }) => {
                   }}
                   value={{
                     label:
-                      selectedDivision + " - " + divisions[selectedDivision],
-                    value: selectedDivision,
+                      comparativeDivision + " - " + divisions[comparativeDivision],
+                    value: comparativeDivision,
                   }}
                   placeholder="Choisissez une division"
                   onChange={handleDivisionChange}
@@ -217,10 +265,10 @@ const Results = ({ session, publish, goBack }) => {
               drop={"down-centered"}
               key={"down-centered"}
               id="dropdown-indics-button"
-              title={selectedIndicatorLabel}
-              disabled={selectedDivision == "00"}
+              title={getViewLabel(showedView)}
+              disabled={comparativeDivision == "00"}
             >
-              {selectedIndicator && (
+              {showedView && (
                 <Dropdown.Item
                   onClick={() =>
                     handleIndicatorChange(
@@ -233,39 +281,29 @@ const Results = ({ session, publish, goBack }) => {
                 </Dropdown.Item>
               )}
 
-              {Object.entries(indicators)
-                .filter(([indic]) =>
-                  session.validations[financialPeriod].includes(indic)
+              {Object.entries(viewsData.views)
+                .filter(([_,view]) => view.validations.every(indic => session.validations[financialPeriod].includes(indic)))
+                .filter(([code,_]) => code!=showedView)
+                .map(([code,view]) =>
+                  <Dropdown.Item key={code}
+                                 onClick={() => handleIndicatorChange(code)}>
+                    {view.icon && <Image className="me-2"
+                           src={view.icon}
+                           alt={code}
+                           height={20}/>}
+                      {view.label}
+                  </Dropdown.Item>
                 )
-                .map(([code, indic]) => {
-                  if (code === selectedIndicator) return null;
-
-                  return (
-                    <Dropdown.Item
-                      key={code}
-                      onClick={() => handleIndicatorChange(code, indic.libelle)}
-                    >
-                      <Image
-                        className="me-2"
-                        src={`icons-ese/logo_ese_${code}_bleu.svg`}
-                        alt={code}
-                        height={20}
-                      />
-                      {indic.libelle}
-                    </Dropdown.Item>
-                  );
-                })}
+              }
             </DropdownButton>
 
-            {selectedIndicator && (
+            {showedView && (
               <Nav variant="underline" defaultActiveKey="/home">
                 <Nav.Item>
                   <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
-                  <Nav.Link href="/#comparaisons">
-                    Comparaison par activité
-                  </Nav.Link>
+                  <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
                 </Nav.Item>
                 <Nav.Item>
                   <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
@@ -279,30 +317,13 @@ const Results = ({ session, publish, goBack }) => {
         </div>
       </div>
 
-      {(!selectedIndicator || !selectedDivision) && (
-        <FootprintReport
-          comparativeData={session.comparativeData}
-          financialData={session.financialData.mainAggregates}
-          period={session.financialPeriod}
-        />
-      )}
+      <View 
+        viewCode={showedView}
+        period={session.financialPeriod}
+        session={session}
+      />
 
-      {selectedIndicator && selectedDivision && selectedDivision != "00" && (
-        <ExtraFinancialReport
-          indic={selectedIndicator}
-          division={selectedDivision}
-          metaIndic={indicators[selectedIndicator]}
-          financialData={session.financialData}
-          impactsData={session.impactsData}
-          comparativeData={session.comparativeData}
-          period={session.financialPeriod}
-          prevPeriod={prevPeriod}
-          legalUnit={session.legalUnit}
-          isLoading={isLoading}
-        ></ExtraFinancialReport>
-      )}
-
-      {selectedDivision != "00" && !isLoading && (
+      {comparativeDivision != "00" && !isLoading && (
         <>
           {session.validations[session.financialPeriod.periodKey].map(
             (indic) => (
@@ -332,6 +353,69 @@ const Results = ({ session, publish, goBack }) => {
 
     </Container>
   );
-};
+}
 
 export default Results;
+
+const View = (props) => 
+{
+  switch(props.viewCode) 
+  {
+    case "default":   return (<DefaultView   {...props}/>);
+    case "art":       return (<IndicatorView {...props} indic={"art"}/>);
+    case "eco":       return (<IndicatorView {...props} indic={"eco"}/>);
+    case "ghg":       return (<IndicatorView {...props} indic={"ghg"}/>);
+    case "geq":       return (<IndicatorView {...props} indic={"geq"}/>);
+    case "haz":       return (<IndicatorView {...props} indic={"haz"}/>);
+    case "idr":       return (<IndicatorView {...props} indic={"idr"}/>);
+    case "knw":       return (<IndicatorView {...props} indic={"knw"}/>);
+    case "mat":       return (<IndicatorView {...props} indic={"mat"}/>);
+    case "nrg":       return (<IndicatorView {...props} indic={"nrg"}/>);
+    case "was":       return (<IndicatorView {...props} indic={"was"}/>);
+    case "wat":       return (<IndicatorView {...props} indic={"wat"}/>);
+    case "soc":       return (<IndicatorView {...props} indic={"soc"}/>);
+    default:          return (<></>);
+  }
+}
+
+const buildViewReport = async (props) => 
+{
+  switch(props.viewCode) 
+  {
+    case "default":   return (null);
+    case "art":       return (await buildIndicReport({...props, indic:"art"}));
+    case "eco":       return (await buildIndicReport({...props, indic:"eco"}));
+    case "ghg":       return (await buildIndicReport({...props, indic:"ghg"}));
+    case "geq":       return (await buildIndicReport({...props, indic:"geq"}));
+    case "haz":       return (await buildIndicReport({...props, indic:"haz"}));
+    case "idr":       return (await buildIndicReport({...props, indic:"idr"}));
+    case "knw":       return (await buildIndicReport({...props, indic:"knw"}));
+    case "mat":       return (await buildIndicReport({...props, indic:"mat"}));
+    case "nrg":       return (await buildIndicReport({...props, indic:"nrg"}));
+    case "was":       return (await buildIndicReport({...props, indic:"was"}));
+    case "wat":       return (await buildIndicReport({...props, indic:"wat"}));
+    case "soc":       return (await buildIndicReport({...props, indic:"soc"}));
+    default:          return (null);
+  }
+}
+
+const buildViewDataFile = async (props) => 
+{
+  switch(props.viewCode) 
+  {
+    case "default":   return (null);
+    case "art":       return (await buildIndicReport({...props, indic:"art"}));
+    case "eco":       return (await buildIndicReport({...props, indic:"eco"}));
+    case "ghg":       return (await buildIndicReport({...props, indic:"ghg"}));
+    case "geq":       return (await buildIndicReport({...props, indic:"geq"}));
+    case "haz":       return (await buildIndicReport({...props, indic:"haz"}));
+    case "idr":       return (await buildIndicReport({...props, indic:"idr"}));
+    case "knw":       return (await buildIndicReport({...props, indic:"knw"}));
+    case "mat":       return (await buildIndicReport({...props, indic:"mat"}));
+    case "nrg":       return (await buildIndicReport({...props, indic:"nrg"}));
+    case "was":       return (await buildIndicReport({...props, indic:"was"}));
+    case "wat":       return (await buildIndicReport({...props, indic:"wat"}));
+    case "soc":       return (await buildIndicReport({...props, indic:"soc"}));
+    default:          return (null);
+  }
+}
