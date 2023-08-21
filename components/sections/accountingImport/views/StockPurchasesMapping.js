@@ -1,5 +1,20 @@
+// La Société Nouvelle
+
+// React
 import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
+
+/* -------------------- STOCKS-EXPENSES MAPPING -------------------- */
+
+/** View for mapping between stock and expense accounts
+ *  
+ *  Props :
+ *    - meta -> fec metadata (accounts)
+ *    - onClick()
+ *    - return()
+ * 
+ *  Update meta.accounts...
+ */
 
 export const StockPurchasesMapping = (props) => 
 {
@@ -16,14 +31,8 @@ export const StockPurchasesMapping = (props) =>
     return initializedAccounts;
   });
 
-  const stocksAccounts = Object.keys(accounts).filter((accountNum) =>
-    /^3(1|2|7)/.test(accountNum)
-  );
-  const purchasesAccounts = Object.keys(accounts).filter((accountNum) =>
-    /^60(1|2|7)/.test(accountNum)
-  );
-
-  // new object property purchasesAccounts -> purchasesAccounts
+  const stocksAccounts = Object.keys(accounts).filter((accountNum) => /^3(1|2|7)/.test(accountNum));
+  const purchasesAccounts = Object.keys(accounts).filter((accountNum) => /^60(1|2|7)/.test(accountNum));
 
   useEffect(() => {
     // Initialization of purchases accounts for the stocks account
@@ -41,18 +50,17 @@ export const StockPurchasesMapping = (props) =>
   }, []);
 
 
-  function handleDeletePurchaseAccount(stockAccountNum, purchaseAccountNum) {
+  const handleDeletePurchaseAccount = (stockAccountNum, purchaseAccountNum) =>
+  {
     const updatedAccounts = { ...accounts };
-    const purchasesAccounts = updatedAccounts[
-      stockAccountNum
-    ].purchasesAccounts.filter(
-      (accountNum) => accountNum !== purchaseAccountNum ///Remove the corresponding purchase account
-    );
+    const purchasesAccounts = updatedAccounts[stockAccountNum].purchasesAccounts
+      .filter((accountNum) => accountNum !== purchaseAccountNum); ///Remove the corresponding purchase account
     updatedAccounts[stockAccountNum].purchasesAccounts = purchasesAccounts; // Update the purchasesAccounts for the corresponding stock account
     setAccounts(updatedAccounts);
   }
 
-  const handleAddPurchaseAccount = (stockAccountNum, purchaseAccountNum) => {
+  const handleAddPurchaseAccount = (stockAccountNum, purchaseAccountNum) => 
+  {
     const updatedAccounts = {
       ...accounts,
       [stockAccountNum]: {
@@ -190,4 +198,4 @@ export const StockPurchasesMapping = (props) =>
       </div>
     </div>
   );
-};
+}

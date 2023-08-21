@@ -1,137 +1,105 @@
+// La Société Nouvelle
+
+// React
 import React, { useState } from "react";
+
+// Bootstrap
 import { Container } from "react-bootstrap";
 
-
 // Views
-import FinancialDataForm from "./views/FinancialDataForm";
-import FECImport from "./views/FECImport";
-import DepreciationAssetsMapping from "./views/DepreciationAssetsMapping";
+import { FinancialDataForm } from "./views/FinancialDataForm";
+import { BalanceForwardBookSelection } from "./views/BalanceForwardBookSelection";
+import { DepreciationAssetsMapping } from "./views/DepreciationAssetsMapping";
 import { StockPurchasesMapping } from "./views/StockPurchasesMapping";
 import { FinancialDatas } from "./views/FinancialDatas";
 
 // Readers
-import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
+import { FECDataReader } from "/src/readers/FECReader";
 
 // Utils
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
 
 // Modals
 import ErrorReportModal from "../../popups/ErrorReportModal";
-import { ErrorAPIModal, ErrorFileModal } from "../../popups/MessagePopup";
+import { ErrorAPIModal } from "../../popups/MessagePopup";
 
-const AccountingImportSection = (props) => {
+const AccountingImportSection = (props) => 
+{
   const { session } = props;
 
-  const [corporateName, setCorporateName] = useState(
-    session.legalUnit.corporateName || ""
-  );
-  const [siren, setSiren] = useState(session.legalUnit.siren || "");
-  const [selectedDivision, setSelectedDivision] = useState(
-    session.legalUnit.activityCode || ""
-  );
-  const [file, setFile] = useState([]);
+  const [view, setView] = useState(session.financialData.isFinancialDataLoaded ? 4 : 0);
   const [importedData, setImportedData] = useState(null);
-  const [view, setView] = useState(
-    session.financialData.isFinancialDataLoaded ? 4 : 0
-  );
+
+  const [division, setDivision] = useState(session.comparativeData.activityCode);
+
   const [errorFEC, setErrorFEC] = useState(false);
-  const [errorFile, setErrorFile] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState([]);
   const [errorAPI, setErrorAPI] = useState(false);
 
   const handleCorporateName = (corporateName) => {
     session.legalUnit.corporateName = corporateName;
-    setCorporateName(corporateName);
   };
 
-  const handleSiren = async (siren) => {
-    setSiren(siren);
-  
-    if (
-      siren !== "" &&
-      /^[0-9]{9}$/.test(siren) &&
-      /^[^a-zA-Z]+$/.test(siren)
-    ) {
-      try {
-        await session.legalUnit.setSiren(siren);
-        const divisionCode = session.legalUnit.activityCode.slice(0, 2);
-        session.comparativeData.activityCode = divisionCode;
-        setSelectedDivision(divisionCode);
-        setCorporateName(session.legalUnit.corporateName);
-      } catch (error) {
-        setErrorAPI(true);
-
+  const handleSiren = async (siren) => 
+  { 
+    session.legalUnit.siren = siren;
+    try {
+      await session.legalUnit.fetchLegalUnitData();
+      if (/^[0-9]{2}/.test(session.legalUnit.activityCode)) {
+        session.comparativeData.activityCode = session.legalUnit.activityCode.slice(0,2);
+        setView(view);
+        setDivision(session.legalUnit.activityCode.slice(0,2));
       }
+    } catch (error) {
+      setErrorAPI(true);
     }
   };
   
   const handleDivision = (division) => {
     session.legalUnit.activityCode = division;
     session.comparativeData.activityCode = division;
-    setSelectedDivision(division);
   };
-  const handleFile = (file) => {
-    setErrorFEC(false);
-    setErrorFile(false);
-    setErrors([]);
-    setFile(file);
+  const handleFECData = (FECData) => {
+    console.log(FECData);
+    setImportedData(FECData);
+    nextView(0);
   };
 
-  const nextView = (currentView) => {
-    if (currentView === 1) {
-      let accountsToMap = Object.keys(importedData.meta.accounts).filter(
-        (accountNum) =>
-          /^28/.test(accountNum) ||
-          /^29/.test(accountNum) ||
-          /^39/.test(accountNum)
-      );
-      if (accountsToMap.length > 0) {
-        setView(2);
-      } else {
-        nextView(2);
-      }
-    } else if (currentView === 2) {
-      let stocksAccounts = Object.keys(importedData.meta.accounts).filter(
-        (accountNum) => /^3(1|2|7)/.test(accountNum)
-      );
-      if (stocksAccounts.length > 0) {
-        setView(3);
-      } else {
-        loadFECData(importedData);
-      }
+  const nextView = (currentView) => 
+  {
+    switch(currentView) 
+    {
+      case 0 : {
+        setView(1);
+        break;
+      }; break;
+      case 1 : {
+        let haveAmortisationAccounts = Object.keys(importedData.meta.accounts)
+          .filter((accountNum) =>/^(28|29|39)/.test(accountNum));
+        if (haveAmortisationAccounts) {
+          setView(2);
+        } else {
+          nextView(2);
+        }
+      }; break;
+      case 2 : {
+        let haveStockAccounts = Object.keys(importedData.meta.accounts)
+          .some((accountNum) => /^3(1|2|7)/.test(accountNum));
+        if (haveStockAccounts) {
+          setView(3);
+        } else {
+          loadFECData(importedData);
+        }
+      }; break;
+      case 3 : {
+        setView(4)
+      }; break;
+      default : setView(0);
     }
   };
 
-  const importFECFile = async (file) => {
-    let currentFile = file[0];
-    let reader = new FileReader();
-
-    try {
-      reader.readAsText(currentFile, "iso-8859-1");
-
-      // Wait for the reader to finish loading the file
-      await new Promise((resolve) => {
-        reader.onload = resolve;
-      });
-
-      // Parse the file content
-      let FECData = await FECFileReader(reader.result);
-
-      console.log("--------------------------------------------------");
-      console.log("Lecture du FEC");
-      console.log(FECData.meta);
-      console.log(FECData.books);
-      setImportedData(FECData);
-      setView(1);
-    } catch (error) {
-      console.log(error);
-      setErrorFile(true);
-      setErrorMessage(error);
-    }
-  };
-
-  const loadFECData = async (importedData) => {
+  const loadFECData = async (importedData) => 
+  {
     let FECData = await FECDataReader(importedData);
     console.log("--------------------------------------------------");
     console.log("Lecture des écritures comptables");
@@ -177,47 +145,23 @@ const AccountingImportSection = (props) => {
     <Container fluid>
       <section className="step">
         <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
+
         {view === 0 && (
           <FinancialDataForm
             onChangeCorporateName={handleCorporateName}
             onChangeSiren={handleSiren}
             onChangeDivision={handleDivision}
-            uploadFile={handleFile}
-            corporateName={corporateName}
-            siren={siren}
-            selectedDivision={selectedDivision}
+            setImportedData={handleFECData}
+            corporateName={session.legalUnit.corporateName}
+            siren={session.legalUnit.siren}
+            division={division}
             onClick={() => importFECFile(file)}
             nextStep={() => setView(2)}
           />
         )}
 
-        {errorFEC && (
-          <ErrorReportModal
-            hasError={errorFEC}
-            onClose={() => setErrorFEC(false)}
-            errorMessage={errorMessage}
-            errors={errors}
-          />
-        )}
-        {
-          errorFile && (
-            <ErrorFileModal
-            title={"Erreur lors de la lecture du FEC"}
-            errorFile={errorFile}
-            errorMessage={errorMessage}
-            onClose={() => setErrorFile(false)}
-            />
-          )
-        }
-
-        <ErrorAPIModal
-        hasError = {errorAPI}
-                    onClose={() => setErrorAPI(false)}
-
-        ></ErrorAPIModal>
-
         {view === 1 && (
-          <FECImport
+          <BalanceForwardBookSelection
             return={() => setView(0)}
             FECData={importedData}
             onClick={() => nextView(1)}
@@ -247,6 +191,20 @@ const AccountingImportSection = (props) => {
             reset={() => setView(0)}
           />
         )}
+
+        {errorFEC && (
+          <ErrorReportModal
+            hasError={errorFEC}
+            onClose={() => setErrorFEC(false)}
+            errorMessage={errorMessage}
+            errors={errors}
+          />
+        )}
+
+        <ErrorAPIModal
+          hasError = {errorAPI}
+          onClose={() => setErrorAPI(false)}/>
+        
       </section>
     </Container>
   );

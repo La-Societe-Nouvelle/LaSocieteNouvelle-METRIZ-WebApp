@@ -1,6 +1,5 @@
 import {
-    buildRegexFinancialPeriod,
-    getListMonthsFinancialPeriod,
+    buildRegexFinancialPeriod
   } from "/src/Session";
 
 export const getFinancialPeriodFECData = (FECData) =>
@@ -29,3 +28,9 @@ export const getMonthPeriodsFECData = (FECData) =>
 
   return [];
 }
+
+export const getListMonthsFinancialPeriod = (dateStart, dateEnd) => {
+  let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
+  let months = datesEndMonths.map((date) => date.substring(0, 6));
+  return months;
+};
