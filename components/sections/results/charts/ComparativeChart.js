@@ -81,7 +81,7 @@ export const ComparativeChart = ({
     comparativeData[aggregate].area.target.data[indic.toUpperCase()] ? 
       comparativeData[aggregate].area.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
     null,
-    comparativeData[aggregate].area.target.data[indic.toUpperCase()] ? 
+    comparativeData[aggregate].division.target.data[indic.toUpperCase()] ? 
       comparativeData[aggregate].division.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
   ];
 

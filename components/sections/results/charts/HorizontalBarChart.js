@@ -1,3 +1,6 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
@@ -6,7 +9,20 @@ Chart.register(ChartDataLabels);
 
 // Libraries
 
-const DeviationChart = ({ id, legalUnitData, branchData }) => {
+// to rename
+
+const DeviationChart = ({ 
+  id,
+  session,
+  period,
+  indic 
+}) => {
+
+  const {
+    financialData,
+    comparativeData
+  } = session;
+
   const labels = [
     "Production",
     "Consommations intermédiaires",
@@ -14,16 +30,20 @@ const DeviationChart = ({ id, legalUnitData, branchData }) => {
     "Valeur ajoutée nette",
   ];
 
-  const data = legalUnitData.map((value, key) => {
+  const aggregates = [
+    "production",
+    "intermediateConsumptions",
+    "fixedCapitalConsumptions",
+    "netValueAdded"
+  ];
 
-    if (value) {
-      const difference = value - branchData[key].value;
-      const percentage = (difference / branchData[key].value) * 100;
-      return Math.round(percentage);
-    } else {
-      return 0;
-    }
-  });
+  const data = [];
+  for (let aggregate of aggregates) {
+    let companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
+    let divisionFootprint = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+    let value = Math.round( (companyFootprint-divisionFootprint)/divisionFootprint * 100 );
+    data.push(value);
+  }
 
   const maxValue = Math.max(
     Math.abs(Math.min(...data)),

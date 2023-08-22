@@ -128,29 +128,13 @@ const IndicatorCharts = ({
         indicators[indic].type == "indice") && (
         <Row>
           <div className="deviation-chart-container">
-            {/* <DeviationChart
+            <DeviationChart
               id={`deviation-chart-${indic}-print`}
-              legalUnitData={[
-                mainAggregates.production.periodsData[period.periodKey].footprint
-                  .indicators[indic].value,
-                mainAggregates.intermediateConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.indicators[indic].value,
-                mainAggregates.fixedCapitalConsumptions.periodsData[
-                  period.periodKey
-                ].footprint.indicators[indic].value,
-                mainAggregates.netValueAdded.periodsData[period.periodKey].footprint
-                  .indicators[indic].value,
-              ]}
-              branchData={[
-                datasets["production"].division,
-                datasets["intermediateConsumptions"].division,
-                datasets["fixedCapitalConsumptions"].division,
-                datasets["netValueAdded"].division,
-              ]}
+              session={session}
+              period={period}
               indic={indic}
               isPrinting={true}
-            /> */}
+            />
           </div>
         </Row>
       )}
