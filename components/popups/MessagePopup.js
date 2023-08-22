@@ -60,6 +60,20 @@ export const ErrorFileModal = ({ errorFile, title, errorMessage, onClose }) => {
   );
 };
 
+export const InfoModal = ({ showModal, title, message, onClose }) => {
+  return (
+    <Modal show={showModal} onHide={onClose} size="md" centered>
+      <Modal.Header closeButton>
+        <Modal.Title as={"h6"}>{title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <p className="small">{message}</p>
+      </Modal.Body>
+
+    </Modal>
+  );
+};
+
 export const ErrorAPIModal = ({ hasError, onClose }) => {
   return (
     <Modal show={hasError} onHide={onClose} size="md" centered>

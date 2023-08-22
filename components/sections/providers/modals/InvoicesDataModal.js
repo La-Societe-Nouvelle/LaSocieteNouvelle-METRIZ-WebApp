@@ -4,7 +4,7 @@
 import React from "react";
 import { Modal, Table } from "react-bootstrap";
 
-/* -------------------- INVOICES DATA POPUP -------------------- */
+/* -------------------- INVOICES DATA MODAL -------------------- */
 
 /** Component in SirenSection
  *  Props :
@@ -18,7 +18,7 @@ import { Modal, Table } from "react-bootstrap";
  *    mapping
  */
 
-export class InvoicesPopup extends React.Component 
+export class InvoicesDataModal extends React.Component 
 {
   constructor(props) {
     super(props);
@@ -31,17 +31,17 @@ export class InvoicesPopup extends React.Component
 
   render() 
   {
-    const { invoicesData, providers, closeinvoicesPopup} = this.props;
+    const { invoicesData, providers, closeInvoicesDataModal, onSubmit} = this.props;
     const { mapping } = this.state;
     
     return (
-      <Modal show="true" onHide={closeinvoicesPopup} size="xl" centered>
+      <Modal show="true" onHide={closeInvoicesDataModal} size="xl" centered>
         <Modal.Header  closeButton>
           <h3>Associer les comptes fournisseurs </h3>
         </Modal.Header>
         <Modal.Body>
           <div className="assessment">
-            <Table size="sm" responsive>
+            <Table size="sm" >
               <thead>
                 <tr>
                   <td>Identifiant</td>
@@ -84,16 +84,9 @@ export class InvoicesPopup extends React.Component
             </Table>
 
             <div className="view-footer text-end mt-2">
-            <button
-                className="btn btn-light me-1 "
-                onClick={closeinvoicesPopup}
-              >
-                Annuler
-              </button>
-
               <button
                 className="btn btn-secondary "
-                onClick={() => this.onSubmit()}
+                onClick={() => onSubmit(this.state.mapping)}
               >
                 Valider
               </button>
@@ -114,13 +107,7 @@ export class InvoicesPopup extends React.Component
     this.setState({ mapping });
   };
 
-  // Submit
-  onSubmit = async () => 
-  {
-    // to do
-    this.props.onGoBack(this.state.mapping);
-  };
-
+ 
   /* ---------- TABLE DISPLAY ---------- */
 
   // Column for sorting
