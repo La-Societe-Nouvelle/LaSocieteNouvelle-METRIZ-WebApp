@@ -24,8 +24,8 @@ import { HeaderPublish } from "/components/parts/headers/HeaderPublish";
 import { updateVersion } from "/src/version/updateVersion";
 import { Footer } from "/components/parts/Footer";
 import { Mobile } from "/components/Mobile";
-import { DataUpdater } from "/components/popups/dataUpdater/DataUpdater";
-import SaveModal from "../components/popups/SaveModal";
+import { DataUpdater } from "/components/modals/dataUpdater/DataUpdater";
+import SaveModal from "../components/modals/SaveModal";
 import ErrorBoundary from "../src/utils/ErrorBoundary";
 
 // Services

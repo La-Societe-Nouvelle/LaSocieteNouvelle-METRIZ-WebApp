@@ -3,9 +3,9 @@
 // React
 import { Image, Modal } from "react-bootstrap";
 
-export const ProvidersImportSuccessModal = ({ sync, closePopup }) => {
+export const ProvidersImportSuccessModal = ({ showModal, sync, onClose }) => {
   return (
-    <Modal show="true" onHide={closePopup} size="md" centered>
+    <Modal show={showModal} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
         <Modal.Title as={"h5"}>Import des fournisseurs</Modal.Title>
       </Modal.Header>

@@ -31,11 +31,11 @@ export class InvoicesDataModal extends React.Component
 
   render() 
   {
-    const { invoicesData, providers, closeInvoicesDataModal, onSubmit} = this.props;
+    const { invoicesData, providers, showModal, onClose, onSubmit} = this.props;
     const { mapping } = this.state;
     
     return (
-      <Modal show="true" onHide={closeInvoicesDataModal} size="xl" centered>
+      <Modal show={showModal} onHide={onClose} size="xl" centered>
         <Modal.Header  closeButton>
           <h3>Associer les comptes fournisseurs </h3>
         </Modal.Header>

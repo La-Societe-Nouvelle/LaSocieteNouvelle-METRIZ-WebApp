@@ -21,7 +21,7 @@ import divisions from "/lib/divisions";
 
 // Readers
 import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
-import { ErrorFileModal } from "../../../popups/MessagePopup";
+import { ErrorFileModal } from "../../../modals/userInfoModals";
 
 /* ---------- FEC IMPORT FORM ---------- */
 

@@ -6,13 +6,13 @@ import Dropzone from "react-dropzone";
 
 // Components
 import { InitialStatesTable } from "../../tables/InitialStatesTable";
-import { ProgressBar } from "../../popups/ProgressBar";
+import { ProgressBar } from "../../modals/ProgressBar";
 
 import { updateVersion } from "../../../src/version/updateVersion";
 import { Container } from "react-bootstrap";
 import { getPrevDate } from "../../../src/utils/Utils";
 import { Session } from "../../../src/Session";
-import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../popups/MessagePopup";
+import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../modals/userInfoModals";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */

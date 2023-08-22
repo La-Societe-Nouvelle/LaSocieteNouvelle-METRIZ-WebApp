@@ -5,7 +5,7 @@ import React from "react";
 
 // Components
 import { UnidentifiedCompaniesTable } from "../../tables/UnidentifiedCompaniesTable";
-import { ProgressBar } from "../../popups/ProgressBar";
+import { ProgressBar } from "../../modals/ProgressBar";
 
 // Readers
 import { Container } from "react-bootstrap";
@@ -15,7 +15,7 @@ import { getSignificativeUnidentifiedProviders } from "/src/formulas/significati
 
 // API
 import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
-import { ErrorAPIModal } from "../../popups/MessagePopup";
+import { ErrorAPIModal } from "../../modals/userInfoModals";
 
 /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- PROVIDERS SECTION - IDENTIFIED PROVIDERS -------------------------------------------------- */

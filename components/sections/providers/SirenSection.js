@@ -17,8 +17,8 @@ import { CSVFileReader, processCSVCompaniesData } from "/src/readers/CSVReader";
 import { XLSXFileReader } from "/src/readers/XLSXReader";
 
 // Modals
-import { ProgressBar } from "../../popups/ProgressBar";
-import { ErrorAPIModal, InfoModal } from "../../popups/MessagePopup";
+import { ProgressBar } from "../../modals/ProgressBar";
+import { ErrorAPIModal, InfoModal } from "../../modals/userInfoModals";
 import { ProvidersImportSuccessModal } from "./modals/ProvidersImportSuccessModal";
 import { InvoicesDataModal } from "./modals/InvoicesDataModal";
 
@@ -53,9 +53,9 @@ export class SirenSection extends React.Component {
       file: null,
       progression: 0,
       synchronised: 0,
-      importProvidersModal: false,
+      showImportProvidersModal: false,
       showInvoicesDataModal: false,
-      showInfoModal : false,
+      showInfoModal: false,
       isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
       isNextStepAvailable: checkNextStepAvailable(
         props.financialData.providers
@@ -78,12 +78,11 @@ export class SirenSection extends React.Component {
     };
 
     this.onInvoicesDrop = async (files) => {
-    
       if (files.length > 0) {
         let invoicesData = await this.readInvoices(files);
         console.log(invoicesData);
-        console.log(Object.keys(invoicesData).length)
-        if(Object.keys(invoicesData).length !== 0) {
+        console.log(Object.keys(invoicesData).length);
+        if (Object.keys(invoicesData).length !== 0) {
           this.setState({
             fetching: false,
             progression: 0,
@@ -91,16 +90,13 @@ export class SirenSection extends React.Component {
             errorFile: false,
             invoicesData,
           });
-        }
-        else{
+        } else {
           this.setState({
             fetching: false,
             progression: 0,
             showInfoModal: true,
           });
         }
-    
-        
       } else {
         this.setState({
           showInvoicesDataModal: false,
@@ -147,7 +143,7 @@ export class SirenSection extends React.Component {
       nbItems,
       fetching,
       progression,
-      importProvidersModal,
+      showImportProvidersModal,
       showInvoicesDataModal,
       showInfoModal,
       isSyncButtonEnable,
@@ -191,6 +187,7 @@ export class SirenSection extends React.Component {
               Synchronisation des données grâce au numéro de siren
             </h3>
           </div>
+            {/* Download Providers Excel file*/}
           <div className="step mt-3">
             <h4>1. Télécharger et compléter le tableaux de vos fournisseurs</h4>
             <p className="form-text">
@@ -204,6 +201,7 @@ export class SirenSection extends React.Component {
               <i className="bi bi-download"></i> Exporter mes fournisseurs
             </button>
           </div>
+           {/* Import Completed Excel File */}
           <div className="step">
             <h4>2. Importer le fichier excel complété</h4>
 
@@ -236,15 +234,8 @@ export class SirenSection extends React.Component {
                 </p>
               </div>
             )}
-            {importProvidersModal && (
-              <ProvidersImportSuccessModal
-                sync={() => this.synchroniseProviders()}
-                closeImportProvidersModal={() =>
-                  this.closeImportProvidersModal()
-                }
-              />
-            )}
           </div>
+            {/* Upload Invoices */}
           <div className="step">
             <h4>Déposer des factures</h4>
 
@@ -272,19 +263,27 @@ export class SirenSection extends React.Component {
               onClose={() => {
                 this.setState({ showInfoModal: false });
               }}
-            ></InfoModal>    
+            ></InfoModal>
 
-            {showInvoicesDataModal && (
+            <ProvidersImportSuccessModal
+              showModal={showImportProvidersModal}
+              sync={() => this.synchroniseProviders()}
+              onClose={() => this.setState({ showImportProvidersModal: false })}
+            />
+
+            {invoicesData && (
               <InvoicesDataModal
+                showModal={showInvoicesDataModal}
                 invoicesData={invoicesData}
                 providers={providers}
-                closeInvoicesDataModal={() => this.closeInvoicesDataModal()}
+                onClose={() => this.setState({ showInvoicesDataModal: false })}
                 onSubmit={(invoicesData) =>
                   this.setInvoicesProvider(invoicesData)
                 }
               />
             )}
           </div>
+            {/* Synchronize Providers Data */}
           <div className="step" id="step-3">
             <h4>3. Synchroniser les données de vos fournisseurs</h4>
 
@@ -750,9 +749,7 @@ export class SirenSection extends React.Component {
   };
 
   setInvoicesProvider = (invoicesData) => {
-  
     for (let invoiceData of Object.values(invoicesData)) {
-   
       if (invoiceData.matching != "") {
         let provider = this.props.financialData.providers.find(
           (provider) => provider.providerNum == invoiceData.matching
@@ -806,7 +803,7 @@ export class SirenSection extends React.Component {
   // fetch data for showed providers
   synchroniseProviders = async () => {
     // Hide the import providers modal after initiating synchronization
-    this.setState({ importProvidersModal: false });
+    this.setState({ showImportProvidersModal: false });
 
     // providers with fpt unfetched
     let providersToSynchronise = this.props.financialData.providers.filter(
@@ -864,11 +861,14 @@ export class SirenSection extends React.Component {
   /* ----- MODALS ----- */
 
   openImportProvidersModal = () =>
-this.setState({ importProvidersModal: true });
-  closeImportProvidersModal = () =>
-    this.setState({ importProvidersModal: false });
+    this.setState({ showImportProvidersModal: true });
+
   closeInvoicesDataModal = () =>
-    this.setState({ showInvoicesDataModal: false, invoicesData: null, file: [] });
+    this.setState({
+      showInvoicesDataModal: false,
+      invoicesData: null,
+      file: [],
+    });
 }
 
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
