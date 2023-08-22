@@ -1,5 +1,12 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
 import Dropzone from "react-dropzone";
+import { Container } from "react-bootstrap";
+
+// API
+import api from "../../../config/api";
 
 // Table
 import { IdentifiedProvidersTable } from "../../tables/IdentifiedCompaniesTable";
@@ -9,24 +16,24 @@ import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
 import { CSVFileReader, processCSVCompaniesData } from "/src/readers/CSVReader";
 import { XLSXFileReader } from "/src/readers/XLSXReader";
 
-// Components
+// Modals
 import { ProgressBar } from "../../popups/ProgressBar";
-import { ErrorAPIModal, SuccessFileModal } from "../../popups/MessagePopup";
-import { Container } from "react-bootstrap";
+import { ErrorAPIModal, InfoModal } from "../../popups/MessagePopup";
+import { ProvidersImportSuccessModal } from "./modals/ProvidersImportSuccessModal";
+import { InvoicesDataModal } from "./modals/InvoicesDataModal";
 
 // Formulas
 import { getSignificativeProviders } from "/src/formulas/significativeLimitFormulas";
 
-// API
-import api from "../../../config/api";
-
-import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
+// Services
+import {
+  fetchMaxFootprint,
+  fetchMinFootprint,
+} from "/src/services/DefaultDataService";
 
 // pdf extractor
 import pdf from "pdf-extraction";
-import { InvoicesPopup } from "./InvoicesPopup";
 import { getDefaultFootprintId } from "../../../src/Provider";
-
 
 const identificationPatterns = [
   /FR[0-9]{11}( |$|\r\n|\r|\n)/g,
@@ -46,8 +53,9 @@ export class SirenSection extends React.Component {
       file: null,
       progression: 0,
       synchronised: 0,
-      popup: false,
-      invoicesPopup: false,
+      importProvidersModal: false,
+      showInvoicesDataModal: false,
+      showInfoModal : false,
       isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
       isNextStepAvailable: checkNextStepAvailable(
         props.financialData.providers
@@ -62,27 +70,40 @@ export class SirenSection extends React.Component {
     this.onDrop = (files) => {
       if (files.length) {
         this.importFile(files[0]);
-        this.openPopup();
+        this.openImportProvidersModal();
         this.setState({ errorFile: false });
       } else {
         this.setState({ errorFile: true });
       }
     };
 
-    this.onInvoicesDrop = async (files) => 
-    {
+    this.onInvoicesDrop = async (files) => {
+    
       if (files.length > 0) {
         let invoicesData = await this.readInvoices(files);
-        this.setState({
-          fetching: false,
-          progression: 0,
-          invoicesPopup: true,
-          errorFile: false,
-          invoicesData,
-        });
+        console.log(invoicesData);
+        console.log(Object.keys(invoicesData).length)
+        if(Object.keys(invoicesData).length !== 0) {
+          this.setState({
+            fetching: false,
+            progression: 0,
+            showInvoicesDataModal: true,
+            errorFile: false,
+            invoicesData,
+          });
+        }
+        else{
+          this.setState({
+            fetching: false,
+            progression: 0,
+            showInfoModal: true,
+          });
+        }
+    
+        
       } else {
         this.setState({
-          invoicesPopup: false,
+          showInvoicesDataModal: false,
           errorFile: true,
           invoicesData: null,
         });
@@ -126,8 +147,9 @@ export class SirenSection extends React.Component {
       nbItems,
       fetching,
       progression,
-      popup,
-      invoicesPopup,
+      importProvidersModal,
+      showInvoicesDataModal,
+      showInfoModal,
       isSyncButtonEnable,
       isNextStepAvailable,
       errorFile,
@@ -214,23 +236,19 @@ export class SirenSection extends React.Component {
                 </p>
               </div>
             )}
-            {popup && (
-              <SuccessFileModal
-                title={"Import des fournisseurs"}
-                message="Vous pouvez maintenant synchroniser les
-                données des fournisseurs."
-                closePopup={() => this.closePopup()}
+            {importProvidersModal && (
+              <ProvidersImportSuccessModal
+                sync={() => this.synchroniseProviders()}
+                closeImportProvidersModal={() =>
+                  this.closeImportProvidersModal()
+                }
               />
             )}
           </div>
           <div className="step">
             <h4>Déposer des factures</h4>
 
-            <Dropzone
-              onDrop={this.onInvoicesDrop}
-              accept={[".pdf"]}
-              //maxFiles={1}
-            >
+            <Dropzone onDrop={this.onInvoicesDrop} accept={[".pdf"]}>
               {({ getRootProps, getInputProps }) => (
                 <div className="dropzone-section">
                   <div {...getRootProps()} className="dropzone">
@@ -246,12 +264,22 @@ export class SirenSection extends React.Component {
               )}
             </Dropzone>
 
-            {invoicesPopup && (
-              <InvoicesPopup
+            <InfoModal
+              showModal={showInfoModal}
+              title={"Association des comptes fournisseurs"}
+              message="Aucun SIREN n'a pu être extrait des documents importés.  
+              Veuillez renseigner manuellement le numero SIREN de ces comptes fournisseurs "
+              onClose={() => {
+                this.setState({ showInfoModal: false });
+              }}
+            ></InfoModal>    
+
+            {showInvoicesDataModal && (
+              <InvoicesDataModal
                 invoicesData={invoicesData}
                 providers={providers}
-                closeinvoicesPopup={() => this.closeinvoicesPopup()}
-                onGoBack={(invoicesData) =>
+                closeInvoicesDataModal={() => this.closeInvoicesDataModal()}
+                onSubmit={(invoicesData) =>
                   this.setInvoicesProvider(invoicesData)
                 }
               />
@@ -443,28 +471,32 @@ export class SirenSection extends React.Component {
 
   /* ---------- UPDATES ---------- */
 
-  refreshSection = async () => 
-  {
+  refreshSection = async () => {
     // next step available
-    const isNextStepAvailable = checkNextStepAvailable(this.props.financialData.providers);
+    const isNextStepAvailable = checkNextStepAvailable(
+      this.props.financialData.providers
+    );
 
     // data to sync
-    const isSyncButtonEnable = checkSyncButtonEnable(this.props.financialData.providers);
+    const isSyncButtonEnable = checkSyncButtonEnable(
+      this.props.financialData.providers
+    );
 
     // significative prodiders
-    let {minFpt,maxFpt} = this.state;
+    let { minFpt, maxFpt } = this.state;
     let significativeProviders = await getSignificativeProviders(
       this.props.financialData.providers,
-      minFpt,maxFpt,
+      minFpt,
+      maxFpt,
       this.props.financialPeriod
     );
 
     this.setState({
       isNextStepAvailable,
       isSyncButtonEnable,
-      significativeProviders 
-    })
-  }
+      significativeProviders,
+    });
+  };
 
   /* ---------- FILE IMPORT ---------- */
 
@@ -565,27 +597,49 @@ export class SirenSection extends React.Component {
       promises.push(filePromise);
     }
 
-    await Promise.all(promises).then(async (fileContents) => 
-    {
-      for (let fileContent of fileContents) 
-      {
+    await Promise.all(promises).then(async (fileContents) => {
+      for (let fileContent of fileContents) {
         let data = await pdf(fileContent);
-    
+
         // VAT Identification Numbers
-        let identificationNumbers = identificationPatterns.map((regex) => (data.text.match(regex) || []))
-          .reduce((a,b) => a.concat(b),[])
-          .map((number) => number.replace(/( |\r\n|\r|\n|RCS|SIREN|SIRET)/g,''))
-          .filter((value, index, self) => index === self.findIndex((item) => item == value));
+        let identificationNumbers = identificationPatterns
+          .map((regex) => data.text.match(regex) || [])
+          .reduce((a, b) => a.concat(b), [])
+          .map((number) =>
+            number.replace(/( |\r\n|\r|\n|RCS|SIREN|SIRET)/g, "")
+          )
+          .filter(
+            (value, index, self) =>
+              index === self.findIndex((item) => item == value)
+          );
         // Dates
-        let dates = (data.text.match(/[0-9]{2}\/[0-9]{2}\/(20|)[0-9]{2}/g) || [])
-          .map((date) => "20"+(date.length==8 ? date.substring(6,8) : date.substring(8,10))+date.substring(3,5)+date.substring(0,2))
-          .filter((value, index, self) => index === self.findIndex((item) => item == value));
+        let dates = (
+          data.text.match(/[0-9]{2}\/[0-9]{2}\/(20|)[0-9]{2}/g) || []
+        )
+          .map(
+            (date) =>
+              "20" +
+              (date.length == 8
+                ? date.substring(6, 8)
+                : date.substring(8, 10)) +
+              date.substring(3, 5) +
+              date.substring(0, 2)
+          )
+          .filter(
+            (value, index, self) =>
+              index === self.findIndex((item) => item == value)
+          );
         // Amounts
         let amounts = (data.text.match(/[0-9| ]+(.|,)[0-9]{0,2}( |)€/g) || [])
-          .map((amount) => amount.replace(/€/g,'').replace(/ /g,'').replace(',','.'))
+          .map((amount) =>
+            amount.replace(/€/g, "").replace(/ /g, "").replace(",", ".")
+          )
           .map((amount) => parseFloat(amount))
-          .filter((value, index, self) => index === self.findIndex((item) => item == value));
-        
+          .filter(
+            (value, index, self) =>
+              index === self.findIndex((item) => item == value)
+          );
+
         let invoiceData = {
           identificationNumbers,
           dates,
@@ -618,7 +672,7 @@ export class SirenSection extends React.Component {
               }
             })
             .catch((err) => {
-              this.setState({ error:true });
+              this.setState({ error: true });
             });
           // fetch data
           invoicesProviders[idProvider] = {
@@ -695,13 +749,14 @@ export class SirenSection extends React.Component {
     return invoicesProviders;
   };
 
-  setInvoicesProvider = (invoicesData) => 
-  {
-    for (let invoiceData of Object.values(invoicesData)) 
-    {
-      if (invoiceData.matching!="") 
-      {
-        let provider = this.props.financialData.providers.find((provider) => provider.providerNum == invoiceData.matching);
+  setInvoicesProvider = (invoicesData) => {
+  
+    for (let invoiceData of Object.values(invoicesData)) {
+   
+      if (invoiceData.matching != "") {
+        let provider = this.props.financialData.providers.find(
+          (provider) => provider.providerNum == invoiceData.matching
+        );
         if (provider) {
           provider.corporateId = invoiceData.legalUnitData.siren;
           provider.legalUnitData = invoiceData.legalUnitData;
@@ -709,11 +764,11 @@ export class SirenSection extends React.Component {
           provider.footprintStatus = 0;
         }
       } else {
-        // remove data from provier
+        // remove data from provider
       }
     }
 
-    this.setState({ invoicesData: null, invoicesPopup: false });
+    this.setState({ invoicesData: null, showInvoicesDataModal: false });
   };
 
   /* ---------- FILE EXPORT ---------- */
@@ -750,8 +805,14 @@ export class SirenSection extends React.Component {
 
   // fetch data for showed providers
   synchroniseProviders = async () => {
+    // Hide the import providers modal after initiating synchronization
+    this.setState({ importProvidersModal: false });
+
     // providers with fpt unfetched
-    let providersToSynchronise = this.props.financialData.providers.filter((provider) => !provider.useDefaultFootprint && provider.footprintStatus != 200);
+    let providersToSynchronise = this.props.financialData.providers.filter(
+      (provider) =>
+        !provider.useDefaultFootprint && provider.footprintStatus != 200
+    );
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
 
@@ -800,12 +861,14 @@ export class SirenSection extends React.Component {
     document.getElementById("step-3").scrollIntoView();
   };
 
-  /* ----- POP-UP ----- */
+  /* ----- MODALS ----- */
 
-  openPopup = () => this.setState({ popup: true });
-  closePopup = () => this.setState({ popup: false });
-  openinvoicesPopup = () => this.setState({ invoicesPopup: true });
-  closeinvoicesPopup = () => this.setState({ invoicesPopup: false, invoicesData: null, file: [] });
+  openImportProvidersModal = () =>
+this.setState({ importProvidersModal: true });
+  closeImportProvidersModal = () =>
+    this.setState({ importProvidersModal: false });
+  closeInvoicesDataModal = () =>
+    this.setState({ showInvoicesDataModal: false, invoicesData: null, file: [] });
 }
 
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
