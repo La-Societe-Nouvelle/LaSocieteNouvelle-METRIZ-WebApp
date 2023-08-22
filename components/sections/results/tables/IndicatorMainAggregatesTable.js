@@ -569,7 +569,7 @@ export const IndicatorMainAggregatesTable = ({
                 {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
-                      periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(amount),
+                      periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(periodsData[period.periodKey].amount),
                       nbDecimals
                     )}
                     
@@ -603,7 +603,9 @@ export const IndicatorMainAggregatesTable = ({
                             prevIntermediateConsumptionsAggregates[
                               index
                             ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getGrossImpact(
-                              amount
+                              prevIntermediateConsumptionsAggregates[
+                                index
+                              ].periodsData[prevPeriod.periodKey].amount
                             ),
                             nbDecimals
                           )}
@@ -717,7 +719,7 @@ export const IndicatorMainAggregatesTable = ({
                 {printGrossImpact && (
                   <td className="text-end">
                     {printValue(
-                      periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(amount),
+                      periodsData[period.periodKey].footprint.indicators[indic].getGrossImpact(periodsData[period.periodKey].amount),
                       nbDecimals
                     )}
                     
@@ -751,7 +753,9 @@ export const IndicatorMainAggregatesTable = ({
                             prevFixedCapitalConsumptionsAggregates[
                               index
                             ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getGrossImpact(
-                              amount
+                              prevFixedCapitalConsumptionsAggregates[
+                                index
+                              ].periodsData[prevPeriod.periodKey].amount
                             ),
                             nbDecimals
                           )}

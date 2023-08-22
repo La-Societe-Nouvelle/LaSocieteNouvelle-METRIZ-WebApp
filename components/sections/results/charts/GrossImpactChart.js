@@ -1,18 +1,37 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
-// Modules
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Doughnut } from "react-chartjs-2";
 
-function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, netValueAdded,id,isPrinting}) {
+export const GrossImpactChart = ({
+  id,
+  session,
+  period,
+  indic,
+  isPrinting
+}) => {
 
+  const {
+    financialData
+  } = session;
 
-  let total = intermediateConsumptions + fixedCapitalConsumptions + netValueAdded;
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    netValueAdded
+  } = financialData.mainAggregates;
 
-  intermediateConsumptions = (intermediateConsumptions / total) * 100;
-  fixedCapitalConsumptions = (fixedCapitalConsumptions / total) * 100;
-  netValueAdded = (netValueAdded / total) * 100;
+  const productionGrossImpacts = getGrossImpact(production,period,indic);
+  const grossImpactsDistribution = {
+    intermediateConsumptions: Math.round((getGrossImpact(intermediateConsumptions,period,indic) / productionGrossImpacts) * 100),
+    fixedCapitalConsumptions: Math.round((getGrossImpact(fixedCapitalConsumptions,period,indic) / productionGrossImpacts) * 100),
+    netValueAdded:            Math.round((getGrossImpact(netValueAdded,period,indic) / productionGrossImpacts) * 100),
+  }
 
   const data = {
     labels: [
@@ -23,9 +42,9 @@ function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, n
     datasets: [
       {
         data: [
-          Math.round(intermediateConsumptions),
-          Math.round(fixedCapitalConsumptions),
-          Math.round(netValueAdded),
+          grossImpactsDistribution.intermediateConsumptions,
+          grossImpactsDistribution.fixedCapitalConsumptions,
+          grossImpactsDistribution.netValueAdded,
         ],
         skipNull: true,
         backgroundColor: [
@@ -79,4 +98,8 @@ function GrossImpactChart({intermediateConsumptions, fixedCapitalConsumptions, n
   return <Doughnut id={id} data={data} options={options} />;
 }
 
-export default GrossImpactChart;
+const getGrossImpact = (aggregate,period,indic) => {
+  let amount =    aggregate.periodsData[period.periodKey].amount;
+  let footprint = aggregate.periodsData[period.periodKey].footprint;
+  return footprint.indicators[indic].getGrossImpact(amount);
+}

@@ -20,54 +20,54 @@
       }
     },
     "geq": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "label": "Indice d'écart de rémunérations Femmes/Hommes",
+      "icon": "icons-ese/logo_ese_geq_bleu.svg",
       "validations": ["geq"]
     },
     "ghg": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "label": "Intensité d'émission de gaz à effet de serre",
+      "icon": "icons-ese/logo_ese_ghg_bleu.svg",
       "validations": ["ghg"]
     },
     "haz": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "label": "Intensité d'Utilisation de produits dangereux",
+      "icon": "icons-ese/logo_ese_haz_bleu.svg",
       "validations": ["haz"]
     },
     "idr": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
+      "label": "Indice d'écart des rémunérations",
+      "icon": "icons-ese/logo_ese_idr_bleu.svg",
       "validations": ["idr"]
     },
     "knw": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
-      "validations": []
+      "label": "Contribution à l'Evolution des compétences et des connaissances",
+      "icon": "icons-ese/logo_ese_knw_bleu.svg",
+      "validations": ["knw"]
     },
     "mat": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
-      "validations": []
+      "label": "Intensité d'Extraction de Matières premières",
+      "icon": "icons-ese/logo_ese_mat_bleu.svg",
+      "validations": ["mat"]
     },
     "nrg": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
-      "validations": []
+      "label": "Intensité de Consommation d'Energie",
+      "icon": "icons-ese/logo_ese_nrg_bleu.svg",
+      "validations": ["nrg"]
     },
     "soc": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
-      "validations": []
+      "label": "Contribution aux Acteurs d'Intérêt social",
+      "icon": "icons-ese/logo_ese_soc_bleu.svg",
+      "validations": ["soc"]
     },
     "was": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
-      "validations": []
+      "label": "Intensité de Production de Déchets",
+      "icon": "icons-ese/logo_ese_was_bleu.svg",
+      "validations": ["was"]
     },
     "wat": {
-      "label": "",
-      "icon": "icons-ese/logo_ese_art_bleu.svg",
-      "validations": []
+      "label": "Intensité de Consommation d'Eau",
+      "icon": "icons-ese/logo_ese_wat_bleu.svg",
+      "validations": ["wat"]
     }
   }
 }

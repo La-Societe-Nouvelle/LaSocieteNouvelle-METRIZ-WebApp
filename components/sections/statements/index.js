@@ -1,3 +1,6 @@
+// La Société Nouvelle
+
+// React
 import React, { useState } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
@@ -6,7 +9,8 @@ import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 import indicators from "/lib/indics";
 
-const DirectImpacts = ({ session, submit }) => {
+const DirectImpacts = ({ session, submit }) => 
+{
   const [period] = useState(session.financialPeriod);
 
   const [validations, setValidations] = useState(

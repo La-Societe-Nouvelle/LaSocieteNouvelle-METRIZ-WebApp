@@ -14,7 +14,7 @@ import SigPieChart from "../charts/SigPieChart";
 import DeviationChart from "../charts/HorizontalBarChart";
 
 import { printValue } from "../../../../src/utils/Utils";
-import GrossImpactChart from "../charts/GrossImpactChart";
+import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { getClosestYearData } from "../utils";
 
 /* ---------- CHARTS CONTAINER ---------- */
@@ -128,7 +128,7 @@ const IndicatorCharts = ({
         indicators[indic].type == "indice") && (
         <Row>
           <div className="deviation-chart-container">
-            <DeviationChart
+            {/* <DeviationChart
               id={`deviation-chart-${indic}-print`}
               legalUnitData={[
                 mainAggregates.production.periodsData[period.periodKey].footprint
@@ -150,7 +150,7 @@ const IndicatorCharts = ({
               ]}
               indic={indic}
               isPrinting={true}
-            />
+            /> */}
           </div>
         </Row>
       )}
@@ -160,27 +160,10 @@ const IndicatorCharts = ({
         <div className="impact-chart-container">
           <GrossImpactChart
             id={`gross-impact-chart-${indic}-print`}
-            isPrinting={true}
-            intermediateConsumptions={mainAggregates.intermediateConsumptions.periodsData[
-              period.periodKey
-            ].footprint.indicators[indic].getGrossImpact(
-              mainAggregates.intermediateConsumptions.periodsData[
-                period.periodKey
-              ].amount
-            )}
-            fixedCapitalConsumptions={mainAggregates.fixedCapitalConsumptions.periodsData[
-              period.periodKey
-            ].footprint.indicators[indic].getGrossImpact(
-              mainAggregates.fixedCapitalConsumptions.periodsData[
-                period.periodKey
-              ].amount
-            )}
-            netValueAdded={mainAggregates.netValueAdded.periodsData[
-              period.periodKey
-            ].footprint.indicators[indic].getGrossImpact(
-              mainAggregates.netValueAdded.periodsData[period.periodKey].amount
-            )}
-          />
+            session={session}
+            period={period}
+            indic={indic}
+            isPrinting={true}/>
         </div>
       )}
     </div>
