@@ -5,12 +5,12 @@ import React from "react";
 import { Col, Row, Nav } from "react-bootstrap";
 
 // Visuals
-import { ComparisonsVisual } from "../components/ComparisonsVisual";
-import { MainAggregatesTableVisual } from "../components/MainAggregatesTableVisual";
-import { GrossImpactDistributionVisual } from "../components/GrossImpactDistributionVisual";
-import { AnalysisNoteVisual } from "../components/AnalysisNoteVisual";
-import { MainAggregatesFootprintsVisual } from "../components/MainAggregatesFootprintsVisual";
-import { EvolutionCurvesVisual } from "../components/EvolutionCurvesVisual";
+import { ComparisonsVisual } from "../visuals/ComparisonsVisual";
+import { MainAggregatesTableVisual } from "../visuals/MainAggregatesTableVisual";
+import { GrossImpactDistributionVisual } from "../visuals/GrossImpactDistributionVisual";
+import { AnalysisNoteVisual } from "../visuals/AnalysisNoteVisual";
+import { MainAggregatesFootprintsVisual } from "../visuals/MainAggregatesFootprintsVisual";
+import { EvolutionCurvesVisual } from "../visuals/EvolutionCurvesVisual";
 
 // Lib
 import metaIndics from "/lib/indics";

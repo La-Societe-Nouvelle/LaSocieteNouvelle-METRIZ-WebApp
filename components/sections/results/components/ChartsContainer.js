@@ -1,5 +1,6 @@
 // La Société Nouvelle
 
+// React
 import React from "react";
 import { Row } from "react-bootstrap";
 
@@ -7,7 +8,7 @@ import { Row } from "react-bootstrap";
 import indicators from "/lib/indics";
 
 // Charts
-import ComparativeChart from "../charts/ComparativeChart";
+import { ComparativeChart } from "../charts/ComparativeChart";
 import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
 import DeviationChart from "../charts/HorizontalBarChart";
@@ -60,12 +61,6 @@ const IndicatorCharts = ({
     comparativeData
   } = session;
 
-  const prevDateEnd = period.dateEnd;
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
-
-  const year = period.periodKey.slice(2);
   // Define the aggregates and their corresponding titles
   const mainAggregates = financialData.mainAggregates;
   const aggregates = {
@@ -75,37 +70,6 @@ const IndicatorCharts = ({
     netValueAdded: "Valeur ajoutée nette",
   };
 
-  const datasets = {}; // macro datasets for each aggregate
-  const targetDatasets = {}; //  target datasets for each aggregate
-
-  Object.keys(aggregates).forEach((aggregate) => {
-    datasets[aggregate] = {
-      area: comparativeData[aggregate].area.macrodata.data[indic.toUpperCase()],
-      division:
-        comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()],
-    };
-
-    targetDatasets[aggregate] = {
-      area: comparativeData[aggregate].area.target.data[indic.toUpperCase()],
-      division:
-        comparativeData[aggregate].division.target.data[indic.toUpperCase()],
-    };
-
-    // Get the closest year data
-    Object.keys(datasets[aggregate]).forEach((category) => {
-      datasets[aggregate][category] = getClosestYearData(
-        datasets[aggregate][category],
-        year
-      );
-    });
-
-    Object.keys(targetDatasets[aggregate]).forEach((category) => {
-      targetDatasets[aggregate][category] = getClosestYearData(
-        targetDatasets[aggregate][category],
-        year
-      );
-    });
-  });
   return (
     <div
       className={"charts-container " + indic}
@@ -114,33 +78,13 @@ const IndicatorCharts = ({
       <Row className="charts">
         {Object.keys(aggregates).map((aggregate) => (
           <React.Fragment key={aggregate}>
-            {renderComparativeCharts(
-              `comparative-chart-${aggregate}-${indic}-print`,
-              [
-                datasets[aggregate].area,
-                {
-                  value:
-                    mainAggregates[aggregate].periodsData[period.periodKey]
-                      .footprint.indicators[indic].value,
-                  year: year,
-                },
-                datasets[aggregate].division,
-              ],
-              [
-                null,
-                prevPeriod
-                  ? mainAggregates[aggregate].periodsData[prevPeriod.periodKey]
-                      .footprint.indicators[indic].value
-                  : null,
-                null,
-              ],
-              [
-                targetDatasets[aggregate].area,
-                null,
-                targetDatasets[aggregate].division,
-              ],
+            {renderComparativeCharts({
+              chartId: `comparative-chart-${aggregate}-${indic}-print`,
+              session,
+              period,
+              aggregate,
               indic
-            )}
+            })}
             {renderSigCharts(
               `sig-chart-${aggregate}-${indic}-print`,
               indic,
@@ -243,20 +187,20 @@ const IndicatorCharts = ({
   );
 }
 
-const renderComparativeCharts = (
+const renderComparativeCharts = ({
   chartId,
-  datasets,
-  prevFootprint,
-  targetDatasets,
+  session,
+  period,
+  aggregate,
   indic
-) => {
+}) => {
   return (
     <div key={chartId} className={"comparative-chart-container"}>
       <ComparativeChart
         id={chartId}
-        footprintDataset={datasets}
-        prevFootprint={prevFootprint}
-        targetDataset={targetDatasets}
+        session={session}
+        period={period}
+        aggregate={aggregate}
         indic={indic}
         isPrinting={false}
       />

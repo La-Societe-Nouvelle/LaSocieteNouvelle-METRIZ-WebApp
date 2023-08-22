@@ -1,46 +1,101 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
 import Chart from "chart.js/auto";
 import { Bar } from "react-chartjs-2";
+
 // Libraries
 import metaIndics from "/lib/indics";
+
 import { printValue } from "/src/utils/Utils";
 
 const getSuggestedMax = (max) => {
   if (max < 10) {
     return 10;
-  }
-
-  switch (true) {
-    case max > 10 && max < 25:
-      return 25;
-    case max > 25 && max < 50:
-      return 50;
-    default:
-      return 100;
+  } else if (max < 20) {
+    return 25;
+  } else if (max < 45) {
+    return 50;
+  } else {
+    return 100;
   }
 };
 
-const ComparativeChart = ({
+/* ---------- COMPARATIVE CHART ---------- */
+
+/** Bar chart to compare footprint with macro & branch
+ *  
+ *  Args :
+ *    - id
+ *    - indic
+ *    - session,
+ *    - aggregate
+ *    - isPrinting -> use in report
+ * 
+ */
+
+export const ComparativeChart = ({
   id,
+  session,
+  period,
+  aggregate,
   indic,
-  footprintDataset,
-  prevFootprint,
-  targetDataset,
   isPrinting,
 }) => {
-  const unit = metaIndics[indic].unit;
-  const precision = metaIndics[indic].nbDecimals;
 
-  const max = Math.max(...footprintDataset.map((o) => o.value));
+  const { unit, nbDecimals } = metaIndics[indic];
+
+  // Datasets --------------------------------------------------------------
+
+  const {
+    financialData,
+    comparativeData
+  } = session
+  const mainAggregates = financialData.mainAggregates;
+
+  // current footprints
+
+  const dataset_currentFootprints = [
+    comparativeData[aggregate].area.macrodata.data[indic.toUpperCase()].slice(-1)[0].value,
+    mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value,
+    comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value
+  ];
+
+  // prev footprints
+
+  const prevDateEnd = period.dateEnd;
+  const prevPeriod = session.availablePeriods.find(
+    (period) => period.dateEnd == prevDateEnd
+  );
+
+  const dataset_prevFootprints = [
+    null,
+    prevPeriod ? mainAggregates[aggregate].periodsData[prevPeriod.periodKey].footprint.indicators[indic].value : null,
+    null
+  ];
+
+  // targets
+
+  const dataset_target = [
+    comparativeData[aggregate].area.target.data[indic.toUpperCase()] ? 
+      comparativeData[aggregate].area.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
+    null,
+    comparativeData[aggregate].area.target.data[indic.toUpperCase()] ? 
+      comparativeData[aggregate].division.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
+  ];
+
+  // Data for chart --------------------------------------------------------
+
+  const max = Math.max(...dataset_currentFootprints.filter((o) => o!=null));
   const suggestedMax = unit === "%" ? getSuggestedMax(max) : null;
 
-  // Data for chart
   const chartData = {
     labels: ["France", "Exercice", "Branche"],
     datasets: [
       {
         label: "Empreinte",
-        data: footprintDataset.map((data) => data ? data.value : null),
+        data: dataset_currentFootprints,
         skipNull: true,
         backgroundColor: [
           "RGBA(176,185,247,1)",
@@ -55,7 +110,7 @@ const ComparativeChart = ({
       },
       {
         label: "Valeur N-1",
-        data: prevFootprint,
+        data: dataset_prevFootprints,
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
@@ -69,7 +124,7 @@ const ComparativeChart = ({
       },
       {
         label: "Objectif",
-        data: targetDataset.map((data) => data ? data.value : null),
+        data: dataset_target,
         skipNull: true,
         backgroundColor: [
           "RGBA(215,220,251,1)",
@@ -84,6 +139,7 @@ const ComparativeChart = ({
     ],
   };
 
+  // Options
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: isPrinting ? false : true,
@@ -92,6 +148,7 @@ const ComparativeChart = ({
       y: {
         display: true,
         min: 0,
+        max: suggestedMax,
         ticks: {
           color: "#191558",
           font: {
@@ -101,7 +158,6 @@ const ComparativeChart = ({
         grid: {
           color: "#ececff",
           lineWidth : 2,
-
         },
       },
       x: {
@@ -126,7 +182,7 @@ const ComparativeChart = ({
         align: "top",
         formatter: function (value, context) {
           if (value) {
-            return printValue(value, precision);
+            return printValue(value, nbDecimals);
           }
         },
         color: "#191558",
@@ -157,7 +213,7 @@ const ComparativeChart = ({
             return (
               context.dataset.label +
               " : " +
-              printValue(context.parsed.y, precision) +
+              printValue(context.parsed.y, nbDecimals) +
               " " +
               unit
             );
@@ -177,6 +233,4 @@ const ComparativeChart = ({
       }}
     />
   );
-};
-
-export default ComparativeChart;
+}

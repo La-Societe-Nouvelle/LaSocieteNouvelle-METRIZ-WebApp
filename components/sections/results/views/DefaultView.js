@@ -86,22 +86,6 @@ export const DefaultView = ({
 
   return (
     <>
-      {/* <div className="box">
-        <Nav variant="underline" defaultActiveKey="/home">
-          <Nav.Item>
-            <Nav.Link href="/#rapport">Analyse extra-financière</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/#comparaisons">Comparaison par activité</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
-          </Nav.Item>
-        </Nav>
-      </div> */}
       <Row>
         {showEnvironmentalChart && (
           <Col lg={6}>

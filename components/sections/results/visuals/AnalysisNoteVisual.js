@@ -2,6 +2,12 @@
 
 import { getAnalyse } from "../../../../src/utils/Writers";
 
+/* ---------- ANALYSIS NOTE VISUAL ---------- */
+
+/** Visualisation de la note d'analyse
+ *  
+ */
+
 export const AnalysisNoteVisual = ({
   session,
   period,

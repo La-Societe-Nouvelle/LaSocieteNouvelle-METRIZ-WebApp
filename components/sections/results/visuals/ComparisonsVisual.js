@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
+import { ComparativeDataContainer } from "../components/ComparativeDataContainer";
 import { ComparativeTable } from "../tables/ComparativeTable";
-import ComparativeDataContainer from "./ComparativeDataContainer";
 
 export const ComparisonsVisual = ({
   session,
