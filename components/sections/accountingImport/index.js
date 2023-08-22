@@ -20,8 +20,9 @@ import { FECDataReader } from "/src/readers/FECReader";
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
 
 // Modals
-import ErrorReportModal from "../../popups/ErrorReportModal";
-import { ErrorAPIModal } from "../../popups/MessagePopup";
+import ErrorReportModal from "../../modals/ErrorReportModal";
+import { ErrorAPIModal } from "../../modals/userInfoModals";
+
 
 const AccountingImportSection = (props) => 
 {

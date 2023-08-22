@@ -6,7 +6,7 @@ import React from "react";
 // Icon
 import { Button, Modal, Image } from "react-bootstrap";
 
-/* ---------- MESSAGE POP-UP ---------- */
+/* ---------- USER INFORMATION MODALS ---------- */
 
 export const SuccessFileModal = ({ message, title, closePopup }) => {
   return (

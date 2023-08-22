@@ -31,7 +31,7 @@ import { buildFullFile } from "../../../src/utils/deliverables/generateDownloada
 import DownloadDropdown from "./components/DownloadDropdown";
 import { ChartsContainer } from "./components/ChartsContainer";
 
-import { Loader } from "../../popups/Loader";
+import { Loader } from "../../modals/Loader";
 import { IndicatorView } from "./views/IndicatorView";
 import { DefaultView } from "./views/DefaultView";
 

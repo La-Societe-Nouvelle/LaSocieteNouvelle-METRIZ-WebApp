@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 import StatementForms from "./StatementForms";
-import { Loader } from "../../popups/Loader";
+import { Loader } from "../../modals/Loader";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 import indicators from "/lib/indics";

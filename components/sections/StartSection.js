@@ -4,7 +4,7 @@
 
 import React from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
-import { Loader } from "../popups/Loader";
+import { Loader } from "../modals/Loader";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
