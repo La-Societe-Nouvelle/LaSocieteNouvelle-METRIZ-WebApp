@@ -12,7 +12,7 @@ import { Session } from "/src/Session";
 import { StartSection } from "../components/sections/StartSection";
 import AccountingImportSection from "../components/sections/accountingImport";
 import { InitialStatesSection } from "../components/sections/initialStates";
-import { ProvidersSection } from "../components/sections/providers";
+import ProvidersSection  from "../components/sections/providers";
 import DirectImpacts from "../components/sections/statements";
 import Results from "../components/sections/results";
 import PublishStatementSection from "../components/sections/publishStatement";

@@ -6,7 +6,7 @@ import { Modal, Table } from "react-bootstrap";
 
 /* -------------------- INVOICES DATA MODAL -------------------- */
 
-/** Component in SirenSection
+/** 
  *  Props :
  *    - invoicesData (extracted data from pdf)
  *    - providers

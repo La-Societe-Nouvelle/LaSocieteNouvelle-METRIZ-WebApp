@@ -2,36 +2,37 @@
 
 // React
 import React from "react";
-
-// Components
-import { UnidentifiedCompaniesTable } from "../../tables/UnidentifiedCompaniesTable";
-import { ProgressBar } from "../../modals/ProgressBar";
-
-// Readers
 import { Container } from "react-bootstrap";
 
-// Formulas
-import { getSignificativeUnidentifiedProviders } from "/src/formulas/significativeLimitFormulas";
+// Views
+import { UnidentifiedProvidersTable } from "./views/UnidentifiedProvidersTable";
 
-// API
-import { fetchMaxFootprint, fetchMinFootprint } from "/src/services/DefaultDataService";
-import { ErrorAPIModal } from "../../modals/userInfoModals";
+// Modals
+import { ProgressBar } from "../../../modals/ProgressBar";
+import { ErrorAPIModal } from "../../../modals/userInfoModals";
+
+// Services
+import {
+  fetchMaxFootprint,
+  fetchMinFootprint,
+} from "/src/services/DefaultDataService";
+
+// Utils
+import { getSignificativeUnidentifiedProviders } from "./utils";
 
 /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
-/* -------------------------------------------------- PROVIDERS SECTION - IDENTIFIED PROVIDERS -------------------------------------------------- */
+/* -------------------------------------------------- PROVIDERS SECTION - UNIDENTIFIED PROVIDERS -------------------------------------------------- */
 /* ---------------------------------------------------------------------------------------------------------------------------------------------- */
 
-export class SectorSection extends React.Component 
-{
-  constructor(props) 
-  {
+export class UnidentifiedProviders extends React.Component {
+  constructor(props) {
     super(props);
     this.state = {
-      significativeProviders: [],   // significative companies
-      view: "all",                  // filter view
-      nbItems: 20,                  // nb items
-      fetching: false,              // -> to show popup
-      progression: 0,               // progession -> popup
+      significativeProviders: [], // significative companies
+      view: "all", // filter view
+      nbItems: 20, // nb items
+      fetching: false, // -> to show popup
+      progression: 0, // progession -> popup
       error: false,
       minFpt: null,
       maxFpt: null,
@@ -39,25 +40,21 @@ export class SectorSection extends React.Component
     };
   }
 
-  componentDidMount = async () => 
-  {
+  componentDidMount = async () => {
     let minFpt = await fetchMinFootprint();
     let maxFpt = await fetchMaxFootprint();
     let significativeProviders = await getSignificativeUnidentifiedProviders(
       this.props.financialData.providers,
-      minFpt,maxFpt,
+      minFpt,
+      maxFpt,
       this.props.financialPeriod
     );
-    this.setState({significativeProviders,minFpt,maxFpt})
-  }
+    this.setState({ significativeProviders, minFpt, maxFpt });
+  };
 
-  render() 
-  {
+  render() {
     // props
-    const {
-      financialData,
-      financialPeriod
-    } = this.props;
+    const { financialData, financialPeriod } = this.props;
     // state
     const {
       view,
@@ -66,16 +63,30 @@ export class SectorSection extends React.Component
       progression,
       error,
       isNextStepAvailable,
-      significativeProviders
+      significativeProviders,
     } = this.state;
 
     // providers to show (unidentied and concerned by financial period)
-    const unidentifiedProviders = financialData.providers.filter(provider => provider.useDefaultFootprint && provider.periodsData.hasOwnProperty(financialPeriod.periodKey));
-    const showedProviders = getShowedProviders(view,unidentifiedProviders,significativeProviders);
-    
-    const nbSignificativeProvidersWithoutActivity = unidentifiedProviders.filter((provider) => provider.defaultFootprintParams.code == "00" && significativeProviders.includes(provider.providerNum)).length;
-    const someSignificativeProvidersWithoutActivity = nbSignificativeProvidersWithoutActivity > 0;
-    
+    const unidentifiedProviders = financialData.providers.filter(
+      (provider) =>
+        provider.useDefaultFootprint &&
+        provider.periodsData.hasOwnProperty(financialPeriod.periodKey)
+    );
+    const showedProviders = getShowedProviders(
+      view,
+      unidentifiedProviders,
+      significativeProviders
+    );
+
+    const nbSignificativeProvidersWithoutActivity =
+      unidentifiedProviders.filter(
+        (provider) =>
+          provider.defaultFootprintParams.code == "00" &&
+          significativeProviders.includes(provider.providerNum)
+      ).length;
+    const someSignificativeProvidersWithoutActivity =
+      nbSignificativeProvidersWithoutActivity > 0;
+
     return (
       <Container fluid id="sector-section">
         <section className="step">
@@ -194,7 +205,7 @@ export class SectorSection extends React.Component
                 </div>
 
                 {/* ------------------------- Table ------------------------- */}
-                <UnidentifiedCompaniesTable
+                <UnidentifiedProvidersTable
                   nbItems={
                     nbItems == "all"
                       ? unidentifiedProviders.length
@@ -247,29 +258,27 @@ export class SectorSection extends React.Component
 
   /* ---------- FETCHING DATA ---------- */
 
-  synchroniseProviders = async () => 
-  {
+  synchroniseProviders = async () => {
     // providers to synchronise : all providers unidentified & with fpt not fetched (footprint status != 200)
-    let providersToSynchronise = this.props.financialData.providers
-      .filter((provider) => provider.useDefaultFootprint && provider.footprintStatus != 200);
+    let providersToSynchronise = this.props.financialData.providers.filter(
+      (provider) =>
+        provider.useDefaultFootprint && provider.footprintStatus != 200
+    );
 
     // synchronise data
     this.setState({ fetching: true, progression: 0 });
 
     let i = 0;
     let n = providersToSynchronise.length;
-    for (let provider of providersToSynchronise) 
-    {
-      try 
-      {
+    for (let provider of providersToSynchronise) {
+      try {
         // fetch footprint & assign to expenses & investments
         await provider.updateFromRemote();
         this.props.financialData.externalExpenses
           .concat(this.props.financialData.investments)
-          .filter(expense => expense.providerNum==provider.providerNum)
-          .forEach(expense => expense.footprint = provider.footprint);
-      } 
-      catch (error) {
+          .filter((expense) => expense.providerNum == provider.providerNum)
+          .forEach((expense) => (expense.footprint = provider.footprint));
+      } catch (error) {
         // error API
         console.log(error);
         this.setState({ error: true });
@@ -281,58 +290,69 @@ export class SectorSection extends React.Component
     }
 
     // update significative providers
-    let {minFpt,maxFpt} = this.state;
+    let { minFpt, maxFpt } = this.state;
     let significativeProviders = await getSignificativeUnidentifiedProviders(
       this.props.financialData.providers,
-      minFpt,maxFpt,
+      minFpt,
+      maxFpt,
       this.props.financialPeriod
     );
 
     // check next step available
-    const isNextStepAvailable = nextStepAvailable(this.props.financialData.providers);
+    const isNextStepAvailable = nextStepAvailable(
+      this.props.financialData.providers
+    );
 
     // update state
     this.setState({
       fetching: false,
       progression: 0,
       significativeProviders,
-      isNextStepAvailable
+      isNextStepAvailable,
     });
-  }
+  };
 
-  refreshSection = () => 
-  {
+  refreshSection = () => {
     // check next step available
-    const isNextStepAvailable = nextStepAvailable(this.props.financialData.providers);
-    if (this.state.isNextStepAvailable!=isNextStepAvailable) {
+    const isNextStepAvailable = nextStepAvailable(
+      this.props.financialData.providers
+    );
+    if (this.state.isNextStepAvailable != isNextStepAvailable) {
       this.setState({ isNextStepAvailable });
     }
     // temp
     this.forceUpdate();
-  }
+  };
 }
 
-const nextStepAvailable = (providers) => 
-{
-  let stepAvailable = !providers.some((provider) => provider.footprintStatus != 200);
+const nextStepAvailable = (providers) => {
+  let stepAvailable = !providers.some(
+    (provider) => provider.footprintStatus != 200
+  );
   return stepAvailable;
-}
+};
 
-const getShowedProviders = (view,providers,significativeProviders) => 
-{
-  switch (view) 
-  {
-    case "aux":                               // provider account
+const getShowedProviders = (view, providers, significativeProviders) => {
+  switch (view) {
+    case "aux": // provider account
       return providers.filter((provider) => !provider.isDefaultProviderAccount);
-    case "expenses":                          // default provider account
+    case "expenses": // default provider account
       return providers.filter((provider) => provider.isDefaultProviderAccount);
-    case "significative":                     // significative provider
-      return providers.filter((provider) => significativeProviders.includes(provider.providerNum));
-    case "significativeWithoutActivity":      // significative provider & no activity code set
-      return providers.filter((provider) => significativeProviders.includes(provider.providerNum) && provider.defaultFootprintParams.code == "00");
-    case "defaultActivity":                   // no activity code set
-      return providers.filter((provider) => provider.defaultFootprintParams.code == "00");
-    default:                                  // default
+    case "significative": // significative provider
+      return providers.filter((provider) =>
+        significativeProviders.includes(provider.providerNum)
+      );
+    case "significativeWithoutActivity": // significative provider & no activity code set
+      return providers.filter(
+        (provider) =>
+          significativeProviders.includes(provider.providerNum) &&
+          provider.defaultFootprintParams.code == "00"
+      );
+    case "defaultActivity": // no activity code set
+      return providers.filter(
+        (provider) => provider.defaultFootprintParams.code == "00"
+      );
+    default: // default
       return providers;
   }
-}
+};

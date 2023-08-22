@@ -3,7 +3,7 @@
 // React
 import { Image, Modal } from "react-bootstrap";
 
-export const ProvidersImportSuccessModal = ({ showModal, sync, onClose }) => {
+export const ProvidersImportSuccessModal = ({ showModal, onSynchronise, onClose }) => {
   return (
     <Modal show={showModal} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
@@ -23,7 +23,7 @@ export const ProvidersImportSuccessModal = ({ showModal, sync, onClose }) => {
         </p>
 
         <p className="text-center mt-4">
-          <button className="btn btn-secondary " onClick={sync}>
+          <button className="btn btn-secondary " onClick={onSynchronise}>
             <i className="bi bi-arrow-repeat"></i> Synchroniser les données
           </button>
         </p>

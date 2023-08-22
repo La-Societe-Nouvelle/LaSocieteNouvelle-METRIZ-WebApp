@@ -6,24 +6,7 @@ import Dropzone from "react-dropzone";
 import { Container } from "react-bootstrap";
 
 // API
-import api from "../../../config/api";
-
-// Table
-import { IdentifiedProvidersTable } from "../../tables/IdentifiedCompaniesTable";
-
-// Reader & Writers
-import { XLSXFileWriterFromJSON } from "../../../src/writers/XLSXWriter";
-import { CSVFileReader, processCSVCompaniesData } from "/src/readers/CSVReader";
-import { XLSXFileReader } from "/src/readers/XLSXReader";
-
-// Modals
-import { ProgressBar } from "../../modals/ProgressBar";
-import { ErrorAPIModal, InfoModal } from "../../modals/userInfoModals";
-import { ProvidersImportSuccessModal } from "./modals/ProvidersImportSuccessModal";
-import { InvoicesDataModal } from "./modals/InvoicesDataModal";
-
-// Formulas
-import { getSignificativeProviders } from "/src/formulas/significativeLimitFormulas";
+import api from "../../../../config/api";
 
 // Services
 import {
@@ -31,9 +14,22 @@ import {
   fetchMinFootprint,
 } from "/src/services/DefaultDataService";
 
+// Table
+import { IdentifiedProvidersTable } from "../../../tables/IdentifiedCompaniesTable";
+
+// Utils
+import { getSignificativeProviders } from "./utils";
+
+// Modals
+import { ProgressBar } from "../../../modals/ProgressBar";
+import { ErrorAPIModal, InfoModal } from "../../../modals/userInfoModals";
+import { InvoicesDataModal } from "./modals/InvoicesDataModal";
+
 // pdf extractor
 import pdf from "pdf-extraction";
-import { getDefaultFootprintId } from "../../../src/Provider";
+import { getDefaultFootprintId } from "/src/Provider";
+import DownloadProvidersExcel from "./views/DownloadProvidersExcel";
+import ImportProviders from "./views/ImportProviders";
 
 const identificationPatterns = [
   /FR[0-9]{11}( |$|\r\n|\r|\n)/g,
@@ -42,7 +38,7 @@ const identificationPatterns = [
   /(^|)( |)[0-9]{9,15}( |)(SIRET|SIREN|RCS)/g,
 ];
 
-export class SirenSection extends React.Component {
+export class IdentifiedProviders extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -53,7 +49,6 @@ export class SirenSection extends React.Component {
       file: null,
       progression: 0,
       synchronised: 0,
-      showImportProvidersModal: false,
       showInvoicesDataModal: false,
       showInfoModal: false,
       isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
@@ -67,21 +62,11 @@ export class SirenSection extends React.Component {
       invoicesData: null,
     };
 
-    this.onDrop = (files) => {
-      if (files.length) {
-        this.importFile(files[0]);
-        this.openImportProvidersModal();
-        this.setState({ errorFile: false });
-      } else {
-        this.setState({ errorFile: true });
-      }
-    };
-
+ 
     this.onInvoicesDrop = async (files) => {
       if (files.length > 0) {
         let invoicesData = await this.readInvoices(files);
-        console.log(invoicesData);
-        console.log(Object.keys(invoicesData).length);
+
         if (Object.keys(invoicesData).length !== 0) {
           this.setState({
             fetching: false,
@@ -120,6 +105,8 @@ export class SirenSection extends React.Component {
   };
 
   componentDidUpdate = () => {
+
+    
     // next step available
     const isNextStepAvailable = checkNextStepAvailable(
       this.props.financialData.providers
@@ -136,6 +123,10 @@ export class SirenSection extends React.Component {
     }
   };
 
+  updateProviders = (updatedProviders) => {
+    this.setState({ financialData: { ...this.state.financialData, providers: updatedProviders } });
+  };
+  
   render() {
     const {
       significativeProviders,
@@ -143,12 +134,10 @@ export class SirenSection extends React.Component {
       nbItems,
       fetching,
       progression,
-      showImportProvidersModal,
       showInvoicesDataModal,
       showInfoModal,
       isSyncButtonEnable,
       isNextStepAvailable,
-      errorFile,
       error,
       invoicesData,
     } = this.state;
@@ -187,55 +176,16 @@ export class SirenSection extends React.Component {
               Synchronisation des données grâce au numéro de siren
             </h3>
           </div>
-            {/* Download Providers Excel file*/}
-          <div className="step mt-3">
-            <h4>1. Télécharger et compléter le tableaux de vos fournisseurs</h4>
-            <p className="form-text">
-              Exportez la liste des comptes fournisseurs auxiliaires afin de
-              renseigner les numéros siren de vos fournisseurs.
-            </p>
-            <button
-              className="btn btn-primary mt-3"
-              onClick={this.exportXLSXFile}
-            >
-              <i className="bi bi-download"></i> Exporter mes fournisseurs
-            </button>
-          </div>
-           {/* Import Completed Excel File */}
-          <div className="step">
-            <h4>2. Importer le fichier excel complété</h4>
 
-            <Dropzone
-              onDrop={this.onDrop}
-              accept={[".xlsx", ".csv"]}
-              maxFiles={1}
-            >
-              {({ getRootProps, getInputProps }) => (
-                <div className="dropzone-section">
-                  <div {...getRootProps()} className="dropzone">
-                    <input {...getInputProps()} />
-                    <p>
-                      <i className="bi bi-file-arrow-up-fill"></i>
-                      Glisser votre fichier ici
-                    </p>
-                    <p className="small">OU</p>
-                    <p className="btn btn-primary">
-                      Selectionner votre fichier
-                    </p>
-                  </div>
-                </div>
-              )}
-            </Dropzone>
+          <DownloadProvidersExcel providers={financialData.providers} />
 
-            {errorFile && (
-              <div className="alert alert-danger">
-                <p>
-                  <i className="bi bi-x-octagon"></i> Fichier incorrect
-                </p>
-              </div>
-            )}
-          </div>
-            {/* Upload Invoices */}
+          <ImportProviders
+            providers={financialData.providers}
+            updateProviders={this.updateProviders}
+            synchroniseProviders={this.synchroniseProviders}
+          />
+
+          {/* TO DO : Upload Invoices component */}
           <div className="step">
             <h4>Déposer des factures</h4>
 
@@ -265,12 +215,6 @@ export class SirenSection extends React.Component {
               }}
             ></InfoModal>
 
-            <ProvidersImportSuccessModal
-              showModal={showImportProvidersModal}
-              sync={() => this.synchroniseProviders()}
-              onClose={() => this.setState({ showImportProvidersModal: false })}
-            />
-
             {invoicesData && (
               <InvoicesDataModal
                 showModal={showInvoicesDataModal}
@@ -283,7 +227,7 @@ export class SirenSection extends React.Component {
               />
             )}
           </div>
-            {/* Synchronize Providers Data */}
+          {/*  TO DO : Providers Data component */}
           <div className="step" id="step-3">
             <h4>3. Synchroniser les données de vos fournisseurs</h4>
 
@@ -497,93 +441,7 @@ export class SirenSection extends React.Component {
     });
   };
 
-  /* ---------- FILE IMPORT ---------- */
-
-  importFile = (file) => {
-    this.setState({ file });
-    let extension = file.name.split(".").pop();
-
-    switch (extension) {
-      case "csv":
-        this.importCSVFile(file);
-        break;
-      case "xlsx":
-        this.importXLSXFile(file);
-        break;
-    }
-
-    this.setState({ view: "all" });
-  };
-
-  // Import CSV File
-  importCSVFile = (file) => {
-    let reader = new FileReader();
-
-    reader.onload = async () => {
-      let CSVData = await CSVFileReader(reader.result);
-
-      let companiesIds = await processCSVCompaniesData(CSVData);
-      await Promise.all(
-        Object.entries(companiesIds).map(
-          async ([providerNum, corporateName, corporateId]) => {
-            let provider = providerNum
-              ? this.props.financialData.providers.find(
-                  (provider) => provider.providerNum == providerNum
-                )
-              : this.props.financialData.providers.find(
-                  (provider) => provider.providerLib == corporateName
-                );
-            if (provider) {
-              provider.corporateId = corporateId;
-              provider.legalUnitData.denomination = denomination;
-              provider.useDefaultFootprint = false;
-              provider.footprintStatus = 0; // check if changes or use update()
-            }
-          }
-        )
-      );
-      this.setState({
-        providers: this.props.financialData.providers,
-      });
-    };
-
-    reader.readAsText(file);
-  };
-
-  // Import XLSX File
-  importXLSXFile = async (file) => {
-    let reader = new FileReader();
-    reader.onload = async () => {
-      let XLSXData = await XLSXFileReader(reader.result);
-      await Promise.all(
-        XLSXData.map(
-          async ({ accountNum, accountLib, denomination, siren, account }) => {
-            if (account && !accountNum) accountNum = account;
-            let provider = accountNum
-              ? this.props.financialData.providers.filter(
-                  (provider) => provider.providerNum == accountNum
-                )[0] // based on num
-              : this.props.financialData.providers.filter(
-                  (provider) => provider.providerLib == accountLib
-                )[0]; // based on lib
-            if (provider) {
-              provider.corporateId = siren;
-              provider.legalUnitData.denomination = denomination;
-              provider.useDefaultFootprint = false;
-              provider.footprintStatus = 0; // check if changes or use update()
-            }
-            return;
-          }
-        )
-      );
-      this.setState({
-        providers: this.props.financialData.providers,
-      });
-    };
-
-    reader.readAsArrayBuffer(file);
-  };
-
+ 
   readInvoices = async (files) => {
     let invoicesData = [];
     let promises = [];
@@ -768,42 +626,12 @@ export class SirenSection extends React.Component {
     this.setState({ invoicesData: null, showInvoicesDataModal: false });
   };
 
-  /* ---------- FILE EXPORT ---------- */
-
-  // Export CSV File
-  exportXLSXFile = async () => {
-    let jsonContent = await this.props.financialData.providers
-      .filter((provider) => provider.providerNum.charAt(0) != "_")
-      .map((provider) => {
-        return {
-          accountNum: provider.providerNum,
-          denomination: provider.corporateName,
-          siren: provider.corporateId,
-        };
-      });
-    let fileProps = { wsclos: [{ wch: 50 }, { wch: 20 }] };
-
-    // write file (JSON -> ArrayBuffer)
-    let file = await XLSXFileWriterFromJSON(
-      fileProps,
-      "fournisseurs",
-      jsonContent
-    );
-
-    // trig download
-    let blob = new Blob([file], { type: "application/octet-stream" });
-    let link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "fournisseurs.xlsx";
-    link.click();
-  };
 
   /* ---------- FETCHING DATA ---------- */
 
   // fetch data for showed providers
   synchroniseProviders = async () => {
     // Hide the import providers modal after initiating synchronization
-    this.setState({ showImportProvidersModal: false });
 
     // providers with fpt unfetched
     let providersToSynchronise = this.props.financialData.providers.filter(
@@ -859,9 +687,6 @@ export class SirenSection extends React.Component {
   };
 
   /* ----- MODALS ----- */
-
-  openImportProvidersModal = () =>
-    this.setState({ showImportProvidersModal: true });
 
   closeInvoicesDataModal = () =>
     this.setState({

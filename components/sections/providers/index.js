@@ -1,11 +1,11 @@
 // La Société Nouvelle
 
 // React
-import React from "react";
+import React, { useState } from "react";
 
-// Steps Section
-import { SectorSection } from "./SectorSection";
-import { SirenSection } from "./SirenSection";
+// Views
+import { UnidentifiedProviders } from "./unidentifiedProviders";
+import { IdentifiedProviders } from "./identifiedProviders";
 
 /* ----------------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- PROVIDERS SECTION -------------------------------------------------- */
@@ -20,55 +20,49 @@ import { SirenSection } from "./SirenSection";
  * 
  */
 
-export class ProvidersSection extends React.Component 
-{
-  constructor(props) {
-    super(props);
-    this.state = {
-      step: 1,
-    };
-  }
+const ProvidersSection = (props) => {
+  const { financialData, financialPeriod } = props.session;
+  const [step, setStep] = useState(1);
 
-  nextStep = () => 
-  {
-    // submit if step 2 or step 1 & no default fpt
-    let submit = this.state.step==2 || !this.props.session.financialData.providers.some((provider) => provider.useDefaultFootprint);
+  const nextStep = () => {
+    let submit =
+      step === 2 ||
+      !props.session.financialData.providers.some(
+        (provider) => provider.useDefaultFootprint
+      );
     if (submit) {
-      this.props.submit();
-    } else if (this.state.step==1) {
-      this.setState({step: 2});
+      props.submit();
+    } else if (step === 1) {
+      setStep(2);
     }
+  };
+
+  const prevStep = () => {
+    setStep(1);
+  };
+
+  if (step === 1) {
+    return (
+      <IdentifiedProviders
+        financialData={financialData}
+        financialPeriod={financialPeriod}
+        nextStep={nextStep}
+      />
+    );
   }
 
-  prevStep = () => 
-  {
-    this.setState({step: 1})
+  if (step === 2) {
+    return (
+      <UnidentifiedProviders
+        financialData={financialData}
+        financialPeriod={financialPeriod}
+        prevStep={prevStep}
+        nextStep={nextStep}
+      />
+    );
   }
- 
-  render() 
-  {
-    const { financialData, financialPeriod } = this.props.session;
-    const {step} = this.state;
 
-    // Step 1 - Identified providers
-    if (step == 1) {
-      return (
-        <SirenSection
-          financialData={financialData} 
-          financialPeriod={financialPeriod}
-          nextStep={this.nextStep}/>
-      )
-    }
+  return null;
+};
 
-  // Step 2 - Unidentified providers (default footprints)
-   if (step == 2) {
-      return (
-        <SectorSection
-          financialData={financialData} 
-          financialPeriod={financialPeriod}
-          prevStep={this.prevStep} 
-          nextStep={this.nextStep}/>
-      )
-    }
-  }
-}
+export default ProvidersSection;
