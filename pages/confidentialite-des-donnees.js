@@ -1,7 +1,7 @@
 // Components
 import { Container } from "react-bootstrap";
 import { Footer } from "../components/parts/Footer";
-import HeaderPage from "../components/parts/headers/HeaderPage";
+import {HeaderPage} from "../components/parts/headers/HeaderPage";
 
 export default function Page() {
   return (
