@@ -7,7 +7,7 @@ import React from "react";
 import { Container, Navbar } from "react-bootstrap";
 
 // Components
-import TopBar from "./TopBar";
+import { Topbar } from "./Topbar";
 
 /* -------------------- HEADER PUBLISH FORM -------------------- */
 
@@ -18,7 +18,7 @@ export const HeaderPublish = ({ setStep, session }) =>
 
   return (
     <header>
-      <TopBar
+      <Topbar
         session={session} 
       />
       <Navbar expand="lg">
