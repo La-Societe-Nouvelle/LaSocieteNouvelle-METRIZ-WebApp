@@ -33,12 +33,8 @@ function StatementFormContainer ({
     isBeta
   } = indicators[indic]
 
-  const [selected, setSelected] = useState(false);
+  const [selected, setSelected] = useState(session.validations[period.periodKey].includes(indic));
   const [errorMessage, setErrorMessage] = useState(null);
-
-  useEffect(() => {
-    console.log("test use effect statement form container");
-  });
 
   const handleCheckboxChange = (event) => {
     const { checked } = event.target;

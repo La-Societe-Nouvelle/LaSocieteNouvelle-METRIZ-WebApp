@@ -13,6 +13,7 @@ import { useEffect } from "react";
 
 const DirectImpacts = ({ session, submit }) => 
 {
+  const [period] = useState(session.financialPeriod);
 
   const [statementsStatus, setStatementsStatus] = useState({
     art: { status: "unselect", errorMessage: null },
@@ -29,8 +30,6 @@ const DirectImpacts = ({ session, submit }) =>
     wat: { status: "unselect", errorMessage: null },
   })
 
-  const [period] = useState(session.financialPeriod);
-
   const [selectedStatements, setSelectedStatements] = useState([]); // session.validations[period.periodKey]
   const [invalidStatements, setInvalidStatements] = useState([]);
   const [emptyStatements, setEmptyStatements] = useState([]);
@@ -38,7 +37,6 @@ const DirectImpacts = ({ session, submit }) =>
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log(statementsStatus);
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);
@@ -49,7 +47,8 @@ const DirectImpacts = ({ session, submit }) =>
       .filter(([_,status]) => status.status=="incomplete")
       .map(([indic,_]) => indic);
     //
-    console.log(selectedStatements);
+    session.validations[period.periodKey] = selectedStatements;
+    //
     setSelectedStatements(selectedStatements);
     setInvalidStatements(invalidStatements);
     setEmptyStatements(emptyStatements);

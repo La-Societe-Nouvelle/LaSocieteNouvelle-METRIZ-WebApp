@@ -1,103 +1,95 @@
 // La Société Nouvelle
 
-import React, { useState, useEffect } from "react";
+// React
+import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
+
+import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
+
+// Modals
 import AssessmentDSN from "../modals/AssessmentDSN";
 
-const StatementGEQ = ({ impactsData, onUpdate, onError }) => {
-  const [wageGap, setWageGap] = useState(
-    valueOrDefault(impactsData.wageGap, "")
-  );
+/* ---------- STATEMENT - INDIC #GEQ ---------- */
+
+/** Props concerned in impacts data :
+ *    - isAllActivitiesInFrance
+ *    - domesticProduction
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
+
+const StatementGEQ = ({ 
+  impactsData, 
+  onUpdate, 
+}) => {
+
+  const [hasEmployees, setHasEmployees] = useState(impactsData.hasEmployees);
+  const [wageGap, setWageGap] = useState(valueOrDefault(impactsData.wageGap, ""));
   const [info, setInfo] = useState(impactsData.comments.geq || "");
-  const [isDisabled, setIsDisabled] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
 
-  const hasEmployees = impactsData.hasEmployees;
-
+  // update impacts data when state update
   useEffect(() => {
-    if (impactsData.hasEmployees == false) {
-      onUpdate("geq");
+    impactsData.hasEmployees = hasEmployees;
+    impactsData.wageGap = wageGap;
+    const statementStatus = checkStatement(impactsData);
+    setIsInvalid(statementStatus.status=="error");
+    onUpdate(statementStatus);
+  }, [hasEmployees,wageGap]);
+
+  // update state when props update
+  useEffect(() => 
+  {
+    if (impactsData.hasEmployees!=hasEmployees) {
+      setHasEmployees(impactsData.hasEmployees);
     }
-  }, [impactsData]);
-
-  useEffect(() => {
-
-    if (!impactsData.hasEmployees && wageGap === 0) {
-      setIsDisabled(false);
+    if ((impactsData.wageGap)!=wageGap) {
+      setWageGap(impactsData.wageGap || "");
     }
-    if (
-      impactsData.hasEmployees &&
-      wageGap !== "" &&
-      impactsData.netValueAdded !== null
-    ) {
-      setIsDisabled(false);
-    }
+  }, [impactsData.hasEmployees, impactsData.wageGap]);
 
-    if (impactsData.hasEmployees && wageGap === "") {
-      setIsDisabled(true);
-    }
-
-    if (wageGap !== valueOrDefault(impactsData.wageGap, "")) {
-      setWageGap(valueOrDefault(impactsData.wageGap, ""));
-      onUpdate("geq");
-    }
-  }, [
-    impactsData.hasEmployees,
-    impactsData.netValueAdded,
-    impactsData.wageGap,
-
-  ]);
-
+  // radio button - has employees
   const onHasEmployeesChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        impactsData.hasEmployees = true;
-        impactsData.wageGap = null;
-        onError("geq", false);
+        setHasEmployees(true);
+        setWageGap(null);
         break;
       case "false":
-        impactsData.hasEmployees = false;
-        impactsData.wageGap = 0;
-        setIsDisabled(false);
-        onError("geq", false);
-
+        setHasEmployees(false);
+        setWageGap(0);
         break;
     }
-    setWageGap(valueOrDefault(impactsData.wageGap, ""));
-    onUpdate("geq");
   };
 
+  // input
   const updateWageGap = (input) => {
-    const inputValue = input.target.valueAsNumber;
-
-    impactsData.wageGap = input.target.value;
-    let errorMessage = "";
-    // Validation checks for the input value
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
+    const { value, valueAsNumber } = input.target.valueAsNumber;
+    if (value=="") {
+      setWageGap('');
+    } else if (!isNaN(valueAsNumber)) {
+      setWageGap(valueAsNumber);
+    } else {
+      setWageGap(value);
     }
-
-    setIsInvalid(errorMessage !== "");
-    onError("geq", errorMessage);
-
-    setWageGap(impactsData.wageGap);
-    setIsDisabled(false);
-    onUpdate("geq");
   };
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (impactsData.comments.geq = info);
 
+  // data from modals
   const updateSocialData = (updatedData) => {
-
-    impactsData.interdecileRange  = updatedData.interdecileRange ;
+    impactsData.interdecileRange  = updatedData.interdecileRange;
     impactsData.wageGap = updatedData.wageGap;
     impactsData.knwDetails.apprenticesRemunerations = updatedData.knwDetails.apprenticesRemunerations;
-    if (impactsData.wageGap) {
-      setWageGap(impactsData.wageGap);
-    }
   };
 
   return (
@@ -183,3 +175,33 @@ const StatementGEQ = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementGEQ;
+
+// Check statement in impacts data
+const checkStatement = (impactsData) => 
+{
+  const {
+    hasEmployees,
+    wageGap
+  } = impactsData;
+
+  if (hasEmployees === true) {
+    if (wageGap=="" || wageGap==null) {
+      return({ status: "incomplete", errorMessage: null });
+    } else if (isCorrectValue(wageGap,0)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } else if (hasEmployees === false) {
+    if (isCorrectValue(wageGap,0,0)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } else if (hasEmployees === null) {
+    // & wage gap not null or empty string
+    return({ status: "incomplete", errorMessage: null });
+  } else {
+    return({ status: "error", errorMessage: "Erreur application" });
+  }
+}

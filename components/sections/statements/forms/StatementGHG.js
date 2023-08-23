@@ -1,105 +1,94 @@
 // La Société Nouvelle
+
+// React
 import React, { useEffect, useState } from "react";
+import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import Select from "react-select";
 
-import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
-
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { AssessmentGHG } from "../modals/AssessmentGHG";
+import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
-const StatementGHG = ({ impactsData, onUpdate, onError }) => {
+// Modals
+import { AssessmentGHG } from "../modals/AssessmentGHG";
+
+const units = {
+  "kgCO2e": { label: "kgCO2e",  coef: 1.0     },
+  "tCO2e":  { label: "tCO2e",   coef: 1000.0  },
+};
+
+const StatementGHG = ({ 
+  impactsData, 
+  onUpdate
+}) => {
+
   const [greenhousesGazEmissions, setGreenhousesGazEmissions] = useState(
-    valueOrDefault(impactsData.greenhousesGazEmissions, "")
-  );
-
-  const [greenhousesGazEmissionsUnit, setGreenhousesGazEmissionsUnit] =
-    useState(impactsData.greenhousesGazEmissionsUnit);
-
-  const [
-    greenhousesGazEmissionsUncertainty,
-    setGreenhousesGazEmissionsUncertainty,
-  ] = useState(
-    valueOrDefault(impactsData.greenhousesGazEmissionsUncertainty, "")
-  );
+    valueOrDefault(impactsData.greenhousesGazEmissions, ""));
+  const [greenhousesGazEmissionsUnit, setGreenhousesGazEmissionsUnit] = useState(
+    impactsData.greenhousesGazEmissionsUnit || "kgCO2e");
+  const [greenhousesGazEmissionsUncertainty, setGreenhousesGazEmissionsUncertainty] = useState(
+    valueOrDefault(impactsData.greenhousesGazEmissionsUncertainty, ""));
   const [info, setInfo] = useState(impactsData.comments.ghg || "");
-  const [showModal, setShowModal] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
+  // update session
   useEffect(() => {
-    if (greenhousesGazEmissions != impactsData.greenhousesGazEmissions) {
+    impactsData.greenhousesGazEmissions = greenhousesGazEmissions;
+    impactsData.greenhousesGazEmissionsUncertainty = greenhousesGazEmissionsUncertainty;
+    impactsData.greenhousesGazEmissionsUnit = greenhousesGazEmissionsUnit;
+    const statementStatus = checkStatement(impactsData);
+    setIsInvalid(statementStatus.status=="error");
+    onUpdate(statementStatus);
+  }, [greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,greenhousesGazEmissionsUnit]);
+
+  // update state
+  useEffect(() => 
+  {
+    if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
       setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
-      setGreenhousesGazEmissionsUncertainty(
-        impactsData.greenhousesGazEmissionsUncertainty
-      );
     }
-  }, [impactsData.greenhousesGazEmissions]);
-
-  const options = [
-    { value: "kgCO2e", label: "kgCO2e" },
-    { value: "tCO2e", label: "tCO2e" },
-  ];
-
-  const updateGreenhousesGazEmissions = (input) => {
-    let errorMessage = "";
-    const inputValue = input.target.valueAsNumber;
-
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
+    if (impactsData.greenhousesGazEmissionsUncertainty!=greenhousesGazEmissionsUncertainty) {
+      setGreenhousesGazEmissionsUncertainty(impactsData.greenhousesGazEmissionsUncertainty || "");
     }
-    if (impactsData.netValueAdded == null) {
-      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+  }, [impactsData.greenhousesGazEmissions, impactsData.greenhousesGazEmissionsUncertainty]);
+
+  const updateGreenhousesGazEmissions = (event) => {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setGreenhousesGazEmissions('');
+    } else if (!isNaN(valueAsNumber)) {
+      setGreenhousesGazEmissions(valueAsNumber);
+    } else {
+      setGreenhousesGazEmissions(value);
     }
-
-    setIsInvalid(errorMessage !== "");
-    onError("ghg", errorMessage);
-
-    setGreenhousesGazEmissions(input.target.value);
-
-    impactsData.ghgTotal = true;
-
-    impactsData.setGreenhousesGazEmissions(input.target.value);
-    setGreenhousesGazEmissionsUncertainty(
-      impactsData.greenhousesGazEmissionsUncertainty
-    );
-
-    onUpdate("ghg");
+    // set default uncertainty
+    if (!isNaN(greenhousesGazEmissions) && greenhousesGazEmissionsUncertainty=="") {
+      setGreenhousesGazEmissionsUncertainty(25.0);
+    }
   };
 
-  const updateGreenhousesGazEmissionsUncertainty = (input) => {
-    impactsData.greenhousesGazEmissionsUncertainty = input.target.value;
-    setGreenhousesGazEmissionsUncertainty(input.target.value);
-    onUpdate("ghg");
+  const updateGreenhousesGazEmissionsUncertainty = (event) => {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setGreenhousesGazEmissionsUncertainty('');
+    } else if (!isNaN(valueAsNumber)) {
+      setGreenhousesGazEmissionsUncertainty(valueAsNumber);
+    } else {
+      setGreenhousesGazEmissionsUncertainty(value);
+    }
   };
 
   const updateGreenhousesGazEmissionsUnit = (selected) => {
-    const selectedUnit = selected.value;
-
-    if (selectedUnit !== impactsData.greenhousesGazEmissionsUnit) {
-      let updatedGreenhousesGazEmissions = impactsData.greenhousesGazEmissions;
-
-      if (selectedUnit === "tCO2e") {
-        updatedGreenhousesGazEmissions =
-          impactsData.greenhousesGazEmissions / 1000;
-      } else if (selectedUnit === "kgCO2e") {
-        updatedGreenhousesGazEmissions =
-          impactsData.greenhousesGazEmissions * 1000;
-      }
-
-      setGreenhousesGazEmissions(updatedGreenhousesGazEmissions);
-      impactsData.setGreenhousesGazEmissions(updatedGreenhousesGazEmissions);
+    const nextUnit = selected.value;
+    setGreenhousesGazEmissionsUnit(nextUnit);
+    // update value
+    if (!isNaN(greenhousesGazEmissions)) {
+      setGreenhousesGazEmissions(roundValue(greenhousesGazEmissions*(units[greenhousesGazEmissionsUnit].coef/units[nextUnit].coef),0));
     }
-    setGreenhousesGazEmissionsUnit(selectedUnit);
-
-    impactsData.greenhousesGazEmissionsUnit = selectedUnit;
-
-    onUpdate("ghg");
   };
 
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.ghg = event.target.value;
-  };
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.ghg = info);
 
   return (
     <Form className="statement">
@@ -114,7 +103,7 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
                 <div className="me-1 custom-input with-select input-group">
                   <Form.Control
                     type="number"
-                    value={roundValue(greenhousesGazEmissions, 0)}
+                    value={greenhousesGazEmissions}
                     inputMode="numeric"
                     onChange={updateGreenhousesGazEmissions}
                     isInvalid={isInvalid}
@@ -122,7 +111,7 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
                   />
                   <Select
                     styles={unitSelectStyles}
-                    options={options}
+                    options={Object.keys(units).map((unit) => {return({label: unit, value: unit })})}
                     value={{
                       label: greenhousesGazEmissionsUnit,
                       value: greenhousesGazEmissionsUnit,
@@ -187,6 +176,7 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
                 className="w-100"
                 onChange={updateInfo}
                 value={info}
+                onBlur={saveInfo}
               />
             </Col>
           </Form.Group>
@@ -218,3 +208,42 @@ const StatementGHG = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementGHG;
+
+// Check statement
+const checkStatement = (impactsData) => 
+{
+  const {
+    greenhousesGazEmissions,
+    greenhousesGazEmissionsUncertainty,
+  } = impactsData;
+
+  // ok
+  if (isCorrectValue(greenhousesGazEmissions,0) && isCorrectValue(greenhousesGazEmissionsUncertainty,0,100)) {
+    return({ status: "ok", errorMessage: null });
+  } 
+  // incomplete
+  else if (greenhousesGazEmissions=="" || greenhousesGazEmissionsUncertainty=="") {
+    return({ status: "incomplete", errorMessage: null });
+  } 
+  // error
+  else if (greenhousesGazEmissions!="" && isCorrectValue(greenhousesGazEmissions,0)) {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(greenhousesGazEmissions) ?
+        "Valeur saisie incorrecte (négative)"
+        : "Veuillez saisir une valeur numérique"
+    });
+  } else if (greenhousesGazEmissionsUncertainty!="" && isCorrectValue(greenhousesGazEmissionsUncertainty,0,100)) {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(greenhousesGazEmissionsUncertainty) ?
+        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
+        : "Veuillez saisir une valeur numérique pour l'incertitude"
+    });
+  } else {
+    return({
+      status: "error",
+      errorMessage: "Valeurs saisies incorrectes"
+    });
+  }
+}

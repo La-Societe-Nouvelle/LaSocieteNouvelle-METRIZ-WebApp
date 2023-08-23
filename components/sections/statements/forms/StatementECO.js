@@ -45,10 +45,10 @@ const StatementECO = ({
   useEffect(() => 
   {
     if (impactsData.isAllActivitiesInFrance!=isAllActivitiesInFrance) {
-      setIsValueAddedCrafted(impactsData.isAllActivitiesInFrance);
+      setIsAllActivitiesInFrance(impactsData.isAllActivitiesInFrance);
     }
     if ((impactsData.domesticProduction)!=domesticProduction) {
-      setCraftedProduction(impactsData.domesticProduction || "");
+      setDomesticProduction(impactsData.domesticProduction || "");
     }
   }, [impactsData.isAllActivitiesInFrance, impactsData.domesticProduction]);
 

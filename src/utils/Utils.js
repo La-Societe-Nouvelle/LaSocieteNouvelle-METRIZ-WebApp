@@ -136,7 +136,7 @@ export function valueOrDefault(value, defaultValue) {
 export const isCorrectValue = (value,min,max) => 
   {
     // is a number
-    if (!isNaN(value)) {
+    if (!isNaN(value) && value!=="") {
       // check min
       if (min!=undefined) 
       {
