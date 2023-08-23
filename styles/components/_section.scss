@@ -40,22 +40,16 @@ section {
  * STEP 3 - PROVIDERS
  * ==============================================
  */
-#siren-section,
-#sector-section {
-  .step:not(:first-child) {
-    margin-bottom: 2rem;
-    padding: 1rem 2rem;
-  }
+ #siren-section,
+ #sector-section {
+   .step:not(:first-child) {
+     margin-bottom: 2rem;
+     padding: 1rem 2rem;
+   }
+ 
 
-  .step~.step {
-    margin-bottom: inherit;
-    padding: inherit;
-  }
-
-  h4 {
-    margin-bottom: 1rem;
-  }
-}
+  
+ }
 
 /**
  * ==============================================
