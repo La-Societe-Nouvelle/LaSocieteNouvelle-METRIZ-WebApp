@@ -1,71 +1,90 @@
 // La Société Nouvelle
 
-import React, { useState } from "react";
+// React
+import React, { useEffect, useState } from "react";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue } from "/src/utils/Utils";
+
+import { roundValue, isCorrectValue } from "../../../../src/utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ART ---------- */
 
+/** Props concerned in impacts data :
+ *    - isValueAddedCrafted
+ *    - craftedProduction
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
 
-const StatementART = ({ impactsData, onUpdate, onError }) => {
+const StatementART = ({ 
+  impactsData,
+  onUpdate, 
+}) => {
 
+  const [isValueAddedCrafted, setIsValueAddedCrafted] = useState( impactsData.isValueAddedCrafted);
   const [craftedProduction, setCraftedProduction] = useState( impactsData.craftedProduction || "" );
   const [info, setInfo] = useState(impactsData.comments.art || "");
   const [isInvalid, setIsInvalid] = useState(false);
+  
+  // update impacts data when state update
+  useEffect(() => {
+    impactsData.isValueAddedCrafted = isValueAddedCrafted;
+    impactsData.craftedProduction = craftedProduction;
+    const statementStatus = checkStatement(impactsData);
+    setIsInvalid(statementStatus.status=="error");
+    onUpdate(statementStatus);
+  }, [isValueAddedCrafted,craftedProduction]);
 
+  // update state when props update
+  useEffect(() => 
+  {
+    if (impactsData.isValueAddedCrafted!=isValueAddedCrafted) {
+      setIsValueAddedCrafted(impactsData.isValueAddedCrafted);
+    }
+    if ((impactsData.craftedProduction)!=craftedProduction) {
+      setCraftedProduction(impactsData.craftedProduction || "");
+    }
+  }, [impactsData.isValueAddedCrafted, impactsData.craftedProduction]);
+
+  // radio button - crafted activities
   const onIsValueAddedCraftedChange = (event) => {
     let radioValue = event.target.value;
     switch (radioValue) {
       case "true":
-        impactsData.isValueAddedCrafted = true;
-        impactsData.craftedProduction = impactsData.netValueAdded;
-        setIsInvalid(false);
-        onError("art", false);
+        setIsValueAddedCrafted(true);
+        setCraftedProduction(impactsData.netValueAdded);
         break;
       case "partially":
-        impactsData.isValueAddedCrafted = "partially";
-        impactsData.craftedProduction = "";
-        setIsInvalid(false);
-        onError("art", false);
+        setIsValueAddedCrafted("partially");
+        setCraftedProduction("");
         break;
       case "false":
-        impactsData.isValueAddedCrafted = false;
-        impactsData.craftedProduction = 0;
-        setIsInvalid(false);
-        onError("art", false);
+        setIsValueAddedCrafted(false);
+        setCraftedProduction(0);
         break;
     }
- 
-    onUpdate("art");
-    setCraftedProduction(impactsData.craftedProduction);
-
   };
 
-  const handleIsValueAddedCrafted = (event) => {
-    const inputValue = event.target.valueAsNumber;
-    let errorMessage = "";
-
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
-    } else if (impactsData.netValueAdded == null) {
-      errorMessage = "La valeur ajoutée nette n'est pas définie.";
-    } else if (inputValue >= impactsData.netValueAdded) {
-      errorMessage =
-        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+  // amount input
+  const handleAmountValueAddedCrafted = (event) => {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setCraftedProduction('');
+    } else if (!isNaN(valueAsNumber)) {
+      setCraftedProduction(valueAsNumber);
+    } else {
+      setCraftedProduction(value);
     }
-
-    setIsInvalid(errorMessage !== "");
-    onError("art", errorMessage);
-
-    impactsData.craftedProduction = event.target.value;
-    setCraftedProduction(event.target.value);
-    onUpdate("art");
   };
 
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.art = event.target.value;
-  };
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.art = info);
 
   return (
     <Form className="statement">
@@ -81,7 +100,7 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
                 type="radio"
                 label="Oui"
                 value="true"
-                checked={impactsData.isValueAddedCrafted === true}
+                checked={isValueAddedCrafted === true}
                 onChange={onIsValueAddedCraftedChange}
               />
               <Form.Check
@@ -89,7 +108,7 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
                 type="radio"
                 label="Non"
                 value="false"
-                checked={impactsData.isValueAddedCrafted === false}
+                checked={isValueAddedCrafted === false}
                 onChange={onIsValueAddedCraftedChange}
               />
               <Form.Check
@@ -97,7 +116,7 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
                 type="radio"
                 label="Partiellement"
                 value="partially"
-                checked={impactsData.isValueAddedCrafted === "partially"}
+                checked={isValueAddedCrafted === "partially"}
                 onChange={onIsValueAddedCraftedChange}
               />
             </Col>
@@ -112,8 +131,8 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
                   type="number"
                   value={roundValue(craftedProduction, 0)}
                   inputMode="numeric"
-                  onChange={handleIsValueAddedCrafted}
-                  disabled={impactsData.isValueAddedCrafted !== "partially"}
+                  onChange={handleAmountValueAddedCrafted}
+                  disabled={isValueAddedCrafted !== "partially"}
                   isInvalid={isInvalid}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
@@ -132,6 +151,7 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
               rows={3}
               onChange={updateInfo}
               value={info}
+              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -141,3 +161,44 @@ const StatementART = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementART;
+
+// Check statement in impacts data
+const checkStatement = (impactsData) => 
+{
+  const {
+    netValueAdded,
+    isValueAddedCrafted,
+    craftedProduction
+  } = impactsData;
+
+  if (isValueAddedCrafted === true) {
+    if (isCorrectValue(craftedProduction,netValueAdded,netValueAdded)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } else if (isValueAddedCrafted === false) {
+    if (isCorrectValue(craftedProduction,0,0)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } else if (isValueAddedCrafted === "partially") {
+    if (craftedProduction=="") {
+      return({ status: "incomplete", errorMessage: null });
+    } else if (isCorrectValue(craftedProduction,0,netValueAdded)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({
+        status: "error",
+        errorMessage: isCorrectValue(craftedProduction) ?
+          "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
+          : "Veuillez saisir une valeur numérique"
+      });
+    }
+  } else if (isValueAddedCrafted === null) {
+    return({ status: "incomplete", errorMessage: null });
+  } else {
+    return({ status: "error", errorMessage: "Erreur application" });
+  }
+}

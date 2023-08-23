@@ -8,18 +8,52 @@ import { Loader } from "../../modals/Loader";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import { checkIfDataExists } from "./utils";
 import indicators from "/lib/indics";
+import StatementFormContainer from "./StatementFormContainer";
+import { useEffect } from "react";
 
 const DirectImpacts = ({ session, submit }) => 
 {
+
+  const [statementsStatus, setStatementsStatus] = useState({
+    art: { status: "unselect", errorMessage: null },
+    eco: { status: "unselect", errorMessage: null },
+    soc: { status: "unselect", errorMessage: null },
+    idr: { status: "unselect", errorMessage: null },
+    geq: { status: "unselect", errorMessage: null },
+    knw: { status: "unselect", errorMessage: null },
+    ghg: { status: "unselect", errorMessage: null },
+    haz: { status: "unselect", errorMessage: null },
+    mat: { status: "unselect", errorMessage: null },
+    nrg: { status: "unselect", errorMessage: null },
+    was: { status: "unselect", errorMessage: null },
+    wat: { status: "unselect", errorMessage: null },
+  })
+
   const [period] = useState(session.financialPeriod);
 
-  const [validations, setValidations] = useState(
-    session.validations[period.periodKey]
-  );
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [selectedStatements, setSelectedStatements] = useState([]); // session.validations[period.periodKey]
   const [invalidStatements, setInvalidStatements] = useState([]);
   const [emptyStatements, setEmptyStatements] = useState([]);
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    console.log(statementsStatus);
+    let selectedStatements = Object.entries(statementsStatus)
+      .filter(([_,status]) => status.status!="unselect")
+      .map(([indic,_]) => indic);
+    let invalidStatements = Object.entries(statementsStatus)
+      .filter(([_,status]) => status.status=="error")
+      .map(([indic,_]) => indic);
+    let emptyStatements = Object.entries(statementsStatus)
+      .filter(([_,status]) => status.status=="incomplete")
+      .map(([indic,_]) => indic);
+    //
+    console.log(selectedStatements);
+    setSelectedStatements(selectedStatements);
+    setInvalidStatements(invalidStatements);
+    setEmptyStatements(emptyStatements);
+  }, [statementsStatus])
 
   const handleSubmitStatements = async () => {
     setIsLoading(true);
@@ -27,7 +61,7 @@ const DirectImpacts = ({ session, submit }) =>
 
     const missingIndicators = [];
 
-    for (const validation of validations) {
+    for (const validation of selectedStatements) {
       const indicatorCode = validation.toUpperCase();
       // fetch comparative data
       //
@@ -45,17 +79,18 @@ const DirectImpacts = ({ session, submit }) =>
     submit();
   };
 
-  const handleValidations = async (
-    indicators,
-    invalidStatements,
-    emptyStatements
-  ) => {
-    setValidations(indicators);
-    setInvalidStatements(invalidStatements);
-    setEmptyStatements(emptyStatements);
-
-    session.validations[period.periodKey] = indicators;
+  const onStatementUpdate = async (indic, status) => {
+    setStatementsStatus({
+      ...statementsStatus,
+      [indic]: status
+    });
   };
+
+  const categories = [
+    "Création de la valeur",
+    "Empreinte sociale",
+    "Empreinte environnementale"
+  ];
 
   return (
     <Container fluid>
@@ -65,15 +100,35 @@ const DirectImpacts = ({ session, submit }) =>
           Identifiez et déclarez les impacts directs et obtenez des éléments
           d'analyse pour chaque indicateur clé.
         </p>
-        <StatementForms
+
+        {categories.map((category) => 
+          <div key={category}>
+            <h3>
+              <i className="bi bi-pencil-square"></i> {category}
+            </h3>
+            {Object.entries(indicators)
+              .filter(([_, value]) => value.isAvailable && value.category === category)
+              .map(([key,_]) => 
+                <StatementFormContainer 
+                  key={key}
+                  session={session}
+                  period={period}
+                  indic={key}
+                  onUpdate={onStatementUpdate}
+                />
+              )}
+          </div>
+        )}
+
+        {/* <StatementForms
           session={session}
           period={period}
           initialSelectedIndicators={validations}
           updateValidations={handleValidations}
-        />
+        /> */}
         {isLoading && <Loader title={"Chargement en cours..."} />}
 
-        {invalidStatements && invalidStatements.length > 0 && (
+        {invalidStatements.length > 0 && (
           <Alert variant="danger" className="flex-column align-items-start">
             {`Attention : ${
               invalidStatements.length > 1
@@ -136,9 +191,7 @@ const DirectImpacts = ({ session, submit }) =>
             disabled={
               emptyStatements.length > 0 ||
               invalidStatements.length > 0 ||
-              validations.length == 0
-                ? true
-                : false
+              selectedStatements.length == 0
             }
           >
             Valider et accéder aux résultats

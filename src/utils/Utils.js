@@ -130,6 +130,40 @@ export function valueOrDefault(value, defaultValue) {
   }
 }
 
+/* -------------------------- ROUNDING FUNCTION -------------------------- */
+// correct value
+
+export const isCorrectValue = (value,min,max) => 
+  {
+    // is a number
+    if (!isNaN(value)) {
+      // check min
+      if (min!=undefined) 
+      {
+        if (!isCorrectValue(min)) {
+          return false;
+        } else if (isCorrectValue(min) && min>value) {
+          return false;
+        }
+      }
+      // check max
+      if (max!=undefined) 
+      {
+        if (!isCorrectValue(max)) {
+          return false;
+        } else if (isCorrectValue(max) && max<value) {
+          return false;
+        }
+      }
+      // a number and between min & max
+      return true;
+    }
+    // not a number
+    else {
+      return false
+    }
+  }
+
 /* -------------------------- COMPARISON FUNCTION -------------------------- */
 // to compare values
 
