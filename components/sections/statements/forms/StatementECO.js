@@ -1,69 +1,91 @@
-import React, { useState } from "react";
+// La Société Nouvelle
+
+// React
+import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
-const StatementECO = ({ impactsData, onUpdate, onError }) => {
+import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
 
-  const [domesticProduction, setDomesticProduction] = useState(
-    valueOrDefault(impactsData.domesticProduction, "")
-  );
+/* ---------- STATEMENT - INDIC #ECO ---------- */
+
+/** Props concerned in impacts data :
+ *    - isAllActivitiesInFrance
+ *    - domesticProduction
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
+
+const StatementECO = ({ 
+  impactsData, 
+  onUpdate
+}) => {
+
+  const [isAllActivitiesInFrance, setIsAllActivitiesInFrance] = useState(impactsData.isAllActivitiesInFrance);
+  const [domesticProduction, setDomesticProduction] = useState(valueOrDefault(impactsData.domesticProduction, ""));
   const [info, setInfo] = useState(impactsData.comments.eco || "");
   const [isInvalid, setIsInvalid] = useState(false);
 
+  // update impacts data when state update
+  useEffect(() => {
+    impactsData.isAllActivitiesInFrance = isAllActivitiesInFrance;
+    impactsData.domesticProduction = domesticProduction;
+    const statementStatus = checkStatement(impactsData);
+    setIsInvalid(statementStatus.status=="error");
+    onUpdate(statementStatus);
+  }, [isAllActivitiesInFrance,domesticProduction]);
+
+  // update state when props update
+  useEffect(() => 
+  {
+    if (impactsData.isAllActivitiesInFrance!=isAllActivitiesInFrance) {
+      setIsValueAddedCrafted(impactsData.isAllActivitiesInFrance);
+    }
+    if ((impactsData.domesticProduction)!=domesticProduction) {
+      setCraftedProduction(impactsData.domesticProduction || "");
+    }
+  }, [impactsData.isAllActivitiesInFrance, impactsData.domesticProduction]);
+
+  // radio button - 
   const onIsAllActivitiesInFranceChange = (event) => {
     const radioValue = event.target.value;
     onUpdate("eco"); 
 
     switch (radioValue) {
       case "true":
-        impactsData.isAllActivitiesInFrance = true;
-        impactsData.domesticProduction = impactsData.netValueAdded;
-        setIsInvalid(false);
-        onError("eco", false);
+        setIsAllActivitiesInFrance(true);
+        setDomesticProduction(impactsData.netValueAdded);
         break;
       case "partially":
-        impactsData.isAllActivitiesInFrance = "partially";
-        impactsData.domesticProduction = "";
+        setIsAllActivitiesInFrance("partially");
+        setDomesticProduction("");
         break;
       case "false":
-        impactsData.isAllActivitiesInFrance = false;
-        impactsData.domesticProduction = 0;
-        setIsInvalid(false);
-        onError("eco", false);
+        setIsAllActivitiesInFrance(false);
+        setDomesticProduction(0);
         break;
     }
-    setDomesticProduction(impactsData.domesticProduction);
   };
 
   const updateDomesticProduction = (event) => {
-
-    const inputValue = event.target.valueAsNumber;
-    let errorMessage = "";
-
-    // Validation checks for the input value
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
-    } else if (impactsData.netValueAdded == null) {
-      errorMessage = "La valeur ajoutée nette n'est pas définie.";
-    } else if (inputValue >= impactsData.netValueAdded) {
-      errorMessage =
-        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setDomesticProduction('');
+    } else if (!isNaN(valueAsNumber)) {
+      setDomesticProduction(valueAsNumber);
+    } else {
+      setDomesticProduction(value);
     }
-
-    
-    setIsInvalid(errorMessage !== "");
-    onError("eco", errorMessage);
-
-    impactsData.domesticProduction = event.target.value;
-
-    setDomesticProduction(event.target.value);
-    onUpdate("eco");
   };
 
-  const updateInfo = (event) => {
-    impactsData.comments.eco = info;
-    setInfo(event.target.value);
-  };
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.eco = info);
 
   return (
     <Form className="statement">
@@ -134,6 +156,7 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
               rows={3}
               onChange={updateInfo}
               value={info}
+              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -141,4 +164,46 @@ const StatementECO = ({ impactsData, onUpdate, onError }) => {
     </Form>
   );
 };
+
 export default StatementECO;
+
+// Check statement in impacts data
+const checkStatement = (impactsData) => 
+{
+  const {
+    netValueAdded,
+    isAllActivitiesInFrance,
+    domesticProduction
+  } = impactsData;
+
+  if (isAllActivitiesInFrance === true) {
+    if (isCorrectValue(domesticProduction,netValueAdded,netValueAdded)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } else if (isAllActivitiesInFrance === false) {
+    if (isCorrectValue(domesticProduction,0,0)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } else if (isAllActivitiesInFrance === "partially") {
+    if (domesticProduction=="") {
+      return({ status: "incomplete", errorMessage: null });
+    } else if (isCorrectValue(domesticProduction,0,netValueAdded)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({
+        status: "error",
+        errorMessage: isCorrectValue(domesticProduction) ?
+          "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
+          : "Veuillez saisir une valeur numérique"
+      });
+    }
+  } else if (isAllActivitiesInFrance === null) {
+    return({ status: "incomplete", errorMessage: null });
+  } else {
+    return({ status: "error", errorMessage: "Erreur application" });
+  }
+}

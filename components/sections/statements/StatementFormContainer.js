@@ -44,6 +44,7 @@ function StatementFormContainer ({
     const { checked } = event.target;
     setSelected(checked);
     if (!checked) {
+      setErrorMessage(null);
       onUpdate(indic,{status:"unselect", errorMessage: null});
     }
   };
@@ -92,6 +93,7 @@ function StatementFormContainer ({
   const toggleCheckbox = () => {
     setSelected(!selected);
     if (selected) {
+      setErrorMessage(null);
       onUpdate(indic,{status:"unselect", errorMessage: null});
     }
   };
