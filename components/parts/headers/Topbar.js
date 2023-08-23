@@ -11,7 +11,7 @@ import { downloadSession } from "/src/utils/Utils";
 
 /* -------------------- TOP BAR -------------------- */
 
-export const TopBar = ({ session }) =>
+export const Topbar = ({ session }) =>
 {
   return (
     <div className="top-bar">

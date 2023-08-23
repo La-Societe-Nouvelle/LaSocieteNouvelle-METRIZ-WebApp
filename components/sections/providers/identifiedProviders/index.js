@@ -14,6 +14,10 @@ import {
   fetchMinFootprint,
 } from "/src/services/DefaultDataService";
 
+// Views
+
+import SIRENProvidersImport from "./views/SIRENProvidersImport";
+
 // Table
 import { IdentifiedProvidersTable } from "../../../tables/IdentifiedCompaniesTable";
 
@@ -28,8 +32,6 @@ import { InvoicesDataModal } from "./modals/InvoicesDataModal";
 // pdf extractor
 import pdf from "pdf-extraction";
 import { getDefaultFootprintId } from "/src/Provider";
-import DownloadProvidersExcel from "./views/DownloadProvidersExcel";
-import ImportProviders from "./views/ImportProviders";
 
 const identificationPatterns = [
   /FR[0-9]{11}( |$|\r\n|\r|\n)/g,
@@ -170,16 +172,30 @@ export class IdentifiedProviders extends React.Component {
     return (
       <Container fluid id="siren-section">
         <section className="step">
-          <div className="section-title">
-            <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
-            <h3 className="subtitle mb-4">
-              Synchronisation des données grâce au numéro de siren
-            </h3>
-          </div>
-
-          <DownloadProvidersExcel providers={financialData.providers} />
-
-          <ImportProviders
+        <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
+          <h3 className=" my-4">
+            Synchronisation des données grâce au numéro SIREN
+          </h3>
+          <p className="small">
+            La synchronisation des données relatives aux fournisseurs s'effectue
+            via le numéro siren. Pour établir la correspondance entre les
+            numéros de compte auxiliaire dans vos écritures comptables et les
+            numéros de SIREN, vous avez trois options :
+          </p>
+          <ol className="small">
+            <li>
+              <strong>Importer </strong> les numéros SIREN de vos
+              fournisseurs via un fichier au format Excel ou CSV
+            </li>
+            <li>
+              <strong>Associer </strong>  les comptes fournisseurs à partir des
+              factures
+            </li>
+            <li>
+              <strong>Compléter </strong> manuellement le tableau 
+            </li>
+          </ol>
+          <SIRENProvidersImport
             providers={financialData.providers}
             updateProviders={this.updateProviders}
             synchroniseProviders={this.synchroniseProviders}
@@ -187,7 +203,7 @@ export class IdentifiedProviders extends React.Component {
 
           {/* TO DO : Upload Invoices component */}
           <div className="step">
-            <h4>Déposer des factures</h4>
+            <h4>2. Déposer des factures</h4>
 
             <Dropzone onDrop={this.onInvoicesDrop} accept={[".pdf"]}>
               {({ getRootProps, getInputProps }) => (
@@ -228,7 +244,7 @@ export class IdentifiedProviders extends React.Component {
             )}
           </div>
           {/*  TO DO : Providers Data component */}
-          <div className="step" id="step-3">
+          <div className="step">
             <h4>3. Synchroniser les données de vos fournisseurs</h4>
 
             <div className="table-container">

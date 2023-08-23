@@ -9,7 +9,7 @@ import {
   Navbar } from "react-bootstrap";
 
 // Components
-import { TopBar } from "./TopBar";
+import { Topbar } from "./Topbar";
 
 // Step names
 const stepNames = [
@@ -28,7 +28,7 @@ export const HeaderSection = ({ step, stepMax, setStep, session }) =>
 
   return (
     <header>
-      <TopBar 
+      <Topbar 
         session={session}
       />
       <Navbar expand="lg">

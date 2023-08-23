@@ -1,13 +1,13 @@
 // Components
 import { Container } from "react-bootstrap";
 import { Footer } from "../components/parts/Footer";
-import HeaderPage from "../components/parts/headers/HeaderPage";
+import {HeaderPage} from "../components/parts/headers/HeaderPage";
 
 export default function Home() {
   return (
     <>
       <div className="wrapper" id="wrapper">
-       <HeaderPage></HeaderPage>
+       <HeaderPage/>
         <Container>
           <section className="step">
             <h1>A propos</h1>
