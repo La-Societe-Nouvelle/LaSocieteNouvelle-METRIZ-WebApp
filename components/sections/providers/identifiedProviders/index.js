@@ -33,7 +33,6 @@ import { InvoicesDataModal } from "./modals/InvoicesDataModal";
 import pdf from "pdf-extraction";
 import { getDefaultFootprintId } from "/src/Provider";
 
-
 const identificationPatterns = [
   /FR[0-9]{11}( |$|\r\n|\r|\n)/g,
   /FR [0-9]{2} [0-9]{3} [0-9]{3} [0-9]{3}( |$|\r\n|\r|\n)/g,
