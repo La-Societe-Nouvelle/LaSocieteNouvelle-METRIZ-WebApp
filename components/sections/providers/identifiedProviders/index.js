@@ -2,11 +2,7 @@
 
 // React
 import React from "react";
-import Dropzone from "react-dropzone";
 import { Container } from "react-bootstrap";
-
-// API
-import api from "../../../../config/api";
 
 // Services
 import {
@@ -16,7 +12,8 @@ import {
 
 // Views
 
-import SIRENProvidersImport from "./views/SIRENProvidersImport";
+import ImportProvidersView from "./views/ImportProvidersView";
+import { InvoicesProvidersView } from "./views/InvoicesProvidersView";
 
 // Table
 import { IdentifiedProvidersTable } from "../../../tables/IdentifiedCompaniesTable";
@@ -26,19 +23,7 @@ import { getSignificativeProviders } from "./utils";
 
 // Modals
 import { ProgressBar } from "../../../modals/ProgressBar";
-import { ErrorAPIModal, InfoModal } from "../../../modals/userInfoModals";
-import { InvoicesDataModal } from "./modals/InvoicesDataModal";
-
-// pdf extractor
-import pdf from "pdf-extraction";
-import { getDefaultFootprintId } from "/src/Provider";
-
-const identificationPatterns = [
-  /FR[0-9]{11}( |$|\r\n|\r|\n)/g,
-  /FR [0-9]{2} [0-9]{3} [0-9]{3} [0-9]{3}( |$|\r\n|\r|\n)/g,
-  /(SIRET|SIREN|RCS)( |)[0-9]{9,15}( |)($|\r\n|\r|\n)/g,
-  /(^|)( |)[0-9]{9,15}( |)(SIRET|SIREN|RCS)/g,
-];
+import { ErrorAPIModal } from "../../../modals/userInfoModals";
 
 export class IdentifiedProviders extends React.Component {
   constructor(props) {
@@ -51,8 +36,6 @@ export class IdentifiedProviders extends React.Component {
       file: null,
       progression: 0,
       synchronised: 0,
-      showInvoicesDataModal: false,
-      showInfoModal: false,
       isSyncButtonEnable: checkSyncButtonEnable(props.financialData.providers),
       isNextStepAvailable: checkNextStepAvailable(
         props.financialData.providers
@@ -61,36 +44,6 @@ export class IdentifiedProviders extends React.Component {
       error: false,
       minFpt: null,
       maxFpt: null,
-      invoicesData: null,
-    };
-
- 
-    this.onInvoicesDrop = async (files) => {
-      if (files.length > 0) {
-        let invoicesData = await this.readInvoices(files);
-
-        if (Object.keys(invoicesData).length !== 0) {
-          this.setState({
-            fetching: false,
-            progression: 0,
-            showInvoicesDataModal: true,
-            errorFile: false,
-            invoicesData,
-          });
-        } else {
-          this.setState({
-            fetching: false,
-            progression: 0,
-            showInfoModal: true,
-          });
-        }
-      } else {
-        this.setState({
-          showInvoicesDataModal: false,
-          errorFile: true,
-          invoicesData: null,
-        });
-      }
     };
   }
 
@@ -107,8 +60,6 @@ export class IdentifiedProviders extends React.Component {
   };
 
   componentDidUpdate = () => {
-
-    
     // next step available
     const isNextStepAvailable = checkNextStepAvailable(
       this.props.financialData.providers
@@ -126,9 +77,14 @@ export class IdentifiedProviders extends React.Component {
   };
 
   updateProviders = (updatedProviders) => {
-    this.setState({ financialData: { ...this.state.financialData, providers: updatedProviders } });
+    this.setState({
+      financialData: {
+        ...this.state.financialData,
+        providers: updatedProviders,
+      },
+    });
   };
-  
+
   render() {
     const {
       significativeProviders,
@@ -136,12 +92,9 @@ export class IdentifiedProviders extends React.Component {
       nbItems,
       fetching,
       progression,
-      showInvoicesDataModal,
-      showInfoModal,
       isSyncButtonEnable,
       isNextStepAvailable,
       error,
-      invoicesData,
     } = this.state;
 
     const financialData = this.props.financialData;
@@ -168,11 +121,11 @@ export class IdentifiedProviders extends React.Component {
     ).length;
     const someSignificativeProvidersUnidentified =
       nbSignificativeProvidersUnidentified > 0;
-
+    console.log(providers);
     return (
       <Container fluid id="siren-section">
         <section className="step">
-        <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
+          <h2 className="mb-3">Etape 3 - Traitement des fournisseurs</h2>
           <h3 className=" my-4">
             Synchronisation des données grâce au numéro SIREN
           </h3>
@@ -184,65 +137,28 @@ export class IdentifiedProviders extends React.Component {
           </p>
           <ol className="small">
             <li>
-              <strong>Importer </strong> les numéros SIREN de vos
-              fournisseurs via un fichier au format Excel ou CSV
+              <strong>Importer </strong> les numéros SIREN de vos fournisseurs
+              via un fichier au format Excel ou CSV
             </li>
             <li>
-              <strong>Associer </strong>  les comptes fournisseurs à partir des
+              <strong>Associer </strong> les comptes fournisseurs à partir des
               factures
             </li>
             <li>
-              <strong>Compléter </strong> manuellement le tableau 
+              <strong>Compléter </strong> manuellement le tableau
             </li>
           </ol>
-          <SIRENProvidersImport
+          <ImportProvidersView
             providers={financialData.providers}
             updateProviders={this.updateProviders}
             synchroniseProviders={this.synchroniseProviders}
           />
+          <InvoicesProvidersView
+            providers={financialData.providers}
+            externalExpenses={financialData.externalExpenses}
+            updateProviders={this.updateProviders} 
+          />
 
-          {/* TO DO : Upload Invoices component */}
-          <div className="step">
-            <h4>2. Déposer des factures</h4>
-
-            <Dropzone onDrop={this.onInvoicesDrop} accept={[".pdf"]}>
-              {({ getRootProps, getInputProps }) => (
-                <div className="dropzone-section">
-                  <div {...getRootProps()} className="dropzone">
-                    <input {...getInputProps()} />
-                    <p>
-                      <i className="bi bi-file-arrow-up-fill"></i>
-                      Glisser vos factures ici
-                    </p>
-                    <p className="small">OU</p>
-                    <p className="btn btn-primary">Selectionner les fichiers</p>
-                  </div>
-                </div>
-              )}
-            </Dropzone>
-
-            <InfoModal
-              showModal={showInfoModal}
-              title={"Association des comptes fournisseurs"}
-              message="Aucun SIREN n'a pu être extrait des documents importés.  
-              Veuillez renseigner manuellement le numero SIREN de ces comptes fournisseurs "
-              onClose={() => {
-                this.setState({ showInfoModal: false });
-              }}
-            ></InfoModal>
-
-            {invoicesData && (
-              <InvoicesDataModal
-                showModal={showInvoicesDataModal}
-                invoicesData={invoicesData}
-                providers={providers}
-                onClose={() => this.setState({ showInvoicesDataModal: false })}
-                onSubmit={(invoicesData) =>
-                  this.setInvoicesProvider(invoicesData)
-                }
-              />
-            )}
-          </div>
           {/*  TO DO : Providers Data component */}
           <div className="step">
             <h4>3. Synchroniser les données de vos fournisseurs</h4>
@@ -457,192 +373,6 @@ export class IdentifiedProviders extends React.Component {
     });
   };
 
- 
-  readInvoices = async (files) => {
-    let invoicesData = [];
-    let promises = [];
-    for (let file of files) {
-      let filePromise = new Promise((resolve) => {
-        let reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsArrayBuffer(file);
-      });
-      promises.push(filePromise);
-    }
-
-    await Promise.all(promises).then(async (fileContents) => {
-      for (let fileContent of fileContents) {
-        let data = await pdf(fileContent);
-
-        // VAT Identification Numbers
-        let identificationNumbers = identificationPatterns
-          .map((regex) => data.text.match(regex) || [])
-          .reduce((a, b) => a.concat(b), [])
-          .map((number) =>
-            number.replace(/( |\r\n|\r|\n|RCS|SIREN|SIRET)/g, "")
-          )
-          .filter(
-            (value, index, self) =>
-              index === self.findIndex((item) => item == value)
-          );
-        // Dates
-        let dates = (
-          data.text.match(/[0-9]{2}\/[0-9]{2}\/(20|)[0-9]{2}/g) || []
-        )
-          .map(
-            (date) =>
-              "20" +
-              (date.length == 8
-                ? date.substring(6, 8)
-                : date.substring(8, 10)) +
-              date.substring(3, 5) +
-              date.substring(0, 2)
-          )
-          .filter(
-            (value, index, self) =>
-              index === self.findIndex((item) => item == value)
-          );
-        // Amounts
-        let amounts = (data.text.match(/[0-9| ]+(.|,)[0-9]{0,2}( |)€/g) || [])
-          .map((amount) =>
-            amount.replace(/€/g, "").replace(/ /g, "").replace(",", ".")
-          )
-          .map((amount) => parseFloat(amount))
-          .filter(
-            (value, index, self) =>
-              index === self.findIndex((item) => item == value)
-          );
-
-        let invoiceData = {
-          identificationNumbers,
-          dates,
-          amounts,
-        };
-
-        invoicesData.push(invoiceData);
-      }
-    });
-
-    // start fetching data
-    this.setState({ fetching: true, progression: 0 });
-
-    let i = 0;
-    let n = invoicesData.length;
-    // group by provider
-    let invoicesProviders = {};
-    for (let invoiceData of invoicesData) {
-      if (invoiceData.identificationNumbers.length == 1) {
-        let idProvider = invoiceData.identificationNumbers[0];
-        if (!Object.keys(invoicesProviders).includes(idProvider)) {
-          let siren = getDefaultFootprintId(idProvider);
-          let legalUnitData = {};
-          await api
-            .get("legalunitfootprint/" + siren)
-            .then((res) => {
-              let status = res.data.header.code;
-              if (status == 200) {
-                legalUnitData = res.data.legalUnit;
-              }
-            })
-            .catch((err) => {
-              this.setState({ error: true });
-            });
-          // fetch data
-          invoicesProviders[idProvider] = {
-            legalUnitData,
-            invoices: [],
-          };
-        }
-        // push data
-        invoicesProviders[idProvider].invoices.push({
-          dates: invoiceData.dates,
-          amounts: invoiceData.amounts,
-        });
-      }
-      // update progression
-      i++;
-      this.setState({ progression: Math.round((i / n) * 100) });
-    }
-
-    // default matching
-    let defaultMatching = [];
-    // for each provider identified in invoices
-    for (let providerId of Object.keys(invoicesProviders)) {
-      let providerData = invoicesProviders[providerId];
-      let providersMatching = {};
-      // for each invoice
-      for (let invoiceData of providerData.invoices) {
-        let expensesMatching = this.props.financialData.externalExpenses.filter(
-          (expense) =>
-            invoiceData.dates.includes(expense.date) &&
-            invoiceData.amounts.includes(expense.amount)
-        );
-        // for each expense matching a date & an amount in invoices -> add to matching scores
-        expensesMatching
-          .map((expense) => expense.providerNum)
-          .filter(
-            (value, index, self) =>
-              index === self.findIndex((item) => item == value)
-          )
-          .forEach(
-            (providerNum) =>
-              (providersMatching[providerNum] =
-                (providersMatching[providerNum] || 0) + 1)
-          );
-      }
-      // if a least a match
-      if (Object.entries(providersMatching).length > 0) {
-        // get providers (account aux) with max matching in invoices
-        let maxMatches = Math.max(...Object.values(providersMatching));
-        let providersWithMax = Object.entries(providersMatching)
-          .filter(([_, nbMatches]) => nbMatches == maxMatches)
-          .map(([providerNum, _]) => providerNum);
-        // if a single provider has max -> add to default matching array
-        if (providersWithMax.length == 1) {
-          defaultMatching.push({
-            providerId,
-            denomination: providerData.legalUnitData.denomination,
-            providerNum: providersWithMax[0],
-          });
-        }
-      }
-    }
-
-    defaultMatching
-      .filter(
-        (value, _, self) =>
-          self.filter((item) => item.providerId == value.providerId).length == 1
-      )
-      .forEach(
-        (matching) =>
-          (invoicesProviders[matching.providerId].matching =
-            matching.providerNum)
-      );
-
-    return invoicesProviders;
-  };
-
-  setInvoicesProvider = (invoicesData) => {
-    for (let invoiceData of Object.values(invoicesData)) {
-      if (invoiceData.matching != "") {
-        let provider = this.props.financialData.providers.find(
-          (provider) => provider.providerNum == invoiceData.matching
-        );
-        if (provider) {
-          provider.corporateId = invoiceData.legalUnitData.siren;
-          provider.legalUnitData = invoiceData.legalUnitData;
-          provider.useDefaultFootprint = false;
-          provider.footprintStatus = 0;
-        }
-      } else {
-        // remove data from provider
-      }
-    }
-
-    this.setState({ invoicesData: null, showInvoicesDataModal: false });
-  };
-
-
   /* ---------- FETCHING DATA ---------- */
 
   // fetch data for showed providers
@@ -701,15 +431,6 @@ export class IdentifiedProviders extends React.Component {
 
     document.getElementById("step-3").scrollIntoView();
   };
-
-  /* ----- MODALS ----- */
-
-  closeInvoicesDataModal = () =>
-    this.setState({
-      showInvoicesDataModal: false,
-      invoicesData: null,
-      file: [],
-    });
 }
 
 /* -------------------------------------------------- ANNEXES -------------------------------------------------- */
