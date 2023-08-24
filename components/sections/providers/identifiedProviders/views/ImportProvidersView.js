@@ -17,7 +17,7 @@ import {
 import { ProvidersImportSuccessModal } from "../modals/ProvidersImportSuccessModal";
 import { ErrorFileModal } from "../../../../modals/userInfoModals";
 
-const SIRENProvidersImport = ({
+const ImportProvidersView = ({
   providers,
   updateProviders,
   synchroniseProviders,
@@ -187,4 +187,4 @@ const SIRENProvidersImport = ({
   );
 };
 
-export default SIRENProvidersImport;
+export default ImportProvidersView;

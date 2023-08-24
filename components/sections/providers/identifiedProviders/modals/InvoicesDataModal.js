@@ -1,121 +1,123 @@
 // La Société Nouvelle
 
 // React
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Table } from "react-bootstrap";
+import Select from "react-select";
+
+// Styles
+import { customSelectStyles } from "../../../../../config/customStyles";
 
 /* -------------------- INVOICES DATA MODAL -------------------- */
 
-/** 
- *  Props :
- *    - invoicesData (extracted data from pdf)
- *    - providers
- *    - onGoBack -> close popup
- *  Behaviour :
- *    Edit indivualsData in state
- *    Update impacts data and footprints on validation
- *  State :
- *    mapping
- */
 
-export class InvoicesDataModal extends React.Component 
-{
-  constructor(props) {
-    super(props);
-    this.state = {
-      // mapping
-      mapping: props.invoicesData || {},
-    };
-  }
+const InvoicesDataModal = ({
+  invoicesData,
+  providers,
+  showModal,
+  onClose,
+  onSubmit,
+}) => {
+  const [providersMapping, setProvidersMapping] = useState(invoicesData || {});
 
+  useEffect(() => {
+    setProvidersMapping(invoicesData || {});
+  }, [invoicesData]);
 
-  render() 
-  {
-    const { invoicesData, providers, showModal, onClose, onSubmit} = this.props;
-    const { mapping } = this.state;
-    
-    return (
-      <Modal show={showModal} onHide={onClose} size="xl" centered>
-        <Modal.Header  closeButton>
-          <h3>Associer les comptes fournisseurs </h3>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="assessment">
-            <Table size="sm" >
-              <thead>
-                <tr>
-                  <td>Identifiant</td>
-                  <td>Dénomination</td>
-                  <td>Compte fournisseur</td>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.entries(invoicesData).map(
-                  ([key, { legalUnitData }]) => (
-                    <tr key={key}>
-                      <td>{key}</td>
-                      <td>{legalUnitData.denomination}</td>
-                      <td>
-                        <select
-                          className="form-select"
-                          onChange={(e) =>
-                            this.handleOnchange(key, e.target.value)
-                          }
-                          value={mapping[key].matching}
-                        >
-                          <option value="">
-                            Aucun compte fournisseur associé
-                          </option>
-                          {providers
-                            .filter(
-                              (provider) => !provider.isDefaultProviderAccount
-                            )
-                            .map(({ providerNum, providerLib }, index) => (
-                              <option key={index} value={providerNum}>
-                                {providerNum} - {providerLib}
-                              </option>
-                            ))}
-                        </select>
-                      </td>
-                    </tr>
-                  )
-                )}
-              </tbody>
-            </Table>
+  const handleOnchange = (providerId, providerNum) => {
+    const updatedMapping = { ...providersMapping };
+    Object.values(updatedMapping)
+      .filter((invoiceData) => invoiceData.matching === providerNum)
+      .forEach((invoiceData) => (invoiceData.matching = ""));
+    updatedMapping[providerId].matching = providerNum;
 
-            <div className="view-footer text-end mt-2">
-              <button
-                className="btn btn-secondary "
-                onClick={() => onSubmit(this.state.mapping)}
-              >
-                Valider
-              </button>
-            </div>
-          </div>
-        </Modal.Body>
-      </Modal>
-    );
-  }
-
-  /* ---------- HEADER ACTIONS ---------- */
-
-  handleOnchange = async (providerId, providerNum) => 
-  {
-    let mapping = this.state.mapping;
-    Object.values(mapping).filter((invoiceData) => invoiceData.matching==providerNum).forEach((invoiceData) => invoiceData.matching="");
-    mapping[providerId].matching = providerNum;
-    this.setState({ mapping });
+    setProvidersMapping(updatedMapping);
   };
 
- 
-  /* ---------- TABLE DISPLAY ---------- */
+  return (
+    <Modal show={showModal} onHide={onClose} size="xl" centered>
+      <Modal.Header closeButton>
+        <h3>Associer les comptes fournisseurs</h3>
+      </Modal.Header>
+      <Modal.Body>
+        <Table size="sm">
+          <thead>
+            <tr>
+              <td>Identifiant</td>
+              <td>Dénomination</td>
+              <td>Compte fournisseur</td>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(providersMapping).map(
+              ([key, { legalUnitData }]) => (
+                <tr key={key}>
+                  <td>{key}</td>
+                  <td>{legalUnitData.denomination}</td>
+                  <td>
+                    <Select
+                      styles={customSelectStyles}
+                      options={[
+                        {
+                          value: "",
+                          label: "Aucun compte fournisseur associé",
+                        },
+                        ...providers
+                          .filter(
+                            (provider) => !provider.isDefaultProviderAccount
+                          )
+                          .filter(
+                            ({ providerNum }) =>
+                              !Object.values(providersMapping).some(
+                                (invoiceData) =>
+                                  invoiceData.matching === providerNum
+                              )
+                          )
+                          .map(({ providerNum, providerLib }) => ({
+                            value: providerNum,
+                            label: `${providerNum} - ${providerLib}`,
+                          })),
+                      ]}
+                      onChange={(selectedOption) =>
+                        handleOnchange(key, selectedOption.value)
+                      }
+                      placeholder="Sélectionnez un compte fournisseur"
+                      defaultValue={
+                        providersMapping[key].matching
+                          ? {
+                              value: providersMapping[key].matching,
+                              label: `${providersMapping[key].matching} - ${
+                                providers.find(
+                                  (provider) =>
+                                    provider.providerNum ===
+                                    providersMapping[key].matching
+                                )?.providerLib
+                              }`,
+                            }
+                          : {
+                              value: "",
+                              label: "Aucun compte fournisseur associé",
+                            }
+                      }
+                    />
+                  </td>
+                </tr>
+              )
+            )}
+          </tbody>
+        </Table>
 
-  // Column for sorting
-  changeColumnSorted(columnSorted) {
-    if (columnSorted != this.state.columnSorted) {
-      this.setState({ columnSorted: columnSorted, reverseSort: false });
-    } else {
-      this.setState({ reverseSort: !this.state.reverseSort });
-    }
-  }
-}
+        <div className="view-footer text-end mt-2">
+          <button
+            className="btn btn-secondary"
+            onClick={() => onSubmit(providersMapping)}
+          >
+            Valider
+          </button>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
+};
+
+export default InvoicesDataModal;

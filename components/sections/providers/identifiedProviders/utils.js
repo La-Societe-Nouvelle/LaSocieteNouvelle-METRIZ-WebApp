@@ -252,3 +252,30 @@ export async function XLSXFileWriterFromJSON(
 
   return buf;
 }
+
+
+/* ------------------------------------ INVOICES --------------------------------------- */
+
+// get footrpint id (siren)
+export const getDefaultFootprintId = (corporateId) =>
+{
+  if (!corporateId) {
+    return null;
+  }
+  // SIREN
+  else if (/^[0-9]{9}$/.test(corporateId)) {
+    return corporateId;
+  }
+  // SIRET
+  else if (/^[0-9]{14}$/.test(corporateId)) {
+    return corporateId.substring(0, 9);
+  }
+  // VAT NUMBER
+  else if (/^FR[0-9]{11}$/.test(corporateId)) {
+    return corporateId.substring(4, 13);
+  }
+  // DEFAULT
+  else {
+    return corporateId;
+  }
+}
