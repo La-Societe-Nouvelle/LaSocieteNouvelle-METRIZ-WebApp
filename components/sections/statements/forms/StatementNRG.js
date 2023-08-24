@@ -1,125 +1,112 @@
 // La Société Nouvelle
 
+// React
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { AssessmentNRG } from "../modals/AssessmentNRG";
+
+import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
-/* ---------- DECLARATION - INDIC #NRG ---------- */
+// Modals
+import { AssessmentNRG } from "../modals/AssessmentNRG";
 
-const StatementNRG = ({ impactsData, onUpdate, onError }) => {
-  const [energyConsumption, setEnergyConsumption] = useState(
-    valueOrDefault(impactsData.energyConsumption, "")
-  );
+/* ---------- STATEMENT - INDIC #NRG ---------- */
+
+/** Props concerned in impacts data :
+ *    - energyConsumption
+ *    - energyConsumptionUnit
+ *    - energyConsumptionUncertainty
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
+
+const units = {
+  "MJ":  { label: "MJ",   coef: 1.0       }, // default
+  "GJ":  { label: "GJ",   coef: 1000.0    },
+  "kWh": { label: "kWh",  coef: 0.278     },
+  "MWh": { label: "MWh",  coef: 278.0  },
+};
+
+const StatementNRG = ({ 
+  impactsData, 
+  onUpdate 
+}) => {
+  // state
+  const [energyConsumption, setEnergyConsumption] = 
+    useState(valueOrDefault(impactsData.energyConsumption, ""));
+  const [energyConsumptionUnit, setEnergyConsumptionUnit] = 
+    useState(impactsData.energyConsumptionUnit);
   const [energyConsumptionUncertainty, setEnergyConsumptionUncertainty] =
     useState(valueOrDefault(impactsData.energyConsumptionUncertainty, ""));
-
-  const [energyConsumptionUnit, setEnergyConsumptionUnit] = useState(
-    impactsData.energyConsumptionUnit
-  );
-
   const [info, setInfo] = useState(impactsData.comments.nrg || "");
   const [showModal, setShowModal] = useState(false);
-  const [isInvalid, setIsInvalid] = useState(false);
 
+  // update impacts data when state update
   useEffect(() => {
-    if (energyConsumption != impactsData.energyConsumption) {
-      setEnergyConsumption(impactsData.energyConsumption);
-      setEnergyConsumptionUncertainty(
-        impactsData.energyConsumptionUncertainty
-      );
+    impactsData.energyConsumption = energyConsumption;
+    impactsData.energyConsumptionUnit = energyConsumptionUnit;
+    impactsData.energyConsumptionUncertainty = energyConsumptionUncertainty;
+    const statementStatus = checkStatement(impactsData);
+    onUpdate(statementStatus);
+  }, [energyConsumption,energyConsumptionUnit,energyConsumptionUncertainty]);
+
+  // update state when props update
+  useEffect(() => {
+    // ...
+  }, []);
+
+  // energy consumption
+  const updateEnergyConsumption = (event) => 
+  {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setEnergyConsumption('');
+    } else if (!isNaN(valueAsNumber)) {
+      setEnergyConsumption(valueAsNumber);
+      if (energyConsumptionUncertainty=="") {
+        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        setEnergyConsumptionUncertainty(defaultUncertainty);
+      }
+    } else {
+      setEnergyConsumption(value);
     }
-  }, [impactsData.energyConsumption]);
+  };
 
-
-  const options = [
-    { value: "MJ", label: "MJ" },
-    { value: "GJ", label: "GJ" },
-    { value: "kWh", label: "kWh" },
-    { value: "MWh", label: "MWh" },
-  ];
-  const updateEnergyConsumption = (input) => {
-    let errorMessage = "";
-
-    const inputValue = input.target.valueAsNumber;
-
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
+  // energy consumption unit
+  const updateEnergyConsumptionUnit = (selected) => 
+  {
+    const nextUnit = selected.value;
+    setEnergyConsumptionUnit(nextUnit);
+    // update value
+    if (!isNaN(energyConsumption)) {
+      setEnergyConsumption(roundValue(energyConsumption*(units[energyConsumptionUnit].coef/units[nextUnit].coef),0));
     }
-    if (impactsData.netValueAdded == null) {
-      errorMessage = "La valeur ajoutée nette n'est pas définie.";
+  };
+
+  // energy consumption uncertainty
+  const updateEnergyConsumptionUncertainty = (event) => 
+  {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setEnergyConsumptionUncertainty('');
+    } else if (!isNaN(valueAsNumber)) {
+      setEnergyConsumptionUncertainty(valueAsNumber);
+    } else {
+      setEnergyConsumptionUncertainty(value);
     }
-    setIsInvalid(errorMessage !== "");
-    onError("nrg", errorMessage);
-
-    impactsData.nrgTotal = true;
-    impactsData.setEnergyConsumption(input.target.value);
-
-    setEnergyConsumption(input.target.value);
-    setEnergyConsumptionUncertainty(impactsData.energyConsumptionUncertainty);
-    onUpdate("nrg");
   };
 
-  const updateEnergyConsumptionUncertainty = (input) => {
-    impactsData.energyConsumptionUncertainty = input.target.value;
-    setEnergyConsumptionUncertainty(input.target.value);
-    onUpdate("nrg");
-  };
-
-  const updateEnergyConsumptionUnit = (selected) => {
-    const selectedUnit = selected.value;
-
-    if (selectedUnit !== impactsData.energyConsumptionUnit) {
-      const convertedValue = convertEnergyConsumption(
-        impactsData.energyConsumption,
-        impactsData.energyConsumptionUnit,
-        selectedUnit
-      );
-      setEnergyConsumption(convertedValue);
-      impactsData.setEnergyConsumption(convertedValue);
-    }
-    setEnergyConsumptionUnit(selectedUnit);
-
-    impactsData.energyConsumptionUnit = selectedUnit;
-
-    onUpdate("nrg");
-  };
-
-  const convertEnergyConsumption = (value, fromUnit, toUnit) => {
-    const conversionFactors = {
-      GJ: {
-        MJ: 1000,
-        kWh: 3.6,
-        MWh: 3600,
-      },
-      MJ: {
-        GJ: 1 / 1000,
-        kWh: 1 / 3.6,
-        MWh: 1 / 3600,
-      },
-      kWh: {
-        GJ: 1 / 3.6,
-        MJ: 3.6,
-        MWh: 1 / 1000,
-      },
-      MWh: {
-        GJ: 1 / 3600,
-        MJ: 3600,
-        kWh: 1000,
-      },
-    };
-    const conversionFactor = conversionFactors[fromUnit][toUnit];
-    const convertedValue = value * conversionFactor;
-    return convertedValue;
-  };
-
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.nrg = event.target.value;
-  };
+  // comment
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.nrg = info);
 
   return (
     <Form className="statement">
@@ -132,15 +119,15 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
                 <div className="custom-input with-select input-group me-1">
                   <Form.Control
                     type="number"
-                    value={roundValue(energyConsumption, 0)}
+                    value={energyConsumption}
                     inputMode="numeric"
-                    isInvalid={isInvalid}
+                    isInvalid={!isValidValue(energyConsumption)}
                     onChange={updateEnergyConsumption}
                     className="me-1"
                   />
                   <Select
                     styles={unitSelectStyles}
-                    options={options}
+                    options={Object.keys(units).map((unit) => {return({label: unit, value:unit})})}
                     value={{
                       label: energyConsumptionUnit,
                       value: energyConsumptionUnit,
@@ -166,12 +153,12 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
               <InputGroup className="custom-input">
                 <Form.Control
                   type="number"
-                  value={roundValue(energyConsumptionUncertainty, 0)}
+                  value={energyConsumptionUncertainty}
                   inputMode="numeric"
                   onChange={updateEnergyConsumptionUncertainty}
                   className="uncertainty-input"
+                  isInvalid={!isValidUncertainty(energyConsumptionUncertainty)}
                 />
-
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
             </Col>
@@ -188,6 +175,7 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
+              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -218,3 +206,53 @@ const StatementNRG = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementNRG;
+
+// Check statement
+const checkStatement = (impactsData) => 
+{
+  const {
+    energyConsumption,
+    energyConsumptionUncertainty,
+  } = impactsData;
+
+  // ok
+  if (isCorrectValue(energyConsumption,0) && isCorrectValue(energyConsumptionUncertainty,0,100)) {
+    return({ status: "ok", errorMessage: null });
+  } 
+  // valid value (empty or correct)
+  else if (!isValidValue(energyConsumption) && !isValidUncertainty(energyConsumptionUncertainty)) {
+    return({
+      status: "error",
+      errorMessage: "Valeurs saisies incorrectes"
+    });
+  }
+  // error value for energy consumption
+  else if (!isValidValue(energyConsumption)) {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(energyConsumption) ?
+        "Valeur saisie incorrecte (négative)"
+        : "Veuillez saisir une valeur numérique"
+    });
+  }
+  // error value for uncertainty
+  else if (!isValidUncertainty(energyConsumptionUncertainty)) {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(energyConsumptionUncertainty) ?
+        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
+        : "Veuillez saisir une valeur numérique pour l'incertitude"
+    });
+  }
+  // incomplete statement
+  else if (energyConsumption=="" || energyConsumptionUncertainty=="") {
+    return({ status: "incomplete", errorMessage: null });
+  }
+  // other
+  else {
+    return({ status: "error", errorMessage: "Erreur Application" });
+  }
+}
+
+const isValidValue = (value) => value=="" || isCorrectValue(value,0)
+const isValidUncertainty = (uncertainty) => uncertainty=="" || isCorrectValue(uncertainty,0,100)

@@ -1,86 +1,106 @@
 // La Société Nouvelle
 
-import React, { useState } from "react";
+// React
+import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "../../../../src/utils/Utils";
+
+import { roundValue, valueOrDefault, isCorrectValue } from "../../../../src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
-/* ---------- DECLARATION - INDIC #WAS ---------- */
+/* ---------- STATEMENT - INDIC #WAS ---------- */
 
-const StatementWAS = ({ impactsData, onUpdate, onError }) => {
-  const [wasteProduction, setWasteProduction] = useState(
-    valueOrDefault(impactsData.wasteProduction, "")
-  );
-  const [wasteProductionUncertainty, setWasteProductionUncertainty] = useState(
-    valueOrDefault(impactsData.wasteProductionUncertainty, "")
-  );
+/** Props concerned in impacts data :
+ *    - wasteProduction
+ *    - wasteProductionUnit
+ *    - wasteProductionUncertainty
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
 
-  const [wasteProductionUnit, setWasteProductionUnit] = useState(
-    impactsData.wasteProductionUnit
-  );
+const units = {
+  "kg": { label: "kg",  coef: 1.0     }, // default
+  "t":  { label: "t",   coef: 1000.0  },
+};
 
-  const [isInvalid, setIsInvalid] = useState(false);
-
+const StatementWAS = ({ 
+  impactsData, 
+  onUpdate 
+}) => {
+  // satte
+  const [wasteProduction, setWasteProduction] = 
+    useState(valueOrDefault(impactsData.wasteProduction, ""));
+  const [wasteProductionUnit, setWasteProductionUnit] = 
+    useState(impactsData.wasteProductionUnit);
+  const [wasteProductionUncertainty, setWasteProductionUncertainty] = 
+    useState(valueOrDefault(impactsData.wasteProductionUncertainty, ""));
   const [info, setInfo] = useState(impactsData.comments.was || "");
 
-  const options = [
-    { value: "kg", label: "kg" },
-    { value: "t", label: "t" },
-  ];
+  // update impacts data when state update
+  useEffect(() => {
+    impactsData.wasteProduction = wasteProduction;
+    impactsData.wasteProductionUnit = wasteProductionUnit;
+    impactsData.wasteProductionUncertainty = wasteProductionUncertainty;
+    const statementStatus = checkStatement(impactsData);
+    onUpdate(statementStatus);
+  }, [wasteProduction,wasteProductionUnit,wasteProductionUncertainty]);
 
-  const updateWasteProduction = (input) => {
-    let errorMessage = "";
+  // update state when props update
+  useEffect(() => {
+    // ...
+  }, []);
 
-    const inputValue = input.target.valueAsNumber;
-
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
-    }
-    if (impactsData.netValueAdded == null) {
-      errorMessage = "La valeur ajoutée nette n'est pas définie.";
-    }
-    setIsInvalid(errorMessage !== "");
-    onError("was", errorMessage);
-
-    impactsData.setWasteProduction(input.target.value);
-    setWasteProduction(input.target.value);
-    setWasteProductionUncertainty(impactsData.wasteProductionUncertainty);
-    onUpdate("was");
-  };
-
-  const updateWasteProductionUncertainty = (input) => {
-    impactsData.wasteProductionUncertainty = input.target.value;
-    setWasteProductionUncertainty(input.target.value);
-    onUpdate("was");
-  };
-
-  const updateWasteProductionUnit = (selected) => {
-    const selectedUnit = selected.value;
-
-    if (selectedUnit !== impactsData.wasteProductionUnit) {
-      let updatedWasteProduction = impactsData.wasteProduction;
-
-      if (selectedUnit === "t") {
-        updatedWasteProduction = impactsData.wasteProduction / 1000;
-      } else if (selectedUnit === "kg") {
-        updatedWasteProduction = impactsData.wasteProduction * 1000;
+  // waste production
+  const updateWasteProduction = (event) => 
+  {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setWasteProduction('');
+    } else if (!isNaN(valueAsNumber)) {
+      setWasteProduction(valueAsNumber);
+      if (wasteProductionUncertainty=="") {
+        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        setWasteProductionUncertainty(defaultUncertainty);
       }
-
-      setWasteProduction(updatedWasteProduction);
-      impactsData.setWasteProduction(updatedWasteProduction);
+    } else {
+      setWasteProduction(value);
     }
-
-    setWasteProductionUnit(selectedUnit);
-
-    impactsData.wasteProductionUnit = selectedUnit;
-    onUpdate("was");
   };
 
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.was = event.target.value;
+  // waste production unit
+  const updateWasteProductionUnit = (selected) => 
+  {
+    const nextUnit = selected.value;
+    setWasteProductionUnit(nextUnit);
+    // update value
+    if (!isNaN(wasteProduction)) {
+      setWasteProduction(roundValue(wasteProduction*(units[wasteProductionUnit].coef/units[nextUnit].coef),0));
+    }
   };
+
+  // waste production uncertainty
+  const updateWasteProductionUncertainty = (event) => 
+  {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setWasteProductionUncertainty('');
+    } else if (!isNaN(valueAsNumber)) {
+      setWasteProductionUncertainty(valueAsNumber);
+    } else {
+      setWasteProductionUncertainty(value);
+    }
+  };
+
+  // comment
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.was = info);
 
   return (
     <Form className="statement">
@@ -97,15 +117,15 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
               <div className="custom-input with-select input-group me-1">
                 <Form.Control
                   type="number"
-                  value={roundValue(wasteProduction, 0)}
+                  value={wasteProduction}
                   inputMode="numeric"
                   onChange={updateWasteProduction}
-                  isInvalid={isInvalid}
+                  isInvalid={!isValidValue(wasteProduction)}
                   className="me-1"
                 />
 
                 <Select
-                  options={options}
+                  options={Object.keys(units).map((unit) => {return({label: unit, value:unit})})}
                   styles={unitSelectStyles}
                   value={{
                     label: wasteProductionUnit,
@@ -128,6 +148,7 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
                   inputMode="numeric"
                   onChange={updateWasteProductionUncertainty}
                   className="uncertainty-input"
+                  isInvalid={!isValidUncertainty(wasteProductionUncertainty)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -143,6 +164,7 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
+              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -152,3 +174,53 @@ const StatementWAS = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementWAS;
+
+// Check statement
+const checkStatement = (impactsData) => 
+{
+  const {
+    wasteProduction,
+    wasteProductionUncertainty,
+  } = impactsData;
+
+  // ok
+  if (isCorrectValue(wasteProduction,0) && isCorrectValue(wasteProductionUncertainty,0,100)) {
+    return({ status: "ok", errorMessage: null });
+  } 
+  // valid value (empty or correct)
+  else if (!isValidValue(wasteProduction) && !isValidUncertainty(wasteProductionUncertainty)) {
+    return({
+      status: "error",
+      errorMessage: "Valeurs saisies incorrectes"
+    });
+  }
+  // error value for waste production
+  else if (!isValidValue(wasteProduction)) {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(wasteProduction) ?
+        "Valeur saisie incorrecte (négative)"
+        : "Veuillez saisir une valeur numérique"
+    });
+  }
+  // error value for uncertainty
+  else if (!isValidUncertainty(wasteProductionUncertainty)) {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(wasteProductionUncertainty) ?
+        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
+        : "Veuillez saisir une valeur numérique pour l'incertitude"
+    });
+  }
+  // incomplete statement
+  else if (wasteProduction=="" || wasteProductionUncertainty=="") {
+    return({ status: "incomplete", errorMessage: null });
+  }
+  // other
+  else {
+    return({ status: "error", errorMessage: "Erreur Application" });
+  }
+}
+
+const isValidValue = (value) => value=="" || isCorrectValue(value,0)
+const isValidUncertainty = (uncertainty) => uncertainty=="" || isCorrectValue(uncertainty,0,100)

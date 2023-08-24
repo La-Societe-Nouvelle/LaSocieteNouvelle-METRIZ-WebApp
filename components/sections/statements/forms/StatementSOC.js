@@ -1,33 +1,56 @@
-import React, { useState } from "react";
+// La Société Nouvelle
+
+// React
+import React, { useEffect, useState } from "react";
 import { Form, Row, Col } from "react-bootstrap";
 
-/* ---------- DECLARATION - INDIC #SOC ---------- */
+/* ---------- STATEMENT - INDIC #SOC ---------- */
 
-const StatementSOC = ({ impactsData, onUpdate }) => {
+/** Props concerned in impacts data :
+ *    - hasSocialPurpose
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
+
+const StatementSOC = ({ 
+  impactsData, 
+  onUpdate 
+}) => {
+
+  const [hasSocialPurpose, setHasSocialPurpose] = 
+    useState(impactsData.hasSocialPurpose);
   const [info, setInfo] = useState(impactsData.comments.soc || "");
-  const [hasSocialPurpose, setHasSocialPurpose] = useState(
-    impactsData.hasSocialPurpose
-  );
 
+  // update impacts data when state update
+  useEffect(() => {
+    impactsData.hasSocialPurpose = hasSocialPurpose;
+    const statementStatus = checkStatement(impactsData);
+    onUpdate(statementStatus);
+  }, [hasSocialPurpose]);
+
+  // has social purpose
   const onSocialPurposeChange = (event) => {
     const radioValue = event.target.value;
-
     switch (radioValue) {
       case "true":
-        impactsData.hasSocialPurpose = true;
+        setHasSocialPurpose(true);
         break;
       case "false":
-        impactsData.hasSocialPurpose = false;
+        setHasSocialPurpose(false);
         break;
     }
-
-    setHasSocialPurpose(impactsData.hasSocialPurpose);
-    onUpdate("soc");
   };
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.soc = event.target.value;
-  };
+  
+  // comment
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.soc = info);
 
   return (
     <Form className="statement">
@@ -71,6 +94,7 @@ const StatementSOC = ({ impactsData, onUpdate }) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
+              onblur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -80,3 +104,17 @@ const StatementSOC = ({ impactsData, onUpdate }) => {
 };
 
 export default StatementSOC;
+
+// Check statement in impacts data
+const checkStatement = (impactsData) => 
+{
+  const {
+    hasSocialPurpose,
+  } = impactsData;
+
+  if (hasSocialPurpose === true || hasSocialPurpose === false) {
+    return({ status: "ok", errorMessage: null });
+  } else {
+    return({ status: "incomplete", errorMessage: null });
+  }
+}
