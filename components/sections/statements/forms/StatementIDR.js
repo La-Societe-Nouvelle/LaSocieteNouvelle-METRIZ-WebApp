@@ -5,88 +5,86 @@ import { Form, Row, Col } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 import AssessmentDSN from "../modals/AssessmentDSN";
+import { isCorrectValue } from "../../../../src/utils/Utils";
 
-/* ---------- DECLARATION - INDIC #IDR ---------- */
+/* ---------- STATEMENT - INDIC #IDR ---------- */
 
-const StatementIDR = ({ impactsData, onUpdate, onError }) => {
-  const [interdecileRange, setInterdecileRange] = useState(
-    valueOrDefault(impactsData.interdecileRange, "")
-  );
+/** Props concerned in impacts data :
+ *    - isAllActivitiesInFrance
+ *    - domesticProduction
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
+
+const StatementIDR = ({ 
+  impactsData, 
+  onUpdate
+}) => {
+  // state
+  const [hasEmployees, setHasEmployees] = useState(impactsData.hasEmployees);
+  const [interdecileRange, setInterdecileRange] = 
+    useState(valueOrDefault(impactsData.interdecileRange, ""));
   const [info, setInfo] = useState(impactsData.comments.idr || "");
 
-  const [isInvalid, setIsInvalid] = useState(false);
-
-  const hasEmployees = impactsData.hasEmployees;
-
+  // update impacts data when state update
   useEffect(() => {
-    if (impactsData.hasEmployees == false) {
-      onUpdate("idr");
+    impactsData.hasEmployees = hasEmployees;
+    impactsData.interdecileRange = interdecileRange;
+    const statementStatus = checkStatement(impactsData);
+    onUpdate(statementStatus);
+  }, [hasEmployees,interdecileRange]);
+
+  // update state when props update
+  useEffect(() => 
+  {
+    if (impactsData.hasEmployees!=hasEmployees) {
+      setHasEmployees(impactsData.hasEmployees);
     }
-  }, [impactsData]);
-
-  useEffect(() => {
-    if (
-      impactsData.interdecileRange &&
-      interdecileRange != impactsData.interdecileRange
-    ) {
-      setInterdecileRange(impactsData.interdecileRange);
+    if ((impactsData.interdecileRange)!=interdecileRange) {
+      setWageGap(impactsData.interdecileRange || "");
     }
-  }, [impactsData.interdecileRange]);
+  }, [impactsData.hasEmployees, impactsData.interdecileRange]);
 
-  const onHasEmployeesChange = (event) => {
-    const radioValue = event.target.value;
-    let newHasEmployees = null;
-    let newWageGap = null;
-
-    if (radioValue === "true") {
-      newHasEmployees = true;
-      setIsInvalid(false);
-      onError("idr", false);
-    } else if (radioValue === "false") {
-      newHasEmployees = false;
-      newWageGap = 0;
-      setIsInvalid(false);
-      onError("idr", false);
-    }
-
-    impactsData.setHasEmployees(newHasEmployees);
-    impactsData.wageGap = newWageGap;
-    setInterdecileRange(valueOrDefault(impactsData.interdecileRange, ""));
-    onUpdate("idr");
-  };
-
-  const updateInterdecileRange = (event) => {
-    const inputValue = event.target.valueAsNumber;
-    let errorMessage = "";
-    // Validation checks for the input value
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
-    } else if (inputValue > 100) {
-      errorMessage = "La valeur ne peut pas être supérieure à 100.";
-    }
-
-    setIsInvalid(errorMessage !== "");
-    onError("idr", errorMessage);
-
-    impactsData.interdecileRange = event.target.value;
-    setInterdecileRange(event.target.value);
-    onUpdate("idr");
-  };
-
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.idr = event.target.value;
-  };
-
-  const updateSocialData = (updatedData) => {
-
-    impactsData.interdecileRange  = updatedData.interdecileRange ;
-    impactsData.wageGap = updatedData.wageGap;
-    impactsData.knwDetails.apprenticesRemunerations = updatedData.knwDetails.apprenticesRemunerations;
-     if (impactsData.interdecileRange) {
-      setInterdecileRange(impactsData.interdecileRange);
+  // has employees
+  const onHasEmployeesChange = (event) => 
+  {
+    let radioValue = event.target.value;
+    switch (radioValue) {
+      case "true":
+        setHasEmployees(true);
+        setInterdecileRange("");
+        break;
+      case "false":
+        setHasEmployees(false);
+        setInterdecileRange(1.0);
+        break;
     }
   };
+
+  // interdecile range
+  const updateInterdecileRange = (event) => 
+  {
+    const { value, valueAsNumber } = event.target.valueAsNumber;
+    if (value=="") {
+      setInterdecileRange('');
+    } else if (!isNaN(valueAsNumber)) {
+      setInterdecileRange(valueAsNumber);
+    } else {
+      setInterdecileRange(value);
+    }
+  };
+
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.idr = info);
+
+  const updateSocialData = () => {};
 
   return (
     <Form className="statement">
@@ -126,11 +124,11 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
                 <div className="input-group custom-input me-1">
                   <Form.Control
                     type="number"
-                    value={roundValue(interdecileRange, 1)}
+                    value={interdecileRange}
                     inputMode="numeric"
                     onChange={updateInterdecileRange}
                     disabled={hasEmployees === false}
-                    isInvalid={isInvalid}
+                    isInvalid={!isValidValue(interdecileRange)}
                   />
                 </div>
 
@@ -154,6 +152,7 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
+              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -163,3 +162,52 @@ const StatementIDR = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementIDR;
+
+
+// Check statement in impacts data
+const checkStatement = (impactsData) => 
+{
+  const {
+    hasEmployees,
+    interdecileRange
+  } = impactsData;
+
+  if (hasEmployees === true) 
+  {
+    // ok
+    if (isCorrectValue(interdecileRange,1)) {
+      return({ status: "ok", errorMessage: null });
+    } 
+    // incomplete
+    else if (interdecileRange=="" || interdecileRange==null) {
+      return({ status: "incomplete", errorMessage: null });
+    } 
+    else if (isCorrectValue(interdecileRange)) {
+      return({ 
+        status: "error", 
+        errorMessage: "Valeur saisie incorrecte (inférieure à 1)"
+      });
+    } else {
+      return({ 
+        status: "error", 
+        errorMessage: "Veuillez saisir une valeur numérique"
+      });
+    }
+  } 
+  else if (hasEmployees === false) {
+    if (isCorrectValue(interdecileRange,1,1)) {
+      return({ status: "ok", errorMessage: null });
+    } else {
+      return({ status: "error", errorMessage: "Erreur application" });
+    }
+  } 
+  else if (hasEmployees === null) {
+    // & wage gap not null or empty string
+    return({ status: "incomplete", errorMessage: null });
+  } 
+  else {
+    return({ status: "error", errorMessage: "Erreur application" });
+  }
+}
+
+const isValidValue = (value) => value=="" || isCorrectValue(value,1)

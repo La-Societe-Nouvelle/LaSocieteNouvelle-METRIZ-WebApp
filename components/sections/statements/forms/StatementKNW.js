@@ -47,10 +47,8 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
     onUpdate("knw");
   };
 
-  const updateInfo = (event) => {
-    setInfo(event.target.value);
-    impactsData.comments.knw = event.target.value;
-  };
+  const updateInfo = (event) => setInfo(event.target.value);
+  const saveInfo = () => (impactsData.comments.knw = info);
 
   return (
     <Form className="statement">
