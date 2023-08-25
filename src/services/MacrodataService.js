@@ -1,6 +1,9 @@
 import api from "../../config/api";
 import { endpoints } from "../../config/endpoint";
 
+// Libraries
+import metaIndics from "/lib/indics.json";
+
 export async function fetchMacrodata(dataset, activityCodes, indicators) {
   const aggregates = ["CFC", "PRD", "NVA", "IC"];
 
@@ -24,13 +27,18 @@ export async function fetchMacrodata(dataset, activityCodes, indicators) {
   }
 }
 
-export async function fetchComparativeData(comparativeData, validations) {
+export async function fetchComparativeData(comparativeData) 
+{
+  console.log("fetch comparative data");
+  let availableIndics = availableIndics = Object.entries(metaIndics).filter(([_,meta]) => meta.isAvailable).map(([indic,_]) => indic);
+  console.log(availableIndics);
+
   let activityCodes = ["00"];
   if (comparativeData.activityCode && comparativeData.activityCode != "00") {
     activityCodes.push(comparativeData.activityCode);
   }
 
-  let indicators = validations.map((validation) => validation.toUpperCase());
+  let indicators = availableIndics.map((indic) => indic.toUpperCase());
 
   const excludedIndicators = ["ART", "ECO", "IDR", "HAZ"];
 

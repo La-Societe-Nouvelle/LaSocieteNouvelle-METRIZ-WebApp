@@ -11,6 +11,9 @@ import {
 import RadarChart from "../charts/RadarChart";
 import ProportionalRingChart from "../charts/ProportionalRingChart";
 import SocialBarChart from "../charts/SocialBarChart";
+import { ComparativeHorizontalBarChartVisual } from "../visuals/ComparativeHorizontalBarChartVisual";
+import { ValueCreationFootprintsVisual } from "../visuals/ValueCreationFootprintsVisual";
+import { SocialFootprintMainVisual } from "../visuals/SocialFootprintsVisual";
 
 export const DefaultView = ({
   session,
@@ -72,48 +75,47 @@ export const DefaultView = ({
     "proportion"
   );
 
+  // Social footprint
+  const socialFootprintIndics = Object.entries(indicators).filter(([_,meta]) => meta.category=="Empreinte sociale").map(([indic,_]) => indic);
+
   const showEnvironmentalChart = Object.values(environmentalFootprint).some(
     (value) => value != null
   );
   const showProportionalChart = Object.values(proportionFootprint).some(
     (value) => value != null
   );
-  const showSocialChart = Object.values(socialFootprint).some(
-    (value) => value != null
-  );
-
-  
+  const showSocialFootprint = socialFootprintIndics.length>0;
+  console.log(socialFootprint);
+  console.log(showSocialFootprint);
 
   return (
     <>
       <Row>
         {showEnvironmentalChart && (
           <Col lg={6}>
-            <div className="box">
-              <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 className="mb-0">Empreinte environnementale</h3>
-                <Button
-                  className="btn-light btn-rounded"
-                  size="sm"
-                  onClick={() =>
-                    downloadChartImage(
-                      "environmentalChart",
-                      "empreinte_environnementale.png"
-                    )
-                  }
-                >
-                  <i className="bi bi-download"></i>
-                </Button>
-              </div>
-              <RadarChart
-                labels={environnementalIndic}
-                divisionFootprint={divisionEnvironmentalFootprint}
-                productionFootprint={environmentalFootprint}
-              />
-            </div>
+            <ComparativeHorizontalBarChartVisual
+              session={session}
+              period={period}
+            />
           </Col>
         )}
         {showProportionalChart && (
+          <Col lg={6}>
+            <ValueCreationFootprintsVisual
+              session={session}
+              period={period}
+            />
+          </Col>
+        )}
+        {showSocialFootprint && (
+          <Col lg={6}>
+            <SocialFootprintMainVisual
+              session={session}
+              period={period}
+            />
+          </Col>
+        )}
+        {/* {showProportionalChart && (
           <Col lg={6}>
             <div className="box">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -139,8 +141,8 @@ export const DefaultView = ({
               />
             </div>
           </Col>
-        )}
-        {showSocialChart && (
+        )} */}
+        {/* {showSocialChart && (
           <Col lg={6}>
             <div className="box">
             <div className="d-flex justify-content-between align-items-center mb-4">
@@ -166,7 +168,7 @@ export const DefaultView = ({
               />
             </div>
           </Col>
-        )}
+        )} */}
       </Row>
     </>
   );

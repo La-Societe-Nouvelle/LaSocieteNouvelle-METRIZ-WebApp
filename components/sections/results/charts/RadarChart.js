@@ -1,20 +1,55 @@
-import React from "react";
-// Modules
-import Chart from "chart.js/auto";
+// La Société Nouvelle
 
+// React
+import React from "react";
+
+import Chart from "chart.js/auto";
 import { Radar } from "react-chartjs-2";
 
-function RadarChart({ labels, divisionFootprint, productionFootprint }) {
+// Libraries
+import metaIndics from "/lib/indics.json";
+
+/* ---------- RADAR CHART ---------- */
+
+/** Rader chart to show environnemental footprint
+ *  
+ *  Args :
+ *    - id
+ *    - indic
+ *    - session,
+ *    - aggregate
+ *    - isPrinting -> use in report
+ * 
+ */
+
+function RadarChart({ 
+  labels, 
+  divisionFootprint, 
+  productionFootprint 
+}) {
+
+  const companyData = [];
+  const reference = [];
+  Object.keys(productionFootprint).forEach((indic) => {
+    if (productionFootprint[indic] && divisionFootprint[indic]>0) {
+      companyData.push(productionFootprint[indic]/divisionFootprint[indic]);
+      reference.push(1.0);
+    }
+  })
+
+  const min = 0.0;
+  const max = Math.max(2.0,...companyData.map((value) => value*1.2));
+
   const data = {
-    labels: Object.values(labels).map((indicator) => {
-      const label = indicator.libelleGrandeur;
-      const unit = indicator.unit;
+    labels: Object.entries(productionFootprint).filter(([_,value]) => value!=null).map(([indic,_]) => {
+      const label = metaIndics[indic].libelleGrandeur;
+      const unit = metaIndics[indic].unit;
       return unit ? `${label} (${unit})` : label;
     }),
     datasets: [
       {
         label: "Exercice",
-        data: Object.values(productionFootprint),
+        data: companyData,
         fill: false,
         backgroundColor : "rgb(250,89,95)",
         pointBackgroundColor: "rgb(250,89,95)",
@@ -23,8 +58,8 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
         pointHoverBorderColor: "rgb(255, 99, 132)",
       },
       {
-        label: "Branche",
-        data: Object.values(divisionFootprint),
+        label: "Référence",
+        data: reference,
         fill: false,
         backgroundColor : "rgb(255, 182, 66)",
         pointBackgroundColor: "rgb(255, 182, 66)",
@@ -37,14 +72,11 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
 
   const datasetBorderColor = (context) => {
     const datasetIndex = context.datasetIndex;
-
     const colors = ["rgba(250,89,95,0.5)", "rgba(255, 182, 66, 0.5)"];
-
     return colors[datasetIndex];
   };
 
   const options = {
-
     scales: {
       r: {
         grid: {
@@ -62,12 +94,16 @@ function RadarChart({ labels, divisionFootprint, productionFootprint }) {
           },
           color: "#191558",
         },
+        suggestedMin: min,
+        suggestedMax: max,
+        min: min,
+        max: max,
       },
     },
 
     elements: {
       point: {
-        radius: 6,
+        radius: 0,
         hoverRadius: 3,
       },
       line: {

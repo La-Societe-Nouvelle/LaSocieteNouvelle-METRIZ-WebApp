@@ -5,6 +5,9 @@ import LegalUnitService from "../../../src/services/LegalUnitService";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 import UpdateDataView from "./UpdatedDataView";
 
+// Libraries
+import metaIndics from "/lib/indics.json";
+
 export const DataUpdater = ({ session, updatePrevSession }) => {
   const [show, setShow] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -104,7 +107,7 @@ const fetchLatestData = async (updatedSession) => {
   // Récupère les dernières données comparatives
 
   if (validations.length > 0) {
-    await fetchComparativeData(updatedSession.comparativeData, validations);
+    await fetchComparativeData(updatedSession.comparativeData);
   }
 };
 

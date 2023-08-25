@@ -31,9 +31,14 @@ const StatementART = ({
   const [craftedProduction, setCraftedProduction] = useState( impactsData.craftedProduction || "" );
   const [info, setInfo] = useState(impactsData.comments.art || "");
   const [isInvalid, setIsInvalid] = useState(false);
-  
+
+  useEffect(() => {
+    console.log("there");
+  }, []);
+
   // update impacts data when state update
   useEffect(() => {
+    console.log("here");
     impactsData.isValueAddedCrafted = isValueAddedCrafted;
     impactsData.craftedProduction = craftedProduction;
     const statementStatus = checkStatement(impactsData);

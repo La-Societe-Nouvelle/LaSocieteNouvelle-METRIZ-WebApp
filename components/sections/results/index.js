@@ -78,10 +78,7 @@ const Results = ({ session, publish, goBack }) =>
       // fetch data
       setIsLoading(true);
       session.comparativeData.activityCode = comparativeDivision;
-      await fetchComparativeData(
-        session.comparativeData,
-        session.validations[period.periodKey] // to update -> fetch data for all periods
-      );
+      await fetchComparativeData(session.comparativeData);
       setIsLoading(false);
     }
   };

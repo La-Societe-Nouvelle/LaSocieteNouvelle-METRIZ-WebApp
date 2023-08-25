@@ -113,7 +113,7 @@ export class Session
     newPeriods.forEach((period) => {
       this.impactsData[period.periodKey] = new ImpactsData();
       this.validations[period.periodKey] = [];
-      this.indics[period.periodKey] = Object.keys(metaIndics);
+      this.indics[period.periodKey] = Object.entries(metaIndics).filter(([_,meta]) => meta.isAvailable).filter(([indic,_]) => indic);
     });
   };
 

@@ -23,6 +23,8 @@ import {
 
 import metaRubriques from "/lib/rubriquesDSN";
 
+// current refactoring -> add show error in file list 
+
 const ImportSocialData = ({ 
   impactsData, 
   onChange,

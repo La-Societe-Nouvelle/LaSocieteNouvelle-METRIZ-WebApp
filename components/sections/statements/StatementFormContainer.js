@@ -36,6 +36,12 @@ function StatementFormContainer ({
   const [selected, setSelected] = useState(session.validations[period.periodKey].includes(indic));
   const [errorMessage, setErrorMessage] = useState(null);
 
+  // useEffect(() => {
+  //   if (selected) {
+
+  //   }
+  // }, []);
+
   const handleCheckboxChange = (event) => {
     const { checked } = event.target;
     setSelected(checked);
@@ -46,6 +52,8 @@ function StatementFormContainer ({
   };
 
   const onStatementUpdate = (statementStatus) => {
+    console.log("here too for "+indic);
+    console.log(statementStatus);
     setErrorMessage(statementStatus.errorMessage);
     onUpdate(indic,statementStatus);
   }

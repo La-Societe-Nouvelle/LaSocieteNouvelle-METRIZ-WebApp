@@ -111,7 +111,7 @@ const updater_3_0_0 = async (sessionData) => {
 
 
   if (sessionData.validations[period.periodKey].length > 0) {
-    await fetchComparativeData(sessionData.comparativeData, sessionData.validations[period.periodKey]);
+    await fetchComparativeData(sessionData.comparativeData);
   }
 
   if (

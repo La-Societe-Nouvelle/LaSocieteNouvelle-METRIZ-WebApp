@@ -1,50 +1,66 @@
 // La Société Nouvelle
 
+// React
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
-import { AssessmentKNW } from "../modals/AssessmentKNW";
 
-const StatementKNW = ({ impactsData, onUpdate, onError }) => {
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
+
+// Modals
+import { AssessmentKNW } from "../modals/AssessmentKNW";
+import { isCorrectValue } from "../../../../src/utils/Utils";
+
+/* ---------- STATEMENT - INDIC #KNW ---------- */
+
+/** Props concerned in impacts data :
+ *    - researchAndTrainingContribution
+ * 
+ *  key functions :
+ *    - useEffect on state
+ *    - useEffect on props
+ *    - checkStatement
+ * 
+ *  onUpdate -> send status to form container :
+ *    - status : "ok" | "error" | "incomplete"
+ *    - errorMessage : null | {message}
+ */
+
+const StatementKNW = ({ 
+  impactsData, 
+  onUpdate
+}) => {
+
   const [researchAndTrainingContribution, setResearchAndTrainingContribution] =
     useState(valueOrDefault(impactsData.researchAndTrainingContribution, ""));
   const [info, setInfo] = useState(impactsData.comments.knw || " ");
   const [showModal, setShowModal] = useState(false);
   const [isInvalid, setIsInvalid] = useState(false);
 
+  // update impacts data when state update
   useEffect(() => {
-    if (
-      researchAndTrainingContribution !=
-        impactsData.researchAndTrainingContribution &&
-      impactsData.researchAndTrainingContribution
-    ) {
-      setResearchAndTrainingContribution(
-        impactsData.researchAndTrainingContribution
-      );
-  
+    impactsData.researchAndTrainingContribution = researchAndTrainingContribution;
+    const statementStatus = checkStatement(impactsData);
+    onUpdate(statementStatus);
+  }, [researchAndTrainingContribution]);
+
+  // update state when props update
+  useEffect(() => 
+  {
+    if (impactsData.researchAndTrainingContribution!=researchAndTrainingContribution) {
+      setResearchAndTrainingContribution(impactsData.researchAndTrainingContribution || "");
     }
   }, [impactsData.researchAndTrainingContribution]);
 
-  const updateResearchAndTrainingContribution = (input) => {
-    let errorMessage = "";
-    const inputValue = input.target.valueAsNumber;
-
-    if (isNaN(inputValue)) {
-      errorMessage = "Veuillez saisir un nombre valide.";
-    } else if (impactsData.netValueAdded == null) {
-      errorMessage = "La valeur ajoutée nette n'est pas définie.";
-    } else if (inputValue >= impactsData.netValueAdded) {
-      errorMessage =
-        "La valeur saisie ne peut pas être supérieure à la valeur ajoutée nette.";
+  // reasearch and training contribution
+  const updateResearchAndTrainingContribution = (event) => {
+    const { value, valueAsNumber } = event.target;
+    if (value=="") {
+      setResearchAndTrainingContribution('');
+    } else if (!isNaN(valueAsNumber)) {
+      setResearchAndTrainingContribution(valueAsNumber);
+    } else {
+      setResearchAndTrainingContribution(value);
     }
-
-    setIsInvalid(errorMessage !== "");
-    onError("knw", errorMessage);
-
-    impactsData.researchAndTrainingContribution = input.target.value;
-    setResearchAndTrainingContribution(input.target.value);
-
-    onUpdate("knw");
   };
 
   const updateInfo = (event) => setInfo(event.target.value);
@@ -66,7 +82,7 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
                     value={roundValue(researchAndTrainingContribution, 0)}
                     inputMode="numeric"
                     onChange={updateResearchAndTrainingContribution}
-                    isInvalid={isInvalid}
+                    isInvalid={!isCorrectValue(researchAndTrainingContribution,0,impactsData.netValueAdded)}
                   />
                   <InputGroup.Text>&euro;</InputGroup.Text>
                 </InputGroup>
@@ -91,6 +107,7 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
               className="w-100"
               onChange={updateInfo}
               value={info}
+              onBlur={saveInfo}
             />
           </Form.Group>
         </Col>
@@ -119,3 +136,25 @@ const StatementKNW = ({ impactsData, onUpdate, onError }) => {
 };
 
 export default StatementKNW;
+
+// Check statement in impacts data
+const checkStatement = (impactsData) => 
+{
+  const {
+    netValueAdded,
+    researchAndTrainingContribution,
+  } = impactsData;
+
+  if (researchAndTrainingContribution=="" || researchAndTrainingContribution==null) {
+    return({ status: "incomplete", errorMessage: null });
+  } else if (isCorrectValue(researchAndTrainingContribution,0,netValueAdded)) {
+    return({ status: "ok", errorMessage: null });
+  } else {
+    return({
+      status: "error",
+      errorMessage: isCorrectValue(researchAndTrainingContribution) ?
+        "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
+        : "Veuillez saisir une valeur numérique"
+    });
+  }
+}

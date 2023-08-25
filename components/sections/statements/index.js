@@ -14,6 +14,7 @@ import { useEffect } from "react";
 const DirectImpacts = ({ session, submit }) => 
 {
   const [period] = useState(session.financialPeriod);
+  console.log(session.validations[period.periodKey]);
 
   const [statementsStatus, setStatementsStatus] = useState({
     art: { status: "unselect", errorMessage: null },
@@ -37,6 +38,12 @@ const DirectImpacts = ({ session, submit }) =>
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    console.log("use effect");
+  },[]);
+
+  useEffect(() => {
+    console.log("triggered");
+    console.log(statementsStatus);
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);
@@ -55,6 +62,8 @@ const DirectImpacts = ({ session, submit }) =>
   }, [statementsStatus])
 
   const handleSubmitStatements = async () => {
+    console.log(session.validations);
+    console.log(session.impactsData[period.periodKey]);
     setIsLoading(true);
     await session.updateFootprints(period);
 
@@ -71,18 +80,18 @@ const DirectImpacts = ({ session, submit }) =>
       }
     }
     if (missingIndicators.length > 0) {
-      await fetchComparativeData(session.comparativeData, missingIndicators);
+      await fetchComparativeData(session.comparativeData);
     }
 
     setIsLoading(false);
     submit();
   };
 
-  const onStatementUpdate = async (indic, status) => {
-    setStatementsStatus({
-      ...statementsStatus,
+  const onStatementUpdate = (indic, status) => {
+    setStatementsStatus(prevStatementsStatus => {return({
+      ...prevStatementsStatus,
       [indic]: status
-    });
+    })});
   };
 
   const categories = [
