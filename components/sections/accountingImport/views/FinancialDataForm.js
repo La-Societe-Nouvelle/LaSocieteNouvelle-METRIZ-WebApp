@@ -6,30 +6,23 @@ import Select from "react-select";
 import { useDropzone } from "react-dropzone";
 
 // Bootstrap
-import {
-  Button,
-  Col,
-  Form,
-  FormGroup,
-  Image,
-  Row,
-} from "react-bootstrap";
+import { Button, Col, Form, FormGroup, Image, Row } from "react-bootstrap";
 import { customSelectStyles } from "../../../../config/customStyles";
 
 // Lib
 import divisions from "/lib/divisions";
 
 // Readers
-import { FECDataReader, FECFileReader } from "/src/readers/FECReader";
+import { FECFileReader } from "/src/readers/FECReader";
 import { ErrorFileModal } from "../../../modals/userInfoModals";
 
 /* ---------- FEC IMPORT FORM ---------- */
 
 /** View to import financial data (accounting data file)
- *  
+ *
  *  Props :
  *    - onClick()
- * 
+ *
  *  Read accounting data file
  *  Get informations :
  *    - company id (SIREN)
@@ -44,10 +37,9 @@ const divisionsOptions = Object.entries(divisions)
   .map(([value, label]) => ({
     value: value,
     label: `${value} - ${label}`,
-  }))
+  }));
 
-export function FinancialDataForm(props) 
-{
+export function FinancialDataForm(props) {
   const [siren, setSiren] = useState(props.siren);
   const [corporateName, setCorporateName] = useState(props.corporateName || "");
   const [division, setDivision] = useState(props.division);
@@ -58,7 +50,7 @@ export function FinancialDataForm(props)
 
   useEffect(() => {
     setCorporateName(props.corporateName || "");
-  }, [props.corporateName]); 
+  }, [props.corporateName]);
   useEffect(() => {
     setDivision(props.division);
   }, [props.division]);
@@ -67,13 +59,18 @@ export function FinancialDataForm(props)
   //   const isCorporateNameValid = props.corporateName && props.corporateName.trim() !== "";
   //   const isDivisionSelected = props.selectedDivision !== null;
   //   let isSirenValid = props.siren==="" || /^[0-9]{9}$/.test(props.siren); // not defined or valid pattern (9 figures)
-  
+
   //   setFormValid(files.length>0 && isCorporateNameValid && isDivisionSelected && isSirenValid);
   // }, [props.corporateName, props.division, props.siren]);
 
   const isFormValid = () => {
-    return files.length>0 && corporateName && division && (siren==="" || /^[0-9]{9}$/.test(siren))
-  }
+    return (
+      files.length > 0 &&
+      corporateName &&
+      division &&
+      (siren === "" || /^[0-9]{9}$/.test(siren))
+    );
+  };
 
   // dropzone
   const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
@@ -97,7 +94,7 @@ export function FinancialDataForm(props)
     setCorporateName(event.target.value);
     props.onChangeCorporateName(event.target.value);
   };
-  
+
   const handleDivisionChange = (selectedOption) => {
     const division = selectedOption.value;
     props.onChangeDivision(division);
@@ -105,11 +102,9 @@ export function FinancialDataForm(props)
 
   //
 
-  const handleSubmit = async (event) => 
-  {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (isFormValid()) 
-    {
+    if (isFormValid()) {
       let FECData = await readFECFile(files[0]);
       if (FECData.valid) {
         props.setImportedData(FECData.data);
@@ -124,19 +119,21 @@ export function FinancialDataForm(props)
     <Row>
       <Col lg={5}>
         <h3 className="subtitle">C'est parti !</h3>
-        <Image fluid 
-               src="/resources/illu_financialData.svg" 
-               alt="Financial Data Illustration" />
+        <Image
+     
+          fluid
+          src="/illus/accountingImport.svg"
+          alt="Financial Data Illustration"
+        />
       </Col>
       <Col>
         <Form className="border-left">
-
           <Form.Group as={Row} className="my-3">
             <Form.Label column sm={4} className="fw-normal fst-italic">
               Numéro SIREN <i>(optionnel)</i> :
             </Form.Label>
             <Col sm={8}>
-            <Form.Control
+              <Form.Control
                 type="text"
                 value={siren}
                 onChange={handleSirenChange}
@@ -151,7 +148,7 @@ export function FinancialDataForm(props)
               Dénomination / Nom du projet * :
             </Form.Label>
             <Col sm={8}>
-            <Form.Control
+              <Form.Control
                 type="text"
                 value={corporateName}
                 onChange={handleCorporateNameChange}
@@ -159,7 +156,7 @@ export function FinancialDataForm(props)
               />
             </Col>
           </Form.Group>
-          
+
           <Form.Group as={Row} className="my-3">
             <Form.Label column sm={4}>
               Branche d'activité * :
@@ -173,7 +170,14 @@ export function FinancialDataForm(props)
                 }}
                 placeholder="Selectionner une branche d'activité"
                 onChange={handleDivisionChange}
-                value={division ? { label: division + " - " + divisions[division], value: division } : null}
+                value={
+                  division
+                    ? {
+                        label: division + " - " + divisions[division],
+                        value: division,
+                      }
+                    : null
+                }
                 required
               />
             </Col>
@@ -185,13 +189,17 @@ export function FinancialDataForm(props)
               <p>
                 L'importation des écritures comptables s'effectue via un Fichier
                 d'Ecritures Comptables (FEC¹). Générez ce fichier{" "}
-                <b>à partir de votre logiciel comptable, ou demandez-le auprès de votre service comptable.</b>
+                <b>
+                  à partir de votre logiciel comptable, ou demandez-le auprès de
+                  votre service comptable.
+                </b>
               </p>
             </div>
             <div {...getRootProps({ className: "dropzone" })}>
               <input {...getInputProps()} />
               <p>
-                <i className="bi bi-file-arrow-up-fill"></i> Glisser votre fichier ici
+                <i className="bi bi-file-arrow-up-fill"></i> Glisser votre
+                fichier ici
               </p>
               <p className="small">OU</p>
               <p className="btn btn-primary">Selectionner votre fichier</p>
@@ -200,13 +208,16 @@ export function FinancialDataForm(props)
             {fileRejections.length > 0 && (
               <div className="alert alert-danger">
                 <ul className="list-group list-unstyled">
-                {fileRejections.map(({ errors }) => 
-                  <>
-                    {errors.map((e) =>
-                      <li key={e.code} className="">
-                        <i className="bi bi-exclamation-triangle"/> L'extension du fichier doit être en .txt ou .csv
-                      </li>)}
-                  </>)}
+                  {fileRejections.map(({ errors }) => (
+                    <>
+                      {errors.map((e) => (
+                        <li key={e.code} className="">
+                          <i className="bi bi-exclamation-triangle" />{" "}
+                          L'extension du fichier doit être en .txt ou .csv
+                        </li>
+                      ))}
+                    </>
+                  ))}
                 </ul>
               </div>
             )}
@@ -214,10 +225,11 @@ export function FinancialDataForm(props)
             {acceptedFiles.length > 0 && (
               <div className="alert alert-info">
                 <p className="font-weight-bold">Fichier à analyser :</p>
-                {acceptedFiles.map((file) =>
+                {acceptedFiles.map((file) => (
                   <p key={file.path}>
-                    <i className="bi bi-upload"/> {file.path}
-                  </p>)}
+                    <i className="bi bi-upload" /> {file.path}
+                  </p>
+                ))}
               </div>
             )}
             <p className="small fst-italic mb-0">*Champs obligatoires</p>
@@ -233,15 +245,18 @@ export function FinancialDataForm(props)
               title={"Erreur lors de la lecture du FEC"}
               errorFile={errorFile}
               errorMessage={errorMessage}
-              onClose={() => setErrorFile(false)}/>
+              onClose={() => setErrorFile(false)}
+            />
           )}
 
           <div className="text-end">
-            <Button variant="secondary"
-                    disabled={!isFormValid()}
-                    onClick={handleSubmit}>
+            <Button
+              variant="secondary"
+              disabled={!isFormValid()}
+              onClick={handleSubmit}
+            >
               Suivant
-              <i className="bi bi-chevron-right"/>
+              <i className="bi bi-chevron-right" />
             </Button>
           </div>
         </Form>
@@ -250,11 +265,9 @@ export function FinancialDataForm(props)
   );
 }
 
-const readFECFile = async (file) => 
-{
+const readFECFile = async (file) => {
   let reader = new FileReader();
-  try 
-  {
+  try {
     reader.readAsText(file, "iso-8859-1");
 
     // Wait for the reader to finish loading the file
@@ -270,17 +283,16 @@ const readFECFile = async (file) =>
     console.log(FECData.meta);
     console.log(FECData.books);
 
-    return ({
+    return {
       valid: true,
       data: FECData,
-      error: null
-    })
-  } 
-  catch (error) {
-    return ({
+      error: null,
+    };
+  } catch (error) {
+    return {
       valid: false,
       data: {},
-      error
-    })
+      error,
+    };
   }
-}
+};
