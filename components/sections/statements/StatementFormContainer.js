@@ -94,6 +94,11 @@ function StatementFormContainer ({
     }
   };
 
+  const handleModalOpen = (indicator) => {
+    setIndicatorModal(indicator);
+    setShowModal(true);
+  };
+
   return (
     <div key={indic} className="border rounded mb-3 indic-statement bg-light">
       <div className="d-flex align-items-center px-2 py-3  " id={indic}>
