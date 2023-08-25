@@ -27,7 +27,7 @@ const StatementART = ({
   onUpdate, 
 }) => {
 
-  const [isValueAddedCrafted, setIsValueAddedCrafted] = useState( impactsData.isValueAddedCrafted);
+  const [isValueAddedCrafted, setIsValueAddedCrafted] = useState(impactsData.isValueAddedCrafted);
   const [craftedProduction, setCraftedProduction] = useState( impactsData.craftedProduction || "" );
   const [info, setInfo] = useState(impactsData.comments.art || "");
   const [isInvalid, setIsInvalid] = useState(false);

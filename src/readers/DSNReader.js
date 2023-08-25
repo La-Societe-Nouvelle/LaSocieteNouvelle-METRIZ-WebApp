@@ -54,10 +54,12 @@ export const DSNFileReader = async (content) =>
 
 export const DSNDataReader = async (dataDSN) =>
 {
+  // data
+  let declaration = {};
+  let errors = [];
+
   // rows
   const rows = dataDSN.rows;
-
-  let declaration = {};
 
   // Lecture des lignes
   let index = 0;
@@ -72,16 +74,14 @@ export const DSNDataReader = async (dataDSN) =>
     if (blocCode=="S20.G00.05")
     {
       let bloc = getBloc(rows,index,blocCode);
-      declaration = {
-        nature: bloc["S20.G00.05.001"],
-        type: bloc["S20.G00.05.002"],
-        fraction: bloc["S20.G00.05.003"],
-        ordre: bloc["S20.G00.05.004"],
-        mois: bloc["S20.G00.05.005"],
-        dateFichier: bloc["S20.G00.05.007"],
-        champ: bloc["S20.G00.05.008"],
-        devise: bloc["S20.G00.05.010"]
-      };
+      declaration.nature = bloc["S20.G00.05.001"];
+      declaration.type = bloc["S20.G00.05.002"];
+      declaration.fraction = bloc["S20.G00.05.003"];
+      declaration.ordre = bloc["S20.G00.05.004"];
+      declaration.mois = bloc["S20.G00.05.005"];
+      declaration.dateFichier = bloc["S20.G00.05.007"];
+      declaration.champ = bloc["S20.G00.05.008"];
+      declaration.devise = bloc["S20.G00.05.010"];
     }
 
     // Entreprise --------------------------------------- //
@@ -243,6 +243,10 @@ export const DSNDataReader = async (dataDSN) =>
       index+=1;
     }
   }
+
+  // add final props
+  declaration.errors = errors;
+  declaration.validStatement = errors.length==0;
 
   return declaration;
 }

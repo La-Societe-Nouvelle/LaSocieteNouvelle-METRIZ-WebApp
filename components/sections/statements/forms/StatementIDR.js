@@ -48,7 +48,7 @@ const StatementIDR = ({
       setHasEmployees(impactsData.hasEmployees);
     }
     if ((impactsData.interdecileRange)!=interdecileRange) {
-      setWageGap(impactsData.interdecileRange || "");
+      setInterdecileRange(impactsData.interdecileRange || "");
     }
   }, [impactsData.hasEmployees, impactsData.interdecileRange]);
 

@@ -521,6 +521,50 @@ export const getIndividualsData = async (declarations) => {
   
   /* -------------------- OTHER FUNCTIONS -------------------- */
   
+  export const getDistinctEstablishmentIds = (statements) => {
+    const distinctEstablishmentIds = statements
+      .reduce((distinctEstablishmentIds, statement) => 
+      {
+        // duplicata in distinct statements array
+        const haveDuplicata = distinctEstablishmentIds.some((item) =>
+            item === statement.nicEtablissement
+        );
+        if (haveDuplicata) {
+          return distinctEstablishmentIds;
+        } else {
+          return [...distinctEstablishmentIds, statement.nicEtablissement];
+        }
+      }, []);
+    return distinctEstablishmentIds;
+  }
+
+  export const getDistinctStatements = (statements) => {
+    const distinctStatements = statements
+      .reduce((distinctStatements, statement) => 
+      {
+        // duplicata in distinct statements array
+        const haveDuplicata = distinctStatements.some((item) =>
+            item.nicEtablissement === statement.nicEtablissement &&
+            item.mois === statement.mois &&
+            item.fraction === statement.fraction
+        );
+        if (haveDuplicata) {
+          return distinctStatements;
+        } else {
+          return [...distinctStatements, statement];
+        }
+      }, []);
+    return distinctStatements;
+  }
+
+  export const checkMonths = (socialStatements) => {
+    let monthsAvailable = socialStatements
+      .map((statement) => statement.mois)
+      .filter((value, index, self) => index === self.findIndex((item) => item == value));
+    let missingMonth = monthsAvailable.length!==12;
+    return missingMonth;
+  };
+
   export const checkFractions = (socialStatements) => {
     let missingFraction = false;
     let monthsAvailable = socialStatements

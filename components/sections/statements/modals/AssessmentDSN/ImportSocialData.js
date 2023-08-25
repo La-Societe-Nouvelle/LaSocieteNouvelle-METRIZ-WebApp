@@ -1,11 +1,16 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
 import { useEffect, useState } from "react";
-
 import Dropzone from "react-dropzone";
 import { Alert, Button, Table } from "react-bootstrap";
 
 import {
   checkFractions,
+  checkMonths,
+  getDistinctEstablishmentIds,
+  getDistinctStatements,
   getGenderWageGap,
   getIndividualsData,
   getInterdecileRange,
@@ -18,99 +23,91 @@ import {
 
 import metaRubriques from "/lib/rubriquesDSN";
 
-const ImportSocialData = ({ impactsData, handleSocialStatements }) => {
-  const [socialStatements, setSocialStatements] = useState(
-    impactsData.socialStatements || []
-  );
+const ImportSocialData = ({ 
+  impactsData, 
+  onChange,
+  handleSocialStatements 
+}) => {
+  // social statements (= DSN)
+  const [socialStatements, setSocialStatements] = 
+    useState(impactsData.socialStatements || []);
+  
   const [errorFile, setErrorFile] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [warning, setWarning] = useState([]);
+  const [warnings, setWarnings] = useState([]);
 
+  // used ?
   useEffect(async () => {
     if (socialStatements != impactsData.socialStatements) {
       setSocialStatements(impactsData.socialStatements);
     }
   }, [impactsData.socialStatements]);
 
-  useEffect(async () => {
-    if (socialStatements.length > 0) {
-      verifySocialStatements(socialStatements);
-    }
+  //
+  useEffect(async () => 
+  {
+    // check social statements
+    verifySocialStatements(socialStatements);
 
-    if (impactsData.socialStatements != socialStatements) {
-      await handleSocialStatements(socialStatements);
-    }
+    // update impacts data (in modal, not in session)
+    impactsData.socialStatements = socialStatements;
+    // if (impactsData.socialStatements != socialStatements) {
+    //   await handleSocialStatements(socialStatements);
+    // }
+    onChange();
   }, [socialStatements]);
 
-  const verifySocialStatements = async (statements) => {
-    const monthlyStatements = statements.filter(
-      (statement) => statement.nature === "01"
-    );
-
-    const distinctStatements = monthlyStatements.reduce(
-      (uniqueStatements, statement) => {
-        const isDuplicate = uniqueStatements.some(
-          (item) =>
-            item.nicEtablissement === statement.nicEtablissement &&
-            item.mois === statement.mois &&
-            item.fraction === statement.fraction
-        );
-        return isDuplicate
-          ? uniqueStatements
-          : [...uniqueStatements, statement];
-      },
-      []
-    );
-
-    const duplicate = monthlyStatements.length > distinctStatements.length;
-
-    const etablissements = [
-      ...new Set(
-        monthlyStatements.map((statement) => statement.nicEtablissement)
-      ),
-    ];
-
-    const alerts = [];
+  const verifySocialStatements = async (statements) => 
+  {
+    const warnings = [];
     const errors = [];
 
-    etablissements.forEach((etablissement) => {
-      const etablissementStatements = distinctStatements.filter(
-        (statement) => statement.nicEtablissement === etablissement
-      );
+    // Declaration.Nature -> "01" - DSN Mensuelle
+    const monthlyStatements = statements.filter((statement) => statement.nature === "01");
+    const distinctStatements = getDistinctStatements(monthlyStatements);
 
-      const missingMonth =
-        etablissementStatements.filter((value) => value.mois).length !== 12;
+    // check duplicata
+    if (monthlyStatements.length>distinctStatements.length) {
+      errors.push({
+        type: "duplicate",
+        message: "Plusieurs déclarations sont identiques",
+      });
+    }
+
+    // check incomplete data
+    const nicEtablissements = getDistinctEstablishmentIds(distinctStatements);
+    nicEtablissements.forEach((etablissement) => 
+    {
+      // statements related to the establishment
+      const etablissementStatements = distinctStatements
+        .filter((statement) => statement.nicEtablissement === etablissement);
+
+      // incomplete year
+      const missingMonth = checkMonths(etablissementStatements);
       if (missingMonth) {
-        alerts.push({
+        warnings.push({
           type: "missing",
-          message: `Déclaration mensuelle manquante (année incomplète) pour l'établissement n°${etablissement}`,
+          message: `Déclaration(s) mensuelle(s) manquante(s) pour l'établissement n°${etablissement} (année incomplète)`,
         });
       }
 
+      // missing fraction
       const missingFraction = checkFractions(etablissementStatements);
       if (missingFraction) {
-        alerts.push({
+        warnings.push({
           type: "missing",
           message: `Déclaration mensuelle manquante (fraction incomplète) pour l'établissement n°${etablissement}`,
         });
       }
     });
 
-    setWarning(alerts);
-    setErrors(
-      duplicate
-        ? [
-            ...errors,
-            {
-              type: "duplicate",
-              message: "Plusieurs déclarations sont identiques",
-            },
-          ]
-        : errors
-    );
+    setWarnings(warnings);
+    setErrors(errors);
   };
 
-  const onDrop = (files) => {
+  // on drop
+  const onDrop = (files) => 
+  {
     if (files.length) {
       importFiles(files);
       setErrorFile(false);
@@ -119,40 +116,45 @@ const ImportSocialData = ({ impactsData, handleSocialStatements }) => {
     }
   };
 
-  const importFiles = async (files) => {
+  // import files
+  const importFiles = async (files) => 
+  {
     try {
       const newSocialStatements = await Promise.all(
-        files.map(async (file) => {
+        files.map(async (file) => 
+        {
           const extension = file.name.split(".").pop();
-
-          if (extension === "edi" || extension === "txt") {
+          if (extension === "edi" || extension === "txt") 
+          {
+            // read file
             const dataDSN = await new Promise((resolve, reject) => {
               const reader = new FileReader();
               reader.onload = () => resolve(DSNFileReader(reader.result));
               reader.onerror = reject;
               reader.readAsText(file, "ISO-8859-1");
             });
-            const socialStatement = await DSNDataReader(dataDSN);
 
-            // Check if socialStatement is empty
-            if (Object.keys(socialStatement).length === 0) {
-              throw new Error("Erreur lors de la lecture des déclarations.");
+            if (dataDSN.errors.length==0)
+            {
+              // format data
+              const socialStatement = await DSNDataReader(dataDSN);
+
+              if (socialStatement.validStatement)
+              {
+                // build indicators for social statement 
+                const individualsData = await getIndividualsData([socialStatement]);
+                socialStatement.interdecileRange = await getInterdecileRange(individualsData);
+                socialStatement.genderWageGap = await getGenderWageGap(individualsData);
+                socialStatement.nicEtablissement = socialStatement.entreprise.etablissement.nic;
+    
+                return socialStatement;
+              }
+              else throw new Error("Erreur lors de la lecture des déclarations.");
             }
-
-            const individualsData = await getIndividualsData([socialStatement]);
-
-            socialStatement.interdecileRange = await getInterdecileRange(
-              individualsData
-            );
-            socialStatement.genderWageGap = await getGenderWageGap(
-              individualsData
-            );
-
-            socialStatement.nicEtablissement =
-              socialStatement.entreprise.etablissement.nic;
-            socialStatement.error = false;
-
-            return socialStatement;
+            else throw new Error("Erreur lors de la lecture du fichier.");
+          }
+          else {
+            // task
           }
         })
       );
@@ -176,7 +178,8 @@ const ImportSocialData = ({ impactsData, handleSocialStatements }) => {
         ...prevSocialStatements,
         ...validSocialStatements,
       ]);
-    } catch (error) {
+    } 
+    catch (error) {
       console.log(error);
     }
   };
@@ -186,7 +189,6 @@ const ImportSocialData = ({ impactsData, handleSocialStatements }) => {
   };
 
   const deleteStatement = (id) => {
-
     setSocialStatements((prevSocialStatements) =>
       prevSocialStatements.filter((statement) => statement.id !== id)
     );
@@ -229,7 +231,7 @@ const ImportSocialData = ({ impactsData, handleSocialStatements }) => {
             {errorFile && (
               <Alert variant="danger"> Format de fichier incorrect.</Alert>
             )}
-            {warning.map((error, key) => (
+            {warnings.map((error, key) => (
               <Alert key={key} variant="warning">
                 <p>
                   <i className="bi bi-exclamation-triangle-fill me-2"></i>{" "}

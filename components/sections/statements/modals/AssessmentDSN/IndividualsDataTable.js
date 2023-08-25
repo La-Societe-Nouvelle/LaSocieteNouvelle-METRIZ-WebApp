@@ -3,7 +3,6 @@
 // React
 import React from "react";
 import { useEffect,useState } from "react";
-
 import { Table } from "react-bootstrap";
 
 // Utils
@@ -14,23 +13,26 @@ import EmployeeRow from "./EmployeeRow";
 
 /* -------------------- INDIVIDUALS DATA FOR SOCIAL FOOTPRINT -------------------- */
 
-const IndividualsDataTable = ({ impactsData, handleIndividualsData }) => {
+const IndividualsDataTable = ({ 
+  impactsData, 
+  handleIndividualsData 
+}) => {
   const [individualsData, setIndividualsData] = useState(
     impactsData.individualsData
   );
 
+  // when props update
   useEffect(() => {
     if (individualsData != impactsData.individualsData) {
       setIndividualsData(impactsData.individualsData);
     }
   }, [impactsData]);
 
+  //
   useEffect(async () => {
     if (impactsData.individualsData != individualsData) {
       await handleIndividualsData(individualsData);
     }
-
-
   }, [individualsData]);
 
   const deleteAll = () => setIndividualsData([]);

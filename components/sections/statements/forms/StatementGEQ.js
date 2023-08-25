@@ -71,7 +71,8 @@ const StatementGEQ = ({
   };
 
   // input
-  const updateWageGap = (input) => {
+  const updateWageGap = (input) => 
+  {
     const { value, valueAsNumber } = input.target.valueAsNumber;
     if (value=="") {
       setWageGap('');

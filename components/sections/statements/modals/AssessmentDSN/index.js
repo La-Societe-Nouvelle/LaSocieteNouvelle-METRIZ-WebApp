@@ -1,3 +1,6 @@
+// La Société Nouvelle
+
+// React
 import React from "react";
 import { useState, useEffect } from "react";
 import { Button, Modal, Tab, Tabs } from "react-bootstrap";
@@ -12,16 +15,22 @@ import {
   getInterdecileRange,
 } from "./utils";
 
-/* -------------------- ASSESSMENT FOR SOCIAL FOOTPRINT -------------------- */
+/* -------------------- ASSESSMENT TOOL FOR SOCIAL FOOTPRINT -------------------- */
 
 /* The AssessmentDSN component handles the assessment tool for social footprint.
  * It includes logic for handling imported social data and managing individuals' data.
  * The component uses Tabs to switch between importing DSN and managing social data.
+ * 
+ * Modal update ImpactsData only on submit /!\
+ * 
  */
-const AssessmentDSN = (props) => {
+const AssessmentDSN = (props) => 
+{
   const [showModal, setShowModal] = useState(false);
 
   const [impactsData, setImpactsData] = useState(props.impactsData);
+  console.log(impactsData.socialStatements);
+  console.log(props.impactsData.socialStatements);
 
   const handleSocialStatements = async (socialStatements) => {
     const individualsData = await getIndividualsData(socialStatements);
@@ -36,33 +45,67 @@ const AssessmentDSN = (props) => {
 
     await updateImpactsData(updatedSocialStatements, individualsData);
   };
-  const updateImpactsData = async (socialStatements, individualsData) => {
-    const interdecileRange = await getInterdecileRange(individualsData);
-    const wageGap = await getGenderWageGap(individualsData);
-    const apprenticesRemunerations = await getApprenticeshipRemunerations(
-      individualsData
-    );
 
+  // const updateImpactsData = async (socialStatements, individualsData) => 
+  // {
+  //   const interdecileRange = await getInterdecileRange(individualsData);
+  //   const wageGap = await getGenderWageGap(individualsData);
+  //   const apprenticesRemunerations = await getApprenticeshipRemunerations(
+  //     individualsData
+  //   );
+
+  //   setImpactsData({
+  //     ...impactsData,
+  //     socialStatements: socialStatements,
+  //     individualsData: individualsData,
+  //     interdecileRange: interdecileRange,
+  //     wageGap: wageGap,
+  //     knwDetails: {
+  //       ...impactsData.knwDetails,
+  //       apprenticesRemunerations: apprenticesRemunerations,
+  //     },
+  //   });
+
+  //   // await props.onUpdate("idr");
+  //   // await props.onUpdate("geq");
+  //   // await props.onUpdate("knw");
+  // };
+
+  const onImportChange = async () => {
+    //console.log(impactsData.socialStatements);
+    const individualsData = await getIndividualsData(impactsData.socialStatements);
     setImpactsData({
       ...impactsData,
-      socialStatements: socialStatements,
-      individualsData: individualsData,
-      interdecileRange: interdecileRange,
-      wageGap: wageGap,
-      knwDetails: {
-        ...impactsData.knwDetails,
-        apprenticesRemunerations: apprenticesRemunerations,
-      },
-    });
+      individualsData
+    })
+  }
 
-    await props.onUpdate("idr");
-    await props.onUpdate("geq");
-    await props.onUpdate("knw");
-  };
+  const updateImpactsData = async () => 
+  {
+    const {
+      socialStatements
+    } = impactsData;
 
-  useEffect(() => {
-    props.updateSocialData(impactsData);
-  }, [impactsData]);
+    const individualsData = await getIndividualsData(socialStatements);
+
+    const interdecileRange = await getInterdecileRange(individualsData);
+    const wageGap = await getGenderWageGap(individualsData);
+    const apprenticesRemunerations = await getApprenticeshipRemunerations(individualsData);
+
+    impactsData.individualsData = individualsData;
+    impactsData.interdecileRange = interdecileRange;
+    impactsData.wageGap = wageGap;
+    impactsData.knwDetails.apprenticesRemunerations = apprenticesRemunerations;
+  }
+
+  useEffect(async () => {
+    console.log("impacts data updated in modal")
+    const individualsData = await getIndividualsData(impactsData.socialStatements);
+    setImpactsData({
+      ...impactsData,
+      individualsData
+    })
+  }, [impactsData.socialStatements]);
 
   return (
     <>
@@ -95,6 +138,7 @@ const AssessmentDSN = (props) => {
             <Tab eventKey="import" title="Importer les DSN">
               <ImportSocialData
                 impactsData={impactsData}
+                onChange={onImportChange}
                 handleSocialStatements={handleSocialStatements}
               />
             </Tab>
