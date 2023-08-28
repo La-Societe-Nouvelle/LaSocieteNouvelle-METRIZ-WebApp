@@ -32,8 +32,9 @@ export const ValueCreationFootprintsVisual = ({
         </Button>
       </div>
       <Row className=".row.inline-block">
+        <Col lg={(3-nbIndics)*2}/>
         {validations.includes("eco") &&
-          <Col lg={12/nbIndics}>
+          <Col lg={4}>
             <RingChart
               session={session}
               period={period}
@@ -41,7 +42,7 @@ export const ValueCreationFootprintsVisual = ({
             />
           </Col>}
         {validations.includes("art") &&
-          <Col lg={12/nbIndics}>
+          <Col lg={4}>
             <RingChart
               session={session}
               period={period}
@@ -49,13 +50,14 @@ export const ValueCreationFootprintsVisual = ({
             />
           </Col>}
         {validations.includes("soc") &&
-          <Col lg={12/nbIndics}>
+          <Col lg={4}>
             <RingChart
               session={session}
               period={period}
               indic={"soc"}
             />
           </Col>}
+        <Col lg={(3-nbIndics)*2}/>
       </Row>
     </div>
   );

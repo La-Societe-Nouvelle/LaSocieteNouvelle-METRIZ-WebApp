@@ -81,12 +81,10 @@ export const DefaultView = ({
   const showEnvironmentalChart = Object.values(environmentalFootprint).some(
     (value) => value != null
   );
-  const showProportionalChart = Object.values(proportionFootprint).some(
+  const showValueCreationVisual = Object.values(proportionFootprint).some(
     (value) => value != null
   );
-  const showSocialFootprint = socialFootprintIndics.length>0;
-  console.log(socialFootprint);
-  console.log(showSocialFootprint);
+  const showSocialFootprintVisual = socialFootprintIndics.length>0;
 
   return (
     <>
@@ -99,76 +97,22 @@ export const DefaultView = ({
             />
           </Col>
         )}
-        {showProportionalChart && (
+        {(showValueCreationVisual || showSocialFootprintVisual) && (
           <Col lg={6}>
-            <ValueCreationFootprintsVisual
+            {showValueCreationVisual && <ValueCreationFootprintsVisual
               session={session}
               period={period}
-            />
-          </Col>
-        )}
-        {showSocialFootprint && (
-          <Col lg={6}>
-            <SocialFootprintMainVisual
+            />}
+            {showSocialFootprintVisual && <SocialFootprintMainVisual
               session={session}
               period={period}
-            />
+            />}
           </Col>
         )}
-        {/* {showProportionalChart && (
+        {showSocialFootprintVisual && (
           <Col lg={6}>
-            <div className="box">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 className="mb-0">Empreinte économique</h3>
-                <Button
-                  className="btn-light btn-rounded"
-                  size="sm"
-                  onClick={() =>
-                    downloadChartImage(
-                      "proportionalChart",
-                      "empreinte_economique.png"
-                    )
-                  }
-                >
-                  <i className="bi bi-download"></i>
-                </Button>
-              </div>
-    
-              <ProportionalRingChart
-                metaIndicators={proportionsIndicsMeta}
-                productionFootprint={proportionFootprint}
-                divisionFootprint={proportionDivisionFootprint}
-              />
-            </div>
           </Col>
-        )} */}
-        {/* {showSocialChart && (
-          <Col lg={6}>
-            <div className="box">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h3 className="mb-0">Empreinte sociale</h3>
-                <Button
-                  className="btn-light btn-rounded"
-                  size="sm"
-                  onClick={() =>
-                    downloadChartImage(
-                      "socialChart",
-                      "empreinte_sociale.png"
-                    )
-                  }
-                >
-                  <i className="bi bi-download"></i>
-                </Button>
-              </div>
-      
-              <SocialBarChart
-                metaIndicators={socialIndic}
-                productionFootprint={socialFootprint}
-                divisionFootprint={divisionSocialFootprint}
-              />
-            </div>
-          </Col>
-        )} */}
+        )}
       </Row>
     </>
   );

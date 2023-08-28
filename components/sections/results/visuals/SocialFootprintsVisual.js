@@ -12,6 +12,8 @@ export const SocialFootprintMainVisual = ({
 }) => {
 
   const validations = session.validations[period.periodKey];
+  const nbIndics = ["geq","idr","knw"].filter((indic) => validations.includes(indic)).length;
+  console.log(nbIndics);
 
   return (
     <div className="box">
@@ -30,11 +32,12 @@ export const SocialFootprintMainVisual = ({
           <i className="bi bi-download"></i>
         </Button>
       </div>
-      <Row>
+      <Row className=".row.inline-block">
+        {nbIndics<3 && <Col lg={(3-nbIndics)*2}/>}
         {validations.includes("geq") &&
-          <Col>
+          <Col lg={4}>
             <VerticalBarChart
-              id={"socialfootprintvisual_knw"}
+              id={"socialfootprintvisual_geq"}
               session={session}
               period={period}
               aggregate={"production"}
@@ -43,21 +46,26 @@ export const SocialFootprintMainVisual = ({
             />
           </Col>}
         {validations.includes("idr") &&
-          <Col>
-            <RingChart
+          <Col lg={4}>
+            <VerticalBarChart
+              id={"socialfootprintvisual_idr"}
               session={session}
               period={period}
+              aggregate={"production"}
               indic={"idr"}
+              showDivisionData={true}
             />
           </Col>}
         {validations.includes("knw") &&
-          <Col>
+          <Col lg={4}>
             <RingChart
+              id={"socialfootprintvisual_knw"}
               session={session}
               period={period}
               indic={"knw"}
             />
           </Col>}
+        {nbIndics<3 && <Col lg={(3-nbIndics)*2}/>}
       </Row>
     </div>
   );

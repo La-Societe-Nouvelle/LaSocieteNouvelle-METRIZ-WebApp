@@ -71,7 +71,7 @@ const StatementIDR = ({
   // interdecile range
   const updateInterdecileRange = (event) => 
   {
-    const { value, valueAsNumber } = event.target.valueAsNumber;
+    const { value, valueAsNumber } = event.target;
     if (value=="") {
       setInterdecileRange('');
     } else if (!isNaN(valueAsNumber)) {

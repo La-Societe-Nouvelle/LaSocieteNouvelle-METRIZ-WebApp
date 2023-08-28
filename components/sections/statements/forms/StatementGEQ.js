@@ -25,32 +25,29 @@ import AssessmentDSN from "../modals/AssessmentDSN";
  *    - errorMessage : null | {message}
  */
 
-const StatementGEQ = ({ 
-  impactsData, 
-  onUpdate, 
+const StatementGEQ = ({
+  impactsData,
+  onUpdate,
 }) => {
 
   const [hasEmployees, setHasEmployees] = useState(impactsData.hasEmployees);
   const [wageGap, setWageGap] = useState(valueOrDefault(impactsData.wageGap, ""));
   const [info, setInfo] = useState(impactsData.comments.geq || "");
-  const [isInvalid, setIsInvalid] = useState(false);
 
   // update impacts data when state update
   useEffect(() => {
     impactsData.hasEmployees = hasEmployees;
     impactsData.wageGap = wageGap;
     const statementStatus = checkStatement(impactsData);
-    setIsInvalid(statementStatus.status=="error");
     onUpdate(statementStatus);
-  }, [hasEmployees,wageGap]);
+  }, [hasEmployees, wageGap]);
 
   // update state when props update
-  useEffect(() => 
-  {
-    if (impactsData.hasEmployees!=hasEmployees) {
+  useEffect(() => {
+    if (impactsData.hasEmployees != hasEmployees) {
       setHasEmployees(impactsData.hasEmployees);
     }
-    if ((impactsData.wageGap)!=wageGap) {
+    if ((impactsData.wageGap) != wageGap) {
       setWageGap(impactsData.wageGap || "");
     }
   }, [impactsData.hasEmployees, impactsData.wageGap]);
@@ -71,10 +68,9 @@ const StatementGEQ = ({
   };
 
   // input
-  const updateWageGap = (input) => 
-  {
-    const { value, valueAsNumber } = input.target.valueAsNumber;
-    if (value=="") {
+  const updateWageGap = (event) => {
+    const { value, valueAsNumber } = event.target;
+    if (value == "") {
       setWageGap('');
     } else if (!isNaN(valueAsNumber)) {
       setWageGap(valueAsNumber);
@@ -88,7 +84,7 @@ const StatementGEQ = ({
 
   // data from modals
   const updateSocialData = (updatedData) => {
-    impactsData.interdecileRange  = updatedData.interdecileRange;
+    impactsData.interdecileRange = updatedData.interdecileRange;
     impactsData.wageGap = updatedData.wageGap;
     impactsData.knwDetails.apprenticesRemunerations = updatedData.knwDetails.apprenticesRemunerations;
   };
@@ -139,7 +135,7 @@ const StatementGEQ = ({
                     disabled={hasEmployees === false}
                     inputMode="numeric"
                     onChange={updateWageGap}
-                    isInvalid={isInvalid}
+                    isInvalid={!isValidValue(wageGap, 0)}
                   />
                   <InputGroup.Text>%</InputGroup.Text>
                 </InputGroup>
@@ -178,31 +174,32 @@ const StatementGEQ = ({
 export default StatementGEQ;
 
 // Check statement in impacts data
-const checkStatement = (impactsData) => 
-{
+const checkStatement = (impactsData) => {
   const {
     hasEmployees,
     wageGap
   } = impactsData;
 
   if (hasEmployees === true) {
-    if (wageGap=="" || wageGap==null) {
-      return({ status: "incomplete", errorMessage: null });
-    } else if (isCorrectValue(wageGap,0)) {
-      return({ status: "ok", errorMessage: null });
+    if (wageGap == "" || wageGap == null) {
+      return ({ status: "incomplete", errorMessage: null });
+    } else if (isCorrectValue(wageGap, 0)) {
+      return ({ status: "ok", errorMessage: null });
     } else {
-      return({ status: "error", errorMessage: "Erreur application" });
+      return ({ status: "error", errorMessage: "Erreur application" });
     }
   } else if (hasEmployees === false) {
-    if (isCorrectValue(wageGap,0,0)) {
-      return({ status: "ok", errorMessage: null });
+    if (isCorrectValue(wageGap, 0, 0)) {
+      return ({ status: "ok", errorMessage: null });
     } else {
-      return({ status: "error", errorMessage: "Erreur application" });
+      return ({ status: "error", errorMessage: "Erreur application" });
     }
   } else if (hasEmployees === null) {
     // & wage gap not null or empty string
-    return({ status: "incomplete", errorMessage: null });
+    return ({ status: "incomplete", errorMessage: null });
   } else {
-    return({ status: "error", errorMessage: "Erreur application" });
+    return ({ status: "error", errorMessage: "Erreur application" });
   }
 }
+
+const isValidValue = (value) => value == "" || isCorrectValue(value, 0)

@@ -62,21 +62,25 @@ export const VerticalBarChart = ({
 
   const dataset_currentFootprints = [];
   const labels =[];
+  const backgroundColors = [];
   // area
   if (showAreaData) {
     let areaValue = comparativeData[aggregate].area.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
     dataset_currentFootprints.push(areaValue);
     labels.push("France");
+    backgroundColors.push("RGBA(176,185,247,1)");
   }
   // company
   let companyValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
   dataset_currentFootprints.push(companyValue);
   labels.push("Exercice");
+  backgroundColors.push("RGBA(250,89,95,1)");
   // division
   if (showDivisionData) {
     let divisionValue = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
     dataset_currentFootprints.push(divisionValue);
     labels.push("Branche");
+    backgroundColors.push("rgb(255, 182, 66)");
   }
 
   // prev footprints
@@ -106,11 +110,7 @@ export const VerticalBarChart = ({
     label: "Empreinte",
     data: dataset_currentFootprints,
     skipNull: true,
-    backgroundColor: [
-      "RGBA(176,185,247,1)",
-      "RGBA(250,89,95,1)",
-      "rgb(255, 182, 66)",
-    ],
+    backgroundColor: backgroundColors,
     borderWidth: 0,
     type: "bar",
     barPercentage: 0.6,
@@ -121,11 +121,7 @@ export const VerticalBarChart = ({
     label: "Valeur N-1",
     data: dataset_prevFootprints,
     skipNull: true,
-    backgroundColor: [
-      "RGBA(215,220,251,1)",
-      "RGBA(250,89,95,1)",
-      "rgb(255 220 141)",
-    ],
+    backgroundColor: backgroundColors,
     borderWidth: 0,
     barPercentage: 0.6,
     categoryPercentage: 0.6,
@@ -135,11 +131,7 @@ export const VerticalBarChart = ({
     label: "Objectif",
     data: dataset_target,
     skipNull: true,
-    backgroundColor: [
-      "RGBA(215,220,251,1)",
-      "RGBA(250,89,95,1)",
-      "rgb(255 220 141)",
-    ],
+    backgroundColor: backgroundColors,
     borderWidth: 0,
     barPercentage: 0.6,
     categoryPercentage: 0.6,
@@ -161,6 +153,10 @@ export const VerticalBarChart = ({
     responsive: true,
     maintainAspectRatio: isPrinting ? false : true,
     devicePixelRatio: 2,
+    aspectRatio: 1,
+    layout: {
+      padding: 25,
+    },
     scales: {
       y: {
         display: true,
@@ -173,7 +169,7 @@ export const VerticalBarChart = ({
           },
         },
         grid: {
-          color: "#ececff",
+          color: "rgba(245, 245, 245, 0.75)",
           lineWidth : 2,
         },
       },
@@ -186,7 +182,7 @@ export const VerticalBarChart = ({
         },
         grid: {
           lineWidth : 2,
-          color: "#ececff",
+          color: "rgba(245, 245, 245, 0.75)",
         },
       },
     },
