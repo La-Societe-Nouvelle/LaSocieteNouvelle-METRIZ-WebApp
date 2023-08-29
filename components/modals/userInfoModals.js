@@ -84,8 +84,8 @@ export const ErrorAPIModal = ({ hasError, onClose }) => {
         <Image
           src="illus/503.svg"
           alt="error image"
-          height={250}
-          className="mx-auto my-3 d-block"
+          height={200}
+          className="mx-auto my-1 d-block"
         />
         <p className="small ">
           Nous rencontrons actuellement des problèmes avec notre service.
@@ -94,7 +94,7 @@ export const ErrorAPIModal = ({ hasError, onClose }) => {
             className="fw-bold text-decoration-underline"
           >
             nous contacter
-          </a> pour obtenir de l'assistance
+          </a> pour obtenir de l'assistance.
         </p>
       </Modal.Body>
       <Modal.Footer>

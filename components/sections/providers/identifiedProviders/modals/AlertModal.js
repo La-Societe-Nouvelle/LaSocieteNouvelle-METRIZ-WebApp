@@ -62,7 +62,7 @@ export const SyncSuccessModal = ({
             : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez maintenant passer à l'étape suivante.          "}
         </p>
         <div className="text-end">
-          <Button className="me-1">Fermer</Button>
+          <Button className="me-1" onClick={onClose}>Fermer</Button>
           <Button variant="secondary" onClick={nextStep}>
             {isAllProvidersIdentified ? "Mesurer mon impact" : "Etape suivante"}
           </Button>
