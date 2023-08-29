@@ -11,7 +11,7 @@ import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
 import { ComparativeData } from "../models/ComparativeData";
 import { fetchComparativeData } from "../services/MacrodataService";
-import { getGhgEmissionsUncertainty, getTotalGhgEmissionsUncertainty } from "../../components/sections/statements/modals/AssessmentGHG";
+import { getGhgEmissionsUncertainty, getTotalGhgEmissionsUncertainty } from "../../components/sections/statements/modals/AssessmentGHG/AssessmentGHG";
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */

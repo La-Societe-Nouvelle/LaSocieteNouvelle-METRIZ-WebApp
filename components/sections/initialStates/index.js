@@ -5,7 +5,7 @@ import React from "react";
 import Dropzone from "react-dropzone";
 
 // Components
-import { InitialStatesTable } from "../InitialStatesTable";
+import { InitialStatesTable } from "./InitialStatesTable";
 import { ProgressBar } from "../../modals/ProgressBar";
 
 import { updateVersion } from "../../../src/version/updateVersion";

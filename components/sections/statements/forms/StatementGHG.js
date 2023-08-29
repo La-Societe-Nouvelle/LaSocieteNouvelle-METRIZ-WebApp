@@ -9,7 +9,7 @@ import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
 // Modals
-import { AssessmentGHG } from "../modals/AssessmentGHG";
+import { AssessmentGHG } from "../modals/AssessmentGHG/AssessmentGHG";
 
 /* ---------- STATEMENT - INDIC #GHG ---------- */
 

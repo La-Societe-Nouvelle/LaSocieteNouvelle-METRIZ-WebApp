@@ -15,7 +15,7 @@ import {
   getGhgEmissionsUncertainty,
   getTotalGhgEmissions,
   getTotalGhgEmissionsUncertainty,
-} from "./AssessmentGHG";
+} from "./AssessmentGHG/utils";
 
 const orderGroupsFossilFuels = [
   "Gaz",
