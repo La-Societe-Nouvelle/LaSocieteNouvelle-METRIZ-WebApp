@@ -5,7 +5,7 @@ import React, { useState } from "react";
 
 // Views
 import { UnidentifiedProviders } from "./unidentifiedProviders";
-import { IdentifiedProviders } from "./identifiedProviders";
+import IdentifiedProviders from "./identifiedProviders";
 
 /* ----------------------------------------------------------------------------------------------------------------------- */
 /* -------------------------------------------------- PROVIDERS SECTION -------------------------------------------------- */
@@ -17,7 +17,7 @@ import { IdentifiedProviders } from "./identifiedProviders";
  *    2- unidentified providers (default account & provider account without siren number) -> useDefaultFootprint == true
  *  State :
  *    -> step (1 or 2)
- * 
+ *
  */
 
 const ProvidersSection = (props) => {
@@ -47,6 +47,7 @@ const ProvidersSection = (props) => {
         financialData={financialData}
         financialPeriod={financialPeriod}
         nextStep={nextStep}
+        submit={props.submit}
       />
     );
   }

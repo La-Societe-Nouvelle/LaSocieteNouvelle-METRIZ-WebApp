@@ -18,7 +18,7 @@ import InvoicesDataModal from "../modals/InvoicesDataModal";
 // Utils
 import { getDefaultFootprintId } from "../utils";
 
-export const InvoicesProvidersView = ({
+const InvoicesProvidersView = ({
   providers,
   externalExpenses,
   updateProviders,
@@ -232,7 +232,7 @@ export const InvoicesProvidersView = ({
   return (
     <div className="step">
       <h4>2. Déposer des factures</h4>
-
+    
       <Dropzone onDrop={onInvoicesDrop} accept={[".pdf"]}>
         {({ getRootProps, getInputProps }) => (
           <div className="dropzone-section">
@@ -268,3 +268,5 @@ export const InvoicesProvidersView = ({
     </div>
   );
 };
+
+export default InvoicesProvidersView;
