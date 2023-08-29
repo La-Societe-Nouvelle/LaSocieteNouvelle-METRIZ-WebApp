@@ -1,17 +1,26 @@
+// La Société Nouvelle
+
+// XLSX
 import * as XLSX from 'xlsx';
-import { getExpensesGroupByAccount } from '../../components/tables/IndicatorExpensesTable';
+
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../formulas/aggregatesBuilder';
+
 import {  roundValue } from '../utils/Utils';
 
+// Lib
 import metaIndics from "/lib/indics";
 
-async function exportIndicXLSX(
-  indic,
+/** XLSX DATA GENERATOR
+ * 
+ */
+
+export async function exportIndicXLSX({
   session,
-  period
-) {
+  period,
+  indic
+}) {
   // Build file
-  let file = await IndicXLSXFileWriter(
+  let file = await indicXLSXFileWriter(
     indic,
     session,
     period
@@ -26,11 +35,19 @@ async function exportIndicXLSX(
 
 /* ---------- CONTENT BUILDER ---------- */
 
-export async function IndicXLSXFileWriter(indic,session,period)
-{
-  const workbook = XLSX.utils.book_new();
+/**
+ *  2 Tabs :
+ *    - main aggregates data
+ *    - expenses accounts data
+ */
 
-  //workbook.Props = fileProps;
+export const indicXLSXFileWriter = async ({
+  session,
+  period,
+  indic
+}) => {
+  // workbook
+  const workbook = XLSX.utils.book_new();
 
   // build main aggregates tab
   let mainAggregatesContent = await buildMainAggregatesContent(indic,session,period);
@@ -49,11 +66,11 @@ export async function IndicXLSXFileWriter(indic,session,period)
   var XLSXData = XLSX.write(workbook, {bookType:'xlsx',  type: 'binary'});
 
   // convert to ArrayBuffer
-  var buf = new ArrayBuffer(XLSXData.length);
-  var view = new Uint8Array(buf);
+  var buffer = new ArrayBuffer(XLSXData.length);
+  var view = new Uint8Array(buffer);
   for (var i=0; i!=XLSXData.length; ++i) view[i] = XLSXData.charCodeAt(i) & 0xFF;
 
-  return buf;
+  return buffer;
 }
 
 /* ---------- CONTENT BUILDERS ---------- */ 
@@ -232,10 +249,4 @@ async function buildExpensesContent(indic,session)
     });
 
   return aoaContent;
-}
-
-/* ---------- EXPORT ---------- */ 
-
-export {
-  exportIndicXLSX
 }

@@ -7,12 +7,13 @@ import jsPDF from "jspdf";
 
 import metaIndics from "../../../lib/indics.json";
 import { generateCover } from "./generateCover";
-import { generateReport } from "./generateIndicatorReport";
-import { generateContributionIndicatorSheet } from "./generateContributionIndicatorSheet";
-import { generateIntensityIndicatorSheet } from "./generateIntensityIndicatorSheet";
-import { generateIndiceIndicatorSheet } from "./generateIndiceIndicatorSheet";
+import { buildStandardReport } from "./standardReportGenerator";
+import { buildSummaryReportContributionIndic } from "./summaryReportGeneratorContribution";
+import { generateIntensityIndicatorSheet } from "./summaryReportGeneratorIntensity";
+import { generateIndiceIndicatorSheet } from "./summaryReportGeneratorIndex";
 import { generateFootprintPDF } from "../../writers/Export";
 import { generateXLSXFile } from "./generateExcelFile";
+import { resolve } from "styled-jsx/css";
 
 /* ---------- DOWNLOADABLES FILES ---------- */
 
@@ -97,26 +98,34 @@ export async function buildFullFile({
   return zipBlob;
 }
 
+
 export async function buildIndicReport({
   session,
   period,
   indic
 }) {
-  // Extract necessary data from the session object
-  const legalUnit = session.legalUnit.corporateName;
-  const financialData = session.financialData;
-  const impactsData = session.impactsData;
-  const comparativeData = session.comparativeData;
 
-  // Generate PDF for the selected indicator (file ID: indic-report)
-  const indicReport = await generateIndicReportPDF(
+  // Session data -------------------------------------
+
+  const {
     legalUnit,
-    selectedView,
     financialData,
     impactsData,
-    comparativeData,
+    comparativeData
+  } = session;
+
+  const corporateName = legalUnit.corporateName;
+
+  // Meta data ----------------------------------------
+  
+  // --------------------------------------------------
+
+  // Generate PDF for the selected indicator (file ID: indic-report)
+  const indicReport = await generateIndicReportPDF({
+    session,
+    indic,
     period
-  );
+  });
 
   const pdfBlob = new Blob([indicReport], { type: "application/pdf" });
   return pdfBlob;
@@ -199,7 +208,7 @@ async function generateCompleteReportPDF({
     const { type } = metaIndics[indic];
 
     basicPDFpromises.push(
-      generateReport({
+      buildStandardReport({
         session,
         indic,
         download: false,
@@ -210,12 +219,11 @@ async function generateCompleteReportPDF({
     switch (type) {
       case "proportion":
         reportPDFpromises.push(
-          generateContributionIndicatorSheet({
+          buildSummaryReportContributionIndic({
             session,
-            indic,
-            download: false,
-            period
-          })
+            period,
+            indic
+          }).getBlob()
         );
         break;
       case "intensité":
@@ -223,9 +231,8 @@ async function generateCompleteReportPDF({
           generateIntensityIndicatorSheet({
             session,
             indic,
-            download: false,
             period
-          })
+          }).getBlob()
         );
         break;
       case "indice":
@@ -233,9 +240,8 @@ async function generateCompleteReportPDF({
           generateIndiceIndicatorSheet({
             session,
             indic,
-            download: false,
             period
-          })
+          }).getBlob()
         );
         break;
       default:
@@ -252,6 +258,8 @@ async function generateCompleteReportPDF({
     const pdfs = await Promise.all(mergedPromises);
 
     const mergedPdfDoc = await PDFDocument.create();
+    mergedPdfDoc.setTitle("title");
+
     const fontBytes = await fetch(
       "https://metriz.lasocietenouvelle.org/fonts/Raleway/Raleway-Regular.ttf"
     ).then((res) => res.arrayBuffer());
@@ -306,6 +314,8 @@ async function generateCompleteReportPDF({
   }
 }
 
+// Indic report
+
 async function generateIndicReportPDF({
   session,
   indic,
@@ -315,35 +325,31 @@ async function generateIndicReportPDF({
 
   const { type } = metaIndics[indic];
 
-  pdfPromises.push(
-    generateReport({
-      session,
-      indic,
-      download: false,
-      period
-    })
-  );
+  const standardReport = buildStandardReport({
+    session,
+    indic,
+    period
+  })
+  pdfPromises.push(new Promise((resolve) => standardReport.getBlob((blob) => resolve(blob))));
 
   switch (type) 
   {
-    case "proportion":
-      pdfPromises.push(
-        generateContributionIndicatorSheet({
-          session,
-          indic,
-          download: false,
-          period
-        })
-      );
+    case "proportion": {
+      const summaryReport = buildSummaryReportContributionIndic({
+        session,
+        indic,
+        period
+      });
+      pdfPromises.push(new Promise((resolve) => summaryReport.getBlob((blob) => resolve(blob))));
+    }
       break;
     case "intensité":
       pdfPromises.push(
         generateIntensityIndicatorSheet({
           session,
           indic,
-          download: false,
           period
-        })
+        }).getBlob()
       );
       break;
     case "indice":
@@ -351,9 +357,8 @@ async function generateIndicReportPDF({
         generateIndiceIndicatorSheet({
           session,
           indic,
-          download: false,
           period
-        })
+        }).getBlob()
       );
       break;
     default:

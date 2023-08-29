@@ -19,6 +19,10 @@ export const ComparisonsVisual = ({
         session={session}
         indic={indic}
         period={period}
+        showAreaFootprint={true}
+        showTarget={true}
+        showPreviousData={true}
+        showDivisionData={true}
       />
     </div>
   );

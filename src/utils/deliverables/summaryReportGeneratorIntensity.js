@@ -26,7 +26,6 @@ loadFonts();
 export const generateIntensityIndicatorSheet = ({
   session,
   indic,
-  download,
   period
 }) => {
   // ---------------------------------------------------------------
@@ -1021,15 +1020,9 @@ export const generateIntensityIndicatorSheet = ({
     },
   };
 
-  return new Promise((resolve) => {
-    pdfMake.createPdf(docDefinition).getBlob((blob) => {
-      if (download) {
-        saveAs(blob, `${documentTitle}.pdf`);
-      }
+  const summaryReport = pdfMake.createPdf(docDefinition);
 
-      resolve(blob);
-    });
-  });
+  return summaryReport;
 };
 
 function createChargesImpactContent(

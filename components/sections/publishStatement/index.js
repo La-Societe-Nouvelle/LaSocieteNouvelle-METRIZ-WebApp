@@ -14,9 +14,8 @@ import {
 
 // Sources
 import {
-  exportStatementPDF,
-  getBinaryPDF,
-} from "../../../src/writers/StatementWriter";
+  getStatementPDF,
+} from "../../../src/writers/StatementPDFBuilder";
 
 import { printValue } from "../../../src/utils/Utils";
 
@@ -492,7 +491,7 @@ const Summary = (props) => {
   const [isSend, setIsSend] = useState(false);
   const [error, setError] = useState(false);
   const today = new Date();
-  const todayString =
+  const todayString = 
     String(today.getDate()).padStart(2, "0") +
     "/" +
     String(today.getMonth() + 1).padStart(2, "0") +
@@ -506,8 +505,10 @@ const Summary = (props) => {
       return acc;
     }, {});
 
-  const exportStatement = () => {
-    exportStatementPDF(
+  const exportStatement = () => 
+  {
+    // build pdf
+    const statementPDF = getStatementPDF(
       siren,
       corporateName,
       year,
@@ -517,13 +518,24 @@ const Summary = (props) => {
       legalUnitFootprint,
       comments
     );
+
+    let today = new Date();
+    statementPDF.download(
+      "declaration_"+siren +
+      "-" + 
+        String(today.getDate()).padStart(2, "0") + 
+        String(today.getMonth()+1).padStart(2, "0") + 
+        today.getFullYear() +
+      ".pdf"
+    );
   };
 
   const submitStatement = async (event) => {
     event.preventDefault();
 
     try {
-      const statementFile = getBinaryPDF(
+      // build PDF
+      const statementPDF = getStatementPDF(
         siren,
         corporateName,
         year,
@@ -533,6 +545,12 @@ const Summary = (props) => {
         legalUnitFootprint,
         comments
       );
+      
+      const statementFile = new Promise((resolve, reject) => {
+        statementPDF.getBase64((datauristring) => {
+          resolve(datauristring);
+        });
+      });
 
       const messageToAdmin = mailToAdminWriter(
         siren,

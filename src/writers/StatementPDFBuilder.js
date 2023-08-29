@@ -7,77 +7,18 @@ import { printValue } from "../utils/Utils";
 import metaIndics from "/lib/indics";
 import { getDateFormatted, loadFonts } from "./deliverables/utils/utils";
 
+// PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
-export function exportStatementPDF(
-  siren,
-  denomination,
-  year,
-  declarant,
-  declarantOrganisation,
-  price,
-  legalUnitFootprint,
-  comments
-) {
-  const documentDefinition = writeStatementPDF(
-    siren,
-    denomination,
-    year,
-    declarant,
-    declarantOrganisation,
-    price,
-    legalUnitFootprint,
-    comments
-  );
+/** STATEMENT PDF GENERATOR
+ * 
+ * 
+ */
 
-  const pdfDocGenerator = pdfMake.createPdf(documentDefinition);
-
-  let today = new Date();
-  pdfDocGenerator.download(
-    "declaration_" +
-      siren +
-      "-" +
-      String(today.getDate()).padStart(2, "0") +
-      String(today.getMonth() + 1).padStart(2, "0") +
-      today.getFullYear() +
-      ".pdf"
-  );
-}
-
-export function getBinaryPDF(
-  siren,
-  denomination,
-  year,
-  declarant,
-  declarantOrganisation,
-  price,
-  legalUnitFootprint,
-  comments
-) {
-  const documentDefinition = writeStatementPDF(
-    siren,
-    denomination,
-    year,
-    declarant,
-    declarantOrganisation,
-    price,
-    legalUnitFootprint,
-    comments
-  );
-
-  const pdfDocGenerator = pdfMake.createPdf(documentDefinition);
-
-  return new Promise((resolve, reject) => {
-    pdfDocGenerator.getBase64((datauristring) => {
-      resolve(datauristring);
-    });
-  });
-}
-
-const writeStatementPDF = (
+export const getStatementPDF = (
   siren,
   denomination,
   year,
@@ -87,8 +28,10 @@ const writeStatementPDF = (
   legalUnitFootprint,
   comments
 ) => {
+  // date
   const today = new Date();
 
+  // document definition
   const documentDefinition = {
     content: [
       {
@@ -134,7 +77,7 @@ const writeStatementPDF = (
                     style: "tableCell",
                   },
                   {
-                    text: printValue(indicator.value, 0),
+                    text: printValue(indicator.value, metaIndics[key].nbDecimals),
                     alignment: "right",
                     style: "tableCell",
                   },
@@ -276,5 +219,8 @@ const writeStatementPDF = (
     },
   };
 
-  return documentDefinition;
-};
+  // generator pdf
+  const statementPDF = pdfMake.createPdf(documentDefinition);
+
+  return statementPDF;
+}

@@ -1,15 +1,27 @@
 // La Société Nouvelle
 
+// React
 import React, { useState } from "react";
-import { printValue } from "/src/utils/Utils";
 import { Table } from "react-bootstrap";
 
+// Utils
+import { printValue } from "/src/utils/Utils";
+
+// Lib
 import metaIndics from "/lib/indics";
+
+/** EXPENSES TABLE
+ *  
+ *  Show footprints of external expenses accounts
+ * 
+ */
+
+const indicsWithGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"];
 
 export const  ExpensesTable = ({
   session,
-  indic,
-  period
+  period,
+  indic
 }) => {
 
   const {
@@ -24,36 +36,9 @@ export const  ExpensesTable = ({
 
   const { unit, nbDecimals, unitAbsolute} = metaIndics[indic];
 
+  // sorting
   const [columnSorted, setColumnSorted] = useState("amount");
   const [reverseSort, setReverseSort] = useState(false);
-
-  const filteredExternalExpensesAccounts = externalExpensesAccounts.filter(
-    (provider) => provider.periodsData.hasOwnProperty(period.periodKey)
-  );
-
-  const sortAccounts = (accounts, columnSorted) => {
-    switch (columnSorted) {
-      case "account":
-        accounts.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
-        break;
-      case "amount":
-        accounts.sort(
-          (a, b) =>
-            b.periodsData[period.periodKey].amount -
-            a.periodsData[period.periodKey].amount
-        );
-        break;
-      default:
-        break;
-    }
-    if (reverseSort) accounts.reverse();
-  };
-
-  sortAccounts(filteredExternalExpensesAccounts, columnSorted);
-
-  const impactAbsolu = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
-    indic
-  );
 
   const changeColumnSorted = (columnSorted) => {
     if (columnSorted !== columnSorted) {
@@ -64,18 +49,46 @@ export const  ExpensesTable = ({
     }
   };
 
+  const sortAccounts = (accounts, columnSorted) => {
+    switch (columnSorted) {
+      case "account":
+        accounts.sort((a, b) => a.accountNum.localeCompare(b.accountNum));
+        break;
+      case "amount":
+        accounts.sort(
+          (a, b) => {
+            if (a.periodsData[period.periodKey] && b.periodsData[period.periodKey]) {
+              return b.periodsData[period.periodKey].amount - a.periodsData[period.periodKey].amount;
+            } else if (a.periodsData[period.periodKey]) {
+              return -1;
+            } else {
+              return 1;
+            }
+          }
+        );
+        break;
+      default:
+        break;
+    }
+    if (reverseSort) accounts.reverse();
+  };
+
+  sortAccounts(externalExpensesAccounts, columnSorted);
+
+  const showGrossImpact = indicsWithGrossImpact.includes(indic);
+
   return (
       <Table id="indicatorExpenses">
         <thead>
           <tr>
             <th></th>
             <th></th>
-            <th colSpan={impactAbsolu ? "4" : "3"} className="text-center">
+            <th colSpan={showGrossImpact ? "4" : "3"} className="text-center">
               Année N
             </th>
             {prevPeriod && (
               <th
-                colSpan={impactAbsolu ? "3" : "2"}
+                colSpan={showGrossImpact ? "3" : "2"}
                 className="text-center border-left"
               >
                 N-1
@@ -105,7 +118,7 @@ export const  ExpensesTable = ({
             <td className="text-end">
               Incertitude <span className="tw-normal small d-block">%</span>
             </td>
-            {impactAbsolu && (
+            {showGrossImpact && (
               <td className="text-end">
                 Impact{" "}
                 <span className="tw-normal small d-block">{unitAbsolute}</span>
@@ -121,7 +134,7 @@ export const  ExpensesTable = ({
                 <td className="text-end">
                   Incertitude <span className="tw-normal small d-block">%</span>
                 </td>
-                {impactAbsolu && (
+                {showGrossImpact && (
                   <td className="text-end">
                     Impact{" "}
                     <span className="tw-normal small d-block">
@@ -134,7 +147,7 @@ export const  ExpensesTable = ({
           </tr>
         </thead>
         <tbody>
-          {filteredExternalExpensesAccounts.map(
+          {externalExpensesAccounts.map(
             ({ accountNum, accountLib, periodsData }) => {
               return (
                 <tr key={accountNum}>
@@ -164,7 +177,7 @@ export const  ExpensesTable = ({
                       0
                     )}
                   </td>
-                  {impactAbsolu && (
+                  {showGrossImpact && (
                     <td className="text-end">
                       {printValue(
                         periodsData[period.periodKey].footprint.indicators[
@@ -196,7 +209,7 @@ export const  ExpensesTable = ({
                           0
                         )}
                       </td>
-                      {impactAbsolu && (
+                      {showGrossImpact && (
                         <td className="text-end">
                           {printValue(
                             periodsData[
@@ -217,6 +230,4 @@ export const  ExpensesTable = ({
         </tbody>
       </Table>
   );
-};
-
-
+}

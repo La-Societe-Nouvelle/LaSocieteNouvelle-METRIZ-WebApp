@@ -21,7 +21,7 @@ import {
  * It includes logic for handling imported social data and managing individuals' data.
  * The component uses Tabs to switch between importing DSN and managing social data.
  * 
- * Modal update ImpactsData only on submit /!\
+ * Modal update ImpactsData but set value for indicator only on submit /!\
  * 
  */
 const AssessmentDSN = (props) => 
@@ -98,8 +98,9 @@ const AssessmentDSN = (props) =>
     impactsData.knwDetails.apprenticesRemunerations = apprenticesRemunerations;
   }
 
+  // update individuals data when file imported
   useEffect(async () => {
-    console.log("impacts data updated in modal")
+    console.log("impacts data updated in modal");
     const individualsData = await getIndividualsData(impactsData.socialStatements);
     setImpactsData({
       ...impactsData,

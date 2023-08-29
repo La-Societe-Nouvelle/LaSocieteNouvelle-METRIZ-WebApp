@@ -1,34 +1,64 @@
 // La Société Nouvelle
+
+// React
 import { useEffect, useState } from "react";
 import {  Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/Utils";
+import { 
+  buildFixedCapitalConsumptionsAggregates, 
+  buildIntermediateConsumptionsAggregates 
+} from "/src/formulas/aggregatesBuilder";
 
+// Lib
 import metaIndics from "/lib/indics";
-
-import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
 
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
 
+const indicsWithGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"];
+
 export const IndicatorMainAggregatesTable = ({
   session,
-  indic,
-  period
+  period,
+  indic
 }) => {
+
+  // Session data -------------------------------------
 
   const {
     financialData
   } = session;
 
+  const { 
+    revenue, 
+    storedProduction, 
+    immobilisedProduction 
+  } = financialData.productionAggregates;
+
+  const {
+    production,
+    intermediateConsumptions,
+    fixedCapitalConsumptions,
+    netValueAdded,
+  } = financialData.mainAggregates;
+  
   const prevDateEnd = period.dateEnd;
   const prevPeriod = session.availablePeriods.find(
     (period) => period.dateEnd == prevDateEnd
   );
 
-  const { unit, nbDecimals, unitGrossImpact} = metaIndics[indic];
+  const periods = [period];
+  if (prevPeriod) periods.push(prevPeriod);
 
+  // Meta data ----------------------------------------
+  
+    const { unit, nbDecimals, unitGrossImpact} = metaIndics[indic];
+
+  // --------------------------------------------------
+
+  // state
   const [
     intermediateConsumptionsAggregates,
     setIntermediateConsumptionsAggregates,
@@ -39,77 +69,24 @@ export const IndicatorMainAggregatesTable = ({
     setFixedCapitalConsumptionsAggregates,
   ] = useState([]);
 
-  const [
-    prevIntermediateConsumptionsAggregates,
-    setPrevIntermediateConsumptionsAggregates,
-  ] = useState([]);
-  const [
-    prevFixedCapitalConsumptionsAggregates,
-    setPrevFixedCapitalConsumptionsAggregates,
-  ] = useState([]);
-
+  // build aggregates
   useEffect(async () => {
-    // Current Aggregates
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
-        financialData,
-        [period]
+        financialData, periods
       );
     setIntermediateConsumptionsAggregates(intermediateConsumptionsAggregates);
 
     const fixedCapitalConsumptionsAggregates =
       await buildFixedCapitalConsumptionsAggregates(
         financialData,
-        [period]
+        periods
       );
-
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
-
-    // Previous Aggretates
-    if (prevPeriod) {
-      const prevIntermediateConsumptionsAggregates =
-        await buildIntermediateConsumptionsAggregates(
-          financialData,
-          [prevPeriod]
-          );
-      const filteredPrevIntermediateConsumptionsAggregates =
-        prevIntermediateConsumptionsAggregates.filter(
-          (aggregate) => aggregate.amount != 0
-        );
-      setPrevIntermediateConsumptionsAggregates(
-        filteredPrevIntermediateConsumptionsAggregates
-      );
-
-      const prevFixedCapitalConsumptionsAggregates =
-        await buildFixedCapitalConsumptionsAggregates(
-          financialData,
-          [prevPeriod]
-
-        );
-      const filteredPrevFixedCapitalConsumptionsAggregates =
-        prevFixedCapitalConsumptionsAggregates.filter(
-          (aggregate) => aggregate.amount != 0
-        );
-
-      setPrevFixedCapitalConsumptionsAggregates(
-        filteredPrevFixedCapitalConsumptionsAggregates
-      );
-    }
   }, []);
   
-  const { revenue, storedProduction, immobilisedProduction } =
-    financialData.productionAggregates;
+  const printGrossImpact = indicsWithGrossImpact.includes(indic);
 
-  const {
-    production,
-    intermediateConsumptions,
-    fixedCapitalConsumptions,
-    netValueAdded,
-  } = financialData.mainAggregates;
-  
-  const printGrossImpact = ["ghg", "haz", "mat", "nrg", "was", "wat"].includes(
-    indic
-  );
   return (
       <Table id="mainAggregates">
         <thead>
@@ -576,11 +553,11 @@ export const IndicatorMainAggregatesTable = ({
                   </td>
                 ) }
                 {prevPeriod &&
-                  prevIntermediateConsumptionsAggregates.length > 0 && (
+                  intermediateConsumptionsAggregates.length > 0 && (
                     <>
                       <td className="text-end border-left">
                         {printValue(
-                          prevIntermediateConsumptionsAggregates[
+                          intermediateConsumptionsAggregates[
                             index
                           ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getValue(),
                           nbDecimals
@@ -590,7 +567,7 @@ export const IndicatorMainAggregatesTable = ({
                       <td className="text-end  pe-3">
                         <u>+</u>
                         {printValue(
-                          prevIntermediateConsumptionsAggregates[
+                          intermediateConsumptionsAggregates[
                             index
                           ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getUncertainty(),
                           0
@@ -600,10 +577,10 @@ export const IndicatorMainAggregatesTable = ({
                       {printGrossImpact && (
                         <td className="text-end">
                           {printValue(
-                            prevIntermediateConsumptionsAggregates[
+                            intermediateConsumptionsAggregates[
                               index
                             ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getGrossImpact(
-                              prevIntermediateConsumptionsAggregates[
+                              intermediateConsumptionsAggregates[
                                 index
                               ].periodsData[prevPeriod.periodKey].amount
                             ),
@@ -726,11 +703,11 @@ export const IndicatorMainAggregatesTable = ({
                   </td>
                 ) }
                 {prevPeriod &&
-                  prevFixedCapitalConsumptionsAggregates.length > 0 && (
+                  fixedCapitalConsumptionsAggregates.length > 0 && (
                     <>
                       <td className="text-end border-left">
                         {printValue(
-                          prevFixedCapitalConsumptionsAggregates[
+                          fixedCapitalConsumptionsAggregates[
                             index
                           ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getValue(),
                           nbDecimals
@@ -740,7 +717,7 @@ export const IndicatorMainAggregatesTable = ({
                       <td className="text-end  pe-3">
                         <u>+</u>
                         {printValue(
-                          prevFixedCapitalConsumptionsAggregates[
+                          fixedCapitalConsumptionsAggregates[
                             index
                           ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getUncertainty(),
                           0
@@ -750,10 +727,10 @@ export const IndicatorMainAggregatesTable = ({
                       {printGrossImpact && (
                         <td className="text-end">
                           {printValue(
-                            prevFixedCapitalConsumptionsAggregates[
+                            fixedCapitalConsumptionsAggregates[
                               index
                             ].periodsData[prevPeriod.periodKey].footprint.indicators[indic].getGrossImpact(
-                              prevFixedCapitalConsumptionsAggregates[
+                              fixedCapitalConsumptionsAggregates[
                                 index
                               ].periodsData[prevPeriod.periodKey].amount
                             ),
@@ -852,4 +829,4 @@ export const IndicatorMainAggregatesTable = ({
       </Table>
 
   );
-};
+}

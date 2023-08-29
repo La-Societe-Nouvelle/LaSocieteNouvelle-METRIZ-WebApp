@@ -1,5 +1,10 @@
-import { printValue } from "../../../utils/Utils";
+// La Société Nouvelle
+
+// Lib
 import metaIndics from "/lib/indics";
+
+// utils
+import { printValue } from "../../../utils/Utils";
 
 export const generateIndicTableBody = (
   mainAggregates,

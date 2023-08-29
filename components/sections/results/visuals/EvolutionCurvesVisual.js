@@ -9,18 +9,11 @@ import Select from "react-select";
 import TrendChart from "../charts/TrendChart";
 
 // Lib
-import targetMeta from "../../../../lib/target";
-import trendMeta from "../../../../lib/trend.json";
 import metaIndics from "/lib/indics";
+import metaTargets from "/lib/target";
+import metaTrends from "/lib/trend.json";
 
 import { customSelectStyles } from "../../../../config/customStyles";
-
-const graphOptions = [
-  { label: "Production", value: "prd" },
-  { label: "Consommations intermédiaires", value: "ic" },
-  { label: "Consommations de capital fixe", value: "cfc" },
-  { label: "Valeur ajoutée nette", value: "nva" },
-];
 
 /* ---------- EVOLUTION CURVES CONTAINER ---------- */
 
@@ -28,15 +21,24 @@ const graphOptions = [
  *  
  *  Props :
  *    - session
+ *    - indic
  * 
- *  Params :
+ *  (no period -> on all periods)
+ * 
+ *  Params (in component) :
  *    - aggregate
  * 
  */
 
+const graphOptions = [
+  { label: "Production", value: "production" },
+  { label: "Consommations intermédiaires", value: "intermediateConsumptions" },
+  { label: "Consommations de capital fixe", value: "fixedCapitalConsumptions" },
+  { label: "Valeur ajoutée nette", value: "netValueAdded" },
+];
+
 export const EvolutionCurvesVisual = ({
   session,
-  period,
   indic
 }) => {
 
@@ -45,47 +47,24 @@ export const EvolutionCurvesVisual = ({
     comparativeData
   } = session;
 
-  const aggregates = financialData.mainAggregates;
-  const { unit } = metaIndics[indic];
+  const { 
+    unit 
+  } = metaIndics[indic];
 
-  const [showedAggregate, setShowedAggregate] = useState(graphOptions[0]);
+
+  const [showedAggregate, setShowedAggregate] = useState("production");
   const changeShowedAggregate = (selectedOption) => {
-    setShowedAggregate(selectedOption);
+    setShowedAggregate(selectedOption.value);
   };
 
-  const evolutionCurvesData = 
-  {
-    prd: {
-      title: "",
-      historical: comparativeData.production.division.macrodata.data[indic.toUpperCase()] || [],
-      trend:      comparativeData.production.division.trend.data[indic.toUpperCase()] || [],
-      target:     comparativeData.production.division.target.data[indic.toUpperCase()] || [],
-      aggregate:  aggregates.production.periodsData,
-    },
-    ic: {
-      title: "",
-      historical: comparativeData.intermediateConsumptions.division.macrodata.data[indic.toUpperCase()] || [],
-      trend:      comparativeData.intermediateConsumptions.division.trend.data[indic.toUpperCase()] || [],
-      target:     comparativeData.intermediateConsumptions.division.target.data[indic.toUpperCase()] || [],
-      aggregate:  aggregates.intermediateConsumptions.periodsData,
-    },
-    cfc: {
-      title: "",
-      historical: comparativeData.fixedCapitalConsumptions.division.macrodata.data[indic.toUpperCase()] || [],
-      trend:      comparativeData.fixedCapitalConsumptions.division.trend.data[indic.toUpperCase()] || [],
-      target:     comparativeData.fixedCapitalConsumptions.division.target.data[indic.toUpperCase()] || [],
-      aggregate:  aggregates.fixedCapitalConsumptions.periodsData,
-    },
-    nva: {
-      title: "",
-      historical: comparativeData.netValueAdded.division.macrodata.data[indic.toUpperCase()] || [],
-      trend:      comparativeData.netValueAdded.division.trend.data[indic.toUpperCase()] || [],
-      target:     comparativeData.netValueAdded.division.target.data[indic.toUpperCase()] || [],
-      aggregate:  aggregates.netValueAdded.periodsData,
-    },
+  const evolutionCurvesData = {
+    historical: comparativeData[showedAggregate].division.macrodata.data[indic.toUpperCase()] || [],
+    trend:      comparativeData[showedAggregate].division.trend.data[indic.toUpperCase()] || [],
+    target:     comparativeData[showedAggregate].division.target.data[indic.toUpperCase()] || [],
+    aggregate:  financialData.mainAggregates[showedAggregate].periodsData,
   };
+  const title = "";
 
-  const { title, historical, trend, target, aggregate } = evolutionCurvesData[showedAggregate.value];
   return (
     <Row>
       <Col lg={8}>
@@ -95,7 +74,7 @@ export const EvolutionCurvesVisual = ({
           <Select
             styles={customSelectStyles}
             className="mb-4"
-            defaultValue={showedAggregate}
+            defaultValue={graphOptions.find((option) => option.value==showedAggregate)}
             options={graphOptions}
             onChange={changeShowedAggregate}
           />
@@ -105,10 +84,7 @@ export const EvolutionCurvesVisual = ({
             <TrendChart
               id={`trend-${showedAggregate.value}-${indic}`}
               unit={unit}
-              historical={historical}
-              trend={trend}
-              target={target}
-              aggregate={aggregate}
+              {...evolutionCurvesData}
               indic={indic}
               isPrinting={false}
             />
@@ -134,7 +110,7 @@ export const EvolutionCurvesVisual = ({
                 l'économie nationale, ses interactions avec l’extérieur et de la
                 dynamique des prix par branche.
               </p>
-              <p className="small mt-3">Source : {trendMeta[indic].source}</p>
+              <p className="small mt-3">Source : {metaTrends[indic].source}</p>
             </>
           )}
           {comparativeData.production.division.target.data[
@@ -142,8 +118,8 @@ export const EvolutionCurvesVisual = ({
           ] && (
             <>
               <h5>Objectif de la branche :</h5>
-              {targetMeta[indic].info}
-              <p className="small mt-3">Source : {targetMeta[indic].source}</p>
+              {metaTargets[indic].info}
+              <p className="small mt-3">Source : {metaTargets[indic].source}</p>
             </>
           )}
         </div>

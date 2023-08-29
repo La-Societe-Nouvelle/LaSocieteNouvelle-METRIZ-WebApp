@@ -1,7 +1,9 @@
+// La Société Nouvelle
+
 // PDF make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { buildAggregatePeriodIndicator } from "../../formulas/footprintFormulas";
+
 // Utils
 import { getShortCurrentDateString, printValue } from "../Utils";
 import {
@@ -13,11 +15,12 @@ import {
   sortAccountsByFootprint,
   sortProvidersByContrib,
 } from "./deliverablesUtils";
+import { buildAggregatePeriodIndicator } from "../../formulas/footprintFormulas";
+import { getClosestYearData } from "../../../components/sections/results/utils";
 
 // Lib
-import divisions from "/lib/divisions";
+import metaDivisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
-import { getClosestYearData } from "../../../components/sections/results/utils";
 
 // --------------------------------------------------------------------------
 //  Contribution Indicator Sheet
@@ -28,13 +31,13 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateContributionIndicatorSheet = ({
+export const buildSummaryReportContributionIndic = async ({
   session,
   indic,
-  download,
   period
 }) => {
-  // ---------------------------------------------------------------
+
+  // Session data --------------------------------------------------
 
   const {
     legalUnit,
@@ -44,15 +47,23 @@ export const generateContributionIndicatorSheet = ({
 
   const { production } = financialData.mainAggregates;
   const { revenue } = financialData.productionAggregates;
-  const precision = metaIndics[indic].nbDecimals;
-  const unitGrossImpact = metaIndics[indic].unitAbsolute;
-  const divisionName = divisions[comparativeData.activityCode];
+  const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
-
-  const { libelle, unit } = metaIndics[indic];
-
+  
+  // Metadata ------------------------------------------------------
+  
+  const { 
+    libelle, 
+    unit,
+    unitAbsolute,
+    nbDecimals
+  } = metaIndics[indic];
+  
+  const divisionName = metaDivisions[comparativeData.activityCode];
+  
   // ---------------------------------------------------------------
   // utils
+
   const indicDescription = getIndicDescription(indic);
   const externalExpensesAccounts =
     financialData.externalExpensesAccounts.filter((account) =>
@@ -161,7 +172,7 @@ export const generateContributionIndicatorSheet = ({
     "Plaquette_" +
     indic.toUpperCase() +
     "_" +
-    legalUnit.replaceAll(" ", "") +
+    corporateName.replaceAll(" ", "") +
     "-" +
     currentPeriod;
 
@@ -173,7 +184,7 @@ export const generateContributionIndicatorSheet = ({
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
+        { text: corporateName, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + currentPeriod,
           alignment: "right",
@@ -295,7 +306,7 @@ export const generateContributionIndicatorSheet = ({
     },
     info: {
       title: documentTitle,
-      author: legalUnit,
+      author: corporateName,
       subject: "Plaquette de résultat",
       creator: "Metriz - La Société Nouvelle",
       producer: "Metriz - La Societé Nouvelle",
@@ -559,8 +570,8 @@ export const generateContributionIndicatorSheet = ({
                 mostImpactfulProviders,
                 indic,
                 unit,
-                unitGrossImpact,
-                precision,
+                unitAbsolute,
+                nbDecimals,
                 period
               ),
             ],
@@ -625,13 +636,7 @@ export const generateContributionIndicatorSheet = ({
     },
   };
 
-  return new Promise((resolve) => {
-    pdfMake.createPdf(docDefinition).getBlob((blob) => {
-      if (download) {
-        saveAs(blob, `${documentTitle}.pdf`);
-      }
+  const summaryReport = pdfMake.createPdf(docDefinition);
 
-      resolve(blob);
-    });
-  });
-};
+  return summaryReport
+}

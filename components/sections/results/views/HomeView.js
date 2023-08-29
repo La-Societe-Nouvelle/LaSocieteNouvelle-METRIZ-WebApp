@@ -15,7 +15,7 @@ import { ComparativeHorizontalBarChartVisual } from "../visuals/ComparativeHoriz
 import { ValueCreationFootprintsVisual } from "../visuals/ValueCreationFootprintsVisual";
 import { SocialFootprintMainVisual } from "../visuals/SocialFootprintsVisual";
 
-export const DefaultView = ({
+export const HomeView = ({
   session,
   period
 }) => {

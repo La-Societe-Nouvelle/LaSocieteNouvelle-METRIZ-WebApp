@@ -29,7 +29,6 @@ loadFonts();
 export const generateIndiceIndicatorSheet = ({
   session,
   indic,
-  download,
   period
 }) => {
   // ---------------------------------------------------------------
@@ -919,13 +918,7 @@ export const generateIndiceIndicatorSheet = ({
     },
   };
 
-  return new Promise((resolve) => {
-    pdfMake.createPdf(docDefinition).getBlob((blob) => {
-      if (download) {
-        saveAs(blob, `${documentTitle}.pdf`);
-      }
+  const summaryReport = pdfMake.createPdf(docDefinition);
 
-      resolve(blob);
-    });
-  });
-};
+  return summaryReport;
+}

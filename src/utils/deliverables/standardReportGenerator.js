@@ -23,15 +23,14 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateReport = async ({
+export const buildStandardReport = async ({
   session,
   indic,
-  download,
   period
 }) => {
-  // ---------------------------------------------------------------
 
-  // session data
+  // Session data --------------------------------------------------
+
   const {
     legalUnit,
     financialData,
@@ -39,7 +38,8 @@ export const generateReport = async ({
     comparativeData
   } = session;
 
-  // metadata indicator
+  // Metadata ------------------------------------------------------
+
   const {
     label,
     unit 
@@ -112,7 +112,7 @@ export const generateReport = async ({
     "Rapport_" +
     currentPeriod +
     "_" +
-    legalUnit.replaceAll(" ", "") +
+    legalUnit.corporateName.replaceAll(" ", "") +
     "-" +
     indic.toUpperCase();
 
@@ -123,7 +123,7 @@ export const generateReport = async ({
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
+        { text: legalUnit.corporateName, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + currentPeriod,
           alignment: "right",
@@ -171,7 +171,7 @@ export const generateReport = async ({
     },
     info: {
       label: documentTitle,
-      author: legalUnit,
+      author: legalUnit.corporateName,
       subject: "Rapport des impacts de votre entreprise",
       creator: "Metriz - La Société Nouvelle",
       producer: "Metriz - La Societé Nouvelle",
@@ -499,12 +499,7 @@ export const generateReport = async ({
     },
   };
 
-  return new Promise((resolve) => {
-    pdfMake.createPdf(docDefinition).getBlob((blob) => {
-      if (download) {
-        saveAs(blob, `${documentTitle}.pdf`);
-      }
-      resolve(blob);
-    });
-  });
-};
+  const standardReport = pdfMake.createPdf(docDefinition);
+  
+  return standardReport;
+}

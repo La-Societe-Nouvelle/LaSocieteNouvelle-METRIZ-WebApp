@@ -26,14 +26,15 @@ import { customSelectStyles } from "../../../config/customStyles";
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
 import { getPrevDate } from "../../../src/utils/Utils";
-import { buildFullFile } from "../../../src/utils/deliverables/generateDownloadableFiles";
+import { buildFullFile, buildIndicReport } from "../../../src/utils/deliverables/generateDownloadableFiles";
 
 import DownloadDropdown from "./components/DownloadDropdown";
 import { ChartsContainer } from "./components/ChartsContainer";
 
 import { Loader } from "../../modals/Loader";
 import { IndicatorView } from "./views/IndicatorView";
-import { DefaultView } from "./views/DefaultView";
+import { HomeView } from "./views/HomeView";
+import { buildSummaryReportContributionIndic } from "../../../src/utils/deliverables/summaryReportGeneratorContribution";
 
 const divisionsOptions = Object.entries(divisions)
   .sort((a, b) => parseInt(a) - parseInt(b))
@@ -93,7 +94,8 @@ const Results = ({ session, publish, goBack }) =>
   };
 
   const handleDownload = async (selectedFiles) => {
-
+    console.log("handle download");
+    console.log(selectedFiles);
     setIsGenerating(true);
 
     // Download .zip files
@@ -105,35 +107,30 @@ const Results = ({ session, publish, goBack }) =>
       saveAs(ZIPFile, `${documentTitle}.zip`);
     }
 
-    else if (selectedFiles.length>0) {
+    else if (selectedFiles.length>1) {
       // zip
     }
 
     else if (selectedFiles.includes("indic-report")) {
+      console.log("download report");
       //
-      let PDFFile = await buildViewReport({
+      let PDFFile = await buildSummaryReport({
         viewCode: showedView,
         session,
         period,
       });
-      let PDFTitle = `${indicLabel}_${legalUnitNameFile}_${year}.pdf`;
-
-      const pdfUrl = URL.createObjectURL(PDFFile);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pdfUrl;
-      downloadLink.download = PDFTitle;
-      downloadLink.click();
-      URL.revokeObjectURL(pdfUrl);
+      let PDFTitle = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.pdf`; // possible to set title inside function
+      PDFFile.download(PDFTitle);
     }
 
     else if (selectedFiles.includes("sig-indic-xlsx")) {
       //
-      let PDFFile = await buildViewReport({
+      let PDFFile = await buildSummaryReport({
         viewCode: showedView,
         session,
         period,
       });
-      let PDFTitle = `${indicLabel}_${legalUnitNameFile}_${year}.pdf`;
+      let PDFTitle = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.pdf`;
 
       const pdfUrl = URL.createObjectURL(PDFFile);
       const downloadLink = document.createElement("a");
@@ -318,7 +315,7 @@ const View = (props) =>
 {
   switch(props.viewCode) 
   {
-    case "default":   return (<DefaultView   {...props}/>);
+    case "default":   return (<HomeView   {...props}/>);
     case "art":       return (<IndicatorView {...props} indic={"art"}/>);
     case "eco":       return (<IndicatorView {...props} indic={"eco"}/>);
     case "ghg":       return (<IndicatorView {...props} indic={"ghg"}/>);
@@ -335,13 +332,13 @@ const View = (props) =>
   }
 }
 
-const buildViewReport = async (props) => 
+const buildSummaryReport = async (props) => 
 {
   switch(props.viewCode) 
   {
     case "default":   return (null);
     case "art":       return (await buildIndicReport({...props, indic:"art"}));
-    case "eco":       return (await buildIndicReport({...props, indic:"eco"}));
+    case "eco":       return (await buildSummaryReportContributionIndic({...props, indic:"eco"}));
     case "ghg":       return (await buildIndicReport({...props, indic:"ghg"}));
     case "geq":       return (await buildIndicReport({...props, indic:"geq"}));
     case "haz":       return (await buildIndicReport({...props, indic:"haz"}));
