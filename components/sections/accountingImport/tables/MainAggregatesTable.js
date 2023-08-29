@@ -3,8 +3,8 @@
 // Utils
 import { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
-import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../../src/formulas/aggregatesBuilder';
-import { printValue } from '../../src/utils/Utils';
+import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '../../../../src/formulas/aggregatesBuilder';
+import { printValue } from '../../../../src/utils/Utils';
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 

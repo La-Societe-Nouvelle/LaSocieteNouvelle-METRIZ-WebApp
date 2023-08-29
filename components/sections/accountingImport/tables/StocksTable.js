@@ -5,7 +5,7 @@ import React from 'react';
 import { Table } from 'react-bootstrap';
 
 // Utils
-import { getAmountItems, getPrevDate, getSumItems, printValue } from "../../src/utils/Utils";
+import { getAmountItems, getPrevDate, getSumItems, printValue } from "../../../../src/utils/Utils";
 
 /* ---------- TABLE STOCKS ---------- */
 

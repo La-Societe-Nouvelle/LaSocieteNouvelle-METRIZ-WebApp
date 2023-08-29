@@ -1,10 +1,8 @@
 // La Société Nouvelle
 
-// react
+// React
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-
-// bootstrap
 import {
   Button,
   Col,
@@ -94,8 +92,6 @@ const Results = ({ session, publish, goBack }) =>
   };
 
   const handleDownload = async (selectedFiles) => {
-    console.log("handle download");
-    console.log(selectedFiles);
     setIsGenerating(true);
 
     // Download .zip files
@@ -112,7 +108,6 @@ const Results = ({ session, publish, goBack }) =>
     }
 
     else if (selectedFiles.includes("indic-report")) {
-      console.log("download report");
       //
       let PDFFile = await buildSummaryReport({
         viewCode: showedView,

@@ -4,12 +4,12 @@
 import React from "react";
 
 // Tables
-import { MainAggregatesTable } from "../../../tables/MainAggregatesTable";
-import { ImmobilisationsTable } from "../../../tables/ImmobilisationsTable";
-import { AmortisationsTable } from "../../../tables/AmortisationsTable";
-import { IncomeStatementTable } from "../../../tables/IncomeStatementTable";
-import { ExpensesTable } from "../../../tables/ExpensesTable";
-import { StocksTable } from "../../../tables/StocksTable";
+import { ImmobilisationsTable } from "../tables/ImmobilisationsTable";
+import { AmortisationsTable } from "../tables/AmortisationsTable";
+import { IncomeStatementTable } from "../tables/IncomeStatementTable";
+import { ExpensesTable } from "../tables/ExpensesTable";
+import { StocksTable } from "../tables/StocksTable";
+import { MainAggregatesTable } from "../tables/MainAggregatesTable";
 
 /* ----------------------------------------------------------- */
 /* -------------------- FINANCIAL SECTION -------------------- */

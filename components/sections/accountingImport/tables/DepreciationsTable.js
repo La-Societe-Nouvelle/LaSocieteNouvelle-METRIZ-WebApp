@@ -9,9 +9,13 @@ import {
   getAmountItems,
   getPrevAmountItems,
   printValue,
-} from "../../src/utils/Utils";
+} from "../../../../src/utils/Utils";
 
-/* ---------- IMMOBILISATIONS TABLE ---------- */
+/* ---------- DEPRECIATIONS TABLE ---------- */
+
+/** currently unused but to add in immobilisations view
+ * 
+ */
 
 export class DepreciationsTable extends React.Component {
   constructor(props) {

@@ -11,8 +11,8 @@ import { printValue } from "/src/utils/Utils";
 import divisions from "/lib/divisions";
 import branches from "/lib/branches";
 import { Table } from "react-bootstrap";
-import { getPrevDate } from "../../src/utils/Utils";
-import { customSelectStyles } from "../../config/customStyles";
+import { getPrevDate } from "../../../src/utils/Utils";
+import { customSelectStyles } from "../../../config/customStyles";
 
 /* ---------- INITIAL STATES TABLE ---------- */
 

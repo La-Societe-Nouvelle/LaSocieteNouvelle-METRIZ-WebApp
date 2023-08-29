@@ -10,7 +10,7 @@ import {
   getPrevDate,
   getSumItems,
   printValue,
-} from "../../src/utils/Utils";
+} from "../../../../src/utils/Utils";
 
 /* ---------- IMMOBILISATIONS TABLE ---------- */
 

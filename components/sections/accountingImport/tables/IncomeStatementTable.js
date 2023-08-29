@@ -1,8 +1,8 @@
 // La Société Nouvelle
 // Utils
-import { getAmountItems, getAmountItemsForPeriod, getSumItems, printValue, roundValue } from '../../src/utils/Utils';
+import { getAmountItems, getAmountItemsForPeriod, getSumItems, printValue, roundValue } from '../../../../src/utils/Utils';
 import { Table } from "react-bootstrap";
-import { buildAggregateFromAccounts } from '../../src/accountingObjects/Aggregate';
+import { buildAggregateFromAccounts } from '../../../../src/accountingObjects/Aggregate';
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 

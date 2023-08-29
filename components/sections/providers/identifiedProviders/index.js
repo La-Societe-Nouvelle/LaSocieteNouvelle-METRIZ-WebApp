@@ -16,7 +16,7 @@ import ImportProvidersView from "./views/ImportProvidersView";
 import { InvoicesProvidersView } from "./views/InvoicesProvidersView";
 
 // Table
-import { IdentifiedProvidersTable } from "../../../tables/IdentifiedCompaniesTable";
+import { IdentifiedProvidersTable } from "./views/IdentifiedCompaniesTable";
 
 // Utils
 import { getSignificativeProviders } from "./utils";
