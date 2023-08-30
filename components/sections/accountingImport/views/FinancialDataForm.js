@@ -13,7 +13,8 @@ import { customSelectStyles } from "../../../../config/customStyles";
 import divisions from "/lib/divisions";
 
 // Readers
-import { FECFileReader } from "/src/readers/FECReader";
+import { FECFileReader } from "../utils/FECReader";
+
 import { ErrorFileModal } from "../../../modals/userInfoModals";
 import { getDivisionsOptions } from "../../../../src/utils/Utils";
 

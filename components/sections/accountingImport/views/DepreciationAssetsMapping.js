@@ -115,9 +115,6 @@ export function DepreciationAssetsMapping(props)
 
   return (
     <div>
-      <h3 className="mb-4">
-        Associez les comptes d'amortissements et de dépréciations
-      </h3>
       <Table>
         {/* Header */}
         <thead>
@@ -169,7 +166,7 @@ export function DepreciationAssetsMapping(props)
         <button className="btn btn-secondary"
                 onClick={onSubmit}
                 disabled={isDisabled}>
-          Valider
+          Suivant
           <i className="bi bi-chevron-right"/>
         </button>
       </div>

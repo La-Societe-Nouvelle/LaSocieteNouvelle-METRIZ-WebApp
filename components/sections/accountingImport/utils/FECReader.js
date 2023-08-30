@@ -1,8 +1,8 @@
 // La Société Nouvelle - METRIZ
 
 // Libraries
-import booksProps from "../../lib/books";
-import { getSumItems, roundValue } from "../utils/Utils";
+import booksProps from "../../../../lib/books.json";
+import { getSumItems, roundValue } from "/src/utils/Utils";
 
 import { distance } from "fastest-levenshtein";
 

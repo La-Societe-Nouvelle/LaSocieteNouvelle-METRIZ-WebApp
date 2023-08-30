@@ -9,32 +9,31 @@ import { Table } from "react-bootstrap";
 /* ---------- BALANCE FORWARD BOOK SELECTION  ---------- */
 
 /** View to select the balance carrier forward book
- *  
+ *
  *  Props :
  *    - FECData -> meta
  *    - onClick()
  *    - return()
- * 
+ *
  *  Update meta.accounts to set the balance carrier forward book (journal A-Nouveau)
  */
 
-export function BalanceForwardBookSelection(props)
-{
+export function BalanceForwardBookSelection(props) {
   const { books } = props.FECData;
   const [meta, setMeta] = useState(props.FECData.meta);
 
   const formateDate = (date) => date.substring(6,8)+"/"+date.substring(4,6)+"/"+date.substring(0,4);
 
   // on change
-  const handleOnChange = (event) => 
-  {
+  const handleOnChange = (event) => {
     let selectedCode = event.target.value;
-    let prevSelectedCode = Object.entries(meta.books)
-      .filter(([code, _]) => meta.books[code].type == "ANOUVEAUX")
-      .map(([code, _]) => code)[0] || "";
+    let prevSelectedCode =
+      Object.entries(meta.books)
+        .filter(([code, _]) => meta.books[code].type == "ANOUVEAUX")
+        .map(([code, _]) => code)[0] || "";
 
     // change selected code
-    if (selectedCode!=prevSelectedCode) {
+    if (selectedCode != prevSelectedCode) {
       Object.entries(meta.books).forEach(([code, _]) => {
         meta.books[code].type = code == selectedCode ? "ANOUVEAUX" : "";
       });
@@ -46,26 +45,24 @@ export function BalanceForwardBookSelection(props)
 
     props.FECData.meta = meta; // update props
     setMeta(meta);
-  }
+  };
 
-  const onSubmit = () =>
-  {
+  const onSubmit = () => {
     console.log("Sélection du journal des A-Nouveaux : ");
     console.log(meta.books);
     props.onClick();
-  }
+  };
 
   return (
     <>
-      <h3 className="subtitle ">Identifiez les A-Nouveaux</h3>
-      <div className="form-text mb-3">
+      <div className="small mb-3">
         <p>
-          L'identification du journal des A-Nouveaux est nécessaire à la
-          bonne lecture du fichier d'écritures comptables. En cas de premier
-          exercice, validez la sélection sans cocher de case.
+          L'identification du journal des A-Nouveaux est nécessaire à la bonne
+          lecture du fichier d'écritures comptables. En cas de premier exercice,
+          validez la sélection sans cocher de case.
         </p>
       </div>
-      <Table bordered hover >
+      <Table bordered hover>
         <thead>
           <tr>
             <td>Code</td>
@@ -78,8 +75,7 @@ export function BalanceForwardBookSelection(props)
         <tbody>
           {Object.entries(meta.books)
             .sort()
-            .map(([code, { label, type }]) => 
-            {
+            .map(([code, { label, type }]) => {
               const nLines = books[code].length;
               const dateEnd = books[code][nLines - 1].EcritureDate;
               return (
@@ -95,7 +91,8 @@ export function BalanceForwardBookSelection(props)
                         name="ANOUVEAUX"
                         value={code}
                         checked={type == "ANOUVEAUX"}
-                        onChange={handleOnChange}/>
+                        onChange={handleOnChange}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -104,17 +101,14 @@ export function BalanceForwardBookSelection(props)
         </tbody>
       </Table>
       <div className="text-end">
-        <button className="btn btn-primary me-2"
-                onClick={() => props.return()}>
-          <i className="bi bi-chevron-left"/>
-          Importer un autre FEC
+        <button className="btn btn-primary me-2" onClick={() => props.return()}>
+          Annuler
         </button>
-        <button className="btn btn-secondary"
-                onClick={onSubmit}>
+        <button className="btn btn-secondary" onClick={onSubmit}>
           Etape suivante
-          <i className="bi bi-chevron-right"/>
+          <i className="bi bi-chevron-right" />
         </button>
       </div>
     </>
-  )
+  );
 }

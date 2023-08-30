@@ -2,8 +2,6 @@
 
 // React
 import React, { useState } from "react";
-
-// Bootstrap
 import { Container } from "react-bootstrap";
 
 // Views
@@ -13,19 +11,16 @@ import { DepreciationAssetsMapping } from "./views/DepreciationAssetsMapping";
 import { StockPurchasesMapping } from "./views/StockPurchasesMapping";
 import { FinancialDatas } from "./views/FinancialDatas";
 
-// Readers
-import { FECDataReader } from "/src/readers/FECReader";
-
 // Utils
+import { FECDataReader } from "./utils/FECReader";
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "./utils";
 
 // Modals
 import ErrorReportModal from "../../modals/ErrorReportModal";
 import { ErrorAPIModal } from "../../modals/userInfoModals";
+import ImportModal from "./ImportModal";
 
-
-const AccountingImportSection = (props) => 
-{
+const AccountingImportSection = (props) => {
   const { session } = props;
 
   const [view, setView] = useState(session.financialData.isFinancialDataLoaded ? 4 : 0);
@@ -41,67 +36,33 @@ const AccountingImportSection = (props) =>
     session.legalUnit.corporateName = corporateName;
   };
 
-  const handleSiren = async (siren) => 
-  { 
+  const handleSiren = async (siren) => {
     session.legalUnit.siren = siren;
     try {
       await session.legalUnit.fetchLegalUnitData();
       if (/^[0-9]{2}/.test(session.legalUnit.activityCode)) {
-        session.comparativeData.activityCode = session.legalUnit.activityCode.slice(0,2);
+        session.comparativeData.activityCode =
+          session.legalUnit.activityCode.slice(0, 2);
         setView(view);
-        setDivision(session.legalUnit.activityCode.slice(0,2));
+        setDivision(session.legalUnit.activityCode.slice(0, 2));
       }
     } catch (error) {
       setErrorAPI(true);
     }
   };
-  
+
   const handleDivision = (division) => {
     session.legalUnit.activityCode = division;
     session.comparativeData.activityCode = division;
-    setDivision(division);   
+    setDivision(division);
   };
+
   const handleFECData = (FECData) => {
-    console.log(FECData);
     setImportedData(FECData);
     nextView(0);
   };
 
-  const nextView = (currentView) => 
-  {
-    switch(currentView) 
-    {
-      case 0 : {
-        setView(1);
-        break;
-      }; break;
-      case 1 : {
-        let haveAmortisationAccounts = Object.keys(importedData.meta.accounts)
-          .filter((accountNum) =>/^(28|29|39)/.test(accountNum));
-        if (haveAmortisationAccounts) {
-          setView(2);
-        } else {
-          nextView(2);
-        }
-      }; break;
-      case 2 : {
-        let haveStockAccounts = Object.keys(importedData.meta.accounts)
-          .some((accountNum) => /^3(1|2|7)/.test(accountNum));
-        if (haveStockAccounts) {
-          setView(3);
-        } else {
-          loadFECData(importedData);
-        }
-      }; break;
-      case 3 : {
-        setView(4)
-      }; break;
-      default : setView(0);
-    }
-  };
-
-  const loadFECData = async (importedData) => 
-  {
+  const loadFECData = async (importedData) => {
     let FECData = await FECDataReader(importedData);
     console.log("--------------------------------------------------");
     console.log("Lecture des écritures comptables");
@@ -142,13 +103,91 @@ const AccountingImportSection = (props) =>
       setView(4);
     }
   };
+  const nextView = (currentView) => {
+    switch (currentView) {
+      case 0:
+        setView(1);
+        break;
+      case 1:
+        // Check if there are amortisation accounts
+        if (
+          Object.keys(importedData.meta.accounts).some((accountNum) =>
+            /^(28|29|39)/.test(accountNum)
+          )
+        ) {
+          setView(2);
+        } else {
+          nextView(2);
+        }
+        break;
+      case 2:
+        // Check if there are stock accounts
+        if (
+          Object.keys(importedData.meta.accounts).some((accountNum) =>
+            /^3(1|2|7)/.test(accountNum)
+          )
+        ) {
+          setView(3);
+        } else {
+          // If not, load FEC data and move to view 4
+          loadFECData(importedData);
+        }
+        break;
+      case 3:
+        setView(4);
+        break;
+      default:
+        setView(0);
+    }
+  };
+  const renderBalanceForwardBookModal = () => (
+    <ImportModal
+      show={view === 1}
+      onHide={() => setView(0)}
+      title="Identifiez les A-Nouveaux"
+    >
+      <BalanceForwardBookSelection
+        return={() => setView(0)}
+        FECData={importedData}
+        onClick={() => nextView(1)}
+      />
+    </ImportModal>
+  );
+
+  const renderDepreciationAssetsModal = () => (
+    <ImportModal
+      show={view === 2}
+      onHide={() => setView(0)}
+      title="Associez les comptes d'amortissements et de dépréciations"
+    >
+      <DepreciationAssetsMapping
+        return={() => setView(1)}
+        onClick={() => nextView(2)}
+        meta={importedData.meta}
+      />
+    </ImportModal>
+  );
+
+  const renderStockPurchasesModal = () => (
+    <ImportModal
+      show={view === 3}
+      onHide={() => setView(0)}
+      title="Associez les comptes de stocks et les comptes de charges"
+    >
+      <StockPurchasesMapping
+        return={() => setView(2)}
+        onClick={() => loadFECData(importedData)}
+        meta={importedData.meta}
+      />
+    </ImportModal>
+  );
 
   return (
     <Container fluid>
       <section className="step">
         <h2 className="mb-2">Etape 1 - Importez vos flux comptables</h2>
 
-        {view === 0 && (
+        {view < 4 && (
           <FinancialDataForm
             onChangeCorporateName={handleCorporateName}
             onChangeSiren={handleSiren}
@@ -158,34 +197,18 @@ const AccountingImportSection = (props) =>
             siren={session.legalUnit.siren}
             division={division}
             onClick={() => importFECFile(file)}
-            nextStep={() => setView(2)}
           />
         )}
 
-        {view === 1 && (
-          <BalanceForwardBookSelection
-            return={() => setView(0)}
-            FECData={importedData}
-            onClick={() => nextView(1)}
-          />
+        {importedData && (
+          <>
+            {renderBalanceForwardBookModal()}
+            {renderDepreciationAssetsModal()}
+            {renderStockPurchasesModal()}
+          </>
         )}
 
-        {view === 2 && (
-          <DepreciationAssetsMapping
-            return={() => setView(1)}
-            onClick={() => nextView(2)}
-            meta={importedData.meta}
-          />
-        )}
-
-        {view === 3 && (
-          <StockPurchasesMapping
-            return={() => setView(2)}
-            onClick={() => loadFECData(importedData)}
-            meta={importedData.meta}
-          />
-        )}
-
+        {/* Final view - Financial Datas */}
         {view === 4 && (
           <FinancialDatas
             {...props}
@@ -193,7 +216,7 @@ const AccountingImportSection = (props) =>
             reset={() => setView(0)}
           />
         )}
-
+        {/* Error Modal for FEC Errors */}
         {errorFEC && (
           <ErrorReportModal
             hasError={errorFEC}
@@ -202,11 +225,8 @@ const AccountingImportSection = (props) =>
             errors={errors}
           />
         )}
-
-        <ErrorAPIModal
-          hasError = {errorAPI}
-          onClose={() => setErrorAPI(false)}/>
-        
+        {/* Error Modal for API Errors */}
+        <ErrorAPIModal hasError={errorAPI} onClose={() => setErrorAPI(false)} />
       </section>
     </Container>
   );

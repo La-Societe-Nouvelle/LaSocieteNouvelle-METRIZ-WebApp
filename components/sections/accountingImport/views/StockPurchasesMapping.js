@@ -110,7 +110,6 @@ export const StockPurchasesMapping = (props) =>
 
   return (
     <div>
-      <h3>Associez les comptes de stocks et les comptes de charges</h3>
       <Form>
         <Table size="lg" hover className="mt-3">
           <thead>
