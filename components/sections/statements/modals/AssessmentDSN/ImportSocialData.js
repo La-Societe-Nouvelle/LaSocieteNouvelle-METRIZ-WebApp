@@ -19,7 +19,7 @@ import {
 import {
   DSNDataReader,
   DSNFileReader,
-} from "../../../../../src/readers/DSNReader";
+} from "./DSNReader";
 
 import metaRubriques from "/lib/rubriquesDSN";
 

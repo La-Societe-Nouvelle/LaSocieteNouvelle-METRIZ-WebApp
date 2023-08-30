@@ -1,15 +1,23 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
-import StatementForms from "./StatementForms";
-import { Loader } from "../../modals/Loader";
+
+// Services
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
-import { checkIfDataExists } from "./utils";
-import indicators from "/lib/indics";
+
+// Components
 import StatementFormContainer from "./StatementFormContainer";
-import { useEffect } from "react";
+
+// Modals
+import { Loader } from "../../modals/Loader";
+
+// Utils
+import { checkIfDataExists } from "./utils";
+
+// Libs
+import indicators from "/lib/indics";
 
 const DirectImpacts = ({ session, submit }) => 
 {
