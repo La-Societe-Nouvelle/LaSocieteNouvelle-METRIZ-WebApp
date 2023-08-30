@@ -2,6 +2,8 @@
 /* -------------------------------------------------- UTILS FUNCTIONS -------------------------------------------------- */
 /* --------------------------------------------------------------------------------------------------------------------- */
 
+import divisions from "/lib/divisions";
+import areas from "/lib/areas";
 
   // download session (session -> JSON data)
   export const downloadSession = async (session) => {
@@ -20,6 +22,25 @@
     link.click();
   };
   
+/* -------------------------- Options -------------------------- */
+
+export const getDivisionsOptions = () => {
+  return Object.entries(divisions)
+    .sort((a, b) => parseInt(a) - parseInt(b))
+    .map(([value, label]) => {
+      return { value: value, label: value + ' - ' + label };
+    });
+};
+
+// utils.js
+export const getAreasOptions = () => {
+  return Object.entries(areas)
+    .sort()
+    .map(([value, label]) => {
+      return { value: value, label:  label };
+    });
+};
+
 
 /* -------------------------- PRINT FUNCTIONS -------------------------- */
 // to format values

@@ -2,7 +2,7 @@
 
 // React
 import React, { useState } from "react";
-import { Button, Form, Pagination, Table } from "react-bootstrap";
+import { Button, Form, Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "../../../../../src/utils/Utils";
@@ -10,20 +10,21 @@ import { printValue } from "../../../../../src/utils/Utils";
 // Modal
 import { SyncErrorModal } from "../modals/AlertModal";
 
+// Component
+import PaginationComponent from "../../PaginationComponent";
+
 const SyncProvidersView = ({
   providers,
   financialPeriod,
   updateProviders,
   significativeProviders,
-  synchroniseProviders,
+  handleSynchronize,
   showSyncErrorModal,
   closeSyncErrorModal,
 }) => {
-
   const [view, setView] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
-
 
   // Filtered Providers
   const getShowedProviders = (view) => {
@@ -70,10 +71,6 @@ const SyncProvidersView = ({
   const endIndex = startIndex + itemsPerPage;
   const totalPages = Math.ceil(showedProviders.length / itemsPerPage);
 
-  const handleChangeView = (e) => {
-    const view = e.target.value;
-    setView(view);
-  };
 
   const handleSirenProvider = async (e, providerNum) => {
     const newSiren = e.target.value;
@@ -88,16 +85,7 @@ const SyncProvidersView = ({
     updateProviders(updatedProviders);
   };
 
-  const handleChangeItemsPerPage = (e) => {
-    let newItemsPerPage;
-    if (e.target.value == "all") {
-      newItemsPerPage = providers.length;
-    } else {
-      newItemsPerPage = parseInt(e.target.value);
-    }
 
-    setItemsPerPage(newItemsPerPage);
-  };
 
   const isSyncButtonEnable = providers.some(
     (provider) =>
@@ -112,24 +100,14 @@ const SyncProvidersView = ({
     <div className="step">
       <h4>3. Synchroniser les données de vos fournisseurs</h4>
 
-      <SyncErrorModal
-        showModal={showSyncErrorModal}
-        onClose={closeSyncErrorModal}
-        changeView={() => setView("error")}
-      />
-
-      <div className="text-end my-3">
-        <Button
-          onClick={() => synchroniseProviders()}
-          className="btn btn-secondary"
-          disabled={!isSyncButtonEnable}
-        >
-          <i className="bi bi-arrow-repeat"></i> Synchroniser les données
-        </Button>
-      </div>
-      <div className="d-flex py-2 justify-content-end">
-        <div className="d-flex align-items-center me-2 ">
-          <Form.Select size="sm" onChange={handleChangeView} value={view}>
+      <div className="d-flex py-2 justify-content-between">
+        <div className="d-flex align-items-center ">
+          <Form.Select
+            size="sm"
+            onChange={(e) => setView(e.target.value)}
+            value={view}
+            className="me-3"
+          >
             <option key="1" value="all">
               Tous les comptes externes
             </option>
@@ -149,12 +127,16 @@ const SyncProvidersView = ({
               Comptes significatifs non identifiés
             </option>
           </Form.Select>
-        </div>
-        <div className="d-flex align-items-center">
-          <label></label>
+
           <Form.Select
             size="sm"
-            onChange={handleChangeItemsPerPage}
+            onChange={(e) =>
+              setItemsPerPage(
+                e.target.value === "all"
+                  ? providers.length
+                  : parseInt(e.target.value)
+              )
+            }
             value={itemsPerPage}
           >
             <option key="1" value="20">
@@ -168,6 +150,14 @@ const SyncProvidersView = ({
             </option>
           </Form.Select>
         </div>
+
+        <Button
+          onClick={handleSynchronize}
+          className="btn btn-secondary"
+          disabled={!isSyncButtonEnable}
+        >
+          <i className="bi bi-arrow-repeat"></i> Synchroniser les données
+        </Button>
       </div>
       <Table>
         <thead>
@@ -241,17 +231,17 @@ const SyncProvidersView = ({
         </tbody>
       </Table>
 
-      <Pagination size="sm" className="justify-content-end">
-        {Array.from({ length: totalPages }, (_, index) => (
-          <Pagination.Item
-            key={index}
-            onClick={() => handlePageChange(index + 1)}
-            active={currentPage === index + 1}
-          >
-            {index + 1}
-          </Pagination.Item>
-        ))}
-      </Pagination>
+      <PaginationComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+      />
+
+      <SyncErrorModal
+        showModal={showSyncErrorModal}
+        onClose={closeSyncErrorModal}
+        changeView={() => setView("error")}
+      />
     </div>
   );
 };

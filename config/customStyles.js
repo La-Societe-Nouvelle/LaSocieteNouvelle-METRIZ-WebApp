@@ -1,10 +1,14 @@
-export const customSelectStyles = {
+export const customSelectStyles = (selectSize) =>  ({
 
     control: (provided, state) => ({
       ...provided,
       border: "2px solid #dbdef1",
       borderRadius: "0.5rem",
       boxShadow: "none",
+      width: selectSize ? selectSize : "100%", // Ajustez la largeur selon vos besoins
+      whiteSpace: "nowrap", // Empêche le texte de se retourner à la ligne
+      overflow: "hidden", // Masque le texte qui dépasse
+      textOverflow: "ellipsis", 
       "&:hover": {
         borderColor: "#dbdef1",
       },
@@ -23,11 +27,12 @@ export const customSelectStyles = {
       color: "#191558",
       backgroundColor:"transparent",
       background: state.isFocused ? "#dbdef1" : "",
+      
       "&:hover": {
         color: "#191558",
       },
     }),
-  };
+  });
   
   export const unitSelectStyles = {
     control: (provided, state) => ({

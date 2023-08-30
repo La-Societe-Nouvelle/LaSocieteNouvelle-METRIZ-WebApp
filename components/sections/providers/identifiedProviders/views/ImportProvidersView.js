@@ -20,14 +20,14 @@ import { ErrorFileModal } from "../../../../modals/userInfoModals";
 const ImportProvidersView = ({
   providers,
   updateProviders,
-  synchroniseProviders,
+  handleSynchronize,
 }) => {
   const [errorFile, setErrorFile] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-  const handleSynchronise = () => {
+  const handleModalSynchronize = () => {
     setShowModal(false);
-    synchroniseProviders();
+    handleSynchronize();
   };
 
   const onDrop = async (files) => {
@@ -180,7 +180,7 @@ const ImportProvidersView = ({
       </div>
       <ProvidersImportSuccessModal
         showModal={showModal}
-        onSynchronise={handleSynchronise}
+        onSynchronise={handleModalSynchronize}
         onClose={() => setShowModal(false)}
       />
     </>

@@ -48,7 +48,6 @@ export const SyncSuccessModal = ({
   isAllProvidersIdentified,
   nextStep
 }) => {
-    {console.log(isAllProvidersIdentified)}
 
   return (
     <Modal show={showModal} onHide={onClose} size="md" centered>
@@ -59,7 +58,7 @@ export const SyncSuccessModal = ({
         <p className="small">
           {isAllProvidersIdentified
             ? "Toutes les fournisseurs ont été identifiés et leurs données ont été synchronisées avec succès. Vous pouvez directement passer à la mesure de vos impacts. "
-            : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez maintenant passer à l'étape suivante.          "}
+            : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez renseigner les numéros Siren manquants ou leur associer un secteur d'activité à l'étape suivante.          "}
         </p>
         <div className="text-end">
           <Button className="me-1" onClick={onClose}>Fermer</Button>
