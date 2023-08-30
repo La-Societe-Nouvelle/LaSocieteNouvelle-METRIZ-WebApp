@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Select from "react-select";
 import {
   Button,
@@ -11,34 +11,36 @@ import {
   DropdownButton,
   Form,
   Image,
-  Nav,
   Row,
 } from "react-bootstrap";
 
-import divisions from "/lib/divisions";
-
-import viewsData from "./views";
-
-import { customSelectStyles } from "../../../config/customStyles";
-
+// Services
 import { fetchComparativeData } from "../../../src/services/MacrodataService";
 
-import { getPrevDate } from "../../../src/utils/Utils";
-import { buildFullFile, buildIndicReport } from "../../../src/utils/deliverables/generateDownloadableFiles";
-
-import DownloadDropdown from "./components/DownloadDropdown";
-import { ChartsContainer } from "./components/ChartsContainer";
-
-import { Loader } from "../../modals/Loader";
+// Views
+import viewsData from "./views";
 import { IndicatorView } from "./views/IndicatorView";
 import { HomeView } from "./views/HomeView";
+
+// Components            
+import DownloadDropdown from "./components/DownloadDropdown";
+import { ChartsContainer } from "./components/ChartsContainer";                                                                                                            
+import { Loader } from "../../modals/Loader";
+
+// Utils
+import { getDivisionsOptions } from "../../../src/utils/Utils";
+import { buildFullFile, buildIndicReport } from "../../../src/utils/deliverables/generateDownloadableFiles";
 import { buildSummaryReportContributionIndic } from "../../../src/utils/deliverables/summaryReportGeneratorContribution";
 
-const divisionsOptions = Object.entries(divisions)
-  .sort((a, b) => parseInt(a) - parseInt(b))
-  .map(([value, label]) => {
-    return { value: value, label: value + " - " + label };
-  })
+// Styles
+import { customSelectStyles } from "../../../config/customStyles";
+
+// Lib
+import divisions from "/lib/divisions";
+
+
+// Division options
+const divisionsOptions = getDivisionsOptions(divisions);
 
 /* ---------- RESULTS SECTION ---------- */
 

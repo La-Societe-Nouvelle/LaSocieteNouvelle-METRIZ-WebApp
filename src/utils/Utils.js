@@ -2,8 +2,6 @@
 /* -------------------------------------------------- UTILS FUNCTIONS -------------------------------------------------- */
 /* --------------------------------------------------------------------------------------------------------------------- */
 
-import divisions from "/lib/divisions";
-import areas from "/lib/areas";
 
   // download session (session -> JSON data)
   export const downloadSession = async (session) => {
@@ -23,6 +21,17 @@ import areas from "/lib/areas";
   };
   
 /* -------------------------- Options -------------------------- */
+import divisions from "/lib/divisions";
+import areas from "/lib/areas";
+import branches from "/lib/branches";
+
+export const getBranchesOptions = () => {
+  return Object.entries(branches)
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([value, label]) => {
+      return { value: value, label: value + " - " + label };
+    });
+};
 
 export const getDivisionsOptions = () => {
   return Object.entries(divisions)
@@ -35,7 +44,6 @@ export const getDivisionsOptions = () => {
 // utils.js
 export const getAreasOptions = () => {
   return Object.entries(areas)
-    .sort()
     .map(([value, label]) => {
       return { value: value, label:  label };
     });

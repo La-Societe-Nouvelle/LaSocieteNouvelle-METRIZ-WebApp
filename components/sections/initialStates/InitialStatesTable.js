@@ -3,30 +3,24 @@
 // React
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
+import { Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/Utils";
+import { getBranchesOptions, getDivisionsOptions, getPrevDate } from "/src/utils/Utils";
 
 // Libraries
 import divisions from "/lib/divisions";
 import branches from "/lib/branches";
-import { Table } from "react-bootstrap";
-import { getPrevDate } from "../../../src/utils/Utils";
-import { customSelectStyles } from "../../../config/customStyles";
+
+// Styles
+import { customSelectStyles } from "/config/customStyles";
 
 /* ---------- INITIAL STATES TABLE ---------- */
 
-const branchesOptions = Object.entries(branches)
-  .sort((a, b) => a[0].localeCompare(b[0]))
-  .map(([value, label]) => {
-    return { value: value, label: value + " - " + label };
-  });
+const branchesOptions = getBranchesOptions(branches);
+const divisionsOptions = getDivisionsOptions(divisions);
 
-const divisionsOptions = Object.entries(divisions)
-  .sort((a, b) => parseInt(a) - parseInt(b))
-  .map(([value, label]) => {
-    return { value: value, label: value + " - " + label };
-  });
 
 const initialStateTypeOptions = {
   none: { value: "none", label: "---" },

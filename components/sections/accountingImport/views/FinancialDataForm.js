@@ -15,6 +15,7 @@ import divisions from "/lib/divisions";
 // Readers
 import { FECFileReader } from "/src/readers/FECReader";
 import { ErrorFileModal } from "../../../modals/userInfoModals";
+import { getDivisionsOptions } from "../../../../src/utils/Utils";
 
 /* ---------- FEC IMPORT FORM ---------- */
 
@@ -31,13 +32,7 @@ import { ErrorFileModal } from "../../../modals/userInfoModals";
  */
 
 // Division options
-const divisionsOptions = Object.entries(divisions)
-  .sort((a, b) => parseInt(a) - parseInt(b))
-  .filter(([value]) => value !== "00")
-  .map(([value, label]) => ({
-    value: value,
-    label: `${value} - ${label}`,
-  }));
+const divisionsOptions = getDivisionsOptions(divisions);
 
 export function FinancialDataForm(props) {
   const [siren, setSiren] = useState(props.siren);
@@ -117,10 +112,9 @@ export function FinancialDataForm(props) {
 
   return (
     <Row>
-      <Col lg={5}>
+      <Col lg={4}>
         <h3 className="subtitle">C'est parti !</h3>
         <Image
-     
           fluid
           src="/illus/accountingImport.svg"
           alt="Financial Data Illustration"
