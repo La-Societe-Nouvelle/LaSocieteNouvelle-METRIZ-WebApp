@@ -55,10 +55,16 @@ export const SyncSuccessModal = ({
         <Modal.Title as={"h6"}>Données synchronisées !</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+      <Image
+          src="illus/sync-success.svg"
+          alt="success image"
+          height={140}
+          className="mx-auto my-3 d-block"
+        />
         <p className="small">
           {isAllProvidersIdentified
             ? "Toutes les fournisseurs ont été identifiés et leurs données ont été synchronisées avec succès. Vous pouvez directement passer à la mesure de vos impacts. "
-            : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez renseigner les numéros Siren manquants ou leur associer un secteur d'activité à l'étape suivante.          "}
+            : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez renseigner les numéros SIREN manquants ou leur associer un secteur d'activité à l'étape suivante.          "}
         </p>
         <div className="text-end">
           <Button className="me-1" onClick={onClose}>Fermer</Button>

@@ -12,7 +12,7 @@ export const ProvidersImportSuccessModal = ({ showModal, onSynchronise, onClose 
 
       <Modal.Body>
         <Image
-          src="illus/upload.svg"
+          src="illus/upload-success.svg"
           alt=""
           height={140}
           className="mx-auto d-block"

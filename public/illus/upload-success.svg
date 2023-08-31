@@ -3,47 +3,18 @@
    viewBox="0 0 268.73767 193.17514"
    version="1.1"
    id="svg50"
-   sodipodi:docname="upload.svg"
    width="268.73767"
    height="193.17514"
-   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
-   inkscape:export-filename="upload-success.svg"
-   inkscape:export-xdpi="53.117348"
-   inkscape:export-ydpi="53.117348"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <defs
      id="defs54" />
-  <sodipodi:namedview
-     id="namedview52"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     showgrid="false"
-     inkscape:zoom="3.7822486"
-     inkscape:cx="176.21792"
-     inkscape:cy="103.90644"
-     inkscape:window-width="2560"
-     inkscape:window-height="1334"
-     inkscape:window-x="2389"
-     inkscape:window-y="-11"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="g324" />
   <g
      id="g43849"
      transform="translate(-5.67242,-41.830195)">
     <g
        id="freepik--background-simple--inject-3"
-       transform="matrix(0.89587085,0,0,0.89587085,-93.644987,-51.097859)"
-       inkscape:export-filename="..\Desktop\LSN\LaSocieteNouvelle-METRIZ-WebApp\public\illus\upload.svg"
-       inkscape:export-xdpi="53.117348"
-       inkscape:export-ydpi="53.117348">
+       transform="matrix(0.89587085,0,0,0.89587085,-93.644987,-51.097859)">
       <path
          d="m 356.13549,202.90255 c -13.66902,32.48534 -4.43536,91.02048 -51.22345,97.22839 -39.24334,5.19742 -62.00428,-25.24486 -99.13919,-2.9138 -27.06371,16.27274 -73.232,41.89114 -89.53304,-3.13258 -12.74758,-35.2164 -1.31963,-78.99373 18.39738,-109.02869 15.49937,-23.63244 56.84478,-69.35209 92.01505,-64.02583 39.52595,5.95692 49.2619,62.85722 84.69641,18.47316 21.31664,-26.70174 58.18728,-54.905572 92.48783,-18.31792 13.53332,14.43134 5.35685,25.14634 -6.91974,35.21065 -18.10593,14.83685 -31.3905,24.17362 -40.78125,46.50662 z"
          style="fill:#ededff;fill-opacity:1"
@@ -95,7 +66,7 @@
            style="opacity:0.3"
            id="g43">
           <polygon
-             points="247.19,235.62 247.19,234.67 249.55,234.67 249.47,232.31 250.42,232.28 250.53,235.62 "
+             points="250.42,232.28 250.53,235.62 247.19,235.62 247.19,234.67 249.55,234.67 249.47,232.31 "
              style="fill:#191558"
              id="polygon27" />
           <path
@@ -103,7 +74,7 @@
              style="fill:#191558"
              id="path29" />
           <polygon
-             points="164.24,235.62 164.14,232.31 165.08,232.28 165.16,234.67 167.55,234.67 167.55,235.62 "
+             points="167.55,234.67 167.55,235.62 164.24,235.62 164.14,232.31 165.08,232.28 165.16,234.67 "
              style="fill:#191558"
              id="polygon31" />
           <path
@@ -111,7 +82,7 @@
              style="fill:#191558"
              id="path33" />
           <polygon
-             points="161.43,149.33 164.76,149.33 164.76,150.28 162.41,150.28 162.48,152.63 161.54,152.66 "
+             points="162.48,152.63 161.54,152.66 161.43,149.33 164.76,149.33 164.76,150.28 162.41,150.28 "
              style="fill:#191558"
              id="polygon35" />
           <path
@@ -119,7 +90,7 @@
              style="fill:#191558"
              id="path37" />
           <polygon
-             points="246.79,150.28 244.41,150.28 244.41,149.33 247.71,149.33 247.82,152.63 246.87,152.66 "
+             points="247.82,152.63 246.87,152.66 246.79,150.28 244.41,150.28 244.41,149.33 247.71,149.33 "
              style="fill:#191558"
              id="polygon39" />
           <path
@@ -132,7 +103,7 @@
            style="fill:#191558"
            id="path45" />
         <polygon
-           points="196.11,194.68 201.39,194.68 201.71,204.32 209.8,204.32 209.48,194.68 214.76,194.68 205.13,185.35 "
+           points="209.48,194.68 214.76,194.68 205.13,185.35 196.11,194.68 201.39,194.68 201.71,204.32 209.8,204.32 "
            style="fill:#191558"
            id="polygon47" />
       </g>
@@ -148,8 +119,7 @@
   <g
      id="g6538"
      transform="matrix(0.06734655,0,0,0.06734655,73.725007,-66.130233)"
-     style="display:inline;fill:#36e775;fill-opacity:1;stroke:#191558;stroke-opacity:0"
-     inkscape:label="g6538">
+     style="display:inline;fill:#36e775;fill-opacity:1;stroke:#191558;stroke-opacity:0">
     <g
        id="g282"
        style="fill:#332f6c;fill-opacity:0.956863;stroke:#191558;stroke-opacity:0"

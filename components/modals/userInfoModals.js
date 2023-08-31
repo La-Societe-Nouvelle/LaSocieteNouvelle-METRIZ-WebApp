@@ -17,7 +17,7 @@ export const SuccessFileModal = ({ message, title, closePopup }) => {
 
       <Modal.Body>
         <Image
-          src="illus/upload.svg"
+          src="illus/upload-success.svg"
           alt=""
           height={140}
           className="mx-auto d-block"
