@@ -70,8 +70,6 @@ const DirectImpacts = ({ session, submit }) =>
   }, [statementsStatus])
 
   const handleSubmitStatements = async () => {
-    console.log(session.validations);
-    console.log(session.impactsData[period.periodKey]);
     setIsLoading(true);
     await session.updateFootprints(period);
 

@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
+import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 
 // Modals
 import AssessmentDSN from "../modals/AssessmentDSN";
@@ -183,13 +183,13 @@ const checkStatement = (impactsData) => {
   if (hasEmployees === true) {
     if (wageGap == "" || wageGap == null) {
       return ({ status: "incomplete", errorMessage: null });
-    } else if (isCorrectValue(wageGap, 0)) {
+    } else if (isValidNumber(wageGap, 0)) {
       return ({ status: "ok", errorMessage: null });
     } else {
       return ({ status: "error", errorMessage: "Erreur application" });
     }
   } else if (hasEmployees === false) {
-    if (isCorrectValue(wageGap, 0, 0)) {
+    if (isValidNumber(wageGap, 0, 0)) {
       return ({ status: "ok", errorMessage: null });
     } else {
       return ({ status: "error", errorMessage: "Erreur application" });
@@ -202,4 +202,4 @@ const checkStatement = (impactsData) => {
   }
 }
 
-const isValidValue = (value) => value == "" || isCorrectValue(value, 0)
+const isValidValue = (value) => value == "" || isValidNumber(value, 0)

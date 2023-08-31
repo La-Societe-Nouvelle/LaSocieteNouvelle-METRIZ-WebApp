@@ -1,5 +1,7 @@
 import {  getSumItems, roundValue } from "/src/utils/Utils";
 
+
+
 /* -------------------- INDIVIDUALS DATA -------------------- */
 
 /** Individuals Data -> return array with each individual and data needed for assessment, from DSN files

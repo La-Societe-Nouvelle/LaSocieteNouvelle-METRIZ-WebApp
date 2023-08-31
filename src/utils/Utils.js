@@ -162,36 +162,41 @@ export function valueOrDefault(value, defaultValue) {
 /* -------------------------- ROUNDING FUNCTION -------------------------- */
 // correct value
 
-export const isCorrectValue = (value,min,max) => 
-  {
-    // is a number
-    if (!isNaN(value) && value!=="") {
-      // check min
-      if (min!=undefined) 
-      {
-        if (!isCorrectValue(min)) {
-          return false;
-        } else if (isCorrectValue(min) && min>value) {
-          return false;
-        }
+export const isValidNumber = (value,min,max) => 
+{
+  // is a number
+  if (!isNaN(value) && value!=="") {
+    // check min
+    if (min!=undefined) 
+    {
+      if (!isValidNumber(min)) {
+        return false;
+      } else if (isValidNumber(min) && min>value) {
+        return false;
       }
-      // check max
-      if (max!=undefined) 
-      {
-        if (!isCorrectValue(max)) {
-          return false;
-        } else if (isCorrectValue(max) && max<value) {
-          return false;
-        }
+    }
+    // check max
+    if (max!=undefined) 
+    {
+      if (!isValidNumber(max)) {
+        return false;
+      } else if (isValidNumber(max) && max<value) {
+        return false;
       }
-      // a number and between min & max
-      return true;
     }
-    // not a number
-    else {
-      return false
-    }
+    // a number and between min & max
+    return true;
   }
+  // not a number
+  else {
+    return false
+  }
+}
+
+export const isValidInput = (value,min,max) => 
+{
+  return value==="" || isValidNumber(value,min,max);
+}
 
 /* -------------------------- COMPARISON FUNCTION -------------------------- */
 // to compare values

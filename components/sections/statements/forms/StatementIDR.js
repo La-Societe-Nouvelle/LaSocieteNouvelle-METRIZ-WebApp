@@ -5,7 +5,7 @@ import { Form, Row, Col } from "react-bootstrap";
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 import AssessmentDSN from "../modals/AssessmentDSN";
-import { isCorrectValue } from "../../../../src/utils/Utils";
+import { isValidNumber } from "../../../../src/utils/Utils";
 
 /* ---------- STATEMENT - INDIC #IDR ---------- */
 
@@ -175,14 +175,14 @@ const checkStatement = (impactsData) =>
   if (hasEmployees === true) 
   {
     // ok
-    if (isCorrectValue(interdecileRange,1)) {
+    if (isValidNumber(interdecileRange,1)) {
       return({ status: "ok", errorMessage: null });
     } 
     // incomplete
     else if (interdecileRange=="" || interdecileRange==null) {
       return({ status: "incomplete", errorMessage: null });
     } 
-    else if (isCorrectValue(interdecileRange)) {
+    else if (isValidNumber(interdecileRange)) {
       return({ 
         status: "error", 
         errorMessage: "Valeur saisie incorrecte (inférieure à 1)"
@@ -195,7 +195,7 @@ const checkStatement = (impactsData) =>
     }
   } 
   else if (hasEmployees === false) {
-    if (isCorrectValue(interdecileRange,1,1)) {
+    if (isValidNumber(interdecileRange,1,1)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({ status: "error", errorMessage: "Erreur application" });
@@ -210,4 +210,4 @@ const checkStatement = (impactsData) =>
   }
 }
 
-const isValidValue = (value) => value=="" || isCorrectValue(value,1)
+const isValidValue = (value) => value=="" || isValidNumber(value,1)

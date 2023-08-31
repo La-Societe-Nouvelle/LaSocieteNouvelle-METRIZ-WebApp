@@ -1,7 +1,26 @@
 
+/* ----------------- ITEMS ----------------- */
+
+export const initGhgItem = (id,assessmentItem) => 
+{
+  const item = {
+    id: id,
+    assessmentItem: assessmentItem,
+    label: null,
+    factorId: null,
+    gas: assessmentItem == "4" ? "R14" : "co2e",
+    consumption: null,
+    consumptionUnit: null,
+    consumptionUncertainty: null,
+    ghgEmissions: null,
+    ghgEmissionsUncertainty: null,
+  };
+  return item;
+}
+
 /* -------------------- GHG FORMULAS -------------------- */
 
-import { getSumItems } from "../../../../../src/utils/Utils";
+import { getSumItems, roundValue } from "../../../../../src/utils/Utils";
 
 // Libraries
 import fuels from "/lib/emissionFactors/fuels.json";
@@ -25,19 +44,24 @@ export const getGhgEmissions = ({
   consumption,
   consumptionUnit,
   factorId,
-  gaz,
+  gas,
 }) => {
   switch (consumptionUnit) {
     case "kgCO2e":
       return consumption;
     case "tCO2e":
       return consumption * 1000;
-    default:
-      return (
-        consumption *
-        emissionFactors[factorId].units[consumptionUnit].coefGHG *
-        greenhouseGases[gaz].prg
-      );
+    default: {
+      if (emissionFactors[factorId]) {
+        return (
+          consumption *
+          emissionFactors[factorId].units[consumptionUnit].coefGHG *
+          greenhouseGases[gas].prg
+        );
+      } else {
+        return null;
+      }
+    }
   }
 }
 
@@ -48,11 +72,11 @@ export const getGhgEmissionsUncertainty = (item) =>
   const valueMax = getGhgEmissionsMax(item);
   const valueMin = getGhgEmissionsMin(item);
   return value != 0
-    ? Math.round(
+    ? Math.abs(roundValue(
         (Math.max(Math.abs(valueMax - value), Math.abs(value - valueMin)) /
           value) *
           100
-      )
+      , 0))
     : 0;
 }
 
@@ -62,23 +86,28 @@ const getGhgEmissionsMax = ({
   consumptionUnit,
   consumptionUncertainty,
   factorId,
-  gaz,
+  gas,
 }) => {
   switch (consumptionUnit) {
     case "kgCO2e":
       return consumption * (1 + consumptionUncertainty / 100);
     case "tCO2e":
       return consumption * (1 + consumptionUncertainty / 100) * 1000;
-    default:
-      return (
-        consumption *
-        (1 + consumptionUncertainty / 100) *
-        emissionFactors[factorId].units[consumptionUnit].coefGHG *
-        (1 +
-          emissionFactors[factorId].units[consumptionUnit].coefGHGUncertainty /
-            100) *
-        greenhouseGases[gaz].prg
-      );
+    default: {
+      if (emissionFactors[factorId]) {
+        return (
+          consumption *
+          (1 + consumptionUncertainty / 100) *
+          emissionFactors[factorId].units[consumptionUnit].coefGHG *
+          (1 +
+            emissionFactors[factorId].units[consumptionUnit].coefGHGUncertainty /
+              100) *
+          greenhouseGases[gas].prg
+        );
+      } else {
+        return null;
+      }
+    }
   }
 }
 
@@ -88,23 +117,26 @@ const getGhgEmissionsMin = ({
   consumptionUnit,
   consumptionUncertainty,
   factorId,
-  gaz,
+  gas,
 }) => {
   switch (consumptionUnit) {
     case "kgCO2e":
       return consumption * (1 - consumptionUncertainty / 100);
     case "tCO2e":
       return consumption * (1 - consumptionUncertainty / 100) * 1000;
-    default:
-      return (
-        consumption *
-        (1 - consumptionUncertainty / 100) *
-        emissionFactors[factorId].units[consumptionUnit].coefGHG *
-        (1 -
-          emissionFactors[factorId].units[consumptionUnit].coefGHGUncertainty /
-            100) *
-        greenhouseGases[gaz].prg
-      );
+    default: {
+      if (emissionFactors[factorId]) {
+        return (
+          consumption *
+          (1 - consumptionUncertainty / 100) *
+          emissionFactors[factorId].units[consumptionUnit].coefGHG *
+          (1 - emissionFactors[factorId].units[consumptionUnit].coefGHGUncertainty / 100) *
+          greenhouseGases[gas].prg
+        );
+      } else {
+        return null;
+      }
+    }
   }
 }
 

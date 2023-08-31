@@ -8,7 +8,7 @@ import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 // Modals
 import { AssessmentKNW } from "../modals/AssessmentKNW";
-import { isCorrectValue } from "../../../../src/utils/Utils";
+import { isValidNumber } from "../../../../src/utils/Utils";
 
 /* ---------- STATEMENT - INDIC #KNW ---------- */
 
@@ -82,7 +82,7 @@ const StatementKNW = ({
                     value={roundValue(researchAndTrainingContribution, 0)}
                     inputMode="numeric"
                     onChange={updateResearchAndTrainingContribution}
-                    isInvalid={!isCorrectValue(researchAndTrainingContribution,0,impactsData.netValueAdded)}
+                    isInvalid={!isValidNumber(researchAndTrainingContribution,0,impactsData.netValueAdded)}
                   />
                   <InputGroup.Text>&euro;</InputGroup.Text>
                 </InputGroup>
@@ -147,12 +147,12 @@ const checkStatement = (impactsData) =>
 
   if (researchAndTrainingContribution=="" || researchAndTrainingContribution==null) {
     return({ status: "incomplete", errorMessage: null });
-  } else if (isCorrectValue(researchAndTrainingContribution,0,netValueAdded)) {
+  } else if (isValidNumber(researchAndTrainingContribution,0,netValueAdded)) {
     return({ status: "ok", errorMessage: null });
   } else {
     return({
       status: "error",
-      errorMessage: isCorrectValue(researchAndTrainingContribution) ?
+      errorMessage: isValidNumber(researchAndTrainingContribution) ?
         "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
         : "Veuillez saisir une valeur numérique"
     });

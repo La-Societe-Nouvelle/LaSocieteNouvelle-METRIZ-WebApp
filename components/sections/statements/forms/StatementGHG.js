@@ -5,11 +5,11 @@ import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import Select from "react-select";
 
-import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
+import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
 // Modals
-import { AssessmentGHG } from "../modals/AssessmentGHG/AssessmentGHG";
+import { AssessmentGHG } from "../modals/AssessmentGHG";
 
 /* ---------- STATEMENT - INDIC #GHG ---------- */
 
@@ -241,7 +241,7 @@ const checkStatement = (impactsData) =>
   } = impactsData;
 
   // ok
-  if (isCorrectValue(greenhousesGazEmissions,0) && isCorrectValue(greenhousesGazEmissionsUncertainty,0,100)) {
+  if (isValidNumber(greenhousesGazEmissions,0) && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
     return({ status: "ok", errorMessage: null });
   } 
   // incomplete
@@ -249,17 +249,17 @@ const checkStatement = (impactsData) =>
     return({ status: "incomplete", errorMessage: null });
   } 
   // error
-  else if (greenhousesGazEmissions!="" && isCorrectValue(greenhousesGazEmissions,0)) {
+  else if (greenhousesGazEmissions!="" && isValidNumber(greenhousesGazEmissions,0)) {
     return({
       status: "error",
-      errorMessage: isCorrectValue(greenhousesGazEmissions) ?
+      errorMessage: isValidNumber(greenhousesGazEmissions) ?
         "Valeur saisie incorrecte (négative)"
         : "Veuillez saisir une valeur numérique"
     });
-  } else if (greenhousesGazEmissionsUncertainty!="" && isCorrectValue(greenhousesGazEmissionsUncertainty,0,100)) {
+  } else if (greenhousesGazEmissionsUncertainty!="" && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
     return({
       status: "error",
-      errorMessage: isCorrectValue(greenhousesGazEmissionsUncertainty) ?
+      errorMessage: isValidNumber(greenhousesGazEmissionsUncertainty) ?
         "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
         : "Veuillez saisir une valeur numérique pour l'incertitude"
     });
@@ -271,5 +271,5 @@ const checkStatement = (impactsData) =>
   }
 }
 
-const isValidValue = (value) => value=="" || isCorrectValue(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isCorrectValue(uncertainty,0,100)
+const isValidValue = (value) => value=="" || isValidNumber(value,0)
+const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

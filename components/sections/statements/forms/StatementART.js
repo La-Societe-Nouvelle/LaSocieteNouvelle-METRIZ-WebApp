@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, isCorrectValue } from "../../../../src/utils/Utils";
+import { roundValue, isValidNumber } from "../../../../src/utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ART ---------- */
 
@@ -177,13 +177,13 @@ const checkStatement = (impactsData) =>
   } = impactsData;
 
   if (isValueAddedCrafted === true) {
-    if (isCorrectValue(craftedProduction,netValueAdded,netValueAdded)) {
+    if (isValidNumber(craftedProduction,netValueAdded,netValueAdded)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({ status: "error", errorMessage: "Erreur application" });
     }
   } else if (isValueAddedCrafted === false) {
-    if (isCorrectValue(craftedProduction,0,0)) {
+    if (isValidNumber(craftedProduction,0,0)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({ status: "error", errorMessage: "Erreur application" });
@@ -191,12 +191,12 @@ const checkStatement = (impactsData) =>
   } else if (isValueAddedCrafted === "partially") {
     if (craftedProduction=="") {
       return({ status: "incomplete", errorMessage: null });
-    } else if (isCorrectValue(craftedProduction,0,netValueAdded)) {
+    } else if (isValidNumber(craftedProduction,0,netValueAdded)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({
         status: "error",
-        errorMessage: isCorrectValue(craftedProduction) ?
+        errorMessage: isValidNumber(craftedProduction) ?
           "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
           : "Veuillez saisir une valeur numérique"
       });

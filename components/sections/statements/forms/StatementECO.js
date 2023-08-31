@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
+import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ECO ---------- */
 
@@ -177,13 +177,13 @@ const checkStatement = (impactsData) =>
   } = impactsData;
 
   if (isAllActivitiesInFrance === true) {
-    if (isCorrectValue(domesticProduction,netValueAdded,netValueAdded)) {
+    if (isValidNumber(domesticProduction,netValueAdded,netValueAdded)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({ status: "error", errorMessage: "Erreur application" });
     }
   } else if (isAllActivitiesInFrance === false) {
-    if (isCorrectValue(domesticProduction,0,0)) {
+    if (isValidNumber(domesticProduction,0,0)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({ status: "error", errorMessage: "Erreur application" });
@@ -191,12 +191,12 @@ const checkStatement = (impactsData) =>
   } else if (isAllActivitiesInFrance === "partially") {
     if (domesticProduction=="") {
       return({ status: "incomplete", errorMessage: null });
-    } else if (isCorrectValue(domesticProduction,0,netValueAdded)) {
+    } else if (isValidNumber(domesticProduction,0,netValueAdded)) {
       return({ status: "ok", errorMessage: null });
     } else {
       return({
         status: "error",
-        errorMessage: isCorrectValue(domesticProduction) ?
+        errorMessage: isValidNumber(domesticProduction) ?
           "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
           : "Veuillez saisir une valeur numérique"
       });

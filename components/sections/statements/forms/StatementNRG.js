@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
+import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
 // Modals
@@ -216,7 +216,7 @@ const checkStatement = (impactsData) =>
   } = impactsData;
 
   // ok
-  if (isCorrectValue(energyConsumption,0) && isCorrectValue(energyConsumptionUncertainty,0,100)) {
+  if (isValidNumber(energyConsumption,0) && isValidNumber(energyConsumptionUncertainty,0,100)) {
     return({ status: "ok", errorMessage: null });
   } 
   // valid value (empty or correct)
@@ -230,7 +230,7 @@ const checkStatement = (impactsData) =>
   else if (!isValidValue(energyConsumption)) {
     return({
       status: "error",
-      errorMessage: isCorrectValue(energyConsumption) ?
+      errorMessage: isValidNumber(energyConsumption) ?
         "Valeur saisie incorrecte (négative)"
         : "Veuillez saisir une valeur numérique"
     });
@@ -239,7 +239,7 @@ const checkStatement = (impactsData) =>
   else if (!isValidUncertainty(energyConsumptionUncertainty)) {
     return({
       status: "error",
-      errorMessage: isCorrectValue(energyConsumptionUncertainty) ?
+      errorMessage: isValidNumber(energyConsumptionUncertainty) ?
         "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
         : "Veuillez saisir une valeur numérique pour l'incertitude"
     });
@@ -254,5 +254,5 @@ const checkStatement = (impactsData) =>
   }
 }
 
-const isValidValue = (value) => value=="" || isCorrectValue(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isCorrectValue(uncertainty,0,100)
+const isValidValue = (value) => value=="" || isValidNumber(value,0)
+const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

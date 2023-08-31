@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isCorrectValue } from "/src/utils/Utils";
+import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "../../../../config/customStyles";
 
 /* ---------- STATEMENT - INDIC #HAZ ---------- */
@@ -191,7 +191,7 @@ const checkStatement = (impactsData) =>
   } = impactsData;
 
   // ok
-  if (isCorrectValue(hazardousSubstancesConsumption,0) && isCorrectValue(hazardousSubstancesConsumptionUncertainty,0,100)) {
+  if (isValidNumber(hazardousSubstancesConsumption,0) && isValidNumber(hazardousSubstancesConsumptionUncertainty,0,100)) {
     return({ status: "ok", errorMessage: null });
   } 
   // valid value (empty or correct)
@@ -205,7 +205,7 @@ const checkStatement = (impactsData) =>
   else if (!isValidValue(hazardousSubstancesConsumption)) {
     return({
       status: "error",
-      errorMessage: isCorrectValue(hazardousSubstancesConsumption) ?
+      errorMessage: isValidNumber(hazardousSubstancesConsumption) ?
         "Valeur saisie incorrecte (négative)"
         : "Veuillez saisir une valeur numérique"
     });
@@ -214,7 +214,7 @@ const checkStatement = (impactsData) =>
   else if (!isValidUncertainty(hazardousSubstancesConsumptionUncertainty)) {
     return({
       status: "error",
-      errorMessage: isCorrectValue(hazardousSubstancesConsumptionUncertainty) ?
+      errorMessage: isValidNumber(hazardousSubstancesConsumptionUncertainty) ?
         "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
         : "Veuillez saisir une valeur numérique pour l'incertitude"
     });
@@ -229,5 +229,5 @@ const checkStatement = (impactsData) =>
   }
 }
 
-const isValidValue = (value) => value=="" || isCorrectValue(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isCorrectValue(uncertainty,0,100)
+const isValidValue = (value) => value=="" || isValidNumber(value,0)
+const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)
