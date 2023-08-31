@@ -135,7 +135,9 @@ const UnidentifiedProviders = (props) => {
 
     setSignificativeProviders(updatedSignificativeProviders);
   };
-
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
   // Pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -211,7 +213,6 @@ const UnidentifiedProviders = (props) => {
             <i className="bi bi-arrow-repeat"></i> Synchroniser les données
           </Button>
         </div>
-        {console.log(showedProviders)}
         <ProvidersTable
           providers={showedProviders}
           significativeProviders={significativeProviders}
@@ -224,7 +225,7 @@ const UnidentifiedProviders = (props) => {
         <PaginationComponent
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={() => setCurrentPage(newPage)}
+          onPageChange={handlePageChange}
         />
         {/* User Messages ---------------------------------------------------------*/}
 
