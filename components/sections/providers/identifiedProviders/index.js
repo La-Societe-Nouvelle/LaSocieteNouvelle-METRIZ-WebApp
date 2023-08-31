@@ -33,6 +33,7 @@ const IdentifiedProviders = (props) => {
   );
 
   useEffect(() => {
+  
     const fetchData = async () => {
       let significativeProviders = await getSignificativeProviders(
         providers,
@@ -44,9 +45,11 @@ const IdentifiedProviders = (props) => {
     };
 
     fetchData();
-  }, []);
+  }, [providers]);
 
   const updateProviders = (updatedProviders) => {
+
+
     financialData.providers = updatedProviders;
     setProviders(updatedProviders);
   };
@@ -119,7 +122,6 @@ const IdentifiedProviders = (props) => {
         </ol>
 
         {/* Views --------------------------------------------------------- */}
-
         <ImportProvidersView
           providers={providers}
           updateProviders={updateProviders}

@@ -210,24 +210,22 @@ const InvoicesProvidersView = ({
   };
 
   const handleInvoicesProvider = (providersMapping) => {
-    for (let invoiceData of Object.values(providersMapping)) {
-      if (invoiceData.matching != "") {
-        let provider = providers.find(
-          (provider) => provider.providerNum == invoiceData.matching
-        );
-
-        if (provider) {
-          provider.corporateId = invoiceData.legalUnitData.siren;
-          provider.legalUnitData = invoiceData.legalUnitData;
-          provider.useDefaultFootprint = false;
-          provider.footprintStatus = 200;
-          provider.dataFetched = true;
-        }
+    for (let i = 0; i < providers.length; i++) {
+      const matchingProvider = Object.values(providersMapping).find(mapping => mapping.matching === providers[i].providerNum);
+      if (matchingProvider) {
+        providers[i].corporateId = matchingProvider.legalUnitData.siren;
+        providers[i].legalUnitData = matchingProvider.legalUnitData;
+        providers[i].useDefaultFootprint = false;
+        providers[i].footprintStatus = 200;
+        providers[i].dataFetched = true;
       }
     }
-    updateProviders(providers);
+    updateProviders([...providers]);
     setShowModal(false);
   };
+  
+  
+  
 
   return (
     <div className="step">

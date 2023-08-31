@@ -6,11 +6,11 @@ import { Button, Container, Form } from "react-bootstrap";
 
 // Components
 import ProvidersTable from "./ProvidersTable";
-import SyncSuccessModal from "./SyncSuccessModal";
 import PaginationComponent from "../PaginationComponent";
 
 //Utils
 import { getSignificativeUnidentifiedProviders } from "./utils";
+import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
 
 const UnidentifiedProviders = (props) => {
   const financialData = props.financialData;
@@ -20,6 +20,7 @@ const UnidentifiedProviders = (props) => {
 
   const [significativeProviders, setSignificativeProviders] = useState([]);
   const [showSyncSuccessModal, setShowSyncSuccessModal] = useState(false);
+  const [showSyncWarningModal, setShowWarningModal] = useState(false);
 
   const [providers, setProviders] = useState(
     financialData.providers.filter(
@@ -109,14 +110,31 @@ const UnidentifiedProviders = (props) => {
       }
       return provider;
     });
-    setProviders(updatedProviders); // Update providers here
+    setProviders(updatedProviders); 
   };
 
-  const handleSynchronize = async () => {
+  const handleAcceptSynchronize = async () => {
+
+
+    const haswarnings = providers.some(
+      (provider) =>
+        significativeProviders.includes(provider.providerNum) &&
+        provider.defaultFootprintParams.code == "00"
+    );
+
+    haswarnings
+      ? setShowWarningModal(true)
+      : handleSynchronize();
+  };
+
+  const handleSynchronize = async () => { 
+
+    setShowWarningModal(false);
     const providersToSynchronise = providers.filter(
       (provider) =>
         provider.useDefaultFootprint && provider.footprintStatus !== 200
     );
+
     await props.synchronizeProviders(providersToSynchronise);
 
     const updatedSignificativeProviders =
@@ -132,10 +150,12 @@ const UnidentifiedProviders = (props) => {
     );
     setIsNextStepAvailable(stepAvailable);
     setShowSyncSuccessModal(stepAvailable);
-
     setSignificativeProviders(updatedSignificativeProviders);
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
   // Pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -204,14 +224,13 @@ const UnidentifiedProviders = (props) => {
           </div>
 
           <Button
-            onClick={handleSynchronize}
+            onClick={handleAcceptSynchronize}
             className="btn btn-secondary"
             disabled={false}
           >
             <i className="bi bi-arrow-repeat"></i> Synchroniser les données
           </Button>
         </div>
-        {console.log(showedProviders)}
         <ProvidersTable
           providers={showedProviders}
           significativeProviders={significativeProviders}
@@ -224,7 +243,7 @@ const UnidentifiedProviders = (props) => {
         <PaginationComponent
           currentPage={currentPage}
           totalPages={totalPages}
-          onPageChange={() => setCurrentPage(newPage)}
+          onPageChange={handlePageChange}
         />
         {/* User Messages ---------------------------------------------------------*/}
 
@@ -232,6 +251,13 @@ const UnidentifiedProviders = (props) => {
           showModal={showSyncSuccessModal}
           onClose={() => setShowSyncSuccessModal(false)}
           nextStep={props.nextStep}
+        />
+
+        
+<SyncWarningModal
+          showModal={showSyncWarningModal}
+          onClose={() => setShowWarningModal(false)}
+          onSubmit={handleSynchronize}
         />
 
         {/* Actions ---------------------------------------------------------*/}
