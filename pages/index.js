@@ -4,8 +4,9 @@
 import React from "react";
 import Head from "next/head";
 import { BrowserView, MobileView } from "react-device-detect";
-import { Mobile } from "/src/components/Mobile";
 
+// Src
+import { Mobile } from "/src/components/Mobile";
 import { Metriz } from "/src/Metriz";
 
 /*   _________________________________________________________________________________________________________
@@ -21,11 +22,11 @@ import { Metriz } from "/src/Metriz";
  *  |_________________________________________________________________________________________________________|
  */
 
-/* -------------------------------------------------------------------------------------- */
-/* ---------------------------------------- HOME ---------------------------------------- */
-/* -------------------------------------------------------------------------------------- */
+  /* ---------------------------------------------------------------------------------------------------------- */
+  /* -------------------------------------------------- HOME -------------------------------------------------- */
+  /* ---------------------------------------------------------------------------------------------------------- */
 
-export default function Home() {
+const Home = () => {
   return (
     <>
       <Head>
@@ -47,9 +48,11 @@ export default function Home() {
         <meta property="og:image" content="/metriz_illus.jpg" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <BrowserView>
         <Metriz />
       </BrowserView>
+
       <MobileView>
         <Mobile />
       </MobileView>
@@ -57,3 +60,4 @@ export default function Home() {
   );
 }
 
+export default Home;

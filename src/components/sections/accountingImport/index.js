@@ -20,6 +20,10 @@ import ErrorReportModal from "../../modals/ErrorReportModal";
 import { ErrorAPIModal } from "../../modals/userInfoModals";
 import ImportModal from "./ImportModal";
 
+/* ------------------------------------------------------------------ */
+/* -------------------- ACCOUTING IMPORT SECTION -------------------- */
+/* ------------------------------------------------------------------ */
+
 const AccountingImportSection = (props) => {
   const { session } = props;
 
