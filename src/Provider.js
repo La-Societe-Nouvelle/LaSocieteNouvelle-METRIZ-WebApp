@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
-import { getDefaultFootprintId } from "../components/sections/providers/identifiedProviders/utils";
-import api from "../config/api";
+import { getDefaultFootprintId } from "/src/components/sections/providers/identifiedProviders/utils";
+import api from "/config/api";
 import { getAmountItems } from "./utils/Utils";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
 

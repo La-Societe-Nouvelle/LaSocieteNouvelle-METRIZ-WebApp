@@ -1,5 +1,5 @@
 // La Société Nouvelle
-import api from "../../config/api";
+import api from "/config/api";
 
 // Imports
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";

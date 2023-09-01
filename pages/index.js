@@ -9,27 +9,28 @@ import { BrowserView, MobileView } from "react-device-detect";
 import { Session } from "/src/Session";
 
 // Sections
-import { StartSection } from "../components/sections/StartSection";
-import AccountingImportSection from "../components/sections/accountingImport";
-import { InitialStatesSection } from "../components/sections/initialStates";
-import ProvidersSection  from "../components/sections/providers";
-import DirectImpacts from "../components/sections/statements";
-import Results from "../components/sections/results";
-import PublishStatementSection from "../components/sections/publishStatement";
+import { StartSection } from "/src/components/sections/StartSection";
+import AccountingImportSection from "/src/components/sections/accountingImport";
+import { InitialStatesSection } from "/src/components/sections/initialStates";
+import ProvidersSection  from "/src/components/sections/providers";
+import DirectImpacts from "/src/components/sections/statements";
+import Results from "/src/components/sections/results";
+import PublishStatementSection from "/src/components/sections/publishStatement";
+
 // Others components
-import { Header } from "/components/parts/headers/Header";
-import { HeaderSection } from "/components/parts/headers/HeaderSection";
-import { HeaderPublish } from "/components/parts/headers/HeaderPublish";
+import { Header } from "/src/components/parts/headers/Header";
+import { HeaderSection } from "/src/components/parts/headers/HeaderSection";
+import { HeaderPublish } from "/src/components/parts/headers/HeaderPublish";
 
 import { updateVersion } from "/src/version/updateVersion";
-import { Footer } from "/components/parts/Footer";
-import { Mobile } from "/components/Mobile";
-import { DataUpdater } from "/components/modals/dataUpdater/DataUpdater";
-import SaveModal from "../components/modals/SaveModal";
-import ErrorBoundary from "../src/utils/ErrorBoundary";
+import { Footer } from "/src/components/parts/Footer";
+import { Mobile } from "/src/components/Mobile";
+import { DataUpdater } from "/src/components/modals/dataUpdater/DataUpdater";
+import SaveModal from "/src/components/modals/SaveModal";
+import ErrorBoundary from "/src/utils/ErrorBoundary";
 
 // Services
-import { logUserProgress } from "../src/services/StatsService";
+import { logUserProgress } from "/src/services/StatsService";
 
 /*   _________________________________________________________________________________________________________
  *  |                                                                                                         |
@@ -88,12 +89,15 @@ export default function Home() {
  *    2 variables :
  *        - Session (données saisies) -> LegalUnit (données relatives à l'unité légale) / FinancialData (données comptables) / ImpactsData (données d'impacts)
  *        - step -> étape courante
+ *        - showDataUpdater
  */
 
 class Metriz extends React.Component {
+
   constructor(props) {
     super(props);
-    this.state = {
+    this.state = 
+    {
       session: new Session(),
       step: 0,
       loading: false,
@@ -115,6 +119,7 @@ class Metriz extends React.Component {
           className={step == 0 ? "wrapper bg-white" : "wrapper"}
           id="wrapper"
         >
+          {/* ---------- HEADER ---------- */}
           {step == 0 ? (
             <Header />
           ) : step == 6 ? (
@@ -142,11 +147,13 @@ class Metriz extends React.Component {
               session={session}
             />
           )}
-          {}
+
+          {/* ---------- SECTION ---------- */}
           <ErrorBoundary session={session}>
             {this.buildSectionView(step)}
           </ErrorBoundary>
         </div>
+
         <Footer step={step} />
       </>
     );
@@ -193,7 +200,8 @@ class Metriz extends React.Component {
   /* ----- SECTION ----- */
 
   // ...redirect to the selected section
-  buildSectionView = (step) => {
+  buildSectionView = (step) => 
+  {
     const { session } = this.state;
 
     const sectionProps = {
@@ -234,13 +242,11 @@ class Metriz extends React.Component {
         );
       case 5:
         return (
-          <>
-            <Results
-              {...sectionProps}
-              goBack={() => this.setStep(4)}
-              publish={() => this.setStep(6)}
-            />
-          </>
+          <Results
+            {...sectionProps}
+            goBack={() => this.setStep(4)}
+            publish={() => this.setStep(6)}
+          />
         );
       case 6:
         return <PublishStatementSection {...sectionProps} />;
@@ -270,6 +276,8 @@ class Metriz extends React.Component {
       this.setStep(3);
       this.updateProgression(2);
     }
+
+    // logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(this.state.session.id, 1, this.state.date, []);
     }

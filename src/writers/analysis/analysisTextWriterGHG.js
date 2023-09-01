@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-import { getClosestYearData } from "../../../components/sections/results/utils";
+import { getClosestYearData } from "../../../src/components/sections/results/utils";
 import { compareToReference, printValue } from "../../utils/Utils";
 
 export const analysisTextWriterGHG = (props) => {

@@ -16,7 +16,7 @@ import {
   sortProvidersByContrib,
 } from "./deliverablesUtils";
 import { buildAggregatePeriodIndicator } from "../../formulas/footprintFormulas";
-import { getClosestYearData } from "../../../components/sections/results/utils";
+import { getClosestYearData } from "../../../src/components/sections/results/utils";
 
 // Lib
 import metaDivisions from "/lib/divisions";
