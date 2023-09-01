@@ -1,14 +1,7 @@
-/* ------------------------------------------------------------------------------------- */
-/* ---------------------------------------- APP ---------------------------------------- */
-/* ------------------------------------------------------------------------------------- */
-
 // La Société Nouvelle
 
 // React / Next
-import React from "react";
-
-// Objects
-import { Session } from "/src/Session";
+import React, { useState } from "react";
 
 // Error Handler
 import ErrorBoundary from "/src/utils/ErrorBoundary";
@@ -28,250 +21,141 @@ import { HeaderSection } from "/src/components/parts/headers/HeaderSection";
 import { HeaderPublish } from "/src/components/parts/headers/HeaderPublish";
 import { Footer } from "/src/components/parts/Footer";
 
-
-// Modals
-import { updateVersion } from "/src/version/updateVersion";
-import { DataUpdater } from "/src/components/modals/dataUpdater/DataUpdater";
-import SaveModal from "/src/components/modals/SaveModal";
-
-// Services
+// Logs
 import { logUserProgress } from "/src/services/StatsService";
 
-/** Notes :
- *    2 variables :
- *        - Session (données saisies) -> LegalUnit (données relatives à l'unité légale) / FinancialData (données comptables) / ImpactsData (données d'impacts)
- *        - step -> étape courante
- */
+// Utils
+import { getCurrentDateString } from "./utils/Utils";
 
-export class Metriz extends React.Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        session: new Session(),
-        step: 0,
-        loading: false,
-        showDataUpdater: false,
-        showSaveModal: false,
-        date: new Date(),
-      };
+/* ------------------------------------------------------------------------------------- */
+/* ---------------------------------------- APP ---------------------------------------- */
+/* ------------------------------------------------------------------------------------- */
+
+export const Metriz = () => {
+
+  const [session, setSession] = useState({});
+  const [step, setStep] = useState(0);
+  const currentDate = getCurrentDateString();
+  
+  const initSession = (newSession) => {
+
+    const initialStep = newSession.progression === 0 ? 1 : newSession.progression;
+
+    setSession(newSession);
+    setStep(initialStep);
+  };
+
+
+  const buildSectionView = () => {
+    const sections = [
+      <StartSection submit={initSession}  />,
+      <AccountingImportSection session={session} submit={validImportedData} />,
+      <InitialStatesSection
+        session={session}
+        submit={validInitialStates}
+        onReturn={() => setStep(1)}
+      />,
+      <ProvidersSection session={session} submit={validProviders} />,
+      <DirectImpacts session={session} submit={validStatements} />,
+      <Results
+        session={session}
+        goBack={() => setStep(4)}
+        publish={() => setStep(6)}
+      />,
+      <PublishStatementSection session={session} />,
+    ];
+
+    return sections[step];
+  };
+
+  const validImportedData = async () => {
+    console.log("--------------------------------------------------");
+    console.log("Ecritures comptables importées");
+    console.log(session.financialData);
+
+    // first year..
+    // if (getAmountItems(session.financialData.immobilisations.concat(session.financialData.stocks).map(asset => asset.InitialState)) == 0) {
+    //   setStep(1);
+    //   updateProgression(1);
+    // }
+
+    let accountsShowed = session.financialData.immobilisations.concat(
+      session.financialData.stocks
+    );
+    console.log(accountsShowed);
+
+    if (accountsShowed.length > 0) {
+      updateProgression(2);
+    } else {
+      updateProgression(3);
     }
-  
-    handleCloseModal = () => {
-      this.setState({ showSaveModal: false });
-    };
-  
-    render() {
-      const { step, session, showDataUpdater, showSaveModal } = this.state;
-      return (
-        <>
-          <div
-            className={step == 0 ? "wrapper bg-white" : "wrapper"}
-            id="wrapper"
-          >
-            {step == 0 ? (
-              <Header />
-            ) : step == 6 ? (
-              <HeaderPublish setStep={this.setStep} session={session} />
-            ) : (
-              <HeaderSection
-                step={step}
-                stepMax={session.progression}
-                setStep={this.setStep}
-                session={session}
-              />
-            )}
-  
-            {showDataUpdater && step > 3 && (
-              <DataUpdater
-                session={session}
-                updatePrevSession={this.updatePrevSession}
-              ></DataUpdater>
-            )}
-  
-            {showSaveModal && (
-              <SaveModal
-                show={showSaveModal}
-                handleClose={this.handleCloseModal}
-                session={session}
-              />
-            )}
-            {}
-            <ErrorBoundary session={session}>
-              {this.buildSectionView(step)}
-            </ErrorBoundary>
-          </div>
-          <Footer step={step} />
-        </>
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(session.id, 1, currentDate, []);
+    }
+  };
+
+  const validInitialStates = async () => {
+    updateProgression(3);
+
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(session.id, 2, currentDate, []);
+    }
+  };
+
+  const validProviders = async () => {
+
+    let availablePeriods = session.availablePeriods;
+
+    for (let period of availablePeriods) {
+      session.updateFootprints(period);
+    }
+
+    updateProgression(4);
+
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(session.id, 3, currentDate, []);
+    }
+  };
+
+  const validStatements = async () => {
+    updateProgression(5);
+
+    const financialPeriod = session.financialPeriod.periodKey;
+    if (process.env.NODE_ENV === "production") {
+      await logUserProgress(
+        session.id,
+        4,
+        currentDate,
+        session.validations[financialPeriod]
       );
     }
-  
-    // change session
-    setStep = (nextStep) => this.setState({ step: nextStep });
-  
-    // Update previous session with updated session
-    updatePrevSession = (updatedSession) => {
-      this.setState({
-        session: updatedSession,
-      });
-    };
-    // import session (JSON data -> session)
-    loadPrevSession = async (file) => {
-      this.setState({ loading: true });
-      const reader = new FileReader();
-  
-      reader.onload = async () => {
-        // text -> JSON
-        const prevProps = await JSON.parse(reader.result);
-        console.log(prevProps.version);
-        // update to current version
-        await updateVersion(prevProps);
-  
-        // JSON -> session
-        const session = new Session(prevProps);
-        for (let period of session.availablePeriods) {
-          await session.updateFootprints(period);
-        }
-  
-        this.setState({
-          session: session,
-          step: session.progression,
-          loading: false,
-          showDataUpdater: prevProps.version == "3.0.0",
-          showSaveModal: false,
-        });
-      };
-      reader.readAsText(file);
-    };
-  
-    /* ----- SECTION ----- */
-  
-    // ...redirect to the selected section
-    buildSectionView = (step) => {
-      const { session } = this.state;
-  
-      const sectionProps = {
-        session: session,
-      };
-  
-      switch (step) {
-        case 0:
-          return (
-            <StartSection
-              startNewSession={() => this.setStep(1)}
-              loadPrevSession={this.loadPrevSession}
-              isLoading={this.state.loading}
-            />
-          );
-        case 1:
-          return (
-            <AccountingImportSection
-              {...sectionProps}
-              submit={this.validImportedData}
-            />
-          );
-        case 2:
-          return (
-            <InitialStatesSection
-              {...sectionProps}
-              submit={this.validInitialStates}
-              onReturn={() => this.setStep(1)}
-            />
-          );
-        case 3:
-          return (
-            <ProvidersSection {...sectionProps} submit={this.validProviders} />
-          );
-        case 4:
-          return (
-            <DirectImpacts {...sectionProps} submit={this.validStatements} />
-          );
-        case 5:
-          return (
-            <>
-              <Results
-                {...sectionProps}
-                goBack={() => this.setStep(4)}
-                publish={() => this.setStep(6)}
-              />
-            </>
-          );
-        case 6:
-          return <PublishStatementSection {...sectionProps} />;
-      }
-    };
-  
-    /* ----- PROGESSION ---- */
-  
-    validImportedData = async () => {
-      console.log("--------------------------------------------------");
-      console.log("Ecritures comptables importées");
-      console.log(this.state.session.financialData);
-  
-      // first year..
-      // if (getAmountItems(this.state.session.financialData.immobilisations.concat(this.state.session.financialData.stocks).map(asset => asset.InitialState)) == 0) {
-      //   this.state.session.progression++;
-      // }
-  
-      let accountsShowed =
-        this.state.session.financialData.immobilisations.concat(
-          this.state.session.financialData.stocks
-        );
-      if (accountsShowed.length > 0) {
-        this.setStep(2);
-        this.updateProgression(1);
-      } else {
-        this.setStep(3);
-        this.updateProgression(2);
-      }
-      if (process.env.NODE_ENV === "production") {
-        await logUserProgress(this.state.session.id, 1, this.state.date, []);
-      }
-    };
-  
-    validInitialStates = async () => {
-      this.setStep(3);
-      this.updateProgression(2);
-  
-      if (process.env.NODE_ENV === "production") {
-        await logUserProgress(this.state.session.id, 2, this.state.date, []);
-      }
-    };
-  
-    validProviders = async () => {
-      let availablePeriods = this.state.session.availablePeriods;
-      for (let period of availablePeriods) {
-        this.state.session.updateFootprints(period);
-      }
-  
-      this.setStep(4);
-      this.updateProgression(3);
-  
-      if (process.env.NODE_ENV === "production") {
-        await logUserProgress(this.state.session.id, 3, this.state.date, []);
-      }
-    };
-    validStatements = async () => {
-      this.setStep(5);
-      this.setState({ showSaveModal: true });
-  
-      this.updateProgression(4);
-  
-      const financialPeriod = this.state.session.financialPeriod.periodKey;
-      if (process.env.NODE_ENV === "production") {
-        await logUserProgress(
-          this.state.session.id,
-          4,
-          this.state.date,
-          this.state.session.validations[financialPeriod]
-        );
-      }
-    };
-  
-    updateProgression = (step) => {
-      this.state.session.progression = Math.max(
-        step + 1,
-        this.state.session.progression
-      );
-    };
-  }
-  
+  };
+
+  const updateProgression = (nextStep) => {
+    setStep(nextStep);
+    setSession((prevSession) => ({
+      ...prevSession,
+      progression: Math.max(nextStep, prevSession.progression),
+    }));
+  };
+
+
+  return (
+    <>
+      {step == 0 ? (
+        <Header />
+      ) : step == 6 ? (
+        <HeaderPublish setStep={() => setStep(step)} session={session} />
+      ) : (
+        <HeaderSection
+          step={step}
+          stepMax={session.progression}
+          setStep={() => setStep(step)}
+          session={session}
+        />
+      )}
+      <ErrorBoundary session={session}>{buildSectionView(step)}</ErrorBoundary>
+      <Footer />
+    </>
+  );
+};
