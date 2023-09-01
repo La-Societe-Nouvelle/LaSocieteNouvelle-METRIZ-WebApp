@@ -10,6 +10,12 @@ import { Loader } from "../modals/Loader";
 // Objects
 import { Session } from "/src/Session";
 
+// Updater
+import { updateVersion } from "/src/version/updateVersion";
+
+// Modal
+import {DataUpdater} from "/src/components/modals/dataUpdater/DataUpdater"
+
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */
 /* ------------------------------------------------------- */
