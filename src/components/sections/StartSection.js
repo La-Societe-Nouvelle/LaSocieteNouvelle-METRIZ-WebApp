@@ -35,6 +35,11 @@ export const StartSection = ({
   const startNewSession = () => {
     const session = new Session();
     submit(session);
+
+    // Public logs
+    console.log("--------------------------------------------------");
+    console.log("Initialisation d'une nouvelle session");
+    console.log(session);
   };
 
   // Import session
@@ -54,8 +59,16 @@ export const StartSection = ({
     const reader = new FileReader();
     reader.onload = async () => 
     {
+      // Public logs
+      console.log("--------------------------------------------------");
+      console.log("chargement d'une session précédente");
+
       // text -> JSON
       const sessionProps = await JSON.parse(reader.result);
+
+      // Public logs
+      console.log("Session (contenu brut) : ")
+      console.log(session);
 
       // update to current version
       await updateVersion(sessionProps);
@@ -68,6 +81,10 @@ export const StartSection = ({
         await session.updateFootprints(period);
       }
 
+      // Public logs
+      console.log("Session (après actualisation des empreintes) : ")
+      console.log(session);
+
       setSession(session);
       setIsLoading(false);
       setShowDataUpdater(true); // -> switch to data updater modals
@@ -79,6 +96,10 @@ export const StartSection = ({
     setSession(updatedSession);
     setShowDataUpdater(false);
     submit(updatedSession);
+
+    // Public logs
+    console.log("Session (après actualisation des données) : ")
+    console.log(updatedSession);
   }
 
 
