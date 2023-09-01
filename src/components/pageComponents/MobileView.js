@@ -1,5 +1,5 @@
 
-export function Mobile() {
+export const Mobile = () => {
     return <>
         <div className="container">
             <section className='step'>

@@ -1,7 +1,7 @@
 // Components
 import { Container } from "react-bootstrap";
-import { Footer } from "/src/components/parts/Footer";
-import {HeaderPage} from "/src/components/parts/headers/HeaderPage";
+import { Footer } from "/src/components/pageComponents/Footer";
+import {HeaderPage} from "/src/components/pageComponents/HeaderPage";
 
 export default function Home() {
   return (

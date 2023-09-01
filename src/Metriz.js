@@ -10,16 +10,15 @@ import ErrorBoundary from "/src/utils/ErrorBoundary";
 import { StartSection } from "/src/components/sections/StartSection";
 import AccountingImportSection from "/src/components/sections/accountingImport";
 import { InitialStatesSection } from "/src/components/sections/initialStates";
-import ProvidersSection  from "/src/components/sections/providers";
+import ProvidersSection from "/src/components/sections/providers";
 import DirectImpacts from "/src/components/sections/statements";
 import Results from "/src/components/sections/results";
 import PublishStatementSection from "/src/components/sections/publishStatement";
 
 // Others components
-import { Header } from "/src/components/parts/headers/Header";
-import { HeaderSection } from "/src/components/parts/headers/HeaderSection";
-import { HeaderPublish } from "/src/components/parts/headers/HeaderPublish";
-import { Footer } from "/src/components/parts/Footer";
+import { HeaderSection } from "/src/components/pageComponents/HeaderSection";
+import { HeaderPublish } from "/src/components/pageComponents/HeaderPublish";
+import { Footer } from "/src/components/pageComponents/Footer";
 
 // Logs
 import { logUserProgress } from "/src/services/StatsService";
@@ -32,40 +31,29 @@ import { getCurrentDateString } from "./utils/Utils";
 /* ------------------------------------------------------------------------------------- */
 
 export const Metriz = () => {
-
   const [session, setSession] = useState({});
   const [step, setStep] = useState(0);
-  const currentDate = getCurrentDateString();
-  
-  const initSession = (newSession) => {
+  const [selectedPeriod, setSelectedPeriod] = useState();
 
-    const initialStep = newSession.progression === 0 ? 1 : newSession.progression;
+  const currentDate = getCurrentDateString();
+
+  const initSession = (newSession) => {
+    const initialStep =
+      newSession.progression === 0 ? 1 : newSession.progression;
+    const period = newSession.availablePeriods[0];
 
     setSession(newSession);
     setStep(initialStep);
+    setSelectedPeriod(period);
   };
 
+  const updateSelectedPeriod = (period) => {
+    setSelectedPeriod(period);
+  };
 
-  const buildSectionView = () => {
-    const sections = [
-      <StartSection submit={initSession}  />,
-      <AccountingImportSection session={session} submit={validImportedData} />,
-      <InitialStatesSection
-        session={session}
-        submit={validInitialStates}
-        onReturn={() => setStep(1)}
-      />,
-      <ProvidersSection session={session} submit={validProviders} />,
-      <DirectImpacts session={session} submit={validStatements} />,
-      <Results
-        session={session}
-        goBack={() => setStep(4)}
-        publish={() => setStep(6)}
-      />,
-      <PublishStatementSection session={session} />,
-    ];
-
-    return sections[step];
+  // Validations
+  const handleStep = (nextStep) => {
+    setStep(nextStep);
   };
 
   const validImportedData = async () => {
@@ -103,7 +91,6 @@ export const Metriz = () => {
   };
 
   const validProviders = async () => {
-
     let availablePeriods = session.availablePeriods;
 
     for (let period of availablePeriods) {
@@ -139,22 +126,59 @@ export const Metriz = () => {
     }));
   };
 
+  // Sections Views
+  const buildSectionView = () => {
+    const sections = [
+      <StartSection submit={initSession} />,
+      <AccountingImportSection session={session} submit={validImportedData} />,
+      <InitialStatesSection
+        session={session}
+        period={selectedPeriod}
+        submit={validInitialStates}
+        onReturn={() => setStep(1)}
+      />,
+      <ProvidersSection
+        session={session}
+        submit={validProviders}
+        period={selectedPeriod}
+      />,
+      <DirectImpacts
+        session={session}
+        submit={validStatements}
+        period={selectedPeriod}
+      />,
+      <Results
+        session={session}
+        period={selectedPeriod}
+        goBack={() => setStep(4)}
+        publish={() => setStep(6)}
+      />,
+      <PublishStatementSection session={session} />,
+    ];
+
+    return sections[step];
+  };
 
   return (
     <>
-      {step == 0 ? (
-        <Header />
-      ) : step == 6 ? (
-        <HeaderPublish setStep={() => setStep(step)} session={session} />
-      ) : (
+      {/* Header */}
+
+      {step > 0 && step < 6 && (
         <HeaderSection
           step={step}
           stepMax={session.progression}
-          setStep={() => setStep(step)}
+          setStep={handleStep}
           session={session}
         />
       )}
+      {step == 6 && <HeaderPublish setStep={handleStep} session={session} />}
+
+      {/* Sections */}
+
       <ErrorBoundary session={session}>{buildSectionView(step)}</ErrorBoundary>
+
+      {/* Footer */}
+
       <Footer />
     </>
   );

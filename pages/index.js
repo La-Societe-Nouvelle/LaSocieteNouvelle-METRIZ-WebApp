@@ -6,7 +6,7 @@ import Head from "next/head";
 import { BrowserView, MobileView } from "react-device-detect";
 
 // Src
-import { Mobile } from "/src/components/Mobile";
+import { Mobile } from "/src/components/pageComponents/MobileView";
 import { Metriz } from "/src/Metriz";
 
 /*   _________________________________________________________________________________________________________
