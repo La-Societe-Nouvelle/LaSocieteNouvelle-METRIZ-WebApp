@@ -14,25 +14,25 @@ import { Session } from "/src/Session";
 import ErrorBoundary from "/src/utils/ErrorBoundary";
 
 // Sections
-import { StartSection } from "../components/sections/StartSection";
-import AccountingImportSection from "../components/sections/accountingImport";
-import { InitialStatesSection } from "../components/sections/initialStates";
-import ProvidersSection  from "../components/sections/providers";
-import DirectImpacts from "../components/sections/statements";
-import Results from "../components/sections/results";
-import PublishStatementSection from "../components/sections/publishStatement";
+import { StartSection } from "/src/components/sections/StartSection";
+import AccountingImportSection from "/src/components/sections/accountingImport";
+import { InitialStatesSection } from "/src/components/sections/initialStates";
+import ProvidersSection  from "/src/components/sections/providers";
+import DirectImpacts from "/src/components/sections/statements";
+import Results from "/src/components/sections/results";
+import PublishStatementSection from "/src/components/sections/publishStatement";
 
 // Others components
-import { Header } from "/components/parts/headers/Header";
-import { HeaderSection } from "/components/parts/headers/HeaderSection";
-import { HeaderPublish } from "/components/parts/headers/HeaderPublish";
-import { Footer } from "/components/parts/Footer";
+import { Header } from "/src/components/parts/headers/Header";
+import { HeaderSection } from "/src/components/parts/headers/HeaderSection";
+import { HeaderPublish } from "/src/components/parts/headers/HeaderPublish";
+import { Footer } from "/src/components/parts/Footer";
 
 
 // Modals
 import { updateVersion } from "/src/version/updateVersion";
-import { DataUpdater } from "/components/modals/dataUpdater/DataUpdater";
-import SaveModal from "../components/modals/SaveModal";
+import { DataUpdater } from "/src/components/modals/dataUpdater/DataUpdater";
+import SaveModal from "/src/components/modals/SaveModal";
 
 // Services
 import { logUserProgress } from "/src/services/StatsService";

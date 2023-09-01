@@ -4,7 +4,7 @@
 import React from "react";
 import Head from "next/head";
 import { BrowserView, MobileView } from "react-device-detect";
-import { Mobile } from "/components/Mobile";
+import { Mobile } from "/src/components/Mobile";
 
 import { Metriz } from "/src/Metriz";
 
