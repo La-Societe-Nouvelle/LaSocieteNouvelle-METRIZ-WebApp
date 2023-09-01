@@ -27,6 +27,7 @@ export const DataUpdater = ({ session, updatePrevSession }) => {
 
   const handleClose = () => {
     setShow(false);
+    updatePrevSession(session);
   };
 
   return (
