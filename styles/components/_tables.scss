@@ -29,15 +29,9 @@ table {
     width: 100px;
   }
 
-  .success {
-
-    .form-input,
-    .form-input:active,
-    .form-input:focus,
-    select {
-      border-color: #59b719;
-      background-color: #ecf9ef;
-    }
+  .form-control.success {
+    border-color: lighten($success, 25%);
+      background-color: lighten($success, 45%);
   }
 
   tr.warning td,

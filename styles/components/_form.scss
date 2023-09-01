@@ -61,27 +61,6 @@ table input {
   padding-left: 1.5rem;
 }
 
-.statement-form {
-  display: flex;
-  justify-content: space-around;
-  gap: 1em;
-
-  .form-group {
-    flex-grow: 1;
-    flex-shrink: 1;
-    flex-basis: 0;
-
-    .form-input,
-    .input-number {
-      width: 50%;
-    }
-  }
-}
-
-.statement-action {
-  text-align: right;
-}
-
 .radio-button-input {
   display: flex;
   flex-direction: column;
@@ -92,18 +71,7 @@ table input {
 }
 
 // Form Statements
-.statement {
-  .form-group {
-    margin-bottom: 1rem;
-    color: $primary;
-  }
-
-  .form-label,
-  .form-check-label {
-    font-size: 0.85rem;
-  }
-}
-
+ 
 .css-1s2u09g-control {
   border: 1px solid $light;
 }
@@ -122,6 +90,17 @@ table input {
 }
 
 .statement {
+  
+  .form-group {
+    margin-bottom: 1rem;
+    color: $primary;
+  }
+
+  .form-label,
+  .form-check-label {
+    font-size: 0.85rem;
+  }
+
   .custom-input {
     justify-content: end;
   }
