@@ -279,3 +279,75 @@ export const getDefaultFootprintId = (corporateId) =>
     return corporateId;
   }
 }
+
+
+
+/* ------------------------------------ Providers Status --------------------------------------- */
+
+
+export function getIdentifiedProviderStatus(provider) {
+  if (provider.corporateId && provider.footprintStatus === 200) {
+    return "success";
+  } else if (provider.corporateId && provider.footprintStatus === 404) {
+    return "error";
+  } else if (!provider.corporateId && !provider.isDefaultProviderAccount) {
+    return "info";
+  }
+  return "";
+}
+
+export function getIdentifiedProviderStatusIcon(provider) {
+  if (provider.corporateId) {
+    if (!provider.footprintStatus) {
+      return {
+        className: "bi bi-arrow-repeat text-success",
+        title: "Données prêtes à être synchronisées",
+      };
+    } else if (provider.footprintStatus === 200) {
+      return {
+        className: "bi bi-check2 text-success",
+        title: "Données synchronisées",
+      };
+    } else if (provider.footprintStatus === 404) {
+      return {
+        className: "bi bi-x-lg text-danger",
+        title: "Erreur lors de la synchronisation",
+      };
+    }
+  } else if (!provider.corporateId && !provider.isDefaultProviderAccount) {
+    return {
+      className: "bi bi-exclamation-circle text-info",
+      title: "Donnée manquante",
+    };
+  }
+
+  return {
+    className: "",
+    title: "",
+  };
+}
+export function getUnidentifiedProviderStatusIcon(provider) {
+
+    if (!provider.footprintStatus) {
+      return {
+        className: "bi bi-arrow-repeat text-success",
+        title: "Données prêtes à être synchronisées",
+      };
+    } else if (provider.footprintStatus === 200) {
+      return {
+        className: "bi bi-check2 text-success",
+        title: "Données synchronisées",
+      };
+    } else if (provider.footprintStatus === 404) {
+      return {
+        className: "bi bi-x-lg text-danger",
+        title: "Erreur lors de la synchronisation",
+      };
+    }
+ 
+  return {
+    className: "",
+    title: "",
+  };
+}
+

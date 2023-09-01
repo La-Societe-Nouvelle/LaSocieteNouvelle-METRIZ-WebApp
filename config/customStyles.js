@@ -1,18 +1,37 @@
-export const customSelectStyles = (selectSize) =>  ({
+export const customSelectStyles = (selectSize, status, hasWarning) =>  ({
 
-    control: (provided, state) => ({
-      ...provided,
-      border: "2px solid #dbdef1",
-      borderRadius: "0.5rem",
-      boxShadow: "none",
-      width: selectSize ? selectSize : "100%", // Ajustez la largeur selon vos besoins
-      whiteSpace: "nowrap", // Empêche le texte de se retourner à la ligne
-      overflow: "hidden", // Masque le texte qui dépasse
-      textOverflow: "ellipsis", 
-      "&:hover": {
-        borderColor: "#dbdef1",
-      },
-    }),
+    control: (provided, state) => {
+
+      let styles = {
+        ...provided,
+        borderWidth: "2px",
+        borderRadius: "0.5rem",
+        boxShadow: "none",
+        width: selectSize ? selectSize : "100%", 
+        whiteSpace: "nowrap", 
+        overflow: "hidden", 
+        textOverflow: "ellipsis", 
+        "&:hover": {
+          borderColor: "#dbdef1",
+        },
+
+      };
+  
+      if (hasWarning) {
+        styles.borderColor = "#ffc107"; 
+        styles.backgroundColor = "#f7f0da"; 
+      
+      }
+      
+      if (status === 200) {
+        styles.borderColor = "#98e3b9"
+        styles.backgroundColor = "#e8f9ef";
+      }
+  
+
+  
+      return styles;
+    },
     dropdownIndicator: (provided) => ({
       ...provided,
       padding : '4px',

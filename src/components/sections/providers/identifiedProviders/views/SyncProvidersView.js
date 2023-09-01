@@ -6,6 +6,7 @@ import { Button, Form, Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/Utils";
+import { getIdentifiedProviderStatus, getIdentifiedProviderStatusIcon } from "../utils";
 
 // Modal
 import { SyncErrorModal } from "../modals/AlertModal";
@@ -96,6 +97,8 @@ const SyncProvidersView = ({
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
   };
+
+  
   return (
     <div className="step">
       <h4>3. Synchroniser les données de vos fournisseurs</h4>
@@ -182,36 +185,14 @@ const SyncProvidersView = ({
             .map((provider, index) => (
               <tr key={index}>
                 <td>
-                  {provider.corporateId && !provider.footprintStatus && (
-                    <i
-                      className="bi bi-arrow-repeat text-success"
-                      title="Données prêtes à être synchronisées"
-                    ></i>
-                  )}
-                  {provider.corporateId && provider.footprintStatus === 200 && (
-                    <i
-                      className="bi bi-check2 text-success"
-                      title="Données synchronisées"
-                    ></i>
-                  )}
-                  {provider.corporateId && provider.footprintStatus === 404 && (
-                    <i
-                      className="bi bi-x-lg text-danger"
-                      title="Erreur lors de la synchronisation"
-                    ></i>
-                  )}
-                  {!provider.corporateId &&
-                    !provider.isDefaultProviderAccount && (
-                      <i
-                        className="bi bi-exclamation-circle text-info"
-                        title="Donnée manquante"
-                      ></i>
-                    )}
+                 <i className={ getIdentifiedProviderStatusIcon(provider).className}
+                  title={ getIdentifiedProviderStatusIcon(provider).title}></i>
                 </td>
                 <td className="siren-input">
                   <Form.Control
                     type="text"
                     value={provider.corporateId || ""}
+                    className={getIdentifiedProviderStatus(provider)}
                     onChange={(e) =>
                       handleSirenProvider(e, provider.providerNum)
                     }
