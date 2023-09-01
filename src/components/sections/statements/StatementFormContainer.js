@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Image, Form, Button } from "react-bootstrap";
 
 import {
@@ -19,6 +19,11 @@ import {
   StatementWAT,
 } from "./forms";
 
+
+// Modals
+import IndicatorDetailsModal from "./modals/IndicatorDetailsModal";
+
+// Libs
 import indicators from "/lib/indics";
 
 function StatementFormContainer ({
@@ -35,13 +40,9 @@ function StatementFormContainer ({
 
   const [selected, setSelected] = useState(session.validations[period.periodKey].includes(indic));
   const [errorMessage, setErrorMessage] = useState(null);
-
-  // useEffect(() => {
-  //   if (selected) {
-
-  //   }
-  // }, []);
-
+  const [indicatorModal, setIndicatorModal] = useState(null);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+ 
   const handleCheckboxChange = (event) => {
     const { checked } = event.target;
     setSelected(checked);
@@ -104,7 +105,7 @@ function StatementFormContainer ({
 
   const handleModalOpen = (indicator) => {
     setIndicatorModal(indicator);
-    setShowModal(true);
+    setShowInfoModal(true);
   };
 
   return (
@@ -128,9 +129,7 @@ function StatementFormContainer ({
                     />
                     <h4 className="my-1">
                       {libelle}
-                      {isBeta && (
-                        <span className="beta ms-1">BETA</span>
-                      )}
+                      {isBeta && <span className="beta ms-1">BETA</span>}
                     </h4>
                   </div>
                 </Form.Check.Label>
@@ -155,10 +154,16 @@ function StatementFormContainer ({
         <div className="px-2 py-2">{renderStatementForm(indic)}</div>
       )}
 
+      {indicatorModal && (
+        <IndicatorDetailsModal
+          show={showInfoModal}
+          handleClose={() => setShowInfoModal(false)}
+          indicator={indicatorModal}
+        />
+      )}
+
       {errorMessage && (
-        <div className="mx-2 my-2 alert alert-danger">
-          {errorMessage}
-        </div>
+        <div className="mx-2 my-2 alert alert-danger">{errorMessage}</div>
       )}
     </div>
   );
