@@ -38,24 +38,25 @@ export const SuccessFileModal = ({ message, title, closePopup }) => {
 };
 export const ErrorFileModal = ({ errorFile, title, errorMessage, onClose }) => {
   return (
-    <Modal show={errorFile} onHide={onClose} size="md" centered>
+    <Modal show={errorFile} onHide={onClose} size="sm" centered>
       <Modal.Header closeButton>
-        <Modal.Title as={"h6"}>{title}</Modal.Title>
+        <Modal.Title as={"h6"}></Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Image
-          src="illus/error.svg"
+          src="illus/error-file.svg"
           alt="error image"
-          height={120}
-          className="mx-auto my-3 d-block"
+          height={60}
+          className="mx-auto mb-3 d-block"
         />
+        <h6 className="text-center">{title}</h6>
         <p className="text-center small">{errorMessage}</p>
+        <div className="text-center">
+          <Button variant="primary" size="md" onClick={onClose}>
+            Fermer
+          </Button>
+        </div>
       </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" size="md" onClick={onClose}>
-          Fermer
-        </Button>
-      </Modal.Footer>
     </Modal>
   );
 };
@@ -69,7 +70,6 @@ export const InfoModal = ({ showModal, title, message, onClose }) => {
       <Modal.Body>
         <p className="small">{message}</p>
       </Modal.Body>
-
     </Modal>
   );
 };
@@ -89,12 +89,14 @@ export const ErrorAPIModal = ({ hasError, onClose }) => {
         />
         <p className="small ">
           Nous rencontrons actuellement des problèmes avec notre service.
-          Veuillez réessayer plus tard. Si le problème persiste, n'hésitez pas à <a
+          Veuillez réessayer plus tard. Si le problème persiste, n'hésitez pas à{" "}
+          <a
             href="mailto:support@lasocietenouvelle.org"
             className="fw-bold text-decoration-underline"
           >
             nous contacter
-          </a> pour obtenir de l'assistance.
+          </a>{" "}
+          pour obtenir de l'assistance.
         </p>
       </Modal.Body>
       <Modal.Footer>
