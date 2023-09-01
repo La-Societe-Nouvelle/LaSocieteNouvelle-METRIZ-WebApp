@@ -221,7 +221,7 @@ class Metriz extends React.Component {
           <InitialStatesSection
             {...sectionProps}
             submit={this.validInitialStates}
-            return={() => this.setStep(1)}
+            onReturn={() => this.setStep(1)}
           />
         );
       case 3:
