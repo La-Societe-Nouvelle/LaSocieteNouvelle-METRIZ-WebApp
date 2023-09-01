@@ -9,72 +9,79 @@ import { Table } from "react-bootstrap";
 import { getNewId } from "/src/utils/Utils";
 
 import EmployeeRow from "./EmployeeRow";
+import { initIndividualData } from "./utils";
 
 
 /* -------------------- INDIVIDUALS DATA FOR SOCIAL FOOTPRINT -------------------- */
 
 const IndividualsDataTable = ({ 
   impactsData, 
-  handleIndividualsData 
+  handleIndividualsData,
+  onChange
 }) => {
+  // individuals data
   const [individualsData, setIndividualsData] = useState(
     impactsData.individualsData
   );
 
   // when props update
   useEffect(() => {
-    if (individualsData != impactsData.individualsData) {
+    console.log(individualsData !== impactsData.individualsData);
+    console.log(individualsData != impactsData.individualsData);
+    console.log(individualsData);
+    console.log(impactsData.individualsData);
+    if (individualsData !== impactsData.individualsData) {
       setIndividualsData(impactsData.individualsData);
     }
-  }, [impactsData]);
+  }, [impactsData.individualsData]);
 
-  //
+  // when state update
   useEffect(async () => {
-    if (impactsData.individualsData != individualsData) {
-      await handleIndividualsData(individualsData);
-    }
+    console.log("use effect triggered individuals data state")
+    impactsData.individualsData = individualsData;
+    console.log(individualsData);
   }, [individualsData]);
+
+  // manage individuals data
 
   const deleteAll = () => setIndividualsData([]);
 
-  const removeIndividual = (id) =>
+  const removeIndividual = (id) => {
     setIndividualsData((prevIndividualsData) =>
       prevIndividualsData.filter((individualData) => individualData.id !== id)
     );
+  }
 
   const addEmployee = () => {
-    const newIndividualData = {
-      id:
-        "_" +
-        getNewId(
-          individualsData
-            .filter((individualData) => individualData.id.startsWith("_"))
-            .map((item) => ({ id: item.id.substring(1) }))
-        ),
-      name: "",
-      sex: "",
-      wage: null,
-      workingHours: null,
-      hourlyRate: null,
-      trainingHours: null,
-      trainingContract: false,
-    };
+    const id = getNewId(
+      individualsData
+        .filter((individualData) => individualData.id.startsWith("_"))
+        .map((item) => ({ id: item.id.substring(1) }))
+    );
+    const newIndividualData = initIndividualData(id);
     setIndividualsData((prevIndividualsData) => [
       ...prevIndividualsData,
       newIndividualData,
     ]);
   };
 
-  const updateIndividualData = async (nextimpactsData) => {
-    setIndividualsData((prevIndividualsData) =>
-      prevIndividualsData.map((individualData) =>
-        individualData.id === nextimpactsData.id
-          ? { ...individualData, ...nextimpactsData }
+  const updateIndividualData = async (nextIndividualData) => {
+    const nextIndividualsData = impactsData.individualsData
+      .map((individualData) =>
+        individualData.id === nextIndividualData.id
+          ? { ...individualData, ...nextIndividualData }
           : individualData
-      )
-    );
+      );
+    console.log(nextIndividualsData);
+    impactsData.individualsData = nextIndividualsData;
+    //setIndividualsData(nextIndividualsData);
   };
 
+  const rowDidUpdate = () => {
+    console.log(individualsData);
+    impactsData.individualsData = individualsData;
+    onChange();
+  }
 
   return (
     <div className="assessment">
@@ -92,20 +99,22 @@ const IndividualsDataTable = ({
           </tr>
         </thead>
         <tbody>
-          {individualsData.map((individualData) => (
-            <tr key={individualData.id}>
-              <td>
-                <i
-                  className="bi bi-trash3-fill"
-                  onClick={() => removeIndividual(individualData.id)}
+          {individualsData
+            .map((individualData) => (
+              <tr key={individualData.id}>
+                <td>
+                  <i
+                    className="bi bi-trash3-fill"
+                    onClick={() => removeIndividual(individualData.id)}
+                  />
+                </td>
+                <EmployeeRow
+                  individualData={individualData}
+                  isNewEmployeeRow={false}
+                  updateSocialData={updateIndividualData}
+                  onUpdate={rowDidUpdate}
                 />
-              </td>
-              <EmployeeRow
-                {...individualData}
-                isNewEmployeeRow={false}
-                updateSocialData={updateIndividualData}
-              />
-            </tr>
+              </tr>
           ))}
         </tbody>
       </Table>

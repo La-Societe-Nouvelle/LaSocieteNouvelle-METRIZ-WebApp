@@ -1,11 +1,11 @@
 // La Société Nouvelle
 
 // React
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Dropzone from "react-dropzone";
 import { Alert, Button, Table } from "react-bootstrap";
 
+// Utils
 import {
   checkFractions,
   checkMonths,
@@ -21,16 +21,23 @@ import {
   DSNFileReader,
 } from "./DSNReader";
 
+// Lib
 import metaRubriques from "/lib/rubriquesDSN";
 
-// current refactoring -> add show error in file list 
+/* ---------- ASSESSMENT - LOADING DATA ---------- */
+
+/** 
+ */
 
 const ImportSocialData = ({ 
   impactsData, 
   onChange,
   handleSocialStatements 
 }) => {
-  // social statements (= DSN)
+
+  const isMounted = useRef(false);
+
+  // social statements (DSN)
   const [socialStatements, setSocialStatements] = 
     useState(impactsData.socialStatements || []);
   
@@ -48,15 +55,16 @@ const ImportSocialData = ({
   //
   useEffect(async () => 
   {
-    // check social statements
-    verifySocialStatements(socialStatements);
-
-    // update impacts data (in modal, not in session)
-    impactsData.socialStatements = socialStatements;
-    // if (impactsData.socialStatements != socialStatements) {
-    //   await handleSocialStatements(socialStatements);
-    // }
-    onChange();
+    if (isMounted.current) {
+      // check social statements
+      verifySocialStatements(socialStatements);
+      // update impacts data (in modal, not in session)
+      impactsData.socialStatements = socialStatements;
+      // trigger individuals data update
+      onChange();
+    } else {
+      isMounted.current = true;
+    }
   }, [socialStatements]);
 
   const verifySocialStatements = async (statements) => 

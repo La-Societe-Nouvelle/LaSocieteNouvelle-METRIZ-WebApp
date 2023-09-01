@@ -49,6 +49,22 @@ const revenuAutresIncludedInPay = [
   "93", // Cotisation prévoyance et retraite supplémentaire
 ];
 
+export const initIndividualData = (id) =>
+{
+  const individualData = {
+    id: "_"+id,
+    name: "",
+    sex: "",
+    wage: null,
+    workingHours: null,
+    hourlyRate: null,
+    trainingHours: null,
+    trainingContract: false,
+    apprenticeshipHours: null
+    
+  };
+  return individualData;
+}
 
 export const getIndividualsData = async (declarations) => {
     // array of data

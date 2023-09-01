@@ -19,18 +19,20 @@ import {
 
 /* The AssessmentDSN component handles the assessment tool for social footprint.
  * It includes logic for handling imported social data and managing individuals' data.
- * The component uses Tabs to switch between importing DSN and managing social data.
+ * 
+ *  2 tabs :
+ *    - tab to import DSN (update socialStatements -> update individualsData)
+ *    - tab to visualiza social data
  * 
  * Modal update ImpactsData but set value for indicator only on submit /!\
  * 
  */
-const AssessmentDSN = (props) => 
-{
-  const [showModal, setShowModal] = useState(false);
+const AssessmentDSN = ({
+  impactsData
+}) => {
 
-  const [impactsData, setImpactsData] = useState(props.impactsData);
-  console.log(impactsData.socialStatements);
-  console.log(props.impactsData.socialStatements);
+  const [showModal, setShowModal] = useState(false);
+  const [individualsData, setIndividualsData] = useState(impactsData.individualsData);
 
   const handleSocialStatements = async (socialStatements) => {
     const individualsData = await getIndividualsData(socialStatements);
@@ -71,17 +73,24 @@ const AssessmentDSN = (props) =>
   //   // await props.onUpdate("knw");
   // };
 
-  const onImportChange = async () => {
-    //console.log(impactsData.socialStatements);
-    const individualsData = await getIndividualsData(impactsData.socialStatements);
-    setImpactsData({
-      ...impactsData,
-      individualsData
-    })
+  // update individuals data when file imported
+  const onSocialStatementsUpdate = async () => {
+    console.log("there");
+    impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
+    console.log(impactsData.individualsData);
+    setIndividualsData({...impactsData.individualsData});
+  }
+
+  // update individuals data when file imported
+  const onIndividualsDataUpdate = async () => {
+    //impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
+    console.log(impactsData.individualsData);
+    //setIndividualsData({...impactsData.individualsData});
   }
 
   const updateImpactsData = async () => 
   {
+    console.log("here");
     const {
       socialStatements
     } = impactsData;
@@ -100,12 +109,9 @@ const AssessmentDSN = (props) =>
 
   // update individuals data when file imported
   useEffect(async () => {
-    console.log("impacts data updated in modal");
-    const individualsData = await getIndividualsData(impactsData.socialStatements);
-    setImpactsData({
-      ...impactsData,
-      individualsData
-    })
+    console.log("use effect triggered")
+    // impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
+    // setIndividualsData({...impactsData.individualsData});
   }, [impactsData.socialStatements]);
 
   return (
@@ -114,7 +120,7 @@ const AssessmentDSN = (props) =>
         variant="light-secondary"
         className=" rounded-2  w-100 p-2"
         onClick={() => setShowModal(true)}
-        disabled={props.impactsData.hasEmployees ? false : true}
+        disabled={impactsData.hasEmployees ? false : true}
       >
         <i className="bi bi-calculator"></i>
         &nbsp;Importer les DSN
@@ -139,7 +145,7 @@ const AssessmentDSN = (props) =>
             <Tab eventKey="import" title="Importer les DSN">
               <ImportSocialData
                 impactsData={impactsData}
-                onChange={onImportChange}
+                onChange={onSocialStatementsUpdate}
                 handleSocialStatements={handleSocialStatements}
               />
             </Tab>
@@ -147,6 +153,7 @@ const AssessmentDSN = (props) =>
               <IndividualsDataTable
                 impactsData={impactsData}
                 handleIndividualsData={handleIndividualsData}
+                onChange={onIndividualsDataUpdate}
               />
             </Tab>
           </Tabs>

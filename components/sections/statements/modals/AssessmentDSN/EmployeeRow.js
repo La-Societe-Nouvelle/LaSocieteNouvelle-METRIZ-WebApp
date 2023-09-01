@@ -1,44 +1,54 @@
+// La Société Nouvelle
+
+// React
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 
-const EmployeeRow = (props) => {
+const EmployeeRow = ({
+  individualData,
+  updateSocialData,
+  onUpdate
+}) => {
 
-  const [name, setName] = useState(props.name || '');
-  const [sex, setSex] = useState(props.sex || '');
-  const [wage, setWage] = useState(props.wage || null);
-  const [workingHours, setWorkingHours] = useState(props.workingHours || null);
-  const [hourlyRate, setHourlyRate] = useState(props.hourlyRate || null);
-  const [apprenticeshipHours, setApprenticeshipHours] = useState(props.apprenticeshipHours || null);
-  const [apprenticeshipContract, setApprenticeshipContract] = useState(props.apprenticeshipContract || false);
+  const [name, setName] = useState(individualData.name);
+  const [sex, setSex] = useState(individualData.sex);
+  const [wage, setWage] = useState(individualData.wage);
+  const [workingHours, setWorkingHours] = useState(individualData.workingHours);
+  const [hourlyRate, setHourlyRate] = useState(individualData.hourlyRate);
+  const [apprenticeshipHours, setApprenticeshipHours] = useState(individualData.apprenticeshipHours);
+  const [apprenticeshipContract, setApprenticeshipContract] = useState(individualData.apprenticeshipContract);
    
   useEffect(() => {
-
-    setName(props.name || '');
-    setSex(props.sex || '');
-    setWage(props.wage || null);
-    setWorkingHours(props.workingHours || null);
-    setHourlyRate(props.hourlyRate || null);
-    setApprenticeshipHours(props.apprenticeshipHours || null);
-    setApprenticeshipContract(props.apprenticeshipContract || false);
-  }, [props.name, props.sex, props.wage, props.workingHours, props.hourlyRate, props.apprenticeshipHours, props.apprenticeshipContract]);
+    if (individualData.name!=name) setName(individualData.name);
+    //setSex(individualData.sex);
+    //setWage(individualData.wage);
+    // setWorkingHours(props.workingHours);
+    // setHourlyRate(props.hourlyRate);
+    // setApprenticeshipHours(props.apprenticeshipHours);
+    // setApprenticeshipContract(props.apprenticeshipContract);
+  }, [individualData]);
 
   useEffect(() => {
-    updateSocialData();
+    individualData.name = name;
+    console.log(individualData);
+    
+    onUpdate();
+    //updateSocialData();
   }, [name, sex, wage, workingHours, hourlyRate, apprenticeshipHours, apprenticeshipContract]);
 
-  const updateSocialData = () => {
-    const data = {
-      id: props.id,
-      name,
-      sex,
-      wage,
-      workingHours,
-      hourlyRate,
-      apprenticeshipHours,
-      apprenticeshipContract,
-    };
-    props.updateSocialData(data);
-  };
+  // const updateSocialData = () => {
+  //   const data = {
+  //     id: individualData.id,
+  //     name,
+  //     sex,
+  //     wage,
+  //     workingHours,
+  //     hourlyRate,
+  //     apprenticeshipHours,
+  //     apprenticeshipContract,
+  //   };
+  //   updateSocialData(data);
+  // };
 
   const isValid = hourlyRate != null && workingHours != null;
 
@@ -110,16 +120,15 @@ const EmployeeRow = (props) => {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
   };
 
-    /* -------------------- CHECK IF ALL DATA OK -------------------- */
+  /* -------------------- CHECK IF ALL DATA OK -------------------- */
 
-    const checkIndividualData = (individualData) => {
-      if (individualData.sex != 1 && individualData.sex != 2) return false;
-      else if (individualData.wage == null) return false;
-      else if (individualData.workingHours == null) return false;
-      else if (individualData.hourlyRate == null) return false;
-      else return true;
-    };
-  
+  const checkIndividualData = (individualData) => {
+    if (individualData.sex != 1 && individualData.sex != 2) return false;
+    else if (individualData.wage == null) return false;
+    else if (individualData.workingHours == null) return false;
+    else if (individualData.hourlyRate == null) return false;
+    else return true;
+  };
 
   return (
     <>
