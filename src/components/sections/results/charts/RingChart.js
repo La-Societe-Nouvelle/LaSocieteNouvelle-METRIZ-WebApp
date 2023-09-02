@@ -9,6 +9,7 @@ import { roundValue } from "/src/utils/Utils";
 const RingChart = ({
   session,
   period,
+  aggregate,
   indic
 }) => {
 
@@ -19,8 +20,8 @@ const RingChart = ({
     comparativeData
   } = session;
 
-  const productionValue = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic].value;
-  const divisionFootprint = comparativeData.production.division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+  const companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
+  const divisionFootprint = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
 
   const backgroundColor = "rgba(245, 245, 245, 0.75)";
   const backgroundColorBis = "rgba(245, 245, 245, 0)";
@@ -38,16 +39,16 @@ const RingChart = ({
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
   },{
-    data: [productionValue,roundValue(100-productionValue,2)],
+    data: [companyFootprint,roundValue(100-companyFootprint,2)],
     backgroundColor: [colors[indic][0], backgroundColor],
-    label: "Production",
+    label: financialData.mainAggregates[aggregate].label,
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
     }
   ];
 
   const data = {
-    labels: ["Production"],
+    labels: [financialData.mainAggregates[aggregate].label],
     datasets: datasets,
   };
 

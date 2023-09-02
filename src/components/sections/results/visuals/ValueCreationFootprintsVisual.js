@@ -38,6 +38,7 @@ export const ValueCreationFootprintsVisual = ({
             <RingChart
               session={session}
               period={period}
+              aggregate={"production"}
               indic={"eco"}
             />
           </Col>}
@@ -46,6 +47,7 @@ export const ValueCreationFootprintsVisual = ({
             <RingChart
               session={session}
               period={period}
+              aggregate={"production"}
               indic={"art"}
             />
           </Col>}
@@ -54,6 +56,7 @@ export const ValueCreationFootprintsVisual = ({
             <RingChart
               session={session}
               period={period}
+              aggregate={"production"}
               indic={"soc"}
             />
           </Col>}

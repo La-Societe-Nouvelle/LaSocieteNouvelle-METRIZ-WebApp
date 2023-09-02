@@ -13,7 +13,6 @@ export const SocialFootprintMainVisual = ({
 
   const validations = session.validations[period.periodKey];
   const nbIndics = ["geq","idr","knw"].filter((indic) => validations.includes(indic)).length;
-  console.log(nbIndics);
 
   return (
     <div className="box">
@@ -62,6 +61,7 @@ export const SocialFootprintMainVisual = ({
               id={"socialfootprintvisual_knw"}
               session={session}
               period={period}
+              aggregate={"production"}
               indic={"knw"}
             />
           </Col>}
