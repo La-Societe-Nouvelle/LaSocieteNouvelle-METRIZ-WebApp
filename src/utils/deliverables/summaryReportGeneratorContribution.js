@@ -115,9 +115,7 @@ export const buildSummaryReportContributionIndic = async ({
   );
 
   const currentICdivisionData = getClosestYearData(
-    comparativeData.intermediateConsumptions.division.macrodata.data[
-      indic.toUpperCase()
-    ],
+    comparativeData.intermediateConsumptions.division.history.data[indic],
     currentPeriod
   );
 

@@ -4,7 +4,11 @@ import { endpoints } from "../../config/endpoint";
 // Libraries
 import metaIndics from "/lib/indics.json";
 
-export async function fetchMacrodata(dataset, activityCodes, indicators) {
+export async function fetchMacrodata(
+  dataset, 
+  activityCodes, 
+  indicators) 
+{
   const aggregates = ["CFC", "PRD", "NVA", "IC"];
 
   try {
@@ -20,7 +24,8 @@ export async function fetchMacrodata(dataset, activityCodes, indicators) {
     if (response.data.header.code === 200) {
       return response.data.data;
     } else {
-      return null;
+      // handle empty answer (not error for target)
+      return [];
     }
   } catch (error) {
     throw Error(error.message)

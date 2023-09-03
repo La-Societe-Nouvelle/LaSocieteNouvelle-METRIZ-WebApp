@@ -157,22 +157,23 @@ export class Provider
       // request
       await api.get("legalunitfootprint/" + footprintId).then((res) => 
       {
-          let status = res.data.header.code;
-          this.footprintStatus = status;
-          if (status == 200) {
-            // legal data --------------------------------------- //
-            this.legalUnitData = res.data.legalUnit;
-            // footprint ---------------------------------------- //
-            this.footprint.updateAll(res.data.footprint);
-            this.dataFetched = true;
-          } else {
-            // legal data --------------------------------------- //
-            this.legalUnitData = {};
-            // footprint ---------------------------------------- //
-            this.footprint = new SocialFootprint();
-            this.dataFetched = false;
-          }
+        let status = res.data.header.code;
+        this.footprintStatus = status;
+        if (status == 200) {
+          // legal data --------------------------------------- //
+          this.legalUnitData = res.data.legalUnit;
+          // footprint ---------------------------------------- //
+          this.footprint.updateAll(res.data.footprint);
+          this.dataFetched = true;
+        } else {
+          // legal data --------------------------------------- //
+          this.legalUnitData = {};
+          // footprint ---------------------------------------- //
+          this.footprint = new SocialFootprint();
+          this.dataFetched = false;
+        }
       }).catch((err)=>{
+        console.log("error "+err.message);
         throw Error(err.message);
       });
     }
@@ -204,6 +205,7 @@ export class Provider
             this.dataFetched = false;
           }
       }).catch((err)=>{
+        console.log("error 2 "+err.message);
           throw err;
         });
     }

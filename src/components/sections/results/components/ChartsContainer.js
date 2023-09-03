@@ -104,19 +104,13 @@ const IndicatorCharts = ({
             id={`trend-chart-${indic}-print`}
             unit={indicators[indic].unit}
             historical={
-              comparativeData["production"].division.macrodata.data[
-                indic.toUpperCase()
-              ]
+              comparativeData["production"].division.history.data[indic]
             }
             trend={
-              comparativeData["production"].division.trend.data[
-                indic.toUpperCase()
-              ]
+              comparativeData["production"].division.trend.data[indic]
             }
             target={
-              comparativeData["production"].division.trend.data[
-                indic.toUpperCase()
-              ]
+              comparativeData["production"].division.trend.data[indic]
             }
             aggregate={mainAggregates.production.periodsData}
             indic={indic}

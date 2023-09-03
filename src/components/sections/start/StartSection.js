@@ -5,16 +5,14 @@ import React, { useState } from "react";
 import { Button, Col, Container, Image, Row } from "react-bootstrap";
 
 // Modals
-import { Loader } from "../modals/Loader";
+import { Loader } from "../../modals/Loader";
+import { DataUpdater } from "/src/components/modals/dataUpdater/DataUpdater";
 
 // Objects
 import { Session } from "/src/Session";
 
 // Updater
 import { updateVersion } from "/src/version/updateVersion";
-
-// Modal
-import { DataUpdater } from "/src/components/modals/dataUpdater/DataUpdater";
 
 /* ------------------------------------------------------- */
 /* -------------------- START SECTION -------------------- */

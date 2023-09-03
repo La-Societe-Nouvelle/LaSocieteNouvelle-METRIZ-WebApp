@@ -58,9 +58,9 @@ export const EvolutionCurvesVisual = ({
   };
 
   const evolutionCurvesData = {
-    historical: comparativeData[showedAggregate].division.macrodata.data[indic.toUpperCase()] || [],
-    trend:      comparativeData[showedAggregate].division.trend.data[indic.toUpperCase()] || [],
-    target:     comparativeData[showedAggregate].division.target.data[indic.toUpperCase()] || [],
+    historical: comparativeData[showedAggregate].division.history.data[indic],
+    trend:      comparativeData[showedAggregate].division.trend.data[indic],
+    target:     comparativeData[showedAggregate].division.target.data[indic],
     aggregate:  financialData.mainAggregates[showedAggregate].periodsData,
   };
   const title = "";
@@ -96,9 +96,7 @@ export const EvolutionCurvesVisual = ({
         <div className="box ">
           <h4>Notes</h4>
 
-          {comparativeData.production.division.trend.data[
-            indic.toUpperCase()
-          ] && (
+          {comparativeData.production.division.trend.data[indic] && (
             <>
               <h5>Tendance de la branche :</h5>
               <p className="small-text">
@@ -113,9 +111,7 @@ export const EvolutionCurvesVisual = ({
               <p className="small mt-3">Source : {metaTrends[indic].source}</p>
             </>
           )}
-          {comparativeData.production.division.target.data[
-            indic.toUpperCase()
-          ] && (
+          {comparativeData.production.division.target.data[indic].length>0 && (
             <>
               <h5>Objectif de la branche :</h5>
               {metaTargets[indic].info}

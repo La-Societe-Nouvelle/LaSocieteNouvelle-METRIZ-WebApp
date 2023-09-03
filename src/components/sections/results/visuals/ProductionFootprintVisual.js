@@ -41,7 +41,7 @@ export const ProductionFootprintVisual = ({
         </Button>
       </div>
       <div className="d-inline">
-        <Row className="row-eq-height justify-content-center">
+        <Row className="row-eq-height justify-content-around">
           {validations.map((indic) => 
             <Col lg={2} className="d-flex flex-column justify-content-between my-5">
               {keyIndics.includes(indic) &&

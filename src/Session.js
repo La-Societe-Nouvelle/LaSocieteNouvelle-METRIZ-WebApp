@@ -30,8 +30,8 @@ import {
   getPrevDate
 } from "./utils/Utils";
 
-import { ComparativeData } from "./models/ComparativeData";
 import { getAnalysisFromChatGPT } from "./writers/analysis/analysis";
+import { ComparativeData } from "./ComparativeData";
 
 /* ---------- OBJECT SESSION ---------- */
 

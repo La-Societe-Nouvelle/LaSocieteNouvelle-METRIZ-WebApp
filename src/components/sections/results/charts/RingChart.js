@@ -21,7 +21,7 @@ const RingChart = ({
   } = session;
 
   const companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
-  const divisionFootprint = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+  const divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
 
   const backgroundColor = "rgba(245, 245, 245, 0.75)";
   const backgroundColorBis = "rgba(245, 245, 245, 0)";
@@ -53,14 +53,10 @@ const RingChart = ({
   };
 
   const getCutOut = (chart) => {
-    console.log(chart);
-    console.log(chart.canvas);
     return 50;
   }
 
   const handleResize = (chart) => {
-    console.log("trigger");
-    console.log(chart);
     setWidth(chart.canvas.width)
   };
 

@@ -32,7 +32,7 @@ const ComparativeHorizontalBarChart = ({
   {
     if (validations[period.periodKey].includes(indic)) {
       let companyProductionFpt = financialData.mainAggregates.production.periodsData[period.periodKey].footprint.indicators[indic].value;
-      let divisionFootprint = comparativeData.production.division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+      let divisionFootprint = comparativeData.production.division.history.data[indic].slice(-1)[0].value;
       // case division fpt = 0 ?
       let gap = Math.round( (companyProductionFpt-divisionFootprint)/divisionFootprint * 100 );
   

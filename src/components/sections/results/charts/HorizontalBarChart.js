@@ -40,7 +40,7 @@ const DeviationChart = ({
   const data = [];
   for (let aggregate of aggregates) {
     let companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
-    let divisionFootprint = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+    let divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
     let value = Math.round( (companyFootprint-divisionFootprint)/divisionFootprint * 100 );
     data.push(value);
   }

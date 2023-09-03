@@ -58,7 +58,7 @@ export const analysisTextWriterGHG = (props) => {
   currentParagraph = [];
 
   const netValueAddedComparativeData = getClosestYearData(
-    comparativeData.intermediateConsumptions.division.macrodata.data["GHG"],
+    comparativeData.intermediateConsumptions.division.history.data.ghg,
     year
   );
 
@@ -189,7 +189,7 @@ export const analysisTextWriterGHG = (props) => {
   // comparaison branche
 
   const intermediateConsumptionsComparativeData = getClosestYearData(
-    comparativeData.intermediateConsumptions.division.macrodata.data["GHG"],
+    comparativeData.intermediateConsumptions.division.history.data.ghg,
     year
   );
 

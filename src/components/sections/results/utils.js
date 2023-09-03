@@ -136,9 +136,9 @@ export const getTagsIndic = (
   } = session;
 
   const companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
-  const divisionFootprint = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
-  const targetFootprint = comparativeData[aggregate].division.target.data[indic.toUpperCase()] 
-    ? comparativeData[aggregate].division.target.data[indic.toUpperCase()].slice(-1)[0].value 
+  const divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
+  const targetFootprint = comparativeData[aggregate].division.target.data[indic].length>0 
+    ? comparativeData[aggregate].division.target.data[indic].slice(-1)[0].value 
     : null;
 
   const positiveImpact = ["eco","art","soc","knw"].includes(indic);

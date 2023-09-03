@@ -441,5 +441,13 @@ export const getExpensesGroupByAccount = (expenses) => {
   );
 };
 
+/* -------------------------- ARRAY -------------------------- */
 
-
+export const getDistinctItems = (array) => 
+{
+  const filteredArray = array.filter(
+    (value, index, self) =>
+      index === self.findIndex((item) => item == value)
+  )
+  return filteredArray;
+}

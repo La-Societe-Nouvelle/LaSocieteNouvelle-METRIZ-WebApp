@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import ErrorBoundary from "/src/utils/ErrorBoundary";
 
 // Sections
-import { StartSection } from "/src/components/sections/StartSection";
+import { StartSection } from "/src/components/sections/start/StartSection";
 import AccountingImportSection from "/src/components/sections/accountingImport";
 import { InitialStatesSection } from "/src/components/sections/initialStates";
 import ProvidersSection from "/src/components/sections/providers";
@@ -38,6 +38,7 @@ export const Metriz = () => {
   const currentDate = getCurrentDateString();
 
   const initSession = (newSession) => {
+    console.log(newSession.progression);
     const initialStep =
       newSession.progression === 0 ? 1 : newSession.progression;
     const period = newSession.availablePeriods[0];

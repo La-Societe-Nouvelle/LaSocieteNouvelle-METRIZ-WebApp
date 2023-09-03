@@ -91,7 +91,7 @@ export class Indicator {
     this.source = data.source;
     this.lastupdate = data.lastupdate;
     // Complements
-    this.libelleFlag = data.libelleFlag;
+    this.libelleFlag = data.libelleFlag || null;
   }
         
   setValue(value) 

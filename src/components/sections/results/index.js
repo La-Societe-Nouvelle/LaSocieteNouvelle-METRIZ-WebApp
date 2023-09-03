@@ -14,9 +14,6 @@ import {
   Row,
 } from "react-bootstrap";
 
-// Services
-import { fetchComparativeData } from "/src/services/MacrodataService";
-
 // Views
 import viewsData from "./views";
 import { IndicatorView } from "./views/IndicatorView";
@@ -79,7 +76,7 @@ const Results = ({ session, publish, goBack }) =>
       // fetch data
       setIsLoading(true);
       session.comparativeData.activityCode = comparativeDivision;
-      await fetchComparativeData(session.comparativeData);
+      await session.comparativeData.fetchComparativeData(session.validations[period.periodKey]);
       setIsLoading(false);
     }
   };

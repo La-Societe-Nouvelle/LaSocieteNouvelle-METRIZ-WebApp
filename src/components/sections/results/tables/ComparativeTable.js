@@ -38,7 +38,7 @@ export const ComparativeTable = ({
   );
 
   const { unit, nbDecimals } = metaIndics[indic];
-
+  
   const printCompanyFootprint = (aggregate,periodKey) => {
     return printValue(financialData.mainAggregates[aggregate].periodsData[periodKey].footprint.getIndicator(indic).value, 
       nbDecimals
@@ -46,10 +46,11 @@ export const ComparativeTable = ({
   }
 
   const printComparativeFootprint = (aggregate, category, dataset) => {
-    return printValue(
-      comparativeData[aggregate][category][dataset].data[indic.toUpperCase()].at(-1).value, 
-      nbDecimals
-    )
+    return comparativeData[aggregate][category][dataset].data[indic].length>0 
+      ? printValue(
+        comparativeData[aggregate][category][dataset].data[indic].at(-1).value, 
+        nbDecimals)
+      : null;
   }
   
   const getPercentageGap = (value, reference) => {
@@ -122,10 +123,10 @@ export const ComparativeTable = ({
                 <td>{financialData.mainAggregates[aggregate].label}</td>
                 {showAreaFootprint && (
                   <td className="border-left text-end">
-                    {printComparativeFootprint(aggregate,"area","macrodata")}
+                    {printComparativeFootprint(aggregate,"area","history")}
                   </td>
                 )}
-                {(showAreaFootprint && showTarget && comparativeData[aggregate].area.target.data[indic.toUpperCase()]) && (
+                {(showAreaFootprint && showTarget && comparativeData[aggregate].area.target.data[indic].length>0) && (
                   <td className="text-end">
                     {printComparativeFootprint(aggregate,"area","target")}
                   </td>
@@ -148,18 +149,18 @@ export const ComparativeTable = ({
                 )}
                 {(showDivisionData) && (
                   <td className="border-left text-end">
-                    {printComparativeFootprint(aggregate,"division","macrodata")}
+                    {printComparativeFootprint(aggregate,"division","history")}
                   </td>   
                 )}
-                {(showDivisionData && showTarget && comparativeData[aggregate].division.target.data[indic.toUpperCase()]) && (
+                {(showDivisionData && showTarget && comparativeData[aggregate].division.target.data[indic].length>0) && (
                   <>
                     <td className="text-end">
                       {printComparativeFootprint(aggregate,"division","target")}
                     </td>
                     <td className="text-end">
                       {getPercentageGap(
-                        comparativeData[aggregate].division.target.data[indic.toUpperCase()].at(-1).value,
-                        comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].at(-1).value
+                        comparativeData[aggregate].division.target.data[indic].at(-1).value,
+                        comparativeData[aggregate].division.history.data[indic].at(-1).value
                       )+"%"}
                     </td>
                   </>

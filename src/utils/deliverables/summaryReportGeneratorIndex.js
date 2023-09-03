@@ -64,15 +64,14 @@ export const generateIndiceIndicatorSheet = ({
 
   let branchProductionTarget = null;
 
-  if (comparativeData.production.division.target.data[indic.toUpperCase()]) {
+  if (comparativeData.production.division.target.data[indic]) {
     branchProductionTarget = targetAnnualReduction(
-      comparativeData.production.division.target.data[indic.toUpperCase()]
+      comparativeData.production.division.target.data[indic]
     );
   }
 
-  let lastEstimatedData = comparativeData.production.division.macrodata.data[
-    indic.toUpperCase()
-  ].filter((item) => item.year <= currentPeriod);
+  let lastEstimatedData = comparativeData.production.division.history.data[indic]
+    .filter((item) => item.year <= currentPeriod);
 
   lastEstimatedData = lastEstimatedData.slice(
     Math.max(lastEstimatedData.length - 2, 1)

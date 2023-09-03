@@ -57,9 +57,9 @@ export const ComparativeChart = ({
   // current footprints
 
   const dataset_currentFootprints = [
-    comparativeData[aggregate].area.macrodata.data[indic.toUpperCase()].slice(-1)[0].value,
+    comparativeData[aggregate].area.history.data[indic].slice(-1)[0].value,
     mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value,
-    comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value
+    comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value
   ];
 
   // prev footprints
@@ -78,11 +78,11 @@ export const ComparativeChart = ({
   // targets
 
   const dataset_target = [
-    comparativeData[aggregate].area.target.data[indic.toUpperCase()] ? 
-      comparativeData[aggregate].area.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
+    comparativeData[aggregate].area.target.data[indic].length>0 ? 
+      comparativeData[aggregate].area.target.data[indic].slice(-1)[0].value : null,
     null,
-    comparativeData[aggregate].division.target.data[indic.toUpperCase()] ? 
-      comparativeData[aggregate].division.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
+    comparativeData[aggregate].division.target.data[indic].length>0 ? 
+      comparativeData[aggregate].division.target.data[indic].slice(-1)[0].value : null,
   ];
 
   // Data for chart --------------------------------------------------------

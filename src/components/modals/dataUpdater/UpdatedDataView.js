@@ -1,47 +1,57 @@
+// La Société Nouvelle
+
+// React
 import React, { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
+
+// Lib
 import metaIndics from "/lib/indics";
+
+const indics = Object.entries(metaIndics)
+  .filter(([_,metaIndic]) => metaIndic.isAvailable)
+  .map(([indic,_]) => indic);
+
 import { downloadSession, isObjEmpty } from "/src/utils/Utils";
+import { getInitialStatesChanges, getProductionFootprintChanges, getProvidersChanges } from "./utils";
 
-const UpdateDataView = (props) => {
+const UpdateDataView = ({
+  prevSession,
+  updatedSession,
+  updatePrevSession,
+  close
+}) => {
 
-  const [updatedProviders, setUpdatedProviders] = useState(null);
-  const [updatedAccounts, setUpdatedAccounts] = useState(null);
+  const [providersChanges, setProvidersChanges] = useState([]);
+  const [initialStatesChanges, setInitialStatesChanges] = useState([]);
+  const [resultsChanges, setResultsChanges] = useState([]);
   const [updatedComparativeData, setUpdatedComparativeData] = useState(null);
-  const [updatedFootprint, setUpdatedFootprint] = useState(null);
   const [showButton, setShowButton] = useState(false);
   const [isSessionUpdated, setIsSessionUpdated] = useState(false);
   const [isUptodate, setIsuptodate] = useState(false);
 
+
   useEffect(async () => {
-
-    const compareProviders = await compareProvidersFpt(
-      props.prevSession.financialData.providers,
-      props.updatedSession.financialData.providers
+    // providers changes
+    const providersChanges = await getProvidersChanges(
+      updatedSession.financialData.providers,
+      prevSession.financialData.providers
     );
-    if (compareProviders) {
-      setUpdatedProviders(compareProviders);
-    }
+    setProvidersChanges(providersChanges);
 
-    const prevAccounts = props.prevSession.financialData.immobilisations
-      .concat(props.prevSession.financialData.stocks)
-      .filter((asset) => asset.initialStateType == "defaultData");
-
-    const currAccounts = props.updatedSession.financialData.immobilisations
-      .concat(props.updatedSession.financialData.stocks)
-      .filter((asset) => asset.initialStateType == "defaultData");
-
-    const compareAccounts = await compareInitialStateFpt(
-      prevAccounts,
-      currAccounts
+    // initial states changes
+    const immobilisationsChanges = await getInitialStatesChanges(
+      updatedSession.financialData.immobilisations,
+      prevSession.financialData.immobilisations
     );
-    if (compareAccounts) {
-      setUpdatedAccounts(compareAccounts);
-    }
+    const stocksChanges = await getInitialStatesChanges(
+      updatedSession.financialData.stocks,
+      prevSession.financialData.stocks
+    );
+    setInitialStatesChanges([...immobilisationsChanges,...stocksChanges]);
 
     const compareComparativeData = compareDataUpdates(
-      props.prevSession.comparativeData,
-      props.updatedSession.comparativeData
+      prevSession.comparativeData,
+      updatedSession.comparativeData
     );
 
     if (compareComparativeData) {
@@ -49,8 +59,8 @@ const UpdateDataView = (props) => {
     }
 
     if (
-      isObjEmpty(compareProviders) &&
-      isObjEmpty(compareAccounts) &&
+      isObjEmpty(providersChanges) &&
+      isObjEmpty(initialStatesChanges) &&
       isObjEmpty(compareComparativeData) 
     ) {
       setShowButton(false);
@@ -59,249 +69,148 @@ const UpdateDataView = (props) => {
       setShowButton(true);
       setIsuptodate(false);
     }
-  }, [props]);
+  }, [prevSession,updatedSession]);
 
   useEffect(async () => {
-    if (isSessionUpdated) {
-      props.updatePrevSession(props.updatedSession);
-    }
+    //console.log(isSessionUpdated);
+    // if (isSessionUpdated) {
+    //   updatePrevSession(updatedSession);
+    // }
   }, [isSessionUpdated]);
 
-  async function updateAggregatesFootprints(prevSession, currSession) {
-    let compareProductionFootprint = {};
-
-    for (let period of prevSession.availablePeriods) {
-      await currSession.updateFootprints(period);
+  // re-compute footprints
+  const applyUpdates = async () => 
+  {
+    // update footprints
+    for (let period of updatedSession.availablePeriods) {
+      await updatedSession.updateFootprints(period);
     }
 
+    // get changes
+    const resultsChanges = [];
     for (let period of prevSession.availablePeriods) {
-      const result = compareAggregateFootprint(
-        prevSession.financialData.mainAggregates.production.periodsData[
-          period.periodKey
-        ].footprint.indicators,
-        currSession.financialData.mainAggregates.production.periodsData[
-          period.periodKey
-        ].footprint.indicators
+      const resultsChangesOnPeriod = getProductionFootprintChanges(
+        updatedSession.financialData.mainAggregates.production.periodsData[period.periodKey].footprint,
+        prevSession.financialData.mainAggregates.production.periodsData[period.periodKey].footprint
       );
-
-      if (result) {
-        if (!compareProductionFootprint[period.periodKey]) {
-          compareProductionFootprint[period.periodKey] = {};
-        }
-        compareProductionFootprint[period.periodKey] = result;
-      }
+      resultsChanges.push(...resultsChangesOnPeriod);
     }
-    setUpdatedFootprint(compareProductionFootprint);
+    setResultsChanges(resultsChanges);
+
     setIsSessionUpdated(true);
   }
 
-  return isSessionUpdated ? (
-    <>
-      <p>Les données ont bien été mises à jour ! </p>
-      {Object.keys(updatedFootprint).length > 0 &&
-        Object.entries(updatedFootprint).map(([key, value]) => {
-          const indics = Object.keys(value);
-          let items = [];
-          indics.forEach((indic, index) => {
-            const currValue = value[indic].value.currValue;
-            const prevValue = value[indic].value.prevValue;
-            const diff = Math.abs((currValue - prevValue) / prevValue);
-
-            if (prevValue !== null && currValue !== null && diff >= 0.1) {
-              items.push(
-                <li key={index}>
-                  <b>{metaIndics[indic].libelle} </b>: L'empreinte de la
-                  production pour {key.slice(2)} est maintenant de {currValue}{" "}
-                  {metaIndics[indic].unit}. La valeur précédente était de{" "}
-                  {prevValue} {metaIndics[indic].unit}.
-                </li>
-              );
-            }
-          });
-          return (
-            <div>
-              {items.length > 0 && (
-                <>
-                  <p className="">
-                    L'empreinte de certains indicateurs a été recalculée en
-                    conséquence :
-                  </p>
-                  <ul className="small">{items}</ul>
-                </>
-              )}
-            </div>
-          );
-        })}
-      <Button
-        variant="secondary"
-        className="me-1 my-2"
-        onClick={() => downloadSession(props.updatedSession)}
-      >
-        Sauvegarder ma session
-      </Button>
-      <Button variant="primary" className="my-2" onClick={props.close}>
-        Reprendre mon analyse
-      </Button>
-    </>
-  ) : (
-    <>
-      {isUptodate ? (
-        <div className="text-center">
-          <p>
-            <i className="success bi bi-check2-circle"></i> Toutes les données
-            de votre session sont à jour. Vous pouvez reprendre votre analyse.
-          </p>
-          <div >
-            <Button
-              variant="primary"
-              size="md"
-              className="me-1"
-              onClick={props.close}
-            >
-              Fermer
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <p className="mb-3 ">Des données plus récentes sont disponibles :</p>
-      )}
+  if (isSessionUpdated) {
+    return (
+      <>
+        <p>Les données ont bien été mises à jour ! </p>
+        {Object.keys(resultsChanges).length > 0 &&
+          Object.entries(resultsChanges).map(([key, value]) => {
+            const indics = Object.keys(value);
+            let items = [];
+            indics.forEach((indic, index) => {
+              const currValue = value[indic].value.currValue;
+              const prevValue = value[indic].value.prevValue;
+              const diff = Math.abs((currValue - prevValue) / prevValue);
   
-      {updatedProviders && !isObjEmpty(updatedProviders) && (
-        <FootprintPreview data={updatedProviders} label={"fournisseurs"} />
-      )}
-
-      {updatedAccounts && !isObjEmpty(updatedAccounts) && (
-        <FootprintPreview
-          data={updatedAccounts}
-          label={"comptes de stocks et d'immobilisations"}
-        />
-      )}
-      {updatedComparativeData && !isObjEmpty(updatedComparativeData) && (
-        <div className="small my-3 pt-3">
-          <h4 className="h6">
-            <i className="text-info me-1 bi bi-arrow-repeat"></i>Données
-            comparatives
-          </h4>
-          <p>Les données de comparaisons vont être mises à jour.</p>
-        </div>
-      )}
-
-      {showButton && (
+              if (prevValue !== null && currValue !== null && diff >= 0.1) {
+                items.push(
+                  <li key={index}>
+                    <b>{metaIndics[indic].libelle} </b>: L'empreinte de la
+                    production pour {key.slice(2)} est maintenant de {currValue}{" "}
+                    {metaIndics[indic].unit}. La valeur précédente était de{" "}
+                    {prevValue} {metaIndics[indic].unit}.
+                  </li>
+                );
+              }
+            });
+            return (
+              <div>
+                {items.length > 0 && (
+                  <>
+                    <p className="">
+                      L'empreinte de certains indicateurs a été recalculée en
+                      conséquence :
+                    </p>
+                    <ul className="small">{items}</ul>
+                  </>
+                )}
+              </div>
+            );
+          })}
         <Button
           variant="secondary"
-          className="mt-2"
-          onClick={() =>
-            updateAggregatesFootprints(props.prevSession, props.updatedSession)
-          }
+          className="me-1 my-2"
+          onClick={() => downloadSession(updatedSession)}
         >
-          Mettre à jour ma session
+          Sauvegarder ma session
         </Button>
-      )}
-    </>
-  );
-};
+        <Button variant="primary" className="my-2" onClick={close}>
+          Reprendre mon analyse
+        </Button>
+      </>
+    )
+  } else {
+    return (
+      <>
+        {isUptodate ? (
+          <div className="text-center">
+            <p>
+              <i className="success bi bi-check2-circle"></i> Toutes les données
+              de votre session sont à jour. Vous pouvez reprendre votre analyse.
+            </p>
+            <div >
+              <Button
+                variant="primary"
+                size="md"
+                className="me-1"
+                onClick={close}
+              >
+                Fermer
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p className="mb-3 ">Des données plus récentes sont disponibles :</p>
+        )}
+    
+        {providersChanges && !isObjEmpty(providersChanges) && (
+          <FootprintPreview data={providersChanges} label={"fournisseurs"} />
+        )}
 
+        {initialStatesChanges && !isObjEmpty(initialStatesChanges) && (
+          <FootprintPreview
+            data={initialStatesChanges}
+            label={"comptes de stocks et d'immobilisations"}
+          />
+        )}
+        {updatedComparativeData && !isObjEmpty(updatedComparativeData) && (
+          <div className="small my-3 pt-3">
+            <h4 className="h6">
+              <i className="text-info me-1 bi bi-arrow-repeat"></i>Données
+              comparatives
+            </h4>
+            <p>Les données de comparaisons vont être mises à jour.</p>
+          </div>
+        )}
 
-
-async function compareProvidersFpt(prevProviders, currProviders) {
-  const updates = {};
-
-  // Parcours de tous les fournisseurs
-  for (const provider in currProviders) {
-    const currProvider = currProviders[provider];
-    const prevProvider = prevProviders[provider];
-    const providerId = prevProvider.corporateId
-      ? prevProvider.corporateId
-      : prevProvider.providerNum;
-    // Comparaison des indicateurs pour chaque fournisseur
-    for (const indicator in currProvider.footprint.indicators) {
-      let diffs = {};
-
-      const currFootprint = currProvider.footprint.indicators[indicator];
-      const prevFootprint = prevProvider.footprint.indicators[indicator];
-
-      const prevKeys = Object.keys(prevFootprint);
-
-      // Check if lastupdate is different
-      if (currFootprint.lastupdate != prevFootprint.lastupdate) {
-        // Compare the values of each key
-        for (const key of prevKeys) {
-          if (typeof prevFootprint[key] !== "function") {
-            const prevValue = prevFootprint[key];
-            const currValue = currFootprint[key];
-
-            if (prevValue !== currValue) {
-              diffs[key] = {
-                prevValue,
-                currValue,
-              };
+        {showButton && (
+          <Button
+            variant="secondary"
+            className="mt-2"
+            onClick={() =>
+              applyUpdates(prevSession, updatedSession)
             }
-          }
-        }
-
-        if (!updates[provider]) {
-          updates[provider] = { id: providerId };
-        }
-        // Stockage des indicateurs modifiés dans l'objet updates
-        if (!updates[provider]) {
-          updates[provider] = {};
-        }
-        updates[provider][indicator] = diffs;
-      }
-    }
+          >
+            Mettre à jour ma session
+          </Button>
+        )}
+      </>
+    )
   }
-
-  return updates;
 }
 
-async function compareInitialStateFpt(prevAccounts, currAccounts) {
-  const updates = {};
 
-  // Parcours de tous les fournisseurs
-  for (const account in currAccounts) {
-    const currAccount = currAccounts[account];
-    const prevAccount = prevAccounts[account];
-
-    // Comparaison des indicateurs pour chaque fournisseur
-    for (const indicator in currAccount.initialState.footprint.indicators) {
-      let diffs = {};
-
-      const currFootprint =
-        currAccount.initialState.footprint.indicators[indicator];
-      const prevFootprint =
-        prevAccount.initialState.footprint.indicators[indicator];
-
-      const prevKeys = Object.keys(prevFootprint);
-      // Check if lastupdate is different
-      if (currFootprint.lastupdate != prevFootprint.lastupdate) {
-        // Compare the values of each key
-        for (const key of prevKeys) {
-          if (typeof prevFootprint[key] !== "function") {
-            const prevValue = prevFootprint[key];
-            const currValue = currFootprint[key];
-            if (prevValue !== currValue) {
-              diffs[key] = {
-                prevValue,
-                currValue,
-              };
-            }
-          }
-        }
-
-        if (!updates[account]) {
-          updates[account] = { accountNum: prevAccount.accountNum };
-        }
-        // Stockage des indicateurs modifiés dans l'objet updates
-        if (!updates[account]) {
-          updates[account] = {};
-        }
-        updates[account][indicator] = diffs;
-      }
-    }
-  }
-
-  return updates;
-}
 
 function compareDataUpdates(prevData, currData) {
   const compareComparativeData = {};
@@ -358,40 +267,6 @@ function compareDataUpdates(prevData, currData) {
   }
 
   return compareComparativeData;
-}
-
-function compareAggregateFootprint(prevData, currData) {
-  const updates = {};
-
-  for (const indicator in prevData) {
-    let diffs = {};
-
-    const currFootprint = currData[indicator];
-    const prevFootprint = prevData[indicator];
-
-    // Check if lastupdate is different
-
-    if (currFootprint.lastupdate != prevFootprint.lastupdate) {
-      const prevKeys = Object.keys(prevFootprint);
-      // Compare the values of each key
-      for (const key of prevKeys) {
-        if (key == "value") {
-          const prevValue = prevFootprint[key];
-          const currValue = currFootprint[key];
-
-          if (prevValue !== currValue) {
-            diffs[key] = {
-              prevValue,
-              currValue,
-            };
-            updates[indicator] = diffs;
-          }
-        }
-      }
-    }
-  }
-
-  return !isObjEmpty(updates) ? updates : false;
 }
 
 const FootprintPreview = ({ data, label }) => {

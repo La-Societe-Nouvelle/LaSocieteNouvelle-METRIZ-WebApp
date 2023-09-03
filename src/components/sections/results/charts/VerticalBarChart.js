@@ -65,7 +65,7 @@ export const VerticalBarChart = ({
   const backgroundColors = [];
   // area
   if (showAreaData) {
-    let areaValue = comparativeData[aggregate].area.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+    let areaValue = comparativeData[aggregate].area.history.data[indic].slice(-1)[0].value;
     dataset_currentFootprints.push(areaValue);
     labels.push("France");
     backgroundColors.push("RGBA(176,185,247,1)");
@@ -77,7 +77,7 @@ export const VerticalBarChart = ({
   backgroundColors.push("RGBA(250,89,95,1)");
   // division
   if (showDivisionData) {
-    let divisionValue = comparativeData[aggregate].division.macrodata.data[indic.toUpperCase()].slice(-1)[0].value;
+    let divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
     dataset_currentFootprints.push(divisionValue);
     labels.push("Branche");
     backgroundColors.push("rgb(255, 182, 66)");
@@ -99,11 +99,11 @@ export const VerticalBarChart = ({
   // targets
 
   const dataset_target = [
-    comparativeData[aggregate].area.target.data[indic.toUpperCase()] ? 
-      comparativeData[aggregate].area.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
+    comparativeData[aggregate].area.target.data[indic].length>0 ? 
+      comparativeData[aggregate].area.target.data[indic].slice(-1)[0].value : null,
     null,
-    comparativeData[aggregate].division.target.data[indic.toUpperCase()] ? 
-      comparativeData[aggregate].division.target.data[indic.toUpperCase()].slice(-1)[0].value : null,
+    comparativeData[aggregate].division.target.data[indic].length>0 ? 
+      comparativeData[aggregate].division.target.data[indic].slice(-1)[0].value : null,
   ];
 
   const datasets = [{

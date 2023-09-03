@@ -4,25 +4,20 @@
 import React, { useState,useEffect } from "react";
 import { Alert, Button, Container } from "react-bootstrap";
 
-// Services
-import { fetchComparativeData } from "/src/services/MacrodataService";
-
 // Components
 import StatementFormContainer from "./StatementFormContainer";
 
 // Modals
 import { Loader } from "../../modals/Loader";
 
-// Utils
-import { checkIfDataExists } from "./utils";
-
 // Libs
 import indicators from "/lib/indics";
 
-const DirectImpacts = ({ session, submit }) => 
-{
+const DirectImpacts = ({ 
+  session, 
+  submit 
+}) => {
   const [period] = useState(session.financialPeriod);
-  console.log(session.validations[period.periodKey]);
 
   const [statementsStatus, setStatementsStatus] = useState({
     art: { status: "unselect", errorMessage: null },
@@ -69,25 +64,16 @@ const DirectImpacts = ({ session, submit }) =>
     setEmptyStatements(emptyStatements);
   }, [statementsStatus])
 
-  const handleSubmitStatements = async () => {
+  // on submit
+  const handleSubmitStatements = async () => 
+  {
     setIsLoading(true);
+
+    // compute footprints
     await session.updateFootprints(period);
 
-    const missingIndicators = [];
-
-    for (const validation of selectedStatements) {
-      const indicatorCode = validation.toUpperCase();
-      // fetch comparative data
-      //
-      const hasData = checkIfDataExists(session.comparativeData, indicatorCode);
-
-      if (!hasData) {
-        missingIndicators.push(indicatorCode);
-      }
-    }
-    if (missingIndicators.length > 0) {
-      await fetchComparativeData(session.comparativeData);
-    }
+    // fetch comparative data
+    await session.comparativeData.fetchComparativeData(selectedStatements);
 
     setIsLoading(false);
     submit();

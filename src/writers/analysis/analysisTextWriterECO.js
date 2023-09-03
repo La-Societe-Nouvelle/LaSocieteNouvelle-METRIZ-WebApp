@@ -71,7 +71,7 @@ export const analysisTextWriterECO = (props) => {
 
   // comparaison branche
   const closetYearComparativeData = getClosestYearData(
-    comparativeData.intermediateConsumptions.division.macrodata.data["ECO"],
+    comparativeData.intermediateConsumptions.division.history.data["ECO"],
     year
   );
   
