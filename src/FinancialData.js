@@ -40,8 +40,10 @@ export const otherFinancialDataItems = [
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */
 
-export class FinancialData {
-  constructor(data) {
+export class FinancialData 
+{
+  constructor(data) 
+  {
     // if no data (new session)
     if (data == undefined) {
       this.isFinancialDataLoaded = false;
@@ -51,6 +53,7 @@ export class FinancialData {
       // data loaded state
       this.metaAccounts = data.accounts;
       this.isFinancialDataLoaded = data.isFinancialDataLoaded; // to follow progression
+      this.status = data.status;
 
       // Production items ------------------------ //
 
@@ -117,14 +120,11 @@ export class FinancialData {
 
       // Aggregates ------------------------------ //
 
-      this.mainAggregates = {
+      this.mainAggregates = 
+      {
         production: new Aggregate(data.mainAggregates.production),
-        intermediateConsumptions: new Aggregate(
-          data.mainAggregates.intermediateConsumptions
-        ),
-        fixedCapitalConsumptions: new Aggregate(
-          data.mainAggregates.fixedCapitalConsumptions
-        ),
+        intermediateConsumptions: new Aggregate(data.mainAggregates.intermediateConsumptions),
+        fixedCapitalConsumptions: new Aggregate(data.mainAggregates.fixedCapitalConsumptions),
         netValueAdded: new Aggregate(data.mainAggregates.netValueAdded),
       };
 
@@ -140,7 +140,11 @@ export class FinancialData {
   /* ---------------------------------------- BUILD FINANCIAL DATA FROM FEC DATA ---------------------------------------- */
   /* -------------------------------------------------------------------------------------------------------------------- */
 
-  loadFECData = async (FECData, financialPeriod, periods) => {
+  loadFECData = async (
+    FECData, 
+    financialPeriod, 
+    periods
+  ) => {
     // ---------------------------------------------------------------------------------------------------- //
 
     // Meta ------------------------------------ //
@@ -223,9 +227,20 @@ export class FinancialData {
     // Initial states -------------------------- //
 
     await this.initInitialStates();
+    
+    // Status ---------------------------------- //
+    
+    this.status = {};
+    periods.forEach(({ periodKey }) => {
+      this.status[periodKey] = {
+        isLoaded: true,
+        isValidated: false
+      }
+    });
+
+    this.isFinancialDataLoaded = true;
 
     // ---------------------------------------------------------------------------------------------------- //
-    this.isFinancialDataLoaded = true;
   };
 
   /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */

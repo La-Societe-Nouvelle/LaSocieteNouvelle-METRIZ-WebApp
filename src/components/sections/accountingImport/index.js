@@ -80,6 +80,7 @@ export const AccountingImportSection = (props) => {
       setImportedData(null);
     } else {
       let financialPeriod = getFinancialPeriodFECData(FECData);
+      props.updatePeriod(financialPeriod);
       let monthPeriods = getMonthPeriodsFECData(FECData);
       let periods = [financialPeriod, ...monthPeriods];
 
@@ -90,6 +91,7 @@ export const AccountingImportSection = (props) => {
         financialPeriod,
         periods
       );
+      console.log(session.financialData);
 
       session.impactsData[
         financialPeriod.periodKey

@@ -34,6 +34,11 @@ export class FinancialDatas extends React.Component
     window.scrollTo(0, 0);
   }
 
+  validFinancialData = () => {
+    this.props.session.financialData.status[this.state.period.periodKey].isValidated = true;
+    this.props.submit();
+  }
+
   render() {
     const { selectedTable, period } = this.state;
 
@@ -108,7 +113,7 @@ export class FinancialDatas extends React.Component
           </button>
           }
       
-          <button className={"btn btn-secondary"} onClick={this.props.submit}>
+          <button className={"btn btn-secondary"} onClick={this.validFinancialData}>
           { this.props.session.progression > 1 ?  "Reprendre mon analyse" : "Valider l'import" }
             <i className="bi bi-chevron-right"></i>
           </button>

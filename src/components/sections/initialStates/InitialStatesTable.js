@@ -7,7 +7,7 @@ import { Table } from "react-bootstrap";
 
 // Utils
 import { printValue } from "/src/utils/Utils";
-import { getBranchesOptions, getDivisionsOptions, getPrevDate } from "/src/utils/Utils";
+import { getBranchesOptions, getDivisionsOptions } from "/src/utils/Utils";
 
 // Libraries
 import divisions from "/lib/divisions";
@@ -15,6 +15,7 @@ import branches from "/lib/branches";
 
 // Styles
 import { customSelectStyles } from "/config/customStyles";
+import { getPrevDate } from "../../../utils/periodsUtils";
 
 /* ---------- INITIAL STATES TABLE ---------- */
 
