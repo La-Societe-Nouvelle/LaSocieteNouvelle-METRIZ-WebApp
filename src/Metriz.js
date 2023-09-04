@@ -26,7 +26,7 @@ import { logUserProgress } from "/src/services/StatsService";
 // Utils
 import { getCurrentDateString } from "/src/utils/periodsUtils";
 import { getMoreRecentYearlyPeriod } from "/src/utils/periodsUtils";
-import { checkInitialStates } from "./utils/progressionUtils";
+import { checkInitialStates, getProgression } from "./utils/progressionUtils";
 
 /* ------------------------------------------------------------------------------------- */
 /* ---------------------------------------- APP ---------------------------------------- */
@@ -44,10 +44,11 @@ export const Metriz = () =>
   const initSession = (session) => 
   {
     let defaultPeriod = getMoreRecentYearlyPeriod(session.availablePeriods);
+    let progression = getProgression(session,defaultPeriod);
 
     setSession(session);
     setSelectedPeriod(defaultPeriod);
-    setStep(session.progression);
+    setStep(progression);
   };
 
   const updateSelectedPeriod = (period) => {
@@ -157,6 +158,7 @@ export const Metriz = () =>
       <AccountingImportSection 
         session={session}
         period={selectedPeriod}
+        updatePeriod={updateSelectedPeriod}
         submit={validFinancialData} 
       />,
       <InitialStatesSection

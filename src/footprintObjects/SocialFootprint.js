@@ -1,3 +1,4 @@
+import { isValidNumber } from '../utils/Utils';
 import {Indicator} from './Indicator';
 
 const indics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
@@ -34,5 +35,9 @@ export class SocialFootprint {
   }
 
   isComplete = () => Object.entries(this.indicators).filter(([_,indicator]) => !indicator.value).length == 0;
+
+  isValid = () => {
+    return !Object.values(this.indicators).some((indicator) => !indicator.isValid());
+  }
 
 }

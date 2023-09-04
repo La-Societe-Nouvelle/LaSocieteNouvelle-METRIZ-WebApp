@@ -115,4 +115,8 @@ export class Indicator {
     this.uncertainty = value;
   }
 
+  isValid = () => {
+    return isValidNumber(this.value) && isValidNumber(this.uncertainty);
+  }
+
 }
