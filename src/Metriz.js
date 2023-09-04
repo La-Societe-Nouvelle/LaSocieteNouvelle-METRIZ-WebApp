@@ -242,9 +242,9 @@ export const Metriz = () =>
       {(step > 0 && step < 6) && 
         <HeaderSection
           step={step}
-          stepMax={session.progression}
           setStep={updateStep}
           session={session}
+          period={selectedPeriod}
         />
       }
       {(step == 6) && 

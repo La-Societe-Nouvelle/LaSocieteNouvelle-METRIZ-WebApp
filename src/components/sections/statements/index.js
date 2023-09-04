@@ -82,6 +82,7 @@ const DirectImpacts = ({
       ...prevStatementsStatus,
       [indic]: status
     })});
+    session.initNetValueAddedFootprint(period);
   };
 
   const categories = [

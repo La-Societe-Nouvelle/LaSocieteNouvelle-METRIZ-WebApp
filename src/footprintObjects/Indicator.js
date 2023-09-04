@@ -1,3 +1,5 @@
+import { isValidNumber } from "../utils/Utils";
+
 export class Indicator {
 
   constructor(props) 

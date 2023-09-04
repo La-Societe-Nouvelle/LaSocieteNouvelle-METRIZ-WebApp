@@ -36,7 +36,7 @@ export const Topbar = ({ session }) =>
         </li>
       </ul>
       <Button className="btn-sm me-4 my-2 p-2"
-              disabled={session.progression == 0}
+              //disabled={session.progression == 0}
               variant="secondary"
               onClick={() => downloadSession(session)}>
         <i className="bi bi-arrow-down"/>

@@ -32,6 +32,7 @@ import {
 
 import { getAnalysisFromChatGPT } from "./writers/analysis/analysis";
 import { ComparativeData } from "./ComparativeData";
+import { SocialFootprint } from "./footprintObjects/SocialFootprint";
 
 /* ---------- OBJECT SESSION ---------- */
 
@@ -256,6 +257,10 @@ export class Session
       return new Indicator({ indic: indic });
     }
   };
+
+  initNetValueAddedFootprint = (period) => {
+    this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].footprint = new SocialFootprint();
+  }
 
   /* -------------------- MAIN AGGREGATES FOOTPRINTS -------------------- */
 

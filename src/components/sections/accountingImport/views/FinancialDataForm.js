@@ -64,18 +64,22 @@ export const FinancialDataForm = ({
 
   // update session -----------------------------------
 
-  useEffect(async () => {
+  useEffect(async () => 
+  {
     session.legalUnit.siren = siren;
-    try {
-      await session.legalUnit.fetchLegalUnitData();
-      setCorporateName(session.legalUnit.corporateName || "");
-      if (/^[0-9]{2}/.test(session.legalUnit.activityCode)) {
-        let nextDivision = session.legalUnit.activityCode.slice(0, 2);
-        session.comparativeData.activityCode = nextDivision;
-        setDivision(nextDivision);
+    if (/^[0-9]{9}/.test(siren)) 
+    {
+      try {
+        await session.legalUnit.fetchLegalUnitData();
+        setCorporateName(session.legalUnit.corporateName || "");
+        if (/^[0-9]{2}/.test(session.legalUnit.activityCode)) {
+          let nextDivision = session.legalUnit.activityCode.slice(0, 2);
+          session.comparativeData.activityCode = nextDivision;
+          setDivision(nextDivision);
+        }
+      } catch (error) {
+        setErrorAPI(true);
       }
-    } catch (error) {
-      setErrorAPI(true);
     }
   }, [siren])
 
@@ -234,6 +238,7 @@ export const FinancialDataForm = ({
 
       // impacts data
       let impactsDataOnFinancialPeriod = session.impactsData[financialPeriod.periodKey];
+      impactsDataOnFinancialPeriod.netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[financialPeriod.periodKey].amount;
       impactsDataOnFinancialPeriod.knwDetails.apprenticeshipTax = accountingData.KNWData.apprenticeshipTax;
       impactsDataOnFinancialPeriod.knwDetails.vocationalTrainingTax = accountingData.KNWData.vocationalTrainingTax;
 

@@ -225,7 +225,7 @@ export const InitialStatesSection = ({
         await currSession.financialData.loadFinancialDataFromBackUp(
           prevSession.financialData
         );
-        await currSession.updateFootprints(prevSession.financialPeriod);
+        //await currSession.updateFootprints(prevSession.financialPeriod);
 
         // Update component
         setPopupSuccess(true);
@@ -366,7 +366,7 @@ export const InitialStatesSection = ({
             <div className="table-data mt-2">
               <InitialStatesTable
                 financialData={session.financialData}
-                financialPeriod={session.financialPeriod}
+                period={period}
                 accountsShowed={accountsShowed}
                 onUpdate={updateFootprints}
               />

@@ -40,7 +40,7 @@ export const ChartsContainer = ({
           <div key={indic}>
             <IndicatorCharts
               session={session}
-              period={session.financialPeriod}
+              period={period}
               indic={indic}
             />
           </div>

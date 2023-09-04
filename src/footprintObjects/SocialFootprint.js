@@ -37,7 +37,7 @@ export class SocialFootprint {
   isComplete = () => Object.entries(this.indicators).filter(([_,indicator]) => !indicator.value).length == 0;
 
   isValid = () => {
-    return !Object.values(this.indicators).some((indicator) => !indicator.isValid());
+    return Object.values(this.indicators).every((indicator) => indicator.isValid());
   }
 
 }

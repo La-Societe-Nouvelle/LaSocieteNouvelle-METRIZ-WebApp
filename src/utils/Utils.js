@@ -5,11 +5,11 @@
 
   // download session (session -> JSON data)
   export const downloadSession = async (session) => {
-    const { legalUnit, financialPeriod } = session;
+    const { legalUnit } = session;
     const siren = legalUnit.siren || legalUnit.corporateName;
-    const periodKey = financialPeriod.periodKey.slice(2);
+    const period = getMoreRecentYearlyPeriod(session.availablePeriods);
   
-    const fileName = `session-metriz-${siren}-${periodKey}`;
+    const fileName = `session-metriz-${siren}-${period.periodKey}`;
     const json = JSON.stringify(session);
     const blob = new Blob([json], { type: "application/json" });
     const href = URL.createObjectURL(blob);
@@ -24,6 +24,7 @@
 import divisions from "/lib/divisions";
 import areas from "/lib/areas";
 import branches from "/lib/branches";
+import { getMoreRecentYearlyPeriod } from "./periodsUtils";
 
 export const getBranchesOptions = () => {
   return Object.entries(branches)
@@ -165,7 +166,7 @@ export function valueOrDefault(value, defaultValue) {
 export const isValidNumber = (value,min,max) => 
 {
   // is a number
-  if (!isNaN(value) && value!=="") {
+  if (!isNaN(value) && value!=="" && value!==null) {
     // check min
     if (min!=undefined) 
     {

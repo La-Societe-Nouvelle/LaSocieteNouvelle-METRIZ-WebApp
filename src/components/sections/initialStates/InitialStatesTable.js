@@ -48,7 +48,7 @@ export class InitialStatesTable extends React.Component {
 
   render() {
     const { immobilisations, stocks } = this.props.financialData;
-    const prevStateDateEnd = getPrevDate(this.props.financialPeriod.dateStart);
+    const prevStateDateEnd = getPrevDate(this.props.period.dateStart);
 
     const { columnSorted, nbItems, page } = this.state;
 

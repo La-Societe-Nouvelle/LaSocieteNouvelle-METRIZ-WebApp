@@ -10,6 +10,7 @@ import {
 
 // Components
 import { Topbar } from "./Topbar";
+import { getProgression } from "../../utils/progressionUtils";
 
 // Step names
 const stepNames = [
@@ -22,9 +23,11 @@ const stepNames = [
 
 /* -------------------- HEADER SECTION -------------------- */
 
-export const HeaderSection = ({ step, stepMax, setStep, session }) => 
+export const HeaderSection = ({ step, setStep, session, period }) => 
 {
   const refresh = () => location.reload(true);
+  const stepMax = getProgression(session,period);
+  console.log(stepMax);
 
   return (
     <header>
@@ -48,7 +51,7 @@ export const HeaderSection = ({ step, stepMax, setStep, session }) =>
             {
               const stepNumber = index + 1;
               const stepName = stepNames[index];
-              const isCompleted = stepMax >= stepNumber;
+              const isCompleted = stepMax > stepNumber;
               const isCurrentStep = step == stepNumber;
               return (
                 <StepperItem

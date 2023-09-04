@@ -55,11 +55,16 @@ const divisionsOptions = getDivisionsOptions(divisions);
  * 
  */
 
-const Results = ({ session, publish, goBack }) => 
-{
+const Results = ({ 
+  session, 
+  period, 
+  publish, 
+  goBack 
+}) => {
+  console.log(period);
   // Selections
   const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
-  const [period, setPeriod] = useState(session.financialPeriod);
+  //const [period, setPeriod] = useState(session.financialPeriod);
   const [showedView, setShowedView] = useState("default");
 
   // temp state
