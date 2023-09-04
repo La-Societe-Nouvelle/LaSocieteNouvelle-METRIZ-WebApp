@@ -20,6 +20,10 @@ export const getMoreRecentYearlyPeriod = (periods) =>
   return yearlyPeriods.at(-1);
 }
 
+export const getYearPeriod = (period) => {
+  return period.dateEnd.substring(0,4);
+}
+
 /* -------------------------- DATES -------------------------- */
 
 /** CURRENT DATE

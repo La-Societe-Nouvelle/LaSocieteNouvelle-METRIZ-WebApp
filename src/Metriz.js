@@ -26,7 +26,13 @@ import { logUserProgress } from "/src/services/StatsService";
 // Utils
 import { getCurrentDateString } from "/src/utils/periodsUtils";
 import { getMoreRecentYearlyPeriod } from "/src/utils/periodsUtils";
-import { checkInitialStates, getProgression } from "./utils/progressionUtils";
+import { 
+  checkExternalFootprints, 
+  checkFinancialData, 
+  checkImpactsStatements, 
+  checkInitialStates, 
+  getProgression 
+} from "./utils/progressionUtils";
 
 /* ------------------------------------------------------------------------------------- */
 /* ---------------------------------------- APP ---------------------------------------- */
@@ -40,8 +46,25 @@ export const Metriz = () =>
 
   const currentDate = getCurrentDateString();
 
-  // init session
+  // Update state -------------------------------------
+
+  const updateSelectedPeriod = (period) => {
+    setSelectedPeriod(period);
+  };
+
+  const updateStep = (nextStep) => {
+    setStep(nextStep);
+  };
+
+  // Init session -------------------------------------
+
   const initSession = (session) => 
+  {
+    setSession(session);
+    setStep(1);
+  };
+
+  const resumeSession = (session) => 
   {
     let defaultPeriod = getMoreRecentYearlyPeriod(session.availablePeriods);
     let progression = getProgression(session,defaultPeriod);
@@ -51,15 +74,7 @@ export const Metriz = () =>
     setStep(progression);
   };
 
-  const updateSelectedPeriod = (period) => {
-    setSelectedPeriod(period);
-  };
-
   // Validations --------------------------------------
-
-  const updateStep = (nextStep) => {
-    setStep(nextStep);
-  };
 
   // imported data
   const validFinancialData = async () => 
@@ -73,12 +88,18 @@ export const Metriz = () =>
     console.log(session);
     console.log("--------------------------------------------------");
 
+    // validation
+    let stepValidation = checkFinancialData(session,selectedPeriod);
+    if (!stepValidation) {
+      // log error
+    }
+
     // next step
     let initialStatesValidation = checkInitialStates(session,selectedPeriod);
     if (!initialStatesValidation) {
-      setStep(2);
+      setStep(2); // initial states section
     } else {
-      setStep(3);
+      setStep(3); // provider section
     }
 
     // server logs
@@ -99,8 +120,14 @@ export const Metriz = () =>
     console.log(session);
     console.log("--------------------------------------------------");
 
+    // validation
+    let stepValidation = checkInitialStates(session,selectedPeriod);
+    if (!stepValidation) {
+      // log error
+    }
+
     // next step
-    setStep(3);
+    setStep(3); // providers section
 
     // server logs
     if (process.env.NODE_ENV === "production") {
@@ -119,8 +146,14 @@ export const Metriz = () =>
     console.log(session);
     console.log("--------------------------------------------------");
 
+    // validation
+    let stepValidation = checkExternalFootprints(session,selectedPeriod);
+    if (!stepValidation) {
+      // log error
+    }
+
     // next step
-    setStep(4);
+    setStep(4); // statements section
 
     // server logs
     if (process.env.NODE_ENV === "production") {
@@ -139,8 +172,14 @@ export const Metriz = () =>
     console.log(session);
     console.log("--------------------------------------------------");
     
+    // validation
+    let stepValidation = checkImpactsStatements(session,selectedPeriod);
+    if (!stepValidation) {
+      // log error
+    }
+
     // next step
-    setStep(5);
+    setStep(5); // results section
 
     // server logs
     if (process.env.NODE_ENV === "production") {
@@ -150,36 +189,42 @@ export const Metriz = () =>
   };
 
   // Sections Views
-  const buildSectionView = () => {
+  const buildSectionView = () => 
+  {
     const sections = [
       <StartSection 
-        submit={initSession} 
+        initSession={initSession}
+        resumeSession={resumeSession}
       />,
       <AccountingImportSection 
         session={session}
         period={selectedPeriod}
-        updatePeriod={updateSelectedPeriod}
+        selectPeriod={updateSelectedPeriod}
         submit={validFinancialData} 
       />,
       <InitialStatesSection
         session={session}
         period={selectedPeriod}
+        selectPeriod={updateSelectedPeriod}
         submit={validInitialStates}
         onReturn={() => setStep(1)}
       />,
       <ProvidersSection
         session={session}
         period={selectedPeriod}
+        selectPeriod={updateSelectedPeriod}
         submit={validProviders}
       />,
       <DirectImpacts
         session={session}
         period={selectedPeriod}
+        selectPeriod={updateSelectedPeriod}
         submit={validStatements}
       />,
       <Results
         session={session}
         period={selectedPeriod}
+        selectPeriod={updateSelectedPeriod}
         goBack={() => setStep(4)}
         publish={() => setStep(6)}
       />,
@@ -194,23 +239,26 @@ export const Metriz = () =>
   return (
     <>
       {/* Header */}
-
-      {step > 0 && step < 6 && (
+      {(step > 0 && step < 6) && 
         <HeaderSection
           step={step}
           stepMax={session.progression}
           setStep={updateStep}
           session={session}
         />
-      )}
-      {step == 6 && <HeaderPublish setStep={updateStep} session={session} />}
+      }
+      {(step == 6) && 
+        <HeaderPublish 
+          setStep={updateStep} 
+          session={session} 
+        />}
 
       {/* Sections */}
-
-      <ErrorBoundary session={session}>{buildSectionView(step)}</ErrorBoundary>
+      <ErrorBoundary session={session}>
+        {buildSectionView(step)}
+      </ErrorBoundary>
 
       {/* Footer */}
-
       <Footer />
     </>
   );

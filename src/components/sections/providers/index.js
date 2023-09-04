@@ -30,8 +30,16 @@ import { ErrorAPIModal } from "../../modals/userInfoModals";
  *
  */
 
-const ProvidersSection = (props) => {
-  const { financialData, financialPeriod } = props.session;
+const ProvidersSection = ({
+  session,
+  period,
+  submit
+}) => {
+
+  const { 
+    financialData, 
+  } = session;
+
   const [step, setStep] = useState(1);
 
   const [minFpt, setMinFpt] = useState(null);
@@ -103,11 +111,11 @@ const ProvidersSection = (props) => {
         {apiErrorModal}
         <IdentifiedProviders
           financialData={financialData}
-          financialPeriod={financialPeriod}
+          financialPeriod={period}
           nextStep={() => setStep(2)}
           minFpt={minFpt}
           maxFpt={maxFpt}
-          submit={props.submit}
+          submit={submit}
           synchronizeProviders={synchronizeProviders}
         />
       </>
@@ -121,11 +129,11 @@ const ProvidersSection = (props) => {
         {apiErrorModal}
         <UnidentifiedProviders
           financialData={financialData}
-          financialPeriod={financialPeriod}
+          financialPeriod={period}
           minFpt={minFpt}
           maxFpt={maxFpt}
           prevStep={() => setStep(1)}
-          nextStep={props.submit}
+          nextStep={submit}
           synchronizeProviders={synchronizeProviders}
         />
       </>

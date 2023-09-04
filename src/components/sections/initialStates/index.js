@@ -13,6 +13,7 @@ import { Container } from "react-bootstrap";
 import { getPrevDate } from "/src/utils/Utils";
 import { Session } from "/src/Session";
 import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../modals/userInfoModals";
+import { getMoreRecentYearlyPeriod, getYearPeriod } from "../../../utils/periodsUtils";
 
 /* ---------------------------------------------------------------- */
 /* -------------------- INITIAL STATES SECTION -------------------- */
@@ -20,6 +21,8 @@ import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../modals/us
 
 export const InitialStatesSection = ({
   session,
+  period,
+  selectPeriod,
   onReturn,
   submit
 }) => {
@@ -41,8 +44,6 @@ export const InitialStatesSection = ({
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [])
-
-  
 
   const accountsShowed = session.financialData.immobilisations.concat(
     session.financialData.stocks
@@ -108,61 +109,67 @@ export const InitialStatesSection = ({
         // update to current version
         await updateVersion(prevSessionData);
 
-        const currSession = session;
-
+        // build session object
         const prevSession = new Session(prevSessionData);
 
-        const prevYear = prevSession.financialPeriod.periodKey.slice(2);
-        const currYear = currSession.financialPeriod.periodKey.slice(2);
+        const currSession = session;
+        const currYear = getYearPeriod(period);
 
-        const conflictingPeriod = prevSession.availablePeriods.find(
-          (periodObj) => {
-            return currSession.availablePeriods.some((period) => {
-              return period.periodKey === periodObj.periodKey;
-            });
-          }
-        );
+        const prevMoreRecentPeriod = getMoreRecentYearlyPeriod(prevSession);
+        const prevYear = getYearPeriod(prevMoreRecentPeriod);
+
+        // Matching periods ---------------------------------
+
+        // check if prev session periods not includes current session period
+        const conflictingPeriod = prevSession.availablePeriods
+          .find((prevPeriod) => currSession.availablePeriods
+            .some((period) => period.periodKey === prevPeriod.periodKey));
 
         if (conflictingPeriod) {
-          const existingYear = conflictingPeriod.periodKey.slice(2); // Récupérer les années de la période
+          const existingYear = getYearPeriod(conflictingPeriod); // Récupérer les années de la période
           setTitlePopup("Erreur - Sauvegarde");
-          setMessage("Des données existent déjà pour l'exercice de " +
-            existingYear +
-            ". Veuillez vérifier la sauvegarde et réessayer.");
+          setMessage(
+            "Des données existent déjà pour l'exercice de "+existingYear+"."
+            + " Veuillez vérifier la sauvegarde et réessayer."
+          );
           setPopupError(true);
           return;
         }
+
+        // check if prev session periods linked to current period
+        const prevPeriod = prevSession.availablePeriods
+          .find((prevPeriod) => prevPeriod.dateEnd == getPrevDate(period.dateStart));
+
+        if (!prevPeriod) {
+          setTitlePopup("Erreur de Fichier");
+          setMessage(
+            "La sauvegarde ne correspond pas à l'année précédente."
+            +" Veuillez vérifier le fichier et réessayer."
+          );
+          setPopupError(true);
+        }
+
+        // Matching siren -----------------------------------
+        // /!\ if not set ?
 
         if (prevSession.legalUnit.siren != currSession.legalUnit.siren) {
           setTitlePopup("Erreur de Fichier");
-          setMessage("Les numéros de siren ne correspondent pas. Veuillez vérifier le fichier et réessayer");
+          setMessage(
+            "Les numéros de siren ne correspondent pas."
+            + " Veuillez vérifier le fichier et réessayer."
+          );
           setPopupError(true);
-          return;
-        }
-
-        if (
-          parseInt(prevYear) != parseInt(currYear) - 1 ||
-          prevSession.financialPeriod.dateEnd !=
-            getPrevDate(currSession.financialPeriod.dateStart)
-        ) {
-          console.log(prevYear + " - " + currYear);
-          console.log(prevSession.financialPeriod.dateEnd);
-          console.log(getPrevDate(currSession.financialPeriod.dateStart));
-          setTitlePopup("Erreur de Fichier");
-          setMessage("La sauvegarde ne correspond pas à l'année précédente. Veuillez vérifier le fichier et réessayer.");
-          setPpupError(true);
           return;
         }
 
         let checkANouveaux = true;
         currSession.financialData.immobilisations
           .filter((immobilisation) => immobilisation.initialState.amount > 0)
-          .forEach((immobilisation) => {
-            let prevImmobilisation =
-              prevSession.financialData.immobilisations.find(
-                (prevImmobilisation) =>
-                  prevImmobilisation.accountNum == immobilisation.accountNum
-              );
+          .forEach((immobilisation) => 
+          {
+            let prevImmobilisation = prevSession.financialData.immobilisations
+              .find((account) => account.accountNum == immobilisation.accountNum);
+            
             let prevStateDateEnd = immobilisation.initialState.date;
             if (!prevImmobilisation) {
               checkANouveaux = false;

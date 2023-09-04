@@ -15,7 +15,7 @@ import { MainAggregatesTable } from "../tables/MainAggregatesTable";
 /* -------------------- FINANCIAL SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-export class FinancialDatas extends React.Component 
+export class FinancialDataViews extends React.Component 
 {
 
   constructor(props) 
@@ -23,7 +23,7 @@ export class FinancialDatas extends React.Component
     super(props);
     this.state = {
       selectedTable: "incomeStatement",
-      period: props.session.financialPeriod,
+      period: props.period,
       errorFile: false,
       errorMessage: "",
       errors: [],

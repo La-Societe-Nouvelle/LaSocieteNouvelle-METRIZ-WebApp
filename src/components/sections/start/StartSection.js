@@ -26,7 +26,10 @@ import { updateVersion } from "/src/version/updateVersion";
  *    submit : return session to Metriz (new session or loaded session from backupfile)
  */
 
-export const StartSection = ({ submit }) => {
+export const StartSection = ({ 
+  initSession,
+  resumeSession
+}) => {
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showDataUpdater, setShowDataUpdater] = useState(false);
@@ -35,7 +38,7 @@ export const StartSection = ({ submit }) => {
 
   const startNewSession = () => {
     const session = new Session();
-    submit(session);
+    initSession(session);
 
     // Public logs
     console.log("--------------------------------------------------");
@@ -94,7 +97,7 @@ export const StartSection = ({ submit }) => {
   const loadUpdatedSession = (updatedSession) => {
     setSession(updatedSession);
     setShowDataUpdater(false);
-    submit(updatedSession);
+    resumeSession(updatedSession);
 
     // Public logs
     console.log("Session (après actualisation des données) : ");

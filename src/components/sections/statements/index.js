@@ -14,10 +14,10 @@ import { Loader } from "../../modals/Loader";
 import indicators from "/lib/indics";
 
 const DirectImpacts = ({ 
-  session, 
+  session,
+  period,
   submit 
 }) => {
-  const [period] = useState(session.financialPeriod);
 
   const [statementsStatus, setStatementsStatus] = useState({
     art: { status: "unselect", errorMessage: null },
