@@ -9,6 +9,7 @@ import { Bar } from "react-chartjs-2";
 import metaIndics from "/lib/indics";
 
 import { printValue } from "/src/utils/Utils";
+import { increaseBrightness } from "../utils";
 
 const getSuggestedMax = (max) => {
   if (max < 10) {
@@ -45,10 +46,14 @@ export const VerticalBarChart = ({
   showDivisionData,
   showAreaData,
   showTargetData,
-  showPreviousData
+  showPreviousData,
+  useIndicColors
 }) => {
 
   const { unit, nbDecimals } = metaIndics[indic];
+
+  const indicColor = metaIndics[indic].color;
+  const branchIndicColor = increaseBrightness( indicColor, 50); 
 
   // Datasets --------------------------------------------------------------
 
@@ -74,13 +79,26 @@ export const VerticalBarChart = ({
   let companyValue = mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
   dataset_currentFootprints.push(companyValue);
   labels.push("Exercice");
-  backgroundColors.push("RGBA(250,89,95,1)");
+  if(useIndicColors) {
+    backgroundColors.push(indicColor);
+
+  }
+  else {
+    backgroundColors.push("RGBA(250,89,95,1)");
+
+  }
   // division
   if (showDivisionData) {
     let divisionValue = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
     dataset_currentFootprints.push(divisionValue);
     labels.push("Branche");
-    backgroundColors.push("rgb(255, 182, 66)");
+    if(useIndicColors) {
+      backgroundColors.push(branchIndicColor);
+      
+    } else {
+      backgroundColors.push("rgb(255, 182, 66)");
+
+    }
   }
 
   // prev footprints
@@ -155,7 +173,10 @@ export const VerticalBarChart = ({
     devicePixelRatio: 2,
     aspectRatio: 1,
     layout: {
-      padding: 25,
+      padding : {
+        left: 10,
+        right : 10,
+      },
     },
     scales: {
       y: {
@@ -177,7 +198,7 @@ export const VerticalBarChart = ({
         ticks: {
           color: "#191558",
           font: {
-            size: 12,
+            size: 10,
           },
         },
         grid: {

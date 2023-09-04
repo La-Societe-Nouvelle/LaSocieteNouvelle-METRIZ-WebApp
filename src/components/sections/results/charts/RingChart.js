@@ -5,6 +5,7 @@ import { Doughnut } from "react-chartjs-2";
 // Libraries
 import metaIndics from "/lib/indics.json";
 import { roundValue } from "/src/utils/Utils";
+import { increaseBrightness } from "../utils";
 
 const RingChart = ({
   session,
@@ -25,22 +26,19 @@ const RingChart = ({
 
   const backgroundColor = "rgba(245, 245, 245, 0.75)";
   const backgroundColorBis = "rgba(245, 245, 245, 0)";
-  const colors = {
-    art: ["rgba(213, 181, 255, 1)", "rgba(213, 181, 255, 0.5)"],
-    eco: ["rgb(204, 253, 255)", "rgba(204, 253, 255,0.5)"],
-    soc: ["rgba(255, 220, 160,1)", "rgba(255, 220, 160,0.5)"],
-    knw: ["rgba(255, 220, 160,1)", "rgba(255, 220, 160,0.5)"],
-  };
+
+  const indicColor = metaIndics[indic].color;
+  const branchIndicColor = increaseBrightness( indicColor, 80); 
 
   const datasets = [{
     data: [divisionFootprint,roundValue(100-divisionFootprint,2)],
-    backgroundColor: [colors[indic][1], backgroundColorBis],
+    backgroundColor: [branchIndicColor, backgroundColorBis],
     label: "Branche",
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
   },{
     data: [companyFootprint,roundValue(100-companyFootprint,2)],
-    backgroundColor: [colors[indic][0], backgroundColor],
+    backgroundColor: [indicColor, backgroundColor],
     label: financialData.mainAggregates[aggregate].label,
     borderWidth: 0,
     hoverBorderColor: "#FFFFFF",
@@ -65,17 +63,25 @@ const RingChart = ({
     responsive: true,
     onResize: handleResize,
     layout: {
-      padding: 10,
+      padding : {
+        left: 20,
+        right : 20,
+      },
     },
     plugins: {
       datalabels: {
         formatter: (value, context) => {
-          return `${value}%`;
+          if (context.dataIndex === 0) {
+              return `${value}%`;
+          } else {
+              return ''; 
+          }
         },
         color: "#191558",
         font: {
           size: 10,
           family: "Roboto",
+          
         },
       },
       tooltip: {
@@ -92,7 +98,7 @@ const RingChart = ({
         position: "bottom",
         align: "start",
         labels: {
-          boxWidth: 12,
+          boxWidth: 10,
           font: {
             size: 10,
           },
