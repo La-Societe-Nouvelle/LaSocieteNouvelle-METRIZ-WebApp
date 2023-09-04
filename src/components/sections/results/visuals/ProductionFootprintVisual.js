@@ -25,37 +25,25 @@ export const ProductionFootprintVisual = ({
 
   return (
     <div className="box">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3 className="mb-0">Empreinte de la production</h3>
-        <Button
-          className="btn-light btn-rounded"
-          size="sm"
-          onClick={() =>
-            downloadChartImage(
-              "environmentalChart",
-              "empreinte_environnementale.png"
-            )
-          }
-        >
-          <i className="bi bi-download"></i>
-        </Button>
-      </div>
-      <div className="d-inline">
-        <Row className="row-eq-height justify-content-around">
+       <h3>Empreinte de la production</h3>
+        <Row className="justify-content-around">
           {validations.map((indic) => 
-            <Col lg={2} className="d-flex flex-column justify-content-between my-5">
+            <Col lg={2} className="my-3">
+              <div className="production-box d-flex flex-column justify-content-between ">
+
+             
               {keyIndics.includes(indic) &&
-                <div className="my-2 alert alert-danger">
+                <div className="production-box-header major">
                   Enjeu sectoriel majeur
                 </div>}
               {!keyIndics.includes(indic) &&
-                <div className="my-2 alert alert-light">
+                <div className="production-box-header ">
                   Enjeu national
                 </div>}
-              <div>
-                <p>
+              <div className="production-box-title">
+                <h5>
                   {metaIndics[indic].libelle}
-                </p>
+                </h5>
               </div>
               {buildIndicatorChart({
                 id: "socialfootprintvisual_"+indic,
@@ -63,21 +51,23 @@ export const ProductionFootprintVisual = ({
                 period,
                 aggregate: "production",
                 indic,
-                showDivisionData: true
+                showDivisionData: true,
+                useIndicColors : true
               })}
-              <div>
+              <div className="my-4">
                 {tags[indic].map((tag,index) => 
-                  <div key={index} className="text-end flex-grow-1">
+                  <div key={index} className="text-center flex-grow-1">
                     <span className={"badge rounded-pill bg-"+tag.class}>
                       {tag.text}
                     </span>
                   </div>
                 )}
               </div>
+              </div>
             </Col>
           )}   
         </Row>
-      </div>   
+ 
     </div>
   );
 }

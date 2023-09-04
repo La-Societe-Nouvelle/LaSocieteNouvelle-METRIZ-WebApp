@@ -1,146 +1,158 @@
 {
   "art": {
     "isBeta": false,
-    "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",  
+    "libelle": "Contribution aux Métiers d'Art et aux Savoir-Faire",
     "libelleGrandeur": "Métiers d'Art et aux Savoir-Faire",
-    "category" : "Création de la valeur",
+    "category": "Création de la valeur",
     "nbDecimals": 1,
-    "odds": ["08","09","12"],
+    "odds": ["08", "09", "12"],
     "type": "proportion",
     "unit": "%",
     "unitAbsolute": "€",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(223, 112, 211)"
   },
   "idr": {
     "isBeta": false,
     "libelle": "Indice d'écart des rémunérations",
     "libelleGrandeur": "Ecart des rémunérations",
-    "category" : "Empreinte sociale",
+    "category": "Empreinte sociale",
     "nbDecimals": 2,
-    "odds": ["08","10"],
+    "odds": ["08", "10"],
     "type": "indice",
     "unit": "",
     "unitAbsolute": "",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(240, 60, 114)"
   },
   "eco": {
     "isBeta": false,
     "libelle": "Contribution à l'économie nationale",
     "libelleGrandeur": "Économie nationale",
-    "category" : "Création de la valeur",
+    "category": "Création de la valeur",
     "nbDecimals": 1,
-    "odds": ["08","12"],
+    "odds": ["08", "12"],
     "type": "proportion",
     "unit": "%",
     "unitAbsolute": "€",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(89, 18, 75)"
   },
   "geq": {
     "isBeta": false,
     "libelle": "Indice d'écart de rémunérations Femmes/Hommes",
     "libelleGrandeur": "Écart de rémunérations Femmes/Hommes",
-    "category" : "Empreinte sociale",
+    "category": "Empreinte sociale",
     "nbDecimals": 1,
-    "odds": ["05","10"],
+    "odds": ["05", "10"],
     "type": "indice",
     "unit": "%",
     "unitAbsolute": "%",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(163, 24, 66)"
   },
   "ghg": {
     "isBeta": false,
     "libelle": "Intensité d'émission de gaz à effet de serre",
     "libelleGrandeur": "Émissions de Gaz à effet de serre",
-    "category" : "Empreinte environnementale",
+    "category": "Empreinte environnementale",
     "nbDecimals": 0,
-    "odds": ["12","13","14","15"],
+    "odds": ["12", "13", "14", "15"],
     "type": "intensité",
     "unit": "gCO2e/€",
     "unitAbsolute": "kgCO2e",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(0, 255, 0)"
   },
   "haz": {
     "isBeta": false,
     "libelle": "Intensité d'Utilisation de produits dangereux",
     "libelleGrandeur": "Utilisation de produits dangereux",
-    "category" : "Empreinte environnementale",
+    "category": "Empreinte environnementale",
     "nbDecimals": 1,
-    "odds": ["02","03","12","14","15"],
+    "odds": ["02", "03", "12", "14", "15"],
     "type": "intensité",
     "unit": "g/€",
     "unitAbsolute": "kg",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(255, 255, 0)"
   },
   "knw": {
     "isBeta": false,
     "libelle": "Contribution à l'Evolution des compétences et des connaissances",
     "libelleGrandeur": "Compétences et connaissances",
-    "category" : "Empreinte sociale",
+    "category": "Empreinte sociale",
     "nbDecimals": 1,
-    "odds": ["08","09","12"],
+    "odds": ["08", "09", "12"],
     "type": "proportion",
     "unit": "%",
     "unitAbsolute": "€",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(255, 165, 0)"
   },
   "mat": {
     "isBeta": false,
     "libelle": "Intensité d'Extraction de Matières premières",
     "libelleGrandeur": "Extraction de matières premières",
-    "category" : "Empreinte environnementale",
+    "category": "Empreinte environnementale",
     "nbDecimals": 0,
-    "odds": ["12","14","15"],
+    "odds": ["12", "14", "15"],
     "type": "intensité",
     "unit": "g/€",
     "unitAbsolute": "kg",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(139, 69, 19)"
   },
   "nrg": {
     "isBeta": false,
     "libelle": "Intensité de Consommation d'Energie",
     "libelleGrandeur": "Consommation d'énergie",
-    "category" : "Empreinte environnementale",
+    "category": "Empreinte environnementale",
     "nbDecimals": 0,
-    "odds": ["07","12","13"],
+    "odds": ["07", "12", "13"],
     "type": "intensité",
     "unit": "kJ/€",
     "unitAbsolute": "MJ",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(173, 216, 230)"
   },
   "soc": {
     "isBeta": false,
     "libelle": "Contribution aux Acteurs d'Intérêt social",
     "libelleGrandeur": "Acteurs d'Intérêt social",
-    "category" : "Création de la valeur",
+    "category": "Création de la valeur",
     "nbDecimals": 1,
-    "odds": ["08","12"],
+    "odds": ["08", "12"],
     "type": "proportion",
     "unit": "%",
     "unitAbsolute": "€",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(0, 100, 0)"
   },
   "was": {
     "isBeta": false,
-    "libelle": "Intensité de Production de Déchets",   
+    "libelle": "Intensité de Production de Déchets",
     "libelleGrandeur": "Production de déchets",
-    "category" : "Empreinte environnementale",
+    "category": "Empreinte environnementale",
     "nbDecimals": 0,
-    "odds": ["03","11","12","14","15"],
+    "odds": ["03", "11", "12", "14", "15"],
     "type": "intensité",
     "unit": "g/€",
     "unitAbsolute": "kg",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(128, 128, 128)"
   },
   "wat": {
     "isBeta": false,
     "libelle": "Intensité de Consommation d'Eau",
     "libelleGrandeur": "Consommation d'eau",
-    "category" : "Empreinte environnementale",
+    "category": "Empreinte environnementale",
     "nbDecimals": 1,
-    "odds": ["06","12","14","15"],
+    "odds": ["06", "12", "14", "15"],
     "type": "intensité",
     "unit": "L/€",
     "unitAbsolute": "m3",
-    "isAvailable" : true
+    "isAvailable": true,
+    "color": "rgb(0, 206, 209)"
   }
 }

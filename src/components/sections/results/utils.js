@@ -181,3 +181,9 @@ export const getTagsIndic = (
     }])
   }
 }
+
+export const increaseBrightness = (rgbColor, factor) => {
+  const rgbArray = rgbColor.match(/\d+/g).map(Number);
+  const newRgbArray = rgbArray.map(value => Math.min(255, value + factor));
+  return `rgb(${newRgbArray.join(',')})`;
+};

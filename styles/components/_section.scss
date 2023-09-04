@@ -131,6 +131,39 @@ section {
  * ==============================================
  */
 
+ .production-box {
+  border: 1px solid #f0f0f8;
+  border-radius: 1rem;
+
+  .production-box-header {
+    &:first-child {
+      
+      border-radius: calc(0.5rem - 1px) calc(0.5rem - 1px) 0 0;
+    }
+    background-color: $bg-light;
+
+    padding: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid #f0f0f8; 
+      font-weight: 600;
+      font-size: 0.8rem;
+
+  }
+  .production-box-header.major {
+    background-color: $light-secondary;
+    border-left : 5px solid $secondary;
+    color :$secondary;
+  }
+  .production-box-title {
+    height: 50px;
+  }
+  h5{
+    margin : 0.5rem 0.5rem 0.5rem 0.5rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+ }
 .results {
   .box {
     border: 2px solid #f0f0f8;
