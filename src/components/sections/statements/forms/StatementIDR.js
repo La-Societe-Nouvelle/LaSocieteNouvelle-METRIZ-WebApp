@@ -6,6 +6,7 @@ import { roundValue, valueOrDefault } from "/src/utils/Utils";
 
 import AssessmentDSN from "../modals/AssessmentDSN";
 import { isValidNumber } from "/src/utils/Utils";
+import { checkStatementIDR } from "./utils";
 
 /* ---------- STATEMENT - INDIC #IDR ---------- */
 
@@ -37,7 +38,7 @@ const StatementIDR = ({
   useEffect(() => {
     impactsData.hasEmployees = hasEmployees;
     impactsData.interdecileRange = interdecileRange;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementIDR(impactsData);
     onUpdate(statementStatus);
   }, [hasEmployees,interdecileRange]);
 
@@ -162,52 +163,5 @@ const StatementIDR = ({
 };
 
 export default StatementIDR;
-
-
-// Check statement in impacts data
-const checkStatement = (impactsData) => 
-{
-  const {
-    hasEmployees,
-    interdecileRange
-  } = impactsData;
-
-  if (hasEmployees === true) 
-  {
-    // ok
-    if (isValidNumber(interdecileRange,1)) {
-      return({ status: "ok", errorMessage: null });
-    } 
-    // incomplete
-    else if (interdecileRange=="" || interdecileRange==null) {
-      return({ status: "incomplete", errorMessage: null });
-    } 
-    else if (isValidNumber(interdecileRange)) {
-      return({ 
-        status: "error", 
-        errorMessage: "Valeur saisie incorrecte (inférieure à 1)"
-      });
-    } else {
-      return({ 
-        status: "error", 
-        errorMessage: "Veuillez saisir une valeur numérique"
-      });
-    }
-  } 
-  else if (hasEmployees === false) {
-    if (isValidNumber(interdecileRange,1,1)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({ status: "error", errorMessage: "Erreur application" });
-    }
-  } 
-  else if (hasEmployees === null) {
-    // & wage gap not null or empty string
-    return({ status: "incomplete", errorMessage: null });
-  } 
-  else {
-    return({ status: "error", errorMessage: "Erreur application" });
-  }
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,1)

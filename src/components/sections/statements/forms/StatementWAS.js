@@ -7,6 +7,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+import { checkStatementWAS } from "./utils";
 
 /* ---------- STATEMENT - INDIC #WAS ---------- */
 
@@ -48,7 +49,7 @@ const StatementWAS = ({
     impactsData.wasteProduction = wasteProduction;
     impactsData.wasteProductionUnit = wasteProductionUnit;
     impactsData.wasteProductionUncertainty = wasteProductionUncertainty;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementWAS(impactsData);
     onUpdate(statementStatus);
   }, [wasteProduction,wasteProductionUnit,wasteProductionUncertainty]);
 
@@ -174,53 +175,6 @@ const StatementWAS = ({
 };
 
 export default StatementWAS;
-
-// Check statement
-const checkStatement = (impactsData) => 
-{
-  const {
-    wasteProduction,
-    wasteProductionUncertainty,
-  } = impactsData;
-
-  // ok
-  if (isValidNumber(wasteProduction,0) && isValidNumber(wasteProductionUncertainty,0,100)) {
-    return({ status: "ok", errorMessage: null });
-  } 
-  // valid value (empty or correct)
-  else if (!isValidValue(wasteProduction) && !isValidUncertainty(wasteProductionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: "Valeurs saisies incorrectes"
-    });
-  }
-  // error value for waste production
-  else if (!isValidValue(wasteProduction)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(wasteProduction) ?
-        "Valeur saisie incorrecte (négative)"
-        : "Veuillez saisir une valeur numérique"
-    });
-  }
-  // error value for uncertainty
-  else if (!isValidUncertainty(wasteProductionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(wasteProductionUncertainty) ?
-        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
-        : "Veuillez saisir une valeur numérique pour l'incertitude"
-    });
-  }
-  // incomplete statement
-  else if (wasteProduction=="" || wasteProductionUncertainty=="") {
-    return({ status: "incomplete", errorMessage: null });
-  }
-  // other
-  else {
-    return({ status: "error", errorMessage: "Erreur Application" });
-  }
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,0)
 const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

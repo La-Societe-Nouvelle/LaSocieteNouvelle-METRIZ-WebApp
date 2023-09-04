@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
+import { checkStatementECO } from "./utils";
 
 /* ---------- STATEMENT - INDIC #ECO ---------- */
 
@@ -36,7 +37,7 @@ const StatementECO = ({
   useEffect(() => {
     impactsData.isAllActivitiesInFrance = isAllActivitiesInFrance;
     impactsData.domesticProduction = domesticProduction;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementECO(impactsData);
     setIsInvalid(statementStatus.status=="error");
     onUpdate(statementStatus);
   }, [isAllActivitiesInFrance,domesticProduction]);
@@ -166,44 +167,3 @@ const StatementECO = ({
 };
 
 export default StatementECO;
-
-// Check statement in impacts data
-const checkStatement = (impactsData) => 
-{
-  const {
-    netValueAdded,
-    isAllActivitiesInFrance,
-    domesticProduction
-  } = impactsData;
-
-  if (isAllActivitiesInFrance === true) {
-    if (isValidNumber(domesticProduction,netValueAdded,netValueAdded)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({ status: "error", errorMessage: "Erreur application" });
-    }
-  } else if (isAllActivitiesInFrance === false) {
-    if (isValidNumber(domesticProduction,0,0)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({ status: "error", errorMessage: "Erreur application" });
-    }
-  } else if (isAllActivitiesInFrance === "partially") {
-    if (domesticProduction=="") {
-      return({ status: "incomplete", errorMessage: null });
-    } else if (isValidNumber(domesticProduction,0,netValueAdded)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({
-        status: "error",
-        errorMessage: isValidNumber(domesticProduction) ?
-          "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
-          : "Veuillez saisir une valeur numérique"
-      });
-    }
-  } else if (isAllActivitiesInFrance === null) {
-    return({ status: "incomplete", errorMessage: null });
-  } else {
-    return({ status: "error", errorMessage: "Erreur application" });
-  }
-}

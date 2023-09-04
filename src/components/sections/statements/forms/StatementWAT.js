@@ -7,6 +7,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+import { checkStatementWAT } from "./utils";
 
 /* ---------- STATEMENT - INDIC #WAT ---------- */
 
@@ -48,7 +49,7 @@ const StatementWAT = ({
     impactsData.waterConsumption = waterConsumption;
     impactsData.waterConsumptionUnit = waterConsumptionUnit;
     impactsData.waterConsumptionUncertainty = waterConsumptionUncertainty;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementWAT(impactsData);
     onUpdate(statementStatus);
   }, [waterConsumption,waterConsumptionUnit,waterConsumptionUncertainty]);
 
@@ -168,56 +169,9 @@ const StatementWAT = ({
       </Row>
     </Form>
   );
-};
+}
 
 export default StatementWAT;
-
-// Check statement
-const checkStatement = (impactsData) => 
-{
-  const {
-    waterConsumption,
-    waterConsumptionUncertainty,
-  } = impactsData;
-
-  // ok
-  if (isValidNumber(waterConsumption,0) && isValidNumber(waterConsumptionUncertainty,0,100)) {
-    return({ status: "ok", errorMessage: null });
-  } 
-  // valid value (empty or correct)
-  else if (!isValidValue(waterConsumption) && !isValidUncertainty(waterConsumptionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: "Valeurs saisies incorrectes"
-    });
-  }
-  // error value for water consumption
-  else if (!isValidValue(waterConsumption)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(waterConsumption) ?
-        "Valeur saisie incorrecte (négative)"
-        : "Veuillez saisir une valeur numérique"
-    });
-  }
-  // error value for uncertainty
-  else if (!isValidUncertainty(waterConsumptionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(waterConsumptionUncertainty) ?
-        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
-        : "Veuillez saisir une valeur numérique pour l'incertitude"
-    });
-  }
-  // incomplete statement
-  else if (waterConsumption=="" || waterConsumptionUncertainty=="") {
-    return({ status: "incomplete", errorMessage: null });
-  }
-  // other
-  else {
-    return({ status: "error", errorMessage: "Erreur Application" });
-  }
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,0)
 const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

@@ -10,6 +10,7 @@ import { unitSelectStyles } from "/config/customStyles";
 
 // Modals
 import { AssessmentNRG } from "../modals/AssessmentNRG";
+import { checkStatementNRG } from "./utils";
 
 /* ---------- STATEMENT - INDIC #NRG ---------- */
 
@@ -54,7 +55,7 @@ const StatementNRG = ({
     impactsData.energyConsumption = energyConsumption;
     impactsData.energyConsumptionUnit = energyConsumptionUnit;
     impactsData.energyConsumptionUncertainty = energyConsumptionUncertainty;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementNRG(impactsData);
     onUpdate(statementStatus);
   }, [energyConsumption,energyConsumptionUnit,energyConsumptionUncertainty]);
 
@@ -206,53 +207,6 @@ const StatementNRG = ({
 };
 
 export default StatementNRG;
-
-// Check statement
-const checkStatement = (impactsData) => 
-{
-  const {
-    energyConsumption,
-    energyConsumptionUncertainty,
-  } = impactsData;
-
-  // ok
-  if (isValidNumber(energyConsumption,0) && isValidNumber(energyConsumptionUncertainty,0,100)) {
-    return({ status: "ok", errorMessage: null });
-  } 
-  // valid value (empty or correct)
-  else if (!isValidValue(energyConsumption) && !isValidUncertainty(energyConsumptionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: "Valeurs saisies incorrectes"
-    });
-  }
-  // error value for energy consumption
-  else if (!isValidValue(energyConsumption)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(energyConsumption) ?
-        "Valeur saisie incorrecte (négative)"
-        : "Veuillez saisir une valeur numérique"
-    });
-  }
-  // error value for uncertainty
-  else if (!isValidUncertainty(energyConsumptionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(energyConsumptionUncertainty) ?
-        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
-        : "Veuillez saisir une valeur numérique pour l'incertitude"
-    });
-  }
-  // incomplete statement
-  else if (energyConsumption=="" || energyConsumptionUncertainty=="") {
-    return({ status: "incomplete", errorMessage: null });
-  }
-  // other
-  else {
-    return({ status: "error", errorMessage: "Erreur Application" });
-  }
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,0)
 const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

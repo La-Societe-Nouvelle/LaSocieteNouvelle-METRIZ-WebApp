@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
 import { roundValue, isValidNumber } from "/src/utils/Utils";
+import { checkStatementART } from "./utils";
 
 /* ---------- STATEMENT - INDIC #ART ---------- */
 
@@ -41,7 +42,7 @@ const StatementART = ({
     console.log("here");
     impactsData.isValueAddedCrafted = isValueAddedCrafted;
     impactsData.craftedProduction = craftedProduction;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementART(impactsData);
     setIsInvalid(statementStatus.status=="error");
     onUpdate(statementStatus);
   }, [isValueAddedCrafted,craftedProduction]);
@@ -166,44 +167,3 @@ const StatementART = ({
 };
 
 export default StatementART;
-
-// Check statement in impacts data
-const checkStatement = (impactsData) => 
-{
-  const {
-    netValueAdded,
-    isValueAddedCrafted,
-    craftedProduction
-  } = impactsData;
-
-  if (isValueAddedCrafted === true) {
-    if (isValidNumber(craftedProduction,netValueAdded,netValueAdded)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({ status: "error", errorMessage: "Erreur application" });
-    }
-  } else if (isValueAddedCrafted === false) {
-    if (isValidNumber(craftedProduction,0,0)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({ status: "error", errorMessage: "Erreur application" });
-    }
-  } else if (isValueAddedCrafted === "partially") {
-    if (craftedProduction=="") {
-      return({ status: "incomplete", errorMessage: null });
-    } else if (isValidNumber(craftedProduction,0,netValueAdded)) {
-      return({ status: "ok", errorMessage: null });
-    } else {
-      return({
-        status: "error",
-        errorMessage: isValidNumber(craftedProduction) ?
-          "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
-          : "Veuillez saisir une valeur numérique"
-      });
-    }
-  } else if (isValueAddedCrafted === null) {
-    return({ status: "incomplete", errorMessage: null });
-  } else {
-    return({ status: "error", errorMessage: "Erreur application" });
-  }
-}

@@ -7,6 +7,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+import { checkStatementMAT } from "./utils";
 
 /* ---------- STATEMENT - INDIC #MAT ---------- */
 
@@ -52,7 +53,7 @@ const StatementMAT = ({
     impactsData.materialsExtraction = materialsExtraction;
     impactsData.materialsExtractionUnit = materialsExtractionUnit;
     impactsData.materialsExtractionUncertainty = materialsExtractionUncertainty;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementMAT(impactsData);
     onUpdate(statementStatus);
   }, [isExtractiveActivities,materialsExtraction,materialsExtractionUnit,materialsExtractionUncertainty]);
 
@@ -222,90 +223,6 @@ const StatementMAT = ({
 };
 
 export default StatementMAT;
-
-// Check statement
-const checkStatement = (impactsData) => 
-{
-  const {
-    isExtractiveActivities,
-    materialsExtraction,
-    materialsExtractionUncertainty,
-  } = impactsData;
-
-  // extractive activities
-  if (isExtractiveActivities === true) 
-  {
-    // ok
-    if (isValidNumber(materialsExtraction,0) && isValidNumber(materialsExtractionUncertainty,0,100)) {
-      return({ status: "ok", errorMessage: null });
-    } 
-    // valid value (empty or correct)
-    else if (!isValidValue(materialsExtraction) && !isValidUncertainty(materialsExtractionUncertainty)) {
-      return({
-        status: "error",
-        errorMessage: "Valeurs saisies incorrectes"
-      });
-    }
-    // error value for materials extraction
-    else if (!isValidValue(materialsExtraction)) {
-      return({
-        status: "error",
-        errorMessage: isValidNumber(materialsExtraction) ?
-          "Valeur saisie incorrecte (négative)"
-          : "Veuillez saisir une valeur numérique"
-      });
-    }
-    // error value for uncertainty
-    else if (!isValidUncertainty(materialsExtractionUncertainty)) {
-      return({
-        status: "error",
-        errorMessage: isValidNumber(materialsExtractionUncertainty) ?
-          "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
-          : "Veuillez saisir une valeur numérique pour l'incertitude"
-      });
-    }
-    // incomplete statement
-    else if (materialsExtraction=="" || materialsExtractionUncertainty=="") {
-      return({ status: "incomplete", errorMessage: null });
-    }
-    // other
-    else {
-      return({ status: "error", errorMessage: "Erreur Application" });
-    }
-  }
-  // not extractive activities
-  else if (isExtractiveActivities === false)
-  {
-    // ok
-    if (isValidNumber(materialsExtraction,0,0) && isValidNumber(materialsExtractionUncertainty,0,0)) {
-      return({ status: "ok", errorMessage: null });
-    } 
-    // error
-    else {
-      return({
-        status: "error",
-        errorMessage: "Erreur Application"
-      });
-    }
-  }
-  // unselect extractive activities
-  else if (isExtractiveActivities === "" || isExtractiveActivities === null)
-  {
-    // incomplete
-    return({
-      status: "incomplete",
-      errorMessage: null
-    });
-  }
-  // other value for isExtractiveActivities
-  else {
-    return({
-      status: "error",
-      errorMessage: "Erreur Application"
-    });
-  }
-
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,0)
 const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

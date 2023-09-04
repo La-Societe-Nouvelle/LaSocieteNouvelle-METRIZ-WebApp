@@ -10,6 +10,7 @@ import { unitSelectStyles } from "/config/customStyles";
 
 // Modals
 import { AssessmentGHG } from "../modals/AssessmentGHG";
+import { checkStatementGHG } from "./utils";
 
 /* ---------- STATEMENT - INDIC #GHG ---------- */
 
@@ -52,7 +53,7 @@ const StatementGHG = ({
     impactsData.greenhousesGazEmissions = greenhousesGazEmissions;
     impactsData.greenhousesGazEmissionsUncertainty = greenhousesGazEmissionsUncertainty;
     impactsData.greenhousesGazEmissionsUnit = greenhousesGazEmissionsUnit;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementGHG(impactsData);
     onUpdate(statementStatus);
   }, [greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,greenhousesGazEmissionsUnit]);
 
@@ -231,45 +232,6 @@ const StatementGHG = ({
 };
 
 export default StatementGHG;
-
-// Check statement
-const checkStatement = (impactsData) => 
-{
-  const {
-    greenhousesGazEmissions,
-    greenhousesGazEmissionsUncertainty,
-  } = impactsData;
-
-  // ok
-  if (isValidNumber(greenhousesGazEmissions,0) && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
-    return({ status: "ok", errorMessage: null });
-  } 
-  // incomplete
-  else if (greenhousesGazEmissions=="" || greenhousesGazEmissionsUncertainty=="") {
-    return({ status: "incomplete", errorMessage: null });
-  } 
-  // error
-  else if (greenhousesGazEmissions!="" && isValidNumber(greenhousesGazEmissions,0)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(greenhousesGazEmissions) ?
-        "Valeur saisie incorrecte (négative)"
-        : "Veuillez saisir une valeur numérique"
-    });
-  } else if (greenhousesGazEmissionsUncertainty!="" && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(greenhousesGazEmissionsUncertainty) ?
-        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
-        : "Veuillez saisir une valeur numérique pour l'incertitude"
-    });
-  } else {
-    return({
-      status: "error",
-      errorMessage: "Valeurs saisies incorrectes"
-    });
-  }
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,0)
 const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

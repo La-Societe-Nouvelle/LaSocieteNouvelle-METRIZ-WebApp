@@ -8,6 +8,7 @@ import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 
 // Modals
 import AssessmentDSN from "../modals/AssessmentDSN";
+import { checkStatementGEQ } from "./utils";
 
 /* ---------- STATEMENT - INDIC #GEQ ---------- */
 
@@ -38,7 +39,7 @@ const StatementGEQ = ({
   useEffect(() => {
     impactsData.hasEmployees = hasEmployees;
     impactsData.wageGap = wageGap;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementGEQ(impactsData);
     onUpdate(statementStatus);
   }, [hasEmployees, wageGap]);
 
@@ -172,34 +173,5 @@ const StatementGEQ = ({
 };
 
 export default StatementGEQ;
-
-// Check statement in impacts data
-const checkStatement = (impactsData) => {
-  const {
-    hasEmployees,
-    wageGap
-  } = impactsData;
-
-  if (hasEmployees === true) {
-    if (wageGap == "" || wageGap == null) {
-      return ({ status: "incomplete", errorMessage: null });
-    } else if (isValidNumber(wageGap, 0)) {
-      return ({ status: "ok", errorMessage: null });
-    } else {
-      return ({ status: "error", errorMessage: "Erreur application" });
-    }
-  } else if (hasEmployees === false) {
-    if (isValidNumber(wageGap, 0, 0)) {
-      return ({ status: "ok", errorMessage: null });
-    } else {
-      return ({ status: "error", errorMessage: "Erreur application" });
-    }
-  } else if (hasEmployees === null) {
-    // & wage gap not null or empty string
-    return ({ status: "incomplete", errorMessage: null });
-  } else {
-    return ({ status: "error", errorMessage: "Erreur application" });
-  }
-}
 
 const isValidValue = (value) => value == "" || isValidNumber(value, 0)

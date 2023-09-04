@@ -7,6 +7,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+import { checkStatementHAZ } from "./utils";
 
 /* ---------- STATEMENT - INDIC #HAZ ---------- */
 
@@ -49,7 +50,7 @@ const StatementHAZ = ({
     impactsData.hazardousSubstancesConsumption = hazardousSubstancesConsumption;
     impactsData.hazardousSubstancesConsumptionUnit = hazardousSubstancesConsumptionUnit;
     impactsData.hazardousSubstancesConsumptionUncertainty = hazardousSubstancesConsumptionUncertainty;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementHAZ(impactsData);
     onUpdate(statementStatus);
   }, [hazardousSubstancesConsumption,hazardousSubstancesConsumptionUnit,hazardousSubstancesConsumptionUncertainty]);
 
@@ -181,53 +182,6 @@ const StatementHAZ = ({
 };
 
 export default StatementHAZ;
-
-// Check statement
-const checkStatement = (impactsData) => 
-{
-  const {
-    hazardousSubstancesConsumption,
-    hazardousSubstancesConsumptionUncertainty,
-  } = impactsData;
-
-  // ok
-  if (isValidNumber(hazardousSubstancesConsumption,0) && isValidNumber(hazardousSubstancesConsumptionUncertainty,0,100)) {
-    return({ status: "ok", errorMessage: null });
-  } 
-  // valid value (empty or correct)
-  else if (!isValidValue(hazardousSubstancesConsumption) && !isValidUncertainty(hazardousSubstancesConsumptionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: "Valeurs saisies incorrectes"
-    });
-  }
-  // error value for energy consumption
-  else if (!isValidValue(hazardousSubstancesConsumption)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(hazardousSubstancesConsumption) ?
-        "Valeur saisie incorrecte (négative)"
-        : "Veuillez saisir une valeur numérique"
-    });
-  }
-  // error value for uncertainty
-  else if (!isValidUncertainty(hazardousSubstancesConsumptionUncertainty)) {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(hazardousSubstancesConsumptionUncertainty) ?
-        "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
-        : "Veuillez saisir une valeur numérique pour l'incertitude"
-    });
-  }
-  // incomplete statement
-  else if (hazardousSubstancesConsumption=="" || hazardousSubstancesConsumptionUncertainty=="") {
-    return({ status: "incomplete", errorMessage: null });
-  }
-  // other
-  else {
-    return({ status: "error", errorMessage: "Erreur Application" });
-  }
-}
 
 const isValidValue = (value) => value=="" || isValidNumber(value,0)
 const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

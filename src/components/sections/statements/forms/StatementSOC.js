@@ -3,6 +3,7 @@
 // React
 import React, { useEffect, useState } from "react";
 import { Form, Row, Col } from "react-bootstrap";
+import { checkStatementSOC } from "./utils";
 
 /* ---------- STATEMENT - INDIC #SOC ---------- */
 
@@ -31,7 +32,7 @@ const StatementSOC = ({
   // update impacts data when state update
   useEffect(() => {
     impactsData.hasSocialPurpose = hasSocialPurpose;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementSOC(impactsData);
     onUpdate(statementStatus);
   }, [hasSocialPurpose]);
 
@@ -104,17 +105,3 @@ const StatementSOC = ({
 };
 
 export default StatementSOC;
-
-// Check statement in impacts data
-const checkStatement = (impactsData) => 
-{
-  const {
-    hasSocialPurpose,
-  } = impactsData;
-
-  if (hasSocialPurpose === true || hasSocialPurpose === false) {
-    return({ status: "ok", errorMessage: null });
-  } else {
-    return({ status: "incomplete", errorMessage: null });
-  }
-}

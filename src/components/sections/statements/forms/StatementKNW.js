@@ -9,6 +9,7 @@ import { roundValue, valueOrDefault } from "/src/utils/Utils";
 // Modals
 import { AssessmentKNW } from "../modals/AssessmentKNW";
 import { isValidNumber } from "/src/utils/Utils";
+import { checkStatementKNW } from "./utils";
 
 /* ---------- STATEMENT - INDIC #KNW ---------- */
 
@@ -39,7 +40,7 @@ const StatementKNW = ({
   // update impacts data when state update
   useEffect(() => {
     impactsData.researchAndTrainingContribution = researchAndTrainingContribution;
-    const statementStatus = checkStatement(impactsData);
+    const statementStatus = checkStatementKNW(impactsData);
     onUpdate(statementStatus);
   }, [researchAndTrainingContribution]);
 
@@ -136,25 +137,3 @@ const StatementKNW = ({
 };
 
 export default StatementKNW;
-
-// Check statement in impacts data
-const checkStatement = (impactsData) => 
-{
-  const {
-    netValueAdded,
-    researchAndTrainingContribution,
-  } = impactsData;
-
-  if (researchAndTrainingContribution=="" || researchAndTrainingContribution==null) {
-    return({ status: "incomplete", errorMessage: null });
-  } else if (isValidNumber(researchAndTrainingContribution,0,netValueAdded)) {
-    return({ status: "ok", errorMessage: null });
-  } else {
-    return({
-      status: "error",
-      errorMessage: isValidNumber(researchAndTrainingContribution) ?
-        "Valeur saisie incorrecte (négative ou supérieur à la valeur ajoutée nette de l'entreprise)"
-        : "Veuillez saisir une valeur numérique"
-    });
-  }
-}
