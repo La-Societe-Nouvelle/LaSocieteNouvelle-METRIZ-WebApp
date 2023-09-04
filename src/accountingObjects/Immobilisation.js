@@ -5,7 +5,8 @@ import api from "/config/api";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
 // Utils
-import { getAmountItems, getDatesEndMonths, getNbDaysBetweenDates, getPrevDate, getSumItems, roundValue } from "../utils/Utils";
+import { getAmountItems, getSumItems, roundValue } from "../utils/Utils";
+import { getDatesEndMonths, getNbDaysBetweenDates, getPrevDate } from "../utils/periodsUtils";
 import { AmortisationExpense } from "./AmortisationExpense";
 
 export class Immobilisation 
@@ -192,7 +193,7 @@ export class Immobilisation
         .filter((value, index, self) => index === self.findIndex(item => item === value))   // remove duplicates dates and empty string
         .sort((a, b) => parseInt(a) - parseInt(b));   // sort by date (chronology)
 
-      let immobilisationAmount = this.initialState.amount;
+    let immobilisationAmount = this.initialState.amount;
     let amortisationAmount = this.initialState.amortisationAmount;
     let amortisationExpensesAmount = 0;
     let maxAmortisationExpensesAmount = 0;

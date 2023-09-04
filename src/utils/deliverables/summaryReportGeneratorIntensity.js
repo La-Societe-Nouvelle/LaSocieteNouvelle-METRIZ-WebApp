@@ -14,7 +14,7 @@ import {
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
 } from "./deliverablesUtils";
-import { getShortCurrentDateString, printValue } from "../Utils";
+import { getShortCurrentDateString, printValue } from "/src/utils/periodsUtils";
 
 // --------------------------------------------------------------------------
 

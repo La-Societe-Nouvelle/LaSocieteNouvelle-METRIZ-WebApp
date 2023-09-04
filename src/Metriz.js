@@ -8,7 +8,7 @@ import ErrorBoundary from "/src/utils/ErrorBoundary";
 
 // Sections
 import { StartSection } from "/src/components/sections/start/StartSection";
-import AccountingImportSection from "/src/components/sections/accountingImport";
+import { AccountingImportSection } from "/src/components/sections/accountingImport";
 import { InitialStatesSection } from "/src/components/sections/initialStates";
 import ProvidersSection from "/src/components/sections/providers";
 import DirectImpacts from "/src/components/sections/statements";
@@ -24,114 +24,141 @@ import { Footer } from "/src/components/pageComponents/Footer";
 import { logUserProgress } from "/src/services/StatsService";
 
 // Utils
-import { getCurrentDateString } from "./utils/Utils";
+import { getCurrentDateString } from "/src/utils/periodsUtils";
+import { getMoreRecentYearlyPeriod } from "/src/utils/periodsUtils";
+import { checkInitialStates } from "./utils/progressionUtils";
 
 /* ------------------------------------------------------------------------------------- */
 /* ---------------------------------------- APP ---------------------------------------- */
 /* ------------------------------------------------------------------------------------- */
 
-export const Metriz = () => {
+export const Metriz = () => 
+{
   const [session, setSession] = useState({});
+  const [selectedPeriod, setSelectedPeriod] = useState({});
   const [step, setStep] = useState(0);
-  const [selectedPeriod, setSelectedPeriod] = useState();
 
   const currentDate = getCurrentDateString();
 
-  const initSession = (newSession) => {
-    console.log(newSession.progression);
-    const initialStep =
-      newSession.progression === 0 ? 1 : newSession.progression;
-    const period = newSession.availablePeriods[0];
+  // init session
+  const initSession = (session) => 
+  {
+    let defaultPeriod = getMoreRecentYearlyPeriod(session.availablePeriods);
 
-    setSession(newSession);
-    setStep(initialStep);
-    setSelectedPeriod(period);
+    setSession(session);
+    setSelectedPeriod(defaultPeriod);
+    setStep(session.progression);
   };
 
   const updateSelectedPeriod = (period) => {
     setSelectedPeriod(period);
   };
 
-  // Validations
-  const handleStep = (nextStep) => {
+  // Validations --------------------------------------
+
+  const updateStep = (nextStep) => {
     setStep(nextStep);
   };
 
-  const validImportedData = async () => {
+  // imported data
+  const validFinancialData = async () => 
+  {
+    // console logs
     console.log("--------------------------------------------------");
-    console.log("Ecritures comptables importées");
+    console.log("[SESSION] Validation des données comptables");
+    console.log("Données comptables : ");
     console.log(session.financialData);
+    console.log("Objet session : ");
+    console.log(session);
+    console.log("--------------------------------------------------");
 
-    // first year..
-    // if (getAmountItems(session.financialData.immobilisations.concat(session.financialData.stocks).map(asset => asset.InitialState)) == 0) {
-    //   setStep(1);
-    //   updateProgression(1);
-    // }
-
-    let accountsShowed = session.financialData.immobilisations.concat(
-      session.financialData.stocks
-    );
-    console.log(accountsShowed);
-
-    if (accountsShowed.length > 0) {
-      updateProgression(2);
+    // next step
+    let initialStatesValidation = checkInitialStates(session,selectedPeriod);
+    if (!initialStatesValidation) {
+      setStep(2);
     } else {
-      updateProgression(3);
+      setStep(3);
     }
+
+    // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 1, currentDate, []);
     }
   };
 
-  const validInitialStates = async () => {
-    updateProgression(3);
+  const validInitialStates = async () => 
+  {
+    // console logs
+    console.log("--------------------------------------------------");
+    console.log("[SESSION] Validation des états initiaux");
+    console.log("Etats initiaux : ");
+    console.log(session.financialData.immobilisations);
+    console.log(session.financialData.stocks);
+    console.log("Objet session : ");
+    console.log(session);
+    console.log("--------------------------------------------------");
 
+    // next step
+    setStep(3);
+
+    // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 2, currentDate, []);
     }
   };
 
-  const validProviders = async () => {
-    let availablePeriods = session.availablePeriods;
+  const validProviders = async () => 
+  {
+    // console logs
+    console.log("--------------------------------------------------");
+    console.log("[SESSION] Validation des empreintes fournisseurs");
+    console.log("Données fournisseurs : ");
+    console.log(session.financialData.providers);
+    console.log("Objet session : ");
+    console.log(session);
+    console.log("--------------------------------------------------");
 
-    for (let period of availablePeriods) {
-      session.updateFootprints(period);
-    }
+    // next step
+    setStep(4);
 
-    updateProgression(4);
-
+    // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 3, currentDate, []);
     }
   };
 
-  const validStatements = async () => {
-    updateProgression(5);
+  const validStatements = async () => 
+  {
+    // console logs
+    console.log("--------------------------------------------------");
+    console.log("[SESSION] Validation des déclarations d'impacts directs");
+    console.log("Données d'impacts : ");
+    console.log(session.impactsData[selectedPeriod.periodKey]);
+    console.log("Objet session : ");
+    console.log(session);
+    console.log("--------------------------------------------------");
+    
+    // next step
+    setStep(5);
 
-    const financialPeriod = session.financialPeriod.periodKey;
+    // server logs
     if (process.env.NODE_ENV === "production") {
-      await logUserProgress(
-        session.id,
-        4,
-        currentDate,
-        session.validations[financialPeriod]
-      );
+      await logUserProgress(session.id, 4, currentDate, 
+        session.validations[selectedPeriod.periodKey]);
     }
-  };
-
-  const updateProgression = (nextStep) => {
-    setStep(nextStep);
-    setSession((prevSession) => ({
-      ...prevSession,
-      progression: Math.max(nextStep, prevSession.progression),
-    }));
   };
 
   // Sections Views
   const buildSectionView = () => {
     const sections = [
-      <StartSection submit={initSession} />,
-      <AccountingImportSection session={session} submit={validImportedData} />,
+      <StartSection 
+        submit={initSession} 
+      />,
+      <AccountingImportSection 
+        session={session}
+        period={selectedPeriod}
+        submit={validFinancialData} 
+      />,
       <InitialStatesSection
         session={session}
         period={selectedPeriod}
@@ -140,13 +167,13 @@ export const Metriz = () => {
       />,
       <ProvidersSection
         session={session}
-        submit={validProviders}
         period={selectedPeriod}
+        submit={validProviders}
       />,
       <DirectImpacts
         session={session}
-        submit={validStatements}
         period={selectedPeriod}
+        submit={validStatements}
       />,
       <Results
         session={session}
@@ -154,7 +181,9 @@ export const Metriz = () => {
         goBack={() => setStep(4)}
         publish={() => setStep(6)}
       />,
-      <PublishStatementSection session={session} />,
+      <PublishStatementSection 
+        session={session}
+      />,
     ];
 
     return sections[step];
@@ -168,11 +197,11 @@ export const Metriz = () => {
         <HeaderSection
           step={step}
           stepMax={session.progression}
-          setStep={handleStep}
+          setStep={updateStep}
           session={session}
         />
       )}
-      {step == 6 && <HeaderPublish setStep={handleStep} session={session} />}
+      {step == 6 && <HeaderPublish setStep={updateStep} session={session} />}
 
       {/* Sections */}
 
@@ -183,4 +212,4 @@ export const Metriz = () => {
       <Footer />
     </>
   );
-};
+}

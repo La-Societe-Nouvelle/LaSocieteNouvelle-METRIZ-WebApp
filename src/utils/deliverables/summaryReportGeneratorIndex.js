@@ -7,7 +7,7 @@ import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
 // Utils
-import { getShortCurrentDateString, printValue } from "../Utils";
+import { getShortCurrentDateString, printValue } from "/src/utils/periodsUtils";
 import {
   calculateAverageEvolutionRate,
   getIndicDescription,

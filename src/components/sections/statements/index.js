@@ -41,12 +41,10 @@ const DirectImpacts = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    console.log("use effect");
+    //console.log("use effect");
   },[]);
 
   useEffect(() => {
-    console.log("triggered");
-    console.log(statementsStatus);
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);

@@ -24,7 +24,7 @@ import ImportModal from "./ImportModal";
 /* -------------------- ACCOUTING IMPORT SECTION -------------------- */
 /* ------------------------------------------------------------------ */
 
-const AccountingImportSection = (props) => {
+export const AccountingImportSection = (props) => {
   const { session } = props;
 
   const [view, setView] = useState(session.financialData.isFinancialDataLoaded ? 4 : 0);
@@ -234,6 +234,4 @@ const AccountingImportSection = (props) => {
       </section>
     </Container>
   );
-};
-
-export default AccountingImportSection;
+}

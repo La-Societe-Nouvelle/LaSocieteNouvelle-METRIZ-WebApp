@@ -2,8 +2,18 @@
 
 // Generic formulas
 import { SocialFootprint } from '../footprintObjects/SocialFootprint';
-import { getAmountItems, getPrevDate, getSumItems, roundValue, sortChronologicallyDates } from '../utils/Utils';
-import { buildAggregateIndicator, buildAggregatePeriodIndicator, buildDifferenceFootprint, mergeFootprints, buildDifferenceIndicator, mergeIndicators, buildAggregateFootprint, buildAggregatePeriodFootprint } from './footprintFormulas';
+import { getAmountItems,getSumItems, roundValue } from '../utils/Utils';
+import { getPrevDate, sortChronologicallyDates } from '../utils/periodsUtils';
+import { 
+  buildAggregateIndicator, 
+  buildAggregatePeriodIndicator, 
+  buildDifferenceFootprint, 
+  mergeFootprints, 
+  buildDifferenceIndicator, 
+  mergeIndicators, 
+  buildAggregateFootprint, 
+  buildAggregatePeriodFootprint 
+} from './footprintFormulas';
 
 /** Structure of file
  *    - Intermediate consumptions & purchase stocks footprints

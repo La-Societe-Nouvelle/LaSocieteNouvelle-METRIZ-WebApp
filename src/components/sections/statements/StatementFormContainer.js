@@ -53,8 +53,6 @@ function StatementFormContainer ({
   };
 
   const onStatementUpdate = (statementStatus) => {
-    console.log("here too for "+indic);
-    console.log(statementStatus);
     setErrorMessage(statementStatus.errorMessage);
     onUpdate(indic,statementStatus);
   }

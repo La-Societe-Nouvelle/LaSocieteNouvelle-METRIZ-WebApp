@@ -5,7 +5,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 // Utils
-import { getShortCurrentDateString, printValue } from "../Utils";
+import { getShortCurrentDateString, printValue } from "/src/utils/periodsUtils";
 import {
   cutString,
   getIndicDescription,

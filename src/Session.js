@@ -28,7 +28,7 @@ import {
   getDatesEndMonths,
   getLastDateOfMonth,
   getPrevDate
-} from "./utils/Utils";
+} from "./utils/periodsUtils";
 
 import { getAnalysisFromChatGPT } from "./writers/analysis/analysis";
 import { ComparativeData } from "./ComparativeData";
@@ -95,11 +95,11 @@ export class Session
     });
 
     // Analysis -> in footprint object ?
-    this.analaysis = {};
+    this.analysis = {};
     this.availablePeriods.forEach((period) => {
-      this.analaysis[period.periodKey] = {};
+      this.analysis[period.periodKey] = {};
       Object.keys(metaIndics)
-        .map((indic) => this.analaysis[period.periodKey][indic] = {
+        .map((indic) => this.analysis[period.periodKey][indic] = {
           analysis: ""
         });
     });
@@ -200,26 +200,26 @@ export class Session
     console.log(this.financialData);
 
     // Analysis (IA)
-    // if (this.analaysis==undefined) {
-    //   this.analaysis = {};
-    // }
-    // if (this.analaysis[period.periodKey]==undefined) {
-    //   this.analaysis[period.periodKey] = {};
-    // }
-    // await Promise.all(Object.keys(metaIndics)
-    //   .filter((indic) => indic=="eco")
-    //   .map(async (indic) => {
-    //     const analaysis = await getAnalysisFromChatGPT({
-    //       session: this,
-    //       period,
-    //       indic
-    //     });
-    //     if (this.analaysis[period.periodKey][indic]==undefined) {
-    //       this.analaysis[period.periodKey][indic] = {};
-    //     }
-    //     this.analaysis[period.periodKey][indic].analaysis = analaysis;
-    //   })
-    // );
+    if (this.analysis==undefined) {
+      this.analysis = {};
+    }
+    if (this.analysis[period.periodKey]==undefined) {
+      this.analysis[period.periodKey] = {};
+    }
+    await Promise.all(this.validations[period.periodKey]
+      //.filter((indic) => indic=="eco")
+      .map(async (indic) => {
+        const analysis = await getAnalysisFromChatGPT({
+          session: this,
+          period,
+          indic
+        });
+        if (this.analysis[period.periodKey][indic]==undefined) {
+          this.analysis[period.periodKey][indic] = {};
+        }
+        this.analysis[period.periodKey][indic].analysis = analysis;
+      })
+    );
 
     return;
   };

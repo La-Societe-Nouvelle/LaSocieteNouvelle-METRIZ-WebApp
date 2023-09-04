@@ -1,7 +1,8 @@
 // La Société Nouvelle
 
 // Imports
-import { getAmountItems, getDatesEndMonths, getPrevDate, roundValue } from '../utils/Utils';
+import { getAmountItems, roundValue } from '../utils/Utils';
+import { getDatesEndMonths, getPrevDate } from '../utils/periodsUtils';
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
 // API url

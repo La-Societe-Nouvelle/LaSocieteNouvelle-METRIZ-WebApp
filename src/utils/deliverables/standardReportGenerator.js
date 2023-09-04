@@ -10,7 +10,7 @@ import {
   buildIntermediateConsumptionsAggregates,
 } from "../../formulas/aggregatesBuilder";
 import { getAnalyse, getStatementNote } from "../Writers";
-import { getShortCurrentDateString } from "../Utils";
+import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import { loadFonts } from "./deliverablesUtils";
 import { generateSIGtable } from "./generateSIGtable";
 

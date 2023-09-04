@@ -1,7 +1,7 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import { loadFonts } from "./deliverablesUtils";
-import { getShortCurrentDateString } from "../Utils";
+import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
