@@ -43,7 +43,7 @@ export const VerticalBarChart = ({
   const { unit, nbDecimals } = metaIndics[indic];
 
   const indicColor = metaIndics[indic].color;
-  const branchIndicColor = changeOpacity( indicColor, 0.4); 
+  const branchIndicColor = changeOpacity( indicColor, 0.3); 
 
   // Datasets --------------------------------------------------------------
 
