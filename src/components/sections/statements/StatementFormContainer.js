@@ -108,7 +108,7 @@ function StatementFormContainer ({
 
   return (
     <div key={indic} className="border rounded mb-3 indic-statement bg-light">
-      <div className="d-flex align-items-center px-2 py-3  " id={indic}>
+      <div className="d-flex align-items-center px-3 py-3  " id={indic}>
         <Form className="indic-form">
           <Form.Group key={indic}>
             <Form.Check
@@ -149,7 +149,7 @@ function StatementFormContainer ({
       </div>
 
       {selected && (
-        <div className="px-2 py-2">{renderStatementForm(indic)}</div>
+         renderStatementForm(indic) 
       )}
 
       {indicatorModal && (
