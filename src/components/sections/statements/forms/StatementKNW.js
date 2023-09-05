@@ -105,7 +105,6 @@ const StatementKNW = ({
             <Form.Control
               as="textarea"
               rows={3}
-              className="w-100"
               onChange={updateInfo}
               value={info}
               onBlur={saveInfo}

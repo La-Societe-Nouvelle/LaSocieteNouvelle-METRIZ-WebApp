@@ -153,7 +153,6 @@ const StatementART = ({
             </Form.Label>
             <Form.Control
               as="textarea"
-              className="w-100"
               rows={3}
               onChange={updateInfo}
               value={info}
