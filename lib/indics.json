@@ -10,7 +10,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(223, 112, 211)"
+    "color": "rgb(235, 95, 64)"
   },
   "idr": {
     "isBeta": false,
@@ -36,7 +36,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(89, 18, 75)"
+    "color": "rgb(27, 44, 132)"
   },
   "geq": {
     "isBeta": false,
@@ -49,7 +49,7 @@
     "unit": "%",
     "unitAbsolute": "%",
     "isAvailable": true,
-    "color": "rgb(163, 24, 66)"
+    "color": "rgb(225, 18, 18)"
   },
   "ghg": {
     "isBeta": false,
@@ -62,7 +62,7 @@
     "unit": "gCO2e/€",
     "unitAbsolute": "kgCO2e",
     "isAvailable": true,
-    "color": "rgb(0, 255, 0)"
+    "color": "rgb(63, 126, 68)"
   },
   "haz": {
     "isBeta": false,
@@ -75,7 +75,7 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgb(255, 255, 0)"
+    "color": "rgb(128, 193, 133)"
   },
   "knw": {
     "isBeta": false,
@@ -88,7 +88,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(255, 165, 0)"
+    "color": "rgb(162, 8, 26)"
   },
   "mat": {
     "isBeta": false,
@@ -114,7 +114,7 @@
     "unit": "kJ/€",
     "unitAbsolute": "MJ",
     "isAvailable": true,
-    "color": "rgb(173, 216, 230)"
+    "color": "rgb(252, 195, 1)"
   },
   "soc": {
     "isBeta": false,
@@ -127,7 +127,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(0, 100, 0)"
+    "color": "rgb(253, 157, 36)"
   },
   "was": {
     "isBeta": false,
@@ -153,6 +153,6 @@
     "unit": "L/€",
     "unitAbsolute": "m3",
     "isAvailable": true,
-    "color": "rgb(0, 206, 209)"
+    "color": "rgb(59, 159, 184)"
   }
 }
