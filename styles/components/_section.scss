@@ -164,22 +164,24 @@ section {
     text-align: center;
   }
  }
-.results {
-  .box {
-    border: 2px solid #f0f0f8;
-    border-radius: 1rem;
-    background-color: #ffffff;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    h3{
-      color : $primary;
-    }
-    // min-height: calc(100% - 2rem);
-    h4 {
-      margin-bottom: 2rem;
-    }
 
+ .box {
+  border: 2px solid #f0f0f8;
+  border-radius: 1rem;
+  background-color: #ffffff;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  h3{
+    color : $primary;
   }
+  // min-height: calc(100% - 2rem);
+  h4 {
+    margin-bottom: 2rem;
+  }
+
+}
+
+.results {
 
   .nav-underline {
     a {

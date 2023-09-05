@@ -228,9 +228,14 @@ const InvoicesProvidersView = ({
   
 
   return (
-    <div className="step">
-      <h4>2. Déposer des factures</h4>
-    
+    <div className="box">
+      <h4>Déposer des factures</h4>
+      <p className="small">
+            Téléchargez la liste des comptes fournisseurs auxiliaires, complétez
+            les numéros SIREN et réimportez le fichier.
+            <br/>Vous pourrez ensuite synchroniser les données de vos
+            fournisseurs.
+          </p>
       <Dropzone onDrop={onInvoicesDrop} accept={[".pdf"]}>
         {({ getRootProps, getInputProps }) => (
           <div className="dropzone-section">

@@ -136,20 +136,22 @@ const ImportProvidersView = ({
 
   return (
     <>
-      <div className="step p-4">
-        <h4 className="mb-3">1. Importer les fournisseurs</h4>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <p className="small">
+      <div className="box">
+       
+        
+        <div className="d-flex justify-content-between mb-4 align-items-center">
+        <h4 className="mb-0">Importer les fournisseurs</h4>
+            <Button variant="secondary" onClick={() => exportXLSXFile(providers)} size="sm">
+              <i className="bi bi-download"></i> Exporter les fournisseurs
+            </Button>
+        </div>
+      
+        <p className="small">
             Téléchargez la liste des comptes fournisseurs auxiliaires, complétez
             les numéros SIREN et réimportez le fichier.
-            <br></br>Vous pourrez ensuite synchroniser les données de vos
+            <br/>Vous pourrez ensuite synchroniser les données de vos
             fournisseurs.
           </p>
-
-          <Button variant="secondary" onClick={() => exportXLSXFile(providers)}>
-            <i className="bi bi-download"></i> Exporter les fournisseurs
-          </Button>
-        </div>
 
         <Dropzone onDrop={onDrop} accept={[".xlsx", ".csv"]} maxFiles={1}>
           {({ getRootProps, getInputProps }) => (

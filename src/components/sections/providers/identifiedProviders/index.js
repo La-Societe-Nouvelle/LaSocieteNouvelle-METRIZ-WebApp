@@ -2,7 +2,7 @@
 
 // React
 import React, { useState, useEffect } from "react";
-import { Container } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 
 // Views
 import ImportProvidersView from "./views/ImportProvidersView";
@@ -107,7 +107,7 @@ const IdentifiedProviders = (props) => {
           de compte auxiliaire dans vos écritures comptables et les numéros de
           SIREN, vous avez trois options :
         </p>
-        <ol className="small">
+        <ul className="small">
           <li>
             <strong>Importer </strong> les numéros SIREN de vos fournisseurs via
             un fichier au format Excel ou CSV
@@ -119,19 +119,25 @@ const IdentifiedProviders = (props) => {
           <li>
             <strong>Compléter </strong> manuellement le tableau
           </li>
-        </ol>
+        </ul>
 
         {/* Views --------------------------------------------------------- */}
-        <ImportProvidersView
-          providers={providers}
-          updateProviders={updateProviders}
-          handleSynchronize={handleSynchronize}
-        />
-        <InvoicesProvidersView
-          providers={providers}
-          externalExpenses={financialData.externalExpenses}
-          updateProviders={updateProviders}
-        />
+        <Row>
+          <Col>
+              <ImportProvidersView
+                providers={providers}
+                updateProviders={updateProviders}
+                handleSynchronize={handleSynchronize}
+              />
+          </Col>
+          <Col>
+              <InvoicesProvidersView
+                providers={providers}
+                externalExpenses={financialData.externalExpenses}
+                updateProviders={updateProviders}
+              />
+          </Col>
+        </Row>
 
         <SyncProvidersView
           providers={providers}

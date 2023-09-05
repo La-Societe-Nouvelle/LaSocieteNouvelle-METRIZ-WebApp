@@ -133,7 +133,7 @@ const ProvidersSection = ({
           minFpt={minFpt}
           maxFpt={maxFpt}
           prevStep={() => setStep(1)}
-          nextStep={submit}
+          submit={submit}
           synchronizeProviders={synchronizeProviders}
         />
       </>

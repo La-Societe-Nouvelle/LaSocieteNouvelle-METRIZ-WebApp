@@ -100,8 +100,8 @@ const SyncProvidersView = ({
 
   
   return (
-    <div className="step">
-      <h4>3. Synchroniser les données de vos fournisseurs</h4>
+    <div className="box" >
+      <h4>Synchroniser les données de vos fournisseurs</h4>
 
       <div className="d-flex py-2 justify-content-between">
         <div className="d-flex align-items-center ">
