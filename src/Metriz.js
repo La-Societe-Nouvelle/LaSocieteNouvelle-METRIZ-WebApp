@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React / Next
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 // Error Handler
 import ErrorBoundary from "/src/utils/ErrorBoundary";
@@ -45,6 +45,13 @@ export const Metriz = () =>
   const [step, setStep] = useState(0);
 
   const currentDate = getCurrentDateString();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    })  }, [step]); 
 
   // Update state -------------------------------------
 
