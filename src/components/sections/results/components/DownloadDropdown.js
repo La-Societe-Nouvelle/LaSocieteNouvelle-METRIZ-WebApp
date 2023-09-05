@@ -50,7 +50,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
               <Form.Check
                 type="checkbox"
                 id={`checkbox-${file.id}`}
-                disabled={!view}
+                disabled={view == "default"}
                 label={
                   <label htmlFor={`checkbox-${file.id}`}>{file.name}</label>
                 }

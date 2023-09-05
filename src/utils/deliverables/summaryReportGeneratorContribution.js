@@ -5,7 +5,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
 // Utils
-import { getShortCurrentDateString, printValue } from "/src/utils/periodsUtils";
+import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import {
   cutString,
   getIndicDescription,
@@ -17,6 +17,7 @@ import {
 } from "./deliverablesUtils";
 import { buildAggregatePeriodIndicator } from "../../formulas/footprintFormulas";
 import { getClosestYearData } from "../../../src/components/sections/results/utils";
+import { printValue } from "../Utils";
 
 // Lib
 import metaDivisions from "/lib/divisions";
