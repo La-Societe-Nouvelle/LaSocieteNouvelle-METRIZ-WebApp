@@ -8,19 +8,11 @@ import { Bar } from "react-chartjs-2";
 // Libraries
 import metaIndics from "/lib/indics";
 
+// Utils
 import { printValue } from "/src/utils/Utils";
+import { getSuggestedMax } from "./chartsUtils";
 
-const getSuggestedMax = (max) => {
-  if (max < 10) {
-    return 10;
-  } else if (max < 20) {
-    return 25;
-  } else if (max < 45) {
-    return 50;
-  } else {
-    return 100;
-  }
-};
+
 
 /* ---------- COMPARATIVE CHART ---------- */
 
@@ -157,7 +149,7 @@ export const ComparativeChart = ({
         },
         grid: {
           color: "#ececff",
-          lineWidth : 2,
+          lineWidth : 1,
         },
       },
       x: {
@@ -168,7 +160,7 @@ export const ComparativeChart = ({
           },
         },
         grid: {
-          lineWidth : 2,
+          lineWidth : 1,
           color: "#ececff",
         },
       },

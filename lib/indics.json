@@ -10,7 +10,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(235, 95, 64)"
+    "color": "rgba(235, 95, 64, 1)"
   },
   "idr": {
     "isBeta": false,
@@ -23,7 +23,7 @@
     "unit": "",
     "unitAbsolute": "",
     "isAvailable": true,
-    "color": "rgb(240, 60, 114)"
+    "color": "rgba(240, 60, 114, 1)"
   },
   "eco": {
     "isBeta": false,
@@ -36,7 +36,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(27, 44, 132)"
+    "color": "rgba(27, 44, 132, 1)"
   },
   "geq": {
     "isBeta": false,
@@ -49,7 +49,7 @@
     "unit": "%",
     "unitAbsolute": "%",
     "isAvailable": true,
-    "color": "rgb(225, 18, 18)"
+    "color": "rgba(225, 18, 18, 1)"
   },
   "ghg": {
     "isBeta": false,
@@ -62,7 +62,7 @@
     "unit": "gCO2e/€",
     "unitAbsolute": "kgCO2e",
     "isAvailable": true,
-    "color": "rgb(63, 126, 68)"
+    "color": "rgba(63, 126, 68, 1)"
   },
   "haz": {
     "isBeta": false,
@@ -75,7 +75,7 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgb(128, 193, 133)"
+    "color": "rgba(128, 193, 133, 1)"
   },
   "knw": {
     "isBeta": false,
@@ -88,7 +88,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(162, 8, 26)"
+    "color": "rgba(162, 8, 26, 1)"
   },
   "mat": {
     "isBeta": false,
@@ -101,7 +101,7 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgb(139, 69, 19)"
+    "color": "rgba(139, 69, 19, 1)"
   },
   "nrg": {
     "isBeta": false,
@@ -114,7 +114,7 @@
     "unit": "kJ/€",
     "unitAbsolute": "MJ",
     "isAvailable": true,
-    "color": "rgb(252, 195, 1)"
+    "color": "rgba(252, 195, 1, 1)"
   },
   "soc": {
     "isBeta": false,
@@ -127,7 +127,7 @@
     "unit": "%",
     "unitAbsolute": "€",
     "isAvailable": true,
-    "color": "rgb(253, 157, 36)"
+    "color": "rgba(253, 157, 36, 1)"
   },
   "was": {
     "isBeta": false,
@@ -140,7 +140,7 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgb(128, 128, 128)"
+    "color": "rgba(128, 128, 128, 1)"
   },
   "wat": {
     "isBeta": false,
@@ -153,6 +153,6 @@
     "unit": "L/€",
     "unitAbsolute": "m3",
     "isAvailable": true,
-    "color": "rgb(59, 159, 184)"
+    "color": "rgba(59, 159, 184, 1)"
   }
 }

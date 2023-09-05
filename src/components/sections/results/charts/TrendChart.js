@@ -5,7 +5,9 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 Chart.register(ChartDataLabels);
 import { Line } from "react-chartjs-2";
 import "chartjs-adapter-moment";
-import { getSuggestedMax } from "../utils";
+
+// Utils
+import { getSuggestedMax } from "./chartsUtils";
 
 function TrendChart({
   historical,

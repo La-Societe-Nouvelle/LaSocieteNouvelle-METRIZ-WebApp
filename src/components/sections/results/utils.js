@@ -25,20 +25,7 @@ export const getClosestYearData = (data, currentYear) => {
     : null;
 };
 
-export const getSuggestedMax = (max) => {
-  if (max < 10) {
-    return 10;
-  }
 
-  switch (true) {
-    case max > 10 && max < 25:
-      return 25;
-    case max > 25 && max < 50:
-      return 50;
-    default:
-      return 100;
-  }
-};
 /**
  * Get the metadata for indicators belonging to a specific category.
  * @param {Object} indicators - The object containing all indicators with their metadata.
@@ -182,8 +169,3 @@ export const getTagsIndic = (
   }
 }
 
-export const increaseBrightness = (rgbColor, factor) => {
-  const rgbArray = rgbColor.match(/\d+/g).map(Number);
-  const newRgbArray = rgbArray.map(value => Math.min(255, value + factor));
-  return `rgb(${newRgbArray.join(',')})`;
-};

@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 
-
 // Libraries
 import metaIndics from "/lib/indics.json";
+
+// Utils
 import { roundValue } from "/src/utils/Utils";
-import { increaseBrightness } from "../utils";
+import { changeOpacity, getCutOut } from "./chartsUtils";
 
 const RingChart = ({
   session,
@@ -16,10 +17,7 @@ const RingChart = ({
 
   const [width, setWidth] = useState(100);
 
-  const {
-    financialData,
-    comparativeData
-  } = session;
+  const {financialData,comparativeData} = session;
 
   const companyFootprint = financialData.mainAggregates[aggregate].periodsData[period.periodKey].footprint.indicators[indic].value;
   const divisionFootprint = comparativeData[aggregate].division.history.data[indic].slice(-1)[0].value;
@@ -28,7 +26,7 @@ const RingChart = ({
   const backgroundColorBis = "rgba(245, 245, 245, 0)";
 
   const indicColor = metaIndics[indic].color;
-  const branchIndicColor = increaseBrightness( indicColor, 80); 
+  const branchIndicColor = changeOpacity( indicColor, 0.4); 
 
   const datasets = [{
     data: [divisionFootprint,roundValue(100-divisionFootprint,2)],
@@ -50,10 +48,6 @@ const RingChart = ({
     datasets: datasets,
   };
 
-  const getCutOut = (chart) => {
-    return 50;
-  }
-
   const handleResize = (chart) => {
     setWidth(chart.canvas.width)
   };
@@ -64,6 +58,7 @@ const RingChart = ({
     onResize: handleResize,
     layout: {
       padding : {
+        top : 20,
         left: 20,
         right : 20,
       },
@@ -125,10 +120,10 @@ const RingChart = ({
         },
       },
     },
-    cutout: width/5,
+    cutout:getCutOut(width,5),
   };
 
-  return <Doughnut  id="proportionalChart" data={data} options={options} />;
+  return <Doughnut  data={data} options={options} />;
 };
 
 export default RingChart;

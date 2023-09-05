@@ -8,20 +8,10 @@ import { Bar } from "react-chartjs-2";
 // Libraries
 import metaIndics from "/lib/indics";
 
+// utils
 import { printValue } from "/src/utils/Utils";
-import { increaseBrightness } from "../utils";
+import { changeOpacity, getSuggestedMax } from "./chartsUtils";
 
-const getSuggestedMax = (max) => {
-  if (max < 10) {
-    return 10;
-  } else if (max < 20) {
-    return 25;
-  } else if (max < 45) {
-    return 50;
-  } else {
-    return 100;
-  }
-};
 
 /* ---------- VERTICAL BAR CHART ---------- */
 
@@ -53,14 +43,11 @@ export const VerticalBarChart = ({
   const { unit, nbDecimals } = metaIndics[indic];
 
   const indicColor = metaIndics[indic].color;
-  const branchIndicColor = increaseBrightness( indicColor, 50); 
+  const branchIndicColor = changeOpacity( indicColor, 0.4); 
 
   // Datasets --------------------------------------------------------------
 
-  const {
-    financialData,
-    comparativeData
-  } = session
+  const {financialData,comparativeData} = session
   const mainAggregates = financialData.mainAggregates;
 
   // current footprints
@@ -80,10 +67,11 @@ export const VerticalBarChart = ({
   dataset_currentFootprints.push(companyValue);
   labels.push("Exercice");
   if(useIndicColors) {
+    
     backgroundColors.push(indicColor);
-
   }
   else {
+   
     backgroundColors.push("RGBA(250,89,95,1)");
 
   }
@@ -93,11 +81,11 @@ export const VerticalBarChart = ({
     dataset_currentFootprints.push(divisionValue);
     labels.push("Branche");
     if(useIndicColors) {
+
       backgroundColors.push(branchIndicColor);
       
     } else {
       backgroundColors.push("rgb(255, 182, 66)");
-
     }
   }
 
@@ -190,8 +178,8 @@ export const VerticalBarChart = ({
           },
         },
         grid: {
-          color: "rgba(245, 245, 245, 0.75)",
-          lineWidth : 2,
+          color: "rgba(245, 245, 245, 0.5)",
+          lineWidth : 1,
         },
       },
       x: {
@@ -202,8 +190,8 @@ export const VerticalBarChart = ({
           },
         },
         grid: {
-          lineWidth : 2,
-          color: "rgba(245, 245, 245, 0.75)",
+          lineWidth : 1,
+          color: "rgba(245, 245, 245, 0.5)",
         },
       },
     },
