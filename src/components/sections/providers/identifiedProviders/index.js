@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useRef } from "react";
 import { Col, Container, Row } from "react-bootstrap";
 
 // Views
@@ -20,7 +20,7 @@ const IdentifiedProviders = (props) => {
   const [significativeProviders, setSignificativeProviders] = useState([]);
   const [showSyncErrorModal, setShowSyncErrorModal] = useState(false);
   const [showSyncSuccessModal, setShowSyncSuccessModal] = useState(false);
-
+  const scrollTargetRef = useRef(null);
   const financialData = props.financialData;
   const financialPeriod = props.financialPeriod;
   const minFpt = props.minFpt;
@@ -45,21 +45,21 @@ const IdentifiedProviders = (props) => {
     };
 
     fetchData();
+
+    
   }, [providers]);
 
   const updateProviders = (updatedProviders) => {
-
-
     financialData.providers = updatedProviders;
     setProviders(updatedProviders);
   };
 
   const handleSynchronize = async () => {
+    
     let providersToSynchronise = providers.filter(
       (provider) =>
         !provider.useDefaultFootprint && provider.footprintStatus !== 200
     );
-
     await props.synchronizeProviders(providersToSynchronise);
 
     const updatedSignificativeProviders = await getSignificativeProviders(
@@ -76,6 +76,13 @@ const IdentifiedProviders = (props) => {
     setShowSyncErrorModal(hasSyncError);
     setShowSyncSuccessModal(!hasSyncError);
     setSignificativeProviders(updatedSignificativeProviders);
+
+    if (scrollTargetRef.current) {
+      window.scrollTo({
+        top: scrollTargetRef.current.offsetTop,
+        behavior: "smooth",
+      });
+    }
   };
 
   // Check if all providers have their footprint data synchronized
@@ -124,33 +131,32 @@ const IdentifiedProviders = (props) => {
         {/* Views --------------------------------------------------------- */}
         <Row>
           <Col>
-              <ImportProvidersView
-                providers={providers}
-                updateProviders={updateProviders}
-                handleSynchronize={handleSynchronize}
-              />
+            <ImportProvidersView
+              providers={providers}
+              updateProviders={updateProviders}
+              handleSynchronize={handleSynchronize}
+            />
           </Col>
           <Col>
-              <InvoicesProvidersView
-                providers={providers}
-                externalExpenses={financialData.externalExpenses}
-                updateProviders={updateProviders}
-              />
+            <InvoicesProvidersView
+              providers={providers}
+              externalExpenses={financialData.externalExpenses}
+              updateProviders={updateProviders}
+            />
           </Col>
         </Row>
-
-        <SyncProvidersView
-          providers={providers}
-          significativeProviders={significativeProviders}
-          financialPeriod={financialPeriod}
-          updateProviders={updateProviders}
-          handleSynchronize={handleSynchronize}
-          showSyncErrorModal={showSyncErrorModal}
-          closeSyncErrorModal={() => setShowSyncErrorModal(false)}
-        />
-
+        <div ref={scrollTargetRef}>
+          <SyncProvidersView
+            providers={providers}
+            significativeProviders={significativeProviders}
+            financialPeriod={financialPeriod}
+            updateProviders={updateProviders}
+            handleSynchronize={handleSynchronize}
+            showSyncErrorModal={showSyncErrorModal}
+            closeSyncErrorModal={() => setShowSyncErrorModal(false)}
+          />
+        </div>
         {/* Modals --------------------------------------------------------- */}
-
         <SyncSuccessModal
           showModal={showSyncSuccessModal}
           onClose={() => setShowSyncSuccessModal(false)}

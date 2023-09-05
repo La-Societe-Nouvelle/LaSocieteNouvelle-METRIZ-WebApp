@@ -66,13 +66,6 @@ const InvoicesDataModal = ({
                           .filter(
                             (provider) => !provider.isDefaultProviderAccount
                           )
-                          .filter(
-                            ({ providerNum }) =>
-                              !Object.values(providersMapping).some(
-                                (invoiceData) =>
-                                  invoiceData.matching === providerNum
-                              )
-                          )
                           .map(({ providerNum, providerLib }) => ({
                             value: providerNum,
                             label: `${providerNum} - ${providerLib}`,
