@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 
 // Components
@@ -9,10 +9,11 @@ import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
 import { isValidNumber, printValue } from "/src/utils/Utils"
+import { getNrgConsumption, getNrgConsumptionUncertainty } from "./utils";
+import { getGhgEmissions, getGhgEmissionsUncertainty } from "../AssessmentGHG/utils";
 
 // Libs
 import fuels from "/lib/emissionFactors/fuels.json";
-import { getNrgConsumption, getNrgConsumptionUncertainty } from "./utils";
 
 const orderGroupsBiomassFuels = [
   "Biomasse", 
@@ -27,56 +28,88 @@ export const RowAssessmentTypeBiomass = ({
   itemId,
   itemData,
   onUpdate,
-  ghgItem
+  ghgItem,
+  onUpdateGhgItem
 }) => {
 
+  // variables
   const [fuelCode, setFuelCode] = useState(itemData.fuelCode);
   const [consumption, setConsumption] = useState(itemData.consumption);
   const [consumptionUnit, setConsumptionUnit] = useState(itemData.consumptionUnit);
   const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty);
 
+  // results
   const [nrgConsumption, setNrgConsumption] = useState(itemData.nrgConsumption);
   const [nrgConsumptionUncertainty, setNrgConsumptionUncertainty] = useState(itemData.nrgConsumptionUncertainty);
 
+  const firstUpdate = useRef(true);
+
+  // ----------------------------------------------------------------------------------------------------
+
   useEffect(() => 
   {
-    // itemData props
-    itemData.fuelCode = fuelCode;
-    itemData.consumption = consumption;
-    itemData.consumptionUnit = consumptionUnit;
-    itemData.consumptionUncertainty = consumptionUncertainty;
-    // nrg consumption
-    const nrgConsumption = getNrgConsumption(itemData);
-    const nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
-    itemData.nrgConsumption = nrgConsumption;
-    itemData.nrgConsumptionUncertainty = nrgConsumptionUncertainty;
-    setNrgConsumption(nrgConsumption);
-    setNrgConsumptionUncertainty(nrgConsumptionUncertainty);
+    if (fuelCode)
+    {
+      // itemData props
+      itemData.fuelCode = fuelCode;
+      itemData.consumption = consumption;
+      itemData.consumptionUnit = consumptionUnit;
+      itemData.consumptionUncertainty = consumptionUncertainty;
 
-    // ghg item
-    //...
+      // nrg consumption
+      const nrgConsumption = getNrgConsumption(itemData);
+      const nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
+      itemData.nrgConsumption = nrgConsumption;
+      itemData.nrgConsumptionUncertainty = nrgConsumptionUncertainty;
+      setNrgConsumption(nrgConsumption);
+      setNrgConsumptionUncertainty(nrgConsumptionUncertainty);
+
+      // ghg item
+      if (ghgItem) {
+        ghgItem.assessmentItem = fuels[fuelCode].usageSourcesFixes ? "1" : "2";
+        ghgItem.factorId = fuelCode;
+        ghgItem.consumption = consumption;
+        ghgItem.consumptionUnit = consumptionUnit;
+        ghgItem.consumptionUncertainty = consumptionUncertainty;
+        ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
+        ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
+      }
+    }
+
+    if (!firstUpdate.current) onUpdateNrgItem();
+    firstUpdate.current = false;
 
     // did update
-    //onUpdate();
+    onUpdate();
   }, [fuelCode,consumption,consumptionUnit,consumptionUncertainty])
 
+  // ----------------------------------------------------------------------------------------------------
+
   // Energy product
-  const updateFuel = (event) => {
+  const updateFuel = (event) => 
+  {
     const nextFuelCode = event.target.value;
-    if (!fuelCode 
-      || !Object.keys(fuels[nextFuelCode].units).includes(consumptionUnit)) 
-    {
-      setConsumption(0.0);
-      setConsumptionUnit(Object.keys(fuels[nextFuelCode].units)[0]);
+    setFuelCode(nextFuelCode);
+
+    // 
+    if (!fuelCode) {
+      const nextUnit = Object.keys(fuels[nextFuelCode].units)[0];
+      setConsumptionUnit(nextUnit);
       setConsumptionUncertainty(25.0);
     }
-    setFuelCode(nextFuelCode);
+    //
+    else if (!Object.keys(fuels[nextFuelCode].units).includes(consumptionUnit)) {
+      const nextUnit = Object.keys(fuels[nextFuelCode].units)[0];
+      setConsumption(0.0);
+      setConsumptionUnit(nextUnit);
+      setConsumptionUncertainty(25.0);
+    }
   }
 
   // Consumption
   const updateConsumption = (nextConsumption) => {
     setConsumption(nextConsumption);
-    if (nextConsumption==0) setConsumptionUncertainty(0.0);
+    if (isValidNumber(nextConsumption,0,0)) setConsumptionUncertainty(0.0);
   };
 
   // Consumption unit
@@ -89,6 +122,8 @@ export const RowAssessmentTypeBiomass = ({
   const updateConsumptionUncertainty = (nextConsumptionUncertainty) => {
     setConsumptionUncertainty(nextConsumptionUncertainty);
   };
+
+  // ----------------------------------------------------------------------------------------------------
 
   return(
     <tr key={itemId}>

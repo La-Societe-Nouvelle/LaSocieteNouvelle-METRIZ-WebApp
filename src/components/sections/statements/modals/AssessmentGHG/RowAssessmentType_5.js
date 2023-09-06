@@ -8,7 +8,7 @@ import { Col, Row } from "react-bootstrap"
 import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
-import { isValidNumber, printValue } from "/src/utils/Utils"
+import { isValidInput, printValue } from "/src/utils/Utils"
 import { getGhgEmissions, getGhgEmissionsUncertainty } from "./utils"
 
 // Lib
@@ -27,32 +27,43 @@ export const RowAssessmentType_5 = ({
   onUpdate
 }) => {
 
+  // variables
   const [factorId, setFactorId] = useState(itemData.factorId);
-  const [consumption, setConsumption] = useState(itemData.consumption);
+  const [consumption, setConsumption] = useState(itemData.consumption || "");
   const [consumptionUnit, setConsumptionUnit] = useState(itemData.consumptionUnit);
-  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty);
+  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty || "");
 
+  // results
   const [ghgEmissions, setGhgEmissions] = useState(itemData.ghgEmissions);
   const [ghgEmissionsUncertainty, setGhgEmissionsUncertainty] = useState(itemData.ghgEmissionsUncertainty);
 
+  // ----------------------------------------------------------------------------------------------------
+
   useEffect(() => 
   {
-    // itemData props
-    itemData.factorId = factorId;
-    itemData.label = factorId ? emissionFactors[factorId].label : null;
-    itemData.consumption = consumption;
-    itemData.consumptionUnit = consumptionUnit;
-    itemData.consumptionUncertainty = consumptionUncertainty;
-    // ghg emissions
-    const ghgEmissions = getGhgEmissions(itemData);
-    const ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    itemData.ghgEmissions = ghgEmissions;
-    itemData.ghgEmissionsUncertainty = ghgEmissionsUncertainty;
-    setGhgEmissions(ghgEmissions);
-    setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
+    if (factorId)
+    {
+      // itemData props
+      itemData.factorId = factorId;
+      itemData.label = factorId ? emissionFactors[factorId].label : null;
+      itemData.consumption = consumption;
+      itemData.consumptionUnit = consumptionUnit;
+      itemData.consumptionUncertainty = consumptionUncertainty;
+
+      // ghg emissions
+      const ghgEmissions = getGhgEmissions(itemData);
+      const ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
+      itemData.ghgEmissions = ghgEmissions;
+      itemData.ghgEmissionsUncertainty = ghgEmissionsUncertainty;
+      setGhgEmissions(ghgEmissions);
+      setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
+    }
+
     // did update
     onUpdate();
   }, [factorId,consumption,consumptionUnit,consumptionUncertainty])
+
+  // ----------------------------------------------------------------------------------------------------
 
   // Factor
   const updateFactor = (event) => 
@@ -64,9 +75,11 @@ export const RowAssessmentType_5 = ({
       !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
       !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
     ) {
-      setConsumption(0.0);
       setConsumptionUnit(Object.keys(emissionFactors[nextFactorId].units)[0]);
       setConsumptionUncertainty(25.0);
+      if (factorId) {
+        setConsumption(0.0);
+      }
     }
   };
 
@@ -87,6 +100,8 @@ export const RowAssessmentType_5 = ({
   const updateConsumptionUncertainty = (nextConsumptionUncertainty) => {
     setConsumptionUncertainty(nextConsumptionUncertainty);
   };
+
+  // ----------------------------------------------------------------------------------------------------
 
   return(
     <tr key={itemId}>
@@ -131,7 +146,7 @@ export const RowAssessmentType_5 = ({
           <Col lg="2">
             <InputNumber
               value={consumption}
-              isInvalid={!isValidNumber(consumption,0)}
+              isInvalid={!isValidInput(consumption,0)}
               onUpdate={updateConsumption}
               disabled={!factorId}
             />
@@ -157,7 +172,7 @@ export const RowAssessmentType_5 = ({
           <Col lg="1">
             <InputNumber
               value={consumptionUncertainty}
-              isInvalid={!isValidNumber(consumptionUncertainty,0,100)}
+              isInvalid={!isValidInput(consumptionUncertainty,0,100)}
               onUpdate={updateConsumptionUncertainty}
               placeholder="%"
               disabled={!factorId}

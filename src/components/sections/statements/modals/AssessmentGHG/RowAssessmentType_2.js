@@ -1,30 +1,37 @@
 // La Société Nouvelle
 
 // React
-import { Col, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
+import { Col, Row } from "react-bootstrap";
 
 // Components
 import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
-import { isValidNumber, printValue } from "/src/utils/Utils";
+import { isValidInput, printValue } from "/src/utils/Utils";
 import { getGhgEmissions, getGhgEmissionsUncertainty } from "./utils";
+import { getNrgConsumption, getNrgConsumptionUncertainty } from "../AssessmentNRG/utils";
 
 // Libraries
 import fuels from "/lib/emissionFactors/fuels.json";
+import { isValidNumber } from "../../../../../utils/Utils";
 
 const emissionFactors = {
   ...fuels
 };
 
-const orderGroupsAssessmentItem_2 = [
+const orderedFuelGroups = [
   "Carburant - usage routier",
   "Bio-carburants",
   "Gaz",
   "Carburant - usage maritime et fluvial",
   "Carburant - usage aérien",
   "Autres",
+];
+
+const defaultUnits = [
+  "kgCO2e",
+  "tCO2e"
 ];
 
 // ROW ASSESSMENT TYPE 2 - FUELS (MOVING SOURCES)
@@ -34,52 +41,86 @@ export const RowAssessmentType_2 = ({
   itemId,
   itemData,
   onUpdate,
-  nrgItem
+  nrgItem,
+  onUpdateNrgItem
 }) => {
 
+  // variables
   const [factorId, setFactorId] = useState(itemData.factorId);
-  const [consumption, setConsumption] = useState(itemData.consumption);
+  const [consumption, setConsumption] = useState(itemData.consumption || "");
   const [consumptionUnit, setConsumptionUnit] = useState(itemData.consumptionUnit);
-  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty);
+  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty || "");
 
+  // results
   const [ghgEmissions, setGhgEmissions] = useState(itemData.ghgEmissions);
   const [ghgEmissionsUncertainty, setGhgEmissionsUncertainty] = useState(itemData.ghgEmissionsUncertainty);
 
+  const firstUpdate = useRef(true);
+
+  // ----------------------------------------------------------------------------------------------------
+
   useEffect(() => 
   {
-    // itemData props
-    itemData.factorId = factorId;
-    itemData.label = factorId ? emissionFactors[factorId].label : null;
-    itemData.consumption = consumption;
-    itemData.consumptionUnit = consumptionUnit;
-    itemData.consumptionUncertainty = consumptionUncertainty;
-    // ghg emissions
-    const ghgEmissions = getGhgEmissions(itemData);
-    const ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    itemData.ghgEmissions = ghgEmissions;
-    itemData.ghgEmissionsUncertainty = ghgEmissionsUncertainty;
-    setGhgEmissions(ghgEmissions);
-    setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
+    if (factorId) 
+    {
+      // itemData props
+      itemData.factorId = factorId;
+      itemData.label = factorId ? emissionFactors[factorId].label : null;
+      itemData.consumption = consumption;
+      itemData.consumptionUnit = consumptionUnit;
+      itemData.consumptionUncertainty = consumptionUncertainty;
 
-    // nrg item
-    //...
+      // ghg emissions
+      const ghgEmissions = getGhgEmissions(itemData);
+      const ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
+      itemData.ghgEmissions = ghgEmissions;
+      itemData.ghgEmissionsUncertainty = ghgEmissionsUncertainty;
+      setGhgEmissions(ghgEmissions);
+      setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
 
-    // did update
+      // nrg item
+      // /!\ error if nrg item undefined
+      if (nrgItem) {
+        nrgItem.type = emissionFactors[factorId].type;
+        nrgItem.fuelCode = factorId;
+        nrgItem.consumption = consumption;
+        nrgItem.consumptionUnit = consumptionUnit;
+        nrgItem.consumptionUncertainty = consumptionUncertainty;
+        nrgItem.nrgConsumption = getNrgConsumption(nrgItem);
+        nrgItem.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(nrgItem);
+      }
+    }
+
+    if (!firstUpdate.current) onUpdateNrgItem();
+    firstUpdate.current = false;
+
+    // trigger AssessmentGHG
     onUpdate();
   }, [factorId,consumption,consumptionUnit,consumptionUncertainty])
+
+  // ----------------------------------------------------------------------------------------------------
 
   // Fuel
   const updateFactor = (event) => 
   {
+    // update fuel
     const nextFactorId = event.target.value
     setFactorId(nextFactorId);
-    // re-init if unit not defined for new ghg factor
-    if (
-      !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
-      !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
-    ) {
+
+    // init values if factor id not defined
+    if (!factorId) {
+      const nextUnit = Object.keys(emissionFactors[nextFactorId].units)[0];
+      setConsumptionUnit(nextUnit);
+      setConsumptionUncertainty(25.0);
+    }
+    // init values if unit not defined for new fuel (and not default units)
+    else if (
+      ![...defaultUnits, 
+        ...Object.keys(emissionFactors[nextFactorId].units)].includes(consumptionUnit)) 
+    {
+      const nextUnit = Object.keys(emissionFactors[nextFactorId].units)[0];
       setConsumption(0.0);
-      setConsumptionUnit(Object.keys(emissionFactors[nextFactorId].units)[0]);
+      setConsumptionUnit(nextUnit);
       setConsumptionUncertainty(25.0);
     }
   };
@@ -87,7 +128,7 @@ export const RowAssessmentType_2 = ({
   // Consumption
   const updateConsumption = (nextConsumption) => {
     setConsumption(nextConsumption);
-    if (nextConsumption==0) setConsumptionUncertainty(0.0);
+    if (isValidNumber(nextConsumption,0,0)) setConsumptionUncertainty(0.0);
   };
 
   // Consumption unit
@@ -100,6 +141,8 @@ export const RowAssessmentType_2 = ({
   const updateConsumptionUncertainty = (nextConsumptionUncertainty) => {
     setConsumptionUncertainty(nextConsumptionUncertainty);
   };
+
+  // ----------------------------------------------------------------------------------------------------
 
   return(
     <tr key={itemId}>
@@ -130,8 +173,8 @@ export const RowAssessmentType_2 = ({
                 )
                 .sort(
                   (a, b) =>
-                    orderGroupsAssessmentItem_2.indexOf(a) -
-                    orderGroupsAssessmentItem_2.indexOf(b)
+                    orderedFuelGroups.indexOf(a) -
+                    orderedFuelGroups.indexOf(b)
                 )
                 .map((groupName) => (
                   <optgroup label={groupName} key={groupName}>
@@ -158,7 +201,7 @@ export const RowAssessmentType_2 = ({
               value={consumption}
               onUpdate={updateConsumption}
               disabled={!factorId}
-              isInvalid={!isValidNumber(consumption,0)}
+              isInvalid={!isValidInput(consumption,0)}
             />
           </Col>
           <Col lg="1">
@@ -183,7 +226,7 @@ export const RowAssessmentType_2 = ({
               onUpdate={updateConsumptionUncertainty}
               placeholder="%"
               disabled={!factorId}
-              isInvalid={!isValidNumber(consumptionUncertainty,0,100)}
+              isInvalid={!isValidInput(consumptionUncertainty,0,100)}
             />
           </Col>
         </Row>

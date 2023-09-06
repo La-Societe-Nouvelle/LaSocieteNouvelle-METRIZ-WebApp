@@ -8,7 +8,8 @@ import { Col, Row } from "react-bootstrap";
 import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
-import { isValidNumber, printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/Utils";
+import { isValidInput } from "../../../../../utils/Utils";
 import { getGhgEmissions, getGhgEmissionsUncertainty } from "./utils";
 
 // Libraries
@@ -27,46 +28,60 @@ export const RowAssessmentType_3a = ({
   onUpdate
 }) => {
 
+  // variables
   const [factorId, setFactorId] = useState(itemData.factorId);
-  const [consumption, setConsumption] = useState(itemData.consumption);
+  const [consumption, setConsumption] = useState(itemData.consumption || "");
   const [consumptionUnit, setConsumptionUnit] = useState(itemData.consumptionUnit);
-  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty);
+  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty || "");
 
+  // results
   const [ghgEmissions, setGhgEmissions] = useState(itemData.ghgEmissions);
   const [ghgEmissionsUncertainty, setGhgEmissionsUncertainty] = useState(itemData.ghgEmissionsUncertainty);
 
+  // ----------------------------------------------------------------------------------------------------
+
   useEffect(() => 
   {
-    // itemData props
-    itemData.factorId = factorId;
-    itemData.label = factorId ? emissionFactors[factorId].label : null;
-    itemData.consumption = consumption;
-    itemData.consumptionUnit = consumptionUnit;
-    itemData.consumptionUncertainty = consumptionUncertainty;
-    // ghg emissions
-    const ghgEmissions = getGhgEmissions(itemData);
-    const ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    itemData.ghgEmissions = ghgEmissions;
-    itemData.ghgEmissionsUncertainty = ghgEmissionsUncertainty;
-    setGhgEmissions(ghgEmissions);
-    setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
+    if (factorId)
+    {
+      // itemData props
+      itemData.factorId = factorId;
+      itemData.label = factorId ? emissionFactors[factorId].label : null;
+      itemData.consumption = consumption;
+      itemData.consumptionUnit = consumptionUnit;
+      itemData.consumptionUncertainty = consumptionUncertainty;
+  
+      // ghg emissions
+      const ghgEmissions = getGhgEmissions(itemData);
+      const ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
+      itemData.ghgEmissions = ghgEmissions;
+      itemData.ghgEmissionsUncertainty = ghgEmissionsUncertainty;
+      setGhgEmissions(ghgEmissions);
+      setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
+    }
+
     // did update
     onUpdate();
   }, [factorId,consumption,consumptionUnit,consumptionUncertainty])
+
+  // ----------------------------------------------------------------------------------------------------
 
   // Industrial process
   const updateFactor = (event) => 
   {
     const nextFactorId = event.target.value
     setFactorId(nextFactorId);
+
     // re-init if unit not defined for new ghg factor
     if (
       !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
       !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
     ) {
-      setConsumption(0.0);
       setConsumptionUnit(Object.keys(emissionFactors[nextFactorId].units)[0]);
       setConsumptionUncertainty(25.0);
+      if (factorId) {
+        setConsumption(0.0);
+      }
     }
   };
 
@@ -90,6 +105,8 @@ export const RowAssessmentType_3a = ({
   const updateConsumptionUncertainty = (nextConsumptionUncertainty) => {
     setConsumptionUncertainty(nextConsumptionUncertainty);
   };
+
+  // ----------------------------------------------------------------------------------------------------
 
   return(
     <tr key={itemId}>
@@ -124,7 +141,7 @@ export const RowAssessmentType_3a = ({
               value={consumption}
               onUpdate={updateConsumption}
               disabled={!factorId}
-              isInvalid={!isValidNumber(consumption,0)}
+              isInvalid={!isValidInput(consumption,0)}
             />
           </Col>
           <Col lg="1">
@@ -154,7 +171,7 @@ export const RowAssessmentType_3a = ({
               onUpdate={updateConsumptionUncertainty}
               placeholder="%"
               disabled={!factorId}
-              isInvalid={!isValidNumber(consumptionUncertainty,0,100)}
+              isInvalid={!isValidInput(consumptionUncertainty,0,100)}
             />
           </Col>
         </Row>

@@ -18,6 +18,48 @@ export const initNrgItem = (id,type) =>
   return item;
 }
 
+/** Checks to do :
+ *    - valid consumption
+ *    - valid uncertainty
+ *    - valid unit
+ */
+
+export const checkNrgItem = ({
+  fuelCode,
+  consumption,
+  consumptionUncertainty,
+  consumptionUnit,
+  nrgConsumption,
+  nrgConsumptionUncertainty
+}) =>
+{
+  // factorId unset
+  if (fuelCode==null) {
+    return false;
+  } 
+  // consumption not valid
+  else if (!isValidNumber(consumption,0)) {
+    return false;
+  } 
+  // uncertainty not valid
+  else if (!isValidNumber(consumptionUncertainty,0,100)) {
+    return false;
+  } 
+  // unit not valid
+  else if (!fuels[fuelCode] 
+          || !["MJ","GJ","tep","kWh", ...Object.keys(fuels[fuelCode].units)].includes(consumptionUnit)) {
+    return false;
+  }
+  // ghg data not valid
+  else if (!isValidNumber(nrgConsumption,0) || !isValidNumber(nrgConsumptionUncertainty,0,100)) {
+    return false;
+    // ... log error
+  } 
+  else {
+    return true;
+  }
+}
+
 /* ---------- NRG FORMULAS ---------- */
 
 export const getNrgConsumption = ({

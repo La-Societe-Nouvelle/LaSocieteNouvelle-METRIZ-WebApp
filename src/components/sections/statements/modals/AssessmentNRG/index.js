@@ -2,25 +2,24 @@
 
 // React
 import React, { useEffect, useState } from "react";
-import { Table, Row, Col } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 
 // Utils
-import { InputNumber } from "/src/components/input/InputNumber";
 import { getNewId, printValue } from "/src/utils/Utils";
+import { 
+  checkNrgItem,
+  getNrgConsumptionByType, 
+  getNrgConsumptionUncertaintyByType, 
+  getTotalNrgConsumption, 
+  getTotalNrgConsumptionUncertainty, 
+  initNrgItem 
+} from "./utils";
+import { initGhgItem } from "../AssessmentGHG/utils";
 
-// Libs
-import fuels from "/lib/emissionFactors/fuels.json";
-import {
-  getGhgEmissions,
-  getGhgEmissionsUncertainty,
-  getTotalGhgEmissions,
-  getTotalGhgEmissionsUncertainty,
-  initGhgItem,
-} from "../AssessmentGHG/utils";
+// Rows
 import { SimpleRowAssessment } from "./SimpleRowAssessment";
 import { RowAssessmentTypeFossil } from "./RowAssessmentTypeFossil";
 import { RowAssessmentTypeBiomass } from "./RowAssessmentTypeBiomass";
-import { getNrgConsumptionByType, getNrgConsumptionUncertaintyByType, getTotalNrgConsumption, getTotalNrgConsumptionUncertainty, initNrgItem } from "./utils";
 
 /* -------------------------------------------------------- */
 /* -------------------- ASSESSMENT NRG -------------------- */
@@ -45,63 +44,64 @@ import { getNrgConsumptionByType, getNrgConsumptionUncertaintyByType, getTotalNr
     nrgConsumption: energy consumption (in MJ)
     nrgConsumptionUncertainty: uncertainty of the energy consumption
 
-   Modifications are saved only when validation button is pressed, otherwise it stay in the state
 */
 
 const assessmentItems = {
-  "electricity": { label: "Electricité", toInit: true },
-  "fossil": { label: "Produits énergétiques fossiles", toInit: false },
-  "biomass": { label: "Biomasse", toInit: false },
-  "heat": { label: "Chaleur", toInit: true },
-  "renewableTransformedEnergy": { label: "Energie renouvelable transformée", toInit: true }
+  "electricity":                { label: "Electricité",                       toInit: true  },
+  "fossil":                     { label: "Produits énergétiques fossiles",    toInit: false },
+  "biomass":                    { label: "Biomasse",                          toInit: false },
+  "heat":                       { label: "Chaleur",                           toInit: true  },
+  "renewableTransformedEnergy": { label: "Energie renouvelable transformée",  toInit: true  }
 };
 
 export const AssessmentNRG = ({
   impactsData,
-  onGoBack
+  onGoBack,
+  submit
 }) => {
 
-  const [message, setMessage] = useState("");
   const [nrgDetails, setNrgDetails] = useState(impactsData.nrgDetails);
 
-  useEffect(async () => {
-    console.log("build component");
-    console.log(nrgDetails);
-    console.log(impactsData.nrgDetails);
-    for (let assessmentItemId of [
-      "electricity",
-      "heat",
-      "renewableTransformedEnergy"
-    ]) {
-      if (impactsData.nrgDetails[assessmentItemId]==undefined) {
-        impactsData.nrgDetails[assessmentItemId] = {
-          id: assessmentItemId,
-          fuelCode: assessmentItemId,
-          type: assessmentItemId,
-          consumption: 0.0,
-          consumptionUnit: "kWh",
-          consumptionUncertainty: 0.0,
-          nrgConsumption: 0.0,
-          nrgConsumptionUncertainty: 0.0,
-        };
-      }
-    }
-    //setNrgDetails({...nrgDetails});
+  const [ghgDetailsUpdated, setGhgDetailsUpdated] = useState(false);
+  const [isItemsValid, setIsItemsValid] = useState(false); // trigger on mount
+  const [warningMessage, setWarningMessage] = useState("");
+  
+  useEffect(async () => 
+  {
+    Object.entries(assessmentItems)
+      .filter(([_,assessmentItemData]) => assessmentItemData.toInit)
+      .forEach(([assessmentItemId,_]) => 
+      {
+        if (!impactsData.nrgDetails.hasOwnProperty(assessmentItemId)) {
+          impactsData.nrgDetails[assessmentItemId] = {
+            id: assessmentItemId,
+            fuelCode: assessmentItemId,
+            type: assessmentItemId,
+            consumption: 0.0,
+            consumptionUnit: "kWh",
+            consumptionUncertainty: 0.0,
+            nrgConsumption: 0.0,
+            nrgConsumptionUncertainty: 0.0,
+          };
+        }
+      });
+    setNrgDetails({...impactsData.nrgDetails});
   }, [])
 
-  useEffect(() => {
-    console.log("use effect triggered");
-    console.log(nrgDetails);
-  }, [nrgDetails])
+  useEffect(() => didUpdate(), []);
+
+  // ----------------------------------------------------------------------------------------------------
 
   // add new nrg consumption item (fossil or biomass)
-  const addItem = (assessmentItem) => {
-    const id = getNewId(Object.entries(nrgDetails).map(([_, item]) => item).filter((item) => !isNaN(item.id)));
+  const addItem = (assessmentItem) => 
+  {
+    // build nrg item
+    const id = getNewId(Object.values(nrgDetails).filter((item) => !isNaN(item.id)));
     const nrgItem = initNrgItem(id,assessmentItem);
 
-    // nrg details
-    const idGHG = getNewId(Object.entries(impactsData.ghgDetails).map(([_, item]) => item));
-    const ghgItem = initGhgItem(idGHG,null); // don't know assessment item before setting fuel code !
+    // build ghg item
+    const idGHG = getNewId(Object.values(impactsData.ghgDetails));
+    const ghgItem = initGhgItem(idGHG,null); // don't know assessment item before setting fuel code
     ghgItem.idNRG = id;
     impactsData.ghgDetails[idGHG] = ghgItem;
     nrgItem.idGHG = idGHG;
@@ -111,27 +111,49 @@ export const AssessmentNRG = ({
   };
 
   // delete item
-  const deleteItem = (itemId) => {
+  const deleteItem = (itemId) => 
+  {
     const item = nrgDetails[itemId];
+
+    // delete ghg item
     delete impactsData.ghgDetails[item.idGHG];
-    delete nrgDetails[itemId];
+
+    // delete nrg item
+    delete nrgDetails[item.id];
+
     setNrgDetails({...nrgDetails});
   };
 
-  const didUpdate = () => {
-    console.log("did update");
+  // ----------------------------------------------------------------------------------------------------
+
+  const didUpdate = () => 
+  {
+    // check if every items set
+    let isDetailsValid = Object.values(nrgDetails).every((item) => checkNrgItem(item));
+    setIsItemsValid(isDetailsValid);
+    setWarningMessage(isDetailsValid ? "" : "Certains postes sont incomplets ou erronés.");
   }
 
-  const onSubmit = () => {
-    console.log("submit");
+  const ghgDetailsDidUpdate = () => 
+  {
+    setGhgDetailsUpdated(true);
   }
+
+  const onSubmit = () => 
+  {
+    // update nrg statement
+    impactsData.nrgDetails = nrgDetails;
+    impactsData.energyConsumption = getTotalNrgConsumption(nrgDetails);
+    impactsData.energyConsumptionUncertainty = getTotalNrgConsumptionUncertainty(nrgDetails);
+
+    submit();
+  }
+
+  // ----------------------------------------------------------------------------------------------------
 
   // get total
   const total = getTotalNrgConsumption(nrgDetails);
   const totalUncertainty = getTotalNrgConsumptionUncertainty(nrgDetails);
-
-  console.log("render");
-  console.log(nrgDetails);
 
   return (
     <div className="assessment">
@@ -149,7 +171,7 @@ export const AssessmentNRG = ({
             <SimpleRowAssessment
               label={assessmentItems["electricity"].label}
               itemData={nrgDetails["electricity"]}
-              //onUpdate={didUpdate}
+              onUpdate={didUpdate}
             />
           )}
 
@@ -167,8 +189,9 @@ export const AssessmentNRG = ({
                 deleteItem={() => deleteItem(itemId)}
                 itemId={itemId}
                 itemData={itemData}
-                //onUpdate={didUpdate}
-                //ghgItem={impactsData.ghgDetails[itemData.idGHG]}
+                onUpdate={didUpdate}
+                ghgItem={impactsData.ghgDetails[itemData.idGHG]}
+                onUpdateGhgItem={ghgDetailsDidUpdate}
               />
             ))}
 
@@ -186,8 +209,9 @@ export const AssessmentNRG = ({
                 deleteItem={() => deleteItem(itemId)}
                 itemId={itemId}
                 itemData={itemData}
-                //onUpdate={didUpdate}
-                //ghgItem={impactsData.ghgDetails[itemData.idGHG]}
+                onUpdate={didUpdate}
+                ghgItem={impactsData.ghgDetails[itemData.idGHG]}
+                onUpdateGhgItem={ghgDetailsDidUpdate}
               />
             ))}            
 
@@ -216,12 +240,17 @@ export const AssessmentNRG = ({
         </tbody>
       </Table>
 
-      {message && (
+      {ghgDetailsUpdated && (
         <p className="small p-2 alert-warning">
           modifications ayant été apportées sur la consommation de produits
           énergétiques (combustibles), l'intensité d'émissions de Gaz à effet
           de serre sera également modifiée. Veuillez vérifier et (re)valider
           la déclaration en conséquence.
+        </p>
+      )}
+      {warningMessage && (
+        <p className="small p-2 alert-warning">
+          {warningMessage}
         </p>
       )}
 
@@ -244,185 +273,7 @@ export const AssessmentNRG = ({
   );
 }
 
-  /* ----- NEW ITEM ----- */
-
-  // New line
-const addNewLine = (type) => this.setState({ typeNewProduct: type });
-
-  // set nrg product
-const addProduct = (fuelCode) => {
-    let { nrgDetails } = this.state;
-    const id = getNewId(
-      Object.entries(nrgDetails)
-        .map(([_, item]) => item)
-        .filter((item) => !isNaN(item.id))
-    );
-    nrgDetails[id] = {
-      id: id,
-      fuelCode: fuelCode,
-      type: fuels[fuelCode].type,
-      consumption: 0.0,
-      consumptionUnit: "GJ",
-      consumptionUncertainty: 25.0,
-      nrgConsumption: 0.0,
-      nrgConsumptionUncertainty: 0.0,
-    };
-    this.setState({ nrgDetails: nrgDetails, typeNewProduct: "" });
-  };
-
-  /* ----- UPDATES ----- */
-
-  // update nrg product
-const changeNrgProduct = (itemId, nextFuelCode) => {
-    let itemData = this.state.nrgDetails[itemId];
-    itemData.fuelCode = nextFuelCode;
-
-    // check if the unit used is also available for the new product
-    if (
-      Object.keys(fuels[nextFuelCode].units).includes(itemData.consumptionUnit)
-    ) {
-      itemData.nrgConsumption = getNrgConsumption(itemData);
-      itemData.nrgConsumptionUncertainty =
-        getNrgConsumptionUncertainty(itemData);
-    } else {
-      itemData.consumption = 0.0;
-      itemData.consumptionUnit = "GJ";
-      itemData.consumptionUncertainty = 0.0;
-      itemData.nrgConsumption = 0.0;
-      itemData.nrgConsumptionUncertainty = 0.0;
-    }
-
-    // update total
-    this.updateEnergyConsumption();
-  };
-
-const changeNrgProductUnit = (itemId, nextConsumptionUnit) => {
-    let itemData = this.state.nrgDetails[itemId];
-    itemData.consumptionUnit = nextConsumptionUnit;
-    itemData.nrgConsumption = getNrgConsumption(itemData);
-    itemData.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
-    this.updateEnergyConsumption();
-  };
-
-  // update nrg consumption
-const updateConsumption = (itemId, nextValue) => {
-    let itemData = this.state.nrgDetails[itemId];
-    if (itemData.type == "fossil" || itemData.type == "biomass") {
-      this.setState({ message: true });
-    }
-
-    itemData.consumption = nextValue;
-    itemData.nrgConsumption = getNrgConsumption(itemData);
-    itemData.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(itemData);
-    this.updateEnergyConsumption();
-  };
-
-  // update uncertainty
-const updateConsumptionUncertainty = (itemId, nextValue) => {
-    let item = this.state.nrgDetails[itemId];
-    item.consumptionUncertainty = nextValue;
-    item.nrgConsumptionUncertainty = getNrgConsumptionUncertainty(item);
-    this.updateEnergyConsumption();
-  };
-
-  /* ----- DELETE ----- */
-
-const deleteItem = (itemId) => {
-    let itemData = this.state.nrgDetails[itemId];
-    if (itemData.type == "fossil" || itemData.type == "biomass") {
-      this.setState({ message: true });
-    }
-
-    delete this.state.nrgDetails[itemId];
-    this.updateEnergyConsumption();
-  };
-
-  /* ---------- STATE / PROPS ---------- */
-
-  // update state
-const updateEnergyConsumption = () => {
-    // Update state
-    this.setState({
-      energyConsumption: getTotalNrgConsumption(this.state.nrgDetails),
-      energyConsumptionUncertainty: getTotalNrgConsumptionUncertainty(
-        this.state.nrgDetails
-      ),
-    });
-  };
-
-  // update props
-  const onSubmit = async () => {
-    let impactsData = this.props.impactsData;
-
-    // --------------------------------------------------
-    // update nrg data
-
-    impactsData.nrgDetails = this.state.nrgDetails;
-    impactsData.energyConsumption = getTotalNrgConsumption(
-      impactsData.nrgDetails
-    );
-    impactsData.energyConsumptionUncertainty =
-      getTotalNrgConsumptionUncertainty(impactsData.nrgDetails);
-
-    await this.props.onUpdate("nrg");
-
-    // --------------------------------------------------
-    // update ghg data
-
-    // ...delete
-    Object.entries(impactsData.ghgDetails)
-      .filter(([_, itemData]) => itemData.factorId != undefined)
-      .filter(([_, itemData]) => ["1", "2"].includes(itemData.assessmentItem))
-      .forEach(([itemId, _]) => {
-        let nrgItem = Object.entries(impactsData.nrgDetails)
-          .map(([_, nrgItemData]) => nrgItemData)
-          .filter((nrgItem) => nrgItem.idGHG == itemId)[0];
-        if (nrgItem == undefined) delete impactsData.ghgDetails[itemId];
-      });
-
-    // ...add & update
-    Object.entries(impactsData.nrgDetails)
-      .filter(([_, data]) => data.type == "fossil" || data.type == "biomass")
-      .forEach(([itemId, itemData]) => {
-        let ghgItem = Object.entries(impactsData.ghgDetails)
-          .map(([_, ghgItemData]) => ghgItemData)
-          .filter((ghgItem) => ghgItem.idNRG == itemId)[0];
-        // init if undefined
-        if (ghgItem == undefined) {
-          const id = getNewId(
-            Object.entries(impactsData.ghgDetails).map(([_, data]) => data)
-          );
-          impactsData.ghgDetails[id] = { id: id, idNRG: itemId };
-          itemData.idGHG = id;
-          ghgItem = impactsData.ghgDetails[id];
-        }
-        // update values
-        ghgItem.assessmentItem = fuels[itemData.fuelCode].usageSourcesFixes
-          ? "1"
-          : "2";
-        ghgItem.label = itemData.label;
-        ghgItem.factorId = itemData.fuelCode;
-        ghgItem.gaz = "co2e";
-        ghgItem.consumption = itemData.consumption;
-        ghgItem.consumptionUnit = itemData.consumptionUnit;
-        ghgItem.consumptionUncertainty = itemData.consumptionUncertainty;
-        ghgItem.ghgEmissions = getGhgEmissions(ghgItem);
-        ghgItem.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(ghgItem);
-      });
-
-    // ...total & uncertainty
-    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(
-      impactsData.ghgDetails
-    );
-    impactsData.greenhousesGazEmissionsUncertainty =
-      getTotalGhgEmissionsUncertainty(impactsData.ghgDetails);
-    await this.props.onUpdate("ghg");
-
-    // --------------------------------------------------
-
-    // go back
-    this.props.onGoBack();
-  };
+// ##############################################################################################################
 
 const FirstRowAssessmentItem = ({
   nrgDetails,
@@ -442,14 +293,11 @@ const FirstRowAssessmentItem = ({
       </td>
       <td colSpan="2">{assessmentItems[assessmentItem].label}</td>
       <td>
-        {printValue(getNrgConsumptionByType(nrgDetails, assessmentItem), 0)}{" "}
+        {printValue(getNrgConsumptionByType(nrgDetails, assessmentItem), 0)}
         MJ
       </td>
       <td>
-        {printValue(
-          getNrgConsumptionUncertaintyByType(nrgDetails, assessmentItem),
-          0
-        )}{" "}
+        {printValue(getNrgConsumptionUncertaintyByType(nrgDetails, assessmentItem), 0)}
         %
       </td>
     </tr>
