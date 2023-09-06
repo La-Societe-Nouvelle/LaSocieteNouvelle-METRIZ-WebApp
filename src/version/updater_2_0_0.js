@@ -4,168 +4,145 @@
  *    -> data = json of prev backup
  */
 
-import { Immobilisation, ImmobilisationState } from "../accountingObjects/Immobilisation";
-import { FinancialData } from "../FinancialData";
+import { Immobilisation } from "../accountingObjects/Immobilisation";
 import { SocialFootprint } from "../footprintObjects/SocialFootprint";
 import { getAmountItems, getPrevDate } from "../utils/Utils";
 
+import {
+  buildRegexFinancialPeriod
+} from "/src/Session";
+
 export const otherFinancialDataItems = [
-  "otherOperatingIncomes", // #74, #75, #781, #791
-  "financialIncomes", // #76, #786, #796
-  "exceptionalIncomes", // #77, #787, #797
-  "taxes", // #63
-  "personnelExpenses", // #64
-  "otherExpenses", // #65
-  "financialExpenses", // #66 & #686
-  "exceptionalExpenses", // #67 & #687 except #6871
-  "provisions", // #681 except #6811
-  "taxOnProfits", // #69
+  "otherOperatingIncomes",  // #74, #75, #781, #791
+  "financialIncomes",       // #76, #786, #796
+  "exceptionalIncomes",     // #77, #787, #797
+  "taxes",                  // #63
+  "personnelExpenses",      // #64
+  "otherExpenses",          // #65
+  "financialExpenses",      // #66 & #686
+  "exceptionalExpenses",    // #67 & #687 except #6871
+  "provisions",             // #681 except #6811
+  "taxOnProfits",           // #69
 ];
 
 export const updater_2_0_0 = async (sessionData) =>
 {
-  let prevSession = {...sessionData};
+  // keep in memory data before update
+  let prevSessionData = {...sessionData};
+  
+  // ----------------------------------------------------------------------------------------------------
+  // Rebuild Session Data
+  
+  // LIST OF UPDATES :
+  // - Changes ids in ghg details
+  // - Changes financial data structure
   
   // version
-  sessionData.version = "2.0.0"; // Session.version ?
+  sessionData.version = "2.0.0";
 
   // Progression
-  sessionData.progression = prevSession.progression;
+  sessionData.progression = prevSessionData.progression; // OBSOLETE
   
   // Periods
-  let prevFinancialPeriod = getFinancialPeriod(prevSession.year);
+  let prevFinancialPeriod = buildFinancialPeriod(prevSessionData.year);
  
   sessionData.availablePeriods = [prevFinancialPeriod];
-  sessionData.financialPeriod = prevFinancialPeriod;
+  sessionData.financialPeriod = prevFinancialPeriod; // OBSOLETE
 
-  // Legal unit data
-  sessionData.legalUnit = prevSession.legalUnit;
+  // Legal Unit data
+  sessionData.legalUnit = prevSessionData.legalUnit;
 
   // Financial data
-  sessionData.financialData = await getNextFinancialDataObjectBuilder(prevSession.financialData,prevFinancialPeriod);
+  sessionData.financialData = await updateFinancialData(prevSessionData.financialData, prevFinancialPeriod);
 
   // Impacts data
   sessionData.impactsData = {
-    [prevFinancialPeriod.periodKey]: prevSession.impactsData,
+    [prevFinancialPeriod.periodKey]: prevSessionData.impactsData,
   };
 
   // Validations
   sessionData.validations = {
-    [prevFinancialPeriod.periodKey]: prevSession.validations,
+    [prevFinancialPeriod.periodKey]: prevSessionData.validations,
   };
 
   // Comparative data
   sessionData.comparativeData = {
-    activityCode : prevSession.comparativeData.activityCode,
-    fixedCapitalConsumptions : prevSession.comparativeData.fixedCapitalConsumption || prevSession.comparativeData.fixedCapitalConsumptions,
-    intermediateConsumptions : prevSession.comparativeData.intermediateConsumption || prevSession.comparativeData.intermediateConsumptions,
-    netValueAdded :  prevSession.comparativeData.netValueAdded,
-    production :  prevSession.comparativeData.production,
+    activityCode : prevSessionData.comparativeData.activityCode,
+    fixedCapitalConsumptions : prevSessionData.comparativeData.fixedCapitalConsumption || prevSessionData.comparativeData.fixedCapitalConsumptions,
+    intermediateConsumptions : prevSessionData.comparativeData.intermediateConsumption || prevSessionData.comparativeData.intermediateConsumptions,
+    netValueAdded :  prevSessionData.comparativeData.netValueAdded,
+    production :  prevSessionData.comparativeData.production,
   };
   // Indicators list
   sessionData.indics = {
-    [prevFinancialPeriod.periodKey]: prevSession.indics,
+    [prevFinancialPeriod.periodKey]: prevSessionData.indics,
   };
 
-  prevSession = sessionData;
+  prevSessionData = sessionData;
 }
 
-const getFinancialPeriod = (prevYear) =>
+const updateFinancialData = async (prevFinancialData,prevFinancialPeriod) =>
 {
-  let year = prevYear || "2021"; // default 01/01/2021
-  let prevFinancialPeriod = {
-    dateStart: year+"0101",
-    dateEnd: year+"1231",
-    periodKey: "FY"+year,
-    regex: buildRegexFinancialPeriod(year+"0101",year+"1231"),
-  };
-  return prevFinancialPeriod;
-}
+  // ----------------------------------------------------------------------------------------------------
+  // Rebuild Financial Data
+  
+  // LIST OF UPDATES :
+  // - Adds metaAccounts {}
+  // 
 
-const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFinancialPeriod) =>
-{
   let nextFinancialData = {};
+
   // metaAccounts
   nextFinancialData.metaAccounts = {};
-  prevFinancialDataObject.expenseAccounts
-    .concat(prevFinancialDataObject.stocks)
-    .concat(prevFinancialDataObject.immobilisations)
-    .concat(prevFinancialDataObject.depreciations)
+  prevFinancialData.expenseAccounts
+    .concat(prevFinancialData.stocks)
+    .concat(prevFinancialData.immobilisations)
+    .concat(prevFinancialData.depreciations)
     .forEach(account => {
       nextFinancialData.metaAccounts[account.account] = account[account.accountLib];  // check no duplicate & all accounts
-    })
+    });
 
   // isFinancialDataLoaded [unchange]
-  nextFinancialData.isFinancialDataLoaded = prevFinancialDataObject.isFinancialDataLoaded;
+  nextFinancialData.isFinancialDataLoaded = prevFinancialData.isFinancialDataLoaded;
 
   // Production items ------------------------ //
 
   nextFinancialData.productionAggregates = {
-    revenue: {
-      id:"revenue", 
-      label:"Production vendue",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.revenue,
-            footprint: prevFinancialDataObject.aggregates.revenue.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    }, 
-    storedProduction: {
-      id:"storedProduction", 
-      label:"Production stockée",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.storedProduction,
-            footprint: prevFinancialDataObject.aggregates.storedProduction.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    },
-    immobilisedProduction: {
-      id:"immobilisedProduction", 
-      label:"Production immobilisée",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.immobilisedProduction,
-            footprint: prevFinancialDataObject.aggregates.immobilisedProduction.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    },
+    revenue: buildAggregate("revenue","Production vendue",prevFinancialData,prevFinancialPeriod), 
+    storedProduction: buildAggregate("storedProduction","Production stockée",prevFinancialData,prevFinancialPeriod), 
+    immobilisedProduction: buildAggregate("immobilisedProduction","Production immobilisée",prevFinancialData,prevFinancialPeriod), 
   };
 
   // External expenses ----------------------- //
 
-  nextFinancialData.externalExpenses = prevFinancialDataObject.expenses.map(prevExpense => buildExpense(prevExpense,prevFinancialPeriod));
+  nextFinancialData.externalExpenses = prevFinancialData.expenses.map(prevExpense => buildExpense(prevExpense,prevFinancialPeriod));
 
   // Stocks ---------------------------------- //
 
-  nextFinancialData.stocks = prevFinancialDataObject.stocks.map(prevStock => buildStock(prevFinancialDataObject,prevStock,prevFinancialPeriod));
-  nextFinancialData.stockVariations = prevFinancialDataObject.stockVariations.map(prevStockVariation => buildStockVariation(prevStockVariation,prevFinancialPeriod));
+  nextFinancialData.stocks = prevFinancialData.stocks.map(prevStock => buildStock(prevFinancialData,prevStock,prevFinancialPeriod));
+  nextFinancialData.stockVariations = prevFinancialData.stockVariations.map(prevStockVariation => buildStockVariation(prevStockVariation,prevFinancialPeriod));
 
   // Immobilisations ------------------------- //
 
-  nextFinancialData.immobilisations = prevFinancialDataObject.immobilisations.map(prevImmobilisation => {
-    let prevAmortisation = prevFinancialDataObject.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^28/.test(account))[0];
-    let prevDepreciation = prevFinancialDataObject.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^29/.test(account))[0];
-    let prevDepreciationExpenses = prevAmortisation ? prevFinancialDataObject.depreciationExpenses.filter(expense => expense.accountAux==prevAmortisation.account) : [];
+  nextFinancialData.immobilisations = prevFinancialData.immobilisations.map(prevImmobilisation => {
+    let prevAmortisation = prevFinancialData.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^28/.test(account))[0];
+    let prevDepreciation = prevFinancialData.depreciations.filter(({account,accountAux}) => accountAux==prevImmobilisation.account && /^29/.test(account))[0];
+    let prevDepreciationExpenses = prevAmortisation ? prevFinancialData.depreciationExpenses.filter(expense => expense.accountAux==prevAmortisation.account) : [];
     let nextImmobilisation = buildImmobilisation(prevImmobilisation,prevAmortisation,prevDepreciation,prevDepreciationExpenses,prevFinancialPeriod);
     return nextImmobilisation;
   });
 
   // depreciationExpenses => only amortisation expenses ?
-  nextFinancialData.amortisationExpenses = prevFinancialDataObject.depreciationExpenses.map(prevAmortisationExpense => buildAmortisationExpense(prevAmortisationExpense,prevFinancialPeriod));
+  nextFinancialData.amortisationExpenses = prevFinancialData.depreciationExpenses.map(prevAmortisationExpense => buildAmortisationExpense(prevAmortisationExpense,prevFinancialPeriod));
   nextFinancialData.adjustedAmortisationExpenses = nextFinancialData.immobilisations
     .filter(nextImmobilisation => nextImmobilisation.isAmortisable)
     .map(nextImmobilisation => buildAdjustedAmortisationExpense(nextImmobilisation,prevFinancialPeriod));
-  nextFinancialData.investments = prevFinancialDataObject.investments.map(prevInvestment => buildInvestment(prevInvestment,prevFinancialPeriod));
-  nextFinancialData.immobilisedProductions = prevFinancialDataObject.immobilisationProductions.map(prevImmobilisedProduction => buildImmobilisedProduction(prevImmobilisedProduction,prevFinancialPeriod));
+  nextFinancialData.investments = prevFinancialData.investments.map(prevInvestment => buildInvestment(prevInvestment,prevFinancialPeriod));
+  nextFinancialData.immobilisedProductions = prevFinancialData.immobilisationProductions.map(prevImmobilisedProduction => buildImmobilisedProduction(prevImmobilisedProduction,prevFinancialPeriod));
 
   // Expenses accounts ----------------------- //
 
-  nextFinancialData.externalExpensesAccounts = prevFinancialDataObject.expenseAccounts
+  nextFinancialData.externalExpensesAccounts = prevFinancialData.expenseAccounts
     .filter(account => /^6(0[^3]|1|2)/.test(account.accountNum))
     .map(prevAccount => buildExpensesAccount(prevAccount,prevFinancialPeriod));
 
@@ -202,55 +179,15 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
 
   // Providers ------------------------------- //
 
-  nextFinancialData.providers = prevFinancialDataObject.companies.map(prevProvider => buildProvider(prevProvider,prevFinancialDataObject.expenses,prevFinancialDataObject.investments,prevFinancialPeriod));
+  nextFinancialData.providers = prevFinancialData.companies.map(prevProvider => buildProvider(prevProvider,prevFinancialData.expenses,prevFinancialData.investments,prevFinancialPeriod));
 
   // Aggregates ------------------------------ //
 
   nextFinancialData.mainAggregates = {
-    production: {
-      id:"production", 
-      label:"Production",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregates.production.amount,
-            footprint: prevFinancialDataObject.aggregates.production.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    },
-    intermediateConsumptions: {
-      id:"intermediateConsumptions", 
-      label:"Consommations intermédiaires",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregates.intermediateConsumption.amount,
-            footprint: prevFinancialDataObject.aggregates.intermediateConsumption.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    },
-    fixedCapitalConsumptions: {
-      id:"intermediateConsumptions", 
-      label:"Consommations de capital fixe",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregates.capitalConsumption.amount,
-            footprint: prevFinancialDataObject.aggregates.capitalConsumption.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    },
-    netValueAdded: {
-      id:"netValueAdded", 
-      label:"Valeur ajoutée nette",
-      periodsData: {
-        [prevFinancialPeriod.periodKey]: {
-            amount: prevFinancialDataObject.aggregates.netValueAdded.amount,
-            footprint: prevFinancialDataObject.aggregates.netValueAdded.footprint,
-            periodKey: prevFinancialPeriod.periodKey
-        }
-      }
-    }
+    production: buildAggregate("production","Production",prevFinancialData,prevFinancialPeriod), 
+    intermediateConsumptions: buildAggregate("intermediateConsumptions","Consommations intermédiaires",prevFinancialData,prevFinancialPeriod), 
+    fixedCapitalConsumptions: buildAggregate("fixedCapitalConsumptions","Consommations de capital fixe",prevFinancialData,prevFinancialPeriod), 
+    netValueAdded: buildAggregate("netValueAdded","Valeur ajoutée nette",prevFinancialData,prevFinancialPeriod), 
   };
 
   // Other figures --------------------------- //
@@ -262,7 +199,7 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
       label: itemLib,
       periodsData: {
         [prevFinancialPeriod.periodKey]: {
-          amount: prevFinancialDataObject[itemLib],
+          amount: prevFinancialData[itemLib],
         }
       },
     };
@@ -270,6 +207,37 @@ const getNextFinancialDataObjectBuilder = async (prevFinancialDataObject,prevFin
   });
 
   return nextFinancialData;
+}
+
+const buildAggregate = (key,label,prevFinancialData,prevFinancialPeriod) =>
+{
+  return({
+    id: key, 
+    label: label,
+    periodsData: {
+      [prevFinancialPeriod.periodKey]: {
+          amount: prevFinancialData.aggregates[key].amount,
+          footprint: prevFinancialData.aggregates[key].footprint,
+          periodKey: prevFinancialPeriod.periodKey
+      }
+    }
+  })
+}
+
+// ##################################################################################################################### //
+// ################################################## UTILS FUNCTIONS ################################################## //
+// ##################################################################################################################### //
+
+const buildFinancialPeriod = (prevYear) =>
+{
+  let year = prevYear || "2021"; // default 01/01/2021
+  let prevFinancialPeriod = {
+    dateStart: year+"0101",
+    dateEnd: year+"1231",
+    periodKey: "FY"+year,
+    regex: buildRegexFinancialPeriod(year+"0101",year+"1231"),
+  };
+  return prevFinancialPeriod;
 }
 
 const buildExpense = (prevExpense,prevFinancialPeriod) => 
@@ -577,23 +545,3 @@ class PrevFinancialDataObject
 }
 
 // ---------------------------------------------- UTILS -------------------------------------------------- //
-
-const buildRegexFinancialPeriod = (dateStart, dateEnd) => 
-{
-  // REVIEW
-  let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
-  let months = datesEndMonths.map((date) => date.substring(0, 6));
-
-  let datesLastMonth = [];
-  if (dateEnd != getLastDateOfMonth(dateEnd)) {
-    let lastMonth = dateEnd.substring(0, 6);
-    let prevDate = dateEnd;
-    while (prevDate.startsWith(lastMonth)) {
-      datesLastMonth.push(prevDate);
-      prevDate = getPrevDate(prevDate);
-    }
-  }
-
-  let regexString = "^(" + months.concat(datesLastMonth).join("|") + ")";
-  return new RegExp(regexString);
-}
