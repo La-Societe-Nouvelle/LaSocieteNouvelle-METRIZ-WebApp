@@ -14,7 +14,8 @@ import {
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
 } from "./deliverablesUtils";
-import { getShortCurrentDateString, printValue } from "/src/utils/periodsUtils";
+import { getShortCurrentDateString } from "/src/utils/periodsUtils";
+import { printValue } from "../Utils";
 
 // --------------------------------------------------------------------------
 
@@ -23,19 +24,19 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateIntensityIndicatorSheet = ({
+export const buildSummaryReportIntensityIndic = async ({
   session,
   indic,
   period
 }) => {
   // ---------------------------------------------------------------
-
   const {
     legalUnit,
     financialData,
     comparativeData
   } = session;
 
+  const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
 
   const {
@@ -56,7 +57,7 @@ export const generateIntensityIndicatorSheet = ({
 
   // UTILS
   let branchProductionTarget = null;
-
+ 
   if (comparativeData.production.division.target.data[indic]) {
     branchProductionTarget = targetAnnualReduction(
       comparativeData.production.division.target.data[indic]
@@ -153,7 +154,7 @@ export const generateIntensityIndicatorSheet = ({
     "_" +
     currentPeriod +
     "-" +
-    legalUnit.replaceAll(" ", "");
+    corporateName.replaceAll(" ", "");
 
   // ---------------------------------------------------------------
   // PDF Content and Layout
@@ -163,7 +164,7 @@ export const generateIntensityIndicatorSheet = ({
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
+        { text: corporateName, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + currentPeriod,
           alignment: "right",
@@ -301,7 +302,7 @@ export const generateIntensityIndicatorSheet = ({
     },
     info: {
       label: documentTitle,
-      author: legalUnit,
+      author: corporateName,
       subject: "Plaquette de résultat",
       creator: "Metriz - La Société Nouvelle",
       producer: "Metriz - La Societé Nouvelle",

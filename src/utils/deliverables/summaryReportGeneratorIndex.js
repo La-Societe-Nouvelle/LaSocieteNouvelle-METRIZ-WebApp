@@ -7,7 +7,7 @@ import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
 // Utils
-import { getShortCurrentDateString, printValue } from "/src/utils/periodsUtils";
+import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import {
   calculateAverageEvolutionRate,
   getIndicDescription,
@@ -17,6 +17,7 @@ import {
   sortProvidersByImpact,
   targetAnnualReduction,
 } from "./deliverablesUtils";
+import { printValue } from "../Utils";
 
 // --------------------------------------------------------------------------
 //  Intensity Indicator Report
@@ -26,7 +27,7 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 //Call function to load fonts
 loadFonts();
 
-export const generateIndiceIndicatorSheet = ({
+export const buildSummaryReportIndexIndic = ({
   session,
   indic,
   period
@@ -42,6 +43,7 @@ export const generateIndiceIndicatorSheet = ({
     comparativeData
   } = session;
 
+  const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
   const precision = metaIndics[indic].nbDecimals;
   const divisionName = divisions[comparativeData.activityCode];
@@ -135,7 +137,7 @@ export const generateIndiceIndicatorSheet = ({
     "_" +
     currentPeriod +
     "-" +
-    legalUnit.replaceAll(" ", "");
+    corporateName.replaceAll(" ", "");
 
   // ---------------------------------------------------------------
   // PDF Content and Layout
@@ -144,7 +146,7 @@ export const generateIndiceIndicatorSheet = ({
     pageMargins: [margins.left, margins.top, margins.right, margins.bottom],
     header: {
       columns: [
-        { text: legalUnit, margin: [20, 15, 0, 0], bold: true },
+        { text: corporateName, margin: [20, 15, 0, 0], bold: true },
         {
           text: "Exercice  " + currentPeriod,
           alignment: "right",
@@ -254,7 +256,7 @@ export const generateIndiceIndicatorSheet = ({
     },
     info: {
       title: documentTitle,
-      author: legalUnit,
+      author: corporateName,
       subject: "Plaquette de résultat",
       creator: "Metriz - La Société Nouvelle",
       producer: "Metriz - La Societé Nouvelle",
