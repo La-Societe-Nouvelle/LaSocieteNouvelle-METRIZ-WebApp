@@ -1,4 +1,21 @@
 
+// Libraries
+import fuels from "/lib/emissionFactors/fuels.json";
+import industrialProcesses from "/lib/emissionFactors/industrialProcesses";
+import agriculturalProcesses from "/lib/emissionFactors/agriculturalProcesses";
+import coolingSystems from "/lib/emissionFactors/coolingSystems";
+import landChanges from "/lib/emissionFactors/landChanges";
+import greenhouseGases from "/lib/ghg";
+
+const emissionFactors = {
+  ...fuels,
+  ...industrialProcesses,
+  ...agriculturalProcesses,
+  ...coolingSystems,
+  ...landChanges,
+};
+
+
 /* ----------------- ITEMS ----------------- */
 
 export const initGhgItem = (id,assessmentItem) => 
@@ -18,26 +35,52 @@ export const initGhgItem = (id,assessmentItem) =>
   return item;
 }
 
+/** Checks to do :
+ *    - valid consumption
+ *    - valid uncertainty
+ *    - valid unit
+ */
+
+export const checkGhgItem = ({
+  factorId,
+  consumption,
+  consumptionUncertainty,
+  consumptionUnit,
+  ghgEmissions,
+  ghgEmissionsUncertainty
+}) =>
+{
+  // factorId unset
+  if (factorId==null) {
+    return false;
+  } 
+  // consumption not valid
+  else if (!isValidNumber(consumption,0)) {
+    return false;
+  } 
+  // uncertainty not valid
+  else if (!isValidNumber(consumptionUncertainty,0,100)) {
+    return false;
+  } 
+  // unit not valid
+  else if (!emissionFactors[factorId] 
+          || !["kgCO2e","tCO2e", ...Object.keys(emissionFactors[factorId].units)].includes(consumptionUnit)) {
+    return false;
+  }
+  // ghg data not valid
+  else if (!isValidNumber(ghgEmissions,0) || !isValidNumber(ghgEmissionsUncertainty,0,100)) {
+    return false;
+    // ... log error
+  } 
+  else {
+    return true;
+  }
+}
+
 /* -------------------- GHG FORMULAS -------------------- */
 
 import { getSumItems, roundValue } from "/src/utils/Utils";
-
-// Libraries
-import fuels from "/lib/emissionFactors/fuels.json";
-import industrialProcesses from "/lib/emissionFactors/industrialProcesses";
-import agriculturalProcesses from "/lib/emissionFactors/agriculturalProcesses";
-import coolingSystems from "/lib/emissionFactors/coolingSystems";
-import landChanges from "/lib/emissionFactors/landChanges";
-import greenhouseGases from "/lib/ghg";
-
-const emissionFactors = {
-  ...fuels,
-  ...industrialProcesses,
-  ...agriculturalProcesses,
-  ...coolingSystems,
-  ...landChanges,
-};
-
+import { isValidNumber } from "../../../../../utils/Utils";
 
 // get ghg emissions from items (in kgCO2e)
 export const getGhgEmissions = ({
@@ -71,13 +114,19 @@ export const getGhgEmissionsUncertainty = (item) =>
   const value    = getGhgEmissions(item);
   const valueMax = getGhgEmissionsMax(item);
   const valueMin = getGhgEmissionsMin(item);
-  return value != 0
-    ? Math.abs(roundValue(
-        (Math.max(Math.abs(valueMax - value), Math.abs(value - valueMin)) /
-          value) *
-          100
-      , 0))
-    : 0;
+  if (value==null
+   || valueMax==null
+   || valueMin==null) {
+    return null;
+  } else {
+    return value != 0
+      ? Math.abs(roundValue(
+          (Math.max(Math.abs(valueMax - value), Math.abs(value - valueMin)) /
+            value) *
+            100
+        , 0))
+      : 0;
+  }
 }
 
 // get max ghg emissions

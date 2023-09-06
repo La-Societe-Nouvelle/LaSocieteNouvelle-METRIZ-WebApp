@@ -13,6 +13,8 @@ import { getGhgEmissions, getGhgEmissionsUncertainty } from "./utils"
 
 // Libraries
 import fuels from "/lib/emissionFactors/fuels.json";
+import { isValidInput } from "../../../../../utils/Utils";
+import { initNrgItem } from "../AssessmentNRG/utils";
 
 const emissionFactors = {
   ...fuels
@@ -38,9 +40,9 @@ export const RowAssessmentType_1 = ({
 }) => {
 
   const [factorId, setFactorId] = useState(itemData.factorId);
-  const [consumption, setConsumption] = useState(itemData.consumption);
+  const [consumption, setConsumption] = useState(itemData.consumption || "");
   const [consumptionUnit, setConsumptionUnit] = useState(itemData.consumptionUnit);
-  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty);
+  const [consumptionUncertainty, setConsumptionUncertainty] = useState(itemData.consumptionUncertainty || "");
 
   const [ghgEmissions, setGhgEmissions] = useState(itemData.ghgEmissions);
   const [ghgEmissionsUncertainty, setGhgEmissionsUncertainty] = useState(itemData.ghgEmissionsUncertainty);
@@ -62,7 +64,13 @@ export const RowAssessmentType_1 = ({
     setGhgEmissionsUncertainty(ghgEmissionsUncertainty);
 
     // nrg item
-    //...
+    // if (!nrgItem) {
+    //   nrgItem = initNrgItem(itemData.idNRG,emissionFactors[factorId].type);
+    //   nrgItem.idGHG = itemId;
+    // }
+    // nrgItem.consumption = consumption;
+    // nrgItem.consumptionUncertainty = consumptionUncertainty;
+    // console.log(nrgItem);
 
     // did update
     onUpdate();
@@ -74,13 +82,14 @@ export const RowAssessmentType_1 = ({
     const nextFactorId = event.target.value
     setFactorId(nextFactorId);
     // re-init if unit not defined for new ghg factor
-    if (
-      !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
-      !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
+    if (!["kgCO2e", "tCO2e"].includes(consumptionUnit) 
+     && !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
     ) {
-      setConsumption(0.0);
       setConsumptionUnit(Object.keys(emissionFactors[nextFactorId].units)[0]);
       setConsumptionUncertainty(25.0);
+      if (factorId) {
+        setConsumption(0.0);
+      }
     }
   };
 
@@ -159,7 +168,7 @@ export const RowAssessmentType_1 = ({
               value={consumption}
               onUpdate={updateConsumption}
               disabled={!factorId}
-              isInvalid={!isValidNumber(consumption,0)}
+              isInvalid={!isValidInput(consumption,0)}
             />
           </Col>
           <Col lg="1">
@@ -184,7 +193,7 @@ export const RowAssessmentType_1 = ({
               onUpdate={updateConsumptionUncertainty}
               placeholder={"%"}
               disabled={!factorId}
-              isInvalid={!isValidNumber(consumptionUncertainty,0,100)}
+              isInvalid={!isValidInput(consumptionUncertainty,0,100)}
             />
           </Col>
         </Row>

@@ -65,13 +65,16 @@ export const AssessmentNRG = ({
   const [nrgDetails, setNrgDetails] = useState(impactsData.nrgDetails);
 
   useEffect(async () => {
+    console.log("build component");
+    console.log(nrgDetails);
+    console.log(impactsData.nrgDetails);
     for (let assessmentItemId of [
       "electricity",
       "heat",
       "renewableTransformedEnergy"
     ]) {
-      if (nrgDetails[assessmentItemId]==undefined) {
-        nrgDetails[assessmentItemId] = {
+      if (impactsData.nrgDetails[assessmentItemId]==undefined) {
+        impactsData.nrgDetails[assessmentItemId] = {
           id: assessmentItemId,
           fuelCode: assessmentItemId,
           type: assessmentItemId,
@@ -83,11 +86,12 @@ export const AssessmentNRG = ({
         };
       }
     }
-    setNrgDetails({...nrgDetails});
+    //setNrgDetails({...nrgDetails});
   }, [])
 
   useEffect(() => {
     console.log("use effect triggered");
+    console.log(nrgDetails);
   }, [nrgDetails])
 
   // add new nrg consumption item (fossil or biomass)

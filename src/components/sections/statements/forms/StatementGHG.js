@@ -60,6 +60,7 @@ const StatementGHG = ({
   // update state
   useEffect(() => 
   {
+    console.log("triggered statement GHGS");
     if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
       setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
     }
@@ -112,6 +113,17 @@ const StatementGHG = ({
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (impactsData.comments.ghg = info);
+
+  const onAssessmentSubmit = () => {
+    console.log("here");
+    if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
+      setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
+    }
+    if (impactsData.greenhousesGazEmissionsUncertainty!=greenhousesGazEmissionsUncertainty) {
+      setGreenhousesGazEmissionsUncertainty(impactsData.greenhousesGazEmissionsUncertainty || "");
+    }
+    setShowModal(false);
+  }
 
   return (
     <Form className="statement">
@@ -222,7 +234,7 @@ const StatementGHG = ({
             impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            onUpdate={onUpdate}
+            submit={onAssessmentSubmit}
           />
         </Modal.Body>
       </Modal>
