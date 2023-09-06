@@ -1,46 +1,58 @@
 // La Société Nouvelle
 
 //
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
+
+// Modal
 import { ErrorFileModal } from "../../../modals/userInfoModals";
+
+// Utils
 import { FECFileReader } from "../utils/FECReader";
 
 export const FinancialDataDropzone = ({
-  setImportedData
+  setImportedData,
+  setFileRead
 }) => {
 
-  const [files, setFiles] = useState([]);
-  const [errorFile, setErrorFile] = useState(false);
+  const [showErrorFileModal, setErrorFile] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [fileRead, setFileRead] = useState(false);
 
-  // dropzone
-  const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
-    useDropzone({
-      accept: ".txt, .csv",
-      multiple: false,
-      onDrop: (files) => {
-        setFileRead(false);
-        setErrorFile(false);
-        setFiles(files);
-      },
-    });
+  const onDrop = async (acceptedFiles) => {
+    setFileRead(false);
+    setErrorFile(false);
 
-  // on drop
-  useEffect(async () => 
-  {
-    if (files[0]) {
-      let FECData = await readFECFile(files[0]);
+    if (acceptedFiles.length === 0) {
+      setErrorFile(true);
+      setErrorMessage('L\'extension du fichier doit être en .txt ou .csv');
+      return;
+    }
+
+    const file = acceptedFiles[0];
+    const fileName = file.name.split('.')[0];
+
+    try {
+      const FECData = await readFECFile(file);
       if (FECData.valid) {
         setImportedData(FECData.data);
+        setFileRead(fileName);
       } else {
         setErrorFile(true);
         setErrorMessage(FECData.error);
       }
-      setFileRead(true)
+    } catch (error) {
+      setErrorFile(true);
+      setErrorMessage('Une erreur est survenue lors de la lecture du fichier.');
     }
-  }, [files]);
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: '.txt, .csv',
+    multiple: false,
+    onDrop,
+  });
+
+
 
   return (
     <>
@@ -54,39 +66,13 @@ export const FinancialDataDropzone = ({
         <p className="small">OU</p>
         <p className="btn btn-primary">Selectionner votre fichier</p>
       </div>
-      {/* Rejections */}
-      {fileRejections.length > 0 && (
-        <div className="alert alert-danger">
-          <ul className="list-group list-unstyled">
-            {fileRejections.map(({ errors }) => (
-              <>
-                {errors.map((e) => (
-                  <li key={e.code} className="">
-                    <i className="bi bi-exclamation-triangle" />{" "}
-                    L'extension du fichier doit être en .txt ou .csv
-                  </li>
-                ))}
-              </>
-            ))}
-          </ul>
-        </div>
-      )}
-      {/* Files */}
-      {acceptedFiles.length > 0 && (
-        <div className="alert alert-info">
-          <p className="font-weight-bold">Fichier à analyser :</p>
-          {acceptedFiles.map((file) => (
-            <p key={file.path}>
-              <i className="bi bi-upload" /> {file.path}
-            </p>
-          ))}
-        </div>
-      )}
+
+
       {/* Errors reading */}
-      {errorFile && (
+      {showErrorFileModal && (
         <ErrorFileModal
           title={"Erreur lors de la lecture du FEC"}
-          errorFile={errorFile}
+          showModal={showErrorFileModal}
           errorMessage={errorMessage}
           onClose={() => setErrorFile(false)}
         />
