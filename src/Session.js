@@ -53,7 +53,8 @@ export class Session
     this.id = props.id || "";
 
     // Year
-    this.year = props.year || ""; // obsolete
+    // this.year = props.year || ""; // obsolete
+
     this.availablePeriods = props.availablePeriods || [];
     this.availablePeriods.forEach((period) => {
       period.regex = buildRegexFinancialPeriod(
@@ -62,13 +63,15 @@ export class Session
       );
     });
 
-    this.financialPeriod = props.financialPeriod || {};
-    this.financialPeriod.regex = props.financialPeriod
-      ? buildRegexFinancialPeriod(
-          props.financialPeriod.dateStart,
-          props.financialPeriod.dateEnd
-        )
-      : {};
+     // obsolete
+    // this.financialPeriod = props.financialPeriod || {};
+
+    // this.financialPeriod.regex = props.financialPeriod
+    //   ? buildRegexFinancialPeriod(
+    //       props.financialPeriod.dateStart,
+    //       props.financialPeriod.dateEnd
+    //     )
+    //   : {};
 
     // Data
     this.legalUnit = new LegalUnit(props.legalUnit);

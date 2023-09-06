@@ -237,6 +237,7 @@ export const Metriz = () =>
       />,
       <PublishStatementSection 
         session={session}
+        period={selectedPeriod}
       />,
     ];
 

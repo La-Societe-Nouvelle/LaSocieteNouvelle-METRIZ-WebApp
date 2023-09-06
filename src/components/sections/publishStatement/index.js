@@ -26,20 +26,19 @@ import metaIndics from "/lib/indics";
 /* -------------------- PUBLISH STATEMENT SECTION -------------------- */
 /* ----------------------------------------------------------- */
 
-const PublishStatementSection = ({ session }) => {
+const PublishStatementSection = ({ session, period }) => {
   const {
     legalUnit,
-    financialPeriod,
     financialData,
     validations,
     impactsData,
   } = session;
 
-  const { periodKey } = financialPeriod;
+  const { periodKey } = period;
   const { productionAggregates } = financialData;
   const { corporateName } = legalUnit;
 
-  const year = financialPeriod.dateEnd.substring(0, 4);
+  const year = period.dateEnd.substring(0, 4);
   const comments = impactsData[periodKey].comments;
   const socialFootprint =
     productionAggregates.revenue.periodsData[periodKey].footprint;
