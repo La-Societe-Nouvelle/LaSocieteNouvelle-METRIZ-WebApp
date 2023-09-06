@@ -38,13 +38,13 @@ const StatementMAT = ({
 }) => {
   // state
   const [isExtractiveActivities, setIsExtractiveActivities] = 
-    useState(impactsData.isExtractiveActivities || "");
+    useState(impactsData.isExtractiveActivities);
   const [materialsExtraction, setMaterialsExtraction] = 
-    useState(valueOrDefault(impactsData.materialsExtraction, ""));
+    useState(impactsData.materialsExtraction);
   const [materialsExtractionUnit, setmaterialsExtractionUnit] = 
     useState(impactsData.materialsExtractionUnit);
   const [materialsExtractionUncertainty, setMaterialsExtractionUncertainty] =
-    useState(valueOrDefault(impactsData.materialsExtractionUncertainty, ""));
+    useState(impactsData.materialsExtractionUncertainty);
   const [info, setInfo] = useState(impactsData.comments.mat || "");
 
   // update impacts data when state update

@@ -29,7 +29,7 @@ const StatementECO = ({
 }) => {
 
   const [isAllActivitiesInFrance, setIsAllActivitiesInFrance] = useState(impactsData.isAllActivitiesInFrance);
-  const [domesticProduction, setDomesticProduction] = useState(valueOrDefault(impactsData.domesticProduction, ""));
+  const [domesticProduction, setDomesticProduction] = useState(impactsData.domesticProduction);
   const [info, setInfo] = useState(impactsData.comments.eco || "");
   const [isInvalid, setIsInvalid] = useState(false);
 
