@@ -8,16 +8,31 @@ import { getAmountItems } from "../utils/Utils";
 import { Expense } from "/src/accountingObjects/Expense";
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-import { updater_2_0_0 } from "./updateVersion_v1_to_v2";
+import { updater_2_0_0 } from "./updater_2_0_0";
 import { fetchComparativeData } from "../services/MacrodataService";
-import { getGhgEmissionsUncertainty, getTotalGhgEmissionsUncertainty } from "../../src/components/sections/statements/modals/AssessmentGHG/utils";
 import { ComparativeData } from "../ComparativeData";
+
+import { updater_1_0_1 } from "./updater_1_0_1";
+import { updater_1_0_0 } from "./updater_1_0_0";
+import { updater_1_0_2 } from "./updater_1_0_2";
+import { updater_1_0_4 } from "./updater_1_0_4";
+import { updater_1_0_5 } from "./updater_1_0_5";
+
 
 /* ----------------------------------------------------------------- */
 /* -------------------- MANAGE PREVIOUS VERSION -------------------- */
 /* ----------------------------------------------------------------- */
 
-export const updateVersion = async (sessionData) => {
+/** Functions to update session JSON to current version
+ *  ex. function updater_2_2_1 -> convert session JSON to version 2.2.1
+ * 
+ *  Versions :
+ *    1.0.0
+ * 
+ */
+
+export const updateVersion = async (sessionData) => 
+{
   switch (sessionData.version) {
     case "3.0.0":
       break;
@@ -120,95 +135,4 @@ const updater_3_0_0 = async (sessionData) => {
   ) {
     sessionData.progression = 5;
   }
-};
-
-const updater_1_0_5 = async (sessionData) => {
-  // delete useless objects from  previous session
-  delete sessionData.comparativeAreaFootprints;
-  delete sessionData.targetSNBCarea;
-  delete sessionData.targetSNBCbranch;
-
-  // get previous session division code
-  let code = sessionData.comparativeDivision;
-
-  sessionData.comparativeData = new ComparativeData();
-  sessionData.comparativeData.activityCode = code;
-
-  delete sessionData.comparativeDivision;
-
-  // set previous analysis to True to disable new indicators assessment with missing data
-  sessionData.indics = [
-    "eco",
-    "art",
-    "soc",
-    "knw",
-    "dis",
-    "geq",
-    "ghg",
-    "mat",
-    "was",
-    "nrg",
-    "wat",
-    "haz",
-  ];
-};
-
-const updater_1_0_4 = async (sessionData) => {
-  let investments = sessionData.financialData.investments
-    ? sessionData.financialData.investments.map(
-        (props, index) => new Expense({ id: index, ...props })
-      )
-    : [];
-  let investmentsFootprint = new SocialFootprint();
-  Object.keys(metaIndics).forEach(
-    async (indic) =>
-      (investmentsFootprint[indic] = await buildAggregateIndicator(
-        indic,
-        investments
-      ))
-  );
-  let dataGrossFixedCapitalFormationAggregate = {
-    label: "Formation brute de capital fixe",
-    amount: getAmountItems(investments),
-    footprint: investmentsFootprint,
-  };
-  sessionData.financialData.aggregates.grossFixedCapitalFormation =
-    dataGrossFixedCapitalFormationAggregate;
-};
-
-const updater_1_0_2 = (sessionData) => {
-  // update progression according to current number of steps
-  if (sessionData.progression > 1) {
-    sessionData.progression = sessionData.progression - 1;
-  }
-};
-
-const updater_1_0_1 = (sessionData) => {
-  // update ghgDetails (error with variable name in NRG tool : getGhgEmissionsUncertainty used instead of ghgEmissionsUncertainty)
-  Object.entries(sessionData.impactsData.ghgDetails).forEach(
-    ([_, itemData]) => {
-      // update name
-      itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
-    }
-  );
-  // update value
-  sessionData.impactsData.ghgEmissionsUncertainty =
-    getTotalGhgEmissionsUncertainty(sessionData.impactsData.ghgDetails);
-};
-
-const updater_1_0_0 = (sessionData) => {
-  // update ghgDetails
-  Object.entries(sessionData.impactsData.ghgDetails).forEach(
-    ([_, itemData]) => {
-      // update name factor id
-      itemData.factorId = itemData.fuelCode;
-      // update prefix id
-      if (/^p/.test(itemData.factorId))
-        itemData.factorId = "fuel" + itemData.factorId.substring(1);
-      if (/^s/.test(itemData.factorId))
-        itemData.factorId = "coolSys" + itemData.factorId.substring(1);
-      if (/^industrialProcesses_/.test(itemData.factorId))
-        itemData.factorId = "indusProcess" + itemData.factorId.substring(20);
-    }
-  );
-};
+}
