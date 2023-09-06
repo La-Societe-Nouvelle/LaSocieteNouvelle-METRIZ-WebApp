@@ -26,7 +26,7 @@ const RingChart = ({
   const backgroundColorBis = "rgba(245, 245, 245, 0)";
 
   const indicColor = metaIndics[indic].color;
-  const branchIndicColor = changeOpacity( indicColor, 0.4); 
+  const branchIndicColor = changeOpacity( indicColor, 0.3); 
 
   const datasets = [{
     data: [divisionFootprint,roundValue(100-divisionFootprint,2)],

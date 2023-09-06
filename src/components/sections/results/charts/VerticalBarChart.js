@@ -43,7 +43,7 @@ export const VerticalBarChart = ({
   const { unit, nbDecimals } = metaIndics[indic];
 
   const indicColor = metaIndics[indic].color;
-  const branchIndicColor = changeOpacity( indicColor, 0.4); 
+  const branchIndicColor = changeOpacity( indicColor, 0.3); 
 
   // Datasets --------------------------------------------------------------
 
@@ -164,6 +164,7 @@ export const VerticalBarChart = ({
       padding : {
         left: 10,
         right : 10,
+        top : 30
       },
     },
     scales: {
@@ -204,7 +205,7 @@ export const VerticalBarChart = ({
         align: "top",
         formatter: function (value, context) {
           if (value) {
-            return printValue(value, nbDecimals);
+            return printValue(value, nbDecimals) + " " + unit;
           }
         },
         color: "#191558",
@@ -214,17 +215,8 @@ export const VerticalBarChart = ({
         },
       },
       title: {
-        display: true,
-        padding: {
-          top: 10,
-          bottom: 20,
-        },
-        align: "start",
-        text: unit,
-        color: "#191558",
-        font: {
-          size: 11,
-        },
+        display: false,
+   
       },
       tooltip: {
         backgroundColor: "#191558",

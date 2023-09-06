@@ -72,6 +72,7 @@ section {
 
 .indic-statement {
 
+  overflow: hidden;
   form.statement>div.row>div.col:nth-child(2) {
     border-left: 1px solid $light;
 
@@ -89,8 +90,8 @@ section {
   }
 
   .statement {
-    padding: 2rem;
-    border-radius: 1rem;
+    padding: 1rem 1rem 0.5rem 1rem;
+
     background-color: #fff;
 
     .form-label {

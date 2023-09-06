@@ -75,7 +75,7 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgba(128, 193, 133, 1)"
+    "color": "rgba(209, 195, 70, 82)"
   },
   "knw": {
     "isBeta": false,

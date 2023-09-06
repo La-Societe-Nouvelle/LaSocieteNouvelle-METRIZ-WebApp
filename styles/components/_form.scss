@@ -78,11 +78,11 @@ table input {
 
 .indic-form {
   .form-check-input {
-    width: 1.5em !important;
-    height: 1.5em;
-
+    width: 1.3em !important;
+    height: 1.3em;
     border: 2px solid rgba(25, 21, 88, 0.31);
   }
+
 }
 
 .form-label {
@@ -90,7 +90,9 @@ table input {
 }
 
 .statement {
-  
+  textarea.form-control {
+    font-size: 0.8rem;
+  }
   .form-group {
     margin-bottom: 1rem;
     color: $primary;

@@ -231,11 +231,9 @@ const InvoicesProvidersView = ({
     <div className="box">
       <h4>Déposer des factures</h4>
       <p className="small">
-            Téléchargez la liste des comptes fournisseurs auxiliaires, complétez
-            les numéros SIREN et réimportez le fichier.
-            <br/>Vous pourrez ensuite synchroniser les données de vos
-            fournisseurs.
-          </p>
+        Importez vos factures au format PDF dans la zone de dépôt et associez ensuite les
+        comptes fournisseurs correspondants.
+      </p>
       <Dropzone onDrop={onInvoicesDrop} accept={[".pdf"]}>
         {({ getRootProps, getInputProps }) => (
           <div className="dropzone-section">
@@ -255,7 +253,7 @@ const InvoicesProvidersView = ({
       <InfoModal
         showModal={showAlertModal}
         title={"Association des comptes fournisseurs"}
-        message="Aucun SIREN n'a pu être extrait des documents importés. Veuillez renseigner manuellement le numero SIREN de ces comptes fournisseurs "
+        message="Aucun SIREN n'a pu être extrait des documents importés. Veuillez renseigner manuellement le numero SIREN des comptes fournisseurs. "
         onClose={() => setShowAlertModal(false)}
       ></InfoModal>
 
