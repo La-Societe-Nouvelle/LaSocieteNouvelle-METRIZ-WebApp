@@ -23,7 +23,7 @@ export const ProductionFootprintVisual = ({ session, period }) => {
       <h3>Empreinte de la production</h3>
       <Row className="justify-content-around">
         {validations.map((indic) => (
-          <Col lg={2} className="my-3">
+          <Col lg={2} className="my-3" key={indic}>
             <div
               className={`production-box d-flex flex-column justify-content-between ${
                 keyIndics.includes(indic) ? "major" : ""

@@ -8,9 +8,9 @@ import { Button, Modal, Image } from "react-bootstrap";
 
 /* ---------- USER INFORMATION MODALS ---------- */
 
-export const SuccessFileModal = ({ message, title, closePopup }) => {
+export const SuccessFileModal = ({ showModal,message, title, closePopup }) => {
   return (
-    <Modal show="true" onHide={closePopup} size="md" centered>
+    <Modal show={showModal} onHide={closePopup} size="md" centered>
       <Modal.Header closeButton>
         <Modal.Title as={"h5"}>{title}</Modal.Title>
       </Modal.Header>
@@ -29,16 +29,16 @@ export const SuccessFileModal = ({ message, title, closePopup }) => {
 
         <p className="text-center mt-4">
           <button className="btn btn-primary " onClick={closePopup}>
-            Fermer la fenêtre
+            Fermer 
           </button>
         </p>
       </Modal.Body>
     </Modal>
   );
 };
-export const ErrorFileModal = ({ errorFile, title, errorMessage, onClose }) => {
+export const ErrorFileModal = ({ showModal, title, errorMessage, onClose }) => {
   return (
-    <Modal show={errorFile} onHide={onClose} size="sm" centered>
+    <Modal show={showModal} onHide={onClose} size="sm" centered>
       <Modal.Header closeButton>
         <Modal.Title as={"h6"}></Modal.Title>
       </Modal.Header>

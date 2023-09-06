@@ -54,12 +54,14 @@ export const FinancialDataForm = ({
 
   // Accounting import
   const [FECData, setFECData] = useState(null);
-  const [showModals, setShowModals] = useState(false);
+  const [showViewsModals, setShowViewsModals] = useState(false);
   const [modal, setModal] = useState(0);
+  const [fileName, setFileName] = useState(null);
+  
+  // UI Modals
   const [hasErrorsFEC, setHasErrorsFEC] = useState(false);
   const [errorsMessage, setErrorsMessage] = useState("");
   const [errorsFEC, setErrorsFEC] = useState([]);
-  
   const [errorAPI, setErrorAPI] = useState(false);
 
   // update session -----------------------------------
@@ -113,19 +115,21 @@ export const FinancialDataForm = ({
   // on change - corporate name
   const handleCorporateNameChange = (event) => {
     setCorporateName(event.target.value);
-    props.onChangeCorporateName(event.target.value);
+   // props.onChangeCorporateName(event.target.value);
   };
 
   const handleDivisionChange = (selectedOption) => {
     const division = selectedOption.value;
-    props.onChangeDivision(division);
+    setDivision(division)
+    //props.onChangeDivision(division);
   };
 
   const handleFECData = (FECData) => 
   {
+    setIsDataLoaded(false);
     setFECData(FECData);
     setModal(1);
-    setShowModals(true);
+    setShowViewsModals(true);
   };
 
   // Modals -------------------------------------------
@@ -134,7 +138,7 @@ export const FinancialDataForm = ({
     <ImportModal
       show={modal === 1}
       onHide={cancelImport}
-      title="Identifiez les A-Nouveaux"
+      title={fileName}
     >
       <BalanceForwardBookSelection
         return={cancelImport}
@@ -148,7 +152,7 @@ export const FinancialDataForm = ({
     <ImportModal
       show={modal === 2}
       onHide={cancelImport}
-      title="Associez les comptes d'amortissements et de dépréciations"
+      title={fileName}
     >
       <DepreciationAssetsMapping
         return={() => setModal(1)}
@@ -162,7 +166,7 @@ export const FinancialDataForm = ({
     <ImportModal
       show={modal === 3}
       onHide={cancelImport}
-      title="Associez les comptes de stocks et les comptes de charges"
+      title={fileName}
     >
       <StockPurchasesMapping
         return={() => setModal(2)}
@@ -190,7 +194,8 @@ export const FinancialDataForm = ({
 
   const cancelImport = () => {
     setFECData(null);
-    setShowModals(false);
+    setShowViewsModals(false);
+    setFileName(false);
   }
 
   // Load accounting data -----------------------------
@@ -250,7 +255,7 @@ export const FinancialDataForm = ({
       console.log("Session id : "+session.id);
       
       setIsDataLoaded(true);
-      setShowModals(false);
+      setShowViewsModals(false);
       selectPeriod(financialPeriod);
     }
   };
@@ -327,26 +332,41 @@ export const FinancialDataForm = ({
               <Form.Label>Fichier d'Ecritures Comptables (FEC) *</Form.Label>
               <div className="form-text">
                 <p>
-                  L'importation des écritures comptables s'effectue via un Fichier
-                  d'Ecritures Comptables (FEC¹). Générez ce fichier{" "}
+                  L'importation des écritures comptables s'effectue via un
+                  Fichier d'Ecritures Comptables (FEC¹). Générez ce fichier{" "}
                   <b>
-                    à partir de votre logiciel comptable, ou demandez-le auprès de
-                    votre service comptable.
+                    à partir de votre logiciel comptable, ou demandez-le auprès
+                    de votre service comptable.
                   </b>
                 </p>
               </div>
               <FinancialDataDropzone
                 setImportedData={handleFECData}
+                setFileRead={(name) => setFileName(name)}
               />
               <p className="small fst-italic mb-0">*Champs obligatoires</p>
               <p className="small fst-italic">
-                ¹ Le fichier doit respecter les normes relatives à la structure du
-                fichier (libellés des colonnes, séparateur tabulation ou barre
-                verticale, encodage ISO 8859-15, etc.).
+                ¹ Le fichier doit respecter les normes relatives à la structure
+                du fichier (libellés des colonnes, séparateur tabulation ou
+                barre verticale, encodage ISO 8859-15, etc.).
               </p>
             </FormGroup>
 
-            {showModals && (
+            {/* Files */}
+                  
+            {fileName && (
+              <div className={`alert ${isDataLoaded ? 'alert-success' : 'alert-info'}`}>
+                <p className="font-weight-bold">Fichier à analyser :</p>
+
+                <p className="fw-bold">
+                <i className="bi bi-file-earmark-spreadsheet"></i> 
+                   {fileName}
+                   <i className={`ms-1 bi ${isDataLoaded ? 'bi-check-lg' : 'bi-arrow-clockwise'}`}></i>
+                </p>
+             
+              </div>
+            )}
+            {showViewsModals && (
               <>
                 {renderBalanceForwardBookModal()}
                 {renderDepreciationAssetsModal()}
@@ -379,10 +399,7 @@ export const FinancialDataForm = ({
       )}
 
       {/* Error Modal for API Errors */}
-      <ErrorAPIModal 
-        hasError={errorAPI} 
-        onClose={() => setErrorAPI(false)} 
-      />
+      <ErrorAPIModal hasError={errorAPI} onClose={() => setErrorAPI(false)} />
     </>
   );
 }

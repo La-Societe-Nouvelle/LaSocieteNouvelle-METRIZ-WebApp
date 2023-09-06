@@ -304,6 +304,7 @@ export const InitialStatesSection = ({
           </Dropzone>
           {popupSuccess && (
             <SuccessFileModal
+              showModal={popupSuccess}
               message={message}
               title={titlePopup}
               closePopup={() => setPopupSuccess(false)}
@@ -311,7 +312,7 @@ export const InitialStatesSection = ({
           )}
           {popupError && (
             <ErrorFileModal
-              errorFile={popupError}
+              showModal={popupError}
               title={titlePopup}
               errorMessage={message}
               onClose={() => setPopupError(false)}

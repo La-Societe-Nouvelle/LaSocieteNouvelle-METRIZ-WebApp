@@ -28,6 +28,8 @@ import { Loader } from "../../modals/Loader";
 import { getDivisionsOptions } from "/src/utils/Utils";
 import { buildFullFile, buildIndicReport } from "/src/utils/deliverables/generateDownloadableFiles";
 import { buildSummaryReportContributionIndic } from "/src/utils/deliverables/summaryReportGeneratorContribution";
+import { buildSummaryReportIntensityIndic } from "../../../utils/deliverables/summaryReportGeneratorIntensity";
+import { buildSummaryReportIndexIndic } from "../../../utils/deliverables/summaryReportGeneratorIndex";
 
 // Styles
 import { customSelectStyles } from "/config/customStyles";
@@ -61,7 +63,7 @@ const Results = ({
   publish, 
   goBack 
 }) => {
-  console.log(period);
+
   // Selections
   const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
   //const [period, setPeriod] = useState(session.financialPeriod);
@@ -73,6 +75,7 @@ const Results = ({
 
   const handleDivisionChange = async (selectedOption) => {
     const division = selectedOption.value;
+    console.log(division)
     if (division!=comparativeDivision) 
     {
       // update state
@@ -82,13 +85,14 @@ const Results = ({
       setIsLoading(true);
       session.comparativeData.activityCode = comparativeDivision;
       await session.comparativeData.fetchComparativeData(session.validations[period.periodKey]);
+      
       setIsLoading(false);
     }
   };
 
   const handlePeriodChange = (selectedPeriod) => {
     const period = selectedPeriod.value;
-    setPeriod(period);
+    //setPeriod(period);
   };
 
   const handleViewChange = (viewCode) => {
@@ -122,22 +126,22 @@ const Results = ({
       PDFFile.download(PDFTitle);
     }
 
-    else if (selectedFiles.includes("sig-indic-xlsx")) {
-      //
-      let PDFFile = await buildSummaryReport({
-        viewCode: showedView,
-        session,
-        period,
-      });
-      let PDFTitle = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.pdf`;
+    // else if (selectedFiles.includes("sig-indic-xlsx")) {
+    //   //
+    //   let PDFFile = await buildSummaryReport({
+    //     viewCode: showedView,
+    //     session,
+    //     period,
+    //   });
+    //   let PDFTitle = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.pdf`;
 
-      const pdfUrl = URL.createObjectURL(PDFFile);
-      const downloadLink = document.createElement("a");
-      downloadLink.href = pdfUrl;
-      downloadLink.download = PDFTitle;
-      downloadLink.click();
-      URL.revokeObjectURL(pdfUrl);
-    }
+    //   const pdfUrl = URL.createObjectURL(PDFFile);
+    //   const downloadLink = document.createElement("a");
+    //   downloadLink.href = pdfUrl;
+    //   downloadLink.download = PDFTitle;
+    //   downloadLink.click();
+    //   URL.revokeObjectURL(pdfUrl);
+    // }
 
     setIsGenerating(false);
   };
@@ -336,18 +340,18 @@ const buildSummaryReport = async (props) =>
   switch(props.viewCode) 
   {
     case "default":   return (null);
-    case "art":       return (await buildIndicReport({...props, indic:"art"}));
+    case "art":       return (await buildSummaryReportContributionIndic({...props, indic:"art"}));
     case "eco":       return (await buildSummaryReportContributionIndic({...props, indic:"eco"}));
-    case "ghg":       return (await buildIndicReport({...props, indic:"ghg"}));
-    case "geq":       return (await buildIndicReport({...props, indic:"geq"}));
-    case "haz":       return (await buildIndicReport({...props, indic:"haz"}));
-    case "idr":       return (await buildIndicReport({...props, indic:"idr"}));
-    case "knw":       return (await buildIndicReport({...props, indic:"knw"}));
-    case "mat":       return (await buildIndicReport({...props, indic:"mat"}));
-    case "nrg":       return (await buildIndicReport({...props, indic:"nrg"}));
-    case "was":       return (await buildIndicReport({...props, indic:"was"}));
-    case "wat":       return (await buildIndicReport({...props, indic:"wat"}));
-    case "soc":       return (await buildIndicReport({...props, indic:"soc"}));
+    case "ghg":       return (await buildSummaryReportIntensityIndic({...props, indic:"ghg"}));
+    case "geq":       return (await buildSummaryReportIndexIndic({...props, indic:"geq"}));
+    case "haz":       return (await buildSummaryReportIntensityIndic({...props, indic:"haz"}));
+    case "idr":       return (await buildSummaryReportIndexIndic({...props, indic:"idr"}));
+    case "knw":       return (await buildSummaryReportContributionIndic({...props, indic:"knw"}));
+    case "mat":       return (await buildSummaryReportIntensityIndic({...props, indic:"mat"}));
+    case "nrg":       return (await buildSummaryReportIntensityIndic({...props, indic:"nrg"}));
+    case "was":       return (await buildSummaryReportIntensityIndic({...props, indic:"was"}));
+    case "wat":       return (await buildSummaryReportIntensityIndic({...props, indic:"wat"}));
+    case "soc":       return (await buildSummaryReportContributionIndic({...props, indic:"soc"}));
     default:          return (null);
   }
 }

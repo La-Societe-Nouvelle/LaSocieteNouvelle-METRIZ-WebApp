@@ -22,7 +22,7 @@ const ImportProvidersView = ({
   updateProviders,
   handleSynchronize,
 }) => {
-  const [errorFile, setErrorFile] = useState(false);
+  const [showErrorFileModal, setErrorFile] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const handleModalSynchronize = () => {
@@ -169,10 +169,10 @@ const ImportProvidersView = ({
           )}
         </Dropzone>
 
-        {errorFile && (
+        {showErrorFileModal && (
           <ErrorFileModal
             title={"Fichier incorrect"}
-            errorFile={errorFile}
+            showModal={showErrorFileModal}
             errorMessage={
               "Format de fichier incorrect. Veuillez importer un fichier au format .xslx ou .csv"
             }

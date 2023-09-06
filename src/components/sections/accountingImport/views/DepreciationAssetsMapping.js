@@ -115,6 +115,7 @@ export function DepreciationAssetsMapping(props)
 
   return (
     <div>
+      <h4>Associez les comptes d'amortissements et de dépréciations</h4>
       <Table>
         {/* Header */}
         <thead>
