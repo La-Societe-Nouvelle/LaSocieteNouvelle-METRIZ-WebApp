@@ -9,6 +9,7 @@ import { Alert, Button, Table } from "react-bootstrap";
 import {
   checkFractions,
   checkMonths,
+  getApprenticeshipRemunerations,
   getDistinctEstablishmentIds,
   getDistinctStatements,
   getGenderWageGap,
@@ -29,40 +30,34 @@ import metaRubriques from "/lib/rubriquesDSN";
 /** 
  */
 
-const ImportSocialData = ({ 
-  impactsData, 
-  onChange,
-  handleSocialStatements 
+export const SocialStatementsTab = ({ 
+  socialStatements: socialStatementsInModal,
+  onUpdateSocialStatements 
 }) => {
 
   const isMounted = useRef(false);
 
   // social statements (DSN)
-  const [socialStatements, setSocialStatements] = 
-    useState(impactsData.socialStatements || []);
-  
+  const [socialStatements, setSocialStatements] = useState(socialStatementsInModal);
+
   const [errorFile, setErrorFile] = useState(false);
   const [errors, setErrors] = useState([]);
   const [warnings, setWarnings] = useState([]);
-
-  // used ?
-  useEffect(async () => {
-    if (socialStatements != impactsData.socialStatements) {
-      setSocialStatements(impactsData.socialStatements);
-    }
-  }, [impactsData.socialStatements]);
-
-  //
+  
+  // ----------------------------------------------------------------------------------------------------
+  
+  // when social statements updates
   useEffect(async () => 
   {
-    if (isMounted.current) {
+    console.log(isMounted);
+    if (isMounted.current) 
+    {
       // check social statements
       verifySocialStatements(socialStatements);
-      // update impacts data (in modal, not in session)
-      impactsData.socialStatements = socialStatements;
-      // trigger individuals data update
-      onChange();
-    } else {
+      
+      onUpdateSocialStatements(socialStatements);
+    } 
+    else {
       isMounted.current = true;
     }
   }, [socialStatements]);
@@ -184,8 +179,8 @@ const ImportSocialData = ({
         (statement) => statement !== undefined
       );
 
-      setSocialStatements((prevSocialStatements) => [
-        ...prevSocialStatements,
+      setSocialStatements([
+        ...socialStatements,
         ...validSocialStatements,
       ]);
     } 
@@ -311,6 +306,4 @@ const ImportSocialData = ({
       </div>
     </div>
   );
-};
-
-export default ImportSocialData;
+}

@@ -135,8 +135,6 @@ const StatementIDR = ({
 
                 <AssessmentDSN
                   impactsData={impactsData}
-                  onUpdate={onUpdate}
-                  updateSocialData={updateSocialData}
                 />
               </div>
             </Col>

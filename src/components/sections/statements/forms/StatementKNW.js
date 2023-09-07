@@ -4,12 +4,13 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
 
+// Utils
 import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { isValidNumber } from "/src/utils/Utils";
+import { checkStatementKNW } from "./utils";
 
 // Modals
 import { AssessmentKNW } from "../modals/AssessmentKNW";
-import { isValidNumber } from "/src/utils/Utils";
-import { checkStatementKNW } from "./utils";
 
 /* ---------- STATEMENT - INDIC #KNW ---------- */
 

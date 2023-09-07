@@ -3,133 +3,122 @@
 // React
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
+import { isValidInput, isValidNumber, roundValue } from '../../../../../utils/Utils';
 
 const EmployeeRow = ({
   individualData,
-  updateSocialData,
   onUpdate
 }) => {
 
-  const [name, setName] = useState(individualData.name);
-  const [sex, setSex] = useState(individualData.sex);
-  const [wage, setWage] = useState(individualData.wage);
-  const [workingHours, setWorkingHours] = useState(individualData.workingHours);
-  const [hourlyRate, setHourlyRate] = useState(individualData.hourlyRate);
-  const [apprenticeshipHours, setApprenticeshipHours] = useState(individualData.apprenticeshipHours);
-  const [apprenticeshipContract, setApprenticeshipContract] = useState(individualData.apprenticeshipContract);
+  const [name, setName] = useState(individualData.name || "");
+  const [sex, setSex] = useState(individualData.sex || "");
+  const [wage, setWage] = useState(individualData.wage || "");
+  const [workingHours, setWorkingHours] = useState(individualData.workingHours || "");
+  const [hourlyRate, setHourlyRate] = useState(individualData.hourlyRate || "");
+  const [apprenticeshipHours, setApprenticeshipHours] = useState(individualData.apprenticeshipHours || "");
+  const [apprenticeshipContract, setApprenticeshipContract] = useState(individualData.apprenticeshipContract || "");
+
+  // ----------------------------------------------------------------------------------------------------
    
-  useEffect(() => {
+  // from outside
+  useEffect(() => 
+  {
     if (individualData.name!=name) setName(individualData.name);
-    //setSex(individualData.sex);
-    //setWage(individualData.wage);
-    // setWorkingHours(props.workingHours);
-    // setHourlyRate(props.hourlyRate);
-    // setApprenticeshipHours(props.apprenticeshipHours);
-    // setApprenticeshipContract(props.apprenticeshipContract);
+    if (individualData.sex!=sex) setSex(individualData.sex);
+    if (individualData.wage!=wage) setWage(individualData.wage);
+    if (individualData.workingHours!=workingHours) setWorkingHours(individualData.workingHours);
+    if (individualData.hourlyRate!=hourlyRate) setHourlyRate(individualData.hourlyRate);
+    if (individualData.apprenticeshipHours!=apprenticeshipHours) setApprenticeshipHours(individualData.apprenticeshipHours);
+    if (individualData.apprenticeshipContract!=apprenticeshipContract) setApprenticeshipContract(individualData.apprenticeshipContract);
+
   }, [individualData]);
 
-  useEffect(() => {
+  // from inside
+  useEffect(() => 
+  {
     individualData.name = name;
-    console.log(individualData);
+    individualData.sex = sex;
+    individualData.workingHours = workingHours;
+    individualData.hourlyRate = hourlyRate;
+    individualData.apprenticeshipHours = apprenticeshipHours;
+    individualData.apprenticeshipContract = apprenticeshipContract;
     
-    onUpdate();
     //updateSocialData();
+    onUpdate();
   }, [name, sex, wage, workingHours, hourlyRate, apprenticeshipHours, apprenticeshipContract]);
 
-  // const updateSocialData = () => {
-  //   const data = {
-  //     id: individualData.id,
-  //     name,
-  //     sex,
-  //     wage,
-  //     workingHours,
-  //     hourlyRate,
-  //     apprenticeshipHours,
-  //     apprenticeshipContract,
-  //   };
-  //   updateSocialData(data);
-  // };
+  // ----------------------------------------------------------------------------------------------------
 
-  const isValid = hourlyRate != null && workingHours != null;
-
+  // name
   const handleNameChange = (event) => {
-    setName(event.target.value);
+    const nextName = event.target.value;
+    setName(nextName);
   };
 
+  // sex
   const handleSexChange = (event) => {
-    setSex(event.target.value);
+    const nextSex = event.target.value;
+    setSex(nextSex);
   };
 
-  const handleWorkingHoursChange = (event) => {
+  // working hours
+  const handleWorkingHoursChange = (event) => 
+  {
     const input = event.target.value;
-    const workingHours = input !== '' ? parseInt(input) : null;
-    setWorkingHours(workingHours);
+    const nextWorkingHours = parseFloat(input);
+
+    isNaN(nextWorkingHours) ? setWage(input) : setWage(nextWorkingHours);
   };
 
-  const handleWageChange = (event) => {
+  // wage
+  const handleWageChange = (event) => 
+  {
     const input = event.target.value;
-    let wage = roundValue(input, 2);
-    let hourlyRate = null;
+    const nextWage = parseFloat(input);
 
-    if (wage !== null && wage !== 0) {
-      hourlyRate = workingHours > 0 ? roundValue(wage / workingHours, 2) : null;
-    } else if (wage === 0) {
-      setWorkingHours(0);
-      setHourlyRate(0);
-    }
+    isNaN(nextWage) ? setWage(input) : setWage(nextWage);
 
-    setWage(wage);
-    setHourlyRate(hourlyRate);
-  };
-
-  const handleHourlyRateChange = (event) => {
-    const input = event.target.value;
-    const hourlyRate = roundValue(input, 2);
-    let wage = null;
-
-    if (hourlyRate !== null && hourlyRate !== 0) {
-      wage = workingHours > 0 ? roundValue(workingHours * hourlyRate, 2) : null;
-    } else if (hourlyRate === 0) {
-      wage = 0;
-    }
-
-    setHourlyRate(hourlyRate);
-    setWage(wage);
-  };
-
-  const handleApprenticeshipContractChange = (event) => {
-    const apprenticeshipContract = event.target.checked;
-    const apprenticeshipHours = apprenticeshipContract ? workingHours : 0;
-    setApprenticeshipContract(apprenticeshipContract);
-    setApprenticeshipHours(apprenticeshipHours);
-  };
-
-  const handleApprenticeshipHoursChange = (event) => {
-    const input = event.target.value;
-    const apprenticeshipHours = input !== '' ? parseInt(input) : null;
-
-    if (apprenticeshipHours > 0 && workingHours > 0 && apprenticeshipHours > workingHours) {
-      setApprenticeshipHours(workingHours);
-    } else {
-      setApprenticeshipHours(apprenticeshipHours);
+    if (isValidNumber(nextWage,0)
+     && isValidNumber(workingHours,0) && workingHours>0) {
+      setHourlyRate(roundValue(nextWage / workingHours, 2));
     }
   };
 
-  const roundValue = (value, decimals) => {
-    if (value === null) return null;
-    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+  // hourly rate
+  const handleHourlyRateChange = (event) => 
+  {
+    const input = event.target.value;
+    const nextHourlyRate = parseFloat(input);
+
+    isNaN(nextHourlyRate) ? setHourlyRate(input) : setHourlyRate(nextHourlyRate);
+
+    if (isValidNumber(nextHourlyRate,0) && isValidNumber(workingHours,0)) {
+      const nextWage = roundValue(workingHours * nextHourlyRate, 2);
+      setWage(nextWage);
+    }
+  };
+
+  //
+  const handleApprenticeshipContractChange = (event) => 
+  {
+    const nextApprenticeshipContract = event.target.checked;
+    setApprenticeshipContract(nextApprenticeshipContract);
+
+    const nextApprenticeshipHours = nextApprenticeshipContract ? workingHours : 0;
+    setApprenticeshipHours(nextApprenticeshipHours);
+  };
+
+  //
+  const handleApprenticeshipHoursChange = (event) => 
+  {
+    const input = event.target.value;
+    const nextApprenticeshipHours = parseFloat(input);
+
+    isNaN(nextApprenticeshipHours) ? setApprenticeshipHours(input) : setApprenticeshipHours(nextApprenticeshipHours);
   };
 
   /* -------------------- CHECK IF ALL DATA OK -------------------- */
-
-  const checkIndividualData = (individualData) => {
-    if (individualData.sex != 1 && individualData.sex != 2) return false;
-    else if (individualData.wage == null) return false;
-    else if (individualData.workingHours == null) return false;
-    else if (individualData.hourlyRate == null) return false;
-    else return true;
-  };
-
+  
   return (
     <>
       <td>
@@ -145,7 +134,7 @@ const EmployeeRow = ({
           value={sex}
           onChange={handleSexChange}
           size="sm"
-          isInvalid={!isValid}
+          isInvalid={!["","1","2"].includes(sex)}
         >
           <option key="" value=""> - </option>
           <option key="F" value="2">F</option>
@@ -156,24 +145,27 @@ const EmployeeRow = ({
         <Form.Control
           className="form-control-sm"
           type="text"
-          value={workingHours !== null ? workingHours.toString() : ''}
+          value={workingHours}
           onChange={handleWorkingHoursChange}
+          isInvalid={!isValidInput(workingHours,0)}
         />
       </td>
       <td>
         <Form.Control
           className="form-control-sm"
           type="text"
-          value={wage !== null ? wage.toString() : ''}
+          value={wage}
           onChange={handleWageChange}
+          isInvalid={!isValidInput(wage,0)}
         />
       </td>
       <td>
         <Form.Control
           className="form-control-sm"
           type="text"
-          value={hourlyRate !== null ? hourlyRate.toString() : ''}
+          value={hourlyRate}
           onChange={handleHourlyRateChange}
+          isInvalid={!isValidInput(hourlyRate,0)}
         />
       </td>
       <td className="text-center">
@@ -188,9 +180,10 @@ const EmployeeRow = ({
         <Form.Control
           className="form-control-sm"
           type="text"
-          value={apprenticeshipHours !== null ? apprenticeshipHours.toString() : ''}
+          value={apprenticeshipHours}
           disabled={apprenticeshipContract}
           onChange={handleApprenticeshipHoursChange}
+          isInvalid={!isValidInput(apprenticeshipHours,0,workingHours)}
         />
       </td>
     </>
