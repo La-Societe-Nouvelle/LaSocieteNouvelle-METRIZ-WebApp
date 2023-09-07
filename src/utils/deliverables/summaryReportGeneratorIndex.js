@@ -65,8 +65,8 @@ export const buildSummaryReportIndexIndic = ({
   const indicDescription = getIndicDescription(indic);
 
   let branchProductionTarget = null;
-
-  if (comparativeData.production.division.target.data[indic]) {
+  
+  if (comparativeData.production.division.target.data[indic].length) {
     branchProductionTarget = targetAnnualReduction(
       comparativeData.production.division.target.data[indic]
     );
