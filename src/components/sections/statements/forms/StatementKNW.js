@@ -64,6 +64,14 @@ const StatementKNW = ({
     }
   };
 
+  const onAssessmentSubmit = () => 
+  {
+    if (impactsData.researchAndTrainingContribution!=researchAndTrainingContribution) {
+      setResearchAndTrainingContribution(researchAndTrainingContribution)
+    } 
+    setShowModal(false);
+  }
+
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (impactsData.comments.knw = info);
 
@@ -127,7 +135,7 @@ const StatementKNW = ({
             impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            onUpdate={onUpdate}
+            submit={onAssessmentSubmit}
           />
         </Modal.Body>
       </Modal>
