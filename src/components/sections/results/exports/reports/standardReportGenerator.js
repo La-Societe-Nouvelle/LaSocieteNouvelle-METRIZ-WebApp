@@ -1,18 +1,18 @@
 // PDF Make
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+
 // Lib
 import metaIndics from "/lib/indics";
 import divisions from "/lib/divisions";
-// Utils
-import {
-  buildFixedCapitalConsumptionsAggregates,
-  buildIntermediateConsumptionsAggregates,
-} from "../../formulas/aggregatesBuilder";
-import { getAnalyse, getStatementNote } from "../Writers";
+
+// Utils 
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
-import { loadFonts } from "./deliverablesUtils";
+import { loadFonts } from "../exportsUtils";
 import { generateSIGtable } from "./generateSIGtable";
+
+import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
+import { getAnalyse, getStatementNote } from "/src/utils/Writers";
 
 // --------------------------------------------------------------------------
 //  Indicator Report

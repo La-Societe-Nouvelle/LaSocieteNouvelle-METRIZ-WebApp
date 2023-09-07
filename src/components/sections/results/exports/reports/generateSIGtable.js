@@ -1,18 +1,14 @@
-// La Société Nouvelle
+import { printValue } from "/src/utils/Utils";
+import metaIndics from "/lib/indics.json";
 
-// Lib
-import metaIndics from "/lib/indics";
-
-// utils
-import { printValue } from "../../../utils/Utils";
-
-export const generateIndicTableBody = (
+export const generateSIGtable = (
   mainAggregates,
   productionAggregates,
   indic,
   unit,
   intermediateConsumptionsAggregates,
-  fixedCapitalConsumptionsAggregates
+  fixedCapitalConsumptionsAggregates,
+  period
 ) => {
   // FINANCIAL DATA
   const {
@@ -20,6 +16,7 @@ export const generateIndicTableBody = (
     storedProduction,
     immobilisedProduction,
   } = productionAggregates;
+
   const {
     production,
     intermediateConsumptions,
@@ -66,8 +63,10 @@ export const generateIndicTableBody = (
             text: [
               {
                 text:
-                  printValue(production.periodsData[period.periodKey].footprint.indicators[indic].value, precision) +
-                  " ",
+                  printValue(
+                    production.periodsData[period.periodKey].footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
               },
               { text: unit, fontSize: "7" },
             ],
@@ -87,7 +86,7 @@ export const generateIndicTableBody = (
     ],
     [
       {
-        text: "Chiffre d'affaire",
+        text: "Chiffre d'affaires",
         style: "tableLeft",
         margin: [15, 0, 0, 0],
       },
@@ -99,21 +98,25 @@ export const generateIndicTableBody = (
         columns: [
           {
             text: [
-              
               {
                 text:
-                  printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].value, precision) +
-                  " ",
+                  printValue(
+                    revenue.periodsData[period.periodKey].footprint.indicators[indic].value,
+                    precision
+                  ) + " ",
               },
               { text: unit, fontSize: "7" },
             ],
           },
         ],
         fillColor: "#fa595f",
-        fillOpacity : 0.3,
+        fillOpacity: 0.2,
         margin: [2, 2, 2, 2],
       },
       {
+        fillColor: "#fa595f",
+        fillOpacity: 0.2,
+        margin: [2, 2, 2, 2],
         text:
           printValue(revenue.periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) + " %",
         fontSize: "7",
@@ -154,11 +157,16 @@ export const generateIndicTableBody = (
             storedProduction.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
             0
           ) + " %",
-          fontSize: "7",
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getImmobilisedProductionRow(immobilisedProduction, indic, unit, precision),
+    ...getImmobilisedProductionRow(
+      immobilisedProduction,
+      indic,
+      unit,
+      precision
+    ),
     [
       {
         text: "Consommations intermédiaires",
@@ -200,7 +208,13 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getAggregateRow(intermediateConsumptionsAggregates, indic, unit, precision),
+    ...getAggregateRow(
+      intermediateConsumptionsAggregates,
+      indic,
+      unit,
+      precision,
+      period
+    ),
     [
       {
         text: "Consommations de capital fixe",
@@ -241,7 +255,13 @@ export const generateIndicTableBody = (
         margin: [2, 2, 2, 2],
       },
     ],
-    ...getAggregateRow(fixedCapitalConsumptionsAggregates, indic, unit, precision),
+    ...getAggregateRow(
+      fixedCapitalConsumptionsAggregates,
+      indic,
+      unit,
+      precision,
+      period
+    ),
     [
       {
         text: "Valeur ajoutée nette",
@@ -284,7 +304,14 @@ export const generateIndicTableBody = (
   return tableBody;
 };
 
-const getImmobilisedProductionRow = (immobilisedProduction, indic, unit, precision) => {
+/* ---------- TABLE ROWS ---------- */
+
+const getImmobilisedProductionRow = (
+  immobilisedProduction,
+  indic,
+  unit,
+  precision
+) => {
   const immobilisedProductionRow = [];
   // Immobilised production
   if (immobilisedProduction > 0) {
@@ -322,7 +349,7 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit, precisi
             immobilisedProduction.periodsData[period.periodKey].footprint.indicators[indic].uncertainty,
             0
           ) + " %",
-          fontSize: "7",
+        fontSize: "7",
         margin: [2, 2, 2, 2],
       }
     );
@@ -331,20 +358,20 @@ const getImmobilisedProductionRow = (immobilisedProduction, indic, unit, precisi
   return immobilisedProductionRow;
 };
 
-const getAggregateRow = (aggregates, indic, unit, precision) => {
+const getAggregateRow = (aggregates, indic, unit, precision,period) => {
   let rows = [];
   aggregates
-    .filter((aggregate) => aggregate.amount != 0)
-    .forEach((aggregate) => {
+    .map(({ label, periodsData}, index) => {
+
       let row = [];
       row.push(
         {
-          text: aggregate.accountLib,
+          text: label,
           style: "tableLeft",
           margin: [15, 0, 0, 0],
         },
         {
-          text: printValue(aggregate.amount, 0) + " €",
+          text: printValue(periodsData[period.periodKey].amount, 0) + " €",
           margin: [2, 2, 2, 2],
         },
         {
@@ -353,8 +380,10 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
               text: [
                 {
                   text:
-                    printValue(aggregate.footprint.indicators[indic].value, precision) +
-                    " ",
+                    printValue(
+                      periodsData[period.periodKey].footprint.indicators[indic].value,
+                      precision
+                    ) + " ",
                 },
                 { text: unit, fontSize: "7" },
               ],
@@ -364,9 +393,9 @@ const getAggregateRow = (aggregates, indic, unit, precision) => {
         },
         {
           text:
-            printValue(aggregate.footprint.indicators[indic].uncertainty, 0) +
+            printValue( periodsData[period.periodKey].footprint.indicators[indic].uncertainty, 0) +
             " %",
-            fontSize: "7",
+          fontSize: "7",
           margin: [2, 2, 2, 2],
         }
       );

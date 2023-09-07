@@ -16,22 +16,23 @@ import {
   loadFonts,
   sortProvidersByImpact,
   targetAnnualReduction,
-} from "./deliverablesUtils";
-import { printValue } from "../Utils";
+} from "../exportsUtils";
+import { printValue } from "/src/utils/Utils";
 
 // --------------------------------------------------------------------------
-//  Intensity Indicator Report
+//  Report for Index Indicator
 // --------------------------------------------------------------------------
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 //Call function to load fonts
 loadFonts();
 
-export const buildSummaryReportIndexIndic = ({
+export const buildSummaryReportIndexIndic = async({
   session,
   indic,
   period
 }) => {
+
   // ---------------------------------------------------------------
   // Variables
 

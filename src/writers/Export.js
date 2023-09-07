@@ -73,7 +73,7 @@ async function generateFootprintPDF(
 
 
   doc.setProperties({
-    title: "rapport_empreinte_societale_" + legalUnit.replaceAll(" ", ""),
+    title: "rapport_empreinte_societale_" + legalUnit.corporateName.replaceAll(" ", ""),
   });
 
     // FINANCIAL DATA
@@ -116,7 +116,7 @@ async function generateFootprintPDF(
   y += 8;
   doc.setTextColor(250, 102, 106);
   doc.setFontSize(14);
-  doc.text(legalUnit.toUpperCase() || " - ", x, y);
+  doc.text(legalUnit.corporateName.toUpperCase() || " - ", x, y);
   doc.setFontSize(10);
 
   y += 8;

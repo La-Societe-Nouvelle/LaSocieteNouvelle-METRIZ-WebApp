@@ -1,12 +1,13 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import { loadFonts } from "./deliverablesUtils";
+
+import { loadFonts } from "../exportsUtils";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 loadFonts();
 
-export const generateCover = (year, legalUnit) => {
+export const generateReportCover = (year, legalUnit) => {
   const margins = {
     top: 50,
     bottom: 50,

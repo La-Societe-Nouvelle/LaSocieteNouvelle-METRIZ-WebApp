@@ -5,6 +5,7 @@ import pdfFonts from "pdfmake/build/vfs_fonts";
 import divisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
+// Utils
 import {
   getMostImpactfulExpenseAccountRows,
   getUncertaintyDescription,
@@ -13,12 +14,14 @@ import {
   targetAnnualReduction,
   getIntensKeyProviders,
   calculateAverageEvolutionRate,
-} from "./deliverablesUtils";
+} from "../exportsUtils";
+
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
-import { printValue } from "../Utils";
+import { printValue } from "/src/utils/Utils";
 
 // --------------------------------------------------------------------------
-
+//  Report for Intensity Indicator
+// --------------------------------------------------------------------------
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 //Call function to load fonts
@@ -58,7 +61,7 @@ export const buildSummaryReportIntensityIndic = async ({
   // UTILS
   let branchProductionTarget = null;
  
-  if (comparativeData.production.division.target.data[indic]) {
+  if (comparativeData.production.division.target.data[indic].length) {
     branchProductionTarget = targetAnnualReduction(
       comparativeData.production.division.target.data[indic]
     );

@@ -8,7 +8,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
       id: "sig-indic-xlsx",
       name: "Soldes intermédiaires de gestion (.xlsx)",
     },
-    { id: "indic-report", name: "Plaquette (.pdf)" },
+    { id: "summary-report", name: "Plaquette (.pdf)" },
   ];
 
  

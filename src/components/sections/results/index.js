@@ -26,16 +26,19 @@ import { Loader } from "../../modals/Loader";
 
 // Utils
 import { getDivisionsOptions } from "/src/utils/Utils";
-import { buildFullFile, buildIndicReport } from "/src/utils/deliverables/generateDownloadableFiles";
-import { buildSummaryReportContributionIndic } from "/src/utils/deliverables/summaryReportGeneratorContribution";
-import { buildSummaryReportIntensityIndic } from "../../../utils/deliverables/summaryReportGeneratorIntensity";
-import { buildSummaryReportIndexIndic } from "../../../utils/deliverables/summaryReportGeneratorIndex";
+
+import { buildSummaryReportContributionIndic } from "./exports/reports/summaryReportGeneratorContribution";
+import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryReportGeneratorIntensity";
+import { buildSummaryReportIndexIndic } from "./exports/reports/summaryReportGeneratorIndex";
+import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
+import { buildCompleteFile } from "./exports/completeFileGenerator";
 
 // Styles
 import { customSelectStyles } from "/config/customStyles";
 
 // Lib
 import divisions from "/lib/divisions";
+
 
 
 // Division options
@@ -74,20 +77,19 @@ const Results = ({
   const [isLoading, setIsLoading] = useState(false); // fetching data
 
   const handleDivisionChange = async (selectedOption) => {
-    const division = selectedOption.value;
-    console.log(division)
-    if (division!=comparativeDivision) 
-    {
+  
+      const division = selectedOption.value;
+ 
       // update state
       setComparativeDivision(division);
       
       // fetch data
       setIsLoading(true);
-      session.comparativeData.activityCode = comparativeDivision;
+      session.comparativeData.activityCode = division;
       await session.comparativeData.fetchComparativeData(session.validations[period.periodKey]);
       
       setIsLoading(false);
-    }
+    
   };
 
   const handlePeriodChange = (selectedPeriod) => {
@@ -104,18 +106,19 @@ const Results = ({
 
     // Download .zip files
     if (selectedFiles.includes("checkbox-all")) {
-      let ZIPFile = await buildFullFile({
+      let ZIPFile = await buildCompleteFile({
         session,
         period
       });
-      saveAs(ZIPFile, `${documentTitle}.zip`);
+      saveAs(ZIPFile, `test.zip`);
     }
 
     else if (selectedFiles.length>1) {
       // zip
     }
 
-    else if (selectedFiles.includes("indic-report")) {
+    // Plaquettes
+    else if (selectedFiles.includes("summary-report")) {
       //
       let PDFFile = await buildSummaryReport({
         viewCode: showedView,
@@ -126,22 +129,27 @@ const Results = ({
       PDFFile.download(PDFTitle);
     }
 
-    // else if (selectedFiles.includes("sig-indic-xlsx")) {
-    //   //
-    //   let PDFFile = await buildSummaryReport({
-    //     viewCode: showedView,
-    //     session,
-    //     period,
-    //   });
-    //   let PDFTitle = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.pdf`;
+    else if (selectedFiles.includes("sig-indic-xlsx")) {
+      //
+      let XLSXFile = await buildViewDataFile({
+        viewCode: showedView,
+        session,
+        period,
+      });
+      const fileName = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.xlsx`;
 
-    //   const pdfUrl = URL.createObjectURL(PDFFile);
-    //   const downloadLink = document.createElement("a");
-    //   downloadLink.href = pdfUrl;
-    //   downloadLink.download = PDFTitle;
-    //   downloadLink.click();
-    //   URL.revokeObjectURL(pdfUrl);
-    // }
+      const url = window.URL.createObjectURL(XLSXFile);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+
+      document.body.appendChild(a);
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+
+    }
 
     setIsGenerating(false);
   };
@@ -361,18 +369,18 @@ const buildViewDataFile = async (props) =>
   switch(props.viewCode) 
   {
     case "default":   return (null);
-    case "art":       return (await buildIndicReport({...props, indic:"art"}));
-    case "eco":       return (await buildIndicReport({...props, indic:"eco"}));
-    case "ghg":       return (await buildIndicReport({...props, indic:"ghg"}));
-    case "geq":       return (await buildIndicReport({...props, indic:"geq"}));
-    case "haz":       return (await buildIndicReport({...props, indic:"haz"}));
-    case "idr":       return (await buildIndicReport({...props, indic:"idr"}));
-    case "knw":       return (await buildIndicReport({...props, indic:"knw"}));
-    case "mat":       return (await buildIndicReport({...props, indic:"mat"}));
-    case "nrg":       return (await buildIndicReport({...props, indic:"nrg"}));
-    case "was":       return (await buildIndicReport({...props, indic:"was"}));
-    case "wat":       return (await buildIndicReport({...props, indic:"wat"}));
-    case "soc":       return (await buildIndicReport({...props, indic:"soc"}));
+    case "art":       return (await buildDataFile({...props, indic:"art"}));
+    case "eco":       return (await buildDataFile({...props, indic:"eco"}));
+    case "ghg":       return (await buildDataFile({...props, indic:"ghg"}));
+    case "geq":       return (await buildDataFile({...props, indic:"geq"}));
+    case "haz":       return (await buildDataFile({...props, indic:"haz"}));
+    case "idr":       return (await buildDataFile({...props, indic:"idr"}));
+    case "knw":       return (await buildDataFile({...props, indic:"knw"}));
+    case "mat":       return (await buildDataFile({...props, indic:"mat"}));
+    case "nrg":       return (await buildDataFile({...props, indic:"nrg"}));
+    case "was":       return (await buildDataFile({...props, indic:"was"}));
+    case "wat":       return (await buildDataFile({...props, indic:"wat"}));
+    case "soc":       return (await buildDataFile({...props, indic:"soc"}));
     default:          return (null);
   }
 }

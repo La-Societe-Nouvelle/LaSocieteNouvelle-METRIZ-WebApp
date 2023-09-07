@@ -4,7 +4,12 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 
+// Lib
+import metaDivisions from "/lib/divisions";
+import metaIndics from "/lib/indics";
+
 // Utils
+import { printValue } from "/src/utils/Utils";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import {
   cutString,
@@ -14,17 +19,16 @@ import {
   loadFonts,
   sortAccountsByFootprint,
   sortProvidersByContrib,
-} from "./deliverablesUtils";
-import { buildAggregatePeriodIndicator } from "../../formulas/footprintFormulas";
-import { getClosestYearData } from "../../../src/components/sections/results/utils";
-import { printValue } from "../Utils";
+} from "../exportsUtils";
 
-// Lib
-import metaDivisions from "/lib/divisions";
-import metaIndics from "/lib/indics";
+import { getClosestYearData } from "../../utils";
+
+
+import { buildAggregatePeriodIndicator } from "/src/formulas/footprintFormulas";
+
 
 // --------------------------------------------------------------------------
-//  Contribution Indicator Sheet
+//  Report for Contribution Indicator
 // --------------------------------------------------------------------------
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
