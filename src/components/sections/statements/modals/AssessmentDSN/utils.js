@@ -1,3 +1,4 @@
+import { isValidNumber } from "../../../../../utils/Utils";
 import {  getSumItems, roundValue } from "/src/utils/Utils";
 
 
@@ -64,6 +65,18 @@ export const initIndividualData = (id) =>
     
   };
   return individualData;
+}
+
+export const checkIndividualData = (individualData) => 
+{
+  if (isValidNumber(individualData.workingHours,0)
+   && ["1","2"].includes(individualData.sex)
+   && isValidNumber(individualData.wage,0)
+   && isValidNumber(individualData.hourlyRate,0)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 export const getIndividualsData = async (declarations) => {
@@ -339,10 +352,8 @@ export const getIndividualsData = async (declarations) => {
   
   export const getIndividualSex = (individu) => {
     let sex = individu.sexe
-      ? parseInt(individu.sexe)
-      : parseInt(
-          (individu.identifiant || individu.identifiantTechnique).charAt(0)
-        ); // erro if both id missing
+      ? individu.sexe
+      : (individu.identifiant || individu.identifiantTechnique).charAt(0); // erro if both id missing
     return sex;
   };
   

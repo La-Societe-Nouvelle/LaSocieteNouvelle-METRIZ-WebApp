@@ -196,7 +196,7 @@ export const isValidNumber = (value,min,max) =>
 
 export const isValidInput = (value,min,max) => 
 {
-  return value==="" || isValidNumber(value,min,max);
+  return value===null || value==="" || isValidNumber(value,min,max);
 }
 
 /* -------------------------- COMPARISON FUNCTION -------------------------- */

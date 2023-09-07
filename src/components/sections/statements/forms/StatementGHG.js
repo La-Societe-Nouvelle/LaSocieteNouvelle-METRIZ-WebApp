@@ -115,7 +115,6 @@ const StatementGHG = ({
   const saveInfo = () => (impactsData.comments.ghg = info);
 
   const onAssessmentSubmit = () => {
-    console.log("here");
     if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
       setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
     }

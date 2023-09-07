@@ -1,19 +1,23 @@
 // La Société Nouvelle
 
 // React
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, Tab, Tabs } from "react-bootstrap";
 
-import ImportSocialData from "./ImportSocialData";
-import IndividualsDataTable from "./IndividualsDataTable";
+// Components
+import { SocialStatementsTab } from "./SocialStatementsTab";
+import { IndividualsDataTab } from "./IndividualsDataTab";
 
+// Utils
 import {
+  checkIndividualData,
   getApprenticeshipRemunerations,
+  getEmployeesTrainingCompensations,
   getGenderWageGap,
   getIndividualsData,
   getInterdecileRange,
 } from "./utils";
+import { isValidNumber } from "../../../../../utils/Utils";
 
 /* -------------------- ASSESSMENT TOOL FOR SOCIAL FOOTPRINT -------------------- */
 
@@ -26,93 +30,75 @@ import {
  * 
  * Modal update ImpactsData but set value for indicator only on submit /!\
  * 
+ * 
+ *  Individuals data item :
+ *    - 
+ * 
  */
+
 const AssessmentDSN = ({
-  impactsData
+  impactsData,
+  onGoBack,
+  submit
 }) => {
 
   const [showModal, setShowModal] = useState(false);
   const [individualsData, setIndividualsData] = useState(impactsData.individualsData);
+  const [socialStatements, setSocialStatements] = useState(impactsData.socialStatements);
 
-  const handleSocialStatements = async (socialStatements) => {
-    const individualsData = await getIndividualsData(socialStatements);
-    await updateImpactsData(socialStatements, individualsData);
-  };
+  const [isIndividualsDataValid, setIsIndividualsDataValid] = useState(false);
+  const [warningMessage, setWarningMessage] = useState("");
 
-  const handleIndividualsData = async (individualsData) => {
-    let updatedSocialStatements = impactsData.socialStatements;
-    if (individualsData.length == 0) {
-      updatedSocialStatements = [];
-    }
+  useEffect(() => checkIndividualsData(impactsData.individualsData), []);
 
-    await updateImpactsData(updatedSocialStatements, individualsData);
-  };
+  // ----------------------------------------------------------------------------------------------------
 
-  // const updateImpactsData = async (socialStatements, individualsData) => 
-  // {
-  //   const interdecileRange = await getInterdecileRange(individualsData);
-  //   const wageGap = await getGenderWageGap(individualsData);
-  //   const apprenticesRemunerations = await getApprenticeshipRemunerations(
-  //     individualsData
-  //   );
-
-  //   setImpactsData({
-  //     ...impactsData,
-  //     socialStatements: socialStatements,
-  //     individualsData: individualsData,
-  //     interdecileRange: interdecileRange,
-  //     wageGap: wageGap,
-  //     knwDetails: {
-  //       ...impactsData.knwDetails,
-  //       apprenticesRemunerations: apprenticesRemunerations,
-  //     },
-  //   });
-
-  //   // await props.onUpdate("idr");
-  //   // await props.onUpdate("geq");
-  //   // await props.onUpdate("knw");
-  // };
-
-  // update individuals data when file imported
-  const onSocialStatementsUpdate = async () => {
-    console.log("there");
-    impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
-    console.log(impactsData.individualsData);
-    setIndividualsData({...impactsData.individualsData});
-  }
-
-  // update individuals data when file imported
-  const onIndividualsDataUpdate = async () => {
-    //impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
-    console.log(impactsData.individualsData);
-    //setIndividualsData({...impactsData.individualsData});
-  }
-
-  const updateImpactsData = async () => 
+  // trigger when social statements update -> reset individuals data
+  const handleSocialStatements = async (socialStatements) => 
   {
-    console.log("here");
-    const {
-      socialStatements
-    } = impactsData;
-
+    // build individuals data
     const individualsData = await getIndividualsData(socialStatements);
 
-    const interdecileRange = await getInterdecileRange(individualsData);
-    const wageGap = await getGenderWageGap(individualsData);
-    const apprenticesRemunerations = await getApprenticeshipRemunerations(individualsData);
-
+    // update impacts data
+    impactsData.socialStatements = socialStatements;
     impactsData.individualsData = individualsData;
-    impactsData.interdecileRange = interdecileRange;
-    impactsData.wageGap = wageGap;
-    impactsData.knwDetails.apprenticesRemunerations = apprenticesRemunerations;
+    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(individualsData);
+
+    setSocialStatements(socialStatements);
+    setIndividualsData(individualsData);
+    checkIndividualsData(individualsData);
+  };
+
+  // trigger when individuals data update (manually)
+  const handleIndividualsData = async (individualsData) => 
+  {
+    // update impacts data
+    impactsData.individualsData = individualsData;
+    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(individualsData);
+
+    setIndividualsData(individualsData);
+    checkIndividualsData(individualsData);
   }
 
-  // update individuals data when file imported
-  useEffect(async () => {
-    console.log("use effect triggered")
-    // impactsData.individualsData = await getIndividualsData(impactsData.socialStatements);
-    // setIndividualsData({...impactsData.individualsData});
-  }, [impactsData.socialStatements]);
+  const checkIndividualsData = (individualsData) => {
+    // check if every items set
+    let isIndividualsDataValid = individualsData.every((individualData) => checkIndividualData(individualData));
+    setIsIndividualsDataValid(isIndividualsDataValid);
+    setWarningMessage(isIndividualsDataValid ? "" : "Certains postes sont incomplets ou erronés.");
+  }
+
+  const onSubmit = async () => 
+  {
+    // update indicators
+    impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
+    impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
+    impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(impactsData.individualsData);
+    impactsData.knwDetails.employeesTrainingsCompensations = await getEmployeesTrainingCompensations(impactsData.individualsData);
+
+    setShowModal(false);
+  }
+
+  // ----------------------------------------------------------------------------------------------------
 
   return (
     <>
@@ -143,23 +129,25 @@ const AssessmentDSN = ({
             className="mb-3"
           >
             <Tab eventKey="import" title="Importer les DSN">
-              <ImportSocialData
-                impactsData={impactsData}
-                onChange={onSocialStatementsUpdate}
-                handleSocialStatements={handleSocialStatements}
+              <SocialStatementsTab
+                socialStatements={socialStatements}
+                onUpdateSocialStatements={handleSocialStatements}
               />
             </Tab>
             <Tab eventKey="socialData" title="Gérer les données sociales">
-              <IndividualsDataTable
-                impactsData={impactsData}
-                handleIndividualsData={handleIndividualsData}
-                onChange={onIndividualsDataUpdate}
+              <IndividualsDataTab
+                individualsData={individualsData}
+                onUpdateIndividualsData={handleIndividualsData}
               />
             </Tab>
           </Tabs>
           <hr></hr>
           <div className="text-end">
-            <Button variant="secondary" onClick={() => setShowModal(false)}>
+            <Button 
+              variant="secondary" 
+              onClick={onSubmit}
+              disabled={!isIndividualsDataValid}
+            >
               Valider{" "}
             </Button>
           </div>
