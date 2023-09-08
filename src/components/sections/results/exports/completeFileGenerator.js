@@ -95,7 +95,7 @@ async function buildCompleteReport({
 }) {
   try {
     // Report Cover
-    const coverPage = generateReportCover(year, session.legalUnit);
+    const coverPage = generateReportCover(year, session.legalUnit.corporateName);
 
     // Generate standard reports and their blobs
     const standardPDFs = await generateStandardReports(session, period);
@@ -124,7 +124,6 @@ async function generateStandardReports(session, period) {
       const standardReport = await buildStandardReport({
         session,
         indic,
-        download: false,
         period,
       });
 

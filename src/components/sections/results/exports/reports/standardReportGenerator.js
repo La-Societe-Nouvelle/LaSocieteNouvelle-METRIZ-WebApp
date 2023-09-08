@@ -41,7 +41,7 @@ export const buildStandardReport = async ({
   // Metadata ------------------------------------------------------
 
   const {
-    label,
+    libelle,
     unit 
   } = metaIndics[indic];
 
@@ -170,14 +170,14 @@ export const buildStandardReport = async ({
       };
     },
     info: {
-      label: documentTitle,
+      libelle: documentTitle,
       author: legalUnit.corporateName,
       subject: "Rapport des impacts de votre entreprise",
       creator: "Metriz - La Société Nouvelle",
       producer: "Metriz - La Societé Nouvelle",
     },
     content: [
-      { text: "Résultat - " + label, style: "header" },
+      { text: "Résultat - " + libelle, style: "header" },
       //--------------------------------------------------
       {
         text: "Empreintes de vos Soldes Intermédiaires de Gestion",
@@ -231,7 +231,7 @@ export const buildStandardReport = async ({
       // ---------------------------------------------------------------------------
       //  PAGE 2
       {
-        text: "Analyse - " + label,
+        text: "Analyse - " + libelle,
         style: "header",
         pageBreak: "before",
       },
