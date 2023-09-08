@@ -2,10 +2,10 @@ import React from "react";
 import { Modal, Button, Image } from "react-bootstrap";
 import { downloadSession } from "/src/utils/Utils";
 
-const SaveModal = ({ session,show, handleClose }) => {
+const SaveModal = ({ session,showModal, handleClose }) => {
 
   return (
-    <Modal show={show} onHide={handleClose}>
+    <Modal show={showModal} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title as={"h6"}>Sauvegarder votre session</Modal.Title>
       </Modal.Header>

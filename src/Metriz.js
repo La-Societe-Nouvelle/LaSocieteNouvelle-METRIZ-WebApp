@@ -43,6 +43,7 @@ export const Metriz = () =>
   const [session, setSession] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState({});
   const [step, setStep] = useState(0);
+  const [showSaveModal, setShowSavelModal] = useState(false);
 
   const currentDate = getCurrentDateString();
 
@@ -188,6 +189,7 @@ export const Metriz = () =>
     }
 
     // next step
+    setShowSavelModal(true);
     setStep(5); // results section
 
     // server logs
@@ -237,6 +239,7 @@ export const Metriz = () =>
         selectPeriod={updateSelectedPeriod}
         goBack={() => setStep(4)}
         publish={() => setStep(6)}
+        showModal={showSaveModal}
       />,
       <PublishStatementSection 
         session={session}
