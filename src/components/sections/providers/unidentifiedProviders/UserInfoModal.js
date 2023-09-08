@@ -1,6 +1,6 @@
 import { Button, Image, Modal } from "react-bootstrap";
 
-export const SyncSuccessModal = ({ showModal, onClose, nextStep }) => {
+export const SyncSuccessModal = ({ showModal, onClose }) => {
   return (
     <Modal show={showModal} onHide={onClose} size="md" centered>
       <Modal.Header closeButton>
@@ -16,12 +16,9 @@ export const SyncSuccessModal = ({ showModal, onClose, nextStep }) => {
         <p className="small text-center">
           Toutes les comptes fournisseurs ont été synchronisés avec succès !
         </p>
-        <div className="text-end">
+        <div className="text-center">
           <Button className="me-1" onClick={onClose}>
             Fermer
-          </Button>
-          <Button variant="secondary" onClick={nextStep}>
-            Mesurer mon impact
           </Button>
         </div>
       </Modal.Body>
@@ -42,9 +39,9 @@ export const SyncWarningModal = ({ showModal, onClose, onSubmit }) => {
           height={100}
           className="mx-auto mb-3 d-block"
         />
-        <p className="small">
-          Attention , certains comptes significatifs n'ont pas été reliés à un
-          secteur d'activité et peut entrainer un grand risque d'imprécision
+        <p className="small"> 
+          Attention , certains comptes significatifs n'ont pas été rattachés à un
+          secteur d'activité et peuvent engendrer un <b>grand risque d'imprécision </b> 
           dans les résultats. Souhaitez-vous continuer ?
         </p>
         <div className="text-center">
