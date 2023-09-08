@@ -56,6 +56,11 @@ const UnidentifiedProviders = (props) => {
       setSignificativeProviders(significativeProviders);
     };
     fetchData();
+
+   const isProvidersSync = !providers.some(
+      (provider) => provider.footprintStatus !== 200
+    )
+    setIsNextStepAvailable(isProvidersSync);
   }, []);
 
   useEffect(() => {
