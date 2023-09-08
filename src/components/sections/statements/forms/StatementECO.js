@@ -6,6 +6,7 @@ import { Form, Row, Col, InputGroup } from "react-bootstrap";
 
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { checkStatementECO } from "./utils";
+import { isValidInput } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ECO ---------- */
 
@@ -31,14 +32,12 @@ const StatementECO = ({
   const [isAllActivitiesInFrance, setIsAllActivitiesInFrance] = useState(impactsData.isAllActivitiesInFrance);
   const [domesticProduction, setDomesticProduction] = useState(impactsData.domesticProduction);
   const [info, setInfo] = useState(impactsData.comments.eco || "");
-  const [isInvalid, setIsInvalid] = useState(false);
 
   // update impacts data when state update
   useEffect(() => {
     impactsData.isAllActivitiesInFrance = isAllActivitiesInFrance;
     impactsData.domesticProduction = domesticProduction;
     const statementStatus = checkStatementECO(impactsData);
-    setIsInvalid(statementStatus.status=="error");
     onUpdate(statementStatus);
   }, [isAllActivitiesInFrance,domesticProduction]);
 
@@ -75,13 +74,12 @@ const StatementECO = ({
   };
 
   const updateDomesticProduction = (event) => {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setDomesticProduction('');
-    } else if (!isNaN(valueAsNumber)) {
-      setDomesticProduction(valueAsNumber);
+    const input = event.target.value;
+    const nextValue = parseFloat(input);
+    if (isValidNumber(nextValue)) {
+      setDomesticProduction(roundValue(nextValue,0));
     } else {
-      setDomesticProduction(value);
+      setDomesticProduction(input);
     }
   };
 
@@ -136,11 +134,10 @@ const StatementECO = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
-                  value={roundValue(domesticProduction, 0)}
-                  inputMode="numeric"
+                  type="text"
+                  value={domesticProduction}
                   onChange={updateDomesticProduction}
-                  isInvalid={isInvalid}
+                  isInvalid={!isValidInput(domesticProduction)}
                   disabled={impactsData.isAllActivitiesInFrance !== "partially"}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
