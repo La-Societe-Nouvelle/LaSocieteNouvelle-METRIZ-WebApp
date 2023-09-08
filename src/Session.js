@@ -121,7 +121,7 @@ export class Session
     });
   };
 
-  loadSessionFromBackup = (prevSession) => 
+  loadSessionFromBackup = async (prevSession) => 
   {
     // add previous periods
     this.addPeriods(prevSession.availablePeriods);
@@ -130,7 +130,10 @@ export class Session
     this.validations[prevSession.financialPeriod.periodKey] =
       prevSession.validations[prevSession.financialPeriod.periodKey];
 
-    // add previsous impact data
+    // add previous financial data
+    await this.financialData.loadFinancialDataFromBackUp(prevSession.financialData);
+
+    // add previous impact data
     this.impactsData[prevSession.financialPeriod.periodKey] =
       prevSession.impactsData[prevSession.financialPeriod.periodKey];
   };

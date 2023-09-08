@@ -163,6 +163,16 @@ export function valueOrDefault(value, defaultValue) {
 /* -------------------------- ROUNDING FUNCTION -------------------------- */
 // correct value
 
+export const isValidInputNumber = (input,nbDecimals) => 
+{
+  const regexPattern = 
+    "^(-|)[0-9]*" 
+    + ((nbDecimals && nbDecimals>0) ? "(\\.[0-9]{0,"+nbDecimals+"}|)" : "") 
+    + "$";
+  let regex = new RegExp(regexPattern);
+  return regex.test(input);
+}
+
 export const isValidNumber = (value,min,max) => 
 {
   // is a number
@@ -172,20 +182,20 @@ export const isValidNumber = (value,min,max) =>
     {
       if (!isValidNumber(min)) {
         return false;
-      } else if (isValidNumber(min) && min>value) {
+      } else if (isValidNumber(min) && parseFloat(min)>parseFloat(value)) {
         return false;
-      }
+      };
     }
     // check max
     if (max!=undefined) 
     {
       if (!isValidNumber(max)) {
         return false;
-      } else if (isValidNumber(max) && max<value) {
+      } else if (isValidNumber(max) && parseFloat(max)<parseFloat(value)) {
         return false;
-      }
+      };
     }
-    // a number and between min & max
+    // a number and between min & max (if defined)
     return true;
   }
   // not a number

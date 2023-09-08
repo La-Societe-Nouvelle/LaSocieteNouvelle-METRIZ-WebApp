@@ -4,9 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { checkStatementECO } from "./utils";
-import { isValidInput } from "../../../../utils/Utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ECO ---------- */
 
@@ -75,10 +74,7 @@ const StatementECO = ({
 
   const updateDomesticProduction = (event) => {
     const input = event.target.value;
-    const nextValue = parseFloat(input);
-    if (isValidNumber(nextValue)) {
-      setDomesticProduction(roundValue(nextValue,0));
-    } else {
+    if (isValidInputNumber(input,0)) {
       setDomesticProduction(input);
     }
   };
@@ -137,7 +133,7 @@ const StatementECO = ({
                   type="text"
                   value={domesticProduction}
                   onChange={updateDomesticProduction}
-                  isInvalid={!isValidInput(domesticProduction)}
+                  isInvalid={!isValidInput(domesticProduction,0,impactsData.netValueAdded)}
                   disabled={impactsData.isAllActivitiesInFrance !== "partially"}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>

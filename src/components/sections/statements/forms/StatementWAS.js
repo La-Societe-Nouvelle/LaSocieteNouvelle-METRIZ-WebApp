@@ -8,6 +8,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
 import { checkStatementWAS } from "./utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #WAS ---------- */
 
@@ -61,17 +62,13 @@ const StatementWAS = ({
   // waste production
   const updateWasteProduction = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setWasteProduction('');
-    } else if (!isNaN(valueAsNumber)) {
-      setWasteProduction(valueAsNumber);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setWasteProduction(input);
       if (wasteProductionUncertainty=="") {
-        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        let defaultUncertainty = parseFloat(input)> 0 ? 25.0 : 0.0;
         setWasteProductionUncertainty(defaultUncertainty);
       }
-    } else {
-      setWasteProduction(value);
     }
   };
 
@@ -89,13 +86,9 @@ const StatementWAS = ({
   // waste production uncertainty
   const updateWasteProductionUncertainty = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setWasteProductionUncertainty('');
-    } else if (!isNaN(valueAsNumber)) {
-      setWasteProductionUncertainty(valueAsNumber);
-    } else {
-      setWasteProductionUncertainty(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input)) {
+      setWasteProductionUncertainty(input);
     }
   };
 
@@ -117,11 +110,10 @@ const StatementWAS = ({
             <Col>
               <div className="custom-input with-select input-group me-1">
                 <Form.Control
-                  type="number"
+                  type="text"
                   value={wasteProduction}
-                  inputMode="numeric"
                   onChange={updateWasteProduction}
-                  isInvalid={!isValidValue(wasteProduction)}
+                  isInvalid={!isValidInput(wasteProduction,0)}
                   className="me-1"
                 />
 
@@ -144,12 +136,11 @@ const StatementWAS = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
-                  value={roundValue(wasteProductionUncertainty, 0)}
-                  inputMode="numeric"
+                  type="text"
+                  value={wasteProductionUncertainty}
                   onChange={updateWasteProductionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidUncertainty(wasteProductionUncertainty)}
+                  isInvalid={!isValidInput(wasteProductionUncertainty,0,100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -174,6 +165,3 @@ const StatementWAS = ({
 };
 
 export default StatementWAS;
-
-const isValidValue = (value) => value=="" || isValidNumber(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

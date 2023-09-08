@@ -11,6 +11,7 @@ import { unitSelectStyles } from "/config/customStyles";
 // Modals
 import { AssessmentNRG } from "../modals/AssessmentNRG";
 import { checkStatementNRG } from "./utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #NRG ---------- */
 
@@ -67,17 +68,13 @@ const StatementNRG = ({
   // energy consumption
   const updateEnergyConsumption = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setEnergyConsumption('');
-    } else if (!isNaN(valueAsNumber)) {
-      setEnergyConsumption(valueAsNumber);
+    const input = event.target.value;
+    if (isValidInputNumber(input)) {
+      setEnergyConsumption(input);
       if (energyConsumptionUncertainty=="") {
-        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        let defaultUncertainty = parseFloat(input)> 0 ? 25.0 : 0.0;
         setEnergyConsumptionUncertainty(defaultUncertainty);
       }
-    } else {
-      setEnergyConsumption(value);
     }
   };
 
@@ -95,13 +92,9 @@ const StatementNRG = ({
   // energy consumption uncertainty
   const updateEnergyConsumptionUncertainty = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setEnergyConsumptionUncertainty('');
-    } else if (!isNaN(valueAsNumber)) {
-      setEnergyConsumptionUncertainty(valueAsNumber);
-    } else {
-      setEnergyConsumptionUncertainty(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setEnergyConsumptionUncertainty(input);
     }
   };
 
@@ -119,10 +112,9 @@ const StatementNRG = ({
               <div className=" d-flex align-items-center justify-content-between">
                 <div className="custom-input with-select input-group me-1">
                   <Form.Control
-                    type="number"
+                    type="text"
                     value={energyConsumption}
-                    inputMode="numeric"
-                    isInvalid={!isValidValue(energyConsumption)}
+                    isInvalid={!isValidInput(energyConsumption,0)}
                     onChange={updateEnergyConsumption}
                     className="me-1"
                   />
@@ -153,12 +145,11 @@ const StatementNRG = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
+                  type="text"
                   value={energyConsumptionUncertainty}
-                  inputMode="numeric"
                   onChange={updateEnergyConsumptionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidUncertainty(energyConsumptionUncertainty)}
+                  isInvalid={!isValidInput(energyConsumptionUncertainty,0,100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -206,6 +197,3 @@ const StatementNRG = ({
 };
 
 export default StatementNRG;
-
-const isValidValue = (value) => value=="" || isValidNumber(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

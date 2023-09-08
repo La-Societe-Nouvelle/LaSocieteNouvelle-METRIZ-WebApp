@@ -4,11 +4,12 @@
 import React, { useEffect, useState } from "react";
 import { Form, Row, Col, InputGroup } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
+import { valueOrDefault, isValidNumber } from "/src/utils/Utils";
 
 // Modals
 import AssessmentDSN from "../modals/AssessmentDSN";
 import { checkStatementGEQ } from "./utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #GEQ ---------- */
 
@@ -59,7 +60,7 @@ const StatementGEQ = ({
     switch (radioValue) {
       case "true":
         setHasEmployees(true);
-        setWageGap(null);
+        setWageGap("");
         break;
       case "false":
         setHasEmployees(false);
@@ -70,13 +71,9 @@ const StatementGEQ = ({
 
   // input
   const updateWageGap = (event) => {
-    const { value, valueAsNumber } = event.target;
-    if (value == "") {
-      setWageGap('');
-    } else if (!isNaN(valueAsNumber)) {
-      setWageGap(valueAsNumber);
-    } else {
-      setWageGap(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,2)) {
+      setWageGap(input);
     }
   };
 
@@ -131,12 +128,11 @@ const StatementGEQ = ({
               <div className="d-flex justify-content-between">
                 <InputGroup className="custom-input me-1">
                   <Form.Control
-                    type="number"
-                    value={roundValue(wageGap, 1)}
+                    type="text"
+                    value={wageGap}
                     disabled={hasEmployees === false}
-                    inputMode="numeric"
                     onChange={updateWageGap}
-                    isInvalid={!isValidValue(wageGap, 0)}
+                    isInvalid={!isValidInput(wageGap, 0)}
                   />
                   <InputGroup.Text>%</InputGroup.Text>
                 </InputGroup>

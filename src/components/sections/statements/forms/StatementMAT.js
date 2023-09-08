@@ -5,9 +5,10 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
+import { roundValue } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
 import { checkStatementMAT } from "./utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #MAT ---------- */
 
@@ -83,17 +84,13 @@ const StatementMAT = ({
   // materials extraction
   const updateMaterialsExtraction = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setMaterialsExtraction('');
-    } else if (!isNaN(valueAsNumber)) {
-      setMaterialsExtraction(valueAsNumber);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setMaterialsExtraction(input);
       if (materialsExtractionUncertainty=="") {
-        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        let defaultUncertainty = parseFloat(input)> 0 ? 25.0 : 0.0;
         setMaterialsExtractionUncertainty(defaultUncertainty);
       }
-    } else {
-      setMaterialsExtraction(value);
     }
   };
 
@@ -111,13 +108,9 @@ const StatementMAT = ({
   // materials extraction uncertainty
   const updateMaterialsExtractionUncertainty = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setMaterialsExtractionUncertainty('');
-    } else if (!isNaN(valueAsNumber)) {
-      setMaterialsExtractionUncertainty(valueAsNumber);
-    } else {
-      setMaterialsExtractionUncertainty(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setMaterialsExtractionUncertainty(input);
     }
   };
 
@@ -162,12 +155,11 @@ const StatementMAT = ({
               <div className=" d-flex align-items-center justify-content-between">
                 <div className="custom-input with-select input-group">
                   <Form.Control
-                    type="number"
+                    type="text"
                     value={materialsExtraction}
-                    inputMode="numeric"
                     disabled={!isExtractiveActivities}
                     onChange={updateMaterialsExtraction}
-                    isInvalid={!isValidValue(materialsExtraction)}
+                    isInvalid={!isValidInput(materialsExtraction,0)}
                     className="me-1 border-right-3"
                   />
                   <Select
@@ -189,13 +181,12 @@ const StatementMAT = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
+                  type="text"
                   value={materialsExtractionUncertainty}
-                  inputMode="numeric"
                   disabled={!isExtractiveActivities}
                   onChange={updateMaterialsExtractionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidUncertainty(materialsExtractionUncertainty)}
+                  isInvalid={!isValidInput(materialsExtractionUncertainty,0,100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -222,6 +213,3 @@ const StatementMAT = ({
 };
 
 export default StatementMAT;
-
-const isValidValue = (value) => value=="" || isValidNumber(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

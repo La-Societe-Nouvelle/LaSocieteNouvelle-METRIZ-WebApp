@@ -5,9 +5,10 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
 import { checkStatementHAZ } from "./utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #HAZ ---------- */
 
@@ -62,17 +63,13 @@ const StatementHAZ = ({
   // hazardous substances consumption
   const updateHazardousSubstancesConsumption = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setHazardousSubstancesConsumption('');
-    } else if (!isNaN(valueAsNumber)) {
-      setHazardousSubstancesConsumption(valueAsNumber);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setHazardousSubstancesConsumption(input);
       if (hazardousSubstancesConsumptionUncertainty=="") {
-        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        let defaultUncertainty = parseFloat(input)>0 ? 25.0 : 0.0;
         setHazardousSubstancesConsumptionUncertainty(defaultUncertainty);
       }
-    } else {
-      setHazardousSubstancesConsumption(value);
     }
   };
 
@@ -90,13 +87,9 @@ const StatementHAZ = ({
   // hazardous substances consumption uncertainty
   const updateHazardousSubstancesConsumptionUncertainty = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setHazardousSubstancesConsumptionUncertainty('');
-    } else if (!isNaN(valueAsNumber)) {
-      setHazardousSubstancesConsumptionUncertainty(valueAsNumber);
-    } else {
-      setHazardousSubstancesConsumptionUncertainty(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setHazardousSubstancesConsumptionUncertainty(input);
     }
   };
 
@@ -116,11 +109,10 @@ const StatementHAZ = ({
             <div className=" d-flex align-items-center justify-content-between">
                 <div className="input-group custom-input with-select">
                   <Form.Control
-                    type="number"
+                    type="text"
                     value={hazardousSubstancesConsumption}
-                    inputMode="numeric"
                     onChange={updateHazardousSubstancesConsumption}
-                    isInvalid={!isValidValue(hazardousSubstancesConsumption)}
+                    isInvalid={!isValidInput(hazardousSubstancesConsumption,0)}
                     className="me-1"
                   />
                    <Select
@@ -146,15 +138,11 @@ const StatementHAZ = ({
             <Col>
               <InputGroup className="custom-input ">
                 <Form.Control
-                  type="number"
-                  value={roundValue(
-                    hazardousSubstancesConsumptionUncertainty,
-                    0
-                  )}
-                  inputMode="numeric"
+                  type="text"
+                  value={hazardousSubstancesConsumptionUncertainty}
                   onChange={updateHazardousSubstancesConsumptionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidUncertainty(hazardousSubstancesConsumptionUncertainty)}
+                  isInvalid={!isValidInput(hazardousSubstancesConsumptionUncertainty,0,100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -181,6 +169,3 @@ const StatementHAZ = ({
 };
 
 export default StatementHAZ;
-
-const isValidValue = (value) => value=="" || isValidNumber(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

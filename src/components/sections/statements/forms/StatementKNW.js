@@ -5,12 +5,13 @@ import React, { useState, useEffect } from "react";
 import { Form, Button, Row, Col, Modal, InputGroup } from "react-bootstrap";
 
 // Utils
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { valueOrDefault } from "/src/utils/Utils";
 import { isValidNumber } from "/src/utils/Utils";
 import { checkStatementKNW } from "./utils";
 
 // Modals
 import { AssessmentKNW } from "../modals/AssessmentKNW";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #KNW ---------- */
 
@@ -55,13 +56,9 @@ const StatementKNW = ({
 
   // reasearch and training contribution
   const updateResearchAndTrainingContribution = (event) => {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setResearchAndTrainingContribution('');
-    } else if (!isNaN(valueAsNumber)) {
-      setResearchAndTrainingContribution(valueAsNumber);
-    } else {
-      setResearchAndTrainingContribution(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setResearchAndTrainingContribution(input);
     }
   };
 
@@ -88,11 +85,10 @@ const StatementKNW = ({
               <div className="d-flex justify-content-between">
                 <InputGroup className="custom-input me-1">
                   <Form.Control
-                    type="number"
-                    value={roundValue(researchAndTrainingContribution, 0)}
-                    inputMode="numeric"
+                    type="text"
+                    value={researchAndTrainingContribution}
                     onChange={updateResearchAndTrainingContribution}
-                    isInvalid={!isValidNumber(researchAndTrainingContribution,0,impactsData.netValueAdded)}
+                    isInvalid={!isValidInput(researchAndTrainingContribution,0,impactsData.netValueAdded)}
                   />
                   <InputGroup.Text>&euro;</InputGroup.Text>
                 </InputGroup>

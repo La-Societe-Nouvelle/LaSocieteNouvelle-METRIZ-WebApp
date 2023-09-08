@@ -8,6 +8,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
 import { checkStatementWAT } from "./utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #WAT ---------- */
 
@@ -61,17 +62,13 @@ const StatementWAT = ({
   // water consumption
   const updateWaterConsumption = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setWaterConsumption('');
-    } else if (!isNaN(valueAsNumber)) {
-      setWaterConsumption(valueAsNumber);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setWaterConsumption(input);
       if (waterConsumptionUncertainty=="") {
-        let defaultUncertainty = valueAsNumber> 0 ? 25.0 : 0.0;
+        let defaultUncertainty = parseFloat(input)> 0 ? 25.0 : 0.0;
         setWaterConsumptionUncertainty(defaultUncertainty);
       }
-    } else {
-      setWaterConsumption(value);
     }
   };
 
@@ -89,13 +86,9 @@ const StatementWAT = ({
   // water consumption uncertainty
   const updateWaterConsumptionUncertainty = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setWaterConsumptionUncertainty('');
-    } else if (!isNaN(valueAsNumber)) {
-      setWaterConsumptionUncertainty(valueAsNumber);
-    } else {
-      setWaterConsumptionUncertainty(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setWaterConsumptionUncertainty(input);
     }
   };
 
@@ -114,12 +107,11 @@ const StatementWAT = ({
             <Col>
               <div className="custom-input with-select input-group">
                 <Form.Control
-                  type="number"
+                  type="text"
                   value={waterConsumption}
-                  inputMode="numeric"
                   onChange={updateWaterConsumption}
                   className="me-1"
-                  isInvalid={!isValidValue(waterConsumption)}
+                  isInvalid={!isValidInput(waterConsumption,0)}
                 />
 
                 <Select
@@ -139,12 +131,11 @@ const StatementWAT = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
+                  type="text"
                   value={waterConsumptionUncertainty}
-                  inputMode="numeric"
                   onChange={updateWaterConsumptionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidUncertainty(waterConsumptionUncertainty)}
+                  isInvalid={!isValidInput(waterConsumptionUncertainty,0,100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
@@ -171,6 +162,3 @@ const StatementWAT = ({
 }
 
 export default StatementWAT;
-
-const isValidValue = (value) => value=="" || isValidNumber(value,0)
-const isValidUncertainty = (uncertainty) => uncertainty=="" || isValidNumber(uncertainty,0,100)

@@ -4,9 +4,8 @@
 import React, { useEffect, useState } from "react";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, isValidNumber } from "/src/utils/Utils";
 import { checkStatementART } from "./utils";
-import { isValidInput } from "../../../../utils/Utils";
+import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ART ---------- */
 
@@ -33,13 +32,8 @@ const StatementART = ({
   const [craftedProduction, setCraftedProduction] = useState(impactsData.craftedProduction);
   const [info, setInfo] = useState(impactsData.comments.art || "");
 
-  useEffect(() => {
-    console.log("there");
-  }, []);
-
   // update impacts data when state update
   useEffect(() => {
-    console.log("here");
     impactsData.isValueAddedCrafted = isValueAddedCrafted;
     impactsData.craftedProduction = craftedProduction;
     const statementStatus = checkStatementART(impactsData);
@@ -79,10 +73,7 @@ const StatementART = ({
   // amount input
   const handleAmountValueAddedCrafted = (event) => {
     const input = event.target.value;
-    const nextValue = parseFloat(input);
-    if (isValidNumber(nextValue)) {
-      setCraftedProduction(roundValue(nextValue, 0));
-    } else {
+    if (isValidInputNumber(input,0)) {
       setCraftedProduction(input);
     }
   };
@@ -136,7 +127,7 @@ const StatementART = ({
                   value={craftedProduction}
                   onChange={handleAmountValueAddedCrafted}
                   disabled={isValueAddedCrafted !== "partially"}
-                  isInvalid={!isValidInput(craftedProduction)}
+                  isInvalid={!isValidInput(craftedProduction,0,impactsData.netValueAdded)}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
               </InputGroup>

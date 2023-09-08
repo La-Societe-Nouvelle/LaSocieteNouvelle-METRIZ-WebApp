@@ -11,6 +11,7 @@ import { unitSelectStyles } from "/config/customStyles";
 // Modals
 import { AssessmentGHG } from "../modals/AssessmentGHG";
 import { checkStatementGHG } from "./utils";
+import { isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #GHG ---------- */
 
@@ -60,7 +61,6 @@ const StatementGHG = ({
   // update state
   useEffect(() => 
   {
-    console.log("triggered statement GHGS");
     if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
       setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
     }
@@ -72,19 +72,14 @@ const StatementGHG = ({
   // greenhouse gas emissions
   const updateGreenhousesGazEmissions = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setGreenhousesGazEmissions('');
-    } else if (!isNaN(valueAsNumber)) {
-      setGreenhousesGazEmissions(valueAsNumber);
-      // set default uncertainty
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setGreenhousesGazEmissions(input);
       if (greenhousesGazEmissionsUncertainty=="") {
-        let defaultUncertainty = valueAsNumber>0 ? 25.0 : 0.0 ;
+        let defaultUncertainty = parseFloat(input)>0 ? 25.0 : 0.0 ;
         setGreenhousesGazEmissionsUncertainty(defaultUncertainty);
       }
-    } else {
-      setGreenhousesGazEmissions(value);
-    }
+    } 
   };
 
   // greenhouse gas emissions unit
@@ -101,13 +96,9 @@ const StatementGHG = ({
   // greenhouse gas emissions uncertainty
   const updateGreenhousesGazEmissionsUncertainty = (event) => 
   {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setGreenhousesGazEmissionsUncertainty('');
-    } else if (!isNaN(valueAsNumber)) {
-      setGreenhousesGazEmissionsUncertainty(valueAsNumber);
-    } else {
-      setGreenhousesGazEmissionsUncertainty(value);
+    const input = event.target.value;
+    if (isValidInputNumber(input,0)) {
+      setGreenhousesGazEmissionsUncertainty(input);
     }
   };
 
@@ -136,9 +127,8 @@ const StatementGHG = ({
               <div className=" d-flex align-items-center justify-content-between">
                 <div className="me-1 custom-input with-select input-group">
                   <Form.Control
-                    type="number"
+                    type="texte"
                     value={greenhousesGazEmissions}
-                    inputMode="numeric"
                     onChange={updateGreenhousesGazEmissions}
                     isInvalid={!isValidValue(greenhousesGazEmissions)}
                     className="me-1"
@@ -173,9 +163,8 @@ const StatementGHG = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
+                  type="text"
                   value={greenhousesGazEmissionsUncertainty}
-                  inputMode="numeric"
                   onChange={updateGreenhousesGazEmissionsUncertainty}
                   className="uncertainty-input"
                   isInvalid={!isValidUncertainty(greenhousesGazEmissionsUncertainty)}

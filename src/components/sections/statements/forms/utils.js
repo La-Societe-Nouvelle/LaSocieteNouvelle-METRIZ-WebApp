@@ -130,14 +130,14 @@ export const checkStatementGHG = (impactsData) =>
     return({ status: "incomplete", errorMessage: null });
   } 
   // error
-  else if (greenhousesGazEmissions!="" && isValidNumber(greenhousesGazEmissions,0)) {
+  else if (greenhousesGazEmissions!="" && !isValidNumber(greenhousesGazEmissions,0)) {
     return({
       status: "error",
       errorMessage: isValidNumber(greenhousesGazEmissions) ?
         "Valeur saisie incorrecte (négative)"
         : "Veuillez saisir une valeur numérique"
     });
-  } else if (greenhousesGazEmissionsUncertainty!="" && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
+  } else if (greenhousesGazEmissionsUncertainty!="" && !isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
     return({
       status: "error",
       errorMessage: isValidNumber(greenhousesGazEmissionsUncertainty) ?

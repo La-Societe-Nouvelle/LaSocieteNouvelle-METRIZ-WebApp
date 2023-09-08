@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from "react";
 import { Form, Row, Col } from "react-bootstrap";
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { valueOrDefault } from "/src/utils/Utils";
 
 import AssessmentDSN from "../modals/AssessmentDSN";
 import { isValidNumber } from "/src/utils/Utils";
 import { checkStatementIDR } from "./utils";
+import { isValidInputNumber } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #IDR ---------- */
 
@@ -70,22 +71,15 @@ const StatementIDR = ({
   };
 
   // interdecile range
-  const updateInterdecileRange = (event) => 
-  {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setInterdecileRange('');
-    } else if (!isNaN(valueAsNumber)) {
-      setInterdecileRange(valueAsNumber);
-    } else {
-      setInterdecileRange(value);
+  const updateInterdecileRange = (event) => {
+    const input = event.target.value;
+    if (isValidInputNumber(input,1)) {
+      setInterdecileRange(input);
     }
   };
 
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (impactsData.comments.idr = info);
-
-  const updateSocialData = () => {};
 
   return (
     <Form className="statement">
@@ -124,9 +118,8 @@ const StatementIDR = ({
               <div className="d-flex ">
                 <div className="input-group custom-input me-1">
                   <Form.Control
-                    type="number"
+                    type="text"
                     value={interdecileRange}
-                    inputMode="numeric"
                     onChange={updateInterdecileRange}
                     disabled={hasEmployees === false}
                     isInvalid={!isValidValue(interdecileRange)}
