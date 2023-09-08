@@ -107,7 +107,7 @@ export const RowAssessmentType_5 = ({
     <tr key={itemId}>
       <td width="30px">
         <button 
-          className="btn btn-sm btn-light"
+          className="btn btn-sm px-2 py-1"
           onClick={deleteItem}
         >
           <i className="bi bi-trash"></i>

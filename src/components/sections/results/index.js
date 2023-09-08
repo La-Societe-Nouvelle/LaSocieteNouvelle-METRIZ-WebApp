@@ -39,6 +39,9 @@ import { customSelectStyles } from "/config/customStyles";
 // Lib
 import divisions from "/lib/divisions";
 
+// Modal
+import SaveModal from "../../modals/SaveModal";
+
 
 
 // Division options
@@ -64,17 +67,21 @@ const Results = ({
   session, 
   period, 
   publish, 
-  goBack 
+  goBack,
+  showModal
 }) => {
 
   // Selections
   const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
   //const [period, setPeriod] = useState(session.financialPeriod);
   const [showedView, setShowedView] = useState("default");
-
+  
   // temp state
   const [isGenerating, setIsGenerating] = useState(false); // building files
   const [isLoading, setIsLoading] = useState(false); // fetching data
+
+  // modal
+  const [showSaveModal, setShowSaveModal] = useState(showModal);
 
   const handleDivisionChange = async (selectedOption) => {
   
@@ -309,6 +316,8 @@ const Results = ({
       {isLoading && (
         <Loader title={"Récupération des données de comparaison ..."} />
       )}
+
+      <SaveModal session={session} showModal={showSaveModal} handleClose={() => setShowSaveModal(false)} ></SaveModal>
 
       <div className=" text-end">
         <Button onClick={goBack} className="mb-4">

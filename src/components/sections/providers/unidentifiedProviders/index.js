@@ -13,6 +13,7 @@ import { getSignificativeUnidentifiedProviders } from "./utils";
 import { SyncSuccessModal, SyncWarningModal } from "./UserInfoModal";
 
 const UnidentifiedProviders = (props) => {
+
   const financialData = props.financialData;
   const financialPeriod = props.financialPeriod;
   const minFpt = props.minFpt;
@@ -29,6 +30,7 @@ const UnidentifiedProviders = (props) => {
         provider.periodsData.hasOwnProperty(financialPeriod.periodKey)
     )
   );
+  
   const [itemsPerPage, setItemsPerPage] = useState(20);
   const [showedProviders, setShowedProviders] = useState(providers);
   const [isNextStepAvailable, setIsNextStepAvailable] = useState(false);
@@ -54,6 +56,11 @@ const UnidentifiedProviders = (props) => {
       setSignificativeProviders(significativeProviders);
     };
     fetchData();
+
+   const isProvidersSync = !providers.some(
+      (provider) => provider.footprintStatus !== 200
+    )
+    setIsNextStepAvailable(isProvidersSync);
   }, []);
 
   useEffect(() => {
@@ -99,6 +106,9 @@ const UnidentifiedProviders = (props) => {
   };
 
   const updateProviderParams = (providerNum, paramName, paramValue) => {
+    
+    setIsNextStepAvailable(false);
+
     const updatedProviders = providers.map((provider) => {
       if (provider.providerNum === providerNum) {
         const updatedParams = {
@@ -113,8 +123,7 @@ const UnidentifiedProviders = (props) => {
     setProviders(updatedProviders); 
   };
 
-  const handleAcceptSynchronize = async () => {
-
+  const handleConfirmNextStep = async () => {
 
     const haswarnings = providers.some(
       (provider) =>
@@ -124,7 +133,7 @@ const UnidentifiedProviders = (props) => {
 
     haswarnings
       ? setShowWarningModal(true)
-      : handleSynchronize();
+      : props.submit();
   };
 
   const handleSynchronize = async () => { 
@@ -160,6 +169,12 @@ const UnidentifiedProviders = (props) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const totalPages = Math.ceil(showedProviders.length / itemsPerPage);
+
+  const isSyncButtonEnable = providers.some(
+    (provider) =>
+      (provider.useDefaultFootprint && provider.footprintStatus !== 200) ||
+      provider.footprintStatus === 203
+  );
 
   return (
     <Container fluid id="sector-section">
@@ -224,9 +239,9 @@ const UnidentifiedProviders = (props) => {
           </div>
 
           <Button
-            onClick={handleAcceptSynchronize}
+            onClick={handleSynchronize}
             className="btn btn-secondary"
-            disabled={false}
+            disabled={!isSyncButtonEnable}
           >
             <i className="bi bi-arrow-repeat"></i> Synchroniser les données
           </Button>
@@ -254,10 +269,10 @@ const UnidentifiedProviders = (props) => {
         />
 
         
-<SyncWarningModal
+        <SyncWarningModal
           showModal={showSyncWarningModal}
           onClose={() => setShowWarningModal(false)}
-          onSubmit={handleSynchronize}
+          onSubmit={() => props.submit()}
         />
 
         {/* Actions ---------------------------------------------------------*/}
@@ -273,7 +288,7 @@ const UnidentifiedProviders = (props) => {
             </button>
             <button
               className="btn btn-secondary me-3"
-              onClick={() => props.submit()}
+              onClick={handleConfirmNextStep}
               disabled={!isNextStepAvailable}
             >
               Mesurer mon impact <i className="bi bi-chevron-right"></i>

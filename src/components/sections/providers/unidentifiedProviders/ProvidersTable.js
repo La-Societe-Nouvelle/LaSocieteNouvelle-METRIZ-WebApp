@@ -63,7 +63,9 @@ const ProvidersTable = ({
               <td>
                 <div className="d-flex">
                   <i
-                    className={getUnidentifiedProviderStatusIcon(provider).className}
+                    className={
+                      getUnidentifiedProviderStatusIcon(provider).className
+                    }
                     title={getUnidentifiedProviderStatusIcon(provider).title}
                   ></i>
                   {hasWarning(provider) && (
@@ -124,6 +126,14 @@ const ProvidersTable = ({
           ))}
         </tbody>
       </Table>
+      <p class=" border-warning">
+        <i
+          className="bi bi-exclamation-triangle text-warning"
+          title="Grand risque d'imprécision"
+        ></i>{" "}
+          Compte significatifs non rattachés à un secteur d'activité
+  
+      </p>
     </>
   );
 };

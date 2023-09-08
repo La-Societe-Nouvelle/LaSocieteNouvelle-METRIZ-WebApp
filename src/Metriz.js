@@ -43,6 +43,7 @@ export const Metriz = () =>
   const [session, setSession] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState({});
   const [step, setStep] = useState(0);
+  const [showSaveModal, setShowSavelModal] = useState(false);
 
   const currentDate = getCurrentDateString();
 
@@ -188,6 +189,7 @@ export const Metriz = () =>
     }
 
     // next step
+    setShowSavelModal(true);
     setStep(5); // results section
 
     // server logs
@@ -200,6 +202,7 @@ export const Metriz = () =>
   // Sections Views
   const buildSectionView = () => 
   {
+    
     const sections = [
       <StartSection 
         initSession={initSession}
@@ -236,6 +239,7 @@ export const Metriz = () =>
         selectPeriod={updateSelectedPeriod}
         goBack={() => setStep(4)}
         publish={() => setStep(6)}
+        showModal={showSaveModal}
       />,
       <PublishStatementSection 
         session={session}
@@ -249,22 +253,18 @@ export const Metriz = () =>
   return (
     <>
       {/* Header */}
-      {(step > 0 && step < 6) && 
-        <HeaderSection
-          step={step}
-          setStep={updateStep}
-          session={session}
-          period={selectedPeriod}
-        />
-      }
-      {(step == 6) && 
-        <HeaderPublish 
-          setStep={updateStep} 
-          session={session} 
-        />}
-
-      {/* Sections */}
       <ErrorBoundary session={session}>
+        {step > 0 && step < 6 && (
+          <HeaderSection
+            step={step}
+            setStep={updateStep}
+            session={session}
+            period={selectedPeriod}
+          />
+        )}
+        {step == 6 && <HeaderPublish setStep={updateStep} session={session} />}
+
+        {/* Sections */}
         {buildSectionView(step)}
       </ErrorBoundary>
 
