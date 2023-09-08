@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 
 // Utils
@@ -22,16 +22,22 @@ const SyncProvidersView = ({
   handleSynchronize,
   showSyncErrorModal,
   closeSyncErrorModal,
+  view
 }) => {
-  const [view, setView] = useState("all");
+
+  const [currentView, setCurrentView] = useState(view);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(20);
+  
+  useEffect(() => {
+    setCurrentView(view);
+  }, [view]);
 
   // Filtered Providers
-  const getShowedProviders = (view) => {
+  const getShowedProviders = (currentView) => {
     let filteredProviders = providers;
 
-    switch (view) {
+    switch (currentView) {
       case "notDefined":
         filteredProviders = filteredProviders.filter(
           (provider) => !provider.corporateId
@@ -65,7 +71,7 @@ const SyncProvidersView = ({
 
     return filteredProviders;
   };
-  const showedProviders = getShowedProviders(view);
+  const showedProviders = getShowedProviders(currentView);
 
   // Pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -107,8 +113,8 @@ const SyncProvidersView = ({
         <div className="d-flex align-items-center ">
           <Form.Select
             size="sm"
-            onChange={(e) => setView(e.target.value)}
-            value={view}
+            onChange={(e) => setCurrentView(e.target.value)}
+            value={currentView}
             className="me-3"
           >
             <option key="1" value="all">
