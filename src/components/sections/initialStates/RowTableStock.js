@@ -132,14 +132,14 @@ export const RowTableStock = ({
         <td>{accountNum}</td>
         <td>
           {accountLib.charAt(0).toUpperCase() +
-            accountLib.slice(1).toLowerCase()}
+           accountLib.slice(1).toLowerCase()}
         </td>
         <td colSpan={2}>
           <Select
             styles={customSelectStyles}
             value={initialStateTypeOptions[initialStateType]}
             placeholder={"Choisissez..."}
-            className={initialStateType == "currentFootprint" ? "success" : ""}
+            className={initialStateSet ? "success" : ""}
             options={[{ label: "Estimée sur exercice courant", value: "none" }]}
           />
         </td>
@@ -155,7 +155,7 @@ export const RowTableStock = ({
         <td>{accountNum}</td>
         <td>
           {accountLib.charAt(0).toUpperCase() +
-            accountLib.slice(1).toLowerCase()}
+           accountLib.slice(1).toLowerCase()}
         </td>
         <td colSpan={(initialStateType=="defaultData") ? 1 : 2}>
           <Select
