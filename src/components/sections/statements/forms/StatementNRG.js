@@ -59,10 +59,16 @@ const StatementNRG = ({
     onUpdate(statementStatus);
   }, [energyConsumption,energyConsumptionUnit,energyConsumptionUncertainty]);
 
-  // update state when props update
-  useEffect(() => {
-    // ...
-  }, []);
+  // update state
+  useEffect(() => 
+  {
+    if (impactsData.energyConsumption!=energyConsumption) {
+      setEnergyConsumption(impactsData.energyConsumption);
+    }
+    if (impactsData.energyConsumptionUncertainty!=energyConsumptionUncertainty) {
+      setEnergyConsumptionUncertainty(impactsData.energyConsumptionUncertainty || "");
+    }
+  }, [impactsData.energyConsumption, impactsData.energyConsumptionUncertainty]);
 
   // energy consumption
   const updateEnergyConsumption = (event) => 
@@ -108,6 +114,16 @@ const StatementNRG = ({
   // comment
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (impactsData.comments.nrg = info);
+
+  const onAssessmentSubmit = () => {
+    if (impactsData.energyConsumption!=energyConsumption) {
+      setEnergyConsumption(impactsData.energyConsumption);
+    }
+    if (impactsData.energyConsumptionUncertainty!=energyConsumptionUncertainty) {
+      setEnergyConsumptionUncertainty(impactsData.energyConsumptionUncertainty || "");
+    }
+    setShowModal(false);
+  }
 
   return (
     <Form className="statement">
@@ -197,7 +213,7 @@ const StatementNRG = ({
             impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            submit={() => setShowModal(false)}
+            submit={onAssessmentSubmit}
           />
         </Modal.Body>
       </Modal>
