@@ -197,7 +197,7 @@ const StatementNRG = ({
             impactsData={impactsData}
             onGoBack={() => setShowModal(false)}
             handleClose={() => setShowModal(false)}
-            onUpdate={onUpdate}
+            submit={() => setShowModal(false)}
           />
         </Modal.Body>
       </Modal>

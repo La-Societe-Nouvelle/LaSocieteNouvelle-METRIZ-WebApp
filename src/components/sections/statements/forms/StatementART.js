@@ -6,6 +6,7 @@ import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
 import { roundValue, isValidNumber } from "/src/utils/Utils";
 import { checkStatementART } from "./utils";
+import { isValidInput } from "../../../../utils/Utils";
 
 /* ---------- STATEMENT - INDIC #ART ---------- */
 
@@ -31,7 +32,6 @@ const StatementART = ({
   const [isValueAddedCrafted, setIsValueAddedCrafted] = useState(impactsData.isValueAddedCrafted);
   const [craftedProduction, setCraftedProduction] = useState(impactsData.craftedProduction);
   const [info, setInfo] = useState(impactsData.comments.art || "");
-  const [isInvalid, setIsInvalid] = useState(false);
 
   useEffect(() => {
     console.log("there");
@@ -43,7 +43,6 @@ const StatementART = ({
     impactsData.isValueAddedCrafted = isValueAddedCrafted;
     impactsData.craftedProduction = craftedProduction;
     const statementStatus = checkStatementART(impactsData);
-    setIsInvalid(statementStatus.status=="error");
     onUpdate(statementStatus);
   }, [isValueAddedCrafted,craftedProduction]);
 
@@ -79,13 +78,12 @@ const StatementART = ({
 
   // amount input
   const handleAmountValueAddedCrafted = (event) => {
-    const { value, valueAsNumber } = event.target;
-    if (value=="") {
-      setCraftedProduction('');
-    } else if (!isNaN(valueAsNumber)) {
-      setCraftedProduction(valueAsNumber);
+    const input = event.target.value;
+    const nextValue = parseFloat(input);
+    if (isValidNumber(nextValue)) {
+      setCraftedProduction(roundValue(nextValue, 0));
     } else {
-      setCraftedProduction(value);
+      setCraftedProduction(input);
     }
   };
 
@@ -134,12 +132,11 @@ const StatementART = ({
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
-                  type="number"
-                  value={roundValue(craftedProduction, 0)}
-                  inputMode="numeric"
+                  type="text"
+                  value={craftedProduction}
                   onChange={handleAmountValueAddedCrafted}
                   disabled={isValueAddedCrafted !== "partially"}
-                  isInvalid={isInvalid}
+                  isInvalid={!isValidInput(craftedProduction)}
                 />
                 <InputGroup.Text>&euro;</InputGroup.Text>
               </InputGroup>

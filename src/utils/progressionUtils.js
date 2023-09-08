@@ -39,6 +39,7 @@ export const getProgression = (session,period) =>
 
   // check initial states
   let initialStatesValid = checkInitialStates(session,period);
+  console.log("etats initiaux valides : "+initialStatesValid);
   if (!initialStatesValid) {
     return progressionIndex.initialStatesSection;
   }

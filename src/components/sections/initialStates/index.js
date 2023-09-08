@@ -14,10 +14,12 @@ import { getPrevDate } from "/src/utils/Utils";
 import { Session } from "/src/Session";
 import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../modals/userInfoModals";
 import { getMoreRecentYearlyPeriod, getYearPeriod } from "../../../utils/periodsUtils";
+import { checkInitialStates } from "../../../utils/progressionUtils";
+import { checkMergeSessions } from "./utils";
 
-/* ---------------------------------------------------------------- */
-/* -------------------- INITIAL STATES SECTION -------------------- */
-/* ---------------------------------------------------------------- */
+/* -------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------- INITIAL STATES SECTION ---------------------------------------- */
+/* -------------------------------------------------------------------------------------------------------- */
 
 export const InitialStatesSection = ({
   session,
@@ -26,6 +28,11 @@ export const InitialStatesSection = ({
   onReturn,
   submit
 }) => {
+
+  const [assets, setAssets] = useState([
+    ...session.financialData.immobilisations,
+    ...session.financialData.stocks
+  ]);
 
   const [fetching, setFetching] = useState(false);
   const [syncProgression, setSyncProgression] = useState(0);
@@ -50,13 +57,9 @@ export const InitialStatesSection = ({
   );
 
   const isNextStepAvailable = () => {
-    let accounts = session.financialData.immobilisations.concat(session.financialData.stocks);
-    return !accounts.some(
-      (account) =>
-        (account.initialStateType == "defaultData" && !account.initialStateSet) ||
-        (account.isAmortisable && account.initialStateType == "none")
-    );
-  };;
+    let initialStatesValid = checkInitialStates(session,period);
+    return initialStatesValid;
+  };
 
   /* ---------- ACTIONS ---------- */
 
@@ -90,9 +93,11 @@ export const InitialStatesSection = ({
 
   /* ----- UPDATES ----- */
 
-  const updateFootprints = () => {
-    //this.props.session.updateFootprints();
-    //this.setState({ financialData: this.props.session.financialData });
+  const refreshState = () => {
+    setAssets([
+      ...session.financialData.immobilisations,
+      ...session.financialData.stocks
+    ])
   };
 
   /* ---------- BACK-UP IMPORT ---------- */
@@ -112,125 +117,26 @@ export const InitialStatesSection = ({
         // build session object
         const prevSession = new Session(prevSessionData);
 
+        // ------------------------------
+
         const currSession = session;
         const currYear = getYearPeriod(period);
 
         const prevMoreRecentPeriod = getMoreRecentYearlyPeriod(prevSession);
         const prevYear = getYearPeriod(prevMoreRecentPeriod);
 
-        // Matching periods ---------------------------------
+        const isMergeAvailable = checkMergeSessions(session,prevSession);
+        if (isMergeAvailable) 
+        {
+          // Update session with prev values
+          await currSession.loadSessionFromBackup(prevSession); // try ?
 
-        // check if prev session periods not includes current session period
-        const conflictingPeriod = prevSession.availablePeriods
-          .find((prevPeriod) => currSession.availablePeriods
-            .some((period) => period.periodKey === prevPeriod.periodKey));
+          // Update component
+          setPopupSuccess(true);
+          setTitlePopup("Reprise sur l'exercice précédent");
+          setMessage("Les données de l'exercice précédent ont été ajoutées avec succès. Les valeurs des indicateurs de stocks, immobilisations et amortissements en fin d'exercice vont être prises en compte pour l'exercice en cours.");
+        };
 
-        if (conflictingPeriod) {
-          const existingYear = getYearPeriod(conflictingPeriod); // Récupérer les années de la période
-          setTitlePopup("Erreur - Sauvegarde");
-          setMessage(
-            "Des données existent déjà pour l'exercice de "+existingYear+"."
-            + " Veuillez vérifier la sauvegarde et réessayer."
-          );
-          setPopupError(true);
-          return;
-        }
-
-        // check if prev session periods linked to current period
-        const prevPeriod = prevSession.availablePeriods
-          .find((prevPeriod) => prevPeriod.dateEnd == getPrevDate(period.dateStart));
-
-        if (!prevPeriod) {
-          setTitlePopup("Erreur de Fichier");
-          setMessage(
-            "La sauvegarde ne correspond pas à l'année précédente."
-            +" Veuillez vérifier le fichier et réessayer."
-          );
-          setPopupError(true);
-        }
-
-        // Matching siren -----------------------------------
-        // /!\ if not set ?
-
-        if (prevSession.legalUnit.siren != currSession.legalUnit.siren) {
-          setTitlePopup("Erreur de Fichier");
-          setMessage(
-            "Les numéros de siren ne correspondent pas."
-            + " Veuillez vérifier le fichier et réessayer."
-          );
-          setPopupError(true);
-          return;
-        }
-
-        let checkANouveaux = true;
-        currSession.financialData.immobilisations
-          .filter((immobilisation) => immobilisation.initialState.amount > 0)
-          .forEach((immobilisation) => 
-          {
-            let prevImmobilisation = prevSession.financialData.immobilisations
-              .find((account) => account.accountNum == immobilisation.accountNum);
-            
-            let prevStateDateEnd = immobilisation.initialState.date;
-            if (!prevImmobilisation) {
-              checkANouveaux = false;
-            } else if (!prevImmobilisation.states[prevStateDateEnd]) {
-              checkANouveaux = false;
-            } else if (
-              prevImmobilisation.states[prevStateDateEnd].amount !=
-                immobilisation.initialState.amount ||
-              (immobilisation.amortisationAccountNum &&
-                prevImmobilisation.states[prevStateDateEnd]
-                  .amortisationAmount !=
-                  immobilisation.initialState.amortisationAmount) ||
-              (immobilisation.depreciationAccountNum &&
-                prevImmobilisation.states[prevStateDateEnd]
-                  .depreciationAmount !=
-                  immobilisation.initialState.depreciationAmount)
-            ) {
-              checkANouveaux = false;
-            }
-          });
-        currSession.financialData.stocks
-          .filter((stock) => stock.initialState.amount > 0)
-          .forEach((stock) => {
-            let prevStock = prevSession.financialData.stocks.find(
-              (prevStock) => prevStock.accountNum == stock.accountNum
-            );
-            let prevStateDateEnd = stock.initialState.date;
-            if (!prevStock) {
-              checkANouveaux = false;
-            } else if (!prevStock.states[prevStateDateEnd]) {
-              checkANouveaux = false;
-            } else if (
-              prevStock.states[prevStateDateEnd].amount !=
-                stock.initialState.amount ||
-              (stock.depreciationAccountNum &&
-                prevStock.states[prevStateDateEnd].depreciationAmount !=
-                  stock.initialState.depreciationAmount)
-            ) {
-              checkANouveaux = false;
-            }
-          });
-        if (!checkANouveaux) {
-          setTitlePopup("Erreur - Correspondances des données");
-          setMessage("Des données importées ne correspondent pas aux données du journal des A-Nouveaux. Veuillez vérifier le fichier et réessayer.");
-          setPopupError(true);
-          return;
-        }
-
-        // Update session with prev values
-        await currSession.loadSessionFromBackup(prevSession);
-
-        // Update financialData with prev values
-        await currSession.financialData.loadFinancialDataFromBackUp(
-          prevSession.financialData
-        );
-        //await currSession.updateFootprints(prevSession.financialPeriod);
-
-        // Update component
-        setPopupSuccess(true);
-        setTitlePopup("Reprise sur l'exercice précédent");
-        setMessage("Les données de l'exercice précédent ont été ajoutées avec succès. Les valeurs des indicateurs de stocks, immobilisations et amortissements en fin d'exercice vont être prises en compte pour l'exercice en cours.");
       } catch (error) {
 
         if(error.message == "Network Error") {
@@ -256,6 +162,11 @@ export const InitialStatesSection = ({
     }
   };
 
+  const isSyncButtonEnable = assets.some(
+    (account) => (
+      account.initialStateType == "defaultData" 
+      && !account.initialStateSet)
+  );
 
   return (
     <Container fluid>
@@ -340,7 +251,7 @@ export const InitialStatesSection = ({
             </p>
           </div>
 
-          {!isNextStepAvailable() ? (
+          {isSyncButtonEnable ? (
             <div className="alert alert-info">
               <p>
                 <i className="bi bi-exclamation-circle"></i> Les empreintes de
@@ -369,7 +280,7 @@ export const InitialStatesSection = ({
                 financialData={session.financialData}
                 period={period}
                 accountsShowed={accountsShowed}
-                onUpdate={updateFootprints}
+                onUpdate={refreshState}
               />
             </div>
           )}

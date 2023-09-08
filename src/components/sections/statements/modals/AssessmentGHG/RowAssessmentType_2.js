@@ -15,6 +15,7 @@ import { getNrgConsumption, getNrgConsumptionUncertainty } from "../AssessmentNR
 // Libraries
 import fuels from "/lib/emissionFactors/fuels.json";
 import { isValidNumber } from "../../../../../utils/Utils";
+import { useRef } from "react";
 
 const emissionFactors = {
   ...fuels
