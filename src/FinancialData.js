@@ -487,25 +487,31 @@ export class FinancialData
     this.stocks
       .filter((stock) => !stock.isProductionStock)
       .forEach((stock) => {
-        stock.initialStateType = this.externalExpenses.some((expense) =>
+        if (this.externalExpenses.some((expense) =>
           stock.purchasesAccounts.includes(expense.accountNum)
-        )
-          ? "currentFootprint"
-          : "defaultData";
-        stock.initialFootprintParams =
-          stock.initialStateType == "defaultData"
-            ? {
-                area: "FRA",
-                code: "00",
-                aggregate: "TRESS",
-              }
-            : {};
+        )) {
+          stock.initialStateType = "currentFootprint";
+          stock.initialFootprintParams = {};
+          stock.initialStateSet = true;
+        } else {
+          stock.initialStateType = "defaultData";
+          stock.initialFootprintParams = {
+            area: "FRA",
+            code: "00",
+            aggregate: "TRESS",
+          };
+          stock.initialStateSet = false;
+        }
       });
 
     // Stocks (production) -> current footprint for all
     this.stocks
       .filter((stock) => stock.isProductionStock)
-      .forEach((stock) => (stock.initialStateType = "currentFootprint"));
+      .forEach((stock) => {
+        stock.initialStateType = "currentFootprint";
+        stock.initialFootprintParams = {};
+        stock.initialStateSet = true;
+      });
   };
 
   /* ------------------------- Load BackUp Data ------------------------- */
