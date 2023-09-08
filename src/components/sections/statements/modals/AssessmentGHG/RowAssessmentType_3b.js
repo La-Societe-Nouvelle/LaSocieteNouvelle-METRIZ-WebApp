@@ -108,7 +108,7 @@ export const RowAssessmentType_3b = ({
     <tr key={itemId}>
       <td width="30px">
         <button
-          className="btn btn-sm "
+          className="btn btn-sm px-2 py-1"
           onClick={deleteItem}
         >
           <i className="bi bi-trash"></i>

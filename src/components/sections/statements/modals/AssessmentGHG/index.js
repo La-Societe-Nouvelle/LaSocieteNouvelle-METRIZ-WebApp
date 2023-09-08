@@ -322,7 +322,7 @@ const FirstRowAssessmentItem = ({
     <tr>
       <td width="30px">
         <button 
-          className="btn btn-sm btn-light"
+          className="btn btn-sm btn-light px-2 py-1"
           onClick={() => addNewLine(assessmentItem)}
         >
           <i className="bi bi-plus-lg"></i>
