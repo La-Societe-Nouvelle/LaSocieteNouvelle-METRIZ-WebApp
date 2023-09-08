@@ -133,13 +133,14 @@ export const Metriz = () =>
       // log error
     }
 
-    // next step
-    setStep(3); // providers section
-
     // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 2, currentDate, []);
     }
+
+    // next step
+    const progression = getProgression(session,selectedPeriod);
+    setStep(progression); // providers section
   };
 
   const validProviders = async () => 
@@ -158,14 +159,15 @@ export const Metriz = () =>
     if (!stepValidation) {
       // log error
     }
-
-    // next step
-    setStep(4); // statements section
-
+    
     // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 3, currentDate, []);
     }
+
+    // next step
+    const progression = getProgression(session,selectedPeriod);
+    setStep(progression); // providers section
   };
 
   const validStatements = async () => 
