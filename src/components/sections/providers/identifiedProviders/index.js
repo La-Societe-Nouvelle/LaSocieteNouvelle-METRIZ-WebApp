@@ -20,6 +20,7 @@ const IdentifiedProviders = (props) => {
   const [significativeProviders, setSignificativeProviders] = useState([]);
   const [showSyncErrorModal, setShowSyncErrorModal] = useState(false);
   const [showSyncSuccessModal, setShowSyncSuccessModal] = useState(false);
+  const [currentView, setCurrentView] = useState("all");
   const scrollTargetRef = useRef(null);
   const financialData = props.financialData;
   const financialPeriod = props.financialPeriod;
@@ -76,6 +77,7 @@ const IdentifiedProviders = (props) => {
     setShowSyncErrorModal(hasSyncError);
     setShowSyncSuccessModal(!hasSyncError);
     setSignificativeProviders(updatedSignificativeProviders);
+    setCurrentView("all");
 
     if (scrollTargetRef.current) {
       window.scrollTo({
@@ -83,6 +85,11 @@ const IdentifiedProviders = (props) => {
         behavior: "smooth",
       });
     }
+  };
+
+  const handleChangeView = (updatedView) => {
+    setCurrentView(updatedView);
+    setShowSyncSuccessModal(false);
   };
 
   // Check if all providers have their footprint data synchronized
@@ -129,22 +136,22 @@ const IdentifiedProviders = (props) => {
         </ul>
 
         {/* Views --------------------------------------------------------- */}
-        <Row>
-          <Col>
+        <div className="d-flex align-items-stretch justify-content-between">
+         
             <ImportProvidersView
               providers={providers}
               updateProviders={updateProviders}
               handleSynchronize={handleSynchronize}
             />
-          </Col>
-          <Col>
+      
+        
             <InvoicesProvidersView
               providers={providers}
               externalExpenses={financialData.externalExpenses}
               updateProviders={updateProviders}
             />
-          </Col>
-        </Row>
+        
+        </div>
         <div ref={scrollTargetRef}>
           <SyncProvidersView
             providers={providers}
@@ -154,6 +161,7 @@ const IdentifiedProviders = (props) => {
             handleSynchronize={handleSynchronize}
             showSyncErrorModal={showSyncErrorModal}
             closeSyncErrorModal={() => setShowSyncErrorModal(false)}
+            view={currentView}
           />
         </div>
         {/* Modals --------------------------------------------------------- */}
@@ -162,6 +170,7 @@ const IdentifiedProviders = (props) => {
           onClose={() => setShowSyncSuccessModal(false)}
           isAllProvidersIdentified={allProvidersIdentified}
           nextStep={allProvidersIdentified ? props.submit : props.nextStep}
+          changeView={handleChangeView}
         />
 
         {/* Actions ---------------------------------------------------------*/}

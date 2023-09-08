@@ -228,7 +228,7 @@ const InvoicesProvidersView = ({
   
 
   return (
-    <div className="box">
+    <div className="box flex-grow-1 ms-2">
       <h4>Déposer des factures</h4>
       <p className="small">
         Importez vos factures au format PDF dans la zone de dépôt et associez ensuite les

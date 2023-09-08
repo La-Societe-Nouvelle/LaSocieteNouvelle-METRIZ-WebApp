@@ -46,7 +46,8 @@ export const SyncSuccessModal = ({
   showModal,
   onClose,
   isAllProvidersIdentified,
-  nextStep
+  nextStep,
+  changeView
 }) => {
 
   return (
@@ -66,8 +67,8 @@ export const SyncSuccessModal = ({
             ? "Toutes les fournisseurs ont été identifiés et leurs données ont été synchronisées avec succès. Vous pouvez directement passer à la mesure de vos impacts. "
             : "Toutes les données des fournisseurs identifiés ont été synchronisées avec succès. Vous pouvez renseigner les numéros SIREN manquants ou leur associer un secteur d'activité à l'étape suivante.          "}
         </p>
-        <div className="text-end">
-          <Button className="me-1" onClick={onClose}>Fermer</Button>
+        <div className="text-center">
+        <Button className="me-2" onClick={() => changeView("notDefined")}>Comptes sans SIREN</Button>
           <Button variant="secondary" onClick={nextStep}>
             {isAllProvidersIdentified ? "Mesurer mon impact" : "Etape suivante"}
           </Button>
