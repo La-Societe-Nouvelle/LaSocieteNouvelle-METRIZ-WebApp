@@ -39,25 +39,25 @@ export const getProgression = (session,period) =>
 
   // check initial states
   let initialStatesValid = checkInitialStates(session,period);
-  console.log("etats initiaux valides : "+initialStatesValid);
   if (!initialStatesValid) {
     return progressionIndex.initialStatesSection;
   }
-
+  
   // check external footprints
   let externalFootprintsValid = checkExternalFootprints(session,period);
   if (!externalFootprintsValid) {
     return progressionIndex.providersSection;
   }
-
+  
   // statements
   let statementsValid = checkImpactsStatements(session,period);
   if (!statementsValid) {
     return progressionIndex.statementsSection;
   }
-
+  
   // results
   let resultsValid = checkResults(session,period);
+  console.log("déclaration validées : "+statementsValid);
   if (!resultsValid) {
     return progressionIndex.statementsSection;
   } else {
@@ -92,8 +92,8 @@ export const checkExternalFootprints = (session,period) => {
 export const checkImpactsStatements = (session,period) => 
 {
   let selectedIndics = session.validations[period.periodKey];
-  return selectedIndics
-    .every((indic) => checkIndicStatement(session.impactsData[period.periodKey], indic).status=="ok");
+  return selectedIndics.length>0 &&
+    selectedIndics.every((indic) => checkIndicStatement(session.impactsData[period.periodKey], indic).status=="ok");
 }
 
 const checkIndicStatement = (impactsData,indic) =>

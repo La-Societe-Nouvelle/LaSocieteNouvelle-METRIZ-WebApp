@@ -51,7 +51,7 @@ export const HeaderSection = ({ step, setStep, session, period }) =>
             {
               const stepNumber = index + 1;
               const stepName = stepNames[index];
-              const isCompleted = stepMax > stepNumber;
+              const isCompleted = stepMax > stepNumber || stepMax==5;
               const isCurrentStep = step == stepNumber;
               return (
                 <StepperItem
