@@ -3,6 +3,7 @@ import React from "react";
 import { Button, Container, Image } from "react-bootstrap";
 import { downloadSession } from "./Utils";
 import { saveErrorLog } from "../services/StatsService";
+import { Topbar } from "../components/pageComponents/Topbar";
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -25,50 +26,55 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <Container fluid>
-          <section className="step">
-            <div className="d-flex  align-items-center justify-content-evenly">
-              <Image src="/illus/503.svg" height={600} />
-              <div className="">
-                <h1 className="mb-4">Oops ! Un problème est survenu</h1>
-                {this.state.session.progression > 0 && (
-                  <p>
-                    Pour ne pas perdre vos données d'analyse,{" "}
-                    <b>sauvegardez votre session</b>. Vous pourrez reprendre où
-                    vous en étiez.
-                  </p>
-                )}
-                <p>
-                  Nous nous excusons pour ce désagrément et travaillons sur la
-                  résolution du problème. <br />
-                  Si vous avez des questions ou avez besoin d'aide, n'hésitez
-                  pas à{" "}
-                  <a
-                    href="mailto:support@lasocietenouvelle.org"
-                    className="fw-bold text-decoration-underline"
-                  >
-                    contacter notre support
-                  </a>
-                  .
-                </p>
-                <div className="mt-4">
-                  <a href="/" className="btn btn-primary me-2">
-                    Retour à l'accueil
-                  </a>
-
+        <>
+          <header>
+            <Topbar session={this.state.session} />
+          </header>
+          <Container fluid className="mt-4">
+            <section className="step">
+              <div className="d-flex  align-items-center justify-content-evenly">
+                <Image src="/illus/503.svg" height={600} />
+                <div className="">
+                  <h1 className="mb-4">Oops ! Un problème est survenu</h1>
                   {this.state.session.progression > 0 && (
-                    <Button
-                      variant="secondary"
-                      onClick={() => downloadSession(this.state.session)}
-                    >
-                      Sauvegarder ma session
-                    </Button>
+                    <p>
+                      Pour ne pas perdre vos données d'analyse,{" "}
+                      <b>sauvegardez votre session</b>. Vous pourrez reprendre
+                      où vous en étiez.
+                    </p>
                   )}
+                  <p>
+                    Nous nous excusons pour ce désagrément et travaillons sur la
+                    résolution du problème. <br />
+                    Si vous avez des questions ou avez besoin d'aide, n'hésitez
+                    pas à{" "}
+                    <a
+                      href="mailto:support@lasocietenouvelle.org"
+                      className="fw-bold text-decoration-underline"
+                    >
+                      contacter notre support
+                    </a>
+                    .
+                  </p>
+                  <div className="mt-4">
+                    <a href="/" className="btn btn-primary me-2">
+                      Retour à l'accueil
+                    </a>
+
+                    {this.state.session.progression > 0 && (
+                      <Button
+                        variant="secondary"
+                        onClick={() => downloadSession(this.state.session)}
+                      >
+                        Sauvegarder ma session
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
-        </Container>
+            </section>
+          </Container>
+        </>
       );
     }
 

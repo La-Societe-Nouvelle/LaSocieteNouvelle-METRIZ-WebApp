@@ -200,6 +200,7 @@ export const Metriz = () =>
   // Sections Views
   const buildSectionView = () => 
   {
+    
     const sections = [
       <StartSection 
         initSession={initSession}
@@ -249,22 +250,18 @@ export const Metriz = () =>
   return (
     <>
       {/* Header */}
-      {(step > 0 && step < 6) && 
-        <HeaderSection
-          step={step}
-          setStep={updateStep}
-          session={session}
-          period={selectedPeriod}
-        />
-      }
-      {(step == 6) && 
-        <HeaderPublish 
-          setStep={updateStep} 
-          session={session} 
-        />}
-
-      {/* Sections */}
       <ErrorBoundary session={session}>
+        {step > 0 && step < 6 && (
+          <HeaderSection
+            step={step}
+            setStep={updateStep}
+            session={session}
+            period={selectedPeriod}
+          />
+        )}
+        {step == 6 && <HeaderPublish setStep={updateStep} session={session} />}
+
+        {/* Sections */}
         {buildSectionView(step)}
       </ErrorBoundary>
 
