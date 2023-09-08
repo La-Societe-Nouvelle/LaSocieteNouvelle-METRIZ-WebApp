@@ -119,7 +119,7 @@ export const ComparativeTable = ({
             </tr>
 
             {aggregates.map((aggregate) => 
-              <tr>
+              <tr key={aggregate}>
                 <td>{financialData.mainAggregates[aggregate].label}</td>
                 {showAreaFootprint && (
                   <td className="border-left text-end">

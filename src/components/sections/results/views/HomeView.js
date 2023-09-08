@@ -1,5 +1,4 @@
 import React from "react";
-import { Col, Row } from "react-bootstrap";
 import { ProductionFootprintVisual } from "../visuals/ProductionFootprintVisual";
 
 export const HomeView = ({
@@ -7,14 +6,5 @@ export const HomeView = ({
   period
 }) => {
 
-  return (
-    <>
-      <Row>
-        <ProductionFootprintVisual
-          session={session}
-          period={period}
-        />
-      </Row>
-    </>
-  );
+  return <ProductionFootprintVisual session={session} period={period} />;
 }
