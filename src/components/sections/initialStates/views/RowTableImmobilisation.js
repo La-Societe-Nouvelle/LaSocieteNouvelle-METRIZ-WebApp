@@ -3,13 +3,14 @@
 // React
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import { getBranchesOptions, printValue } from "../../../utils/Utils";
+import { getBranchesOptions, printValue } from "../../../../utils/Utils";
 
 // Styles
 import { customSelectStyles } from "/config/customStyles";
 
 // Libraries
 import branches from "/lib/branches";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
 const branchesOptions = getBranchesOptions(branches);
 
@@ -58,7 +59,7 @@ const getInitialStateOptions = (initialStateType) =>
 
 export const RowTableImmobilisation = ({
   account,
-  prevStateDateEnd, // day before period
+  period,
   onUpdate
 }) => {
 
@@ -67,6 +68,8 @@ export const RowTableImmobilisation = ({
     accountLib, 
     isAmortisable,
   } = account;
+
+  const prevStateDateEnd = getPrevDate(period.dateStart);
 
   const [initialStateType, setInitialStateType] = useState(account.initialStateType);
   const [initialStateSet, setInitialStateSet] = useState(account.initialStateSet);

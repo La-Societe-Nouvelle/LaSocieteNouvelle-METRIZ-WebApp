@@ -3,14 +3,15 @@
 // React
 import { useEffect, useState } from "react";
 import Select from "react-select";
-import { getBranchesOptions, printValue } from "../../../utils/Utils";
+import { getBranchesOptions, printValue } from "../../../../utils/Utils";
 
 // Styles
 import { customSelectStyles } from "/config/customStyles";
 
 // Libraries
 import branches from "/lib/branches";
-import { isCurrentFootprintAvailable } from "./utils";
+import { isCurrentFootprintAvailable } from "../utils";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
 const branchesOptions = getBranchesOptions(branches);
 
@@ -63,7 +64,7 @@ const getInitialStateOptions = (initialStateType, hasInputs) =>
 
 export const RowTableStock = ({
   account,
-  prevStateDateEnd, // day before period
+  period,
   onUpdate
 }) => {
 
@@ -73,6 +74,8 @@ export const RowTableStock = ({
     isProductionStock,
     hasInputs,
   } = account;
+
+  const prevStateDateEnd = getPrevDate(period.dateStart);
 
   const [initialStateType, setInitialStateType] = useState(account.initialStateType);
   const [initialStateSet, setInitialStateSet] = useState(account.initialStateSet);
