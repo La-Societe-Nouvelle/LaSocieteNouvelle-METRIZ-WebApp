@@ -1,13 +1,21 @@
 // La Société Nouvelle
+
+// API
 import api from "/config/api";
 
-// Imports
+// Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+import { AmortisationExpense } from "./AmortisationExpense";
 
 // Utils
 import { getAmountItems, getSumItems, roundValue } from "../utils/Utils";
 import { getDatesEndMonths, getNbDaysBetweenDates, getPrevDate } from "../utils/periodsUtils";
-import { AmortisationExpense } from "./AmortisationExpense";
+
+// ################################################## IMMOBILISATION OBJECT ##################################################
+
+/**
+ * 
+ */
 
 export class Immobilisation 
 {
@@ -74,25 +82,6 @@ export class Immobilisation
     this.defaultAmortisationExpenseAccountLib = this.isAmortisable ?  "Dotations - " + this.amortisationAccountLib : undefined;
   }
 
-  /* ------------------------- Update props ------------------------- */
-
-  async updateProps(nextProps)
-  {
-    // update initial state type
-    if (nextProps.initialState != undefined &&
-        nextProps.initialState != this.initialStateType) {
-      this.initialStateType = nextProps.initialState;
-      this.initialStateSet = false;
-    }
-
-    // update initial state fpt params
-    if (this.initialStateType == "defaultData" &&
-        nextProps.initialFootprintParams !== this.initialFootprintParams) {
-      this.initialFootprintParams = nextProps.initialFootprintParams;
-      this.initialStateSet = false;
-    }
-  }
-
   /* ------------------------- Load BackUp Data ------------------------- */
 
   loadInitialStateFromBackUp = async (prevImmobilisation)  =>
@@ -118,8 +107,8 @@ export class Immobilisation
     this.initialStateSet = prevImmobilisation.initialStateSet;
 
     // // states
-    Object.values(prevImmobilisation.states).forEach(
-      (state) => (this.states[state.date] = new ImmobilisationState(state))
+    Object.values(prevImmobilisation.states)
+      .forEach((state) => (this.states[state.date] = new ImmobilisationState(state))
     );
   }
 
@@ -322,6 +311,8 @@ export class Immobilisation
   }
 
 }
+
+// ################################################## IMMOBILISATION STATE OBJECT ##################################################
 
 export class ImmobilisationState
 {

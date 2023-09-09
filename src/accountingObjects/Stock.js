@@ -1,12 +1,20 @@
 // La Société Nouvelle
 
-// Imports
-import { getAmountItems, roundValue } from '../utils/Utils';
-import { getDatesEndMonths, getPrevDate } from '../utils/periodsUtils';
+// API
+import api from "/config/api";
+
+// Objects
 import { SocialFootprint } from '/src/footprintObjects/SocialFootprint';
 
-// API url
-import api from "../../config/api";
+// Utils
+import { getAmountItems, roundValue } from '../utils/Utils';
+import { getDatesEndMonths, getPrevDate } from '../utils/periodsUtils';
+
+// ################################################## STOCK OBJECT ##################################################
+
+/**
+ * 
+ */
 
 export class Stock {
 
@@ -68,27 +76,6 @@ export class Stock {
 
     this.defaultStockVariationAccountNum = !this.isProductionStock ? "60"+this.accountNum : undefined;
     this.defaultStockVariationAccountLib = !this.isProductionStock ?  "Variation stock "+this.accountLib : undefined;
-  }
-
-  /* ------------------------- Update props ------------------------- */
-
-  async update(nextProps) 
-  {
-    // update initial state ----------------------------- //
-    if (nextProps.initialStateType!=undefined 
-     && nextProps.initialStateType!=this.initialStateType) 
-    {
-      this.initialStateType = nextProps.initialStateType;
-      this.initialStateSet = false;
-    }
-
-    // update default footprint ------------------------- //
-    if (this.initialState=="defaultData" && 
-        nextProps.initialFootprintParams!==this.initialFootprintParams)
-    {
-      this.initialFootprintParams = nextProps.initialFootprintParams;
-      this.initialStateSet = false;
-    }
   }
 
   /* ------------------------- Load BackUp Data ------------------------- */
@@ -198,6 +185,8 @@ export class Stock {
   }
 
 }
+
+// ################################################## STOCK STATE OBJECT ##################################################
 
 export class StockState
 {

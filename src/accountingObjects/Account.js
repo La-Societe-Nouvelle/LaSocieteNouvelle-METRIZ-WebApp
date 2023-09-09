@@ -1,9 +1,28 @@
-// Imports
-import { buildAggregateIndicator } from "../formulas/footprintFormulas";
-import { getAmountItems, getPrevAmountItems } from "../utils/Utils";
+// La Société Nouvelle
+
+// Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
-const indics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
+// Utils
+import { getAmountItems } from "../utils/Utils";
+
+// ################################################## ACCOUNT OBJECT ##################################################
+
+/** Usages :
+ *    -> Expenses accounts (external expenses, stock variations, amortisations)
+ *       builds in financial data
+ * 
+ *  Props :
+ *    - id -> accountNum
+ *    - accountNum
+ *    - accountLib
+ *    - periodsData
+ * 
+ *  Props of periods :
+ *    - periodKey
+ *    - amount
+ *    - footprint
+ */
 
 export class Account {
 
@@ -17,9 +36,10 @@ export class Account {
     this.accountNum = accountNum;                                   // account number
     this.accountLib = accountLib;                                   // account label
     
-    this.periodsData = {};
+    this.periodsData = {};                                          // data for each period
     if (periodsData) {
-      Object.values(periodsData).forEach(({periodKey,amount,footprint}) => {
+      Object.values(periodsData)
+            .forEach(({periodKey,amount,footprint}) => {
         this.periodsData[periodKey] = {
           periodKey,
           amount,
@@ -30,6 +50,7 @@ export class Account {
   // ---------------------------------------------------------------------------------------------------- //
   }
 
+  // build periods data from items, for array of periods
   buildPeriods = (items,periods) => 
   {
     this.periodsData = {};
@@ -42,22 +63,4 @@ export class Account {
       }
     })
   }
-
-}
-
-export const buildAggregateFromArray = ({accountNum,
-                                         accountLib,
-                                         items}) =>
-{
-  let amount = getAmountItems(items);
-
-  let footprint = new SocialFootprint();
-  indics.forEach(indic => footprint.indicators[indic] = buildAggregateIndicator(indic,items));
-
-  let prevAmount = getPrevAmountItems(items);
-
-  let prevFootprint = new SocialFootprint();
-  indics.forEach(indic => prevFootprint.indicators[indic] = buildAggregateIndicator(indic,items,{usePrev: true}));
-
-  return new Account({accountNum,accountLib,amount,footprint,prevAmount,prevFootprint});
 }

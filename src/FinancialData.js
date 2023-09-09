@@ -5,12 +5,7 @@ import { Expense } from "/src/accountingObjects/Expense";
 import { Immobilisation } from "/src/accountingObjects/Immobilisation";
 import { Stock } from "/src/accountingObjects/Stock";
 import { Account } from "./accountingObjects/Account";
-import {
-  Aggregate,
-  buildAggregateFromAccounts,
-  buildAggregateFromItems,
-  mergeAggregatePeriodsData,
-} from "./accountingObjects/Aggregate";
+import { Aggregate } from "./accountingObjects/Aggregate";
 
 // Other objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
@@ -22,21 +17,39 @@ import { getAmountItems, mergePeriodsData, roundValue } from "./utils/Utils";
 import accountsMatching from "/lib/accountsMatching";
 import { StockVariation } from "./accountingObjects/StockVariation";
 import { AmortisationExpense } from "./accountingObjects/AmortisationExpense";
-import { immobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
+import { ImmobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
 import { Provider } from "./Provider";
+import { buildMainAggregates, buildProductionAggregates, mergeAggregatesPeriodsData } from "./formulas/aggregatesBuilder";
 
 export const otherFinancialDataItems = [
-  "otherOperatingIncomes", // #74, #75, #781, #791
-  "financialIncomes", // #76, #786, #796
-  "exceptionalIncomes", // #77, #787, #797
-  "taxes", // #63
-  "personnelExpenses", // #64
-  "otherExpenses", // #65
-  "financialExpenses", // #66 & #686
-  "exceptionalExpenses", // #67 & #687 except #6871
-  "provisions", // #681 except #6811
-  "taxOnProfits", // #69
+  "otherOperatingIncomes",  // #74, #75, #781, #791
+  "financialIncomes",       // #76, #786, #796
+  "exceptionalIncomes",     // #77, #787, #797
+  "taxes",                  // #63
+  "personnelExpenses",      // #64
+  "otherExpenses",          // #65
+  "financialExpenses",      // #66 & #686
+  "exceptionalExpenses",    // #67 & #687 except #6871
+  "provisions",             // #681 except #6811
+  "taxOnProfits",           // #69
 ];
+
+const metaProductionAggregates = {
+  "revenue":                  {   label: "Production vendue"},      // #70
+  "storedProduction":         {   label: "Production stockée"},     // #71
+  "immobilisedProduction":    {   label: "Production immobilisée"}  // #72
+}
+
+const metaMainAggregates = {
+  "production":               {   label: "Production"},
+  "intermediateConsumptions": {   label: "Consommations intermédiaires"},
+  "fixedCapitalConsumptions": {   label: "Consomamtions de capital fixe"},
+  "netValueAdded":            {   label: "Valeur ajoutée nette"},
+}
+
+/**
+ * 
+ */
 
 /* ---------- OBJECT FINANCIAL DATA ---------- */
 
@@ -97,7 +110,7 @@ export class FinancialData
         (props) => new Expense({ ...props })
       ); // investments (flows #2 <- #404)
       this.immobilisedProductions = data.immobilisedProductions.map(
-        (props) => new immobilisedProduction({ ...props })
+        (props) => new ImmobilisedProduction({ ...props })
       ); // productions of immobilisations (flows #2 <- #72)
 
       // Expenses accounts ----------------------- //
@@ -153,7 +166,7 @@ export class FinancialData
 
     // Production items ------------------------ //
 
-    await this.buildProductionAggregates(FECData, periods);
+    this.productionAggregates = await buildProductionAggregates(FECData, periods);
 
     // External expenses ----------------------- //
 
@@ -186,7 +199,7 @@ export class FinancialData
       (props) => new Expense({ ...props })
     ); // investments (flows #2 <- #404)
     this.immobilisedProductions = FECData.immobilisedProductions.map(
-      (props) => new immobilisedProduction({ ...props })
+      (props) => new ImmobilisedProduction({ ...props })
     ); // productions of immobilisations (flows #2 <- #72)
 
     this.adjustedAmortisationExpenses = [];
@@ -220,9 +233,10 @@ export class FinancialData
 
     await this.buildOtherFinancialData(FECData, periods);
 
-    // Main Aggregates ------------------------- //
+    // Aggregates ------------------------------ //
 
-    await this.buildMainAggregates(periods);
+    this.productionAggregates = await bui
+    this.mainAggregates = await buildMainAggregates(this, periods);
 
     // Initial states -------------------------- //
 
@@ -245,30 +259,6 @@ export class FinancialData
 
   /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
 
-  buildProductionAggregates = async (FECData, periods) => {
-    this.productionAggregates = {};
-    // revenue (#70)
-    this.productionAggregates.revenue = buildAggregateFromItems({
-      id: "revenue",
-      label: "Production vendue",
-      items: FECData.revenue,
-      periods,
-    });
-    // stored production (#71)
-    this.productionAggregates.storedProduction = buildAggregateFromItems({
-      id: "storedProduction",
-      label: "Production stockée",
-      items: FECData.storedProduction,
-      periods,
-    });
-    // immobilised production (#72)
-    this.productionAggregates.immobilisedProduction = buildAggregateFromItems({
-      id: "immobilisedProduction",
-      label: "Production immobilisée",
-      items: FECData.immobilisedProduction,
-      periods,
-    });
-  };
 
   buildExpensesAccounts = async (periods) => {
     // external expenses
@@ -338,77 +328,6 @@ export class FinancialData
         periods
       )
     );
-  };
-
-  buildMainAggregates = async (periods) => {
-    this.mainAggregates = {};
-
-    // MAIN AGGREGATES ----------------------------------------- //
-
-    // Production
-    let production = new Aggregate({
-      id: "production",
-      label: "Production",
-    });
-    periods.forEach(
-      ({ periodKey }) =>
-        (production.periodsData[periodKey] = {
-          periodKey,
-          amount: roundValue(
-            this.productionAggregates.revenue.periodsData[periodKey].amount +
-              this.productionAggregates.storedProduction.periodsData[periodKey]
-                .amount +
-              this.productionAggregates.immobilisedProduction.periodsData[
-                periodKey
-              ].amount,
-            2
-          ),
-          footprint: new SocialFootprint(),
-        })
-    );
-    this.mainAggregates.production = production;
-
-    // Intermediate consumptions
-    let intermediateConsumptions = buildAggregateFromAccounts({
-      id: "intermediateConsumptions",
-      label: "Consommations intermédiaires",
-      accounts: this.externalExpensesAccounts.concat(
-        this.stockVariationsAccounts
-      ),
-      periods,
-    });
-    this.mainAggregates.intermediateConsumptions = intermediateConsumptions;
-
-    // Fixed capital consumptions
-    let fixedCapitalConsumptions = buildAggregateFromAccounts({
-      id: "fixedCapitalConsumptions",
-      label: "Consommations de capital fixe",
-      accounts: this.amortisationExpensesAccounts,
-      periods,
-    });
-    this.mainAggregates.fixedCapitalConsumptions = fixedCapitalConsumptions;
-
-    // Net value added
-    let netValueAdded = new Aggregate({
-      id: "netValueAdded",
-      label: "Valeur ajoutée nette",
-    });
-    periods.forEach(
-      ({ periodKey }) =>
-        (netValueAdded.periodsData[periodKey] = {
-          periodKey,
-          amount: roundValue(
-            production.periodsData[periodKey].amount -
-              intermediateConsumptions.periodsData[periodKey].amount -
-              fixedCapitalConsumptions.periodsData[periodKey].amount,
-            2
-          ),
-          footprint: new SocialFootprint(),
-        })
-    );
-    this.mainAggregates.netValueAdded = netValueAdded;
-
-    // --------------------------------------------------------- //
   };
 
   buildOtherFinancialData = async (FECData, periods) => {
@@ -516,7 +435,8 @@ export class FinancialData
 
   /* ------------------------- Load BackUp Data ------------------------- */
 
-  loadFinancialDataFromBackUp = async (prevFinancialData) => {
+  loadFinancialDataFromBackUp = async (prevFinancialData) => 
+  {
     // Merge with previous exepenses
     this.adjustedAmortisationExpenses =
       this.adjustedAmortisationExpenses.concat(
@@ -578,7 +498,7 @@ export class FinancialData
     this.investments = this.investments.concat(prevFinancialData.investments);
 
     // Add previous periods in mainAggregates
-    this.mainAggregates = mergeAggregatePeriodsData(
+    this.mainAggregates = mergeAggregatesPeriodsData(
       this.mainAggregates,
       prevFinancialData.mainAggregates
     );
@@ -589,7 +509,7 @@ export class FinancialData
       prevFinancialData.metaAccounts
     );
 
-    this.otherFinancialData = mergeAggregatePeriodsData(
+    this.otherFinancialData = mergeAggregatesPeriodsData(
       this.otherFinancialData,
       prevFinancialData.otherFinancialData
     );

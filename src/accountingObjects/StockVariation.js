@@ -3,6 +3,12 @@
 // Imports
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
 
+// ################################################## STOCK VARIATION OBJECT ##################################################
+
+/**
+ * 
+ */
+
 export class StockVariation {
 
   constructor({accountNum,
@@ -26,5 +32,4 @@ export class StockVariation {
     this.date = date;
   // ---------------------------------------------------------------------------------------------------- //
   }
-
 }

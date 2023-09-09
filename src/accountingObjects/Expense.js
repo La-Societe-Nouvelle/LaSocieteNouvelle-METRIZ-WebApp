@@ -1,7 +1,20 @@
 // La Société Nouvelle
 
-// Imports
+// Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
+
+// ################################################## EXPENSE OBJECT ##################################################
+
+/** Props :
+ *    - accountNum -> #6x
+ *    - accountLib
+ *    - providerNum
+ *    - providerLib
+ *    - isDefaultProviderAccount
+ *    - amount
+ *    - footprint
+ *    - date
+ */
 
 export class Expense {
 
@@ -22,11 +35,10 @@ export class Expense {
     this.providerLib = providerLib;
     this.isDefaultProviderAccount = isDefaultProviderAccount;
 
-    this.amount = amount || 0;
+    this.amount = amount;
     this.footprint = new SocialFootprint(footprint);
 
     this.date = date;
   // ---------------------------------------------------------------------------------------------------- //
   }
-
 }
