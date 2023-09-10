@@ -62,7 +62,11 @@
     "unit": "gCO2e/€",
     "unitAbsolute": "kgCO2e",
     "isAvailable": true,
-    "color": "rgba(63, 126, 68, 1)"
+    "color": "rgba(63, 126, 68, 1)",
+    "statementUnits": {
+      "kgCO2e": { "label": "kgCO2e",  "coef": 1.0     },
+      "tCO2e":  { "label": "tCO2e",   "coef": 1000.0  }
+    }
   },
   "haz": {
     "isBeta": false,
@@ -75,7 +79,11 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgba(209, 195, 70, 82)"
+    "color": "rgba(209, 195, 70, 82)",
+    "statementUnits": {
+      "kg": { "label": "kg",  "coef": 1.0       },
+      "t":  { "label": "t",   "coef": 1000.0    }
+    }
   },
   "knw": {
     "isBeta": false,
@@ -101,7 +109,11 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgba(139, 69, 19, 1)"
+    "color": "rgba(139, 69, 19, 1)",
+    "statementUnits": {
+      "kg": { "label": "kg",  "coef": 1.0       },
+      "t":  { "label": "t",   "coef": 1000.0    }
+    }
   },
   "nrg": {
     "isBeta": false,
@@ -114,7 +126,13 @@
     "unit": "kJ/€",
     "unitAbsolute": "MJ",
     "isAvailable": true,
-    "color": "rgba(252, 195, 1, 1)"
+    "color": "rgba(252, 195, 1, 1)",
+    "statementUnits": {
+      "MJ":  { "label": "MJ",   "coef": 1.0    },
+      "GJ":  { "label": "GJ",   "coef": 1000.0 },
+      "kWh": { "label": "kWh",  "coef": 0.278  },
+      "MWh": { "label": "MWh",  "coef": 278.0  }
+    }
   },
   "soc": {
     "isBeta": false,
@@ -140,7 +158,11 @@
     "unit": "g/€",
     "unitAbsolute": "kg",
     "isAvailable": true,
-    "color": "rgba(128, 128, 128, 1)"
+    "color": "rgba(128, 128, 128, 1)",
+    "statementUnits": {
+      "kg": { "label": "kg",  "coef": 1.0     },
+      "t":  { "label": "t",   "coef": 1000.0  }
+    }
   },
   "wat": {
     "isBeta": false,
@@ -153,6 +175,10 @@
     "unit": "L/€",
     "unitAbsolute": "m3",
     "isAvailable": true,
-    "color": "rgba(59, 159, 184, 1)"
+    "color": "rgba(59, 159, 184, 1)",
+    "statementUnits": {
+      "m3": { "label": "m³",  "coef": 1.0     },
+      "L":  { "label": "L",   "coef": 0.0001  }
+    }
   }
 }

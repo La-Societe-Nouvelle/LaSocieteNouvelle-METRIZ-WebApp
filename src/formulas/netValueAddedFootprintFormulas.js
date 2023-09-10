@@ -3,192 +3,275 @@
 // Objects
 import { Indicator } from "/src/footprintObjects/Indicator";
 
-/* ----------------------------------------------------------------------------- */
-/* -------------------- NET VALUE ADDED INDICATORS FORMULAS -------------------- */
-/* ----------------------------------------------------------------------------- */
+// Utils
+import { isValidNumber, roundValue } from "../utils/Utils";
 
-export function buildNetValueAddedIndicator(indic, impactsData) {
-  let indicator = new Indicator({ indic });
-  switch (indic) {
-    case "art":
-      buildValueART(indicator, impactsData);
-      break;
-    case "idr":
-      buildValueIDR(indicator, impactsData);
-      break;
-    case "eco":
-      buildValueECO(indicator, impactsData);
-      break;
-    case "geq":
-      buildValueGEQ(indicator, impactsData);
-      break;
-    case "ghg":
-      buildValueGHG(indicator, impactsData);
-      break;
-    case "haz":
-      buildValueHAZ(indicator, impactsData);
-      break;
-    case "knw":
-      buildValueKNW(indicator, impactsData);
-      break;
-    case "mat":
-      buildValueMAT(indicator, impactsData);
-      break;
-    case "nrg":
-      buildValueNRG(indicator, impactsData);
-      break;
-    case "soc":
-      buildValueSOC(indicator, impactsData);
-      break;
-    case "was":
-      buildValueWAS(indicator, impactsData);
-      break;
-    case "wat":
-      buildValueWAT(indicator, impactsData);
-      break;
+// Librairies
+import metaIndics from "/lib/indics";
+
+/* --------------------------------------------------------------------------------------- */
+/* ------------------------- NET VALUE ADDED INDICATORS FORMULAS ------------------------- */
+/* --------------------------------------------------------------------------------------- */
+
+export function buildNetValueAddedIndicator (indic, impactsData) 
+{
+  const indicator = new Indicator({ indic });
+
+  if (isValidNumber(impactsData.netValueAdded,0) 
+   && impactsData.netValueAdded>0)
+  {
+    switch (indic) {
+      case "art": return buildValueART(indicator, impactsData);
+      case "idr": return buildValueIDR(indicator, impactsData);
+      case "eco": return buildValueECO(indicator, impactsData);
+      case "geq": return buildValueGEQ(indicator, impactsData);
+      case "ghg": return buildValueGHG(indicator, impactsData);
+      case "haz": return buildValueHAZ(indicator, impactsData);
+      case "knw": return buildValueKNW(indicator, impactsData);
+      case "mat": return buildValueMAT(indicator, impactsData);
+      case "nrg": return buildValueNRG(indicator, impactsData);
+      case "soc": return buildValueSOC(indicator, impactsData);
+      case "was": return buildValueWAS(indicator, impactsData);
+      case "wat": return buildValueWAT(indicator, impactsData);
+      default   : return indicator;
+    }
+  } 
+  else {
+    return indicator;
   }
+}
+
+const buildValueART = (indicator, impactsData) => 
+{
+  const { nbDecimals } = metaIndics.art;
+  const { 
+    craftedProduction, 
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(craftedProduction,0,netValueAdded)) 
+  {
+    let value = roundValue((craftedProduction/netValueAdded)*100, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(0);
+  }
+
   return indicator;
 }
 
-const buildValueART = (indicator, impactsData) => {
-  if (impactsData.craftedProduction != null) {
-    indicator.setValue(
-      (impactsData.craftedProduction / impactsData.netValueAdded) * 100
-    );
+const buildValueIDR = (indicator, impactsData) => 
+{
+  const { nbDecimals } = metaIndics.idr;
+  const { interdecileRange} = impactsData;
+
+  if (isValidNumber(interdecileRange,1)) 
+  {
+    let value = roundValue(interdecileRange, nbDecimals);
+    indicator.setValue(value);
     indicator.setUncertainty(0);
   }
-};
 
-const buildValueIDR = (indicator, impactsData) => {
-  if (impactsData.interdecileRange != null) {
-    indicator.setValue(impactsData.interdecileRange);
+  return indicator;
+}
+
+const buildValueECO = (indicator, impactsData) => 
+{
+  const { nbDecimals } = metaIndics.art;
+  const { 
+    domesticProduction, 
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(domesticProduction,0,netValueAdded)) 
+  {
+    let value = roundValue((domesticProduction/netValueAdded)*100, nbDecimals);
+    indicator.setValue(value);
     indicator.setUncertainty(0);
   }
-};
 
-const buildValueECO = (indicator, impactsData) => {
-  if (impactsData.domesticProduction != null) {
-    indicator.setValue(
-      (impactsData.domesticProduction / impactsData.netValueAdded) * 100
-    );
+  return indicator;
+}
+
+const buildValueGEQ = (indicator, impactsData) => 
+{
+  const { nbDecimals } = metaIndics.geq;
+  const { wageGap} = impactsData;
+
+  if (isValidNumber(wageGap,0)) 
+  {
+    let value = roundValue(wageGap, nbDecimals);
+    indicator.setValue(value);
     indicator.setUncertainty(0);
   }
-};
 
-const buildValueGEQ = (indicator, impactsData) => {
-  if (impactsData.wageGap != null) {
-    indicator.setValue(impactsData.wageGap);
+  return indicator;
+}
+
+const buildValueGHG = (indicator, impactsData) => 
+{
+  const { nbDecimals, statementUnits } = metaIndics.ghg;
+  const { 
+    greenhousesGazEmissions, 
+    greenhousesGazEmissionsUncertainty, 
+    greenhousesGazEmissionsUnit,
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(greenhousesGazEmissions,0) 
+   && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)
+   && Object.keys(statementUnits).includes(greenhousesGazEmissionsUnit)) 
+  {
+    let grossImpact = greenhousesGazEmissions*statementUnits[greenhousesGazEmissionsUnit].coef;
+    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(greenhousesGazEmissionsUncertainty);
+  }
+
+  return indicator;
+}
+
+const buildValueHAZ = (indicator, impactsData) => 
+{
+  const { nbDecimals, statementUnits } = metaIndics.haz;
+  const { 
+    hazardousSubstancesConsumption, 
+    hazardousSubstancesConsumptionUncertainty,
+    hazardousSubstancesConsumptionUnit,
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(hazardousSubstancesConsumption,0)
+   && isValidNumber(hazardousSubstancesConsumptionUncertainty,0,100)
+   && Object.keys(statementUnits).includes(hazardousSubstancesConsumptionUnit)) 
+  {
+    let grossImpact = hazardousSubstancesConsumption*statementUnits[hazardousSubstancesConsumptionUnit].coef;
+    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(hazardousSubstancesConsumptionUncertainty);
+  }
+
+  return indicator;
+}
+
+const buildValueKNW = (indicator, impactsData) => 
+{
+  const { nbDecimals } = metaIndics.knw;
+  const { 
+    researchAndTrainingContribution, 
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(researchAndTrainingContribution,0,netValueAdded)) {
+    let value = roundValue((researchAndTrainingContribution/netValueAdded)*100, nbDecimals);
+    indicator.setValue(value);
     indicator.setUncertainty(0);
   }
-};
 
-const buildValueGHG = (indicator, impactsData) => {
-  if (impactsData.greenhousesGazEmissions != null) {
-    // Convert greenhouses gas emissions to kilograms if the unit is 'tCO2e'
-    const greenhousesGazEmissions =
-      impactsData.greenhousesGazEmissionsUnit == "tCO2e"
-        ? impactsData.greenhousesGazEmissions * 1000
-        : impactsData.greenhousesGazEmissions;
+  return indicator;
+}
 
-    indicator.setValue(
-      (greenhousesGazEmissions / impactsData.netValueAdded) * 1000
-    );
-    indicator.setUncertainty(impactsData.greenhousesGazEmissionsUncertainty);
+const buildValueMAT = (indicator, impactsData) => 
+{
+  const { nbDecimals, statementUnits } = metaIndics.mat;
+  const { 
+    materialsExtraction, 
+    materialsExtractionUncertainty,
+    materialsExtractionUnit,
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(materialsExtraction,0)
+   && isValidNumber(materialsExtractionUncertainty,0,100)
+   && Object.keys(statementUnits).includes(materialsExtractionUnit)) 
+  {
+    let grossImpact = materialsExtraction*statementUnits[materialsExtractionUnit].coef;
+    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(materialsExtractionUncertainty);
   }
-};
 
-const buildValueHAZ = (indicator, impactsData) => {
-  if (impactsData.hazardousSubstancesConsumption != null) {
-    const hazardousSubstancesConsumption =
-      impactsData.hazardousSubstancesConsumptionUnit == "t"
-        ? impactsData.hazardousSubstancesConsumption * 1000
-        : impactsData.hazardousSubstancesConsumption;
+  return indicator;
+}
 
-    indicator.setValue(
-      (hazardousSubstancesConsumption / impactsData.netValueAdded) * 1000
-    );
-    indicator.setUncertainty(
-      impactsData.hazardousSubstancesConsumptionUncertainty
-    );
+const buildValueNRG = (indicator, impactsData) => 
+{
+  const { nbDecimals, statementUnits } = metaIndics.nrg;
+  const { 
+    energyConsumption,
+    energyConsumptionUncertainty,
+    energyConsumptionUnit, 
+    netValueAdded
+  } = impactsData;
+  
+  if (isValidNumber(energyConsumption,0)
+   && isValidNumber(energyConsumptionUncertainty,0,100)
+   && Object.keys(statementUnits).includes(energyConsumptionUnit)) 
+  {
+    let grossImpact = energyConsumption*statementUnits[energyConsumptionUnit].coef;
+    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(energyConsumptionUncertainty);
   }
-};
 
-const buildValueKNW = (indicator, impactsData) => {
-  if (impactsData.researchAndTrainingContribution != null) {
-    indicator.setValue(
-      (impactsData.researchAndTrainingContribution /
-        impactsData.netValueAdded) *
-        100
-    );
+  return indicator;
+}
+
+const buildValueSOC = (indicator, impactsData) => 
+{
+  const { nbDecimals } = metaIndics.soc;
+  const { hasSocialPurpose } = impactsData;
+
+  if (hasSocialPurpose !== null) {
+    let value = roundValue(impactsData.hasSocialPurpose ? 100.0 : 0.0, nbDecimals);
+    indicator.setValue(value);
     indicator.setUncertainty(0);
   }
-};
 
-const buildValueMAT = (indicator, impactsData) => {
-  if (impactsData.materialsExtraction != null) {
-    const materialsExtraction =
-      impactsData.materialsExtractionUnit == "t"
-        ? impactsData.materialsExtraction * 1000
-        : impactsData.materialsExtraction;
+  return indicator;
+}
 
-    indicator.setValue(
-      (materialsExtraction / impactsData.netValueAdded) * 1000
-    );
-    indicator.setUncertainty(impactsData.materialsExtractionUncertainty);
+const buildValueWAS = (indicator, impactsData) => 
+{
+  const { nbDecimals, statementUnits } = metaIndics.was;
+  const { 
+    wasteProduction, 
+    wasteProductionUncertainty,
+    wasteProductionUnit, 
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(wasteProduction,0)
+   && isValidNumber(wasteProductionUncertainty,0,100)
+   && Object.keys(statementUnits).includes(wasteProductionUnit)) 
+  {
+    let grossImpact = wasteProduction*statementUnits[wasteProductionUnit].coef;
+    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(wasteProductionUncertainty);
   }
-};
 
-const buildValueNRG = (indicator, impactsData) => {
-  if (impactsData.energyConsumption != null) {
-    
-    let energyConsumption;
-    switch (impactsData.energyConsumptionUnit) {
-      case "GJ":
-        energyConsumption = impactsData.energyConsumption * 1000;
-        break;
-      case "kWh":
-        energyConsumption = impactsData.energyConsumption * 3.6;
-        break;
-      case "MWh":
-        energyConsumption = impactsData.energyConsumption * 3600;
-        break;
-      default:
-        energyConsumption = impactsData.energyConsumption;
-        break;
-    }
+  return indicator;
+}
 
-    indicator.setValue((energyConsumption / impactsData.netValueAdded) * 1000);
-    indicator.setUncertainty(impactsData.energyConsumptionUncertainty);
+const buildValueWAT = (indicator, impactsData) => 
+{
+  const { nbDecimals, statementUnits } = metaIndics.wat;
+  const { 
+    waterConsumption, 
+    waterConsumptionUncertainty,
+    waterConsumptionUnit,
+    netValueAdded
+  } = impactsData;
+
+  if (isValidNumber(waterConsumption,0)
+   && isValidNumber(waterConsumptionUncertainty,0,100)
+   && Object.kets(statementUnits).includes(waterConsumptionUnit)) 
+  {
+    let grossImpact = waterConsumption*statementUnits[waterConsumptionUnit].coef;
+    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    indicator.setValue(value);
+    indicator.setUncertainty(waterConsumptionUncertainty);
   }
-};
 
-const buildValueSOC = (indicator, impactsData) => {
-  if (impactsData.hasSocialPurpose != null) {
-    indicator.setValue(impactsData.hasSocialPurpose ? 100 : 0);
-    indicator.setUncertainty(0);
-  }
-};
-
-const buildValueWAS = (indicator, impactsData) => {
-  if (impactsData.wasteProduction != null) {
-    const wasteProduction =
-      impactsData.wasteProductionUnit == "t"
-        ? impactsData.wasteProduction * 1000
-        : impactsData.wasteProduction;
-
-    indicator.setValue((wasteProduction / impactsData.netValueAdded) * 1000);
-    indicator.setUncertainty(impactsData.wasteProductionUncertainty);
-  }
-};
-
-const buildValueWAT = (indicator, impactsData) => {
-  if (impactsData.waterConsumption != null) {
-    const waterConsumption =
-      impactsData.waterConsumptionUnit == "l"
-        ? impactsData.waterConsumption / 1000
-        : impactsData.waterConsumption;
-
-    indicator.setValue((waterConsumption / impactsData.netValueAdded) * 1000);
-    indicator.setUncertainty(impactsData.waterConsumptionUncertainty);
-  }
-};
+  return indicator;
+}

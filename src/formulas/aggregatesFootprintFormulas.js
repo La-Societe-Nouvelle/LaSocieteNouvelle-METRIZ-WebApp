@@ -2,17 +2,15 @@
 
 // Generic formulas
 import { SocialFootprint } from '../footprintObjects/SocialFootprint';
-import { getAmountItems,getSumItems, roundValue } from '../utils/Utils';
+import { getAmountItems, roundValue } from '../utils/Utils';
 import { getPrevDate, sortChronologicallyDates } from '../utils/periodsUtils';
 import { 
-  buildAggregateIndicator, 
-  buildAggregatePeriodIndicator, 
   buildDifferenceFootprint, 
-  mergeFootprints, 
   buildDifferenceIndicator, 
-  mergeIndicators, 
   buildAggregateFootprint, 
-  buildAggregatePeriodFootprint 
+  buildAggregateIndicator,
+  buildAggregatePeriodFootprint, 
+  buildAggregatePeriodIndicator
 } from './footprintFormulas';
 
 /** Structure of file
@@ -160,7 +158,7 @@ const updatePurchasesStocksStatesFpt = async (financialData,period) =>
     }
     
     if (newStockAmount > 0) { // if storage from purchases
-      finalState.footprint = await mergeFootprints([
+      finalState.footprint = await buildAggregateFootprint([
         {amount: oldStockAmount, footprint: prevState.footprint},    // old stock (remains)
         {amount: newStockAmount, footprint: purchasesFootprint}]);   // new stock
     } else { // if only unstorage prev stock
@@ -340,7 +338,7 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
 
       let newImmobilisationsAmount = getAmountItems(newImmobilisations, 2);
       // immobilisation footprint
-      state.footprint = await mergeFootprints([
+      state.footprint = await buildAggregateFootprint([
         ...newImmobilisations,                                                                             // investments
         {amount: roundValue(state.amount-newImmobilisationsAmount, 2), footprint: prevState.footprint}]);  // remains
 
@@ -353,7 +351,7 @@ const updateImmobilisationsStatesFpt = async (financialData,period) =>
           {amount: prevState.amortisationAmount, footprint: prevState.amortisationFootprint} // amortisation
         )
         // amortisation footprint
-        state.amortisationFootprint = await mergeFootprints([
+        state.amortisationFootprint = await buildAggregateFootprint([
           {amount: state.amortisationExpenseAmount, footprint: amortisationExpenseFootprint},                                            // amortisation expense
           {amount: roundValue(state.amortisationAmount-state.amortisationExpenseAmount, 2), footprint: prevState.amortisationFootprint}  // amortisation
         ])
@@ -584,7 +582,7 @@ const updateSoldProductionFpt = async (indic,financialData,period) =>
   let productionFootprint = financialData.mainAggregates.production.periodsData[period.periodKey].footprint;
 
   financialData.productionAggregates.revenue.periodsData[period.periodKey].footprint.indicators[indic]
-    = await mergeIndicators(indic,[
+    = await buildAggregateIndicator(indic,[
       {amount: initialProductionStockAmount, footprint: initialProductionStockFootprint},
       {amount: roundValue(revenueAmount-initialProductionStockAmount,2), footprint: productionFootprint}
     ]);
