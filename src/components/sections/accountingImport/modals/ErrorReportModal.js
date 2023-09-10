@@ -1,8 +1,25 @@
+// La Société Nouvelle
+
+// React
 import React, { useState } from "react";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
+
+// Utils
 import { sendReportToSupport } from "/pages/api/mail-api";
 
-const ErrorReportModal = ({ hasError, onClose, errorMessage, errors }) => {
+/* ---------- ERROR REPORT MODAL  ---------- */
+
+/** Modal for FEC reading errors
+ * 
+ */
+
+export const ErrorReportModal = ({ 
+  hasError, 
+  onClose, 
+  errorMessage, 
+  errors 
+}) => {
+
   const [email, setEmail] = useState("");
   const [comment, setComment] = useState("");
   const [isSend, setIsSend] = useState(null);
@@ -84,5 +101,4 @@ const ErrorReportModal = ({ hasError, onClose, errorMessage, errors }) => {
       </Modal.Footer>
     </Modal>
   );
-};
-export default ErrorReportModal;
+}

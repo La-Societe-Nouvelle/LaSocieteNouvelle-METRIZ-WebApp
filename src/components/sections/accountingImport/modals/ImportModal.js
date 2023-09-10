@@ -1,7 +1,15 @@
+// La Société Nouvelle
+
+// React
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 
-const ImportModal = ({ show, onHide, title, children }) => {
+export const ImportModal = ({ 
+  show, 
+  onHide,
+  title, 
+  children 
+}) => {
   return (
     <Modal show={show} onHide={onHide} size='xl' centered>
       <Modal.Header closeButton>
@@ -10,7 +18,4 @@ const ImportModal = ({ show, onHide, title, children }) => {
       <Modal.Body>{children}</Modal.Body>
     </Modal>
   );
-};
-
-export default ImportModal;
-
+}

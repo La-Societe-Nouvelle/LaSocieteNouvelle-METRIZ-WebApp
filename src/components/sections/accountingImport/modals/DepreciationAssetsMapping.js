@@ -1,9 +1,7 @@
 // La Société Nouvelle
 
 // React
-import React, { useEffect, useState } from "react";
-
-// Bootstrap
+import React, { useState } from "react";
 import { Table } from "react-bootstrap";
 
 /* -------------------- AMORTISATION/DEPRECIATION-ASSET MAPPING -------------------- */
@@ -12,38 +10,33 @@ import { Table } from "react-bootstrap";
  *  
  *  Props :
  *    - meta -> fec metadata (accounts)
- *    - onClick()
- *    - return()
+ *    - onSubmit()
+ *    - onGoBack()
  * 
  *  Update meta.accounts to set for each amortisation/depreciation account the asset account
  */
 
-export function DepreciationAssetsMapping(props) 
-{
-  // JSON of accounts
-  const [accounts, setAccounts] = useState(props.meta.accounts);
+export const DepreciationAssetsMapping = ({
+  meta,
+  onSubmit,
+  onGoBack
+}) => {
 
   // accounts to map (list of account nums) -> amortisation & depreciation accounts
-  const accountsToMap = Object.keys(accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
+  const accountsToMap = Object.keys(meta.accounts).filter((accountNum) => /^28/.test(accountNum) || /^29/.test(accountNum) || /^39/.test(accountNum));
   // asset accounts (list of account nums) -> asset account (storage & immobilisation)
-  const assetAccounts = Object.keys(accounts).filter((accountNum) => /^2(0|1)/.test(accountNum) || /^3[0-8]/.test(accountNum));
-   
-  // disable if at least one account is not mapped i.e. enable if all accounts mapped
-  const [isDisabled, setIsDisabled] = useState(true);
+  const assetAccounts = Object.keys(meta.accounts).filter((accountNum) => /^2(0|1)/.test(accountNum) || /^3[0-8]/.test(accountNum));
+  
+  // JSON of accounts
+  const [accounts, setAccounts] = useState(meta.accounts);
 
-  // check if some accounts have assetAccountNum prop undefined
-  useEffect(() => {
-    if (accountsToMap.some((accountNum) => !accounts[accountNum].assetAccountNum)) {
-      setIsDisabled(true);
-    } else {
-      setIsDisabled(false);
-    }
-  }, [isDisabled]);
+  // ----------------------------------------------------------------------------------------------------
 
   // on change
   const handleOnchange = (accountToMapNum, nextAssetAccountNum) =>
   {
-    // amortisation account
+    // amortisation account -----------------------------
+
     if (accountToMapNum.charAt(1)=="8") 
     {
       // remove current association with amortisation account (in prev asset account data)
@@ -69,7 +62,8 @@ export function DepreciationAssetsMapping(props)
       accounts[accountToMapNum].assetAccountLib = accounts[nextAssetAccountNum].accountLib;
     }
 
-    // depreciation data
+    // depreciation account -----------------------------
+
     if (accountToMapNum.charAt(1)=="9") 
     {
       // remove current association with depreciation account (in prev asset account data)
@@ -95,23 +89,28 @@ export function DepreciationAssetsMapping(props)
       accounts[accountToMapNum].assetAccountLib = accounts[nextAssetAccountNum].accountLib;
     }
 
-    props.meta.accounts = accounts; // update props
-    setAccounts(accounts);
+    // --------------------------------------------------
 
-    // check if all accounts are mapped
-    if (accountsToMap.some((account) => !accounts[account].assetAccountNum)) {
-      setIsDisabled(true);
-    } else {
-      setIsDisabled(false);
-    }
+    setAccounts({...accounts});
   }
 
-  const onSubmit = () =>
+  // ----------------------------------------------------------------------------------------------------
+
+  const submit = () =>
   {
+    // update meta (props)
+    meta.accounts = accounts;
+
+    // console logs
     console.log("Associations des comptes d'amortissement et de dépréciation avec les comptes de stock et d'immobilisation : ");
     console.log(Object.values(accounts).filter(({accountNum}) => /^2(0|1)/.test(accountNum) || /^3[0-8]/.test(accountNum)));
-    props.onClick();
+
+    onSubmit();
   }
+
+  // ----------------------------------------------------------------------------------------------------
+
+  const isAssociationValid = accountsToMap.every((accountNum) => accounts[accountNum].assetAccountNum);
 
   return (
     <div>
@@ -145,7 +144,7 @@ export function DepreciationAssetsMapping(props)
                 <select className="form-select"
                         onChange={(e) => handleOnchange(accountToMapNum, e.target.value)}
                         value={accounts[accountToMapNum].assetAccountNum || ""}>
-                  <option value="">Sélectionner un compte...</option>
+                  <option value="" disabled hidden>Sélectionner un compte...</option>
                   {assetAccounts
                     .filter(([assetAccountNum, _]) =>
                       assetAccountNum[0] == accountToMapNum[0])
@@ -161,12 +160,12 @@ export function DepreciationAssetsMapping(props)
       </Table>
       <div className="text-end">
         <button className="btn btn-primary me-2" 
-                onClick={() => props.return()}>
+                onClick={() => onGoBack()}>
           <i className="bi bi-chevron-left"/> Retour 
         </button>
         <button className="btn btn-secondary"
-                onClick={onSubmit}
-                disabled={isDisabled}>
+                onClick={submit}
+                disabled={!isAssociationValid}>
           Suivant
           <i className="bi bi-chevron-right"/>
         </button>

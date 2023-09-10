@@ -235,7 +235,6 @@ export class FinancialData
 
     // Aggregates ------------------------------ //
 
-    this.productionAggregates = await bui
     this.mainAggregates = await buildMainAggregates(this, periods);
 
     // Initial states -------------------------- //

@@ -3,33 +3,40 @@
 // React
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
-
-// Bootstrap
 import { Button, Col, Form, FormGroup, Image, Row } from "react-bootstrap";
+
+// Styles
 import { customSelectStyles } from "/config/customStyles";
 
-// Lib
+// Librairies
 import divisions from "/lib/divisions";
+
+// Modals
+import { BalanceForwardBookSelection } from "../modals/BalanceForwardBookSelection";
+import { DepreciationAssetsMapping } from "../modals/DepreciationAssetsMapping";
+import { StockPurchasesMapping } from "../modals/StockPurchasesMapping";
+import { ErrorReportModal } from "../modals/ErrorReportModal";
+import { ImportModal } from "../modals/ImportModal";
+import { ErrorAPIModal } from "../../../modals/userInfoModals";
 
 // Readers
 import { FECDataReader } from "../utils/FECReader";
 
-import { ErrorAPIModal } from "../../../modals/userInfoModals";
+// Utils
 import { getDivisionsOptions } from "/src/utils/Utils";
-import { FinancialDataDropzone } from "./FinancialDataDropzone";
-import ImportModal from "../ImportModal";
-import { BalanceForwardBookSelection } from "./BalanceForwardBookSelection";
-import { DepreciationAssetsMapping } from "./DepreciationAssetsMapping";
-import { StockPurchasesMapping } from "./StockPurchasesMapping";
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "../utils";
-import ErrorReportModal from "../../../modals/ErrorReportModal";
+
+// Components
+import { FinancialDataDropzone } from "./FinancialDataDropzone";
 
 /* ---------- FEC IMPORT FORM ---------- */
 
 /** View to import financial data (accounting data file)
  *
  *  Props :
- *    - onClick()
+ *    - session
+ *    - selectedPeriod
+ *    - submit
  *
  *  Read accounting data file
  *  Get informations :
@@ -50,13 +57,13 @@ export const FinancialDataForm = ({
   const [siren, setSiren] = useState(session.legalUnit.siren);
   const [corporateName, setCorporateName] = useState(session.legalUnit.corporateName || "");
   const [division, setDivision] = useState(session.legalUnit.activityCode || "");
+  const [fileName, setFileName] = useState(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   // Accounting import
   const [FECData, setFECData] = useState(null);
   const [showViewsModals, setShowViewsModals] = useState(false);
   const [modal, setModal] = useState(0);
-  const [fileName, setFileName] = useState(null);
   
   // UI Modals
   const [hasErrorsFEC, setHasErrorsFEC] = useState(false);
@@ -64,6 +71,7 @@ export const FinancialDataForm = ({
   const [errorsFEC, setErrorsFEC] = useState([]);
   const [errorAPI, setErrorAPI] = useState(false);
 
+  // ----------------------------------------------------------------------------------------------------
   // update session -----------------------------------
 
   useEffect(async () => 
@@ -93,17 +101,7 @@ export const FinancialDataForm = ({
     session.comparativeData.activityCode = division;
   }, [division]);
 
-  // Check form ---------------------------------------
-
-  const isFormValid = () => {
-    return (
-      isDataLoaded &&
-      corporateName &&
-      division &&
-      (siren === "" || /^[0-9]{9}$/.test(siren))
-    );
-  };
-
+  // ----------------------------------------------------------------------------------------------------
   // Handlers -----------------------------------------
 
   // on change - siren
@@ -132,49 +130,7 @@ export const FinancialDataForm = ({
     setShowViewsModals(true);
   };
 
-  // Modals -------------------------------------------
-
-  const renderBalanceForwardBookModal = () => (
-    <ImportModal
-      show={modal === 1}
-      onHide={cancelImport}
-      title={fileName}
-    >
-      <BalanceForwardBookSelection
-        return={cancelImport}
-        FECData={FECData}
-        onClick={() => nextModal(1)}
-      />
-    </ImportModal>
-  );
-
-  const renderDepreciationAssetsModal = () => (
-    <ImportModal
-      show={modal === 2}
-      onHide={cancelImport}
-      title={fileName}
-    >
-      <DepreciationAssetsMapping
-        return={() => setModal(1)}
-        onClick={() => nextModal(2)}
-        meta={FECData.meta}
-      />
-    </ImportModal>
-  );
-
-  const renderStockPurchasesModal = () => (
-    <ImportModal
-      show={modal === 3}
-      onHide={cancelImport}
-      title={fileName}
-    >
-      <StockPurchasesMapping
-        return={() => setModal(2)}
-        onClick={() => loadAccountingData(FECData)}
-        meta={FECData.meta}
-      />
-    </ImportModal>
-  );
+  // ----------------------------------------------------------------------------------------------------
 
   const nextModal = () => 
   {
@@ -198,6 +154,7 @@ export const FinancialDataForm = ({
     setFileName(false);
   }
 
+  // ----------------------------------------------------------------------------------------------------
   // Load accounting data -----------------------------
 
   const loadAccountingData = async () => 
@@ -258,6 +215,18 @@ export const FinancialDataForm = ({
       setShowViewsModals(false);
       selectPeriod(financialPeriod);
     }
+  };
+
+  // ----------------------------------------------------------------------------------------------------
+
+  // Check form
+  const isFormValid = () => {
+    return (
+      isDataLoaded &&
+      corporateName &&
+      division &&
+      (siren === "" || /^[0-9]{9}$/.test(siren))
+    );
   };
 
   return (
@@ -342,7 +311,7 @@ export const FinancialDataForm = ({
               </div>
               <FinancialDataDropzone
                 setImportedData={handleFECData}
-                setFileRead={(name) => setFileName(name)}
+                setFileName={setFileName}
               />
               <p className="small fst-italic mb-0">*Champs obligatoires</p>
               <p className="small fst-italic">
@@ -368,9 +337,27 @@ export const FinancialDataForm = ({
             )}
             {showViewsModals && (
               <>
-                {renderBalanceForwardBookModal()}
-                {renderDepreciationAssetsModal()}
-                {renderStockPurchasesModal()}
+                <ImportModal show={modal === 1} onHide={cancelImport} title={fileName}>
+                  <BalanceForwardBookSelection
+                    FECData={FECData}
+                    onSubmit={() => nextModal(1)}
+                    onCancel={cancelImport}
+                  />
+                </ImportModal>
+                <ImportModal show={modal === 2} onHide={cancelImport} title={fileName}>
+                  <DepreciationAssetsMapping
+                    meta={FECData.meta}
+                    onSubmit={() => nextModal(2)}
+                    onGoBack={() => setModal(1)}
+                  />
+                </ImportModal>
+                <ImportModal show={modal === 3} onHide={cancelImport} title={fileName}>
+                  <StockPurchasesMapping
+                    meta={FECData.meta}
+                    onSubmit={() => loadAccountingData(FECData)}
+                    onGoBack={() => setModal(2)}
+                  />
+                </ImportModal>
               </>
             )}
 

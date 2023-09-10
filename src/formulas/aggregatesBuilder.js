@@ -2,9 +2,10 @@
 
 // Objects
 import { Aggregate } from "../accountingObjects/Aggregate";
+import { SocialFootprint } from "../footprintObjects/SocialFootprint";
 
 // Utils
-import { getAmountItems, getAmountItemsForPeriod } from "../utils/Utils";
+import { getAmountItems, getAmountItemsForPeriod, roundValue } from "../utils/Utils";
 import { buildAggregatePeriodFootprint } from "./footprintFormulas";
 
 /* ---------------------------------------------------------------------------------------------------- */

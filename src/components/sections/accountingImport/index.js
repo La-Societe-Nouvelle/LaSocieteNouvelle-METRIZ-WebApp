@@ -8,9 +8,9 @@ import { Container } from "react-bootstrap";
 import { FinancialDataForm } from "./views/FinancialDataForm";
 import { FinancialDataViews } from "./views/FinancialDataViews";
 
-/* ------------------------------------------------------------------ */
-/* -------------------- ACCOUTING IMPORT SECTION -------------------- */
-/* ------------------------------------------------------------------ */
+/* ------------------------------------------------------------------------------------------------------------------------------ */
+/* -------------------------------------------------- ACCOUTING IMPORT SECTION -------------------------------------------------- */
+/* ------------------------------------------------------------------------------------------------------------------------------ */
 
 /** Views :
  *    0 -> Financial data form (with dropzone)
@@ -45,10 +45,8 @@ export const AccountingImportSection = ({
           <FinancialDataViews
             session={session}
             period={period}
-            selectPeriod={selectPeriod}
-            return={() => setView(0)}
-            reset={() => setView(0)}
-            submit={submit}
+            onSubmit={submit}
+            onGoBack={() => setView(0)}
           />
         )}
       </section>
