@@ -182,7 +182,7 @@ export const  ExpensesTable = ({
                       {printValue(
                         periodsData[period.periodKey].footprint.indicators[
                           indic
-                        ].getValueAbsolute(
+                        ].getGrossImpact(
                           periodsData[period.periodKey].amount
                         ),
                         nbDecimals
@@ -214,7 +214,7 @@ export const  ExpensesTable = ({
                           {printValue(
                             periodsData[
                               prevPeriod.periodKey
-                            ].footprint.indicators[indic].getValueAbsolute(
+                            ].footprint.indicators[indic].getGrossImpact(
                               periodsData[prevPeriod.periodKey].amount
                             ),
                             nbDecimals

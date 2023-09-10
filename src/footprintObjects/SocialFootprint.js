@@ -1,40 +1,57 @@
-import { isValidNumber } from '../utils/Utils';
+// La Société Nouvelle
+
+// Objects
 import {Indicator} from './Indicator';
 
-const indics = ["eco","art","soc","knw","idr","geq","ghg","mat","was","nrg","wat","haz"];
+// Librairies
+import metaIndics from "/lib/indics";
+
+// ################################################## FOOTPRINT OBJECT ##################################################
 
 export class SocialFootprint {
 
-  constructor(props) 
+  constructor({
+    indicators
+  }) 
   {
-    if (props==undefined) props = {indicators: {}};
-  // ---------------------------------------------------------------------------------------------------- //
+    // ---------------------------------------------------------------------------------------------------- //
+
     // indicators
     this.indicators = {};
-    indics.forEach(indic => this.indicators[indic] = new Indicator({indic,...props.indicators[indic]}));
-  // ---------------------------------------------------------------------------------------------------- //
+    Object.entries(metaIndics)
+      .filter(([_,metaIndic]) => metaIndic.isAvailable)
+      .forEach(([indic]) => this.indicators[indic] = new Indicator({
+        indic,
+        ...indicators?.[indic]
+      }));
+  
+    // ---------------------------------------------------------------------------------------------------- //
   }
 
   /* --------- Getters ---------- */
 
-  getIndicator(indic) {return this.indicators[indic]}
+  getIndicator = (indic) => this.indicators[indic]
 
-  /* ---------- Updaters ---------- */
+  // Indicator getters
+  getValue = (indic) => this.indicators[indic].getValue();
+  getUncertainty = (indic) => this.indicators[indic].getUncertainty();
+  getGrossImpact = (indic,amount) => this.indicators[indic].getGrossImpact(amount);
+
+  /* ---------- Update from API ---------- */
   
   // All indicators
-  updateAll(data) 
+  updateALl(data) 
   {
-    indics.map((indic) => {this.updateIndic(indic,data[indic.toUpperCase()])})
-  }
-  
-  // Specific indicator
-  updateIndic(indic, data) 
-  {
- 
-    this.indicators[indic].update(data);
+    Object.entries(metaIndics)
+      .filter(([_,metaIndic]) => metaIndic.isAvailable)
+      .forEach(([indic,_]) => 
+      {
+        let indicData = data[indic.toUpperCase()];
+        this.indicators[indic].update(indicData);
+      });
   }
 
-  isComplete = () => Object.entries(this.indicators).filter(([_,indicator]) => !indicator.value).length == 0;
+  /* ---------- Check ---------- */
 
   isValid = () => {
     return Object.values(this.indicators).every((indicator) => indicator.isValid());

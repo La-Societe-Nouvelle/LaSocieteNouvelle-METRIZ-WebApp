@@ -1,124 +1,159 @@
-import { isValidNumber } from "../utils/Utils";
+// La Société Nouvelle
+
+// Utils
+import { isValidNumber, roundValue } from "../utils/Utils";
+
+// Librairies
+import metaIndics from "/lib/indics";
+
+// ################################################## INDICATOR OBJECT ##################################################
 
 export class Indicator {
 
-  constructor(props) 
+  constructor({
+    indic,
+    value,
+    uncertainty,
+    flag,
+    source,
+    info,
+    year,
+    lastupdate,
+  }) 
   {
-    if (props==undefined) props = {};
-
     // ---------------------------------------------------------------------------------------------------- //
-    
-    this.indic = props.indic;
-    this.value = props.value || null;
-    this.flag = props.flag || null;
-    this.uncertainty = props.uncertainty || null; // A check 
-    this.source = props.source || null; // A check
-    this.info = props.info || null;// A check 
-    this.lastupdate = props.lastupdate || null;
-    this.currency =  props.currency || null;
-    this.libelleFlag = props.libelleFlag || null;
-  // ---------------------------------------------------------------------------------------------------- //
-  }
 
-  updateFromBackUp(backUp) 
-  {
-    this.value = backUp.value;
-    this.flag = backUp.flag;
-    this.uncertainty = backUp.uncertainty;
-    this.libelleFlag = backUp.libelleFlag;
-    this.info = backUp.info;
+    this.indic = indic;
+
+    this.value = value              ?? null;
+    this.uncertainty = uncertainty  ?? null;
+
+    this.flag = flag                ?? null;
+    this.source = source            ?? null;
+    this.info = info                ?? null;
+    this.year = year                ?? null;
+
+    this.lastupdate = lastupdate    ?? null;
+
+  // ---------------------------------------------------------------------------------------------------- //
   }
 
   /* ---------- Getters ---------- */
     
-  getIndic = () => this.indic
-  getValue = () => this.value  
-  getFlag = () => this.flag
-  getInfo = () => this.info
-  getSource = () => this.source
-  
-  getUncertainty() {
-    if (this.getValue()!=null) {return this.uncertainty}
-    else                       {return null}
+  getValue = () => {
+    return this.value;
+  }
+  getUncertainty = () => {
+    if (isValidNumber(this.value)) {
+      return this.uncertainty
+    } else {
+      return null
+    }
   }
 
-  getLibelleFlag() {return this.libelleFlag}
+  // Derivated values
 
-  // Values
-
+  // gross impact
   getGrossImpact = (amount) =>
   {
-    if (amount!=null && this.value!=null) 
+    if (isValidNumber(amount) && isValidNumber(this.value)) 
     { 
-        if      (["ghg","haz","mat","nrg","was","wat"].includes(this.indic))  { return amount*this.value/1000; }
-        else if (["art","eco","knw","soc"].includes(this.indic))              { return amount*this.value/100; }
-        else                                                                  { return null; }
+      const { type, nbDecimals } = metaIndics[this.indic];
+      switch (type) {
+        case "intensité" :  return roundValue(amount*this.value/1000, nbDecimals);
+        case "proportion":  return roundValue(amount*this.value/100, nbDecimals);
+        case "indice"    :  return null;
+        default          :  return null;
+      }
+    } else {
+      return null
     }
-    else {return null}
   }
 
-  getValueAbsolute(amount) {
-    if (amount!=null && this.getValue()!=null) 
-    { 
-        if      (["ghg","haz","mat","nrg","was","wat"].includes(this.indic))  { return amount*this.getValue()/1000; }
-        else if (["art","eco","knw","soc"].includes(this.indic))              { return amount*this.getValue()/100; }
-        else                                                                  { return null; }
+  // value max
+  getValueMax = () => 
+  {
+    if (isValidNumber(this.value) && isValidNumber(this.uncertainty,0)) 
+    {
+      const { type, nbDecimals } = metaIndics[this.indic];
+
+      let coef = 1.0 + this.uncertainty/100;
+      let valueMax = roundValue(this.value*coef, nbDecimals);
+
+      if (type=="proportion") { // majoration
+        return Math.sign(valueMax) * Math.min(Math.abs(valueMax), 100.0);
+      } else {
+        return valueMax;
+      }
+    } 
+    else {
+      return null;
     }
-    else {return null}
-  }
-  getValueMax() {
-    if (this.value!=null & this.getUncertainty()!=null) {
-        let coef = 1.0 + this.getUncertainty()/100;
-        if (["art","eco","geq","knw","soc"].includes(this.indic)) {
-            return Math.min(this.value*coef,100.0);
-        } else {
-            return this.value*coef;
-        }
-    } else {return null}
-  }
-  getValueMin() {
-    if (this.value!=null & this.getUncertainty()!=null) {
-        let coef = Math.max(1.0 - this.getUncertainty()/100, 0.0);
-        return this.value*coef;
-    } else  {return null}
   }
 
-  /* ---------- Update from API & Setters ---------- */
+  getValueMin = () => 
+  {
+    if (isValidNumber(this.value) && isValidNumber(this.uncertainty,0)) 
+    {
+      const { nbDecimals } = metaIndics[this.indic];
+
+      let coef = Math.max(1.0 - this.uncertainty/100, 0.0);
+      let valueMin = roundValue(this.value*coef, nbDecimals);
+
+      return valueMin;
+    } 
+    else {
+      return null;
+    }
+  }
+
+  /* ---------- Update from API ---------- */
     
-  update(data) {
+  // data from API response (method called in SocialFootprint.js)
+  update(data) 
+  {
     this.value = data.value;
-    this.flag = data.flag || 'd';
     this.uncertainty = data.uncertainty;
+    this.flag = data.flag;
     this.info = data.info;
     this.source = data.source;
+    this.year = data.year;
     this.lastupdate = data.lastupdate;
-    // Complements
-    this.libelleFlag = data.libelleFlag || null;
   }
+
+  /* ---------- Setters ---------- */
         
-  setValue(value) 
+  setValue(nextValue) 
   {
-    this.value = value;
-    if (value!=null) 
+    if (isValidNumber(nextValue)) 
     {
-        this.flag = "m";
-        this.libelleFlag = "Valeur modifiée";
+      this.value = nextValue;
+      this.flag = "m"; // valeur modifiée
     } 
     else 
     {
-        this.flag = "i";
-        this.libelleFlag = "Valeur invalide";
-        this.uncertainty = null;
+      this.value = null;
+      this.flag = "i"; // valeur invalide
+      this.uncertainty = null;
     }
   }
 
-  setUncertainty(value) 
+  setUncertainty(nextUncertainty) 
   {
-    this.uncertainty = value;
+    if (isValidNumber(nextUncertainty)) {
+      this.uncertainty = nextUncertainty;
+    } else {
+      this.uncertainty = null;
+    }
   }
 
-  isValid = () => {
-    return isValidNumber(this.value) && isValidNumber(this.uncertainty);
+  /* ---------- Check ---------- */
+
+  // -> doesn't check max & min limits
+  isValid = () => 
+  {
+    return isValidNumber(this.value) 
+        && isValidNumber(this.uncertainty,0);
   }
 
 }
