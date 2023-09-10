@@ -7,10 +7,7 @@
 import { Immobilisation } from "../accountingObjects/Immobilisation";
 import { SocialFootprint } from "../footprintObjects/SocialFootprint";
 import { getAmountItems, getPrevDate } from "../utils/Utils";
-
-import {
-  buildRegexFinancialPeriod
-} from "/src/Session";
+import { buildRegexFinancialPeriod } from "../utils/periodsUtils";
 
 export const otherFinancialDataItems = [
   "otherOperatingIncomes",  // #74, #75, #781, #791

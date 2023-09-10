@@ -1,6 +1,4 @@
-import {
-    buildRegexFinancialPeriod
-  } from "/src/Session";
+import { buildRegexFinancialPeriod } from "../../../utils/periodsUtils";
 
 export const getFinancialPeriodFECData = (FECData) =>
 {

@@ -1,15 +1,5 @@
 // La Société Nouvelle
-import metaIndics from "/lib/indics.json";
 
-import { buildAggregateIndicator } from "../formulas/footprintFormulas";
-
-import { getAmountItems } from "../utils/Utils";
-
-import { Expense } from "/src/accountingObjects/Expense";
-import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
-
-import { updater_2_0_0 } from "./updater_2_0_0";
-import { fetchComparativeData } from "../services/MacrodataService";
 import { ComparativeData } from "../ComparativeData";
 
 import { updater_1_0_1 } from "./updater_1_0_1";
@@ -17,6 +7,7 @@ import { updater_1_0_0 } from "./updater_1_0_0";
 import { updater_1_0_2 } from "./updater_1_0_2";
 import { updater_1_0_4 } from "./updater_1_0_4";
 import { updater_1_0_5 } from "./updater_1_0_5";
+import { updater_2_0_0 } from "./updater_2_0_0";
 
 
 /* ----------------------------------------------------------------- */

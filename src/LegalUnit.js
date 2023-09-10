@@ -1,9 +1,10 @@
-// API url
+// La Société Nouvelle
 
+// API url
 import api from "/config/api";
 
+// ################################################## LEGAL UNIT OBJECT ##################################################
 
-/* ---------- LEGAL UNIT DATA ---------- */
 export class LegalUnit {
 
   constructor(props) 

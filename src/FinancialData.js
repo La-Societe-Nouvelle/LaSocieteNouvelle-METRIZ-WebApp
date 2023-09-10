@@ -6,20 +6,17 @@ import { Immobilisation } from "/src/accountingObjects/Immobilisation";
 import { Stock } from "/src/accountingObjects/Stock";
 import { Account } from "./accountingObjects/Account";
 import { Aggregate } from "./accountingObjects/Aggregate";
-
-// Other objects
-import { SocialFootprint } from "/src/footprintObjects/SocialFootprint";
-
-// Utils
-import { getAmountItems, mergePeriodsData, roundValue } from "./utils/Utils";
-
-// Libraries
-import accountsMatching from "/lib/accountsMatching";
+import { Provider } from "./Provider";
 import { StockVariation } from "./accountingObjects/StockVariation";
 import { AmortisationExpense } from "./accountingObjects/AmortisationExpense";
 import { ImmobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
-import { Provider } from "./Provider";
+
+// Utils
+import { getAmountItems } from "./utils/Utils";
 import { buildMainAggregates, buildProductionAggregates, mergeAggregatesPeriodsData } from "./formulas/aggregatesBuilder";
+
+// Libraries
+import accountsMatching from "/lib/accountsMatching";
 
 export const otherFinancialDataItems = [
   "otherOperatingIncomes",  // #74, #75, #781, #791
@@ -34,24 +31,11 @@ export const otherFinancialDataItems = [
   "taxOnProfits",           // #69
 ];
 
-const metaProductionAggregates = {
-  "revenue":                  {   label: "Production vendue"},      // #70
-  "storedProduction":         {   label: "Production stockée"},     // #71
-  "immobilisedProduction":    {   label: "Production immobilisée"}  // #72
-}
-
-const metaMainAggregates = {
-  "production":               {   label: "Production"},
-  "intermediateConsumptions": {   label: "Consommations intermédiaires"},
-  "fixedCapitalConsumptions": {   label: "Consomamtions de capital fixe"},
-  "netValueAdded":            {   label: "Valeur ajoutée nette"},
-}
+// ################################################## FINANCIAL DATA OBJECT ##################################################
 
 /**
  * 
  */
-
-/* ---------- OBJECT FINANCIAL DATA ---------- */
 
 export class FinancialData 
 {
@@ -257,7 +241,6 @@ export class FinancialData
   };
 
   /* ---------------------------------------- EXPENSE ACCOUNTS BUILDER ---------------------------------------- */
-
 
   buildExpensesAccounts = async (periods) => {
     // external expenses
@@ -560,6 +543,7 @@ export class FinancialData
   getProvider = (providerNum) =>
     this.providers.filter((provider) => provider.providerNum == providerNum)[0];
 }
+
 /* ---------------------------------------- UTILS  ---------------------------------------- */
 
 export const mergePeriodsAccounts = (
@@ -591,7 +575,7 @@ export const mergePeriodsAccounts = (
     }
   });
   return mergedExpensesAccounts;
-};
+}
 
 export const mergeAccounts = (current, previous) => {
   // Create a new object to hold the merged metadata, starting with the previous metadata.
@@ -609,4 +593,4 @@ export const mergeAccounts = (current, previous) => {
   }
 
   return mergedAccounts;
-};
+}

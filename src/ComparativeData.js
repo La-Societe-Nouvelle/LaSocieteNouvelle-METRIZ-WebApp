@@ -1,8 +1,9 @@
 // La Société Nouvelle
 
+// API
 import api from "/config/api";
 
-// COMPARATIVE DATA
+// ################################################## COMPARATIVE DATA OBJECT ##################################################
 
 /** Structure :
  *  ----------------------------------------------------------------------------------------------------
@@ -107,7 +108,6 @@ export class ComparativeData {
     } catch (error) {
       throw Error(error.message);
     }
-   
   };
 
   fetchMacrodata = async (endpoint, params) => {
@@ -186,4 +186,4 @@ const getAvailableParams = (params, metadata) => {
     filteredAggregates
   };
 
-};
+}

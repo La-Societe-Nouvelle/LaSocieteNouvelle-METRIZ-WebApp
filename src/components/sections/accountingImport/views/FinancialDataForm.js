@@ -189,7 +189,6 @@ export const FinancialDataForm = ({
       
       // add periods
       session.addPeriods(periods);
-      //selectPeriod(financialPeriod); // set selected period in App
 
       // load financial data
       await session.financialData.loadFECData(

@@ -54,9 +54,12 @@ const DirectImpacts = ({
     let emptyStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status=="incomplete")
       .map(([indic,_]) => indic);
-    //
+    
+    // update session
     session.validations[period.periodKey] = selectedStatements;
-    //
+    session.updateFootprints(period);
+
+    // update state
     setSelectedStatements(selectedStatements);
     setInvalidStatements(invalidStatements);
     setEmptyStatements(emptyStatements);
@@ -82,7 +85,6 @@ const DirectImpacts = ({
       ...prevStatementsStatus,
       [indic]: status
     })});
-    session.initNetValueAddedFootprint(period);
   };
 
   const categories = [
@@ -118,13 +120,7 @@ const DirectImpacts = ({
               )}
           </div>
         )}
-
-        {/* <StatementForms
-          session={session}
-          period={period}
-          initialSelectedIndicators={validations}
-          updateValidations={handleValidations}
-        /> */}
+      
         {isLoading && <Loader title={"Chargement en cours..."} />}
 
         {invalidStatements.length > 0 && (

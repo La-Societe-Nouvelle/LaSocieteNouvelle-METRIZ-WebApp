@@ -182,3 +182,21 @@ export const sortChronologicallyDates = (dateA, dateB) => {
 export const sortUnchronologicallyDates = (dateA, dateB) => {
   return parseInt(dateB) - parseInt(dateA);
 };
+
+export const buildRegexFinancialPeriod = (dateStart, dateEnd) => {
+  let datesEndMonths = getDatesEndMonths(dateStart, dateEnd);
+  let months = datesEndMonths.map((date) => date.substring(0, 6));
+
+  let datesLastMonth = [];
+  if (dateEnd != getLastDateOfMonth(dateEnd)) {
+    let lastMonth = dateEnd.substring(0, 6);
+    let prevDate = dateEnd;
+    while (prevDate.startsWith(lastMonth)) {
+      datesLastMonth.push(prevDate);
+      prevDate = getPrevDate(prevDate);
+    }
+  }
+
+  let regexString = "^(" + months.concat(datesLastMonth).join("|") + ")";
+  return new RegExp(regexString);
+}

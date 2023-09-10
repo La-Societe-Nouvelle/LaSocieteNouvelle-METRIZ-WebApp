@@ -1,8 +1,8 @@
 // La Société Nouvelle
 
 // Updater for version 3.0.0
-export const updater_3_0_0 = async (sessionData) => {
-  
+export const updater_3_0_0 = async (sessionData) => 
+{  
   // ----------------------------------------------------------------------------------------------------
   // Changes in impacts data
 

@@ -1,9 +1,16 @@
 // La Société Nouvelle
 
-import { getDefaultFootprintId } from "/src/components/sections/providers/identifiedProviders/utils";
+// API
 import api from "/config/api";
-import { getAmountItems } from "./utils/Utils";
+
+// Objects
 import { SocialFootprint } from "/src/footprintObjects/SocialFootprint.js";
+
+// Utils
+import { getDefaultFootprintId } from "/src/components/sections/providers/identifiedProviders/utils";
+import { getAmountItems } from "./utils/Utils";
+
+// ################################################## PROVIDER OBJECT ##################################################
 
 /** Provider - object
  *  -> use to manage data about providers
