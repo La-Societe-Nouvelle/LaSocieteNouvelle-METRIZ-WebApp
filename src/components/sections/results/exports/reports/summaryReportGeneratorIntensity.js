@@ -17,7 +17,7 @@ import {
 } from "../exportsUtils";
 
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 // --------------------------------------------------------------------------
 //  Report for Intensity Indicator

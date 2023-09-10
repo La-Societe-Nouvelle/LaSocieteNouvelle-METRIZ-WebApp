@@ -17,7 +17,7 @@ import {
   getStatementPDF,
 } from "/src/writers/StatementPDFBuilder";
 
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 // Libraries
 import metaIndics from "/lib/indics";

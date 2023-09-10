@@ -1,7 +1,8 @@
 // La Société Nouvelle
 
 import { getClosestYearData } from "../../../src/components/sections/results/utils";
-import { compareToReference, printValue } from "../../utils/Utils";
+import { compareToReference } from "../../utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 export const analysisTextWriterGHG = (props) => {
   const { impactsData, comparativeData, financialData, period } = props;

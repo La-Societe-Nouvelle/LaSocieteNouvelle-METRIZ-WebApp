@@ -1,6 +1,6 @@
 // La Société Nouvelle
 import { getClosestYearData } from "../../../src/components/sections/results/utils";
-import { printValue } from "../../utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 export const analysisTextWriterECO = (props) => {
   const { impactsData, comparativeData, financialData, period } = props;

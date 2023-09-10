@@ -1,6 +1,6 @@
 // La Société Nouvelle
 
-import { printValue } from "../../utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 export const analysisTextWriterIDR = (props) => {
   const { impactsData, financialData, period } = props;

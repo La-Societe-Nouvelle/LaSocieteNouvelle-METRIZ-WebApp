@@ -17,7 +17,7 @@ import {
   sortProvidersByImpact,
   targetAnnualReduction,
 } from "../exportsUtils";
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 // --------------------------------------------------------------------------
 //  Report for Index Indicator

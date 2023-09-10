@@ -5,7 +5,8 @@ import React from "react";
 import { Table } from "react-bootstrap";
 
 // Utils
-import { getAmountItems, getSumItems, printValue } from "/src/utils/Utils";
+import { getAmountItems, getSumItems } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { getPrevDate } from "/src/utils/periodsUtils";
 
 /* ---------- IMMOBILISATIONS TABLE ---------- */

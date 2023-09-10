@@ -5,7 +5,8 @@ import React, { useEffect, useState } from "react";
 import { Table } from "react-bootstrap";
 
 // Utils
-import { getNewId, printValue } from "/src/utils/Utils";
+import { getNewId } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { 
   checkGhgItem,
   getTotalByAssessmentItem,

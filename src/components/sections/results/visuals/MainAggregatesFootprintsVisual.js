@@ -3,7 +3,7 @@
 import React from "react";
 import { Col, Row } from "react-bootstrap";
 import SigPieChart from "../charts/SigPieChart";
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 // Lib
 import metaIndics from "/lib/indics";

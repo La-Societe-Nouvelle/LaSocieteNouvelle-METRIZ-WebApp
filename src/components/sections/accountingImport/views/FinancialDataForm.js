@@ -23,7 +23,7 @@ import { ErrorAPIModal } from "../../../modals/userInfoModals";
 import { FECDataReader } from "../utils/FECReader";
 
 // Utils
-import { getDivisionsOptions } from "/src/utils/Utils";
+import { getDivisionsOptions } from "/src/utils/metaUtils";
 import { getFinancialPeriodFECData, getMonthPeriodsFECData } from "../utils";
 
 // Components

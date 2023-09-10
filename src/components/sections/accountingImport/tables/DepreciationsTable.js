@@ -8,8 +8,9 @@ import { Table } from "react-bootstrap";
 import {
   getAmountItems,
   getPrevAmountItems,
-  printValue,
 } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
+
 
 /* ---------- DEPRECIATIONS TABLE ---------- */
 

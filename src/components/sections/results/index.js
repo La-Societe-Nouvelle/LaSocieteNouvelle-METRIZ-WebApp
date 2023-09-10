@@ -25,7 +25,7 @@ import { ChartsContainer } from "./components/ChartsContainer";
 import { Loader } from "../../modals/Loader";
 
 // Utils
-import { getDivisionsOptions } from "/src/utils/Utils";
+import { getDivisionsOptions } from "/src/utils/metaUtils";
 
 import { buildSummaryReportContributionIndic } from "./exports/reports/summaryReportGeneratorContribution";
 import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryReportGeneratorIntensity";

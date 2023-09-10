@@ -8,7 +8,8 @@ import Select from "react-select";
 import { customSelectStyles } from "/config/customStyles";
 
 // Utils
-import { getBranchesOptions, printValue } from "/src/utils/Utils";
+import { getBranchesOptions } from "/src/utils/metaUtils";
+import { printValue } from "/src/utils/formatters";
 import { getPrevDate } from "/src/utils/periodsUtils";
 
 // Libraries

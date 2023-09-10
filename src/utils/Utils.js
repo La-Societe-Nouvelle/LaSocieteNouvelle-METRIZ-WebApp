@@ -20,85 +20,7 @@
     link.click();
   };
   
-/* -------------------------- Options -------------------------- */
-import divisions from "/lib/divisions";
-import areas from "/lib/areas";
-import branches from "/lib/branches";
 import { getMoreRecentYearlyPeriod } from "./periodsUtils";
-
-export const getBranchesOptions = () => {
-  return Object.entries(branches)
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([value, label]) => {
-      return { value: value, label: value + " - " + label };
-    });
-};
-
-export const getDivisionsOptions = () => {
-  return Object.entries(divisions)
-    .sort((a, b) => parseInt(a) - parseInt(b))
-    .map(([value, label]) => {
-      return { value: value, label: value + ' - ' + label };
-    });
-};
-
-// utils.js
-export const getAreasOptions = () => {
-  return Object.entries(areas)
-    .map(([value, label]) => {
-      return { value: value, label:  label };
-    });
-};
-
-
-/* -------------------------- PRINT FUNCTIONS -------------------------- */
-// to format values
-
-/** PRINT VALUE (simple)
- *    value null or undefined -> " - "
- *    round value with precision set
- *    negative value in parenthesis
- *    spaces between 3-digits group
- */
-
-export function printValue(value, precision) {
-  // value null/undefined/empty
-  if (value === null || value === undefined || value === "") {
-    return " - ";
-  } else {
-    if (!precision) precision = 0;
-    let roundedValue = roundValue(value, precision).toFixed(precision);
-
-    if (roundedValue < 0) {
-      return (
-        "(" +
-        (-roundedValue).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") +
-        ")"
-      );
-    } else {
-      return roundedValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    }
-  }
-}
-
-/** PRINT VALUE INPUT (used for input number)
- *    value null or empty -> empty string
- *    round value with precision set
- *    negative value in parenthesis
- *    spaces between 3-digits group
- */
-
-export function printValueInput(value, precision) {
-  if ((value == null) | (value === "")) {
-    return "";
-  } else {
-    if (!precision) precision = 0;
-    let formattedValue = roundValue(value, precision)
-      .toString()
-      .replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    return formattedValue;
-  }
-}
 
 /* -------------------------- OPERATIONS FUNCTIONS -------------------------- */
 // operations on list
@@ -160,9 +82,10 @@ export function valueOrDefault(value, defaultValue) {
   }
 }
 
-/* -------------------------- ROUNDING FUNCTION -------------------------- */
+/* -------------------------- CHECK INPUT -------------------------- */
 // correct value
 
+// input is a number
 export const isValidInputNumber = (input,nbDecimals) => 
 {
   const regexPattern = 
@@ -173,6 +96,7 @@ export const isValidInputNumber = (input,nbDecimals) =>
   return regex.test(input);
 }
 
+// value is a number
 export const isValidNumber = (value,min,max) => 
 {
   // is a number
@@ -204,6 +128,7 @@ export const isValidNumber = (value,min,max) =>
   }
 }
 
+// value is a number or unset (null or empty string)
 export const isValidInput = (value,min,max) => 
 {
   return value===null || value==="" || isValidNumber(value,min,max);
@@ -263,34 +188,6 @@ export function mergePeriodsData(current, previous) {
   const periodsData = { ...previous.periodsData, ...current.periodsData };
   return { ...current, periodsData };
 }
-
-export function getEvolution(value, target) {
-  if (target) {
-    const evolution = ((target - value) / value) * 100;
-    return evolution.toFixed(0);
-  } else {
-    return "-";
-  }
-}
-
-
-export const getExpensesGroupByAccount = (expenses) => {
-  const expensesByAccount = {};
-  expenses.forEach(({ accountNum, accountLib, amount }) => {
-    if (!expensesByAccount[accountNum]) {
-      expensesByAccount[accountNum] = { accountNum, amount, accountLib };
-    } else {
-      expensesByAccount[accountNum].amount += amount;
-    }
-  });
-  return Object.entries(expensesByAccount).map(
-    ([accountNum, { amount, accountLib }]) => ({
-      accountNum,
-      amount,
-      accountLib,
-    })
-  );
-};
 
 /* -------------------------- ARRAY -------------------------- */
 

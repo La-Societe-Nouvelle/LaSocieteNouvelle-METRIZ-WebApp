@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
 // Modules
-import { printValue } from "../utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 // Libraries
 import metaIndics from "/lib/indics";

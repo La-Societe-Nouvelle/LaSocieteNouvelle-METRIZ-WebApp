@@ -1,5 +1,4 @@
-import { printValue } from "/src/utils/Utils";
-
+import { printValue } from "/src/utils/formatters";
 
 export function sortAccountsByFootprint(accounts, period, indicator, order) {
 

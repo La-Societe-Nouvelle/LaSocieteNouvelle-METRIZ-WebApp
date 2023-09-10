@@ -8,7 +8,7 @@ import { Table } from "react-bootstrap";
 import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
-import { printValue, printValueInput } from "/src/utils/Utils";
+import { printValue, printValueInput } from "/src/utils/formatters";
 import { getKnwContribution, getKnwContributionRate } from "./utils";
 import { isValidInput } from "../../../../../utils/Utils";
 

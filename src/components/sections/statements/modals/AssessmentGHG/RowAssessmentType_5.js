@@ -8,8 +8,9 @@ import { Col, Row } from "react-bootstrap"
 import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
-import { isValidInput, printValue } from "/src/utils/Utils"
-import { getGhgEmissions, getGhgEmissionsUncertainty } from "./utils"
+import { isValidInput } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
+import { getGhgEmissions, getGhgEmissionsUncertainty } from "./utils";
 
 // Lib
 import landChanges from "/lib/emissionFactors/landChanges";

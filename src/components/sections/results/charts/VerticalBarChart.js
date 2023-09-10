@@ -9,7 +9,7 @@ import { Bar } from "react-chartjs-2";
 import metaIndics from "/lib/indics";
 
 // utils
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { changeOpacity, getSuggestedMax } from "./chartsUtils";
 
 

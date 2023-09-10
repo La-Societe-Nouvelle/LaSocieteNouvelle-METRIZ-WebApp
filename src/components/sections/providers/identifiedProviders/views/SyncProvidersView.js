@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, Table } from "react-bootstrap";
 
 // Utils
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { getIdentifiedProviderStatus, getIdentifiedProviderStatusIcon } from "../utils";
 
 // Modal

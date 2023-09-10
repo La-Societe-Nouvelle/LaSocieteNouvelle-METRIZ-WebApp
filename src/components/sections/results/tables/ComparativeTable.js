@@ -8,7 +8,7 @@ import { Col, Row, Table } from "react-bootstrap";
 import metaIndics from "/lib/indics";
 
 // Utils
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 const aggregates = [
   "production",

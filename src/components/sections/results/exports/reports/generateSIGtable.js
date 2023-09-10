@@ -1,4 +1,4 @@
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import metaIndics from "/lib/indics.json";
 
 export const generateSIGtable = (

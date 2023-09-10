@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {  Table } from "react-bootstrap";
 
 // Utils
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { 
   buildFixedCapitalConsumptionsAggregates, 
   buildIntermediateConsumptionsAggregates 

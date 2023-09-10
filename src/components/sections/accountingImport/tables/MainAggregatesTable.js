@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '/src/formulas/aggregatesBuilder';
-import { printValue } from '/src/utils/Utils';
+import { printValue } from "/src/utils/formatters";
 
 /* ---------- INCOME STATEMENT TABLE ---------- */
 

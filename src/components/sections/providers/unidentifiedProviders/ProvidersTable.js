@@ -6,9 +6,9 @@ import Select from "react-select";
 // Utils
 import {
   getAreasOptions,
-  getDivisionsOptions,
-  printValue,
-} from "/src/utils/Utils";
+  getDivisionsOptions
+} from "/src/utils/metaUtils";
+import { printValue } from "/src/utils/formatters";
 import { getUnidentifiedProviderStatusIcon } from "../identifiedProviders/utils";
 
 // Select Style

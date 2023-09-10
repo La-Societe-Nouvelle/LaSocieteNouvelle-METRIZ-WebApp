@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 // Utils
-import { getBranchesOptions, printValue } from "../../../../utils/Utils";
-import { getPrevDate } from "../../../../utils/periodsUtils";
+import { getBranchesOptions } from "/src/utils/metaUtils";
+import { printValue } from "/src/utils/formatters";
+import { getPrevDate } from "/src/utils/periodsUtils";
 
 // Styles
 import { customSelectStyles } from "/config/customStyles";

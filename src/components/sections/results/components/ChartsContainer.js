@@ -13,7 +13,7 @@ import TrendChart from "../charts/TrendChart";
 import SigPieChart from "../charts/SigPieChart";
 import DeviationChart from "../charts/HorizontalBarChart";
 
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { GrossImpactChart } from "../charts/GrossImpactChart";
 import { getClosestYearData } from "../utils";
 

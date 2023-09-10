@@ -9,7 +9,7 @@ import metaDivisions from "/lib/divisions";
 import metaIndics from "/lib/indics";
 
 // Utils
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { getShortCurrentDateString } from "/src/utils/periodsUtils";
 import {
   cutString,

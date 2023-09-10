@@ -1,6 +1,7 @@
 // La Société Nouvelle
 // Utils
-import { getAmountItems, getAmountItemsForPeriod, getSumItems, printValue, roundValue } from '/src/utils/Utils';
+import { getAmountItems, getAmountItemsForPeriod } from '/src/utils/Utils';
+import { printValue } from "/src/utils/formatters";
 import { Table } from "react-bootstrap";
 
 /* ---------- INCOME STATEMENT TABLE ---------- */

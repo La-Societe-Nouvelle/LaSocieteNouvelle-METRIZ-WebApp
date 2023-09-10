@@ -8,7 +8,8 @@ import { Col, Row } from "react-bootstrap";
 import { InputNumber } from "/src/components/input/InputNumber";
 
 // Utils
-import { isValidNumber, printValue } from "/src/utils/Utils"
+import { isValidNumber } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 import { getNrgConsumption, getNrgConsumptionUncertainty } from "./utils";
 import { getGhgEmissions, getGhgEmissionsUncertainty } from "../AssessmentGHG/utils";
 

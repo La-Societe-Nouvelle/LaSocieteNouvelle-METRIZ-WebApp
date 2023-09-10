@@ -10,7 +10,7 @@ import metaIndics from "../../lib/indics";
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from "../formulas/aggregatesBuilder";
 
 // Utils
-import { printValue } from "/src/utils/Utils";
+import { printValue } from "/src/utils/formatters";
 
 function exportIndicDataExpensesCSV(indic, session) {
   let csvContent = "data:text/csv;charset=utf-8,";
