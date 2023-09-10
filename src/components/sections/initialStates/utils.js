@@ -1,6 +1,12 @@
+// La Société Nouvelle
+
+// Utils
 import { isValidNumber } from "../../../utils/Utils";
 import { getPrevDate, sortChronologicallyDates, sortUnchronologicallyDates } from "../../../utils/periodsUtils";
 
+/* ---------- SYNC INITIAL STATES UTILS ---------- */
+
+// to use to check if current footprint option is available
 export const isCurrentFootprintAvailable = (account, financialData) => 
 {
   // stock account
@@ -15,12 +21,14 @@ export const isCurrentFootprintAvailable = (account, financialData) =>
       (investment) => investment.accountNum == account.accountNum
     );
   }
-};
+}
+
+/* ---------- INITIAL STATES IMPORT UTILS ---------- */
 
 /** Check merging :
  *    - periods not already in session
- *    - more recent period match with oldest in session
- * 
+ *    - continuity (more recent period match with oldest in session)
+ *    - for each asset corresponding amounts (between last state and initial state)
  */
 
 export const checkLoadedSession = (session, loadedSession) => 
@@ -57,6 +65,7 @@ export const checkLoadedSession = (session, loadedSession) =>
     }]);
   }
 
+  // -> if errors -> return erros list
   if (errors.length>0) {
     return ({
       checked: errors.length==0,

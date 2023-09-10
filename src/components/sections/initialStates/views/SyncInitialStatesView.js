@@ -1,22 +1,27 @@
 // La Société Nouvelle
 
-import { useEffect, useState } from "react";
+// React
+import { useState } from "react";
 import { ProgressBar, Table } from "react-bootstrap";
-import { ErrorAPIModal } from "../../../modals/userInfoModals";
+
+// Components
 import { RowTableImmobilisation } from "./RowTableImmobilisation";
 import { RowTableStock } from "./RowTableStock";
 
-export const InitialStatesView = ({
-  session,
+// Modals
+import { ErrorAPIModal } from "../../../modals/userInfoModals";
+
+/* ---------- SYNC INITIAL STATES VIEW  ---------- */
+
+/** Table to synchronise initial states
+ * 
+ */
+
+export const SyncInitialStatesView = ({
+  assets,
   period,
   initialStatesDidUpdate
 }) => {
-
-  // accounts
-  const [assets, setAssets] = useState([
-    ...session.financialData.immobilisations,
-    ...session.financialData.stocks
-  ]);
 
   // fetching data
   const [fetching, setFetching] = useState(false);
@@ -25,20 +30,14 @@ export const InitialStatesView = ({
   // error API
   const [errorAPI, setErrorAPI] = useState(false);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [])
-
   // ----------------------------------------------------------------------------------------------------
 
   // Synchronisation
   const synchroniseAll = async () => 
   {
     // accounts
-    const accountsToSync = [
-      ...session.financialData.immobilisations,
-      ...session.financialData.stocks
-    ].filter((asset) => asset.initialStateType == "defaultData");
+    const accountsToSync = assets
+      .filter((asset) => asset.initialStateType == "defaultData");
 
     // init progression
     setFetching(true);
@@ -71,13 +70,7 @@ export const InitialStatesView = ({
 
   /* ----- UPDATES ----- */
 
-  const rowDidUpdate = () => 
-  {
-    setAssets([
-      ...session.financialData.immobilisations,
-      ...session.financialData.stocks
-    ])
-
+  const rowDidUpdate = () => {
     initialStatesDidUpdate();
   };
 
@@ -170,7 +163,8 @@ export const InitialStatesView = ({
 
 /* ---------- ROWS ---------- */
 
-const Row = (props) => {
+const Row = (props) => 
+{
   switch (props.account.accountNum.charAt(0)) {
     case "2":
       return <RowTableImmobilisation {...props} />;

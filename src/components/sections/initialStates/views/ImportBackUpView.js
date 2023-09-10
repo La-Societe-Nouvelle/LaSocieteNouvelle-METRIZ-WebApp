@@ -4,13 +4,15 @@
 import React, { useState } from "react";
 import Dropzone from "react-dropzone";
 
-//
+// Objects
 import { Session } from "../../../../Session";
 import { updateVersion } from "/src/version/updateVersion";
 
 // Utils
 import { checkLoadedSession } from "../utils";
 import { ErrorAPIModal, ErrorFileModal, SuccessFileModal } from "../../../modals/userInfoModals";
+
+/* ---------- INITIAL STATES DROPZONE  ---------- */
 
 export const ImportBackUpView = ({
   session,
@@ -107,6 +109,8 @@ export const ImportBackUpView = ({
     }
   };
 
+  // ----------------------------------------------------------------------------------------------------
+
   return (
     <div className="step p-4">
       <h3 className="mb-3"> Reprise sur l'exercice précédent</h3>
@@ -137,6 +141,7 @@ export const ImportBackUpView = ({
           </div>
         )}
       </Dropzone>
+
       {popupSuccess && (
         <SuccessFileModal
           showModal={popupSuccess}
@@ -145,6 +150,7 @@ export const ImportBackUpView = ({
           closePopup={() => setPopupSuccess(false)}
         />
       )}
+
       {showPopup && (
         <ErrorFileModal
           showModal={showPopup}
@@ -153,6 +159,7 @@ export const ImportBackUpView = ({
           onClose={() => setShowPopup(false)}
         />
       )}
+      
       <ErrorAPIModal
         hasError={errorAPI}
         onClose={() => setErrorAPI(false)}

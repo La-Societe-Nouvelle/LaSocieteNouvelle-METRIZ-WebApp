@@ -9,11 +9,11 @@ import { ImportBackUpView } from "./views/ImportBackUpView";
 
 // Utils
 import { checkInitialStates } from "../../../utils/progressionUtils";
-import { InitialStatesView } from "./views/InitialStatesView";
+import { SyncInitialStatesView } from "./views/SyncInitialStatesView";
 
-/* -------------------------------------------------------------------------------------------------------- */
-/* ---------------------------------------- INITIAL STATES SECTION ---------------------------------------- */
-/* -------------------------------------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------------------- */
+/* -------------------------------------------------- INITIAL STATES SECTION -------------------------------------------------- */
+/* ---------------------------------------------------------------------------------------------------------------------------- */
 
 export const InitialStatesSection = ({
   session,
@@ -22,18 +22,31 @@ export const InitialStatesSection = ({
   submit
 }) => {
 
+  // accounts
+  const [assets, setAssets] = useState([
+    ...session.financialData.immobilisations,
+    ...session.financialData.stocks
+  ]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [])
+
+  // ----------------------------------------------------------------------------------------------------
+  
+  const onUpdate = () => {
+    setAssets([
+      ...session.financialData.immobilisations,
+      ...session.financialData.stocks
+    ]);
+  }
+
+  // ----------------------------------------------------------------------------------------------------
 
   const isNextStepAvailable = () => {
     let initialStatesValid = checkInitialStates(session,period);
     return initialStatesValid;
   };
-
-  const onUpdate = () => {
-    console.log("data loaded");
-  }
 
   return (
     <Container fluid>
@@ -57,7 +70,8 @@ export const InitialStatesSection = ({
           backUpDidLoad={onUpdate}
         />
         
-        <InitialStatesView
+        <SyncInitialStatesView
+          assets={assets}
           session={session}
           period={period}
           initialStatesDidUpdate={onUpdate}
