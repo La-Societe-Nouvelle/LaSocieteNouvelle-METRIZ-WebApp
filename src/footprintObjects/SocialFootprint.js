@@ -10,10 +10,13 @@ import metaIndics from "/lib/indics";
 
 export class SocialFootprint {
 
-  constructor({
-    indicators
-  }) 
+  constructor(props) 
   {
+    if (props==undefined) props = {};
+    let {
+      indicators
+    } = props;
+
     // ---------------------------------------------------------------------------------------------------- //
 
     // indicators
@@ -40,7 +43,7 @@ export class SocialFootprint {
   /* ---------- Update from API ---------- */
   
   // All indicators
-  updateALl(data) 
+  updateAll(data) 
   {
     Object.entries(metaIndics)
       .filter(([_,metaIndic]) => metaIndic.isAvailable)

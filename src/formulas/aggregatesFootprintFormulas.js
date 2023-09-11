@@ -473,11 +473,11 @@ export const updateMainAggregatesFootprints = async (financialData,period) =>
   // Fixed capital consumtpions
   let fixedCapitalConsumptionsAccounts = financialData.amortisationExpensesAccounts
     .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
-  fixedCapitalConsumptions.periodsData[period.periodKey].footprint.indicators[indic] = 
+  fixedCapitalConsumptions.periodsData[period.periodKey].footprint = 
     await buildAggregatePeriodFootprint(fixedCapitalConsumptionsAccounts, period.periodKey);
   
   // Production
-  production.periodsData[period.periodKey].footprint.indicators[indic] = 
+  production.periodsData[period.periodKey].footprint = 
     await buildAggregatePeriodFootprint([netValueAdded,intermediateConsumptions,fixedCapitalConsumptions], period.periodKey);
   
   return;

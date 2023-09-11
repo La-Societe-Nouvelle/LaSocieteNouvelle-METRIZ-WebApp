@@ -107,7 +107,7 @@ export async function buildDifferenceFootprint(itemA,itemB)
 
 export async function buildDifferenceIndicator(indic,itemA,itemB)
 {
-  const { nbDecimals } = metaIndics[indicator.indic];
+  const { nbDecimals } = metaIndics[indic];
   
   // init indicator
   const indicator = new Indicator({indic});

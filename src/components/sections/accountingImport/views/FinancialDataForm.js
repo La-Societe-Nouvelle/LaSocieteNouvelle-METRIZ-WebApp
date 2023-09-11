@@ -180,10 +180,10 @@ export const FinancialDataForm = ({
     else 
     {
       // console logs
-      console.log("Aucune erreur détectée");
+      console.log("Aucune erreur détectée lors de la lecture du FEC");
 
       // build periods
-      let financialPeriod = getFinancialPeriodFECData(accountingData);
+      let financialPeriod = await getFinancialPeriodFECData(accountingData);
       let monthPeriods = getMonthPeriodsFECData(accountingData);
       let periods = [financialPeriod, ...monthPeriods];
       

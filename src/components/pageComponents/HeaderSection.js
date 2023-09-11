@@ -27,8 +27,7 @@ export const HeaderSection = ({ step, setStep, session, period }) =>
 {
   const refresh = () => location.reload(true);
   const stepMax = getProgression(session,period); // HERE
-  console.log(stepMax);
-
+  
   return (
     <header>
       <Topbar 

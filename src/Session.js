@@ -45,21 +45,21 @@ export class Session
     // Identifier
     this.id = props.id || "";
 
-    // Indicators list
-    this.indics = {};
-    this.availablePeriods.forEach((period) => {
-      this.indics[period.periodKey] = props.indics[period.periodKey];
-    });
-
     // Periods
     this.availablePeriods = props.availablePeriods || [];
     this.availablePeriods.forEach((period) => {
       period.regex = buildRegexFinancialPeriod(
         period.dateStart,
         period.dateEnd
-      );
-    });
+        );
+      });
 
+    // Indicators list
+    this.indics = {};
+    this.availablePeriods.forEach((period) => {
+      this.indics[period.periodKey] = props.indics[period.periodKey];
+    });
+      
     // Legal Unit data
     this.legalUnit = new LegalUnit(props.legalUnit);
 
@@ -224,7 +224,7 @@ export class Session
 
   updateNetValueAddedFootprint = async (period) => 
   {
-    const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[periodKey].amount;
+    const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].amount;
     this.impactsData[period.periodKey].setNetValueAdded(netValueAdded);
 
     await Promise.all(Object.entries(metaIndics)
@@ -237,7 +237,7 @@ export class Session
 
   updateNetValueAddedIndicator = (indic, periodKey) => 
   {
-    const impactsData = this.impactsData[period.periodKey];
+    const impactsData = this.impactsData[periodKey];
     let indicator = this.validations[periodKey].includes(indic) ? 
         buildNetValueAddedIndicator(indic, impactsData)
       : new Indicator({ indic });
