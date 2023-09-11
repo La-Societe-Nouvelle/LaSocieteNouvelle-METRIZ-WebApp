@@ -13,6 +13,7 @@ import {
 
 // Lib
 import metaIndics from "/lib/indics";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
 
 /* ---------- INDICATOR STATEMENT TABLE ---------- */
@@ -44,10 +45,9 @@ export const IndicatorMainAggregatesTable = ({
     netValueAdded,
   } = financialData.mainAggregates;
   
-  const prevDateEnd = period.dateEnd;
+  const prevDateEnd = getPrevDate(period.dateStart);
   const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
+    (period) => period.dateEnd == prevDateEnd);
 
   const periods = [period];
   if (prevPeriod) periods.push(prevPeriod);

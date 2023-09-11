@@ -11,6 +11,7 @@ import metaIndics from "/lib/indics";
 // Utils
 import { printValue } from "/src/utils/formatters";
 import { getSuggestedMax } from "./chartsUtils";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
 
 
@@ -56,10 +57,9 @@ export const ComparativeChart = ({
 
   // prev footprints
 
-  const prevDateEnd = period.dateEnd;
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod = session.availablePeriods
+    .find((period) => period.dateEnd == prevDateEnd);
 
   const dataset_prevFootprints = [
     null,
