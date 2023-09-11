@@ -417,125 +417,123 @@ export class FinancialData
 
   /* ------------------------- Load BackUp Data ------------------------- */
 
-  loadFinancialDataFromBackUp = async (prevFinancialData) => 
+  loadFinancialDataFromBackUp = async (loadedFinancialData) => 
   {
-    // Merge with previous exepenses
-    this.adjustedAmortisationExpenses =
-      this.adjustedAmortisationExpenses.concat(
-        prevFinancialData.adjustedAmortisationExpenses
-      );
-    this.amortisationExpenses = this.amortisationExpenses.concat(
-      prevFinancialData.amortisationExpenses
-    );
-
-    // Add previous periods in expenses accounts
-    this.amortisationExpensesAccounts = mergePeriodsAccounts(
-      this.amortisationExpensesAccounts,
-      prevFinancialData.amortisationExpensesAccounts
-    );
-
-    // Merge with previous external expenses
-    this.externalExpenses = this.externalExpenses.concat(
-      prevFinancialData.externalExpenses
-    );
-
-    // Add previous periods in expenses accounts
-    this.externalExpensesAccounts = mergePeriodsAccounts(
-      this.externalExpensesAccounts,
-      prevFinancialData.externalExpensesAccounts
-    );
-
-    // Add previous initial state for immobilisations
-
-    for (let prevImmobilisation of prevFinancialData.immobilisations) {
-      const existingImmo = this.immobilisations.find(
-        (immobilisation) =>
-          immobilisation.accountNum === prevImmobilisation.accountNum
-      );
-
-      if (existingImmo) {
-        await existingImmo.loadInitialStateFromBackUp(prevImmobilisation);
-      } else {
-        const newImmo = new Immobilisation(prevImmobilisation);
-        this.immobilisations.push(newImmo);
-      }
-    }
-
-    // Add previous initial state for stocks
-
-    for (let prevStock of prevFinancialData.stocks) {
-      const existingStock = this.stocks.find(
-        (stock) => stock.accountNum === prevStock.accountNum
-      );
-
-      if (existingStock) {
-        await existingStock.loadInitialStateFromBackUp(prevStock);
-      } else {
-        const newStock = new Stock(prevStock);
-        this.stocks.push(newStock);
-      }
-    }
-
-    // Merge with previous investments
-    this.investments = this.investments.concat(prevFinancialData.investments);
-
-    // Add previous periods in mainAggregates
-    this.mainAggregates = mergeAggregatesPeriodsData(
-      this.mainAggregates,
-      prevFinancialData.mainAggregates
-    );
-
     // Merge with previous metaAccounts
-    this.metaAccounts = mergeAccounts(
-      this.metaAccounts,
-      prevFinancialData.metaAccounts
+    this.metaAccounts = {
+      ...this.metaAccounts,
+      ...loadedFinancialData.metaAccounts
+    };
+
+    // isFinancialDataLoaded
+    // status
+
+    // Production items
+    this.productionAggregates = mergeAggregatesPeriodsData(
+      this.productionAggregates,
+      loadedFinancialData.productionAggregates
     );
 
-    this.otherFinancialData = mergeAggregatesPeriodsData(
-      this.otherFinancialData,
-      prevFinancialData.otherFinancialData
-    );
+    // External expenses
+    this.externalExpenses = this.externalExpenses
+      .concat(loadedFinancialData.externalExpenses);
+
+    // Stocks
+    for (let loadedStock of loadedFinancialData.stocks) {
+      const existingStock = this.stocks.find((stock) => stock.accountNum === loadedStock.accountNum);
+      if (existingStock) {
+        await existingStock.loadInitialStateFromBackUp(loadedStock);
+      } else {
+        this.stocks.push(loadedStock);
+      }
+    };
+    this.stockVariations = this.stockVariations
+      .concat(loadedFinancialData.stockVariations);
+
+    // Immobilisations
+    for (let loadedImmobilisation of loadedFinancialData.immobilisations) {
+      const existingImmobilisation = this.immobilisations.find((immobilisation) => immobilisation.accountNum === loadedImmobilisation.accountNum);
+      if (existingImmobilisation) {
+        await existingImmobilisation.loadInitialStateFromBackUp(loadedImmobilisation);
+      } else {
+        this.immobilisations.push(loadedImmobilisation);
+      }
+    };
+    this.amortisationExpenses = this.amortisationExpenses
+      .concat(loadedFinancialData.amortisationExpenses);
+    this.adjustedAmortisationExpenses = this.adjustedAmortisationExpenses
+      .concat(loadedFinancialData.adjustedAmortisationExpenses);
+    this.investments = this.investments
+      .concat(loadedFinancialData.investments);
+    this.immobilisedProductions = this.immobilisedProductions
+      .concat(loadedFinancialData.immobilisedProductions);
+
+    // Expenses accounts
+    for (let loadedAccount of loadedFinancialData.externalExpensesAccounts) {
+      const existingAccount = this.externalExpensesAccounts
+        .find((account) => account.accountNum === loadedAccount.accountNum);
+      if (existingAccount) {
+        existingAccount.periodsData = {
+          ...existingAccount.periodsData,
+          ...loadedAccount.periodsData
+        };
+      } else {
+        this.externalExpensesAccounts.push(loadedAccount);
+      }
+    };
+    for (let loadedAccount of loadedFinancialData.stockVariationsAccounts) {
+      const existingAccount = this.stockVariationsAccounts
+        .find((account) => account.accountNum === loadedAccount.accountNum);
+      if (existingAccount) {
+        existingAccount.periodsData = {
+          ...existingAccount.periodsData,
+          ...loadedAccount.periodsData
+        };
+      } else {
+        this.stockVariationsAccounts.push(loadedAccount);
+      }
+    };
+    for (let loadedAccount of loadedFinancialData.amortisationExpensesAccounts) {
+      const existingAccount = this.amortisationExpensesAccounts
+        .find((account) => account.accountNum === loadedAccount.accountNum);
+      if (existingAccount) {
+        existingAccount.periodsData = {
+          ...existingAccount.periodsData,
+          ...loadedAccount.periodsData
+        };
+      } else {
+        this.amortisationExpensesAccounts.push(loadedAccount);
+      }
+    };
 
     // Providers
-    for (let prevProvider of prevFinancialData.providers) {
-      let provider = this.providers.find(
-        (provider) => provider.providerNum === prevProvider.providerNum
-      );
-      if (provider) {
-        await provider.loadPrevProvider(prevProvider);
+    for (let loadedProvider of loadedFinancialData.providers) {
+      const existingProvider = this.amortisationExpensesAccounts
+        .find((provider) => provider.providerNum === loadedProvider.providerNum);
+      if (existingProvider) {
+        existingProvider.periodsData = {
+          ...existingProvider.periodsData,
+          ...loadedProvider.periodsData
+        };
       } else {
-        const newProvider = new Provider({ ...prevProvider });
-        this.providers.push(newProvider);
+        this.providers.push(loadedProvider);
       }
-    }
+    };
 
-    // Production aggregates
-
-    this.productionAggregates.revenue = mergePeriodsData(
-      this.productionAggregates.revenue,
-      prevFinancialData.productionAggregates.revenue
+    // Aggregates
+    console.log(this.mainAggregates.netValueAdded);
+    console.log(loadedFinancialData.mainAggregates.netValueAdded);
+    this.mainAggregates = mergeAggregatesPeriodsData(
+      this.mainAggregates,
+      loadedFinancialData.mainAggregates
     );
-
-    this.productionAggregates.immobilisedProduction = mergePeriodsData(
-      this.productionAggregates.immobilisedProduction,
-      prevFinancialData.productionAggregates.immobilisedProduction
+    console.log(this.mainAggregates);
+    
+    // Other financial data
+    this.otherFinancialData = mergeAggregatesPeriodsData(
+      this.otherFinancialData,
+      loadedFinancialData.otherFinancialData
     );
-
-    this.productionAggregates.storedProduction = mergePeriodsData(
-      this.productionAggregates.storedProduction,
-      prevFinancialData.productionAggregates.storedProduction
-    );
-
-    // Stock variations
-    this.stockVariationsAccounts = mergePeriodsAccounts(
-      this.stockVariationsAccounts,
-      prevFinancialData.stockVariationsAccounts
-    );
-
-    this.stockVariations = this.stockVariations.concat(
-      prevFinancialData.stockVariations
-    );
-
   };
 
   /* ---------------------------------------- GETTERS ---------------------------------------- */

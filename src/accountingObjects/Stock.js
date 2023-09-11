@@ -80,26 +80,26 @@ export class Stock {
 
   /* ------------------------- Load BackUp Data ------------------------- */
 
-   loadInitialStateFromBackUp = async (prevStock) =>
+   loadInitialStateFromBackUp = async (loadedStock) =>
   {
     // stock enries
-    this.entries.push(...prevStock.entries);
+    this.entries.push(...loadedStock.entries);
 
     // depreciation entries
-    this.depreciationEntries.push(...prevStock.depreciationEntries);
+    this.depreciationEntries.push(...loadedStock.depreciationEntries);
 
     // initial state
-    this.initialStateType = prevStock.initialStateType;
-    this.initialState = new StockState(prevStock.initialState);
-    this.initialFootprintParams = prevStock.initialFootprintParams || {};
-    this.initialStateSet = prevStock.initialStateSet;
+    this.initialStateType = loadedStock.initialStateType;
+    this.initialState = new StockState(loadedStock.initialState);
+    this.initialFootprintParams = loadedStock.initialFootprintParams || {};
+    this.initialStateSet = loadedStock.initialStateSet;
 
     // purchasesAccounts
-    if(prevStock.purchasesAccounts.length > 0) {
-      this.purchasesAccounts = this.purchasesAccounts.concat(prevStock.purchasesAccounts.filter(account => !this.purchasesAccounts.includes(account)));
+    if(loadedStock.purchasesAccounts.length > 0) {
+      this.purchasesAccounts = this.purchasesAccounts.concat(loadedStock.purchasesAccounts.filter(account => !this.purchasesAccounts.includes(account)));
     }
     // states
-    Object.values(prevStock.states)
+    Object.values(loadedStock.states)
       .forEach(state => this.states[state.date] = new StockState(state));
   }
 

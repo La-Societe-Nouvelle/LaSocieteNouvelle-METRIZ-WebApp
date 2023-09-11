@@ -85,10 +85,6 @@ export const checkLoadedSession = async (session, loadedSession) =>
       {
         let prevImmobilisation = loadedSession.financialData.immobilisations
           .find((account) => account.accountNum == immobilisation.accountNum);
-        console.log(prevImmobilisation.accountNum);
-        console.log(prevImmobilisation.initialState);
-        console.log(prevImmobilisation.states[dateEndPrevSession]);
-        console.log(isValidNumber(prevImmobilisation.states[dateEndPrevSession].amount));
         
         if (!prevImmobilisation) {
           errors.push({

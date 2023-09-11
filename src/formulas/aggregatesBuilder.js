@@ -174,16 +174,16 @@ export const buildMainAggregates = async (financialData, periods) =>
 
 /* ---------------------------------------- MERGING DATA ---------------------------------------- */
 
-export const mergeAggregatesPeriodsData = (current, previous) => 
+export const mergeAggregatesPeriodsData = (current, loaded) => 
 {
   // Create a new object and copy the properties from both current and previous objects
-  const mergedAggregates = Object.assign(current, previous);
+  const mergedAggregates = Object.assign({}, current, loaded);
   
   // Loop through each aggregate property in the object and merge the periodsData
-  for (let aggregate in mergedAggregates) {
-    mergedAggregates[aggregate].periodsData = Object.assign(
-      current[aggregate].periodsData,
-      previous[aggregate].periodsData
+  for (let aggregateKey of Object.keys(mergedAggregates)) {
+    mergedAggregates[aggregateKey].periodsData = Object.assign(
+      current[aggregateKey].periodsData,
+      loaded[aggregateKey].periodsData
     );
   }
 
