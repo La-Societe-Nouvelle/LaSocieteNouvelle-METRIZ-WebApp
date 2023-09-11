@@ -72,10 +72,10 @@ export const Metriz = () =>
     setStep(1);
   };
 
-  const resumeSession = (session) => 
+  const resumeSession = async (session) => 
   {
     let defaultPeriod = getMoreRecentYearlyPeriod(session.availablePeriods);
-    let progression = getProgression(session,defaultPeriod);
+    let progression = await getProgression(session,defaultPeriod);
 
     setSession(session);
     setSelectedPeriod(defaultPeriod);
@@ -140,7 +140,7 @@ export const Metriz = () =>
     }
 
     // next step
-    const progression = getProgression(session,selectedPeriod);
+    const progression = await getProgression(session,selectedPeriod);
     setStep(progression); // providers section
   };
 
@@ -167,7 +167,7 @@ export const Metriz = () =>
     }
 
     // next step
-    const progression = getProgression(session,selectedPeriod);
+    const progression = await getProgression(session,selectedPeriod);
     setStep(progression); // providers section
   };
 

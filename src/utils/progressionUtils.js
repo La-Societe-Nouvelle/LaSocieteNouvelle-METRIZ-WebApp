@@ -24,7 +24,7 @@ const progressionIndex = {
   "resultsSection": 5
 };
 
-export const getProgression = (session,period) => 
+export const getProgression = async (session,period) => 
 {
   // period defined
   if (!period.periodKey) {

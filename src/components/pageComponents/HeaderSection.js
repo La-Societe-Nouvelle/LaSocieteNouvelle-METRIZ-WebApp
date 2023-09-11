@@ -11,6 +11,8 @@ import {
 // Components
 import { Topbar } from "./Topbar";
 import { getProgression } from "../../utils/progressionUtils";
+import { useState } from "react";
+import { useEffect } from "react";
 
 // Step names
 const stepNames = [
@@ -26,7 +28,13 @@ const stepNames = [
 export const HeaderSection = ({ step, setStep, session, period }) => 
 {
   const refresh = () => location.reload(true);
-  const stepMax = getProgression(session,period); // HERE
+
+  const [stepMax, setStepMax] = useState(0);
+
+  useEffect(async () => {
+    let progression = await getProgression(session,period)
+    setStepMax(progression);
+  }, [step]);
   
   return (
     <header>
