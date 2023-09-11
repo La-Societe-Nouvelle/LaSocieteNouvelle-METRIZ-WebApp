@@ -197,7 +197,9 @@ section {
   }
 
   .indic-result-menu {
-
+    img {
+      width: 35px;
+    }
     .btn:focus {
       outline: 0;
       box-shadow: 0 0 0 0.15rem rgba(250, 89, 95, 0.33);
@@ -261,11 +263,6 @@ section {
   height: 100%;
 }
 
-#dropdown-indics-button {
-  padding: 0.8rem 1.5rem;
-  font-size: 1rem;
-
-}
 
 /* ---------- Loading Animation ---------- */
 

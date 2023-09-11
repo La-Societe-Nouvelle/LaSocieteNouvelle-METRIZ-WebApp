@@ -36,9 +36,12 @@
   .dropdown-container {
     border-radius: 2rem;  
   }
+  
   #dropdown-indics-button{
     width: 100%;
     text-align: left;
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
     img {
       border-left: 1px solid lighten($secondary, 25%);
       padding-left : 1rem;

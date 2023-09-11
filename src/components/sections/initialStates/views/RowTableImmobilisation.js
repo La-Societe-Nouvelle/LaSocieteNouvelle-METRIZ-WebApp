@@ -20,13 +20,13 @@ const branchesOptions = getBranchesOptions(branches);
 /* ---------- ROW FOR STOCK ACCOUNT  ---------- */
 
 /** Row for stock account
- * 
+ *
  */
 
 const metaInitialStates = {
-  none: { 
-    value: "none", 
-    label: "---" 
+  none: {
+    value: "none",
+    label: "---",
   },
   prevFootprint: {
     value: "prevFootprint",
@@ -34,70 +34,68 @@ const metaInitialStates = {
   },
   currentFootprint: {
     value: "currentFootprint",
-    label: "Estimée sur exerice courant",
+    label: "Estimée sur exercice courant",
   },
-  defaultData: { 
-    value: "defaultData", 
-    label: "Valeurs par défaut" 
+  defaultData: {
+    value: "defaultData",
+    label: "Valeurs par défaut",
   },
 };
 
-export const RowTableImmobilisation = ({
-  account,
-  period,
-  onUpdate
-}) => {
-
-  const { 
-    accountNum, 
-    accountLib, 
-    isAmortisable,
-    initialState
-  } = account;
+export const RowTableImmobilisation = ({ account, period, onUpdate }) => {
+  const { accountNum, accountLib, isAmortisable, initialState } = account;
 
   const prevStateDateEnd = getPrevDate(period.dateStart);
-  const isPrevPeriodAvailable = parseInt(initialState.date)<parseInt(prevStateDateEnd);
+  const isPrevPeriodAvailable =
+    parseInt(initialState.date) < parseInt(prevStateDateEnd);
 
-  const [initialStateType, setInitialStateType] = useState(account.initialStateType);
-  const [initialStateSet, setInitialStateSet] = useState(account.initialStateSet);
-  const [initialFootprintParams, setInitialFootprintParams] = useState(account.initialFootprintParams);
+  const [initialStateType, setInitialStateType] = useState(
+    account.initialStateType
+  );
+  const [initialStateSet, setInitialStateSet] = useState(
+    account.initialStateSet
+  );
+  const [initialFootprintParams, setInitialFootprintParams] = useState(
+    account.initialFootprintParams
+  );
 
   // ----------------------------------------------------------------------------------------------------
 
-  useEffect(() => 
-  {
-    if (initialStateType!=account.initialStateType) {
+  useEffect(() => {
+    if (initialStateType != account.initialStateType) {
       setInitialStateType(account.initialStateType);
     }
-    if (initialStateSet!=account.initialStateSet) {
+    if (initialStateSet != account.initialStateSet) {
       setInitialStateSet(account.initialStateSet);
     }
-    if (initialFootprintParams!=account.initialFootprintParams) {
+    if (initialFootprintParams != account.initialFootprintParams) {
       setInitialStateSet(account.initialFootprintParams);
     }
-  }, [account.initialStateType, account.initialStateSet, account.initialFootprintParams]);
+  }, [
+    account.initialStateType,
+    account.initialStateSet,
+    account.initialFootprintParams,
+  ]);
 
   useEffect(() => {
     account.initialStateType = initialStateType;
     account.initialStateSet = initialStateSet;
     account.initialFootprintParams = initialFootprintParams;
     onUpdate();
-  }, [initialStateType,initialStateSet,initialFootprintParams])
+  }, [initialStateType, initialStateSet, initialFootprintParams]);
 
   // ----------------------------------------------------------------------------------------------------
 
-  const onActivityCodeChange = (event) => 
-  {
+  const onActivityCodeChange = (event) => {
     const nextActivityCode = event.value;
     setInitialFootprintParams({
       ...initialFootprintParams,
-      code: nextActivityCode
+      code: nextActivityCode,
     });
     setInitialStateSet(false);
   };
 
-  const onInitialStateTypeChange = (event) => 
-  {
+  const onInitialStateTypeChange = (event) => {
     const nextType = event.value;
     setInitialStateType(nextType);
 
@@ -115,35 +113,37 @@ export const RowTableImmobilisation = ({
 
   // options
   const initialStateOptions = [metaInitialStates.defaultData];
-  
+
   return (
     <tr>
       <td>{accountNum}</td>
       <td>
-        {accountLib.charAt(0).toUpperCase() +
-          accountLib.slice(1).toLowerCase()}
+        {accountLib.charAt(0).toUpperCase() + accountLib.slice(1).toLowerCase()}
       </td>
       {/* Immobilisation non amortie */}
-      {!isAmortisable &&
+      {!isAmortisable && (
         <td colSpan="2">
           &nbsp;&nbsp;Immobilisation non amortie sur l'exercice
-        </td>}
+        </td>
+      )}
       {/* Empreinte reprise sur exercice précédent */}
-      {(isAmortisable && isPrevPeriodAvailable) &&
+      {isAmortisable && isPrevPeriodAvailable && (
         <td colSpan={2}>
           <Select
             className={"success"}
             value={metaInitialStates.prevFootprint}
             isDisabled
-            styles={customSelectStyles}
+            styles={customSelectStyles()}
           />
-        </td>}
+        </td>
+      )}
       {/* Empreinte par défaut à définir */}
-      {(isAmortisable && !isPrevPeriodAvailable) &&
+
+      {isAmortisable && !isPrevPeriodAvailable && (
         <>
-          <td colSpan={(initialStateType=="defaultData") ? 1 : 2}>
+          <td colSpan={initialStateType == "defaultData" ? 1 : 2}>
             <Select
-              styles={customSelectStyles}
+              styles={customSelectStyles()}
               value={metaInitialStates[initialStateType]}
               placeholder={"Choisissez..."}
               className={initialStateSet ? "success" : ""}
@@ -152,26 +152,28 @@ export const RowTableImmobilisation = ({
             />
           </td>
           {initialStateType == "defaultData" && (
-            <td className={initialStateSet === true ? " success" : ""}>
+            <td>
               <Select
                 defaultValue={{
-                  label: initialFootprintParams.code + " - " + branches[initialFootprintParams.code],
+                  label:
+                    initialFootprintParams.code +
+                    " - " +
+                    branches[initialFootprintParams.code],
                   value: initialFootprintParams.code,
                 }}
                 placeholder={"Choisissez une branche"}
-                className={initialStateSet ? " success" : ""}
+                className={initialStateSet ? "success" : ""}
                 options={branchesOptions}
                 onChange={onActivityCodeChange}
-                styles={customSelectStyles}
+                styles={customSelectStyles()}
               />
             </td>
           )}
         </>
-      }
+      )}
       <td className="text-end">
-        {printValue(account.states[prevStateDateEnd].amount, 0)}{" "}
-        &euro;
+        {printValue(account.states[prevStateDateEnd].amount, 0)} &euro;
       </td>
     </tr>
   );
-}
+};

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 
 // Styles
-import { customSelectStyles } from "/config/customStyles";
+import { customSelectStyles} from "/config/customStyles";
 
 // Utils
 import { getBranchesOptions } from "/src/utils/metaUtils";
@@ -34,7 +34,7 @@ const metaInitialStates = {
   },
   currentFootprint: {
     value: "currentFootprint",
-    label: "Estimée sur exerice courant",
+    label: "Estimée sur exercice courant",
   },
   defaultData: { 
     value: "defaultData", 
@@ -147,7 +147,7 @@ export const RowTableStock = ({
             className={"success"}
             value={metaInitialStates.prevFootprint}
             isDisabled
-            styles={customSelectStyles}
+            styles={customSelectStyles()}
           />
         </td>}
       {(!isPrevPeriodAvailable && !isInitialAmountNull) &&
@@ -159,7 +159,7 @@ export const RowTableStock = ({
               value={metaInitialStates[initialStateType]}
               options={initialStateOptions}
               onChange={onInitialStateTypeChange}
-              styles={customSelectStyles}
+              styles={customSelectStyles()}
             />
           </td>
           {initialStateType == "defaultData" && (
@@ -173,7 +173,7 @@ export const RowTableStock = ({
                 }}
                 options={branchesOptions}
                 onChange={onActivityCodeChange}
-                styles={customSelectStyles}
+                styles={customSelectStyles()}
               />
             </td>
           )}
