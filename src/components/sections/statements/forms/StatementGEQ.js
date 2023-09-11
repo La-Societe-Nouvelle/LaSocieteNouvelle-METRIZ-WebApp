@@ -87,6 +87,12 @@ const StatementGEQ = ({
     impactsData.knwDetails.apprenticesRemunerations = updatedData.knwDetails.apprenticesRemunerations;
   };
 
+  const onAssessmentSubmit = () => {
+    if ((impactsData.interdecileRange)!=interdecileRange) {
+      setInterdecileRange(impactsData.interdecileRange || "");
+    }
+  }
+
   return (
     <Form className="statement">
       <Row>
@@ -141,6 +147,7 @@ const StatementGEQ = ({
                   impactsData={impactsData}
                   onUpdate={onUpdate}
                   updateSocialData={updateSocialData}
+                  submit={onAssessmentSubmit}
                 />
               </div>
             </Col>

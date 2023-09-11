@@ -81,6 +81,12 @@ const StatementIDR = ({
   const updateInfo = (event) => setInfo(event.target.value);
   const saveInfo = () => (impactsData.comments.idr = info);
 
+  const onAssessmentSubmit = () => {
+    if ((impactsData.interdecileRange)!=interdecileRange) {
+      setInterdecileRange(impactsData.interdecileRange || "");
+    }
+  }
+
   return (
     <Form className="statement">
       <Row>
@@ -128,6 +134,7 @@ const StatementIDR = ({
 
                 <AssessmentDSN
                   impactsData={impactsData}
+                  submit={onAssessmentSubmit}
                 />
               </div>
             </Col>

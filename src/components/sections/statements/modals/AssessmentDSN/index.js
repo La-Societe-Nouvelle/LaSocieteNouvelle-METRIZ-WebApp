@@ -89,12 +89,14 @@ const AssessmentDSN = ({
 
   const onSubmit = async () => 
   {
+    console.log("submit");
     // update indicators
     impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
     impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
     impactsData.knwDetails.apprenticesRemunerations = await getApprenticeshipRemunerations(impactsData.individualsData);
     impactsData.knwDetails.employeesTrainingsCompensations = await getEmployeesTrainingCompensations(impactsData.individualsData);
 
+    submit();
     setShowModal(false);
   }
 
