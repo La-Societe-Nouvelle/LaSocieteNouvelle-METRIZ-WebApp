@@ -6,11 +6,8 @@ import { getAmountItems, roundValue } from '../utils/Utils';
 import { getPrevDate, sortChronologicallyDates } from '../utils/periodsUtils';
 import { 
   buildDifferenceFootprint, 
-  buildDifferenceIndicator, 
   buildAggregateFootprint, 
-  buildAggregateIndicator,
   buildAggregatePeriodFootprint, 
-  buildAggregatePeriodIndicator
 } from './footprintFormulas';
 
 /** Structure of file
@@ -32,7 +29,7 @@ export const updateIntermediateConsumptionsFootprints = async (financialData,per
 
   // Purchases stocks
   await updatePurchasesStocksStatesFpt(financialData,period);
-
+  
   // Stocks variations accounts footprints
   await updatePurchasesStocksVariationsAccountsFpt(financialData,period);
 }
@@ -50,7 +47,6 @@ const updateExternalExpensesAccountsFpt = async (financialData,period) =>
     let expenses = financialData.externalExpenses
       .filter(expense => expense.accountNum==account.accountNum)  // expenses linked to expense account
       .filter(expense => period.regex.test(expense.date))         // expenses within period
-      .filter(expense => expense.amount > 0);                     // temp solution to avoid uncertainty issue
     // build footprint
     account.periodsData[period.periodKey].footprint = await buildAggregateFootprint(expenses);
     return;
@@ -75,7 +71,6 @@ const updateInitialStateStocksFpt = async (financialData,period) =>
     let purchases = financialData.externalExpenses
       .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))  // expenses linked to stock account
       .filter(expense => period.regex.test(expense.date))                       // expenses within period
-      .filter(expense => expense.amount > 0);                                   // temp solution to avoid uncertainty issue
     let purchasesFootprint = await buildAggregateFootprint(purchases);
     
     if (purchases.length==0) {
@@ -150,7 +145,6 @@ const updatePurchasesStocksStatesFpt = async (financialData,period) =>
     let purchases = financialData.externalExpenses
       .filter(expense => stock.purchasesAccounts.includes(expense.accountNum))
       .filter(expense => period.regex.test(expense.date))
-      .filter(expense => expense.amount > 0);
     let purchasesFootprint = await buildAggregateFootprint(purchases);
 
     if (newStockAmount>0 && purchases.length==0) {
@@ -265,7 +259,6 @@ const updateInitialStateImmobilisationsFpt = async (financialData,period) =>
     let investments = financialData.investments
       .filter(investment => investment.accountNum==immobilisation.accountNum)
       .filter(investment => period.regex.test(investment.date))
-      .filter(investment => investment.amount>0);
     let investmentsFootprint = await buildAggregateFootprint(investments);
     
     if (investments.length==0) {
@@ -469,8 +462,8 @@ export const updateMainAggregatesFootprints = async (financialData,period) =>
     .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
   intermediateConsumptions.periodsData[period.periodKey].footprint = 
     await buildAggregatePeriodFootprint(intermediateConsumptionsAccounts, period.periodKey);
-  
-  // Fixed capital consumtpions
+
+  // Fixed capital consumptions
   let fixedCapitalConsumptionsAccounts = financialData.amortisationExpensesAccounts
     .filter(account => account.periodsData.hasOwnProperty(period.periodKey) && account.periodsData[period.periodKey].amount>0); // accounts defined on period with amount not null
   fixedCapitalConsumptions.periodsData[period.periodKey].footprint = 

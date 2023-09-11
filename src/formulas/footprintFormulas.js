@@ -160,9 +160,9 @@ export async function buildAggregatePeriodFootprint(accounts,periodKey)
 
 export async function buildAggregatePeriodIndicator(indic,accounts,periodKey) 
 {
-  const { nbDecimals } = metaIndics[indic].nbDecimals;
+  const { nbDecimals } = metaIndics[indic];
   const accountsOnPeriod =  accounts.filter(account => account.periodsData.hasOwnProperty(periodKey));
-   
+  
   // init indicator
   const indicator = new Indicator({indic});
     
@@ -182,7 +182,7 @@ export async function buildAggregatePeriodIndicator(indic,accounts,periodKey)
     {
       grossImpact+= indicatorAccount.getValue()*amountAccount;
       grossImpactMax+= indicatorAccount.getValueMax()*amountAccount;
-      grossImpactMin+= indicatorAccount.getValueMax()*amountAccount;
+      grossImpactMin+= indicatorAccount.getValueMin()*amountAccount;
       totalAmount+= amountAccount;
     } 
     else if (!isValidNumber(amountAccount) || !indicatorAccount.isValid()) {
