@@ -2,10 +2,7 @@
 
 import { ComparativeData } from "../ComparativeData";
 
-import { updater_1_0_1 } from "./updater_1_0_1";
 import { updater_1_0_0 } from "./updater_1_0_0";
-import { updater_1_0_2 } from "./updater_1_0_2";
-import { updater_1_0_4 } from "./updater_1_0_4";
 import { updater_1_0_5 } from "./updater_1_0_5";
 import { updater_2_0_0 } from "./updater_2_0_0";
 
@@ -40,37 +37,28 @@ export const updateVersion = async (sessionData) =>
       await updater_3_0_0(sessionData);
       break;
     case "1.0.4":
-      await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
       await updater_3_0_0(sessionData);
       break;
     case "1.0.3":
       // updater 1_0_3 removed -> build old comparative data (useless with updater_1_0_5 : fetch comparative data)
-      await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
       await updater_3_0_0(sessionData);
       break;
     case "1.0.2":
-      updater_1_0_2(sessionData);
-      await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
       await updater_3_0_0(sessionData);
       break;
     case "1.0.1":
-      updater_1_0_1(sessionData);
-      updater_1_0_2(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
       await updater_3_0_0(sessionData);
       break;
     case "1.0.0":
       updater_1_0_0(sessionData);
-      updater_1_0_1(sessionData);
-      updater_1_0_2(sessionData);
-      await updater_1_0_4(sessionData);
       await updater_1_0_5(sessionData);
       await updater_2_0_0(sessionData);
       await updater_3_0_0(sessionData);

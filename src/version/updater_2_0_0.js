@@ -36,10 +36,7 @@ export const updater_2_0_0 = async (sessionData) =>
   
   // version
   sessionData.version = "2.0.0";
-
-  // Progression
-  sessionData.progression = prevSessionData.progression; // OBSOLETE
-  
+    
   // Periods
   let prevFinancialPeriod = buildFinancialPeriod(prevSessionData.year);
  
