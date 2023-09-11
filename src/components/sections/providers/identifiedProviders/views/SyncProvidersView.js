@@ -227,7 +227,7 @@ const SyncProvidersView = ({
       <SyncErrorModal
         showModal={showSyncErrorModal}
         onClose={closeSyncErrorModal}
-        changeView={() => setView("error")}
+        changeView={() => setCurrentView("error")}
       />
     </div>
   );

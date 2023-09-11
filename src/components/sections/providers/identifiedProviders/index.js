@@ -106,7 +106,7 @@ const IdentifiedProviders = (props) => {
     (provider) => !provider.useDefaultFootprint
   ).length;
 
-  const isNextStepAvailable = nbSirenSynchronised === nbSiren && nbSiren !== 0;
+  const isNextStepAvailable = (nbSirenSynchronised === nbSiren && nbSiren !== 0);
 
   return (
     <Container fluid id="siren-section">
