@@ -277,7 +277,7 @@ export const buildFixedCapitalConsumptionsAggregates = async (financialData, ava
   const aggregates = [];
 
   // build aggregates
-  for (const metaAggregate of metaIntermediateConsumptionsAggregates)
+  for (const metaAggregate of metaFixedCapitalConsumptionsAggregates)
   {
     const { label, regex } = metaAggregate;
 
