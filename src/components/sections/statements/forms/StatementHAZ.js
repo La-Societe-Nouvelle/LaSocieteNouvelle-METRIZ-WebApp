@@ -5,10 +5,16 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+
+// Utils
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { checkStatementHAZ } from "./utils";
-import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
+import { isValidInput, isValidInputNumber } from "/src/utils/Utils";
+
+// Lib
+import indicators from "/lib/indics";
+
 
 /* ---------- STATEMENT - INDIC #HAZ ---------- */
 
@@ -28,10 +34,7 @@ import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
  */
 
 
-const units = {
-  "kg": { label: "kg",  coef: 1.0       }, // default
-  "t":  { label: "t",   coef: 1000.0    }
-};
+
 
 const StatementHAZ = ({ 
   impactsData, 
@@ -45,6 +48,9 @@ const StatementHAZ = ({
   const [hazardousSubstancesConsumptionUncertainty, setHazardousSubstancesConsumptionUncertainty] = 
     useState(valueOrDefault(impactsData.hazardousSubstancesConsumptionUncertainty, ""));  
   const [info, setInfo] = useState(impactsData.comments.haz || "");
+
+    // Units
+    const units = indicators["haz"].statementUnits
 
   // update impacts data when state update
   useEffect(() => {

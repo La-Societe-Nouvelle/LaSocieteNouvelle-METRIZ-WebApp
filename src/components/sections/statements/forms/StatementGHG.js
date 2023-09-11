@@ -5,13 +5,19 @@ import React, { useState, useEffect } from "react";
 import { Form, Row, Col, Button, Modal, InputGroup } from "react-bootstrap";
 import Select from "react-select";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+
+// Utils
+import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
+import { checkStatementGHG } from "./utils";
+import { isValidInputNumber } from "/src/utils/Utils";
 
 // Modals
 import { AssessmentGHG } from "../modals/AssessmentGHG";
-import { checkStatementGHG } from "./utils";
-import { isValidInputNumber } from "../../../../utils/Utils";
+
+// Lib
+import indicators from "/lib/indics";
+
 
 /* ---------- STATEMENT - INDIC #GHG ---------- */
 
@@ -30,10 +36,7 @@ import { isValidInputNumber } from "../../../../utils/Utils";
  *    - errorMessage : null | {message}
  */
 
-const units = {
-  "kgCO2e": { label: "kgCO2e",  coef: 1.0     },
-  "tCO2e":  { label: "tCO2e",   coef: 1000.0  },
-};
+
 
 const StatementGHG = ({ 
   impactsData, 
@@ -48,6 +51,10 @@ const StatementGHG = ({
     useState(valueOrDefault(impactsData.greenhousesGazEmissionsUncertainty, ""));
   const [info, setInfo] = useState(impactsData.comments.ghg || "");
   const [showModal, setShowModal] = useState(false);
+
+  // Units
+  const units = indicators["ghg"].statementUnits
+
 
   // update session
   useEffect(() => {

@@ -5,13 +5,19 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { Button, Col, Form, InputGroup, Modal, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+
+// Utils
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
+import { checkStatementNRG } from "./utils";
+import { isValidInput, isValidInputNumber } from "/src/utils/Utils";
+
 
 // Modals
 import { AssessmentNRG } from "../modals/AssessmentNRG";
-import { checkStatementNRG } from "./utils";
-import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
+
+// Lib
+import indicators from "/lib/indics";
 
 /* ---------- STATEMENT - INDIC #NRG ---------- */
 
@@ -30,12 +36,6 @@ import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
  *    - errorMessage : null | {message}
  */
 
-const units = {
-  "MJ":  { label: "MJ",   coef: 1.0       }, // default
-  "GJ":  { label: "GJ",   coef: 1000.0    },
-  "kWh": { label: "kWh",  coef: 0.278     },
-  "MWh": { label: "MWh",  coef: 278.0  },
-};
 
 const StatementNRG = ({ 
   impactsData, 
@@ -50,6 +50,10 @@ const StatementNRG = ({
     useState(valueOrDefault(impactsData.energyConsumptionUncertainty, ""));
   const [info, setInfo] = useState(impactsData.comments.nrg || "");
   const [showModal, setShowModal] = useState(false);
+
+  // Units
+  const units = indicators["nrg"].statementUnits
+
 
   // update impacts data when state update
   useEffect(() => {

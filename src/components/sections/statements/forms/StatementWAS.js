@@ -5,10 +5,15 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+
+// Utils
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { checkStatementWAS } from "./utils";
-import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
+import { isValidInput, isValidInputNumber } from "/src/utils/Utils";
+
+// Lib
+import indicators from "/lib/indics";
 
 /* ---------- STATEMENT - INDIC #WAS ---------- */
 
@@ -27,23 +32,25 @@ import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
  *    - errorMessage : null | {message}
  */
 
-const units = {
-  "kg": { label: "kg",  coef: 1.0     }, // default
-  "t":  { label: "t",   coef: 1000.0  },
-};
 
 const StatementWAS = ({ 
   impactsData, 
   onUpdate 
 }) => {
   // satte
-  const [wasteProduction, setWasteProduction] = 
-    useState(valueOrDefault(impactsData.wasteProduction, ""));
-  const [wasteProductionUnit, setWasteProductionUnit] = 
-    useState(impactsData.wasteProductionUnit);
-  const [wasteProductionUncertainty, setWasteProductionUncertainty] = 
-    useState(valueOrDefault(impactsData.wasteProductionUncertainty, ""));
+  const [wasteProduction, setWasteProduction] = useState(
+    valueOrDefault(impactsData.wasteProduction, "")
+  );
+  const [wasteProductionUnit, setWasteProductionUnit] = useState(
+    impactsData.wasteProductionUnit
+  );
+  const [wasteProductionUncertainty, setWasteProductionUncertainty] = useState(
+    valueOrDefault(impactsData.wasteProductionUncertainty, "")
+  );
   const [info, setInfo] = useState(impactsData.comments.was || "");
+
+  // Units
+  const units = indicators["was"].statementUnits;
 
   // update impacts data when state update
   useEffect(() => {
@@ -52,7 +59,7 @@ const StatementWAS = ({
     impactsData.wasteProductionUncertainty = wasteProductionUncertainty;
     const statementStatus = checkStatementWAS(impactsData);
     onUpdate(statementStatus);
-  }, [wasteProduction,wasteProductionUnit,wasteProductionUncertainty]);
+  }, [wasteProduction, wasteProductionUnit, wasteProductionUncertainty]);
 
   // update state when props update
   useEffect(() => {
@@ -60,32 +67,35 @@ const StatementWAS = ({
   }, []);
 
   // waste production
-  const updateWasteProduction = (event) => 
-  {
+  const updateWasteProduction = (event) => {
     const input = event.target.value;
-    if (isValidInputNumber(input,0)) {
+    if (isValidInputNumber(input, 0)) {
       setWasteProduction(input);
-      if (wasteProductionUncertainty=="") {
-        let defaultUncertainty = parseFloat(input)> 0 ? 25.0 : 0.0;
+      if (wasteProductionUncertainty == "") {
+        let defaultUncertainty = parseFloat(input) > 0 ? 25.0 : 0.0;
         setWasteProductionUncertainty(defaultUncertainty);
       }
     }
   };
 
   // waste production unit
-  const updateWasteProductionUnit = (selected) => 
-  {
+  const updateWasteProductionUnit = (selected) => {
     const nextUnit = selected.value;
     setWasteProductionUnit(nextUnit);
     // update value
     if (!isNaN(wasteProduction)) {
-      setWasteProduction(roundValue(wasteProduction*(units[wasteProductionUnit].coef/units[nextUnit].coef),0));
+      setWasteProduction(
+        roundValue(
+          wasteProduction *
+            (units[wasteProductionUnit].coef / units[nextUnit].coef),
+          0
+        )
+      );
     }
   };
 
   // waste production uncertainty
-  const updateWasteProductionUncertainty = (event) => 
-  {
+  const updateWasteProductionUncertainty = (event) => {
     const input = event.target.value;
     if (isValidInputNumber(input)) {
       setWasteProductionUncertainty(input);
@@ -113,12 +123,14 @@ const StatementWAS = ({
                   type="text"
                   value={wasteProduction}
                   onChange={updateWasteProduction}
-                  isInvalid={!isValidInput(wasteProduction,0)}
+                  isInvalid={!isValidInput(wasteProduction, 0)}
                   className="me-1"
                 />
 
                 <Select
-                  options={Object.keys(units).map((unit) => {return({label: unit, value:unit})})}
+                  options={Object.keys(units).map((unit) => {
+                    return { label: unit, value: unit };
+                  })}
                   styles={unitSelectStyles}
                   value={{
                     label: wasteProductionUnit,
@@ -140,7 +152,7 @@ const StatementWAS = ({
                   value={wasteProductionUncertainty}
                   onChange={updateWasteProductionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidInput(wasteProductionUncertainty,0,100)}
+                  isInvalid={!isValidInput(wasteProductionUncertainty, 0, 100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
