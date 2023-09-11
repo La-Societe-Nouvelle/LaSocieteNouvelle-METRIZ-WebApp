@@ -188,6 +188,7 @@ export class Provider
     // Case - Fetch id not ok ----------------------------------------------------------------------------- //
     else if (!this.useDefaultFootprint) 
     {
+      this.footprintStatus = 404;
       // legal data --------------------------------------- //
       this.legalUnitData = {};
       // footprint ---------------------------------------- //
