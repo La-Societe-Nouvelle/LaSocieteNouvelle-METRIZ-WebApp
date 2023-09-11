@@ -1,8 +1,8 @@
 // La Société Nouvelle
-
-// Utils
 import { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
+
+// Utils
 import { buildFixedCapitalConsumptionsAggregates, buildIntermediateConsumptionsAggregates } from '/src/formulas/aggregatesBuilder';
 import { printValue } from "/src/utils/formatters";
 

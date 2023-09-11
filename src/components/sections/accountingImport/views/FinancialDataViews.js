@@ -167,7 +167,7 @@ const buildTab = (financialData,tab,period) =>
     case "stocks":
       return (
         <StocksTable 
-          financialData={session.financialData} 
+          financialData={financialData} 
           period={period}
         />
       ); 
