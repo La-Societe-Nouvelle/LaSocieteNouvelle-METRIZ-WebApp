@@ -111,20 +111,20 @@ const buildValueGHG = (indicator, impactsData) =>
 {
   const { nbDecimals, statementUnits } = metaIndics.ghg;
   const { 
-    greenhousesGazEmissions, 
-    greenhousesGazEmissionsUncertainty, 
-    greenhousesGazEmissionsUnit,
+    greenhouseGasEmissions, 
+    greenhouseGasEmissionsUncertainty, 
+    greenhouseGasEmissionsUnit,
     netValueAdded
   } = impactsData;
 
-  if (isValidNumber(greenhousesGazEmissions,0) 
-   && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)
-   && Object.keys(statementUnits).includes(greenhousesGazEmissionsUnit)) 
+  if (isValidNumber(greenhouseGasEmissions,0) 
+   && isValidNumber(greenhouseGasEmissionsUncertainty,0,100)
+   && Object.keys(statementUnits).includes(greenhouseGasEmissionsUnit)) 
   {
-    let grossImpact = parseFloat(greenhousesGazEmissions)*statementUnits[greenhousesGazEmissionsUnit].coef;
+    let grossImpact = parseFloat(greenhouseGasEmissions)*statementUnits[greenhouseGasEmissionsUnit].coef;
     let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
-    indicator.setUncertainty(parseInt(greenhousesGazEmissionsUncertainty));
+    indicator.setUncertainty(parseInt(greenhouseGasEmissionsUncertainty));
   }
 
   return indicator;
@@ -134,20 +134,20 @@ const buildValueHAZ = (indicator, impactsData) =>
 {
   const { nbDecimals, statementUnits } = metaIndics.haz;
   const { 
-    hazardousSubstancesConsumption, 
-    hazardousSubstancesConsumptionUncertainty,
-    hazardousSubstancesConsumptionUnit,
+    hazardousSubstancesUse, 
+    hazardousSubstancesUseUncertainty,
+    hazardousSubstancesUseUnit,
     netValueAdded
   } = impactsData;
 
-  if (isValidNumber(hazardousSubstancesConsumption,0)
-   && isValidNumber(hazardousSubstancesConsumptionUncertainty,0,100)
-   && Object.keys(statementUnits).includes(hazardousSubstancesConsumptionUnit)) 
+  if (isValidNumber(hazardousSubstancesUse,0)
+   && isValidNumber(hazardousSubstancesUseUncertainty,0,100)
+   && Object.keys(statementUnits).includes(hazardousSubstancesUseUnit)) 
   {
-    let grossImpact = parseFloat(hazardousSubstancesConsumption)*statementUnits[hazardousSubstancesConsumptionUnit].coef;
+    let grossImpact = parseFloat(hazardousSubstancesUse)*statementUnits[hazardousSubstancesUseUnit].coef;
     let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
-    indicator.setUncertainty(hazardousSubstancesConsumptionUncertainty);
+    indicator.setUncertainty(hazardousSubstancesUseUncertainty);
   }
 
   return indicator;

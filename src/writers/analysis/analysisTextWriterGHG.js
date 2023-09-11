@@ -63,7 +63,7 @@ export const analysisTextWriterGHG = (props) => {
     year
   );
 
-  if (impactsData.greenhousesGazEmissions == 0) {
+  if (impactsData.greenhouseGasEmissions == 0) {
     currentParagraph.push(
       "Les activités de l'entreprise ne génère aucune émission directe de gaz à effet de serre. L'intensité liée à la valeur ajoutée nette est donc de 0 gCO2e/€."
     );
@@ -71,10 +71,10 @@ export const analysisTextWriterGHG = (props) => {
     // valeur brute
     currentParagraph.push(
       "Les émissions directes de l'entreprise représentent " +
-        printValue(impactsData.greenhousesGazEmissions, 0) +
+        printValue(impactsData.greenhouseGasEmissions, 0) +
         " kgCO2e, soit " +
         printValue(
-          (impactsData.greenhousesGazEmissions /
+          (impactsData.greenhouseGasEmissions /
             mainAggregates.production.periodsData[period.periodKey].footprint.indicators.ghg.getGrossImpact(
               mainAggregates.production.periodsData[period.periodKey].amount
             )) *

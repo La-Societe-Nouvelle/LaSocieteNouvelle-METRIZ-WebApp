@@ -55,70 +55,41 @@ export class FinancialData
       // Production items ------------------------ //
 
       this.productionAggregates = {
-        revenue: new Aggregate(data.productionAggregates.revenue), // revenue (#71)
-        storedProduction: new Aggregate(
-          data.productionAggregates.storedProduction
-        ), // stored production (#71)
-        immobilisedProduction: new Aggregate(
-          data.productionAggregates.immobilisedProduction
-        ), // immobilised production (#72)
+        revenue: new Aggregate(data.productionAggregates.revenue),                                                                  // revenue (#71)
+        storedProduction: new Aggregate(data.productionAggregates.storedProduction),                                                // stored production (#71)
+        immobilisedProduction: new Aggregate(data.productionAggregates.immobilisedProduction),                                      // immobilised production (#72)
       };
 
       // External expenses ----------------------- //
 
-      this.externalExpenses = data.externalExpenses.map(
-        (props) => new Expense({ ...props })
-      ); // external expenses (#60[^3], #61, #62)
+      this.externalExpenses = data.externalExpenses.map((props) => new Expense({ ...props }));                                      // external expenses (#60[^3], #61, #62)
 
       // Stocks ---------------------------------- //
 
-      this.stocks = Object.values(data.stocks).map(
-        (props) => new Stock({ ...props })
-      ); // stocks (#31 to #35, #37) / Depreciation (#29)
-      this.stockVariations = data.stockVariations.map(
-        (props) => new StockVariation({ ...props })
-      ); // stock variation (#603, #71)
+      this.stocks = Object.values(data.stocks).map((props) => new Stock({ ...props }));                                             // stocks (#31 to #35, #37) / Depreciation (#29)
+      this.stockVariations = data.stockVariations.map((props) => new StockVariation({ ...props }));                                 // stock variation (#603, #71)
 
       // Immobilisations ------------------------- //
 
-      this.immobilisations = Object.values(data.immobilisations).map(
-        (props) => new Immobilisation({ ...props })
-      ); // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
-      this.amortisationExpenses = data.amortisationExpenses.map(
-        (props) => new AmortisationExpense({ ...props })
-      ); // amortisation expenses (#6811, #6871)
-      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map(
-        (props) => new AmortisationExpense({ ...props })
-      ); // amortisation expenses (#6811, #6871)
-      this.investments = data.investments.map(
-        (props) => new Expense({ ...props })
-      ); // investments (flows #2 <- #404)
-      this.immobilisedProductions = data.immobilisedProductions.map(
-        (props) => new ImmobilisedProduction({ ...props })
-      ); // productions of immobilisations (flows #2 <- #72)
+      this.immobilisations = Object.values(data.immobilisations).map((props) => new Immobilisation({ ...props }));                  // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+      this.amortisationExpenses = data.amortisationExpenses.map((props) => new AmortisationExpense({ ...props }));                  // amortisation expenses (#6811, #6871)
+      this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map((props) => new AmortisationExpense({ ...props }));  // amortisation expenses (#6811, #6871)
+      this.investments = data.investments.map((props) => new Expense({ ...props }));                                                // investments (flows #2 <- #404)
+      this.immobilisedProductions = data.immobilisedProductions.map((props) => new ImmobilisedProduction({ ...props }));            // productions of immobilisations (flows #2 <- #72)
 
       // Expenses accounts ----------------------- //
 
-      this.externalExpensesAccounts = data.externalExpensesAccounts.map(
-        (props) => new Account({ ...props })
-      );
-      this.stockVariationsAccounts = data.stockVariationsAccounts.map(
-        (props) => new Account({ ...props })
-      );
-      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map(
-        (props) => new Account({ ...props })
-      );
+      this.externalExpensesAccounts = data.externalExpensesAccounts.map((props) => new Account({ ...props }));
+      this.stockVariationsAccounts = data.stockVariationsAccounts.map((props) => new Account({ ...props }));
+      this.amortisationExpensesAccounts = data.amortisationExpensesAccounts.map((props) => new Account({ ...props }));
 
       // Providers ------------------------------- //
 
-      this.providers = data.providers.map(
-        (props) => new Provider({ ...props })
-      );
+      this.providers = data.providers.map((props) => new Provider({ ...props }));
 
       // Aggregates ------------------------------ //
 
-      this.mainAggregates = 
-      {
+      this.mainAggregates = {
         production: new Aggregate(data.mainAggregates.production),
         intermediateConsumptions: new Aggregate(data.mainAggregates.intermediateConsumptions),
         fixedCapitalConsumptions: new Aggregate(data.mainAggregates.fixedCapitalConsumptions),

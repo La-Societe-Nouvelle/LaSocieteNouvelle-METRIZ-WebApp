@@ -52,14 +52,14 @@ export const analysisTextWriterHAZ = (props) => {
 
   currentParagraph = [];
 
-  if (impactsData.hazardousSubstancesConsumption == 0) {
+  if (impactsData.hazardousSubstancesUse == 0) {
     currentParagraph.push(
       "Aucun produit dangereux n'est utilisé pour les activités de l'entreprise. L'intensité associée à la valeur ajoutée est donc de 0 g/€."
     );
   } else {
     currentParagraph.push(
       "La consommation de produits dangereux s'élève à hauteur de " +
-        printValue(impactsData.hazardousSubstancesConsumption, 0) +
+        printValue(impactsData.hazardousSubstancesUse, 0) +
         " kg," +
         " soit une intensité de " +
         printValue(mainAggregates.netValueAdded.periodsData[period.periodKey].footprint.indicators.haz.value, 0) +
@@ -68,7 +68,7 @@ export const analysisTextWriterHAZ = (props) => {
     currentParagraph.push(
       "L'utilisation directe de produits dangereux compte pour " +
         printValue(
-          (impactsData.hazardousSubstancesConsumption /
+          (impactsData.hazardousSubstancesUse /
             mainAggregates.production.periodsData[period.periodKey].footprint.indicators.haz.getGrossImpact(
               mainAggregates.production.periodsData[period.periodKey].amount
             )) *

@@ -19,9 +19,9 @@ import indicators from "/lib/indics";
 /* ---------- STATEMENT - INDIC #HAZ ---------- */
 
 /** Props concerned in impacts data :
- *    - hazardousSubstancesConsumption
- *    - hazardousSubstancesConsumptionUnit
- *    - hazardousSubstancesConsumptionUncertainty
+ *    - hazardousSubstancesUse
+ *    - hazardousSubstancesUseUnit
+ *    - hazardousSubstancesUseUncertainty
  * 
  *  key functions :
  *    - useEffect on state
@@ -41,12 +41,12 @@ const StatementHAZ = ({
   onUpdate 
 }) => {
   // state
-  const [hazardousSubstancesConsumption, setHazardousSubstancesConsumption] =
-    useState(valueOrDefault(impactsData.hazardousSubstancesConsumption, ""));
-  const [hazardousSubstancesConsumptionUnit, setHazardousSubstancesConsumptionUnit] = 
-    useState(impactsData.hazardousSubstancesConsumptionUnit);
-  const [hazardousSubstancesConsumptionUncertainty, setHazardousSubstancesConsumptionUncertainty] = 
-    useState(valueOrDefault(impactsData.hazardousSubstancesConsumptionUncertainty, ""));  
+  const [hazardousSubstancesUse, setHazardousSubstancesUse] =
+    useState(valueOrDefault(impactsData.hazardousSubstancesUse, ""));
+  const [hazardousSubstancesUseUnit, setHazardousSubstancesUseUnit] = 
+    useState(impactsData.hazardousSubstancesUseUnit);
+  const [hazardousSubstancesUseUncertainty, setHazardousSubstancesUseUncertainty] = 
+    useState(valueOrDefault(impactsData.hazardousSubstancesUseUncertainty, ""));  
   const [info, setInfo] = useState(impactsData.comments.haz || "");
 
     // Units
@@ -54,12 +54,12 @@ const StatementHAZ = ({
 
   // update impacts data when state update
   useEffect(() => {
-    impactsData.hazardousSubstancesConsumption = hazardousSubstancesConsumption;
-    impactsData.hazardousSubstancesConsumptionUnit = hazardousSubstancesConsumptionUnit;
-    impactsData.hazardousSubstancesConsumptionUncertainty = hazardousSubstancesConsumptionUncertainty;
+    impactsData.hazardousSubstancesUse = hazardousSubstancesUse;
+    impactsData.hazardousSubstancesUseUnit = hazardousSubstancesUseUnit;
+    impactsData.hazardousSubstancesUseUncertainty = hazardousSubstancesUseUncertainty;
     const statementStatus = checkStatementHAZ(impactsData);
     onUpdate(statementStatus);
-  }, [hazardousSubstancesConsumption,hazardousSubstancesConsumptionUnit,hazardousSubstancesConsumptionUncertainty]);
+  }, [hazardousSubstancesUse,hazardousSubstancesUseUnit,hazardousSubstancesUseUncertainty]);
 
   // update state when props update
   useEffect(() => {
@@ -67,35 +67,35 @@ const StatementHAZ = ({
   }, []);
 
   // hazardous substances consumption
-  const updateHazardousSubstancesConsumption = (event) => 
+  const updateHazardousSubstancesUse = (event) => 
   {
     const input = event.target.value;
     if (isValidInputNumber(input,0)) {
-      setHazardousSubstancesConsumption(input);
-      if (hazardousSubstancesConsumptionUncertainty=="") {
+      setHazardousSubstancesUse(input);
+      if (hazardousSubstancesUseUncertainty=="") {
         let defaultUncertainty = parseFloat(input)>0 ? 25.0 : 0.0;
-        setHazardousSubstancesConsumptionUncertainty(defaultUncertainty);
+        setHazardousSubstancesUseUncertainty(defaultUncertainty);
       }
     }
   };
 
   // hazardous substances consumption unit
-  const updateHazardousSubstancesConsumptionUnit = (selected) => 
+  const updateHazardousSubstancesUseUnit = (selected) => 
   {
     const nextUnit = selected.value;
-    setHazardousSubstancesConsumptionUnit(nextUnit);
+    setHazardousSubstancesUseUnit(nextUnit);
     // update value
-    if (!isNaN(hazardousSubstancesConsumption)) {
-      setHazardousSubstancesConsumption(roundValue(hazardousSubstancesConsumption*(units[hazardousSubstancesConsumptionUnit].coef/units[nextUnit].coef),0));
+    if (!isNaN(hazardousSubstancesUse)) {
+      setHazardousSubstancesUse(roundValue(hazardousSubstancesUse*(units[hazardousSubstancesUseUnit].coef/units[nextUnit].coef),0));
     }
   };
 
   // hazardous substances consumption uncertainty
-  const updateHazardousSubstancesConsumptionUncertainty = (event) => 
+  const updateHazardousSubstancesUseUncertainty = (event) => 
   {
     const input = event.target.value;
     if (isValidInputNumber(input,0)) {
-      setHazardousSubstancesConsumptionUncertainty(input);
+      setHazardousSubstancesUseUncertainty(input);
     }
   };
 
@@ -116,20 +116,20 @@ const StatementHAZ = ({
                 <div className="input-group custom-input with-select">
                   <Form.Control
                     type="text"
-                    value={hazardousSubstancesConsumption}
-                    onChange={updateHazardousSubstancesConsumption}
-                    isInvalid={!isValidInput(hazardousSubstancesConsumption,0)}
+                    value={hazardousSubstancesUse}
+                    onChange={updateHazardousSubstancesUse}
+                    isInvalid={!isValidInput(hazardousSubstancesUse,0)}
                     className="me-1"
                   />
                    <Select
                     styles={unitSelectStyles}
                     options={Object.keys(units).map((indic) => {return({label: indic, value: indic})})}
                     defaultValue={{
-                      label: hazardousSubstancesConsumptionUnit,
-                      value: hazardousSubstancesConsumptionUnit,
+                      label: hazardousSubstancesUseUnit,
+                      value: hazardousSubstancesUseUnit,
                     }}
                     className="small"
-                    onChange={updateHazardousSubstancesConsumptionUnit}
+                    onChange={updateHazardousSubstancesUseUnit}
                   />
                 </div>
                 <div>
@@ -145,10 +145,10 @@ const StatementHAZ = ({
               <InputGroup className="custom-input ">
                 <Form.Control
                   type="text"
-                  value={hazardousSubstancesConsumptionUncertainty}
-                  onChange={updateHazardousSubstancesConsumptionUncertainty}
+                  value={hazardousSubstancesUseUncertainty}
+                  onChange={updateHazardousSubstancesUseUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidInput(hazardousSubstancesConsumptionUncertainty,0,100)}
+                  isInvalid={!isValidInput(hazardousSubstancesUseUncertainty,0,100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>

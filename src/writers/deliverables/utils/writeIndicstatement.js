@@ -72,9 +72,9 @@ export const writeStatementGHG = (impactsData) => {
     {
       text:
         "Emissions directes de gaz à effet de serre : " +
-        printValue(impactsData.greenhousesGazEmissions, 0) +
+        printValue(impactsData.greenhouseGasEmissions, 0) +
         " kgCO2e +/- " +
-        printValue(impactsData.greenhousesGazEmissionsUncertainty, 0) +
+        printValue(impactsData.greenhouseGasEmissionsUncertainty, 0) +
         " %",
     },
   ];
@@ -87,9 +87,9 @@ export const writeStatementHAZ = (impactsData) => {
     {
       text:
         "Quantité utilisée de produits dangereux : " +
-        printValue(impactsData.hazardousSubstancesConsumption, 0) +
+        printValue(impactsData.hazardousSubstancesUse, 0) +
         " kg +/- " +
-        printValue(impactsData.hazardousSubstancesConsumptionUncertainty, 0) +
+        printValue(impactsData.hazardousSubstancesUseUncertainty, 0) +
         " %",
     },
   ];

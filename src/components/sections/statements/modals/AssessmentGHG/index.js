@@ -136,8 +136,8 @@ export const AssessmentGHG = ({
   {
     // update ghg statement
     impactsData.ghgDetails = ghgDetails;
-    impactsData.greenhousesGazEmissions = getTotalGhgEmissions(ghgDetails);
-    impactsData.greenhousesGazEmissionsUncertainty = getTotalGhgEmissionsUncertainty(ghgDetails);
+    impactsData.greenhouseGasEmissions = getTotalGhgEmissions(ghgDetails);
+    impactsData.greenhouseGasEmissionsUncertainty = getTotalGhgEmissionsUncertainty(ghgDetails);
 
     submit();
   }

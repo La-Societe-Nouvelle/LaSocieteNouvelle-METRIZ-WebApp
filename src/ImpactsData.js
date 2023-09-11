@@ -14,8 +14,8 @@ export class ImpactsData  {
 
     /* --- Value Creation --- */
 
-    this.isAllActivitiesInFrance = props.isAllActivitiesInFrance !== undefined ? props.isAllActivitiesInFrance : null;
-    this.domesticProduction = props.domesticProduction !== undefined ? props.domesticProduction : null;
+    this.isAllActivitiesInFrance = props.isAllActivitiesInFrance ?? null;
+    this.domesticProduction = props.domesticProduction ?? null;
 
     this.isValueAddedCrafted = props.isValueAddedCrafted !== undefined ? props.isValueAddedCrafted : null;
     this.craftedProduction =  props.craftedProduction !== undefined ? props.craftedProduction : null;
@@ -37,16 +37,15 @@ export class ImpactsData  {
 
     /* --- Environnemental Data */
 
-    this.greenhousesGazEmissions =  props.greenhousesGazEmissions !== undefined ? props.greenhousesGazEmissions : null;
-    this.greenhousesGazEmissionsUncertainty =  props.greenhousesGazEmissionsUncertainty !== undefined ? props.greenhousesGazEmissionsUncertainty : null;
-    this.greenhousesGazEmissionsUnit = props.greenhousesGazEmissionsUnit !== undefined ? props.greenhousesGazEmissionsUnit : "kgCO2e";
+    this.greenhouseGasEmissions =  props.greenhouseGasEmissions !== undefined ? props.greenhouseGasEmissions : null;
+    this.greenhouseGasEmissionsUncertainty =  props.greenhouseGasEmissionsUncertainty !== undefined ? props.greenhouseGasEmissionsUncertainty : null;
+    this.greenhouseGasEmissionsUnit = props.greenhouseGasEmissionsUnit !== undefined ? props.greenhouseGasEmissionsUnit : "kgCO2e";
 
     this.ghgDetails = props.ghgDetails || {};
-    this.ghgTotal = props.ghgTotal || false;
 
-    this.hazardousSubstancesConsumption = props.hazardousSubstancesConsumption !== undefined ? props.hazardousSubstancesConsumption : null;
-    this.hazardousSubstancesConsumptionUnit = props.hazardousSubstancesConsumptionUnit !== undefined ? props.hazardousSubstancesConsumptionUnit : "kg";
-    this.hazardousSubstancesConsumptionUncertainty = props.hazardousSubstancesConsumptionUncertainty !== undefined ? props.hazardousSubstancesConsumptionUncertainty : null;
+    this.hazardousSubstancesUse = props.hazardousSubstancesUse !== undefined ? props.hazardousSubstancesUse : null;
+    this.hazardousSubstancesUseUnit = props.hazardousSubstancesUseUnit !== undefined ? props.hazardousSubstancesUseUnit : "kg";
+    this.hazardousSubstancesUseUncertainty = props.hazardousSubstancesUseUncertainty !== undefined ? props.hazardousSubstancesUseUncertainty : null;
 
     this.isExtractiveActivities = props.isExtractiveActivities !== undefined ? props.isExtractiveActivities : null;
     this.materialsExtraction =  props.materialsExtraction !== undefined ? props.materialsExtraction : null;
@@ -56,9 +55,8 @@ export class ImpactsData  {
     this.energyConsumption = props.energyConsumption !== undefined ? props.energyConsumption : null;
     this.energyConsumptionUnit = props.energyConsumptionUnit !== undefined ? props.energyConsumptionUnit : "MJ";
     this.energyConsumptionUncertainty = props.energyConsumptionUncertainty !== undefined ? props.energyConsumptionUncertainty : null;
-    this.nrgDetails = props.nrgDetails || {};
-    this.nrgTotal = props.nrgTotal || false;
 
+    this.nrgDetails = props.nrgDetails || {};
 
     this.wasteProduction = props.wasteProduction !== undefined ? props.wasteProduction : null;
     this.wasteProductionUnit = props.wasteProductionUnit !== undefined ? props.wasteProductionUnit : "kg";

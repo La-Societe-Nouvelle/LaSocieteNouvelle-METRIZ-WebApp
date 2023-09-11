@@ -117,30 +117,30 @@ export const checkStatementGEQ = (impactsData) => {
 export const checkStatementGHG = (impactsData) => 
 {
   const {
-    greenhousesGazEmissions,
-    greenhousesGazEmissionsUncertainty,
+    greenhouseGasEmissions,
+    greenhouseGasEmissionsUncertainty,
   } = impactsData;
 
   // ok
-  if (isValidNumber(greenhousesGazEmissions,0) && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
+  if (isValidNumber(greenhouseGasEmissions,0) && isValidNumber(greenhouseGasEmissionsUncertainty,0,100)) {
     return({ status: "ok", errorMessage: null });
   } 
   // incomplete
-  else if (greenhousesGazEmissions=="" || greenhousesGazEmissionsUncertainty=="") {
+  else if (greenhouseGasEmissions=="" || greenhouseGasEmissionsUncertainty=="") {
     return({ status: "incomplete", errorMessage: null });
   } 
   // error
-  else if (greenhousesGazEmissions!="" && !isValidNumber(greenhousesGazEmissions,0)) {
+  else if (greenhouseGasEmissions!="" && !isValidNumber(greenhouseGasEmissions,0)) {
     return({
       status: "error",
-      errorMessage: isValidNumber(greenhousesGazEmissions) ?
+      errorMessage: isValidNumber(greenhouseGasEmissions) ?
         "Valeur saisie incorrecte (négative)"
         : "Veuillez saisir une valeur numérique"
     });
-  } else if (greenhousesGazEmissionsUncertainty!="" && !isValidNumber(greenhousesGazEmissionsUncertainty,0,100)) {
+  } else if (greenhouseGasEmissionsUncertainty!="" && !isValidNumber(greenhouseGasEmissionsUncertainty,0,100)) {
     return({
       status: "error",
-      errorMessage: isValidNumber(greenhousesGazEmissionsUncertainty) ?
+      errorMessage: isValidNumber(greenhouseGasEmissionsUncertainty) ?
         "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
         : "Veuillez saisir une valeur numérique pour l'incertitude"
     });
@@ -156,41 +156,41 @@ export const checkStatementGHG = (impactsData) =>
 export const checkStatementHAZ = (impactsData) => 
 {
   const {
-    hazardousSubstancesConsumption,
-    hazardousSubstancesConsumptionUncertainty,
+    hazardousSubstancesUse,
+    hazardousSubstancesUseUncertainty,
   } = impactsData;
 
   // ok
-  if (isValidNumber(hazardousSubstancesConsumption,0) && isValidNumber(hazardousSubstancesConsumptionUncertainty,0,100)) {
+  if (isValidNumber(hazardousSubstancesUse,0) && isValidNumber(hazardousSubstancesUseUncertainty,0,100)) {
     return({ status: "ok", errorMessage: null });
   } 
   // valid value (empty or correct)
-  else if (!isValidInput(hazardousSubstancesConsumption,0) && !isValidInput(hazardousSubstancesConsumptionUncertainty,0,100)) {
+  else if (!isValidInput(hazardousSubstancesUse,0) && !isValidInput(hazardousSubstancesUseUncertainty,0,100)) {
     return({
       status: "error",
       errorMessage: "Valeurs saisies incorrectes"
     });
   }
   // error value for energy consumption
-  else if (!isValidInput(hazardousSubstancesConsumption,0)) {
+  else if (!isValidInput(hazardousSubstancesUse,0)) {
     return({
       status: "error",
-      errorMessage: isValidNumber(hazardousSubstancesConsumption) ?
+      errorMessage: isValidNumber(hazardousSubstancesUse) ?
         "Valeur saisie incorrecte (négative)"
         : "Veuillez saisir une valeur numérique"
     });
   }
   // error value for uncertainty
-  else if (!isValidInput(hazardousSubstancesConsumptionUncertainty,0,100)) {
+  else if (!isValidInput(hazardousSubstancesUseUncertainty,0,100)) {
     return({
       status: "error",
-      errorMessage: isValidNumber(hazardousSubstancesConsumptionUncertainty) ?
+      errorMessage: isValidNumber(hazardousSubstancesUseUncertainty) ?
         "Incertitude saisie incorrecte (négative ou supérieur à 100%)"
         : "Veuillez saisir une valeur numérique pour l'incertitude"
     });
   }
   // incomplete statement
-  else if (hazardousSubstancesConsumption=="" || hazardousSubstancesConsumptionUncertainty=="") {
+  else if (hazardousSubstancesUse=="" || hazardousSubstancesUseUncertainty=="") {
     return({ status: "incomplete", errorMessage: null });
   }
   // other

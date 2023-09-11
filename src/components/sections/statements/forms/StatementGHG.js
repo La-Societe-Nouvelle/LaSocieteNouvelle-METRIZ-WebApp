@@ -22,9 +22,9 @@ import indicators from "/lib/indics";
 /* ---------- STATEMENT - INDIC #GHG ---------- */
 
 /** Props concerned in impacts data :
- *    - greenhousesGazEmissions
- *    - greenhousesGazEmissionsUnit
- *    - greenhousesGazEmissionsUncertainty
+ *    - greenhouseGasEmissions
+ *    - greenhouseGasEmissionsUnit
+ *    - greenhouseGasEmissionsUncertainty
  * 
  *  key functions :
  *    - useEffect on state
@@ -43,12 +43,12 @@ const StatementGHG = ({
   onUpdate
 }) => {
 
-  const [greenhousesGazEmissions, setGreenhousesGazEmissions] = 
-    useState(valueOrDefault(impactsData.greenhousesGazEmissions, ""));
-  const [greenhousesGazEmissionsUnit, setGreenhousesGazEmissionsUnit] = 
-    useState(impactsData.greenhousesGazEmissionsUnit || "kgCO2e");
-  const [greenhousesGazEmissionsUncertainty, setGreenhousesGazEmissionsUncertainty] = 
-    useState(valueOrDefault(impactsData.greenhousesGazEmissionsUncertainty, ""));
+  const [greenhouseGasEmissions, setGreenhouseGasEmissions] = 
+    useState(valueOrDefault(impactsData.greenhouseGasEmissions, ""));
+  const [greenhouseGasEmissionsUnit, setGreenhouseGasEmissionsUnit] = 
+    useState(impactsData.greenhouseGasEmissionsUnit || "kgCO2e");
+  const [greenhouseGasEmissionsUncertainty, setGreenhouseGasEmissionsUncertainty] = 
+    useState(valueOrDefault(impactsData.greenhouseGasEmissionsUncertainty, ""));
   const [info, setInfo] = useState(impactsData.comments.ghg || "");
   const [showModal, setShowModal] = useState(false);
 
@@ -58,54 +58,54 @@ const StatementGHG = ({
 
   // update session
   useEffect(() => {
-    impactsData.greenhousesGazEmissions = greenhousesGazEmissions;
-    impactsData.greenhousesGazEmissionsUncertainty = greenhousesGazEmissionsUncertainty;
-    impactsData.greenhousesGazEmissionsUnit = greenhousesGazEmissionsUnit;
+    impactsData.greenhouseGasEmissions = greenhouseGasEmissions;
+    impactsData.greenhouseGasEmissionsUncertainty = greenhouseGasEmissionsUncertainty;
+    impactsData.greenhouseGasEmissionsUnit = greenhouseGasEmissionsUnit;
     const statementStatus = checkStatementGHG(impactsData);
     onUpdate(statementStatus);
-  }, [greenhousesGazEmissions,greenhousesGazEmissionsUncertainty,greenhousesGazEmissionsUnit]);
+  }, [greenhouseGasEmissions,greenhouseGasEmissionsUncertainty,greenhouseGasEmissionsUnit]);
 
   // update state
   useEffect(() => 
   {
-    if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
-      setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
+    if (impactsData.greenhouseGasEmissions!=greenhouseGasEmissions) {
+      setGreenhouseGasEmissions(impactsData.greenhouseGasEmissions);
     }
-    if (impactsData.greenhousesGazEmissionsUncertainty!=greenhousesGazEmissionsUncertainty) {
-      setGreenhousesGazEmissionsUncertainty(impactsData.greenhousesGazEmissionsUncertainty || "");
+    if (impactsData.greenhouseGasEmissionsUncertainty!=greenhouseGasEmissionsUncertainty) {
+      setGreenhouseGasEmissionsUncertainty(impactsData.greenhouseGasEmissionsUncertainty || "");
     }
-  }, [impactsData.greenhousesGazEmissions, impactsData.greenhousesGazEmissionsUncertainty]);
+  }, [impactsData.greenhouseGasEmissions, impactsData.greenhouseGasEmissionsUncertainty]);
 
   // greenhouse gas emissions
-  const updateGreenhousesGazEmissions = (event) => 
+  const updateGreenhouseGasEmissions = (event) => 
   {
     const input = event.target.value;
     if (isValidInputNumber(input,0)) {
-      setGreenhousesGazEmissions(input);
-      if (greenhousesGazEmissionsUncertainty=="") {
+      setGreenhouseGasEmissions(input);
+      if (greenhouseGasEmissionsUncertainty=="") {
         let defaultUncertainty = parseFloat(input)>0 ? 25.0 : 0.0 ;
-        setGreenhousesGazEmissionsUncertainty(defaultUncertainty);
+        setGreenhouseGasEmissionsUncertainty(defaultUncertainty);
       }
     } 
   };
 
   // greenhouse gas emissions unit
-  const updateGreenhousesGazEmissionsUnit = (selected) => 
+  const updateGreenhouseGasEmissionsUnit = (selected) => 
   {
     const nextUnit = selected.value;
-    setGreenhousesGazEmissionsUnit(nextUnit);
+    setGreenhouseGasEmissionsUnit(nextUnit);
     // update value
-    if (!isNaN(greenhousesGazEmissions)) {
-      setGreenhousesGazEmissions(roundValue(greenhousesGazEmissions*(units[greenhousesGazEmissionsUnit].coef/units[nextUnit].coef),0));
+    if (!isNaN(greenhouseGasEmissions)) {
+      setGreenhouseGasEmissions(roundValue(greenhouseGasEmissions*(units[greenhouseGasEmissionsUnit].coef/units[nextUnit].coef),0));
     }
   };
 
   // greenhouse gas emissions uncertainty
-  const updateGreenhousesGazEmissionsUncertainty = (event) => 
+  const updateGreenhouseGasEmissionsUncertainty = (event) => 
   {
     const input = event.target.value;
     if (isValidInputNumber(input,0)) {
-      setGreenhousesGazEmissionsUncertainty(input);
+      setGreenhouseGasEmissionsUncertainty(input);
     }
   };
 
@@ -113,11 +113,11 @@ const StatementGHG = ({
   const saveInfo = () => (impactsData.comments.ghg = info);
 
   const onAssessmentSubmit = () => {
-    if (impactsData.greenhousesGazEmissions!=greenhousesGazEmissions) {
-      setGreenhousesGazEmissions(impactsData.greenhousesGazEmissions);
+    if (impactsData.greenhouseGasEmissions!=greenhouseGasEmissions) {
+      setGreenhouseGasEmissions(impactsData.greenhouseGasEmissions);
     }
-    if (impactsData.greenhousesGazEmissionsUncertainty!=greenhousesGazEmissionsUncertainty) {
-      setGreenhousesGazEmissionsUncertainty(impactsData.greenhousesGazEmissionsUncertainty || "");
+    if (impactsData.greenhouseGasEmissionsUncertainty!=greenhouseGasEmissionsUncertainty) {
+      setGreenhouseGasEmissionsUncertainty(impactsData.greenhouseGasEmissionsUncertainty || "");
     }
     setShowModal(false);
   }
@@ -135,19 +135,19 @@ const StatementGHG = ({
                 <div className="me-1 custom-input with-select input-group">
                   <Form.Control
                     type="texte"
-                    value={greenhousesGazEmissions}
-                    onChange={updateGreenhousesGazEmissions}
-                    isInvalid={!isValidValue(greenhousesGazEmissions)}
+                    value={greenhouseGasEmissions}
+                    onChange={updateGreenhouseGasEmissions}
+                    isInvalid={!isValidValue(greenhouseGasEmissions)}
                     className="me-1"
                   />
                   <Select
                     styles={unitSelectStyles}
                     options={Object.keys(units).map((unit) => {return({label: unit, value: unit })})}
                     value={{
-                      label: greenhousesGazEmissionsUnit,
-                      value: greenhousesGazEmissionsUnit,
+                      label: greenhouseGasEmissionsUnit,
+                      value: greenhouseGasEmissionsUnit,
                     }}
-                    onChange={updateGreenhousesGazEmissionsUnit}
+                    onChange={updateGreenhouseGasEmissionsUnit}
                   />
                 </div>
 
@@ -171,10 +171,10 @@ const StatementGHG = ({
               <InputGroup className="custom-input">
                 <Form.Control
                   type="text"
-                  value={greenhousesGazEmissionsUncertainty}
-                  onChange={updateGreenhousesGazEmissionsUncertainty}
+                  value={greenhouseGasEmissionsUncertainty}
+                  onChange={updateGreenhouseGasEmissionsUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidUncertainty(greenhousesGazEmissionsUncertainty)}
+                  isInvalid={!isValidUncertainty(greenhouseGasEmissionsUncertainty)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
