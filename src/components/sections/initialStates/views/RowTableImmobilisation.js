@@ -129,7 +129,7 @@ export const RowTableImmobilisation = ({
           &nbsp;&nbsp;Immobilisation non amortie sur l'exercice
         </td>}
       {/* Empreinte reprise sur exercice précédent */}
-      {isPrevPeriodAvailable &&
+      {(isAmortisable && isPrevPeriodAvailable) &&
         <td colSpan={2}>
           <Select
             className={"success"}

@@ -57,7 +57,6 @@ export const getProgression = async (session,period) =>
   
   // results
   let resultsValid = checkResults(session,period);
-  console.log("déclaration validées : "+statementsValid);
   if (!resultsValid) {
     return progressionIndex.statementsSection;
   } else {
@@ -75,7 +74,6 @@ export const checkInitialStates = (session,period) =>
     ...session.financialData.immobilisations,
     ...session.financialData.stocks
   ];
-  console.log(assetAccounts);
   return assetAccounts.every((account) => !account.isAmortisable || account.initialStateSet);
 }
 
@@ -119,6 +117,5 @@ export const checkResults = (session,period) =>
 {
   let netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey];
   let validations = session.validations[period.periodKey];
-  console.log(netValueAdded.footprint);
   return validations.every((indic) => netValueAdded.footprint.indicators[indic].isValid());
 }

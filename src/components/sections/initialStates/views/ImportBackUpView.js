@@ -35,12 +35,12 @@ export const ImportBackUpView = ({
 
   const onDrop = (files) => {
     setFiles(files);
-    importFile();
+    importFile(files);
   }
 
   /* ---------- BACK-UP IMPORT ---------- */
 
-  const importFile = () => 
+  const importFile = (files) => 
   {
     let file = files[0];
 
@@ -62,7 +62,8 @@ export const ImportBackUpView = ({
 
         // --------------------------------------------------
 
-        const loadedSessionChecking = checkLoadedSession(session,loadedSession);
+        const loadedSessionChecking = await checkLoadedSession(session,loadedSession);
+        console.log(loadedSessionChecking);
         if (loadedSessionChecking.checked) 
         {
           // Update session with back up
@@ -75,6 +76,8 @@ export const ImportBackUpView = ({
         // if error
         else {
           setTitlePopup("Erreur - fichier");
+          console.log(loadedSessionChecking.errors);
+          console.log(loadedSessionChecking.errors.map((error) => error.message).join(" "))
           setMessagePopup(loadedSessionChecking.errors.map((error) => error.message).join(" "));
           setShowPopup(true);
         };
@@ -83,6 +86,7 @@ export const ImportBackUpView = ({
       }
 
       catch (error) {
+        console.log(error);
         // API error
         if(error.message == "Network Error") {
           setErrorAPI(true);
@@ -99,6 +103,7 @@ export const ImportBackUpView = ({
     try 
     {
       // read file
+      console.log(file);
       reader.readAsText(file);
     } 
     catch (error) {

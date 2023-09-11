@@ -31,21 +31,22 @@ export const isCurrentFootprintAvailable = (account, financialData) =>
  *    - for each asset corresponding amounts (between last state and initial state)
  */
 
-export const checkLoadedSession = (session, loadedSession) => 
+export const checkLoadedSession = async (session, loadedSession) => 
 {
   const errors = [];
 
   // Check conflicts ----------------------------------
   // check if prev session periods not already in current session
 
+  const currentPeriodKeys = session.availablePeriods.map((period) => period.periodKey);
   const conflictingPeriods = loadedSession.availablePeriods
-    .filter((period) => Object.keys(session.availablePeriods).includes(period.periodKey));
+    .filter((period) => currentPeriodKeys.includes(period.periodKey));
 
   if (conflictingPeriods.length>0) {
-    return([{
+    errors.push({
       title: "Erreur - Sauvegarde",
       message: "Des données existent au sein de la session en cours pour certaines périodes de la session importée."
-    }]);
+    });
   }
 
   // Check continuity ---------------------------------
@@ -59,10 +60,10 @@ export const checkLoadedSession = (session, loadedSession) =>
     .map((period) => period.dateEnd)[0];
 
   if (dateEndPrevSession!=getPrevDate(dateStartSession)) {
-    return([{
+    errors.push({
       title: "Erreur - Sauvegarde",
       message: "La sauvegarde ne correspond pas à l'année précédente."
-    }]);
+    });
   }
 
   // -> if errors -> return erros list
@@ -84,6 +85,10 @@ export const checkLoadedSession = (session, loadedSession) =>
       {
         let prevImmobilisation = loadedSession.financialData.immobilisations
           .find((account) => account.accountNum == immobilisation.accountNum);
+        console.log(prevImmobilisation.accountNum);
+        console.log(prevImmobilisation.initialState);
+        console.log(prevImmobilisation.states[dateEndPrevSession]);
+        console.log(isValidNumber(prevImmobilisation.states[dateEndPrevSession].amount));
         
         if (!prevImmobilisation) {
           errors.push({
@@ -91,22 +96,22 @@ export const checkLoadedSession = (session, loadedSession) =>
             message: "Le compte d'immobilisation "+immobilisation.accountNum+" n'est pas présent dans la session importée."
           });
         } 
-        else if (!isValidNumber(prevImmobilisation.lastState.amount)
-              || !isValidNumber(prevImmobilisation.lastState.amortisationAmount)) {
+        else if (!isValidNumber(prevImmobilisation.states[dateEndPrevSession].amount)
+              || !isValidNumber(prevImmobilisation.states[dateEndPrevSession].amortisationAmount)) {
           errors.push({
             title: "Erreur application",
             message: "Etat final non défini pour le compte d'immobilisation "+immobilisation.accountNum+"."
           });
         }
         else if (!isValidNumber(prevImmobilisation.initialState.amount) 
-              || (prevImmobilisation.initialState.amount>0 && prevImmobilisation)) {
+              || !prevImmobilisation.initialState.footprint.isValid()) {
           errors.push({
             title: "Erreur application",
-            message: "Etat final non défini pour le compte d'immobilisation "+immobilisation.accountNum+"."
+            message: "Etat initial non défini pour le compte d'immobilisation "+immobilisation.accountNum+"."
           });
         } 
-        else if (immobilisation.initialState.amount!=prevImmobilisation.lastState.amount
-              || immobilisation.initialState.amortisationAmount!=prevImmobilisation.lastState.amortisationAmount) {
+        else if (immobilisation.initialState.amount!=prevImmobilisation.states[dateEndPrevSession].amount
+              || immobilisation.initialState.amortisationAmount!=prevImmobilisation.states[dateEndPrevSession].amortisationAmount) {
           errors.push({
             title: "Montants non correspondants.",
             message: "Les montants ne correspondent pas pour le compte d'immobilisation "+immobilisation.accountNum+"."
@@ -128,13 +133,13 @@ export const checkLoadedSession = (session, loadedSession) =>
             message: "Le compte de stock "+stock.accountNum+" n'est pas présent dans la session importée."
           });
         }
-        else if (!isValidNumber(prevStock.lastState.amount)) {
+        else if (!isValidNumber(prevStock.states[dateEndPrevSession].amount)) {
           errors.push({
             title: "Erreur application",
             message: "Etat final non défini pour le compte de stock "+stock.accountNum+"."
           });
         } 
-        else if (stock.initialState.amount!=prevStock.lastState.amount) {
+        else if (stock.initialState.amount!=prevStock.states[dateEndPrevSession].amount) {
           errors.push({
             title: "Montants non correspondants.",
             message: "Les montants ne correspondent pas pour le compte de stock "+stock.accountNum+"."

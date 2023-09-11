@@ -12,7 +12,7 @@ import { AmortisationExpense } from "./accountingObjects/AmortisationExpense";
 import { ImmobilisedProduction } from "./accountingObjects/ImmobilisedProduction";
 
 // Utils
-import { getAmountItems } from "./utils/Utils";
+import { getAmountItems, mergePeriodsData } from "./utils/Utils";
 import { buildMainAggregates, buildProductionAggregates, mergeAggregatesPeriodsData } from "./formulas/aggregatesBuilder";
 
 // Libraries
