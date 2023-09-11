@@ -5,10 +5,15 @@ import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import { Col, Form, InputGroup, Row } from "react-bootstrap";
 
-import { roundValue, valueOrDefault, isValidNumber } from "/src/utils/Utils";
 import { unitSelectStyles } from "/config/customStyles";
+
+// Utils
+import { roundValue, valueOrDefault } from "/src/utils/Utils";
 import { checkStatementWAT } from "./utils";
-import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
+import { isValidInput, isValidInputNumber } from "/src/utils/Utils";
+
+// Lib
+import indicators from "/lib/indics";
 
 /* ---------- STATEMENT - INDIC #WAT ---------- */
 
@@ -27,23 +32,25 @@ import { isValidInput, isValidInputNumber } from "../../../../utils/Utils";
  *    - errorMessage : null | {message}
  */
 
-const units = {
-  "m3": { label: "m³",  coef: 1.0     }, // default
-  "L":  { label: "L",   coef: 0.0001  },
-};
+
 
 const StatementWAT = ({ 
   impactsData, 
   onUpdate
 }) => {
   // State
-  const [waterConsumption, setWaterConsumption] = 
-    useState(valueOrDefault(impactsData.waterConsumption, ""));
-  const [waterConsumptionUnit, setWaterConsumptionUnit] = 
-    useState(impactsData.waterConsumptionUnit);
+  const [waterConsumption, setWaterConsumption] = useState(
+    valueOrDefault(impactsData.waterConsumption, "")
+  );
+  const [waterConsumptionUnit, setWaterConsumptionUnit] = useState(
+    impactsData.waterConsumptionUnit
+  );
   const [waterConsumptionUncertainty, setWaterConsumptionUncertainty] =
     useState(valueOrDefault(impactsData.waterConsumptionUncertainty, ""));
   const [info, setInfo] = useState(impactsData.comments.wat || "");
+
+  // Units
+  const units = indicators["wat"].statementUnits;
 
   // update impacts data when state update
   useEffect(() => {
@@ -52,7 +59,7 @@ const StatementWAT = ({
     impactsData.waterConsumptionUncertainty = waterConsumptionUncertainty;
     const statementStatus = checkStatementWAT(impactsData);
     onUpdate(statementStatus);
-  }, [waterConsumption,waterConsumptionUnit,waterConsumptionUncertainty]);
+  }, [waterConsumption, waterConsumptionUnit, waterConsumptionUncertainty]);
 
   // update state when props update
   useEffect(() => {
@@ -60,34 +67,37 @@ const StatementWAT = ({
   }, []);
 
   // water consumption
-  const updateWaterConsumption = (event) => 
-  {
+  const updateWaterConsumption = (event) => {
     const input = event.target.value;
-    if (isValidInputNumber(input,0)) {
+    if (isValidInputNumber(input, 0)) {
       setWaterConsumption(input);
-      if (waterConsumptionUncertainty=="") {
-        let defaultUncertainty = parseFloat(input)> 0 ? 25.0 : 0.0;
+      if (waterConsumptionUncertainty == "") {
+        let defaultUncertainty = parseFloat(input) > 0 ? 25.0 : 0.0;
         setWaterConsumptionUncertainty(defaultUncertainty);
       }
     }
   };
 
   // water consumption unit
-  const updateWaterConsumptionUnit = (selected) => 
-  {
+  const updateWaterConsumptionUnit = (selected) => {
     const nextUnit = selected.value;
     setWaterConsumptionUnit(nextUnit);
     // update value
     if (!isNaN(waterConsumption)) {
-      setWaterConsumption(roundValue(waterConsumption*(units[waterConsumptionUnit].coef/units[nextUnit].coef),1));
+      setWaterConsumption(
+        roundValue(
+          waterConsumption *
+            (units[waterConsumptionUnit].coef / units[nextUnit].coef),
+          1
+        )
+      );
     }
   };
 
   // water consumption uncertainty
-  const updateWaterConsumptionUncertainty = (event) => 
-  {
+  const updateWaterConsumptionUncertainty = (event) => {
     const input = event.target.value;
-    if (isValidInputNumber(input,0)) {
+    if (isValidInputNumber(input, 0)) {
       setWaterConsumptionUncertainty(input);
     }
   };
@@ -111,11 +121,13 @@ const StatementWAT = ({
                   value={waterConsumption}
                   onChange={updateWaterConsumption}
                   className="me-1"
-                  isInvalid={!isValidInput(waterConsumption,0)}
+                  isInvalid={!isValidInput(waterConsumption, 0)}
                 />
 
                 <Select
-                  options={Object.keys(units).map((unit) => {return({label: unit, value:unit})})}
+                  options={Object.keys(units).map((unit) => {
+                    return { label: unit, value: unit };
+                  })}
                   styles={unitSelectStyles}
                   value={{
                     label: waterConsumptionUnit,
@@ -127,7 +139,9 @@ const StatementWAT = ({
             </Col>
           </Form.Group>
           <Form.Group as={Row} className="form-group">
-            <Form.Label column lg={7}>Incertitude</Form.Label>
+            <Form.Label column lg={7}>
+              Incertitude
+            </Form.Label>
             <Col>
               <InputGroup className="custom-input">
                 <Form.Control
@@ -135,7 +149,7 @@ const StatementWAT = ({
                   value={waterConsumptionUncertainty}
                   onChange={updateWaterConsumptionUncertainty}
                   className="uncertainty-input"
-                  isInvalid={!isValidInput(waterConsumptionUncertainty,0,100)}
+                  isInvalid={!isValidInput(waterConsumptionUncertainty, 0, 100)}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
               </InputGroup>
