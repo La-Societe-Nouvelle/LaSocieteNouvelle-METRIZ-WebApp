@@ -402,8 +402,8 @@ const getViewLabel = (viewCode) =>
         {viewsData.views[viewCode].icon && (
           <Image
             className="me-2"
-            src={viewsData.views[viewCode].icon}
-            height={25}
+            src={"/icons-ese/logo_ese_"+viewCode+"_rose.svg"}
+            height={20}
           />
         )}
         {viewsData.views[viewCode].label}
