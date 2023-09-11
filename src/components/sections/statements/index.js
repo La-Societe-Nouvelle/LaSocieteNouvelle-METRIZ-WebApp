@@ -57,7 +57,7 @@ const DirectImpacts = ({
     
     // update session
     session.validations[period.periodKey] = selectedStatements;
-    session.updateFootprints(period);
+    //session.updateFootprints(period);
 
     // update state
     setSelectedStatements(selectedStatements);

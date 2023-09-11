@@ -51,7 +51,7 @@ const buildValueART = (indicator, impactsData) =>
 
   if (isValidNumber(craftedProduction,0,netValueAdded)) 
   {
-    let value = roundValue((craftedProduction/netValueAdded)*100, nbDecimals);
+    let value = roundValue((parseFloat(craftedProduction)/netValueAdded)*100, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(0);
   }
@@ -66,7 +66,7 @@ const buildValueIDR = (indicator, impactsData) =>
 
   if (isValidNumber(interdecileRange,1)) 
   {
-    let value = roundValue(interdecileRange, nbDecimals);
+    let value = roundValue(parseFloat(interdecileRange), nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(0);
   }
@@ -84,7 +84,7 @@ const buildValueECO = (indicator, impactsData) =>
 
   if (isValidNumber(domesticProduction,0,netValueAdded)) 
   {
-    let value = roundValue((domesticProduction/netValueAdded)*100, nbDecimals);
+    let value = roundValue((parseFloat(domesticProduction)/netValueAdded)*100, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(0);
   }
@@ -99,7 +99,7 @@ const buildValueGEQ = (indicator, impactsData) =>
 
   if (isValidNumber(wageGap,0)) 
   {
-    let value = roundValue(wageGap, nbDecimals);
+    let value = roundValue(parseFloat(wageGap), nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(0);
   }
@@ -121,10 +121,10 @@ const buildValueGHG = (indicator, impactsData) =>
    && isValidNumber(greenhousesGazEmissionsUncertainty,0,100)
    && Object.keys(statementUnits).includes(greenhousesGazEmissionsUnit)) 
   {
-    let grossImpact = greenhousesGazEmissions*statementUnits[greenhousesGazEmissionsUnit].coef;
-    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    let grossImpact = parseFloat(greenhousesGazEmissions)*statementUnits[greenhousesGazEmissionsUnit].coef;
+    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
-    indicator.setUncertainty(greenhousesGazEmissionsUncertainty);
+    indicator.setUncertainty(parseInt(greenhousesGazEmissionsUncertainty));
   }
 
   return indicator;
@@ -144,8 +144,8 @@ const buildValueHAZ = (indicator, impactsData) =>
    && isValidNumber(hazardousSubstancesConsumptionUncertainty,0,100)
    && Object.keys(statementUnits).includes(hazardousSubstancesConsumptionUnit)) 
   {
-    let grossImpact = hazardousSubstancesConsumption*statementUnits[hazardousSubstancesConsumptionUnit].coef;
-    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    let grossImpact = parseFloat(hazardousSubstancesConsumption)*statementUnits[hazardousSubstancesConsumptionUnit].coef;
+    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(hazardousSubstancesConsumptionUncertainty);
   }
@@ -184,8 +184,8 @@ const buildValueMAT = (indicator, impactsData) =>
    && isValidNumber(materialsExtractionUncertainty,0,100)
    && Object.keys(statementUnits).includes(materialsExtractionUnit)) 
   {
-    let grossImpact = materialsExtraction*statementUnits[materialsExtractionUnit].coef;
-    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    let grossImpact = parseFloat(materialsExtraction)*statementUnits[materialsExtractionUnit].coef;
+    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(materialsExtractionUncertainty);
   }
@@ -207,8 +207,8 @@ const buildValueNRG = (indicator, impactsData) =>
    && isValidNumber(energyConsumptionUncertainty,0,100)
    && Object.keys(statementUnits).includes(energyConsumptionUnit)) 
   {
-    let grossImpact = energyConsumption*statementUnits[energyConsumptionUnit].coef;
-    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    let grossImpact = parseFloat(energyConsumption)*statementUnits[energyConsumptionUnit].coef;
+    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(energyConsumptionUncertainty);
   }
@@ -244,8 +244,8 @@ const buildValueWAS = (indicator, impactsData) =>
    && isValidNumber(wasteProductionUncertainty,0,100)
    && Object.keys(statementUnits).includes(wasteProductionUnit)) 
   {
-    let grossImpact = wasteProduction*statementUnits[wasteProductionUnit].coef;
-    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    let grossImpact = parseFloat(wasteProduction)*statementUnits[wasteProductionUnit].coef;
+    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(wasteProductionUncertainty);
   }
@@ -267,8 +267,8 @@ const buildValueWAT = (indicator, impactsData) =>
    && isValidNumber(waterConsumptionUncertainty,0,100)
    && Object.kets(statementUnits).includes(waterConsumptionUnit)) 
   {
-    let grossImpact = waterConsumption*statementUnits[waterConsumptionUnit].coef;
-    let value = roundValue(grossImpact/netValueAdded, nbDecimals);
+    let grossImpact = parseFloat(waterConsumption)*statementUnits[waterConsumptionUnit].coef;
+    let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
     indicator.setValue(value);
     indicator.setUncertainty(waterConsumptionUncertainty);
   }

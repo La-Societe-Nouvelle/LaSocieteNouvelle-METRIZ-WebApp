@@ -224,8 +224,8 @@ export class Session
 
   updateNetValueAddedFootprint = async (period) => 
   {
-    const netValueAdded = this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].amount;
-    this.impactsData[period.periodKey].setNetValueAdded(netValueAdded);
+    const netValueAddedAmount = this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey].amount;
+    this.impactsData[period.periodKey].setNetValueAdded(netValueAddedAmount);
 
     await Promise.all(Object.entries(metaIndics)
       .filter(([_,metaIndic]) => metaIndic.isAvailable)
@@ -233,6 +233,7 @@ export class Session
         this.updateNetValueAddedIndicator(indic, period.periodKey)
       )
     );
+    console.log(this.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey]);
   }
 
   updateNetValueAddedIndicator = (indic, periodKey) => 

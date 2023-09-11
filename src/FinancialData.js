@@ -426,7 +426,12 @@ export class FinancialData
     };
 
     // isFinancialDataLoaded
+    
     // status
+    this.status = {
+      ...this.status,
+      ... loadedFinancialData.status
+    }
 
     // Production items
     this.productionAggregates = mergeAggregatesPeriodsData(
@@ -521,13 +526,10 @@ export class FinancialData
     };
 
     // Aggregates
-    console.log(this.mainAggregates.netValueAdded);
-    console.log(loadedFinancialData.mainAggregates.netValueAdded);
     this.mainAggregates = mergeAggregatesPeriodsData(
       this.mainAggregates,
       loadedFinancialData.mainAggregates
     );
-    console.log(this.mainAggregates);
     
     // Other financial data
     this.otherFinancialData = mergeAggregatesPeriodsData(
