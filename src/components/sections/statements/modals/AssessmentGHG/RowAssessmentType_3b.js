@@ -72,12 +72,16 @@ export const RowAssessmentType_3b = ({
     const nextFactorId = event.target.value
     setFactorId(nextFactorId);
     // re-init if unit not defined for new ghg factor
-    if (
-      !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
-      !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
+    if (!["kgCO2e", "tCO2e",
+          ...Object.keys(emissionFactors[nextFactorId].units)].includes(consumptionUnit)
     ) {
-      setConsumptionUnit(Object.keys(emissionFactors[nextFactorId].units)[0]);
-      setConsumptionUncertainty(25.0);
+      const nextUnit = Object.keys(emissionFactors[nextFactorId].units)[0];
+      setConsumptionUnit(nextUnit);
+      if (!(nextUnit == "kgCO2e" || nextUnit == "tCO2e")) {
+        setConsumptionUncertainty(0);
+      } else {
+        setConsumptionUncertainty(25);
+      }
       if (factorId) {
         setConsumption(0.0);
       }
@@ -95,6 +99,9 @@ export const RowAssessmentType_3b = ({
   const updateConsumptionUnit = (event) => {
     const nextConsumptionUnit = event.target.value;
     setConsumptionUnit(nextConsumptionUnit);
+    if (!(nextConsumptionUnit == "kgCO2e" || nextConsumptionUnit == "tCO2e")) {
+      setConsumptionUncertainty(0);
+    }
   };
 
   // Consumption uncertainty
@@ -177,12 +184,14 @@ export const RowAssessmentType_3b = ({
                   {unit}
                 </option>
               ))}
-              <option key={"kgCO2e"} value={"kgCO2e"}>
-                {"kgCO2e"}
-              </option>
-              <option key={"tCO2e"} value={"tCO2e"}>
-                {"tCO2e"}
-              </option>
+              {factorId &&
+                <option key={"kgCO2e"} value={"kgCO2e"}>
+                  {"kgCO2e"}
+                </option>}
+              {factorId &&
+                <option key={"tCO2e"} value={"tCO2e"}>
+                  {"tCO2e"}
+                </option>}
             </select>
           </Col>
           <Col lg="1">
@@ -191,7 +200,8 @@ export const RowAssessmentType_3b = ({
               isInvalid={!isValidInput(consumptionUncertainty,0,100)}
               onUpdate={updateConsumptionUncertainty}
               placeholder="%"
-              disabled={!factorId}
+              disabled={!factorId
+                     || !(consumptionUnit == "kgCO2e" || consumptionUnit == "tCO2e")}
             />
           </Col>
         </Row>

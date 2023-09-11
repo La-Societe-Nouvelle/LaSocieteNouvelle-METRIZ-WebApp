@@ -75,10 +75,8 @@ export const RowAssessmentType_4 = ({
     const nextFactorId = event.target.value
     setFactorId(nextFactorId);
     // re-init if unit not defined for new ghg factor
-    if (
-      !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
-      !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
-    ) {
+    if (!["kgCO2e", "tCO2e", 
+          ...Object.keys(emissionFactors[nextFactorId].units)].includes(consumptionUnit)) {
       const nextUnit = Object.keys(emissionFactors[nextFactorId].units)[0];
       setConsumptionUnit(nextUnit);
       if (!(nextUnit == "kgCO2e" || nextUnit == "tCO2e")) {

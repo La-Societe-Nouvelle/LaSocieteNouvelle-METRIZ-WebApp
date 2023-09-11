@@ -188,14 +188,17 @@ export const Metriz = () =>
       // log error
     }
 
-    // next step
-    setShowSavelModal(true);
-    setStep(5); // results section
-
     // server logs
     if (process.env.NODE_ENV === "production") {
       await logUserProgress(session.id, 4, currentDate, 
         session.validations[selectedPeriod.periodKey]);
+    }
+    
+    // next step
+    const progression = await getProgression(session,selectedPeriod);
+    setStep(progression); // results section
+    if (progression==5) {
+      setShowSavelModal(true);
     }
   };
 

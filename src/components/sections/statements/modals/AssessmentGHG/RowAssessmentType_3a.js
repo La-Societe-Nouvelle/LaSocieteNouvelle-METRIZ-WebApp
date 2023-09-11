@@ -73,9 +73,8 @@ export const RowAssessmentType_3a = ({
     setFactorId(nextFactorId);
 
     // re-init if unit not defined for new ghg factor
-    if (
-      !["kgCO2e", "tCO2e"].includes(consumptionUnit) &&
-      !Object.keys(emissionFactors[nextFactorId].units).includes(consumptionUnit)
+    if (!["kgCO2e", "tCO2e",
+          ...Object.keys(emissionFactors[nextFactorId].units)].includes(consumptionUnit)
     ) {
       setConsumptionUnit(Object.keys(emissionFactors[nextFactorId].units)[0]);
       setConsumptionUncertainty(25.0);
@@ -157,12 +156,14 @@ export const RowAssessmentType_3a = ({
                     {unit}
                   </option>
               ))}
-              <option key={"kgCO2e"} value={"kgCO2e"}>
-                {"kgCO2e"}
-              </option>
-              <option key={"tCO2e"} value={"tCO2e"}>
-                {"tCO2e"}
-              </option>
+              {factorId && 
+                <option key={"kgCO2e"} value={"kgCO2e"}>
+                  {"kgCO2e"}
+                </option>}
+              {factorId &&
+                <option key={"tCO2e"} value={"tCO2e"}>
+                  {"tCO2e"}
+                </option>}
             </select>
           </Col>
           <Col lg="1">
