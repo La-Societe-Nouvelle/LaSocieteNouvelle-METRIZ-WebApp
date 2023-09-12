@@ -177,7 +177,7 @@
     "isAvailable": true,
     "color": "rgba(59, 159, 184, 1)",
     "statementUnits": {
-      "m3": { "label": "m³",  "coef": 1.0     },
+      "m³": { "label": "m³",  "coef": 1.0     },
       "L":  { "label": "L",   "coef": 0.0001  }
     }
   }

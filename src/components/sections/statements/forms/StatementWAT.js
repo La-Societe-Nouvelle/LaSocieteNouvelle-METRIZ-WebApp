@@ -13,7 +13,7 @@ import { checkStatementWAT } from "./utils";
 import { isValidInput, isValidInputNumber } from "/src/utils/Utils";
 
 // Lib
-import indicators from "/lib/indics";
+import metaIndics from "/lib/indics";
 
 /* ---------- STATEMENT - INDIC #WAT ---------- */
 
@@ -50,7 +50,7 @@ const StatementWAT = ({
   const [info, setInfo] = useState(impactsData.comments.wat || "");
 
   // Units
-  const units = indicators["wat"].statementUnits;
+  const units = metaIndics["wat"].statementUnits;
 
   // update impacts data when state update
   useEffect(() => {
