@@ -57,7 +57,8 @@ export const getProgression = async (session,period) =>
   
   // results
   let resultsValid = checkResults(session,period);
-  if (!resultsValid) {
+  let comparativeData = await checkComparativeData(session,period);
+  if (!resultsValid || !comparativeData) {
     return progressionIndex.statementsSection;
   } else {
     return progressionIndex.resultsSection;
@@ -118,4 +119,26 @@ export const checkResults = (session,period) =>
   let netValueAdded = session.financialData.mainAggregates.netValueAdded.periodsData[period.periodKey];
   let validations = session.validations[period.periodKey];
   return validations.every((indic) => netValueAdded.footprint.indicators[indic].isValid());
+}
+
+export const checkComparativeData = async (session,period) => 
+{
+  const aggregates = ["production","intermediateConsumptions","fixedCapitalConsumptions","netValueAdded"];
+  const scales = ["area","division"];
+  const series = ["history"]; // "trend","target"
+
+  let validations = session.validations[period.periodKey];
+
+  for (let indic of validations) {
+    for (let aggregate of aggregates) {
+      for (let scale of scales) {
+        for (let serie of series) {
+          if (!session.comparativeData?.[aggregate]?.[scale]?.[serie]?.data?.[indic]) {
+            return false;
+          }
+        }
+      }
+    }
+  }
+  return true;
 }
