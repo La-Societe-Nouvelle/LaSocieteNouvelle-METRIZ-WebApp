@@ -76,6 +76,9 @@ const DirectImpacts = ({
     // fetch comparative data
     await session.comparativeData.fetchComparativeData(selectedStatements);
 
+    // fetch analysis
+    await session.buildAnalysis(period);
+
     setIsLoading(false);
     submit();
   };

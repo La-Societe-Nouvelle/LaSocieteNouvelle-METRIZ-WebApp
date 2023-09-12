@@ -2,18 +2,11 @@
 
 export const updater_1_0_5 = async (sessionData) => 
 {
-  // delete useless objects from  previous session
-  delete sessionData.comparativeAreaFootprints;
-  delete sessionData.targetSNBCarea;
-  delete sessionData.targetSNBCbranch;
-
   // get previous session division code
   let code = sessionData.comparativeDivision;
 
-  sessionData.comparativeData = new ComparativeData();
+  sessionData.comparativeData = {};
   sessionData.comparativeData.activityCode = code;
-
-  delete sessionData.comparativeDivision;
 
   // set previous analysis to True to disable new indicators assessment with missing data
   sessionData.indics = [

@@ -9,6 +9,7 @@ import { printValue } from "/src/utils/formatters";
 
 // Lib
 import metaIndics from "/lib/indics";
+import { getPrevDate } from "../../../../utils/periodsUtils";
 
 /** EXPENSES TABLE
  *  
@@ -29,10 +30,9 @@ export const  ExpensesTable = ({
   } = session;
   const externalExpensesAccounts = financialData.externalExpensesAccounts;
 
-  const prevDateEnd = period.dateEnd;
-  const prevPeriod = session.availablePeriods.find(
-    (period) => period.dateEnd == prevDateEnd
-  );
+  const prevDateEnd = getPrevDate(period.dateStart);
+  const prevPeriod = session.availablePeriods
+    .find((period) => period.dateEnd == prevDateEnd);
 
   const { unit, nbDecimals, unitAbsolute} = metaIndics[indic];
 

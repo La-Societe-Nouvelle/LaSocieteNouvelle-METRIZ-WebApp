@@ -67,6 +67,12 @@ export const updater_3_0_0 = async (session) =>
     impactsData.hazardousSubstancesUse = impactsData.hazardousSubstancesConsumption;
     impactsData.hazardousSubstancesUseUnit = impactsData.hazardousSubstancesConsumptionUnit;
     impactsData.hazardousSubstancesUseUncertainty = impactsData.hazardousSubstancesConsumptionUncertainty;
+
+    // - Rename gas -> gaz
+    Object.entries(session.impactsData.ghgDetails)
+        .forEach(([_, itemData]) => {
+      itemData.gas = itemData.gaz;
+    });
   }
 
   // ----------------------------------------------------------------------------------------------------

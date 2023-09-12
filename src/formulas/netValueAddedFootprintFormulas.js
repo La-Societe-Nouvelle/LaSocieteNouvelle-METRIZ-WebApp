@@ -265,7 +265,7 @@ const buildValueWAT = (indicator, impactsData) =>
 
   if (isValidNumber(waterConsumption,0)
    && isValidNumber(waterConsumptionUncertainty,0,100)
-   && Object.kets(statementUnits).includes(waterConsumptionUnit)) 
+   && Object.keys(statementUnits).includes(waterConsumptionUnit)) 
   {
     let grossImpact = parseFloat(waterConsumption)*statementUnits[waterConsumptionUnit].coef;
     let value = roundValue((grossImpact/netValueAdded)*1000, nbDecimals);
