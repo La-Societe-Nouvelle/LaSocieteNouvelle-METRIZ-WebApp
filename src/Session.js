@@ -215,7 +215,7 @@ export class Session
       if (this.analysis[period.periodKey][indic]==undefined) {
         this.analysis[period.periodKey][indic] = {};
       }
-      this.analysis[period.periodKey][indic].analysis = analysis;
+      this.analysis[period.periodKey][indic] = analysis;
       })
     );
   }

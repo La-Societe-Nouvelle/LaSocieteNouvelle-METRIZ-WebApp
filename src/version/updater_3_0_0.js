@@ -100,6 +100,20 @@ export const updater_3_0_0 = async (session) =>
   }
 
   // ----------------------------------------------------------------------------------------------------
+  // Changes in Analysis
+
+  session.analysis = {};
+  for (let period of session.availablePeriods) 
+  {
+    for (let indic of session.validations[period.periodKey]) {
+      session.analysis[period.periodKey][indic]= {
+        analysis: "",
+        isAvailable: false
+      }
+    }
+  }
+
+  // ----------------------------------------------------------------------------------------------------
 }
 
 /* ----------------------------------------------------------------------------------------------------------- */

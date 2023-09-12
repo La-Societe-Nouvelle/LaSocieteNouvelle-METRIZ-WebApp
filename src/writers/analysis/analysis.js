@@ -55,13 +55,18 @@ export const getAnalysisFromChatGPT = async ({
     });
   
     const analysisOpenIA = response.data.choices[0].message;
-    return analysisOpenIA.content;
+    return ({
+      analysis: analysisOpenIA.content,
+      isAvailable: true
+    });
   } 
   catch (error) {
     console.error('Error generating code:', error.message);
+    return ({
+      analysis: "",
+      isAvailable: false
+    });
   }
-
-  return "";
 }
 
 const buildRequestOpenAI = ({
