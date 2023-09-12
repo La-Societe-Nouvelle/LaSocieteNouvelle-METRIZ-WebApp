@@ -34,6 +34,9 @@ import {
   getProgression 
 } from "./utils/progressionUtils";
 
+// Modal
+import SaveModal from "./components/modals/SaveModal";
+
 /* ------------------------------------------------------------------------------------- */
 /* ---------------------------------------- APP ---------------------------------------- */
 /* ------------------------------------------------------------------------------------- */
@@ -43,7 +46,8 @@ export const Metriz = () =>
   const [session, setSession] = useState({});
   const [selectedPeriod, setSelectedPeriod] = useState({});
   const [step, setStep] = useState(0);
-  const [showSaveModal, setShowSavelModal] = useState(false);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [sessionSaved, setSessionSaved] = useState(false); 
 
   const currentDate = getCurrentDateString();
 
@@ -62,6 +66,10 @@ export const Metriz = () =>
 
   const updateStep = (nextStep) => {
     setStep(nextStep);
+  };
+
+  const handleSessionSaved = () => {
+    setSessionSaved(true);
   };
 
   // Init session -------------------------------------
@@ -198,7 +206,7 @@ export const Metriz = () =>
     const progression = await getProgression(session,selectedPeriod);
     setStep(progression); // results section
     if (progression==5) {
-      setShowSavelModal(true);
+      setShowSaveModal(true);
     }
   };
 
@@ -269,6 +277,16 @@ export const Metriz = () =>
 
         {/* Sections */}
         {buildSectionView(step)}
+
+        {/* Modal */}
+
+        <SaveModal
+          onSessionSaved={handleSessionSaved}
+          session={session}
+          showModal={showSaveModal && !sessionSaved}
+          handleClose={() => setShowSaveModal(false)}
+        ></SaveModal>
+
       </ErrorBoundary>
 
       {/* Footer */}

@@ -39,8 +39,6 @@ import { customSelectStyles } from "/config/customStyles";
 // Lib
 import divisions from "/lib/divisions";
 
-// Modal
-import SaveModal from "../../modals/SaveModal";
 
 
 
@@ -80,8 +78,6 @@ const Results = ({
   const [isGenerating, setIsGenerating] = useState(false); // building files
   const [isLoading, setIsLoading] = useState(false); // fetching data
 
-  // modal
-  const [showSaveModal, setShowSaveModal] = useState(showModal);
 
   const handleDivisionChange = async (selectedOption) => {
   
@@ -317,7 +313,6 @@ const Results = ({
         <Loader title={"Récupération des données de comparaison ..."} />
       )}
 
-      <SaveModal session={session} showModal={showSaveModal} handleClose={() => setShowSaveModal(false)} ></SaveModal>
 
       <div className=" text-end">
         <Button onClick={goBack} className="mb-4">

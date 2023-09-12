@@ -36,12 +36,17 @@ const SyncProvidersView = ({
   // Filtered Providers
   const getShowedProviders = (currentView) => {
     let filteredProviders = providers;
-
+   
     switch (currentView) {
       case "notDefined":
-        filteredProviders = filteredProviders.filter(
-          (provider) => !provider.corporateId
-        );
+        filteredProviders = filteredProviders.filter((provider) => {
+       
+          return (
+            (provider.corporateId === null || !/^[0-9]{9}$/.test(provider.corporateId)) ||
+            (provider.footprintStatus === 0 && /^[0-9]{9}$/.test(provider.corporateId))
+          );
+        });
+  
         break;
       case "unsync":
         filteredProviders = filteredProviders.filter(
@@ -89,7 +94,7 @@ const SyncProvidersView = ({
       return provider;
     });
 
-    updateProviders(updatedProviders);
+    await updateProviders(updatedProviders);
   };
 
 
