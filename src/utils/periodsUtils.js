@@ -11,14 +11,16 @@
  * 
  */
 
-export const getMoreRecentYearlyPeriod = (periods) =>
-{
-  let yearlyPeriods = periods
-    .filter((period) => /^FY/.test(period.periodKey))
-    .sort((a, b) => parseInt(a) - parseInt(b));
+export const getMoreRecentYearlyPeriod = (periods) => {
   
-  return yearlyPeriods.at(-1);
-}
+  // Filter yearly periods (FYxxxx) and Sort by end date (descending)**
+  const yearlyPeriods = periods
+    .filter((period) => /^FY/.test(period.periodKey))
+    .sort((a, b) => new Date(b.dateEnd) - new Date(a.dateEnd));
+
+  // Return the first period in the sorted array (the most recent)**
+  return yearlyPeriods[0];
+};
 
 export const getYearPeriod = (period) => {
   return period.dateEnd.substring(0,4);
