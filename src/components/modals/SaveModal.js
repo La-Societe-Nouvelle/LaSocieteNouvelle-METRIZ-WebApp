@@ -2,7 +2,12 @@ import React from "react";
 import { Modal, Button, Image } from "react-bootstrap";
 import { downloadSession } from "/src/utils/Utils";
 
-const SaveModal = ({ session,showModal, handleClose }) => {
+const SaveModal = ({ session, showModal, handleClose, onSessionSaved }) => {
+  const handleSaveSession = () => {
+    downloadSession(session);
+    onSessionSaved();
+    handleClose();
+  };
 
   return (
     <Modal show={showModal} onHide={handleClose}>
@@ -16,12 +21,13 @@ const SaveModal = ({ session,showModal, handleClose }) => {
           className="d-block mx-auto"
         ></Image>
         <p className="small">
-          Nous vous recommandons de sauvegarder votre analyse pour pouvoir <b>la
-          réimporter </b> ultérieurement et <b>accéder à vos résultats</b> sans avoir à refaire l'analyse.
+          Nous vous recommandons de sauvegarder votre analyse pour pouvoir{" "}
+          <b>la réimporter </b> ultérieurement et <b>accéder à vos résultats</b>{" "}
+          sans avoir à refaire l'analyse.
         </p>
         <p className="text-center">
-          <Button variant="secondary" onClick={() => downloadSession(session)} >
-          <i className="bi bi-arrow-down"></i> Sauvegarder ma session
+          <Button variant="secondary" onClick={handleSaveSession}>
+            <i className="bi bi-arrow-down"></i> Sauvegarder ma session
           </Button>
         </p>
       </Modal.Body>
