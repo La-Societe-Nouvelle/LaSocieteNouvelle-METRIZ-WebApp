@@ -58,7 +58,9 @@ export const Metriz = () =>
       behavior: "instant",
     })  }, [step]); 
 
+
   // Update state -------------------------------------
+
 
   const updateSelectedPeriod = (period) => {
     setSelectedPeriod(period);
@@ -222,35 +224,30 @@ export const Metriz = () =>
       <AccountingImportSection 
         session={session}
         period={selectedPeriod}
-        selectPeriod={updateSelectedPeriod}
+        onSelectPeriod={updateSelectedPeriod}
         submit={validFinancialData} 
       />,
       <InitialStatesSection
         session={session}
         period={selectedPeriod}
-        selectPeriod={updateSelectedPeriod}
         submit={validInitialStates}
         onReturn={() => setStep(1)}
       />,
       <ProvidersSection
         session={session}
         period={selectedPeriod}
-        selectPeriod={updateSelectedPeriod}
         submit={validProviders}
       />,
       <DirectImpacts
         session={session}
         period={selectedPeriod}
-        selectPeriod={updateSelectedPeriod}
         submit={validStatements}
       />,
       <Results
         session={session}
         period={selectedPeriod}
-        selectPeriod={updateSelectedPeriod}
         goBack={() => setStep(4)}
         publish={() => setStep(6)}
-        showModal={showSaveModal}
       />,
       <PublishStatementSection 
         session={session}
@@ -271,6 +268,7 @@ export const Metriz = () =>
             setStep={updateStep}
             session={session}
             period={selectedPeriod}
+            onSelectPeriod={updateSelectedPeriod}
           />
         )}
         {step == 6 && <HeaderPublish setStep={updateStep} session={session} />}

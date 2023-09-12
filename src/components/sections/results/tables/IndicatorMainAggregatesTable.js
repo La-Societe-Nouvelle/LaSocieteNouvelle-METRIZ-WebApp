@@ -27,7 +27,6 @@ export const IndicatorMainAggregatesTable = ({
 }) => {
 
   // Session data -------------------------------------
-
   const {
     financialData
   } = session;
@@ -51,7 +50,6 @@ export const IndicatorMainAggregatesTable = ({
 
   const periods = [period];
   if (prevPeriod) periods.push(prevPeriod);
-
   // Meta data ----------------------------------------
   
     const { unit, nbDecimals, unitGrossImpact} = metaIndics[indic];
@@ -71,6 +69,12 @@ export const IndicatorMainAggregatesTable = ({
 
   // build aggregates
   useEffect(async () => {
+    console.log("------------")
+    console.log(period);
+    console.log(periods)
+
+    // to fix : rebuild aggregates on period change before render 
+
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
         financialData, periods
@@ -83,7 +87,7 @@ export const IndicatorMainAggregatesTable = ({
         periods
       );
     setFixedCapitalConsumptionsAggregates(fixedCapitalConsumptionsAggregates);
-  }, []);
+  }, [period]);
   
   const printGrossImpact = indicsWithGrossImpact.includes(indic);
 
@@ -526,6 +530,7 @@ export const IndicatorMainAggregatesTable = ({
               </>
             )}
           </tr>
+          {console.log(intermediateConsumptionsAggregates)}
           {intermediateConsumptionsAggregates
             // .filter((aggregate) => aggregate.amount != 0)
             .map(({ label, periodsData}, index) => (

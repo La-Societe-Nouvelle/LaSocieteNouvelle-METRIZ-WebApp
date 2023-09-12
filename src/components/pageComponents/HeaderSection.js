@@ -25,12 +25,11 @@ const stepNames = [
 
 /* -------------------- HEADER SECTION -------------------- */
 
-export const HeaderSection = ({ step, setStep, session, period }) => 
+export const HeaderSection = ({ step, setStep, session, period, onSelectPeriod }) => 
 {
   const refresh = () => location.reload(true);
 
   const [stepMax, setStepMax] = useState(0);
-
   useEffect(async () => {
     let progression = await getProgression(session,period)
     setStepMax(progression);
@@ -40,6 +39,9 @@ export const HeaderSection = ({ step, setStep, session, period }) =>
     <header>
       <Topbar 
         session={session}
+        progression={stepMax}
+        period={period}
+        onSelectPeriod={onSelectPeriod}
       />
       <Navbar expand="lg">
         <Container fluid id="menu">

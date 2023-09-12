@@ -132,11 +132,12 @@ export const periodSelectStyles = () => ({
       ...provided,
       width : 0,
     }),
-  dropdownIndicator: (provided) => (
+  dropdownIndicator: (provided,state) => (
    {
     ...provided,
     padding: 4,
     color: "#dbdef1",
+    display :  state.isDisabled ? "none" : "",
     "&:hover": {
       color: "#dbdef1",
     },
@@ -154,5 +155,9 @@ export const periodSelectStyles = () => ({
     "&:hover": {
       color: "#191558",
     },
+  }),
+  singleValue: (provided) => ({
+    ...provided,
+    color: "#191558", 
   }),
 })
