@@ -3,6 +3,7 @@ export const customSelectStyles = (selectSize, status, hasWarning) => ({
    
     let styles = {
       ...provided,
+       fontSize: "0.7rem",
       borderWidth: "1px",
       borderRadius: "0.5rem",
       borderColor: "#e7eaf6",
@@ -42,14 +43,17 @@ export const customSelectStyles = (selectSize, status, hasWarning) => ({
       color: "#dbdef1",
     },
   }),
+  
+  menu: (provided) => ({
+    ...provided,
+    zIndex: 9999, 
+  }),
   indicatorSeparator: (provided) => (
-    console.log(provided)
-    ,{
+   {
     ...provided,
     width : 0
-  
-
   }),
+  
   option: (provided, state) => ({
     ...provided,
     fontSize: "0.7rem",
@@ -67,10 +71,10 @@ export const customSelectStyles = (selectSize, status, hasWarning) => ({
 });
 
 export const unitSelectStyles = {
-  control: (provided, state) => ({
+  control: (provided) => ({
     ...provided,
     border: "1px solid #dbdef1",
-    fontSize: "0.8rem",
+    fontSize: "0.9rem",
     borderRadius: "0.5rem",
     boxShadow: "none",
     "&:hover": {
@@ -85,9 +89,18 @@ export const unitSelectStyles = {
       color: "#dbdef1",
     },
   }),
+  indicatorSeparator: (provided) => ({
+    ...provided,
+    width: 0,
+  }),
+  menu: (provided) => ({
+    ...provided,
+    zIndex: 9999,
+  }),
   option: (provided, state) => ({
     ...provided,
-    fontSize: "0.7rem",
+    fontSize: "0.75rem",
+    padding:"0.2rem 0.5rem",
     color: "#191558",
     backgroundColor: "transparent",
     background: state.isFocused ? "#dbdef1" : "",
@@ -96,3 +109,50 @@ export const unitSelectStyles = {
     },
   }),
 };
+
+export const periodSelectStyles = () => ({
+  control: (provided, state) => ({
+    ...provided,
+    border: "1px solid #dbdef1",
+    backgroundColor: "#FFFFFF",
+    fontSize: "0.8rem",
+    borderRadius: "0.5rem",
+    boxShadow: "none",
+    width:"100px",
+    minHeight: "auto",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    "&:hover": {
+      borderColor: "#dbdef1",
+    },
+  }),
+  indicatorSeparator: (provided) => (
+    {
+      ...provided,
+      width : 0,
+    }),
+  dropdownIndicator: (provided) => (
+   {
+    ...provided,
+    padding: 4,
+    color: "#dbdef1",
+    "&:hover": {
+      color: "#dbdef1",
+    },
+  }),
+  menu: (provided) => ({
+    ...provided,
+    zIndex: 9999, 
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    fontSize: "0.8rem",
+    color: "#191558",
+    backgroundColor: "transparent",
+    background: state.isFocused ? "#dbdef1" : "",
+    "&:hover": {
+      color: "#191558",
+    },
+  }),
+})

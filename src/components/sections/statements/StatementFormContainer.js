@@ -107,8 +107,8 @@ function StatementFormContainer ({
   };
 
   return (
-    <div key={indic} className="border rounded mb-3 indic-statement bg-light">
-      <div className="d-flex align-items-center px-3 py-3  " id={indic}>
+    <div key={indic} className="border rounded mb-2 indic-statement bg-light">
+      <div className="d-flex align-items-center p-2  " id={indic}>
         <Form className="indic-form">
           <Form.Group key={indic}>
             <Form.Check
