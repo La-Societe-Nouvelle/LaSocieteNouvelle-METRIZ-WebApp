@@ -51,10 +51,8 @@ export const AssessmentKNW = ({
   const [knwDetails, setKnwDetails] = useState(impactsData.knwDetails);
 
   useEffect(() => {
-    // ...
+    impactsData.knwDetails = knwDetails;
   }, [knwDetails]);
-
-  //
 
   const updateKnwDetails = (itemKey, nextValue) => {
     setKnwDetails({ 
@@ -146,6 +144,7 @@ const RowAssessmentKNW = ({
   }
 
   useEffect(() => {
+    itemValue = value;
     onUpdate(itemKey,value);
   }, [value])
 
@@ -154,7 +153,7 @@ const RowAssessmentKNW = ({
       <td>{itemProps.label}</td>
       <td>
         <InputNumber
-          value={printValueInput(value, 0)}
+          value={value}
           onUpdate={updateValue}
           placeholder="&euro;"
           isInvalid={!isValidInput(value,0)}

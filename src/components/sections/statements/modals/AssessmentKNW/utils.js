@@ -4,7 +4,9 @@ import metaIndics from "/lib/indics";
 
 export const getKnwContribution = (knwDetails) => 
 {
-  let knwItems = Object.values(knwDetails);
+  let knwItems = Object.values(knwDetails)
+    .filter((value) => isValidNumber(value))
+    .map((value) => parseFloat(value));
   return getSumItems(knwItems);
 }
 
