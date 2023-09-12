@@ -25,6 +25,7 @@ const apiKey = "";
 import axios from 'axios';
 import { isValidNumber, roundValue } from "../../utils/Utils";
 import { getTotalNrgConsumption } from "../../components/sections/statements/modals/AssessmentNRG/utils";
+import { getKnwContribution } from "../../components/sections/statements/modals/AssessmentKNW/utils";
 
 export const getAnalysisFromChatGPT = async ({
     session,
@@ -42,7 +43,6 @@ export const getAnalysisFromChatGPT = async ({
   // open ai
   try 
   {
-    console.log("ask chat GPT");
     const response = await axios.post(apiUrl, {
       model: "gpt-3.5-turbo-0301",
       messages: [{"role": "user", "content": request}],
@@ -55,7 +55,6 @@ export const getAnalysisFromChatGPT = async ({
     });
   
     const analysisOpenIA = response.data.choices[0].message;
-    console.log(analysisOpenIA.content);
     return analysisOpenIA.content;
   } 
   catch (error) {
@@ -77,23 +76,21 @@ const buildRequestOpenAI = ({
 
     const request = 
       // --------------------------------------------------
-          "Concernant "+metaIndics[indic].libelle+","+"\n"
-        + "Pour une entreprise de la division économique \""+divisions[session.comparativeData.activityCode]+"\","
+          "Pour une entreprise de la division économique \""+divisions[session.comparativeData.activityCode]+"\","+"\n"
         + "\n"
       // --------------------------------------------------
         + "Impacts directs : "+"\n"
-        + impactsData
+        + impactsData+"\n"
         + "\n"
       // --------------------------------------------------
         + "Empreintes des soldes intermédiaires de gestion : "+"\n"
-        + aggregatesData
+        + aggregatesData+"\n"
         + "\n"
       // --------------------------------------------------
         + "Empreintes des comptes de charges externes : "+"\n"
-        + expensesData
+        + expensesData+"\n"
         + "\n"
       // --------------------------------------------------
-        + "Concernant "+metaIndics[indic].libelle+", "
         + questions[indic];
     
     console.log(request);
@@ -121,8 +118,8 @@ const buildMainAggratesTable = ({
   const { unit, nbDecimals, unitAbsolute } = metaIndics[indic];
 
   const data = 
-      "| Agrégat | Montant | Empreinte | Moyenne branche |"+"\n"
-    + "|---------|---------|-----------|-----------------|"+"\n"
+      "| Agrégat | Montant | "+metaIndics[indic].libelle+" | Moyenne branche |"+"\n"
+    + "|---------|---------|-------------------------------|-----------------|"+"\n"
     + Object.keys(metaMainAggregates).map((aggregateKey) => {
         return( "|"
           +" "+metaMainAggregates[aggregateKey].label+" |"
@@ -301,6 +298,7 @@ const buildImpactsHAZ = (impactsData) =>
 
 const buildImpactsIDR = (impactsData) => 
 {
+  console.log(impactsData.interdecileRange);
   const { 
     hasEmployees,
     interdecileRange
@@ -344,7 +342,7 @@ const buildImpactsKNW = (impactsData) =>
   } = impactsData;
 
   const impacts = 
-    "La participation directe à la recherche et à la formation s'élève à "+interdecileRange+".\n";
+    "La participation directe à la recherche et à la formation s'élève à "+researchAndTrainingContribution+".\n";
   
   if (getKnwContribution(knwDetails)==researchAndTrainingContribution) {
     impacts = impacts+"Détails des participations directes : "+"\n"
@@ -393,7 +391,7 @@ const buildImpactsNRG = (impactsData) =>
     energyConsumptionUnit,
     nrgDetails
   } = impactsData;
-  let totalDetails = getTotalNrgConsumption(ghgDetails);
+  let totalDetails = getTotalNrgConsumption(nrgDetails);
 
   const impacts = "La consommation directe d'énergie s'élève à "+energyConsumption+" "+energyConsumptionUnit+".\n";
   if (totalDetails==energyConsumption) {
@@ -456,16 +454,16 @@ const buildImpactsWAT = (impactsData) =>
 }
 
 const questions = {
-  "art": "",
-  "eco": "",
-  "geq": "",
+  "art": "Comment puis-je davantage soutenir l'artisanat ?",
+  "eco": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je améliorer mes résultats ? Sur quelles consommations agir ?",
+  "geq": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je réduire l'écart de rémunération femmes/hommes ?",
   "ghg": "D'où vient mon empreinte carbone ? Que pourrais-je faire pour la réduire ?",
   "haz": "D'où vient mon empreinte ? Que pourrais-je faire pour la réduire ?",
-  "idr": "D'où vient mon empreinte carbone ? Que pourrais-je faire pour la réduire ?",
-  "knw": "",
+  "idr": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je réduire les écarts de rémunération ?",
+  "knw": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je davantage soutenir la recherche et la formation ?",
   "mat": "D'où vient mon empreinte matière ? Que pourrais-je faire pour la réduire ?",
   "nrg": "D'où vient mon empreinte énergétique ? Que pourrais-je faire pour la réduire ?",
-  "soc": "",
-  "was": "D'où vient mon empreinte carbone ? Que pourrais-je faire pour la réduire ?",
+  "soc": "Comment puis-je soutenir les acteurs d'intérêt social (ESS, société à mission) ? Comment inscrire une raison d'être dans mes status ?",
+  "was": "D'où vient mon empreinte déchets ? Que pourrais-je faire pour la réduire ?",
   "wat": "D'où vient mon empreinte eau ? Que pourrais-je faire pour la réduire ?",
 }
