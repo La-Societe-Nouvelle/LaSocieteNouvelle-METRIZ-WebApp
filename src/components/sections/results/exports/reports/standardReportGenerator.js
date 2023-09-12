@@ -12,7 +12,7 @@ import { loadFonts } from "../exportsUtils";
 import { generateSIGtable } from "./generateSIGtable";
 
 import { buildFixedCapitalConsumptionsAggregates,buildIntermediateConsumptionsAggregates } from "/src/formulas/aggregatesBuilder";
-import { getAnalyse, getStatementNote } from "/src/utils/Writers";
+import { getStatementNote } from "/src/utils/Writers";
 
 // --------------------------------------------------------------------------
 //  Indicator Report
@@ -35,7 +35,8 @@ export const buildStandardReport = async ({
     legalUnit,
     financialData,
     impactsData,
-    comparativeData
+    comparativeData,
+    analysis
   } = session;
 
   // Metadata ------------------------------------------------------
@@ -51,13 +52,7 @@ export const buildStandardReport = async ({
   const currentPeriod = period.periodKey.slice(2);
 
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
-  const analysisNotes = getAnalyse(
-    impactsData,
-    financialData,
-    comparativeData,
-    indic,
-    period
-  );
+  const analysisNotes = analysis[period.periodKey][indic]?.analysis;
  
     // get Intermediate Aggregates
     const intermediateConsumptionsAggregates =
