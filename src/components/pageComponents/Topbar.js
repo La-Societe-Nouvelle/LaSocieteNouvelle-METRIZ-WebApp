@@ -33,12 +33,12 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
 
 
   useEffect(() => {
-    if (period != selectedPeriod) {
+    if (period.periodKey != selectedPeriod) {
       setSelectedPeriod(period.periodKey);
     }
   }, [period]);
 
-  const showInfo = (progression > 1) || session.financialData.status[period.periodKey].isLoaded;
+  const showInfo = (progression > 1) || (selectedPeriod && session?.financialData?.status[selectedPeriod].isLoaded);
 
   return (
     <div className="top-bar">

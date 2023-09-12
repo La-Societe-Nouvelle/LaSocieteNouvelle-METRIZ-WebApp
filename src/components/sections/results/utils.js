@@ -1,4 +1,7 @@
+
+
 import indicators from "/lib/indics";
+import keyIndics from "/lib/keyIndics";
 
 /**
  * Retrieves the value and year for the closest year to the given year from the dataset,
@@ -106,8 +109,8 @@ export const downloadChartImage = (chartId, fileName) => {
   link.click();
 };
 
-export const getKeyIndics = () => {
-  return(["ghg","geq","wat","nrg"])
+export const getKeyIndics = (division) => {
+  return(keyIndics[division].keyIndics)
 }
 
 export const getTagsIndic = (

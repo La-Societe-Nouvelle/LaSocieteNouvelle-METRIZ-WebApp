@@ -7,12 +7,16 @@ import { VerticalBarChart } from "../charts/VerticalBarChart";
 
 import metaIndics from "/lib/indics";
 
-export const ProductionFootprintVisual = ({ session, period }) => {
-  const aggregate = "production";
+export const ProductionFootprintVisual = ({ 
+  session, 
+  period 
+}) => {
 
+  const aggregate = "production";
   const validations = session.validations[period.periodKey];
 
-  const keyIndics = getKeyIndics();
+  const keyIndics = getKeyIndics(session.comparativeData.activityCode);
+
   const tags = {};
   validations.forEach((indic) => {
     tags[indic] = getTagsIndic(session, period, aggregate, indic);

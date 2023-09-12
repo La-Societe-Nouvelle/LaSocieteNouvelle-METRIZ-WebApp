@@ -1,0 +1,257 @@
+{
+  "01": {
+    "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
+  },
+  "02": {
+    "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
+  },
+  "03": {
+    "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
+  },
+  "05": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+  },
+  "06": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+  },
+  "07": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+  },
+  "08": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+  },
+  "09": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+  },
+  "10": {
+    "keyIndics": ["haz","geq","ghg","nrg","wat"]
+  },
+  "11": {
+    "keyIndics": ["haz","geq","ghg","nrg","wat"]
+  },
+  "12": {
+    "keyIndics": ["haz","geq","ghg","nrg","wat"]
+  },
+  "13": {
+    "keyIndics": ["geq","ghg","haz"]
+  },
+  "14": {
+    "keyIndics": ["geq","ghg","haz"]
+  },
+  "15": {
+    "keyIndics": ["geq","ghg","haz"]
+  },
+  "16": {
+    "keyIndics": ["ghg","haz","nrg","was","wat"]
+  },
+  "17": {
+    "keyIndics": ["ghg","haz","nrg","was","wat"]
+  },
+  "18": {
+    "keyIndics": ["ghg","haz","nrg","was","wat"]
+  },
+  "19": {
+    "keyIndics": ["ghg","haz","mat","nrg","was"]
+  },
+  "20": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg"]
+  },
+  "21": {
+    "keyIndics": ["ghg","haz","idr","knw"]
+  },
+  "22": {
+    "keyIndics": ["ghg","haz","mat","nrg"]
+  },
+  "23": {
+    "keyIndics": ["ghg","haz","mat","nrg"]
+  },
+  "24": {
+    "keyIndics": ["ghg","haz","mat","nrg","was"]
+  },
+  "25": {
+    "keyIndics": ["ghg","haz","mat","nrg","was"]
+  },
+  "26": {
+    "keyIndics": ["geq","ghg","idr","knw"]
+  },
+  "27": {
+    "keyIndics": ["geq","ghg","haz","idr"]
+  },
+  "28": {
+    "keyIndics": ["ghg","haz","idr"]
+  },
+  "29": {
+    "keyIndics": ["ghg","haz","idr","knw"]
+  },
+  "30": {
+    "keyIndics": ["ghg","haz","idr","knw"]
+  },
+  "31": {
+    "keyIndics": ["ghg","haz"]
+  },
+  "32": {
+    "keyIndics": ["ghg","haz"]
+  },
+  "33": {
+    "keyIndics": ["ghg","haz"]
+  },
+  "35": {
+    "keyIndics": ["ghg","haz","idr","mat","nrg","wat"]
+  },
+  "36": {
+    "keyIndics": ["art","eco","ghg","was"]
+  },
+  "37": {
+    "keyIndics": ["art","eco","ghg","was"]
+  },
+  "38": {
+    "keyIndics": ["art","eco","ghg","was"]
+  },
+  "39": {
+    "keyIndics": ["art","eco","ghg","was"]
+  },
+  "41": {
+    "keyIndics": ["art","was"]
+  },
+  "42": {
+    "keyIndics": ["art","was"]
+  },
+  "43": {
+    "keyIndics": ["art","was"]
+  },
+  "45": {
+    "keyIndics": ["art","eco","geq"]
+  },
+  "46": {
+    "keyIndics": ["art","eco","geq"]
+  },
+  "47": {
+    "keyIndics": ["art","eco","geq"]
+  },
+  "49": {
+    "keyIndics": ["art","eco"]
+  },
+  "50": {
+    "keyIndics": ["art","eco"]
+  },
+  "51": {
+    "keyIndics": ["art","eco"]
+  },
+  "52": {
+    "keyIndics": ["art","eco"]
+  },
+  "53": {
+    "keyIndics": ["art","eco"]
+  },
+  "55": {
+    "keyIndics": ["art","eco","ghg","wat"]
+  },
+  "56": {
+    "keyIndics": ["art","eco","ghg","wat"]
+  },
+  "58": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "59": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "60": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "61": {
+    "keyIndics": ["art","eco","idr"]
+  },
+  "62": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "63": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "64": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "65": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "66": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "68": {
+    "keyIndics": ["art","eco","geq","was"]
+  },
+  "69": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "70": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "71": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "72": {
+    "keyIndics": ["art","eco","geq","idr","knw"]
+  },
+  "73": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "74": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "75": {
+    "keyIndics": ["art","eco","geq","idr"]
+  },
+  "77": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "78": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "79": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "80": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "81": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "82": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "84": {
+    "keyIndics": ["art","eco","geq","soc"]
+  },
+  "85": {
+    "keyIndics": ["art","eco","geq","knw","soc"]
+  },
+  "86": {
+    "keyIndics": ["art","eco","geq","soc"]
+  },
+  "87": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "88": {
+    "keyIndics": ["art","eco","soc"]
+  },
+  "90": {
+    "keyIndics": ["art","eco","soc","was"]
+  },
+  "91": {
+    "keyIndics": ["art","eco","soc","was"]
+  },
+  "92": {
+    "keyIndics": ["art","eco","soc","was"]
+  },
+  "93": {
+    "keyIndics": ["art","eco","soc","was"]
+  },
+  "94": {
+    "keyIndics": ["art","eco","geq"]
+  },
+  "95": {
+    "keyIndics": ["art","eco","geq"]
+  },
+  "96": {
+    "keyIndics": ["art","eco","geq"]
+  }
+}

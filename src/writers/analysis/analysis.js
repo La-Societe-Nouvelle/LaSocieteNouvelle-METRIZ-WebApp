@@ -20,7 +20,7 @@ const emissionFactors = {
 };
 
 const apiUrl = 'https://api.openai.com/v1/chat/completions';
-const apiKey = "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";
+const apiKey = "";
 
 import axios from 'axios';
 import { isValidNumber, roundValue } from "../../utils/Utils";
@@ -146,8 +146,8 @@ const buildExpensesTable = ({
   const { unit, nbDecimals, unitAbsolute } = metaIndics[indic];
 
   const data = 
-      "| Numéro de compte | Libellé | Montant | Empreinte |"+"\n"
-    + "|------------------|---------|---------|-----------|"+"\n"
+      "| Numéro de compte | Libellé | Montant | "+metaIndics[indic].libelle+" |"+"\n"
+    + "|------------------|---------|---------|-------------------------------|"+"\n"
     + externalExpensesAccounts.map(({ accountNum, accountLib, periodsData }) => 
           "| "+accountNum
         +" | "+accountLib
@@ -455,7 +455,7 @@ const buildImpactsWAT = (impactsData) =>
 
 const questions = {
   "art": "Comment puis-je davantage soutenir l'artisanat ?",
-  "eco": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je améliorer mes résultats ? Sur quelles consommations agir ?",
+  "eco": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je davantage soutenir les activités économiques françaises ?",
   "geq": "Comment est-ce que je me situe par rapport à ma branche ? Comment puis-je réduire l'écart de rémunération femmes/hommes ?",
   "ghg": "D'où vient mon empreinte carbone ? Que pourrais-je faire pour la réduire ?",
   "haz": "D'où vient mon empreinte ? Que pourrais-je faire pour la réduire ?",

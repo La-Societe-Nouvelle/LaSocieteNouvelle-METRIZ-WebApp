@@ -134,6 +134,7 @@ export const FinancialDataForm = ({
 
   const nextModal = () => 
   {
+    console.log(FECData);
     let hasAssetAccounts = Object.keys(FECData.meta.accounts)
       .some((accountNum) => /^(28|29|39)/.test(accountNum));
     let hasStockAccounts = Object.keys(FECData.meta.accounts)
@@ -170,12 +171,13 @@ export const FinancialDataForm = ({
     {
       // console logs
       console.log("Erreur(s) de lecture : ");
-      accountingData.errors.forEach((error) => console.log(error));
-
+      console.log(accountingData.errors);
+      
+      setShowViewsModals(false);
       setHasErrorsFEC(true);
       setErrorsMessage("Erreur(s) relevée(s) : ");
       setErrorsFEC(accountingData.errors);
-      setImportedData(null);
+      setFECData(null);
     } 
     else 
     {
@@ -228,6 +230,8 @@ export const FinancialDataForm = ({
     );
   };
 
+  console.log(FECData);
+  console.log(showViewsModals);
   return (
     <>
       <Row>
