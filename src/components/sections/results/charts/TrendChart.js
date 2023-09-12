@@ -42,13 +42,31 @@ function TrendChart({
 
   const filteredHistorical = historical.filter((data) => data.currency != "EUR2022" && data.year >=  (legalUnitData[0].x - 10 ));
 
-
-
   let updatedTrend = trend;
 
-if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filteredHistorical.length - 1].year !== trend[0].year) {
-  updatedTrend = [...trend, filteredHistorical[filteredHistorical.length - 1]].sort((a, b) => a.year - b.year);
-}
+  if (filteredHistorical.length > 0 
+   && trend.length > 0 
+   && filteredHistorical.at(-1).year !== trend[0].year) {
+    let firstYearTrend = trend.at(0).year;
+    let lastYearHistorical = filteredHistorical.at(-1).year;
+    updatedTrend = [
+      ...trend, 
+      ...filteredHistorical.filter((data) => data.year>=lastYearHistorical && data.year<firstYearTrend)
+    ].sort((a, b) => a.year - b.year);
+  }
+
+  let updatedTarget = linearTarget;
+
+  if (filteredHistorical.length > 0 
+   && linearTarget.length > 0 
+   && filteredHistorical.at(-1).year !== linearTarget[0].year) {
+     let lastYearHistorical = filteredHistorical.at(-1).year;
+    let firstYearTarget = linearTarget.filter((data) => data.year>lastYearHistorical).at(0).year;
+    updatedTarget = [
+      ...linearTarget.filter((data) => data.year>lastYearHistorical), 
+      ...filteredHistorical.filter((data) => data.year>=lastYearHistorical && data.year<firstYearTarget)
+    ].sort((a, b) => a.year - b.year);
+  }
 
   const chartData = {
     datasets: [
@@ -73,7 +91,7 @@ if (filteredHistorical.length > 0 && trend.length > 0 && filteredHistorical[filt
       },
       {
         label: "Objectif",
-        data: linearTarget.map((data) => ({ x: data.year, y: data.value })),
+        data: updatedTarget.map((data) => ({ x: data.year, y: data.value })),
         skipNull: true,
         borderColor: "rgb(255, 238, 200)",
         backgroundColor: "rgb(255, 238, 200)",

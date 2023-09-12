@@ -276,7 +276,7 @@ const Results = ({
             >              
               {Object.entries(viewsData.views)
                 .filter(([_,view]) => view.validations.every(indic => session.validations[period.periodKey].includes(indic)))
-                .filter(([code,_]) => code!=showedView)
+                //.filter(([code,_]) => code!=showedView)
                 .map(([code,view]) =>
                   <Dropdown.Item key={code}
                                  onClick={() => handleViewChange(code)}>
