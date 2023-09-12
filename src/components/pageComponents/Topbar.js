@@ -12,13 +12,14 @@ import { downloadSession } from "/src/utils/Utils";
 
 // Styles
 import { periodSelectStyles } from "../../../config/customStyles";
+import { useEffect } from "react";
 
 /* -------------------- TOP BAR -------------------- */
 
 // Composant Topbar
 
 export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
-
+  
   const [selectedPeriod, setSelectedPeriod] = useState(period.periodKey);
   const handlePeriodChange = (newSelectedPeriodKey) => {
     const newPeriodKey = newSelectedPeriodKey.value;
@@ -28,6 +29,13 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
     let newSelectedPeriod = session.availablePeriods.find(period => period.periodKey == newPeriodKey);
     onSelectPeriod(newSelectedPeriod);
   };
+
+
+  useEffect(() => {
+    if (period != selectedPeriod) {
+      setSelectedPeriod(period.periodKey);
+    }
+  }, [period]);
 
   return (
     <div className="top-bar">
@@ -56,6 +64,7 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
           </li>
         </ul>
       </div>
+      {console.log(selectedPeriod)}
       {progression > 1 && (
         <div className="info-container">
           <div className="unit-info">
