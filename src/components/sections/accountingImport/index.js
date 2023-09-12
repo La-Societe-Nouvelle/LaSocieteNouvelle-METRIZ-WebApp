@@ -20,7 +20,7 @@ import { FinancialDataViews } from "./views/FinancialDataViews";
 export const AccountingImportSection = ({
   session,
   period,
-  selectPeriod,
+  onSelectPeriod,
   submit
 }) => {
 
@@ -35,7 +35,7 @@ export const AccountingImportSection = ({
         {view === 0 && (
           <FinancialDataForm
             session={session}
-            selectPeriod={selectPeriod}
+            onSelectPeriod={onSelectPeriod}
             submit={() => setView(1)}
           />
         )}

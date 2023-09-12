@@ -2,11 +2,61 @@
 
 header {
 
-    img {
-      height: 5em;
-      &:hover {
-        cursor: pointer;
-      }
+  img {
+    height: 5em;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #191558;
+  padding: 1rem;
+  font-size: 0.8rem;
+  color: white;
+  text-transform: uppercase;
+
+
+  .nav-links {
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
     }
   }
 
+  .info-container {
+    display: flex;
+    align-items: center;
+    border-left: 1px solid #52575b;
+    padding-left: 1rem;
+  }
+
+  .unit-info {
+    display: flex;
+    align-items: center;
+
+    .label {
+      margin-right: 0.5rem;
+    }
+
+    .value {
+      margin-right: 2rem;
+    }
+  }
+
+  .info {
+    display: flex;
+    align-items: center;
+  }
+
+  .download-button .btn {
+    padding: 0.5rem 1rem;
+  }
+}

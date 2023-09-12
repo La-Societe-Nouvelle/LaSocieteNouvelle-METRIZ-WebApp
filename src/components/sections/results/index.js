@@ -65,9 +65,7 @@ const Results = ({
   session, 
   period, 
   publish, 
-  goBack,
-  showModal
-}) => {
+  goBack}) => {
 
   // Selections
   const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
@@ -77,7 +75,6 @@ const Results = ({
   // temp state
   const [isGenerating, setIsGenerating] = useState(false); // building files
   const [isLoading, setIsLoading] = useState(false); // fetching data
-
 
   const handleDivisionChange = async (selectedOption) => {
   
@@ -95,10 +92,10 @@ const Results = ({
     
   };
 
-  const handlePeriodChange = (selectedPeriod) => {
-    const period = selectedPeriod.value;
-    //setPeriod(period);
-  };
+  // const handlePeriodChange = (selectedPeriod) => {
+  //   const period = selectedPeriod.value;
+  //   //setPeriod(period);
+  // };
 
   const handleViewChange = (viewCode) => {
     setShowedView(viewCode);
@@ -229,7 +226,7 @@ const Results = ({
             </Form.Group>
           </Form>
         </div>
-        <div className="d-flex align-items-center ">
+        {/* <div className="d-flex align-items-center ">
           <p className="fw-bold col-form-label me-2 mb-0 ">
             Période :
           </p>
@@ -261,7 +258,7 @@ const Results = ({
               </Col>
             </Form.Group>
           </Form>
-        </div>
+        </div> */}
 
         <div className="indic-result-menu mt-4">
           <div className="d-flex align-items-center justify-content-between">

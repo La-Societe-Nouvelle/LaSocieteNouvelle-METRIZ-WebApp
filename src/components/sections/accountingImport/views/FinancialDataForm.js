@@ -50,7 +50,7 @@ const divisionsOptions = getDivisionsOptions(divisions);
 
 export const FinancialDataForm = ({
   session,
-  selectPeriod,
+  onSelectPeriod,
   submit
 }) => {
 
@@ -212,7 +212,7 @@ export const FinancialDataForm = ({
       
       setIsDataLoaded(true);
       setShowViewsModals(false);
-      selectPeriod(financialPeriod);
+      onSelectPeriod(financialPeriod);
     }
   };
 
