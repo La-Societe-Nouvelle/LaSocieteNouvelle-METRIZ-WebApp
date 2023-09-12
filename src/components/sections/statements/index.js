@@ -77,6 +77,7 @@ const DirectImpacts = ({
     await session.comparativeData.fetchComparativeData(selectedStatements);
 
     // fetch analysis
+    console.log("build analysis");
     await session.buildAnalysis(period);
 
     setIsLoading(false);

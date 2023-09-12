@@ -3,7 +3,7 @@ export const customSelectStyles = (selectSize, status, hasWarning) => ({
    
     let styles = {
       ...provided,
-       fontSize: "0.7rem",
+       fontSize: "0.8rem",
       borderWidth: "1px",
       borderRadius: "0.5rem",
       borderColor: "#e7eaf6",

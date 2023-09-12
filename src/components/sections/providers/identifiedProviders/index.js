@@ -197,7 +197,7 @@ const IdentifiedProviders = (props) => {
               onClick={() => props.nextStep()}
               disabled={!isNextStepAvailable}
             >
-              Associer un secteur d'activité
+              Compléter les comptes fournisseurs sans siren
               <i className="bi bi-chevron-right"></i>
             </button>
           )}

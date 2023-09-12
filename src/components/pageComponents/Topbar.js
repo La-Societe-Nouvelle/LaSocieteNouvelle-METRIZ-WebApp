@@ -13,6 +13,7 @@ import { downloadSession } from "/src/utils/Utils";
 // Styles
 import { periodSelectStyles } from "../../../config/customStyles";
 import { useEffect } from "react";
+import { getLabelPeriod } from "../../utils/periodsUtils";
 
 /* -------------------- TOP BAR -------------------- */
 
@@ -36,6 +37,8 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
       setSelectedPeriod(period.periodKey);
     }
   }, [period]);
+
+  const showInfo = (progression > 1) || session.financialData.status[period.periodKey].isLoaded;
 
   return (
     <div className="top-bar">
@@ -64,8 +67,7 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
           </li>
         </ul>
       </div>
-      {console.log(selectedPeriod)}
-      {progression > 1 && (
+      {showInfo && (
         <div className="info-container">
           <div className="unit-info">
             <div className="info">
@@ -80,17 +82,17 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
                     styles={periodSelectStyles()}
                     options={session.availablePeriods.map((period) => {
                       return {
-                        label: period.periodKey.slice(2),
+                        label: getLabelPeriod(period.periodKey),
                         value: period.periodKey,
                       };
                     })}
                     value={{
-                      label: selectedPeriod.slice(2),
+                      label: getLabelPeriod(selectedPeriod),
                       value: selectedPeriod,
                     }}
                     onChange={handlePeriodChange}
                     placeholder="Choisissez une division"
-                    isDisabled={session.availablePeriods.length <= 1}
+                    isDisabled={true || session.availablePeriods.length <= 1}
                   />
                 </div>
               </div>
@@ -99,7 +101,6 @@ export const Topbar = ({ session, progression, period, onSelectPeriod }) => {
           <div className="download-button">
             <Button
               className="me-4"
-              disabled={progression === 1}
               variant="secondary"
               onClick={() => downloadSession(session)}
             >

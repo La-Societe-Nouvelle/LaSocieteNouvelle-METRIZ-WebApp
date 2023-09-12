@@ -20,7 +20,7 @@ const emissionFactors = {
 };
 
 const apiUrl = 'https://api.openai.com/v1/chat/completions';
-const apiKey = "";
+const apiKey = "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";
 
 import axios from 'axios';
 import { isValidNumber, roundValue } from "../../utils/Utils";

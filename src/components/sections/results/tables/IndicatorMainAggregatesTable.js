@@ -530,7 +530,6 @@ export const IndicatorMainAggregatesTable = ({
               </>
             )}
           </tr>
-          {console.log(intermediateConsumptionsAggregates)}
           {intermediateConsumptionsAggregates
             // .filter((aggregate) => aggregate.amount != 0)
             .map(({ label, periodsData}, index) => (

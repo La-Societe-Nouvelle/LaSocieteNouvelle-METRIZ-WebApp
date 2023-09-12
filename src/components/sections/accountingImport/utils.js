@@ -1,6 +1,6 @@
 import { buildRegexFinancialPeriod } from "../../../utils/periodsUtils";
 
-export const getFinancialPeriodFECData = (FECData) =>
+export const getFinancialPeriodFECData = async (FECData) =>
 {
   // periods to build
   let financialPeriod = {

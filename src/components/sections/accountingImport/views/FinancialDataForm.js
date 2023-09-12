@@ -46,7 +46,7 @@ import { FinancialDataDropzone } from "./FinancialDataDropzone";
  */
 
 // Division options
-const divisionsOptions = getDivisionsOptions(divisions);
+const divisionsOptions = getDivisionsOptions({excluded: ["00"]});
 
 export const FinancialDataForm = ({
   session,
@@ -180,7 +180,7 @@ export const FinancialDataForm = ({
     else 
     {
       // console logs
-      console.log("Aucune erreur détectée lors de la lecture du FEC");
+      console.log("Aucune erreur de lecture");
 
       // build periods
       let financialPeriod = await getFinancialPeriodFECData(accountingData);

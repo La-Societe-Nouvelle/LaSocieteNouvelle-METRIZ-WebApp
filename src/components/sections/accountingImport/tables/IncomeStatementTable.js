@@ -65,7 +65,7 @@ export const IncomeStatementTable = ({ financialData, period }) =>
             <td>CHARGES FINANCIERES</td>
             <td className="text-end">{printValue(financialItems.financialExpenses, 0)} &euro;</td>
           </tr>
-          <tr >
+          <tr className={"fw-bold"}>
             <td>RESULTAT FINANCIER</td>
             <td className="text-end">{printValue(financialItems.financialResult, 0)} &euro;</td>
           </tr>
@@ -77,7 +77,7 @@ export const IncomeStatementTable = ({ financialData, period }) =>
             <td>CHARGES EXCEPTIONNELLES</td>
             <td className="text-end">{printValue(financialItems.exceptionalExpenses, 0)} &euro;</td>
           </tr>
-          <tr >
+          <tr className={"fw-bold"}>
             <td>RESULTAT EXCEPTIONNEL</td>
             <td className="text-end">{printValue(financialItems.exceptionalResult, 0)} &euro;</td>
           </tr>

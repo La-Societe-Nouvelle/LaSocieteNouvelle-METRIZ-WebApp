@@ -18,8 +18,12 @@ export const getBranchesOptions = () => {
 
 import divisions from "/lib/divisions";
 
-export const getDivisionsOptions = () => {
+export const getDivisionsOptions = ({
+  excluded
+}) => {
+  const divisionsExcluded = excluded ?? [];
   return Object.entries(divisions)
+    .filter(([value,_]) => !divisionsExcluded.includes(value))
     .sort((a, b) => parseInt(a) - parseInt(b))
     .map(([value, label]) => {
       return { value: value, label: value + ' - ' + label };

@@ -163,9 +163,9 @@ export const RowTableStock = ({
             />
           </td>
           {initialStateType == "defaultData" && (
-            <td className={initialStateSet === true ? " success" : ""}>
+            <td className={initialStateSet ? "success" : ""}>
               <Select
-                className={initialStateSet ? " success" : ""}
+                className={initialStateSet ? "success" : ""}
                 placeholder={"Choisissez une branche"}
                 defaultValue={{
                   label: initialFootprintParams.code + " - " + branches[initialFootprintParams.code],

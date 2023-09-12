@@ -113,7 +113,7 @@ const readFECFile = async (file) =>
     let FECData = await FECFileReader(reader.result);
 
     // console logs
-    console.log("Lecture du fichier déposé FEC : ");
+    console.log("Lecture du fichier (FEC) déposé : ");
     console.log(FECData.meta);
     console.log(FECData.books);
 

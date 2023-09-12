@@ -11,6 +11,14 @@
  * 
  */
 
+export const getLabelPeriod = (periodKey) => {
+  if (periodKey.startsWith("FY")) {
+    return "Exercice "+periodKey.slice(2);
+  } else {
+    return periodKey;
+  }
+}
+
 export const getMoreRecentYearlyPeriod = (periods) => {
   
   // Filter yearly periods (FYxxxx) and Sort by end date (descending)**

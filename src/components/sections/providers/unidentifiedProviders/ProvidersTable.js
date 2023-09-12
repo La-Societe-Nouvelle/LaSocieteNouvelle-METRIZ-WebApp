@@ -30,6 +30,11 @@ const ProvidersTable = ({
   const divisionsOptions = getDivisionsOptions(divisions);
   const areasOptions = getAreasOptions(areas);
 
+  // show note
+  const showSignificativeNote = providers
+  .some((provider) => significativeProviders.includes(provider.providerNum)
+    && provider.defaultFootprintParams.code === "00");
+
 // Check if significant providers are unassigned  
   const hasWarning = (provider) => {
     return (
@@ -126,14 +131,15 @@ const ProvidersTable = ({
           ))}
         </tbody>
       </Table>
-      <p class=" border-warning">
-        <i
-          className="bi bi-exclamation-triangle text-warning"
-          title="Grand risque d'imprécision"
-        ></i>{" "}
-          Compte significatifs non rattachés à un secteur d'activité
-  
-      </p>
+      {showSignificativeNote && 
+        <p class=" border-warning">
+          <i
+            className="bi bi-exclamation-triangle text-warning"
+            title="Grand risque d'imprécision"
+          ></i>{" "}
+            Compte significatifs non rattachés à un secteur d'activité
+    
+        </p>}
     </>
   );
 };
