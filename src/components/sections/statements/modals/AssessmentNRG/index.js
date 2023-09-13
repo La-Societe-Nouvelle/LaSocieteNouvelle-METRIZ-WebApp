@@ -129,6 +129,10 @@ export const AssessmentNRG = ({
 
   const didUpdate = () => 
   {
+    // update impacts data
+    impactsData.nrgDetails = nrgDetails;
+    setNrgDetails({...nrgDetails});
+
     // check if every items set
     let isDetailsValid = Object.values(nrgDetails).every((item) => checkNrgItem(item));
     setIsItemsValid(isDetailsValid);
@@ -220,7 +224,7 @@ export const AssessmentNRG = ({
             <SimpleRowAssessment
               label={assessmentItems["heat"].label}
               itemData={nrgDetails["heat"]}
-              //onUpdate={didUpdate}
+              onUpdate={didUpdate}
             />
           )}
 
@@ -228,7 +232,7 @@ export const AssessmentNRG = ({
             <SimpleRowAssessment
               label={assessmentItems["renewableTransformedEnergy"].label}
               itemData={nrgDetails["renewableTransformedEnergy"]}
-              //onUpdate={didUpdate}
+              onUpdate={didUpdate}
             />
           )}            
 

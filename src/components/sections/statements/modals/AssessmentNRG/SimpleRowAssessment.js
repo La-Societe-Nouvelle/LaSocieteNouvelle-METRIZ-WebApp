@@ -42,7 +42,7 @@ export const SimpleRowAssessment = ({
     setNrgConsumptionUncertainty(nrgConsumptionUncertainty);
 
     // did update
-    //onUpdate();
+    onUpdate();
   }, [consumption,consumptionUnit,consumptionUncertainty])
 
   // Consumption
