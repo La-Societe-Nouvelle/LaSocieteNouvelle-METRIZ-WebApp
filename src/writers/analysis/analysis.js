@@ -20,7 +20,7 @@ const emissionFactors = {
 };
 
 const apiUrl = 'https://api.openai.com/v1/chat/completions';
-const apiKey = "";
+const apiKey = '';
 
 import axios from 'axios';
 import { isValidNumber, roundValue } from "../../utils/Utils";
@@ -39,7 +39,6 @@ export const getAnalysisFromChatGPT = async ({
     period,
     indic
   });
-
   // open ai
   try 
   {
@@ -192,7 +191,8 @@ const buildImpactsART = (impactsData) =>
 {
   const {
     isValueAddedCrafted,
-    craftedProduction
+    craftedProduction,
+    netValueAdded
   } = impactsData;
 
   const impacts = "";
@@ -203,7 +203,7 @@ const buildImpactsART = (impactsData) =>
   } else if (isValueAddedCrafted=="partially") {
     impacts = impacts 
       + "Les activités de l'entreprise sont partiellement artisanales ou font appel à un savoir-faire reconnu (ex. label EPV),"
-      + " "+roundValue(domesticProduction/netValueAdded, 0)+" % de sa valeur ajoutée est qualifiée d'artisanale."+"\n";
+      + " "+roundValue(craftedProduction/netValueAdded, 0)+" % de sa valeur ajoutée est qualifiée d'artisanale."+"\n";
   } else {
     impacts = impacts
      + "Les activités de l'entreprise ne sont pas artisanales et ne font pas appel à un savoir-faire reconnu (ex. label EPV)."+"\n";
