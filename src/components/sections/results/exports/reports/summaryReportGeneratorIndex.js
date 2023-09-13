@@ -47,7 +47,7 @@ export const buildSummaryReportIndexIndic = async({
   const corporateName = legalUnit.corporateName;
   const currentPeriod = period.periodKey.slice(2);
   const precision = metaIndics[indic].nbDecimals;
-  const divisionName = divisions[comparativeData.activityCode];
+  const divisionName = divisions[comparativeData.comparativeDivision];
 
   const { revenue } = financialData.productionAggregates;
 
@@ -846,7 +846,7 @@ export const buildSummaryReportIndexIndic = async({
                   {
                     text:
                       "Branche de référence : " +
-                      comparativeData.activityCode +
+                      comparativeData.comparativeDivision +
                       " - ",
                   },
                   {

@@ -36,14 +36,12 @@ const metaSeries = {
 };
 
 export class ComparativeData {
+
   constructor(props) {
     props = props || {};
 
     // division
-    this.activityCode =
-      props.activityCode && props.activityCode != ""
-        ? props.activityCode
-        : "00";
+    this.comparativeDivision = props.comparativeDivision || "00";
 
     // aggregates dataset
 
@@ -66,8 +64,8 @@ export class ComparativeData {
     try {
 
       const divisions =
-        this.activityCode && this.activityCode != "00"
-          ? ["00", this.activityCode.substring(0, 2)]
+        this.comparativeDivision && this.comparativeDivision != "00"
+          ? ["00", this.comparativeDivision.substring(0, 2)]
           : ["00"];
   
       const aggregates = Object.values(metaAggregates);

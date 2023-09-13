@@ -54,7 +54,7 @@ export const buildSummaryReportIntensityIndic = async ({
 
   const precision = metaIndics[indic].nbDecimals;
   const unitGrossImpact = metaIndics[indic].unitAbsolute;
-  const divisionName = divisions[comparativeData.activityCode];
+  const divisionName = divisions[comparativeData.comparativeDivision];
 
   const { libelle, unit } = metaIndics[indic];
 
@@ -929,7 +929,7 @@ export const buildSummaryReportIntensityIndic = async ({
                   {
                     text:
                       "Branche de référence : " +
-                      comparativeData.activityCode +
+                      comparativeData.comparativeDivision +
                       " - ",
                   },
                   {

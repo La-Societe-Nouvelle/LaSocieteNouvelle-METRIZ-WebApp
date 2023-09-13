@@ -246,10 +246,10 @@ export const buildStandardReport = async ({
         style: "h2",
         margin: analysisNotes ? [0, 30, 0, 10] : [0, 10, 0, 10],
       },
-      comparativeData.activityCode !== "00"
+      comparativeData.comparativeDivision !== "00"
         ? {
             text:
-              "Branche d'activité : " + divisions[comparativeData.activityCode],
+              "Branche d'activité : " + divisions[comparativeData.comparativeDivision],
             margin: [0, 0, 0, 10],
             font: "Raleway",
           }

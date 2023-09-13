@@ -99,7 +99,7 @@ const updater_3_0_0 = async (sessionData) => {
   const prevComparativeCode = sessionData.comparativeData.activityCode;
 
   sessionData.comparativeData = new ComparativeData();
-  sessionData.comparativeData.activityCode = prevComparativeCode;
+  sessionData.comparativeData.comparativeDivision = prevComparativeCode;
 
   const period = sessionData.financialPeriod;
 

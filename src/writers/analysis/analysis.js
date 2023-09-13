@@ -80,7 +80,7 @@ const buildRequestOpenAI = ({
 
     const request = 
       // --------------------------------------------------
-          "Pour une entreprise de la division économique \""+divisions[session.comparativeData.activityCode]+"\","+"\n"
+          "Pour une entreprise de la division économique \""+divisions[session.comparativeData.comparativeDivision]+"\","+"\n"
         + "\n"
       // --------------------------------------------------
         + "Impacts directs : "+"\n"

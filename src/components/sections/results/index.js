@@ -68,7 +68,7 @@ const Results = ({
   goBack}) => {
 
   // Selections
-  const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.activityCode);
+  const [comparativeDivision, setComparativeDivision] = useState(session.comparativeData.comparativeDivision);
   //const [period, setPeriod] = useState(session.financialPeriod);
   const [showedView, setShowedView] = useState("default");
   
@@ -85,7 +85,7 @@ const Results = ({
       
       // fetch data
       setIsLoading(true);
-      session.comparativeData.activityCode = division;
+      session.comparativeData.comparativeDivision = division;
       await session.comparativeData.fetchComparativeData(session.validations[period.periodKey]);
       
       setIsLoading(false);

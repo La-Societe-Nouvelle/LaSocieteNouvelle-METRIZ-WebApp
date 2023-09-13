@@ -64,7 +64,7 @@ export const buildSummaryReportContributionIndic = async ({
     nbDecimals
   } = metaIndics[indic];
   
-  const divisionName = metaDivisions[comparativeData.activityCode];
+  const divisionName = metaDivisions[comparativeData.comparativeDivision];
   
   // ---------------------------------------------------------------
   // utils
@@ -519,7 +519,7 @@ export const buildSummaryReportContributionIndic = async ({
                 alignment: "center",
                 text: [
                   {
-                    text: comparativeData.activityCode + " - ",
+                    text: comparativeData.comparativeDivision + " - ",
                   },
                   {
                     text: cutString(divisionName, 120),

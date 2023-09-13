@@ -15,7 +15,7 @@ export const ProductionFootprintVisual = ({
   const aggregate = "production";
   const validations = session.validations[period.periodKey];
 
-  const keyIndics = getKeyIndics(session.comparativeData.activityCode);
+  const keyIndics = getKeyIndics(session.comparativeData.comparativeDivision);
 
   const tags = {};
   validations.forEach((indic) => {

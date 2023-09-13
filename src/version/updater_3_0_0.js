@@ -85,6 +85,8 @@ export const updater_3_0_0 = async (session) =>
 
   const comparativeData = session.comparativeData;
 
+  comparativeData.comparativeDivision = comparativeData.activityCode;
+
   const comparativeDataAggregates = [
     "production",
     "intermediateConsumptions",

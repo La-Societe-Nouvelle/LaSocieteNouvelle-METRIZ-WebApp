@@ -66,12 +66,12 @@ export class FinancialData
 
       // Stocks ---------------------------------- //
 
-      this.stocks = Object.values(data.stocks).map((props) => new Stock({ ...props }));                                             // stocks (#31 to #35, #37) / Depreciation (#29)
+      this.stocks = data.stocks.map((props) => new Stock({ ...props }));                                                            // stocks (#31 to #35, #37) / Depreciation (#29)
       this.stockVariations = data.stockVariations.map((props) => new StockVariation({ ...props }));                                 // stock variation (#603, #71)
 
       // Immobilisations ------------------------- //
 
-      this.immobilisations = Object.values(data.immobilisations).map((props) => new Immobilisation({ ...props }));                  // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
+      this.immobilisations = data.immobilisations.map((props) => new Immobilisation({ ...props }));                                 // immobilisations (#20 to #27) / Amortisation (#28) / Depreciation (#29)
       this.amortisationExpenses = data.amortisationExpenses.map((props) => new AmortisationExpense({ ...props }));                  // amortisation expenses (#6811, #6871)
       this.adjustedAmortisationExpenses = data.adjustedAmortisationExpenses.map((props) => new AmortisationExpense({ ...props }));  // amortisation expenses (#6811, #6871)
       this.investments = data.investments.map((props) => new Expense({ ...props }));                                                // investments (flows #2 <- #404)

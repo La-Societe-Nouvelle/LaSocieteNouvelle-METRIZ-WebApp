@@ -56,7 +56,7 @@ export const FinancialDataForm = ({
 
   const [siren, setSiren] = useState(session.legalUnit.siren);
   const [corporateName, setCorporateName] = useState(session.legalUnit.corporateName || "");
-  const [division, setDivision] = useState(session.legalUnit.activityCode || "");
+  const [division, setDivision] = useState(session.comparativeData.comparativeDivision || "");
   const [fileName, setFileName] = useState(null);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
 
@@ -84,7 +84,7 @@ export const FinancialDataForm = ({
         setCorporateName(session.legalUnit.corporateName || "");
         if (/^[0-9]{2}/.test(session.legalUnit.activityCode)) {
           let nextDivision = session.legalUnit.activityCode.slice(0, 2);
-          session.comparativeData.activityCode = nextDivision;
+          session.comparativeData.comparativeDivision = nextDivision;
           setDivision(nextDivision);
         }
       } catch (error) {
@@ -98,7 +98,7 @@ export const FinancialDataForm = ({
   }, [corporateName]);
 
   useEffect(() => {
-    session.comparativeData.activityCode = division;
+    session.comparativeData.comparativeDivision = division;
   }, [division]);
 
   // ----------------------------------------------------------------------------------------------------
