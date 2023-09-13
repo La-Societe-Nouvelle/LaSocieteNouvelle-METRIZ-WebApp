@@ -1,10 +1,15 @@
-// Updater version from 1.0.4 to 1.0.5
 
-export const updater_1_0_5 = async (sessionData) => 
+// Updater version from 1.0.2 to 1.0.5
+export const updater_to_1_0_5 = async (session) => 
 {
-  // get previous session division code
-  let code = sessionData.comparativeDivision;
+  // ----------------------------------------------------------------------------------------------------
+  // Changes in comparative data
 
-  sessionData.comparativeData = {};
-  sessionData.comparativeData.activityCode = code;
+  // add comparative data JSON
+  session.comparativeData = {};
+  session.comparativeData.activityCode = session.comparativeDivision;
+
+  // ----------------------------------------------------------------------------------------------------
+
+  session.version = "1.0.5";
 }

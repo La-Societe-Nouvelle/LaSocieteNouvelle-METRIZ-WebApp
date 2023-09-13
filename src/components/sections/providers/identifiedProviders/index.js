@@ -59,7 +59,7 @@ const IdentifiedProviders = (props) => {
     
     let providersToSynchronise = providers.filter(
       (provider) =>
-        !provider.useDefaultFootprint && provider.footprintStatus !== 200
+        !provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())
     );
     await props.synchronizeProviders(providersToSynchronise);
 
@@ -94,13 +94,12 @@ const IdentifiedProviders = (props) => {
 
   // Check if all providers have their footprint data synchronized
   const allProvidersIdentified =
-    providers.filter((provider) => provider.footprintStatus === 200).length ===
-    providers.length;
+    providers.every((provider) => provider.footprintStatus === 200 && provider.footprint.isValid());
 
   // Check if all providers with SIREN number have been synchronized
   const nbSirenSynchronised = providers.filter(
     (provider) =>
-      !provider.useDefaultFootprint && provider.footprintStatus === 200
+      !provider.useDefaultFootprint && (provider.footprintStatus === 200 && provider.footprint.isValid())
   ).length;
   const nbSiren = providers.filter(
     (provider) => !provider.useDefaultFootprint

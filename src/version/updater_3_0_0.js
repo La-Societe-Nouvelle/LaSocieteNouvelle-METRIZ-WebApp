@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
-// Updater for version 3.0.0
-export const updater_3_0_0 = async (session) => 
+// Updater from 2.0.0 to 3.0.0
+export const updater_to_3_0_0 = async (session) => 
 { 
   // ----------------------------------------------------------------------------------------------------
   // Changes in Session props
@@ -34,6 +34,19 @@ export const updater_3_0_0 = async (session) =>
       isValidated: session.progression > 1
     }
   });
+
+  // - initial state set
+
+  const assetAccounts = [
+    ...financialData.stocks,
+    ...financialData.immobilisations
+  ];
+  for (let account of assetAccounts) {
+    if (account.initialStateType && ["currentFootprint"].includes(account.initialStateType)) {
+      account.initialStateSet = true;
+    }
+  }
+
 
   // ----------------------------------------------------------------------------------------------------
   // Changes in Impacts data
@@ -69,7 +82,7 @@ export const updater_3_0_0 = async (session) =>
     impactsData.hazardousSubstancesUseUncertainty = impactsData.hazardousSubstancesConsumptionUncertainty;
 
     // - Rename gas -> gaz
-    Object.entries(session.impactsData.ghgDetails)
+    Object.entries(impactsData.ghgDetails)
         .forEach(([_, itemData]) => {
       itemData.gas = itemData.gaz;
     });
@@ -83,23 +96,24 @@ export const updater_3_0_0 = async (session) =>
   // ----------------------------------------------------------------------------------------------------
   // Changes in Comparative data
 
-  const comparativeData = session.comparativeData;
+  // const comparativeData = session.comparativeData;
 
-  comparativeData.comparativeDivision = comparativeData.activityCode;
+  // comparativeData.comparativeDivision = comparativeData.activityCode;
 
-  const comparativeDataAggregates = [
-    "production",
-    "intermediateConsumptions",
-    "fixedCapitalConsumptions",
-    "netValueAdded"
-  ];
+  // const comparativeDataAggregates = [
+  //   "production",
+  //   "intermediateConsumptions",
+  //   "fixedCapitalConsumptions",
+  //   "netValueAdded"
+  // ];
 
-  for (let aggregateKey of comparativeDataAggregates) 
-  {
-    // history data
-    comparativeData[aggregateKey]?.area?.history = comparativeData[aggregateKey]?.area?.macroData;
-    comparativeData[aggregateKey]?.division?.history = comparativeData[aggregateKey]?.division?.macroData;
-  }
+  // for (let aggregateKey of comparativeDataAggregates) 
+  // {
+  //   // history data
+  //   comparativeData[aggregateKey]?.area?.history = comparativeData[aggregateKey]?.area?.macroData;
+  //   comparativeData[aggregateKey]?.division?.history = comparativeData[aggregateKey]?.division?.macroData;
+  // }
+  delete session.comparativeData;
 
   // ----------------------------------------------------------------------------------------------------
   // Changes in Analysis
@@ -107,6 +121,7 @@ export const updater_3_0_0 = async (session) =>
   session.analysis = {};
   for (let period of session.availablePeriods) 
   {
+    session.analysis[period.periodKey] = {};
     for (let indic of session.validations[period.periodKey]) {
       session.analysis[period.periodKey][indic]= {
         analysis: "",
@@ -116,6 +131,8 @@ export const updater_3_0_0 = async (session) =>
   }
 
   // ----------------------------------------------------------------------------------------------------
+
+  session.version = "3.0.0";
 }
 
 /* ----------------------------------------------------------------------------------------------------------- */

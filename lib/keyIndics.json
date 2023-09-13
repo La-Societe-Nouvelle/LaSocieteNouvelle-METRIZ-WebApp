@@ -1,4 +1,7 @@
-{
+{ 
+  "00": {
+    "keyIndics": []
+  },
   "01": {
     "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
   },

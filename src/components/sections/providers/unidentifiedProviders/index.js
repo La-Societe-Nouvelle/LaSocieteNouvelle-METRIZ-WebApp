@@ -58,7 +58,7 @@ const UnidentifiedProviders = (props) => {
     fetchData();
 
    const isProvidersSync = !providers.some(
-      (provider) => provider.footprintStatus !== 200
+      (provider) => (provider.footprintStatus !== 200 || !provider.footprint.isValid())
     )
     setIsNextStepAvailable(isProvidersSync);
   }, []);
@@ -141,7 +141,7 @@ const UnidentifiedProviders = (props) => {
     setShowWarningModal(false);
     const providersToSynchronise = providers.filter(
       (provider) =>
-        provider.useDefaultFootprint && provider.footprintStatus !== 200
+        provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())
     );
 
     await props.synchronizeProviders(providersToSynchronise);
@@ -172,7 +172,7 @@ const UnidentifiedProviders = (props) => {
 
   const isSyncButtonEnable = providers.some(
     (provider) =>
-      (provider.useDefaultFootprint && provider.footprintStatus !== 200) ||
+      (provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())) ||
       provider.footprintStatus === 203
   );
 

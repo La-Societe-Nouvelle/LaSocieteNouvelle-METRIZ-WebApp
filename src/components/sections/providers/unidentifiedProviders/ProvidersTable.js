@@ -91,7 +91,7 @@ const ProvidersTable = ({
                     value: provider.defaultFootprintParams.area,
                   }}
                   placeholder={"Choisissez un espace économique"}
-                  className={provider.footprintStatus == 200 ? "success" : ""}
+                  className={(provider.footprintStatus == 200 && provider.footprint.isValid()) ? "success" : ""}
                   options={areasOptions}
                   onChange={(e) =>
                     updateProviderParams(provider.providerNum, "area", e.value)
@@ -113,7 +113,7 @@ const ProvidersTable = ({
                     value: provider.defaultFootprintParams.code,
                   }}
                   placeholder={"Choisissez un secteur d'activité"}
-                  className={provider.footprintStatus == 200 ? "success" : ""}
+                  className={(provider.footprintStatus == 200 && provider.footprint.isValid()) ? "success" : ""}
                   options={divisionsOptions}
                   onChange={(e) =>
                     updateProviderParams(provider.providerNum, "code", e.value)

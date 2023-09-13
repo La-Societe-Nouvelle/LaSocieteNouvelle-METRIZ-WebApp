@@ -88,7 +88,7 @@ export class ComparativeData {
       for (const [serie, dataset] of Object.entries({ history, target, trend })) {
         for (let [aggregate, aggregateKey] of Object.entries(metaAggregates)) {
           for (let division of divisions) {
-            let scale = division == "00" ? "area" : "division";
+            let scale = (division == "00") ? "area" : "division";
             for (let indic of indics) {
               let data = dataset
                 .filter(
@@ -100,6 +100,11 @@ export class ComparativeData {
                 .sort((a, b) => a.year - b.year);
               this[aggregate][scale][serie].data[indic] = data;
             }
+          };
+          if (divisions.length==1 && divisions[0]=="00") {
+            this[aggregate].division = {
+              ...this[aggregate].area
+            };
           }
         }
       }

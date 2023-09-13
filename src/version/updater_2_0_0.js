@@ -6,8 +6,8 @@
 
 import { Immobilisation } from "../accountingObjects/Immobilisation";
 import { SocialFootprint } from "../footprintObjects/SocialFootprint";
-import { getAmountItems, getPrevDate } from "../utils/Utils";
-import { buildRegexFinancialPeriod } from "../utils/periodsUtils";
+import { getAmountItems } from "../utils/Utils";
+import { buildRegexFinancialPeriod, getPrevDate } from "../utils/periodsUtils";
 
 export const otherFinancialDataItems = [
   "otherOperatingIncomes",  // #74, #75, #781, #791
@@ -22,10 +22,10 @@ export const otherFinancialDataItems = [
   "taxOnProfits",           // #69
 ];
 
-export const updater_2_0_0 = async (sessionData) =>
+export const updater_2_0_0 = async (session) =>
 {
   // keep in memory data before update
-  let prevSessionData = {...sessionData};
+  let prevSession = {...session};
   
   // ----------------------------------------------------------------------------------------------------
   // Rebuild Session Data
@@ -34,41 +34,37 @@ export const updater_2_0_0 = async (sessionData) =>
   // - Changes ids in ghg details
   // - Changes financial data structure
   
-  // version
-  sessionData.version = "2.0.0";
-    
   // Periods
-  let prevFinancialPeriod = buildFinancialPeriod(prevSessionData.year);
+  let financialPeriod = buildFinancialPeriod(prevSession.year);
  
-  sessionData.availablePeriods = [prevFinancialPeriod];
-  sessionData.financialPeriod = prevFinancialPeriod; // OBSOLETE
-
-  // Legal Unit data
-  sessionData.legalUnit = prevSessionData.legalUnit;
+  session.availablePeriods = [financialPeriod];
+  session.financialPeriod = financialPeriod; // OBSOLETE
 
   // Financial data
-  sessionData.financialData = await updateFinancialData(prevSessionData.financialData, prevFinancialPeriod);
+  session.financialData = await updateFinancialData(prevSession.financialData, financialPeriod);
 
   // Impacts data
-  sessionData.impactsData = {
-    [prevFinancialPeriod.periodKey]: prevSessionData.impactsData,
+  session.impactsData = {
+    [financialPeriod.periodKey]: prevSession.impactsData,
   };
 
   // Validations
-  sessionData.validations = {
-    [prevFinancialPeriod.periodKey]: prevSessionData.validations,
+  session.validations = {
+    [financialPeriod.periodKey]: prevSession.validations,
   };
 
   // Comparative data
-  sessionData.comparativeData = {
-    activityCode : prevSessionData.comparativeData.activityCode,
-    fixedCapitalConsumptions : prevSessionData.comparativeData.fixedCapitalConsumption || prevSessionData.comparativeData.fixedCapitalConsumptions,
-    intermediateConsumptions : prevSessionData.comparativeData.intermediateConsumption || prevSessionData.comparativeData.intermediateConsumptions,
-    netValueAdded :  prevSessionData.comparativeData.netValueAdded,
-    production :  prevSessionData.comparativeData.production,
+  session.comparativeData = {
+    activityCode : prevSession.comparativeData.activityCode,
+    fixedCapitalConsumptions : prevSession.comparativeData.fixedCapitalConsumption || prevSession.comparativeData.fixedCapitalConsumptions,
+    intermediateConsumptions : prevSession.comparativeData.intermediateConsumption || prevSession.comparativeData.intermediateConsumptions,
+    netValueAdded :  prevSession.comparativeData.netValueAdded,
+    production :  prevSession.comparativeData.production,
   };  
 
-  prevSessionData = sessionData;
+  // ----------------------------------------------------------------------------------------------------
+
+  session.version = "2.0.0"
 }
 
 const updateFinancialData = async (prevFinancialData,prevFinancialPeriod) =>
@@ -175,8 +171,8 @@ const updateFinancialData = async (prevFinancialData,prevFinancialPeriod) =>
 
   nextFinancialData.mainAggregates = {
     production: buildAggregate("production","Production",prevFinancialData,prevFinancialPeriod), 
-    intermediateConsumptions: buildAggregate("intermediateConsumptions","Consommations intermédiaires",prevFinancialData,prevFinancialPeriod), 
-    fixedCapitalConsumptions: buildAggregate("fixedCapitalConsumptions","Consommations de capital fixe",prevFinancialData,prevFinancialPeriod), 
+    intermediateConsumptions: buildAggregate("intermediateConsumption","Consommations intermédiaires",prevFinancialData,prevFinancialPeriod), 
+    fixedCapitalConsumptions: buildAggregate("capitalConsumption","Consommations de capital fixe",prevFinancialData,prevFinancialPeriod), 
     netValueAdded: buildAggregate("netValueAdded","Valeur ajoutée nette",prevFinancialData,prevFinancialPeriod), 
   };
 

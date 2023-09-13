@@ -269,7 +269,7 @@ const Results = ({
               key={"down-centered"}
               id="dropdown-indics-button"
               title={getViewLabel(showedView)}
-              disabled={comparativeDivision == "00"}
+              // disabled={comparativeDivision == "00"}
             >              
               {Object.entries(viewsData.views)
                 .filter(([_,view]) => view.validations.every(indic => session.validations[period.periodKey].includes(indic)))
@@ -296,7 +296,7 @@ const Results = ({
         session={session}
       />
 
-      {(comparativeDivision!="00" && !isLoading) && (
+      {(!isLoading) && (
         <ChartsContainer
           session={session}
           period={period}

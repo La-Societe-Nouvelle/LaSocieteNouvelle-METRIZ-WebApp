@@ -1,7 +1,7 @@
 // La Société Nouvelle
 
-// Updater to version 1.0.0
-export const updater_1_0_0 = async (session) => 
+// Updater from 1.0.1 to version 1.0.2
+export const updater_to_1_0_2 = async (session) => 
 {
   // ----------------------------------------------------------------------------------------------------
   // Changes in impacts data
@@ -13,21 +13,13 @@ export const updater_1_0_0 = async (session) =>
   Object.entries(session.impactsData.ghgDetails)
         .forEach(([_, itemData]) => 
   {
-    // update name : fuelCode -> factorId
-    itemData.factorId = itemData.fuelCode;
-    // update prefix for factorId
-    if (/^p/.test(itemData.factorId))
-      itemData.factorId = "fuel" + itemData.factorId.substring(1);
-    if (/^s/.test(itemData.factorId))
-      itemData.factorId = "coolSys" + itemData.factorId.substring(1);
-    if (/^industrialProcesses_/.test(itemData.factorId))
-      itemData.factorId = "indusProcess" + itemData.factorId.substring(20);
-
     // update uncertainty
     itemData.ghgEmissionsUncertainty = getGhgEmissionsUncertainty(itemData);
   });
 
   // ----------------------------------------------------------------------------------------------------
+
+  session.version = "1.0.2";
 }
 
 // get ghg emissions uncertainty
@@ -46,7 +38,7 @@ const getGhgEmissions = ({
   consumption,
   consumptionUnit,
   factorId,
-  gas,
+  gaz,
 }) => {
   switch (consumptionUnit) {
     case "kgCO2e":
@@ -58,7 +50,7 @@ const getGhgEmissions = ({
         return (
           consumption *
           emissionFactors[factorId].units[consumptionUnit].coefGHG *
-          greenhouseGases[gas].prg
+          greenhouseGases[gaz].prg
         );
       } else {
         return null;
