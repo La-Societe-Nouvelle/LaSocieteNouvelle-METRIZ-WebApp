@@ -121,6 +121,10 @@ export const AssessmentGHG = ({
 
   const didUpdate = () => 
   {
+    // update impacts data
+    impactsData.ghgDetails = ghgDetails;
+    setGhgDetails({...ghgDetails});
+
     // check if every items set
     let isDetailsValid = Object.values(ghgDetails).every((item) => checkGhgItem(item));
     setIsItemsValid(isDetailsValid);
