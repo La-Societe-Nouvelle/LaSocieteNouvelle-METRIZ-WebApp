@@ -2,12 +2,16 @@
 
 import { ComparativeDataContainer } from "../components/ComparativeDataContainer";
 import { ComparativeTable } from "../tables/ComparativeTable";
+import { hasComparativeData } from "../utils";
 
 export const ComparisonsVisual = ({
   session,
   period,
   indic
 }) => {
+
+const isTargetDataAvailable  = hasComparativeData(session,'division','target',indic);
+
   return (
     <div id="comparaisons" className="box">
       <ComparativeDataContainer
@@ -20,7 +24,7 @@ export const ComparisonsVisual = ({
         indic={indic}
         period={period}
         showAreaFootprint={true}
-        showTarget={true}
+        showTarget={isTargetDataAvailable}
         showPreviousData={true}
         showDivisionData={true}
       />
