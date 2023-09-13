@@ -106,9 +106,13 @@ const Results = ({
 
     // Download .zip files
     if (selectedFiles.includes("checkbox-all")) {
+
+
+      const showAnalyses = selectedFiles.includes("with-analyses");
       let ZIPFile = await buildCompleteFile({
         session,
-        period
+        period,
+        showAnalyses
       });
       saveAs(ZIPFile, `test.zip`);
     }

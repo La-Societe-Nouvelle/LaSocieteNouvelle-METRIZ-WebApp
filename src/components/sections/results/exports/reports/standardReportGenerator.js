@@ -26,7 +26,8 @@ loadFonts();
 export const buildStandardReport = async ({
   session,
   indic,
-  period
+  period,
+  showAnalyses
 }) => {
 
   // Session data --------------------------------------------------
@@ -52,7 +53,8 @@ export const buildStandardReport = async ({
   const currentPeriod = period.periodKey.slice(2);
 
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
-  const analysisNotes = analysis[period.periodKey][indic]?.isAvailable ? analysis[period.periodKey][indic].analysis : null;
+
+  const analysisNotes = analysis[period.periodKey][indic]?.isAvailable && showAnalyses ? analysis[period.periodKey][indic].analysis : null;
   
   // get Intermediate Aggregates
     const intermediateConsumptionsAggregates =

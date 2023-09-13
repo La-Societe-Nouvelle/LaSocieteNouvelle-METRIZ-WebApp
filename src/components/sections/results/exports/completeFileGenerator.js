@@ -30,7 +30,8 @@ import { buildDataFile } from "./dataFiles/dataFileGenerator";
 
 export async function buildCompleteFile({
   session,
-  period
+  period,
+  showAnalyses
 }) {
   // Extract necessary data from the session object
   const legalUnit = session.legalUnit.corporateName;
@@ -47,7 +48,8 @@ export async function buildCompleteFile({
   const pdfFile = await buildCompleteReport({
     session,
     period,
-    year
+    year,
+    showAnalyses
   });
 
   // Add the full report to the ZIP file
@@ -91,14 +93,15 @@ export async function buildCompleteFile({
 async function buildCompleteReport({
   session,
   period,
-  year
+  year,
+  showAnalyses
 }) {
   try {
     // Report Cover
     const coverPage = generateReportCover(year, session.legalUnit.corporateName);
 
     // Generate standard reports and their blobs
-    const standardPDFs = await generateStandardReports(session, period);
+    const standardPDFs = await generateStandardReports(session, period,showAnalyses);
 
     // Generate summary reports and their blobs
     const summaryPDFs = await generateSummaryReports(session, period);
@@ -117,7 +120,7 @@ async function buildCompleteReport({
   }
 }
 
-async function generateStandardReports(session, period) {
+async function generateStandardReports(session, period,showAnalyses) {
   const validation = session.validations[period.periodKey];
   const standardPDFs = await Promise.all(
     validation.map(async (indic) => {
@@ -125,6 +128,7 @@ async function generateStandardReports(session, period) {
         session,
         indic,
         period,
+        showAnalyses
       });
 
       return new Promise((resolve) => {

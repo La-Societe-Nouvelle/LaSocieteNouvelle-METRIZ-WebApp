@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Button, Dropdown, Form } from "react-bootstrap";
 
 const DownloadDropdown = ({ onDownload, view }) => {
-
   const currentViewFiles = [
     {
       id: "sig-indic-xlsx",
@@ -11,30 +10,58 @@ const DownloadDropdown = ({ onDownload, view }) => {
     { id: "summary-report", name: "Plaquette (.pdf)" },
   ];
 
- 
   const [selectedFileIds, setSelectedFileIds] = useState([]);
 
-
   const handleCheckboxChange = (event, fileId) => {
-    if (fileId === "checkbox-all") { 
- 
-      // If "checkbox-all" is checked, uncheck other checkboxes and clear selectedFileIds
-      setSelectedFileIds(event.target.checked ? ["checkbox-all"] : []);
-    } else {
-      // If a file checkbox is checked, uncheck "checkbox-all" if it is checked
+    const isCheckboxAll = fileId === "checkbox-all";
+    const isWithAnalyses = fileId === "with-analyses";
+
+    const handleCheckboxAll = () => {
       setSelectedFileIds((prevSelected) =>
-        prevSelected.includes("checkbox-all")
-          ? [fileId]
-          : event.target.checked
+        event.target.checked
+          ? [
+              "checkbox-all",
+              ...(prevSelected.includes("with-analyses")
+                ? ["with-analyses"]
+                : []),
+            ]
+          : prevSelected.filter((id) => id !== fileId)
+      );
+    };
+
+    const handleWithAnalyses = () => {
+      setSelectedFileIds((prevSelected) =>
+        event.target.checked
           ? [...prevSelected, fileId]
           : prevSelected.filter((id) => id !== fileId)
       );
+    };
+
+    const handleOtherCheckboxes = () => {
+      setSelectedFileIds((prevSelected) => {
+        const newSelected = event.target.checked
+          ? [
+              ...prevSelected.filter(
+                (id) => id !== "checkbox-all" && id !== "with-analyses"
+              ),
+              fileId,
+            ]
+          : prevSelected.filter((id) => id !== fileId);
+        return newSelected;
+      });
+    };
+
+    if (isCheckboxAll) {
+      handleCheckboxAll();
+    } else if (isWithAnalyses) {
+      handleWithAnalyses();
+    } else {
+      handleOtherCheckboxes();
     }
   };
-  
 
   const handleDownload = () => {
-    onDownload(selectedFileIds,view);
+    onDownload(selectedFileIds, view);
   };
 
   return (
@@ -64,9 +91,24 @@ const DownloadDropdown = ({ onDownload, view }) => {
             <Form.Check
               type="checkbox"
               id={`checkbox-all`}
-              label={<label htmlFor={`checkbox-all`}>Dossier complet (.zip) </label>}
+              label={
+                <label htmlFor={`checkbox-all`}>Dossier complet (.zip) </label>
+              }
               checked={selectedFileIds.includes("checkbox-all")}
               onChange={(event) => handleCheckboxChange(event, "checkbox-all")}
+            />
+            <Form.Check
+              type="checkbox"
+              className="ms-2"
+              id={`with-analyses`}
+              label={
+                <label htmlFor={`with-analyses`}>
+                  {" "}
+                  Inclure les notes d'analyse{" "}
+                </label>
+              }
+              checked={selectedFileIds.includes("with-analyses")}
+              onChange={(event) => handleCheckboxChange(event, "with-analyses")}
             />
           </div>
 
