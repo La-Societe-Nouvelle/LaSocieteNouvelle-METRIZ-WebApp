@@ -49,7 +49,6 @@ export const SocialStatementsTab = ({
   // when social statements updates
   useEffect(async () => 
   {
-    console.log(isMounted);
     if (isMounted.current) 
     {
       // check social statements

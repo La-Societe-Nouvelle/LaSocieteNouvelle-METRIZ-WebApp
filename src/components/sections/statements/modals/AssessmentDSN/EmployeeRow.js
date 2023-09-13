@@ -67,7 +67,17 @@ const EmployeeRow = ({
     const input = event.target.value;
     const nextWorkingHours = parseFloat(input);
 
-    isNaN(nextWorkingHours) ? setWage(input) : setWage(nextWorkingHours);
+    isNaN(nextWorkingHours) ? setWorkingHours(input) : setWorkingHours(nextWorkingHours);
+
+    if (isValidNumber(nextWorkingHours)
+     && isValidNumber(wage,0)) {
+      if (nextWorkingHours>0 && wage>0) {
+        setHourlyRate(roundValue(wage / nextWorkingHours, 2));
+      } else if (nextWorkingHours==0) {
+        setWage(0);
+        setHourlyRate(0);
+      }
+    }
   };
 
   // wage
