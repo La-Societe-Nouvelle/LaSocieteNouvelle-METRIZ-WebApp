@@ -102,7 +102,7 @@ const SyncProvidersView = ({
 
   const isSyncButtonEnable = providers.some(
     (provider) =>
-      (!provider.useDefaultFootprint && provider.footprintStatus !== 200) ||
+      (!provider.useDefaultFootprint && (provider.footprintStatus !== 200 || !provider.footprint.isValid())) ||
       provider.footprintStatus === 203
   );
 

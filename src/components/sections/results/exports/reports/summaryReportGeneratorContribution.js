@@ -80,7 +80,7 @@ export const buildSummaryReportContributionIndic = async ({
       /^60[^(8|9)]/.test(account.accountNum)
     );
   // Calcul du taux de contribution des achats
-  const contribExternalAccounts = buildAggregatePeriodIndicator(
+  const contribExternalAccounts = await buildAggregatePeriodIndicator(
     indic,
     filteredExternalExpensesAccounts,
     period.periodKey

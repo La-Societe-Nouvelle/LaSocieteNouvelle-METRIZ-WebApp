@@ -63,9 +63,6 @@ const InvoicesDataModal = ({
                           label: "Aucun compte fournisseur associé",
                         },
                         ...providers
-                          .filter(
-                            (provider) => !provider.isDefaultProviderAccount
-                          )
                           .map(({ providerNum, providerLib }) => ({
                             value: providerNum,
                             label: `${providerNum} - ${providerLib}`,

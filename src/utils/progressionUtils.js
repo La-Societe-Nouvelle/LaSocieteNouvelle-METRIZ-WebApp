@@ -57,8 +57,8 @@ export const getProgression = async (session,period) =>
   
   // results
   let resultsValid = checkResults(session,period);
-  let comparativeData = await checkComparativeData(session,period);
-  if (!resultsValid || !comparativeData) {
+  let comparativeDataValid = await checkComparativeData(session,period);
+  if (!resultsValid || !comparativeDataValid) {
     return progressionIndex.statementsSection;
   } else {
     return progressionIndex.resultsSection;
