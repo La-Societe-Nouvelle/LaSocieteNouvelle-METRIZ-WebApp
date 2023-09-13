@@ -20,7 +20,7 @@ const emissionFactors = {
 };
 
 const apiUrl = 'https://api.openai.com/v1/chat/completions';
-const apiKey = '';
+const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
 
 import axios from 'axios';
 import { isValidNumber, roundValue } from "../../utils/Utils";
@@ -52,7 +52,8 @@ export const getAnalysisFromChatGPT = async ({
         'Authorization': `Bearer ${apiKey}`,
       },
     });
-  
+    console.log(apiKey)
+    console.log(response)
     const analysisOpenIA = response.data.choices[0].message;
     return ({
       analysis: analysisOpenIA.content,
@@ -60,6 +61,8 @@ export const getAnalysisFromChatGPT = async ({
     });
   } 
   catch (error) {
+    console.log(error)
+    console.log('apikey',apiKey)
     console.error('Error generating code:', error.message);
     return ({
       analysis: "",
