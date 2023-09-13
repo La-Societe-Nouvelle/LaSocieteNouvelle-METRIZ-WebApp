@@ -52,9 +52,9 @@ export const buildStandardReport = async ({
   const currentPeriod = period.periodKey.slice(2);
 
   const statementNotes = getStatementNote(impactsData[period.periodKey], indic);
-  const analysisNotes = analysis[period.periodKey][indic]?.analysis;
- 
-    // get Intermediate Aggregates
+  const analysisNotes = analysis[period.periodKey][indic]?.isAvailable ? analysis[period.periodKey][indic].analysis : null;
+  
+  // get Intermediate Aggregates
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(
         financialData,
@@ -231,19 +231,20 @@ export const buildStandardReport = async ({
         pageBreak: "before",
       },
       // Analysis note
-
-      { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
-      analysisNotes.map((note) => ({
-        text: note.reduce((a, b) => a + " " + b),
-        style: "text",
-        fontSize: 9,
-      })),
+      analysisNotes && [
+        { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
+        {
+          text: analysisNotes,
+          style: "text",
+          fontSize: 9,
+        },
+      ],
       // ---------------------------------------------------------------------------
       // Charts
       {
         text: "Comparaisons",
         style: "h2",
-        margin: [0, 30, 0, 10],
+        margin: analysisNotes ? [0, 30, 0, 10] : [0, 10, 0, 10],
       },
       comparativeData.activityCode !== "00"
         ? {
