@@ -43,6 +43,8 @@ export const IndicatorView = ({
 
   const metaIndic = metaIndics[indic];
 
+  const showAnalysis = session.analysis[period.periodKey][indic]?.isAvailable;
+
   return (
     <>
       {/* Menu */}
@@ -57,9 +59,10 @@ export const IndicatorView = ({
           <Nav.Item>
             <Nav.Link href="/#evolution">Courbes d'évolution</Nav.Link>
           </Nav.Item>
-          <Nav.Item>
-            <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
-          </Nav.Item>
+          {showAnalysis && 
+            <Nav.Item>
+              <Nav.Link href="/#analyse">Note d'analyse</Nav.Link>
+            </Nav.Item>}
         </Nav>
       </div>
 

@@ -36,6 +36,12 @@ const StatementGEQ = ({
   const [wageGap, setWageGap] = useState(valueOrDefault(impactsData.wageGap, ""));
   const [info, setInfo] = useState(impactsData.comments.geq || "");
 
+  useEffect(() => {
+    if (hasEmployees==null && isValidNumber(wageGap,1) && wageGap>0) {
+      setHasEmployees(true);
+    }
+  }, [])
+
   // update impacts data when state update
   useEffect(() => {
     impactsData.hasEmployees = hasEmployees;

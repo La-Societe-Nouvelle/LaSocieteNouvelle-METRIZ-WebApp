@@ -1,6 +1,6 @@
 
-// Updater version from 1.0.2 to 1.0.5
-export const updater_to_1_0_5 = async (session) => 
+// Updater version from 1.0.2 to 1.0.6
+export const updater_to_1_0_6 = async (session) => 
 {
   // ----------------------------------------------------------------------------------------------------
   // Changes in comparative data

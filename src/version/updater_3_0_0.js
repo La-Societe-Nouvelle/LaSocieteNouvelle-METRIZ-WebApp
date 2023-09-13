@@ -113,7 +113,12 @@ export const updater_to_3_0_0 = async (session) =>
   //   comparativeData[aggregateKey]?.area?.history = comparativeData[aggregateKey]?.area?.macroData;
   //   comparativeData[aggregateKey]?.division?.history = comparativeData[aggregateKey]?.division?.macroData;
   // }
+
+  let activityCode = session.comparativeData.activityCode;
   delete session.comparativeData;
+  session.comparativeData = {
+    comparativeDivision: activityCode
+  };
 
   // ----------------------------------------------------------------------------------------------------
   // Changes in Analysis

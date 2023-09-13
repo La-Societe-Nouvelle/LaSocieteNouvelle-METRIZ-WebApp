@@ -35,6 +35,12 @@ const StatementIDR = ({
     useState(valueOrDefault(impactsData.interdecileRange, ""));
   const [info, setInfo] = useState(impactsData.comments.idr || "");
 
+  useEffect(() => {
+    if (hasEmployees==null && isValidNumber(interdecileRange,1) && interdecileRange>1) {
+      setHasEmployees(true);
+    }
+  }, []);
+
   // update impacts data when state update
   useEffect(() => {
     impactsData.hasEmployees = hasEmployees;
