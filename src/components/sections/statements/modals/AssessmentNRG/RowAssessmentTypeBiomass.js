@@ -77,7 +77,7 @@ export const RowAssessmentTypeBiomass = ({
       }
     }
 
-    if (!firstUpdate.current) onUpdateNrgItem();
+    if (!firstUpdate.current) onUpdateGhgItem();
     firstUpdate.current = false;
 
     // did update
