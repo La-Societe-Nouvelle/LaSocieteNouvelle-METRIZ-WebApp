@@ -1,260 +1,717 @@
-{ 
+{
   "00": {
-    "keyIndics": []
+    "keyIndics": [
+      "ghg",
+      "nrg",
+      "wat",
+      "geq"
+    ]
   },
   "01": {
-    "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "geq",
+      "haz",
+      "knw",
+      "wat"
+    ]
   },
   "02": {
-    "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "geq",
+      "haz",
+      "knw",
+      "wat"
+    ]
   },
   "03": {
-    "keyIndics": ["geq","ghg","haz","mat","nrg","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "geq",
+      "haz",
+      "knw",
+      "wat"
+    ]
   },
   "05": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw",
+      "was"
+    ]
   },
   "06": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw",
+      "was"
+    ]
   },
   "07": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw",
+      "was"
+    ]
   },
   "08": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw",
+      "was"
+    ]
   },
   "09": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw",
+      "was"
+    ]
   },
   "10": {
-    "keyIndics": ["haz","geq","ghg","nrg","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "geq",
+      "knw",
+      "wat"
+    ]
   },
   "11": {
-    "keyIndics": ["haz","geq","ghg","nrg","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "geq",
+      "knw",
+      "wat"
+    ]
   },
   "12": {
-    "keyIndics": ["haz","geq","ghg","nrg","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "geq",
+      "knw",
+      "wat"
+    ]
   },
   "13": {
-    "keyIndics": ["geq","ghg","haz"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "geq",
+      "haz",
+      "knw"
+    ]
   },
   "14": {
-    "keyIndics": ["geq","ghg","haz"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "geq",
+      "haz",
+      "knw"
+    ]
   },
   "15": {
-    "keyIndics": ["geq","ghg","haz"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "geq",
+      "haz",
+      "knw"
+    ]
   },
   "16": {
-    "keyIndics": ["ghg","haz","nrg","was","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "nrg",
+      "haz",
+      "knw"
+    ]
   },
   "17": {
-    "keyIndics": ["ghg","haz","nrg","was","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "nrg",
+      "haz",
+      "knw"
+    ]
   },
   "18": {
-    "keyIndics": ["ghg","haz","nrg","was","wat"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "nrg",
+      "haz",
+      "knw"
+    ]
   },
   "19": {
-    "keyIndics": ["ghg","haz","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw"
+    ]
   },
   "20": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "haz",
+      "knw",
+      "idr"
+    ]
   },
   "21": {
-    "keyIndics": ["ghg","haz","idr","knw"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "haz",
+      "idr"
+    ]
   },
   "22": {
-    "keyIndics": ["ghg","haz","mat","nrg"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "haz",
+      "knw"
+    ]
   },
   "23": {
-    "keyIndics": ["ghg","haz","mat","nrg"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "haz",
+      "knw"
+    ]
   },
   "24": {
-    "keyIndics": ["ghg","haz","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "knw"
+    ]
   },
   "25": {
-    "keyIndics": ["ghg","haz","mat","nrg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "knw"
+    ]
   },
   "26": {
-    "keyIndics": ["geq","ghg","idr","knw"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "idr"
+    ]
   },
   "27": {
-    "keyIndics": ["geq","ghg","haz","idr"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "28": {
-    "keyIndics": ["ghg","haz","idr"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw"
+    ]
   },
   "29": {
-    "keyIndics": ["ghg","haz","idr","knw"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "idr"
+    ]
   },
   "30": {
-    "keyIndics": ["ghg","haz","idr","knw"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "idr"
+    ]
   },
   "31": {
-    "keyIndics": ["ghg","haz"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw"
+    ]
   },
   "32": {
-    "keyIndics": ["ghg","haz"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw"
+    ]
   },
   "33": {
-    "keyIndics": ["ghg","haz"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw"
+    ]
   },
   "35": {
-    "keyIndics": ["ghg","haz","idr","mat","nrg","wat"]
-  },
-  "36": {
-    "keyIndics": ["art","eco","ghg","was"]
-  },
-  "37": {
-    "keyIndics": ["art","eco","ghg","was"]
-  },
-  "38": {
-    "keyIndics": ["art","eco","ghg","was"]
-  },
-  "39": {
-    "keyIndics": ["art","eco","ghg","was"]
+    "keyIndics": [
+      "eco",
+      "art",
+      "ghg",
+      "soc",
+      "nrg",
+      "mat",
+      "haz",
+      "knw",
+      "wat",
+      "idr"
+    ]
   },
   "41": {
-    "keyIndics": ["art","was"]
+    "keyIndics": [
+      "eco",
+      "soc",
+      "knw",
+      "was"
+    ]
   },
   "42": {
-    "keyIndics": ["art","was"]
+    "keyIndics": [
+      "eco",
+      "soc",
+      "knw",
+      "was"
+    ]
   },
   "43": {
-    "keyIndics": ["art","was"]
+    "keyIndics": [
+      "eco",
+      "soc",
+      "knw",
+      "was"
+    ]
+  },
+  "97": {
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw"
+    ]
+  },
+  "98": {
+    "keyIndics": [
+      "eco",
+      "art",
+      "soc",
+      "knw"
+    ]
+  },
+  "36": {
+    "keyIndics": [
+      "ghg",
+      "soc",
+      "knw",
+      "was"
+    ]
+  },
+  "37": {
+    "keyIndics": [
+      "ghg",
+      "soc",
+      "knw",
+      "was"
+    ]
+  },
+  "38": {
+    "keyIndics": [
+      "ghg",
+      "soc",
+      "knw",
+      "was"
+    ]
+  },
+  "39": {
+    "keyIndics": [
+      "ghg",
+      "soc",
+      "knw",
+      "was"
+    ]
   },
   "45": {
-    "keyIndics": ["art","eco","geq"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "46": {
-    "keyIndics": ["art","eco","geq"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "47": {
-    "keyIndics": ["art","eco","geq"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "49": {
-    "keyIndics": ["art","eco"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "50": {
-    "keyIndics": ["art","eco"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "51": {
-    "keyIndics": ["art","eco"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "52": {
-    "keyIndics": ["art","eco"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "53": {
-    "keyIndics": ["art","eco"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "55": {
-    "keyIndics": ["art","eco","ghg","wat"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "56": {
-    "keyIndics": ["art","eco","ghg","wat"]
+    "keyIndics": [
+      "soc",
+      "knw"
+    ]
   },
   "58": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "59": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "60": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "61": {
-    "keyIndics": ["art","eco","idr"]
+    "keyIndics": [
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "62": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "63": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "knw",
+      "idr"
+    ]
   },
   "64": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "idr"
+    ]
   },
   "65": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "idr"
+    ]
   },
   "66": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "idr"
+    ]
   },
   "68": {
-    "keyIndics": ["art","eco","geq","was"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "was"
+    ]
   },
   "69": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "idr"
+    ]
   },
   "70": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "idr"
+    ]
   },
   "71": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw",
+      "idr"
+    ]
   },
   "72": {
-    "keyIndics": ["art","eco","geq","idr","knw"]
+    "keyIndics": [
+      "soc",
+      "idr"
+    ]
   },
   "73": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "74": {
-    "keyIndics": ["art","eco","geq","idr"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "75": {
-    "keyIndics": ["art","eco","geq","idr"]
-  },
-  "77": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "78": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "79": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "80": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "81": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "82": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "84": {
-    "keyIndics": ["art","eco","geq","soc"]
-  },
-  "85": {
-    "keyIndics": ["art","eco","geq","knw","soc"]
-  },
-  "86": {
-    "keyIndics": ["art","eco","geq","soc"]
-  },
-  "87": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "88": {
-    "keyIndics": ["art","eco","soc"]
-  },
-  "90": {
-    "keyIndics": ["art","eco","soc","was"]
-  },
-  "91": {
-    "keyIndics": ["art","eco","soc","was"]
-  },
-  "92": {
-    "keyIndics": ["art","eco","soc","was"]
-  },
-  "93": {
-    "keyIndics": ["art","eco","soc","was"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "94": {
-    "keyIndics": ["art","eco","geq"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "95": {
-    "keyIndics": ["art","eco","geq"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
   },
   "96": {
-    "keyIndics": ["art","eco","geq"]
+    "keyIndics": [
+      "soc",
+      "geq",
+      "knw"
+    ]
+  },
+  "85": {
+    "keyIndics": [
+      "geq"
+    ]
+  },
+  "86": {
+    "keyIndics": [
+      "geq",
+      "knw"
+    ]
+  },
+  "77": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "78": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "79": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "80": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "81": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "82": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "84": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "87": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "88": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "90": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "91": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "92": {
+    "keyIndics": [
+      "knw"
+    ]
+  },
+  "93": {
+    "keyIndics": [
+      "knw"
+    ]
   }
 }
