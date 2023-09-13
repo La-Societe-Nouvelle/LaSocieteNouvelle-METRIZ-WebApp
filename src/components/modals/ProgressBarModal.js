@@ -6,7 +6,7 @@ import { Image, Modal } from "react-bootstrap";
 
 /* ---------- FEC IMPORT POP-UP ---------- */
 
-export const ProgressBar = ({ message, progression }) => {
+export const ProgressBarModal = ({ message, progression }) => {
   return (
     <Modal show="true" size="md" centered>
       <Modal.Header>

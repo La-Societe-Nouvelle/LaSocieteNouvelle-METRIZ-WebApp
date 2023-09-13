@@ -14,7 +14,7 @@ import {
 } from "/src/services/DefaultDataService";
 
 // Modals
-import { ProgressBar } from "../../modals/ProgressBar";
+import { ProgressBarModal } from "../../modals/ProgressBarModal";
 import { ErrorAPIModal } from "../../modals/userInfoModals";
 
 /* ----------------------------------------------------------------------------------------------------------------------- */
@@ -91,12 +91,10 @@ const ProvidersSection = ({
   }, []);
 
   const progressBar = fetching && (
-    <div className="popup">
-      <ProgressBar
+      <ProgressBarModal
         message="Récupération des données fournisseurs..."
         progression={progression}
       />
-    </div>
   );
 
   const apiErrorModal = apiError && (

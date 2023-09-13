@@ -2,7 +2,7 @@
 
 // React
 import { useState } from "react";
-import { ProgressBar, Table } from "react-bootstrap";
+import { Table } from "react-bootstrap";
 
 // Components
 import { RowTableImmobilisation } from "./RowTableImmobilisation";
@@ -10,6 +10,7 @@ import { RowTableStock } from "./RowTableStock";
 
 // Modals
 import { ErrorAPIModal } from "../../../modals/userInfoModals";
+import { ProgressBarModal } from "../../../modals/ProgressBarModal";
 
 /* ---------- SYNC INITIAL STATES VIEW  ---------- */
 
@@ -144,14 +145,12 @@ export const SyncInitialStatesView = ({
             </tbody>
           </Table> 
         </div>
-
         {fetching && (
-          <div className="popup">
-            <ProgressBar
+            <ProgressBarModal
               message="Récupération des données par défaut..."
               progression={syncProgression}
             />
-          </div>)}
+          )}
       </div>
 
       <ErrorAPIModal
