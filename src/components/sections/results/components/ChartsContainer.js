@@ -110,7 +110,7 @@ const IndicatorCharts = ({
               comparativeData["production"].division.trend.data[indic]
             }
             target={
-              comparativeData["production"].division.trend.data[indic]
+              comparativeData["production"].division.target.data[indic]
             }
             aggregate={mainAggregates.production.periodsData}
             indic={indic}
