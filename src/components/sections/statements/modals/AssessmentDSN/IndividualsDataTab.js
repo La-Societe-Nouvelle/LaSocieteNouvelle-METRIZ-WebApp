@@ -16,6 +16,7 @@ import { checkIndividualData, initIndividualData } from "./utils";
 export const IndividualsDataTab = ({ 
   individualsData: individualsDataInModal, 
   onUpdateIndividualsData,
+  resetIndividualsData,
 }) => {
 
   // individuals data
@@ -103,6 +104,9 @@ export const IndividualsDataTab = ({
 
       <button className="btn btn-primary btn-sm me-2" onClick={addIndividual}>
         <i className="bi bi-plus-lg"></i> Ajouter
+      </button>
+      <button className="btn btn-primary btn-sm me-2" onClick={resetIndividualsData}>
+        <i className="bi bi-arrow-repeat"></i> Réinitialiser à partir des DSN
       </button>
       <button className="btn btn-secondary btn-sm" onClick={removeAll}>
         <i className="bi bi-trash3-fill" /> Supprimer tout

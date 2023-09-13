@@ -88,8 +88,8 @@ const StatementGEQ = ({
   };
 
   const onAssessmentSubmit = () => {
-    if ((impactsData.interdecileRange)!=interdecileRange) {
-      setInterdecileRange(impactsData.interdecileRange || "");
+    if ((impactsData.wageGap)!=wageGap) {
+      setWageGap(impactsData.wageGap || "");
     }
   }
 

@@ -87,9 +87,13 @@ const AssessmentDSN = ({
     setWarningMessage(isIndividualsDataValid ? "" : "Certains postes sont incomplets ou erronés.");
   }
 
+  const resetIndividualsData = () => 
+  {
+    handleSocialStatements(socialStatements);
+  }
+
   const onSubmit = async () => 
   {
-    console.log("submit");
     // update indicators
     impactsData.interdecileRange = await getInterdecileRange(impactsData.individualsData);
     impactsData.wageGap = await getGenderWageGap(impactsData.individualsData);
@@ -140,6 +144,7 @@ const AssessmentDSN = ({
               <IndividualsDataTab
                 individualsData={individualsData}
                 onUpdateIndividualsData={handleIndividualsData}
+                resetIndividualsData={resetIndividualsData}
               />
             </Tab>
           </Tabs>

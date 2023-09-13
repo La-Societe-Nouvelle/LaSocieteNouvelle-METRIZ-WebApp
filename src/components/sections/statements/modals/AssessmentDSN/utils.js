@@ -1,4 +1,4 @@
-import { isValidNumber } from "../../../../../utils/Utils";
+import { isValidInput, isValidInputNumber, isValidNumber } from "../../../../../utils/Utils";
 import {  getSumItems, roundValue } from "/src/utils/Utils";
 
 
@@ -72,7 +72,8 @@ export const checkIndividualData = (individualData) =>
   if (isValidNumber(individualData.workingHours,0)
    && ["1","2"].includes(individualData.sex)
    && isValidNumber(individualData.wage,0)
-   && isValidNumber(individualData.hourlyRate,0)) {
+   && isValidNumber(individualData.hourlyRate,0)
+   && isValidInput(individualData.apprenticeshipHours,0,individualData.workingHours)) {
     return true;
   } else {
     return false;
