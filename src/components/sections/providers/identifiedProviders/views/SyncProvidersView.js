@@ -36,11 +36,10 @@ const SyncProvidersView = ({
   // Filtered Providers
   const getShowedProviders = (currentView) => {
     let filteredProviders = providers;
-   
+  
     switch (currentView) {
       case "notDefined":
-        filteredProviders = filteredProviders.filter((provider) => {
-       
+        filteredProviders = filteredProviders.filter((provider) => {      
           return (
             (provider.corporateId === null || !/^[0-9]{9}$/.test(provider.corporateId)) ||
             (provider.footprintStatus === 0 && /^[0-9]{9}$/.test(provider.corporateId))
@@ -54,8 +53,9 @@ const SyncProvidersView = ({
         );
         break;
       case "error":
+        // TO DO : Improve condition 
         filteredProviders = filteredProviders.filter(
-          (provider) => provider.footprintStatus === 404
+          (provider) => provider.footprintStatus === 404 || !/^[0-9]{9}$/.test(provider.corporateId)
         );
         break;
       case "significative":
@@ -86,6 +86,7 @@ const SyncProvidersView = ({
 
   const handleSirenProvider = async (e, providerNum) => {
     const newSiren = e.target.value;
+    console.log(newSiren)
     const updatedProviders = providers.map((provider) => {
       if (provider.providerNum === providerNum) {
         provider.update({ corporateId: newSiren });

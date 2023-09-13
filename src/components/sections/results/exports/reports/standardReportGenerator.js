@@ -230,26 +230,18 @@ export const buildStandardReport = async ({
         style: "header",
         pageBreak: "before",
       },
-      // Analysis note
-      analysisNotes && [
-        { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
-        {
-          text: analysisNotes,
-          style: "text",
-          fontSize: 9,
-        },
-      ],
       // ---------------------------------------------------------------------------
       // Charts
       {
         text: "Comparaisons",
         style: "h2",
-        margin: analysisNotes ? [0, 30, 0, 10] : [0, 10, 0, 10],
+        margin: [0, 10, 0, 10],
       },
       comparativeData.comparativeDivision !== "00"
         ? {
             text:
-              "Branche d'activité : " + divisions[comparativeData.comparativeDivision],
+              "Branche d'activité : " +
+              divisions[comparativeData.comparativeDivision],
             margin: [0, 0, 0, 10],
             font: "Raleway",
           }
@@ -431,6 +423,22 @@ export const buildStandardReport = async ({
           },
         ],
       },
+      // ---------------------------------------------------------------------------
+      //  PAGE 3
+      analysisNotes && [
+      {
+        text: "Analyse - " + libelle,
+        style: "header",
+        pageBreak: "before",
+      },
+      // Analysis note
+        { text: "Note d'analyse", style: "h2", margin: [0, 10, 0, 10] },
+        {
+          text: analysisNotes,
+          style: "text",
+          fontSize: 9,
+        },
+      ],
     ],
     // ---------------------------------------------------------------------------
     // Style
