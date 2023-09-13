@@ -2,24 +2,38 @@
 
 // React
 import React from "react";
+import { useState, useEffect  } from "react";
 
 // Bootstrap
 import { Container, Navbar } from "react-bootstrap";
 
 // Components
 import { Topbar } from "./Topbar";
+import { getProgression } from "../../utils/progressionUtils";
 
 /* -------------------- HEADER PUBLISH FORM -------------------- */
 
-export const HeaderPublish = ({ setStep, session }) =>
-{
+export const HeaderPublish = ({
+  step,
+  setStep,
+  session,
+  period,
+  onSelectPeriod,
+}) => {
   // reload on click
   const refresh = () => location.reload(true);
-
+  const [stepMax, setStepMax] = useState(0);
+  useEffect(async () => {
+    let progression = await getProgression(session, period);
+    setStepMax(progression);
+  }, [step]);
   return (
     <header>
       <Topbar
-        session={session} 
+        session={session}
+        progression={stepMax}
+        period={period}
+        onSelectPeriod={onSelectPeriod}
       />
       <Navbar expand="lg">
         <Container fluid id="menu">
@@ -35,26 +49,20 @@ export const HeaderPublish = ({ setStep, session }) =>
           </Navbar.Brand>
           <nav className="d-flex" id="progression">
             <div className={`stepper-item completed`}>
-              <button className={`step-counter `} 
-                      onClick={() => setStep(5)}>
-                <i className="bi bi-chevron-left"/>
+              <button className={`step-counter `} onClick={() => setStep(5)}>
+                <i className="bi bi-chevron-left" />
               </button>
-              <div className="step-name">
-                Retour à l'analyse
-              </div>
+              <div className="step-name">Retour à l'analyse</div>
             </div>
             <div className={`stepper-item`}>
-              <button className={`step-counter current`} 
-                      disabled={true}>
-                <i className="bi bi-cloud-arrow-up-fill"/>
+              <button className={`step-counter current`} disabled={true}>
+                <i className="bi bi-cloud-arrow-up-fill" />
               </button>
-              <div className="step-name">
-                Publication
-              </div>
+              <div className="step-name">Publication</div>
             </div>
           </nav>
         </Container>
       </Navbar>
     </header>
-  )
-}
+  );
+};

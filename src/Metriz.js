@@ -271,7 +271,15 @@ export const Metriz = () =>
             onSelectPeriod={updateSelectedPeriod}
           />
         )}
-        {step == 6 && <HeaderPublish setStep={updateStep} session={session} />}
+        {step == 6 && (
+          <HeaderPublish
+            step={step}
+            setStep={updateStep}
+            session={session}
+            period={selectedPeriod}
+            onSelectPeriod={updateSelectedPeriod}
+          />
+        )}
 
         {/* Sections */}
         {buildSectionView(step)}
@@ -284,7 +292,6 @@ export const Metriz = () =>
           showModal={showSaveModal && !sessionSaved}
           handleClose={() => setShowSaveModal(false)}
         ></SaveModal>
-
       </ErrorBoundary>
 
       {/* Footer */}
