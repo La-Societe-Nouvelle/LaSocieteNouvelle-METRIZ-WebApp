@@ -53,13 +53,7 @@ export class Session
         period.dateEnd
         );
       });
-
-    // Indicators list
-    this.indics = {};
-    this.availablePeriods.forEach((period) => {
-      this.indics[period.periodKey] = props.indics[period.periodKey];
-    });
-      
+    
     // Legal Unit data
     this.legalUnit = new LegalUnit(props.legalUnit);
 
@@ -135,11 +129,6 @@ export class Session
     {
       // periods
       this.availablePeriods.push(period);
-
-      // indics
-      this.indics[period.periodKey] = Object.entries(metaIndics)
-        .filter(([_,metaIndic]) => metaIndic.isAvailable)
-        .map(([indic,_]) => indic);
       
       // impacts data
       this.impactsData[period.periodKey] = new ImpactsData();

@@ -66,11 +66,7 @@ export const updater_2_0_0 = async (sessionData) =>
     intermediateConsumptions : prevSessionData.comparativeData.intermediateConsumption || prevSessionData.comparativeData.intermediateConsumptions,
     netValueAdded :  prevSessionData.comparativeData.netValueAdded,
     production :  prevSessionData.comparativeData.production,
-  };
-  // Indicators list
-  sessionData.indics = {
-    [prevFinancialPeriod.periodKey]: prevSessionData.indics,
-  };
+  };  
 
   prevSessionData = sessionData;
 }

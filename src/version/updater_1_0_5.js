@@ -7,20 +7,4 @@ export const updater_1_0_5 = async (sessionData) =>
 
   sessionData.comparativeData = {};
   sessionData.comparativeData.activityCode = code;
-
-  // set previous analysis to True to disable new indicators assessment with missing data
-  sessionData.indics = [
-    "eco",
-    "art",
-    "soc",
-    "knw",
-    "dis",
-    "geq",
-    "ghg",
-    "mat",
-    "was",
-    "nrg",
-    "wat",
-    "haz",
-  ];
 }
