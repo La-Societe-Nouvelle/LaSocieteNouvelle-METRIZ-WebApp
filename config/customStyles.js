@@ -118,7 +118,7 @@ export const periodSelectStyles = () => ({
     fontSize: "0.8rem",
     borderRadius: "0.5rem",
     boxShadow: "none",
-    width:"100px",
+    width:"140px",
     minHeight: "auto",
     whiteSpace: "nowrap",
     overflow: "hidden",
