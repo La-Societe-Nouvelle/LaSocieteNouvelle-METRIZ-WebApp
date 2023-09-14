@@ -3,7 +3,7 @@ import { saveErrorLog } from '../src/services/StatsService';
 
 
 const apiStats = axios.create({
-  baseURL: "https://api.stats.lasocietenouvelle.org",
+  baseURL: process.env.NEXT_PUBLIC_APISTAT_URL,
   headers: {
     "Content-type": "application/json"
   }

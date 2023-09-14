@@ -7,13 +7,12 @@ export const logUserProgress = async (
   datelasttreatment,
   validatedindics,
 ) => {
-
   const logData = {
     id: id,
     step: step,
     datelasttreatment: datelasttreatment,
     validatedindics: validatedindics,
-    firm: "Version Publique",
+    firm: process.env.NEXT_PUBLIC_VERSION_NAME,
   };
   try {
    await apiStats.post(`/logs/partner/`, logData);

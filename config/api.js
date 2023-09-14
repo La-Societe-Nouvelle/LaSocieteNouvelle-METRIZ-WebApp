@@ -2,7 +2,7 @@ import axios from 'axios';
 import { saveErrorLog } from '../src/services/StatsService';
 
 const api = axios.create({
-  baseURL: 'https://api.lasocietenouvelle.org',
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
 
 });
 
