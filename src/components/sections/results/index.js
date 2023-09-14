@@ -30,6 +30,7 @@ import { getDivisionsOptions } from "/src/utils/metaUtils";
 import { buildSummaryReportContributionIndic } from "./exports/reports/summaryReportGeneratorContribution";
 import { buildSummaryReportIntensityIndic } from "./exports/reports/summaryReportGeneratorIntensity";
 import { buildSummaryReportIndexIndic } from "./exports/reports/summaryReportGeneratorIndex";
+import { buildStandardReport } from "./exports/reports/standardReportGenerator";
 import { buildDataFile } from "./exports/dataFiles/dataFileGenerator";
 import { buildCompleteFile } from "./exports/completeFileGenerator";
 
@@ -92,10 +93,6 @@ const Results = ({
     
   };
 
-  // const handlePeriodChange = (selectedPeriod) => {
-  //   const period = selectedPeriod.value;
-  //   //setPeriod(period);
-  // };
 
   const handleViewChange = (viewCode) => {
     setShowedView(viewCode);
@@ -104,47 +101,58 @@ const Results = ({
   const handleDownload = async (selectedFiles) => {
     setIsGenerating(true);
 
+    const legalUnit = session.legalUnit.corporateName;
+    
+    const year = period.periodKey.slice(2); // dangerous
+    const legalUnitNameFile = legalUnit.replaceAll(/[^a-zA-Z0-9]/g, "_");
+
+    const showAnalyses = selectedFiles.includes("with-analyses");
+    const PDFTitle = `${showedView}_${legalUnitNameFile}_${year}.pdf`;
+
     // Download .zip files
     if (selectedFiles.includes("checkbox-all")) {
-
-
-      const showAnalyses = selectedFiles.includes("with-analyses");
       let ZIPFile = await buildCompleteFile({
         session,
         period,
         showAnalyses
       });
-      saveAs(ZIPFile, `test.zip`);
-    }
 
-    else if (selectedFiles.length>1) {
-      // zip
-    }
+      const zipFileName = `Empreinte-Societale_${legalUnitNameFile}_${year}`;
 
-    // Plaquettes
-    else if (selectedFiles.includes("summary-report")) {
-      //
-      let PDFFile = await buildSummaryReport({
+      saveAs(ZIPFile, zipFileName);
+    } 
+
+    if (selectedFiles.includes("standard-report")) {
+      const PDFFile = await buildStandardReport({
+        session,
+        indic: showedView,
+        period,
+        showAnalyses,
+      });
+      PDFFile.download(PDFTitle);
+    }
+    
+    if (selectedFiles.includes("summary-report")) {
+      const PDFFile = await buildSummaryReport({
         viewCode: showedView,
         session,
         period,
       });
-      let PDFTitle = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.pdf`; // possible to set title inside function
-      PDFFile.download(PDFTitle);
+      PDFFile.download(PDFTitle);    
     }
 
-    else if (selectedFiles.includes("sig-indic-xlsx")) {
+    if (selectedFiles.includes("sig-indic-xlsx")) {
       //
       let XLSXFile = await buildViewDataFile({
         viewCode: showedView,
         session,
         period,
       });
-      const fileName = `${showedView}_${session.legalUnit.corporateName}_${period.periodKey}.xlsx`;
+      const fileName = `${showedView}_${legalUnitNameFile}_${year}.xlsx`;
 
       const url = window.URL.createObjectURL(XLSXFile);
 
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = fileName;
 
@@ -152,9 +160,8 @@ const Results = ({
       a.click();
 
       window.URL.revokeObjectURL(url);
-
     }
-
+  
     setIsGenerating(false);
   };
 
@@ -230,39 +237,6 @@ const Results = ({
             </Form.Group>
           </Form>
         </div>
-        {/* <div className="d-flex align-items-center ">
-          <p className="fw-bold col-form-label me-2 mb-0 ">
-            Période :
-          </p>
-          <Form className="flex-grow-1">
-            <Form.Group
-              as={Row}
-              controlId="formComparativeDivision"
-              className="my-2"
-            >
-              <Col sm={8}>
-                <Select
-                  styles={customSelectStyles}
-                  options={session.availablePeriods.map((period) => {return({
-                      label: period.periodKey,
-                      value: period.periodKey,
-                    })})
-                  }
-                  // components={{
-                  //   IndicatorSeparator: () => null,
-                  // }}
-                  value={{
-                    label: period.periodKey,
-                    value: period.periodKey,
-                  }}
-                  placeholder="Choisissez une division"
-                  onChange={handlePeriodChange}
-                  isDisabled={session.availablePeriods.length<=1}
-                />
-              </Col>
-            </Form.Group>
-          </Form>
-        </div> */}
 
         <div className="indic-result-menu mt-4">
           <div className="d-flex align-items-center justify-content-between">

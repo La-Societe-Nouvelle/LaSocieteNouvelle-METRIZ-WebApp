@@ -11,7 +11,9 @@
     background-color: $secondary;
   }
 }
-
+.btn-download {
+  background-color: $light;
+}
 .btn:disabled{
   color : #fff;
   background-color: $light;

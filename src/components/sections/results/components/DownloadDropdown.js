@@ -8,6 +8,8 @@ const DownloadDropdown = ({ onDownload, view }) => {
       name: "Soldes intermédiaires de gestion (.xlsx)",
     },
     { id: "summary-report", name: "Plaquette (.pdf)" },
+
+    { id: "standard-report", name: "Rapport (.pdf)" },
   ];
 
   const [selectedFileIds, setSelectedFileIds] = useState([]);
@@ -42,7 +44,7 @@ const DownloadDropdown = ({ onDownload, view }) => {
         const newSelected = event.target.checked
           ? [
               ...prevSelected.filter(
-                (id) => id !== "checkbox-all" && id !== "with-analyses"
+                (id) => id !== "checkbox-all" 
               ),
               fileId,
             ]
@@ -64,6 +66,10 @@ const DownloadDropdown = ({ onDownload, view }) => {
     onDownload(selectedFileIds, view);
   };
 
+  const isDisabled =
+    selectedFileIds.length === 0 ||
+    (selectedFileIds.length === 1 && selectedFileIds[0] === "with-analyses");
+  
   return (
     <div className="me-2">
       <Dropdown autoClose={"outside"}>
@@ -97,9 +103,12 @@ const DownloadDropdown = ({ onDownload, view }) => {
               checked={selectedFileIds.includes("checkbox-all")}
               onChange={(event) => handleCheckboxChange(event, "checkbox-all")}
             />
+          </div>
+
+          <Dropdown.Divider></Dropdown.Divider>
+          <div className="dropdown-item">
             <Form.Check
               type="checkbox"
-              className="ms-2"
               id={`with-analyses`}
               label={
                 <label htmlFor={`with-analyses`}>
@@ -112,13 +121,12 @@ const DownloadDropdown = ({ onDownload, view }) => {
             />
           </div>
 
-          <Dropdown.Divider></Dropdown.Divider>
           <Dropdown.Item onClick={handleDownload}>
             <Button
               size="sm"
               variant="download"
               className="w-100"
-              disabled={selectedFileIds.length == 0}
+              disabled={isDisabled}
             >
               Télécharger les fichiers
             </Button>
