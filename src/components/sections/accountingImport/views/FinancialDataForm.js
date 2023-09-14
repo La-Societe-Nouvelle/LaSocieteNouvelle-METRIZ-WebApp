@@ -134,7 +134,6 @@ export const FinancialDataForm = ({
 
   const nextModal = () => 
   {
-    console.log(FECData);
     let hasAssetAccounts = Object.keys(FECData.meta.accounts)
       .some((accountNum) => /^(28|29|39)/.test(accountNum));
     let hasStockAccounts = Object.keys(FECData.meta.accounts)
@@ -209,8 +208,8 @@ export const FinancialDataForm = ({
       session.id = FECData.id; // anonymisation id
 
       // console logs
-      console.log("Periode : "+financialPeriod);
-      console.log("Session id : "+session.id);
+      console.log("Periode : ", financialPeriod);
+      console.log("Session id : ", session.id);
       
       setIsDataLoaded(true);
       setShowViewsModals(false);
@@ -230,8 +229,7 @@ export const FinancialDataForm = ({
     );
   };
 
-  console.log(FECData);
-  console.log(showViewsModals);
+
   return (
     <>
       <Row>

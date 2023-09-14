@@ -132,7 +132,7 @@ const ProvidersTable = ({
         </tbody>
       </Table>
       {showSignificativeNote && 
-        <p class=" border-warning">
+        <p className=" border-warning">
           <i
             className="bi bi-exclamation-triangle text-warning"
             title="Grand risque d'imprécision"

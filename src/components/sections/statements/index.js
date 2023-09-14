@@ -41,10 +41,6 @@ const DirectImpacts = ({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    //console.log("use effect");
-  },[]);
-
-  useEffect(() => {
     let selectedStatements = Object.entries(statementsStatus)
       .filter(([_,status]) => status.status!="unselect")
       .map(([indic,_]) => indic);
@@ -77,7 +73,6 @@ const DirectImpacts = ({
     await session.comparativeData.fetchComparativeData(selectedStatements);
 
     // fetch analysis
-    console.log("build analysis");
     await session.buildAnalysis(period);
 
     setIsLoading(false);

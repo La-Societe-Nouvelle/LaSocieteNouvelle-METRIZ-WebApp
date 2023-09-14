@@ -53,7 +53,6 @@ export const SyncInitialStatesView = ({
       try {
         await account.updateInitialStateFootprintFromRemote();
       } catch (error) {
-        console.log(error);
         setErrorAPI(true)
         break;
       }

@@ -5,7 +5,6 @@ import metaIndics from "../lib/indics.json";
 
 // Objects
 import { Indicator } from "/src/footprintObjects/Indicator";
-import { SocialFootprint } from "./footprintObjects/SocialFootprint";
 
 // Children
 import { LegalUnit } from "/src/LegalUnit.js";

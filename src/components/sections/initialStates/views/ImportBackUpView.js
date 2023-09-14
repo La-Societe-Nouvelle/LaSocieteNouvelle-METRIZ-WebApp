@@ -63,7 +63,7 @@ export const ImportBackUpView = ({
         // --------------------------------------------------
 
         const loadedSessionChecking = await checkLoadedSession(session,loadedSession);
-        console.log(loadedSessionChecking);
+    
         if (loadedSessionChecking.checked) 
         {
           // Update session with back up
@@ -86,7 +86,6 @@ export const ImportBackUpView = ({
       }
 
       catch (error) {
-        console.log(error);
         // API error
         if(error.message == "Network Error") {
           setErrorAPI(true);
@@ -103,11 +102,9 @@ export const ImportBackUpView = ({
     try 
     {
       // read file
-      console.log(file);
       reader.readAsText(file);
     } 
     catch (error) {
-      console.log(error);
       setTitlePopup("Erreur - Fichier");
       setMessagePopup("Fichier non lisible. Veuillez vérifier le fichier et réessayer");
       setShowPopup(true);

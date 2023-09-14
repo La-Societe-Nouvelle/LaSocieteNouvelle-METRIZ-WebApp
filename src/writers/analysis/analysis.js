@@ -52,8 +52,7 @@ export const getAnalysisFromChatGPT = async ({
         'Authorization': `Bearer ${apiKey}`,
       },
     });
-    console.log(apiKey)
-    console.log(response)
+ 
     const analysisOpenIA = response.data.choices[0].message;
     return ({
       analysis: analysisOpenIA.content,
@@ -61,8 +60,7 @@ export const getAnalysisFromChatGPT = async ({
     });
   } 
   catch (error) {
-    console.log(error)
-    console.log('apikey',apiKey)
+  
     console.error('Error generating code:', error.message);
     return ({
       analysis: "",
@@ -100,7 +98,6 @@ const buildRequestOpenAI = ({
       // --------------------------------------------------
         + questions[indic];
     
-    console.log(request);
     return request;
 }
 
@@ -306,7 +303,6 @@ const buildImpactsHAZ = (impactsData) =>
 
 const buildImpactsIDR = (impactsData) => 
 {
-  console.log(impactsData.interdecileRange);
   const { 
     hasEmployees,
     interdecileRange

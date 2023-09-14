@@ -100,11 +100,9 @@ export const Metriz = () =>
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des données comptables");
-    console.log("Données comptables : ");
+    console.log("Données comptables : ", session.financialData);
     console.log(session.financialData);
-    console.log("Objet session : ");
-    console.log(session);
-    console.log("--------------------------------------------------");
+    console.log("Objet session : ", session);
 
     // validation
     let stepValidation = checkFinancialData(session,selectedPeriod);
@@ -134,9 +132,7 @@ export const Metriz = () =>
     console.log("Etats initiaux : ");
     console.log(session.financialData.immobilisations);
     console.log(session.financialData.stocks);
-    console.log("Objet session : ");
-    console.log(session);
-    console.log("--------------------------------------------------");
+    console.log("Objet session : ", session);
 
     // validation
     let stepValidation = checkInitialStates(session,selectedPeriod);
@@ -159,11 +155,8 @@ export const Metriz = () =>
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des empreintes fournisseurs");
-    console.log("Données fournisseurs : ");
-    console.log(session.financialData.providers);
-    console.log("Objet session : ");
-    console.log(session);
-    console.log("--------------------------------------------------");
+    console.log("Données fournisseurs : ", session.financialData.providers);
+    console.log("Objet session : ", session);
 
     // validation
     let stepValidation = checkExternalFootprints(session,selectedPeriod);
@@ -186,11 +179,8 @@ export const Metriz = () =>
     // console logs
     console.log("--------------------------------------------------");
     console.log("[SESSION] Validation des déclarations d'impacts directs");
-    console.log("Données d'impacts : ");
-    console.log(session.impactsData[selectedPeriod.periodKey]);
-    console.log("Objet session : ");
-    console.log(session);
-    console.log("--------------------------------------------------");
+    console.log("Données d'impacts : ",session.impactsData[selectedPeriod.periodKey]);
+    console.log("Objet session : ", session);
     
     // validation
     let stepValidation = checkImpactsStatements(session,selectedPeriod);

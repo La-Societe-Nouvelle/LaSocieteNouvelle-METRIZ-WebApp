@@ -69,11 +69,6 @@ export const IndicatorMainAggregatesTable = ({
 
   // build aggregates
   useEffect(async () => {
-    console.log("------------")
-    console.log(period);
-    console.log(periods)
-
-    // to fix : rebuild aggregates on period change before render 
 
     const intermediateConsumptionsAggregates =
       await buildIntermediateConsumptionsAggregates(

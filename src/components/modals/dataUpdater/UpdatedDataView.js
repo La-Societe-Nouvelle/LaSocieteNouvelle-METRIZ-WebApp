@@ -72,10 +72,7 @@ const UpdateDataView = ({
   }, [prevSession,updatedSession]);
 
   useEffect(async () => {
-    //console.log(isSessionUpdated);
-    // if (isSessionUpdated) {
-    //   updatePrevSession(updatedSession);
-    // }
+
   }, [isSessionUpdated]);
 
   // re-compute footprints
