@@ -58,6 +58,11 @@ const StatementGEQ = ({
     if ((impactsData.wageGap) != wageGap) {
       setWageGap(impactsData.wageGap || "");
     }
+
+    if (!impactsData.hasEmployees) {
+      setWageGap(0);
+    }
+
   }, [impactsData.hasEmployees, impactsData.wageGap]);
 
   // radio button - has employees

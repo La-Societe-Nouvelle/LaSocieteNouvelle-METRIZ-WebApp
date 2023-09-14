@@ -50,13 +50,17 @@ const StatementIDR = ({
   }, [hasEmployees,interdecileRange]);
 
   // update state when props update
-  useEffect(() => 
-  {
-    if (impactsData.hasEmployees!=hasEmployees) {
+  useEffect(() => {
+
+    if (impactsData.hasEmployees != hasEmployees) {
       setHasEmployees(impactsData.hasEmployees);
     }
-    if ((impactsData.interdecileRange)!=interdecileRange) {
+    if (impactsData.interdecileRange != interdecileRange) {
       setInterdecileRange(impactsData.interdecileRange || "");
+    }
+
+    if (!impactsData.hasEmployees) {
+      setInterdecileRange(1.0);
     }
   }, [impactsData.hasEmployees, impactsData.interdecileRange]);
 
