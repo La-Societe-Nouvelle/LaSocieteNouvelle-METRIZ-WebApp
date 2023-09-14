@@ -15,7 +15,7 @@ export const logUserProgress = async (
     firm: process.env.NEXT_PUBLIC_VERSION_NAME,
   };
   try {
-   await apiStats.post(`/logs/partner/`, logData);
+    await apiStats.post(`/logs/partner/`, logData);
   } catch (error) {
     console.error("Error while logging user progress:", error);
     throw Error(error.message)
@@ -34,7 +34,7 @@ errors,
     errors: errors,
   };
   try {
-  await stat.post(`logs/error/`, errorLog);
+  await apiStats.post(`logs/error/`, errorLog);
   } catch (error) {
     console.error("Error while logging user error :", error);
     throw Error(error.message)

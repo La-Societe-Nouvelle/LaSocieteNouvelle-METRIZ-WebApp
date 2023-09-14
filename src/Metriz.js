@@ -24,7 +24,6 @@ import { Footer } from "/src/components/pageComponents/Footer";
 import { logUserProgress } from "/src/services/StatsService";
 
 // Utils
-import { getCurrentDateString } from "/src/utils/periodsUtils";
 import { getMoreRecentYearlyPeriod } from "/src/utils/periodsUtils";
 import { 
   checkExternalFootprints, 
@@ -49,7 +48,7 @@ export const Metriz = () =>
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [sessionSaved, setSessionSaved] = useState(false); 
 
-  const currentDate = getCurrentDateString();
+  const currentDate = new Date();
 
   useEffect(() => {
     window.scrollTo({
