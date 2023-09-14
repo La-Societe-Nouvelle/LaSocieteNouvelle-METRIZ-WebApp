@@ -52,8 +52,7 @@ export const IndicatorMainAggregatesTable = ({
   if (prevPeriod) periods.push(prevPeriod);
   // Meta data ----------------------------------------
   
-    const { unit, nbDecimals, unitGrossImpact} = metaIndics[indic];
-
+    const { unit, nbDecimals, unitAbsolute} = metaIndics[indic];
   // --------------------------------------------------
 
   // state
@@ -119,12 +118,12 @@ export const IndicatorMainAggregatesTable = ({
             <td className="text-end">&euro; </td>
             <td className="text-end">{unit}</td>
             <td className="text-end  pe-3">%</td>
-            {printGrossImpact && <td className="text-end"> {unitGrossImpact}</td> }
+            {printGrossImpact && <td className="text-end"> {unitAbsolute}</td> }
             {prevPeriod && (
               <>
                 <td className="text-end border-left">{unit}</td>
                 <td className="text-end  pe-3">%</td>
-                {printGrossImpact && <td className="text-end  pe-3"> {unitGrossImpact}</td>}
+                {printGrossImpact && <td className="text-end  pe-3"> {unitAbsolute}</td>}
               </>
             )}
           </tr>
